@@ -1,0 +1,17 @@
+set(BOARD_SOURCES board/linux/port.c CACHE INTERNAL "")
+
+set(BOARD_DIR_INCLUDES  board/linux CACHE INTERNAL "")
+
+set(BOARD_COMPILE_FEATURES
+
+        CACHE INTERNAL "")
+
+set(BOARD_COMPILE_DEFINITIONS
+
+        CACHE INTERNAL ""
+        )
+
+set(BOARD_COMPILE_OPTIONS
+
+        CACHE INTERNAL ""
+        )
