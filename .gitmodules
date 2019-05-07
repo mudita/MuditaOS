@@ -1,6 +1,9 @@
-[submodule "module-core"]
-	path = module-core
-	url = git@github.com:muditacom/module-core.git
 [submodule "module-gui"]
 	path = module-gui
 	url = git@github.com:muditacom/module-gui.git
+[submodule "module-utils"]
+	path = module-utils
+	url = git@github.com:muditacom/module-utils.git
+[submodule "module-sys"]
+	path = module-sys
+	url = git@github.com:muditacom/module-sys.git

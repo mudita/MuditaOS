@@ -99,7 +99,7 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
 target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
 
-        ${CMAKE_CURRENT_LIST_DIR}/main.cpp
+        source/main.cpp
 
         )
 
@@ -107,19 +107,25 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/config)
 
-message("add_subdirectory module-core")
-add_subdirectory(module-core)
+message("${PROJECT_NAME}: add_subdirectory module-sys")
+add_subdirectory(module-sys)
 include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/module-core" )
+        "${CMAKE_CURRENT_LIST_DIR}/module-sys" )
 
 
-message("add_subdirectory module-gui")
+message("${PROJECT_NAME}: add_subdirectory module-gui")
 add_subdirectory(module-gui)
 include_directories(${CMAKE_PROJECT_NAME} PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/module-gui" )
+
+message("${PROJECT_NAME}: add_subdirectory module-utils")
+add_subdirectory(module-utils)
+include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+        "${CMAKE_CURRENT_LIST_DIR}/module-utils" )
+
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-core ${LIBRARY_GUI})
+target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-sys  ${LIBRARY_GUI})
