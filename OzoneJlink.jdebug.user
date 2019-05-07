@@ -1,0 +1,20 @@
+
+Breakpoint=3886081910: 136: 0, State=BP_STATE_ON
+OpenDocument="SystemManager.cpp", FilePath="/home/mati/Software/Mudita/git/PurePhone/module-core/SystemManager/SystemManager.cpp", Line=0
+OpenDocument="startup_mimxrt1052.cpp", FilePath="/home/mati/Software/Mudita/git/PurePhone/board/rt1051/startup_mimxrt1052.cpp", Line=678
+OpenDocument="main.cpp", FilePath="/home/mati/Software/Mudita/git/PurePhone/main.cpp", Line=0
+OpenToolbar="Debug", Floating=0, x=0, y=0
+OpenWindow="Call Stack", DockArea=RIGHT, x=0, y=2, w=766, h=191, FilterBarShown=0
+OpenWindow="Registers 1", DockArea=RIGHT, x=0, y=3, w=766, h=239, FilterBarShown=0, FilteredItems=[], RefreshRate=1, ToolbarShown=1
+OpenWindow="Source Files", DockArea=LEFT, x=0, y=0, w=530, h=862, FilterBarShown=1
+OpenWindow="Disassembly", DockArea=RIGHT, x=0, y=0, w=766, h=222, FilterBarShown=0, ExecCountersShown=0
+OpenWindow="Source", x=0, y=0, w=0, h=0, FilterBarShown=0, ExecCountersShown=0
+OpenWindow="Memory 1", DockArea=BOTTOM, x=1, y=0, w=1276, h=462, FilterBarShown=0, EditorAddress=0x0
+OpenWindow="Local Data", DockArea=RIGHT, x=0, y=1, w=766, h=192, FilterBarShown=0
+OpenWindow="Console", DockArea=BOTTOM, x=0, y=0, w=1278, h=462, FilterBarShown=0
+TableHeader="Local Data", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Name";"Value";"Location";"Size";"Type";"Access";"Scope"], ColWidths=[57;145;70;48;51;64;331]
+TableHeader="Call Stack", SortCol="Function", SortOrder="ASCENDING", VisibleCols=["Function";"Stack Frame";"Source";"PC";"Return Address";"Stack Used"], ColWidths=[120;80;50;29;94;393]
+TableHeader="tableWidgetSamples", SortCol="Index", SortOrder="ASCENDING", VisibleCols=["Index";"Time";"Channel 0"], ColWidths=[84;119;126]
+TableHeader="Task List", SortCol="None", SortOrder="ASCENDING", VisibleCols=["Name";"Run Count";"Priority";"Status";"Timeout";"Stack Info (Free / Size)";"ID";"Mutex Count";"Notified Value";"Notify State"], ColWidths=[110;110;110;110;110;110;110;110;110;110]
+TableHeader="Registers 1", SortCol="Name", SortOrder="ASCENDING", VisibleCols=["Auto";"Name";"Value";"Description"], ColWidths=[37;44;42;628]
+TableHeader="Source Files", SortCol="File", SortOrder="ASCENDING", VisibleCols=["File";"Status";"Size";"#Insts";"Path"], ColWidths=[246;59;48;57;679]

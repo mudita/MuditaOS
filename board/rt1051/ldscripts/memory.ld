@@ -1,0 +1,21 @@
+/*
+ * GENERATED FILE - DO NOT EDIT
+ * (c) Code Red Technologies Ltd, 2008-2013
+ * (c) NXP Semiconductors 2013-2018
+ * Generated linker script file for MIMXRT1052xxxxB
+ * Created from memory.ldt by FMCreateLinkMemory
+ * Using Freemarker v2.3.23
+ * MCUXpresso IDE v10.2.0 [Build 759] [2018-05-15]  on 2018-07-30 10:43:20
+ */
+MEMORY
+{
+  	/* Define each memory region */
+  	SRAM_OC (rwx) : ORIGIN = 0x20200000, LENGTH = 0x10000 /* 64K bytes (alias RAM) */  
+  	/*SRAM_ITC (rwx) : ORIGIN = 0x0, LENGTH = 0x0*/ /* 0K bytes (alias RAM2) */  
+  	SRAM_DTC_TEXT (rwx) : ORIGIN = 0x20000000, LENGTH = 0x6000 /* 24K bytes (alias RAM3) */  
+  	SRAM_DTC (rwx) : ORIGIN = 0x20006000, LENGTH = 0x6A000 /* 434K bytes (alias RAM3) */  
+  	BOARD_SDRAM_TEXT (rx) : ORIGIN = 0x80000000, LENGTH = 0x0400000 /* 4M bytes for application code */ 
+  	BOARD_SDRAM_OS_DATA (rw) : ORIGIN = 0x80400000, LENGTH = 0x2000 /* 8k bytes (alias RAM4) */
+  	BOARD_SDRAM_NOCACHE (rwx) : ORIGIN = 0x80402000, LENGTH = 0x3FE000 /* 4M-8k bytes for non cacheable data*/
+  	BOARD_SDRAM_HEAP (rwx) : ORIGIN = 0x80800000, LENGTH = 0x0800000 /* 8M bytes for heap (alias RAM4) */  
+}

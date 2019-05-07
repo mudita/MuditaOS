@@ -1,0 +1,33 @@
+set(PROJECT_TARGET "TARGET_Linux" CACHE INTERNAL "")
+
+set(TARGET_SOURCES  CACHE INTERNAL "")
+
+set(TARGET_DIR_INCLUDES   CACHE INTERNAL "")
+
+set(TARGET_COMPILE_FEATURES
+
+        CACHE INTERNAL "")
+
+set(TARGET_COMPILE_DEFINITIONS
+
+        CACHE INTERNAL ""
+        )
+
+set(TARGET_COMPILE_OPTIONS
+
+        CACHE INTERNAL ""
+        )
+
+set(TARGET_LINKER_FLAGS
+
+        "-Xlinker"
+
+        CACHE INTERNAL ""
+        )
+
+set(TARGET_LIBRARIES
+
+        pthread
+
+        CACHE INTERNAL ""
+        )
