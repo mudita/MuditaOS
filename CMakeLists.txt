@@ -112,7 +112,6 @@ target_sources(${CMAKE_PROJECT_NAME}
 
         source/main.cpp
         source/memory/usermem.c
-        source/memory/memwrap.cpp
 
         )
 

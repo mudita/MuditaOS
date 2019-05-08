@@ -7,7 +7,7 @@ extern "C" {
 #endif
 
 // The configured project target
-#define CONFIG_TARGET TARGET_Linux
+#define CONFIG_TARGET 
 
 
 #ifdef __cplusplus
