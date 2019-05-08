@@ -1,10 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "SystemManager/SystemManager.hpp"
-
-#define LOG_MAIN
-#define LOG_USE_COLOR
-#include "log/log.h"
+#include "log/log.hpp"
 
 
 class BlinkyService : public core::Service {
@@ -26,7 +23,7 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-        LOG_DEBUG("Tick handler!");
+        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization

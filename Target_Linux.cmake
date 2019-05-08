@@ -2,7 +2,11 @@ set(PROJECT_TARGET "TARGET_Linux" CACHE INTERNAL "")
 
 set(TARGET_SOURCES  CACHE INTERNAL "")
 
-set(TARGET_DIR_INCLUDES   CACHE INTERNAL "")
+set(TARGET_DIR_INCLUDES
+
+        ${CMAKE_CURRENT_LIST_DIR}/board/linux
+
+        CACHE INTERNAL "")
 
 set(TARGET_COMPILE_FEATURES
 
@@ -15,19 +19,22 @@ set(TARGET_COMPILE_DEFINITIONS
 
 set(TARGET_COMPILE_OPTIONS
 
-        CACHE INTERNAL ""
-        )
-
-set(TARGET_LINKER_FLAGS
-
-        "-Xlinker"
+        -fsanitize=address
 
         CACHE INTERNAL ""
         )
+
 
 set(TARGET_LIBRARIES
 
         pthread
+
+        CACHE INTERNAL ""
+        )
+
+set(TARGET_LINK_OPTIONS
+
+        -fsanitize=address
 
         CACHE INTERNAL ""
         )

@@ -57,14 +57,18 @@ set(TARGET_SOURCES
         CACHE INTERNAL ""
         )
 
-set(TARGET_DIR_INCLUDES  CACHE INTERNAL "" )
+set(TARGET_DIR_INCLUDES
+
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051
+
+        CACHE INTERNAL "" )
 
 set(TARGET_LIBRARIES
 
         CACHE INTERNAL ""
         )
 
-set(TARGET_LINKER_FLAGS
+set(TARGET_LINK_OPTIONS
 
         CACHE INTERNAL ""
         )

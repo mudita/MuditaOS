@@ -5,6 +5,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project(PurePhone)
 
 include(env.cmake)
+include(config/ProjectConfig.cmake)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")
@@ -13,6 +14,13 @@ message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
 message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
 set(CMAKE_CXX_STANDARD 14)
+
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file(
+        ${CMAKE_CURRENT_LIST_DIR}/config_target.h.in
+        ${CMAKE_CURRENT_LIST_DIR}/config/config_target.h
+)
 
 add_executable(${PROJECT_NAME} "")
 
@@ -47,6 +55,7 @@ message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
 set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building" )
 message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DFSL_RTOS_FREE_RTOS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DUSB_STACK_FREERTOS)
@@ -76,8 +85,10 @@ target_compile_options(${PROJECT_NAME} PUBLIC -fdata-sections)
 target_compile_options(${PROJECT_NAME} PUBLIC -MMD )
 target_compile_options(${PROJECT_NAME} PUBLIC -MP)
 target_compile_options(${PROJECT_NAME} PUBLIC -fno-builtin)
+#target_compile_options(${PROJECT_NAME} PUBLIC -Wl,--wrap=malloc -Wl,--wrap=free)
 
-target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
+target_compile_features(${PROJECT_NAME} PUBLIC
+        ${TARGET_COMPILE_FEATURES})
 
 
 # Warnings related flags
@@ -100,6 +111,8 @@ target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
 
         source/main.cpp
+        source/memory/usermem.c
+        source/memory/memwrap.cpp
 
         )
 
@@ -109,23 +122,21 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR
 
 message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
-include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/module-sys" )
 
 
-message("${PROJECT_NAME}: add_subdirectory module-gui")
+#[[message("${PROJECT_NAME}: add_subdirectory module-gui")
 add_subdirectory(module-gui)
 include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/module-gui" )
+        "${CMAKE_CURRENT_LIST_DIR}/module-gui" )]]
 
 message("${PROJECT_NAME}: add_subdirectory module-utils")
 add_subdirectory(module-utils)
-include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/module-utils" )
 
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-sys  ${LIBRARY_GUI})
+target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-sys module-utils  )
+
+target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
