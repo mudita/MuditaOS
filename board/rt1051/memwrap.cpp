@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 extern "C" {
-#include "../../source/memory/usermem.h"
+#include "memory/usermem.h"
 }
 
 
