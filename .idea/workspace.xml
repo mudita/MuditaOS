@@ -1,30 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
-    <generated>
-      <config projectName="PurePhone" targetName="module-sys" />
-      <config projectName="PurePhone" targetName="module-utils" />
-      <config projectName="PurePhone" targetName="PurePhone" />
-      <config projectName="PurePhone" targetName="module-os" />
-    </generated>
+    <generated />
   </component>
   <component name="CMakeSettings">
     <configurations>
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../Target_Linux.cmake" GENERATION_DIR="build" />
-      <configuration PROFILE_NAME="CrossCompile" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Default" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../Target_RT1051.cmake" GENERATION_DIR="build" />
     </configurations>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6590d9a-c736-48a1-9d2f-c0dcb87cb35d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config_target.h" beforeDir="false" afterPath="$PROJECT_DIR$/config/config_target.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/MIMXRT1051.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/MIMXRT1051_features.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/arm_common_tables.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/arm_const_structs.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/arm_math.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/chip.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_armcc.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_armclang.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_compiler.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_gcc.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_iccarm.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_version.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/core_armv8mbl.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/core_armv8mml.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/core_cm7.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/fsl_device_registers.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/macros.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/mpu_armv7.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/mpu_armv8.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/system_MIMXRT1051.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/board/rt1051/system_MIMXRT1051.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/module-gui" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/module-gui/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui/module-utils" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-sys" beforeDir="false" afterPath="$PROJECT_DIR$/module-sys" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-utils/module-os" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils/module-os" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-crosscompile/" />
@@ -38,13 +47,12 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/source/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
+            <state relative-caret-position="480">
               <caret line="32" selection-start-line="32" selection-end-line="32" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
@@ -65,8 +73,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Target_RT1051.cmake">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="468">
-              <caret line="69" column="9" selection-start-line="69" selection-start-column="9" selection-end-line="69" selection-end-column="9" />
+            <state relative-caret-position="1020">
+              <caret line="68" column="9" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -74,7 +82,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
+            <state relative-caret-position="705">
               <caret line="47" column="62" selection-start-line="47" selection-start-column="62" selection-end-line="47" selection-end-column="62" />
             </state>
           </provider>
@@ -102,8 +110,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/module-utils/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="555">
-              <caret line="37" column="31" selection-start-line="37" selection-start-column="31" selection-end-line="37" selection-end-column="31" />
+            <state relative-caret-position="915">
+              <caret line="61" column="31" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -113,15 +121,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="825">
               <caret line="55" selection-start-line="55" selection-end-line="55" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module-utils/Target_Linux.cmake">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" selection-start-line="7" selection-end-line="7" />
             </state>
           </provider>
         </entry>
@@ -295,11 +294,12 @@
       <workItem from="1557319555714" duration="1866000" />
       <workItem from="1557325146277" duration="237000" />
       <workItem from="1557332150782" duration="1921000" />
+      <workItem from="1557386687141" duration="864000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="69819000" />
+    <option name="totallyTimeSpent" value="70683000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -312,8 +312,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1037" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3244397" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.32817504" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -325,10 +326,10 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3297546" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Messages" order="8" weight="0.32741398" />
-      <window_info anchor="bottom" id="Terminal" order="9" visible="true" weight="0.32741398" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.32705098" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="11" weight="0.32963374" />
-      <window_info anchor="bottom" id="CMake" order="12" weight="0.3163152" />
+      <window_info active="true" anchor="bottom" id="CMake" order="12" visible="true" weight="0.3163152" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -429,16 +430,8 @@
     <entry file="file://$PROJECT_DIR$/module-utils/README.md">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/module-sys/Target_RT1051.cmake">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module-sys/Target_Linux.cmake">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="18" selection-start-column="18" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/module-sys/Target_RT1051.cmake" />
+    <entry file="file://$PROJECT_DIR$/module-sys/Target_Linux.cmake" />
     <entry file="file://$PROJECT_DIR$/config/project_config.h" />
     <entry file="file://$PROJECT_DIR$/module-utils/log/log.hpp">
       <provider selected="true" editor-type-id="text-editor">
@@ -482,16 +475,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module-sys/module-os/Target_Linux.cmake">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="24" selection-start-line="2" selection-start-column="24" selection-end-line="2" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module-sys/module-os/Target_RT1051.cmake">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/module-sys/module-os/Target_Linux.cmake" />
+    <entry file="file://$PROJECT_DIR$/module-sys/module-os/Target_RT1051.cmake" />
     <entry file="file://$PROJECT_DIR$/module-utils/module-os/board/rt1051/port.c">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="480">
@@ -579,14 +564,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module-utils/module-os/Target_Linux.cmake">
+    <entry file="file://$PROJECT_DIR$/module-utils/module-os/Target_Linux.cmake" />
+    <entry file="file://$PROJECT_DIR$/module-utils/module-os/Target_RT1051.cmake" />
+    <entry file="file://$PROJECT_DIR$/source/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        <state relative-caret-position="480">
+          <caret line="32" selection-start-line="32" selection-end-line="32" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module-utils/module-os/Target_RT1051.cmake">
+    <entry file="file://$PROJECT_DIR$/Target_RT1051.cmake">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1020">
+          <caret line="68" column="9" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="705">
+          <caret line="47" column="62" selection-start-line="47" selection-start-column="62" selection-end-line="47" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config/config_target.h">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/config/ProjectConfig.cmake">
@@ -601,8 +605,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/module-utils/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="37" column="31" selection-start-line="37" selection-start-column="31" selection-end-line="37" selection-end-column="31" />
+        <state relative-caret-position="915">
+          <caret line="61" column="31" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
         </state>
       </provider>
     </entry>
@@ -617,33 +621,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Target_RT1051.cmake">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="69" column="9" selection-start-line="69" selection-start-column="9" selection-end-line="69" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="47" column="62" selection-start-line="47" selection-start-column="62" selection-end-line="47" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/config/config_target.h">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/source/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
