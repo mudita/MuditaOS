@@ -5,4 +5,9 @@ cmake-build-crosscompile/
 
 build/
 
+
+.vscode/ipch
+
 lib/
+
+config/config_target\.h

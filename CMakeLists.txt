@@ -85,7 +85,6 @@ target_compile_options(${PROJECT_NAME} PUBLIC -fdata-sections)
 target_compile_options(${PROJECT_NAME} PUBLIC -MMD )
 target_compile_options(${PROJECT_NAME} PUBLIC -MP)
 target_compile_options(${PROJECT_NAME} PUBLIC -fno-builtin)
-#target_compile_options(${PROJECT_NAME} PUBLIC -Wl,--wrap=malloc -Wl,--wrap=free)
 
 target_compile_features(${PROJECT_NAME} PUBLIC
         ${TARGET_COMPILE_FEATURES})
@@ -123,10 +122,10 @@ message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
 
 
-#[[message("${PROJECT_NAME}: add_subdirectory module-gui")
-add_subdirectory(module-gui)
-include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-        "${CMAKE_CURRENT_LIST_DIR}/module-gui" )]]
+# message("${PROJECT_NAME}: add_subdirectory module-gui")
+# add_subdirectory(module-gui)
+# include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+#         "${CMAKE_CURRENT_LIST_DIR}/module-gui" )
 
 message("${PROJECT_NAME}: add_subdirectory module-utils")
 add_subdirectory(module-utils)

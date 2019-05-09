@@ -1,0 +1,10 @@
+[
+  {
+    "name": "RT1051",
+    "toolchainFile": "Target_RT1051.cmake"
+  },
+  {
+    "name": "Linux",
+    "toolchainFile": "Target_Linux.cmake"
+  }
+  ]
