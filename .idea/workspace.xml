@@ -10,30 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6590d9a-c736-48a1-9d2f-c0dcb87cb35d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/MIMXRT1051.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/MIMXRT1051_features.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/arm_common_tables.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/arm_const_structs.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/arm_math.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/chip.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_armcc.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_armclang.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_compiler.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_gcc.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_iccarm.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/cmsis_version.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/core_armv8mbl.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/core_armv8mml.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/core_cm7.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/fsl_device_registers.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/macros.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/mpu_armv7.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/mpu_armv8.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/system_MIMXRT1051.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/board/rt1051/system_MIMXRT1051.h" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/module-gui" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/module-gui/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui/module-utils" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-sys" beforeDir="false" afterPath="$PROJECT_DIR$/module-sys" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-utils/module-os" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils/module-os" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-crosscompile/" />
