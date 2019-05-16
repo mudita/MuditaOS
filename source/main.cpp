@@ -16,7 +16,7 @@ public:
     ~BlinkyService(){
     }
 
-    // Invoked when service received data message
+    // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
         return std::make_shared<sys::ResponseMessage>();
     }
