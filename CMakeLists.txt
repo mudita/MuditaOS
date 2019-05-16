@@ -13,15 +13,6 @@ message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
 message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
 message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
-set(CMAKE_CXX_STANDARD 14)
-
-# configure a header file to pass some of the CMake settings
-# to the source code
-configure_file(
-        ${CMAKE_CURRENT_LIST_DIR}/config_target.h.in
-        ${CMAKE_CURRENT_LIST_DIR}/config/config_target.h
-)
-
 add_executable(${PROJECT_NAME} "")
 
 
@@ -57,6 +48,7 @@ message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DFSL_RTOS_FREE_RTOS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DUSB_STACK_FREERTOS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING)

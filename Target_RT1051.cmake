@@ -19,6 +19,11 @@ set(TARGET_COMPILE_DEFINITIONS
 
         -DCPU_MIMXRT1051DVL6B_cm7
         -DCPU_MIMXRT1051DVL6B
+        -D__MCUXPRESSO
+        -D__USE_CMSIS
+        -D__NEWLIB__
+        -DSKIP_SYSCLK_INIT
+        -D_HAVE_SQLITE_CONFIG_H
 
 
         CACHE INTERNAL ""
@@ -37,6 +42,8 @@ set(TARGET_COMPILE_OPTIONS
         -MP
         -fno-builtin
         -mno-unaligned-access
+
+        -Wno-psabi
 
 
         CACHE INTERNAL ""
