@@ -63,11 +63,11 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 int main() {
 
-    //auto sysmgr = std::make_shared<sys::SystemManager>(5000);
+    auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
-    //sysmgr->StartSystem();
+    sysmgr->StartSystem();
 
-    //sysmgr->RegisterInitFunction(SystemStart);
+    sysmgr->RegisterInitFunction(SystemStart);
 
     cpp_freertos::Thread::StartScheduler();
 
