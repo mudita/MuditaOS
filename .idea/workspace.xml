@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
-    <generated />
+    <generated>
+      <config projectName="PurePhone" targetName="module-sys" />
+      <config projectName="PurePhone" targetName="module-utils" />
+      <config projectName="PurePhone" targetName="PurePhone" />
+      <config projectName="PurePhone" targetName="module-os" />
+    </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
@@ -12,9 +17,6 @@
     <list default="true" id="d6590d9a-c736-48a1-9d2f-c0dcb87cb35d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/module-gui" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/module-gui/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui/module-utils" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-sys" beforeDir="false" afterPath="$PROJECT_DIR$/module-sys" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-utils/module-os" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils/module-os" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-crosscompile/" />
@@ -28,6 +30,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
@@ -240,6 +243,34 @@
       </list>
     </option>
   </component>
+  <component name="RunManager" selected="CMake Application.PurePhone">
+    <configuration name="PurePhone" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="PurePhone" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="PurePhone" RUN_TARGET_NAME="PurePhone">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="module-os" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="module-os" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="module-sys" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="module-sys" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="module-utils" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="module-utils" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.PurePhone" />
+      <item itemvalue="CMake Application.module-sys" />
+      <item itemvalue="CMake Application.module-os" />
+      <item itemvalue="CMake Application.module-utils" />
+    </list>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -275,12 +306,12 @@
       <workItem from="1557319555714" duration="1866000" />
       <workItem from="1557325146277" duration="237000" />
       <workItem from="1557332150782" duration="1921000" />
-      <workItem from="1557386687141" duration="864000" />
+      <workItem from="1557386687141" duration="1481000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70683000" />
+    <option name="totallyTimeSpent" value="71300000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -310,7 +341,7 @@
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32705098" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="11" weight="0.32963374" />
-      <window_info active="true" anchor="bottom" id="CMake" order="12" visible="true" weight="0.3163152" />
+      <window_info anchor="bottom" id="CMake" order="12" weight="0.3163152" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />

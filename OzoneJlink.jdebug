@@ -263,7 +263,7 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  File.Open ("$(ProjectDir)/cmake-build-crosscompile/PurePhone.elf");
+  File.Open ("$(ProjectDir)/build/PurePhone.elf");
 }
 
 /*********************************************************************

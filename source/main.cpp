@@ -1,14 +1,13 @@
-#include <iostream>
 #include <memory>
 #include "SystemManager/SystemManager.hpp"
 #include "log/log.hpp"
 
 
-class BlinkyService : public core::Service {
+class BlinkyService : public sys::Service {
 
 public:
     BlinkyService(const std::string& name)
-            : core::Service(name)
+            : sys::Service(name)
     {
         timer_id = CreateTimer("BlinkyTimer",1000,true);
         ReloadTimer(timer_id);
@@ -18,7 +17,8 @@ public:
     }
 
     // Invoked when service received data message
-    void DataReceivedHandler(core::DataMessage* msgl) override{
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
+        return std::make_shared<sys::ResponseMessage>();
     }
 
     // Invoked when timer ticked
@@ -27,18 +27,21 @@ public:
     }
 
     // Invoked during initialization
-    void InitHandler() override{
-
+    sys::ReturnCodes InitHandler() override{
+        return sys::ReturnCodes::Success;
     }
 
-    void DeinitHandler() override{
+    sys::ReturnCodes DeinitHandler() override{
+        return sys::ReturnCodes::Success;
     }
 
-    void WakeUpHandler() override{
+    sys::ReturnCodes WakeUpHandler() override{
+        return sys::ReturnCodes::Success;
     }
 
 
-    void SleepHandler() override{
+    sys::ReturnCodes SleepHandler() override{
+        return sys::ReturnCodes::Success;
     }
 
     uint32_t timer_id= 0;
@@ -46,14 +49,25 @@ public:
 
 };
 
+int SystemStart(sys::SystemManager* sysmgr)
+{
+    auto ret = sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
+
+    if(ret){
+        return 0;
+    }
+
+    return 0;
+}
+
 
 int main() {
 
-    auto sysmgr = std::make_shared<core::SystemManager>(20000,5000);
+    //auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
-    sysmgr->StartSystem();
+    //sysmgr->StartSystem();
 
-    sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),0);
+    //sysmgr->RegisterInitFunction(SystemStart);
 
     cpp_freertos::Thread::StartScheduler();
 

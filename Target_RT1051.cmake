@@ -38,6 +38,8 @@ set(TARGET_COMPILE_OPTIONS
         -fno-builtin
         -mno-unaligned-access
 
+        -Wno-psabi
+
 
         CACHE INTERNAL ""
 
