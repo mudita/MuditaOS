@@ -11,3 +11,5 @@ build/
 lib/
 
 config/config_target\.h
+
+OzoneJlink\.jdebug\.user

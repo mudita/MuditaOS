@@ -9,7 +9,7 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer("BlinkyTimer",1000,true);
+        timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
     }
 
