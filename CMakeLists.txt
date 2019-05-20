@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.14)
 
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-
+include(env.cmake)
 project(PurePhone)
 
-include(env.cmake)
 include(config/ProjectConfig.cmake)
+
+
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")
@@ -126,6 +127,6 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-sys module-utils  )
+target_link_libraries(${PROJECT_NAME} module-sys module-utils ${TARGET_LIBRARIES} )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
