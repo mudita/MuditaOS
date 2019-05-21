@@ -1,6 +1,7 @@
 [submodule "module-gui"]
 	path = module-gui
 	url = git@github.com:muditacom/module-gui.git
+	branch = master
 [submodule "module-utils"]
 	path = module-utils
 	url = git@github.com:muditacom/module-utils.git
