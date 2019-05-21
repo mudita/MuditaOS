@@ -116,14 +116,14 @@ target_compile_features(${PROJECT_NAME}
 
 
 
-message("${PROJECT_NAME}: add_subdirectory module-os")
-add_subdirectory(module-os)
-
-message("${PROJECT_NAME}: add_subdirectory module-bsp")
-add_subdirectory(module-bsp)
-
-message("${PROJECT_NAME}: add_subdirectory module-utils")
-add_subdirectory(module-utils)
+#message("${PROJECT_NAME}: add_subdirectory module-os")
+#add_subdirectory(module-os)
+#
+#message("${PROJECT_NAME}: add_subdirectory module-bsp")
+#add_subdirectory(module-bsp)
+#
+#message("${PROJECT_NAME}: add_subdirectory module-utils")
+#add_subdirectory(module-utils)
 
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os module-bsp module-utils)
 

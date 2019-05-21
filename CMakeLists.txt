@@ -42,6 +42,7 @@ endif()
 
 set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
 message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
+target_link_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY} )
 
 
 set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building" )
@@ -122,11 +123,19 @@ include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 message("${PROJECT_NAME}: add_subdirectory module-utils")
 add_subdirectory(module-utils)
 
+message("${PROJECT_NAME}: add_subdirectory module-os")
+add_subdirectory(module-os)
+
+message("${PROJECT_NAME}: add_subdirectory module-bsp")
+add_subdirectory(module-bsp)
+
+message("${PROJECT_NAME}: add_subdirectory module-vfs")
+add_subdirectory(module-vfs)
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui module-os module-bsp module-vfs ${TARGET_LIBRARIES} pthread )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
