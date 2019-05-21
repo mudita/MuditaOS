@@ -1,0 +1,9 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+// the configured options and settings for PureOS
+#define MODULE_GUI "@MOD_VERSION@"
+#define GIT_BRANCH "@GIT_BRANCH@"
+#define GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+
+#endif
