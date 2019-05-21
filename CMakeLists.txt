@@ -114,10 +114,10 @@ message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
 
 
-# message("${PROJECT_NAME}: add_subdirectory module-gui")
-# add_subdirectory(module-gui)
-# include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-#         "${CMAKE_CURRENT_LIST_DIR}/module-gui" )
+message("${PROJECT_NAME}: add_subdirectory module-gui")
+add_subdirectory(module-gui)
+include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+	"${CMAKE_CURRENT_LIST_DIR}/module-gui" )
 
 message("${PROJECT_NAME}: add_subdirectory module-utils")
 add_subdirectory(module-utils)
@@ -127,6 +127,6 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} module-sys module-utils ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui ${TARGET_LIBRARIES} )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})

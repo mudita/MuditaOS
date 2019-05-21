@@ -1,13 +1,25 @@
 #!/bin/sh
 
-DIRECTORY=build
+BUILD_DIR="build"
+ASSETS_DIR="assets"
 
-if [ ! -d "$DIRECTORY" ]; then
-  mkdir build
+#if there is no build directory create one
+if [ ! -d "$BUILD_DIR" ]; then
+	mkdir "$BUILD_DIR"
 fi
 
-cd build
+#enter build directory, erase content and make /sys/assets directory
+cd "$BUILD_DIR"
 rm -rf *
+mkdir -p "sys/$ASSETS_DIR"
+
+#if module-gui directory is present try to copy assets to build directory
+MODULE_GUI_DIR="../module-gui"
+if [ -d "$MODULE_GUI_DIR" ]; then
+	
+	echo "Found module-gui, copying assets."
+	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
+fi
 
 #first parameter specifies platform, by default it is Linux
 TARGET="Target_Linux.cmake"
