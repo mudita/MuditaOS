@@ -1,0 +1,2 @@
+set(PROJECT_TARGET "TARGET_Linux")
+set(BUILD_UNIT_TESTS "")
