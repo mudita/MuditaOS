@@ -73,7 +73,7 @@ endif()
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 
-add_subdirectory( module-os )
+#add_subdirectory( module-os )
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	include(targets/Target_Linux.cmake)

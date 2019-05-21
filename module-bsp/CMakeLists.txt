@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
 
-if(TARGET module-bsp)
-    return() # The project has already been built.
-endif()
-
 project(module-bsp VERSION 1.0
         DESCRIPTION "VFS module library")
 
@@ -49,8 +45,6 @@ endif()
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES )
-
-
 
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
@@ -116,8 +110,8 @@ target_compile_features(${PROJECT_NAME}
 
 
 
-message("${PROJECT_NAME}: add_subdirectory module-os")
-add_subdirectory(module-os)
+#message("${PROJECT_NAME}: add_subdirectory module-os")
+#add_subdirectory(module-os)
 
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os )
 

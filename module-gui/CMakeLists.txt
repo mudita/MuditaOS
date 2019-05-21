@@ -59,8 +59,8 @@ else()
 endif()
 
 
-message("${PROJECT_NAME}: add_subdirectory module-utils")
-add_subdirectory(module-utils)
+#message("${PROJECT_NAME}: add_subdirectory module-utils")
+#add_subdirectory(module-utils)
 #add_subdirectory(module-vfs)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
