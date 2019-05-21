@@ -4,6 +4,8 @@
 [submodule "module-utils"]
 	path = module-utils
 	url = git@github.com:muditacom/module-utils.git
+	master = master
 [submodule "module-sys"]
 	path = module-sys
 	url = git@github.com:muditacom/module-sys.git
+	master = master
