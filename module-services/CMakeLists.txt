@@ -19,13 +19,16 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 message("${PROJECT_NAME}: add_subdirectory service-gui")
 add_subdirectory( service-gui )
+message("${PROJECT_NAME}: add_subdirectory service-eink")
+add_subdirectory( service-eink )
+message("${PROJECT_NAME}: add_subdirectory service-kbd")
+add_subdirectory( service-kbd )
+
 include_directories( ../module-sys )
 include_directories( ../module-utils )
+include_directories( ../module-gui )
 
-
-
-
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-sys module-utils )
+target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-sys module-utils module-gui )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
