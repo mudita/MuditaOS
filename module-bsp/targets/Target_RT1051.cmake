@@ -31,6 +31,10 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_sdmmc_event.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_sdmmc_host.c"
 
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/i2c.c"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.c"
+
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/board.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/clock_config.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pin_mux.c"
