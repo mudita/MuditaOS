@@ -123,7 +123,7 @@ namespace bsp {
          * BOARD_SDRAM_NOCACHE
          */
         MPU->RBAR = ARM_MPU_RBAR(7, 0x80400000U);
-        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_4MB);
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
 
         /* The define sets the cacheable memory to shareable,
          * this suggestion is referred from chapter 2.2.1 Memory regions,
@@ -136,8 +136,8 @@ namespace bsp {
         /* Region 7 setting: Memory with Normal type, not shareable, outer/inner write back
          * BOARD_SDRAM_HEAP
          */
-        MPU->RBAR = ARM_MPU_RBAR(8, 0x80800000U);
-        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_8MB);
+        MPU->RBAR = ARM_MPU_RBAR(8, 0x80500000U);
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
 #endif
 
         /* Region 9 setting: Memory with Normal type, not shareable, outer/inner write back
