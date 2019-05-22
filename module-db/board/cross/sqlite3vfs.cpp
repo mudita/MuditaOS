@@ -140,6 +140,8 @@
  */
 #define MAXPATHNAME 512
 
+#define UNUSED(x) ((void)(x))
+
 /*
  ** When using this VFS, the sqlite3_file* handles that SQLite uses are
  ** actually pointers to instances of type EcophoneFile.
@@ -147,7 +149,7 @@
 typedef struct EcophoneFile EcophoneFile;
 struct EcophoneFile {
     sqlite3_file base;              /* Base class. Must be first. */
-    VFS_FILE *fd;                         /* File descriptor */
+    vfs::FILE *fd;                         /* File descriptor */
 
     char *aBuffer;                  /* Pointer to malloc'd buffer */
     int nBuffer;                    /* Valid bytes of data in zBuffer */
@@ -170,11 +172,11 @@ static int ecophoneDirectWrite(
     if (iOfst >= p->fd->ulFileSize)
         iOfst = p->fd->ulFileSize;
 
-    if(vfs_fseek( p->fd, iOfst, FF_SEEK_SET ) != 0){
+    if(vfs.fseek( p->fd, iOfst, SEEK_SET ) != 0){
         return SQLITE_IOERR_WRITE;
     }
 
-    nWrite = vfs_fwrite( zBuf, 1, iAmt, p->fd);
+    nWrite = vfs.fwrite( zBuf, 1, iAmt, p->fd);
     if( (int)nWrite!=iAmt ){
         return SQLITE_IOERR_WRITE;
     }
@@ -205,7 +207,7 @@ static int ecophoneClose(sqlite3_file *pFile){
     rc = ecophoneFlushBuffer(p);
     sqlite3_free(p->aBuffer);
 
-    vfs_fclose(p->fd);
+    vfs.fclose(p->fd);
     return rc;
 }
 
@@ -239,11 +241,11 @@ static int ecophoneRead(
     		iOfst = p->fd->ulFileSize;
     }
 
-    if( vfs_fseek( p->fd, iOfst, FF_SEEK_SET ) != 0 ){
+    if( vfs.fseek( p->fd, iOfst, FF_SEEK_SET ) != 0 ){
         return SQLITE_IOERR_READ;
     }
 
-    nRead = vfs_fread( zBuf, 1, iAmt, p->fd );
+    nRead = vfs.fread( zBuf, 1, iAmt, p->fd );
 
     if( nRead==iAmt ){
         return SQLITE_OK;
@@ -355,7 +357,7 @@ static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize){
         return rc;
     }
 
-    *pSize = vfs_filelength( p->fd );
+    *pSize = vfs.filelength( p->fd );
 
     return SQLITE_OK;
 }
@@ -416,7 +418,7 @@ static int ecophoneAccess(
         int flags,
         int *pResOut
 ){
-    VFS_FILE *fd;
+    vfs::FILE *fd;
     UNUSED(pVfs);
 
     assert( flags==SQLITE_ACCESS_EXISTS       /* access(zPath, F_OK) */
@@ -424,11 +426,11 @@ static int ecophoneAccess(
             || flags==SQLITE_ACCESS_READWRITE    /* access(zPath, R_OK|W_OK) */
     );
 
-    fd = vfs_fopen( zPath, (const char*)"r" );
+    fd = vfs.fopen(zPath, (const char*)"r" );
     if( fd != NULL)
     {
         if (pResOut) *pResOut = flags;
-        vfs_fclose(fd);
+        vfs.fclose(fd);
     }
     else
         if (pResOut) *pResOut = 0;
@@ -517,7 +519,7 @@ static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync){
     if( rc!=0 /*&& errno==ENOENT*/ ) return SQLITE_OK;
 
     if( rc==0 && dirSync ){
-        VFS_FILE *dfd;                      /* File descriptor open on directory */
+        vfs::FILE *dfd;                      /* File descriptor open on directory */
         int i;                        /* Iterator variable */
         char zDir[MAXPATHNAME+1];     /* Name of directory containing file zPath */
 
@@ -528,12 +530,12 @@ static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync){
         zDir[i] = '\0';
 
         /* Open a file-descriptor on the directory. Sync. Close. */
-        dfd = vfs_fopen( zDir, "D" );
+        dfd = vfs.fopen( zDir, "D" );
         if( dfd == NULL ){
             rc = -1;
         }else{
             rc = SQLITE_OK;
-            vfs_fclose(dfd);
+            vfs.fclose(dfd);
         }
     }
     return (rc==0 ? SQLITE_OK : SQLITE_IOERR_DELETE);
@@ -642,7 +644,6 @@ static int ecophoneSleep(sqlite3_vfs *pVfs, int nMicro){
  ** "year 2038" problem that afflicts systems that store time this way).
  */
 static int ecophoneCurrentTime(sqlite3_vfs *pVfs, double *pTime){
-    UNUSED(pVfs);
 
     time_t t = time(0);
     *pTime = t/86400.0 + 2440587.5;

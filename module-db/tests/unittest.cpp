@@ -14,16 +14,20 @@
 #include <stdint.h>
 #include <algorithm>
 
-
 #include <iostream>
+
+#include "../database/sqlite3.h"
 
 
 class vfs vfs;
 
 
-TEST_CASE( "Test case 1" ) {
+TEST_CASE( "Create and destroy simple database" ) {
 
-        vfs.Init();
+    sqlite3* db = nullptr;
 
+    auto rc = sqlite3_open("test.db", &db);\
+    REQUIRE(rc == SQLITE_OK);
 
+    sqlite3_close(db);
 }

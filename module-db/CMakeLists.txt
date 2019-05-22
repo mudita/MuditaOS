@@ -45,6 +45,9 @@ target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3.c PROPERTIES COMPILE_FLAGS -Wno-overflow)
+
+
 target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
@@ -61,7 +64,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} module-vfs)
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-    target_link_libraries(${PROJECT_NAME} sqlite3)
+    target_link_libraries(${PROJECT_NAME} sqlite3 dl)
 endif()
 
 # Host target configuration(mainly used for unit testing)
