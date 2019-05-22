@@ -52,7 +52,7 @@ TEST_CASE( "Test case 1" ) {
         auto path = cwd.substr(0,cwd.find_last_of("/\\"));
 
 
-        auto dirList = vfs.listdir((path + "/tests/test_dir").c_str());
+        auto dirList = vfs.listdir((path + "/module-vfs/tests/test_dir").c_str());
         REQUIRE(dirList.size() == 3);
 
 
