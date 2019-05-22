@@ -29,7 +29,7 @@
 #include "fsl_cache.h"
 #include "macros.h"
 
-
+#include "log/log.hpp"
 
 #define eMMCHIDDEN_SECTOR_COUNT		8
 #define eMMCPRIMARY_PARTITIONS		1
@@ -118,7 +118,7 @@ FF_CreationParameters_t xParameters;
 #if 1
 			/* Mount the partition. */
 			xError = FF_Mount( pxDisk, pxDisk->xStatus.bPartitionNumber);
-			FF_PRINTF( "FF_eMMC_user_DiskInit: FF_Mount: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
+			LOG_PRINTF( "FF_eMMC_user_DiskInit: FF_Mount: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
 
 			if( FF_isERR( xError ) == pdFALSE )
 			{
@@ -142,7 +142,7 @@ FF_CreationParameters_t xParameters;
 
 					/* Mount the partition. */
 					xError = FF_Mount( pxDisk, eMMCPARTITION_NUMBER );
-					FF_PRINTF( "FF_eMMC_user_DiskInit: FF_Mount: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
+					LOG_PRINTF( "FF_eMMC_user_DiskInit: FF_Mount: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
 				}
 
 				if( FF_isERR( xError ) == pdFALSE )
@@ -157,7 +157,7 @@ FF_CreationParameters_t xParameters;
 		}
 		else
 		{
-			FF_PRINTF( "FF_eMMC_user_DiskInit: FF_CreateIOManger: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
+			LOG_PRINTF( "FF_eMMC_user_DiskInit: FF_CreateIOManger: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
 
 			/* The disk structure was allocated, but the disk's IO manager could
 			not be allocated, so free the disk again. */
@@ -167,7 +167,7 @@ FF_CreationParameters_t xParameters;
 	}
 	else
 	{
-		FF_PRINTF( "FF_eMMC_user_DiskInit: Malloc failed\r\n" );
+		LOG_PRINTF( "FF_eMMC_user_DiskInit: Malloc failed\r\n" );
 	}
 
 	return pxDisk;
@@ -208,7 +208,7 @@ BaseType_t xReturn = pdPASS;
 	{
 		pxIOManager = pxDisk->pxIOManager;
 
-		FF_PRINTF( "Reading FAT and calculating Free Space\r\n" );
+		LOG_PRINTF( "Reading FAT and calculating Free Space\r\n" );
 
 		switch( pxIOManager->xPartition.ucType )
 		{
@@ -240,13 +240,13 @@ BaseType_t xReturn = pdPASS;
 
 		/* It is better not to use the 64-bit format such as %Lu because it
 		might not be implemented. */
-		FF_PRINTF( "Partition Nr   %8u\r\n", pxDisk->xStatus.bPartitionNumber );
-		FF_PRINTF( "Type           %8u (%s)\r\n", pxIOManager->xPartition.ucType, pcTypeName );
-		FF_PRINTF( "VolLabel       '%8s' \r\n", pxIOManager->xPartition.pcVolumeLabel );
-		FF_PRINTF( "TotalSectors   %8lu\r\n", pxIOManager->xPartition.ulTotalSectors );
-		FF_PRINTF( "SecsPerCluster %8lu\r\n", pxIOManager->xPartition.ulSectorsPerCluster );
-		FF_PRINTF( "Size           %8lu MB\r\n", ulTotalSizeMB );
-		FF_PRINTF( "FreeSize       %8lu MB ( %d perc free )\r\n", ulFreeSizeMB, iPercentageFree );
+		LOG_PRINTF( "Partition Nr   %8u\r\n", pxDisk->xStatus.bPartitionNumber );
+		LOG_PRINTF( "Type           %8u (%s)\r\n", pxIOManager->xPartition.ucType, pcTypeName );
+		LOG_PRINTF( "VolLabel       '%8s' \r\n", pxIOManager->xPartition.pcVolumeLabel );
+		LOG_PRINTF( "TotalSectors   %8lu\r\n", pxIOManager->xPartition.ulTotalSectors );
+		LOG_PRINTF( "SecsPerCluster %8lu\r\n", pxIOManager->xPartition.ulSectorsPerCluster );
+		LOG_PRINTF( "Size           %8lu MB\r\n", ulTotalSizeMB );
+		LOG_PRINTF( "FreeSize       %8lu MB ( %d perc free )\r\n", ulFreeSizeMB, iPercentageFree );
 	}
 
 	return xReturn;
@@ -274,7 +274,7 @@ uint8_t FF_eMMC_user_DiskIsPresent(void)
 
 static int32_t prvReadeMMC( uint8_t *pucDestination, uint32_t ulSectorNumber, uint32_t ulSectorCount, FF_Disk_t *pxDisk )
 {
-int32_t lReturn;
+int32_t lReturn = FF_ERR_NONE;
 
  bsp::eMMC* mmc_card = static_cast<bsp::eMMC*>(pxDisk->pvTag);
 
@@ -375,13 +375,13 @@ FF_Error_t xError;
 
 	/* Partition the disk */
 	xError = FF_Partition( pxDisk, &xPartition );
-	FF_PRINTF( "FF_Partition: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
+	LOG_PRINTF( "FF_Partition: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
 
 	if( FF_isERR( xError ) == pdFALSE )
 	{
 		/* Format the partition. */
 		xError = FF_Format( pxDisk, eMMCPARTITION_NUMBER, pdFALSE, pdFALSE );
-		FF_PRINTF( "FF_eMMC_user_DiskInit: FF_Format: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
+		LOG_PRINTF( "FF_eMMC_user_DiskInit: FF_Format: %s\r\n", ( const char * ) FF_GetErrMessage( xError ) );
 	}
 
 	return xError;

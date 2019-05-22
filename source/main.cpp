@@ -1,11 +1,17 @@
+
 #include <memory>
-#include "SystemManager/SystemManager.hpp"
 #include "log/log.hpp"
+
 #include "service-gui/ServiceGUI.hpp"
 #include "service-eink/ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
 
+#include "bsp.hpp"
+#include "vfs.hpp"
 
+#include "SystemManager/SystemManager.hpp"
+
+class vfs vfs;
 
 class BlinkyService : public sys::Service {
 
@@ -53,8 +59,11 @@ public:
 
 };
 
+
 int SystemStart(sys::SystemManager* sysmgr)
 {
+    vfs.Init();
+
     auto ret = sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI"),sysmgr);
@@ -69,6 +78,9 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 
 int main() {
+    LOG_PRINTF("Launching PurePhone..\n");
+
+    bsp::BoardInit();
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
