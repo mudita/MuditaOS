@@ -8,13 +8,14 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <fstream>
 #include <string>
-#include <dirent.h>
 #include "Font.hpp"
 
 #include "utf8/UTF8.hpp"
 #include "log/log.hpp"
+//for loading files
+#include "vfs.hpp"
+
 
 namespace gui {
 
@@ -58,7 +59,6 @@ gui::Status FontGlyph::loadImage( uint8_t* data, uint32_t offset ) {
 	return gui::Status::GUI_SUCCESS;
 }
 
-#if ( __linux__ || __APPLE__ )
 gui::Status FontKerning::load( uint8_t* data, uint32_t& offset ) {
 	//utf16 id of the first character
 	memcpy( &first, data + offset, sizeof(uint16_t) ); offset += sizeof(uint16_t);
@@ -69,9 +69,7 @@ gui::Status FontKerning::load( uint8_t* data, uint32_t& offset ) {
 
 	return gui::Status::GUI_SUCCESS;
 }
-#endif
 
-#if ( __linux__ || __APPLE__ )
 gui::Status FontInfo::load( uint8_t* data, uint32_t& offset ) {
 
 	//read up to 63 chars of the fonts name
@@ -102,8 +100,6 @@ gui::Status FontInfo::load( uint8_t* data, uint32_t& offset ) {
 
 	return gui::Status::GUI_SUCCESS;
 }
-#endif
-
 
 Font::~Font() {
 	for (std::map< uint32_t, FontGlyph* >::iterator it=glyphs.begin(); it!=glyphs.end(); ++it)
@@ -118,8 +114,6 @@ Font::~Font() {
 	}
 	kerning.clear();
 }
-
-#if ( __linux__ || __APPLE__ )
 
 gui::Status Font::load( uint8_t* data ) {
 
@@ -183,8 +177,6 @@ gui::Status Font::load( uint8_t* data ) {
 
 	return gui::Status::GUI_SUCCESS;
 }
-
-#endif
 
 int32_t Font::getKerning( uint32_t id1, uint32_t id2 ) {
 	//search for a map with kerning for given character (id1)
@@ -321,32 +313,24 @@ void FontManager::loadFonts( std::string baseDirectory ) {
 	}
 }
 
-#if ( __linux__ || __APPLE__ )
-
 Font* FontManager::loadFont( std::string filename ) {
 
-	std::ifstream file;
+	auto file = vfs.fopen( filename.c_str(), "rb" );
 
-	//open the file
-	file.open ( filename.c_str(), std::fstream::in | std::fstream::binary );
+	auto fileSize = vfs.filelength( file );
 
-	//get the size of the file
-	file.seekg (0, file.end);
-	size_t size = file.tellg();
-	file.seekg (0, file.beg);
-
-	char* fontData = new char[size];
+	char* fontData = new char[fileSize];
 	if( fontData == nullptr ) {
-		file.close();
+		vfs.fclose( file );
 		LOG_ERROR( " Failed to allocate temporary font buffer");
 		return nullptr;
 	}
 
 	//read data to buffer
-	file.read( fontData, size );
+	vfs.fread( fontData, fileSize, 1, file );
 
 	//close file
-	file.close();
+	vfs.fclose( file );
 
 	//allocate memory for new font
 	Font* font = new Font();
@@ -364,31 +348,21 @@ Font* FontManager::loadFont( std::string filename ) {
 	return font;
 }
 
-//#elif // loadFont __linux__
-
-#endif // loadFont __linux__
-
 std::vector<std::string> FontManager::getFontsList() {
 
-	DIR *dir;
 	std::vector<std::string> fontFiles;
 
 	LOG_INFO( "Scanning fonts folder: %s", fontFolder.c_str());
+	auto dirList = vfs.listdir(fontFolder.c_str());
 
-	struct dirent *ent;
-	if ((dir = opendir (fontFolder.c_str())) != NULL) {
-	/* print all the files and directories within directory */
-		while ((ent = readdir (dir)) != NULL) {
-			if( ent->d_type == DT_REG ) {
-//				LOG_INFO("file: %s",ent->d_name);
-				fontFiles.push_back( fontFolder + "/" + ent->d_name );
-			}
+	for( vfs::DirectoryEntry ent : dirList ) {
+		if( ent.attributes != vfs::FileAttributes::Directory ) {
+			fontFiles.push_back( fontFolder + "/" + ent.fileName );
+			//TODO remove commented code
+			//LOG_INFO("font: %s", (fontFolder + "/" + ent.fileName).c_str());
 		}
-		closedir (dir);
-	} else {
-	  /* could not open directory */
-		LOG_ERROR("failed to open directory.");
 	}
+
 	return fontFiles;
 }
 
