@@ -36,6 +36,10 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink/eink_binarization_luts.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink/dma_config.c"
 
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/i2c.c"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.c"
+
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/board.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/clock_config.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pin_mux.c"
