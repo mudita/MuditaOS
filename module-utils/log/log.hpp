@@ -39,6 +39,10 @@
 #include <string.h>
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef enum { LOGTRACE, LOGDEBUG, LOGINFO, LOGWARN, LOGERROR, LOGFATAL }logger_level;
 
@@ -65,5 +69,8 @@ void log_Printf(const char *fmt, ...);
 #define LOG_ERROR(...)  log_Log(LOGERROR, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
 #define LOG_FATAL(...)  log_Log(LOGFATAL, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LOG_LOG_H_ */

@@ -77,7 +77,7 @@ public:
 
 private:
 
-    const char* eMMC_USER_DISK_NAME	= "/";
+    const char* eMMC_USER_DISK_NAME	= "/sys";
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
