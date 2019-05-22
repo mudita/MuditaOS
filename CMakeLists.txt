@@ -6,8 +6,6 @@ project(PurePhone)
 
 include(config/ProjectConfig.cmake)
 
-
-
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")
 message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
@@ -130,10 +128,13 @@ add_subdirectory(module-bsp)
 message("${PROJECT_NAME}: add_subdirectory module-vfs")
 add_subdirectory(module-vfs)
 
+message("${PROJECT_NAME}: add_subdirectory module-services")
+add_subdirectory(module-services)
+
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} module-sys module-utils module-os module-bsp module-vfs ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui module-os module-bsp module-vfs module-services ${TARGET_LIBRARIES} )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
