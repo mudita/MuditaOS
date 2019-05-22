@@ -58,7 +58,6 @@ set(TARGET_COMPILE_FEATURES
 
 set(TARGET_SOURCES
 
-        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/startup_mimxrt1052.cpp
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/_exit.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/memwrap.cpp
 

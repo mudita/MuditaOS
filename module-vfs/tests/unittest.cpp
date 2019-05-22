@@ -52,8 +52,13 @@ TEST_CASE( "Test case 1" ) {
         auto path = cwd.substr(0,cwd.find_last_of("/\\"));
 
 
-        auto dirList = vfs.listdir((path + "/tests/test_dir").c_str());
+        auto dirList = vfs.listdir((path + "/module-vfs/tests/test_dir").c_str());
         REQUIRE(dirList.size() == 3);
-
+        REQUIRE(dirList[0].attributes == vfs::FileAttributes::Directory);
+        REQUIRE(dirList[0].fileName == "test_dir2");
+        REQUIRE(dirList[1].attributes == vfs::FileAttributes::Writable);
+        REQUIRE(dirList[1].fileName == "test1.txt");
+        REQUIRE(dirList[2].attributes == vfs::FileAttributes::Writable);
+        REQUIRE(dirList[2].fileName == "test2.txt");
 
 }

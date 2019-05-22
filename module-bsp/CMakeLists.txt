@@ -58,30 +58,6 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-
-target_compile_options(${PROJECT_NAME}
-
-        PUBLIC
-
-        -Wall
-
-        $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
-        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
-
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
-        $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
-        )
-
-target_compile_features(${PROJECT_NAME}
-
-        PUBLIC
-        
-        cxx_std_14
-        cxx_noexcept
-
-        )
-
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os )
 
 
