@@ -4,9 +4,6 @@
  *  Created on: 29 kwi 2019
  *      Author: robert
  */
-#define LOG_MAIN
-#define LOG_USE_COLOR
-
 #include <memory>
 #include <functional>
 #include <iostream>

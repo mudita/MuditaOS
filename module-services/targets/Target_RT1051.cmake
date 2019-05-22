@@ -1,0 +1,6 @@
+set(BOARD_SOURCES
+
+        CACHE INTERNAL ""
+        )
+
+set(BOARD_DIR_INCLUDES  CACHE INTERNAL "")
