@@ -19,7 +19,6 @@ namespace gui {
 
 class PixMapManager {
 protected:
-	//singleton of the font manager
 	std::string pixMapFolder;
 	std::vector<PixMap*> pixMaps;
 

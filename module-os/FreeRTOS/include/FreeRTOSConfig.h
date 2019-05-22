@@ -40,9 +40,14 @@
 #include <stdint.h>
 
 //TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 /* System clock frequency. */
 extern uint32_t SystemCoreClock;
+#ifdef __cplusplus
+}
+#endif
 
 #define configUSE_PREEMPTION                    1
 #define configUSE_TICKLESS_IDLE                 0

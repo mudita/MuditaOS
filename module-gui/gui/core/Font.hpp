@@ -131,13 +131,9 @@ public:
 
 class FontManager {
 protected:
-	//singleton of the font manager
 	std::string fontFolder;
 	std::vector<Font*> fonts;
-
-
 	std::vector<std::string> getFontsList();
-
 
 	Font* loadFont( std::string filename );
 	void loadFonts( std::string baseDirectory );

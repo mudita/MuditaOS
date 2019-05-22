@@ -9,6 +9,11 @@ config/config_target\.h
 
 OzoneJlink\.jdebug\.user
 
+#no eclipse please
+.cproject
+.project
+.settings/
+
 build-linux/
 
 build-rt1051/
@@ -16,3 +21,4 @@ build-rt1051/
 \.idea/vcs\.xml
 
 \.idea/workspace\.xml
+
