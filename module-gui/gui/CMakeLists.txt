@@ -1,0 +1,19 @@
+include_directories( ${CMAKE_PROJECT_NAME}
+
+PUBLIC
+	"${CMAKE_CURRENT_LIST_DIR}"
+	"${CMAKE_CURRENT_LIST_DIR}/core"
+	"${CMAKE_CURRENT_LIST_DIR}/widgets"
+	"${CMAKE_CURRENT_LIST_DIR}/../module-utils"
+)
+
+target_sources(${PROJECT_NAME}
+
+	PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}/Common.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/GUI.cpp"
+	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/Common.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/GUI.hpp"
+)
+
