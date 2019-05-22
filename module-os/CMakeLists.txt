@@ -89,6 +89,8 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
+target_link_libraries(${PROJECT_NAME} module-bsp)
+
 # Host target configuration(mainly used for unit testing)
 
 if(DEFINED BUILD_UNIT_TESTS)

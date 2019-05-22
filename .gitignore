@@ -1,10 +1,5 @@
 
-cmake-build-debug/
-
-cmake-build-crosscompile/
-
 build/
-
 
 .vscode/ipch
 
@@ -18,4 +13,12 @@ OzoneJlink\.jdebug\.user
 .cproject
 .project
 .settings/
+
+build-linux/
+
+build-rt1051/
+
+\.idea/vcs\.xml
+
+\.idea/workspace\.xml
 
