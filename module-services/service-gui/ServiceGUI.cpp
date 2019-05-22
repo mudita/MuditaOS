@@ -11,11 +11,11 @@
 ServiceGUI::ServiceGUI(const std::string& name)
 		: sys::Service(name)
 {
-	LOG_INFO("ServiceGUI Allocating resources");
+	LOG_INFO("[ServiceGUI] Initializing");
 }
 
 ServiceGUI::~ServiceGUI(){
-	LOG_INFO("ServiceGUI Cleaning resources");
+	LOG_INFO("[ServiceGUI] Cleaning resources");
 }
 
 // Invoked upon receiving data message
