@@ -3,33 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 project(module-bsp VERSION 1.0
         DESCRIPTION "VFS module library")
 
-
-# Get the current working branch
-execute_process(
-        COMMAND git rev-parse --abbrev-ref HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_BRANCH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Get the latest abbreviated commit hash of the working branch
-execute_process(
-        COMMAND git log -1 --format=%h
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_COMMIT_HASH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-set(MOD_VERSION ${PROJECT_VERSION})
-
-# configure a header file to pass some of the CMake settings
-# to the source code
-configure_file(
-        ${CMAKE_CURRENT_LIST_DIR}/version.h.in
-        ${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}-version.h
-)
-
-
 if(NOT DEFINED PROJECT_LIB_DIRECTORY )
     set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
     message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
@@ -107,11 +80,6 @@ target_compile_features(${PROJECT_NAME}
         cxx_noexcept
 
         )
-
-
-
-#message("${PROJECT_NAME}: add_subdirectory module-os")
-#add_subdirectory(module-os)
 
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os )
 
