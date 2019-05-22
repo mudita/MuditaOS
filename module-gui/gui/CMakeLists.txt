@@ -7,7 +7,7 @@ PUBLIC
 	"${CMAKE_CURRENT_LIST_DIR}/../module-utils"
 )
 
-target_sources(${CMAKE_PROJECT_NAME}
+target_sources(${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/Common.cpp"
