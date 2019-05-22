@@ -1,6 +1,7 @@
 set(BOARD_SOURCES ${BOARD_SOURCES}
 
         ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/eMMC/eMMC.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/keyboard/keyboard.cpp
 
 
         CACHE INTERNAL ""
