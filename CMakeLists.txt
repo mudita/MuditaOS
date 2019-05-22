@@ -114,7 +114,7 @@ add_subdirectory(module-sys)
 
 
 message("${PROJECT_NAME}: add_subdirectory module-gui")
-#add_subdirectory(module-gui)
+add_subdirectory(module-gui)
 
 message("${PROJECT_NAME}: add_subdirectory module-utils")
 add_subdirectory(module-utils)
