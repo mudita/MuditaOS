@@ -13,3 +13,9 @@ lib/
 config/config_target\.h
 
 OzoneJlink\.jdebug\.user
+
+#no eclipse please
+.cproject
+.project
+.settings/
+
