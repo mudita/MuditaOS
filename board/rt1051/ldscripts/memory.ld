@@ -14,7 +14,7 @@ MEMORY
   	/*SRAM_ITC (rwx) : ORIGIN = 0x0, LENGTH = 0x0*/ /* 0K bytes (alias RAM2) */  
   	SRAM_DTC_TEXT (rwx) : ORIGIN = 0x20000000, LENGTH = 0x6000 /* 24K bytes (alias RAM3) */  
   	SRAM_DTC (rwx) : ORIGIN = 0x20006000, LENGTH = 0x6A000 /* 434K bytes (alias RAM3) */  
-  	BOARD_SDRAM_TEXT (rx) : ORIGIN = 0x80000000, LENGTH = 0x0400000 /* 4M bytes for application code */ 
-  	BOARD_SDRAM_NOCACHE (rwx) : ORIGIN = 0x80400000, LENGTH = 0x400000 /* 4M bytes for non cacheable data*/
-  	BOARD_SDRAM_HEAP (rwx) : ORIGIN = 0x80800000, LENGTH = 0x0800000 /* 8M bytes for heap (alias RAM4) */  
+  	BOARD_SDRAM_TEXT (rx) : ORIGIN = 0x80000000, LENGTH = 0x0400000 /* 4M bytes for application code */
+  	BOARD_SDRAM_NOCACHE (rwx) : ORIGIN = 0x80400000, LENGTH = 0x100000 /* 1M bytes for non cacheable data*/
+  	BOARD_SDRAM_HEAP (rwx) : ORIGIN = 0x80500000, LENGTH = 0x0C00000 /* 12M bytes for heap (alias RAM4) */
 }
