@@ -15,35 +15,28 @@
 #include <functional>
 #include <stdint.h>
 
+
+#include "common.hpp"
+
 #if defined(TARGET_RT1051)
 
 #include "keyboard/key_codes_rt1051.hpp"
+
+#elif defined(TARGET_Linux)
+#include "keyboard/key_codes_linux.hpp"
+    //TODO:M.P insert Linux specific headers here
 #else
 #error "Unsupported target"
 #endif
 
-
-#include "common.hpp"
 
 namespace bsp {
 
     class keyboard {
+    public:
 
-#if defined(TARGET_RT1051)
-
-#include "keyboard/key_codes_rt1051.hpp"
-#else
-#error "Unsupported target"
-#endif
-
-        enum class KeyEvents{
-            Pressed,
-            Released
-        };
-
-        RetCode Init();
+        RetCode Init(std::function<void(KeyEvents event,KeyCodes code)> signal);
         RetCode DeInit();
-        RetCode RegisterEventSignal(std::function<RetCode(KeyEvents event,KeyCodes code)> init);
 
     };
 

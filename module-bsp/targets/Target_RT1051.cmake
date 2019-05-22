@@ -32,8 +32,9 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_sdmmc_host.c"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/i2c.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/irq/irq_gpio.cpp"
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/rt1051_keyboard.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/board.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/clock_config.c"
@@ -50,6 +51,7 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/fsl_drivers
+            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/cmsis
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC
 
 
