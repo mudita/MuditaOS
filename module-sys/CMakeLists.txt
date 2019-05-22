@@ -5,12 +5,26 @@ project(module-sys VERSION 1.0
 
 set(CMAKE_CXX_STANDARD 14)
 
+if(NOT DEFINED PROJECT_LIB_DIRECTORY )
+    set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
+    message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
+endif()
+
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_LIB_DIRECTORY})
+
+if(NOT DEFINED PROJECT_BUILD_DIRECTORY )
+    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building" )
+    message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
+endif()
+
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
+
 set(SOURCES
 
-        ${CMAKE_CURRENT_LIST_DIR}/Service/Bus.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/Service/Message.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/Service/Service.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/SystemManager/SystemManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/Bus.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
 
         )
 
@@ -35,6 +49,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
 
@@ -49,52 +64,25 @@ target_include_directories(${PROJECT_NAME}
 target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
-
-        CPP_FREERTOS_CONDITION_VARIABLES
         )
-
-target_compile_options(${PROJECT_NAME}
-
-        PUBLIC
-
-        -Wall
-
-        $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
-        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
-
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
-        $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
-
-)
-
-target_compile_features(${PROJECT_NAME} PUBLIC
-
-        cxx_std_14
-        cxx_noexcept
-)
-
-
-
-
 
 # Host target configuration(mainly used for unit testing)
 
 if(DEFINED BUILD_UNIT_TESTS)
 
        add_executable(unittest_${PROJECT_NAME}
-                ${CMAKE_CURRENT_LIST_DIR}/tests/Test1/TestService1.cpp
-                ${CMAKE_CURRENT_LIST_DIR}/tests/Test1/CommandsService.cpp
-                ${CMAKE_CURRENT_LIST_DIR}/tests/Test1/DelayedService.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Test1/TestService1.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Test1/CommandsService.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Test1/DelayedService.cpp
 
-                ${CMAKE_CURRENT_LIST_DIR}/tests/tests.cpp
-                ${CMAKE_CURRENT_LIST_DIR}/tests/tests-main.cpp
-                ${CMAKE_CURRENT_LIST_DIR}/tests/Common/SchedulerKiller.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/tests.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/tests-main.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Common/SchedulerKiller.cpp
         )
 
            target_compile_definitions(${PROJECT_NAME} PUBLIC UNIT_TESTS)
 
-           target_include_directories(unittest_${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/tests )
+           target_include_directories(unittest_${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/tests )
 
            target_compile_definitions(unittest_${PROJECT_NAME} PUBLIC COMPILE_HOST)
 

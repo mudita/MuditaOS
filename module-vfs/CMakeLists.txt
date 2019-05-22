@@ -44,6 +44,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_compile_definitions(${PROJECT_NAME}
 
@@ -54,34 +55,10 @@ target_include_directories(${PROJECT_NAME}
 
         PUBLIC
 
-        ${CMAKE_CURRENT_LIST_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
 
 
 )
-
-
-target_compile_options(${PROJECT_NAME}
-
-        PUBLIC
-
-        -Wall
-
-        $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
-        $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
-
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
-        $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
-        )
-
-target_compile_features(${PROJECT_NAME}
-
-        PUBLIC
-        
-        cxx_std_14
-        cxx_noexcept
-
-        )
 
 target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os module-bsp module-utils)
 

@@ -6,5 +6,9 @@
   {
     "name": "Linux",
     "toolchainFile": "Target_Linux.cmake"
+  },
+  {
+    "name": "Unittests",
+    "toolchainFile": "Target_Unittests.cmake"
   }
   ]

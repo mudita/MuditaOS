@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 
-project(unittests_module-bsp VERSION 1.0
+project(unittest_module-bsp VERSION 1.0
         DESCRIPTION "BSP module library")
 
 

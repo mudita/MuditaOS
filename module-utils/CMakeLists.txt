@@ -43,9 +43,6 @@ endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
-
-#add_subdirectory( module-os )
-
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	include(targets/Target_Linux.cmake)
 else()
@@ -68,6 +65,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES} )
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(${PROJECT_NAME}
 		PUBLIC
