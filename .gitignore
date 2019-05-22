@@ -12,3 +12,7 @@ OzoneJlink\.jdebug\.user
 build-linux/
 
 build-rt1051/
+
+\.idea/vcs\.xml
+
+\.idea/workspace\.xml
