@@ -10,8 +10,8 @@
 #ifndef CHIP_H_
 #define CHIP_H_
 
-#include "cmsis_gcc.h"
-#include "core_cm7.h"
+#include "cmsis/cmsis_gcc.h"
+#include "cmsis/core_cm7.h"
 #include <stdio.h>
 #include <stdbool.h>
 

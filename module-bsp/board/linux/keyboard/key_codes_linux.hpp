@@ -1,6 +1,6 @@
 
 /*
- * @file key_codes_rt1051.hpp
+ * @file key_codes_linux.hpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
  * @date 22.05.19
  * @brief
@@ -9,8 +9,9 @@
  */
 
 
-#ifndef PUREPHONE_KEY_CODES_RT1051_HPP
-#define PUREPHONE_KEY_CODES_RT1051_HPP
+#ifndef PUREPHONE_KEY_CODES_LINUX_HPP
+#define PUREPHONE_KEY_CODES_LINUX_HPP
+
 
 namespace bsp {
 
@@ -48,4 +49,4 @@ namespace bsp {
 
 }
 
-#endif //PUREPHONE_KEY_CODES_RT1051_HPP
+#endif //PUREPHONE_KEY_CODES_LINUX_HPP

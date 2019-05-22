@@ -15,6 +15,8 @@
 #include "fsl_semc.h"
 #include "pin_mux.h"
 
+#include "irq/irq_gpio.hpp"
+
 namespace bsp {
 
 
@@ -179,6 +181,8 @@ namespace bsp {
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
         BOARD_ConfigCellular();
+
+        irq_gpio_Init();
     }
 
 
