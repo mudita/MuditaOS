@@ -27,6 +27,7 @@ add_subdirectory( service-kbd )
 include_directories( ../module-sys )
 include_directories( ../module-utils )
 include_directories( ../module-gui )
+include_directories( ../module-os )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-sys module-utils module-gui )
 
