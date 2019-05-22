@@ -3,7 +3,7 @@
 
 // the configured options and settings for PureOS
 #define MODULE_OS "1.0"
-#define GIT_BRANCH "master"
-#define GIT_COMMIT_HASH "f3828cc"
+#define GIT_BRANCH "no_submodules"
+#define GIT_COMMIT_HASH "a3cd41a"
 
 #endif
