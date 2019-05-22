@@ -1,11 +1,15 @@
 
 #include <memory>
 #include "log/log.hpp"
+
+#include "service-gui/ServiceGUI.hpp"
+#include "service-eink/ServiceEink.hpp"
+#include "service-kbd/ServiceKbd.hpp"
+
 #include "bsp.hpp"
 #include "vfs.hpp"
 
 #include "SystemManager/SystemManager.hpp"
-#include "service-gui/ServiceGUI.hpp"
 
 class vfs vfs;
 
@@ -61,7 +65,9 @@ int SystemStart(sys::SystemManager* sysmgr)
     vfs.Init();
 
     auto ret = sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
 
     if(ret){
         return 0;
