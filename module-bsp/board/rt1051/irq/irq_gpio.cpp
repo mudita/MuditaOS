@@ -59,6 +59,10 @@ namespace bsp {
             NVIC_SetPriority(GPIO3_Combined_16_31_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
         }
 
+
+        extern "C"
+        {
+
         void GPIO2_Combined_0_15_IRQHandler(void) {
             BaseType_t xHigherPriorityTaskWoken = 0;
             uint32_t irq_mask = GPIO_GetPinsInterruptFlags(GPIO2);
@@ -136,6 +140,8 @@ namespace bsp {
 
             // Switch context if necessary
             portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+        }
+
         }
 
 }
