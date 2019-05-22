@@ -137,6 +137,6 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui module-os module-bsp module-vfs module-services ${TARGET_LIBRARIES} pthread )
+target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui module-os module-bsp module-vfs module-services ${TARGET_LIBRARIES} )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})

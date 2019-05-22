@@ -20,10 +20,6 @@ if(NOT WIN32)
   set(BoldWhite   "${Esc}[1;37m")
 endif()
 
-if(TARGET module-utils)
-	return() # The project has already been built.
-endif()
-
 project(module-utils VERSION 1.0
        DESCRIPTION "Library for processing utf8 strings.")
 
@@ -32,31 +28,6 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 set (CMAKE_CXX_STANDARD 14)
-
-# Get the current working branch
-execute_process(
-        COMMAND git rev-parse --abbrev-ref HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_BRANCH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Get the latest abbreviated commit hash of the working branch
-execute_process(
-        COMMAND git log -1 --format=%h
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_COMMIT_HASH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-set(MOD_VERSION ${PROJECT_VERSION})
-
-# configure a header file to pass some of the CMake settings
-# to the source code
-configure_file(
-        ${CMAKE_CURRENT_LIST_DIR}/version.h.in
-        ${CMAKE_CURRENT_LIST_DIR}/${PROJECT_NAME}-version.h
-)
 
 if(NOT DEFINED PROJECT_LIB_DIRECTORY )
 	set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
@@ -71,9 +42,6 @@ if(NOT DEFINED PROJECT_BUILD_DIRECTORY )
 endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
-
-
-#add_subdirectory( module-os )
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	include(targets/Target_Linux.cmake)
@@ -97,6 +65,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES} )
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(${PROJECT_NAME}
 		PUBLIC
