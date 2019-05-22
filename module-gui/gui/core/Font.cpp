@@ -358,7 +358,8 @@ std::vector<std::string> FontManager::getFontsList() {
 	for( vfs::DirectoryEntry ent : dirList ) {
 		if( ent.attributes != vfs::FileAttributes::Directory ) {
 			fontFiles.push_back( fontFolder + "/" + ent.fileName );
-			LOG_INFO("font: %s", (fontFolder + "/" + ent.fileName).c_str());
+			//TODO remove commented code
+			//LOG_INFO("font: %s", (fontFolder + "/" + ent.fileName).c_str());
 		}
 	}
 

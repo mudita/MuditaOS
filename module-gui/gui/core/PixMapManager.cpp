@@ -100,7 +100,8 @@ PixMap* PixMapManager::loadPixMap( std::string filename ) {
 		std::set<char> delims{'/'};
 		std::vector<std::string> path = splitpath( filename, delims);
 		pixMap->setName( path[path.size()-1] );
-		LOG_INFO("%s",path[path.size()-1].c_str());
+		//TODO remove commented code
+		//LOG_INFO("%s",path[path.size()-1].c_str());
 		pixMaps.push_back( pixMap );
 	}
 	delete[] data;
@@ -117,7 +118,8 @@ std::vector<std::string> PixMapManager::getPixMapList() {
 	for( vfs::DirectoryEntry ent : dirList ) {
 		if( ent.attributes != vfs::FileAttributes::Directory ) {
 			pixMapFiles.push_back( pixMapFolder + "/" + ent.fileName );
-			LOG_INFO("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
+			//TODO remove commented code
+			//LOG_INFO("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
 		}
 	}
 
