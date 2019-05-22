@@ -16,6 +16,8 @@
 #include "pin_mux.h"
 #include "dma_config.h"
 
+#include "irq/irq_gpio.hpp"
+
 namespace bsp {
 
 
@@ -177,6 +179,8 @@ namespace bsp {
         BOARD_ConfigAudioCodec();
         BOARD_InitDMA();
         BOARD_ConfigCellular();
+
+        irq_gpio_Init();
     }
 
 
