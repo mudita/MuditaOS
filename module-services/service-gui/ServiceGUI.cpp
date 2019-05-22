@@ -5,6 +5,9 @@
  *      Author: robert
  */
 
+#include "gui/core/Font.hpp"
+#include "gui/core/PixMapManager.hpp"
+
 #include "ServiceGUI.hpp"
 #include "log/log.hpp"
 
@@ -12,6 +15,12 @@ ServiceGUI::ServiceGUI(const std::string& name)
 		: sys::Service(name)
 {
 	LOG_INFO("[ServiceGUI] Initializing");
+
+	gui::FontManager& fontManager = gui::FontManager::getInstance();
+	fontManager.init( "sys/assets" );
+
+	gui::PixMapManager& pixMapManager = gui::PixMapManager::getInstance();
+	pixMapManager.init( "sys/assets" );
 }
 
 ServiceGUI::~ServiceGUI(){

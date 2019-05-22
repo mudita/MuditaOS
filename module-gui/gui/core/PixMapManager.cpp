@@ -6,18 +6,18 @@
  */
 
 #include <set>
-#include <fstream>
 #include <string>
 
-#include <dirent.h>
-#include <unistd.h>
-#include <string.h>
+#include <cstring>
 
+//module-utils
 #include "utf8/UTF8.hpp"
 #include "log/log.hpp"
-
+//module-gui
 #include "PixMap.hpp"
 #include "PixMapManager.hpp"
+//module-vfs
+#include "vfs.hpp"
 
 namespace gui {
 
@@ -37,8 +37,6 @@ void PixMapManager::loadPixMaps( std::string baseDirectory ) {
 		loadPixMap( pixMapName );
 	}
 }
-
-#if ( __linux__ || __APPLE__ )
 
 std::vector<std::string> splitpath(
   const std::string& str
@@ -72,28 +70,22 @@ std::vector<std::string> splitpath(
 
 PixMap* PixMapManager::loadPixMap( std::string filename ) {
 
-	std::ifstream file;
+	auto file = vfs.fopen( filename.c_str(), "rb" );
 
-	//open the file
-	file.open ( filename.c_str(), std::fstream::in | std::fstream::binary );
+	auto fileSize = vfs.filelength( file );
 
-	//get the size of the file
-	file.seekg (0, file.end);
-	size_t size = file.tellg();
-	file.seekg (0, file.beg);
-
-	char* data = new char[size];
+	char* data = new char[fileSize];
 	if( data == nullptr ) {
-		file.close();
+		vfs.fclose( file );
 		LOG_ERROR( " Failed to allocate temporary font buffer");
 		return nullptr;
 	}
 
 	//read data to buffer
-	file.read( data, size );
+	vfs.fread( data, fileSize, 1, file );
 
 	//close file
-	file.close();
+	vfs.fclose( file );
 
 	//allocate memory for new font
 	PixMap* pixMap = new PixMap();
@@ -115,31 +107,20 @@ PixMap* PixMapManager::loadPixMap( std::string filename ) {
 	return pixMap;
 }
 
-//#elif // loadFont __linux__
-
-#endif // loadFont __linux__
-
 std::vector<std::string> PixMapManager::getPixMapList() {
 
-	DIR *dir;
 	std::vector<std::string> pixMapFiles;
 
 	LOG_INFO( "Scanning images folder: %s", pixMapFolder.c_str());
+	auto dirList = vfs.listdir(pixMapFolder.c_str());
 
-	struct dirent *ent;
-	if ((dir = opendir (pixMapFolder.c_str())) != NULL) {
-	/* print all the files and directories within directory */
-		while ((ent = readdir (dir)) != NULL) {
-			if( ent->d_type == DT_REG ) {
-//				LOG_INFO("file: %s",ent->d_name);
-				pixMapFiles.push_back( pixMapFolder + "/" + ent->d_name );
-			}
+	for( vfs::DirectoryEntry ent : dirList ) {
+		if( ent.attributes != vfs::FileAttributes::Directory ) {
+			pixMapFiles.push_back( pixMapFolder + "/" + ent.fileName );
+			LOG_INFO("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
 		}
-		closedir (dir);
-	} else {
-	  /* could not open directory */
-		LOG_ERROR("failed to open directory.");
 	}
+
 	return pixMapFiles;
 }
 
