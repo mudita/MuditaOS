@@ -5,18 +5,27 @@
       <config projectName="PurePhone" targetName="module-sys" />
       <config projectName="PurePhone" targetName="module-utils" />
       <config projectName="PurePhone" targetName="PurePhone" />
+      <config projectName="PurePhone" targetName="module-vfs" />
       <config projectName="PurePhone" targetName="module-os" />
+      <config projectName="PurePhone" targetName="module-bsp" />
     </generated>
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../Target_Linux.cmake" GENERATION_DIR="build" />
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../Target_RT1051.cmake" GENERATION_DIR="build" />
     </configurations>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6590d9a-c736-48a1-9d2f-c0dcb87cb35d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/module-gui" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/module-gui/module-utils" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui/module-utils" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-gui/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/module-gui/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-gui/version.h.in" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-utils/board/linux/log.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/module-utils/board/linux/log.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/include/FreeRTOSFATConfig.h" beforeDir="false" afterPath="$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/include/FreeRTOSFATConfig.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/portable/ff_eMMC_user_disk.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/portable/ff_eMMC_user_disk.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/source/main.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-crosscompile/" />
@@ -36,8 +45,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/source/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="32" selection-start-line="32" selection-end-line="32" />
+            <state relative-caret-position="1410">
+              <caret line="94" selection-start-line="94" selection-end-line="94" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -45,7 +54,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
@@ -54,11 +63,24 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/portable/ff_eMMC_user_disk.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="223">
+              <caret line="31" column="21" selection-start-line="31" selection-start-column="21" selection-end-line="31" selection-end-column="21" />
+              <folding>
+                <element signature="e#210#242#0" expanded="true" />
+                <element signature="e#354#375#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Target_RT1051.cmake">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1020">
-              <caret line="68" column="9" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
+              <caret line="76" column="9" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -73,11 +95,6 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config/config_target.h">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/config/ProjectConfig.cmake">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="90">
@@ -87,15 +104,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/module-utils/rebuild.sh">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/module-utils/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="915">
-              <caret line="61" column="31" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
+            <state relative-caret-position="720">
+              <caret line="48" column="31" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -103,8 +115,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/module-sys/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="825">
-              <caret line="55" selection-start-line="55" selection-end-line="55" />
+            <state relative-caret-position="570">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
             </state>
           </provider>
         </entry>
@@ -126,7 +138,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/board/rt1051/startup_mimxrt1052.cpp" />
         <option value="$PROJECT_DIR$/board/rt1051/_exit.c" />
         <option value="$PROJECT_DIR$/board/rt1051/ldscripts/libs.ld" />
         <option value="$PROJECT_DIR$/module-core/Target_RT1051.cmake" />
@@ -177,6 +188,7 @@
         <option value="$PROJECT_DIR$/module-sys/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/module-utils/module-os/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/portable/ff_eMMC_user_disk.cpp" />
       </list>
     </option>
   </component>
@@ -191,6 +203,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -201,13 +214,47 @@
             <path>
               <item name="PurePhone" type="b2602c69:ProjectViewProjectNode" />
               <item name="PurePhone" type="462c0819:PsiDirectoryNode" />
+              <item name="module-vfs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PurePhone" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PurePhone" type="462c0819:PsiDirectoryNode" />
+              <item name="module-vfs" type="462c0819:PsiDirectoryNode" />
+              <item name="board" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PurePhone" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PurePhone" type="462c0819:PsiDirectoryNode" />
+              <item name="module-vfs" type="462c0819:PsiDirectoryNode" />
+              <item name="board" type="462c0819:PsiDirectoryNode" />
+              <item name="cross" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PurePhone" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PurePhone" type="462c0819:PsiDirectoryNode" />
+              <item name="module-vfs" type="462c0819:PsiDirectoryNode" />
+              <item name="board" type="462c0819:PsiDirectoryNode" />
+              <item name="cross" type="462c0819:PsiDirectoryNode" />
+              <item name="freeRTOS_FAT" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PurePhone" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PurePhone" type="462c0819:PsiDirectoryNode" />
+              <item name="module-vfs" type="462c0819:PsiDirectoryNode" />
+              <item name="board" type="462c0819:PsiDirectoryNode" />
+              <item name="cross" type="462c0819:PsiDirectoryNode" />
+              <item name="freeRTOS_FAT" type="462c0819:PsiDirectoryNode" />
+              <item name="portable" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="PurePhone" type="b2602c69:ProjectViewProjectNode" />
+              <item name="PurePhone" type="462c0819:PsiDirectoryNode" />
               <item name="source" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -249,6 +296,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="module-bsp" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="module-bsp" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="module-os" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="module-os" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -264,11 +316,18 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="module-vfs" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="module-vfs" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="CMake Application.PurePhone" />
-      <item itemvalue="CMake Application.module-sys" />
+      <item itemvalue="CMake Application.module-bsp" />
       <item itemvalue="CMake Application.module-os" />
+      <item itemvalue="CMake Application.module-sys" />
       <item itemvalue="CMake Application.module-utils" />
+      <item itemvalue="CMake Application.module-vfs" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -307,11 +366,12 @@
       <workItem from="1557325146277" duration="237000" />
       <workItem from="1557332150782" duration="1921000" />
       <workItem from="1557386687141" duration="1481000" />
+      <workItem from="1558509491423" duration="94000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="71300000" />
+    <option name="totallyTimeSpent" value="71394000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -324,9 +384,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1037" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.32817504" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.33191034" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -337,7 +396,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3297546" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
-      <window_info anchor="bottom" id="Messages" order="8" weight="0.32741398" />
+      <window_info anchor="bottom" id="Messages" order="8" visible="true" weight="0.32741398" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32705098" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="11" weight="0.32963374" />
@@ -355,23 +414,7 @@
     </ignored-roots>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/module-sys/module-os/FreeRTOS/include/croutine.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="36" selection-start-line="36" selection-end-line="38" selection-end-column="6" />
-          <folding>
-            <element signature="e#1471#1483#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/source/memory/usermem.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="435">
-          <caret line="29" column="1" selection-start-line="29" selection-start-column="1" selection-end-line="29" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/source/memory/usermem.h" />
     <entry file="file://$PROJECT_DIR$/PurePhone-version.h" />
     <entry file="file://$PROJECT_DIR$/module-utils/log/log.c" />
     <entry file="file://$PROJECT_DIR$/module-utils/log/segger/SEGGER.h">
@@ -445,16 +488,6 @@
     <entry file="file://$PROJECT_DIR$/module-sys/Target_RT1051.cmake" />
     <entry file="file://$PROJECT_DIR$/module-sys/Target_Linux.cmake" />
     <entry file="file://$PROJECT_DIR$/config/project_config.h" />
-    <entry file="file://$PROJECT_DIR$/module-utils/log/log.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="54" selection-start-line="54" selection-end-line="54" />
-          <folding>
-            <element signature="e#1155#1174#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/module-utils/board/linux/log.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1155">
@@ -525,16 +558,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cmake_ninja_wrapper.py" />
     <entry file="file://$PROJECT_DIR$/source/memory/memwrap.cpp" />
-    <entry file="file://$PROJECT_DIR$/source/memory/usermem.c">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="16" selection-start-line="19" selection-start-column="16" selection-end-line="19" selection-end-column="16" />
-          <folding>
-            <element signature="e#214#233#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/source/memory/usermem.c" />
     <entry file="file://$PROJECT_DIR$/Target_Linux.cmake">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="225">
@@ -542,16 +566,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/board/rt1051/macros.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="19" selection-start-line="14" selection-start-column="19" selection-end-line="14" selection-end-column="19" />
-          <folding>
-            <element signature="e#223#246#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/board/rt1051/macros.h" />
     <entry file="file://$PROJECT_DIR$/board/rt1051/memwrap.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -566,9 +581,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/module-utils/Target_Cross.cmake">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/module-utils/Target_Cross.cmake" />
     <entry file="file://$PROJECT_DIR$/module-utils/module-os/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1515">
@@ -578,10 +591,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/module-utils/module-os/Target_Linux.cmake" />
     <entry file="file://$PROJECT_DIR$/module-utils/module-os/Target_RT1051.cmake" />
+    <entry file="file://$PROJECT_DIR$/module-utils/Target_Linux.cmake" />
     <entry file="file://$PROJECT_DIR$/source/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
+        <state relative-caret-position="1410">
+          <caret line="94" selection-start-line="94" selection-end-line="94" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
           </folding>
@@ -591,7 +605,7 @@
     <entry file="file://$PROJECT_DIR$/Target_RT1051.cmake">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1020">
-          <caret line="68" column="9" selection-start-line="68" selection-start-column="9" selection-end-line="68" selection-end-column="9" />
+          <caret line="76" column="9" selection-start-line="76" selection-start-column="9" selection-end-line="76" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -617,22 +631,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/module-utils/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="915">
-          <caret line="61" column="31" selection-start-line="61" selection-start-column="31" selection-end-line="61" selection-end-column="31" />
+        <state relative-caret-position="720">
+          <caret line="48" column="31" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="31" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/module-sys/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="825">
-          <caret line="55" selection-start-line="55" selection-end-line="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/module-utils/Target_Linux.cmake">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        <state relative-caret-position="570">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
         </state>
       </provider>
     </entry>
@@ -640,6 +647,27 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module-utils/log/log.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="262">
+          <caret line="54" selection-start-line="54" selection-end-line="54" />
+          <folding>
+            <element signature="e#1155#1174#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/module-vfs/board/cross/freeRTOS_FAT/portable/ff_eMMC_user_disk.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="31" column="21" selection-start-line="31" selection-start-column="21" selection-end-line="31" selection-end-column="21" />
+          <folding>
+            <element signature="e#210#242#0" expanded="true" />
+            <element signature="e#354#375#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

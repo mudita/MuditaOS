@@ -1,0 +1,3 @@
+Theoretical speed for our eMMC with micro card adapter(4-bits + 52Mhz clock in SDR) is:
+~12Mbytes Write
+~18Mbytes Read
