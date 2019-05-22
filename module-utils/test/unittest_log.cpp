@@ -5,8 +5,6 @@
  *      Author: robert
  */
 
-#define LOG_MAIN
-#define LOG_USE_COLOR
 #include "log/log.hpp"
 
 #include <iostream>
