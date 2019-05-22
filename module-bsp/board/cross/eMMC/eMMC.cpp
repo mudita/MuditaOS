@@ -34,14 +34,13 @@ namespace bsp
         mmcCard.enablePreDefinedBlockCount = true;
         mmcCard.host.base = BOARD_EMMC_USDHCx;
         mmcCard.host.sourceClock_Hz = BOARD_EMMC_USDHCx_CLK_FREQ;
-        userPartitionBlocks = mmcCard.userPartitionBlocks;
-
-
+        
         auto ret = MMC_Init(&mmcCard);
-        if(ret != kStatus_Success){
+        if(ret != kStatus_Success){       
             return RetCode::Failure;
         }
         else{
+            userPartitionBlocks = mmcCard.userPartitionBlocks;
             return RetCode::Success;
         }
     #else

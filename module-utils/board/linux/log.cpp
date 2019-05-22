@@ -7,6 +7,7 @@
 #include <string>
 #include <mutex>
 
+
 #define LOGGER_BUFFER_SIZE  4096
 
 #define CONSOLE_ESCAPE_COLOR_BLACK              "\x1b[30m"
