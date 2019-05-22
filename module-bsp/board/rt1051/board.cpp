@@ -19,6 +19,8 @@
 namespace bsp {
 
 
+
+
 /* Get debug console frequency. */
     __attribute__((unused))
     static uint32_t BOARD_DebugConsoleSrcFreq(void) {
