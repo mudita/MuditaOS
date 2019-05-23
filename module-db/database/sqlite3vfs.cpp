@@ -339,7 +339,7 @@ static int ecophoneSync(sqlite3_file *pFile, int flags){
         return rc;
     }
 
-    //rc = fsync(p->fd);  //FF doesn't have this function
+    rc = fflush(p->fd);  //FF doesn't have this function
     rc = SQLITE_OK;
     return (rc==0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
@@ -487,8 +487,15 @@ static int ecophoneOpen(
     memset(p, 0, sizeof(EcophoneFile));
 
     std::string oflags;
-    if( flags&SQLITE_OPEN_READONLY )  oflags = "r";
-    if( flags&SQLITE_OPEN_READWRITE ) oflags = "wa";
+    if(flags&SQLITE_OPEN_READONLY ){
+        oflags = "r";
+    }
+    else if((flags&SQLITE_OPEN_READWRITE) && (flags&SQLITE_OPEN_CREATE) ){
+        oflags = "w+";
+    }
+    else{
+        oflags = "r+";
+    }
 
 
     p->fd = vfs.fopen(zName,oflags.c_str());
