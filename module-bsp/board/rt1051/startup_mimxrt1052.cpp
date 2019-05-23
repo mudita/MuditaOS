@@ -810,6 +810,30 @@ WEAK_AV void SysTick_Handler(void)
     extern "C"{
 #endif
 
+#include <assert.h>
+
+// Exception Stack Frame
+typedef struct
+{
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r12;
+    uint32_t lr;
+    uint32_t pc;
+    uint32_t psr;
+#if  defined(__ARM_ARCH_7EM__)
+    uint32_t s[16];
+#endif
+} syslog_exception_stack_frame_t;
+
+WEAK_AV void HardFault_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
+                                  uint32_t lr __attribute__((unused)))
+{
+    assert(0);
+}
+
 /*    extern void failure_exit(syslog_exception_stack_frame_t* frame,syslog_exception_source_t source);
 
     WEAK_AV void MemManage_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
@@ -818,11 +842,7 @@ WEAK_AV void SysTick_Handler(void)
         failure_exit(frame,SyslogExceptionSource_MemManageFault);
     }
 
-    WEAK_AV void HardFault_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
-                        uint32_t lr __attribute__((unused)))
-    {
-        failure_exit(frame,SyslogExceptionSource_HardFault);
-    }
+
 
     WEAK_AV void BusFault_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
                         uint32_t lr __attribute__((unused)))
@@ -861,7 +881,7 @@ WEAK_AV void MemManage_Handler (void)
 
 WEAK_AV void HardFault_Handler (void)
 {
-#if 0
+#if 1
   asm volatile(
       " tst lr,#4       \n"
       " ite eq          \n"
