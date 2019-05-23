@@ -64,6 +64,23 @@ int SystemStart(sys::SystemManager* sysmgr)
 {
     vfs.Init();
 
+    auto buff = new uint8_t[1024*1024];
+
+    std::fill_n(buff, 1024*1024, 13);
+
+    auto fd = vfs.fopen("/sys/testowy.txt","w+");
+
+    auto bytesWritten = vfs.fwrite(buff,1,1024*1024,fd);
+
+    std::fill_n(buff, 1024*1024, 0);
+
+    vfs.rewind(fd);
+
+    auto bytesRead = vfs.fread(buff,1,1024*1024,fd);
+
+    vfs.fclose(fd);
+
+
     auto ret = sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI"),sysmgr);
