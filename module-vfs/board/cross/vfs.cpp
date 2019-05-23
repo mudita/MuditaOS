@@ -39,6 +39,10 @@ int vfs::fclose ( FILE * stream ){
     return ff_fclose(stream);
 }
 
+int vfs::remove (const char *name){
+    return ff_remove(name);
+}
+
 size_t vfs::fread ( void * ptr, size_t size, size_t count, FILE * stream ){
     return ff_fread(ptr,size,count,stream);
 }

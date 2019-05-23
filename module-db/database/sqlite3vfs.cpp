@@ -112,7 +112,7 @@
 
 #if !defined(SQLITE_TEST) || SQLITE_OS_UNIX
 
-#include "../../database/sqlite3.h"
+#include "sqlite3.h"
 
 #include <assert.h>
 #include <string.h>
@@ -125,6 +125,8 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#include "FreeRTOS.h"
+#include "task.h"
 #include "vfs.hpp"
 #include "config.h"
 
@@ -168,9 +170,10 @@ static int ecophoneDirectWrite(
 ){
     size_t nWrite;                  /* Return value from write() */
 
+    auto fileSize = vfs.filelength(p->fd);
     //vfs_fseek doesn't like offset to be > file size
-    if (iOfst >= p->fd->ulFileSize)
-        iOfst = p->fd->ulFileSize;
+    if (iOfst >= fileSize)
+        iOfst = fileSize;
 
     if(vfs.fseek( p->fd, iOfst, SEEK_SET ) != 0){
         return SQLITE_IOERR_WRITE;
@@ -236,12 +239,13 @@ static int ecophoneRead(
     }
 
     //vfs_fseek returns error if desired file position is > file size. To mimic lseek desired position need to be truncated
+    auto fileSize = vfs.filelength(p->fd);
     if (p->fd != NULL) {
-    	if (iOfst >= p->fd->ulFileSize)
-    		iOfst = p->fd->ulFileSize;
+    	if (iOfst >= fileSize)
+    		iOfst = fileSize;
     }
 
-    if( vfs.fseek( p->fd, iOfst, FF_SEEK_SET ) != 0 ){
+    if( vfs.fseek( p->fd, iOfst, SEEK_SET ) != 0 ){
         return SQLITE_IOERR_READ;
     }
 
@@ -468,8 +472,6 @@ static int ecophoneOpen(
 
     EcophoneFile *p = (EcophoneFile*)pFile; /* Populate this structure */
     char *aBuf = 0;
-    FF_DirHandler_t xHandler;
-    FF_Error_t xError;
 
     if( zName==0 ){
         return SQLITE_IOERR;
@@ -484,15 +486,13 @@ static int ecophoneOpen(
 
     memset(p, 0, sizeof(EcophoneFile));
 
-    /* Look-up the I/O manager for the file system. */
-    if( FF_FS_Find( zName, &xHandler ) != pdFALSE )
-    {
-        //not using vfs_fopen because it lacks proper flag combination
-        if( flags&SQLITE_OPEN_READONLY ) p->fd = FF_Open( xHandler.pxManager, xHandler.pcPath, FF_MODE_READ, &xError );
-        else if (flags&SQLITE_OPEN_READWRITE) p->fd = FF_Open( xHandler.pxManager, xHandler.pcPath, FF_MODE_READ | FF_MODE_WRITE | FF_MODE_CREATE, &xError );
-    }
-    else
-    {
+    std::string oflags;
+    if( flags&SQLITE_OPEN_READONLY )  oflags = "r";
+    if( flags&SQLITE_OPEN_READWRITE ) oflags = "wa";
+
+
+    p->fd = vfs.fopen(zName,oflags.c_str());
+    if(p->fd == nullptr){
         sqlite3_free(aBuf);
         return SQLITE_CANTOPEN;
     }
@@ -515,7 +515,7 @@ static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync){
     UNUSED(pVfs);
     int rc;                         /* Return code */
 
-    rc = ff_remove( zPath );
+    rc = vfs.remove( zPath );
     if( rc!=0 /*&& errno==ENOENT*/ ) return SQLITE_OK;
 
     if( rc==0 && dirSync ){
@@ -560,15 +560,18 @@ static int ecophoneFullPathname(
 ){
     UNUSED(pVfs);
 
-    char zDir[MAXPATHNAME+1];
+    std::string path;
+    // absolute path
     if( zPath[0]=='/' ){
-        zDir[0] = '\0';
-    }else{
-        if( ff_getcwd(zDir, sizeof(zDir))==0 ) return SQLITE_IOERR;
     }
-    zDir[MAXPATHNAME] = '\0';
+    // relative path
+    else{
+        path = vfs.getcurrdir();
+        if( path.empty()) return SQLITE_IOERR;
 
-    sqlite3_snprintf(nPathOut, zPathOut, "%s%s", zDir, zPath);
+    }
+
+    sqlite3_snprintf(nPathOut, zPathOut, "%s/%s", path.c_str(), zPath);
     zPathOut[nPathOut-1] = '\0';
 
     return SQLITE_OK;
