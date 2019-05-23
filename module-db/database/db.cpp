@@ -65,10 +65,11 @@ void errorLogCallback(void *pArg, int iErrCode, const char *zMsg){
 }
 
 
-
-
-
-void db::Init() {
+db::db(){
     sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback, (void*)1);  //(void*)1 is taken from official SQLITE examples and it appears that it ends variable args list
     sqlite3_initialize();
+}
+
+db::~db() {
+    sqlite3_shutdown();
 }

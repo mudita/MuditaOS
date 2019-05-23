@@ -491,7 +491,15 @@ static int ecophoneOpen(
         oflags = "r";
     }
     else if((flags&SQLITE_OPEN_READWRITE) && (flags&SQLITE_OPEN_CREATE) ){
-        oflags = "w+";
+
+        p->fd = vfs.fopen(zName,"r");
+        if(p->fd == nullptr){
+            oflags = "w+";
+        }
+        else{
+            vfs.fclose(p->fd);
+            oflags = "r+";
+        }
     }
     else{
         oflags = "r+";

@@ -26,11 +26,12 @@ class vfs vfs;
 
 TEST_CASE( "Create and destroy simple database" ) {
 
-    db::Init();
 
 
     SECTION("Create database")
     {
+        class db database;
+
         sqlite3* db = nullptr;
 
         auto rc = sqlite3_open("test.db", &db);
@@ -87,6 +88,8 @@ TEST_CASE( "Create and destroy simple database" ) {
 
     SECTION("Add records to database")
     {
+        class db database;
+
         sqlite3* db = nullptr;
 
         auto rc = sqlite3_open("test.db", &db);

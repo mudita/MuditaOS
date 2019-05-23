@@ -16,7 +16,10 @@
 
 class db {
 public:
-    static void Init();
+
+    db();
+    ~db();
+
 };
 
 
