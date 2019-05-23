@@ -24,7 +24,7 @@ project(gui_renderer VERSION 1.0
                    DESCRIPTION "GTK application for showing draw buffer."
                    LANGUAGES CXX)
                    
-find_package(PkgConfig REQUIRED)               
+find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 
 add_subdirectory( src )

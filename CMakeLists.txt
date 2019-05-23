@@ -65,7 +65,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC -D__MCUXPRESSO)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D__USE_CMSIS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D__NEWLIB__)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DSKIP_SYSCLK_INIT)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_HAVE_SQLITE_CONFIG_H)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D_GNU_SOURCE)
 
 
