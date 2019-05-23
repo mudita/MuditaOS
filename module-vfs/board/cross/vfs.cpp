@@ -98,9 +98,12 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
             {
                 attribute = FileAttributes::ReadOnly;
             }
-            else
+            else if(pxFindStruct->ucAttributes & FF_FAT_ATTR_ARCHIVE )
             {
                 attribute = FileAttributes::Writable;
+            }
+            else{
+                continue;
             }
 
             dir_list.push_back(DirectoryEntry{pxFindStruct->pcFileName,attribute,pxFindStruct->ulFileSize});

@@ -82,7 +82,7 @@ PixMap* PixMapManager::loadPixMap( std::string filename ) {
 	}
 
 	//read data to buffer
-	vfs.fread( data, fileSize, 1, file );
+	vfs.fread( data, 1, fileSize, file );
 
 	//close file
 	vfs.fclose( file );

@@ -327,7 +327,7 @@ Font* FontManager::loadFont( std::string filename ) {
 	}
 
 	//read data to buffer
-	vfs.fread( fontData, fileSize, 1, file );
+ 	auto bytesRead= vfs.fread( fontData, 1, fileSize, file );
 
 	//close file
 	vfs.fclose( file );
