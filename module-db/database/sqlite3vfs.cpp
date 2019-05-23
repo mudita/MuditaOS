@@ -339,7 +339,7 @@ static int ecophoneSync(sqlite3_file *pFile, int flags){
         return rc;
     }
 
-    rc = fflush(p->fd);  //FF doesn't have this function
+    //rc = fflush(p->fd);  //FF doesn't have this function
     rc = SQLITE_OK;
     return (rc==0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
