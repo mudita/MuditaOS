@@ -25,7 +25,6 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/database/Field.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/database/QueryResult.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/database/Database.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/database/db.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3.c
         ${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3vfs.cpp
 

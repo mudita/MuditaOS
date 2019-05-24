@@ -29,6 +29,11 @@ public:
 
     bool Execute(const char *format, ...);
 
+    // Must be invoked prior creating any database object in order to initialize database OS layer
+    static void Initialize();
+    // Must be invoked before closing system in order to properly close OS layer
+    static void Deinitialize();
+
 private:
 
     const uint32_t maxQueryLen = (8 * 1024);
