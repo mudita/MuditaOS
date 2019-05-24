@@ -26,10 +26,9 @@
 #define CACHEABLE_SECTION_SDRAM_ALIGN(var,alignbytes)	\
 		__attribute__ ((section (".sdram")))  __attribute__((aligned(alignbytes))) var
 
-#define NONCACHEABLE_SECTION_SDRAM(var)		__attribute__ ((section (".sdramnoncacheable"))) var
+#define NONCACHEABLE_SECTION_SDRAM(var)		var
 
-#define NONCACHEABLE_SECTION_SDRAM_ALIGN(var,alignbytes)	\
-	__attribute__ ((section (".sdramnoncacheable"))) var __attribute__((aligned(alignbytes)))
+#define NONCACHEABLE_SECTION_SDRAM_ALIGN(var,alignbytes)    var __attribute__((aligned(alignbytes)))
 
 #define NONCACHEABLE_SECTION_INIT(var) 		__attribute__((section("NonCacheable.init"))) var
 
@@ -43,21 +42,15 @@
 
 static inline uint32_t IS_MEM_ADDR_CACHED(void* addr)
 {
-	extern uint32_t __sdram_non_cached_start[];
-	extern uint32_t __sdram_non_cached_end[];
-	extern uint32_t __ocram_cached_start[];
-	extern uint32_t __ocram_cached_end[];
+	extern uint32_t __ocram_noncached_start[];
+	extern uint32_t __ocram_noncached_end[];
 	extern uint32_t __dtcm_ram_start[];
 	extern uint32_t __dtcm_ram_end[];
 	extern uint32_t __sdram_cached_start[];
 	extern uint32_t __sdram_cached_end[];
 
-
-	if(((uint32_t*)addr >= (uint32_t*)__sdram_non_cached_start) && ((uint32_t*)addr < (uint32_t*)__sdram_non_cached_end)){
+	if(((uint32_t*)addr >= (uint32_t*)__ocram_noncached_start) && ((uint32_t*)addr < (uint32_t*)__ocram_noncached_end)){
 		return 0;
-	}
-	if(((uint32_t*)addr >= (uint32_t*)__ocram_cached_start) && ((uint32_t*)addr < (uint32_t*)__ocram_cached_end)){
-		return 1;
 	}
 	if(((uint32_t*)addr >= (uint32_t*)__dtcm_ram_start) && ((uint32_t*)addr < (uint32_t*)__dtcm_ram_end)){
 		return 0;
