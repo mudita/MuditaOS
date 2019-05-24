@@ -44,7 +44,7 @@ disk. */
 #define mainIO_MANAGER_CACHE_SIZE	( 15UL * FSL_SDMMC_DEFAULT_BLOCK_SIZE )
 
 
-static NONCACHEABLE_SECTION_SDRAM_ALIGN(uint8_t emmc_user_CacheBuffer[mainIO_MANAGER_CACHE_SIZE],32);
+static ALIGN_(32) uint8_t emmc_user_CacheBuffer[mainIO_MANAGER_CACHE_SIZE];
 
 /*
  * The function that writes to the media.
