@@ -10,11 +10,13 @@
 
 ENTRY(ResetISR)
 
+/*
 __sdram_non_cached_start = ORIGIN(BOARD_SDRAM_NOCACHE);
 __sdram_non_cached_end = ORIGIN(BOARD_SDRAM_NOCACHE) + LENGTH(BOARD_SDRAM_NOCACHE);
+*/
 
-__ocram_cached_start = ORIGIN(SRAM_OC);
-__ocram_cached_end = ORIGIN(SRAM_OC) + LENGTH(SRAM_OC);
+__ocram_noncached_start = ORIGIN(SRAM_OC);
+__ocram_noncached_end = ORIGIN(SRAM_OC) + LENGTH(SRAM_OC);
 
 __dtcm_ram_start = ORIGIN(SRAM_DTC);
 __dtcm_ram_end = ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC);
@@ -50,11 +52,6 @@ SECTIONS
         /* Global Section Table */
         . = ALIGN(4) ;
         __section_table_start = .;
-        __textram_section_table = .;
-        LONG(LOADADDR(.freeRTOS));
-        LONG(    ADDR(.freeRTOS));
-        LONG(  SIZEOF(.freeRTOS));
-        __textram_section_table_end = .;
         __data_section_table = .;
         LONG(LOADADDR(.data));
         LONG(    ADDR(.data));
@@ -72,10 +69,12 @@ SECTIONS
     } > BOARD_SDRAM_TEXT
 
     /* Put FreeRTOS code into internal DTC RAM */
-    .freeRTOS : ALIGN(4)  
-    { 
-        *core/amazon-freertos/*.c.obj (.text .text*) 
+    /*
+    .freeRTOS : ALIGN(4)
+    {
+        *module-os/FreeRTOS/*.c.obj (.text .text*)
     }  > SRAM_DTC_TEXT AT>BOARD_SDRAM_TEXT
+    */
 
     .text : ALIGN(4)    
     {
@@ -186,11 +185,13 @@ SECTIONS
     } >BOARD_SDRAM_HEAP
     
     /* No cacheable region in ext SDRAM */
+    /*
     .sdramnoncacheable (NOLOAD) : ALIGN(4)
     {
         *(.sdramnoncacheable)
         *(.sdramnoncacheable.*)
     } >BOARD_SDRAM_NOCACHE
+    */
 
     /* Reserve and place Heap within memory map */
     _HeapSize = 0x1000;

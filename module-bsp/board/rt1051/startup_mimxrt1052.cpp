@@ -717,14 +717,6 @@ void ResetISR(void) {
     unsigned int *SectionTableAddr;
 
     // Load base address of Global Section Table
-    SectionTableAddr = &__textram_section_table;
-
-    // Copy the special text sections from SDRAM to DTC RAM.
-    LoadAddr = *SectionTableAddr++;
-    ExeAddr = *SectionTableAddr++;
-    SectionLen = *SectionTableAddr++;
-    data_init(LoadAddr, ExeAddr, SectionLen);
-
     SectionTableAddr = &__data_section_table;
 
     // Copy the data sections from flash to SRAM.
@@ -834,13 +826,15 @@ WEAK_AV void HardFault_Handler_C (syslog_exception_stack_frame_t* frame __attrib
     assert(0);
 }
 
+WEAK_AV void MemManage_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
+                                  uint32_t lr __attribute__((unused)))
+{
+    assert(0);
+}
+
 /*    extern void failure_exit(syslog_exception_stack_frame_t* frame,syslog_exception_source_t source);
 
-    WEAK_AV void MemManage_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
-                        uint32_t lr __attribute__((unused)))
-    {
-        failure_exit(frame,SyslogExceptionSource_MemManageFault);
-    }
+
 
 
 
@@ -862,7 +856,7 @@ WEAK_AV void HardFault_Handler_C (syslog_exception_stack_frame_t* frame __attrib
 
 WEAK_AV void MemManage_Handler (void)
 {
-#if 0
+#if 1
   asm volatile(
       " tst lr,#4       \n"
       " ite eq          \n"
