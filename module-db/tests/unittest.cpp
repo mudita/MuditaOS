@@ -20,23 +20,21 @@
 
 #include "../database/db.hpp"
 
+#include "../database/Database.hpp"
+
 
 class vfs vfs;
 
 
 TEST_CASE( "Create and destroy simple database" ) {
 
+    db database;
 
 
     SECTION("Create database")
     {
-        class db database;
 
-        sqlite3* db = nullptr;
-
-        auto rc = sqlite3_open("test.db", &db);
-            REQUIRE(rc == SQLITE_OK);
-
+        Database testDB("test.db");
 
         const char* media_album_table =
                 "CREATE TABLE IF NOT EXISTS albums("
@@ -65,48 +63,48 @@ TEST_CASE( "Create and destroy simple database" ) {
                 "FOREIGN KEY(album_id) 	REFERENCES albums(_id)"
                 ");";
 
-        const char* _media_queries[] = {media_artist_table, media_album_table,media_songs_table};
-
-        sqlite3_stmt *stmt = NULL;  //binary SQL statement object produced by sqlite3_prepare_v2
-
+        const char* testdb_queries[] = {media_artist_table, media_album_table,media_songs_table};
 
         //execute all commands from the array
-        for( uint32_t i=0; i<sizeof(_media_queries)/sizeof(char*); i++)
+        for( uint32_t i=0; i<sizeof(testdb_queries)/sizeof(char*); i++)
         {
-            //create byte code for request
-            REQUIRE(sqlite3_prepare_v2(db, _media_queries[i], -1, &stmt, NULL) == SQLITE_OK);
-            rc = sqlite3_step(stmt);
-            REQUIRE(stmt != nullptr);
-            REQUIRE(rc == SQLITE_DONE);
-
-            sqlite3_finalize(stmt);
-
+            REQUIRE(testDB.Execute(testdb_queries[i]) == true);
         }
 
-        sqlite3_close(db);
     }
 
     SECTION("Add records to database")
     {
-        class db database;
+        Database testDB("test.db");
 
-        sqlite3* db = nullptr;
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');","Mati Patus") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');","Mati Patus2") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');","Mati Patus3") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');","Mati Patus4") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');","Mati Patus5") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');","Mati Patus6") == true);
 
-        auto rc = sqlite3_open("test.db", &db);
-        REQUIRE(rc == SQLITE_OK);
+
+    }
+
+    SECTION("Query database")
+    {
+        Database testDB("test.db");
+
+        const char* name = "Mati Patus6";
+        auto queryRes = testDB.Query("SELECT * from artists;");
+
+        REQUIRE(queryRes->GetFieldCount() == 2);
+        REQUIRE(queryRes->GetRowCount() ==6);
+
+        do{
+            std::cout << "Artist ID: " <<  (*queryRes)[0].GetInt32() << "\n";
+            std::cout << "Artist name: " <<  (*queryRes)[1].GetString() << "\n";
+        }while(queryRes->NextRow());
 
 
-        //create new artist record
-        char* sql_cmd = sqlite3_mprintf( "insert or ignore into artists ( name ) VALUES ( '%s');",
-                                         "Mati Patus");
 
-        REQUIRE(sql_cmd != nullptr);
 
-        int result = sqlite3_exec(db, sql_cmd, NULL, NULL, NULL );
-        REQUIRE(result == SQLITE_OK);
-        sqlite3_free(sql_cmd);
-
-        sqlite3_close(db);
     }
 
 

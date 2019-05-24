@@ -167,7 +167,7 @@ static int ecophoneDirectWrite(
         const void *zBuf,               /* Buffer containing data to write */
         int iAmt,                       /* Size of data to write in bytes */
         sqlite_int64 iOfst              /* File offset to write to */
-){
+) {
     size_t nWrite;                  /* Return value from write() */
 
     auto fileSize = vfs.filelength(p->fd);
@@ -175,12 +175,12 @@ static int ecophoneDirectWrite(
     if (iOfst >= fileSize)
         iOfst = fileSize;
 
-    if(vfs.fseek( p->fd, iOfst, SEEK_SET ) != 0){
+    if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
         return SQLITE_IOERR_WRITE;
     }
 
-    nWrite = vfs.fwrite( zBuf, 1, iAmt, p->fd);
-    if( (int)nWrite!=iAmt ){
+    nWrite = vfs.fwrite(zBuf, 1, iAmt, p->fd);
+    if ((int) nWrite != iAmt) {
         return SQLITE_IOERR_WRITE;
     }
 
@@ -192,9 +192,9 @@ static int ecophoneDirectWrite(
  ** no-op if this particular file does not have a buffer (i.e. it is not
  ** a journal file) or if the buffer is currently empty.
  */
-static int ecophoneFlushBuffer(EcophoneFile *p){
+static int ecophoneFlushBuffer(EcophoneFile *p) {
     int rc = SQLITE_OK;
-    if( p->nBuffer ){
+    if (p->nBuffer) {
         rc = ecophoneDirectWrite(p, p->aBuffer, p->nBuffer, p->iBufferOfst);
         p->nBuffer = 0;
     }
@@ -204,9 +204,9 @@ static int ecophoneFlushBuffer(EcophoneFile *p){
 /*
  ** Close a file.
  */
-static int ecophoneClose(sqlite3_file *pFile){
+static int ecophoneClose(sqlite3_file *pFile) {
     int rc;
-    EcophoneFile *p = (EcophoneFile*)pFile;
+    EcophoneFile *p = (EcophoneFile *) pFile;
     rc = ecophoneFlushBuffer(p);
     sqlite3_free(p->aBuffer);
 
@@ -222,8 +222,8 @@ static int ecophoneRead(
         void *zBuf,
         int iAmt,
         sqlite_int64 iOfst
-){
-    EcophoneFile *p = (EcophoneFile*)pFile;
+) {
+    EcophoneFile *p = (EcophoneFile *) pFile;
     int nRead;                      /* Return value from read() */
     int rc;                         /* Return code from ecophoneFlushBuffer() */
 
@@ -234,26 +234,26 @@ static int ecophoneRead(
      ** a journal file when there is data cached in the write-buffer.
      */
     rc = ecophoneFlushBuffer(p);
-    if( rc!=SQLITE_OK ){
+    if (rc != SQLITE_OK) {
         return rc;
     }
 
     //vfs_fseek returns error if desired file position is > file size. To mimic lseek desired position need to be truncated
     auto fileSize = vfs.filelength(p->fd);
     if (p->fd != NULL) {
-    	if (iOfst >= fileSize)
-    		iOfst = fileSize;
+        if (iOfst >= fileSize)
+            iOfst = fileSize;
     }
 
-    if( vfs.fseek( p->fd, iOfst, SEEK_SET ) != 0 ){
+    if (vfs.fseek(p->fd, iOfst, SEEK_SET) != 0) {
         return SQLITE_IOERR_READ;
     }
 
-    nRead = vfs.fread( zBuf, 1, iAmt, p->fd );
+    nRead = vfs.fread(zBuf, 1, iAmt, p->fd);
 
-    if( nRead==iAmt ){
+    if (nRead == iAmt) {
         return SQLITE_OK;
-    }else if( nRead>=0 ){
+    } else if (nRead >= 0) {
         return SQLITE_IOERR_SHORT_READ;
     }
 
@@ -268,33 +268,33 @@ static int ecophoneWrite(
         const void *zBuf,
         int iAmt,
         sqlite_int64 iOfst
-){
-    EcophoneFile *p = (EcophoneFile*)pFile;
+) {
+    EcophoneFile *p = (EcophoneFile *) pFile;
 
-    if( p->aBuffer ){
-        char *z = (char *)zBuf;       /* Pointer to remaining data to write */
+    if (p->aBuffer) {
+        char *z = (char *) zBuf;       /* Pointer to remaining data to write */
         int n = iAmt;                 /* Number of bytes at z */
         sqlite3_int64 i = iOfst;      /* File offset to write to */
 
-        while( n>0 ){
+        while (n > 0) {
             int nCopy;                  /* Number of bytes to copy into buffer */
 
             /* If the buffer is full, or if this data is not being written directly
              ** following the data already buffered, flush the buffer. Flushing
              ** the buffer is a no-op if it is empty.
              */
-            if( p->nBuffer==SQLITE_ECOPHONEVFS_BUFFERSZ || p->iBufferOfst+p->nBuffer!=i ){
+            if (p->nBuffer == SQLITE_ECOPHONEVFS_BUFFERSZ || p->iBufferOfst + p->nBuffer != i) {
                 int rc = ecophoneFlushBuffer(p);
-                if( rc!=SQLITE_OK ){
+                if (rc != SQLITE_OK) {
                     return rc;
                 }
             }
-            assert( p->nBuffer==0 || p->iBufferOfst+p->nBuffer==i );
+            assert(p->nBuffer == 0 || p->iBufferOfst + p->nBuffer == i);
             p->iBufferOfst = i - p->nBuffer;
 
             /* Copy as much data as possible into the buffer. */
             nCopy = SQLITE_ECOPHONEVFS_BUFFERSZ - p->nBuffer;
-            if( nCopy>n ){
+            if (nCopy > n) {
                 nCopy = n;
             }
             memcpy(&p->aBuffer[p->nBuffer], z, nCopy);
@@ -304,7 +304,7 @@ static int ecophoneWrite(
             i += nCopy;
             z += nCopy;
         }
-    }else{
+    } else {
         return ecophoneDirectWrite(p, zBuf, iAmt, iOfst);
     }
 
@@ -315,7 +315,7 @@ static int ecophoneWrite(
  ** Truncate a file. This is a no-op for this VFS (see header comments at
  ** the top of the file).
  */
-static int ecophoneTruncate(sqlite3_file *pFile, sqlite_int64 size){
+static int ecophoneTruncate(sqlite3_file *pFile, sqlite_int64 size) {
 #if 0
     if( ftruncate(((EcophoneFile *)pFile)->fd, size) ) return SQLITE_IOERR_TRUNCATE;
 #else
@@ -328,27 +328,27 @@ static int ecophoneTruncate(sqlite3_file *pFile, sqlite_int64 size){
 /*
  ** Sync the contents of the file to the persistent media.
  */
-static int ecophoneSync(sqlite3_file *pFile, int flags){
-    EcophoneFile *p = (EcophoneFile*)pFile;
+static int ecophoneSync(sqlite3_file *pFile, int flags) {
+    EcophoneFile *p = (EcophoneFile *) pFile;
     int rc;
 
     UNUSED(flags);
 
     rc = ecophoneFlushBuffer(p);
-    if( rc!=SQLITE_OK ){
+    if (rc != SQLITE_OK) {
         return rc;
     }
 
     //rc = fflush(p->fd);  //FF doesn't have this function
     rc = SQLITE_OK;
-    return (rc==0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
+    return (rc == 0 ? SQLITE_OK : SQLITE_IOERR_FSYNC);
 }
 
 /*
  ** Write the size of the file in bytes to *pSize.
  */
-static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize){
-    EcophoneFile *p = (EcophoneFile*)pFile;
+static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize) {
+    EcophoneFile *p = (EcophoneFile *) pFile;
     int rc;                         /* Return code from fstat() call */
 
     /* Flush the contents of the buffer to disk. As with the flush in the
@@ -357,11 +357,11 @@ static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize){
      ** not worth the trouble.
      */
     rc = ecophoneFlushBuffer(p);
-    if( rc!=SQLITE_OK ){
+    if (rc != SQLITE_OK) {
         return rc;
     }
 
-    *pSize = vfs.filelength( p->fd );
+    *pSize = vfs.filelength(p->fd);
 
     return SQLITE_OK;
 }
@@ -372,17 +372,19 @@ static int ecophoneFileSize(sqlite3_file *pFile, sqlite_int64 *pSize){
  ** a reserved lock on the database file. This ensures that if a hot-journal
  ** file is found in the file-system it is rolled back.
  */
-static int ecophoneLock(sqlite3_file *pFile, int eLock){
+static int ecophoneLock(sqlite3_file *pFile, int eLock) {
     UNUSED(pFile);
     UNUSED(eLock);
     return SQLITE_OK;
 }
-static int ecophoneUnlock(sqlite3_file *pFile, int eLock){
+
+static int ecophoneUnlock(sqlite3_file *pFile, int eLock) {
     UNUSED(pFile);
     UNUSED(eLock);
     return SQLITE_OK;
 }
-static int ecophoneCheckReservedLock(sqlite3_file *pFile, int *pResOut){
+
+static int ecophoneCheckReservedLock(sqlite3_file *pFile, int *pResOut) {
     UNUSED(pFile);
     *pResOut = 0;
     return SQLITE_OK;
@@ -391,7 +393,7 @@ static int ecophoneCheckReservedLock(sqlite3_file *pFile, int *pResOut){
 /*
  ** No xFileControl() verbs are implemented by this VFS.
  */
-static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg){
+static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg) {
     UNUSED(pFile);
     UNUSED(op);
     UNUSED(pArg);
@@ -403,11 +405,12 @@ static int ecophoneFileControl(sqlite3_file *pFile, int op, void *pArg){
  ** may return special values allowing SQLite to optimize file-system
  ** access to some extent. But it is also safe to simply return 0.
  */
-static int ecophoneSectorSize(sqlite3_file *pFile){
+static int ecophoneSectorSize(sqlite3_file *pFile) {
     UNUSED(pFile);
     return 0;
 }
-static int ecophoneDeviceCharacteristics(sqlite3_file *pFile){
+
+static int ecophoneDeviceCharacteristics(sqlite3_file *pFile) {
     UNUSED(pFile);
     return 0;
 }
@@ -421,23 +424,20 @@ static int ecophoneAccess(
         const char *zPath,
         int flags,
         int *pResOut
-){
+) {
     vfs::FILE *fd;
     UNUSED(pVfs);
 
-    assert( flags==SQLITE_ACCESS_EXISTS       /* access(zPath, F_OK) */
-            || flags==SQLITE_ACCESS_READ         /* access(zPath, R_OK) */
-            || flags==SQLITE_ACCESS_READWRITE    /* access(zPath, R_OK|W_OK) */
+    assert(flags == SQLITE_ACCESS_EXISTS       /* access(zPath, F_OK) */
+           || flags == SQLITE_ACCESS_READ         /* access(zPath, R_OK) */
+           || flags == SQLITE_ACCESS_READWRITE    /* access(zPath, R_OK|W_OK) */
     );
 
-    fd = vfs.fopen(zPath, (const char*)"r" );
-    if( fd != NULL)
-    {
+    fd = vfs.fopen(zPath, (const char *) "r");
+    if (fd != NULL) {
         if (pResOut) *pResOut = flags;
         vfs.fclose(fd);
-    }
-    else
-        if (pResOut) *pResOut = 0;
+    } else if (pResOut) *pResOut = 0;
     return SQLITE_OK;
 }
 
@@ -445,13 +445,14 @@ static int ecophoneAccess(
  ** Open a file handle.
  */
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
 static int ecophoneOpen(
         sqlite3_vfs *pVfs,              /* VFS */
         const char *zName,              /* File to open, or 0 for a temp file */
         sqlite3_file *pFile,            /* Pointer to EcophoneFile struct to populate */
         int flags,                      /* Input SQLITE_OPEN_XXX flags */
         int *pOutFlags                  /* Output SQLITE_OPEN_XXX flags (or NULL) */
-){
+) {
     UNUSED(pVfs);
 
     static const sqlite3_io_methods ecophoneio = {
@@ -470,16 +471,16 @@ static int ecophoneOpen(
             ecophoneDeviceCharacteristics     /* xDeviceCharacteristics */
     };
 
-    EcophoneFile *p = (EcophoneFile*)pFile; /* Populate this structure */
+    EcophoneFile *p = (EcophoneFile *) pFile; /* Populate this structure */
     char *aBuf = 0;
 
-    if( zName==0 ){
+    if (zName == 0) {
         return SQLITE_IOERR;
     }
 
-    if( flags&SQLITE_OPEN_MAIN_JOURNAL ){
-        aBuf = (char *)sqlite3_malloc(SQLITE_ECOPHONEVFS_BUFFERSZ);
-        if( !aBuf ){
+    if (flags & SQLITE_OPEN_MAIN_JOURNAL) {
+        aBuf = (char *) sqlite3_malloc(SQLITE_ECOPHONEVFS_BUFFERSZ);
+        if (!aBuf) {
             return SQLITE_NOMEM;
         }
     }
@@ -487,34 +488,34 @@ static int ecophoneOpen(
     memset(p, 0, sizeof(EcophoneFile));
 
     std::string oflags;
-    if(flags&SQLITE_OPEN_READONLY ){
+    if (flags & SQLITE_OPEN_READONLY) {
         oflags = "r";
-    }
-    else if((flags&SQLITE_OPEN_READWRITE) && (flags&SQLITE_OPEN_CREATE) ){
+    } else if ((flags & SQLITE_OPEN_READWRITE) && (flags & SQLITE_OPEN_CREATE)) {
 
-        p->fd = vfs.fopen(zName,"r");
-        if(p->fd == nullptr){
+        // check if database specified exists
+        p->fd = vfs.fopen(zName, "r");
+        if (p->fd == nullptr) {
+            // database doesn't exist, create new one with read&write permissions
             oflags = "w+";
-        }
-        else{
+        } else {
+            // database exists, open it with read&write permissions
             vfs.fclose(p->fd);
             oflags = "r+";
         }
-    }
-    else{
+    } else {
         oflags = "r+";
     }
 
 
-    p->fd = vfs.fopen(zName,oflags.c_str());
-    if(p->fd == nullptr){
+    p->fd = vfs.fopen(zName, oflags.c_str());
+    if (p->fd == nullptr) {
         sqlite3_free(aBuf);
         return SQLITE_CANTOPEN;
     }
 
     p->aBuffer = aBuf;
 
-    if( pOutFlags ){
+    if (pOutFlags) {
         *pOutFlags = flags;
     }
     p->base.pMethods = &ecophoneio;
@@ -526,34 +527,34 @@ static int ecophoneOpen(
  ** is non-zero, then ensure the file-system modification to delete the
  ** file has been synced to disk before returning.
  */
-static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync){
+static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync) {
     UNUSED(pVfs);
     int rc;                         /* Return code */
 
-    rc = vfs.remove( zPath );
-    if( rc!=0 /*&& errno==ENOENT*/ ) return SQLITE_OK;
+    rc = vfs.remove(zPath);
+    if (rc != 0 /*&& errno==ENOENT*/ ) return SQLITE_OK;
 
-    if( rc==0 && dirSync ){
+    if (rc == 0 && dirSync) {
         vfs::FILE *dfd;                      /* File descriptor open on directory */
         int i;                        /* Iterator variable */
-        char zDir[MAXPATHNAME+1];     /* Name of directory containing file zPath */
+        char zDir[MAXPATHNAME + 1];     /* Name of directory containing file zPath */
 
         /* Figure out the directory name from the path of the file deleted. */
         sqlite3_snprintf(MAXPATHNAME, zDir, "%s", zPath);
         zDir[MAXPATHNAME] = '\0';
-        for(i=strlen(zDir); i>1 && zDir[i]!='/'; i++);
+        for (i = strlen(zDir); i > 1 && zDir[i] != '/'; i++);
         zDir[i] = '\0';
 
         /* Open a file-descriptor on the directory. Sync. Close. */
-        dfd = vfs.fopen( zDir, "D" );
-        if( dfd == NULL ){
+        dfd = vfs.fopen(zDir, "D");
+        if (dfd == NULL) {
             rc = -1;
-        }else{
+        } else {
             rc = SQLITE_OK;
             vfs.fclose(dfd);
         }
     }
-    return (rc==0 ? SQLITE_OK : SQLITE_IOERR_DELETE);
+    return (rc == 0 ? SQLITE_OK : SQLITE_IOERR_DELETE);
 }
 
 /*
@@ -572,22 +573,22 @@ static int ecophoneFullPathname(
         const char *zPath,              /* Input path (possibly a relative path) */
         int nPathOut,                   /* Size of output buffer in bytes */
         char *zPathOut                  /* Pointer to output buffer */
-){
+) {
     UNUSED(pVfs);
 
     std::string path;
     // absolute path
-    if( zPath[0]=='/' ){
+    if (zPath[0] == '/') {
     }
-    // relative path
-    else{
+        // relative path
+    else {
         path = vfs.getcurrdir();
-        if( path.empty()) return SQLITE_IOERR;
+        if (path.empty()) return SQLITE_IOERR;
 
     }
 
     sqlite3_snprintf(nPathOut, zPathOut, "%s/%s", path.c_str(), zPath);
-    zPathOut[nPathOut-1] = '\0';
+    zPathOut[nPathOut - 1] = '\0';
 
     return SQLITE_OK;
 }
@@ -604,23 +605,26 @@ static int ecophoneFullPathname(
  ** extensions compiled as shared objects. This simple VFS does not support
  ** this functionality, so the following functions are no-ops.
  */
-static void *ecophoneDlOpen(sqlite3_vfs *pVfs, const char *zPath){
+static void *ecophoneDlOpen(sqlite3_vfs *pVfs, const char *zPath) {
     UNUSED(pVfs);
     UNUSED(zPath);
     return 0;
 }
-static void ecophoneDlError(sqlite3_vfs *pVfs, int nByte, char *zErrMsg){
+
+static void ecophoneDlError(sqlite3_vfs *pVfs, int nByte, char *zErrMsg) {
     UNUSED(pVfs);
     sqlite3_snprintf(nByte, zErrMsg, "Loadable extensions are not supported");
-    zErrMsg[nByte-1] = '\0';
+    zErrMsg[nByte - 1] = '\0';
 }
-static void (*ecophoneDlSym(sqlite3_vfs *pVfs, void *pH, const char *z))(void){
+
+static void (*ecophoneDlSym(sqlite3_vfs *pVfs, void *pH, const char *z))(void) {
     UNUSED(pVfs);
     UNUSED(pH);
     UNUSED(z);
     return 0;
 }
-static void ecophoneDlClose(sqlite3_vfs *pVfs, void *pHandle){
+
+static void ecophoneDlClose(sqlite3_vfs *pVfs, void *pHandle) {
     UNUSED(pVfs);
     UNUSED(pHandle);
     return;
@@ -630,7 +634,7 @@ static void ecophoneDlClose(sqlite3_vfs *pVfs, void *pHandle){
  ** Parameter zByte points to a buffer nByte bytes in size. Populate this
  ** buffer with pseudo-random data.
  */
-static int ecophoneRandomness(sqlite3_vfs *pVfs, int nByte, char *zByte){
+static int ecophoneRandomness(sqlite3_vfs *pVfs, int nByte, char *zByte) {
     UNUSED(pVfs);
     UNUSED(nByte);
     UNUSED(zByte);
@@ -641,11 +645,11 @@ static int ecophoneRandomness(sqlite3_vfs *pVfs, int nByte, char *zByte){
  ** Sleep for at least nMicro microseconds. Return the (approximate) number
  ** of microseconds slept for.
  */
-static int ecophoneSleep(sqlite3_vfs *pVfs, int nMicro){
+static int ecophoneSleep(sqlite3_vfs *pVfs, int nMicro) {
     UNUSED(pVfs);
 
     const TickType_t xDelay = nMicro / 1000 / portTICK_PERIOD_MS;
-    vTaskDelay( xDelay );
+    vTaskDelay(xDelay);
 
     return nMicro;
 }
@@ -661,10 +665,10 @@ static int ecophoneSleep(sqlite3_vfs *pVfs, int nMicro){
  ** value, it will stop working some time in the year 2038 AD (the so-called
  ** "year 2038" problem that afflicts systems that store time this way).
  */
-static int ecophoneCurrentTime(sqlite3_vfs *pVfs, double *pTime){
+static int ecophoneCurrentTime(sqlite3_vfs *pVfs, double *pTime) {
 
     time_t t = time(0);
-    *pTime = t/86400.0 + 2440587.5;
+    *pTime = t / 86400.0 + 2440587.5;
     return SQLITE_OK;
 }
 
@@ -675,7 +679,8 @@ static int ecophoneCurrentTime(sqlite3_vfs *pVfs, double *pTime){
  **   sqlite3_vfs_register(sqlite3_ecophonevfs(), 0);
  */
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
-sqlite3_vfs *sqlite3_ecophonevfs(void){
+
+sqlite3_vfs *sqlite3_ecophonevfs(void) {
     static sqlite3_vfs ecophonevfs = {
             1,                            /* iVersion */
             sizeof(EcophoneFile),             /* szOsFile */
