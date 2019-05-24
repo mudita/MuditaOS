@@ -24,7 +24,7 @@
 #include "task.h"
 #include "semphr.h"
 //#include "fat_media.h"
-#include "vfs.h"
+//#include "vfs.h"
 
 //#include "log.h"
 #include "board.h"
@@ -743,12 +743,12 @@ static void s_EinkSetInitialConfig()
          return;
      }
 
-     LOG_DEBUG("Eink Display configured");
+//     LOG_DEBUG("Eink Display configured");
 }
 
 EinkStatus_e EinkResetAndInitialize()
 {
-    LOG_INFO("Resetting the SPI peripheral, Eink display and setting init configuration");
+//    LOG_INFO("Resetting the SPI peripheral, Eink display and setting init configuration");
     // Initialize the synchronization resources, SPI and GPIOs for the Eink BSP
     BSP_EinkInit(NULL);
     // Reset the display
@@ -833,7 +833,7 @@ EinkStatus_e EinkUpdateWaveform(EinkWaveforms_e Mode, int32_t temperature)
             offset = LUTS_TOTAL_SIZE*(56+segment);
         break;
     }
-
+/*
     VFS_FILE* lutFileDescriptor = NULL;
 
     //Open file
@@ -905,7 +905,7 @@ EinkStatus_e EinkUpdateWaveform(EinkWaveforms_e Mode, int32_t temperature)
     free(bufferLutC);
 
     vfs_fclose(lutFileDescriptor);
-
+*/
     s_einkConfiguredWaveform = Mode;
 
     return EinkOK;
@@ -1404,7 +1404,7 @@ static uint8_t* s_EinkTransformAnimationFrameCoordinateSystem_1Bpp(
             // HACK: Did not create the loop for accessing pixels and merging them in the single byte for better performance.
             //       Wanted to avoid unneeded loop count increasing and jump operations which for large amount of data
             //       take considerable amount of time.
-"
+
             uint32_t index =  inputRow * BOARD_EINK_DISPLAY_RES_X + inputCol;
 
             // Use the LUT to convert the input pixel from 4bpp to 1bpp
