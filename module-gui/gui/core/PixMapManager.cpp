@@ -130,6 +130,9 @@ std::vector<std::string> PixMapManager::getPixMapList() {
 			//TODO remove commented code
 			LOG_INFO("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
 		}
+		else {
+			LOG_FATAL("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
+		}
 	}
 
 	LOG_INFO("Total number of images: %d", pixMapFiles.size());
