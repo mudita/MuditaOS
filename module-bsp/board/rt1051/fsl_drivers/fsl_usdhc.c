@@ -35,7 +35,6 @@
 #include "fsl_usdhc.h"
 #if defined(FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL) && FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL
 #include "fsl_cache.h"
-#include "macros.h"
 #endif /* FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL */
 
 /*******************************************************************************
@@ -1365,12 +1364,12 @@ status_t USDHC_TransferBlocking(USDHC_Type *base, usdhc_adma_config_t *dmaConfig
 #if defined(FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL) && FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL
     else
     {
-        if (data->txData != NULL && IS_MEM_ADDR_CACHED(data->txData))
+        if (data->txData != NULL)
         {
             /* clear the DCACHE */
             DCACHE_CleanByRange((uint32_t)data->txData, (data->blockSize) * (data->blockCount));
         }
-        else if(data->rxData != NULL && IS_MEM_ADDR_CACHED(data->rxData))
+        else if(data->rxData != NULL)
         {
             /* clear the DCACHE */
             DCACHE_CleanInvalidateByRange((uint32_t)data->rxData, (data->blockSize) * (data->blockCount));
@@ -1442,12 +1441,12 @@ status_t USDHC_TransferNonBlocking(USDHC_Type *base,
 #if defined(FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL) && FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL
     else
     {
-        if (data->txData != NULL && IS_MEM_ADDR_CACHED(data->txData))
+        if (data->txData != NULL)
         {
             /* clear the DCACHE */
             DCACHE_CleanByRange((uint32_t)data->txData, (data->blockSize) * (data->blockCount));
         }
-        else if (data->rxData != NULL && IS_MEM_ADDR_CACHED(data->rxData))
+        else if (data->rxData != NULL)
         {
             /* clear the DCACHE */
             DCACHE_CleanInvalidateByRange((uint32_t)data->rxData, (data->blockSize) * (data->blockCount));
