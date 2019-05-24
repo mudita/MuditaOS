@@ -10,9 +10,16 @@
 #include "log/log.hpp"
 
 ServiceEink::ServiceEink(const std::string& name)
-		: sys::Service(name)
+	: sys::Service(name),
+	  timerID { 0 },
+	  selfRefereshTriggerCount{ 0 },
+	  temperatureMeasurementTriggerCount{ 0 },
+	  powerOffTriggerCount{ 0 }
 {
 	LOG_INFO("[ServiceEink] Initializing");
+
+	timerID = CreateTimer(1000,true);
+	ReloadTimer(timerID);
 }
 
 ServiceEink::~ServiceEink(){
@@ -26,6 +33,8 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 // Invoked when timer ticked
 void ServiceEink::TickHandler(uint32_t id) {
+
+
 }
 
 // Invoked during initialization

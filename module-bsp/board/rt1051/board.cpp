@@ -14,6 +14,7 @@
 #include "fsl_lpuart.h"
 #include "fsl_semc.h"
 #include "pin_mux.h"
+#include "dma_config.h"
 
 namespace bsp {
 
@@ -150,8 +151,8 @@ namespace bsp {
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
         /* Enable I cache and D cache */
-        SCB_EnableDCache();
-        SCB_EnableICache();
+//        SCB_EnableDCache();
+//        SCB_EnableICache();
     }
 
 
@@ -176,6 +177,7 @@ namespace bsp {
         BOARD_ConfigMPU();
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
+        BOARD_InitDMA();
         BOARD_ConfigCellular();
     }
 
