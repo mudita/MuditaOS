@@ -18,8 +18,6 @@
 
 #include <iostream>
 
-#include "../database/db.hpp"
-
 #include "../database/Database.hpp"
 
 
@@ -28,8 +26,7 @@ class vfs vfs;
 
 TEST_CASE( "Create and destroy simple database" ) {
 
-    db database;
-
+    Database::Initialize();
 
     SECTION("Create database")
     {
@@ -95,7 +92,7 @@ TEST_CASE( "Create and destroy simple database" ) {
         auto queryRes = testDB.Query("SELECT * from artists;");
 
         REQUIRE(queryRes->GetFieldCount() == 2);
-        REQUIRE(queryRes->GetRowCount() ==6);
+        REQUIRE(queryRes->GetRowCount() == 6);
 
         do{
             std::cout << "Artist ID: " <<  (*queryRes)[0].GetInt32() << "\n";
@@ -107,6 +104,6 @@ TEST_CASE( "Create and destroy simple database" ) {
 
     }
 
-
+    Database::Deinitialize();
 
 }
