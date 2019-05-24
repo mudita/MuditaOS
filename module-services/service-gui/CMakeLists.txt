@@ -16,7 +16,9 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/DrawMessage.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/DrawMessage.hpp"
 )
 

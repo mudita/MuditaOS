@@ -7,6 +7,9 @@
 
 #include "gui/core/Font.hpp"
 #include "gui/core/PixMapManager.hpp"
+//gui service
+#include "GUIMessage.hpp"
+#include "DrawMessage.hpp"
 
 #include "ServiceGUI.hpp"
 #include "log/log.hpp"
@@ -29,6 +32,23 @@ ServiceGUI::~ServiceGUI(){
 
 // Invoked upon receiving data message
 sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
+
+	sgui::GUIMessage* msg = static_cast<sgui::GUIMessage*>(msgl);
+
+	switch( msg->messageType ) {
+	case sgui::GUIMessageType::Uninitialized: {
+		LOG_ERROR("[ServiceGUI] Received uninitialized message type");
+	} break;
+	case sgui::GUIMessageType::Commands: {
+		auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
+		LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+	} break;
+	case sgui::GUIMessageType::FocusInfo: {
+
+		LOG_INFO("[ServiceGUI] Received focus info");
+	} break;
+	};
+
 	return std::make_shared<sys::ResponseMessage>();
 }
 

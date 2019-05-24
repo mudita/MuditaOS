@@ -82,7 +82,7 @@ PixMap* PixMapManager::loadPixMap( std::string filename ) {
 	}
 
 	//read data to buffer
-	vfs.fread( data, fileSize, 1, file );
+	vfs.fread( data, 1, fileSize, file );
 
 	//close file
 	vfs.fclose( file );
@@ -108,6 +108,14 @@ PixMap* PixMapManager::loadPixMap( std::string filename ) {
 	return pixMap;
 }
 
+bool hasEnding2 (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
 std::vector<std::string> PixMapManager::getPixMapList() {
 
 	std::vector<std::string> pixMapFiles;
@@ -116,12 +124,15 @@ std::vector<std::string> PixMapManager::getPixMapList() {
 	auto dirList = vfs.listdir(pixMapFolder.c_str());
 
 	for( vfs::DirectoryEntry ent : dirList ) {
-		if( ent.attributes != vfs::FileAttributes::Directory ) {
+		if( (ent.attributes != vfs::FileAttributes::Directory) &&
+			(hasEnding2( ent.fileName, ".mpi") ) )  {
 			pixMapFiles.push_back( pixMapFolder + "/" + ent.fileName );
 			//TODO remove commented code
-			//LOG_INFO("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
+			LOG_INFO("font: %s", (pixMapFolder + "/" + ent.fileName).c_str());
 		}
 	}
+
+	LOG_INFO("Total number of images: %d", pixMapFiles.size());
 
 	return pixMapFiles;
 }
