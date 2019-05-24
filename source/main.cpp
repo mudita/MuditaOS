@@ -120,7 +120,7 @@ public:
 			auto msg = std::make_shared<sgui::DrawMessage>(commandsList);
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
     	}
-//        LOG_DEBUG("Blinky service tick!");
+        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization

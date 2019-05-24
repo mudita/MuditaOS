@@ -40,8 +40,8 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		LOG_ERROR("[ServiceGUI] Received uninitialized message type");
 	} break;
 	case sgui::GUIMessageType::Commands: {
-//		auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
-//		LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+		auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
+		LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 	} break;
 	case sgui::GUIMessageType::FocusInfo: {
 

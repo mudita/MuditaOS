@@ -9,6 +9,9 @@
 #ifndef MODULE_BSP_BOARD_RT1051_EINK_DMA_CONFIG_H_
 #define MODULE_BSP_BOARD_RT1051_EINK_DMA_CONFIG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*
  *   **********************************************************************************************************************
@@ -45,5 +48,8 @@
  */
 void BOARD_InitDMA();
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MODULE_BSP_BOARD_RT1051_EINK_DMA_CONFIG_H_ */
