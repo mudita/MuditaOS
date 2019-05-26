@@ -281,6 +281,21 @@ typedef enum
     EinkDisplayColorModeInverted
 } EinkDisplayColorMode_e;
 
+typedef struct {
+	//type of eink's waveform
+	EinkWaveforms_e mode;
+	//temperature of surrounding
+	int32_t temperature;
+	//pointer to lookup table for lut c
+	uint8_t* LUTCData;
+	//sizeo of lutc data
+	uint32_t LUTCSize;
+	//pointer to lookup table for lut d
+	uint8_t* LUTDData;
+	//size of lutd data
+	uint32_t LUTDSize;
+}EinkWaveFormSettings_t;
+
 /* Exported constants --------------------------------------------------------*/
 
 /* Exported functions ------------------------------------------------------- */
@@ -353,7 +368,7 @@ EinkUpdateFrame (uint16_t X,
  * @param temperature [in] - current ambient temperature
  * @return EinkOK
  */
-EinkStatus_e EinkClearScreenDeep (int8_t temperature);
+//EinkStatus_e EinkClearScreenDeep (int8_t temperature);
 
 /**
  * @brief This function just displays the color (black or white) on the entire display. Used to clear the display fast.
@@ -382,9 +397,10 @@ EinkRefreshImage (uint16_t X, uint16_t Y, uint16_t W, uint16_t H, EinkDisplayTim
  *          based on the requested waveform (see \ref Mode) and the given temperature (see \ref temperature)
  * @param Mode [in] - type of the waveform
  * @param temperature [in] - current ambient temperature in Celsius degrees
+ * @param LUTCData [in] - Data
  * @return
  */
-EinkStatus_e EinkUpdateWaveform(EinkWaveforms_e Mode, int32_t temperature);
+EinkStatus_e EinkUpdateWaveform(const EinkWaveFormSettings_t* settings);
 
 
 /**

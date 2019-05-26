@@ -6,7 +6,7 @@
 //module-services
 #include "service-gui/ServiceGUI.hpp"
 #include "service-gui/DrawMessage.hpp"
-#include "service-eink/ServiceEink.hpp"
+#include "ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
 
 //module-gui

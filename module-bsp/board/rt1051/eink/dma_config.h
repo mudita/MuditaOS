@@ -42,6 +42,7 @@ extern "C" {
  */
 #define BSP_EINK_MEMCPY_DMA_DMAMUX_BASE                 DMAMUX
 #define BSP_EINK_MEMCPY_DMA_DMA_BASE                    DMA0
+#define BSP_EINK_MEMCPY_DMA_CH                          2
 
 /**
  * @brief This function initializes the entire DMA peripheral

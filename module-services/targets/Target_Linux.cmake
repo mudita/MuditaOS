@@ -1,3 +1,7 @@
-set(BOARD_SOURCES CACHE INTERNAL "")
+set(BOARD_SOURCES 
+	${CMAKE_CURRENT_SOURCE_DIR}/service-eink/board/linux/ServiceEink.cpp 
+	CACHE INTERNAL "")
 
-set(BOARD_DIR_INCLUDES  CACHE INTERNAL "")
+set(BOARD_DIR_INCLUDES  
+	${CMAKE_CURRENT_SOURCE_DIR}/service-eink/board/linux 
+	CACHE INTERNAL "")
