@@ -34,6 +34,8 @@ public:
 	ServiceEink(const std::string& name);
     ~ServiceEink();
 
+    bool deepClearScreen(int8_t temperature);
+
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override;

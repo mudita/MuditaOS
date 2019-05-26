@@ -5,9 +5,11 @@
  *      Author: robert
  */
 
-#include "ServiceEink.hpp"
 
+//module-utils
 #include "log/log.hpp"
+
+#include "ServiceEink.hpp"
 
 ServiceEink::ServiceEink(const std::string& name)
 	: sys::Service(name),
@@ -17,6 +19,8 @@ ServiceEink::ServiceEink(const std::string& name)
 	  powerOffTriggerCount{ 0 }
 {
 	LOG_INFO("[ServiceEink] Initializing");
+
+	//deepClearScreen( 24 );
 
 	timerID = CreateTimer(1000,true);
 	ReloadTimer(timerID);
@@ -53,6 +57,13 @@ sys::ReturnCodes ServiceEink::WakeUpHandler() {
 
 sys::ReturnCodes ServiceEink::SleepHandler() {
 	return sys::ReturnCodes::Success;
+}
+
+
+bool ServiceEink::deepClearScreen(int8_t temperature)
+{
+
+    return true;
 }
 
 

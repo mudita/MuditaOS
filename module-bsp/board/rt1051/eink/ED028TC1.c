@@ -761,152 +761,29 @@ EinkStatus_e EinkResetAndInitialize()
     return EinkOK;
 }
 
-EinkStatus_e EinkUpdateWaveform(EinkWaveforms_e Mode, int32_t temperature)
+EinkStatus_e EinkUpdateWaveform( const EinkWaveFormSettings_t* settings )
 {
-#if (PROJECT_CONFIG_GUI_EINK_VERBOSE_LOGGING==1)
-    LOG_TRACE("Setting waveform: %s", Mode == EinkWaveformINIT  ? "INIT"    :
-                                      Mode == EinkWaveformA2    ? "A2"      :
-                                      Mode == EinkWaveformDU2   ? "DU2"     :
-                                      Mode == EinkWaveformGLD16 ? "GLD16"   :
-                                      Mode == EinkWaveformGC16  ? "GC16"    :
-                                      "Unknown");
-#endif
-
-    const uint16_t LUTD_SIZE = 16385;
-    const uint16_t LUTC_SIZE = 64;
-    const uint16_t LUTR_SIZE = 256; ///< Needed due to \ref EINK_LUTS_FILE_PATH structure
-
-    const uint16_t LUTS_TOTAL_SIZE = LUTD_SIZE + LUTC_SIZE + LUTR_SIZE;
-
     // If neither the temperature nor the waveform has changed - do nothing
-    if ((temperature == s_einkPreviousTemperature) &&
-        (Mode == s_einkConfiguredWaveform))
+    if ((settings->temperature == s_einkPreviousTemperature) &&
+        (settings->mode == s_einkConfiguredWaveform))
     {
-#if (PROJECT_CONFIG_GUI_EINK_VERBOSE_LOGGING==1)
-        LOG_TRACE("Waveform and temperature did not change - ignoring");
-#endif
         return EinkOK;
     }
 
-    s_einkPreviousTemperature = temperature;
-
-    unsigned int segment = 0;
-
-    if (temperature < 38)
+    if (BSP_EinkWriteData(settings->LUTDData, settings->LUTDSize, SPI_AUTOMATIC_CS) != 0)
     {
-        segment = temperature/3;
-    }
-    else
-    {
-        if (temperature < 43)
-        {
-            segment = 12;
-        }
-        else
-        {
-            segment = 13;
-        }
-    }
-
-    uint32_t offset = 0;
-
-    switch (Mode)
-    {
-        case EinkWaveformINIT:
-            offset = LUTS_TOTAL_SIZE*segment;
-        break;
-
-        case EinkWaveformA2:
-            offset = LUTS_TOTAL_SIZE*(14+segment);
-        break;
-
-        case EinkWaveformDU2:
-            offset = LUTS_TOTAL_SIZE*(28+segment);
-        break;
-
-        case EinkWaveformGLD16:
-            offset = LUTS_TOTAL_SIZE*(42+segment);
-        break;
-
-        case EinkWaveformGC16:
-        default:
-            offset = LUTS_TOTAL_SIZE*(56+segment);
-        break;
-    }
-/*
-    VFS_FILE* lutFileDescriptor = NULL;
-
-    //Open file
-    lutFileDescriptor = vfs_fopen(EINK_LUTS_FILE_PATH, "r");
-    if (lutFileDescriptor == NULL)
-    {
-//        LOG_FATAL("Could not find the LUTS.bin file. Returning");
-        return EinkWaveformsFileOpenFail;
-    }
-    // Allocate memory for the LUTD data. +1 for the EinkLUTD command for SPI transfer
-    uint8_t* bufferLutD = (uint8_t*)malloc(LUTD_SIZE + 1);
-
-    if (bufferLutD == NULL)
-    {
-//        LOG_ERROR("Could not allocate memory for the LUTD array");
-        vfs_fclose(lutFileDescriptor);
-        return EinkNoMem;
-    }
-
-    // Allocate memory for the LUTC data. +1 for the EinkLUTC command for SPI transfer
-    uint8_t* bufferLutC = (uint8_t*)malloc(LUTC_SIZE + 1);
-
-    if (bufferLutC == NULL)
-    {
-        LOG_ERROR("Could not allocate memory for the LUTC array");
-        free(bufferLutD);
-        vfs_fclose(lutFileDescriptor);
-        return EinkNoMem;
-    }
-
-    bufferLutD[0] = EinkLUTD;
-    bufferLutC[0] = EinkLUTC;
-
-    ///LUTD
-    vfs_fseek(lutFileDescriptor, offset, FF_SEEK_SET);
-    vfs_fread(&bufferLutD[1], sizeof(uint8_t), LUTD_SIZE, lutFileDescriptor);
-
-    uint8_t  frameCount = bufferLutD[1] + 1;     // 0x00 - 1 frame, ... , 0x0F - 16 frames
-    uint32_t lutDSize = frameCount * 64 + 1 + 1; // (frameCount * 64) - size of actual LUT; (+1) - the byte containing frameCount; (+1) - EinkLUTD command
-
-    if (BSP_EinkWriteData(bufferLutD, lutDSize, SPI_AUTOMATIC_CS) != 0)
-    {
-//        LOG_ERROR("Eink: transmitting the LUTD failed");
-        free(bufferLutC);
-        free(bufferLutD);
-        vfs_fclose(lutFileDescriptor);
-
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
     ///LUTC
-    offset += LUTD_SIZE;
-    vfs_fseek(lutFileDescriptor, offset, FF_SEEK_SET);
-    vfs_fread(&bufferLutC[1], sizeof(uint8_t), LUTC_SIZE, lutFileDescriptor);
-
-    if (BSP_EinkWriteData(bufferLutC, LUTC_SIZE + 1, SPI_AUTOMATIC_CS) != 0)
+    if (BSP_EinkWriteData(settings->LUTCData, settings->LUTCSize, SPI_AUTOMATIC_CS) != 0)
     {
-//        LOG_ERROR("Eink: transmitting the LUTC failed");
-        free(bufferLutC);
-        free(bufferLutD);
-        vfs_fclose(lutFileDescriptor);
-
         EinkResetAndInitialize();
         return EinkSPIErr;
     }
 
-    free(bufferLutD);
-    free(bufferLutC);
-
-    vfs_fclose(lutFileDescriptor);
-*/
-    s_einkConfiguredWaveform = Mode;
+    s_einkConfiguredWaveform = settings->mode;
 
     return EinkOK;
 }
@@ -1079,22 +956,22 @@ EinkUpdateFrame ( uint16_t X,
     return(EinkOK);
 }
 
-EinkStatus_e
-EinkClearScreenDeep (int8_t temperature)
-{
-    EinkWaveforms_e wv = s_einkConfiguredWaveform;
-
-    EinkUpdateWaveform(EinkWaveformA2, temperature);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
-    EinkFillScreenWithColor(EinkDisplayColorBlack);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
-    EinkFillScreenWithColor(EinkDisplayColorBlack);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
-
-    EinkUpdateWaveform(wv, temperature);
-
-    return EinkOK;
-}
+//EinkStatus_e
+//EinkClearScreenDeep (int8_t temperature)
+//{
+//    EinkWaveforms_e wv = s_einkConfiguredWaveform;
+//
+//    EinkUpdateWaveform(EinkWaveformA2, temperature);
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
+//    EinkFillScreenWithColor(EinkDisplayColorBlack);
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
+//    EinkFillScreenWithColor(EinkDisplayColorBlack);
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
+//
+//    EinkUpdateWaveform(wv, temperature);
+//
+//    return EinkOK;
+//}
 
 EinkStatus_e
 EinkFillScreenWithColor (EinkDisplayColorFilling_e colorFill)
