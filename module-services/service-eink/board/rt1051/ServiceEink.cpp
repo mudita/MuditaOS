@@ -68,12 +68,11 @@ ServiceEink::ServiceEink(const std::string& name)
 	EDMA_SetCallback(&s_einkMemcpyDma_handle, s_EinkServiceDMAMemcpyCallback, NULL);
 
 
-
+	//TODO remove screen clearing code below.
 	EinkPowerOn();
 
-	 uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
-	 LOG_INFO("EInk measured temperature: %d\u00B0C", s_einkAmbientTemperature);
-
+	uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
+	LOG_INFO("EInk measured temperature: %d\u00B0C", s_einkAmbientTemperature);
 
 	// Make the saturation to the lower limit
 	if (s_einkAmbientTemperature < 0)
@@ -84,11 +83,7 @@ ServiceEink::ServiceEink(const std::string& name)
 		s_einkAmbientTemperature = 49;
 
 	// Clear the temperature timer count
-
-
-//	EinkUpdateWaveform(EinkWaveformGC16, s_einkAmbientTemperature);
 	deepClearScreen( s_einkAmbientTemperature );
-	//EinkRefreshImage(0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y, EinkDisplayTimingsDeepCleanMode);
 	EinkPowerOff();
 
 	timerID = CreateTimer(1000,true);
@@ -211,14 +206,11 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
 
     waveformSettings.LUTDSize = 0;
     waveformSettings.LUTDData = new uint8_t[ LUTD_SIZE + 1];
-//    uint8_t* bufferLutD = (uint8_t*)malloc(LUTD_SIZE + 1);
 
     if(waveformSettings.LUTDData == nullptr )
     {
         LOG_ERROR("Could not allocate memory for the LUTD array");
-//        vfs_fclose(lutFileDescriptor);
         vfs.fclose( file );
-//        return EinkNoMem;
         return false;
     }
 
@@ -231,10 +223,7 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
     if ( waveformSettings.LUTCData  == nullptr )
     {
         LOG_ERROR("Could not allocate memory for the LUTC array");
-//        free(bufferLutD);
         vfs.fclose( file );
-//        vfs_fclose(lutFileDescriptor);
-//        return EinkNoMem;
         return false;
     }
 

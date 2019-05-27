@@ -20,10 +20,13 @@ ServiceEink::ServiceEink(const std::string& name)
 {
 	LOG_INFO("[ServiceEink] Initializing");
 
-	//deepClearScreen( 24 );
+	deepClearScreen( 24 );
 
 	timerID = CreateTimer(1000,true);
 	ReloadTimer(timerID);
+
+	//start renderer process
+	system( "./gui_renderer &" );
 }
 
 ServiceEink::~ServiceEink(){
