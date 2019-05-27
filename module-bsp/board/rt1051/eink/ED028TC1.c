@@ -777,7 +777,7 @@ EinkStatus_e EinkUpdateWaveform( const EinkWaveFormSettings_t* settings )
     }
 
     ///LUTC
-    if (BSP_EinkWriteData(settings->LUTCData, settings->LUTCSize, SPI_AUTOMATIC_CS) != 0)
+    if (BSP_EinkWriteData(settings->LUTCData, settings->LUTCSize + 1, SPI_AUTOMATIC_CS) != 0)
     {
         EinkResetAndInitialize();
         return EinkSPIErr;

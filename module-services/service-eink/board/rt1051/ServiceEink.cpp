@@ -67,7 +67,29 @@ ServiceEink::ServiceEink(const std::string& name)
 	EDMA_CreateHandle(&s_einkMemcpyDma_handle, BSP_EINK_MEMCPY_DMA_DMA_BASE, BSP_EINK_MEMCPY_DMA_CH);
 	EDMA_SetCallback(&s_einkMemcpyDma_handle, s_EinkServiceDMAMemcpyCallback, NULL);
 
-	deepClearScreen( 24 );
+
+
+	EinkPowerOn();
+
+	 uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
+	 LOG_INFO("EInk measured temperature: %d\u00B0C", s_einkAmbientTemperature);
+
+
+	// Make the saturation to the lower limit
+	if (s_einkAmbientTemperature < 0)
+		s_einkAmbientTemperature = 0;
+
+	// Make the saturation to the higher limit
+	if (s_einkAmbientTemperature > 49)
+		s_einkAmbientTemperature = 49;
+
+	// Clear the temperature timer count
+
+
+//	EinkUpdateWaveform(EinkWaveformGC16, s_einkAmbientTemperature);
+	deepClearScreen( s_einkAmbientTemperature );
+	EinkRefreshImage(0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y, EinkDisplayTimingsDeepCleanMode);
+	EinkPowerOff();
 
 	timerID = CreateTimer(1000,true);
 	ReloadTimer(timerID);
@@ -123,11 +145,11 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
         return EinkOK;
     }
 
-    const uint16_t LUTD_SIZE = 16385;
-	const uint16_t LUTC_SIZE = 64;
-	const uint16_t LUTR_SIZE = 256; ///< Needed due to \ref EINK_LUTS_FILE_PATH structure
+    const uint32_t LUTD_SIZE = 16385;
+	const uint32_t LUTC_SIZE = 64;
+	const uint32_t LUTR_SIZE = 256; ///< Needed due to \ref EINK_LUTS_FILE_PATH structure
 
-	const uint16_t LUTS_TOTAL_SIZE = LUTD_SIZE + LUTC_SIZE + LUTR_SIZE;
+	const uint32_t LUTS_TOTAL_SIZE = LUTD_SIZE + LUTC_SIZE + LUTR_SIZE;
 
 	waveformSettings.temperature = temperature;
 
@@ -178,19 +200,17 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
 
     //Open file
 	auto file = vfs.fopen( "sys/Luts.bin", "rb" );
-//    lutFileDescriptor = vfs_fopen(EINK_LUTS_FILE_PATH, "r");
     if ( file == nullptr )
     {
         LOG_FATAL("Could not find the LUTS.bin file. Returning");
         return false;
-//        return EinkWaveformsFileOpenFail;
     }
     // Allocate memory for the LUTD data. +1 for the EinkLUTD command for SPI transfer
     if( waveformSettings.LUTDData != nullptr )
     	delete [] waveformSettings.LUTDData;
 
-    waveformSettings.LUTDSize = LUTD_SIZE + 1;
-    waveformSettings.LUTDData = new uint8_t( waveformSettings.LUTDSize );
+    waveformSettings.LUTDSize = 0;
+    waveformSettings.LUTDData = new uint8_t[ LUTD_SIZE + 1];
 //    uint8_t* bufferLutD = (uint8_t*)malloc(LUTD_SIZE + 1);
 
     if(waveformSettings.LUTDData == nullptr )
@@ -203,12 +223,11 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
     }
 
     // Allocate memory for the LUTC data. +1 for the EinkLUTC command for SPI transfer
-//    uint8_t* bufferLutC = (uint8_t*)malloc(LUTC_SIZE + 1);
     if( waveformSettings.LUTCData != nullptr )
     	delete [] waveformSettings.LUTCData;
 
-    waveformSettings.LUTCSize = LUTC_SIZE + 1;
-    waveformSettings.LUTCData = new uint8_t( waveformSettings.LUTCSize );
+    waveformSettings.LUTCSize = LUTC_SIZE;
+    waveformSettings.LUTCData = new uint8_t[ LUTC_SIZE + 1];
     if ( waveformSettings.LUTCData  == nullptr )
     {
         LOG_ERROR("Could not allocate memory for the LUTC array");
@@ -221,29 +240,33 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
 
     waveformSettings.LUTDData[0] = EinkLUTD;
     waveformSettings.LUTCData[0] = EinkLUTC;
-//    bufferLutD[0] = EinkLUTD;
-//    bufferLutC[0] = EinkLUTC;
-
 
     ///LUTD
     vfs.fseek( file, offset, FF_SEEK_SET );
-//  vfs_fseek(lutFileDescriptor, offset, FF_SEEK_SET);
-    vfs.fread( &waveformSettings.LUTDData[1], LUTD_SIZE, 1, file );
-//      vfs_fread(&bufferLutD[1], sizeof(uint8_t), LUTD_SIZE, lutFileDescriptor);
+    vfs.fread( &waveformSettings.LUTDData[1], 1, LUTD_SIZE, file );
 
     uint8_t frameCount = waveformSettings.LUTDData[1] + 1; // 0x00 - 1 frame, ... , 0x0F - 16 frames
-//    uint8_t  frameCount = bufferLutD[1] + 1;
     waveformSettings.LUTDSize = frameCount * 64 + 1 + 1; // (frameCount * 64) - size of actual LUT; (+1) - the byte containing frameCount; (+1) - EinkLUTD command
-//    uint32_t lutDSize = frameCount * 64 + 1 + 1;
 
     //LUTC
 	offset += LUTD_SIZE;
 	vfs.fseek( file, offset, FF_SEEK_SET );
-//	vfs_fseek(lutFileDescriptor, offset, FF_SEEK_SET);
-	vfs.fread( &waveformSettings.LUTCData[1], LUTC_SIZE, 1, file );
-//	vfs_fread(&bufferLutC[1], sizeof(uint8_t), LUTC_SIZE, lutFileDescriptor);
+	vfs.fread( &waveformSettings.LUTCData[1], 1, LUTC_SIZE, file );
 
 	vfs.fclose( file );
+
+//	if (BSP_EinkWriteData( waveformSettings.LUTDData, waveformSettings.LUTDSize, SPI_AUTOMATIC_CS) != 0)
+//	{
+//		LOG_ERROR("Eink: transmitting the LUTD failed");
+//		EinkResetAndInitialize();
+//		return EinkSPIErr;
+//	}
+//	if (BSP_EinkWriteData(waveformSettings.LUTCData, waveformSettings.LUTCSize + 1, SPI_AUTOMATIC_CS) != 0)
+//	{
+//		LOG_ERROR("Eink: transmitting the LUTC failed");
+//		EinkResetAndInitialize();
+//		return EinkSPIErr;
+//	}
 
 	return true;
 //	return EinkOK;
@@ -253,14 +276,14 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
 {
     EinkWaveforms_e wv = waveformSettings.mode;
 
-	changeWaveform( EinkWaveformA2, temperature );
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
+	changeWaveform( EinkWaveformINIT, temperature );
+    //EinkFillScreenWithColor(EinkDisplayColorWhite);
     EinkFillScreenWithColor(EinkDisplayColorBlack);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
-    EinkFillScreenWithColor(EinkDisplayColorBlack);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
+    //EinkFillScreenWithColor(EinkDisplayColorWhite);
+    //EinkFillScreenWithColor(EinkDisplayColorBlack);
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
 
-    changeWaveform(wv, temperature);
+    //changeWaveform(wv, temperature);
 
     return true;
 }
