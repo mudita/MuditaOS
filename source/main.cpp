@@ -1,38 +1,126 @@
 
 #include <memory>
+#include <list>
 #include "log/log.hpp"
 
+//module-services
 #include "service-gui/ServiceGUI.hpp"
-#include "service-eink/ServiceEink.hpp"
+#include "service-gui/DrawMessage.hpp"
+#include "ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
 
+//module-gui
+#include "gui/core/Font.hpp"
+#include "gui/core/BoundingBox.hpp"
+#include "gui/core/Context.hpp"
+#include "gui/core/Renderer.hpp"
+#include "gui/core/DrawCommand.hpp"
+#include "gui/core/Font.hpp"
+#include "gui/core/PixMapManager.hpp"
+
+#include "gui/widgets/Window.hpp"
+#include "gui/widgets/Item.hpp"
+#include "gui/widgets/Label.hpp"
+#include "gui/widgets/BoxLayout.hpp"
+#include "gui/widgets/Image.hpp"
+
+//module-bsp
 #include "bsp.hpp"
 #include "vfs.hpp"
+#include "keyboard/keyboard.hpp"
 
 #include "SystemManager/SystemManager.hpp"
 
 class vfs vfs;
 
 class BlinkyService : public sys::Service {
-
+	gui::Window* win = nullptr;
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
+
+        win = new gui::Window(0);
+		win->setSize( 480, 600 );
+
+		gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
+
+		gui::Rect* maxW1 = new gui::Rect();
+		maxW1->setFillColor(gui::Color( 5, 0));
+		maxW1->setFilled(true);
+		maxW1->setMaxSize( 50, 300 );
+
+		gui::Label* maxW4 = new gui::Label();
+		maxW4->setText("Top Left corner");
+		maxW4->setDotsMode(true);
+		maxW4->setMaxSize( 275, 60 );
+
+		gui::Rect* maxW2 = new gui::Rect();
+		maxW2->setFillColor(gui::Color( 8, 0));
+		maxW2->setFilled(true);
+		maxW2->setMaxSize( 35, 300 );
+
+		gui::Rect* maxW3 = new gui::Rect();
+		maxW3->setFillColor(gui::Color( 11, 0));
+		maxW3->setFilled(true);
+		maxW3->setMaxSize( 30, 300 );
+
+		hBox->addWidget(maxW1);
+		hBox->addWidget(maxW4);
+		hBox->addWidget(maxW2);
+
+		gui::VBox* vBox = new gui::VBox( hBox, 10, 155, 460, 600-160 );
+
+		gui::Rect* maxH1 = new gui::Rect();
+		maxH1->setMaxSize( 10, 80 );
+
+		gui::Rect* maxH2 = new gui::Rect();
+		maxH2->setMaxSize( 15, 300 );
+
+		gui::Rect* maxH3 = new gui::Rect();
+		maxH3->setMaxSize( 30, 300 );
+
+		gui::Label* maxH4 = new gui::Label();
+		maxH4->setText("Hello Mudita");
+		maxH4->setRadius( 20 );
+		maxH4->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+		maxH4->setMaxSize( 75, 60 );
+
+		gui::Image* img1 = new gui::Image();
+		uint16_t id = gui::PixMapManager::getInstance().getPixMapID("loudspeaker.mpi");
+		img1->setImageWithID( id );
+
+
+		vBox->addWidget(maxH1);
+		vBox->addWidget(maxH2);
+		vBox->addWidget(maxH4);
+		vBox->addWidget( img1 );
+		vBox->addWidget(maxH3);
+
+		hBox->addWidget(maxW3);
     }
 
     ~BlinkyService(){
+    	if( win )
+    		delete win;
     }
 
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
-        return std::make_shared<sys::ResponseMessage>();
+        return std::make_shared<sys::ResponseMessage>( );
     }
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
+
+    	//context for drawing commands
+    	if( win != nullptr ) {
+			std::list<gui::DrawCommand*> commandsList = win->buildDrawList();
+			auto msg = std::make_shared<sgui::DrawMessage>(commandsList);
+			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+    	}
         LOG_DEBUG("Blinky service tick!");
     }
 
@@ -62,11 +150,16 @@ public:
 
 int SystemStart(sys::SystemManager* sysmgr)
 {
+    //TODO:M.P remove it, only for test purposes
+    bsp::keyboard keyboard;
+    keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
+
+
     vfs.Init();
 
-    auto ret = sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
+    auto ret = sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
 
     if(ret){

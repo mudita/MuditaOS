@@ -98,7 +98,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TIMERS                        1
 #define configTIMER_TASK_PRIORITY               (configMAX_PRIORITIES - 1)
 #define configTIMER_QUEUE_LENGTH                48
-#define configTIMER_TASK_STACK_DEPTH            (8*configMINIMAL_STACK_SIZE)
+#define configTIMER_TASK_STACK_DEPTH            (2048)
 
 /* Define to trap errors during development. */
 #define sconfigASSERT(x) if((x) == 0) {}

@@ -1,0 +1,35 @@
+/*
+ *  @file bsp_keyboard.h
+ *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
+ *  @date 25 oct 2018
+ *  @brief Keyboard BSP implementation
+ *  @copyright Copyright (C) 2018 mudita.com
+ *  @details
+ */
+
+#ifndef BSP_KEYBOARD_BSP_KEYBOARD_H_
+#define BSP_KEYBOARD_BSP_KEYBOARD_H_
+
+#include <functional>
+#include <stdint.h>
+#include "fsl_common.h"
+#include "FreeRTOS.h"
+#include "key_codes_rt1051.hpp"
+#include "common.hpp"
+
+namespace bsp{
+
+        status_t rt1501_keyboard_Init(std::function<void(KeyEvents event,KeyCodes code)> eventHandler);
+
+        status_t rt1501_keyboard_Deinit(void);
+
+        BaseType_t rt1501_keyboard_IRQHandler(void);
+
+        BaseType_t rt1501_keyboard_right_functional_IRQHandler(void);
+}
+
+
+
+
+
+#endif /* BSP_KEYBOARD_BSP_KEYBOARD_H_ */

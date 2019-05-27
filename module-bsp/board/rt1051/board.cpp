@@ -14,8 +14,14 @@
 #include "fsl_lpuart.h"
 #include "fsl_semc.h"
 #include "pin_mux.h"
+#include "dma_config.h"
+
+#include "irq/irq_gpio.hpp"
+#include "common/i2c.h"
 
 namespace bsp {
+
+
 
 
 /* Get debug console frequency. */
@@ -108,22 +114,23 @@ namespace bsp {
         MPU->RBAR = ARM_MPU_RBAR(4, 0x00000000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_128KB);
 
-#if 1 // CPU doesn't use cache when accessing TCM memories
+        // CPU doesn't use cache when accessing TCM memories
         /* Region 5 setting: Memory with Normal type, not shareable, outer/inner write back */
         MPU->RBAR = ARM_MPU_RBAR(5, 0x20000000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_512KB);
-#endif
 
+        // OCRAM configured as non-cached segment
         /* Region 6 setting: Memory with Normal type, not shareable, outer/inner write back */
-        // TODO: cache for OCRAM turned off
         MPU->RBAR = ARM_MPU_RBAR(6, 0x20200000U);
-        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_64KB);
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_64KB);
 
-        /* Memory with Normal type, not shareable, non-cacheable
-         * BOARD_SDRAM_NOCACHE
+
+        /* Region 7 setting: Memory with Normal type, not shareable, outer/inner write back
+         * BOARD_SDRAM_TEXT
          */
-        MPU->RBAR = ARM_MPU_RBAR(7, 0x80400000U);
-        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
+        MPU->RBAR = ARM_MPU_RBAR(7, 0x80000000U);
+        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
+
 
         /* The define sets the cacheable memory to shareable,
          * this suggestion is referred from chapter 2.2.1 Memory regions,
@@ -133,25 +140,20 @@ namespace bsp {
         MPU->RBAR = ARM_MPU_RBAR(8, 0x80000000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 1, 1, 1, 0, ARM_MPU_REGION_SIZE_32MB);
 #else
-        /* Region 7 setting: Memory with Normal type, not shareable, outer/inner write back
+        /* Region 9 setting: Memory with Normal type, not shareable, outer/inner write back
          * BOARD_SDRAM_HEAP
          */
-        MPU->RBAR = ARM_MPU_RBAR(8, 0x80500000U);
+        MPU->RBAR = ARM_MPU_RBAR(9, 0x80400000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
 #endif
 
-        /* Region 9 setting: Memory with Normal type, not shareable, outer/inner write back
-         * BOARD_SDRAM_TEXT
-         */
-        MPU->RBAR = ARM_MPU_RBAR(9, 0x80000000U);
-        MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_4MB);
 
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
         /* Enable I cache and D cache */
-        SCB_EnableDCache();
-        SCB_EnableICache();
+//        SCB_EnableDCache();
+//        SCB_EnableICache();
     }
 
 
@@ -176,7 +178,14 @@ namespace bsp {
         BOARD_ConfigMPU();
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
+        BOARD_InitDMA();
         BOARD_ConfigCellular();
+        
+        bsp_i2c_Init(BOARD_GetI2CInstance(), BOARD_KEYBOARD_I2C_CLOCK_FREQ);
+
+        irq_gpio_Init();
+
+
     }
 
 
