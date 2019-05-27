@@ -23,8 +23,6 @@ include_directories( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}"
 )
 
-
-
 target_sources( ${PROJECT_NAME}
 
 	PRIVATE
