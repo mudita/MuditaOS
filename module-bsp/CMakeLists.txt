@@ -17,7 +17,7 @@ endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
-set(SOURCES )
+set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/bsp/keyboard/keyboard.cpp" )
 
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
@@ -46,6 +46,9 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
+        -DFSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
+        -D__STARTUP_INITIALIZE_NONCACHEDATA
+        -D__USE_CMSIS
 )
 
 target_include_directories(${PROJECT_NAME}
