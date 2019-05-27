@@ -88,7 +88,7 @@ ServiceEink::ServiceEink(const std::string& name)
 
 //	EinkUpdateWaveform(EinkWaveformGC16, s_einkAmbientTemperature);
 	deepClearScreen( s_einkAmbientTemperature );
-	EinkRefreshImage(0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y, EinkDisplayTimingsDeepCleanMode);
+	//EinkRefreshImage(0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y, EinkDisplayTimingsDeepCleanMode);
 	EinkPowerOff();
 
 	timerID = CreateTimer(1000,true);
@@ -255,35 +255,23 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
 
 	vfs.fclose( file );
 
-//	if (BSP_EinkWriteData( waveformSettings.LUTDData, waveformSettings.LUTDSize, SPI_AUTOMATIC_CS) != 0)
-//	{
-//		LOG_ERROR("Eink: transmitting the LUTD failed");
-//		EinkResetAndInitialize();
-//		return EinkSPIErr;
-//	}
-//	if (BSP_EinkWriteData(waveformSettings.LUTCData, waveformSettings.LUTCSize + 1, SPI_AUTOMATIC_CS) != 0)
-//	{
-//		LOG_ERROR("Eink: transmitting the LUTC failed");
-//		EinkResetAndInitialize();
-//		return EinkSPIErr;
-//	}
+	EinkUpdateWaveform( &waveformSettings );
 
 	return true;
-//	return EinkOK;
 }
 
 bool ServiceEink::deepClearScreen(int8_t temperature)
 {
     EinkWaveforms_e wv = waveformSettings.mode;
 
-	changeWaveform( EinkWaveformINIT, temperature );
-    //EinkFillScreenWithColor(EinkDisplayColorWhite);
+	changeWaveform( EinkWaveformA2, temperature );
+    EinkFillScreenWithColor(EinkDisplayColorWhite);
     EinkFillScreenWithColor(EinkDisplayColorBlack);
-    //EinkFillScreenWithColor(EinkDisplayColorWhite);
-    //EinkFillScreenWithColor(EinkDisplayColorBlack);
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
+    EinkFillScreenWithColor(EinkDisplayColorWhite);
+    EinkFillScreenWithColor(EinkDisplayColorBlack);
+    EinkFillScreenWithColor(EinkDisplayColorWhite);
 
-    //changeWaveform(wv, temperature);
+    changeWaveform(wv, temperature);
 
     return true;
 }
