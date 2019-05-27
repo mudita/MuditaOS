@@ -6,6 +6,7 @@
  *  @copyright Copyright (C) 2018 mudita.com
  *  @details
  */
+
 #include "bsp_eink.h"
 #include "board.h"
 #include "fsl_lpspi.h"

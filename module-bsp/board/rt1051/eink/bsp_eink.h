@@ -14,6 +14,10 @@
 #include "fsl_common.h"
 #include "FreeRTOS.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum
 {
     SPI_AUTOMATIC_CS,
@@ -41,5 +45,9 @@ status_t BSP_EinkWriteData(void* txBuffer, uint32_t len, eink_spi_cs_config_e cs
 status_t BSP_EinkReadData(void* rxBuffer, uint32_t len, eink_spi_cs_config_e cs);
 
 BaseType_t BSP_EinkBusyPinStateChangeHandler(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* EINK_BSP_EINK_H_ */
