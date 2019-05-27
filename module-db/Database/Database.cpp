@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <memory>
 #include "log/log.hpp"
+#include "vfs.hpp"
 
 /* Declarations *********************/
 extern sqlite3_vfs *sqlite3_ecophonevfs(void);
@@ -67,7 +68,8 @@ void errorLogCallback(void *pArg, int iErrCode, const char *zMsg){
 
 
 Database::Database(const char *name) :
-        dbConnection(nullptr) {
+        dbConnection(nullptr),
+        dbName(name){
 
     auto rc = sqlite3_open(name, &dbConnection);
     assert(rc == SQLITE_OK);
@@ -85,6 +87,11 @@ void Database::Initialize(){
 }
 void Database::Deinitialize(){
     sqlite3_shutdown();
+}
+
+bool Database::Remove() {
+    vfs.remove(dbName);
+    return true;
 }
 
 bool Database::Execute(const char *format, ...) {

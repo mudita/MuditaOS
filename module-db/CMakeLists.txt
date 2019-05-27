@@ -22,11 +22,15 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/database/Field.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/database/QueryResult.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/database/Database.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3vfs.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database/Field.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database/QueryResult.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database/Database.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ThreadsTable.cpp
 
         )
 
@@ -50,8 +54,8 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3.c PROPERTIES COMPILE_FLAGS -Wno-overflow)
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS -Wno-overflow)
+set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
 
 target_compile_definitions(${PROJECT_NAME}
 
