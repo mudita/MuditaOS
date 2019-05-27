@@ -15,8 +15,10 @@
 #include "log/log.hpp"
 
 ServiceGUI::ServiceGUI(const std::string& name)
-		: sys::Service(name)
-{
+		: sys::Service(name),
+		renderBuffer { nullptr },
+		einkBuffer { nullptr } {
+
 	LOG_INFO("[ServiceGUI] Initializing");
 
 	gui::FontManager& fontManager = gui::FontManager::getInstance();
