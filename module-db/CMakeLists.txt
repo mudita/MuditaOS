@@ -28,9 +28,13 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c
         ${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp
 
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/ContactsDB.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SmsDB.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ThreadsTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsTable.cpp
 
         )
 

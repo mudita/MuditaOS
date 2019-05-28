@@ -51,7 +51,6 @@ private:
 protected:
     sqlite3 *dbConnection;
     const char* dbName;
-
 };
 
 

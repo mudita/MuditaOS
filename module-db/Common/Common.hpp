@@ -24,4 +24,13 @@ enum class SMSType {
     ALL = 0xFF
 };
 
+/**
+ * Types of contacts
+ */
+enum class ContactType {
+    USER = 1,
+    MESSAGE,
+    PHONE
+};
+
 #endif //PUREPHONE_COMMON_HPP
