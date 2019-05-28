@@ -15,6 +15,9 @@
 #include "Database/Database.hpp"
 #include "../Tables/ContactsTable.hpp"
 #include "../Tables/ContactsNameTable.hpp"
+#include "../Tables/ContactsNumberTable.hpp"
+#include "../Tables/ContactsRingtonesTable.hpp"
+#include "../Tables/ContactsAddressTable.hpp"
 
 class ContactsDB : public Database {
 public:
@@ -25,6 +28,9 @@ public:
 
     ContactsTable contacts;
     ContactsNameTable name;
+    ContactsNumberTable number;
+    ContactsRingtonesTable ringtones;
+    ContactsAddressTable    address;
 
 private:
     bool isInitialized;

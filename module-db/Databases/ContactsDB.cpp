@@ -17,10 +17,16 @@ const char *ContactsDB::dbName = "contacts.db";
 ContactsDB::ContactsDB():
         Database(dbName),
         contacts(this),
-        name(this){
+        name(this),
+        number(this),
+        ringtones(this),
+        address(this){
 
     if(contacts.Create() == false) return;
     if(name.Create() == false) return;
+    if(number.Create() == false) return;
+    if(ringtones.Create() == false) return;
+    if(address.Create() == false) return;
 
     isInitialized = true;
 }

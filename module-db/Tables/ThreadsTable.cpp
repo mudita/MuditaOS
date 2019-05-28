@@ -61,7 +61,7 @@ bool ThreadsTable::Update(ThreadsTableRow entry) {
 ThreadsTableRow ThreadsTable::GetByID(uint32_t id) {
     auto retQuery = db->Query("SELECT * FROM threads WHERE _id= %u;", id);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ThreadsTableRow();
     }
 
@@ -81,7 +81,7 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint3
                              limit,
                              offset);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
     }
 

@@ -50,7 +50,7 @@ bool ContactsNameTable::Update(ContactsNameTableRow entry) {
 ContactsNameTableRow ContactsNameTable::GetByID(uint32_t id) {
     auto retQuery = db->Query("SELECT * FROM contact_name WHERE _id= %lu;", id);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ContactsNameTableRow();
     }
 
@@ -66,7 +66,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t off
                               limit,
                               offset);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsNameTableRow>();
     }
 
