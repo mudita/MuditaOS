@@ -12,10 +12,8 @@
 #include "SMSTable.hpp"
 
 
-SMSTable::SMSTable():
-    db(dbName),
-    isInitialized(false)
-{
+SMSTable::SMSTable() :
+        Table(dbName) {
     isInitialized = db.Execute(createTableQuery);
 }
 
@@ -24,19 +22,16 @@ SMSTable::~SMSTable() {
 }
 
 bool SMSTable::Add(SMSTableRow entry) {
-    return db.Execute("INSERT INTO sms ( thread_id,contact_id, date, date_send, error_code, body, read, type ) VALUES (%lu,%lu,%lu,%lu,0,'%s',%d,%d);",
-               entry.threadID,
-               entry.contactID,
-               entry.date,
-               entry.dateSent,
-               entry.body.c_str(),
-               entry.isRead,
-               entry.type
+    return db.Execute(
+            "INSERT INTO sms ( thread_id,contact_id, date, date_send, error_code, body, read, type ) VALUES (%lu,%lu,%lu,%lu,0,'%s',%d,%d);",
+            entry.threadID,
+            entry.contactID,
+            entry.date,
+            entry.dateSent,
+            entry.body.c_str(),
+            entry.isRead,
+            entry.type
     );
-}
-
-bool SMSTable::Remove(SMSTableRow entry) {
-    return db.Execute("DELETE FROM sms where _id = %u;", entry.ID);
 }
 
 bool SMSTable::RemoveByID(uint32_t id) {
@@ -45,61 +40,62 @@ bool SMSTable::RemoveByID(uint32_t id) {
 
 
 bool SMSTable::Update(SMSTableRow entry) {
-    return db.Execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, date_send = %lu, error_code = 0, body = '%s', read = %d, type =%d WHERE _id=%lu;",
-                      entry.threadID,
-                      entry.contactID,
-                      entry.date,
-                      entry.dateSent,
-                      entry.body.c_str(),
-                      entry.isRead,
-                      entry.type,
-                      entry.ID
+    return db.Execute(
+            "UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, date_send = %lu, error_code = 0, body = '%s', read = %d, type =%d WHERE _id=%lu;",
+            entry.threadID,
+            entry.contactID,
+            entry.date,
+            entry.dateSent,
+            entry.body.c_str(),
+            entry.isRead,
+            entry.type,
+            entry.ID
     );
 }
 
 SMSTableRow SMSTable::GetByID(uint32_t id) {
-    auto retQuery = db.Query("SELECT * FROM sms WHERE _id= %u;",id);
+    auto retQuery = db.Query("SELECT * FROM sms WHERE _id= %u;", id);
 
-    if(retQuery->GetRowCount() == 0){
+    if (retQuery->GetRowCount() == 0) {
         return SMSTableRow();
     }
 
     return SMSTableRow{(*retQuery)[0].GetUInt32(),  // ID
-                     (*retQuery)[1].GetUInt32(),    // threadID
-                     (*retQuery)[2].GetUInt32(),    // contactID
-                     (*retQuery)[3].GetUInt32(),    // date
-                     (*retQuery)[4].GetUInt32(),    // dateSent
-                     (*retQuery)[5].GetUInt32(),    // errorCode
-                     (*retQuery)[6].GetString(),    // body
-                     (*retQuery)[7].GetBool(),      // isRead
-                     static_cast<SMSType >((*retQuery)[8].GetUInt32()),    // type
-                     };
+                       (*retQuery)[1].GetUInt32(),    // threadID
+                       (*retQuery)[2].GetUInt32(),    // contactID
+                       (*retQuery)[3].GetUInt32(),    // date
+                       (*retQuery)[4].GetUInt32(),    // dateSent
+                       (*retQuery)[5].GetUInt32(),    // errorCode
+                       (*retQuery)[6].GetString(),    // body
+                       (*retQuery)[7].GetBool(),      // isRead
+                       static_cast<SMSType >((*retQuery)[8].GetUInt32()),    // type
+    };
 }
 
 std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
 
     auto retQuery = db.Query("SELECT * from sms ORDER BY date LIMIT %lu OFFSET %lu;",
-            limit,
-            offset );
+                             limit,
+                             offset);
 
-    if(retQuery->GetRowCount() == 0){
+    if (retQuery->GetRowCount() == 0) {
         return std::vector<SMSTableRow>();
     }
 
     std::vector<SMSTableRow> ret;
 
-    do{
+    do {
         ret.push_back(SMSTableRow{(*retQuery)[0].GetUInt32(),  // ID
-                    (*retQuery)[1].GetUInt32(),    // threadID
-                    (*retQuery)[2].GetUInt32(),    // contactID
-                    (*retQuery)[3].GetUInt32(),    // date
-                    (*retQuery)[4].GetUInt32(),    // dateSent
-                    (*retQuery)[5].GetUInt32(),    // errorCode
-                    (*retQuery)[6].GetString(),    // body
-                    (*retQuery)[7].GetBool(),      // isRead
-                    static_cast<SMSType >((*retQuery)[8].GetUInt32()),    // type
+                                  (*retQuery)[1].GetUInt32(),    // threadID
+                                  (*retQuery)[2].GetUInt32(),    // contactID
+                                  (*retQuery)[3].GetUInt32(),    // date
+                                  (*retQuery)[4].GetUInt32(),    // dateSent
+                                  (*retQuery)[5].GetUInt32(),    // errorCode
+                                  (*retQuery)[6].GetString(),    // body
+                                  (*retQuery)[7].GetBool(),      // isRead
+                                  static_cast<SMSType >((*retQuery)[8].GetUInt32()),    // type
         });
-    }while(retQuery->NextRow());
+    } while (retQuery->NextRow());
 
     return ret;
 }
@@ -107,7 +103,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limi
 uint32_t SMSTable::GetCount() {
     auto queryRet = db.Query("SELECT COUNT(*) FROM SMS;");
 
-    if(queryRet->GetRowCount() == 0){
+    if (queryRet->GetRowCount() == 0) {
         return 0;
     }
 
@@ -115,5 +111,4 @@ uint32_t SMSTable::GetCount() {
 }
 
 
-
-const char* SMSTable::dbName = "sms.db";
+const char *SMSTable::dbName = "sms.db";

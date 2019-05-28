@@ -13,21 +13,10 @@
 #define PUREPHONE_SMSTABLE_HPP
 
 #include "Table.hpp"
-#include "Common/SMSRecord.hpp"
 #include "Database/Database.hpp"
 #include "utf8/UTF8.hpp"
+#include "Common/Common.hpp"
 
-/**
- * Types of sms message
- */
-enum class SMSType {
-    DRAFT = 0x01,
-    FAILED = 0x02,
-    INBOX = 0x04,
-    OUTBOX = 0x08,
-    QUEUED = 0x10,
-    ALL = 0xFF
-};
 
 struct SMSTableRow{
     uint32_t ID;
@@ -48,7 +37,6 @@ public:
     ~SMSTable();
 
     bool Add(SMSTableRow entry) override final;
-    bool Remove(SMSTableRow entry) override final;
     bool RemoveByID(uint32_t id) override final;
     bool Update(SMSTableRow entry) override final;
     SMSTableRow GetByID(uint32_t id) override final;
@@ -76,9 +64,6 @@ private:
 
     static const char* dbName;
 
-    Database db;
-
-    bool isInitialized;
 };
 
 

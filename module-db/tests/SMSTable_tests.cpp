@@ -58,7 +58,7 @@ TEST_CASE("SMS Table tests")
     testRow1.body = "Updated Test SMS message ";
     REQUIRE(smstable.Update(testRow1));
 
-    // Get table row using valid ID & check if it was updated 
+    // Get table row using valid ID & check if it was updated
     auto sms = smstable.GetByID(4);
     REQUIRE(sms.body == testRow1.body);
 
@@ -77,6 +77,22 @@ TEST_CASE("SMS Table tests")
     // Get table rows using invalid offset/limit parameters(should return empty object)
     auto retOffsetLimitFailed = smstable.GetLimitOffset(5,4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
+
+    REQUIRE(smstable.RemoveByID(2));
+
+    // Table should have now 3 elements
+    REQUIRE(smstable.GetCount() == 3);
+
+    // Remove non existing element
+    REQUIRE(smstable.RemoveByID(100));
+
+    // Remove all elements from table
+    REQUIRE(smstable.RemoveByID(1));
+    REQUIRE(smstable.RemoveByID(3));
+    REQUIRE(smstable.RemoveByID(4));
+
+    // Table should have be empty now
+    REQUIRE(smstable.GetCount() == 0);
 
     Database::Deinitialize();
 }
