@@ -17,8 +17,7 @@ const char *SmsDB::dbName = "sms.db";
 SmsDB::SmsDB() :
         Database(dbName),
         sms(this),
-        threads(this),
-        isInitialized(false){
+        threads(this){
 
         if(sms.Create() == false) return;
         if(threads.Create() == false) return;

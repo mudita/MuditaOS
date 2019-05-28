@@ -28,8 +28,6 @@ public:
 
 private:
 
-    bool isInitialized;
-
     static const char *dbName;
 };
 

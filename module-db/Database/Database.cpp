@@ -69,7 +69,8 @@ void errorLogCallback(void *pArg, int iErrCode, const char *zMsg){
 
 Database::Database(const char *name) :
         dbConnection(nullptr),
-        dbName(name){
+        dbName(name),
+        isInitialized(false){
 
     auto rc = sqlite3_open(name, &dbConnection);
     assert(rc == SQLITE_OK);

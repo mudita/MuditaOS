@@ -33,7 +33,6 @@ public:
     ContactsAddressTable    address;
 
 private:
-    bool isInitialized;
     static const char *dbName;
 };
 

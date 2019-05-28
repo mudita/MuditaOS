@@ -34,6 +34,8 @@ public:
     // Must be invoked before closing system in order to properly close OS layer
     static void Deinitialize();
 
+    bool IsInitialized(){return isInitialized;}
+
 private:
 
     const uint32_t maxQueryLen = (8 * 1024);
@@ -51,6 +53,7 @@ private:
 protected:
     sqlite3 *dbConnection;
     const char* dbName;
+    bool isInitialized;
 };
 
 
