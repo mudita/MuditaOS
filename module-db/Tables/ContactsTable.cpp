@@ -59,7 +59,7 @@ bool ContactsTable::Update(ContactsTableRow entry) {
 }
 
 ContactsTableRow ContactsTable::GetByID(uint32_t id) {
-    auto retQuery = db->Query("SELECT * FROM contacts WHERE _id= %u;", id);
+    auto retQuery = db->Query("SELECT * FROM contacts WHERE _id= %lu;", id);
 
     if (retQuery->GetRowCount() == 0) {
         return ContactsTableRow();
@@ -114,7 +114,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByFieldID(uint32_t of
                               limit,
                               offset);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 

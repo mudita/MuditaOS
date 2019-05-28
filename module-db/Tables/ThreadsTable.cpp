@@ -109,7 +109,7 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByFieldID(uint32_t offs
                              limit,
                              offset);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
     }
 

@@ -109,7 +109,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffsetByFieldID(uint32_t offset, uint
                              limit,
                              offset);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTableRow>();
     }
 

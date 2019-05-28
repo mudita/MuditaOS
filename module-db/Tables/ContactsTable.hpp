@@ -73,7 +73,7 @@ private:
             "blacklist        INTEGER,"
             "favourites       INTEGER,"
             "speeddial        INTEGER,"
-            "FOREIGN KEY(name_id) REFERENCES contact_names(_id) FOREIGN KEY(ring_id) REFERENCES contact_ring(_id)"
+            "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ring(_id)"
             ");";
 
     Database* db;

@@ -14,6 +14,7 @@
 
 #include "Database/Database.hpp"
 #include "../Tables/ContactsTable.hpp"
+#include "../Tables/ContactsNameTable.hpp"
 
 class ContactsDB : public Database {
 public:
@@ -23,6 +24,7 @@ public:
     static const char* GetDBName(){return dbName;}
 
     ContactsTable contacts;
+    ContactsNameTable name;
 
 private:
     bool isInitialized;
