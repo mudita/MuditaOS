@@ -89,11 +89,6 @@ void Database::Deinitialize(){
     sqlite3_shutdown();
 }
 
-bool Database::Remove() {
-    vfs.remove(dbName);
-    return true;
-}
-
 bool Database::Execute(const char *format, ...) {
 
     if (!format) { return false; }

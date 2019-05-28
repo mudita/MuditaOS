@@ -55,6 +55,10 @@ public:
     std::vector<SMSTableRow> GetLimitOffset(uint32_t offset,uint32_t limit);
 
     uint32_t GetCount() override final;
+
+    static const char* GetDBName(){
+        return dbName;
+    }
 private:
 
     const char* createTableQuery =
@@ -70,6 +74,7 @@ private:
             "type INTEGER,"
             "FOREIGN KEY(thread_id) REFERENCES threads(_id) ON DELETE CASCADE );";
 
+    static const char* dbName;
 
     Database db;
 
