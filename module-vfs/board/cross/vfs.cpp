@@ -89,8 +89,15 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
     {
         do
         {
+            if(( pxFindStruct->ucAttributes & FF_FAT_ATTR_HIDDEN ) ||
+            (pxFindStruct->ucAttributes & FF_FAT_ATTR_SYSTEM) ||
+                    (pxFindStruct->ucAttributes & FF_FAT_ATTR_VOLID) ||
+                    (pxFindStruct->ucAttributes & FF_FAT_ATTR_LFN)
+            ){
+                continue;
+            }
             /* Point pcAttrib to a string that describes the file. */
-            if( ( pxFindStruct->ucAttributes & FF_FAT_ATTR_DIR ) != 0 )
+            else if( ( pxFindStruct->ucAttributes & FF_FAT_ATTR_DIR ) != 0 )
             {
                 attribute = FileAttributes::Directory;
             }
@@ -98,7 +105,7 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
             {
                 attribute = FileAttributes::ReadOnly;
             }
-            else
+            else if(pxFindStruct->ucAttributes & FF_FAT_ATTR_ARCHIVE )
             {
                 attribute = FileAttributes::Writable;
             }
