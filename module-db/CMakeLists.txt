@@ -35,6 +35,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ThreadsTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsNameTable.cpp
 
         )
 
