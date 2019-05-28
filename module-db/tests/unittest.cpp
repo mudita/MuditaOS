@@ -106,44 +106,6 @@ TEST_CASE( "Create and destroy simple database" ) {
 
     }
 
-    SECTION("SMS Table tests")
-    {
-        SMSTable smstable;
-
-        SMSTableRow testRow1 = {.ID=0,
-                                .threadID=0,
-                                .contactID=0,
-                                .date=0,
-                                .dateSent=0,
-                                .errorCode=0,
-                                .body="Test SMS message 1",
-                                .isRead=true,
-                                .type = SMSType ::INBOX
-
-        };
-
-        smstable.Add(testRow1);
-        smstable.Add(testRow1);
-        smstable.Add(testRow1);
-        smstable.Add(testRow1);
-
-        //REQUIRE(smstable.GetCount() == 4);
-
-        testRow1.ID = 4;
-        testRow1.body = "Updated Test SMS message ";
-
-        smstable.Update(testRow1);
-
-        auto sms = smstable.GetByID(4);
-
-        auto retOffsetLimit = smstable.GetLimitOffset(0,4);
-
-        std::cout << "end";
-
-    }
-
-
-
 
     Database::Deinitialize();
 

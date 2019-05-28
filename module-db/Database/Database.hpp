@@ -29,8 +29,6 @@ public:
 
     bool Execute(const char *format, ...);
 
-    bool Remove();
-
     // Must be invoked prior creating any database object in order to initialize database OS layer
     static void Initialize();
     // Must be invoked before closing system in order to properly close OS layer
