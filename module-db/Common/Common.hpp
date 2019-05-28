@@ -33,4 +33,21 @@ enum class ContactType {
     PHONE
 };
 
+enum class ContactNumberType
+{
+    CELL = 0, /*!< ID defines that number is a cellphone number. */
+    HOME,     /*!< ID defines that number is a home number. */
+    WORK,     /*!< ID defines that number belongs to predefined work number’s group. */
+    FAKS,     /*!< ID defines that number if a faks number. */
+    PAGER,    /*!< ID defines that number is a pager number. */
+    OTHER     /*!< ID defines that number is for device other than defined above. */
+};
+
+enum class ContactAddressType
+{
+    HOME = 0,   /*!< ID defines that address is home address. */
+    WORK,       /*!< ID defines that address is work address. */
+    OTHER       /*!< ID defines that address doesn’t belong to any of the types defined above. */
+};
+
 #endif //PUREPHONE_COMMON_HPP

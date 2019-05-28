@@ -58,7 +58,7 @@ bool SMSTable::Update(SMSTableRow entry) {
 SMSTableRow SMSTable::GetByID(uint32_t id) {
     auto retQuery = db->Query("SELECT * FROM sms WHERE _id= %u;", id);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return SMSTableRow();
     }
 
@@ -80,7 +80,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limi
                              limit,
                              offset);
 
-    if (retQuery->GetRowCount() == 0) {
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTableRow>();
     }
 

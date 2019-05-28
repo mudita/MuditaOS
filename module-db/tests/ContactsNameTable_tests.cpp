@@ -23,7 +23,6 @@
 #include "../Database/Database.hpp"
 #include "../Databases/ContactsDB.hpp"
 
-#include "Tables/ContactsTable.hpp"
 
 TEST_CASE("Contacts Name Table tests")
 {
