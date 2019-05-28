@@ -19,8 +19,11 @@
 
 #include "keyboard/rt1051_keyboard.hpp"
 
-#if 0 //TODO:M.P implement the rest of BSP drivers
+
 #include "bsp_eink.h"
+
+#if 0 //TODO:M.P implement the rest of BSP drivers
+
 
 #include "bsp_jackdet.h"
 #include "bsp_cellular.h"
@@ -132,7 +135,9 @@ namespace bsp {
             uint32_t irq_mask = GPIO_GetPinsInterruptFlags(GPIO3);
 
             if (irq_mask & (1 << BOARD_EINK_BUSY_GPIO_PIN)) {
-                //TODO:M.P xHigherPriorityTaskWoken |= BSP_EinkBusyPinStateChangeHandler();
+
+                xHigherPriorityTaskWoken |= BSP_EinkBusyPinStateChangeHandler();
+
             }
 
             // Clear all IRQs on the GPIO3 port
@@ -143,5 +148,5 @@ namespace bsp {
         }
 
         }
-
 }
+

@@ -327,7 +327,7 @@ Font* FontManager::loadFont( std::string filename ) {
 	}
 
 	//read data to buffer
-	vfs.fread( fontData, fileSize, 1, file );
+ 	auto bytesRead= vfs.fread( fontData, 1, fileSize, file );
 
 	//close file
 	vfs.fclose( file );
@@ -348,6 +348,14 @@ Font* FontManager::loadFont( std::string filename ) {
 	return font;
 }
 
+bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
 std::vector<std::string> FontManager::getFontsList() {
 
 	std::vector<std::string> fontFiles;
@@ -356,12 +364,15 @@ std::vector<std::string> FontManager::getFontsList() {
 	auto dirList = vfs.listdir(fontFolder.c_str());
 
 	for( vfs::DirectoryEntry ent : dirList ) {
-		if( ent.attributes != vfs::FileAttributes::Directory ) {
+		if( (ent.attributes != vfs::FileAttributes::Directory) &&
+			hasEnding( ent.fileName, ".mpf") ) {
 			fontFiles.push_back( fontFolder + "/" + ent.fileName );
 			//TODO remove commented code
-			//LOG_INFO("font: %s", (fontFolder + "/" + ent.fileName).c_str());
+			LOG_INFO("font: %s", (fontFolder + "/" + ent.fileName).c_str());
 		}
 	}
+
+	LOG_INFO("Total number of images: %d", fontFiles.size());
 
 	return fontFiles;
 }

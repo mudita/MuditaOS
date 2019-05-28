@@ -5,14 +5,28 @@
  *      Author: robert
  */
 
-#include "ServiceEink.hpp"
 
+//module-utils
 #include "log/log.hpp"
 
+#include "ServiceEink.hpp"
+
 ServiceEink::ServiceEink(const std::string& name)
-		: sys::Service(name)
+	: sys::Service(name),
+	  timerID { 0 },
+	  selfRefereshTriggerCount{ 0 },
+	  temperatureMeasurementTriggerCount{ 0 },
+	  powerOffTriggerCount{ 0 }
 {
 	LOG_INFO("[ServiceEink] Initializing");
+
+	deepClearScreen( 24 );
+
+	timerID = CreateTimer(1000,true);
+	ReloadTimer(timerID);
+
+	//start renderer process
+	system( "./gui_renderer &" );
 }
 
 ServiceEink::~ServiceEink(){
@@ -26,6 +40,8 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 // Invoked when timer ticked
 void ServiceEink::TickHandler(uint32_t id) {
+
+
 }
 
 // Invoked during initialization
@@ -44,6 +60,13 @@ sys::ReturnCodes ServiceEink::WakeUpHandler() {
 
 sys::ReturnCodes ServiceEink::SleepHandler() {
 	return sys::ReturnCodes::Success;
+}
+
+
+bool ServiceEink::deepClearScreen(int8_t temperature)
+{
+
+    return true;
 }
 
 

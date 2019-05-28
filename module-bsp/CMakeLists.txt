@@ -46,6 +46,9 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
+        -DFSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
+        -D__STARTUP_INITIALIZE_NONCACHEDATA
+        -D__USE_CMSIS
 )
 
 target_include_directories(${PROJECT_NAME}
