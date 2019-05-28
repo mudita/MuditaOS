@@ -10,6 +10,8 @@
 
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
+//eink bsp
+#include "eink/ED028TC1.h"
 
 class ServiceEink: public sys::Service {
 protected:
@@ -30,11 +32,15 @@ protected:
 	//number of timer triggers from last action requiring power on eink to power down eink.
 	const uint32_t powerOffTriggerValue = 3;
 
+	//structure with recently loaded waveformdata
+	EinkWaveFormSettings_t waveformSettings;
+	bool changeWaveform( EinkWaveforms_e Mode, const int32_t temperature );
+
+	bool deepClearScreen(int8_t temperature);
+
 public:
 	ServiceEink(const std::string& name);
     ~ServiceEink();
-
-    bool deepClearScreen(int8_t temperature);
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
     // Invoked when timer ticked
