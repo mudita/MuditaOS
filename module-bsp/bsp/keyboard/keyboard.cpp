@@ -16,6 +16,7 @@
 #include "keyboard/rt1051_keyboard.hpp"
 #elif defined(TARGET_Linux)
     //TODO:M.P insert Linux keyboard implementation here
+#include "keyboard/linux_keyboard.hpp"
 #else
 #error "Unsupported target"
 #endif
@@ -28,6 +29,7 @@ namespace bsp
         rt1501_keyboard_Init(signal);
 
 #elif defined(TARGET_Linux)
+        linux_keyboard_Init(signal);
 
 #else
 #error "Unsupported target"
