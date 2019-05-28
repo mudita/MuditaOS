@@ -19,29 +19,21 @@
 template <typename T>
 class Table {
 
-    bool IsInitialized(){return isInitialized;}
-
 protected:
 
-    Table(const char* name):
-    db(name),
-    isInitialized(false){
-
-    }
+    Table(){}
 
     ~Table(){}
 
+    virtual bool Create() = 0;
     virtual bool Add(T entry) = 0;
     virtual bool RemoveByID(uint32_t id) = 0;
     virtual bool Update(T entry) = 0;
     virtual T GetByID(uint32_t id) = 0;
     virtual std::vector<T> GetLimitOffset(uint32_t offset,uint32_t limit) = 0;
+    virtual std::vector<T> GetLimitOffsetByFieldID(uint32_t offset,uint32_t limit,const char* field,uint32_t id) = 0;
     virtual uint32_t GetCount() = 0;
-
-
-    Database db;
-
-    bool isInitialized;
+    virtual uint32_t GetCountByFieldID(const char* field,uint32_t id) = 0;
 
 };
 

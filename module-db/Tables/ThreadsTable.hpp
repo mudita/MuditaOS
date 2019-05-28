@@ -30,20 +30,20 @@ struct ThreadsTableRow{
 class ThreadsTable : public Table<ThreadsTableRow> {
 public:
 
-    ThreadsTable();
+    ThreadsTable(Database* db);
     ~ThreadsTable();
 
+    bool Create() override final;
     bool Add(ThreadsTableRow entry) override final;
     bool RemoveByID(uint32_t id) override final;
     bool Update(ThreadsTableRow entry) override final;
     ThreadsTableRow GetByID(uint32_t id) override final;
-    std::vector<ThreadsTableRow> GetLimitOffset(uint32_t offset,uint32_t limit);
+    std::vector<ThreadsTableRow> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
+    std::vector<ThreadsTableRow> GetLimitOffsetByFieldID(uint32_t offset,uint32_t limit,const char* field,uint32_t id) override final;
 
     uint32_t GetCount() override final;
+    uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
 
-    static const char* GetDBName(){
-        return dbName;
-    }
 private:
 
     const char* createTableQuery =
@@ -66,7 +66,7 @@ private:
     const char* threadInsertTriggerQuery = "CREATE TRIGGER IF NOT EXISTS on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END";
     const char* threadRemoveTriggerQuery = "CREATE TRIGGER IF NOT EXISTS on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END";
 
-    static const char* dbName;
+    Database* db;
 
 };
 
