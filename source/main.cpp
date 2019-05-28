@@ -157,7 +157,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     vfs.Init();
 
-    auto ret = sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI"),sysmgr);
+    auto ret = sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
