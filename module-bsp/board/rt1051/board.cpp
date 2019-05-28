@@ -14,8 +14,14 @@
 #include "fsl_lpuart.h"
 #include "fsl_semc.h"
 #include "pin_mux.h"
+#include "dma_config.h"
+
+#include "irq/irq_gpio.hpp"
+#include "common/i2c.h"
 
 namespace bsp {
+
+
 
 
 /* Get debug console frequency. */
@@ -146,8 +152,8 @@ namespace bsp {
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
         /* Enable I cache and D cache */
-        SCB_EnableDCache();
-        SCB_EnableICache();
+//        SCB_EnableDCache();
+//        SCB_EnableICache();
     }
 
 
@@ -172,7 +178,14 @@ namespace bsp {
         BOARD_ConfigMPU();
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
+        BOARD_InitDMA();
         BOARD_ConfigCellular();
+        
+        bsp_i2c_Init(BOARD_GetI2CInstance(), BOARD_KEYBOARD_I2C_CLOCK_FREQ);
+
+        irq_gpio_Init();
+
+
     }
 
 

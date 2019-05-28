@@ -29,7 +29,7 @@ include_directories( ../module-utils )
 include_directories( ../module-gui )
 include_directories( ../module-os )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-sys module-utils module-gui )
+target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-sys module-utils module-gui)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

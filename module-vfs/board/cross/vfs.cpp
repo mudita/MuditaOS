@@ -109,7 +109,7 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
             {
                 attribute = FileAttributes::ReadOnly;
             }
-            else(pxFindStruct->ucAttributes & FF_FAT_ATTR_ARCHIVE )
+            else if(pxFindStruct->ucAttributes & FF_FAT_ATTR_ARCHIVE )
             {
                 attribute = FileAttributes::Writable;
             }
