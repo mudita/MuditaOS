@@ -15,6 +15,9 @@
 
 #include "RArea.hpp"
 
+
+#include "module-bsp/board/linux/keyboard/key_codes_linux.hpp"
+#include "module-bsp/bsp/common.hpp"
 class RWindow : public Gtk::Window{
 protected:
 	RArea drawArea;
@@ -29,8 +32,13 @@ protected:
 	//it is removed when there is GDK_KEY_RELEASE event
 	std::map<uint32_t, uint32_t> keys;
 
+	std::map<int8_t, uint32_t> keyMap;
+	//named pipe file descriptor
+	int fifoFd;
+
+	void keyMapInit(void);
 public:
-	RWindow( char* shmMemory, int w, int h );
+	RWindow( char* shmMemory, int fifo, int w, int h );
 	virtual ~RWindow();
 	bool onKeyPress(GdkEventKey* event);
 	bool onKeyRelease(GdkEventKey* event);

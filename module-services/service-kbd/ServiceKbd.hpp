@@ -11,6 +11,30 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 
+#include "key_codes_linux.hpp"
+#include "common.hpp"
+
+
+class KbdMessage : public sys::DataMessage
+{
+public:
+	KbdMessage()
+	{
+		type = Type::Data;
+
+	}
+	KbdMessage(sys::BusChannels cannel) : sys::DataMessage(channel)
+	{
+		type = Type::Data;
+	}
+	sys::Message_t Execute(sys::Service* service) override;
+
+	bsp::KeyEvents keyState = static_cast<bsp::KeyEvents>(0);
+	bsp::KeyCodes keyCode = static_cast<bsp::KeyCodes>(0);
+	int keyPressTime = 0;
+	int keyRelaseTime = 0;
+};
+
 class ServiceKbd: public sys::Service {
 public:
 	ServiceKbd(const std::string& name);

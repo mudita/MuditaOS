@@ -121,7 +121,7 @@ public:
 			auto msg = std::make_shared<sgui::DrawMessage>(commandsList);
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
     	}
-        LOG_DEBUG("Blinky service tick!");
+      //  LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -151,8 +151,8 @@ public:
 int SystemStart(sys::SystemManager* sysmgr)
 {
     //TODO:M.P remove it, only for test purposes
-    bsp::keyboard keyboard;
-    keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
+   // bsp::keyboard keyboard;
+   // keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
 
 
     vfs.Init();

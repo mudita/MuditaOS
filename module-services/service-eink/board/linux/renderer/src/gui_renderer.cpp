@@ -60,16 +60,39 @@ uint8_t* createSHMBuffer( std::string name )
 	return reinterpret_cast<uint8_t*>(shared_mem_ptr);
 }
 
+int createFIFO( std::string name )
+{
+	int fd;
+	char * myfifo = "/tmp/myfifo3";
+	fd = open(myfifo,O_WRONLY | O_NONBLOCK);
+
+	if(fd < 0)
+	{
+		mkfifo(myfifo, 0666);
+		fd = open(myfifo,O_WRONLY);
+	}
+
+	int error = errno;
+	perror("mkfifo");
+//	ENOENT
+
+	return fd;
+}
 int main( int argc, char* argv[] ) {
+
+
 
 	std::string shnName = "pure_gui_fmbuf";
 
 	shared_memory* shm_ptr = reinterpret_cast<shared_memory*>(createSHMBuffer(shnName));
 	char* dataMemory = reinterpret_cast<char*>(shm_ptr)+sizeof(shared_memory);
 
+	std::string fifoName = "pure_kbd_fifo";
+	int fifoFd = createFIFO(fifoName);
+
 	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 
-	RWindow rendererWindow( dataMemory, FrameBufferWidth, FrameBufferHeight );
+	RWindow rendererWindow( dataMemory, fifoFd, FrameBufferWidth, FrameBufferHeight );
 	app->run( rendererWindow );
 
 

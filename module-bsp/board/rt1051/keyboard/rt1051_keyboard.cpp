@@ -54,7 +54,7 @@ namespace bsp {
         /* Init input KEYBOARD IRQ. */
         GPIO_PinInit(BOARD_KEYBOARD_IRQ_GPIO, BOARD_KEYBOARD_IRQ_GPIO_PIN, &irqpin_config);
 
-
+        //
         if (xTaskCreate(bsp_keyboard_worker, "keyboard", 512, NULL, 0, &keyboard_worker_handle) != pdPASS) {
             return kStatus_Fail;
         }

@@ -60,8 +60,13 @@ target_include_directories(${PROJECT_NAME}
 
 
 )
+target_include_directories( ${PROJECT_NAME}  
+	PUBLIC 
+		"${CMAKE_SOURCE_DIR}/"
+		"${CMAKE_SOURCE_DIR}/module-services/"  
+)
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os )
+target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os module-services)
 
 
 # Host target configuration(mainly used for unit testing)
