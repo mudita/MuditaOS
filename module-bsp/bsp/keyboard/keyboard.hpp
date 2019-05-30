@@ -18,6 +18,9 @@
 
 #include "common.hpp"
 
+
+#include "module-sys/Service/Service.hpp"
+
 #if defined(TARGET_RT1051)
 
 #include "keyboard/key_codes_rt1051.hpp"
@@ -35,7 +38,7 @@ namespace bsp {
     class keyboard {
     public:
 
-        RetCode Init(std::function<void(KeyEvents event,KeyCodes code)> signal);
+        RetCode Init(std::function<void(KeyEvents event,KeyCodes code, sys::Service* s)> signal, sys::Service* s);
         RetCode DeInit();
 
     };
