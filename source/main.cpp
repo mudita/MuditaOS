@@ -5,7 +5,7 @@
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
-#include "service-gui/DrawMessage.hpp"
+#include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
 
@@ -121,7 +121,7 @@ public:
 			auto msg = std::make_shared<sgui::DrawMessage>(commandsList);
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
     	}
-        LOG_DEBUG("Blinky service tick!");
+//        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -171,7 +171,8 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 
 int main() {
-    LOG_PRINTF("Launching PurePhone..\n");
+
+	LOG_PRINTF("Launching PurePhone..\n");
 
     bsp::BoardInit();
 
