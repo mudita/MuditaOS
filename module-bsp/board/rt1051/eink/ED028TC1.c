@@ -11,6 +11,9 @@
  *              * UC8177c.pdf
  */
 
+#include "eink/dma_config.h"
+#include "fsl_dmamux.h"
+#include "fsl_edma.h"
 #include "ED028TC1.h"
 #include "bsp_eink.h"
 #include "board.h"
@@ -73,6 +76,9 @@
 //#if EINK_DEBUG_LOG == 1
 //#define EINK_DEBUG_PRINTF(...)	LOG_INFO(__VA_ARGS__)
 //#endif
+
+/// This is DMA handle for internal frame buffer memory-to-memory copying operation
+static edma_handle_t            s_einkMemcpyDma_handle;
 
 #define EINK_LUTS_FILE_PATH "/Luts.bin"
 
@@ -1418,5 +1424,16 @@ static uint8_t* s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(
     }
 
     return dataOut;
+}
+
+EinkStatus_e EinkMemcpyDmaInit( edma_callback memcpyCallback )
+{
+    DMAMUX_EnableAlwaysOn(BSP_EINK_MEMCPY_DMA_DMAMUX_BASE, BSP_EINK_MEMCPY_DMA_CH, true);
+    DMAMUX_EnableChannel(BSP_EINK_MEMCPY_DMA_DMAMUX_BASE, BSP_EINK_MEMCPY_DMA_CH);
+
+    EDMA_CreateHandle(&s_einkMemcpyDma_handle, BSP_EINK_MEMCPY_DMA_DMA_BASE, BSP_EINK_MEMCPY_DMA_CH);
+    EDMA_SetCallback(&s_einkMemcpyDma_handle, memcpyCallback, NULL);
+
+	return EinkOK;
 }
 
