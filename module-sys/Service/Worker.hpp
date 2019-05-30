@@ -1,0 +1,79 @@
+/*
+ * @file Worker.hpp
+ * @author Robert Borzecki (robert.borzecki@mudita.com)
+ * @date 30 maj 2019
+ * @brief
+ * @copyright Copyright (C) 2019 mudita.com
+ * @details
+ */
+#ifndef MODULE_SYS_SERVICE_WORKER_HPP_
+#define MODULE_SYS_SERVICE_WORKER_HPP_
+
+#include <memory>
+#include <string>
+
+#include "Service.hpp"
+
+namespace sys {
+
+class WorkerQueueInfo {
+public:
+	std::string name;
+	int elementSize;
+	int length;
+};
+
+struct WorkerCommand {
+	uint32_t command;
+	uint32_t* data;
+};
+
+/*
+ *
+ */
+class Worker {
+
+	const uint32_t SERVICE_QUEUE_LENGTH = 10;
+	const uint32_t SERVICE_QUEUE_SIZE = sizeof( WorkerCommand );
+
+	sys::Service* service;
+	//queue used by service to send commands to service.
+	xQueueHandle serviceQueue;
+	std::vector<xQueueHandle> queues;
+	QueueSetHandle_t queueSet;
+	//workers task handle
+	xTaskHandle taskHandle;
+public:
+	Worker( sys::Service* service );
+	virtual ~Worker();
+
+	/**
+	 * This function is responsible for creating all queues provided in the constructor.
+	 * When all queues are created this method creates set of queues.
+	 */
+	virtual bool init( std::list<WorkerQueueInfo> queues );
+	virtual bool deinit();
+	/**
+	 * This method starts RTOS thread that waits for incomming queue events.
+	 */
+	virtual bool run();
+	/**
+	 * This method is called from thread when new message arrives in queue.
+	 * @param queueID Index of the queue in the queues vector.
+	 */
+	virtual bool handleMessage( uint32_t queueID );
+	/**
+	 * @brief Returns handle to the queue used to communicate with worker.
+	 */
+	virtual xQueueHandle getQueue();
+	/**
+	 * @brief Sends command and pointer to data to worker
+	 */
+	virtual bool send( uint32_t cmd, uint32_t* data );
+	std::vector<xQueueHandle>& getQueues(){ return queues; };
+	QueueSetHandle_t getSet(){ return queueSet; };
+};
+
+} /* namespace sys */
+
+#endif /* MODULE_SYS_SERVICE_WORKER_HPP_ */
