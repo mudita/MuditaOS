@@ -16,6 +16,7 @@
 
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
+#include "vfs.hpp"
 
 #include "gui/core/Font.hpp"
 #include "gui/core/BoundingBox.hpp"
@@ -30,6 +31,8 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 #include "gui/widgets/Image.hpp"
+
+class vfs vfs;
 
 static const int FrameBufferWidth = 480;
 static const int FrameBufferHeight = 600;
