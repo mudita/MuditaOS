@@ -55,11 +55,11 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 	} break;
 	case sgui::GUIMessageType::Commands: {
 		auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
-		LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+	///	LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 	} break;
 	case sgui::GUIMessageType::FocusInfo: {
 
-		LOG_INFO("[ServiceGUI] Received focus info");
+	//	LOG_INFO("[ServiceGUI] Received focus info");
 	} break;
 	};
 

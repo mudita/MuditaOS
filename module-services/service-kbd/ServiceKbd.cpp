@@ -11,7 +11,7 @@
 
 #include "keyboard/keyboard.hpp"
 #include "linux_keyboard.hpp"
-
+#include "WorkerKbd.hpp"
 
 
 
@@ -31,11 +31,16 @@ ServiceKbd::ServiceKbd(const std::string& name)
 		: sys::Service(name)
 {
 	LOG_INFO("[ServiceKbd] Initializing");
-	bsp::keyboard keyboard;
-	keyboard.Init(bsp::linux_keyboard_event_callback, this);
+
+
 }
 
 ServiceKbd::~ServiceKbd(){
+
+    timer_id = CreateTimer(1000,true);
+    ReloadTimer(timer_id);
+
+
 	LOG_INFO("[ServiceKbd] Cleaning resources");
 	if( kbdWorker != nullptr) {
 		kbdWorker->deinit();
@@ -51,7 +56,7 @@ sys::Message_t ServiceKbd::DataReceivedHandler(sys::DataMessage* msgl) {
 	LOG_INFO("[ServiceKbd] Received key info: key_code = %d, keyEvent = %d\n"
 			"press time: %d, release time %d", static_cast<int>(msg->keyCode),
 			static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
-
+	kbdWorker->send( 123, nullptr );
 	///TEST long press always active
 
 
@@ -60,18 +65,36 @@ sys::Message_t ServiceKbd::DataReceivedHandler(sys::DataMessage* msgl) {
 
 // Invoked when timer ticked
 void ServiceKbd::TickHandler(uint32_t id) {
+
+
+	LOG_INFO("[ServiceKbd] send to worker\n");
+
 }
 
 // Invoked during initialization
 sys::ReturnCodes ServiceKbd::InitHandler() {
-	kbdWorker = new sys::Worker( this );
-	sys::WorkerQueueInfo test1 = {"aaaa", 10, 10 };
+
+
+
+	//initialize keyboard worker
+	kbdWorker = new WorkerKbd( this );
+
+	//create queues for worker
+	sys::WorkerQueueInfo qTimer = {"qTimer", 2, 10 };
+	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(bsp::KeyState), 10 };
 	std::list<sys::WorkerQueueInfo> list;
-	list.push_back(test1);
+
+	list.push_back(qTimer);
+	list.push_back(qIrq);
+
 	kbdWorker->init( list );
 	kbdWorker->run();
-	vTaskDelay(1000);
-	kbdWorker->send( 123, nullptr );
+
+//	kbdWorker->send( 123, nullptr );
+
+	std::vector<xQueueHandle> set = kbdWorker->getQueues();
+
+
 
 	return sys::ReturnCodes::Success;
 }
