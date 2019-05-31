@@ -29,6 +29,17 @@ struct WorkerCommand {
 };
 
 /*
+ * @brief Worker is a wrapper for freeRTOS task used to separate sysmanager environment from
+ * the rest of the system. Its purpose is to handle asynchronous events like IRQ or timers.
+ * Flow of creating worker is as follows:
+ * - create new Worker object and provide pointer to the service that owns the worker,
+ * - call init method and provide list of parameters to create queues. Those queues can be later
+ * used to wake up the worker.
+ * - call run method to start the worker.
+ * Flow for closing the worker is as follows:
+ * - call stop method - task will send a close confirmation to the service after exiting its main loop
+ * - call deinit to destroy all queues ued by the worker
+ * - delete the object.
  *
  */
 class Worker {
@@ -57,6 +68,10 @@ public:
 	 * This method starts RTOS thread that waits for incomming queue events.
 	 */
 	virtual bool run();
+	/**
+	 * Sends stop command to worker.
+	 */
+	virtual bool stop();
 	/**
 	 * This method is called from thread when new message arrives in queue.
 	 * @param queueID Index of the queue in the queues vector.

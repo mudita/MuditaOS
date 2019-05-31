@@ -34,15 +34,16 @@ static void workerTaskFunction( void* ptr ) {
 			}
 		}
 	}
+	vTaskDelete( NULL );
 }
 
 
 
-Worker::Worker( sys::Service* service ) : service {service }, serviceQueue{ NULL } {
-
+Worker::Worker( sys::Service* service ) : service {service }, serviceQueue{ NULL }, queueSet{ NULL }, taskHandle{ NULL } {
 }
+
 Worker::~Worker() {
-
+	deinit();
 }
 
 bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
@@ -91,6 +92,22 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 	return true;
 }
 bool Worker::deinit() {
+
+	//for all queues - remove from set and delete queue
+	std::vector<xQueueHandle> queues;
+	for( auto q : queues ) {
+		//remove queues from set
+		xQueueRemoveFromSet( q, queueSet );
+		//delete queue
+		vQueueDelete( q );
+	}
+	queues.clear();
+
+	//delete queues set
+	vQueueDelete((QueueHandle_t) queueSet );
+	queueSet = NULL;
+
+	taskHandle = NULL;
 	return true;
 };
 /**
@@ -112,10 +129,13 @@ bool Worker::run() {
 	}
 	return true;
 }
-/**
- * This method is called from thread when new message arrives in queue.
- * @param queueID Index of the queue in the queues vector.
- */
+
+bool Worker::stop() {
+	return send( 0,NULL );
+
+}
+
+
 bool Worker::handleMessage( uint32_t queueID ) {
 
 	QueueHandle_t queue = queues[queueID];
