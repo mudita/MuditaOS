@@ -10,6 +10,7 @@
 
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
+#include "Service/Worker.hpp"
 
 #include "key_codes_linux.hpp"
 #include "common.hpp"
@@ -36,6 +37,8 @@ public:
 };
 
 class ServiceKbd: public sys::Service {
+protected:
+	sys::Worker* kbdWorker;
 public:
 	ServiceKbd(const std::string& name);
     ~ServiceKbd();
