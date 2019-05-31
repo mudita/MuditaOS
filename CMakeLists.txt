@@ -112,10 +112,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR
 message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
 
-
-message("${PROJECT_NAME}: add_subdirectory module-gui")
-add_subdirectory(module-gui)
-
 message("${PROJECT_NAME}: add_subdirectory module-utils")
 add_subdirectory(module-utils)
 
@@ -127,6 +123,9 @@ add_subdirectory(module-bsp)
 
 message("${PROJECT_NAME}: add_subdirectory module-vfs")
 add_subdirectory(module-vfs)
+
+message("${PROJECT_NAME}: add_subdirectory module-gui")
+add_subdirectory(module-gui)
 
 message("${PROJECT_NAME}: add_subdirectory module-services")
 add_subdirectory(module-services)

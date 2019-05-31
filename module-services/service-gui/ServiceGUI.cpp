@@ -14,12 +14,20 @@
 #include "ServiceGUI.hpp"
 #include "log/log.hpp"
 
-ServiceGUI::ServiceGUI(const std::string& name)
+ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
 		: sys::Service(name),
 		renderBuffer { nullptr },
-		einkBuffer { nullptr } {
+		transferBuffer { nullptr },
+		renderFrameCounter{ 1 },
+		transferedFrameCounter{ 0 },
+		screenWidth{ screenWidth },
+		screenHeight{ screenHeight } {
 
 	LOG_INFO("[ServiceGUI] Initializing");
+
+	//allocate buffers for rendering and transferring data to eink
+	renderBuffer = new FrameBuffer( screenWidth, screenHeight );
+	transferBuffer = new FrameBuffer( screenWidth, screenHeight );
 
 	gui::FontManager& fontManager = gui::FontManager::getInstance();
 	fontManager.init( "sys/assets" );
@@ -30,6 +38,10 @@ ServiceGUI::ServiceGUI(const std::string& name)
 
 ServiceGUI::~ServiceGUI(){
 	LOG_INFO("[ServiceGUI] Cleaning resources");
+	if( renderBuffer )
+		delete renderBuffer;
+	if( transferBuffer )
+		delete transferBuffer;
 }
 
 // Invoked upon receiving data message
