@@ -43,7 +43,7 @@ struct WorkerCommand {
  *
  */
 class Worker {
-
+protected:
 	const uint32_t SERVICE_QUEUE_LENGTH = 10;
 	const uint32_t SERVICE_QUEUE_SIZE = sizeof( WorkerCommand );
 

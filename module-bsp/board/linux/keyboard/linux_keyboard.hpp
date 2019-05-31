@@ -18,12 +18,17 @@
 #include "module-sys/Service/Service.hpp"
 #include "key_codes_linux.hpp"
 #include "common.hpp"
-
+#include "service-kbd/WorkerKbd.hpp"
 
 
 namespace bsp{
 
-RetCode linux_keyboard_Init(std::function<void(KeyEvents event,KeyCodes code, sys::Service* s)> eventHandler , sys::Service* s);
+struct KeyState{
+	KeyEvents event;
+	KeyCodes code;
+};
+
+RetCode linux_keyboard_Init(WorkerKbd* worker);
 
 		int32_t linux_keyboard_Deinit(void);
 
@@ -31,7 +36,8 @@ RetCode linux_keyboard_Init(std::function<void(KeyEvents event,KeyCodes code, sy
 
         BaseType_t linux_keyboard_right_functional_IRQHandler(void);
 
-        void linux_keyboard_event_callback(KeyEvents event,KeyCodes code, sys::Service* s);
+        void linux_keyboard_event_callback(KeyEvents event,KeyCodes code, sys::Service* S);
+        void startKeyTimer(uint32_t time, xQueueHandle qhandle);
 
 }
 

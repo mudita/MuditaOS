@@ -56,6 +56,7 @@ public:
 
     sys::ReturnCodes SleepHandler() override;
 
+    uint32_t timer_id= 0;
 };
 
 #endif /* MODULE_SERVICES_SERVICE_KBD_SERVICEKBD_HPP_ */

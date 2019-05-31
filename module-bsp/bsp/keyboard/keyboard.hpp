@@ -20,6 +20,7 @@
 
 
 #include "module-sys/Service/Service.hpp"
+#include "service-kbd/WorkerKbd.hpp"
 
 #if defined(TARGET_RT1051)
 
@@ -38,7 +39,7 @@ namespace bsp {
     class keyboard {
     public:
 
-        RetCode Init(std::function<void(KeyEvents event,KeyCodes code, sys::Service* s)> signal, sys::Service* s);
+        RetCode Init(WorkerKbd* worker);
         RetCode DeInit();
 
     };

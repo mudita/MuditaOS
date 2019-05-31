@@ -9,7 +9,7 @@
 #include "key_codes_linux.hpp"
 #include "module-sys/Service/Message.hpp"
 #include "service-kbd/ServiceKbd.hpp"
-
+#include "service-kbd/WorkerKbd.hpp"
 #include <iostream>
 
 #include <stdio.h>
@@ -30,7 +30,7 @@ namespace bsp {
 
 static TaskHandle_t linux_keyboard_worker_handle = NULL;
 TimerHandle_t keyboardTaskPressTimer = NULL;
-static std::function<void(KeyEvents event,KeyCodes code, sys::Service* s)> user_event_callback = NULL;
+static std::function<void(xQueueHandle qhandle)>  user_event_callback = NULL;
 
 struct key_t{
 	KeyEvents lastState = KeyEvents::Released;
@@ -59,14 +59,14 @@ static void linux_keyboard_worker(void *pvp)
 
 	while(1)
 	{
-		bool callbackHandled = false;
+		/*bool callbackHandled = false;
 		if( longPressTimerQueue != NULL)
 			xQueueReceive( longPressTimerQueue, &callbackHandled, 50 );
 		if(callbackHandled)
 		{
 			sys::Service* s = reinterpret_cast<sys::Service*>(pvp);
-			user_event_callback(KeyEvents::Released, key.lastPressed, s );
-		}
+			user_event_callback(KeyEvents::Released, key.lastPressed);
+		}*/
 		uint8_t buff [10];
 		int32_t readedBytes = read(fd, buff, 10);
 
@@ -75,13 +75,15 @@ static void linux_keyboard_worker(void *pvp)
 			KeyEvents event;
 			KeyCodes code;
 
-			event = static_cast<KeyEvents>(buff[0]);
-			code = static_cast<KeyCodes>(buff[1]);
+			bsp::KeyState key;
+			key.event = static_cast<KeyEvents>(buff[0]);
+			key.code = static_cast<KeyCodes>(buff[1]);
 
 			std::cout << "Event: "  << static_cast<int>(buff[0])<< " code: " << static_cast<int>(buff[1]) <<std::endl;
 			//if(buff[2] == buff[0] + buff[1])
-			sys::Service* s = reinterpret_cast<sys::Service*>(pvp);
-				user_event_callback(event, code, s);
+			xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
+
+			xQueueSend(qhandle, &key, 100);
 		}
 		vTaskDelay(50);
 	}
@@ -95,20 +97,20 @@ static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
 	auto message = std::make_shared<KbdMessage>();
 	std::cout << "Timer callback\n";
 
+	xQueueHandle qhandle = reinterpret_cast<xQueueHandle> (pvTimerGetTimerID( xTimer ));
+
 	bool handled = true;
 
-	if( longPressTimerQueue != NULL)
-		xQueueSend( longPressTimerQueue, &handled, 100);
-/*	ServiceKbd* serv = reinterpret_cast<ServiceKbd*> (pvTimerGetTimerID( xTimer ));
-	sys::Bus::SendUnicast(message, "ServiceKbd", serv);
-	std::cout << "Timer callback\n";*/
+	/*if( longPressTimerQueue != NULL)
+		xQueueSend( qhandle, &handled, 100);*/
+
 }
 
-void startKeyTimer(void)
+void startKeyTimer(uint32_t time, xQueueHandle qhandle)
 {
 	std::cout << "Timer start\n";
 
-	keyboardTaskPressTimer = xTimerCreate("keyboardPressTimer", 1000, false,  ( void * ) 0, &keyboardTaskPressTimerCallback);
+	keyboardTaskPressTimer = xTimerCreate("keyboardPressTimer", time, false,  &qhandle, &keyboardTaskPressTimerCallback);
 	if( xTimerStart( keyboardTaskPressTimer, 0 ) != pdPASS )
 	{
 
@@ -138,7 +140,7 @@ void linux_keyboard_event_callback(KeyEvents event,KeyCodes code, sys::Service* 
 		{
 			key.lastPressed = code;
 			key.lastState = event;
-			/*TEST*/
+		/*	TEST
 			if(code == KeyCodes::JoystickLeft)
 			{
 				key.longPressTaskEnabled = true;
@@ -146,7 +148,7 @@ void linux_keyboard_event_callback(KeyEvents event,KeyCodes code, sys::Service* 
 			}
 			else
 				key.longPressTaskEnabled = false;
-			/*TEST*/
+			TEST*/
 
 		}
 	}
@@ -196,15 +198,16 @@ void linux_keyboard_event_callback(KeyEvents event,KeyCodes code, sys::Service* 
 			message->keyRelaseTime = xTaskGetTickCount();
 		}
 	}
-
 	sys::Bus::SendUnicast(message, "ServiceKbd", s);
 }
-RetCode linux_keyboard_Init(std::function<void(bsp::KeyEvents event,bsp::KeyCodes code, sys::Service* s)> event, sys::Service* s) {
+RetCode linux_keyboard_Init(WorkerKbd* worker) {
 
 	// Store user specified event callback
-	user_event_callback = event;
-
-	if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, s, 0, &linux_keyboard_worker_handle) != pdPASS) {
+//	user_event_callback = event;
+	std::vector<xQueueHandle> queues = worker->getQueues();
+	//TODO change magic value to enum
+	xQueueHandle qhandle = queues[2];
+	if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, qhandle, 0, &linux_keyboard_worker_handle) != pdPASS) {
 		return RetCode::Failure;
 	}
 
@@ -213,7 +216,8 @@ RetCode linux_keyboard_Init(std::function<void(bsp::KeyEvents event,bsp::KeyCode
 
 	return RetCode::Success;
 }
-
 }
+
+
 
 

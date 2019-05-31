@@ -26,13 +26,13 @@
 
 namespace bsp
 {
-    RetCode keyboard::Init(std::function<void(KeyEvents event,KeyCodes code, sys::Service* s)> signal, sys::Service* s)
+    RetCode keyboard::Init(WorkerKbd* worker)
     {
 #if defined(TARGET_RT1051)
         rt1501_keyboard_Init(signal, s);
 
 #elif defined(TARGET_Linux)
-        linux_keyboard_Init(signal, s);
+        linux_keyboard_Init(worker);
 #else
 #error "Unsupported target"
 #endif
