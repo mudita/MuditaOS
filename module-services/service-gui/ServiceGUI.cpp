@@ -20,12 +20,15 @@
 #include "service-eink/messages/ImageMessage.hpp"
 
 #include "ServiceGUI.hpp"
+#include "GUIWorker.hpp"
 #include "log/log.hpp"
 
 #include "SystemManager/SystemManager.hpp"
 
+namespace sgui {
+
 ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
-		: sys::Service(name),
+		: sys::Service(name, 4096, sys::ServicePriority::High),
 		renderContext{ nullptr },
 		transferContext { nullptr },
 		renderFrameCounter{ 1 },
@@ -54,6 +57,21 @@ ServiceGUI::~ServiceGUI(){
 		delete transferContext;
 }
 
+void ServiceGUI::sendBuffer() {
+	//copy data from render context to transfer context
+	transferContext->insert( 0, 0, renderContext );
+
+	auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
+			transferContext->getW(),
+			transferContext->getH(),
+			transferContext->getData()
+	);
+	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this, 500);
+	if( ret.first == sys::ReturnCodes::Success ) {
+		transferedFrameCounter = renderFrameCounter;
+	}
+}
+
 // Invoked upon receiving data message
 sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
@@ -72,7 +90,10 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 			std::vector<gui::DrawCommand*> commands;
 			for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
 				commands.push_back( (*i).get() );
+			uint32_t start_tick = xTaskGetTickCount();
 			renderer.render( renderContext, commands );
+			uint32_t end_tick = xTaskGetTickCount();
+			LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
 
 			//increment counter holding number of drawn frames
 			renderFrameCounter++;
@@ -85,27 +106,21 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 	} break;
 	case sgui::MessageType::DisplayReady: {
 
-		LOG_INFO("[ServiceGUI] Received display device ready signal");
-
 		einkReady = true;
-		DeleteTimer( timer_id );
+		if( timer_id != 0 ){
+			DeleteTimer( timer_id );
+			timer_id = 0;
+		}
 
 		//check if something new was rendered. If so render counter has greater value than
 		//transfer counter.
 		if( renderFrameCounter != transferedFrameCounter ) {
 
-			//copy data from render context to transfer context
-			transferContext->insert( 0, 0, renderContext );
-
-			auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
-					transferContext->getW(),
-					transferContext->getH(),
-					transferContext->getData()
-			);
-			auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this, 500);
-			if( ret.first == sys::ReturnCodes::Success ) {
-				transferedFrameCounter = renderFrameCounter;
-			}
+			sendBuffer();
+			einkReady = false;
+		}
+		else {
+			LOG_INFO(" NO new buffer to send");
 		}
 
 	} break;
@@ -125,8 +140,19 @@ void ServiceGUI::TickHandler(uint32_t id) {
 
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
-	timer_id = CreateTimer(100,true);
+
+	//start worker
+//	worker = new GUIWorker( this );
+//	worker->init();
+//	worker->run();
+
+	//creat timer that pulls eink's status
+	timer_id = CreateTimer(250,true);
 	ReloadTimer(timer_id);
+
+
+
+
 	return sys::ReturnCodes::Success;
 }
 
@@ -143,6 +169,6 @@ sys::ReturnCodes ServiceGUI::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-
+} /* namespace sgui */
 
 
