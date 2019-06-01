@@ -103,14 +103,6 @@ ServiceEink::ServiceEink(const std::string& name)
 	memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
 	waveformSettings.mode = EinkWaveformGC16;
 	waveformSettings.temperature = -1000;
-
-//	einkWorker = NULL;;
-//	einkWorkerQueue = NULL;;
-//	einkWorkerIRQQueue = NULL;;
-//	einkQueueSet = NULL;
-
-	timerID = CreateTimer(1000,true);
-	ReloadTimer(timerID);
 }
 
 ServiceEink::~ServiceEink(){
@@ -157,14 +149,12 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to update frame");
 
-			ret =
-			EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
+//			ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
+			ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
 
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to refresh frame");
 			EinkPowerOff();
-
-//			memcpy( shmMemPtr +  sizeof(shared_memory), einkRenderBuffer, dmsg->getSize());
 		} break;
 
 		case seink::MessageType::TemperatureUpdate: {

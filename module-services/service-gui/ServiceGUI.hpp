@@ -14,38 +14,14 @@
 
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
+#include "GUIWorker.hpp"
 
-//class FrameBuffer {
-//	uint8_t* data;
-//	uint32_t width;
-//	uint32_t height;
-//public:
-//	FrameBuffer( uint32_t w, uint32_t h ) :width{w}, height{h} {
-//		//prevent from creating buffer with 0 size
-//		if( width == 0 )
-//			width = 1;
-//		if( height == 0 )
-//			height = 1;
-//		data = new uint8_t[width*height];
-//	}
-//	virtual ~FrameBuffer() { if( data ) delete [] data;} ;
-//
-//	uint8_t* getData() { return data; };
-//	uint32_t getWidth() { return width; };
-//	uint32_t getHeight() { return height; };
-//	uint32_t getSize() { return width*height; };
-//	bool copy( const FrameBuffer& buf ) {
-//		if( (width == buf.width) && (height == buf.height) &&
-//			(data != nullptr) && (buf.data != nullptr )) {
-//			memcpy( data, buf.data, width*height );
-//			return true;
-//		}
-//		return false;
-//	}
-//};
+class GUIWorker;
+
+namespace sgui {
 
 class ServiceGUI: public sys::Service {
-
+protected:
 	//this is where every incomming frame is painted.
 	gui::Context* renderContext;
 	//this buffer is provided to eink
@@ -61,9 +37,13 @@ class ServiceGUI: public sys::Service {
 	//object responsible for rendering images to context
 	gui::Renderer renderer;
 	//flag that defines whether eink is ready for new frame buffer
-	bool einkReady = false;
+	volatile bool einkReady = false;
+	volatile bool bufferLocked = false;
 	uint32_t timer_id= 0;
 
+//	GUIWorker* worker;
+
+	void sendBuffer();
 
 public:
     ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight );
@@ -81,7 +61,8 @@ public:
     sys::ReturnCodes WakeUpHandler() override;
 
     sys::ReturnCodes SleepHandler() override;
-
 };
+
+} /* namespace sgui */
 
 #endif /* MODULE_SERVICES_SERVICE_GUI_SERVICEGUI_HPP_ */
