@@ -22,6 +22,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 set(SOURCES
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Bus.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Service/Worker.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp

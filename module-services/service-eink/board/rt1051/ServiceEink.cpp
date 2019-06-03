@@ -10,14 +10,7 @@
 #include "log/log.hpp"
 //module-vfs
 #include "vfs.hpp"
-//module-bsp
-extern "C"  {
-#include "ED028TC1.h"
-#include "chip.h"
-#include "fsl_dmamux.h"
-#include "fsl_edma.h"
-#include "eink/dma_config.h"
-}
+#include "EinkIncludes.hpp"
 
 #include "ServiceEink.hpp"
 
@@ -51,7 +44,9 @@ ServiceEink::ServiceEink(const std::string& name)
 {
 	LOG_INFO("[ServiceEink] Initializing");
 
+	//initialize initial eink parameters
 	memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
+	waveformSettings.mode = EinkWaveformGC16;
 	waveformSettings.temperature = -1000;
 
 	EinkStatus_e einkStatus = EinkResetAndInitialize();
