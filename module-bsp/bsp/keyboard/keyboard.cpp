@@ -29,7 +29,7 @@ namespace bsp
     RetCode keyboard::Init(WorkerKbd* worker)
     {
 #if defined(TARGET_RT1051)
-        rt1501_keyboard_Init(signal, s);
+        rt1501_keyboard_Init(worker);
 
 #elif defined(TARGET_Linux)
         linux_keyboard_Init(worker);

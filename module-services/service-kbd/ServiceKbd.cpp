@@ -81,7 +81,7 @@ sys::ReturnCodes ServiceKbd::InitHandler() {
 
 	//create queues for worker
 	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
-	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(bsp::KeyState), 10 };
+	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(KeyState), 10 };
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qTimer);

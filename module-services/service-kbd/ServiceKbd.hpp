@@ -8,7 +8,7 @@
 #ifndef MODULE_SERVICES_SERVICE_KBD_SERVICEKBD_HPP_
 #define MODULE_SERVICES_SERVICE_KBD_SERVICEKBD_HPP_
 
-#include "../../module-bsp/board/linux/keyboard/key_codes.hpp"
+#include "../../module-bsp/bsp/keyboard/key_codes.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"

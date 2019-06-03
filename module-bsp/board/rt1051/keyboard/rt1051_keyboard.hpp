@@ -14,12 +14,13 @@
 #include <stdint.h>
 #include "fsl_common.h"
 #include "FreeRTOS.h"
-#include "key_codes_rt1051.hpp"
 #include "common.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "service-kbd/WorkerKbd.hpp"
 
 namespace bsp{
 
-        status_t rt1501_keyboard_Init(std::function<void(KeyEvents event,KeyCodes code)> eventHandler);
+        status_t rt1501_keyboard_Init(WorkerKbd* worker);
 
         status_t rt1501_keyboard_Deinit(void);
 

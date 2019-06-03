@@ -8,8 +8,8 @@
 #ifndef MODULE_SERVICES_SERVICE_KBD_WORKERKBD_HPP_
 #define MODULE_SERVICES_SERVICE_KBD_WORKERKBD_HPP_
 
-#include "../../module-bsp/board/linux/keyboard/key_codes.hpp"
-#include "../../module-bsp/board/linux/keyboard/key_codes.hpp"
+
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
@@ -20,6 +20,10 @@
 #include "keyboard/keyboard.hpp"*/
 #include "common.hpp"
 
+struct KeyState{
+	bsp::KeyEvents event;
+	bsp::KeyCodes code;
+};
 
 class WorkerKbd : public sys::Worker
 {

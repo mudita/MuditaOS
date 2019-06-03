@@ -18,7 +18,7 @@ extern "C" {
 #include "Service/Worker.hpp"
 #include "WorkerKbd.hpp"
 #include "keyboard/keyboard.hpp"
-#include "../../module-bsp/board/linux/keyboard/bsp_keyboard.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
 
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
@@ -60,7 +60,7 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 	}
 	if( queueID == 2)
 	{
-		bsp::KeyState val;
+		KeyState val;
 		if( xQueueReceive(queue, &val, 0 ) != pdTRUE ) {
 					return false;
 			}

@@ -17,16 +17,13 @@
 
 #include "module-sys/Service/Service.hpp"
 #include "common.hpp"
-#include "key_codes.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
 #include "service-kbd/WorkerKbd.hpp"
 
 
 namespace bsp{
 
-struct KeyState{
-	KeyEvents event;
-	KeyCodes code;
-};
+
 
 RetCode linux_keyboard_Init(WorkerKbd* worker);
 
