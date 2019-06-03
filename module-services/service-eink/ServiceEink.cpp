@@ -26,6 +26,8 @@ extern "C" {
 
 #include "SystemManager/SystemManager.hpp"
 
+#include "MessageType.hpp"
+
 #include "ServiceEink.hpp"
 
 enum class EinkWorkerCommands {
@@ -123,11 +125,11 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	switch( msg->messageType ) {
 
-		case seink::MessageType::Uninitialized: {
+		case static_cast<uint32_t>(MessageType::MessageTypeUninitialized): {
 			LOG_ERROR("[ServiceEink] Received uninitialized message type");
 		} break;
 
-		case seink::MessageType::ImageData: {
+		case static_cast<uint32_t>(MessageType::EinkImageData): {
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
 			LOG_ERROR("[ServiceEink] Received framebuffer");
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
@@ -156,16 +158,16 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 				LOG_FATAL("Failed to refresh frame");
 			EinkPowerOff();
 
-			auto msg = std::make_shared<sgui::GUIMessage>(sgui::MessageType::DisplayReady );
+			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;
 
-		case seink::MessageType::TemperatureUpdate: {
+		case static_cast<uint32_t>(MessageType::EinkTemperatureUpdate): {
 
 		} break;
 
-		case seink::MessageType::StateRequest: {
-			auto msg = std::make_shared<sgui::GUIMessage>(sgui::MessageType::DisplayReady );
+		case static_cast<uint32_t>(MessageType::EinkStateRequest ): {
+			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;
 
