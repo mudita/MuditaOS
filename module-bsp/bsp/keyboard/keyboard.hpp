@@ -24,7 +24,7 @@
 
 #if defined(TARGET_RT1051)
 
-#include "keyboard/key_codes_rt1051.hpp"
+#include "keyboard/key_codes.hpp"
 
 #elif defined(TARGET_Linux)
 #include "keyboard/key_codes.hpp"

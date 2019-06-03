@@ -36,10 +36,10 @@ namespace bsp {
     static void bsp_keyboard_worker(void *pvp);
 
 
-    status_t rt1501_keyboard_Init(std::function<void(KeyEvents event,KeyCodes code)> event) {
-        assert(event);
+    status_t rt1501_keyboard_Init(WorkerKbd* worker){
+        //assert(event);
         // Store user specified event callback
-        user_event_callback = event;
+        //user_event_callback = event;
 
         /* Define the init structure for the input RF key pin*/
         gpio_pin_config_t right_functional_pin_config = {kGPIO_DigitalInput, 0, kGPIO_IntRisingOrFallingEdge};
@@ -55,7 +55,10 @@ namespace bsp {
         GPIO_PinInit(BOARD_KEYBOARD_IRQ_GPIO, BOARD_KEYBOARD_IRQ_GPIO_PIN, &irqpin_config);
 
         //
-        if (xTaskCreate(bsp_keyboard_worker, "keyboard", 512, NULL, 0, &keyboard_worker_handle) != pdPASS) {
+        //TODO change magic value to enum
+        std::vector<xQueueHandle> queues = worker->getQueues();
+        xQueueHandle qhandle = queues[2];
+        if (xTaskCreate(bsp_keyboard_worker, "keyboard", 512, qhandle, 0, &keyboard_worker_handle) != pdPASS) {
             return kStatus_Fail;
         }
 
@@ -153,6 +156,9 @@ namespace bsp {
     static void bsp_keyboard_worker(void *pvp) {
         uint32_t ulNotificationValue = 0;
 
+        xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
+
+
         while (1) {
             xTaskNotifyWait(0xFFFFFFFF, 0xFFFFFFFF, &ulNotificationValue, portMAX_DELAY);
 
@@ -179,7 +185,10 @@ namespace bsp {
                     if (rel_pres == 0) {
                     } else {
                     }
-                    user_event_callback(static_cast<KeyEvents >(rel_pres), static_cast<KeyCodes >(key));
+                    KeyState keyState;
+                    keyState.code = static_cast<KeyCodes >(key);
+                    keyState.event = static_cast<KeyEvents >(rel_pres);
+                    xQueueSend(qhandle, &keyState, 100);
                 }
 
                 //Clear all interrupts
@@ -190,11 +199,19 @@ namespace bsp {
             }
 
             if (ulNotificationValue & 0x02) {
-                user_event_callback(KeyEvents::Pressed, KeyCodes::FnRight);
+            	KeyState keyState;
+            	keyState.code = KeyCodes::FnRight;
+            	keyState.event = KeyEvents::Pressed;
+            	xQueueSend(qhandle, &keyState, 100);
+                //user_event_callback(KeyEvents::Pressed, KeyCodes::FnRight);
             }
 
             if (ulNotificationValue & 0x04) {
-                user_event_callback(KeyEvents::Released, KeyCodes::FnRight);
+            	KeyState keyState;
+				keyState.code = KeyCodes::FnRight;
+				keyState.event = KeyEvents::Released;
+				xQueueSend(qhandle, &keyState, 100);
+                //user_event_callback(KeyEvents::Released, KeyCodes::FnRight);
             }
         }
     }
