@@ -88,7 +88,7 @@ static uint8_t              s_einkIsPoweredOn = false;  //  Variable which conta
 static EinkWaveforms_e      s_einkConfiguredWaveform = EinkWaveformGC16;    //  This variable contains the current waveform set in the display
 static int8_t               s_einkPreviousTemperature = 127;                //  This variable contains the last measured temperature of the ambient
 
-static NONCACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLAY_RES_X * BOARD_EINK_DISPLAY_RES_Y/2 + 2]);  // Plus 2 for the EPD command and BPP config
+static CACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLAY_RES_X * BOARD_EINK_DISPLAY_RES_Y/2 + 2]);  // Plus 2 for the EPD command and BPP config
 
 /**
  * @brief This lut is used for convertion of the 4bp input grayscale pixel to the 1bpp output pixel

@@ -79,7 +79,7 @@ sys::ReturnCodes ApplicationClock::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("main");
+	setActiveWindow("Main");
 
 	return sys::ReturnCodes::Success;
 }
@@ -99,31 +99,16 @@ sys::ReturnCodes ApplicationClock::SleepHandler() {
 
 void ApplicationClock::createUserInterface() {
 
-	gui::Window* clockWin = new gui::Window(0);
-	clockWin = new gui::Window(0);
+	gui::Window* clockWin = new gui::Window("Main");
 	clockWin->setSize( 480, 600 );
-
-//	gui::VBox* vBox = new gui::VBox( clockWin, 0, 0, 480, 600 );
-//
-//	gui::Rect* maxH1 = new gui::Rect();
-//	maxH1->setBorderColor( gui::ColorNoColor );
-//	maxH1->setMaxSize( 10, 300 );
-//
-//	gui::Rect* maxH2 = new gui::Rect();
-//	maxH2->setBorderColor( gui::ColorNoColor );
-//	maxH2->setMaxSize( 15, 300 );
 
 	timeLabel = new gui::Label(clockWin, 0,0,480,600);
 	timeLabel->setFont("gt_pressura_bold_65");
 	timeLabel->setText("12:35");
 	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	timeLabel->setMaxSize( 480, 180 );
+	timeLabel->setMaxSize( 480, 120 );
 
-//	vBox->addWidget(maxH1);
-//	vBox->addWidget(timeLabel);
-//	vBox->addWidget(maxH2);
-
-	windows.insert(std::pair<std::string,gui::Window*>("main", clockWin));
+	windows.insert(std::pair<std::string,gui::Window*>(clockWin->getName(), clockWin));
 }
 
 void ApplicationClock::destroyUserInterface() {

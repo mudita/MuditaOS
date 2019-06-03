@@ -92,8 +92,15 @@ void Renderer::drawVerticalLine( Context* ctx, int16_t x, int16_t y,
 
 void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
-	//check if there is anthing to draw
+	//check if there is anything to draw
 	if( cmd->w == 0 || cmd->h == 0 ){
+		return;
+	}
+
+	if(
+		((cmd->fillColor.alpha == 0x0F) && (cmd->borderColor.alpha == 0x0F)) ||
+		((cmd->filled == false ) && (cmd->borderColor.alpha == 0x0F))
+	) {
 		return;
 	}
 
