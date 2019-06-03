@@ -21,7 +21,8 @@ SMSRecord::~SMSRecord() {
 }
 
 bool SMSRecord::Add() {
-    db = std::make_unique<SmsDB>();
+
+    auto db = std::make_unique<SmsDB>();
 
     //db->threads.Add()
 }
