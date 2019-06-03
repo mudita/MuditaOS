@@ -18,7 +18,7 @@
 #elif defined(TARGET_Linux)
     //TODO:M.P insert Linux keyboard implementation here
 
-#include "keyboard/linux_keyboard.hpp"
+#include "keyboard/bsp_keyboard.hpp"
 
 #else
 #error "Unsupported target"

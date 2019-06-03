@@ -7,10 +7,10 @@
 
 #include "ServiceKbd.hpp"
 
+#include "../../module-bsp/board/linux/keyboard/bsp_keyboard.hpp"
 #include "log/log.hpp"
 
 #include "keyboard/keyboard.hpp"
-#include "linux_keyboard.hpp"
 #include "WorkerKbd.hpp"
 
 
@@ -80,7 +80,7 @@ sys::ReturnCodes ServiceKbd::InitHandler() {
 	kbdWorker = new WorkerKbd( this );
 
 	//create queues for worker
-	sys::WorkerQueueInfo qTimer = {"qTimer", 2, 10 };
+	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(bsp::KeyState), 10 };
 	std::list<sys::WorkerQueueInfo> list;
 
@@ -90,11 +90,7 @@ sys::ReturnCodes ServiceKbd::InitHandler() {
 	kbdWorker->init( list );
 	kbdWorker->run();
 
-//	kbdWorker->send( 123, nullptr );
-
 	std::vector<xQueueHandle> set = kbdWorker->getQueues();
-
-
 
 	return sys::ReturnCodes::Success;
 }

@@ -5,8 +5,8 @@
  *      Author: kuba
  */
 
-#ifndef MODULE_BSP_BOARD_LINUX_KEYBOARD_LINUX_KEYBOARD_HPP_
-#define MODULE_BSP_BOARD_LINUX_KEYBOARD_LINUX_KEYBOARD_HPP_
+#ifndef MODULE_BSP_BOARD_LINUX_KEYBOARD_BSP_KEYBOARD_HPP_
+#define MODULE_BSP_BOARD_LINUX_KEYBOARD_BSP_KEYBOARD_HPP_
 
 
 #include <functional>
@@ -16,8 +16,8 @@
 
 
 #include "module-sys/Service/Service.hpp"
-#include "key_codes_linux.hpp"
 #include "common.hpp"
+#include "key_codes.hpp"
 #include "service-kbd/WorkerKbd.hpp"
 
 
@@ -42,4 +42,4 @@ RetCode linux_keyboard_Init(WorkerKbd* worker);
 }
 
 
-#endif /* MODULE_BSP_BOARD_LINUX_KEYBOARD_LINUX_KEYBOARD_HPP_ */
+#endif /* MODULE_BSP_BOARD_LINUX_KEYBOARD_BSP_KEYBOARD_HPP_ */

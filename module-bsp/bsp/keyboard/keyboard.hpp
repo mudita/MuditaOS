@@ -27,7 +27,7 @@
 #include "keyboard/key_codes_rt1051.hpp"
 
 #elif defined(TARGET_Linux)
-#include "keyboard/key_codes_linux.hpp"
+#include "keyboard/key_codes.hpp"
     //TODO:M.P insert Linux specific headers here
 #else
 #error "Unsupported target"
