@@ -10,6 +10,8 @@
 #define MODULE_APPS_APPLICATION_CLOCK_APPLICATIONCLOCK_HPP_
 
 #include "Application.hpp"
+#include "Service/Message.hpp"
+#include "gui/widgets/Label.hpp"
 
 namespace app {
 
@@ -18,6 +20,11 @@ namespace app {
  */
 class ApplicationClock: public Application {
 	uint32_t timer_id= 0;
+
+	uint32_t seconds = 0;
+	uint32_t hour = 0;
+	uint32_t minute = 0;
+	gui::Label* timeLabel = nullptr;
 public:
 	ApplicationClock(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();

@@ -40,6 +40,36 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 void ApplicationClock::TickHandler(uint32_t id) {
 
 	LOG_DEBUG("ApplicationClock tick!");
+
+	seconds++;
+	if( seconds > 59 ) {
+		minute++;
+		seconds = 0;
+	}
+
+	if( minute > 59 ) {
+		hour++;
+		minute = 0;
+	}
+	if( hour > 23 ) {
+		hour = 0;
+	}
+
+	std::string h;
+	if( hour<10 ) {
+		h += "0";
+	}
+	h += std::to_string(hour);
+	std::string m;
+	if( minute < 10 ) {
+		m+= "0";
+	}
+	m += std::to_string(minute);
+
+	std::string t = h+":"+m;
+	UTF8 t8 = UTF8(t.c_str());
+	timeLabel->setText( t8 );
+
 	render(gui::RefreshModes::GUI_REFRESH_FAST );
 
 }
@@ -73,24 +103,25 @@ void ApplicationClock::createUserInterface() {
 	clockWin = new gui::Window(0);
 	clockWin->setSize( 480, 600 );
 
-	gui::VBox* vBox = new gui::VBox( clockWin, 0, 0, 480, 600 );
+//	gui::VBox* vBox = new gui::VBox( clockWin, 0, 0, 480, 600 );
+//
+//	gui::Rect* maxH1 = new gui::Rect();
+//	maxH1->setBorderColor( gui::ColorNoColor );
+//	maxH1->setMaxSize( 10, 300 );
+//
+//	gui::Rect* maxH2 = new gui::Rect();
+//	maxH2->setBorderColor( gui::ColorNoColor );
+//	maxH2->setMaxSize( 15, 300 );
 
-	gui::Rect* maxH1 = new gui::Rect();
-	maxH1->setBorderColor( gui::ColorNoColor );
-	maxH1->setMaxSize( 10, 300 );
+	timeLabel = new gui::Label(clockWin, 0,0,480,600);
+	timeLabel->setFont("gt_pressura_bold_65");
+	timeLabel->setText("12:35");
+	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+	timeLabel->setMaxSize( 480, 180 );
 
-	gui::Rect* maxH2 = new gui::Rect();
-	maxH2->setBorderColor( gui::ColorNoColor );
-	maxH2->setMaxSize( 15, 300 );
-
-	gui::Label* label = new gui::Label();
-	label->setText("12:35");
-	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	label->setMaxSize( 480, 180 );
-
-	vBox->addWidget(maxH1);
-	vBox->addWidget(label);
-	vBox->addWidget(maxH2);
+//	vBox->addWidget(maxH1);
+//	vBox->addWidget(timeLabel);
+//	vBox->addWidget(maxH2);
 
 	windows.insert(std::pair<std::string,gui::Window*>("main", clockWin));
 }

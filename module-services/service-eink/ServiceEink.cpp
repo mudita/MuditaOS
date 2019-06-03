@@ -136,7 +136,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			int32_t temperature = EinkGetTemperatureInternal();
 
-			changeWaveform( EinkWaveforms_e::EinkWaveformGC16, temperature );
+			changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
 			EinkStatus_e ret =
 			EinkUpdateFrame ( 0,
 			                  0,
@@ -155,6 +155,9 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to refresh frame");
 			EinkPowerOff();
+
+			auto msg = std::make_shared<sgui::GUIMessage>(sgui::MessageType::DisplayReady );
+			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;
 
 		case seink::MessageType::TemperatureUpdate: {

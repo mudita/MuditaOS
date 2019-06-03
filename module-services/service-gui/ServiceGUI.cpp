@@ -65,11 +65,13 @@ void ServiceGUI::sendBuffer() {
 			transferContext->getW(),
 			transferContext->getH(),
 			transferContext->getData()
+
 	);
 	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this, 500);
 	if( ret.first == sys::ReturnCodes::Success ) {
 		transferedFrameCounter = renderFrameCounter;
 	}
+	einkReady = false;
 }
 
 // Invoked upon receiving data message
@@ -97,6 +99,15 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			//increment counter holding number of drawn frames
 			renderFrameCounter++;
+
+			if( einkReady ) {
+				sendBuffer();
+			}
+			else {
+				//request eink state
+				auto msg = std::make_shared<seink::EinkMessage>(seink::MessageType::StateRequest );
+				sys::Bus::SendUnicast(msg, "ServiceEink", this);
+			}
 		}
 
 	} break;
@@ -117,7 +128,6 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( renderFrameCounter != transferedFrameCounter ) {
 
 			sendBuffer();
-			einkReady = false;
 		}
 		else {
 			LOG_INFO(" NO new buffer to send");
