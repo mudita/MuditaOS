@@ -43,7 +43,7 @@ struct WorkerCommand {
  *
  */
 class Worker {
-
+protected:
 	const uint32_t SERVICE_QUEUE_LENGTH = 10;
 	const uint32_t SERVICE_QUEUE_SIZE = sizeof( WorkerCommand );
 
@@ -62,7 +62,7 @@ public:
 	 * This function is responsible for creating all queues provided in the constructor.
 	 * When all queues are created this method creates set of queues.
 	 */
-	virtual bool init( std::list<WorkerQueueInfo> queues );
+	virtual bool init( std::list<WorkerQueueInfo> queues = std::list<WorkerQueueInfo>());
 	virtual bool deinit();
 	/**
 	 * This method starts RTOS thread that waits for incomming queue events.

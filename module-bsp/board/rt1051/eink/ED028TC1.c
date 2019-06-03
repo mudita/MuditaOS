@@ -11,6 +11,9 @@
  *              * UC8177c.pdf
  */
 
+#include "eink/dma_config.h"
+#include "fsl_dmamux.h"
+#include "fsl_edma.h"
 #include "ED028TC1.h"
 #include "bsp_eink.h"
 #include "board.h"
@@ -74,6 +77,9 @@
 //#define EINK_DEBUG_PRINTF(...)	LOG_INFO(__VA_ARGS__)
 //#endif
 
+/// This is DMA handle for internal frame buffer memory-to-memory copying operation
+static edma_handle_t            s_einkMemcpyDma_handle;
+
 #define EINK_LUTS_FILE_PATH "/Luts.bin"
 
 /* Internal variable definitions */
@@ -82,7 +88,7 @@ static uint8_t              s_einkIsPoweredOn = false;  //  Variable which conta
 static EinkWaveforms_e      s_einkConfiguredWaveform = EinkWaveformGC16;    //  This variable contains the current waveform set in the display
 static int8_t               s_einkPreviousTemperature = 127;                //  This variable contains the last measured temperature of the ambient
 
-static NONCACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLAY_RES_X * BOARD_EINK_DISPLAY_RES_Y/2 + 2]);  // Plus 2 for the EPD command and BPP config
+static CACHEABLE_SECTION_SDRAM(uint8_t s_einkServiceRotatedBuf[BOARD_EINK_DISPLAY_RES_X * BOARD_EINK_DISPLAY_RES_Y/2 + 2]);  // Plus 2 for the EPD command and BPP config
 
 /**
  * @brief This lut is used for convertion of the 4bp input grayscale pixel to the 1bpp output pixel
@@ -1418,5 +1424,16 @@ static uint8_t* s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(
     }
 
     return dataOut;
+}
+
+EinkStatus_e EinkMemcpyDmaInit( edma_callback memcpyCallback )
+{
+    DMAMUX_EnableAlwaysOn(BSP_EINK_MEMCPY_DMA_DMAMUX_BASE, BSP_EINK_MEMCPY_DMA_CH, true);
+    DMAMUX_EnableChannel(BSP_EINK_MEMCPY_DMA_DMAMUX_BASE, BSP_EINK_MEMCPY_DMA_CH);
+
+    EDMA_CreateHandle(&s_einkMemcpyDma_handle, BSP_EINK_MEMCPY_DMA_DMA_BASE, BSP_EINK_MEMCPY_DMA_CH);
+    EDMA_SetCallback(&s_einkMemcpyDma_handle, memcpyCallback, NULL);
+
+	return EinkOK;
 }
 

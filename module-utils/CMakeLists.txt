@@ -49,14 +49,17 @@ else()
 	include(targets/Target_Cross.cmake)
 endif()
 
+set (SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/i18/i18.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp)
 
-add_library(${PROJECT_NAME} STATIC ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 include(log/CMakeLists.txt)
 include(utf8/CMakeLists.txt)
 
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os)
+target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
