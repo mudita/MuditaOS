@@ -113,7 +113,7 @@ EinkStatus_e EinkResetAndInitialize()
 	}
 
 	//start renderer application
-	system( "./gui_renderer &" );
+	system( "./service_renderer &" );
 
     return EinkOK;
 }
