@@ -8,12 +8,12 @@
  */
 #include "GUIMessage.hpp"
 #include "DrawMessage.hpp"
-
+#include "MessageType.hpp"
 
 namespace sgui {
 
 DrawMessage::DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode ) :
-	GUIMessage(MessageType::Commands) {
+	GUIMessage(MessageType::GUICommands) {
 
 	this->mode = mode;
 	for( auto cmd : commandsList ) {

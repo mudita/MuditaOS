@@ -11,28 +11,16 @@
 
 #include "Service/Message.hpp"
 #include "core/DrawCommand.hpp"
+#include "MessageType.hpp"
 
 namespace sgui {
-
-enum class MessageType {
-	Uninitialized,
-	Commands, // list of rendering commands
-	FocusInfo, // information about application that gained focus
-	DisplayReady, //message that informs gui service that service controlling display device is ready for new buffer data.
-
-	//messages from worker
-	RenderingFinished, //Message is sent from the worker when all rendering is finished.
-};
 
 /*
  * @brief Template for all messages that go to gui service
  */
 class GUIMessage: public sys::DataMessage {
 public:
-	//Identifies type of message within GUI Service
-	const MessageType messageType;
-
-	GUIMessage( MessageType messageType ) : sys::DataMessage(), messageType{ messageType } {};
+	GUIMessage( MessageType messageType ) : sys::DataMessage(static_cast<uint32_t>(messageType)) {};
 	virtual ~GUIMessage() {};
 };
 

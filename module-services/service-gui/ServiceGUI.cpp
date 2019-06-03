@@ -80,10 +80,10 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 	sgui::GUIMessage* msg = static_cast<sgui::GUIMessage*>(msgl);
 
 	switch( msg->messageType ) {
-		case sgui::MessageType::Uninitialized: {
+		case static_cast<uint32_t>(MessageType::MessageTypeUninitialized): {
 			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
 		} break;
-		case sgui::MessageType::Commands: {
+		case static_cast<uint32_t>( MessageType::GUICommands ): {
 			auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
 			if( !dmsg->commands.empty() ) {
 				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
@@ -105,20 +105,20 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 				}
 				else {
 					//request eink state
-					auto msg = std::make_shared<seink::EinkMessage>(seink::MessageType::StateRequest );
+					auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
 					sys::Bus::SendUnicast(msg, "ServiceEink", this);
 				}
 			}
 
 		} break;
-		case sgui::MessageType::RenderingFinished: {
+		case static_cast<uint32_t>( MessageType::GUIRenderingFinished ): {
 			//TODO implement worker and message handling
 		}break;
-		case sgui::MessageType::FocusInfo: {
+		case static_cast<uint32_t>( MessageType::GUIFocusInfo ): {
 
 			LOG_INFO("[ServiceGUI] Received focus info");
 		} break;
-		case sgui::MessageType::DisplayReady: {
+		case static_cast<uint32_t>( MessageType::GUIDisplayReady ): {
 
 			einkReady = true;
 			if( timer_id != 0 ){
@@ -146,7 +146,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 void ServiceGUI::TickHandler(uint32_t id) {
 	if( einkReady == false ) {
 		ReloadTimer( timer_id );
-		auto msg = std::make_shared<seink::EinkMessage>(seink::MessageType::StateRequest );
+		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
 		sys::Bus::SendUnicast(msg, "ServiceEink", this);
 	}
 }
