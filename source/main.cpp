@@ -117,13 +117,6 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-
-//    	//context for drawing commands
-//    	if( win != nullptr ) {
-//			std::list<gui::DrawCommand*> commandsList = win->buildDrawList();
-//			auto msg = std::make_shared<sgui::DrawMessage>(commandsList);
-//			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-//    	}
 //        LOG_DEBUG("Blinky service tick!");
     }
 
@@ -162,8 +155,8 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
 
     ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
 

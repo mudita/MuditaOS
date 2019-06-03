@@ -48,11 +48,11 @@ uint8_t* createSHMBuffer( std::string name )
 	}
 	else {
 		std::cout<<"shm created"<<std::endl;
-		if (ftruncate (fd_shm, sizeof (shared_memory)+2*FrameBufferSize) == -1) {
+		if (ftruncate (fd_shm, sizeof (shared_memory)+FrameBufferSize) == -1) {
 			std::cerr<<"shm is already created"<<std::endl;
 		}
 	}
-	if ((shared_mem_ptr = static_cast<shared_memory*>(mmap (NULL, sizeof (shared_memory)+2*FrameBufferSize, PROT_READ | PROT_WRITE, MAP_SHARED,
+	if ((shared_mem_ptr = static_cast<shared_memory*>(mmap (NULL, sizeof (shared_memory)+FrameBufferSize, PROT_READ | PROT_WRITE, MAP_SHARED,
 			fd_shm, 0))) == MAP_FAILED) {
 		std::cerr<<"mmap failed"<<std::endl;
 	}
