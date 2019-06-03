@@ -45,7 +45,7 @@ public:
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
 
-        win = new gui::Window(0);
+        win = new gui::Window("Main");
 		win->setSize( 480, 600 );
 
 		gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
@@ -117,7 +117,7 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-//        LOG_DEBUG("Blinky service tick!");
+        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -155,9 +155,8 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
+  //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
-
     ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
 
     if(ret){

@@ -80,60 +80,63 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 	sgui::GUIMessage* msg = static_cast<sgui::GUIMessage*>(msgl);
 
 	switch( msg->messageType ) {
-	case sgui::MessageType::Uninitialized: {
-		LOG_ERROR("[ServiceGUI] Received uninitialized message type");
-	} break;
-	case sgui::MessageType::Commands: {
-		auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
-		if( !dmsg->commands.empty() ) {
-			LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+		case sgui::MessageType::Uninitialized: {
+			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
+		} break;
+		case sgui::MessageType::Commands: {
+			auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
+			if( !dmsg->commands.empty() ) {
+				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 
-			//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
-			std::vector<gui::DrawCommand*> commands;
-			for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
-				commands.push_back( (*i).get() );
-			uint32_t start_tick = xTaskGetTickCount();
-			renderer.render( renderContext, commands );
-			uint32_t end_tick = xTaskGetTickCount();
-			LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
+				//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
+				std::vector<gui::DrawCommand*> commands;
+				for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
+					commands.push_back( (*i).get() );
+				uint32_t start_tick = xTaskGetTickCount();
+				renderer.render( renderContext, commands );
+				uint32_t end_tick = xTaskGetTickCount();
+				LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
 
-			//increment counter holding number of drawn frames
-			renderFrameCounter++;
+				//increment counter holding number of drawn frames
+				renderFrameCounter++;
 
-			if( einkReady ) {
+				if( einkReady ) {
+					sendBuffer();
+				}
+				else {
+					//request eink state
+					auto msg = std::make_shared<seink::EinkMessage>(seink::MessageType::StateRequest );
+					sys::Bus::SendUnicast(msg, "ServiceEink", this);
+				}
+			}
+
+		} break;
+		case sgui::MessageType::RenderingFinished: {
+			//TODO implement worker and message handling
+		}break;
+		case sgui::MessageType::FocusInfo: {
+
+			LOG_INFO("[ServiceGUI] Received focus info");
+		} break;
+		case sgui::MessageType::DisplayReady: {
+
+			einkReady = true;
+			if( timer_id != 0 ){
+				DeleteTimer( timer_id );
+				timer_id = 0;
+			}
+
+			//check if something new was rendered. If so render counter has greater value than
+			//transfer counter.
+			if( renderFrameCounter != transferedFrameCounter ) {
+
 				sendBuffer();
 			}
 			else {
-				//request eink state
-				auto msg = std::make_shared<seink::EinkMessage>(seink::MessageType::StateRequest );
-				sys::Bus::SendUnicast(msg, "ServiceEink", this);
+				LOG_INFO(" NO new buffer to send");
 			}
-		}
 
-	} break;
-	case sgui::MessageType::FocusInfo: {
-
-		LOG_INFO("[ServiceGUI] Received focus info");
-	} break;
-	case sgui::MessageType::DisplayReady: {
-
-		einkReady = true;
-		if( timer_id != 0 ){
-			DeleteTimer( timer_id );
-			timer_id = 0;
-		}
-
-		//check if something new was rendered. If so render counter has greater value than
-		//transfer counter.
-		if( renderFrameCounter != transferedFrameCounter ) {
-
-			sendBuffer();
-		}
-		else {
-			LOG_INFO(" NO new buffer to send");
-		}
-
-	} break;
+		} break;
 	};
 
 	return std::make_shared<sys::ResponseMessage>();

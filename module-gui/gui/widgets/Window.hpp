@@ -14,16 +14,17 @@
 
 namespace gui {
 
-
+static uint32_t GUIWindowID=0;
 
 class Window: public Item {
 protected:
 	//unique ID of the window within application.
-	int windowID;
+	uint32_t windowID;
 	RefreshModes refreshMode;
+	std::string name;
 public:
 
-	Window( int id );
+	Window( std::string name, uint32_t id=GUIWindowID++ );
 	virtual ~Window();
 
 	/**
@@ -42,6 +43,7 @@ public:
 	//virtual methods from Item
 	bool onInput( const KeyEvent& key ) override;
 	std::list<DrawCommand*> buildDrawList() override;
+	std::string getName() { return name; };
 };
 
 } /* namespace gui */
