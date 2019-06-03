@@ -102,7 +102,9 @@ void ApplicationClock::createUserInterface() {
 	gui::Window* clockWin = new gui::Window("Main");
 	clockWin->setSize( 480, 600 );
 
-	timeLabel = new gui::Label(clockWin, 0,0,480,600);
+	timeLabel = new gui::Label(clockWin, 100,225,280,150);
+	timeLabel->setFilled( false );
+	timeLabel->setBorderColor( gui::ColorNoColor );
 	timeLabel->setFont("gt_pressura_bold_65");
 	timeLabel->setText("12:35");
 	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));

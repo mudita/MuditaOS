@@ -43,20 +43,6 @@ protected:
 	uint8_t einkRenderBuffer[600 * 480];
 	//uint8_t s_einkRenderBuffer[BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X];
 
-//	const int EINK_QUEUE_SIZE = 10;
-
-	//uint8_t* shmMemPtr;
-	//handle to the worker task responsible for making DMA transfer and
-//	TaskHandle_t einkWorker;
-//	//this queue is used to transfer commands to worker
-//	xQueueHandle einkWorkerQueue;
-//	//queue used to notify worker from the irq handler that DMA transfer has finished
-//	xQueueHandle einkWorkerIRQQueue;
-//	//set of all eink worker queues
-//	QueueSetHandle_t einkQueueSet;
-	//variable that keeps workers main loop spinning
-//	volatile bool workerLoop = true;
-
 public:
 	ServiceEink(const std::string& name);
     ~ServiceEink();
@@ -73,11 +59,6 @@ public:
     sys::ReturnCodes WakeUpHandler() override;
 
     sys::ReturnCodes SleepHandler() override;
-
-//    xQueueHandle getWorkerQueue() { return einkWorkerQueue; };
-//    xQueueHandle getWorkerIRQQueue() { return einkWorkerIRQQueue; };
-//    QueueSetHandle_t getQueueSet() { return einkQueueSet; };
-//    bool getWorkerLoop() { return workerLoop; };
 };
 
 #endif /* MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_ */

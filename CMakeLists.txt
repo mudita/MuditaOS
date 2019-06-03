@@ -101,6 +101,8 @@ target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
 
         source/main.cpp
+        PUBLIC
+        source/MessageType.hpp
 
         )
 
