@@ -16,7 +16,7 @@
 #include "RArea.hpp"
 
 
-#include "module-bsp/board/linux/keyboard/key_codes_linux.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
 #include "module-bsp/bsp/common.hpp"
 class RWindow : public Gtk::Window{
 protected:

@@ -50,6 +50,9 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 	}
 	if( queueID == 1)
 	{
+		bool received;
+		xQueueReceive(queue, &received, 0);
+
 		auto message = std::make_shared<KbdMessage>();
 		message->keyCode = lastPressed;
 		message->keyRelaseTime = xTaskGetTickCount();
@@ -68,7 +71,7 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(val.code));
 		if( (it != longPressParamsList.end()) && (val.event == bsp::KeyEvents::Pressed) )
 		{
-			longPressTimerStart(it->second);
+		longPressTimerStart(it->second);
 		}
 
 		keyboardEventCallback(val.event, val.code);

@@ -23,7 +23,7 @@
 #include <fcntl.h>
 
 #include "bsp_keyboard.hpp"
-#include "key_codes.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
 
 //#include "../board.h"
 
@@ -67,7 +67,7 @@ static void linux_keyboard_worker(void *pvp)
 		if(readedBytes > 1)
 		{
 
-			bsp::KeyState key;
+			KeyState key;
 			key.event = static_cast<KeyEvents>(buff[0]);
 			key.code = static_cast<KeyCodes>(buff[1]);
 
