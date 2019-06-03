@@ -11,37 +11,18 @@
 
 
 #include "Service/Message.hpp"
+#include "MessageType.hpp"
 
 namespace seink {
-
-enum class MessageType {
-	Uninitialized,
-	StateRequest, //message is used to pull status of the eink. If eink is ready to display image
-	ImageData, //message with pointer to the image data for displaying
-	TemperatureUpdate, //message sent from timer handler. Message forces service to update temperature measured by the eink.
-};
 
 /*
  * @brief Template for all messages that go to gui service
  */
 class EinkMessage: public sys::DataMessage {
 public:
-	//Identifies type of message within EINK Service
-	const MessageType messageType;
-
-	EinkMessage( MessageType messageType ) : sys::DataMessage(), messageType{ messageType } {};
+	EinkMessage( MessageType messageType ) : sys::DataMessage( static_cast<uint32_t>(messageType)) {};
 	virtual ~EinkMessage() {};
 };
-
-//class WorkerMessage: public EinkMessage {
-//protected:
-//	uint32_t command;
-//public:
-//	WorkerMessage( uint32_t cmd ) : EinkMessage{ seink::MessageType::WorkerReport }, command{ cmd } {};
-//	virtual ~WorkerMessage() {};
-//
-//	uint32_t getCommand() { return command; };
-//};
 
 } /* namespace seink */
 
