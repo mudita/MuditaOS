@@ -82,13 +82,16 @@ static shared_memory_header* createSHMBuffer( const char* name )
 
 	//check if shared memory blok is already created
 	if ((shared_fd = shm_open ( name, O_RDWR | O_CREAT , 0660)) == -1) {
+		printf("shm is already created");
 	}
 	else {
-		if (ftruncate (shared_fd, sizeof (shared_memory_header)+2*shared_buffer_size ) == -1) {
+		if (ftruncate (shared_fd, sizeof (shared_memory_header)+shared_buffer_size ) == -1) {
+			printf("shm is already created");
 		}
 	}
-	if ((shared_buffer =
-		mmap (NULL, sizeof (shared_memory_header)+2*shared_buffer_size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0)) == MAP_FAILED) {
+	if ((shared_header =
+		mmap (NULL, sizeof (shared_memory_header)+shared_buffer_size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0)) == MAP_FAILED) {
+		printf("mmap failed");
 	}
 
 	shared_buffer = ((uint8_t*)shared_header) + sizeof( shared_memory_header );
@@ -141,6 +144,15 @@ EinkUpdateFrame ( uint16_t X,
                   EinkBpp_e bpp,
                   EinkDisplayColorMode_e invertColors)
 {
+	uint32_t offset_eink = Y*BOARD_EINK_DISPLAY_RES_X + X;
+	uint32_t offset_buffer = 0;
+	for( uint32_t h=0; h<H; ++h ) {
+		memcpy( shared_buffer + offset_eink, buffer + offset_buffer, W );
+		offset_eink += BOARD_EINK_DISPLAY_RES_X;
+		offset_buffer += W;
+	}
+
+	shared_header->frameCount++;
     return EinkOK;
 }
 
