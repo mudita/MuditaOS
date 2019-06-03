@@ -40,7 +40,6 @@ public:
     SMSType type;
 
 private:
-    std::unique_ptr<SmsDB> db;
 
 };
 
