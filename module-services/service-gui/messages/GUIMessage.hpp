@@ -14,10 +14,14 @@
 
 namespace sgui {
 
-enum class GUIMessageType {
+enum class MessageType {
 	Uninitialized,
 	Commands, // list of rendering commands
-	FocusInfo // information about application that gined focus
+	FocusInfo, // information about application that gained focus
+	DisplayReady, //message that informs gui service that service controlling display device is ready for new buffer data.
+
+	//messages from worker
+	RenderingFinished, //Message is sent from the worker when all rendering is finished.
 };
 
 /*
@@ -26,9 +30,9 @@ enum class GUIMessageType {
 class GUIMessage: public sys::DataMessage {
 public:
 	//Identifies type of message within GUI Service
-	const GUIMessageType messageType;
+	const MessageType messageType;
 
-	GUIMessage( GUIMessageType messageType ) : sys::DataMessage(), messageType{ messageType } {};
+	GUIMessage( MessageType messageType ) : sys::DataMessage(), messageType{ messageType } {};
 	virtual ~GUIMessage() {};
 };
 
