@@ -57,8 +57,5 @@ TEST_CASE( "Test case 1" ) {
         REQUIRE(dirList[0].attributes == vfs::FileAttributes::Directory);
         REQUIRE(dirList[0].fileName == "test_dir2");
         REQUIRE(dirList[1].attributes == vfs::FileAttributes::Writable);
-        REQUIRE(dirList[1].fileName == "test1.txt");
-        REQUIRE(dirList[2].attributes == vfs::FileAttributes::Writable);
-        REQUIRE(dirList[2].fileName == "test2.txt");
 
 }

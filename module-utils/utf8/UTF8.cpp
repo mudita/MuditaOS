@@ -302,7 +302,7 @@ UTF8& UTF8::operator+=( const UTF8& utf ) {
 	return *this;
 }
 
-bool UTF8::operator==( const UTF8& utf ) {
+bool UTF8::operator==( const UTF8& utf ) const {
 	uint32_t len = strLength - utf.strLength;
 	uint32_t used = sizeUsed - utf.sizeUsed;
 	if( (len | used) == 0 ){
