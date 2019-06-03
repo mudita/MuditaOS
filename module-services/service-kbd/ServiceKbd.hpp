@@ -10,8 +10,11 @@
 
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
+#include "Service/Worker.hpp"
 
 class ServiceKbd: public sys::Service {
+protected:
+	sys::Worker* kbdWorker;
 public:
 	ServiceKbd(const std::string& name);
     ~ServiceKbd();
