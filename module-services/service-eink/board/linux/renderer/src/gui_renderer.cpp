@@ -60,10 +60,10 @@ uint8_t* createSHMBuffer( std::string name )
 	return reinterpret_cast<uint8_t*>(shared_mem_ptr);
 }
 
-int createFIFO( std::string name )
+int createFIFO( void )
 {
 	int fd;
-	char * myfifo = "/tmp/myfifo3";
+	const char * myfifo = "/tmp/myfifo3";
 	fd = open(myfifo,O_WRONLY | O_NONBLOCK);
 
 	if(fd < 0)
@@ -87,8 +87,7 @@ int main( int argc, char* argv[] ) {
 	shared_memory* shm_ptr = reinterpret_cast<shared_memory*>(createSHMBuffer(shnName));
 	char* dataMemory = reinterpret_cast<char*>(shm_ptr)+sizeof(shared_memory);
 
-	std::string fifoName = "pure_kbd_fifo";
-	int fifoFd = createFIFO(fifoName);
+	int fifoFd = createFIFO();
 
 	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 

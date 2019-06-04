@@ -1,5 +1,5 @@
 /*
- * WorkerKbd.cpp
+ * WorkerEvent.cpp
  *
  *  Created on: May 31, 2019
  *      Author: kuba
@@ -16,11 +16,14 @@ extern "C" {
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
-#include "WorkerKbd.hpp"
-#include "keyboard/keyboard.hpp"
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
 #include "MessageType.hpp"
 
+#include "WorkerEvent.hpp"
+
+#include "keyboard/keyboard.hpp"
+#include "module-bsp/bsp/keyboard/key_codes.hpp"
+
+#include "EventManager.hpp"
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
 {
@@ -35,12 +38,12 @@ static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
 }
 
 
-bool WorkerKbd::handleMessage( uint32_t queueID ) {
+bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
 	QueueHandle_t queue = queues[queueID];
 
 	//service queue
-	if( queueID == 0 ) {
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueService) ) {
 		sys::WorkerCommand wcmd;
 		if( xQueueReceive(queue, &wcmd, 0 ) != pdTRUE ) {
 			return false;
@@ -49,7 +52,7 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 		//place some code here to handle messages from service
 
 	}
-	if( queueID == 1)
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardTimer) )
 	{
 		bool received;
 		xQueueReceive(queue, &received, 0);
@@ -57,12 +60,12 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 		auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = lastPressed;
 		message->keyRelaseTime = xTaskGetTickCount();
-		message->keyState = bsp::KeyEvents::ReleasedLong;
-		sys::Bus::SendUnicast(message, "ServiceKbd", this->service);
+		message->keyState = KeyboardEvents::keyReleasedLong;
+		sys::Bus::SendUnicast(message, "EventManager", this->service);
 
 		lastState = bsp::KeyEvents::Released;
 	}
-	if( queueID == 2)
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardEvent) )
 	{
 		KeyState val;
 		if( xQueueReceive(queue, &val, 0 ) != pdTRUE ) {
@@ -70,17 +73,17 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 			}
 
 		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(val.code));
-		if( (it != longPressParamsList.end()) && (val.event == bsp::KeyEvents::Pressed) )
+		if( (it != longPressParamsList.end()) && (val.event == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
 		{
 		longPressTimerStart(it->second);
 		}
 
-		keyboardEventCallback(val.event, val.code);
+		keyboardEventCallback(static_cast<bsp::KeyEvents>(val.event), static_cast<bsp::KeyCodes>(val.code));
 	}
 	return true;
 }
 
-bool WorkerKbd::init( std::list<sys::WorkerQueueInfo> queues )
+bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
 	std::pair<uint32_t, uint32_t> longPresKeyLeft = {static_cast<uint32_t>(bsp::KeyCodes::JoystickLeft), 500};
 
@@ -93,7 +96,7 @@ bool WorkerKbd::init( std::list<sys::WorkerQueueInfo> queues )
 
 	return true;
 }
-bool WorkerKbd::deinit(void)
+bool WorkerEvent::deinit(void)
 {
 	Worker::deinit();
 
@@ -102,7 +105,7 @@ bool WorkerKbd::deinit(void)
 
 
 
- void WorkerKbd::keyboardEventCallback(bsp::KeyEvents event, bsp::KeyCodes code)
+ void WorkerEvent::keyboardEventCallback(bsp::KeyEvents event, bsp::KeyCodes code)
  {
 	 auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
 
@@ -116,7 +119,7 @@ bool WorkerKbd::deinit(void)
 		}
 
 
-		message->keyState = event;
+		message->keyState =  KeyboardEvents::keyPressed;
 		message->keyPressTime = xTaskGetTickCount();
 		message->keyRelaseTime = 0;
 
@@ -148,7 +151,7 @@ bool WorkerKbd::deinit(void)
 				{
 					xTimerStop(longPressTimerHandle, 0);
 
-					message->keyState = bsp::KeyEvents::ReleasedShort;
+					message->keyState =  KeyboardEvents::keyReleasedShort;
 					message->keyCode = code;
 					message->keyRelaseTime = xTaskGetTickCount();
 					longPressTaskEnabled = false;
@@ -162,21 +165,21 @@ bool WorkerKbd::deinit(void)
 			}
 			else
 			{
-				message->keyState = bsp::KeyEvents::ReleasedShort;
+				message->keyState =  KeyboardEvents::keyReleasedShort;
 				message->keyRelaseTime = xTaskGetTickCount();
 			}
 		}
 		else
 		{
-			message->keyState = bsp::KeyEvents::ReleasedShort;
+			message->keyState =  KeyboardEvents::keyReleasedShort;
 			message->keyRelaseTime = xTaskGetTickCount();
 		}
 	}
-	sys::Bus::SendUnicast(message, "ServiceKbd", this->service);
+	sys::Bus::SendUnicast(message, "EventManager", this->service);
  }
 
 
- bool WorkerKbd::longPressTimerStart(uint32_t time)
+ bool WorkerEvent::longPressTimerStart(uint32_t time)
  {
 	 //TODO change magic number to enum
 	longPressTimerHandle = xTimerCreate("keyboardPressTimer", time, false,  queues[1], &keyboardTaskPressTimerCallback);

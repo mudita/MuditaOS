@@ -16,11 +16,11 @@
 #include "FreeRTOS.h"
 #include "common.hpp"
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
-#include "service-kbd/WorkerKbd.hpp"
+#include "service-kbd/WorkerEvent.hpp"
 
 namespace bsp{
 
-        status_t rt1501_keyboard_Init(WorkerKbd* worker);
+        status_t rt1501_keyboard_Init(WorkerEvent* worker);
 
         status_t rt1501_keyboard_Deinit(void);
 

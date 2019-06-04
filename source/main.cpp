@@ -10,7 +10,7 @@
 #include "service-gui/ServiceGUI.hpp"
 #include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
-#include "service-kbd/ServiceKbd.hpp"
+#include "service-kbd/EventManager.hpp"
 
 //module-gui
 #include "gui/core/Font.hpp"
@@ -156,7 +156,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
   //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
 
     if(ret){

@@ -1,12 +1,12 @@
 /*
- * WorkerKbd.hpp
+ * WorkerEvent.hpp
  *
  *  Created on: May 31, 2019
  *      Author: kuba
  */
 
-#ifndef MODULE_SERVICES_SERVICE_KBD_WORKERKBD_HPP_
-#define MODULE_SERVICES_SERVICE_KBD_WORKERKBD_HPP_
+#ifndef MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_
+#define MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_
 
 
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
@@ -14,18 +14,24 @@
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
 
-#include "ServiceKbd.hpp"
+#include "EventManager.hpp"
 
-/*
-#include "keyboard/keyboard.hpp"*/
 #include "common.hpp"
 
+
+
 struct KeyState{
-	bsp::KeyEvents event;
-	bsp::KeyCodes code;
+	uint8_t event;
+	uint8_t code;
 };
 
-class WorkerKbd : public sys::Worker
+enum class WorkerEventQueues{
+	queueService = 0,
+	queueKeyboardTimer,
+	queueKeyboardEvent
+};
+
+class WorkerEvent : public sys::Worker
 {
 private:
 	TimerHandle_t longPressTimerHandle = NULL;
@@ -37,8 +43,8 @@ private:
 	bsp::KeyEvents lastState = bsp::KeyEvents::Released;
 	bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
 public:
-	WorkerKbd( sys::Service* service ) : sys::Worker( service ) {};
-	// ~WorkerKbd();
+	WorkerEvent( sys::Service* service ) : sys::Worker( service ) {};
+	// ~WorkerEvent();
 
 
 	/**
@@ -57,4 +63,4 @@ public:
 };
 
 
-#endif /* MODULE_SERVICES_SERVICE_KBD_WORKERKBD_HPP_ */
+#endif /* MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_ */

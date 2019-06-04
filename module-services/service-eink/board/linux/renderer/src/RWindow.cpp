@@ -61,8 +61,6 @@ void RWindow::updateDrawBuffer() {
 
 bool RWindow::onKeyPress(GdkEventKey* event)
 {
-
-
 	if( event->type == GDK_KEY_PRESS ) {
 		uint32_t key_code = event->keyval;
 

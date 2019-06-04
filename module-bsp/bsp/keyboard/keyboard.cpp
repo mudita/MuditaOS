@@ -26,7 +26,7 @@
 
 namespace bsp
 {
-    RetCode keyboard::Init(WorkerKbd* worker)
+    RetCode keyboard::Init(WorkerEvent* worker)
     {
 #if defined(TARGET_RT1051)
         rt1501_keyboard_Init(worker);
