@@ -74,6 +74,7 @@ TEST_CASE("Contact Record tests")
     REQUIRE(contRecInterface.Add(recordIN) == true);
     REQUIRE(contRecInterface.Add(recordIN) == true);
     REQUIRE(contRecInterface.Add(recordIN) == true);
+    REQUIRE(contRecInterface.Add(recordIN) == true);
 
     {
         auto recordOUT = contRecInterface.GetByID(1);
@@ -97,6 +98,9 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordOUT.speeddial == speeddialTest);
 
     }
+
+    REQUIRE(contRecInterface.RemoveByID(5) == true);
+
 
     {
         auto recordList = contRecInterface.GetLimitOffset(0,4);
