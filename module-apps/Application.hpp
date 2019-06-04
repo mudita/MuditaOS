@@ -17,6 +17,7 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Common.hpp"
+#include "SystemManager/SystemManager.hpp"
 
 namespace app {
 
@@ -77,6 +78,24 @@ protected:
 	 * Flag defines whether keyboard input is processed
 	 */
 	bool acceptInput = false;
+
+};
+
+class ApplicationLauncher {
+protected:
+	//name of the application to run
+	std::string name;
+	//defines whether application can be closed when it looses focus
+	bool closeable = true;
+public:
+	ApplicationLauncher( std::string name, bool isCloseable ) : name{name}, closeable{isCloseable} {};
+	virtual ~ApplicationLauncher() {};
+	std::string getName() { return name;};
+	bool isCloseable() { return closeable; };
+	//virtual method to run the application
+	virtual bool run(sys::SystemManager* sysmgr) {return true;};
+
+public:
 
 };
 

@@ -11,6 +11,7 @@
 #include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 
 //module-gui
 #include "gui/core/Font.hpp"
@@ -155,9 +156,17 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-  //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
+
+    //vector with launchers to applications
+    std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
+
+    //launcher for clock application
+    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
+    applications.push_back( std::move(clockLauncher) );
+
+    //start application manager
+    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ServiceAppMgr",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;
