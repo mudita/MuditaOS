@@ -22,7 +22,17 @@ SMSRecord::~SMSRecord() {
 
 bool SMSRecord::Add() {
 
-    auto db = std::make_unique<SmsDB>();
+    auto smsdb = std::make_unique<SmsDB>();
+    auto contactdb = std::make_unique<ContactsDB>();
+
+
+    // Check if contact exists
+    auto contact = contactdb->number.GetByName(number.c_str());
+    if(contact.ID == 0){
+
+
+    }
+
 
     //db->threads.Add()
 }

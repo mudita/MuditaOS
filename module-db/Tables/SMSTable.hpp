@@ -62,8 +62,6 @@ private:
             "type INTEGER,"
             "FOREIGN KEY(thread_id) REFERENCES threads(_id) ON DELETE CASCADE );";
 
-    Database* db;
-
 };
 
 

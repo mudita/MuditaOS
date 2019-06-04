@@ -41,9 +41,9 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsAddressTable.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ContactRecord.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ThreadRecord.cpp
+        #${CMAKE_CURRENT_SOURCE_DIR}/Interface/ThreadRecord.cpp
 
         )
 

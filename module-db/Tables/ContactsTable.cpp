@@ -12,7 +12,7 @@
 #include "ContactsTable.hpp"
 
 
-ContactsTable::ContactsTable(Database* db):db(db){
+ContactsTable::ContactsTable(Database* db): Table(db){
 }
 
 ContactsTable::~ContactsTable() {

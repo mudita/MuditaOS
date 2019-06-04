@@ -17,8 +17,9 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 #include "../Databases/SmsDB.hpp"
+#include "../Databases/ContactsDB.hpp"
 
-class SMSRecord : public Record {
+class SMSRecord : public Record<SMSRecord> {
 public:
 
     SMSRecord();

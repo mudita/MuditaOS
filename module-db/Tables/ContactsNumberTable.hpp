@@ -43,6 +43,8 @@ public:
 
     ContactsNumberTableRow GetByID(uint32_t id) override final;
 
+    ContactsNumberTableRow GetByName(const char* name) override final;
+
     std::vector<ContactsNumberTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::vector<ContactsNumberTableRow>
@@ -63,8 +65,6 @@ private:
             "type             INTEGER,"
             "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
             ");";
-
-    Database* db;
 };
 
 

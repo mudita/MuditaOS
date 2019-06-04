@@ -11,7 +11,7 @@
 
 #include "ContactsRingtonesTable.hpp"
 
-ContactsRingtonesTable::ContactsRingtonesTable(Database *db):db(db) {
+ContactsRingtonesTable::ContactsRingtonesTable(Database *db): Table(db) {
 
 }
 

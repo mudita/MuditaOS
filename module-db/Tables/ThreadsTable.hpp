@@ -66,8 +66,6 @@ private:
     const char* threadInsertTriggerQuery = "CREATE TRIGGER IF NOT EXISTS on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END";
     const char* threadRemoveTriggerQuery = "CREATE TRIGGER IF NOT EXISTS on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END";
 
-    Database* db;
-
 };
 
 

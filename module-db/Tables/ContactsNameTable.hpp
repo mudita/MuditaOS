@@ -61,8 +61,6 @@ private:
             "name_alternative TEXT NOT NULL,"
             "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
             ");";
-
-    Database* db;
 };
 
 

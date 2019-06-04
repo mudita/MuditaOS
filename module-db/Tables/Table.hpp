@@ -21,7 +21,7 @@ class Table {
 
 protected:
 
-    Table(){}
+    Table(Database* db):db(db){}
 
     ~Table(){}
 
@@ -30,10 +30,15 @@ protected:
     virtual bool RemoveByID(uint32_t id) = 0;
     virtual bool Update(T entry) = 0;
     virtual T GetByID(uint32_t id) = 0;
+    virtual T GetByName(const char* name){return T{};};
     virtual std::vector<T> GetLimitOffset(uint32_t offset,uint32_t limit) = 0;
     virtual std::vector<T> GetLimitOffsetByFieldID(uint32_t offset,uint32_t limit,const char* field,uint32_t id) = 0;
     virtual uint32_t GetCount() = 0;
     virtual uint32_t GetCountByFieldID(const char* field,uint32_t id) = 0;
+
+    uint32_t GetLastInsertRowID(){return db->GetLastInsertRowID();}
+
+    Database* db;
 
 };
 

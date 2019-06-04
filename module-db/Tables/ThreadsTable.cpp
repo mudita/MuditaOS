@@ -12,7 +12,7 @@
 #include "ThreadsTable.hpp"
 
 
-ThreadsTable::ThreadsTable(Database* db):db(db){
+ThreadsTable::ThreadsTable(Database* db): Table(db){
 }
 
 ThreadsTable::~ThreadsTable() {
