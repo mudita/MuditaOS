@@ -65,7 +65,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC -D__MCUXPRESSO)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D__USE_CMSIS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D__NEWLIB__)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DSKIP_SYSCLK_INIT)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_HAVE_SQLITE_CONFIG_H)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -D_GNU_SOURCE)
 
 
@@ -102,6 +101,8 @@ target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
 
         source/main.cpp
+        PUBLIC
+        source/MessageType.hpp
 
         )
 
@@ -127,13 +128,30 @@ add_subdirectory(module-vfs)
 message("${PROJECT_NAME}: add_subdirectory module-gui")
 add_subdirectory(module-gui)
 
+message("${PROJECT_NAME}: add_subdirectory module-db")
+add_subdirectory(module-db)
+
 message("${PROJECT_NAME}: add_subdirectory module-services")
 add_subdirectory(module-services)
+
+message("${PROJECT_NAME}: add_subdirectory module-apps")
+add_subdirectory(module-apps)
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} module-sys module-utils module-gui module-os module-bsp module-vfs module-services ${TARGET_LIBRARIES} )
+target_link_libraries( ${PROJECT_NAME} 
+	module-sys 
+	module-utils 
+	module-db 
+	module-gui 
+	module-os 
+	module-bsp 
+	module-vfs 
+	module-services
+	module-apps 
+	${TARGET_LIBRARIES} 
+)
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})

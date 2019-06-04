@@ -89,7 +89,8 @@ protected:
     bool enableRunLoop;
 
 
-private:
+//TODO R.B. I've removed this private tag to be able to create application class
+//private:
 
 	virtual void Run();
 

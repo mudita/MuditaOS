@@ -29,6 +29,9 @@ public:
 
 #ifndef TARGET_Linux
     using FILE = FF_FILE;
+#else
+    using FILE = std::FILE;
+
 #endif
 
     enum class FileAttributes
@@ -58,6 +61,8 @@ public:
     FILE * fopen ( const char * filename, const char * mode );
 
     int fclose ( FILE * stream );
+
+    int remove (const char *name);
 
     size_t fread ( void * ptr, size_t size, size_t count, FILE * stream );
 

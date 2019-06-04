@@ -8,6 +8,8 @@
 #ifndef MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_
 #define MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_
 
+//#include "board.h"
+
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 //eink bsp
@@ -38,6 +40,9 @@ protected:
 
 	bool deepClearScreen(int8_t temperature);
 
+	uint8_t einkRenderBuffer[600 * 480];
+	//uint8_t s_einkRenderBuffer[BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X];
+
 public:
 	ServiceEink(const std::string& name);
     ~ServiceEink();
@@ -54,7 +59,6 @@ public:
     sys::ReturnCodes WakeUpHandler() override;
 
     sys::ReturnCodes SleepHandler() override;
-
 };
 
 #endif /* MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_ */

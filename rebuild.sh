@@ -19,6 +19,7 @@ if [ -d "$MODULE_GUI_DIR" ]; then
 	
 	echo "Found module-gui, copying assets."
 	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
+	cp -R "../image/Luts.bin" "sys"
 fi
 
 #first parameter specifies platform, by default it is Linux
