@@ -22,9 +22,10 @@ struct ThreadRecord{
     uint32_t dbID;
     uint32_t date;
     uint32_t msgCount;
-    uint32_t read;
+    uint32_t msgRead;
     UTF8 snippet;
-    uint32_t lastDir;
+    SMSType type;
+    uint32_t contactID;
 };
 
 enum class ContactRecordField{
