@@ -25,7 +25,12 @@ struct ContactsNameTableRow {
     UTF8        nameAlternative;
 };
 
-class ContactsNameTable : public Table<ContactsNameTableRow> {
+enum class ContactNameTableFields{
+    NamePrimary,
+    NameAlternative
+};
+
+class ContactsNameTable : public Table<ContactsNameTableRow,ContactNameTableFields> {
 public:
 
     ContactsNameTable(Database* db);
@@ -45,7 +50,7 @@ public:
     std::vector<ContactsNameTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::vector<ContactsNameTableRow>
-    GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field, uint32_t id) override final;
+    GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactNameTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
 

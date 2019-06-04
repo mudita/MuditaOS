@@ -42,22 +42,25 @@ struct ContactRecord{
     uint8_t speeddial;
 };
 
+enum class ContactRecordField{
+    PrimaryName,
+    NumberE164,
+};
 
-class ContactRecordInterface : public RecordInterface<ContactRecord>{
+class ContactRecordInterface : public RecordInterface<ContactRecord,ContactRecordField>{
 
 public:
 
     bool Add(const ContactRecord& rec) override final;
     bool RemoveByID(uint32_t id) override final;
-    bool RemoveByName(const char* str) override final;
     bool Update(const ContactRecord& rec) override final;
     ContactRecord GetByID(uint32_t id) override final;
-    ContactRecord GetByName(const char* str) override final;
 
     uint32_t GetCount() override final;
 
     std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
 
+    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ContactRecordField field, const char* str) override final;
 };
 
 

@@ -71,6 +71,9 @@ TEST_CASE("Contact Record tests")
 
 
     REQUIRE(contRecInterface.Add(recordIN) == true);
+    REQUIRE(contRecInterface.Add(recordIN) == true);
+    REQUIRE(contRecInterface.Add(recordIN) == true);
+    REQUIRE(contRecInterface.Add(recordIN) == true);
 
     {
         auto recordOUT = contRecInterface.GetByID(1);
@@ -95,6 +98,95 @@ TEST_CASE("Contact Record tests")
 
     }
 
+    {
+        auto recordList = contRecInterface.GetLimitOffset(0,4);
+        REQUIRE(recordList->size() == 4);
+
+        uint32_t  cnt = 1;
+        for(const auto w: *recordList){
+
+            REQUIRE(w.dbID == cnt++);
+
+            REQUIRE(w.primaryName == primaryNameTest);
+            REQUIRE(w.alternativeName == alternativeNameTest);
+            REQUIRE(w.numberUser == numberUserTest);
+            REQUIRE(w.numberE164 == numberE164Test);
+            REQUIRE(w.numberType == contactNumberTypeTest);
+            REQUIRE(w.contactType == contactTypeTest);
+            REQUIRE(w.country == countryTest);
+            REQUIRE(w.city == cityTest);
+            REQUIRE(w.street == streetTest);
+            REQUIRE(w.number == numberTest);
+            REQUIRE(w.note == noteTest);
+            REQUIRE(w.mail == mailTest);
+            REQUIRE(w.addressType == addressTypeTest);
+            REQUIRE(w.assetPath == assetPath);
+            REQUIRE(w.speeddial == speeddialTest);
+        }
+
+
+
+    }
+
+    {
+        auto recordList = contRecInterface.GetLimitOffsetByField(0,4,ContactRecordField::PrimaryName,primaryNameTest);
+        REQUIRE(recordList->size() == 4);
+
+        uint32_t  cnt = 1;
+        for(const auto w: *recordList){
+
+            REQUIRE(w.dbID == cnt++);
+
+            REQUIRE(w.primaryName == primaryNameTest);
+            REQUIRE(w.alternativeName == alternativeNameTest);
+            REQUIRE(w.numberUser == numberUserTest);
+            REQUIRE(w.numberE164 == numberE164Test);
+            REQUIRE(w.numberType == contactNumberTypeTest);
+            REQUIRE(w.contactType == contactTypeTest);
+            REQUIRE(w.country == countryTest);
+            REQUIRE(w.city == cityTest);
+            REQUIRE(w.street == streetTest);
+            REQUIRE(w.number == numberTest);
+            REQUIRE(w.note == noteTest);
+            REQUIRE(w.mail == mailTest);
+            REQUIRE(w.addressType == addressTypeTest);
+            REQUIRE(w.assetPath == assetPath);
+            REQUIRE(w.speeddial == speeddialTest);
+        }
+
+
+
+    }
+
+    {
+    auto recordList = contRecInterface.GetLimitOffsetByField(0,2,ContactRecordField::NumberE164,numberE164Test);
+    REQUIRE(recordList->size() == 2);
+
+    uint32_t  cnt = 1;
+    for(const auto w: *recordList){
+
+        REQUIRE(w.dbID == cnt++);
+
+        REQUIRE(w.primaryName == primaryNameTest);
+        REQUIRE(w.alternativeName == alternativeNameTest);
+        REQUIRE(w.numberUser == numberUserTest);
+        REQUIRE(w.numberE164 == numberE164Test);
+        REQUIRE(w.numberType == contactNumberTypeTest);
+        REQUIRE(w.contactType == contactTypeTest);
+        REQUIRE(w.country == countryTest);
+        REQUIRE(w.city == cityTest);
+        REQUIRE(w.street == streetTest);
+        REQUIRE(w.number == numberTest);
+        REQUIRE(w.note == noteTest);
+        REQUIRE(w.mail == mailTest);
+        REQUIRE(w.addressType == addressTypeTest);
+        REQUIRE(w.assetPath == assetPath);
+        REQUIRE(w.speeddial == speeddialTest);
+    }
+
+
+
+    }
 
 
 

@@ -27,7 +27,15 @@ struct ThreadsTableRow{
     SMSType type;
 };
 
-class ThreadsTable : public Table<ThreadsTableRow> {
+enum class ThreadsTableFields{
+    Date,
+    MsgCount,
+    MsgRead,
+    ContactID,
+    Type
+};
+
+class ThreadsTable : public Table<ThreadsTableRow,ThreadsTableFields> {
 public:
 
     ThreadsTable(Database* db);
@@ -39,7 +47,7 @@ public:
     bool Update(ThreadsTableRow entry) override final;
     ThreadsTableRow GetByID(uint32_t id) override final;
     std::vector<ThreadsTableRow> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
-    std::vector<ThreadsTableRow> GetLimitOffsetByFieldID(uint32_t offset,uint32_t limit,const char* field,uint32_t id) override final;
+    std::vector<ThreadsTableRow> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ThreadsTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
     uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;

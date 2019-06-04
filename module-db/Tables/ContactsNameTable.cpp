@@ -26,7 +26,7 @@ bool ContactsNameTable::Create() {
 
 bool ContactsNameTable::Add(ContactsNameTableRow entry) {
     return db->Execute(
-            "insert into contact_name (contact_id, name_primary, name_alternative) VALUES (%lu, '%s', '%s');",
+            "insert or ignore into contact_name (contact_id, name_primary, name_alternative) VALUES (%lu, '%s', '%s');",
             entry.contactID,
             entry.namePrimary.c_str(),
             entry.nameAlternative.c_str()
@@ -83,11 +83,25 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t off
     return ret;
 }
 
-std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit,
-                                                                             const char *field, uint32_t id) {
-    auto retQuery = db->Query("SELECT * from contact_name WHERE %s=%lu ORDER BY name_primary LIMIT %lu OFFSET %lu;",
-                              field,
-                              id,
+std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit,ContactNameTableFields field,
+                                                                             const char *str) {
+
+    std::string fieldName;
+
+    switch (field){
+        case ContactNameTableFields ::NamePrimary:
+            fieldName = "name_primary";
+            break;
+        case ContactNameTableFields ::NameAlternative:
+            fieldName = "name_alternative";
+            break;
+        default:
+            return std::vector<ContactsNameTableRow>();
+    }
+
+    auto retQuery = db->Query("SELECT * from contact_name WHERE %s='%s' ORDER BY name_primary LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
                               limit,
                               offset);
 
