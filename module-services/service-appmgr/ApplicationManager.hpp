@@ -104,6 +104,14 @@ public:
     sys::ReturnCodes WakeUpHandler() override;
 
     sys::ReturnCodes SleepHandler() override;
+
+    /**
+     * @brief Sends request to application manager to switch from current application to application with specified name.
+     */
+    static bool switchApplication( std::applicationName, )
+	static bool confirmSwitch();
+    static bool confirmClose( );
+    static bool switchPreviousApplication();
 };
 
 } /* namespace sapm */
