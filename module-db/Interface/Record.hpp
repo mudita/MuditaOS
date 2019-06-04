@@ -15,7 +15,7 @@
 #include <memory>
 #include "../Database/Database.hpp"
 
-template<typename T>
+template<typename T, typename F>
 class RecordInterface {
 public:
 
@@ -27,17 +27,15 @@ public:
 
     virtual bool RemoveByID(uint32_t id){};
 
-    virtual bool RemoveByName(const char* str){};
-
     virtual bool Update(const T&){};
 
     virtual T GetByID(uint32_t id){};
 
-    virtual T GetByName(const char* str){};
-
     virtual uint32_t GetCount(){}
 
     virtual std::unique_ptr<std::vector<T>> GetLimitOffset(uint32_t offset,uint32_t limit){}
+
+    virtual std::unique_ptr<std::vector<T>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,F field, const char* str){}
 
 
 

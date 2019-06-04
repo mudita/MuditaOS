@@ -78,10 +78,7 @@ TEST_CASE("Threads Table tests")
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(smsdb.threads.GetLimitOffsetByFieldID(0,4,"msg_count",0).size() == 4);
-
-    // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(smsdb.threads.GetLimitOffsetByFieldID(0,4,"contact_id",5).size() == 0);
+    REQUIRE(smsdb.threads.GetLimitOffsetByField(0,4,ThreadsTableFields::MsgCount,"0").size() == 4);
 
     // Get count of elements by field's ID
     REQUIRE(smsdb.threads.GetCountByFieldID("contact_id",0) == 4);

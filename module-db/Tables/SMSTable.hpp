@@ -30,7 +30,11 @@ struct SMSTableRow{
     SMSType type;
 };
 
-class SMSTable : public Table<SMSTableRow> {
+enum class SMSTableFields{
+    Date,
+};
+
+class SMSTable : public Table<SMSTableRow,SMSTableFields> {
 public:
 
     SMSTable(Database* db);
@@ -42,7 +46,7 @@ public:
     bool Update(SMSTableRow entry) override final;
     SMSTableRow GetByID(uint32_t id) override final;
     std::vector<SMSTableRow> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
-    std::vector<SMSTableRow> GetLimitOffsetByFieldID(uint32_t offset,uint32_t limit,const char* field,uint32_t id) override final;
+    std::vector<SMSTableRow> GetLimitOffsetByField(uint32_t offset,uint32_t limit,SMSTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
     uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;

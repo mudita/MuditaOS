@@ -132,38 +132,8 @@ bool ContactRecordInterface::RemoveByID(uint32_t id) {
     return true;
 }
 
-bool ContactRecordInterface::RemoveByName(const char* str) {
-    auto contactDB = std::make_unique<ContactsDB>();
-
-/*    auto contact =  contactDB->contacts.GetByID(dbID);
-    if(contact.ID == 0){
-        return false;
-    }
-
-    if(contactDB->name.RemoveByID(contact.nameID) == false){
-        return false;
-    }
-
-    if(contactDB->address.RemoveByID(std::stoul(contact.addressIDs)) == false){
-        return false;
-    }
-
-    if(contactDB->number.RemoveByID(std::stoul(contact.numbersID)) == false){
-        return false;
-    }
-
-    if(contactDB->ringtones.RemoveByID(contact.ringID) == false){
-        return false;
-    }
-
-    if(contactDB->contacts.RemoveByID(dbID) == false){
-        return false;
-    }*/
-
-    return true;
-}
-
 bool ContactRecordInterface::Update(const ContactRecord &rec) {
+    // dummy not needed
     return true;
 }
 
@@ -222,10 +192,6 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id) {
 
 }
 
-ContactRecord ContactRecordInterface::GetByName(const char* str) {
-    return ContactRecord{};
-}
-
 uint32_t ContactRecordInterface::GetCount() {
     auto contactDB = std::make_unique<ContactsDB>();
 
@@ -233,5 +199,180 @@ uint32_t ContactRecordInterface::GetCount() {
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    return std::make_unique<std::vector<ContactRecord>>();
+    auto records =  std::make_unique<std::vector<ContactRecord>>();
+
+    auto contactDB = std::make_unique<ContactsDB>();
+
+    auto ret = contactDB->contacts.GetLimitOffset(offset,limit);
+
+    for(const auto &w : ret){
+
+        auto nr = contactDB->number.GetByID(std::stoul(w.numbersID));
+        if(nr.ID == 0){
+            return records;
+        }
+
+        auto ring = contactDB->ringtones.GetByID(w.ringID);
+        if(ring.ID == 0){
+            return records;
+        }
+
+        auto address = contactDB->address.GetByID(std::stoul(w.addressIDs));
+        if(address.ID == 0){
+            return records;
+        }
+
+        auto name = contactDB->name.GetByID(w.nameID);
+        if(name.ID == 0){
+            return records;
+        }
+
+        records->push_back(ContactRecord{
+            .dbID = w.ID,
+            .primaryName = name.namePrimary,
+            .alternativeName=name.nameAlternative,
+            .numberUser=nr.numberUser,
+            .numberE164=nr.numbere164,
+            .contactType=w.type,
+            .numberType=nr.type,
+            .country=address.country,
+            .city=address.city,
+            .street=address.street,
+            .number=address.number,
+            .note=address.note,
+            .mail=address.mail,
+            .addressType=address.type,
+            .assetPath=ring.assetPath,
+            .isOnWhitelist=w.isOnWhitelist,
+            .isOnBlacklist=w.isOnBlacklist,
+            .isOnFavourites=w.isOnFavourites,
+            .speeddial=static_cast<uint8_t >(w.speedDial)
+
+
+        });
+    }
+
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
+                                                                                          uint32_t limit,
+                                                                                          ContactRecordField field,
+                                                                                          const char *str) {
+    auto records =  std::make_unique<std::vector<ContactRecord>>();
+    auto contactDB = std::make_unique<ContactsDB>();
+
+    switch(field){
+        case ContactRecordField ::PrimaryName:
+        {
+            auto ret = contactDB->name.GetLimitOffsetByField(offset,limit,ContactNameTableFields::NamePrimary,str);
+
+            for(const auto &w : ret){
+
+                auto contact = contactDB->contacts.GetByID(w.contactID);
+                if(contact.ID == 0){
+                    return records;
+                }
+
+                auto nr = contactDB->number.GetByID(std::stoul(contact.numbersID));
+                if(nr.ID == 0){
+                    return records;
+                }
+
+                auto ring = contactDB->ringtones.GetByID(contact.ringID);
+                if(ring.ID == 0){
+                    return records;
+                }
+
+                auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
+                if(address.ID == 0){
+                    return records;
+                }
+
+
+                records->push_back(ContactRecord{
+                        .dbID = w.ID,
+                        .primaryName = w.namePrimary,
+                        .alternativeName=w.nameAlternative,
+                        .numberUser=nr.numberUser,
+                        .numberE164=nr.numbere164,
+                        .contactType=contact.type,
+                        .numberType=nr.type,
+                        .country=address.country,
+                        .city=address.city,
+                        .street=address.street,
+                        .number=address.number,
+                        .note=address.note,
+                        .mail=address.mail,
+                        .addressType=address.type,
+                        .assetPath=ring.assetPath,
+                        .isOnWhitelist=contact.isOnWhitelist,
+                        .isOnBlacklist=contact.isOnBlacklist,
+                        .isOnFavourites=contact.isOnFavourites,
+                        .speeddial=static_cast<uint8_t >(contact.speedDial)
+
+
+                });
+            }
+
+
+        }
+
+            break;
+
+        case ContactRecordField ::NumberE164:
+        {
+            auto ret = contactDB->number.GetLimitOffsetByField(offset,limit,ContactNumberTableFields ::NumberE164,str);
+
+            for(const auto &w : ret){
+
+                auto contact = contactDB->contacts.GetByID(w.contactID);
+                if(contact.ID == 0){
+                    return records;
+                }
+
+                auto name = contactDB->name.GetByID(contact.nameID);
+                if(name.ID == 0){
+                    return records;
+                }
+
+                auto ring = contactDB->ringtones.GetByID(contact.ringID);
+                if(ring.ID == 0){
+                    return records;
+                }
+
+                auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
+                if(address.ID == 0){
+                    return records;
+                }
+
+
+                records->push_back(ContactRecord{
+                        .dbID = w.ID,
+                        .primaryName = name.namePrimary,
+                        .alternativeName=name.nameAlternative,
+                        .numberUser=w.numberUser,
+                        .numberE164=w.numbere164,
+                        .contactType=contact.type,
+                        .numberType=w.type,
+                        .country=address.country,
+                        .city=address.city,
+                        .street=address.street,
+                        .number=address.number,
+                        .note=address.note,
+                        .mail=address.mail,
+                        .addressType=address.type,
+                        .assetPath=ring.assetPath,
+                        .isOnWhitelist=contact.isOnWhitelist,
+                        .isOnBlacklist=contact.isOnBlacklist,
+                        .isOnFavourites=contact.isOnFavourites,
+                        .speeddial=static_cast<uint8_t >(contact.speedDial)
+
+
+                });
+            }
+        }
+            break;
+    }
+
+    return records;
 }

@@ -63,10 +63,8 @@ TEST_CASE("Contacts Ringtones Table tests")
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.ringtones.GetLimitOffsetByFieldID(0,4,"contact_id", 0).size() == 4);
+    REQUIRE(contactsdb.ringtones.GetLimitOffsetByField(0,4,ContactRingtonesTableFields::AssetPath,"/test/assets/path/ringtone.wr").size() == 3);
 
-    // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.ringtones.GetLimitOffsetByFieldID(0,4,"contact_id", 100).size() == 0);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = contactsdb.ringtones.GetLimitOffset(0,100);
