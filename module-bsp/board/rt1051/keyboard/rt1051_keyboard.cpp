@@ -36,7 +36,7 @@ namespace bsp {
     static void bsp_keyboard_worker(void *pvp);
 
 
-    status_t rt1501_keyboard_Init(WorkerKbd* worker){
+    status_t rt1501_keyboard_Init(WorkerEvent* worker){
         //assert(event);
         // Store user specified event callback
         //user_event_callback = event;
@@ -186,8 +186,8 @@ namespace bsp {
                     } else {
                     }
                     KeyState keyState;
-                    keyState.code = static_cast<KeyCodes >(key);
-                    keyState.event = static_cast<KeyEvents >(rel_pres);
+                    keyState.code = key;
+                    keyState.event = rel_pres;
                     xQueueSend(qhandle, &keyState, 100);
                 }
 
@@ -200,16 +200,16 @@ namespace bsp {
 
             if (ulNotificationValue & 0x02) {
             	KeyState keyState;
-            	keyState.code = KeyCodes::FnRight;
-            	keyState.event = KeyEvents::Pressed;
+            	keyState.code = static_cast<uint8_t>(KeyCodes::FnRight);
+            	keyState.event = static_cast<uint8_t>(KeyEvents::Pressed);
             	xQueueSend(qhandle, &keyState, 100);
                 //user_event_callback(KeyEvents::Pressed, KeyCodes::FnRight);
             }
 
             if (ulNotificationValue & 0x04) {
             	KeyState keyState;
-				keyState.code = KeyCodes::FnRight;
-				keyState.event = KeyEvents::Released;
+				keyState.code = static_cast<uint8_t>(KeyCodes::FnRight);
+				keyState.event = static_cast<uint8_t>(KeyEvents::Released);
 				xQueueSend(qhandle, &keyState, 100);
                 //user_event_callback(KeyEvents::Released, KeyCodes::FnRight);
             }

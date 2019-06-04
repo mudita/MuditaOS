@@ -1,17 +1,17 @@
 /*
- * ServiceKbd.cpp
+ * EventManager.cpp
  *
  *  Created on: 22 maj 2019
  *      Author: robert
  */
 
-#include "ServiceKbd.hpp"
+#include "EventManager.hpp"
 
-#include "../../module-bsp/board/linux/keyboard/bsp_keyboard.hpp"
+#include "module-bsp/board/linux/keyboard/bsp_keyboard.hpp"
 #include "log/log.hpp"
 
 #include "keyboard/keyboard.hpp"
-#include "WorkerKbd.hpp"
+#include "WorkerEvent.hpp"
 
 
 
@@ -27,57 +27,52 @@ sys::Message_t KbdMessage::Execute(sys::Service* service)
 
 }
 
-ServiceKbd::ServiceKbd(const std::string& name)
+EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
 {
-	LOG_INFO("[ServiceKbd] Initializing");
+	LOG_INFO("[EventManager] Initializing");
 
 
 }
 
-ServiceKbd::~ServiceKbd(){
+EventManager::~EventManager(){
 
     timer_id = CreateTimer(1000,true);
     ReloadTimer(timer_id);
 
 
-	LOG_INFO("[ServiceKbd] Cleaning resources");
-	if( kbdWorker != nullptr) {
-		kbdWorker->deinit();
-		delete kbdWorker;
+	LOG_INFO("[EventManager] Cleaning resources");
+	if( EventWorker != nullptr) {
+		EventWorker->deinit();
+		delete EventWorker;
 	}
 }
 
 // Invoked upon receiving data message
-sys::Message_t ServiceKbd::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	KbdMessage* msg = static_cast<KbdMessage*>(msgl);
 
-	LOG_INFO("[ServiceKbd] Received key info: key_code = %d, keyEvent = %d\n"
+	LOG_INFO("[EventManager] Received key info: key_code = %d, keyEvent = %d\n"
 			"press time: %d, release time %d", static_cast<int>(msg->keyCode),
 			static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
-	kbdWorker->send( 123, nullptr );
-	///TEST long press always active
-
 
 	return std::make_shared<sys::ResponseMessage>();
 }
 
 // Invoked when timer ticked
-void ServiceKbd::TickHandler(uint32_t id) {
+void EventManager::TickHandler(uint32_t id) {
 
 
-	LOG_INFO("[ServiceKbd] send to worker\n");
+	LOG_INFO("[EventManager] send to worker\n");
 
 }
 
 // Invoked during initialization
-sys::ReturnCodes ServiceKbd::InitHandler() {
-
-
+sys::ReturnCodes EventManager::InitHandler() {
 
 	//initialize keyboard worker
-	kbdWorker = new WorkerKbd( this );
+	EventWorker = new WorkerEvent( this );
 
 	//create queues for worker
 	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
@@ -87,24 +82,24 @@ sys::ReturnCodes ServiceKbd::InitHandler() {
 	list.push_back(qTimer);
 	list.push_back(qIrq);
 
-	kbdWorker->init( list );
-	kbdWorker->run();
+	EventWorker->init( list );
+	EventWorker->run();
 
-	std::vector<xQueueHandle> set = kbdWorker->getQueues();
+	std::vector<xQueueHandle> set = EventWorker->getQueues();
 
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceKbd::DeinitHandler() {
+sys::ReturnCodes EventManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceKbd::WakeUpHandler() {
+sys::ReturnCodes EventManager::WakeUpHandler() {
 	return sys::ReturnCodes::Success;
 }
 
 
-sys::ReturnCodes ServiceKbd::SleepHandler() {
+sys::ReturnCodes EventManager::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 

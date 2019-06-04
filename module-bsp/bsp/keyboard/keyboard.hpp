@@ -19,8 +19,8 @@
 #include "common.hpp"
 
 
-#include "module-sys/Service/Service.hpp"
-#include "service-kbd/WorkerKbd.hpp"
+
+#include "service-kbd/WorkerEvent.hpp"
 
 #if defined(TARGET_RT1051)
 
@@ -39,7 +39,7 @@ namespace bsp {
     class keyboard {
     public:
 
-        RetCode Init(WorkerKbd* worker);
+        RetCode Init(WorkerEvent* worker);
         RetCode DeInit();
 
     };

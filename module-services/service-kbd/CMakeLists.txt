@@ -15,10 +15,10 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 target_sources( ${PROJECT_NAME}
 
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceKbd.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/WorkerKbd.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/EventManager.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/WorkerEvent.cpp"
 	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceKbd.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/WorkerKbd.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/EventManager.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/WorkerEvent.hpp"
 )
 

@@ -24,8 +24,7 @@ namespace bsp
     enum class KeyEvents{
         Released,
         Pressed,
-		ReleasedShort,
-		ReleasedLong
+
     };
 
 
