@@ -15,18 +15,29 @@
 #include <memory>
 #include "../Database/Database.hpp"
 
-class Record {
+template<typename T>
+class RecordInterface {
 public:
 
-    Record();
+    RecordInterface(){};
 
-    virtual ~Record();
+    virtual ~RecordInterface(){};
 
-    virtual bool Add();
+    virtual bool Add(const T&){};
 
-    virtual bool Remove();
+    virtual bool RemoveByID(uint32_t id){};
 
-    virtual bool Update();
+    virtual bool RemoveByName(const char* str){};
+
+    virtual bool Update(const T&){};
+
+    virtual T GetByID(uint32_t id){};
+
+    virtual T GetByName(const char* str){};
+
+    virtual uint32_t GetCount(){}
+
+    virtual std::unique_ptr<std::vector<T>> GetLimitOffset(uint32_t offset,uint32_t limit){}
 
 
 

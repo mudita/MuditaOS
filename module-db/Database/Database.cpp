@@ -150,3 +150,7 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
 
     return 0;
 }
+
+uint32_t Database::GetLastInsertRowID() {
+    return sqlite3_last_insert_rowid(dbConnection);
+}

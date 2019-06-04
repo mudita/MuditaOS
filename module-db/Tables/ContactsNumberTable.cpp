@@ -11,7 +11,7 @@
 
 #include "ContactsNumberTable.hpp"
 
-ContactsNumberTable::ContactsNumberTable(Database *db):db(db) {
+ContactsNumberTable::ContactsNumberTable(Database *db): Table(db) {
 
 }
 
@@ -61,6 +61,23 @@ ContactsNumberTableRow ContactsNumberTable::GetByID(uint32_t id) {
                                 (*retQuery)[3].GetString(),    // numbere164
                                 static_cast<ContactNumberType >((*retQuery)[4].GetUInt32()),    // type
     };
+}
+
+ContactsNumberTableRow ContactsNumberTable::GetByName(const char *name) {
+
+    auto retQuery = db->Query("SELECT * FROM contact_number WHERE number_e164= '%s';", name);
+
+    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+        return ContactsNumberTableRow();
+    }
+
+    return ContactsNumberTableRow{(*retQuery)[0].GetUInt32(),  // ID
+                                  (*retQuery)[1].GetUInt32(),    // contactID
+                                  (*retQuery)[2].GetString(),    // numberUser
+                                  (*retQuery)[3].GetString(),    // numbere164
+                                  static_cast<ContactNumberType >((*retQuery)[4].GetUInt32()),    // type
+    };
+
 }
 
 std::vector<ContactsNumberTableRow> ContactsNumberTable::GetLimitOffset(uint32_t offset, uint32_t limit) {

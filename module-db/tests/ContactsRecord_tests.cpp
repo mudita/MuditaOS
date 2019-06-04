@@ -1,0 +1,106 @@
+
+/*
+ * @file ContactsRecord_tests.cpp
+ * @author Mateusz Piesta (mateusz.piesta@mudita.com)
+ * @date 03.06.19
+ * @brief
+ * @copyright Copyright (C) 2019 mudita.com
+ * @details
+ */
+
+
+#include "vfs.hpp"
+
+#include "catch.hpp"
+
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+
+#include <iostream>
+
+#include "../Database/Database.hpp"
+#include "../Interface/ContactRecord.hpp"
+#include "../Databases/ContactsDB.hpp"
+
+
+TEST_CASE("Contact Record tests")
+{
+    Database::Initialize();
+
+    vfs.remove(ContactsDB::GetDBName());
+
+    const char* primaryNameTest = "PrimaryNameTest";
+    const char* alternativeNameTest = "AlternativeNameTest";
+    const char* numberUserTest = "111222333";
+    const char* numberE164Test = "333222111";
+    const char* countryTest = "Poland";
+    const char* cityTest = "Warsaw";
+    const char* streetTest = "Czeczota";
+    const char* numberTest = "7/9";
+    const char* noteTest = "TestNote";
+    const char* mailTest = "TestMail";
+    const char* assetPath = "/Test/Path/To/Asset";
+    const uint8_t speeddialTest = 100;
+    const ContactAddressType addressTypeTest = ContactAddressType ::WORK;
+    const ContactType contactTypeTest = ContactType ::USER;
+    const ContactNumberType contactNumberTypeTest = ContactNumberType ::PAGER;
+
+
+    ContactRecordInterface contRecInterface;
+
+    ContactRecord recordIN;
+
+    recordIN.primaryName=primaryNameTest;
+    recordIN.alternativeName= alternativeNameTest;
+    recordIN.numberUser=numberUserTest;
+    recordIN.numberE164=numberE164Test;
+    recordIN.numberType = contactNumberTypeTest;
+    recordIN.contactType=contactTypeTest;
+    recordIN.country=countryTest;
+    recordIN.city=cityTest;
+    recordIN.street=streetTest;
+    recordIN.number=numberTest;
+    recordIN.note=noteTest;
+    recordIN.mail=mailTest;
+    recordIN.addressType=addressTypeTest;
+    recordIN.assetPath=assetPath;
+    recordIN.speeddial=speeddialTest;
+
+
+
+    REQUIRE(contRecInterface.Add(recordIN) == true);
+
+    {
+        auto recordOUT = contRecInterface.GetByID(1);
+
+        REQUIRE(recordOUT.dbID == 1);
+
+        REQUIRE(recordOUT.primaryName == primaryNameTest);
+        REQUIRE(recordOUT.alternativeName == alternativeNameTest);
+        REQUIRE(recordOUT.numberUser == numberUserTest);
+        REQUIRE(recordOUT.numberE164 == numberE164Test);
+        REQUIRE(recordOUT.numberType == contactNumberTypeTest);
+        REQUIRE(recordOUT.contactType == contactTypeTest);
+        REQUIRE(recordOUT.country == countryTest);
+        REQUIRE(recordOUT.city == cityTest);
+        REQUIRE(recordOUT.street == streetTest);
+        REQUIRE(recordOUT.number == numberTest);
+        REQUIRE(recordOUT.note == noteTest);
+        REQUIRE(recordOUT.mail == mailTest);
+        REQUIRE(recordOUT.addressType == addressTypeTest);
+        REQUIRE(recordOUT.assetPath == assetPath);
+        REQUIRE(recordOUT.speeddial == speeddialTest);
+
+    }
+
+
+
+
+
+
+
+
+    Database::Deinitialize();
+}

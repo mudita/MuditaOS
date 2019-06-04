@@ -12,7 +12,7 @@
 #include "SMSTable.hpp"
 
 
-SMSTable::SMSTable(Database* db): db(db){
+SMSTable::SMSTable(Database* db): Table(db){
 }
 
 SMSTable::~SMSTable() {

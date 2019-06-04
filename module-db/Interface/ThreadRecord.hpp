@@ -17,7 +17,7 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
-class ThreadRecord : public Record{
+class ThreadRecord : public Record<ThreadRecord>{
 public:
 
     uint32_t dbID;
