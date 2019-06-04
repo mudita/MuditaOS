@@ -3,9 +3,12 @@
 #include <list>
 #include "log/log.hpp"
 
+//module-applications
+#include  "application-clock/ApplicationClock.hpp"
+
 //module-services
 #include "service-gui/ServiceGUI.hpp"
-#include "service-gui/DrawMessage.hpp"
+#include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
 
@@ -42,7 +45,7 @@ public:
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
 
-        win = new gui::Window(0);
+        win = new gui::Window("Main");
 		win->setSize( 480, 600 );
 
 		gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
@@ -115,13 +118,6 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
 
-    	//context for drawing commands
-    	if( win != nullptr ) {
-			std::list<gui::DrawCommand*> commandsList = win->buildDrawList();
-			auto msg = std::make_shared<sgui::DrawMessage>(commandsList);
-			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-    	}
-      //  LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -157,10 +153,11 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     vfs.Init();
 
-    auto ret = sysmgr->CreateService(std::make_shared<ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+    auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
+  //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
 
     if(ret){
         return 0;
@@ -171,7 +168,8 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 
 int main() {
-    LOG_PRINTF("Launching PurePhone..\n");
+
+	LOG_PRINTF("Launching PurePhone..\n");
 
     bsp::BoardInit();
 

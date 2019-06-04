@@ -19,6 +19,7 @@ extern "C" {
 #include "WorkerKbd.hpp"
 #include "keyboard/keyboard.hpp"
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "MessageType.hpp"
 
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
@@ -53,7 +54,7 @@ bool WorkerKbd::handleMessage( uint32_t queueID ) {
 		bool received;
 		xQueueReceive(queue, &received, 0);
 
-		auto message = std::make_shared<KbdMessage>();
+		auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = lastPressed;
 		message->keyRelaseTime = xTaskGetTickCount();
 		message->keyState = bsp::KeyEvents::ReleasedLong;
@@ -103,7 +104,7 @@ bool WorkerKbd::deinit(void)
 
  void WorkerKbd::keyboardEventCallback(bsp::KeyEvents event, bsp::KeyCodes code)
  {
-	 auto message = std::make_shared<KbdMessage>();
+	 auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
 
 	message->keyCode = code;
 

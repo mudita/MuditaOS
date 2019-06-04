@@ -14,6 +14,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stdio.h>
 #include <stdbool.h>
+#include "fsl_edma.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
 
@@ -418,6 +419,8 @@ void EinkARGBToLuminance( uint8_t *dataIn,
                           uint8_t* dataOut,
                           uint32_t displayWidth,
                           uint32_t displayHeight);
+
+EinkStatus_e EinkMemcpyDmaInit( edma_callback memcpyCallback );
 
 #if defined(__cplusplus)
 }

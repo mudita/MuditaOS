@@ -62,7 +62,7 @@ public:
 	 * This function is responsible for creating all queues provided in the constructor.
 	 * When all queues are created this method creates set of queues.
 	 */
-	virtual bool init( std::list<WorkerQueueInfo> queues );
+	virtual bool init( std::list<WorkerQueueInfo> queues = std::list<WorkerQueueInfo>());
 	virtual bool deinit();
 	/**
 	 * This method starts RTOS thread that waits for incomming queue events.

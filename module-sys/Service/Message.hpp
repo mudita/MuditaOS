@@ -102,8 +102,10 @@ namespace sys
     class DataMessage : public Message
     {
     public:
+    	//This field must by provided by the class that inherits DataMessage
+    	uint32_t messageType = 0;
 
-        DataMessage(){
+        DataMessage( uint32_t messageType ) : messageType{messageType} {
             type = Type::Data;
         }
 

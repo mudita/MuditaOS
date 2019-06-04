@@ -12,6 +12,7 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
+#include "MessageType.hpp"
 
 #include "common.hpp"
 
@@ -19,15 +20,15 @@
 class KbdMessage : public sys::DataMessage
 {
 public:
-	KbdMessage()
+	KbdMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
 	{
 		type = Type::Data;
 
 	}
-	KbdMessage(sys::BusChannels cannel) : sys::DataMessage(channel)
+/*	KbdMessage(sys::BusChannels cannel) : sys::DataMessage(channel)
 	{
 		type = Type::Data;
-	}
+	}*/
 	sys::Message_t Execute(sys::Service* service) override;
 
 	bsp::KeyEvents keyState = static_cast<bsp::KeyEvents>(0);

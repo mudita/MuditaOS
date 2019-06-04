@@ -74,6 +74,6 @@ if(DEFINED BUILD_UNIT_TESTS)
 	)
 	message(" GUI TEST LIB DIR: ${PROJECT_LIB_DIRECTORY}")
 	target_link_directories("unittest_gui"  PUBLIC "${PROJECT_LIB_DIRECTORY}" )
-	target_link_libraries("unittest_gui" PUBLIC module-vfs module-utils module-gui  rt )
+	target_link_libraries("unittest_gui" PUBLIC module-vfs module-utils module-gui )
 
 endif()
