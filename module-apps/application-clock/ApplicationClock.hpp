@@ -40,6 +40,14 @@ public:
 	void destroyUserInterface();
 };
 
+class ApplicationClockLauncher : public ApplicationLauncher {
+public:
+	ApplicationClockLauncher() : ApplicationLauncher("ApplicationClock", true) {};
+	bool run(sys::SystemManager* sysmgr) override {
+		return sysmgr->CreateService(std::make_shared<app::ApplicationClock>(name),sysmgr);
+	};
+};
+
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_CLOCK_APPLICATIONCLOCK_HPP_ */
