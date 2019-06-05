@@ -94,12 +94,76 @@ uint32_t SMSRecordInterface::GetCount() {
 std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
                                                                                   SMSRecordField field,
                                                                                   const char *str) {
+    auto smsDB = std::make_unique<SmsDB>();
+    auto records = std::make_unique<std::vector<SMSRecord>>();
 
+    std::vector<SMSTableRow> smses;
+
+    switch(field){
+        case SMSRecordField ::ContactID:
+            smses = smsDB->sms.GetLimitOffsetByField(offset,limit,SMSTableFields::ContactID,str);
+            break;
+
+        case SMSRecordField ::ThreadID:
+            smses = smsDB->sms.GetLimitOffsetByField(offset,limit,SMSTableFields::ThreadID,str);
+            break;
+
+        default:
+            return records;
+    }
+
+
+    ContactRecordInterface contactInterface;
+    for(const auto &w : smses){
+
+        auto contactRec = contactInterface.GetByID(w.contactID);
+
+        records->push_back({
+                                   .dbID=w.ID,
+                                   .date=w.date,
+                                   .dateSent=w.dateSent,
+                                   .errorCode=w.errorCode,
+                                   .number=contactRec.numberE164,// TODO: or numberUser?
+                                   .body=w.body,
+                                   .isRead=w.isRead,
+                                   .type=w.type,
+                                   .threadID=w.threadID,
+                                   .contactID=w.contactID
+
+                           });
+    }
+
+    return records;
 }
 
 
 std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
+    auto smsDB = std::make_unique<SmsDB>();
+    auto smses = smsDB->sms.GetLimitOffset(offset,limit);
 
+    auto records = std::make_unique<std::vector<SMSRecord>>();
+
+    ContactRecordInterface contactInterface;
+    for(const auto &w : smses){
+
+        auto contactRec = contactInterface.GetByID(w.contactID);
+
+        records->push_back({
+           .dbID=w.ID,
+           .date=w.date,
+           .dateSent=w.dateSent,
+           .errorCode=w.errorCode,
+           .number=contactRec.numberE164,// TODO: or numberUser?
+           .body=w.body,
+           .isRead=w.isRead,
+           .type=w.type,
+           .threadID=w.threadID,
+           .contactID=w.contactID
+
+        });
+    }
+
+    return records;
 }
 
 bool SMSRecordInterface::Update(const SMSRecord &rec) {
