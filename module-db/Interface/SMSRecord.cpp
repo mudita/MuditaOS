@@ -236,6 +236,26 @@ bool SMSRecordInterface::RemoveByID(uint32_t id) {
     return true;
 }
 
+bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str) {
+    auto smsDB = std::make_unique<SmsDB>();
+
+    switch(field){
+        case SMSRecordField ::ContactID:
+            return smsDB->sms.RemoveByField(SMSTableFields::ContactID,str);
+
+        case SMSRecordField ::ThreadID:
+            return smsDB->sms.RemoveByField(SMSTableFields::ThreadID,str);
+
+        case SMSRecordField ::Number:
+            return false;
+
+        default:
+            return false;
+
+    }
+
+}
+
 SMSRecord SMSRecordInterface::GetByID(uint32_t id) {
     auto smsDB = std::make_unique<SmsDB>();
     auto sms = smsDB->sms.GetByID(id);

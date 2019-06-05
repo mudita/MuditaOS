@@ -27,6 +27,8 @@ public:
 
     virtual bool RemoveByID(uint32_t id){return true;};
 
+    virtual bool RemoveByField(F field,const char* str){return true;};
+
     virtual bool Update(const T&){return true;};
 
     virtual T GetByID(uint32_t id){return T{};};

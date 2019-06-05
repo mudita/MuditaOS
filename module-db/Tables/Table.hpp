@@ -28,6 +28,7 @@ protected:
     virtual bool Create() = 0;
     virtual bool Add(T entry) = 0;
     virtual bool RemoveByID(uint32_t id) = 0;
+    virtual bool RemoveByField(F field, const char* str){return true;}
     virtual bool Update(T entry) = 0;
     virtual T GetByID(uint32_t id) = 0;
     virtual std::vector<T> GetLimitOffset(uint32_t offset,uint32_t limit) = 0;

@@ -41,6 +41,7 @@ public:
 
     bool Add(const SMSRecord& rec) override final;
     bool RemoveByID(uint32_t id) override final;
+    bool RemoveByField(SMSRecordField field,const char* str) override final;
     bool Update(const SMSRecord& rec) override final;
     SMSRecord GetByID(uint32_t id) override final;
 
