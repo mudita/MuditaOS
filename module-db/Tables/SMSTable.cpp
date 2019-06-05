@@ -40,6 +40,29 @@ bool SMSTable::RemoveByID(uint32_t id) {
     return db->Execute("DELETE FROM sms where _id = %u;", id);
 }
 
+bool SMSTable::RemoveByField(SMSTableFields field, const char *str) {
+    std::string fieldName;
+
+    switch(field){
+        case SMSTableFields ::ThreadID:
+            fieldName = "thread_id";
+            break;
+
+        case SMSTableFields ::ContactID:
+            fieldName = "contact_id";
+            break;
+
+        case SMSTableFields ::Date:
+            fieldName = "date";
+            break;
+        default:
+            return false;
+    }
+
+    return db->Execute("DELETE FROM sms where %s = '%s';", fieldName.c_str(),str);
+
+}
+
 
 bool SMSTable::Update(SMSTableRow entry) {
     return db->Execute(

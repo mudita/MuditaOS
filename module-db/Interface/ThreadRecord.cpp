@@ -11,6 +11,7 @@
 
 #include "ThreadRecord.hpp"
 #include "../Databases/SmsDB.hpp"
+#include "SMSRecord.hpp"
 
 bool ThreadRecordInterface::Add(const ThreadRecord &rec) {
     auto smsDB = std::make_unique<SmsDB>();
@@ -35,9 +36,9 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id) {
     if (ret == false) {
         return false;
     }
-    //TODO: remove corresponding SMSes
 
-    return true;
+    SMSRecordInterface smsRecordInterface;
+    return smsRecordInterface.RemoveByField(SMSRecordField::ThreadID,std::to_string(id).c_str());
 }
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec) {

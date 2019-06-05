@@ -25,6 +25,7 @@
 #include "../Databases/ContactsDB.hpp"
 #include "../Databases/SmsDB.hpp"
 #include "../Interface/SMSRecord.hpp"
+#include "../Interface/ThreadRecord.hpp"
 
 struct test{
     UTF8 test;
@@ -124,7 +125,7 @@ TEST_CASE("SMS Record tests")
     REQUIRE(smsRecInterface.GetCount() == 0);
 
     // Test fetching record by using Thread ID
-    // 1) Add records with different numbers, they should be placed in separate threads&contacts dbs
+    // Add records with different numbers, they should be placed in separate threads&contacts dbs
     recordIN.body = bodyTest;
     recordIN.number = numberTest;
     REQUIRE(smsRecInterface.Add(recordIN));
@@ -174,5 +175,38 @@ TEST_CASE("SMS Record tests")
 
     }
 
+    // Remove sms records in order to check automatic management of threads and contact databases
+    ThreadRecordInterface threadRecordInterface;
+    REQUIRE(smsRecInterface.RemoveByID(1));
+    records = smsRecInterface.GetLimitOffsetByField(0,100,SMSRecordField::ContactID,"1");
+    REQUIRE((*records).size() == 1);
+
+    REQUIRE(threadRecordInterface.GetCount() == 2);
+
+    REQUIRE(smsRecInterface.RemoveByID(2));
+    records = smsRecInterface.GetLimitOffsetByField(0,100,SMSRecordField::ContactID,"1");
+    REQUIRE((*records).size() == 0);
+    REQUIRE(threadRecordInterface.GetCount() == 1);
+
+    REQUIRE(smsRecInterface.RemoveByID(3));
+    REQUIRE(smsRecInterface.RemoveByID(4));
+    REQUIRE(threadRecordInterface.GetCount() == 0);
+
+    // Test removing by field
+    recordIN.number = numberTest;
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ThreadID,"1"));
+    REQUIRE(smsRecInterface.GetCount()==0);
+
+    recordIN.number = numberTest;
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.Add(recordIN));
+    REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ContactID,"1"));
+    REQUIRE(smsRecInterface.GetCount()==0);
 
 }
