@@ -76,7 +76,7 @@ public:
 	*@return substring created from source string.
 	*@note In case of start index greater than length of source string or length that exceeds character empty string is returned.
 	**/
-	UTF8 substr( const uint32_t begin, const uint32_t length );
+	UTF8 substr( const uint32_t begin, const uint32_t length ) const;
 
 	/**
 	 * @brief Finds first occurrence of substring in string

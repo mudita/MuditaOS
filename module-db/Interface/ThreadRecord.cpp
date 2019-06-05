@@ -35,8 +35,6 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id) {
     if (ret == false) {
         return false;
     }
-
-    //TODO: remove SMS records from SMS tables
 }
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec) {
@@ -83,14 +81,14 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 }
 
 std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
-                                                                                        ContactRecordField field,
+                                                                                        ThreadRecordField field,
                                                                                         const char *str) {
     auto smsDB = std::make_unique<SmsDB>();
     auto records = std::make_unique<std::vector<ThreadRecord>>();
 
     switch (field) {
-        case ContactRecordField::Date: {
-            auto ret = smsDB->threads.GetLimitOffsetByField(offset, limit,ThreadsTableFields::Date,str);
+        case ThreadRecordField::ContactID: {
+            auto ret = smsDB->threads.GetLimitOffsetByField(offset, limit,ThreadsTableFields::ContactID,str);
 
             for(const auto &w: ret){
                 records->push_back(ThreadRecord{
@@ -107,4 +105,22 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
             break;
 
     }
+
+    return records;
+}
+
+ThreadRecord ThreadRecordInterface::GetByID(uint32_t id) {
+    auto smsDB = std::make_unique<SmsDB>();
+
+    auto rec = smsDB->threads.GetByID(id);
+
+    return ThreadRecord{
+            .dbID = rec.ID,
+            .date = rec.date,
+            .msgCount=rec.msgCount,
+            .msgRead=rec.msgRead,
+            .snippet=rec.snippet,
+            .type=rec.type,
+            .contactID=rec.contactID
+    };
 }
