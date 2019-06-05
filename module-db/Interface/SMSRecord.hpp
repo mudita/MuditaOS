@@ -16,31 +16,42 @@
 #include <stdint.h>
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
-#include "../Databases/SmsDB.hpp"
-#include "../Databases/ContactsDB.hpp"
 
-class SMSRecord : public Record<SMSRecord> {
-public:
-
-    SMSRecord();
-    ~SMSRecord();
-
-    bool Add() override final;
-    bool Remove() override final;
-    bool Update() override final;
-
+struct SMSRecord{
     uint32_t dbID;
-    uint32_t threadID;
-    uint32_t contactID;
     uint32_t date;
     uint32_t dateSent;
     uint32_t errorCode;
     UTF8 number;
     UTF8 body;
-    uint32_t read;
+    bool isRead;
     SMSType type;
+    uint32_t threadID;
+    uint32_t contactID;
+};
+
+enum class SMSRecordField{
+    Number,
+    ThreadID,
+    ContactID
+};
+
+class SMSRecordInterface : public RecordInterface<SMSRecord,SMSRecordField > {
+public:
+
+    bool Add(const SMSRecord& rec) override final;
+    bool RemoveByID(uint32_t id) override final;
+    bool Update(const SMSRecord& rec) override final;
+    SMSRecord GetByID(uint32_t id) override final;
+
+    uint32_t GetCount() override final;
+
+    std::unique_ptr<std::vector<SMSRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
+
+    std::unique_ptr<std::vector<SMSRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,SMSRecordField field, const char* str) override final;
 
 private:
+    const uint32_t snippetLength = 45;
 
 };
 

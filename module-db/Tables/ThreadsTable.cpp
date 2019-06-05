@@ -112,6 +112,9 @@ ThreadsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ThreadsTabl
         case ThreadsTableFields::MsgCount:
             fieldName = "msg_count";
             break;
+        case ThreadsTableFields ::ContactID:
+            fieldName = "contact_id";
+            break;
         default:
             return std::vector<ThreadsTableRow>();
 

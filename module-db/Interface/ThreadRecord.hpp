@@ -28,11 +28,11 @@ struct ThreadRecord{
     uint32_t contactID;
 };
 
-enum class ContactRecordField{
-    Date,
+enum class ThreadRecordField{
+    ContactID,
 };
 
-class ThreadRecordInterface : public RecordInterface<ThreadRecord,ContactRecordField>{
+class ThreadRecordInterface : public RecordInterface<ThreadRecord,ThreadRecordField>{
 public:
 
     bool Add(const ThreadRecord& rec) override final;
@@ -44,7 +44,7 @@ public:
 
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ContactRecordField field, const char* str) override final;
+    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ThreadRecordField field, const char* str) override final;
 };
 
 
