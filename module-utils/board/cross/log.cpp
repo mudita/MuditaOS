@@ -121,3 +121,7 @@ void log_Log(logger_level level, const char *file, int line,const char *function
 void log_SetLevel(logger_level level) {
     logger.level = level;
 }
+void log_SetFilter( char* filter )
+{
+
+}

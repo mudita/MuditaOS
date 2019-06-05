@@ -55,6 +55,7 @@ typedef enum { LOGTRACE, LOGDEBUG, LOGINFO, LOGWARN, LOGERROR, LOGFATAL }logger_
  */
 void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...);
 void log_SetLevel(logger_level level);
+void log_SetFilter( char* filter );
 void log_Printf(const char *fmt, ...);
 
 

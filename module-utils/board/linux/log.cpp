@@ -46,6 +46,8 @@ struct Logger{
     }
     std::mutex lock;
     logger_level level;
+    std::string filter;
+    void setFilter( std::string filter ) { this->filter = filter; };
 };
 
 static Logger logger;
@@ -89,7 +91,9 @@ void log_Log(logger_level level, const char *file, int line,const char *function
     va_end(args);
     ptr += sprintf(ptr,"\r\n");
 
-    std::cout<<loggerBuffer;
+    std::string tempBuffer( loggerBuffer );
+    if( (logger.filter.empty()) || (tempBuffer.find(logger.filter) != std::string::npos) )
+    	std::cout<<loggerBuffer;
 }
 
 /**
@@ -98,4 +102,9 @@ void log_Log(logger_level level, const char *file, int line,const char *function
  */
 void log_SetLevel(logger_level level) {
     logger.level = level;
+}
+
+void log_SetFilter( char* filter )
+{
+	logger.setFilter( filter );
 }
