@@ -32,6 +32,8 @@ struct SMSTableRow{
 
 enum class SMSTableFields{
     Date,
+    ThreadID,
+    ContactID
 };
 
 class SMSTable : public Table<SMSTableRow,SMSTableFields> {

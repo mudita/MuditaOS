@@ -35,12 +35,15 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id) {
     if (ret == false) {
         return false;
     }
+    //TODO: remove corresponding SMSes
+
+    return true;
 }
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec) {
     auto smsDB = std::make_unique<SmsDB>();
 
-    auto ret = smsDB->threads.Update(ThreadsTableRow{
+    return smsDB->threads.Update(ThreadsTableRow{
             .ID = rec.dbID,
             .date = rec.date,
             .msgCount=rec.msgCount,
@@ -50,6 +53,7 @@ bool ThreadRecordInterface::Update(const ThreadRecord &rec) {
             .type=rec.type
 
     });
+
 }
 
 uint32_t ThreadRecordInterface::GetCount() {

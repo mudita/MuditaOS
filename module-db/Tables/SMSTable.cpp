@@ -110,6 +110,12 @@ SMSTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, SMSTableFields 
         case SMSTableFields::Date:
             fieldName = "date";
             break;
+        case SMSTableFields ::ContactID:
+            fieldName = "contact_id";
+            break;
+        case SMSTableFields ::ThreadID:
+            fieldName = "thread_id";
+            break;
         default:
             return std::vector<SMSTableRow>();
     }
