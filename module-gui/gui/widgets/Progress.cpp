@@ -20,7 +20,7 @@ Progress::Progress( Item* parent, const uint32_t& x, const uint32_t& y, const ui
 	current{0} {
 	//setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 	setFillColor( Color{0, 0});
-	setPenWidth(10);
+	setPenWidth(5);
 	createWidgets();
 	updateDrawArea();
 }
@@ -33,8 +33,8 @@ void Progress::createWidgets() {
 	fillRect = new gui::Rect( this, 0, 0, 0, widgetArea.h );
 	//fillRect->setRadius(widgetArea.h/2-1);
 	fillRect->setFilled(true);
-	fillRect->setFillColor( Color{5, 0});
-	Rect::setRadius(widgetArea.h/2);
+	fillRect->setFillColor( Color{0, 0});
+	//Rect::setRadius(widgetArea.h/2);
 }
 
 void Progress::updateProgress() {
