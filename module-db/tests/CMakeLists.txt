@@ -17,6 +17,7 @@ add_executable( ${PROJECT_NAME}
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsNumberTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRingtonesTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsAddressTable_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/SettingsTable_tests.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSRecord_tests.cpp"
