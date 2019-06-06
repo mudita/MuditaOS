@@ -58,7 +58,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
     threadID = (*threadRec)[0].dbID;
 
     // Create SMS
-    auto ret = smsDB->sms.Add(SMSTableRow{
+    smsDB->sms.Add(SMSTableRow{
             .threadID = threadID,
             .contactID=contactID,
             .date=rec.date,
@@ -69,6 +69,8 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
             .type=rec.type
 
     });
+
+    //TODO: error check
 
     // Update thread
     auto thread = (*threadRec)[0];

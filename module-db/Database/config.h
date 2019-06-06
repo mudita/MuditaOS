@@ -15,4 +15,10 @@
 #define SQLITE_THREADSAFE   0   //Use serialized thread-safe mode. This is fully supported threading environment setting
 #define SQLITE_MEMDEBUG     0   //Not sure what exactly this do but without this SQLITE crashes
 
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+
 #endif /* UTILS_SQLITE_CONFIG_H_ */
