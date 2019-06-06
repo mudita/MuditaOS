@@ -98,7 +98,7 @@ void ApplicationTest::createUserInterface(){
 	rect2->setFilled(true);
 
 
-	bar = new gui::Progress(clockWin, 10, 10, 350, 70);
+	bar = new gui::Progress(clockWin, 40, 50, 400, 70);
 	bar->setTotalProgress(100);
 	bar->setCurrentProgress(/*progress % 150*/50);
 
