@@ -9,7 +9,6 @@
 
 //module-gui
 #include "gui/core/Font.hpp"
-#include "gui/core/PixMapManager.hpp"
 #include "gui/core/Context.hpp"
 
 //gui service
@@ -20,6 +19,8 @@
 #include "service-eink/messages/ImageMessage.hpp"
 
 #include "ServiceGUI.hpp"
+
+#include "..//gui/core/ImageManager.hpp"
 #include "GUIWorker.hpp"
 #include "log/log.hpp"
 
@@ -45,8 +46,8 @@ ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t s
 	gui::FontManager& fontManager = gui::FontManager::getInstance();
 	fontManager.init( "sys/assets" );
 
-	gui::PixMapManager& pixMapManager = gui::PixMapManager::getInstance();
-	pixMapManager.init( "sys/assets" );
+	gui::ImageManager& imageManager = gui::ImageManager::getInstance();
+	imageManager.init( "sys/assets" );
 }
 
 ServiceGUI::~ServiceGUI(){

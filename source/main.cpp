@@ -1,6 +1,8 @@
 
 #include <memory>
 #include <list>
+
+#include "../module-gui/gui/core/ImageManager.hpp"
 #include "log/log.hpp"
 #include "memory/usermem.h"
 
@@ -11,7 +13,8 @@
 #include "service-gui/ServiceGUI.hpp"
 #include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
-#include "service-kbd/ServiceKbd.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
+#include "service-kbd/EventManager.hpp"
 
 
 #include "service-db/ServiceDB.hpp"
@@ -24,8 +27,6 @@
 #include "gui/core/Renderer.hpp"
 #include "gui/core/DrawCommand.hpp"
 #include "gui/core/Font.hpp"
-#include "gui/core/PixMapManager.hpp"
-
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Label.hpp"
@@ -99,7 +100,7 @@ public:
 		maxH4->setMaxSize( 75, 60 );
 
 		gui::Image* img1 = new gui::Image();
-		uint16_t id = gui::PixMapManager::getInstance().getPixMapID("loudspeaker.mpi");
+		uint16_t id = gui::ImageManager::getInstance().getImageMapID("loudspeaker.mpi");
 		img1->setImageWithID( id );
 
 
@@ -159,22 +160,26 @@ public:
 int SystemStart(sys::SystemManager* sysmgr)
 {
     //TODO:M.P remove it, only for test purposes
-    bsp::keyboard keyboard;
-    keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
+   // bsp::keyboard keyboard;
+   // keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
 
 
     vfs.Init();
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
+    //vector with launchers to applications
+    std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
-    // Application services
-    ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
+    //launcher for clock application
+    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
+    applications.push_back( std::move(clockLauncher) );
 
+    //start application manager
+    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;

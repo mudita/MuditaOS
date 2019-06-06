@@ -17,22 +17,21 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-message("${PROJECT_NAME}: add_subdirectory service-gui")
 add_subdirectory( service-gui )
-message("${PROJECT_NAME}: add_subdirectory service-eink")
 add_subdirectory( service-eink )
-message("${PROJECT_NAME}: add_subdirectory service-kbd")
 add_subdirectory( service-kbd )
+add_subdirectory( service-appmgr )
 message("${PROJECT_NAME}: add_subdirectory service-db")
 add_subdirectory( service-db )
 
-include_directories( ../module-sys )
-include_directories( ../module-utils )
-include_directories( ../module-gui )
-include_directories( ../module-os )
-include_directories( ../module-bsp )
+target_include_directories( ${PROJECT_NAME} PUBLIC "../module-sys" )
+target_include_directories( ${PROJECT_NAME} PUBLIC "../module-utils" )
+target_include_directories( ${PROJECT_NAME} PUBLIC "../module-gui" )
+target_include_directories( ${PROJECT_NAME} PUBLIC "../module-os" )
+target_include_directories( ${PROJECT_NAME} PUBLIC "../module-bsp" )
+target_include_directories( ${PROJECT_NAME} PUBLIC "../module-apps"  )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-db ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db  ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -50,6 +49,7 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/../source
+
 )
 
 

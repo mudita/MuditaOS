@@ -12,6 +12,7 @@
 #include "Application.hpp"
 #include "Service/Message.hpp"
 #include "gui/widgets/Label.hpp"
+#include "gui/widgets/Image.hpp"
 
 namespace app {
 
@@ -25,6 +26,7 @@ class ApplicationClock: public Application {
 	uint32_t hour = 0;
 	uint32_t minute = 0;
 	gui::Label* timeLabel = nullptr;
+	gui::Image* dotImage[64];
 public:
 	ApplicationClock(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
@@ -38,6 +40,14 @@ public:
 
 	void createUserInterface() ;
 	void destroyUserInterface();
+};
+
+class ApplicationClockLauncher : public ApplicationLauncher {
+public:
+	ApplicationClockLauncher() : ApplicationLauncher("ApplicationClock", true) {};
+	bool run(sys::SystemManager* sysmgr) override {
+		return sysmgr->CreateService(std::make_shared<app::ApplicationClock>(name),sysmgr,1000);
+	};
 };
 
 } /* namespace app */
