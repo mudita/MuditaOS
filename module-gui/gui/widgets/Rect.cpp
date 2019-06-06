@@ -86,8 +86,8 @@ std::list<DrawCommand*> Rect::buildDrawList() {
 
 	//set local draw commands
 	CommandRectangle* rect = new CommandRectangle();
-	if( !childrenCommands.empty() )
-		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
+	/*if( !childrenCommands.empty() )
+		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());*/
 
 	rect->x = drawArea.x;
 	rect->y = drawArea.y;
@@ -113,9 +113,9 @@ std::list<DrawCommand*> Rect::buildDrawList() {
 
 	commands.push_back( rect );
 
-	/*if( !childrenCommands.empty() )
+	if( !childrenCommands.empty() )
 		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
-*/
+
 	return commands;
 }
 
