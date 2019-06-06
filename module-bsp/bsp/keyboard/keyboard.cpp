@@ -16,7 +16,6 @@
 
 #include "keyboard/rt1051_keyboard.hpp"
 #elif defined(TARGET_Linux)
-    //TODO:M.P insert Linux keyboard implementation here
 
 #include "keyboard/bsp_keyboard.hpp"
 

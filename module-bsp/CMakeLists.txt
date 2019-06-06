@@ -67,11 +67,7 @@ target_include_directories( ${PROJECT_NAME}
 )
 
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os module-services)
-
-#target_link_libraries(${PROJECT_NAME} module-os ${TARGET_LIBRARIES})
-
-
+target_link_libraries(${PROJECT_NAME} module-os module-services ${TARGET_LIBRARIES})
 
 # Host target configuration(mainly used for unit testing)
 

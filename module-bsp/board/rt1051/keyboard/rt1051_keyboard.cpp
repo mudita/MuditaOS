@@ -37,9 +37,6 @@ namespace bsp {
 
 
     status_t rt1501_keyboard_Init(WorkerEvent* worker){
-        //assert(event);
-        // Store user specified event callback
-        //user_event_callback = event;
 
         /* Define the init structure for the input RF key pin*/
         gpio_pin_config_t right_functional_pin_config = {kGPIO_DigitalInput, 0, kGPIO_IntRisingOrFallingEdge};
