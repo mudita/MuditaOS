@@ -31,7 +31,7 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES} )
 
 
 # Board specific compilation definitions,options,include directories and features
@@ -61,7 +61,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} ${TARGET_LIBRARIES} module-os )
+target_link_libraries(${PROJECT_NAME} module-os ${TARGET_LIBRARIES})
 
 
 # Host target configuration(mainly used for unit testing)

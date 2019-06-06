@@ -30,6 +30,7 @@ set(TARGET_COMPILE_OPTIONS
 
 set(TARGET_LIBRARIES
 
+		rt
         pthread
 
         CACHE INTERNAL ""

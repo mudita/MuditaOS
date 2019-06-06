@@ -2,12 +2,15 @@ include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}"
+		"${CMAKE_CURRENT_LIST_DIR}/messages"
 )
 
 include_directories( ${PROJECT_NAME}
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}"
+		"${CMAKE_CURRENT_LIST_DIR}/.."
+		"${CMAKE_CURRENT_LIST_DIR}/messages"
 )
 
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
@@ -16,9 +19,12 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/DrawMessage.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/GUIWorker.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceGUI.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/DrawMessage.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/GUIWorker.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/DrawMessage.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/GUIMessage.hpp"
 )
 

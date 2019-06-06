@@ -34,6 +34,7 @@ enum class ServicePriority {
 
 enum class ReturnCodes{
     Success,
+	Failure,
     Timeout,
     ServiceDoesntExist
 };
