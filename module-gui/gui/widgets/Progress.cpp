@@ -31,7 +31,7 @@ void Progress::createWidgets() {
 
 	//thick rect is rounded, filled and occupy total height of parent widget
 	fillRect = new gui::Rect( this, 0, 0, 0, widgetArea.h );
-	fillRect->setRadius(widgetArea.h/2-1);
+	//fillRect->setRadius(widgetArea.h/2-1);
 	fillRect->setFilled(true);
 	fillRect->setFillColor( Color{5, 0});
 	Rect::setRadius(widgetArea.h/2);
@@ -80,15 +80,18 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 		return commands;
 	}
 
-	std::list<DrawCommand*> childrenCommands = Item::buildDrawList();
+	//std::list<DrawCommand*> childrenCommands = Item::buildDrawList();
 	std::list<DrawCommand*> baseCommands = gui::Rect::buildDrawList();
-
+	auto it = baseCommands.begin();
+	it ++;
+	commands.splice(commands.end(), baseCommands, it);
+	commands.splice(commands.end(), baseCommands);
 
 
 	//if( !childrenCommands.empty() )
 //		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
-	if( !baseCommands.empty() )
-		commands.insert( commands.end(), baseCommands.begin(), baseCommands.end());
+/*	if( !baseCommands.empty() )
+		commands.insert( commands.end(), baseCommands.begin(), baseCommands.end());*/
 
 /*	if( !baseCommands.empty() )
 	{
