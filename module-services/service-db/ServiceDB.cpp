@@ -46,16 +46,16 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage* msgl) {
         {
             DBSettingsMessage* msg = reinterpret_cast<DBSettingsMessage*>(msgl);
             auto settingsRec = msg->interface.GetByID(1);
-            responseMsg = std::make_shared<DBSettingsResponseMessage>(settingsRec);
+            responseMsg = std::make_shared<DBSettingsResponseMessage>(settingsRec,settingsRec.dbID == 0 ? false: true);
 
         }
             break;
         case MessageType ::DBSettingsUpdate:
         {
             DBSettingsMessage* msg = reinterpret_cast<DBSettingsMessage*>(msgl);
-            auto settingsRec = msg->interface.Update(msg->record);
+            auto ret = msg->interface.Update(msg->record);
 
-            responseMsg = std::make_shared<DBSettingsResponseMessage>(SettingsRecord{});
+            responseMsg = std::make_shared<DBSettingsResponseMessage>(SettingsRecord{},ret);
         }
             break;
         default:
