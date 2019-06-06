@@ -27,7 +27,7 @@ const char* ServiceDB::serviceName  = "ServiceDB";
 
 
 ServiceDB::ServiceDB()
-        : sys::Service(serviceName)
+        : sys::Service(serviceName,1024*32,sys::ServicePriority::Low)
 {
     LOG_INFO("[ServiceDB] Initializing");
 }
@@ -75,12 +75,6 @@ void ServiceDB::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceDB::InitHandler() {
     Database::Initialize();
-
-    SettingsRecordInterface settingsRecordInterface;
-
-    auto settingsRec = settingsRecordInterface.GetByID(1);
-
-
 
     return sys::ReturnCodes::Success;
 }

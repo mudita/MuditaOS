@@ -19,6 +19,7 @@
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #pragma GCC diagnostic ignored "-Wunused-function"
+#pragma GCC diagnostic ignored "-Woverflow"
 
 
 #endif /* UTILS_SQLITE_CONFIG_H_ */
