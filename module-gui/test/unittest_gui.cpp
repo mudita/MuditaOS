@@ -14,6 +14,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
+#include "../gui/core/ImageMapManager.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
@@ -24,8 +25,6 @@
 #include "gui/core/Renderer.hpp"
 #include "gui/core/DrawCommand.hpp"
 #include "gui/core/Font.hpp"
-#include "gui/core/PixMapManager.hpp"
-
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Label.hpp"
