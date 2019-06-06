@@ -20,7 +20,7 @@ Progress::Progress( Item* parent, const uint32_t& x, const uint32_t& y, const ui
 	current{0} {
 	//setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 	setFillColor( Color{0, 0});
-	setPenWidth(5);
+	setPenWidth(1);
 	createWidgets();
 	updateDrawArea();
 }

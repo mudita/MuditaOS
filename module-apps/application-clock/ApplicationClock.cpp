@@ -77,7 +77,7 @@ void ApplicationClock::TickHandler(uint32_t id) {
 	m += std::to_string(minute);
 	minuteLabel->setText( m );
 
-	if( res )
+	//if( res )
 		render(gui::RefreshModes::GUI_REFRESH_FAST );
 
 }
@@ -124,9 +124,12 @@ void ApplicationClock::createUserInterface() {
 	minuteLabel->setText("05");
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
+	progressBar = new gui::Progress(clockWin, 480/2-30, 300-4, 60, 8 );
+	progressBar->setTotalProgress(59);
+	progressBar->setCurrentProgress(0);
+/*	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
 	rect->setFillColor( gui::ColorFullBlack );
-	rect->setFilled( true );
+	rect->setFilled( true );*/
 
 	gui::Rect* rectCircle = new gui::Rect( clockWin, 10, 70, 460, 460 );
 	rectCircle->setRadius(230);
@@ -161,6 +164,8 @@ bool ApplicationClock::incrementSecond(){
 		seconds = 0;
 		return true;
 	}
+	progressBar->setCurrentProgress(seconds);
+
 	return false;
 }
 
