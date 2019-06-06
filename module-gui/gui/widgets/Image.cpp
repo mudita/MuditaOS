@@ -6,9 +6,10 @@
  */
 
 #include "../core/DrawCommand.hpp"
-#include "../core/PixMapManager.hpp"
 #include "../core/PixMap.hpp"
 #include "Image.hpp"
+
+#include "../core/ImageManager.hpp"
 #include "utf8/UTF8.hpp"
 
 namespace gui {
@@ -33,7 +34,7 @@ Image::~Image() {
 bool Image::setImageWithID( int id ) {
 
 	//get pixmap for selected ID
-	pixMap = PixMapManager::getInstance().getPixMap( id );
+	pixMap = ImageManager::getInstance().getImageMap( id );
 
 	//set height and width and max and min dimensions
 	uint16_t pixMapWidth = pixMap->getWidth();

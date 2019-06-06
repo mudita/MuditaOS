@@ -1,3 +1,4 @@
+
 /*
  * Renderer.cpp
  *
@@ -16,7 +17,7 @@ extern "C" {
 #include "Renderer.hpp"
 #include "Context.hpp"
 #include "Font.hpp"
-#include "PixMapManager.hpp"
+#include "ImageManager.hpp"
 #include "../Common.hpp"
 //utils
 #include "log/log.hpp"
@@ -369,26 +370,29 @@ void Renderer::drawText( Context* ctx, CommandText* cmd ) {
 void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 
 	//retrive pixmap from the pixmap manager
-	PixMap* pixMap = PixMapManager::getInstance().getPixMap( cmd->imageID );
+	ImageMap* imageMap = ImageManager::getInstance().getImageMap( cmd->imageID );
 
 	//if image is not found return;
-	if( pixMap == nullptr )
+	if( imageMap == nullptr )
 		return;
 
 	//get copy of original context using x,y of draw coordinates and original size of the widget
 	Context* drawCtx = ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
 
-	//draw image on temporeary context
-	uint32_t offsetImage = 0;
-	uint32_t offsetContext = 0;
-	uint32_t imageWidth = pixMap->getWidth();
-	uint32_t contextWidth = drawCtx->getW();
-	uint8_t* ctxData = drawCtx->getData();
-	uint8_t* pixData = pixMap->getData();
-	for( uint32_t i=0; i<pixMap->getHeight(); i++ ) {
-		memcpy( ctxData + offsetContext, pixData + offsetImage, imageWidth );
-		offsetImage += imageWidth;
-		offsetContext += contextWidth;
+	if( imageMap->getType() == gui::ImageMap::Type::PIXMAP ) {
+		PixMap* pixMap = reinterpret_cast<PixMap*>(imageMap);
+		//draw image on temporeary context
+		uint32_t offsetImage = 0;
+		uint32_t offsetContext = 0;
+		uint32_t imageWidth = pixMap->getWidth();
+		uint32_t contextWidth = drawCtx->getW();
+		uint8_t* ctxData = drawCtx->getData();
+		uint8_t* pixData = pixMap->getData();
+		for( uint32_t i=0; i<pixMap->getHeight(); i++ ) {
+			memcpy( ctxData + offsetContext, pixData + offsetImage, imageWidth );
+			offsetImage += imageWidth;
+			offsetContext += contextWidth;
+		}
 	}
 
 	//reinsert drawCtx into bast context

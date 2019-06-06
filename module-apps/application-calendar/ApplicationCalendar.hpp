@@ -40,7 +40,7 @@ class ApplicationCalendarLauncher : public ApplicationLauncher {
 public:
 	ApplicationCalendarLauncher() : ApplicationLauncher("ApplicationCalendar", true) {};
 	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr);
+		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr,1000);
 	};
 };
 
