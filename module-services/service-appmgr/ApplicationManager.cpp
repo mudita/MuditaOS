@@ -8,13 +8,17 @@
  */
 #include "SystemManager/SystemManager.hpp"
 #include "ApplicationManager.hpp"
+#include "messages/APMMessage.hpp"
 #include <utility>
 #include <memory>
+
+//module-utils
+#include "log/log.hpp"
 
 namespace sapm {
 
 ApplicationDescription::ApplicationDescription( std::string name, std::unique_ptr<app::ApplicationLauncher> lanucher, bool closeable ) :
-	name{name}, closeable{closeable}, state{ApplicationState::DEACTIVATED}, switchData{nullptr} {
+	name{name}, closeable{closeable}, state{app::Application::State::DEACTIVATED}, switchData{nullptr} {
 	this->lanucher = std::move(lanucher);
 }
 
@@ -38,6 +42,36 @@ ApplicationManager::~ApplicationManager() {
 }
 
 sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
+
+	uint32_t msgType = msgl->messageType;
+
+	switch( msgType ) {
+		case static_cast<uint32_t>(MessageType::APMSwitch): {
+			sapm::APMSwitch* msg = reinterpret_cast<sapm::APMSwitch*>( msgl );
+			LOG_INFO("APMSwitch %s", msg->getName());
+		}break;
+		case static_cast<uint32_t>(MessageType::APMSwitchData): {
+			sapm::APMSwitchData* msg = reinterpret_cast<sapm::APMSwitchData*>( msgl );
+			LOG_INFO("APMSwitchData");
+		}break;
+		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
+			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
+			LOG_INFO("APMSwitchPrevApp");
+		}break;
+		case static_cast<uint32_t>(MessageType::APMConfirmSwitch): {
+			sapm::APMConfirmSwitch* msg = reinterpret_cast<sapm::APMConfirmSwitch*>( msgl );
+			LOG_INFO("APMConfirmSwitch");
+		}break;
+		case static_cast<uint32_t>(MessageType::APMConfirmClose): {
+			sapm::APMConfirmClose* msg = reinterpret_cast<sapm::APMConfirmClose*>( msgl );
+			LOG_INFO("APMConfirmClose");
+		}break;
+		default : {
+			LOG_FATAL("Received unknown massage %d", msgType );
+		} break;
+	};
+
+
 	return std::make_shared<sys::ResponseMessage>();
 }
 // Invoked when timer ticked
@@ -70,6 +104,32 @@ sys::ReturnCodes ApplicationManager::WakeUpHandler() {
 
 sys::ReturnCodes ApplicationManager::SleepHandler() {
 	return sys::ReturnCodes::Success;
+}
+
+bool ApplicationManager::switchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName ) {
+
+	auto msg = std::make_shared<sapm::APMSwitch>(applicationName, windowName );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+bool ApplicationManager::switchApplicationWithData( sys::Service* sender,
+		const std::string& applicationName,
+		const std::string& windowName,
+		std::unique_ptr<app::SwitchData>& switchData ) {
+			auto msg = std::make_shared<sapm::APMSwitchData>(applicationName, windowName, std::move(switchData) );
+			sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+
+	return true;
+}
+bool ApplicationManager::confirmSwitch( sys::Service* sender) {
+	return true;
+}
+bool ApplicationManager::confirmClose( sys::Service* sender) {
+	return true;
+}
+bool ApplicationManager::switchPreviousApplication( sys::Service* sender, const std::string& prevAppName ) {
+
+	return true;
 }
 
 } /* namespace sapm */

@@ -16,53 +16,12 @@
 #include <string.h>
 #include "Application.hpp"
 #include "SystemManager/SystemManager.hpp"
+#include "messages/APMMessage.hpp"
 
 namespace sapm {
 
-//class strores information that was sent along with switch message
-class SwitchData {
-public:
-
-	SwitchData( uint8_t* data, uint32_t size ) : data{nullptr}, size{0} {
-		this->data = new uint8_t[size];
-		if( data ) {
-			memcpy( this->data, data, size );
-			this->size = size;
-		}
-		else
-			this->size = 0;
-	}
-	~SwitchData() {
-		if( data )
-			delete []data;
-	}
-
-	uint8_t* data;
-	uint32_t size;
-};
-
 class ApplicationDescription {
 public:
-	enum class ApplicationState {
-		//Application is registered. Name of the application has been provided along with a function to run.
-		//Such application can be activated using provided init function.
-		DEACTIVATED,
-		//Initialization is triggered by the switch message sent by other application to the application manager.
-		//Upon receiving such message application manager is saving switch message to send it later to the application.
-		//Init function of the application has been activated. Application should create/register all needed channels.
-		//When all channels are ready application will try to register in the application manager by sending APP_REGISTER message
-		INITIALIZING,
-		//Application manager sent variant of switch command to the selected application and it's now waiting for confirmation
-		//from the application
-		ACTIVATING,
-		//Application is working and has focus and can render
-		ACTIVE_FORGROUND,
-		//Applicatino lost focus but it is still working
-		ACTIVE_BACKGROUND,
-		//Application Manager sent signal to application that it should be closed. Application mus perform all necessary cleanup
-		//and request System Manager to close it.
-		DEACTIVATING
-	};
 
 	ApplicationDescription( std::string name, std::unique_ptr<app::ApplicationLauncher> lanucher, bool closeable );
 	~ApplicationDescription() {
@@ -76,9 +35,9 @@ public:
 	//informs if it is possible to close application when it looses focus.
 	bool closeable;
 	//current state of the application
-	ApplicationState state;
+	app::Application::State state = app::Application::State::DEACTIVATED;
 	//switching data stored when application manager had to run init function
-	SwitchData* switchData;
+	app::SwitchData* switchData;
 };
 
 
@@ -86,8 +45,26 @@ public:
  *
  */
 class ApplicationManager: public sys::Service {
+
+	enum class State{
+		IDLE,
+		CLOSING_PREV_APP,
+		WAITING_CLOSE_CONFIRMATION,
+		STARTING_NEW_APP,
+		WAITING_NEW_APP_CONFIRMATION,
+		WAITING_LOST_FOCUS_CONFIRMATION,
+		WAITING_GET_FOCUS_CONFIRMATION
+	};
+
 	std::map< std::string, ApplicationDescription* > applications;
 	sys::SystemManager* systemManager;
+
+	std::string currentApplicationName = "";
+	std::string previousApplicationName = "";
+
+	//tries to switch the application
+	bool switchApplicationInternal( APMSwitch* msg);
+	bool switchApplicationWithDataInternal( APMSwitchData* msg);
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();
@@ -106,12 +83,26 @@ public:
     sys::ReturnCodes SleepHandler() override;
 
     /**
-     * @brief Sends request to application manager to switch from current application to application with specified name.
+     * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
      */
-    static bool switchApplication( std::applicationName, )
-	static bool confirmSwitch();
-    static bool confirmClose( );
-    static bool switchPreviousApplication();
+    static bool switchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName="" );
+    /**
+	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
+	 * Allows sending data to destination application.
+	 */
+    static bool switchApplicationWithData( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
+    /**
+     * @Brief Function allows sending confirmation to the switch request. This is sent both by application that gains and looses focus.
+     */
+	static bool confirmSwitch( sys::Service* sender);
+	/**
+	 * @brief Function allows application to confirm close request.
+	 */
+    static bool confirmClose( sys::Service* sender);
+    /**
+     * @brief Allows requesting Application Manager to run previous application.
+     */
+    static bool switchPreviousApplication( sys::Service* sender, const std::string& prevAppName );
 };
 
 } /* namespace sapm */
