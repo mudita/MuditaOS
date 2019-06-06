@@ -18,12 +18,16 @@
 
 #include "common.hpp"
 
+
+
+#include "service-kbd/WorkerEvent.hpp"
+
 #if defined(TARGET_RT1051)
 
-#include "keyboard/key_codes_rt1051.hpp"
+#include "keyboard/key_codes.hpp"
 
 #elif defined(TARGET_Linux)
-#include "keyboard/key_codes_linux.hpp"
+#include "keyboard/key_codes.hpp"
     //TODO:M.P insert Linux specific headers here
 #else
 #error "Unsupported target"
@@ -35,7 +39,7 @@ namespace bsp {
     class keyboard {
     public:
 
-        RetCode Init(std::function<void(KeyEvents event,KeyCodes code)> signal);
+        RetCode Init(WorkerEvent* worker);
         RetCode DeInit();
 
     };

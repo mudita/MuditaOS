@@ -52,19 +52,19 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchData): {
 			sapm::APMSwitchData* msg = reinterpret_cast<sapm::APMSwitchData*>( msgl );
-			LOG_INFO("APMSwitchData");
+			LOG_INFO("APMSwitchData %s", msg->getName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
-			LOG_INFO("APMSwitchPrevApp");
+			LOG_INFO("APMSwitchPrevApp %s", msg->getName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMConfirmSwitch): {
 			sapm::APMConfirmSwitch* msg = reinterpret_cast<sapm::APMConfirmSwitch*>( msgl );
-			LOG_INFO("APMConfirmSwitch");
+			LOG_INFO("APMConfirmSwitch %s", msg->getName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMConfirmClose): {
 			sapm::APMConfirmClose* msg = reinterpret_cast<sapm::APMConfirmClose*>( msgl );
-			LOG_INFO("APMConfirmClose");
+			LOG_INFO("APMConfirmClose %s", msg->getName());
 		}break;
 		default : {
 			LOG_FATAL("Received unknown massage %d", msgType );
