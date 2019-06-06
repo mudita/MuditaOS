@@ -101,6 +101,8 @@ target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
 
         source/main.cpp
+        PUBLIC
+        source/MessageType.hpp
 
         )
 
@@ -132,10 +134,24 @@ add_subdirectory(module-db)
 message("${PROJECT_NAME}: add_subdirectory module-services")
 add_subdirectory(module-services)
 
+message("${PROJECT_NAME}: add_subdirectory module-apps")
+add_subdirectory(module-apps)
+
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries(${PROJECT_NAME} module-sys module-utils module-db module-gui module-os module-bsp module-vfs module-services ${TARGET_LIBRARIES} )
+target_link_libraries( ${PROJECT_NAME} 
+	module-sys 
+	module-utils 
+	module-db 
+	module-gui 
+	module-os 
+	module-bsp 
+	module-vfs 
+	module-services
+	module-apps 
+	${TARGET_LIBRARIES} 
+)
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})

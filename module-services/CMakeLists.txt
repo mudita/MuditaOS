@@ -28,8 +28,9 @@ include_directories( ../module-sys )
 include_directories( ../module-utils )
 include_directories( ../module-gui )
 include_directories( ../module-os )
+include_directories( ../module-bsp )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-sys module-utils module-gui)
+target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -46,6 +47,7 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../source
 )
 
 

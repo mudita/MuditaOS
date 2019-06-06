@@ -15,6 +15,7 @@ include_directories( ${CMAKE_PROJECT_NAME}
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}"
+		"${CMAKE_CURRENT_LIST_DIR}/messages"
 		"${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}"
 )
 
@@ -22,14 +23,19 @@ include_directories( ${PROJECT_NAME}
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}"
+		"${CMAKE_CURRENT_LIST_DIR}/messages"
 		"${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}"
+#		"${CMAKE_CURRENT_LIST_DIR}/../"
 )
 
 target_sources( ${PROJECT_NAME}
 
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/${EINK_BOARD_PATH}/ServiceEink.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ServiceEink.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/ImageMessage.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceEink.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/EinkMessage.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/messages/ImageMessage.cpp"
 )
 

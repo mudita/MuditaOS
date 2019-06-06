@@ -15,6 +15,7 @@
 #include "Service/Message.hpp"
 #include "core/DrawCommand.hpp"
 #include "GUIMessage.hpp"
+#include "gui/Common.hpp"
 
 namespace sgui {
 
@@ -25,12 +26,12 @@ class DrawMessage: public GUIMessage {
 protected:
 
 public:
-
+	gui::RefreshModes mode;
 	std::list< std::unique_ptr< gui::DrawCommand > > commands;
 	/**
 	 * @brief This constructor converts list of draw command pointers to list of unique pointers
 	 */
-	DrawMessage( std::list< gui::DrawCommand* > commandsList );
+	DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode );
 	virtual ~DrawMessage();
 };
 
