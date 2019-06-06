@@ -5,6 +5,7 @@
 #include "../module-gui/gui/core/ImageManager.hpp"
 #include "log/log.hpp"
 #include "memory/usermem.h"
+#include "ticks.hpp"
 
 //module-applications
 #include  "application-clock/ApplicationClock.hpp"
@@ -126,11 +127,15 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
+        uint32_t timestamp1 = cpp_freertos::Ticks::GetTicks();
         auto ret = DBServiceAPI::SettingsGet(this);
+        LOG_ERROR("SettingsGet perf: %lu",cpp_freertos::Ticks::GetTicks()-timestamp1);
 
         ret.language = SettingsLanguage ::GERMAN;
 
         DBServiceAPI::SettingsUpdate(this,ret);
+
+        LOG_ERROR("Available heap: %lu",usermemGetFreeHeapSize());
     }
 
     // Invoked during initialization
