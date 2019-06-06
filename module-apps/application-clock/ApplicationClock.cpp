@@ -14,6 +14,10 @@
 #include "gui/widgets/BoxLayout.hpp"
 //module-utils
 #include "log/log.hpp"
+//module-services
+#include "service-kbd/EventManager.hpp"
+//MessageType
+#include "MessageType.hpp"
 //this module
 #include "ApplicationClock.hpp"
 
@@ -33,6 +37,13 @@ ApplicationClock::~ApplicationClock() {
 
 // Invoked upon receiving data message
 sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
+
+	//if keyboard message received
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
+	{
+		KbdMessage* msg = static_cast<KbdMessage*>(msgl);
+		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
+	}
 	return std::make_shared<sys::ResponseMessage>( );
 }
 
