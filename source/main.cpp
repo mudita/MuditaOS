@@ -147,11 +147,6 @@ public:
 
 int SystemStart(sys::SystemManager* sysmgr)
 {
-    //TODO:M.P remove it, only for test purposes
-   // bsp::keyboard keyboard;
-   // keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
-
-
     vfs.Init();
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);

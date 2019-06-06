@@ -39,38 +39,24 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
     // Invoked when timer ticked
 void ApplicationClock::TickHandler(uint32_t id) {
 
-	LOG_DEBUG("ApplicationClock tick!");
-
-	seconds++;
-	if( seconds > 59 ) {
-		minute++;
-		seconds = 0;
-	}
-
-	if( minute > 59 ) {
-		hour++;
-		minute = 0;
-	}
-	if( hour > 23 ) {
-		hour = 0;
-	}
+	bool res = incrementSecond();
 
 	std::string h;
 	if( hour<10 ) {
 		h += "0";
 	}
 	h += std::to_string(hour);
+	hourLabel->setText( h );
+
 	std::string m;
 	if( minute < 10 ) {
 		m+= "0";
 	}
 	m += std::to_string(minute);
+	minuteLabel->setText( m );
 
-	std::string t = h+":"+m;
-	UTF8 t8 = UTF8(t.c_str());
-	timeLabel->setText( t8 );
-
-	render(gui::RefreshModes::GUI_REFRESH_FAST );
+	if( res )
+		render(gui::RefreshModes::GUI_REFRESH_FAST );
 
 }
 
@@ -102,15 +88,58 @@ void ApplicationClock::createUserInterface() {
 	gui::Window* clockWin = new gui::Window("Main");
 	clockWin->setSize( 480, 600 );
 
-	timeLabel = new gui::Label(clockWin, 100,225,280,150);
-	timeLabel->setFilled( false );
-	timeLabel->setBorderColor( gui::ColorNoColor );
-	timeLabel->setFont("gt_pressura_bold_65");
-	timeLabel->setText("12:35");
-	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	timeLabel->setMaxSize( 480, 120 );
+	hourLabel = new gui::Label(clockWin, 100,300-160,280,150);
+	hourLabel->setFilled( false );
+	hourLabel->setBorderColor( gui::ColorNoColor );
+	hourLabel->setFont("gt_pressura_regular_140");
+	hourLabel->setText("12");
+	hourLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+
+	minuteLabel = new gui::Label(clockWin, 100,310,280,150);
+	minuteLabel->setFilled( false );
+	minuteLabel->setBorderColor( gui::ColorNoColor );
+	minuteLabel->setFont("gt_pressura_regular_140");
+	minuteLabel->setText("05");
+	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+
+	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
+	rect->setFillColor( gui::ColorFullBlack );
+	rect->setFilled( true );
+
+	gui::Rect* rectCircle = new gui::Rect( clockWin, 10, 70, 460, 460 );
+	rectCircle->setRadius(230);
+	rectCircle->setFilled( false );
+
 
 	windows.insert(std::pair<std::string,gui::Window*>(clockWin->getName(), clockWin));
+}
+
+bool ApplicationClock::incrementHour() {
+	hour++;
+	if( hour > 23 ) {
+		hour = 0;
+		return true;
+	}
+	return false;
+}
+bool ApplicationClock::incrementMinute() {
+	minute++;
+	if( minute > 59 ) {
+		incrementHour();
+		minute = 0;
+		return true;
+	}
+	return false;
+}
+
+bool ApplicationClock::incrementSecond(){
+	seconds++;
+	if( seconds > 59 ) {
+		incrementMinute();
+		seconds = 0;
+		return true;
+	}
+	return false;
 }
 
 void ApplicationClock::destroyUserInterface() {
