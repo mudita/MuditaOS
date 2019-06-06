@@ -5,6 +5,7 @@
 
 //module-applications
 #include  "application-clock/ApplicationClock.hpp"
+#include "application-test/ApplicationTest.hpp"
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
@@ -157,7 +158,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
   //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<app::ApplicationTest>("ApplicationTest",1024*6),sysmgr);
 
     if(ret){
         return 0;
