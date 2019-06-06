@@ -1,0 +1,49 @@
+
+/*
+ * @file SettingsRecord.hpp
+ * @author Mateusz Piesta (mateusz.piesta@mudita.com)
+ * @date 06.06.19
+ * @brief
+ * @copyright Copyright (C) 2019 mudita.com
+ * @details
+ */
+
+
+#ifndef PUREPHONE_SETTINGSRECORD_HPP
+#define PUREPHONE_SETTINGSRECORD_HPP
+
+#include "Record.hpp"
+#include "utf8/UTF8.hpp"
+#include "../Common/Common.hpp"
+
+struct SettingsRecord{
+    uint32_t dbID;
+    bool timeFormat12;
+    bool timeAuto;
+    bool brightnessAuto;
+    uint32_t brightnessLevel;
+    uint32_t fontSize;
+    SettingsPinMode pinMode;
+    uint32_t pinDays;
+    uint32_t pinDaysLeft;
+    std::string pin1;
+    std::string pin2;
+    uint32_t    activeSIM;
+    std::string     networkOperator;
+    uint32_t lockPassHash;
+    SettingsLanguage language;
+};
+
+enum class SettingsRecordField{
+    Dummy
+};
+
+class SettingsRecordInterface : public RecordInterface<SettingsRecord,SettingsRecordField> {
+public:
+
+    bool Update(const SettingsRecord& rec) override final;
+    SettingsRecord GetByID(uint32_t id) override final;
+};
+
+
+#endif //PUREPHONE_SETTINGSRECORD_HPP
