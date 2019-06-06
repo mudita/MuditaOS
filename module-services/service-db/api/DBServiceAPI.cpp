@@ -24,7 +24,12 @@ SettingsRecord DBServiceAPI::SettingsGet(sys::Service* serv) {
         auto respMsg = ret.second;
         DBSettingsResponseMessage* settingsResponse = reinterpret_cast<DBSettingsResponseMessage*>(respMsg.get());
 
-        return settingsResponse->record;
+        if(settingsResponse->retCode == 0){
+            return settingsResponse->record;
+        }
+        else{
+            return SettingsRecord{};
+        }
 
     }
     else{

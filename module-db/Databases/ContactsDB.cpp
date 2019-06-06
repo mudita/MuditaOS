@@ -11,7 +11,7 @@
 
 #include "ContactsDB.hpp"
 
-const char *ContactsDB::dbName = "sys/contacts.db";
+const char *ContactsDB::dbName = "sys/db/contacts.db";
 
 
 ContactsDB::ContactsDB():

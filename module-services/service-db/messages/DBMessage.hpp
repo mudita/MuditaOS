@@ -47,10 +47,11 @@ public:
 
 class DBSettingsResponseMessage: public DBResponseMessage {
 public:
-    DBSettingsResponseMessage(const SettingsRecord& rec) : DBResponseMessage(),record(rec) {};
+    DBSettingsResponseMessage(const SettingsRecord& rec,uint32_t retCode=0) : DBResponseMessage(),record(rec),retCode(retCode) {};
     virtual ~DBSettingsResponseMessage() {};
 
     SettingsRecord record;
+    uint32_t retCode;
 };
 
 
