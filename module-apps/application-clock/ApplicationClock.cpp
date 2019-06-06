@@ -79,14 +79,9 @@ void ApplicationClock::updateLabels() {
     // Invoked when timer ticked
 void ApplicationClock::TickHandler(uint32_t id) {
 
-	bool res = incrementSecond();
+	incrementSecond();
 	updateLabels();
-
-	if( res ) {
-		LOG_INFO("[ClockApplication] seconds refresh");
-		render(gui::RefreshModes::GUI_REFRESH_FAST );
-	}
-
+	render(gui::RefreshModes::GUI_REFRESH_FAST );
 }
 
 // Invoked during initialization
@@ -133,9 +128,12 @@ void ApplicationClock::createUserInterface() {
 	minuteLabel->setText("05");
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
+	progressBar = new gui::Progress(clockWin, 480/2-30, 300-4, 60, 8 );
+	progressBar->setTotalProgress(59);
+	progressBar->setCurrentProgress(0);
+/*	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
 	rect->setFillColor( gui::ColorFullBlack );
-	rect->setFilled( true );
+	rect->setFilled( true );*/
 
 	gui::Rect* rectCircle = new gui::Rect( clockWin, 10, 70, 460, 460 );
 	rectCircle->setRadius(230);
@@ -164,13 +162,16 @@ bool ApplicationClock::incrementMinute() {
 }
 
 bool ApplicationClock::incrementSecond(){
+	bool ret = false;
 	seconds++;
 	if( seconds > 59 ) {
 		incrementMinute();
 		seconds = 0;
-		return true;
+		ret = true;
 	}
-	return false;
+	progressBar->setCurrentProgress(seconds);
+
+	return ret;
 }
 
 void ApplicationClock::destroyUserInterface() {
