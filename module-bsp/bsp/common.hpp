@@ -12,7 +12,7 @@
 #ifndef MODULE_BSP_COMMON_HPP
 #define MODULE_BSP_COMMON_HPP
 
-
+//TODO maybe move KeyEvents to keyboard.hpp
 namespace bsp
 {
     enum class RetCode{
@@ -23,7 +23,8 @@ namespace bsp
 
     enum class KeyEvents{
         Released,
-        Pressed
+        Pressed,
+
     };
 
 

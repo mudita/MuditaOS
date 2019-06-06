@@ -8,7 +8,9 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Context.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Renderer.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/PixMap.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/PixMapManager.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ImageManager.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ImageMap.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/VecMap.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Color.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/DrawCommand.hpp"
@@ -17,5 +19,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Context.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Renderer.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/PixMap.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/PixMapManager.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ImageManager.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ImageMap.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/VecMap.hpp"
 )
