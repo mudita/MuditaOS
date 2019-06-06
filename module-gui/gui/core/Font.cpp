@@ -40,7 +40,6 @@ gui::Status FontGlyph::load( uint8_t* data, uint32_t& offset ) {
 	memcpy( &yoffset, data + offset, sizeof(uint16_t) ); offset += sizeof(uint16_t);
 	//how much the current position should be advanced after drawing the character
 	memcpy( &xadvance, data + offset, sizeof(uint16_t) ); offset += sizeof(uint16_t);
-//	offset+=2;
 
 	return gui::Status::GUI_SUCCESS;
 }
@@ -309,6 +308,7 @@ void FontManager::loadFonts( std::string baseDirectory ) {
 	std::vector<std::string> fontFiles = getFontsList();
 
 	for( std::string fontName : fontFiles ) {
+		LOG_INFO("Loading font: %s", fontName.c_str());
 		loadFont( fontName );
 	}
 }
@@ -331,6 +331,11 @@ Font* FontManager::loadFont( std::string filename ) {
 
 	//close file
 	vfs.fclose( file );
+	if( bytesRead != fileSize) {
+		LOG_ERROR("Failed to read all file");
+		delete [] fontData;
+		return nullptr;
+	}
 
 	//allocate memory for new font
 	Font* font = new Font();
