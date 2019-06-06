@@ -54,7 +54,9 @@ target_link_libraries( ${PROJECT_NAME}  ${GTKMM_LIBRARIES}  )
 target_include_directories(${PROJECT_NAME} PUBLIC ${GTKMM_LIBRARY_DIRS} )
 target_include_directories( ${PROJECT_NAME}  PUBLIC ${GTKMM_INCLUDE_DIRS}  )
 target_link_libraries( ${PROJECT_NAME} ${LIBRT} rt pthread )
-    
+   
+#key_code
+target_include_directories( ${PROJECT_NAME}  PUBLIC "${CMAKE_SOURCE_DIR}/"  )
 ##find_library(LIBRT NAMES rt librt NO_DEFAULT_PATH)
 #message( "LIBRT: ${LIBRT}" ) 
 #if(LIBRT)
