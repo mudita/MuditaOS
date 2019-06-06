@@ -11,24 +11,27 @@
 
 #include "keyboard.hpp"
 
+
 #if defined(TARGET_RT1051)
 
 #include "keyboard/rt1051_keyboard.hpp"
 #elif defined(TARGET_Linux)
-    //TODO:M.P insert Linux keyboard implementation here
+
+#include "keyboard/bsp_keyboard.hpp"
+
 #else
 #error "Unsupported target"
 #endif
 
 namespace bsp
 {
-    RetCode keyboard::Init(std::function<void(KeyEvents event,KeyCodes code)> signal)
+    RetCode keyboard::Init(WorkerEvent* worker)
     {
 #if defined(TARGET_RT1051)
-        rt1501_keyboard_Init(signal);
+        rt1501_keyboard_Init(worker);
 
 #elif defined(TARGET_Linux)
-
+        linux_keyboard_Init(worker);
 #else
 #error "Unsupported target"
 #endif

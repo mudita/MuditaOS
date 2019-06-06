@@ -36,7 +36,13 @@ public:
 	void createUserInterface() ;
 	void destroyUserInterface();
 };
-
+class ApplicationTestLauncher : public ApplicationLauncher {
+public:
+	ApplicationTestLauncher() : ApplicationLauncher("ApplicationTest", true) {};
+	bool run(sys::SystemManager* sysmgr) override {
+		return sysmgr->CreateService(std::make_shared<app::ApplicationTest>(name),sysmgr,1000);
+	};
+};
 }
 
 #endif /* MODULE_APPS_APPLICATION_TEST_APPLICATIONTEST_HPP_ */

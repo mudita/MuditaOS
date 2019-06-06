@@ -23,6 +23,15 @@ enum class MessageType {
 	GUIDisplayReady, //message that informs gui service that service controlling display device is ready for new buffer data.
 	GUIRenderingFinished, //Message is sent from the worker when all rendering is finished.
 
+	//application manager
+	APMSwitch, //request to switch to given application, optionally also to specified window
+	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
+	APMSwitchPrevApp, //Request to switch to previous application.
+	APMConfirmSwitch, //Used when application confirms that it is loosing focus and also when application confirms that is has gained focus
+	APMConfirmClose, //Sent by application to confirm completion of the close procedure
+
+	//keyboard messages
+	KBDKeyEvent
 };
 
 

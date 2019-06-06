@@ -13,7 +13,13 @@
 
 namespace gui {
 
-Window::Window( std::string name, uint32_t id ) : name{name}, windowID{id}, refreshMode{RefreshModes::GUI_REFRESH_FAST}, focusItem{nullptr} {
+Window::Window( std::string name, uint32_t id ) :
+	Item(),
+	windowID{id},
+	refreshMode{RefreshModes::GUI_REFRESH_FAST},
+	name{name},
+	focusItem{nullptr}
+	 {
 }
 
 Window::~Window() {

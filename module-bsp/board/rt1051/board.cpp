@@ -19,6 +19,9 @@
 #include "irq/irq_gpio.hpp"
 #include "common/i2c.h"
 
+#include "irq/irq_gpio.hpp"
+#include "common/i2c.h"
+
 namespace bsp {
 
 
@@ -184,7 +187,6 @@ namespace bsp {
         bsp_i2c_Init(BOARD_GetI2CInstance(), BOARD_KEYBOARD_I2C_CLOCK_FREQ);
 
         irq_gpio_Init();
-
 
     }
 
