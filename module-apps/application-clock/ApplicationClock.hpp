@@ -13,6 +13,8 @@
 #include "Service/Message.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
+#include "gui/widgets/Progress.hpp"
+
 
 namespace app {
 
@@ -28,6 +30,7 @@ class ApplicationClock: public Application {
 	gui::Label* hourLabel = nullptr;
 	gui::Label* minuteLabel = nullptr;
 	gui::Image* dotImage[64];
+	gui::Progress* progressBar = nullptr;
 
 	/**
 	 * @brief Increments hours counter
