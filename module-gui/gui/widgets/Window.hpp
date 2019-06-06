@@ -22,11 +22,14 @@ protected:
 	uint32_t windowID;
 	RefreshModes refreshMode;
 	std::string name;
+	//pointer to the widget that has focus
+	Item* focusItem;
 public:
 
 	Window( std::string name, uint32_t id=GUIWindowID++ );
 	virtual ~Window();
 
+	Item* getFocusItem(){return focusItem; };
 	/**
 	 * True should be returned when changes requires screen to be refreshed
 	 */
@@ -37,8 +40,6 @@ public:
 	virtual void setFocusItem( Item* item );
 	virtual int getWindowID() {return windowID; };
 
-	//pointer to the widget that has focus
-	Item* focusItem;
 
 	//virtual methods from Item
 	bool onInput( const KeyEvent& key ) override;

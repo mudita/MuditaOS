@@ -11,6 +11,7 @@
 
 #include "Application.hpp"
 #include "Service/Message.hpp"
+#include "SystemManager/SystemManager.hpp"
 #include "gui/widgets/Label.hpp"
 
 namespace app {
@@ -33,6 +34,14 @@ public:
 
 	void createUserInterface() ;
 	void destroyUserInterface();
+};
+
+class ApplicationCalendarLauncher : public ApplicationLauncher {
+public:
+	ApplicationCalendarLauncher() : ApplicationLauncher("ApplicationCalendar", true) {};
+	bool run(sys::SystemManager* sysmgr) override {
+		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr,1000);
+	};
 };
 
 } /* namespace app */
