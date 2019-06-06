@@ -43,6 +43,17 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 	{
 		KbdMessage* msg = static_cast<KbdMessage*>(msgl);
 		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
+
+		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
+			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
+				incrementHour();
+				render(gui::RefreshModes::GUI_REFRESH_FAST );
+			}
+			if( msg->keyCode == bsp::KeyCodes::NumericKeyPnd ) {
+				incrementMinute();
+				render(gui::RefreshModes::GUI_REFRESH_FAST );
+			}
+		}
 	}
 	return std::make_shared<sys::ResponseMessage>( );
 }
