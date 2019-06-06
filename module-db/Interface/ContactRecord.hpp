@@ -17,6 +17,7 @@
 #include "../Common/Common.hpp"
 
 struct ContactRecord{
+
     uint32_t dbID;
     UTF8 primaryName;
     UTF8 alternativeName;
@@ -42,25 +43,29 @@ struct ContactRecord{
     uint8_t speeddial;
 };
 
-enum class ContactRecordField{
+enum class ContactRecordField {
     PrimaryName,
     NumberE164,
 };
 
-class ContactRecordInterface : public RecordInterface<ContactRecord,ContactRecordField>{
+class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField> {
 
 public:
 
-    bool Add(const ContactRecord& rec) override final;
+    bool Add(const ContactRecord &rec) override final;
+
     bool RemoveByID(uint32_t id) override final;
-    bool Update(const ContactRecord& rec) override final;
+
+    bool Update(const ContactRecord &rec) override final;
+
     ContactRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
+    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ContactRecordField field, const char* str) override final;
+    std::unique_ptr<std::vector<ContactRecord>>
+    GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str) override final;
 };
 
 

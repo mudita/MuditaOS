@@ -23,6 +23,10 @@ enum class MessageType {
 	GUIDisplayReady, //message that informs gui service that service controlling display device is ready for new buffer data.
 	GUIRenderingFinished, //Message is sent from the worker when all rendering is finished.
 
+	//DB messages
+	DBSettingsGet,  // get current settings from database
+	DBSettingsUpdate,   // update settings
+
 };
 
 

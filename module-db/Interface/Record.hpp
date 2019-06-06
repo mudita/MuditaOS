@@ -15,6 +15,7 @@
 #include <memory>
 #include "../Database/Database.hpp"
 
+
 template<typename T, typename F>
 class RecordInterface {
 public:

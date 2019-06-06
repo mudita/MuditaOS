@@ -11,7 +11,7 @@
 
 #include "SettingsDB.hpp"
 
-const char *SettingsDB::dbName = "settings.db";
+const char *SettingsDB::dbName = "sys/settings.db";
 
 
 SettingsDB::SettingsDB():

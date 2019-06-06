@@ -2,6 +2,7 @@
 #include <memory>
 #include <list>
 #include "log/log.hpp"
+#include "memory/usermem.h"
 
 //module-applications
 #include  "application-clock/ApplicationClock.hpp"
@@ -11,6 +12,10 @@
 #include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
 #include "service-kbd/ServiceKbd.hpp"
+
+
+#include "service-db/ServiceDB.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
 
 //module-gui
 #include "gui/core/Font.hpp"
@@ -45,7 +50,9 @@ public:
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
 
-        win = new gui::Window("Main");
+
+
+/*        win = new gui::Window("Main");
 		win->setSize( 480, 600 );
 
 		gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
@@ -102,7 +109,7 @@ public:
 		vBox->addWidget( img1 );
 		vBox->addWidget(maxH3);
 
-		hBox->addWidget(maxW3);
+		hBox->addWidget(maxW3);*/
     }
 
     ~BlinkyService(){
@@ -118,6 +125,11 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
+        auto ret = DBServiceAPI::SettingsGet(this);
+
+        ret.language = SettingsLanguage ::GERMAN;
+
+        DBServiceAPI::SettingsUpdate(this,ret);
     }
 
     // Invoked during initialization
@@ -155,9 +167,14 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-  //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("BlinkyService"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceKbd>("ServiceKbd"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+
+
+    // Application services
     ret |= sysmgr->CreateService(std::make_shared<app::ApplicationClock>("ApplicationClock",1024*6),sysmgr);
+
 
     if(ret){
         return 0;
