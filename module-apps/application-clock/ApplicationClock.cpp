@@ -47,10 +47,12 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
 				incrementHour();
+				updateLabels();
 				render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyPnd ) {
 				incrementMinute();
+				updateLabels();
 				render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 		}
@@ -58,11 +60,7 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 	return std::make_shared<sys::ResponseMessage>( );
 }
 
-    // Invoked when timer ticked
-void ApplicationClock::TickHandler(uint32_t id) {
-
-	bool res = incrementSecond();
-
+void ApplicationClock::updateLabels() {
 	std::string h;
 	if( hour<10 ) {
 		h += "0";
@@ -76,9 +74,18 @@ void ApplicationClock::TickHandler(uint32_t id) {
 	}
 	m += std::to_string(minute);
 	minuteLabel->setText( m );
+}
 
-	if( res )
+    // Invoked when timer ticked
+void ApplicationClock::TickHandler(uint32_t id) {
+
+	bool res = incrementSecond();
+	updateLabels();
+
+	if( res ) {
+		LOG_INFO("[ClockApplication] seconds refresh");
 		render(gui::RefreshModes::GUI_REFRESH_FAST );
+	}
 
 }
 
@@ -88,6 +95,8 @@ sys::ReturnCodes ApplicationClock::InitHandler() {
 	createUserInterface();
 
 	setActiveWindow("Main");
+
+	render(gui::RefreshModes::GUI_REFRESH_FAST );
 
 	return sys::ReturnCodes::Success;
 }

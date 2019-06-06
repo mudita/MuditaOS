@@ -104,7 +104,8 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 				if( einkReady ) {
 					sendBuffer();
 				}
-				else {
+				else if( !requestSent ){
+					requestSent = true;
 					//request eink state
 					auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
 					sys::Bus::SendUnicast(msg, "ServiceEink", this);
@@ -121,16 +122,13 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		} break;
 		case static_cast<uint32_t>( MessageType::GUIDisplayReady ): {
 
+			LOG_INFO("[ServiceGUI]Display ready");
 			einkReady = true;
-			if( timer_id != 0 ){
-				DeleteTimer( timer_id );
-				timer_id = 0;
-			}
-
+			requestSent = false;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
 			if( renderFrameCounter != transferedFrameCounter ) {
-
+				LOG_INFO("[ServiceGUI]Sending buffer");
 				sendBuffer();
 			}
 			else {
@@ -155,18 +153,12 @@ void ServiceGUI::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
 
-	//start worker
-//	worker = new GUIWorker( this );
-//	worker->init();
-//	worker->run();
-
-	//creat timer that pulls eink's status
-	timer_id = CreateTimer(250,true);
-	ReloadTimer(timer_id);
-
-
-
-
+	if( einkReady == false ) {
+		requestSent = true;
+		ReloadTimer( timer_id );
+		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
+		sys::Bus::SendUnicast(msg, "ServiceEink", this);
+	}
 	return sys::ReturnCodes::Success;
 }
 

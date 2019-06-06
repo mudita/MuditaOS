@@ -38,6 +38,7 @@ protected:
 	gui::Renderer renderer;
 	//flag that defines whether eink is ready for new frame buffer
 	volatile bool einkReady = false;
+	volatile bool requestSent = false;
 	volatile bool bufferLocked = false;
 	uint32_t timer_id= 0;
 

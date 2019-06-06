@@ -41,6 +41,10 @@ class ApplicationClock: public Application {
 	 * @brief Increments seconds counter
 	 */
 	bool incrementSecond();
+	/**
+	 * @brief Updates strings for hour and minutes
+	 */
+	void updateLabels();
 public:
 	ApplicationClock(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
