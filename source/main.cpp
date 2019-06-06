@@ -170,6 +170,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;

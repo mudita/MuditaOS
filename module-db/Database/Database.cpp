@@ -142,7 +142,7 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
     QueryResult *db = reinterpret_cast<QueryResult *>(usrPtr);
 
     std::vector<Field> row;
-    for (uint32_t i = 0; i < count; i++) {
+    for (uint32_t i = 0; i < (uint32_t)count; i++) {
         row.push_back(Field{data[i]});
     }
 
