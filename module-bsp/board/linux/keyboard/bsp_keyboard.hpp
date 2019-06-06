@@ -17,7 +17,7 @@
 
 
 #include "common.hpp"
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "bsp/keyboard/key_codes.hpp"
 #include "service-kbd/WorkerEvent.hpp"
 
 
@@ -25,15 +25,15 @@ namespace bsp{
 
 
 
-RetCode linux_keyboard_Init(WorkerEvent* worker);
+	RetCode linux_keyboard_Init(WorkerEvent* worker);
 
-		int32_t linux_keyboard_Deinit(void);
+	int32_t linux_keyboard_Deinit(void);
 
-        BaseType_t linux_keyboard_IRQHandler(void);
+	BaseType_t linux_keyboard_IRQHandler(void);
 
-        BaseType_t linux_keyboard_right_functional_IRQHandler(void);
+	BaseType_t linux_keyboard_right_functional_IRQHandler(void);
 
-        void startKeyTimer(uint32_t time, xQueueHandle qhandle);
+	void startKeyTimer(uint32_t time, xQueueHandle qhandle);
 
 }
 
