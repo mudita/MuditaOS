@@ -48,12 +48,12 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
 				incrementHour();
 				updateLabels();
-				render(gui::RefreshModes::GUI_REFRESH_FAST );
+				//render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyPnd ) {
 				incrementMinute();
 				updateLabels();
-				render(gui::RefreshModes::GUI_REFRESH_FAST );
+				//render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 		}
 	}
@@ -114,6 +114,9 @@ void ApplicationClock::createUserInterface() {
 	gui::Window* clockWin = new gui::Window("Main");
 	clockWin->setSize( 480, 600 );
 
+	uint32_t xOffset = 0;
+	uint32_t yOffset = 0;
+
 	hourLabel = new gui::Label(clockWin, 100,300-160,280,150);
 	hourLabel->setFilled( false );
 	hourLabel->setBorderColor( gui::ColorNoColor );
@@ -128,7 +131,7 @@ void ApplicationClock::createUserInterface() {
 	minuteLabel->setText("00");
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	progressBar = new gui::Progress(clockWin, 480/2-30, 300-4, 60, 8 );
+	progressBar = new gui::Progress(clockWin, 480/2-90, 300-6, 180, 12 );
 	progressBar->setTotalProgress(59);
 	progressBar->setCurrentProgress(0);
 /*	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
