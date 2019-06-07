@@ -16,6 +16,7 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 #include "Interface/SettingsRecord.hpp"
+#include "Interface/SMSRecord.hpp"
 
 
 class DBMessage: public sys::DataMessage {
@@ -49,6 +50,28 @@ public:
     virtual ~DBSettingsResponseMessage() {};
 
     SettingsRecord record;
+    uint32_t retCode;
+};
+
+class DBSMSMessage : public DBMessage{
+public:
+    DBSMSMessage(MessageType messageType,const SMSRecord& rec = SMSRecord{}): DBMessage(messageType),record(rec){
+
+    }
+    virtual ~DBSMSMessage() {}
+
+    uint32_t id;
+    uint32_t offset;
+    uint32_t limit;
+    SMSRecord record;
+};
+
+class DBSMSResponseMessage: public DBResponseMessage {
+public:
+    DBSMSResponseMessage(std::unique_ptr<std::vector<SMSRecord>> rec,uint32_t retCode=0) : DBResponseMessage(),records(std::move(rec)),retCode(retCode) {};
+    virtual ~DBSMSResponseMessage() {};
+
+    std::unique_ptr<std::vector<SMSRecord>> records;
     uint32_t retCode;
 };
 
