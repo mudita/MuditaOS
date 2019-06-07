@@ -24,12 +24,7 @@ add_subdirectory( service-appmgr )
 message("${PROJECT_NAME}: add_subdirectory service-db")
 add_subdirectory( service-db )
 
-target_include_directories( ${PROJECT_NAME} PUBLIC "../module-sys" )
-target_include_directories( ${PROJECT_NAME} PUBLIC "../module-utils" )
-target_include_directories( ${PROJECT_NAME} PUBLIC "../module-gui" )
-target_include_directories( ${PROJECT_NAME} PUBLIC "../module-os" )
-target_include_directories( ${PROJECT_NAME} PUBLIC "../module-bsp" )
-target_include_directories( ${PROJECT_NAME} PUBLIC "../module-apps"  )
+
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db  ${TARGET_LIBRARIES} )
 
@@ -57,7 +52,6 @@ target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
 
-        CPP_FREERTOS_CONDITION_VARIABLES
         )
 
 target_compile_options(${PROJECT_NAME}

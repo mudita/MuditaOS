@@ -23,6 +23,9 @@
 class ServiceDB: public sys::Service {
 private:
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
+    std::unique_ptr<SMSRecordInterface> smsRecordInterface;
+    std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
+    std::unique_ptr<ContactRecordInterface> contactRecordInterface;
 protected:
 
 public:

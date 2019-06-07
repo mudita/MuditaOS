@@ -10,14 +10,11 @@
 
 
 #include "SMSRecord.hpp"
-#include "../Databases/SmsDB.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
 
 
 bool SMSRecordInterface::Add(const SMSRecord &rec) {
-    auto smsDB = std::make_unique<SmsDB>();
-
 
     uint32_t contactID = 0;
 
@@ -89,14 +86,12 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
 }
 
 uint32_t SMSRecordInterface::GetCount() {
-    auto smsDB = std::make_unique<SmsDB>();
     return smsDB->sms.GetCount();
 }
 
 std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
                                                                                   SMSRecordField field,
                                                                                   const char *str) {
-    auto smsDB = std::make_unique<SmsDB>();
     auto records = std::make_unique<std::vector<SMSRecord>>();
 
     std::vector<SMSTableRow> smses;
@@ -140,7 +135,6 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
 
 
 std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto smsDB = std::make_unique<SmsDB>();
     auto smses = smsDB->sms.GetLimitOffset(offset,limit);
 
     auto records = std::make_unique<std::vector<SMSRecord>>();
@@ -169,7 +163,6 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 }
 
 bool SMSRecordInterface::Update(const SMSRecord &rec) {
-    auto smsDB = std::make_unique<SmsDB>();
 
     auto sms = smsDB->sms.GetByID(rec.dbID);
     if(sms.ID == 0){
@@ -201,7 +194,6 @@ bool SMSRecordInterface::Update(const SMSRecord &rec) {
 }
 
 bool SMSRecordInterface::RemoveByID(uint32_t id) {
-    auto smsDB = std::make_unique<SmsDB>();
 
     auto sms = smsDB->sms.GetByID(id);
     if(sms.ID == 0){
@@ -239,7 +231,6 @@ bool SMSRecordInterface::RemoveByID(uint32_t id) {
 }
 
 bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str) {
-    auto smsDB = std::make_unique<SmsDB>();
 
     switch(field){
         case SMSRecordField ::ContactID:
@@ -259,7 +250,6 @@ bool SMSRecordInterface::RemoveByField(SMSRecordField field, const char *str) {
 }
 
 SMSRecord SMSRecordInterface::GetByID(uint32_t id) {
-    auto smsDB = std::make_unique<SmsDB>();
     auto sms = smsDB->sms.GetByID(id);
 
 
