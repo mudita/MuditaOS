@@ -24,6 +24,7 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL  "Debug")
     message(STATUS "Build type: Debug")
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
+    #target_compile_options(${PROJECT_NAME} PUBLIC -O3)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL  "Release")
