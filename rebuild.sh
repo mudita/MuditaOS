@@ -26,6 +26,7 @@ fi
 TARGET="Target_Linux.cmake"
 TARGET_SET="false"
 BUILD_TESTS="false"
+TYPE="Debug"
 
 if [ "$1" != "" ]; then
 	if [ "$1" = "linux" ]; then
@@ -36,6 +37,11 @@ if [ "$1" != "" ]; then
 	if [ "$1" = "rt1051" ]; then
 		echo "Building for RT1051."
 		TARGET="Target_RT1051.cmake"
+	fi
+	if [ "$1" = "release" ]; then
+		echo "Building for RT1051."
+		TARGET="Target_RT1051.cmake"
+		TYPE="RelWithDebInfo" 
 	fi
 else
 	echo "No platform specified, using target Linux."
@@ -54,7 +60,7 @@ if [ "$TARGET_SET" = "true" ]; then
 fi
 
 if [ "$BUILD_TESTS" = "true" ]; then
-	cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" ../
+	cmake -DCMAKE_BUILD_TYPE="$TYPE" -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" ../
 else
-	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" ../
+	cmake -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" ../
 fi
