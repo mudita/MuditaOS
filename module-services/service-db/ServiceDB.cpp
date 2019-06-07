@@ -31,9 +31,6 @@ ServiceDB::ServiceDB()
 
 ServiceDB::~ServiceDB() {
 
-    // Explicitly destroy record interfaces. They store DB connection handles that need to be closed before deinitializing global database handle
-    settingsRecordInterface.reset();
-
     Database::Deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
 }
@@ -76,7 +73,16 @@ sys::ReturnCodes ServiceDB::InitHandler() {
 
     Database::Initialize();
 
-    settingsRecordInterface = std::make_unique<SettingsRecordInterface>();
+    // Create databases
+    settingsDB = std::make_unique<SettingsDB>();
+    contactsDB = std::make_unique<ContactsDB>();
+    smsDB = std::make_unique<SmsDB>();
+
+    // Create record interfaces
+    settingsRecordInterface = std::make_unique<SettingsRecordInterface>(settingsDB.get());
+    contactRecordInterface = std::make_unique<ContactRecordInterface>(contactsDB.get());
+    smsRecordInterface = std::make_unique<SMSRecordInterface>(smsDB.get(),contactsDB.get());
+    threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(),contactsDB.get());
 
     return sys::ReturnCodes::Success;
 }

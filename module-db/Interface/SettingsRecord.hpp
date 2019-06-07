@@ -42,14 +42,14 @@ enum class SettingsRecordField{
 class SettingsRecordInterface : public RecordInterface<SettingsRecord,SettingsRecordField> {
 public:
 
-    SettingsRecordInterface();
+    SettingsRecordInterface(SettingsDB* db);
     ~SettingsRecordInterface();
 
     bool Update(const SettingsRecord& rec) override final;
     SettingsRecord GetByID(uint32_t id) override final;
 
 private:
-    std::unique_ptr<SettingsDB> settingsDB;
+    SettingsDB* settingsDB;
 };
 
 

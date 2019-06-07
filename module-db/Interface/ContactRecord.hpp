@@ -53,7 +53,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
 public:
 
-    ContactRecordInterface();
+    ContactRecordInterface(ContactsDB* db);
     ~ContactRecordInterface();
 
     bool Add(const ContactRecord &rec) override final;
@@ -72,7 +72,7 @@ public:
     GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str) override final;
 
 private:
-    std::unique_ptr<ContactsDB> contactDB;
+    ContactsDB* contactDB;
 };
 
 

@@ -127,6 +127,7 @@ public:
         LOG_ERROR("SettingsGet perf: %lu",cpp_freertos::Ticks::GetTicks()-timestamp1);
 
         ret.language = SettingsLanguage ::GERMAN;
+        ret.networkOperator = "MuditaConnectingPeople";
 
         DBServiceAPI::SettingsUpdate(this,ret);
 
@@ -174,9 +175,10 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 
     vfs.Init();
-    auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+    bool ret;
+    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
+    //ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 

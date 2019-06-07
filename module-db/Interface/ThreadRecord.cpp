@@ -13,8 +13,7 @@
 #include "SMSRecord.hpp"
 
 
-ThreadRecordInterface::ThreadRecordInterface() {
-    smsDB = std::make_unique<SmsDB>();
+ThreadRecordInterface::ThreadRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb): smsDB(smsDb),contactsDB(contactsDb) {
 }
 
 ThreadRecordInterface::~ThreadRecordInterface() {
@@ -42,7 +41,7 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id) {
         return false;
     }
 
-    SMSRecordInterface smsRecordInterface;
+    SMSRecordInterface smsRecordInterface(smsDB,contactsDB);
     return smsRecordInterface.RemoveByField(SMSRecordField::ThreadID,std::to_string(id).c_str());
 }
 

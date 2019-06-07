@@ -11,8 +11,7 @@
 
 #include "ContactRecord.hpp"
 
-ContactRecordInterface::ContactRecordInterface() {
-    contactDB = std::make_unique<ContactsDB>();
+ContactRecordInterface::ContactRecordInterface(ContactsDB* db) : contactDB(db) {
 }
 
 ContactRecordInterface::~ContactRecordInterface() {

@@ -15,6 +15,7 @@
 #include "Record.hpp"
 #include <stdint.h>
 #include "../Databases/SmsDB.hpp"
+#include "../Databases/ContactsDB.hpp"
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
@@ -40,7 +41,7 @@ enum class SMSRecordField{
 class SMSRecordInterface : public RecordInterface<SMSRecord,SMSRecordField > {
 public:
 
-    SMSRecordInterface();
+    SMSRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb);
     ~SMSRecordInterface();
 
     bool Add(const SMSRecord& rec) override final;
@@ -57,7 +58,9 @@ public:
 
 private:
     const uint32_t snippetLength = 45;
-    std::unique_ptr<SmsDB> smsDB;
+    SmsDB* smsDB;
+    ContactsDB* contactsDB;
+
 
 };
 

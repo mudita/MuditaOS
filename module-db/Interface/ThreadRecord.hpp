@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include "utf8/UTF8.hpp"
 #include "../Databases/SmsDB.hpp"
+#include "../Databases/ContactsDB.hpp"
 #include "../Common/Common.hpp"
 
 
@@ -36,7 +37,7 @@ enum class ThreadRecordField{
 class ThreadRecordInterface : public RecordInterface<ThreadRecord,ThreadRecordField>{
 public:
 
-    ThreadRecordInterface();
+    ThreadRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb);
     ~ThreadRecordInterface();
 
     bool Add(const ThreadRecord& rec) override final;
@@ -50,7 +51,8 @@ public:
 
     std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ThreadRecordField field, const char* str) override final;
 private:
-    std::unique_ptr<SmsDB> smsDB;
+   SmsDB* smsDB;
+   ContactsDB* contactsDB;
 
 };
 

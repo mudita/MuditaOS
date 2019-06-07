@@ -40,6 +40,9 @@ TEST_CASE("SMS Record tests")
     vfs.remove(ContactsDB::GetDBName());
     vfs.remove(SmsDB::GetDBName());
 
+    auto smsDB = std::make_unique<SmsDB>();
+    auto contactsDB = std::make_unique<ContactsDB>();
+
 
     const uint32_t dateTest = 123456789;
     const uint32_t dateSentTest = 987654321;
@@ -52,7 +55,7 @@ TEST_CASE("SMS Record tests")
     const SMSType typeTest = SMSType ::DRAFT;
 
 
-    SMSRecordInterface smsRecInterface;
+    SMSRecordInterface smsRecInterface(smsDB.get(),contactsDB.get());
 
     SMSRecord recordIN;
     recordIN.date = dateTest;
@@ -176,7 +179,7 @@ TEST_CASE("SMS Record tests")
     }
 
     // Remove sms records in order to check automatic management of threads and contact databases
-    ThreadRecordInterface threadRecordInterface;
+    ThreadRecordInterface threadRecordInterface(smsDB.get(),contactsDB.get());
     REQUIRE(smsRecInterface.RemoveByID(1));
     records = smsRecInterface.GetLimitOffsetByField(0,100,SMSRecordField::ContactID,"1");
     REQUIRE((*records).size() == 1);
