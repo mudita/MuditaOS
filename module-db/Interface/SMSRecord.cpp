@@ -13,8 +13,8 @@
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
 
-SMSRecordInterface::SMSRecordInterface() {
-    smsDB = std::make_unique<SmsDB>();
+SMSRecordInterface::SMSRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb): smsDB(smsDb),contactsDB(contactsDb) {
+
 }
 
 SMSRecordInterface::~SMSRecordInterface() {
@@ -25,7 +25,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
 
     uint32_t contactID = 0;
 
-    ContactRecordInterface contactInterface;
+    ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, rec.number.c_str());
 
     // Contact not found, create one
@@ -45,7 +45,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
 
     // Search for a thread with specified contactID
     uint32_t threadID =0;
-    ThreadRecordInterface threadInterface;
+    ThreadRecordInterface threadInterface(smsDB,contactsDB);
     auto threadRec = threadInterface.GetLimitOffsetByField(0, 1, ThreadRecordField::ContactID,
                                                            std::to_string(contactID).c_str());
 
@@ -117,7 +117,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
     }
 
 
-    ContactRecordInterface contactInterface;
+    ContactRecordInterface contactInterface(contactsDB);
     for(const auto &w : smses){
 
         auto contactRec = contactInterface.GetByID(w.contactID);
@@ -146,7 +146,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 
     auto records = std::make_unique<std::vector<SMSRecord>>();
 
-    ContactRecordInterface contactInterface;
+    ContactRecordInterface contactInterface(contactsDB);
     for(const auto &w : smses){
 
         auto contactRec = contactInterface.GetByID(w.contactID);
@@ -190,7 +190,7 @@ bool SMSRecordInterface::Update(const SMSRecord &rec) {
 
     // Update messages read count if necessary
     if(!sms.isRead && rec.isRead){
-        ThreadRecordInterface threadInterface;
+        ThreadRecordInterface threadInterface(smsDB,contactsDB);
         auto threadRec =   threadInterface.GetByID(sms.threadID);
         threadRec.msgRead--;
         threadInterface.Update(threadRec);
@@ -207,7 +207,7 @@ bool SMSRecordInterface::RemoveByID(uint32_t id) {
         return false;
     }
 
-    ThreadRecordInterface threadInterface;
+    ThreadRecordInterface threadInterface(smsDB,contactsDB);
     auto threadRec = threadInterface.GetByID(sms.threadID);
 
     // If thread not found
@@ -260,7 +260,7 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id) {
     auto sms = smsDB->sms.GetByID(id);
 
 
-    ContactRecordInterface contactInterface;
+    ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetByID(sms.contactID);
 
     return SMSRecord{

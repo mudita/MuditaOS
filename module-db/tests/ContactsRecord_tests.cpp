@@ -31,6 +31,8 @@ TEST_CASE("Contact Record tests")
 
     vfs.remove(ContactsDB::GetDBName());
 
+    auto contactDB = std::make_unique<ContactsDB>();
+
     const char* primaryNameTest = "PrimaryNameTest";
     const char* alternativeNameTest = "AlternativeNameTest";
     const char* numberUserTest = "111222333";
@@ -48,7 +50,7 @@ TEST_CASE("Contact Record tests")
     const ContactNumberType contactNumberTypeTest = ContactNumberType ::PAGER;
 
 
-    ContactRecordInterface contRecInterface;
+    ContactRecordInterface contRecInterface(contactDB.get());
 
     ContactRecord recordIN;
 

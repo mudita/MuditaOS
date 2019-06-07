@@ -12,8 +12,7 @@
 #include "SettingsRecord.hpp"
 
 
-SettingsRecordInterface::SettingsRecordInterface() {
-    settingsDB = std::make_unique<SettingsDB>();
+SettingsRecordInterface::SettingsRecordInterface(SettingsDB* db) : settingsDB(db) {
 }
 
 SettingsRecordInterface::~SettingsRecordInterface() {
