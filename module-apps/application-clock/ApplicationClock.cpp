@@ -128,8 +128,8 @@ void ApplicationClock::createUserInterface() {
 	minuteLabel->setText("05");
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	progressBar = new gui::Progress(clockWin, 480/2-30, 300-4, 60, 8 );
-	progressBar->setTotalProgress(59);
+	progressBar = new gui::Progress(clockWin, 480/2-60, 300-4, 120, 8 );
+	progressBar->setTotalProgress(120);
 	progressBar->setCurrentProgress(0);
 /*	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
 	rect->setFillColor( gui::ColorFullBlack );
@@ -169,7 +169,7 @@ bool ApplicationClock::incrementSecond(){
 		seconds = 0;
 		ret = true;
 	}
-	progressBar->setCurrentProgress(seconds);
+	progressBar->setCurrentProgress(seconds*2);
 
 	return ret;
 }

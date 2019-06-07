@@ -21,10 +21,10 @@
 #include "ServiceGUI.hpp"
 
 #include "..//gui/core/ImageManager.hpp"
-#include "GUIWorker.hpp"
 #include "log/log.hpp"
 
 #include "SystemManager/SystemManager.hpp"
+#include "WorkerGUI.hpp"
 
 namespace sgui {
 
@@ -35,7 +35,8 @@ ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t s
 		renderFrameCounter{ 1 },
 		transferedFrameCounter{ 0 },
 		screenWidth{ screenWidth },
-		screenHeight{ screenHeight } {
+		screenHeight{ screenHeight },
+		worker{nullptr} {
 
 	LOG_INFO("[ServiceGUI] Initializing");
 
@@ -75,6 +76,25 @@ void ServiceGUI::sendBuffer() {
 	einkReady = false;
 }
 
+void ServiceGUI::sendToRender() {
+	if( rendering )
+		return;
+
+	WorkerGUIBufferData* wgc = new WorkerGUIBufferData();
+	wgc->commandsCount = latestCommands.size();
+//	for (uint32_t i = 0; i != latestCommands.size(); ++i){
+//		wgc->commands.push_back( std::move(latestCommands[i]));
+//	}
+//
+//	latestCommands.clear();
+	wgc->context = renderContext;
+	worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), nullptr);
+
+
+	rendering = true;
+}
+
+
 // Invoked upon receiving data message
 sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
@@ -90,31 +110,50 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 
 				//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
-				std::vector<gui::DrawCommand*> commands;
+//				std::vector<gui::DrawCommand*> commands;
+//				for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
+//					commands.push_back( (*i).get() );
+
+				if( !latestCommands.empty())
+					latestCommands.clear();
+
+				//store commands in the latestCommands container
 				for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
-					commands.push_back( (*i).get() );
-				uint32_t start_tick = xTaskGetTickCount();
-				renderer.render( renderContext, commands );
-				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
+					latestCommands.push_back( std::move(*i));
 
-				//increment counter holding number of drawn frames
-				renderFrameCounter++;
-
-				if( einkReady ) {
+				if( (renderFrameCounter != transferedFrameCounter) &&
+					(!rendering) &&
+					einkReady) {
+					LOG_INFO("[ServiceGUI]Sending buffer");
 					sendBuffer();
 				}
-				else if( !requestSent ){
-					requestSent = true;
-					//request eink state
-					auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
-					sys::Bus::SendUnicast(msg, "ServiceEink", this);
+
+				//if worker is not rendering send him new set of commands
+				if( !rendering ) {
+					sendToRender();
 				}
+
+//				uint32_t start_tick = xTaskGetTickCount();
+//				renderer.render( renderContext, commands );
+//				uint32_t end_tick = xTaskGetTickCount();
+//				LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
 			}
 
 		} break;
-		case static_cast<uint32_t>( MessageType::GUIRenderingFinished ): {
-			//TODO implement worker and message handling
+		case static_cast<uint32_t>(MessageType::GUIRenderingFinished): {
+			LOG_INFO("Rendering finished");
+			//increment counter holding number of drawn frames
+			renderFrameCounter++;
+
+			if( einkReady ) {
+				sendBuffer();
+			}
+			else if( !requestSent ){
+				requestSent = true;
+				//request eink state
+				auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
+				sys::Bus::SendUnicast(msg, "ServiceEink", this);
+			}
 		}break;
 		case static_cast<uint32_t>( MessageType::GUIFocusInfo ): {
 
@@ -127,7 +166,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 			requestSent = false;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
-			if( renderFrameCounter != transferedFrameCounter ) {
+			if( (renderFrameCounter != transferedFrameCounter) && (!rendering) ) {
 				LOG_INFO("[ServiceGUI]Sending buffer");
 				sendBuffer();
 			}
@@ -152,6 +191,12 @@ void ServiceGUI::TickHandler(uint32_t id) {
 
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
+
+	//initialize keyboard worker
+	worker = new WorkerGUI( this );
+	std::list<sys::WorkerQueueInfo> list;
+	worker->init( list );
+	worker->run();
 
 	if( einkReady == false ) {
 		requestSent = true;
