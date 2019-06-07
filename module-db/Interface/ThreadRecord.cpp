@@ -10,12 +10,18 @@
 
 
 #include "ThreadRecord.hpp"
-#include "../Databases/SmsDB.hpp"
 #include "SMSRecord.hpp"
 
-bool ThreadRecordInterface::Add(const ThreadRecord &rec) {
-    auto smsDB = std::make_unique<SmsDB>();
 
+ThreadRecordInterface::ThreadRecordInterface() {
+    smsDB = std::make_unique<SmsDB>();
+}
+
+ThreadRecordInterface::~ThreadRecordInterface() {
+
+}
+
+bool ThreadRecordInterface::Add(const ThreadRecord &rec) {
     auto ret = smsDB->threads.Add(ThreadsTableRow{
             .date = rec.date,
             .msgCount=rec.msgCount,
@@ -30,7 +36,6 @@ bool ThreadRecordInterface::Add(const ThreadRecord &rec) {
 }
 
 bool ThreadRecordInterface::RemoveByID(uint32_t id) {
-    auto smsDB = std::make_unique<SmsDB>();
 
     auto ret = smsDB->threads.RemoveByID(id);
     if (ret == false) {
@@ -42,8 +47,6 @@ bool ThreadRecordInterface::RemoveByID(uint32_t id) {
 }
 
 bool ThreadRecordInterface::Update(const ThreadRecord &rec) {
-    auto smsDB = std::make_unique<SmsDB>();
-
     return smsDB->threads.Update(ThreadsTableRow{
             .ID = rec.dbID,
             .date = rec.date,
@@ -58,14 +61,11 @@ bool ThreadRecordInterface::Update(const ThreadRecord &rec) {
 }
 
 uint32_t ThreadRecordInterface::GetCount() {
-    auto smsDB = std::make_unique<SmsDB>();
 
     return smsDB->threads.GetCount();
 }
 
 std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto smsDB = std::make_unique<SmsDB>();
-
     auto records = std::make_unique<std::vector<ThreadRecord>>();
 
     auto ret = smsDB->threads.GetLimitOffset(offset, limit);
@@ -88,7 +88,6 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
                                                                                         ThreadRecordField field,
                                                                                         const char *str) {
-    auto smsDB = std::make_unique<SmsDB>();
     auto records = std::make_unique<std::vector<ThreadRecord>>();
 
     switch (field) {
@@ -115,7 +114,6 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 }
 
 ThreadRecord ThreadRecordInterface::GetByID(uint32_t id) {
-    auto smsDB = std::make_unique<SmsDB>();
 
     auto rec = smsDB->threads.GetByID(id);
 

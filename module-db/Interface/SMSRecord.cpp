@@ -13,6 +13,13 @@
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
 
+SMSRecordInterface::SMSRecordInterface() {
+    smsDB = std::make_unique<SmsDB>();
+}
+
+SMSRecordInterface::~SMSRecordInterface() {
+
+}
 
 bool SMSRecordInterface::Add(const SMSRecord &rec) {
 

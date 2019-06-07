@@ -40,6 +40,9 @@ enum class SMSRecordField{
 class SMSRecordInterface : public RecordInterface<SMSRecord,SMSRecordField > {
 public:
 
+    SMSRecordInterface();
+    ~SMSRecordInterface();
+
     bool Add(const SMSRecord& rec) override final;
     bool RemoveByID(uint32_t id) override final;
     bool RemoveByField(SMSRecordField field,const char* str) override final;
