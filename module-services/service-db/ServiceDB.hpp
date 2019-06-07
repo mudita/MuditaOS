@@ -15,8 +15,14 @@
 
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
+#include "Interface/SMSRecord.hpp"
+#include "Interface/ThreadRecord.hpp"
+#include "Interface/ContactRecord.hpp"
+#include "Interface/SettingsRecord.hpp"
 
 class ServiceDB: public sys::Service {
+private:
+    std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
 protected:
 
 public:

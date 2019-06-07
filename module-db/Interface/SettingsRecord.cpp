@@ -10,10 +10,17 @@
 
 
 #include "SettingsRecord.hpp"
-#include "../Databases/SettingsDB.hpp"
+
+
+SettingsRecordInterface::SettingsRecordInterface() {
+    settingsDB = std::make_unique<SettingsDB>();
+}
+
+SettingsRecordInterface::~SettingsRecordInterface() {
+
+}
 
 SettingsRecord SettingsRecordInterface::GetByID(uint32_t id) {
-    auto settingsDB = std::make_unique<SettingsDB>();
 
     auto rec = settingsDB->settings.GetByID(1);
 
@@ -37,7 +44,6 @@ SettingsRecord SettingsRecordInterface::GetByID(uint32_t id) {
 }
 
 bool SettingsRecordInterface::Update(const SettingsRecord &rec) {
-    auto settingsDB = std::make_unique<SettingsDB>();
 
     return settingsDB->settings.Update(SettingsTableRow{
         .ID = rec.dbID,

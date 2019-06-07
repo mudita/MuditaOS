@@ -14,6 +14,8 @@
 #define SQLITE_TEMP_STORE   3   //Temporary files. The user must configure SQLite to use in-memory temp files when using this VFS
 #define SQLITE_THREADSAFE   0   //Use serialized thread-safe mode. This is fully supported threading environment setting
 #define SQLITE_MEMDEBUG     0   //Not sure what exactly this do but without this SQLITE crashes
+#define SQLITE_OMIT_AUTOINIT 1  // If this is set user has to manually invoke sqlite3_initialize.
+#define SQLITE_DEFAULT_MEMSTATUS 0
 
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wsign-compare"

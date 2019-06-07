@@ -12,7 +12,7 @@
 #ifndef PUREPHONE_DBMESSAGE_HPP
 #define PUREPHONE_DBMESSAGE_HPP
 
-
+#include <memory>
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 #include "Interface/SettingsRecord.hpp"
@@ -41,8 +41,6 @@ public:
     virtual ~DBSettingsMessage() {}
 
     SettingsRecord record;
-    SettingsRecordInterface interface;
-
 };
 
 class DBSettingsResponseMessage: public DBResponseMessage {
