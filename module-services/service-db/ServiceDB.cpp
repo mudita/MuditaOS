@@ -41,6 +41,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
     switch (static_cast<MessageType >(msgl->messageType)) {
+
+        /*
+         * Settings record
+         */
         case MessageType::DBSettingsGet: {
             auto settingsRec = settingsRecordInterface->GetByID(1);
             responseMsg = std::make_shared<DBSettingsResponseMessage>(settingsRec,
@@ -55,6 +59,45 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
             responseMsg = std::make_shared<DBSettingsResponseMessage>(SettingsRecord{}, ret);
         }
             break;
+
+
+        /*
+         * SMS records
+         */
+
+        case MessageType ::DBSMSAdd:
+        {
+            DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
+            auto ret = smsRecordInterface->Add(msg->record);
+            responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
+        }
+        break;
+
+        case MessageType ::DBSMSRemove:
+        {
+            DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
+            auto ret = smsRecordInterface->RemoveByID(msg->id);
+            responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
+        }
+        break;
+
+        case MessageType ::DBSMSUpdate:
+        {
+            DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
+            auto ret = smsRecordInterface->Update(msg->record);
+            responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
+        }
+            break;
+
+        case MessageType ::DBSMSGetSMSLimitOffset:
+        {
+            DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
+
+            auto ret = smsRecordInterface->GetLimitOffset(msg->offset,msg->limit);
+            responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(ret), true);
+        }
+            break;
+
         default:
             // ignore this message
             return std::make_shared<sys::ResponseMessage>();

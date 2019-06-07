@@ -27,6 +27,11 @@ enum class MessageType {
 	DBSettingsGet,  // get current settings from database
 	DBSettingsUpdate,   // update settings
 
+	DBSMSAdd,   // Add new sms record
+	DBSMSRemove,    // Remove specified SMS record
+	DBSMSUpdate,     // Update specified SMS record
+	DBSMSGetSMSLimitOffset,  // Get SMS records by limit,offset
+
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
 	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
