@@ -118,14 +118,14 @@ void ApplicationClock::createUserInterface() {
 	hourLabel->setFilled( false );
 	hourLabel->setBorderColor( gui::ColorNoColor );
 	hourLabel->setFont("gt_pressura_regular_140");
-	hourLabel->setText("12");
+	hourLabel->setText("00");
 	hourLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	minuteLabel = new gui::Label(clockWin, 100,310,280,150);
 	minuteLabel->setFilled( false );
 	minuteLabel->setBorderColor( gui::ColorNoColor );
 	minuteLabel->setFont("gt_pressura_regular_140");
-	minuteLabel->setText("05");
+	minuteLabel->setText("00");
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	progressBar = new gui::Progress(clockWin, 480/2-30, 300-4, 60, 8 );
