@@ -11,12 +11,16 @@
 
 #include "ContactRecord.hpp"
 
-#include "../Databases/ContactsDB.hpp"
+ContactRecordInterface::ContactRecordInterface() {
+    contactDB = std::make_unique<ContactsDB>();
+}
+
+ContactRecordInterface::~ContactRecordInterface() {
+
+}
 
 
 bool ContactRecordInterface::Add(const ContactRecord& rec) {
-    auto contactDB = std::make_unique<ContactsDB>();
-
 
     bool ret = contactDB->contacts.Add(ContactsTableRow{.type=rec.contactType,
             .isOnWhitelist=rec.isOnBlacklist,
@@ -102,7 +106,6 @@ bool ContactRecordInterface::Add(const ContactRecord& rec) {
 }
 
 bool ContactRecordInterface::RemoveByID(uint32_t id) {
-    auto contactDB = std::make_unique<ContactsDB>();
 
     auto contact =  contactDB->contacts.GetByID(id);
     if(contact.ID == 0){
@@ -139,7 +142,6 @@ bool ContactRecordInterface::Update(const ContactRecord &rec) {
 
 ContactRecord ContactRecordInterface::GetByID(uint32_t id) {
 
-    auto contactDB = std::make_unique<ContactsDB>();
     ContactRecord rec;
 
     auto contact = contactDB->contacts.GetByID(id);
@@ -193,15 +195,12 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id) {
 }
 
 uint32_t ContactRecordInterface::GetCount() {
-    auto contactDB = std::make_unique<ContactsDB>();
 
     return contactDB->contacts.GetCount();
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
     auto records =  std::make_unique<std::vector<ContactRecord>>();
-
-    auto contactDB = std::make_unique<ContactsDB>();
 
     auto ret = contactDB->contacts.GetLimitOffset(offset,limit);
 
@@ -259,7 +258,6 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                                                                           ContactRecordField field,
                                                                                           const char *str) {
     auto records =  std::make_unique<std::vector<ContactRecord>>();
-    auto contactDB = std::make_unique<ContactsDB>();
 
     switch(field){
         case ContactRecordField ::PrimaryName:

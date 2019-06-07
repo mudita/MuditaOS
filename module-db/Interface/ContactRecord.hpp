@@ -13,6 +13,7 @@
 #define PUREPHONE_CONTACTRECORD_HPP
 
 #include "Record.hpp"
+#include "../Databases/ContactsDB.hpp"
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
@@ -52,6 +53,9 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
 public:
 
+    ContactRecordInterface();
+    ~ContactRecordInterface();
+
     bool Add(const ContactRecord &rec) override final;
 
     bool RemoveByID(uint32_t id) override final;
@@ -66,6 +70,9 @@ public:
 
     std::unique_ptr<std::vector<ContactRecord>>
     GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str) override final;
+
+private:
+    std::unique_ptr<ContactsDB> contactDB;
 };
 
 
