@@ -45,7 +45,6 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
 
     switch (static_cast<MessageType >(msgl->messageType)) {
         case MessageType::DBSettingsGet: {
-            DBSettingsMessage *msg = reinterpret_cast<DBSettingsMessage *>(msgl);
             auto settingsRec = settingsRecordInterface->GetByID(1);
             responseMsg = std::make_shared<DBSettingsResponseMessage>(settingsRec,
                                                                       settingsRec.dbID == 0 ? false : true);

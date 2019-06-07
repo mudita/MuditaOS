@@ -14,6 +14,7 @@
 
 #include "Record.hpp"
 #include <stdint.h>
+#include "../Databases/SmsDB.hpp"
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
@@ -53,6 +54,7 @@ public:
 
 private:
     const uint32_t snippetLength = 45;
+    std::unique_ptr<SmsDB> smsDB;
 
 };
 
