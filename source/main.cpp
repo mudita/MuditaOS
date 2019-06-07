@@ -121,12 +121,7 @@ public:
 
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
-        return std::make_shared<sys::ResponseMessage>( );
-    }
 
-    // Invoked when timer ticked
-    void TickHandler(uint32_t id) override{
-        LOG_DEBUG("Blinky service tick!");
         uint32_t timestamp1 = cpp_freertos::Ticks::GetTicks();
         auto ret = DBServiceAPI::SettingsGet(this);
         LOG_ERROR("SettingsGet perf: %lu",cpp_freertos::Ticks::GetTicks()-timestamp1);
@@ -136,6 +131,15 @@ public:
         DBServiceAPI::SettingsUpdate(this,ret);
 
         LOG_ERROR("Available heap: %lu",usermemGetFreeHeapSize());
+
+        return std::make_shared<sys::ResponseMessage>( );
+    }
+
+    // Invoked when timer ticked
+    void TickHandler(uint32_t id) override{
+        auto msg = std::make_shared<sys::DataMessage>(500);
+        sys::Bus::SendUnicast(msg,"Blinky",this);
+        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -170,14 +174,13 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 
     vfs.Init();
-
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
-    sysmgr->DestroyService(ServiceDB::serviceName,sysmgr);
+    //sysmgr->DestroyService(ServiceDB::serviceName,sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;

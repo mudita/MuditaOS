@@ -24,12 +24,8 @@ const char *ServiceDB::serviceName = "ServiceDB";
 
 
 ServiceDB::ServiceDB()
-        : sys::Service(serviceName, 1024 * 24, sys::ServicePriority::Low) {
+        : sys::Service(serviceName, 1024 * 24, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceDB] Initializing");
-
-    Database::Initialize();
-
-    settingsRecordInterface = std::make_unique<SettingsRecordInterface>();
 
 }
 
@@ -78,6 +74,10 @@ void ServiceDB::TickHandler(uint32_t id) {
 
 // Invoked during initialization
 sys::ReturnCodes ServiceDB::InitHandler() {
+
+    Database::Initialize();
+
+    settingsRecordInterface = std::make_unique<SettingsRecordInterface>();
 
     return sys::ReturnCodes::Success;
 }
