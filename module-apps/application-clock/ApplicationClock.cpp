@@ -117,29 +117,30 @@ void ApplicationClock::createUserInterface() {
 	uint32_t xOffset = 0;
 	uint32_t yOffset = 0;
 
-	hourLabel = new gui::Label(clockWin, 100,300-160,280,150);
+	hourLabel = new gui::Label(clockWin, 100+xOffset,300-160+yOffset,280,150);
 	hourLabel->setFilled( false );
 	hourLabel->setBorderColor( gui::ColorNoColor );
 	hourLabel->setFont("gt_pressura_regular_140");
 	hourLabel->setText("00");
 	hourLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	minuteLabel = new gui::Label(clockWin, 100,310,280,150);
+	minuteLabel = new gui::Label(clockWin, 100+xOffset,310+yOffset,280,150);
 	minuteLabel->setFilled( false );
 	minuteLabel->setBorderColor( gui::ColorNoColor );
 	minuteLabel->setFont("gt_pressura_regular_140");
 	minuteLabel->setText("00");
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	progressBar = new gui::Progress(clockWin, 480/2-90, 300-6, 180, 12 );
+	progressBar = new gui::Progress(clockWin, 480/2-90+xOffset, 300-6+yOffset, 180, 12 );
 	progressBar->setTotalProgress(59);
 	progressBar->setCurrentProgress(0);
 /*	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
 	rect->setFillColor( gui::ColorFullBlack );
 	rect->setFilled( true );*/
 
-	gui::Rect* rectCircle = new gui::Rect( clockWin, 10, 70, 460, 460 );
+	gui::Rect* rectCircle = new gui::Rect( clockWin, 0, 70+yOffset, 480, 480 );
 	rectCircle->setRadius(230);
+	rectCircle->setBorderColor( gui::ColorFullWhite );
 	rectCircle->setFilled( false );
 
 
