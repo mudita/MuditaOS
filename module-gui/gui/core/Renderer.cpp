@@ -106,70 +106,82 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	}
 
 	//get copy of original context using x,y of draw coordinates and original zie of the widget
-	Context* drawCtx = ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
 
-	//draw rectangle using provided flags
+	Context* drawCtx;
+	bool copyContext = false;
+	int16_t wgtX = 0,wgtY = 0;
+	uint16_t wgtW = cmd->areaW, wgtH=cmd->areaH;
+	//check if there is a need or making copy of context to use is as background
+	if( (cmd->areaW == cmd->w) && (cmd->areaH == cmd->h)) {
+		drawCtx = ctx;
+		wgtX = cmd->x;
+		wgtY = cmd->y;
+	}
+	else {
+		copyContext = true;
+		drawCtx= ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
+	}
 
 	//if rounding of corners is 0
 	if( cmd->radius == 0 ) {
 		//fill field inside the rectangle if fill flag is set
 		if( cmd->filled ) {
-			uint32_t offset = 0;
+			uint32_t offset = wgtY*drawCtx->getW() + wgtX;
 			for( int32_t y=0; y<cmd->areaH;y++) {
-				memset( drawCtx->getData()+offset, cmd->fillColor.intensivity, cmd->areaW );
-				offset += cmd->areaW;
+				memset( drawCtx->getData() + offset, cmd->fillColor.intensivity, wgtW );
+				offset += drawCtx->getW();
 			}
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP )
-			drawHorizontalLine( drawCtx, 0, 0, drawCtx->getW(), cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
+			drawHorizontalLine( drawCtx, wgtX, wgtY, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM )
-			drawHorizontalLine( drawCtx, 0, cmd->areaH-1, drawCtx->getW(), cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
+			drawHorizontalLine( drawCtx, wgtX, wgtY + cmd->areaH-1, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT )
-			drawVerticalLine( drawCtx, 0, 0, drawCtx->getH(), cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT );
+			drawVerticalLine( drawCtx, wgtX, wgtY, wgtH, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_RIGHT )
-			drawVerticalLine( drawCtx, cmd->areaW, 0, drawCtx->getH(), cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT );
+			drawVerticalLine( drawCtx, wgtX + cmd->areaW, wgtY, wgtH, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT );
 	}
 	else {
 
 		//calculate centers of circle for all corners
-		int16_t xcTopRight = cmd->w - cmd->radius;
-		int16_t xcTopLeft = cmd->radius;
-		int16_t xcBottomRight = xcTopRight;
-		int16_t xcBottomLeft = xcTopLeft;
+		int16_t xcTopRight = wgtX+cmd->w - cmd->radius;
+		int16_t xcTopLeft = wgtX+cmd->radius;
+		int16_t xcBottomRight = wgtX+xcTopRight;
+		int16_t xcBottomLeft = wgtX+xcTopLeft;
 
-		int16_t ycTopRight = cmd->radius+1;
-		int16_t ycTopLeft = cmd->radius+1;
-		int16_t ycBottomRight = cmd->h - cmd->radius -1;
-		int16_t ycBottomLeft = cmd->h - cmd->radius -1;
+		int16_t ycTopRight = wgtY+cmd->radius+1;
+		int16_t ycTopLeft = wgtY+cmd->radius+1;
+		int16_t ycBottomRight = wgtY+cmd->h - cmd->radius -1;
+		int16_t ycBottomLeft = wgtY+cmd->h - cmd->radius -1;
 
 		int x = cmd->radius, y = 0;
 
 		//top right corner
 		if( (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT) &&
 			!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT))	{
-			drawHorizontalLine( drawCtx, xcTopRight + x - cmd->penWidth, ycTopRight - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
-			drawVerticalLine( drawCtx, xcTopRight + y, ycTopRight - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+			drawHorizontalLine( drawCtx, wgtX + xcTopRight + x - cmd->penWidth, wgtY + ycTopRight - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+			drawVerticalLine( drawCtx, wgtX +xcTopRight + y, wgtY + ycTopRight - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 		}
 
 		//bottom right corner
 		if( (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_RIGHT) &&
 			!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT))	{
-			drawHorizontalLine( drawCtx, xcBottomRight + x - cmd->penWidth, ycBottomRight + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
-			drawVerticalLine( drawCtx, xcBottomRight - y, ycBottomRight + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+			drawHorizontalLine( drawCtx, wgtX + xcBottomRight + x - cmd->penWidth, wgtY + ycBottomRight + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+			drawVerticalLine( drawCtx, wgtX + xcBottomRight - y, wgtY + ycBottomRight + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 		}
 
 		//upper left corner
 		if( (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT) &&
 			!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT))	{
-			drawHorizontalLine( drawCtx, xcTopLeft - x, ycTopLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
-			drawVerticalLine( drawCtx, xcTopLeft + y + 1, ycTopLeft - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+			drawHorizontalLine( drawCtx, wgtX + xcTopLeft - x, wgtY + ycTopLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+			drawVerticalLine( drawCtx, wgtX + xcTopLeft + y + 1, wgtY + ycTopLeft - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 		}
 
 		//Lower left corner
 		if( (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT) &&
 			!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT))	{
-			drawHorizontalLine( drawCtx, xcBottomLeft - x, ycBottomLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
-			drawVerticalLine( drawCtx, xcBottomLeft + y + 1, ycBottomLeft + x + 1 - cmd->penWidth, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+			drawHorizontalLine( drawCtx, wgtX + xcBottomLeft - x, wgtY + ycBottomLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+			drawVerticalLine( drawCtx, wgtX + xcBottomLeft + y + 1, wgtY + ycBottomLeft + x + 1 - cmd->penWidth, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 		}
 
 		// Initialising the value of P
@@ -201,9 +213,9 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 				}
 				else { //classic rounded corner
-					drawHorizontalLine( drawCtx, xcTopRight + x - cmd->penWidth, ycTopRight - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, wgtX+xcTopRight + x - cmd->penWidth, wgtY+ycTopRight - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					if (x != y)
-						drawVerticalLine( drawCtx, xcTopRight + y, ycTopRight - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+						drawVerticalLine( drawCtx, wgtX+xcTopRight + y, wgtY+ycTopRight - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 
@@ -214,9 +226,9 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 				}
 				else { //classic rounded corner
-					drawHorizontalLine( drawCtx, xcBottomRight + x - cmd->penWidth, ycBottomRight + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, wgtX+xcBottomRight + x - cmd->penWidth, wgtY+ycBottomRight + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					if (x != y)
-						drawVerticalLine( drawCtx, xcBottomRight + y, ycBottomRight + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+						drawVerticalLine( drawCtx, wgtX+xcBottomRight + y, wgtY+ycBottomRight + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 
@@ -227,9 +239,9 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 					void drawText( Context* ctx, CommandText* cmd );
 				}
 				else { //classic rounded corner
-					drawHorizontalLine( drawCtx, xcTopLeft - x, ycTopLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, wgtX+xcTopLeft - x, wgtY+ycTopLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					if (x != y)
-						drawVerticalLine( drawCtx, xcTopLeft - y + 1, ycTopLeft - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+						drawVerticalLine( drawCtx, wgtX+xcTopLeft - y + 1, wgtY+ycTopLeft - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 
@@ -240,9 +252,9 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 				}
 				else { //classic rounded corner
-					drawHorizontalLine( drawCtx, xcBottomLeft - x, ycBottomLeft + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, wgtX+xcBottomLeft - x, wgtY+ycBottomLeft + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					if (x != y)
-						drawVerticalLine( drawCtx, xcBottomLeft - y + 1, ycBottomLeft + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+						drawVerticalLine( drawCtx, wgtX+xcBottomLeft - y + 1, wgtY+ycBottomLeft + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 		}
@@ -250,36 +262,40 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		//render edges between corners
 		int16_t xe, ye,le;
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP ) {
-			xe = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
-			ye = 0;
-			le = drawCtx->getW() - xe - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
+			xe = wgtX+cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
+			ye = wgtY;
+			le = wgtW - xe - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
 			drawHorizontalLine( drawCtx, xe, ye, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM ) {
-			xe = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
-			ye = drawCtx->getH()-1;
-			le = drawCtx->getW() - xe - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+			xe = wgtX+cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+			ye = wgtH-1;
+			le = wgtW - xe - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
 			drawHorizontalLine( drawCtx, xe, ye, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
 		}
 
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT ) {
 			xe = 0;
 			ye = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ));
-			le = drawCtx->getH() - ye - cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+			le = wgtH - ye - cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
 			drawVerticalLine( drawCtx, xe, ye, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT );
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_RIGHT ) {
 			xe = cmd->areaW;
 			ye = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ));
-			le = drawCtx->getH() - ye - cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+			le = wgtH - ye - cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
 			drawVerticalLine( drawCtx, xe, ye, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT );
 		}
 	}
-	//reinsert drawCtx into bast context
-	ctx->insert( cmd->x, cmd->y, drawCtx );
 
-	//remove draw context
-	delete drawCtx;
+	//if drawing was performed in temporary context
+	if( copyContext) {
+		//reinsert drawCtx into bast context
+		ctx->insert( cmd->x, cmd->y, drawCtx );
+		//remove draw context
+		delete drawCtx;
+	}
+
 }
 
 void Renderer::drawChar( Context* context, const int16_t x, const int16_t y,
@@ -308,7 +324,18 @@ void Renderer::drawText( Context* ctx, CommandText* cmd ) {
 		return;
 	}
 
-	//get copy of original context using x,y of draw coordinates and original size of the widget
+//	Context* drawCtx;
+//	bool copyContext = false;
+//	//check if there is a need or making copy of context to use is as background
+//	if( (cmd->areaW == cmd->w) && (cmd->areaH == cmd->h)) {
+//		drawCtx = ctx;
+//	}
+//	//get copy of original context using x,y of draw coordinates and original size of the widget
+//	else {
+//		copyContext = true;
+//		drawCtx= ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
+//	}
+
 	Context* drawCtx = ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
 
 	//retrieve font used to draw text
@@ -364,7 +391,8 @@ void Renderer::drawText( Context* ctx, CommandText* cmd ) {
 	ctx->insert( cmd->x, cmd->y, drawCtx );
 
 	//remove draw context
-	delete drawCtx;
+//	if( copyContext )
+		delete drawCtx;
 }
 
 void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
