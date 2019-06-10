@@ -7,6 +7,8 @@
 
 //module-applications
 #include  "application-clock/ApplicationClock.hpp"
+#include  "application-viewer/ApplicationViewer.hpp"
+#include "application-test/ApplicationTest.hpp"
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
@@ -147,11 +149,6 @@ public:
 
 int SystemStart(sys::SystemManager* sysmgr)
 {
-    //TODO:M.P remove it, only for test purposes
-   // bsp::keyboard keyboard;
-   // keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
-
-
     vfs.Init();
 
     auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
@@ -164,6 +161,10 @@ int SystemStart(sys::SystemManager* sysmgr)
     //launcher for clock application
     std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
     applications.push_back( std::move(clockLauncher) );
+
+    //launcher for viewer application
+	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
+	applications.push_back( std::move(viewerLauncher) );
 
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );

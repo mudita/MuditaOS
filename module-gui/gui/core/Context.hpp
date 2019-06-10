@@ -21,7 +21,7 @@ protected:
 	uint8_t* data;
 public:
 	Context();
-	Context( uint16_t width, uint16_t height );
+	Context( uint16_t width, uint16_t height, uint8_t* buffer = nullptr );
 	virtual ~Context();
 
 	/**

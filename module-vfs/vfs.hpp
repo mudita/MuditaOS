@@ -80,6 +80,13 @@ public:
 
     std::vector<DirectoryEntry> listdir(const char* path);
 
+    /**
+     * @brief Reads line of text from opened file.
+     * @note Returns string with line of text starting from the current file pointer position. Function ends with the /r /n or 0 sign.
+     * Function checks if after /r there is /n if so it reads both signs.
+     */
+    std::string getline( FILE* stream, uint32_t length = 1024 );
+
 private:
 
     const char* eMMC_USER_DISK_NAME	= "/sys";
