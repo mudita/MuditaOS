@@ -18,6 +18,7 @@
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "Interface/ContactRecord.hpp"
 
 
 class DBMessage: public sys::DataMessage {
@@ -34,11 +35,11 @@ public:
 
 class DBResponseMessage: public sys::ResponseMessage {
 public:
-    DBResponseMessage(uint32_t retCode) : sys::ResponseMessage(),retCode(retCode) {};
+    DBResponseMessage(uint32_t retCode,uint32_t count) : sys::ResponseMessage(),retCode(retCode),count(count) {};
     virtual ~DBResponseMessage() {};
 
     uint32_t retCode;
-
+    uint32_t count;
 };
 
 class DBSettingsMessage : public DBMessage{
@@ -53,7 +54,7 @@ public:
 
 class DBSettingsResponseMessage: public DBResponseMessage {
 public:
-    DBSettingsResponseMessage(const SettingsRecord& rec,uint32_t retCode=0) : DBResponseMessage(retCode),record(rec){};
+    DBSettingsResponseMessage(const SettingsRecord& rec,uint32_t retCode=0,uint32_t count = 0) : DBResponseMessage(retCode,count),record(rec){};
     virtual ~DBSettingsResponseMessage() {};
 
     SettingsRecord record;
@@ -71,7 +72,7 @@ public:
 
 class DBSMSResponseMessage: public DBResponseMessage {
 public:
-    DBSMSResponseMessage(std::unique_ptr<std::vector<SMSRecord>> rec,uint32_t retCode=0) : DBResponseMessage(retCode),records(std::move(rec)){};
+    DBSMSResponseMessage(std::unique_ptr<std::vector<SMSRecord>> rec,uint32_t retCode=0,uint32_t count=0) : DBResponseMessage(retCode,count),records(std::move(rec)){};
     virtual ~DBSMSResponseMessage() {};
 
     std::unique_ptr<std::vector<SMSRecord>> records;
@@ -89,10 +90,28 @@ public:
 
 class DBThreadResponseMessage: public DBResponseMessage {
 public:
-    DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0) : DBResponseMessage(retCode),records(std::move(rec)){};
+    DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0,uint32_t count=0) : DBResponseMessage(retCode,count),records(std::move(rec)){};
     virtual ~DBThreadResponseMessage() {};
 
     std::unique_ptr<std::vector<ThreadRecord>> records;
+};
+
+class DBContactMessage : public DBMessage{
+public:
+    DBContactMessage(MessageType messageType,const ContactRecord& rec = ContactRecord{}): DBMessage(messageType),record(rec){
+
+    }
+    virtual ~DBContactMessage() {}
+
+    ContactRecord record;
+};
+
+class DBContactResponseMessage: public DBResponseMessage {
+public:
+    DBContactResponseMessage(std::unique_ptr<std::vector<ContactRecord>> rec,uint32_t retCode=0,uint32_t  count=0) : DBResponseMessage(retCode,count),records(std::move(rec)){};
+    virtual ~DBContactResponseMessage() {};
+
+    std::unique_ptr<std::vector<ContactRecord>> records;
 };
 
 #endif //PUREPHONE_DBMESSAGE_HPP

@@ -122,14 +122,38 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
 
-        uint32_t timestamp1 = cpp_freertos::Ticks::GetTicks();
         auto ret = DBServiceAPI::SettingsGet(this);
-        LOG_ERROR("SettingsGet perf: %lu",cpp_freertos::Ticks::GetTicks()-timestamp1);
 
         ret.language = SettingsLanguage ::GERMAN;
         ret.networkOperator = "MuditaConnectingPeople";
 
         DBServiceAPI::SettingsUpdate(this,ret);
+
+/*        DBServiceAPI::SMSAdd(this,SMSRecord{
+            .number="444333222",
+            .body="Test sms",
+            .type=SMSType ::OUTBOX
+        });
+
+        DBServiceAPI::SMSAdd(this,SMSRecord{
+                .number="444333222",
+                .body="Test sms2",
+                .type=SMSType ::OUTBOX
+        });
+
+        DBServiceAPI::SMSAdd(this,SMSRecord{
+                .number="444333222",
+                .body="Test sms3",
+                .type=SMSType ::OUTBOX
+        });
+
+        DBServiceAPI::SMSAdd(this,SMSRecord{
+                .number="444333222",
+                .body="Test sms4",
+                .type=SMSType ::OUTBOX
+        });*/
+
+        auto records = DBServiceAPI::SMSGetLimitOffset(this,0,4);
 
         LOG_ERROR("Available heap: %lu",usermemGetFreeHeapSize());
 
@@ -176,8 +200,8 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     vfs.Init();
     bool ret;
-    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
+    //ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+    //ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     //ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
@@ -186,11 +210,11 @@ int SystemStart(sys::SystemManager* sysmgr)
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
     //launcher for clock application
-    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
-    applications.push_back( std::move(clockLauncher) );
+    //std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
+    //applications.push_back( std::move(clockLauncher) );
 
     //start application manager
-    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+    //ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;
@@ -199,12 +223,32 @@ int SystemStart(sys::SystemManager* sysmgr)
     return 0;
 }
 
+#include <chrono>
 
 int main() {
 
 	LOG_PRINTF("Launching PurePhone..\n");
 
     bsp::BoardInit();
+
+/*
+    Database::Initialize();
+
+    SmsDB smsDatabase;
+    ContactsDB contactDatabase;
+    SMSRecordInterface smsRecordInterface(&smsDatabase,&contactDatabase);
+
+    auto stamp = std::chrono::system_clock::now();
+
+    while(1){
+        stamp = std::chrono::system_clock::now();
+        auto records = smsRecordInterface.GetLimitOffset(0,4);
+        std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-stamp;
+        std::cout << "Time: " <<  elapsed_seconds.count()<< "\n";
+    }
+*/
+
+
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 

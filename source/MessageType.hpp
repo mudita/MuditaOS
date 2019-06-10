@@ -36,6 +36,12 @@ enum class MessageType {
 	DBThreadRemove,     // Remove thread by ID
 	DBThreadGetLimitOffset, // Get Thread record by limit,offset
 
+	DBContactAdd,       // Add contact record
+	DBContactRemove,    // Remove contact remove
+	DBContactUpdate,    // Update contact remove
+	DBContactGetLimitOffset,   // Get contact records by limit,offset
+	DBContactGetCount,         // Get contacts count
+
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
