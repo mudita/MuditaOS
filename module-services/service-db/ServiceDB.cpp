@@ -136,6 +136,19 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
         }
             break;
 
+        case MessageType::DBSMSGetSMSLimitOffsetByThreadID: {
+            DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = smsRecordInterface->GetLimitOffsetByField(msg->offset, msg->limit,SMSRecordField::ThreadID,std::to_string(msg->id).c_str());
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBSMSGetSMSLimitOffsetByThreadID time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(ret), true);
+        }
+            break;
+
 
         /**
          * Thread records

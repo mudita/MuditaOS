@@ -106,6 +106,23 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffset(sys::Ser
     }
 }
 
+std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffsetByThreadID(sys::Service *serv, uint32_t offset,
+                                                                                  uint32_t limit, uint32_t id) {
+    std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSGetSMSLimitOffsetByThreadID);
+    msg->offset = offset;
+    msg->limit = limit;
+    msg->id = id;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBSMSResponseMessage* smsResponse = reinterpret_cast<DBSMSResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true)){
+        return std::move(smsResponse->records);
+    }
+    else{
+        return std::make_unique<std::vector<SMSRecord>>();
+    }
+}
+
 ThreadRecord DBServiceAPI::ThreadGet(sys::Service *serv,uint32_t id) {
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGet);
     msg->id = id;
