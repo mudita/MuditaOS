@@ -24,6 +24,9 @@
 #include "GUIWorker.hpp"
 #include "log/log.hpp"
 
+extern "C"
+#include "module-os/memory/usermem.h"
+
 #include "SystemManager/SystemManager.hpp"
 
 namespace sgui {
@@ -65,14 +68,15 @@ void ServiceGUI::sendBuffer() {
 	auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
 			transferContext->getW(),
 			transferContext->getH(),
+			(mode==gui::RefreshModes::GUI_REFRESH_DEEP?true:false),
 			transferContext->getData()
-
 	);
-	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this, 500);
+	einkReady = false;
+	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this,2000);
 	if( ret.first == sys::ReturnCodes::Success ) {
 		transferedFrameCounter = renderFrameCounter;
 	}
-	einkReady = false;
+
 }
 
 // Invoked upon receiving data message
@@ -87,6 +91,12 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		case static_cast<uint32_t>( MessageType::GUICommands ): {
 			auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
 			if( !dmsg->commands.empty() ) {
+
+				//update mode
+				if( dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP ) {
+					mode = dmsg->mode;
+				}
+
 				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 
 				//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
@@ -110,6 +120,8 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 					auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
 					sys::Bus::SendUnicast(msg, "ServiceEink", this);
 				}
+				uint32_t mem = usermemGetFreeHeapSize();
+				LOG_WARN( "Heap Memory: %d", mem );
 			}
 
 		} break;
@@ -125,6 +137,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("[ServiceGUI]Display ready");
 			einkReady = true;
 			requestSent = false;
+			//mode = gui::RefreshModes::GUI_REFRESH_FAST;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
 			if( renderFrameCounter != transferedFrameCounter ) {

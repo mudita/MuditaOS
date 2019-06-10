@@ -10,8 +10,10 @@
 //module-gui
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/Item.hpp"
+#include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/BoxLayout.hpp"
+#include "gui/core/ImageManager.hpp"
 //module-utils
 #include "log/log.hpp"
 //module-services
@@ -138,10 +140,13 @@ void ApplicationClock::createUserInterface() {
 	rect->setFillColor( gui::ColorFullBlack );
 	rect->setFilled( true );*/
 
-	gui::Rect* rectCircle = new gui::Rect( clockWin, 0, 70+yOffset, 480, 480 );
-	rectCircle->setRadius(230);
-	rectCircle->setBorderColor( gui::ColorFullWhite );
-	rectCircle->setFilled( false );
+//	gui::Rect* rectCircle = new gui::Rect( clockWin, 10, 70+yOffset, 460, 460 );
+//	rectCircle->setRadius(230);
+//	rectCircle->setFilled( false );
+
+	gui::Image* img1 = new gui::Image(clockWin,0,0,0,0);
+	uint16_t id = gui::ImageManager::getInstance().getImageMapID("screen1.vpi");
+	img1->setImageWithID( id );
 
 
 	windows.insert(std::pair<std::string,gui::Window*>(clockWin->getName(), clockWin));
