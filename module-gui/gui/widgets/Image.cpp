@@ -14,13 +14,13 @@
 
 namespace gui {
 
-Image::Image() : Rect(), pixMap { nullptr } {
+Image::Image() : Rect(), imageMap { nullptr } {
 	type = ItemType::IMAGE;
 }
 
 Image::Image( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const UTF8 imageName ) :
 	Rect( parent, x, y, w, h ),
-	pixMap { nullptr }{
+	imageMap { nullptr }{
 	type = ItemType::IMAGE;
 
 	setPosition(x, y);
@@ -34,14 +34,17 @@ Image::~Image() {
 bool Image::setImageWithID( int id ) {
 
 	//get pixmap for selected ID
-	pixMap = ImageManager::getInstance().getImageMap( id );
+	imageMap = ImageManager::getInstance().getImageMap( id );
 
 	//set height and width and max and min dimensions
-	uint16_t pixMapWidth = pixMap->getWidth();
-	uint16_t pixMapHeight = pixMap->getHeight();
+	uint16_t imageMapWidth = imageMap->getWidth();
+	uint16_t imageMapHeight = imageMap->getHeight();
 
-	minWidth = maxWidth = widgetArea.w = pixMapWidth;
-	minHeight = maxHeight = widgetArea.h = pixMapHeight;
+	drawArea.w = imageMapWidth;
+	drawArea.h = imageMapHeight;
+
+	minWidth = maxWidth = widgetArea.w = imageMapWidth;
+	minHeight = maxHeight = widgetArea.h = imageMapHeight;
 
 	return true;
 }
@@ -74,7 +77,7 @@ std::list<DrawCommand*> Image::buildDrawList() {
 	img->areaW = img->w;
 	img->areaH = img->h;
 
-	img->imageID = this->pixMap->getID();
+	img->imageID = this->imageMap->getID();
 
 	commands.push_back( img );
 

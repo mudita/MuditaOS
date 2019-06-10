@@ -124,3 +124,32 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
 
     return dir_list;
 }
+
+std::string vfs::getline( FILE* stream, uint32_t length ) {
+
+	uint32_t currentPosition = ftell(stream);
+
+	//allocate memory to read number of signs defined by length param. Size of buffer is increased by 1 to add string's null terminator.
+	char* buffer = (char*)malloc( length + 1 );
+
+	if( buffer == NULL )
+		return std::string("");
+
+	memset( buffer, 0, length + 1);
+
+	uint32_t bytesRead = fread( buffer, 1, length, stream );
+
+	//search buffer for /n sign
+	for( uint32_t i =0 ; i<bytesRead; ++i ) {
+		if( buffer[i] == 0x0A ) {
+			buffer[i] = 0;
+			fseek( stream, currentPosition + i + 1, SEEK_SET );
+			break;
+		}
+	}
+
+	std::string ret = std::string(buffer);
+	free( buffer );
+
+	return ret;
+}

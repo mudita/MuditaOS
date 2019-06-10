@@ -57,14 +57,13 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			"press time: %d, release time %d", static_cast<int>(msg->keyCode),
 			static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
 
-	if( (msg->keyCode == bsp::KeyCodes::NumericKeyAst) || (msg->keyCode == bsp::KeyCodes::NumericKeyPnd))
-	{
-		auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
-		message->keyCode = msg->keyCode;
-		message->keyState = msg->keyState;
+	auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
+	message->keyCode = msg->keyCode;
+	message->keyState = msg->keyState;
 
-		sys::Bus::SendUnicast(message, "ApplicationClock", this);
-	}
+//		sys::Bus::SendUnicast(message, "ApplicationClock", this);
+	sys::Bus::SendUnicast(message, "ApplicationViewer", this);
+//		sys::Bus::SendBroadcast(message, this);
 	return std::make_shared<sys::ResponseMessage>();
 }
 
