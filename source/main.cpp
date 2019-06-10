@@ -155,6 +155,12 @@ public:
 
         auto records = DBServiceAPI::SMSGetLimitOffset(this,0,4);
 
+        auto threads = DBServiceAPI::ThreadGetLimitOffset(this,0,4);
+
+        auto contacts = DBServiceAPI::ContactGetLimitOffset(this,0,4);
+
+        auto smsthread = DBServiceAPI::SMSGetLimitOffsetByThreadID(this,0,4,2);
+
         LOG_ERROR("Available heap: %lu",usermemGetFreeHeapSize());
 
         return std::make_shared<sys::ResponseMessage>( );
@@ -231,8 +237,7 @@ int main() {
 
     bsp::BoardInit();
 
-/*
-    Database::Initialize();
+/*    Database::Initialize();
 
     SmsDB smsDatabase;
     ContactsDB contactDatabase;
@@ -242,11 +247,10 @@ int main() {
 
     while(1){
         stamp = std::chrono::system_clock::now();
-        auto records = smsRecordInterface.GetLimitOffset(0,4);
+        auto records = smsRecordInterface.GetLimitOffset(0,100);
         std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-stamp;
         std::cout << "Time: " <<  elapsed_seconds.count()<< "\n";
-    }
-*/
+    }*/
 
 
 
