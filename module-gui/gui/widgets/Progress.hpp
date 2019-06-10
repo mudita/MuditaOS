@@ -21,7 +21,7 @@ protected:
 	//rectangle used to draw thin line.
 	gui::Rect* thinRect;
 	//rectangle used to draw thick line.
-	gui::Rect* thickRect;
+	gui::Rect* fillRect;
 
 	/**
 	 * Creates local widgets
