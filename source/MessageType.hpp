@@ -32,6 +32,11 @@ enum class MessageType {
 	DBSMSUpdate,     // Update specified SMS record
 	DBSMSGetSMSLimitOffset,  // Get SMS records by limit,offset
 
+	DBThreadGet,        // Get thread by ID
+	DBThreadRemove,     // Remove thread by ID
+	DBThreadGetLimitOffset, // Get Thread record by limit,offset
+
+
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
 	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
