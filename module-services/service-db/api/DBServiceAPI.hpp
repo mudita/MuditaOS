@@ -16,6 +16,7 @@
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "Interface/ContactRecord.hpp"
 
 class DBServiceAPI {
 
@@ -31,6 +32,13 @@ public:
     static ThreadRecord ThreadGet(sys::Service* serv,uint32_t id);
     static bool ThreadRemove(sys::Service* serv,uint32_t id);
     static std::unique_ptr<std::vector<ThreadRecord>> ThreadGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+
+    static bool ContactAdd(sys::Service* serv,const ContactRecord& rec);
+    static bool ContactRemove(sys::Service* serv,uint32_t id);
+    static bool ContactUpdate(sys::Service* serv,const ContactRecord& rec);
+    static uint32_t ContactGetCount(sys::Service* serv);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+
 
 };
 
