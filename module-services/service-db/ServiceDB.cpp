@@ -61,42 +61,70 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
 
-        /*
-         * SMS records
-         */
+            /*
+             * SMS records
+             */
 
-        case MessageType ::DBSMSAdd:
-        {
+        case MessageType::DBSMSAdd: {
             DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
             auto ret = smsRecordInterface->Add(msg->record);
             responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
         }
-        break;
+            break;
 
-        case MessageType ::DBSMSRemove:
-        {
+        case MessageType::DBSMSRemove: {
             DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
             auto ret = smsRecordInterface->RemoveByID(msg->id);
             responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
         }
-        break;
+            break;
 
-        case MessageType ::DBSMSUpdate:
-        {
+        case MessageType::DBSMSUpdate: {
             DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
             auto ret = smsRecordInterface->Update(msg->record);
             responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
         }
             break;
 
-        case MessageType ::DBSMSGetSMSLimitOffset:
-        {
+        case MessageType::DBSMSGetSMSLimitOffset: {
             DBSMSMessage *msg = reinterpret_cast<DBSMSMessage *>(msgl);
 
-            auto ret = smsRecordInterface->GetLimitOffset(msg->offset,msg->limit);
+            auto ret = smsRecordInterface->GetLimitOffset(msg->offset, msg->limit);
             responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(ret), true);
         }
             break;
+
+
+        /**
+         * Thread records
+         */
+
+        case MessageType::DBThreadGet: {
+            DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
+
+            auto ret = threadRecordInterface->GetByID(msg->id);
+            auto records = std::make_unique<std::vector<ThreadRecord>>();
+            records->push_back(ret);
+            responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.dbID == 0 ? false : true);
+        }
+            break;
+
+        case MessageType::DBThreadRemove: {
+            DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
+
+            auto ret = threadRecordInterface->RemoveByID(msg->id);
+            responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, ret);
+        }
+            break;
+
+        case MessageType::DBThreadGetLimitOffset: {
+            DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
+
+            auto ret = threadRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+            responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(ret), true);
+        }
+            break;
+
 
         default:
             // ignore this message
@@ -124,8 +152,8 @@ sys::ReturnCodes ServiceDB::InitHandler() {
     // Create record interfaces
     settingsRecordInterface = std::make_unique<SettingsRecordInterface>(settingsDB.get());
     contactRecordInterface = std::make_unique<ContactRecordInterface>(contactsDB.get());
-    smsRecordInterface = std::make_unique<SMSRecordInterface>(smsDB.get(),contactsDB.get());
-    threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(),contactsDB.get());
+    smsRecordInterface = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
+    threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
 
     return sys::ReturnCodes::Success;
 }

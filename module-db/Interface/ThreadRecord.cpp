@@ -115,6 +115,9 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
 ThreadRecord ThreadRecordInterface::GetByID(uint32_t id) {
 
     auto rec = smsDB->threads.GetByID(id);
+    if(rec.ID == 0){
+        return ThreadRecord{};
+    }
 
     return ThreadRecord{
             .dbID = rec.ID,

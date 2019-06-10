@@ -15,6 +15,7 @@
 #include "Service/Bus.hpp"
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/SMSRecord.hpp"
+#include "Interface/ThreadRecord.hpp"
 
 class DBServiceAPI {
 
@@ -24,7 +25,12 @@ public:
 
     static bool SMSAdd(sys::Service* serv,const SMSRecord& rec);
     static bool SMSRemove(sys::Service* serv,uint32_t id);
-    static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(uint32_t offset,uint32_t limit);
+    static bool SMSUpdate(sys::Service* serv,const SMSRecord& rec);
+    static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+
+    static ThreadRecord ThreadGet(sys::Service* serv,uint32_t id);
+    static bool ThreadRemove(sys::Service* serv,uint32_t id);
+    static std::unique_ptr<std::vector<ThreadRecord>> ThreadGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
 
 };
 
