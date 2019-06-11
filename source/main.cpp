@@ -189,6 +189,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
+#if 0 // TODO: Robert please clean it up
     //launcher for clock application
     std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
     applications.push_back( std::move(clockLauncher) );
@@ -196,6 +197,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     //launcher for viewer application
 	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
 	applications.push_back( std::move(viewerLauncher) );
+#endif
 
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );

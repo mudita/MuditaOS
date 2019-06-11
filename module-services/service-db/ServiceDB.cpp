@@ -235,7 +235,6 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
         case MessageType::DBContactGetCount: {
-            DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1
             timestamp = cpp_freertos::Ticks::GetTicks();
 #endif
