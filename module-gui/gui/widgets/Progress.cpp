@@ -10,7 +10,7 @@
 namespace gui {
 
 Progress::Progress() : Rect() {
-	setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+	//setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 	createWidgets();
 }
 
@@ -18,20 +18,23 @@ Progress::Progress( Item* parent, const uint32_t& x, const uint32_t& y, const ui
 	Rect( parent, x, y, w, h ),
 	total{0},
 	current{0} {
-	setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+	//setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+	setFillColor( Color{0, 0});
+	setPenWidth(1);
 	createWidgets();
 	updateDrawArea();
 }
 
 void Progress::createWidgets() {
-	//thin line occpy 20% of the height of the parent
-	thinRect = new gui::Rect( this, 0, 2*widgetArea.h/5, widgetArea.w, widgetArea.h/5 );
+	//thin rect is bar border
+	//thinRect = new gui::Rect( this, 0, 0, widgetArea.w , widgetArea.h  );
 
 	//thick rect is rounded, filled and occupy total height of parent widget
-	thickRect = new gui::Rect( this, 0, 0, 0, widgetArea.h );
-	thickRect->setRadius(widgetArea.h/2-1);
-	thickRect->setFilled(true);
-	thickRect->setFillColor( Color{0, 0});
+	fillRect = new gui::Rect( this, 0, 0, 0, widgetArea.h );
+	//fillRect->setRadius(widgetArea.h/2-1);
+	fillRect->setFilled(true);
+	fillRect->setFillColor( Color{0, 0});
+	//Rect::setRadius(widgetArea.h/2);
 }
 
 void Progress::updateProgress() {
@@ -39,9 +42,9 @@ void Progress::updateProgress() {
     float thickWidth = 0.0f;
     if( total )
         thickWidth = current*width/total;
-    if( thickWidth < 2*thickRect->radius )
-    	thickWidth = 2*thickRect->radius+1;
-    thickRect->setSize( static_cast<int>(thickWidth), thickRect->widgetArea.h );
+    if( thickWidth < 2*fillRect->radius )
+    	thickWidth = 2*fillRect->radius+1;
+    fillRect->setSize( static_cast<int>(thickWidth), fillRect->widgetArea.h );
 }
 
 void Progress::setTotalProgress( int value ) {
@@ -77,22 +80,33 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 		return commands;
 	}
 
-	std::list<DrawCommand*> childrenCommands = Item::buildDrawList();
+	//std::list<DrawCommand*> childrenCommands = Item::buildDrawList();
 	std::list<DrawCommand*> baseCommands = gui::Rect::buildDrawList();
+	auto it = baseCommands.begin();
+	it ++;
+	commands.splice(commands.end(), baseCommands, it);
+	commands.splice(commands.end(), baseCommands);
 
-	if( !baseCommands.empty() )
-		commands.insert( commands.end(), baseCommands.begin(), baseCommands.end());
 
-	if( !childrenCommands.empty() )
-		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
+	//if( !childrenCommands.empty() )
+//		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
+/*	if( !baseCommands.empty() )
+		commands.insert( commands.end(), baseCommands.begin(), baseCommands.end());*/
 
+/*	if( !baseCommands.empty() )
+	{
+		commands.emplace_back(  baseCommands.back());
+		baseCommands.pop_back();
+		commands.emplace_back(  baseCommands.back());
+	//	commands.emplace_back(  baseCommands.begin());
+	}*/
 	return commands;
 }
 
 bool Progress::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
-	thinRect->setSize(newDim.w, newDim.h/5);
-	thinRect->setPosition(0, 2*newDim.h/5);
-	thickRect->setSize(newDim.w, newDim.h);
+/*	thinRect->setSize(newDim.w, newDim.h/5);
+	thinRect->setPosition(0, 2*newDim.h/5);*/
+	fillRect->setSize(newDim.w, newDim.h);
 	updateProgress();
 	return true;
 }

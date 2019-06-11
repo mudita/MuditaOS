@@ -216,10 +216,13 @@ namespace bsp {
 
 
     void BoardInit(){
+
         PINMUX_InitBootPins();
+        //Power_SW_Init();
 
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
+
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
         BOARD_InitDMA();
