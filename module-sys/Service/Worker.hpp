@@ -24,8 +24,8 @@ public:
 };
 
 struct WorkerCommand {
-	uint32_t command;
-	uint32_t* data;
+	uint32_t command = 0;
+	uint32_t* data = NULL;
 };
 
 /*

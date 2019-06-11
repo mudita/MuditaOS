@@ -7,6 +7,10 @@
 
 #include <memory>
 
+//module-os
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 //module-gui
 #include "gui/core/Font.hpp"
 #include "gui/core/Context.hpp"
@@ -39,6 +43,7 @@ ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t s
 		transferedFrameCounter{ 0 },
 		screenWidth{ screenWidth },
 		screenHeight{ screenHeight },
+		semCommands{ NULL },
 		worker{nullptr} {
 
 	LOG_INFO("[ServiceGUI] Initializing");
@@ -78,24 +83,15 @@ void ServiceGUI::sendBuffer() {
 		transferedFrameCounter = renderFrameCounter;
 	}
 
+	 mode = gui::RefreshModes::GUI_REFRESH_FAST;
+
 }
 
 void ServiceGUI::sendToRender() {
-	if( rendering )
-		return;
-
-	WorkerGUIBufferData* wgc = new WorkerGUIBufferData();
-	wgc->commandsCount = latestCommands.size();
-//	for (uint32_t i = 0; i != latestCommands.size(); ++i){
-//		wgc->commands.push_back( std::move(latestCommands[i]));
-//	}
-//
-//	latestCommands.clear();
-	wgc->context = renderContext;
-	worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), nullptr);
-
 
 	rendering = true;
+
+	worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
 }
 
 
@@ -119,23 +115,12 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
 				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 
-				//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
-//				std::vector<gui::DrawCommand*> commands;
-//				for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
-//					commands.push_back( (*i).get() );
-
-				if( !latestCommands.empty())
-					latestCommands.clear();
-
-				//store commands in the latestCommands container
-				for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
-					latestCommands.push_back( std::move(*i));
-
-				if( (renderFrameCounter != transferedFrameCounter) &&
-					(!rendering) &&
-					einkReady) {
-					LOG_INFO("[ServiceGUI]Sending buffer");
-					sendBuffer();
+				//lock access to commands vector, clear it and then copy commands from message to vector
+				if( xSemaphoreTake( semCommands, pdMS_TO_TICKS(1000) ) == pdTRUE ) {
+					commands.clear();
+					for (auto it = dmsg->commands.begin(); it != dmsg->commands.end(); it++)
+						commands.push_back(std::move(*it));
+					xSemaphoreGive( semCommands );
 				}
 
 				//if worker is not rendering send him new set of commands
@@ -143,10 +128,6 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 					sendToRender();
 				}
 
-//				uint32_t start_tick = xTaskGetTickCount();
-//				renderer.render( renderContext, commands );
-//				uint32_t end_tick = xTaskGetTickCount();
-//				LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
 				uint32_t mem = usermemGetFreeHeapSize();
 				LOG_WARN( "Heap Memory: %d", mem );
 			}
@@ -155,7 +136,10 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		case static_cast<uint32_t>(MessageType::GUIRenderingFinished): {
 			LOG_INFO("Rendering finished");
 			//increment counter holding number of drawn frames
-			renderFrameCounter++;
+			rendering = false;
+
+			//copy render buffer to transfer buffer using semaphore to protect data
+			//gui service is locking semaphore, makes a copy and then sends message to eink
 
 			if( einkReady ) {
 				sendBuffer();
@@ -195,17 +179,25 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
 // Invoked when timer ticked
 void ServiceGUI::TickHandler(uint32_t id) {
-	if( einkReady == false ) {
-		ReloadTimer( timer_id );
-		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
-		sys::Bus::SendUnicast(msg, "ServiceEink", this);
-	}
+//	if( einkReady == false ) {
+//		ReloadTimer( timer_id );
+//		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
+//		sys::Bus::SendUnicast(msg, "ServiceEink", this);
+//	}
 }
 
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
 
-	//initialize keyboard worker
+	//create semaphore to protect vector with commands waiting for rendering
+	semCommands = xSemaphoreCreateBinary();
+	if( semCommands == NULL ) {
+		LOG_FATAL("Failed to create commands semaphore.");
+		return sys::ReturnCodes::Failure;
+	}
+	xSemaphoreGive( semCommands );
+
+	//initialize gui worker
 	worker = new WorkerGUI( this );
 	std::list<sys::WorkerQueueInfo> list;
 	worker->init( list );
@@ -213,7 +205,7 @@ sys::ReturnCodes ServiceGUI::InitHandler() {
 
 	if( einkReady == false ) {
 		requestSent = true;
-		ReloadTimer( timer_id );
+//		ReloadTimer( timer_id );
 		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
 		sys::Bus::SendUnicast(msg, "ServiceEink", this);
 	}
@@ -221,6 +213,11 @@ sys::ReturnCodes ServiceGUI::InitHandler() {
 }
 
 sys::ReturnCodes ServiceGUI::DeinitHandler() {
+
+	if( semCommands != NULL )
+		vSemaphoreDelete( semCommands );
+	semCommands = NULL;
+
 	return sys::ReturnCodes::Success;
 }
 

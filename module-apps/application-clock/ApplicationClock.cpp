@@ -28,7 +28,7 @@ namespace app {
 ApplicationClock::ApplicationClock(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
 	Application( name, stackDepth, priority ) {
 
-	timer_id = CreateTimer(1000,true);
+	timer_id = CreateTimer(250,true);
 	ReloadTimer(timer_id);
 
 }
@@ -50,12 +50,10 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
 				incrementHour();
 				updateLabels();
-				//render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyPnd ) {
 				incrementMinute();
 				updateLabels();
-				//render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 		}
 	}
@@ -136,18 +134,6 @@ void ApplicationClock::createUserInterface() {
 	progressBar = new gui::Progress(clockWin, 480/2-90+xOffset, 300-6+yOffset, 180, 12 );
 	progressBar->setTotalProgress(59);
 	progressBar->setCurrentProgress(0);
-/*	gui::Rect* rect = new gui::Rect( clockWin, 480/2-30, 300-4, 60, 8 );
-	rect->setFillColor( gui::ColorFullBlack );
-	rect->setFilled( true );*/
-
-//	gui::Rect* rectCircle = new gui::Rect( clockWin, 10, 70+yOffset, 460, 460 );
-//	rectCircle->setRadius(230);
-//	rectCircle->setFilled( false );
-
-	gui::Image* img1 = new gui::Image(clockWin,0,0,0,0);
-	uint16_t id = gui::ImageManager::getInstance().getImageMapID("screen1.vpi");
-	img1->setImageWithID( id );
-
 
 	windows.insert(std::pair<std::string,gui::Window*>(clockWin->getName(), clockWin));
 }
@@ -178,7 +164,7 @@ bool ApplicationClock::incrementSecond(){
 		seconds = 0;
 		ret = true;
 	}
-	progressBar->setCurrentProgress(seconds*2);
+	progressBar->setCurrentProgress(seconds);
 
 	return ret;
 }
