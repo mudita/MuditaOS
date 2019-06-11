@@ -32,7 +32,7 @@ extern "C"
 namespace sgui {
 
 ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
-		: sys::Service(name, 4096, sys::ServicePriority::High),
+		: sys::Service(name, 4096, sys::ServicePriority::Idle),
 		renderContext{ nullptr },
 		transferContext { nullptr },
 		renderFrameCounter{ 1 },

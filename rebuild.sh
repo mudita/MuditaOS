@@ -2,6 +2,7 @@
 
 BUILD_DIR="build"
 ASSETS_DIR="assets"
+DB_DIR="db"
 
 #if there is no build directory create one
 if [ ! -d "$BUILD_DIR" ]; then
@@ -12,6 +13,7 @@ fi
 cd "$BUILD_DIR"
 rm -rf *
 mkdir -p "sys/$ASSETS_DIR"
+mkdir -p "sys/$DB_DIR"
 
 #if module-gui directory is present try to copy assets to build directory
 MODULE_GUI_DIR="../module-gui"

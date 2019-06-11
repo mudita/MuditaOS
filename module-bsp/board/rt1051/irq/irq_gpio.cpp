@@ -96,7 +96,6 @@ namespace bsp {
 
             // Clear all IRQs
             GPIO_PortClearInterruptFlags(GPIO2, irq_mask);
-            uint32_t test = GPIO_GetPinsInterruptFlags(GPIO2);
 
             // Switch context if necessary
             portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);

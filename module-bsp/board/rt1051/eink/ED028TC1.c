@@ -613,7 +613,7 @@ int16_t EinkGetTemperatureInternal()
     // First byte of the temp describes the integer part of the temperature in degrees Celsius
     int8_t temperatureInteger  =    temp[0];
     // The MSB bit of the second byte describes the fraction of the temperature. Bit value of 1 means .5 degree Celsius, bit value of 0 means .0 degree Celsius
-    int8_t temperatureFraction =    ((temp[1] & 0x80) >> 7);
+    //int8_t temperatureFraction =    ((temp[1] & 0x80) >> 7);
 
     return temperatureInteger;
 }

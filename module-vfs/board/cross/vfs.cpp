@@ -137,13 +137,13 @@ std::string vfs::getline( FILE* stream, uint32_t length ) {
 
 	memset( buffer, 0, length + 1);
 
-	uint32_t bytesRead = fread( buffer, 1, length, stream );
+	uint32_t bytesRead = ff_fread( buffer, 1, length, stream );
 
 	//search buffer for /n sign
 	for( uint32_t i =0 ; i<bytesRead; ++i ) {
 		if( buffer[i] == 0x0A ) {
 			buffer[i] = 0;
-			fseek( stream, currentPosition + i + 1, SEEK_SET );
+			ff_fseek( stream, currentPosition + i + 1, SEEK_SET );
 			break;
 		}
 	}

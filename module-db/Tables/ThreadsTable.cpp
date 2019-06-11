@@ -12,7 +12,7 @@
 #include "ThreadsTable.hpp"
 
 
-ThreadsTable::ThreadsTable(Database* db):db(db){
+ThreadsTable::ThreadsTable(Database *db) : Table(db) {
 }
 
 ThreadsTable::~ThreadsTable() {
@@ -21,11 +21,11 @@ ThreadsTable::~ThreadsTable() {
 
 bool ThreadsTable::Create() {
     // Create necessary tables
-    if(db->Execute(createTableQuery) == false) return false;
-    if(db->Execute(createTableThreadsCounterQuery)) return false;
-    if(db->Execute(threadsCounterInsertionQuery)) return false;
-    if(db->Execute(threadInsertTriggerQuery)) return false;
-    if(db->Execute(threadRemoveTriggerQuery)) return false;
+    if (db->Execute(createTableQuery) == false) return false;
+    if (db->Execute(createTableThreadsCounterQuery)) return false;
+    if (db->Execute(threadsCounterInsertionQuery)) return false;
+    if (db->Execute(threadInsertTriggerQuery)) return false;
+    if (db->Execute(threadRemoveTriggerQuery)) return false;
 
     return true;
 }
@@ -33,7 +33,7 @@ bool ThreadsTable::Create() {
 bool ThreadsTable::Add(ThreadsTableRow entry) {
 
     return db->Execute(
-            "INSERT INTO threads ( date, msg_count, read, contact_id, snippet, last_dir ) VALUES ( %lu, 0, 0, %lu, '%s', %lu );",
+            "INSERT or ignore INTO threads ( date, msg_count, read, contact_id, snippet, last_dir ) VALUES ( %lu, 0, 0, %lu, '%s', %lu );",
             entry.date,
             entry.contactID,
             entry.snippet.c_str(),
@@ -61,7 +61,7 @@ bool ThreadsTable::Update(ThreadsTableRow entry) {
 ThreadsTableRow ThreadsTable::GetByID(uint32_t id) {
     auto retQuery = db->Query("SELECT * FROM threads WHERE _id= %u;", id);
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ThreadsTableRow();
     }
 
@@ -78,10 +78,10 @@ ThreadsTableRow ThreadsTable::GetByID(uint32_t id) {
 std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
 
     auto retQuery = db->Query("SELECT * from threads ORDER BY date LIMIT %lu OFFSET %lu;",
-                             limit,
-                             offset);
+                              limit,
+                              offset);
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
     }
 
@@ -101,13 +101,30 @@ std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint3
     return ret;
 }
 
-std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field,
-                                                                   uint32_t id) {
-    auto retQuery = db->Query("SELECT * from threads WHERE %s=%lu ORDER BY date LIMIT %lu OFFSET %lu;",
-                             field,
-                             id,
-                             limit,
-                             offset);
+std::vector<ThreadsTableRow>
+ThreadsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ThreadsTableFields field, const char *str) {
+
+    std::string fieldName;
+    switch (field) {
+        case ThreadsTableFields::Date:
+            fieldName = "date";
+            break;
+        case ThreadsTableFields::MsgCount:
+            fieldName = "msg_count";
+            break;
+        case ThreadsTableFields ::ContactID:
+            fieldName = "contact_id";
+            break;
+        default:
+            return std::vector<ThreadsTableRow>();
+
+    }
+
+    auto retQuery = db->Query("SELECT * from threads WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
+                              limit,
+                              offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();
@@ -141,7 +158,7 @@ uint32_t ThreadsTable::GetCount() {
 }
 
 uint32_t ThreadsTable::GetCountByFieldID(const char *field, uint32_t id) {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM threads WHERE %s=%u;",field,id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM threads WHERE %s=%u;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

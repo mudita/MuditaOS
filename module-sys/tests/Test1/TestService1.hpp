@@ -36,7 +36,7 @@ class TestServiceDataMessage : public sys::DataMessage{
 public:
 
     TestServiceDataMessage(TestServiceDataMessageType type):
-        DataMessage(),
+        DataMessage(static_cast<uint32_t >(0)),
         type(type){
 
     }

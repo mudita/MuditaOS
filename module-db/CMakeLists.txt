@@ -30,6 +30,7 @@ set(SOURCES
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/ContactsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SmsDB.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SettingsDB.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
@@ -39,11 +40,13 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsNumberTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsRingtonesTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsAddressTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SettingsTable.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ContactRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ThreadRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SettingsRecord.cpp
 
         )
 
@@ -67,7 +70,6 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
-set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3.c PROPERTIES COMPILE_FLAGS -Wno-overflow)
 set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Database/sqlite3vfs.cpp PROPERTIES COMPILE_FLAGS -Wno-overflow)
 
 target_compile_definitions(${PROJECT_NAME}
@@ -85,7 +87,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-vfs module-utils)
+target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
 
 # Host target configuration(mainly used for unit testing)
 

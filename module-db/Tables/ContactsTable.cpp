@@ -12,7 +12,7 @@
 #include "ContactsTable.hpp"
 
 
-ContactsTable::ContactsTable(Database* db):db(db){
+ContactsTable::ContactsTable(Database *db) : Table(db) {
 }
 
 ContactsTable::~ContactsTable() {
@@ -25,7 +25,7 @@ bool ContactsTable::Create() {
 
 bool ContactsTable::Add(ContactsTableRow entry) {
     return db->Execute(
-            "insert into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, blacklist, favourites, speeddial ) VALUES (%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, %lu);",
+            "insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, blacklist, favourites, speeddial ) VALUES (%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, %lu);",
             entry.nameID,
             entry.numbersID.c_str(),
             entry.ringID,
@@ -61,20 +61,20 @@ bool ContactsTable::Update(ContactsTableRow entry) {
 ContactsTableRow ContactsTable::GetByID(uint32_t id) {
     auto retQuery = db->Query("SELECT * FROM contacts WHERE _id= %lu;", id);
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ContactsTableRow();
     }
 
     return ContactsTableRow{(*retQuery)[0].GetUInt32(),  // ID
-                       (*retQuery)[1].GetUInt32(),    // nameID
-                       (*retQuery)[2].GetString(),    // numbersID
-                       (*retQuery)[3].GetUInt32(),    // ringID
-                       (*retQuery)[4].GetString(),    // addressID
-                       static_cast<ContactType >((*retQuery)[5].GetUInt32()),    // type
-                       (*retQuery)[6].GetBool(),    // is on whitelist
-                       (*retQuery)[7].GetBool(),      // is on blacklist
-                       (*retQuery)[8].GetBool(),      // is on favourites
-                       (*retQuery)[9].GetUInt32(),      // speed dial key
+                            (*retQuery)[1].GetUInt32(),    // nameID
+                            (*retQuery)[2].GetString(),    // numbersID
+                            (*retQuery)[3].GetUInt32(),    // ringID
+                            (*retQuery)[4].GetString(),    // addressID
+                            static_cast<ContactType >((*retQuery)[5].GetUInt32()),    // type
+                            (*retQuery)[6].GetBool(),    // is on whitelist
+                            (*retQuery)[7].GetBool(),      // is on blacklist
+                            (*retQuery)[8].GetBool(),      // is on favourites
+                            (*retQuery)[9].GetUInt32(),      // speed dial key
     };
 }
 
@@ -83,7 +83,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
                               limit,
                               offset);
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 
@@ -106,11 +106,21 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
     return ret;
 }
 
-std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field,
-                                                                     uint32_t id) {
-    auto retQuery = db->Query("SELECT * from contacts WHERE %s=%lu ORDER BY name_id LIMIT %lu OFFSET %lu;",
-                              field,
-                              id,
+std::vector<ContactsTableRow>
+ContactsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactTableFields field, const char *str) {
+
+    std::string fieldName;
+    switch(field){
+        case ContactTableFields ::SpeedDial:
+            fieldName="speeddial";
+            break;
+        default:
+            return std::vector<ContactsTableRow>();
+    }
+
+    auto retQuery = db->Query("SELECT * from contacts WHERE %s='%s' ORDER BY name_id LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
                               limit,
                               offset);
 
@@ -148,7 +158,7 @@ uint32_t ContactsTable::GetCount() {
 }
 
 uint32_t ContactsTable::GetCountByFieldID(const char *field, uint32_t id) {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %s=%lu;",field,id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %s=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
