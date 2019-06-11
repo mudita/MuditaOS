@@ -84,7 +84,7 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//search for application with specified name and run it
 	//TODO name of the app should be Homescreen but for tests is is "ApplicationClock"
-	std::string runAppName = "ApplicationViewer";
+	std::string runAppName = "ApplicationClock";
 
 	auto it = applications.find(runAppName);
 	if( it!= applications.end()){

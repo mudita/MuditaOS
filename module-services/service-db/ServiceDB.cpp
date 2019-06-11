@@ -35,6 +35,10 @@ ServiceDB::ServiceDB()
 
 ServiceDB::~ServiceDB() {
 
+    settingsDB.reset();
+    contactsDB.reset();
+    smsDB.reset();
+
     Database::Deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
 }
