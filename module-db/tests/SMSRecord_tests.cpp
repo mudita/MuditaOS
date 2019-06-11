@@ -212,4 +212,7 @@ TEST_CASE("SMS Record tests")
     REQUIRE(smsRecInterface.RemoveByField(SMSRecordField::ContactID,"1"));
     REQUIRE(smsRecInterface.GetCount()==0);
 
+
+    Database::Deinitialize();
+
 }
