@@ -68,6 +68,11 @@ void Rect::setCorners( RectangleCornerFlags corners ) {
 	this->corners = corners;
 }
 
+void Rect::setFlat( RectangleFlatFlags flats)
+{
+	this->flatEdges = flats;
+}
+
 void Rect::setFilled( bool val ) {
 	filled = val;
 }

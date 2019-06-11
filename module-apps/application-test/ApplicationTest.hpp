@@ -38,7 +38,7 @@ public:
 };
 class ApplicationTestLauncher : public ApplicationLauncher {
 public:
-	ApplicationTestLauncher() : ApplicationLauncher("ApplicationTest", true) {};
+	ApplicationTestLauncher() : ApplicationLauncher("ApplicationClock", true) {};
 	bool run(sys::SystemManager* sysmgr) override {
 		return sysmgr->CreateService(std::make_shared<app::ApplicationTest>(name),sysmgr,1000);
 	};

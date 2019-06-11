@@ -177,7 +177,6 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		while (x > y)
 		{
 			y++;
-
 			// Mid-point is inside or on the perimeter
 			if (P <= 0)
 				P = P + 2*y + 1;
@@ -187,8 +186,9 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 			{
 				x--;
 				P = P + 2*y - 2*x + 1;
-			}
 
+			}
+			std::cout << "P: " << P  << std::endl;
 			// All the perimeter points have already been printed
 			if (x < y)
 				break;
@@ -204,6 +204,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 					drawHorizontalLine( drawCtx, xcTopRight + x - cmd->penWidth, ycTopRight - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					if (x != y)
 						drawVerticalLine( drawCtx, xcTopRight + y, ycTopRight - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+						//drawVerticalLine( drawCtx, xcTopRight + y, ycTopRight - x, 25, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 
@@ -227,6 +228,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 					void drawText( Context* ctx, CommandText* cmd );
 				}
 				else { //classic rounded corner
+					int cornerWidth = xcBottomRight - xcBottomLeft + 2*x - cmd->penWidth;
+					drawHorizontalLine( drawCtx, xcTopLeft - x , ycTopLeft - y, cornerWidth, 1, cmd->fillColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					drawHorizontalLine( drawCtx, xcTopLeft - x, ycTopLeft - y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					if (x != y)
 						drawVerticalLine( drawCtx, xcTopLeft - y + 1, ycTopLeft - x, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
@@ -237,12 +240,20 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 			if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT) {
 				//corner is sharp
 				if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT) {
-
+					int cornerWidth = cmd->w - xcBottomLeft + x - cmd->penWidth;
+					drawHorizontalLine( drawCtx, 0 , ycBottomLeft + y, cornerWidth, 1, cmd->fillColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 				}
 				else { //classic rounded corner
+					int cornerWidth = xcBottomRight - xcBottomLeft + 2*x - cmd->penWidth;
+					std::cout << "x: " << x  << " y: " << y << " corner width: " << cornerWidth << " cmd->w " << cmd->w  << std::endl;
+					drawHorizontalLine( drawCtx, xcBottomLeft - x , ycBottomLeft + y, cornerWidth, 1, cmd->fillColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
 					drawHorizontalLine( drawCtx, xcBottomLeft - x, ycBottomLeft + y, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
-					if (x != y)
+
+					if (x != y){
 						drawVerticalLine( drawCtx, xcBottomLeft - y + 1, ycBottomLeft + x - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+						drawHorizontalLine( drawCtx, xcBottomLeft - x , ycBottomLeft + y, cornerWidth, 1, cmd->fillColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+
+					}
 				}
 			}
 		}
