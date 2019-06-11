@@ -23,7 +23,7 @@ namespace app{
 ApplicationTest::ApplicationTest(std::string name, uint32_t stackDepth, sys::ServicePriority priority) :
 		Application( name, stackDepth, priority ){
 
-	timer_id = CreateTimer(100, true);
+	timer_id = CreateTimer(1000, true);
 	ReloadTimer(timer_id);
 }
 
@@ -43,7 +43,7 @@ void ApplicationTest::TickHandler(uint32_t id){
 	static uint32_t progress;
 
 	progress++;
-	bar->setCurrentProgress(progress % 100);
+	/*bar->setCurrentProgress(progress % 100);*/
 	render(gui::RefreshModes::GUI_REFRESH_FAST );
 }
 // Invoked during initialization
@@ -76,12 +76,19 @@ void ApplicationTest::createUserInterface(){
 	clockWin->setSize( 480, 600 );
 	windows.insert(std::pair<std::string,gui::Window*>(clockWin->getName(), clockWin));
 
-	rectangle = new gui::Rect(clockWin,190, 250, 100, 100);
+	gui::Color color;
+	color.alpha = 0;
+	color.intensivity = 5;
+
+	rectangle = new gui::Rect(clockWin,290, 150, 100, 100);
 	rectangle->setPenWidth(5);
+	rectangle->setFillColor(color);
+	rectangle->setFilled(true);
 	rectangle->setPosition(90, 250);
 	rectangle->setMaxSize(100, 100);
 	rectangle->setRadius(25);
-	rect = new gui::Rect(rectangle, 10, 10, 80, 80);
+	rectangle->setFlat(gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT | gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT) ;
+/*	rect = new gui::Rect(rectangle, 10, 10, 80, 80);
 
 	gui::Color color;
 	color.alpha = 0;
@@ -95,13 +102,13 @@ void ApplicationTest::createUserInterface(){
 	color.alpha = 0;
 	color.intensivity = 15;
 	rect2->setFillColor(color);
-	rect2->setFilled(true);
+	rect2->setFilled(true);*/
 
 
-	bar = new gui::Progress(clockWin, 40, 50, 400, 70);
+	/*bar = new gui::Progress(clockWin, 40, 50, 400, 70);
 	bar->setTotalProgress(100);
-	bar->setCurrentProgress(/*progress % 150*/50);
-
+	bar->setCurrentProgress(progress % 15050);
+*/
 }
 void ApplicationTest::destroyUserInterface(){
 

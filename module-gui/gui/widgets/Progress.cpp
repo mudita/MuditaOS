@@ -31,10 +31,10 @@ void Progress::createWidgets() {
 
 	//thick rect is rounded, filled and occupy total height of parent widget
 	fillRect = new gui::Rect( this, 0, 0, 0, widgetArea.h );
-	//fillRect->setRadius(widgetArea.h/2-1);
+	fillRect->setRadius(widgetArea.h/2-1);
 	fillRect->setFilled(true);
-	fillRect->setFillColor( Color{0, 0});
-	//Rect::setRadius(widgetArea.h/2);
+	fillRect->setFillColor( Color{5, 0});
+	Rect::setRadius(widgetArea.h/2);
 }
 
 void Progress::updateProgress() {

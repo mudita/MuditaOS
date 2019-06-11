@@ -163,12 +163,12 @@ int SystemStart(sys::SystemManager* sysmgr)
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
     //launcher for clock application
-    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
-    applications.push_back( std::move(clockLauncher) );
+/*    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
+    applications.push_back( std::move(clockLauncher) );*/
 
     //launcher for test application
     std::unique_ptr<app::ApplicationLauncher> testLauncher = std::unique_ptr<app::ApplicationTestLauncher>(new app::ApplicationTestLauncher());
-    applications.push_back( std::move(clockLauncher) );
+    applications.push_back( std::move(testLauncher) );
 
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
