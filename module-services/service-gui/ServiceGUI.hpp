@@ -48,6 +48,7 @@ protected:
 	//previous commands are removed.
 	std::vector<std::unique_ptr<gui::DrawCommand>> latestCommands;
 	uint32_t timer_id= 0;
+	gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_DEEP;
 
 	WorkerGUI* worker;
 

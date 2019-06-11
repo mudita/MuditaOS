@@ -61,39 +61,6 @@ static void s_EinkServiceDMAMemcpyCallback(edma_handle_t *handle, void *param, b
     }
 }
 
-//void EinkWorkerFunction( void * params )
-//{
-//	ServiceEink* service = reinterpret_cast<ServiceEink*>( params );
-//	LOG_INFO("Eink worker thread started");
-//
-//	QueueSetMemberHandle_t activeMember;
-//	uint32_t command;
-//	while( service->getWorkerLoop() ) {
-//
-//		activeMember = xQueueSelectFromSet( service->getQueueSet(), portMAX_DELAY);
-//		//message from service
-//		if (activeMember == service->getWorkerQueue() ) {
-//			xQueueReceive( activeMember, &command, 0);
-//			if( command == static_cast<uint32_t>(EinkWorkerCommands::Initialize)) {
-//				LOG_INFO("Received command: Initialize");
-//				EinkMemcpyDmaInit( s_EinkServiceDMAMemcpyCallback );
-//				auto msg = std::make_shared<seink::WorkerMessage>( static_cast<uint32_t>(EinkWorkerCommands::Initialized) );
-//				sys::Bus::SendUnicast(msg, "ServiceEink", service );
-//			}
-//		}
-//		else if (activeMember == service->getWorkerIRQQueue() ) {
-//			xQueueReceive(activeMember, &command, 0);
-//			LOG_INFO("[EinkWorker] DMA callback");
-//		}
-//		else {
-//			LOG_ERROR("undefined trigger received.");
-//		}
-//	}
-////	EinkMemcpyDmaInit( s_EinkServiceDMAMemcpyCallback );
-//
-//	LOG_INFO("Eink worker thread ended");
-//}
-
 ServiceEink::ServiceEink(const std::string& name)
 	: sys::Service(name),
 	  timerID { 0 },
@@ -139,9 +106,16 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			int32_t temperature = EinkGetTemperatureInternal();
 
-			changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
+			EinkStatus_e ret;
+			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
+			if( dmsg->getDeepRefresh() ) {
+				changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+			}
+			else{
+				changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+			}
 
-			EinkStatus_e ret =
+			ret =
 			EinkUpdateFrame ( 0,
 			                  0,
 			                  480,
@@ -152,7 +126,13 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to update frame");
 
-			ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
+			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
+			if( dmsg->getDeepRefresh() ) {
+				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
+			}
+			else{
+				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
+			}
 
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to refresh frame");
@@ -362,14 +342,40 @@ bool ServiceEink::deepClearScreen(int8_t temperature)
 {
     EinkWaveforms_e wv = waveformSettings.mode;
 
-	changeWaveform( EinkWaveforms_e::EinkWaveformA2, temperature );
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
-    EinkFillScreenWithColor(EinkDisplayColorBlack);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
-    EinkFillScreenWithColor(EinkDisplayColorBlack);
-    EinkFillScreenWithColor(EinkDisplayColorWhite);
+//	changeWaveform( EinkWaveforms_e::EinkWaveformA2, temperature );
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
+//    EinkFillScreenWithColor(EinkDisplayColorBlack);
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
+//    EinkFillScreenWithColor(EinkDisplayColorBlack);
+//    EinkFillScreenWithColor(EinkDisplayColorWhite);
 
-    changeWaveform(wv, temperature);
+    EinkPowerOn();
+	changeWaveform( EinkWaveforms_e::EinkWaveformA2, temperature );
+
+	EinkStatus_e ret;
+	memset( einkRenderBuffer, 15, 480*600 );
+	ret = EinkUpdateFrame ( 0,0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard );
+	if( ret != EinkOK ) LOG_FATAL("Failed to update frame");
+	ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
+	if( ret != EinkOK ) LOG_FATAL("Failed to refresh frame");
+
+	for( uint32_t i=0; i<2; i++) {
+		memset( einkRenderBuffer, 0, 480*600 );
+		ret = EinkUpdateFrame ( 0,0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard );
+		if( ret != EinkOK ) LOG_FATAL("Failed to update frame");
+		ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
+		if( ret != EinkOK ) LOG_FATAL("Failed to refresh frame");
+
+		memset( einkRenderBuffer, 15, 480*600 );
+		ret = EinkUpdateFrame ( 0,0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard );
+		if( ret != EinkOK ) LOG_FATAL("Failed to update frame");
+		ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
+		if( ret != EinkOK ) LOG_FATAL("Failed to refresh frame");
+	}
+
+	changeWaveform(wv, temperature);
+
+	EinkPowerOff();
 
     return true;
 }
