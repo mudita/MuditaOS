@@ -34,30 +34,44 @@ WorkerGUI::~WorkerGUI() {
 bool WorkerGUI::handleMessage( uint32_t queueID ) {
 	QueueHandle_t queue = queues[queueID];
 
+	sgui::ServiceGUI* serviceGUI = reinterpret_cast<sgui::ServiceGUI*>(service);
+
 	//queue for receiving rendering commands
 	if( queueID == 0 )
 	{
 		LOG_INFO("Received rendering commands");
 
-		WorkerGUIBufferData* received;
+		sys::WorkerCommand* received;
 		xQueueReceive(queue, &received, 0);
-		if( received != nullptr);
+		if( received != NULL) {
 
-		//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
-		std::vector<gui::DrawCommand*> commands;
-		for (auto i = service->latestCommands.begin(); i!=service->latestCommands.end(); ++i)
-			commands.push_back( (*i).get() );
+			//take all unique pointers
 
-		uint32_t start_tick = xTaskGetTickCount();
-		renderer.render( received->context, commands );
-		uint32_t end_tick = xTaskGetTickCount();
-		LOG_INFO("[WorkerGUI] RenderingTime: %d", end_tick - start_tick);
+			std::vector<std::unique_ptr<gui::DrawCommand>> uniqueCommands;
 
-		delete received;
+			if( xSemaphoreTake( serviceGUI->semCommands, pdMS_TO_TICKS(1000) ) == pdTRUE ) {
+				for( auto it = serviceGUI->commands.begin(); it != serviceGUI->commands.end(); it++ )
+					uniqueCommands.push_back(std::move(*it));
+				serviceGUI->commands.clear();
+				xSemaphoreGive( serviceGUI->semCommands );
+			}
 
-		//notify gui service that rendering is complete
-		auto message = std::make_shared<sys::DataMessage>(static_cast<uint32_t>(MessageType::GUIRenderingFinished));
-		sys::Bus::SendUnicast(message, this->service->GetName(), this->service);
+			//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
+			std::vector<gui::DrawCommand*> commands;
+			for (auto it = uniqueCommands.begin(); it != uniqueCommands.end(); it++)
+				commands.push_back( (*it).get() );
+
+			uint32_t start_tick = xTaskGetTickCount();
+			serviceGUI->renderer.render( serviceGUI->renderContext, commands );
+			uint32_t end_tick = xTaskGetTickCount();
+			LOG_INFO("[WorkerGUI] RenderingTime: %d", end_tick - start_tick);
+
+//			delete received;
+
+			//notify gui service that rendering is complete
+			auto message = std::make_shared<sys::DataMessage>(static_cast<uint32_t>(MessageType::GUIRenderingFinished));
+			sys::Bus::SendUnicast(message, this->service->GetName(), this->service);
+		}
 	}
 	return true;
 }

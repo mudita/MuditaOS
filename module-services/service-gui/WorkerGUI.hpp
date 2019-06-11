@@ -25,13 +25,6 @@ enum class WorkerGUICommands {
 	Render
 };
 
-class WorkerGUIBufferData {
-public:
-	std::vector<std::unique_ptr<gui::DrawCommand>> commands;
-	uint32_t commandsCount;
-	gui::Context* context;
-};
-
 /*
  *
  */

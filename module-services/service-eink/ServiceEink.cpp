@@ -98,9 +98,15 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
-			LOG_ERROR("[ServiceEink] Received framebuffer");
+			LOG_INFO("[ServiceEink] Received framebuffer");
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
+			deepRefresh = dmsg->getDeepRefresh();
+			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer );
+			sys::Bus::SendUnicast(msg, this->GetName(), this);
+		} break;
+		case static_cast<uint32_t>(MessageType::EinkDMATransfer): {
 
+			LOG_INFO("[ServiceEink] Received framebuffer");
 			uint32_t start_tick = xTaskGetTickCount();
 			EinkPowerOn();
 
@@ -108,7 +114,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			EinkStatus_e ret;
 			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
-			if( dmsg->getDeepRefresh() ) {
+			if( deepRefresh ) {
 				changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
 			}
 			else{
@@ -127,7 +133,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 				LOG_FATAL("Failed to update frame");
 
 			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
-			if( dmsg->getDeepRefresh() ) {
+			if( deepRefresh ) {
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
 			}
 			else{
