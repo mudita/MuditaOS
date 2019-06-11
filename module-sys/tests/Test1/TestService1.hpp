@@ -68,7 +68,7 @@ public:
 
             case TestServiceDataMessageType ::Delayed:
             {
-                auto msg = std::make_shared<sys::DataMessage>();
+                auto msg = std::make_shared<sys::DataMessage>(0);
                 auto retSend = sys::Bus::SendUnicast(msg,"DelayedService",this,5000);
                 REQUIRE( retSend.first == sys::ReturnCodes::Success );
                 ret = retSend.first;
@@ -77,7 +77,7 @@ public:
 
             case TestServiceDataMessageType ::DelayedFail:
             {
-                auto msg = std::make_shared<sys::DataMessage>();
+                auto msg = std::make_shared<sys::DataMessage>(0);
                 auto retSend = sys::Bus::SendUnicast(msg,"DelayedService",this,50);
                 REQUIRE( retSend.first == sys::ReturnCodes::Timeout );
                 ret = retSend.first;
