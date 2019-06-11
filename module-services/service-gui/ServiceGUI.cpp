@@ -82,15 +82,13 @@ void ServiceGUI::sendBuffer() {
 	if( ret.first == sys::ReturnCodes::Success ) {
 		transferedFrameCounter = renderFrameCounter;
 	}
-
+	//set default refreshing mode.
 	 mode = gui::RefreshModes::GUI_REFRESH_FAST;
 
 }
 
 void ServiceGUI::sendToRender() {
-
 	rendering = true;
-
 	worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
 }
 
@@ -137,7 +135,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("Rendering finished");
 			//increment counter holding number of drawn frames
 			rendering = false;
-
+			renderFrameCounter++;
 			//copy render buffer to transfer buffer using semaphore to protect data
 			//gui service is locking semaphore, makes a copy and then sends message to eink
 
@@ -179,11 +177,6 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
 // Invoked when timer ticked
 void ServiceGUI::TickHandler(uint32_t id) {
-//	if( einkReady == false ) {
-//		ReloadTimer( timer_id );
-//		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
-//		sys::Bus::SendUnicast(msg, "ServiceEink", this);
-//	}
 }
 
 // Invoked during initialization
@@ -205,7 +198,6 @@ sys::ReturnCodes ServiceGUI::InitHandler() {
 
 	if( einkReady == false ) {
 		requestSent = true;
-//		ReloadTimer( timer_id );
 		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
 		sys::Bus::SendUnicast(msg, "ServiceEink", this);
 	}
