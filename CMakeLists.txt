@@ -24,6 +24,7 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL  "Debug")
     message(STATUS "Build type: Debug")
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
+    #target_compile_options(${PROJECT_NAME} PUBLIC -O3)
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL  "Release")
@@ -109,6 +110,7 @@ target_sources(${CMAKE_PROJECT_NAME}
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/config)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/source)
 
 message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)

@@ -63,10 +63,8 @@ TEST_CASE("Contacts Number Table tests")
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.number.GetLimitOffsetByFieldID(0,4,"contact_id", 0).size() == 4);
+    REQUIRE(contactsdb.number.GetLimitOffsetByField(0,4,ContactNumberTableFields::NumberE164,"333222111").size() == 4);
 
-    // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.number.GetLimitOffsetByFieldID(0,4,"contact_id", 100).size() == 0);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = contactsdb.number.GetLimitOffset(0,100);

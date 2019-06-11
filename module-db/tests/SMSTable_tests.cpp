@@ -72,10 +72,7 @@ TEST_CASE("SMS Table tests")
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(smsdb.sms.GetLimitOffsetByFieldID(0,4,"type", static_cast<uint32_t >(SMSType::INBOX)).size() == 4);
-
-    // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(smsdb.sms.GetLimitOffsetByFieldID(0,4,"type", static_cast<uint32_t >(SMSType::ALL)).size() == 0);
+    REQUIRE(smsdb.sms.GetLimitOffsetByField(0,4,SMSTableFields::Date,"0").size() == 4);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = smsdb.sms.GetLimitOffset(0,100);

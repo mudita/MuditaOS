@@ -70,7 +70,6 @@ target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
 
-        CPP_FREERTOS_CONDITION_VARIABLES
         )
 
 target_compile_options(${PROJECT_NAME}

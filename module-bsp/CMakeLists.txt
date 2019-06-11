@@ -66,6 +66,7 @@ target_include_directories( ${PROJECT_NAME}
 		"${CMAKE_SOURCE_DIR}/module-services/"  
 )
 
+set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
 target_link_libraries(${PROJECT_NAME} module-os module-services ${TARGET_LIBRARIES})
 
