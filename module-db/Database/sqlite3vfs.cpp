@@ -587,7 +587,15 @@ static int ecophoneFullPathname(
 
     }
 
-    sqlite3_snprintf(nPathOut, zPathOut, "%s/%s", path.c_str(), zPath);
+    // Current path is "/"
+    if(path.size() == 1){
+        sqlite3_snprintf(nPathOut, zPathOut, "%s%s", path.c_str(), zPath);
+    }
+    else{
+        sqlite3_snprintf(nPathOut, zPathOut, "%s/%s", path.c_str(), zPath);
+    }
+
+
     zPathOut[nPathOut - 1] = '\0';
 
     return SQLITE_OK;

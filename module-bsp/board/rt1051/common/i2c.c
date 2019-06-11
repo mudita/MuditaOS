@@ -17,14 +17,14 @@ static status_t BOARD_LPI2C_Send(LPI2C_Type *base, uint8_t deviceAddress, uint32
 static status_t BOARD_LPI2C_Receive(LPI2C_Type *base, uint8_t deviceAddress, uint32_t subAddress,
                 uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
 
-static status_t BOARD_LPI2C_SendSCCB(LPI2C_Type *base,
+status_t BOARD_LPI2C_SendSCCB(LPI2C_Type *base,
                               uint8_t deviceAddress,
                               uint32_t subAddress,
                               uint8_t subAddressSize,
                               uint8_t *txBuff,
                               uint8_t txBuffSize);
 
-static status_t BOARD_LPI2C_ReceiveSCCB(LPI2C_Type *base,
+status_t BOARD_LPI2C_ReceiveSCCB(LPI2C_Type *base,
                                  uint8_t deviceAddress,
                                  uint32_t subAddress,
                                  uint8_t subAddressSize,
@@ -208,7 +208,7 @@ static status_t BOARD_LPI2C_Receive(LPI2C_Type *base, uint8_t deviceAddress, uin
     return reVal;
 }
 
-static status_t BOARD_LPI2C_SendSCCB(LPI2C_Type *base,
+status_t BOARD_LPI2C_SendSCCB(LPI2C_Type *base,
                               uint8_t deviceAddress,
                               uint32_t subAddress,
                               uint8_t subAddressSize,
@@ -218,7 +218,7 @@ static status_t BOARD_LPI2C_SendSCCB(LPI2C_Type *base,
     return BOARD_LPI2C_Send(base, deviceAddress, subAddress, subAddressSize, txBuff, txBuffSize);
 }
 
-static status_t BOARD_LPI2C_ReceiveSCCB(LPI2C_Type *base,
+status_t BOARD_LPI2C_ReceiveSCCB(LPI2C_Type *base,
                                  uint8_t deviceAddress,
                                  uint32_t subAddress,
                                  uint8_t subAddressSize,

@@ -11,7 +11,7 @@
 
 #include "ContactsNumberTable.hpp"
 
-ContactsNumberTable::ContactsNumberTable(Database *db):db(db) {
+ContactsNumberTable::ContactsNumberTable(Database *db): Table(db) {
 
 }
 
@@ -25,7 +25,7 @@ bool ContactsNumberTable::Create() {
 
 bool ContactsNumberTable::Add(ContactsNumberTableRow entry) {
     return db->Execute(
-            "insert into contact_number (contact_id, number_user, number_e164, type) VALUES (%lu, '%s', '%s', %lu);",
+            "insert or ignore into contact_number (contact_id, number_user, number_e164, type) VALUES (%lu, '%s', '%s', %lu);",
             entry.contactID,
             entry.numberUser.c_str(),
             entry.numbere164.c_str(),
@@ -86,11 +86,24 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::GetLimitOffset(uint32_t
     return ret;
 }
 
-std::vector<ContactsNumberTableRow> ContactsNumberTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit,
-                                                                                 const char *field, uint32_t id) {
-    auto retQuery = db->Query("SELECT * from contact_number WHERE %s=%lu ORDER BY number_user LIMIT %lu OFFSET %lu;",
-                              field,
-                              id,
+std::vector<ContactsNumberTableRow> ContactsNumberTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit,ContactNumberTableFields field,
+                                                                                 const char *str) {
+    std::string fieldName;
+    switch (field){
+        case ContactNumberTableFields ::NumberUser:
+            fieldName = "number_user";
+            break;
+        case ContactNumberTableFields ::NumberE164:
+            fieldName = "number_e164";
+            break;
+        default:
+            return std::vector<ContactsNumberTableRow>();
+    }
+
+
+    auto retQuery = db->Query("SELECT * from contact_number WHERE %s='%s' ORDER BY number_user LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
                               limit,
                               offset);
 

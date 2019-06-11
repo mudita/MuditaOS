@@ -15,18 +15,45 @@
 #include "Record.hpp"
 #include <stdint.h>
 #include "utf8/UTF8.hpp"
+#include "../Databases/SmsDB.hpp"
+#include "../Databases/ContactsDB.hpp"
 #include "../Common/Common.hpp"
 
-class ThreadRecord : public Record{
-public:
 
+struct ThreadRecord{
     uint32_t dbID;
     uint32_t date;
     uint32_t msgCount;
-    uint32_t read;
-    uint32_t contactID;
+    uint32_t msgRead;
     UTF8 snippet;
-    uint32_t lastDir;
+    SMSType type;
+    uint32_t contactID;
+};
+
+enum class ThreadRecordField{
+    ContactID,
+};
+
+class ThreadRecordInterface : public RecordInterface<ThreadRecord,ThreadRecordField>{
+public:
+
+    ThreadRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb);
+    ~ThreadRecordInterface();
+
+    bool Add(const ThreadRecord& rec) override final;
+    bool RemoveByID(uint32_t id) override final;
+    bool Update(const ThreadRecord& rec) override final;
+    ThreadRecord GetByID(uint32_t id) override final;
+
+    uint32_t GetCount() override final;
+
+    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
+
+    std::unique_ptr<std::vector<ThreadRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,ThreadRecordField field, const char* str) override final;
+private:
+   SmsDB* smsDB;
+   ContactsDB* contactsDB;
+
 };
 
 
