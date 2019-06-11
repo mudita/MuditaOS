@@ -173,12 +173,23 @@ namespace bsp {
         CLOCK_SetDiv(BOARD_CELLULAR_AUDIO_SAIx_DIV, BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_DIVIDER); // /63
     }
 
+//    static void Power_SW_Init( void ) {
+//        gpio_pin_config_t gpio_config = {kGPIO_DigitalInput, 0, kGPIO_NoIntmode};
+//
+//        GPIO_PinInit(BOARD_POWER_SW_GPIO, BOARD_POWER_SW_GPIO_PIN, &gpio_config);
+//        gpio_config.direction = kGPIO_DigitalOutput;
+//        GPIO_PinInit(BOARD_POWER_HOLD_GPIO, BOARD_POWER_HOLD_GPIO_PIN, &gpio_config);
+//        GPIO_PinWrite(BOARD_POWER_HOLD_GPIO, BOARD_POWER_HOLD_GPIO_PIN, 1U);   //set pwr pin to hold power switch
+//    }
 
     void BoardInit(){
+
         PINMUX_InitBootPins();
+        //Power_SW_Init();
 
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
+
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
         BOARD_InitDMA();
