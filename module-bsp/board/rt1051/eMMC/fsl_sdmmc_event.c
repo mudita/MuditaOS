@@ -157,6 +157,7 @@ bool SDMMCEVENT_Unlock(void)
 	assert(guard);
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(guard,&xHigherPriorityTaskWoken);
+	return true;
 }
 
 /*!

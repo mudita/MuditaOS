@@ -26,7 +26,13 @@ struct ContactsNumberTableRow {
     ContactNumberType   type;
 };
 
-class ContactsNumberTable : public Table<ContactsNumberTableRow> {
+enum class ContactNumberTableFields{
+    NumberUser,
+    NumberE164
+
+};
+
+class ContactsNumberTable : public Table<ContactsNumberTableRow,ContactNumberTableFields> {
 public:
 
     ContactsNumberTable(Database* db);
@@ -46,7 +52,7 @@ public:
     std::vector<ContactsNumberTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::vector<ContactsNumberTableRow>
-    GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field, uint32_t id) override final;
+    GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactNumberTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
 
@@ -63,8 +69,6 @@ private:
             "type             INTEGER,"
             "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
             ");";
-
-    Database* db;
 };
 
 

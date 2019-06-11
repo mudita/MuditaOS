@@ -138,6 +138,7 @@ UTF8::UTF8( const UTF8& utf ) {
 	else {
 		sizeAllocated = stringExpansion;
 		data = new uint8_t[sizeAllocated];
+		memset(data,0,sizeAllocated);
 		sizeUsed = 0;
 	}
 	lastIndex = 0;
@@ -314,7 +315,7 @@ bool UTF8::operator==( const UTF8& utf ) const {
 const char* UTF8::c_str() const {
 	return reinterpret_cast<const char*>(data);
 }
-UTF8 UTF8::substr( const uint32_t begin, const uint32_t length) {
+UTF8 UTF8::substr( const uint32_t begin, const uint32_t length) const {
 
 	if( ( begin + length > this->length() ) ||
         ( length == 0) )

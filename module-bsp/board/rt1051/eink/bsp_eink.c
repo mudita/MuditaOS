@@ -122,7 +122,7 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	bsp_eink_driver_t* driver = (bsp_eink_driver_t*)userData;
+	//bsp_eink_driver_t* driver = (bsp_eink_driver_t*)userData;
 
 	if(xQueueSendFromISR(bsp_eink_TransferComplete,&status,&xHigherPriorityTaskWoken) != pdPASS)
 	{

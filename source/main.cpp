@@ -4,6 +4,8 @@
 
 #include "../module-gui/gui/core/ImageManager.hpp"
 #include "log/log.hpp"
+#include "memory/usermem.h"
+#include "ticks.hpp"
 
 //module-applications
 #include  "application-clock/ApplicationClock.hpp"
@@ -16,6 +18,10 @@
 #include "ServiceEink.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-kbd/EventManager.hpp"
+
+
+#include "service-db/ServiceDB.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
 
 //module-gui
 #include "gui/core/Font.hpp"
@@ -48,7 +54,9 @@ public:
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
 
-        win = new gui::Window("Main");
+
+
+/*        win = new gui::Window("Main");
 		win->setSize( 480, 600 );
 
 		gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
@@ -105,7 +113,7 @@ public:
 		vBox->addWidget( img1 );
 		vBox->addWidget(maxH3);
 
-		hBox->addWidget(maxW3);
+		hBox->addWidget(maxW3);*/
     }
 
     ~BlinkyService(){
@@ -115,12 +123,15 @@ public:
 
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
+
         return std::make_shared<sys::ResponseMessage>( );
     }
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-
+        //auto msg = std::make_shared<sys::DataMessage>(500);
+        //sys::Bus::SendUnicast(msg,"Blinky",this);
+        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -151,13 +162,17 @@ int SystemStart(sys::SystemManager* sysmgr)
 {
     vfs.Init();
 
-    auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+    bool ret;
+    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
+#if 0 // TODO: Robert please clean it up
     //launcher for clock application
     std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
     applications.push_back( std::move(clockLauncher) );
@@ -165,6 +180,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     //launcher for viewer application
 	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
 	applications.push_back( std::move(viewerLauncher) );
+#endif
 
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
@@ -175,7 +191,6 @@ int SystemStart(sys::SystemManager* sysmgr)
 
     return 0;
 }
-
 
 int main() {
 
