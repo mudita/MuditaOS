@@ -124,30 +124,13 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
 
-        auto ret = DBServiceAPI::SettingsGet(this);
-
-        ret.language = SettingsLanguage ::GERMAN;
-        ret.networkOperator = "MuditaConnectingPeople";
-
-        DBServiceAPI::SettingsUpdate(this,ret);
-
-        auto records = DBServiceAPI::SMSGetLimitOffset(this,0,4);
-
-        auto threads = DBServiceAPI::ThreadGetLimitOffset(this,0,4);
-
-        auto contacts = DBServiceAPI::ContactGetLimitOffset(this,0,4);
-
-        auto smsthread = DBServiceAPI::SMSGetLimitOffsetByThreadID(this,0,4,1);
-
-        LOG_ERROR("Available heap: %lu",usermemGetFreeHeapSize());
-
         return std::make_shared<sys::ResponseMessage>( );
     }
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-        auto msg = std::make_shared<sys::DataMessage>(500);
-        sys::Bus::SendUnicast(msg,"Blinky",this);
+        //auto msg = std::make_shared<sys::DataMessage>(500);
+        //sys::Bus::SendUnicast(msg,"Blinky",this);
         LOG_DEBUG("Blinky service tick!");
     }
 
