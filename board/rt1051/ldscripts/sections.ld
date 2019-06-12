@@ -113,6 +113,12 @@ SECTIONS
             /* End C++ */
     } > BOARD_SDRAM_TEXT
 
+    .intfoo : ALIGN(4)
+    {
+        *(.intfoo)
+        *(.intfoo.*)
+    } >SRAM_DTC_TEXT
+
 
     
     /*

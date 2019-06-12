@@ -70,6 +70,7 @@ ServiceGUI::~ServiceGUI(){
 void ServiceGUI::sendBuffer() {
 	//copy data from render context to transfer context
 	transferContext->insert( 0, 0, renderContext );
+	//memcpy( transferContext->getData(), renderContext->getData(), renderContext->getW()*renderContext->getH());
 
 	auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
 			transferContext->getW(),
@@ -83,7 +84,7 @@ void ServiceGUI::sendBuffer() {
 		transferedFrameCounter = renderFrameCounter;
 	}
 	//set default refreshing mode.
-	 mode = gui::RefreshModes::GUI_REFRESH_FAST;
+	mode = gui::RefreshModes::GUI_REFRESH_FAST;
 
 }
 

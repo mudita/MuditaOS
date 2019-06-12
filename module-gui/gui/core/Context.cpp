@@ -79,6 +79,8 @@ void Context::fill( uint8_t colour ) {
 	if( data ) {
 		memset( data, colour, w*h );
 	}
+//	uint32_t size = 480*600;
+//	memset( data, colour, size );
 }
 
 std::ostream & operator << (std::ostream &out, const Context &c)

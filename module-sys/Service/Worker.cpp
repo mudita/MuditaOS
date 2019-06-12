@@ -121,7 +121,8 @@ bool Worker::run() {
 		workerName.c_str(),
 		512,
 		this,
-		service->GetPriority(), &taskHandle);
+		service->GetPriority(),
+		&taskHandle);
 	if ( task_error != pdPASS)
 	{
 //		LOG_ERROR("Failed to start the task");
