@@ -111,8 +111,8 @@ int SystemStart(sys::SystemManager* sysmgr)
     bool ret;
     ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
@@ -138,36 +138,11 @@ int SystemStart(sys::SystemManager* sysmgr)
     return 0;
 }
 
-//__attribute__((section(".intfoo")))
-//static void workerTaskFunction( void* ptr ) {
-//
-//	char* mem = (char*)malloc(480*600);
-//
-//	//const uint32_t size = 480*600;
-//	while (1)
-//	{
-//		uint32_t start_tick = xTaskGetTickCount();
-//		memset( mem, 0, 480*600);
-//		uint32_t end_tick = xTaskGetTickCount();
-//		LOG_DEBUG("memset time: %d", end_tick-start_tick);
-//		vTaskDelay(100);
-//	}
-//	vTaskDelete( NULL );
-//}
-
 int main() {
 
 	LOG_PRINTF("Launching PurePhone..\n ");
 
     bsp::BoardInit();
-
-//	BaseType_t task_error = xTaskCreate(
-//		workerTaskFunction,
-//		"memory_task",
-//		512,
-//		NULL,
-//		0,
-//		NULL);
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
