@@ -52,12 +52,12 @@ endif()
 set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18/i18.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/utf8/UTF8.cpp
         )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 include(log/CMakeLists.txt)
-include(utf8/CMakeLists.txt)
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)

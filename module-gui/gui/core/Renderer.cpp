@@ -24,6 +24,8 @@ extern "C" {
 
 #include "PixMap.hpp"
 #include "VecMap.hpp"
+//module-utils
+#include "utf8/UTF8.hpp"
 
 namespace gui {
 
@@ -469,7 +471,9 @@ void Renderer::render( Context* ctx, std::vector<DrawCommand*>& commands ) {
 		switch( cmd->id ) {
 			case DrawCommandID::GUI_DRAW_CLEAR: {
 				uint32_t start_tick = xTaskGetTickCount();
+//				vPortEnterCritical();
 				ctx->fill( 15 );
+//				vPortExitCritical();
 				uint32_t end_tick = xTaskGetTickCount();
 				LOG_INFO("[ServiceGUI] ctx->fill( 15 ); Time: %d", end_tick - start_tick);
 			}break;
