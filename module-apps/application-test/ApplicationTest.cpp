@@ -87,7 +87,8 @@ void ApplicationTest::createUserInterface(){
 	rectangle->setPosition(90, 250);
 	rectangle->setMaxSize(100, 100);
 	rectangle->setRadius(25);
-	rectangle->setFlat(gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT | gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT) ;
+	rectangle->setFlat(gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT | gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT |
+						/*gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT |*/ gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT) ;
 /*	rect = new gui::Rect(rectangle, 10, 10, 80, 80);
 
 	gui::Color color;
