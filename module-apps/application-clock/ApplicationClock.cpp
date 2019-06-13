@@ -126,9 +126,13 @@ void ApplicationClock::createUserInterface() {
 
 	minuteLabel = new gui::Label(clockWin, 100+xOffset,310+yOffset,280,150);
 	minuteLabel->setFilled( false );
-	minuteLabel->setBorderColor( gui::ColorNoColor );
+	minuteLabel->setBorderColor( gui::ColorFullBlack );
 	minuteLabel->setFont("gt_pressura_regular_140");
 	minuteLabel->setText("00");
+	minuteLabel->setRadius( 20 );
+	minuteLabel->setPenWidth(1);
+	minuteLabel->setFilled(true);
+	minuteLabel->setFillColor( gui::Color(10,0));
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	progressBar = new gui::Progress(clockWin, 480/2-90+xOffset, 300-6+yOffset, 180, 12 );
