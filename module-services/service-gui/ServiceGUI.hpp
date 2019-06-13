@@ -8,19 +8,23 @@
 #ifndef MODULE_SERVICES_SERVICE_GUI_SERVICEGUI_HPP_
 #define MODULE_SERVICES_SERVICE_GUI_SERVICEGUI_HPP_
 
+#include <memory>
+
 //module-gui
 #include "gui/core/Context.hpp"
 #include "gui/core/Renderer.hpp"
+#include "messages/DrawMessage.hpp"
 
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
-#include "GUIWorker.hpp"
-
-class GUIWorker;
+#include "WorkerGUI.hpp"
 
 namespace sgui {
 
+class WorkerGUI;
+
 class ServiceGUI: public sys::Service {
+	friend WorkerGUI;
 protected:
 	//this is where every incomming frame is painted.
 	gui::Context* renderContext;
@@ -39,13 +43,20 @@ protected:
 	//flag that defines whether eink is ready for new frame buffer
 	volatile bool einkReady = false;
 	volatile bool requestSent = false;
-	volatile bool bufferLocked = false;
-	uint32_t timer_id= 0;
+	volatile bool rendering = false;
+	//set of commands recently received. If this vector is not empty and new set of commands is received
+	//previous commands are removed.
+	std::vector<std::unique_ptr<gui::DrawCommand>> commands;
+//	uint32_t timer_id= 0;
 	gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_DEEP;
 
-//	GUIWorker* worker;
+	//semaphore used to protect commands vector while commands are taken from service to worker.
+	SemaphoreHandle_t semCommands;
+
+	WorkerGUI* worker;
 
 	void sendBuffer();
+	void sendToRender();
 
 public:
     ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight );

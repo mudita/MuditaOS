@@ -15,6 +15,8 @@ enum class MessageType {
 	//eink messages
 	EinkStateRequest, //message is used to pull status of the eink. If eink is ready to display image
 	EinkImageData, //message with pointer to the image data for displaying
+	EinkDMATransfer,//this message is internally sent from wink service to eink service. This will trigger DMA transfer to Eink's
+					//controller. After tranfer gui service wil lbewill be notified
 	EinkTemperatureUpdate, //message sent from timer handler. Message forces service to update temperature measured by the eink.
 
 	//gui messages
