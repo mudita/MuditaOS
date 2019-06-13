@@ -179,7 +179,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		//index where middle point of quarter of arc is located. This means that Y starts to grow faster than X
 		int32_t middleIndex = 0;
 		//number of points in the quater arc
-		uint32_t pointCount = 0;
+		int32_t pointCount = 0;
 		Px[index] = x;
 		Py[index] = y;
 		++index;
@@ -247,32 +247,32 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 			int16_t endX[2*wgtR] = {0};
 			if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT ) {
 				if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ) {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						startX[i] = 0;
 				}
 				else {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						startX[i] = wgtR-offsetX[i];
 				}
 			}
 			//if there is no corner set whole vector of points to the value of the radius
 			else {
-				for( uint32_t i=0; i<pointCount; ++i )
+				for( int32_t i=0; i<pointCount; ++i )
 					startX[i] = wgtR;
 			}
 			if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT ) {
 				if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ) {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						endX[i] = wgtW;
 				}
 				else {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						endX[i] = wgtW - wgtR + offsetX[i];
 				}
 			}
 			//if there is no corner set whole vector of points to the value of the radius
 			else {
-				for( uint32_t i=0; i<pointCount; ++i )
+				for( int32_t i=0; i<pointCount; ++i )
 					endX[i] = wgtW - wgtR;
 			}
 			for( int32_t i=0; i< wgtR; ++i )
@@ -288,32 +288,32 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 			memset( endX, 0, 2*wgtR*sizeof(int16_t));
 			if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT ) {
 				if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT ) {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						startX[i] = 0;
 				}
 				else {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						startX[i] = wgtR-offsetX[i];
 				}
 			}
 			//if there is no corner set whole vector of points to the value of the radius
 			else {
-				for( uint32_t i=0; i<pointCount; ++i )
+				for( int32_t i=0; i<pointCount; ++i )
 					startX[i] = wgtR;
 			}
 			if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_RIGHT ) {
 				if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT ) {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						endX[i] = wgtW;
 				}
 				else {
-					for( uint32_t i=0; i<pointCount; ++i )
+					for( int32_t i=0; i<pointCount; ++i )
 						endX[i] = wgtW - wgtR + offsetX[i];
 				}
 			}
 			//if there is no corner set whole vector of points to the value of the radius
 			else {
-				for( uint32_t i=0; i<pointCount; ++i )
+				for( int32_t i=0; i<pointCount; ++i )
 					endX[i] = wgtW - wgtR;
 			}
 			for( int32_t i=0; i< wgtR; ++i )
