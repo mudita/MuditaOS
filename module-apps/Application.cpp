@@ -15,6 +15,8 @@
 //module-sys
 #include "SystemManager/SystemManager.hpp"
 
+#include "service-db/api/DBServiceAPI.hpp"
+
 
 #include "Application.hpp"
 
@@ -51,6 +53,13 @@ int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, 
 }
 int Application::refreshWindow(gui::RefreshModes mode) {
 	return 0;
+}
+
+sys::ReturnCodes Application::InitHandler() {
+	settings = DBServiceAPI::SettingsGet(this);
+	if( settings.dbID == 0 )
+		return sys::ReturnCodes::Failure;
+	return sys::ReturnCodes::Success;
 }
 void Application::setActiveWindow( const std::string& windowName ) {
 	auto it = windows.find(windowName);

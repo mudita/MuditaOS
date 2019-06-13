@@ -18,6 +18,8 @@
 #include "Service/Message.hpp"
 #include "Service/Common.hpp"
 #include "SystemManager/SystemManager.hpp"
+//module-db
+#include "Interface/SettingsRecord.hpp"
 
 namespace app {
 
@@ -101,13 +103,16 @@ public:
 	 * Sets active window of the application. This doesn't cause refresh. value -1 is for undefined state
 	 * and should be set when application is left using back button.
 	 */
+	sys::ReturnCodes InitHandler() override;
 	void setActiveWindow( const std::string& windowName );
 
-//	settings_t* getSettings() {
-//		return settings;
-//	}
+	SettingsRecord& getSettings() {
+		return settings;
+	}
 
 protected:
+	//application's settings taken from database
+	SettingsRecord settings;
 	/**
 	 * Placeholder that can be used to create window and widgets.
 	 */
