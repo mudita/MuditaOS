@@ -87,6 +87,10 @@ void ApplicationClock::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ApplicationClock::InitHandler() {
 
+	auto ret = Application::InitHandler();
+	if( ret != sys::ReturnCodes::Success )
+		return ret;
+
 	createUserInterface();
 
 	setActiveWindow("Main");
