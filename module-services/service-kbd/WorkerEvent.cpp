@@ -22,8 +22,11 @@ extern "C" {
 
 #include "keyboard/keyboard.hpp"
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
-
+//#include "module-bsp/board/rt1051/keyboard/rt1051_keyboard.hpp"
 #include "EventManager.hpp"
+
+#include <iostream>
+
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
 {
@@ -79,6 +82,24 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		}
 
 		keyboardEventCallback(static_cast<bsp::KeyEvents>(val.event), static_cast<bsp::KeyCodes>(val.code));
+	}
+	if( queueID == 3 )
+	{
+		uint8_t notification;
+		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
+				return false;
+		}
+		KeyState val;
+	//	bsp::keyboar_worker(notification, val);
+		LOG_INFO("[EventManager] NOTIFY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ") ;
+
+		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(val.code));
+			if( (it != longPressParamsList.end()) && (val.event == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
+			{
+			longPressTimerStart(it->second);
+			}
+		keyboardEventCallback(static_cast<bsp::KeyEvents>(val.event), static_cast<bsp::KeyCodes>(val.code));
+
 	}
 	return true;
 }

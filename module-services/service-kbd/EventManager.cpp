@@ -84,11 +84,12 @@ sys::ReturnCodes EventManager::InitHandler() {
 	//create queues for worker
 	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(KeyState), 10 };
+	sys::WorkerQueueInfo qNoti = {"qNoti", sizeof(uint8_t), 10 };
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qTimer);
 	list.push_back(qIrq);
-
+	list.push_back(qNoti);
 	EventWorker->init( list );
 	EventWorker->run();
 

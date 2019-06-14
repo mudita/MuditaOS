@@ -20,13 +20,15 @@
 
 namespace bsp{
 
-        status_t rt1501_keyboard_Init(WorkerEvent* worker);
+	void keyboar_worker(uint8_t notification, KeyState& keyState);
 
-        status_t rt1501_keyboard_Deinit(void);
+	status_t rt1501_keyboard_Init(WorkerEvent* worker);
 
-        BaseType_t rt1501_keyboard_IRQHandler(void);
+	status_t rt1501_keyboard_Deinit(void);
 
-        BaseType_t rt1501_keyboard_right_functional_IRQHandler(void);
+	BaseType_t rt1501_keyboard_IRQHandler(void);
+
+	BaseType_t rt1501_keyboard_right_functional_IRQHandler(void);
 }
 
 

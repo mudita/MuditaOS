@@ -131,7 +131,7 @@ void ApplicationClock::createUserInterface() {
 	minuteLabel->setText("00");
 	minuteLabel->setRadius( 20 );
 	minuteLabel->setPenWidth(1);
-	minuteLabel->setFilled(true);
+	//minuteLabel->setFilled(true);
 	minuteLabel->setFillColor( gui::Color(10,0));
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
