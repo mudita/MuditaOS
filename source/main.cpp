@@ -77,7 +77,7 @@ public:
     	uint32_t start_tick = xTaskGetTickCount();
 		memset( mem, 0, 480*600);
 		uint32_t end_tick = xTaskGetTickCount();
-		LOG_DEBUG("memset time: %d", end_tick-start_tick);
+		//LOG_DEBUG("memset time: %d", end_tick-start_tick);
     }
 
     // Invoked during initialization
@@ -129,7 +129,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 #endif
 
     //start application manager
-    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+//    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;
