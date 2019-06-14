@@ -47,12 +47,10 @@ class vfs vfs;
 
 class BlinkyService : public sys::Service {
 	gui::Window* win = nullptr;
-	uint8_t* mem = nullptr;
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-    	mem = new uint8_t[480*600];
         timer_id = CreateTimer(100,true);
         ReloadTimer(timer_id);
 
@@ -74,10 +72,6 @@ public:
         //auto msg = std::make_shared<sys::DataMessage>(500);
         //sys::Bus::SendUnicast(msg,"Blinky",this);
         //LOG_DEBUG("Blinky service tick!");
-    	uint32_t start_tick = xTaskGetTickCount();
-		memset( mem, 0, 480*600);
-		uint32_t end_tick = xTaskGetTickCount();
-		LOG_DEBUG("memset time: %d", end_tick-start_tick);
     }
 
     // Invoked during initialization
