@@ -19,7 +19,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "bsp_keyboard.hpp"
+#include "keyboard/keyboard.hpp"
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
 
 
@@ -27,6 +27,8 @@ namespace bsp {
 
 static TaskHandle_t linux_keyboard_worker_handle = NULL;
 
+static uint8_t kcode = 0;
+static uint8_t kevent = 0;
 static void linux_keyboard_worker(void *pvp)
 {
 	int fd;
@@ -47,14 +49,23 @@ static void linux_keyboard_worker(void *pvp)
 
 		if(readedBytes > 1)
 		{
-			KeyState key;
-			key.event = buff[0];
-			key.code = buff[1];
+			kevent = buff[0];
+			kcode = buff[1];
 
 			//if(buff[2] == buff[0] + buff[1])
 			xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
 
-			xQueueSend(qhandle, &key, 100);
+			uint8_t notification = 0;
+			if(kcode == static_cast<uint8_t>(bsp::KeyCodes::FnRight) )
+			{
+				if( kevent == static_cast<uint8_t>(bsp::KeyEvents::Pressed) )
+					notification = 0x02;
+				else
+					notification = 0x04;
+			}
+			else
+				notification = 0x01;
+			xQueueSend(qhandle, &notification, 100);
 		}
 		vTaskDelay(50);
 	}
@@ -62,14 +73,18 @@ static void linux_keyboard_worker(void *pvp)
 	close(fd);
 }
 
-RetCode linux_keyboard_Init(WorkerEvent* worker) {
+void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code)
+{
+	event = kevent;
+	code = kcode;
+}
 
-	std::vector<xQueueHandle> queues = worker->getQueues();
-	xQueueHandle qhandle = queues[static_cast<uint32_t>(WorkerEventQueues::queueKeyboardEvent)];
-	if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, qhandle, 0, &linux_keyboard_worker_handle) != pdPASS) {
-		return RetCode::Failure;
+int32_t keyboard_Init(xQueueHandle qHandle){
+
+	if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, qHandle, 0, &linux_keyboard_worker_handle) != pdPASS) {
+		return 1;
 	}
-	return RetCode::Success;
+	return 0;
 }
 }
 
