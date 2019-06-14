@@ -21,25 +21,23 @@
 #include "fsl_common.h"
 #include "../common/i2c.h"
 #include "TCA8418.h"
+#include "keyboard/key_codes.hpp"
+#include "common.hpp"
 
 namespace bsp {
 
 #define KEYBOARD_CONTACT_OSCILLATION_TIMEOUT_MS    20
 
-    //static std::function<void(KeyEvents event,KeyCodes code)> user_event_callback = NULL;
-    //static TaskHandle_t keyboard_worker_handle = NULL;
     static TimerHandle_t s_right_functional_check_timer = NULL;
     static volatile uint8_t s_rigth_functional_last_state = 0;
 
     static void s_bsp_keyboard_right_functional_check_timer_cb(TimerHandle_t timer);
 
-    static void bsp_keyboard_worker(void *pvp);
-
     static xQueueHandle qHandleIrq = NULL;
-    static xQueueHandle qHandleWorker = NULL;
 
-    status_t rt1501_keyboard_Init(WorkerEvent* worker){
+    status_t keyboard_Init(xQueueHandle qHandle){
 
+    	qHandleIrq = qHandle;
         /* Define the init structure for the input RF key pin*/
         gpio_pin_config_t right_functional_pin_config = {kGPIO_DigitalInput, 0, kGPIO_IntRisingOrFallingEdge};
         /* Init input KEYBOARD IRQ. */
@@ -53,16 +51,8 @@ namespace bsp {
         /* Init input KEYBOARD IRQ. */
         GPIO_PinInit(BOARD_KEYBOARD_IRQ_GPIO, BOARD_KEYBOARD_IRQ_GPIO_PIN, &irqpin_config);
 
-        //
-        //TODO change magic value to enum
-        std::vector<xQueueHandle> queues = worker->getQueues();
-        xQueueHandle qhandle = queues[2];
-        qHandleWorker = queues[2];
-        qHandleIrq = queues[3];
 
-/*        if (xTaskCreate(bsp_keyboard_worker, "keyboard", 512, qhandle, 0, &keyboard_worker_handle) != pdPASS) {
-            return kStatus_Fail;
-        }*/
+
 
         // Reset keyboard controller
         GPIO_PinWrite(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, 0);
@@ -155,70 +145,8 @@ namespace bsp {
         return kStatus_Success;
     }
 
-/*    static void bsp_keyboard_worker(void *pvp) {
-        uint32_t ulNotificationValue = 0;
 
-        xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
-
-
-        while (1) {
-            xTaskNotifyWait(0xFFFFFFFF, 0xFFFFFFFF, &ulNotificationValue, portMAX_DELAY);
-
-            if (ulNotificationValue & 0x01) {
-                uint8_t retval = 0;
-                // Read how many key events has been registered
-                bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_LCK_EC, (uint8_t *) &retval,
-                                1);
-
-                uint8_t events_count = retval & 0xF;
-                uint8_t i = 0;
-                // Iterate over and parse each event
-                for (i = 0; i < events_count; i++) {
-                    uint8_t key = 0;
-                    uint8_t rel_pres = 0;
-                    bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_EVENT_A,
-                                    (uint8_t *) &retval,
-                                    1);
-
-                    key = retval & 0x7F;
-                    // rel_pres: 0 - key release, 1 - key press
-                    rel_pres = (retval & 0x80) >> 7; // key release/pressed is stored on the last bit
-
-                    if (rel_pres == 0) {
-                    } else {
-                    }
-                    KeyState keyState;
-                    keyState.code = key;
-                    keyState.event = rel_pres;
-                    xQueueSend(qhandle, &keyState, 100);
-                }
-
-                //Clear all interrupts
-                uint8_t reg = 0xff;
-
-                bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, (uint8_t *) &reg, 1);
-
-            }
-
-            if (ulNotificationValue & 0x02) {
-            	KeyState keyState;
-            	keyState.code = static_cast<uint8_t>(KeyCodes::FnRight);
-            	keyState.event = static_cast<uint8_t>(KeyEvents::Pressed);
-            	xQueueSend(qhandle, &keyState, 100);
-                //user_event_callback(KeyEvents::Pressed, KeyCodes::FnRight);
-            }
-
-            if (ulNotificationValue & 0x04) {
-            	KeyState keyState;
-				keyState.code = static_cast<uint8_t>(KeyCodes::FnRight);
-				keyState.event = static_cast<uint8_t>(KeyEvents::Released);
-				xQueueSend(qhandle, &keyState, 100);
-                //user_event_callback(KeyEvents::Released, KeyCodes::FnRight);
-            }
-        }
-    }*/
-
-    void keyboar_worker(uint8_t notification, KeyState& keyState)
+    void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code)
     {
     	if (notification & 0x01) {
 			uint8_t retval = 0;
@@ -243,9 +171,8 @@ namespace bsp {
 				if (rel_pres == 0) {
 				} else {
 				}
-				keyState.code = key;
-				keyState.event = rel_pres;
-				//xQueueSend(qHandleWorker, &keyState, 100);
+				code = key;
+				event = rel_pres;
 			}
 
 			//Clear all interrupts
@@ -257,18 +184,14 @@ namespace bsp {
 
 		if (notification & 0x02) {
 
-			keyState.code = static_cast<uint8_t>(KeyCodes::FnRight);
-			keyState.event = static_cast<uint8_t>(KeyEvents::Pressed);
-			//xQueueSend(qHandleWorker, &keyState, 100);
-			//user_event_callback(KeyEvents::Pressed, KeyCodes::FnRight);
+			code = static_cast<uint8_t>(bsp::KeyCodes::FnRight);
+			event = static_cast<uint8_t>(KeyEvents::Pressed);
 		}
 
 		if (notification & 0x04) {
 
-			keyState.code = static_cast<uint8_t>(KeyCodes::FnRight);
-			keyState.event = static_cast<uint8_t>(KeyEvents::Released);
-			//xQueueSend(qHandleWorker, &keyState, 100);
-			//user_event_callback(KeyEvents::Released, KeyCodes::FnRight);
+			code = static_cast<uint8_t>(KeyCodes::FnRight);
+			event = static_cast<uint8_t>(KeyEvents::Released);
 		}
 	}
 
@@ -294,10 +217,6 @@ namespace bsp {
 
     BaseType_t rt1501_keyboard_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-/*        if (keyboard_worker_handle) {
-            xTaskNotifyFromISR(keyboard_worker_handle, 0x01, eSetBits, &xHigherPriorityTaskWoken);
-        }*/
         if(qHandleIrq){
         	uint8_t val = 0x01;
         	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
@@ -315,19 +234,15 @@ namespace bsp {
         if (right_functional_current_state == s_rigth_functional_last_state) {
             if (right_functional_current_state == 0) {
                 // RIGHT FUNCTIONAL PRESSED
-               /* if (keyboard_worker_handle) {
-                    xTaskNotify(keyboard_worker_handle, 0x02, eSetBits);*/
             	if(qHandleIrq){
 					uint8_t val = 0x02;
 					xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
                 }
             } else {
+            	// RIGHT FUNCTIONAL RELEASED
             	if(qHandleIrq){
 					uint8_t val = 0x04;
 					xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
-                /*// RIGHT FUNCTIONAL PRESSED
-                if (keyboard_worker_handle) {
-                    xTaskNotify(keyboard_worker_handle, 0x04, eSetBits);*/
                 }
             }
         }

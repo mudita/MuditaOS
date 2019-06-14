@@ -7,6 +7,7 @@
  *  @details
  */
 
+/*
 #ifndef BSP_KEYBOARD_BSP_KEYBOARD_H_
 #define BSP_KEYBOARD_BSP_KEYBOARD_H_
 
@@ -20,7 +21,7 @@
 
 namespace bsp{
 
-	void keyboar_worker(uint8_t notification, KeyState& keyState);
+	void keyboard_get_data(const uint8_t& notification, KeyState& keyState);
 
 	status_t rt1501_keyboard_Init(WorkerEvent* worker);
 
@@ -35,4 +36,5 @@ namespace bsp{
 
 
 
-#endif /* BSP_KEYBOARD_BSP_KEYBOARD_H_ */
+#endif  BSP_KEYBOARD_BSP_KEYBOARD_H_
+*/

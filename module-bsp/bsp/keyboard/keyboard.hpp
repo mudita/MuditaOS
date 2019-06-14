@@ -26,14 +26,15 @@
 
 namespace bsp {
 
-    class keyboard {
-    public:
+	void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code);
 
-        RetCode Init(WorkerEvent* worker);
-        RetCode DeInit();
+	int32_t keyboard_Init(xQueueHandle qHandle);
 
-    };
+	int32_t rt1501_keyboard_Deinit(void);
 
+	BaseType_t rt1501_keyboard_IRQHandler(void);
+
+	BaseType_t rt1501_keyboard_right_functional_IRQHandler(void);
 }
 
 

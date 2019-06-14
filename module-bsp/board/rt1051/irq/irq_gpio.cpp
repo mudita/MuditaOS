@@ -17,7 +17,7 @@
 #include "fsl_common.h"
 
 
-#include "keyboard/rt1051_keyboard.hpp"
+#include "keyboard/keyboard.hpp"
 
 
 #include "bsp_eink.h"

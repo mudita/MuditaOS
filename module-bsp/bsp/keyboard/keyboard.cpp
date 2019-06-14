@@ -1,12 +1,13 @@
-
 /*
+
+
  * @file keyboard.cpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
  * @date 22.05.19
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
- */
+
 
 
 #include "keyboard.hpp"
@@ -25,33 +26,46 @@
 
 namespace bsp
 {
+#if defined(TARGET_RT1051)
+
     RetCode keyboard::Init(WorkerEvent* worker)
     {
-#if defined(TARGET_RT1051)
-        rt1501_keyboard_Init(worker);
+       uint32_t ret =  rt1501_keyboard_Init(worker);
+       if(ret != 0)
+    	   return RetCode::Failure;
+       return RetCode ::Success;
+    }
 
-#elif defined(TARGET_Linux)
-        linux_keyboard_Init(worker);
-#else
-#error "Unsupported target"
-#endif
-        // TODO:M.P check return codes
-        return RetCode ::Success;
-
+    void keyboard::getData(const uint8_t& notification, KeyState& keyState)
+    {
+    	keyboard_get_data(notification, keyState);
     }
 
     RetCode keyboard::DeInit()
     {
-#if defined(TARGET_RT1051)
         rt1501_keyboard_Deinit();
+    }
+
 #elif defined(TARGET_Linux)
 
+    RetCode keyboard::Init(WorkerEvent* worker)
+   {
+	 return linux_keyboard_Init(worker);
+   }
+
+   void keyboard::getData(const uint8_t& notification, KeyState& keyState)
+   {
+
+   }
+
+   RetCode keyboard::DeInit()
+   {
+
+   }
+
 #else
+
 #error "Unsupported target"
 #endif
-
-        // TODO:M.P check return codes
-        return RetCode ::Success;
-    }
 }
-
+*/
