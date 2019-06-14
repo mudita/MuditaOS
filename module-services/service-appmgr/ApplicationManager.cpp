@@ -48,23 +48,23 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 	switch( msgType ) {
 		case static_cast<uint32_t>(MessageType::APMSwitch): {
 			sapm::APMSwitch* msg = reinterpret_cast<sapm::APMSwitch*>( msgl );
-			LOG_INFO("APMSwitch %s", msg->getName());
+			LOG_INFO("APMSwitch %s", msg->getSenderName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchData): {
 			sapm::APMSwitchData* msg = reinterpret_cast<sapm::APMSwitchData*>( msgl );
-			LOG_INFO("APMSwitchData %s", msg->getName());
+			LOG_INFO("APMSwitchData %s", msg->getSenderName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
-			LOG_INFO("APMSwitchPrevApp %s", msg->getName());
+			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMConfirmSwitch): {
 			sapm::APMConfirmSwitch* msg = reinterpret_cast<sapm::APMConfirmSwitch*>( msgl );
-			LOG_INFO("APMConfirmSwitch %s", msg->getName());
+			LOG_INFO("APMConfirmSwitch %s", msg->getSenderName());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMConfirmClose): {
 			sapm::APMConfirmClose* msg = reinterpret_cast<sapm::APMConfirmClose*>( msgl );
-			LOG_INFO("APMConfirmClose %s", msg->getName());
+			LOG_INFO("APMConfirmClose %s", msg->getSenderName());
 		}break;
 		default : {
 			LOG_FATAL("Received unknown massage %d", msgType );
@@ -106,9 +106,33 @@ sys::ReturnCodes ApplicationManager::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+//tries to switch the application
+bool ApplicationManager::switchApplicationInternal( APMSwitch* msg) {
+
+	//check if
+//	msg->
+
+
+	return true;
+}
+
+bool ApplicationManager::switchApplicationWithDataInternal( APMSwitchData* msg) {
+
+	return true;
+}
+
+
+
+
+
+
+
+
+//Static methods
+
 bool ApplicationManager::switchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName ) {
 
-	auto msg = std::make_shared<sapm::APMSwitch>(applicationName, windowName );
+	auto msg = std::make_shared<sapm::APMSwitch>(sender->GetName(), applicationName, windowName );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }
@@ -116,15 +140,23 @@ bool ApplicationManager::switchApplicationWithData( sys::Service* sender,
 		const std::string& applicationName,
 		const std::string& windowName,
 		std::unique_ptr<app::SwitchData>& switchData ) {
-			auto msg = std::make_shared<sapm::APMSwitchData>(applicationName, windowName, std::move(switchData) );
+			auto msg = std::make_shared<sapm::APMSwitchData>(sender->GetName(), applicationName, windowName, std::move(switchData) );
 			sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 
 	return true;
 }
 bool ApplicationManager::confirmSwitch( sys::Service* sender) {
+
+	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+
 	return true;
 }
 bool ApplicationManager::confirmClose( sys::Service* sender) {
+
+	auto msg = std::make_shared<sapm::APMConfirmClose>(sender->GetName() );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+
 	return true;
 }
 bool ApplicationManager::switchPreviousApplication( sys::Service* sender, const std::string& prevAppName ) {
