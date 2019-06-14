@@ -51,7 +51,7 @@ class ApplicationManager: public sys::Service {
 		CLOSING_PREV_APP,
 		WAITING_CLOSE_CONFIRMATION,
 		STARTING_NEW_APP,
-		WAITING_NEW_APP_CONFIRMATION,
+		WAITING_NEW_APP_REGISTRATION,
 		WAITING_LOST_FOCUS_CONFIRMATION,
 		WAITING_GET_FOCUS_CONFIRMATION
 	};
@@ -59,8 +59,14 @@ class ApplicationManager: public sys::Service {
 	std::map< std::string, ApplicationDescription* > applications;
 	sys::SystemManager* systemManager;
 
-	std::string currentApplicationName = "";
+	//application that currently has focus. This means that is has rights to display screens and receive keyboard events.
+	std::string focusApplicationName = "";
+	//after loosing focus application becomes previous application and this is its name
 	std::string previousApplicationName = "";
+	//name of the application scheduled for launching
+	std::string launchApplicationName = "";
+	//state of the application manager
+	State state = State::IDLE;
 
 	//tries to switch the application
 	bool switchApplicationInternal( APMSwitch* msg);

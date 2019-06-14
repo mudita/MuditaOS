@@ -20,14 +20,14 @@ namespace sapm {
 class APMMessage: public sys::DataMessage {
 protected:
 	//name of the application that is sending message to application manager.
-	std::string name;
+	std::string senderName;
 public:
-	APMMessage( MessageType messageType, const std::string& name ) :
+	APMMessage( MessageType messageType, const std::string& senderName ) :
 		sys::DataMessage( static_cast<uint32_t>(messageType)),
-		name{name} {};
+		senderName{senderName} {};
 	virtual ~APMMessage() {};
 
-	std::string getName() { return name;};
+	std::string getSenderName() { return senderName;};
 };
 
 
@@ -38,21 +38,28 @@ public:
 //	APMConfirmClose, //Sent by application to confirm completion of the close procedure
 
 class APMSwitch : public APMMessage {
+	std::string application;
+	std::string window;
 public:
-	APMSwitch( const std::string& name, const std::string& win = "" ) :
-		APMMessage( MessageType::APMSwitch, name ) {
+	APMSwitch( const std::string& senderName, const std::string& applicationName, const std::string& windowName = "" ) :
+		APMMessage( MessageType::APMSwitch, senderName ),
+		application{ applicationName },
+		window{ windowName } {
 
 	}
 };
 
 class APMSwitchData : public APMMessage {
 protected:
+	std::string application;
+	std::string window;
 	std::unique_ptr<app::SwitchData> data;
 public:
-	APMSwitchData( const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) :
-		APMMessage( MessageType::APMSwitchData, name ),
-		data{ std::move(data)}{
-
+	APMSwitchData( const std::string& senderName, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) :
+		APMMessage( MessageType::APMSwitchData, senderName),
+		application{ applicationName },
+		window{ windowName },
+		data{ std::move(data)} {
 	}
 };
 
