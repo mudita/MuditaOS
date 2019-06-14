@@ -16,35 +16,35 @@ add_executable(${PROJECT_NAME} "")
 
 
 # If build type not passed assume it is Debug
-if(CMAKE_BUILD_TYPE STREQUAL  "")
+if (CMAKE_BUILD_TYPE STREQUAL "")
     set(CMAKE_BUILD_TYPE Debug)
     message(STATUS "CMAKE_BUILD_TYPE not set, assuming debug build...")
-endif()
+endif ()
 
-if(CMAKE_BUILD_TYPE STREQUAL  "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(STATUS "Build type: Debug")
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
     #target_compile_options(${PROJECT_NAME} PUBLIC -O3)
-endif()
+endif ()
 
-if(CMAKE_BUILD_TYPE STREQUAL  "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
     message(STATUS "Build type: Release")
     target_compile_options(${PROJECT_NAME} PUBLIC -O0)
-endif()
+endif ()
 
-if(CMAKE_BUILD_TYPE STREQUAL  "RelWithDebInfo")
+if (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     message(STATUS "Build type: RelWithDebInfo")
     target_compile_options(${PROJECT_NAME} PUBLIC -O0)
     target_compile_options(${PROJECT_NAME} PUBLIC -g3)
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
-endif()
+endif ()
 
 set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
 message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
-target_link_directories( ${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY} )
+target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
 
-set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building" )
+set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building")
 message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -74,7 +74,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-std=gnu11
 target_compile_options(${PROJECT_NAME} PUBLIC -fsingle-precision-constant)
 target_compile_options(${PROJECT_NAME} PUBLIC -ffunction-sections)
 target_compile_options(${PROJECT_NAME} PUBLIC -fdata-sections)
-target_compile_options(${PROJECT_NAME} PUBLIC -MMD )
+target_compile_options(${PROJECT_NAME} PUBLIC -MMD)
 target_compile_options(${PROJECT_NAME} PUBLIC -MP)
 target_compile_options(${PROJECT_NAME} PUBLIC -fno-builtin)
 
@@ -93,8 +93,6 @@ target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-rtt
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>)
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>)
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>)
-
-
 
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
@@ -133,6 +131,9 @@ add_subdirectory(module-gui)
 message("${PROJECT_NAME}: add_subdirectory module-db")
 add_subdirectory(module-db)
 
+message("${PROJECT_NAME}: add_subdirectory module-cellular")
+add_subdirectory(module-cellular)
+
 message("${PROJECT_NAME}: add_subdirectory module-services")
 add_subdirectory(module-services)
 
@@ -143,18 +144,19 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-target_link_libraries( ${PROJECT_NAME} 
-	module-sys 
-	module-utils 
-	module-db 
-	module-gui 
-	module-os 
-	module-bsp 
-	module-vfs 
-	module-services
-	module-apps 
-	${TARGET_LIBRARIES} 
-)
+target_link_libraries(${PROJECT_NAME}
+        module-sys
+        module-utils
+        module-cellular
+        module-db
+        module-gui
+        module-os
+        module-bsp
+        module-vfs
+        module-services
+        module-apps
+        ${TARGET_LIBRARIES}
+        )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
