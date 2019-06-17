@@ -10,12 +10,3 @@
 
 
 #include "Record.hpp"
-
-
-Record::Record(){
-
-}
-
-Record::~Record() {
-
-}

@@ -4,4 +4,8 @@
   <component name="MacroExpansionManager">
     <option name="directoryName" value="yxNliAcP" />
   </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="/usr/bin" />
+    <option name="version" value="2" />
+  </component>
 </project>

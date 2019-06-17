@@ -60,6 +60,9 @@ set(TARGET_SOURCES
 
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/_exit.c
         ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/memwrap.c
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_flexspi_nor_config.c
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/evkbimxrt1050_sdram_ini_dcd.c
+        ${CMAKE_CURRENT_LIST_DIR}/board/rt1051/xip/fsl_flexspi_nor_boot.c
 
         CACHE INTERNAL ""
         )

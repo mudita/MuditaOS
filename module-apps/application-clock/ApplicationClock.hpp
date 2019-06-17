@@ -13,6 +13,8 @@
 #include "Service/Message.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
+#include "gui/widgets/Progress.hpp"
+
 
 namespace app {
 
@@ -25,13 +27,32 @@ class ApplicationClock: public Application {
 	uint32_t seconds = 0;
 	uint32_t hour = 0;
 	uint32_t minute = 0;
-	gui::Label* timeLabel = nullptr;
+	gui::Label* hourLabel = nullptr;
+	gui::Label* minuteLabel = nullptr;
 	gui::Image* dotImage[64];
+	gui::Progress* progressBar = nullptr;
+
+	/**
+	 * @brief Increments hours counter
+	 */
+	bool incrementHour();
+	/**
+	 * @brief Increments minutes counter
+	 */
+	bool incrementMinute();
+	/**
+	 * @brief Increments seconds counter
+	 */
+	bool incrementSecond();
+	/**
+	 * @brief Updates strings for hour and minutes
+	 */
+	void updateLabels();
 public:
 	ApplicationClock(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
 
-	 sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
 	void TickHandler(uint32_t id) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;

@@ -24,7 +24,11 @@ struct ContactsRingtonesTableRow {
     UTF8        assetPath;
 };
 
-class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow> {
+enum class ContactRingtonesTableFields{
+    AssetPath
+};
+
+class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow,ContactRingtonesTableFields> {
 public:
 
     ContactsRingtonesTable(Database* db);
@@ -44,7 +48,7 @@ public:
     std::vector<ContactsRingtonesTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::vector<ContactsRingtonesTableRow>
-    GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field, uint32_t id) override final;
+    GetLimitOffsetByField(uint32_t offset, uint32_t limit,ContactRingtonesTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
 
@@ -59,8 +63,6 @@ private:
             "asset_path       TEXT NOT NULL,"
             "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
             ");";
-
-    Database* db;
 };
 
 

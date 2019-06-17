@@ -12,7 +12,7 @@
 #include "ContactsAddressTable.hpp"
 
 
-ContactsAddressTable::ContactsAddressTable(Database *db):db(db) {
+ContactsAddressTable::ContactsAddressTable(Database *db): Table(db) {
 
 }
 
@@ -26,7 +26,7 @@ bool ContactsAddressTable::Create() {
 
 bool ContactsAddressTable::Add(ContactsAddressTableRow entry) {
     return db->Execute(
-            "insert into contact_address (contact_id, country, city, street, number, type, note, mail) VALUES (%lu, '%s', '%s', '%s', '%s', %lu, '%s', '%s');",
+            "insert or ignore into contact_address (contact_id, country, city, street, number, type, note, mail) VALUES (%lu, '%s', '%s', '%s', '%s', %lu, '%s', '%s');",
             entry.contactID,
             entry.country.c_str(),
             entry.city.c_str(),
@@ -103,11 +103,33 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffset(uint32
     return ret;
 }
 
-std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit,
-                                                                                   const char *field, uint32_t id) {
-    auto retQuery = db->Query("SELECT * from contact_address WHERE %s=%lu ORDER BY contact_id LIMIT %lu OFFSET %lu;",
-                              field,
-                              id,
+std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit,ContactAddressTableFields field,
+                                                                                   const char *str) {
+
+    std::string fieldName;
+    switch(field){
+        case ContactAddressTableFields ::City:
+            fieldName = "city";
+            break;
+        case ContactAddressTableFields ::Country:
+            fieldName = "country";
+            break;
+        case ContactAddressTableFields ::Street:
+            fieldName = "street";
+            break;
+        case ContactAddressTableFields ::Number:
+            fieldName = "number";
+            break;
+        case ContactAddressTableFields ::Mail:
+            fieldName = "mail";
+            break;
+        default:
+            return std::vector<ContactsAddressTableRow>();
+    }
+
+    auto retQuery = db->Query("SELECT * from contact_address WHERE %s='%s' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
                               limit,
                               offset);
 

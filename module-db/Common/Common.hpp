@@ -50,4 +50,19 @@ enum class ContactAddressType
     OTHER       /*!< ID defines that address doesn’t belong to any of the types defined above. */
 };
 
+enum class SettingsLanguage
+{
+    ENGLISH=0x01,
+    POLISH=0x02,
+    GERMAN=0x04,
+    SPANISH=0x08,
+
+};
+
+enum class SettingsPinMode
+{
+    ALWAYS=0,
+    DAYS=1
+};
+
 #endif //PUREPHONE_COMMON_HPP

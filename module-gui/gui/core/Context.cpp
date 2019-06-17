@@ -16,8 +16,13 @@ namespace gui {
 Context::Context( ) : x{0}, y{0}, w{0}, h{0}, data{nullptr} {
 }
 
-Context::Context( uint16_t width, uint16_t height ) : x{0}, y{0}, w{width}, h{height} {
-	data = new uint8_t[w*h];
+Context::Context( uint16_t width, uint16_t height, uint8_t* buffer ) : x{0}, y{0}, w{width}, h{height} {
+	if( buffer == nullptr ){
+		data = new uint8_t[w*h];
+	}
+	else {
+		data = buffer;
+	}
 	memset( data, 15, w*h);
 }
 
@@ -74,6 +79,8 @@ void Context::fill( uint8_t colour ) {
 	if( data ) {
 		memset( data, colour, w*h );
 	}
+//	uint32_t size = 480*600;
+//	memset( data, colour, size );
 }
 
 std::ostream & operator << (std::ostream &out, const Context &c)

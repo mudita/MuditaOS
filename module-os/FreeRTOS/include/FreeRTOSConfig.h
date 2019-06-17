@@ -38,6 +38,7 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 #include <stdint.h>
+#include "log/log.hpp"
 
 //TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus
@@ -74,7 +75,7 @@ extern uint32_t SystemCoreClock;
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
-#define configTOTAL_HEAP_SIZE                   ((size_t)(1024*128))
+#define configTOTAL_HEAP_SIZE                   ((size_t)(1024*320))
 #define configAPPLICATION_ALLOCATED_HEAP        0
 
 /* Hook function related definitions. */
@@ -96,12 +97,12 @@ extern uint32_t SystemCoreClock;
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS                        1
-#define configTIMER_TASK_PRIORITY               (configMAX_PRIORITIES - 1)
+#define configTIMER_TASK_PRIORITY               0
 #define configTIMER_QUEUE_LENGTH                48
-#define configTIMER_TASK_STACK_DEPTH            (2048)
+#define configTIMER_TASK_STACK_DEPTH            (1024)
 
 /* Define to trap errors during development. */
-#define sconfigASSERT(x) if((x) == 0) {}
+#define configASSERT(x) if((x) == 0) {LOG_FATAL("Assertion: %s",x); while(1);}
 
 
 /* Optional functions - most linkers will remove unused functions anyway. */

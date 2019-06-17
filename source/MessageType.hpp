@@ -15,6 +15,8 @@ enum class MessageType {
 	//eink messages
 	EinkStateRequest, //message is used to pull status of the eink. If eink is ready to display image
 	EinkImageData, //message with pointer to the image data for displaying
+	EinkDMATransfer,//this message is internally sent from wink service to eink service. This will trigger DMA transfer to Eink's
+					//controller. After tranfer gui service wil lbewill be notified
 	EinkTemperatureUpdate, //message sent from timer handler. Message forces service to update temperature measured by the eink.
 
 	//gui messages
@@ -22,6 +24,27 @@ enum class MessageType {
 	GUIFocusInfo, // information about application that gained focus
 	GUIDisplayReady, //message that informs gui service that service controlling display device is ready for new buffer data.
 	GUIRenderingFinished, //Message is sent from the worker when all rendering is finished.
+
+	//DB messages
+	DBSettingsGet,  // get current settings from database
+	DBSettingsUpdate,   // update settings
+
+	DBSMSAdd,   // Add new sms record
+	DBSMSRemove,    // Remove specified SMS record
+	DBSMSUpdate,     // Update specified SMS record
+	DBSMSGetSMSLimitOffset,  // Get SMS records by limit,offset
+    DBSMSGetSMSLimitOffsetByThreadID,  // Get SMS records by limit,offset with specified ThreadID field
+
+	DBThreadGet,        // Get thread by ID
+	DBThreadRemove,     // Remove thread by ID
+	DBThreadGetLimitOffset, // Get Thread record by limit,offset
+
+	DBContactAdd,       // Add contact record
+	DBContactRemove,    // Remove contact remove
+	DBContactUpdate,    // Update contact remove
+	DBContactGetLimitOffset,   // Get contact records by limit,offset
+	DBContactGetCount,         // Get contacts count
+
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window

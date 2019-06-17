@@ -11,7 +11,7 @@
 
 #include "ContactsRingtonesTable.hpp"
 
-ContactsRingtonesTable::ContactsRingtonesTable(Database *db):db(db) {
+ContactsRingtonesTable::ContactsRingtonesTable(Database *db): Table(db) {
 
 }
 
@@ -26,7 +26,7 @@ bool ContactsRingtonesTable::Create() {
 
 bool ContactsRingtonesTable::Add(ContactsRingtonesTableRow entry) {
     return db->Execute(
-            "insert into contact_ringtones (contact_id, asset_path ) VALUES (%lu, '%s');",
+            "insert or ignore into contact_ringtones (contact_id, asset_path ) VALUES (%lu, '%s');",
             entry.contactID,
             entry.assetPath.c_str()
     );
@@ -79,12 +79,20 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffset(ui
     return ret;
 }
 
-std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit,
-                                                                                       const char *field,
-                                                                                       uint32_t id) {
-    auto retQuery = db->Query("SELECT * from contact_ringtones WHERE %s=%lu ORDER BY contact_id LIMIT %lu OFFSET %lu;",
-                              field,
-                              id,
+std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit,ContactRingtonesTableFields field,
+                                                                                       const char *str) {
+    std::string fieldName;
+    switch(field){
+        case ContactRingtonesTableFields ::AssetPath:
+            fieldName="asset_path";
+            break;
+        default:
+            return std::vector<ContactsRingtonesTableRow>();
+    }
+
+    auto retQuery = db->Query("SELECT * from contact_ringtones WHERE %s='%s' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
                               limit,
                               offset);
 

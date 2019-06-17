@@ -4,9 +4,12 @@
 
 #include "../module-gui/gui/core/ImageManager.hpp"
 #include "log/log.hpp"
+#include "memory/usermem.h"
+#include "ticks.hpp"
 
 //module-applications
 #include  "application-clock/ApplicationClock.hpp"
+#include  "application-viewer/ApplicationViewer.hpp"
 #include "application-test/ApplicationTest.hpp"
 
 //module-services
@@ -15,6 +18,10 @@
 #include "ServiceEink.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-kbd/EventManager.hpp"
+
+
+#include "service-db/ServiceDB.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
 
 //module-gui
 #include "gui/core/Font.hpp"
@@ -40,71 +47,15 @@ class vfs vfs;
 
 class BlinkyService : public sys::Service {
 	gui::Window* win = nullptr;
+	uint8_t* mem = nullptr;
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(1000,true);
+    	mem = new uint8_t[480*600];
+        timer_id = CreateTimer(100,true);
         ReloadTimer(timer_id);
 
-        win = new gui::Window("Main");
-		win->setSize( 480, 600 );
-
-		gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
-
-		gui::Rect* maxW1 = new gui::Rect();
-		maxW1->setFillColor(gui::Color( 5, 0));
-		maxW1->setFilled(true);
-		maxW1->setMaxSize( 50, 300 );
-
-		gui::Label* maxW4 = new gui::Label();
-		maxW4->setText("Top Left corner");
-		maxW4->setDotsMode(true);
-		maxW4->setMaxSize( 275, 60 );
-
-		gui::Rect* maxW2 = new gui::Rect();
-		maxW2->setFillColor(gui::Color( 8, 0));
-		maxW2->setFilled(true);
-		maxW2->setMaxSize( 35, 300 );
-
-		gui::Rect* maxW3 = new gui::Rect();
-		maxW3->setFillColor(gui::Color( 11, 0));
-		maxW3->setFilled(true);
-		maxW3->setMaxSize( 30, 300 );
-
-		hBox->addWidget(maxW1);
-		hBox->addWidget(maxW4);
-		hBox->addWidget(maxW2);
-
-		gui::VBox* vBox = new gui::VBox( hBox, 10, 155, 460, 600-160 );
-
-		gui::Rect* maxH1 = new gui::Rect();
-		maxH1->setMaxSize( 10, 80 );
-
-		gui::Rect* maxH2 = new gui::Rect();
-		maxH2->setMaxSize( 15, 300 );
-
-		gui::Rect* maxH3 = new gui::Rect();
-		maxH3->setMaxSize( 30, 300 );
-
-		gui::Label* maxH4 = new gui::Label();
-		maxH4->setText("Hello Mudita");
-		maxH4->setRadius( 20 );
-		maxH4->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-		maxH4->setMaxSize( 75, 60 );
-
-		gui::Image* img1 = new gui::Image();
-		uint16_t id = gui::ImageManager::getInstance().getImageMapID("loudspeaker.mpi");
-		img1->setImageWithID( id );
-
-
-		vBox->addWidget(maxH1);
-		vBox->addWidget(maxH2);
-		vBox->addWidget(maxH4);
-		vBox->addWidget( img1 );
-		vBox->addWidget(maxH3);
-
-		hBox->addWidget(maxW3);
     }
 
     ~BlinkyService(){
@@ -114,12 +65,19 @@ public:
 
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
+
         return std::make_shared<sys::ResponseMessage>( );
     }
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-
+        //auto msg = std::make_shared<sys::DataMessage>(500);
+        //sys::Bus::SendUnicast(msg,"Blinky",this);
+        //LOG_DEBUG("Blinky service tick!");
+    	uint32_t start_tick = xTaskGetTickCount();
+		memset( mem, 0, 480*600);
+		uint32_t end_tick = xTaskGetTickCount();
+		LOG_DEBUG("memset time: %d", end_tick-start_tick);
     }
 
     // Invoked during initialization
@@ -148,28 +106,33 @@ public:
 
 int SystemStart(sys::SystemManager* sysmgr)
 {
-    //TODO:M.P remove it, only for test purposes
-   // bsp::keyboard keyboard;
-   // keyboard.Init([](bsp::KeyEvents event,bsp::KeyCodes code)->void{LOG_DEBUG("KeyEvent:%d KeyCode:%d",event,code);});
-
-
     vfs.Init();
 
-    auto ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+    bool ret;
+    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
+#if 1 // TODO: Robert please clean it up
     //launcher for clock application
 /*    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
     applications.push_back( std::move(clockLauncher) );*/
+
 
     //launcher for test application
     std::unique_ptr<app::ApplicationLauncher> testLauncher = std::unique_ptr<app::ApplicationTestLauncher>(new app::ApplicationTestLauncher());
     applications.push_back( std::move(testLauncher) );
 
+//    //launcher for viewer application
+//	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
+//	applications.push_back( std::move(viewerLauncher) );
+
+#endif
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
@@ -180,10 +143,9 @@ int SystemStart(sys::SystemManager* sysmgr)
     return 0;
 }
 
-
 int main() {
 
-	LOG_PRINTF("Launching PurePhone..\n");
+	LOG_PRINTF("Launching PurePhone..\n ");
 
     bsp::BoardInit();
 
@@ -192,6 +154,8 @@ int main() {
     sysmgr->StartSystem();
 
     sysmgr->RegisterInitFunction(SystemStart);
+
+
 
     cpp_freertos::Thread::StartScheduler();
 

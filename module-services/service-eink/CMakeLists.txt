@@ -33,9 +33,5 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceEink.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/messages/ImageMessage.cpp"
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/ServiceEink.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/messages/EinkMessage.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/messages/ImageMessage.cpp"
 )
 

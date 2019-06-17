@@ -41,8 +41,7 @@ protected:
 	bool deepClearScreen(int8_t temperature);
 
 	uint8_t einkRenderBuffer[600 * 480];
-	//uint8_t s_einkRenderBuffer[BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X];
-
+	bool	deepRefresh = false;
 public:
 	ServiceEink(const std::string& name);
     ~ServiceEink();
