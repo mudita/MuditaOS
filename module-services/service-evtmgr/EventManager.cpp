@@ -37,10 +37,6 @@ EventManager::EventManager(const std::string& name)
 
 EventManager::~EventManager(){
 
-    timer_id = CreateTimer(1000,true);
-    ReloadTimer(timer_id);
-
-
 	LOG_INFO("[EventManager] Cleaning resources");
 	if( EventWorker != nullptr) {
 		EventWorker->deinit();

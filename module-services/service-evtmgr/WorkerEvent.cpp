@@ -75,7 +75,7 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(code));
 		if( (it != longPressParamsList.end()) && (state == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
 		{
-		longPressTimerStart(it->second);
+			longPressTimerStart(it->second);
 		}
 
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
@@ -98,6 +98,8 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 }
 bool WorkerEvent::deinit(void)
 {
+	xTimerDelete(longPressTimerHandle, 100);
+	Worker::stop();
 	Worker::deinit();
 	bsp::keyboard_Deinit();
 

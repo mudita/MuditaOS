@@ -23,7 +23,7 @@
 //module-utils
 #include "log/log.hpp"
 //module-services
-#include "service-kbd/EventManager.hpp"
+#include "service-evtmgr/EventManager.hpp"
 //MessageType
 #include "MessageType.hpp"
 //this module
