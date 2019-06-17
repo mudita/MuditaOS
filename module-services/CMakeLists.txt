@@ -36,15 +36,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 
-
-
 target_include_directories(${PROJECT_NAME}
 
         PUBLIC
-
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../source
-
+	        ${CMAKE_CURRENT_SOURCE_DIR}
+       		${CMAKE_CURRENT_SOURCE_DIR}/../source
 )
 
 
