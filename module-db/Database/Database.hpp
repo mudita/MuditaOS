@@ -36,6 +36,8 @@ public:
 
     bool IsInitialized(){return isInitialized;}
 
+    uint32_t GetLastInsertRowID();
+
 private:
 
     const uint32_t maxQueryLen = (8 * 1024);

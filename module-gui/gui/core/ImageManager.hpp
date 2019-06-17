@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <cstring>
 
-#include "PixMap.hpp"
+#include "ImageMap.hpp"
 
 namespace gui {
 

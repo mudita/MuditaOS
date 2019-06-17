@@ -32,8 +32,11 @@ struct ContactsTableRow {
     uint32_t speedDial;
 };
 
+enum class ContactTableFields{
+    SpeedDial
+};
 
-class ContactsTable : public Table<ContactsTableRow> {
+class ContactsTable : public Table<ContactsTableRow,ContactTableFields> {
 public:
 
     ContactsTable(Database* db);
@@ -53,7 +56,7 @@ public:
     std::vector<ContactsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
     std::vector<ContactsTableRow>
-    GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field, uint32_t id) override final;
+    GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
 
@@ -75,8 +78,6 @@ private:
             "speeddial        INTEGER,"
             "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
             ");";
-
-    Database* db;
 
 };
 

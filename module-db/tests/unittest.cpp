@@ -90,7 +90,6 @@ TEST_CASE( "Create and destroy simple database" ) {
     {
         Database testDB("test.db");
 
-        const char* name = "Mati Patus6";
         auto queryRes = testDB.Query("SELECT * from artists;");
 
         REQUIRE(queryRes->GetFieldCount() == 2);

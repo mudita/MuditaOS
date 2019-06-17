@@ -37,6 +37,7 @@ message("${PROJECT_NAME}: add_subdirectory application-clock")
 add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
 add_subdirectory( application-test )
+add_subdirectory( application-viewer )
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )
@@ -69,7 +70,6 @@ target_compile_definitions(${PROJECT_NAME}
 
         PUBLIC
 
-        CPP_FREERTOS_CONDITION_VARIABLES
         )
 
 target_compile_options(${PROJECT_NAME}

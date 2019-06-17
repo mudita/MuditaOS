@@ -12,7 +12,7 @@
 #include "SMSTable.hpp"
 
 
-SMSTable::SMSTable(Database* db): db(db){
+SMSTable::SMSTable(Database *db) : Table(db) {
 }
 
 SMSTable::~SMSTable() {
@@ -25,7 +25,7 @@ bool SMSTable::Create() {
 
 bool SMSTable::Add(SMSTableRow entry) {
     return db->Execute(
-            "INSERT INTO sms ( thread_id,contact_id, date, date_send, error_code, body, read, type ) VALUES (%lu,%lu,%lu,%lu,0,'%s',%d,%d);",
+            "INSERT or ignore INTO sms ( thread_id,contact_id, date, date_send, error_code, body, read, type ) VALUES (%lu,%lu,%lu,%lu,0,'%s',%d,%d);",
             entry.threadID,
             entry.contactID,
             entry.date,
@@ -38,6 +38,29 @@ bool SMSTable::Add(SMSTableRow entry) {
 
 bool SMSTable::RemoveByID(uint32_t id) {
     return db->Execute("DELETE FROM sms where _id = %u;", id);
+}
+
+bool SMSTable::RemoveByField(SMSTableFields field, const char *str) {
+    std::string fieldName;
+
+    switch(field){
+        case SMSTableFields ::ThreadID:
+            fieldName = "thread_id";
+            break;
+
+        case SMSTableFields ::ContactID:
+            fieldName = "contact_id";
+            break;
+
+        case SMSTableFields ::Date:
+            fieldName = "date";
+            break;
+        default:
+            return false;
+    }
+
+    return db->Execute("DELETE FROM sms where %s = '%s';", fieldName.c_str(),str);
+
 }
 
 
@@ -58,7 +81,7 @@ bool SMSTable::Update(SMSTableRow entry) {
 SMSTableRow SMSTable::GetByID(uint32_t id) {
     auto retQuery = db->Query("SELECT * FROM sms WHERE _id= %u;", id);
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return SMSTableRow();
     }
 
@@ -75,12 +98,11 @@ SMSTableRow SMSTable::GetByID(uint32_t id) {
 }
 
 std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
-
     auto retQuery = db->Query("SELECT * from sms ORDER BY date LIMIT %lu OFFSET %lu;",
-                             limit,
-                             offset);
+                              limit,
+                              offset);
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTableRow>();
     }
 
@@ -102,12 +124,29 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limi
     return ret;
 }
 
-std::vector<SMSTableRow> SMSTable::GetLimitOffsetByFieldID(uint32_t offset, uint32_t limit, const char *field, uint32_t id) {
-    auto retQuery = db->Query("SELECT * from sms WHERE %s=%lu ORDER BY date LIMIT %lu OFFSET %lu;",
-                             field,
-                             id,
-                             limit,
-                             offset);
+std::vector<SMSTableRow>
+SMSTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, SMSTableFields field, const char *str) {
+
+    std::string fieldName;
+    switch (field) {
+        case SMSTableFields::Date:
+            fieldName = "date";
+            break;
+        case SMSTableFields ::ContactID:
+            fieldName = "contact_id";
+            break;
+        case SMSTableFields ::ThreadID:
+            fieldName = "thread_id";
+            break;
+        default:
+            return std::vector<SMSTableRow>();
+    }
+
+    auto retQuery = db->Query("SELECT * from sms WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
+                              limit,
+                              offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -142,7 +181,7 @@ uint32_t SMSTable::GetCount() {
 }
 
 uint32_t SMSTable::GetCountByFieldID(const char *field, uint32_t id) {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM sms WHERE %s=%lu;",field,id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM sms WHERE %s=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

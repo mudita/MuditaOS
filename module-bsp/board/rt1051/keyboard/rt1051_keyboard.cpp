@@ -26,7 +26,7 @@ namespace bsp {
 
 #define KEYBOARD_CONTACT_OSCILLATION_TIMEOUT_MS    20
 
- //   static std::function<void(KeyEvents event,KeyCodes code)> user_event_callback = NULL;
+    static std::function<void(KeyEvents event,KeyCodes code)> user_event_callback = NULL;
     static TaskHandle_t keyboard_worker_handle = NULL;
     static TimerHandle_t s_right_functional_check_timer = NULL;
     static volatile uint8_t s_rigth_functional_last_state = 0;

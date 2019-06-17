@@ -7,6 +7,10 @@
 
 #include <memory>
 
+//module-os
+#include "FreeRTOS.h"
+#include "semphr.h"
+
 //module-gui
 #include "gui/core/Font.hpp"
 #include "gui/core/Context.hpp"
@@ -21,21 +25,26 @@
 #include "ServiceGUI.hpp"
 
 #include "..//gui/core/ImageManager.hpp"
-#include "GUIWorker.hpp"
 #include "log/log.hpp"
 
+extern "C"
+#include "module-os/memory/usermem.h"
+
 #include "SystemManager/SystemManager.hpp"
+#include "WorkerGUI.hpp"
 
 namespace sgui {
 
 ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
-		: sys::Service(name, 4096, sys::ServicePriority::High),
+		: sys::Service(name, 4096, sys::ServicePriority::Idle),
 		renderContext{ nullptr },
 		transferContext { nullptr },
 		renderFrameCounter{ 1 },
 		transferedFrameCounter{ 0 },
 		screenWidth{ screenWidth },
-		screenHeight{ screenHeight } {
+		screenHeight{ screenHeight },
+		semCommands{ NULL },
+		worker{nullptr} {
 
 	LOG_INFO("[ServiceGUI] Initializing");
 
@@ -61,19 +70,29 @@ ServiceGUI::~ServiceGUI(){
 void ServiceGUI::sendBuffer() {
 	//copy data from render context to transfer context
 	transferContext->insert( 0, 0, renderContext );
+	//memcpy( transferContext->getData(), renderContext->getData(), renderContext->getW()*renderContext->getH());
 
 	auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
 			transferContext->getW(),
 			transferContext->getH(),
+			(mode==gui::RefreshModes::GUI_REFRESH_DEEP?true:false),
 			transferContext->getData()
-
 	);
-	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this, 500);
+	einkReady = false;
+	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this,2000);
 	if( ret.first == sys::ReturnCodes::Success ) {
 		transferedFrameCounter = renderFrameCounter;
 	}
-	einkReady = false;
+	//set default refreshing mode.
+	mode = gui::RefreshModes::GUI_REFRESH_FAST;
+
 }
+
+void ServiceGUI::sendToRender() {
+	rendering = true;
+	worker->send(static_cast<uint32_t>(WorkerGUICommands::Render), NULL);
+}
+
 
 // Invoked upon receiving data message
 sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
@@ -87,33 +106,49 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		case static_cast<uint32_t>( MessageType::GUICommands ): {
 			auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
 			if( !dmsg->commands.empty() ) {
+
+				//update mode
+				if( dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP ) {
+					mode = dmsg->mode;
+				}
+
 				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 
-				//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
-				std::vector<gui::DrawCommand*> commands;
-				for (auto i = dmsg->commands.begin(); i != dmsg->commands.end(); ++i)
-					commands.push_back( (*i).get() );
-				uint32_t start_tick = xTaskGetTickCount();
-				renderer.render( renderContext, commands );
-				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] RenderingTime: %d", end_tick - start_tick);
-
-				//increment counter holding number of drawn frames
-				renderFrameCounter++;
-
-				if( einkReady ) {
-					sendBuffer();
+				//lock access to commands vector, clear it and then copy commands from message to vector
+				if( xSemaphoreTake( semCommands, pdMS_TO_TICKS(1000) ) == pdTRUE ) {
+					commands.clear();
+					for (auto it = dmsg->commands.begin(); it != dmsg->commands.end(); it++)
+						commands.push_back(std::move(*it));
+					xSemaphoreGive( semCommands );
 				}
-				else {
-					//request eink state
-					auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
-					sys::Bus::SendUnicast(msg, "ServiceEink", this);
+
+				//if worker is not rendering send him new set of commands
+				if( !rendering ) {
+					sendToRender();
 				}
+
+				uint32_t mem = usermemGetFreeHeapSize();
+				LOG_WARN( "Heap Memory: %d", mem );
 			}
 
 		} break;
-		case static_cast<uint32_t>( MessageType::GUIRenderingFinished ): {
-			//TODO implement worker and message handling
+		case static_cast<uint32_t>(MessageType::GUIRenderingFinished): {
+			LOG_INFO("Rendering finished");
+			//increment counter holding number of drawn frames
+			rendering = false;
+			renderFrameCounter++;
+			//copy render buffer to transfer buffer using semaphore to protect data
+			//gui service is locking semaphore, makes a copy and then sends message to eink
+
+			if( einkReady ) {
+				sendBuffer();
+			}
+			else if( !requestSent ){
+				requestSent = true;
+				//request eink state
+				auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest);
+				sys::Bus::SendUnicast(msg, "ServiceEink", this);
+			}
 		}break;
 		case static_cast<uint32_t>( MessageType::GUIFocusInfo ): {
 
@@ -121,16 +156,14 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		} break;
 		case static_cast<uint32_t>( MessageType::GUIDisplayReady ): {
 
+			LOG_INFO("[ServiceGUI]Display ready");
 			einkReady = true;
-			if( timer_id != 0 ){
-				DeleteTimer( timer_id );
-				timer_id = 0;
-			}
-
+			requestSent = false;
+			//mode = gui::RefreshModes::GUI_REFRESH_FAST;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
-			if( renderFrameCounter != transferedFrameCounter ) {
-
+			if( (renderFrameCounter != transferedFrameCounter) && (!rendering) ) {
+				LOG_INFO("[ServiceGUI]Sending buffer");
 				sendBuffer();
 			}
 			else {
@@ -145,32 +178,39 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 
 // Invoked when timer ticked
 void ServiceGUI::TickHandler(uint32_t id) {
-	if( einkReady == false ) {
-		ReloadTimer( timer_id );
-		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
-		sys::Bus::SendUnicast(msg, "ServiceEink", this);
-	}
 }
 
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
 
-	//start worker
-//	worker = new GUIWorker( this );
-//	worker->init();
-//	worker->run();
+	//create semaphore to protect vector with commands waiting for rendering
+	semCommands = xSemaphoreCreateBinary();
+	if( semCommands == NULL ) {
+		LOG_FATAL("Failed to create commands semaphore.");
+		return sys::ReturnCodes::Failure;
+	}
+	xSemaphoreGive( semCommands );
 
-	//creat timer that pulls eink's status
-	timer_id = CreateTimer(250,true);
-	ReloadTimer(timer_id);
+	//initialize gui worker
+	worker = new WorkerGUI( this );
+	std::list<sys::WorkerQueueInfo> list;
+	worker->init( list );
+	worker->run();
 
-
-
-
+	if( einkReady == false ) {
+		requestSent = true;
+		auto msg = std::make_shared<seink::EinkMessage>(MessageType::EinkStateRequest );
+		sys::Bus::SendUnicast(msg, "ServiceEink", this);
+	}
 	return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceGUI::DeinitHandler() {
+
+	if( semCommands != NULL )
+		vSemaphoreDelete( semCommands );
+	semCommands = NULL;
+
 	return sys::ReturnCodes::Success;
 }
 

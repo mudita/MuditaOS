@@ -80,14 +80,15 @@ void ApplicationTest::createUserInterface(){
 	color.alpha = 0;
 	color.intensivity = 5;
 
-	rectangle = new gui::Rect(clockWin,290, 150, 100, 100);
+	rectangle = new gui::Rect(clockWin,90, 250, 150, 150);
 	rectangle->setPenWidth(5);
 	rectangle->setFillColor(color);
-	rectangle->setFilled(true);
-	rectangle->setPosition(90, 250);
-	rectangle->setMaxSize(100, 100);
+	//rectangle->setFilled(true);
+	rectangle->setFilled(false);
+	//rectangle->setPosition(90, 250);
+	//rectangle->setMaxSize(100, 100);
 	rectangle->setRadius(25);
-	rectangle->setFlat(gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT | gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT |
+	rectangle->setFlat(gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT | /*gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT |*/
 						/*gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT |*/ gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT) ;
 /*	rect = new gui::Rect(rectangle, 10, 10, 80, 80);
 
