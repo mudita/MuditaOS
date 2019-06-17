@@ -107,10 +107,10 @@ void ApplicationTest::createUserInterface(){
 	rect2->setFilled(true);*/
 
 
-	/*bar = new gui::Progress(clockWin, 40, 50, 400, 70);
+	bar = new gui::Progress(clockWin, 40, 50, 400, 70);
 	bar->setTotalProgress(100);
-	bar->setCurrentProgress(progress % 15050);
-*/
+	bar->setCurrentProgress(1);
+
 }
 void ApplicationTest::destroyUserInterface(){
 
