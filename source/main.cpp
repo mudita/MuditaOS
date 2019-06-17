@@ -17,7 +17,7 @@
 #include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-kbd/EventManager.hpp"
+#include "service-evtmgr/EventManager.hpp"
 
 
 #include "service-db/ServiceDB.hpp"
@@ -129,7 +129,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 #endif
 
     //start application manager
-    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+   ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;

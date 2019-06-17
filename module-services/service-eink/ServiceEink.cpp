@@ -107,7 +107,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 		case static_cast<uint32_t>(MessageType::EinkDMATransfer): {
 
 //			LOG_INFO("[ServiceEink] Received framebuffer");
-			uint32_t start_tick = xTaskGetTickCount();
+//			uint32_t start_tick = xTaskGetTickCount();
 			EinkPowerOn();
 
 			int32_t temperature = EinkGetTemperatureInternal();
@@ -143,7 +143,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to refresh frame");
 			EinkPowerOff();
-			uint32_t end_tick = xTaskGetTickCount();
+//			uint32_t end_tick = xTaskGetTickCount();
 
 //			LOG_INFO("[ServiceEink] RefreshTime: %d", end_tick - start_tick);
 
