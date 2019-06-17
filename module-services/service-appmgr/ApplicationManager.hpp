@@ -69,8 +69,12 @@ class ApplicationManager: public sys::Service {
 	State state = State::IDLE;
 
 	//tries to switch the application
-	bool switchApplicationInternal( APMSwitch* msg);
-	bool switchApplicationWithDataInternal( APMSwitchData* msg);
+	bool handleSwitchApplication( APMSwitch* msg);
+	bool handleSwitchApplicationWithData( APMSwitchData* msg);
+	bool handleCloseConfirmation( APMConfirmClose* msg );
+	bool handleSwitchConfirmation( APMConfirmSwitch* msg );
+	bool handleRegisterApplication( APMRegister* msg );
+	bool startApplication( const std::string& appName );
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();
@@ -91,24 +95,29 @@ public:
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
      */
-    static bool switchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName="" );
+    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName="" );
     /**
 	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
 	 * Allows sending data to destination application.
 	 */
-    static bool switchApplicationWithData( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
+    static bool messageSwitchApplicationWithData( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
     /**
      * @Brief Function allows sending confirmation to the switch request. This is sent both by application that gains and looses focus.
      */
-	static bool confirmSwitch( sys::Service* sender);
+	static bool messageConfirmSwitch( sys::Service* sender);
 	/**
 	 * @brief Function allows application to confirm close request.
 	 */
-    static bool confirmClose( sys::Service* sender);
+    static bool messageConfirmClose( sys::Service* sender);
     /**
      * @brief Allows requesting Application Manager to run previous application.
      */
-    static bool switchPreviousApplication( sys::Service* sender, const std::string& prevAppName );
+    static bool messageSwitchPreviousApplication( sys::Service* sender, const std::string& prevAppName );
+    /**
+	* @brief Sends information from application to manager about result of application's init function.
+	* If successful message will contain name and true value, otherwise false value will be transmitted.
+	*/
+   static bool messageRegisterApplication( sys::Service* sender, const std::string& applicationName, const bool& status );
 };
 
 } /* namespace sapm */

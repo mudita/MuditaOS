@@ -39,7 +39,7 @@ bool WorkerGUI::handleMessage( uint32_t queueID ) {
 	//queue for receiving rendering commands
 	if( queueID == 0 )
 	{
-		LOG_INFO("Received rendering commands");
+//		LOG_INFO("Received rendering commands");
 
 		sys::WorkerCommand received;
 		xQueueReceive(queue, &received, 0);
@@ -62,7 +62,7 @@ bool WorkerGUI::handleMessage( uint32_t queueID ) {
 		uint32_t start_tick = xTaskGetTickCount();
 		serviceGUI->renderer.render( serviceGUI->renderContext, commands );
 		uint32_t end_tick = xTaskGetTickCount();
-		LOG_INFO("[WorkerGUI] RenderingTime: %d", end_tick - start_tick);
+//		LOG_INFO("[WorkerGUI] RenderingTime: %d", end_tick - start_tick);
 
 //			delete received;
 
