@@ -62,7 +62,10 @@ enum class MessageType {
 	AppSwitchWithData,
 	AppRefresh,
 	AppClose,
-	AppFocus
+	AppFocus,
+
+	EVMFocusApplication,
+	EVMKeyboardProfile,
 };
 
 
