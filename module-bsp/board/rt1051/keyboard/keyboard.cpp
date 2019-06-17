@@ -127,9 +127,7 @@ namespace bsp {
     }
 
 
-    status_t rt1501_keyboard_Deinit(void) {
-       // user_event_callback = NULL;
-        //vTaskDelete(keyboard_worker_handle);
+    status_t keyboard_Deinit(void) {
 
         /* Enable GPIO pin interrupt */
         GPIO_PortDisableInterrupts(BOARD_KEYBOARD_IRQ_GPIO, 1U << BOARD_KEYBOARD_IRQ_GPIO_PIN);
@@ -141,6 +139,9 @@ namespace bsp {
 
         // Keep keyboard controller in reset state
         GPIO_PinWrite(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, 0);
+
+        //Clear IRQ queue handle
+        qHandleIrq = NULL;
 
         return kStatus_Success;
     }
@@ -195,7 +196,7 @@ namespace bsp {
 		}
 	}
 
-    BaseType_t rt1501_keyboard_right_functional_IRQHandler(void) {
+    BaseType_t keyboard_right_functional_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         GPIO_ClearPinsInterruptFlags(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
 
@@ -215,9 +216,9 @@ namespace bsp {
     }
 
 
-    BaseType_t rt1501_keyboard_IRQHandler(void) {
+    BaseType_t keyboard_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if(qHandleIrq){
+        if(qHandleIrq != NULL){
         	uint8_t val = 0x01;
         	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
         }
@@ -234,13 +235,13 @@ namespace bsp {
         if (right_functional_current_state == s_rigth_functional_last_state) {
             if (right_functional_current_state == 0) {
                 // RIGHT FUNCTIONAL PRESSED
-            	if(qHandleIrq){
+            	if(qHandleIrq != NULL){
 					uint8_t val = 0x02;
 					xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
                 }
             } else {
             	// RIGHT FUNCTIONAL RELEASED
-            	if(qHandleIrq){
+            	if(qHandleIrq != NULL){
 					uint8_t val = 0x04;
 					xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
                 }

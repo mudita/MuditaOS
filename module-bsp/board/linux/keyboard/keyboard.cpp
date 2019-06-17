@@ -20,73 +20,83 @@
 #include <fcntl.h>
 
 #include "keyboard/keyboard.hpp"
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
-
 
 namespace bsp {
 
-static TaskHandle_t linux_keyboard_worker_handle = NULL;
+	static TaskHandle_t linux_keyboard_worker_handle = NULL;
 
-static uint8_t kcode = 0;
-static uint8_t kevent = 0;
-static void linux_keyboard_worker(void *pvp)
-{
-	int fd;
+	static uint8_t kcode = 0;
+	static uint8_t kevent = 0;
 
-	const char * myfifo = "/tmp/myfifo3";
+	static int fd;
 
-	// Creating the named file(FIFO)
-	// mkfifo(<pathname>, <permission>)
-	mkfifo(myfifo, 0666);
-
-	// Open FIFO for write only
-	fd = open(myfifo, O_RDONLY | O_NONBLOCK );
-
-	while(1)
+	static void linux_keyboard_worker(void *pvp)
 	{
-		uint8_t buff [10];
-		int32_t readedBytes = read(fd, buff, 10);
 
-		if(readedBytes > 1)
+
+		const char * myfifo = "/tmp/myfifo3";
+
+		// Creating the named file(FIFO)
+		// mkfifo(<pathname>, <permission>)
+		mkfifo(myfifo, 0666);
+
+		// Open FIFO for write only
+		fd = open(myfifo, O_RDONLY | O_NONBLOCK );
+
+		while(1)
 		{
-			kevent = buff[0];
-			kcode = buff[1];
+			uint8_t buff [10];
+			int32_t readedBytes = read(fd, buff, 10);
 
-			//if(buff[2] == buff[0] + buff[1])
-			xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
-
-			uint8_t notification = 0;
-			if(kcode == static_cast<uint8_t>(bsp::KeyCodes::FnRight) )
+			if(readedBytes > 1)
 			{
-				if( kevent == static_cast<uint8_t>(bsp::KeyEvents::Pressed) )
-					notification = 0x02;
+				kevent = buff[0];
+				kcode = buff[1];
+
+				xQueueHandle qhandle = reinterpret_cast<xQueueHandle>(pvp);
+
+				uint8_t notification = 0;
+				if(kcode == static_cast<uint8_t>(bsp::KeyCodes::FnRight) )
+				{
+					if( kevent == static_cast<uint8_t>(bsp::KeyEvents::Pressed) )
+						notification = 0x02;
+					else
+						notification = 0x04;
+				}
 				else
-					notification = 0x04;
+					notification = 0x01;
+				xQueueSend(qhandle, &notification, 100);
 			}
-			else
-				notification = 0x01;
-			xQueueSend(qhandle, &notification, 100);
+			vTaskDelay(50);
 		}
-		vTaskDelay(50);
+
+		close(fd);
 	}
 
-	close(fd);
-}
-
-void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code)
-{
-	event = kevent;
-	code = kcode;
-}
-
-int32_t keyboard_Init(xQueueHandle qHandle){
-
-	if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, qHandle, 0, &linux_keyboard_worker_handle) != pdPASS) {
-		return 1;
+	void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code)
+	{
+		event = kevent;
+		code = kcode;
 	}
-	return 0;
+
+	int32_t keyboard_Init(xQueueHandle qHandle){
+
+		if (xTaskCreate(linux_keyboard_worker, "keyboard", 512, qHandle, 0, &linux_keyboard_worker_handle) != pdPASS) {
+			return 1;
+		}
+		return 0;
+	}
+
+	int32_t keyboard_Deinit(void)
+	{
+		vTaskDelete(linux_keyboard_worker_handle);
+		close(fd);
+		return 0;
+	}
+
 }
-}
+
+
 
 
 

@@ -7,7 +7,7 @@
 
 #include "EventManager.hpp"
 
-#include "module-bsp/board/linux/keyboard/bsp_keyboard.hpp"
+
 #include "log/log.hpp"
 
 #include "keyboard/keyboard.hpp"
@@ -61,9 +61,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 	message->keyCode = msg->keyCode;
 	message->keyState = msg->keyState;
 
-//		sys::Bus::SendUnicast(message, "ApplicationClock", this);
 	sys::Bus::SendUnicast(message, "ApplicationViewer", this);
-//		sys::Bus::SendBroadcast(message, this);
+
 	return std::make_shared<sys::ResponseMessage>();
 }
 
@@ -83,13 +82,12 @@ sys::ReturnCodes EventManager::InitHandler() {
 
 	//create queues for worker
 	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
-	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(KeyState), 10 };
-	sys::WorkerQueueInfo qNoti = {"qNoti", sizeof(uint8_t), 10 };
+	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qTimer);
 	list.push_back(qIrq);
-	list.push_back(qNoti);
+
 	EventWorker->init( list );
 	EventWorker->run();
 
@@ -99,6 +97,8 @@ sys::ReturnCodes EventManager::InitHandler() {
 }
 
 sys::ReturnCodes EventManager::DeinitHandler() {
+
+	EventWorker->deinit();
 	return sys::ReturnCodes::Success;
 }
 

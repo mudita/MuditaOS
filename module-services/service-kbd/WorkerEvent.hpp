@@ -18,8 +18,6 @@
 
 #include "common.hpp"
 
-
-
 struct KeyState{
 	uint8_t event;
 	uint8_t code;
@@ -28,7 +26,6 @@ struct KeyState{
 enum class WorkerEventQueues{
 	queueService = 0,
 	queueKeyboardTimer,
-	queueKeyboardEvent,
 	queueKeyboardIRQ
 };
 

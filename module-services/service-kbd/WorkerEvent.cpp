@@ -19,14 +19,8 @@ extern "C" {
 #include "MessageType.hpp"
 
 #include "WorkerEvent.hpp"
-
-#include "module-bsp/bsp/keyboard/keyboard.hpp"
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
-#include "module-bsp/board/rt1051/keyboard/rt1051_keyboard.hpp"
 #include "EventManager.hpp"
-
-#include <iostream>
-
+#include "module-bsp/bsp/keyboard/keyboard.hpp"
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
 {
@@ -105,6 +99,7 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 bool WorkerEvent::deinit(void)
 {
 	Worker::deinit();
+	bsp::keyboard_Deinit();
 
 	return true;
 }
