@@ -610,7 +610,7 @@ void Renderer::render( Context* ctx, std::vector<DrawCommand*>& commands ) {
 				ctx->fill( 15 );
 //				vPortExitCritical();
 				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] ctx->fill( 15 ); Time: %d", end_tick - start_tick);
+//				LOG_INFO("[ServiceGUI] ctx->fill( 15 ); Time: %d", end_tick - start_tick);
 			}break;
 			case DrawCommandID::GUI_DRAW_LINE: {
 
@@ -620,7 +620,7 @@ void Renderer::render( Context* ctx, std::vector<DrawCommand*>& commands ) {
 				uint32_t start_tick = xTaskGetTickCount();
 				drawRectangle( ctx, static_cast<CommandRectangle*>(cmd) );
 				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] drawRect Time: %d", end_tick - start_tick);
+//				LOG_INFO("[ServiceGUI] drawRect Time: %d", end_tick - start_tick);
 
 			}break;
 			case DrawCommandID::GUI_DRAW_TEXT: {
@@ -628,14 +628,14 @@ void Renderer::render( Context* ctx, std::vector<DrawCommand*>& commands ) {
 				uint32_t start_tick = xTaskGetTickCount();
 				drawText( ctx, static_cast<CommandText*>(cmd) );
 				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] drawText time: %d", end_tick - start_tick);
+//				LOG_INFO("[ServiceGUI] drawText time: %d", end_tick - start_tick);
 			}break;
 			case DrawCommandID::GUI_DRAW_IMAGE: {
 
 				uint32_t start_tick = xTaskGetTickCount();
 				drawImage( ctx, static_cast<CommandImage*>(cmd) );
 				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] drawImage time: %d", end_tick - start_tick);
+//				LOG_INFO("[ServiceGUI] drawImage time: %d", end_tick - start_tick);
 			} break;
 			default:
 				break;

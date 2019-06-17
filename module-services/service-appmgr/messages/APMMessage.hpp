@@ -12,6 +12,8 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
+#include "SwitchData.hpp"
+
 namespace sapm {
 
 /*
@@ -45,8 +47,9 @@ public:
 		APMMessage( MessageType::APMSwitch, senderName ),
 		application{ applicationName },
 		window{ windowName } {
-
 	}
+	const std::string& getName() const { return application; };
+	const std::string& getWindow() const { return window; };
 };
 
 class APMSwitchData : public APMMessage {
@@ -61,6 +64,9 @@ public:
 		window{ windowName },
 		data{ std::move(data)} {
 	}
+		std::string getApplication() { return application; };
+		std::string getWindow() { return window; };
+//		std::unique_ptr<app::SwitchData> getData
 };
 
 class APMSwitchPrevApp : public APMMessage {
@@ -79,8 +85,30 @@ public:
 		APMMessage( MessageType::APMConfirmClose, name ) {}
 };
 
+class APMRegister: public APMMessage {
+protected:
+	bool status;
+public:
+	APMRegister( const std::string& senderName, const bool& status ) :
+	APMMessage( MessageType::APMRegister, senderName ),
+	status{ status } {}
 
-} /* namespace seink */
+	const bool& getStatus() { return status; };
+};
+
+class APMDelayedClose: public APMMessage {
+protected:
+	std::string application;
+public:
+	APMDelayedClose( const std::string& senderName, std::string application  ) :
+	APMMessage( MessageType::APMRegister, senderName ),
+	application{ application } {}
+
+	const std::string& getApplication() { return application; };
+};
+
+
+} /* namespace sapm */
 
 
 

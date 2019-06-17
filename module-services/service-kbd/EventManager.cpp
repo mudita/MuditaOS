@@ -62,7 +62,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 	message->keyState = msg->keyState;
 
 //		sys::Bus::SendUnicast(message, "ApplicationClock", this);
-	sys::Bus::SendUnicast(message, "ApplicationViewer", this);
+	sys::Bus::SendUnicast(message, "ApplicationClock", this);
 //		sys::Bus::SendBroadcast(message, this);
 	return std::make_shared<sys::ResponseMessage>();
 }
