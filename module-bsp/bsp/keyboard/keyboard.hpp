@@ -12,16 +12,10 @@
 #ifndef PUREPHONE_KEYBOARD_HPP
 #define PUREPHONE_KEYBOARD_HPP
 
-#include <functional>
 #include <stdint.h>
 
-
 #include "common.hpp"
-
-
-
 #include "service-kbd/WorkerEvent.hpp"
-
 #include "key_codes.hpp"
 
 namespace bsp {
@@ -30,11 +24,11 @@ namespace bsp {
 
 	int32_t keyboard_Init(xQueueHandle qHandle);
 
-	int32_t rt1501_keyboard_Deinit(void);
+	int32_t keyboard_Deinit(void);
 
-	BaseType_t rt1501_keyboard_IRQHandler(void);
+	BaseType_t keyboard_IRQHandler(void);
 
-	BaseType_t rt1501_keyboard_right_functional_IRQHandler(void);
+	BaseType_t keyboard_right_functional_IRQHandler(void);
 }
 
 
