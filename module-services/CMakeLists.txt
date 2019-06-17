@@ -19,7 +19,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 add_subdirectory( service-gui )
 add_subdirectory( service-eink )
-add_subdirectory( service-kbd )
+add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 message("${PROJECT_NAME}: add_subdirectory service-db")
 add_subdirectory( service-db )

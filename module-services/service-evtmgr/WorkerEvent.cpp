@@ -19,11 +19,8 @@ extern "C" {
 #include "MessageType.hpp"
 
 #include "WorkerEvent.hpp"
-
-#include "keyboard/keyboard.hpp"
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
-
 #include "EventManager.hpp"
+#include "module-bsp/bsp/keyboard/keyboard.hpp"
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
 {
@@ -65,20 +62,24 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
 		lastState = bsp::KeyEvents::Released;
 	}
-	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardEvent) )
-	{
-		KeyState val;
-		if( xQueueReceive(queue, &val, 0 ) != pdTRUE ) {
-					return false;
-			}
 
-		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(val.code));
-		if( (it != longPressParamsList.end()) && (val.event == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardIRQ) )
+	{
+		uint8_t notification;
+		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
+				return false;
+		}
+		uint8_t state, code;
+		bsp::keyboard_get_data(notification, state, code);
+
+		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(code));
+		if( (it != longPressParamsList.end()) && (state == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
 		{
-		longPressTimerStart(it->second);
+			longPressTimerStart(it->second);
 		}
 
-		keyboardEventCallback(static_cast<bsp::KeyEvents>(val.event), static_cast<bsp::KeyCodes>(val.code));
+		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
+
 	}
 	return true;
 }
@@ -90,22 +91,24 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	longPressParamsList.insert(longPresKeyLeft);
 
 	Worker::init(queues);
-	//initialize keyboard
-	bsp::keyboard keyboard;
-	keyboard.Init(this);
+	std::vector<xQueueHandle> qhanldes = this->getQueues();
+	bsp::keyboard_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
 
 	return true;
 }
 bool WorkerEvent::deinit(void)
 {
+	xTimerDelete(longPressTimerHandle, 100);
+	Worker::stop();
 	Worker::deinit();
+	bsp::keyboard_Deinit();
 
 	return true;
 }
 
 
 
- void WorkerEvent::keyboardEventCallback(bsp::KeyEvents event, bsp::KeyCodes code)
+ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
  {
 	 auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
 
@@ -181,8 +184,10 @@ bool WorkerEvent::deinit(void)
 
  bool WorkerEvent::longPressTimerStart(uint32_t time)
  {
-	 //TODO change magic number to enum
-	longPressTimerHandle = xTimerCreate("keyboardPressTimer", time, false,  queues[1], &keyboardTaskPressTimerCallback);
+
+	longPressTimerHandle = xTimerCreate("keyboardPressTimer", time, false,
+			queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardTimer)], &keyboardTaskPressTimerCallback);
+
 	longPressTaskEnabled = true;
 	if( xTimerStart( longPressTimerHandle, 0 ) != pdPASS )
 	{

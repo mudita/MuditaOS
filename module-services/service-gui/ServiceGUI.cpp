@@ -127,7 +127,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 					sendToRender();
 				}
 
-				uint32_t mem = usermemGetFreeHeapSize();
+//				uint32_t mem = usermemGetFreeHeapSize();
 //				LOG_WARN( "Heap Memory: %d", mem );
 			}
 
