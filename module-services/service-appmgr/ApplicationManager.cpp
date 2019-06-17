@@ -52,7 +52,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("APMSwitch %s", msg->getSenderName().c_str());
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchData): {
-			sapm::APMSwitchData* msg = reinterpret_cast<sapm::APMSwitchData*>( msgl );
+			sapm::APMSwitchWithData* msg = reinterpret_cast<sapm::APMSwitchWithData*>( msgl );
 			handleSwitchApplicationWithData( msg );
 			LOG_INFO("APMSwitchData %s", msg->getSenderName().c_str());
 		}break;
@@ -178,9 +178,10 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg) {
 			state = State::WAITING_CLOSE_CONFIRMATION;
 			app::Application::messageCloseApplication( this, previousApplicationName );
 		}
-		//if application is not closeable send
+		//if application is not closeable send lost focus message
 		else {
-
+			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
+			app::Application::messageSwitchApplication(this, previousApplicationName, "");
 		}
 	}
 	//if there was no application to close or application can't be closed change internal state to
@@ -206,18 +207,37 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 }
 
 bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
-	if( msg->getSenderName() == launchApplicationName ) {
-		focusApplicationName = launchApplicationName;
-		launchApplicationName = "";
+	//this is the case when application manager is waiting for newly started application to confir mthat it has
+	//successfully gained focus.
+	if( state == State::WAITING_GET_FOCUS_CONFIRMATION ) {
+		if( msg->getSenderName() == launchApplicationName ) {
+			focusApplicationName = launchApplicationName;
+			launchApplicationName = "";
 
-		auto it = applications.find(focusApplicationName);
-		it->second->state = app::Application::State::ACTIVE_FORGROUND;
-		state = State::IDLE;
+			auto it = applications.find(focusApplicationName);
+			it->second->state = app::Application::State::ACTIVE_FORGROUND;
+			state = State::IDLE;
+			return true;
+		}
+
 	}
-	return true;
+	//this is the case where application manager is waiting for non-closeable application
+	//to confirm that it has lost focus.
+	else if( state == State::WAITING_LOST_FOCUS_CONFIRMATION ) {
+		if( msg->getSenderName() == focusApplicationName ) {
+			previousApplicationName = focusApplicationName;
+			focusApplicationName = "";
+
+			auto it = applications.find(previousApplicationName);
+			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+			startApplication( launchApplicationName );
+			return true;
+		}
+	}
+	return false;
 }
 
-bool ApplicationManager::handleSwitchApplicationWithData( APMSwitchData* msg) {
+bool ApplicationManager::handleSwitchApplicationWithData( APMSwitchWithData* msg) {
 
 	return true;
 }
@@ -254,7 +274,7 @@ bool ApplicationManager::messageSwitchApplicationWithData( sys::Service* sender,
 		const std::string& applicationName,
 		const std::string& windowName,
 		std::unique_ptr<app::SwitchData>& switchData ) {
-			auto msg = std::make_shared<sapm::APMSwitchData>(sender->GetName(), applicationName, windowName, std::move(switchData) );
+			auto msg = std::make_shared<sapm::APMSwitchWithData>(sender->GetName(), applicationName, windowName, std::move(switchData) );
 			sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 
 	return true;
@@ -263,7 +283,7 @@ bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
 
-	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
+	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender,500  );
 	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
@@ -277,7 +297,9 @@ bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender,
 	return true;
 }
 
-bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const std::string& applicationName, const bool& status ) {
+bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status ) {
+	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender  );
 	return true;
 }
 

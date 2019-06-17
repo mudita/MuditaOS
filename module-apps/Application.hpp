@@ -102,7 +102,7 @@ public:
 	 * @brief This method is used to send message to set focus of the application.
 	 * Application can gain or lose focus depending on the provided focus flag.
 	 */
-	static bool messageFocusApplication( sys::Service* sender, std::string application, bool focus );
+//	static bool messageFocusApplication( sys::Service* sender, std::string application, bool focus );
 
 protected:
 	//application's settings taken from database

@@ -52,13 +52,13 @@ public:
 	const std::string& getWindow() const { return window; };
 };
 
-class APMSwitchData : public APMMessage {
+class APMSwitchWithData : public APMMessage {
 protected:
 	std::string application;
 	std::string window;
 	std::unique_ptr<app::SwitchData> data;
 public:
-	APMSwitchData( const std::string& senderName, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) :
+	APMSwitchWithData( const std::string& senderName, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) :
 		APMMessage( MessageType::APMSwitchData, senderName),
 		application{ applicationName },
 		window{ windowName },
@@ -66,7 +66,7 @@ public:
 	}
 		std::string getApplication() { return application; };
 		std::string getWindow() { return window; };
-//		std::unique_ptr<app::SwitchData> getData
+		std::unique_ptr<app::SwitchData>& getData() { return data; };
 };
 
 class APMSwitchPrevApp : public APMMessage {
