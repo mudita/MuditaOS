@@ -15,7 +15,8 @@
 #include "task.h"
 
 #include "dma_config.h"
-#include "board.h"
+#include "fsl_cache.h"
+
 
 
 void LPUART1_IRQHandler(void)
@@ -42,6 +43,10 @@ void LPUART1_IRQHandler(void)
                                           ( void * ) &characterReceived,
                                           1,
                                           &xHigherPriorityTaskWoken );
+
+                if(xTimerResetFromISR(bsp::RT1051Cellular::rxTimeoutTimer,&xHigherPriorityTaskWoken) != pdTRUE){
+                    assert(0);
+                }
             }
 
         }
@@ -54,6 +59,8 @@ void LPUART1_IRQHandler(void)
 
 namespace bsp {
 
+    TimerHandle_t RT1051Cellular::rxTimeoutTimer = nullptr;
+
     RT1051Cellular::RT1051Cellular() {
 
         MSPInit();
@@ -65,6 +72,25 @@ namespace bsp {
             LOG_ERROR("Cellular Uart error: Could not create the RX stream buffer!");
             return;
         }
+
+        rxTimeoutTimer= xTimerCreate
+                ( /* Just a text name, not used by the RTOS
+                kernel. */
+                        "celltim",
+                        /* The timer period in ticks, must be
+                        greater than 0. */
+                        25,
+                        /* The timers will auto-reload themselves
+                        when they expire. */
+                        pdFALSE,
+                        /* The ID is used to store a count of the
+                        number of times the timer has expired, which
+                        is initialised to 0. */
+                        ( void * ) 0,
+                        /* Each timer calls the same callback when
+                        it expires. */
+                        rxTimeoutTimerHandle
+                );
 
         lpuart_config_t s_cellularConfig;
 
@@ -108,7 +134,96 @@ namespace bsp {
 
         LPUART_Deinit(CELLULAR_UART_BASE);
 
+        MSPDeinit();
+        DMADeinit();
+
     }
+
+    void RT1051Cellular::PowerUp() {
+        const TickType_t POWER_UP_DELAY_MS = 500;
+
+        DisableRx();
+
+        WakeupModem();
+        InformModemHostWakeup();
+
+        TickType_t tick = xTaskGetTickCount();
+        GPIO_PinWrite(BSP_CELLULAR_POWER_PORT, BSP_CELLULAR_POWER_PIN, 1);
+        vTaskDelayUntil(&tick, POWER_UP_DELAY_MS);
+        //BSP_CellularSetPowerState(CellularPowerStateTurningOn);
+        GPIO_PinWrite(BSP_CELLULAR_POWER_PORT, BSP_CELLULAR_POWER_PIN, 0);
+
+        EnableRx();
+    }
+
+    void RT1051Cellular::PowerDown() {
+        const uint16_t POWER_DOWN_DELAY_MS = 700;
+
+        WakeupModem();
+        InformModemHostWakeup();
+
+        TickType_t tick = xTaskGetTickCount();
+        GPIO_PinWrite(BSP_CELLULAR_POWER_PORT, BSP_CELLULAR_POWER_PIN, 1);
+        vTaskDelayUntil(&tick, POWER_DOWN_DELAY_MS);
+        //BSP_CellularSetPowerState(CellularPowerStateTurningOff);
+        GPIO_PinWrite(BSP_CELLULAR_POWER_PORT, BSP_CELLULAR_POWER_PIN, 0);
+        //vTaskDelay(pdMS_TO_TICKS(POWER_DOWN_IN_PROGRESS_DELAY_MS));
+
+/*        while (s_cellularPowerState != CellularPowerStatePoweredDown)
+        {
+            vTaskDelay(pdMS_TO_TICKS(200));
+        }*/
+
+        DisableRx();
+    }
+
+    uint32_t RT1051Cellular::Write(void *buf, size_t nbytes) {
+        lpuart_transfer_t sendXfer;
+        sendXfer.data       = static_cast<uint8_t *>(buf);
+        sendXfer.dataSize   = nbytes;
+
+        EnableTx();
+
+        uartDmaHandle.userData = xTaskGetCurrentTaskHandle();
+        SCB_CleanInvalidateDCache();
+        if (LPUART_SendEDMA(CELLULAR_UART_BASE, &uartDmaHandle, &sendXfer) != kStatus_Success)
+        {
+            LOG_ERROR("Cellular: TX Failed!");
+            DisableTx();
+            return 0;
+        }
+
+        auto ulNotificationValue = ulTaskNotifyTake( pdFALSE, 100 );
+
+        if (ulNotificationValue == 0)
+        {
+            LOG_ERROR("Cellular Uart error: TX Transmission timeout");
+            DisableTx();
+            return 0;
+        }
+
+        DisableTx();
+        return 1;
+    }
+
+    uint32_t RT1051Cellular::Read(void *buf, size_t nbytes) {
+        return xStreamBufferReceive(uartRxStreamBuffer,buf,nbytes,0);
+    }
+
+    uint32_t RT1051Cellular::Wait(uint32_t timeout) {
+        if(blockedTaskHandle != nullptr){
+            LOG_FATAL("Wait called simultaneously from more than one thread!");
+            return 0;
+        }
+
+        if(xStreamBufferBytesAvailable(uartRxStreamBuffer)){
+            return 1;
+        }
+
+        blockedTaskHandle = xTaskGetCurrentTaskHandle();
+        return ulTaskNotifyTake( pdTRUE, timeout );
+    }
+
 
 
     void RT1051Cellular::MSPInit() {
@@ -149,8 +264,12 @@ namespace bsp {
         GPIO_PinInit(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT,     BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN,   &gpio_init_structure);
         GPIO_PinInit(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT,     BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN,   &gpio_init_structure);
 
-        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
-        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN);
+/*        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
+        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN);*/
+    }
+
+    void RT1051Cellular::MSPDeinit() {
+
     }
 
     void RT1051Cellular::DMAInit() {
@@ -166,6 +285,11 @@ namespace bsp {
                                         NULL,
                                         &uartTxDmaHandle,
                                         NULL);
+    }
+
+    void RT1051Cellular::DMADeinit() {
+        LPUART_TransferAbortReceiveEDMA(CELLULAR_UART_BASE,&uartDmaHandle);
+        DMAMUX_DisableChannel(BSP_CELLULAR_UART_TX_DMA_DMAMUX_BASE, BSP_CELLULAR_UART_TX_DMA_CH);
     }
 
     uint32_t RT1051Cellular::UartGetPeripheralClock() {
@@ -185,25 +309,21 @@ namespace bsp {
         return freq;
     }
 
-    void RT1051Cellular::EnableRx() {
-        LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
-        LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
-        LPUART_EnableRx(CELLULAR_UART_BASE, true);
-    }
-
-    void RT1051Cellular::DisableRx() {
-        LPUART_DisableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
-        LPUART_ClearStatusFlags(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
-        LPUART_EnableRx(CELLULAR_UART_BASE, false);
-    }
 
     void RT1051Cellular::DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status,
                                                    void *userData) {
 
         BaseType_t higherPriorTaskWoken = 0;
-        xTaskNotifyFromISR((TaskHandle_t)userData, 0, eNoAction, &higherPriorTaskWoken);
+        vTaskNotifyGiveFromISR( (TaskHandle_t)userData, &higherPriorTaskWoken );
 
         portEND_SWITCHING_ISR(higherPriorTaskWoken);
+    }
+
+    void RT1051Cellular::rxTimeoutTimerHandle(TimerHandle_t xTimer) {
+        if(blockedTaskHandle){
+            xTaskNotifyGive(blockedTaskHandle);
+        }
+
     }
 
 }

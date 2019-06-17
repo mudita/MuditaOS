@@ -69,6 +69,14 @@ namespace bsp
         }
     }
 
+    void LinuxCellular::PowerUp() {
+
+    }
+
+    void LinuxCellular::PowerDown() {
+
+    }
+
     uint32_t LinuxCellular::Read(void *buf, size_t nbytes) {
         return read(fd,buf,nbytes);
     }

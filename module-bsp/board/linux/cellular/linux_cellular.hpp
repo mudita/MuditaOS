@@ -30,6 +30,10 @@ namespace bsp {
         LinuxCellular(const char* term);
         ~LinuxCellular();
 
+        void PowerUp() override final;
+
+        void PowerDown() override final;
+
         uint32_t Wait(uint32_t timeout) override final;
 
         uint32_t Read(void *buf, size_t nbytes) override final;

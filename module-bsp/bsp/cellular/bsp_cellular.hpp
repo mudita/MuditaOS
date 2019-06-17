@@ -27,6 +27,10 @@ namespace bsp {
         virtual ~Cellular() {}
 
 
+        virtual void PowerUp() = 0;
+
+        virtual void PowerDown() = 0;
+
         virtual uint32_t Wait(uint32_t timeout) = 0;
 
         virtual uint32_t Read(void *buf, size_t nbytes) = 0;
