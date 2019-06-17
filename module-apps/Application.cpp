@@ -64,20 +64,40 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	bool handled = false;
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
-		//
-		if( (state == State::INITIALIZING ) || ( state == State::ACTIVE_BACKGROUND ) ){
-			state = State::ACTIVATING;
 
-			if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
-				state = State::ACTIVE_FORGROUND;
-				render( gui::RefreshModes::GUI_REFRESH_DEEP );
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
+
+		AppMessage* msg = reinterpret_cast<AppMessage*>( msgl );
+		//Application is starting or it is in the background. Upon switch command if name if correcct it goes forground
+		if( ( state == State::INITIALIZING ) ||	( state == State::ACTIVE_BACKGROUND )){
+
+			if( msg->getApplicationName() == this->GetName()) {
+				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
+					state = State::ACTIVE_FORGROUND;
+					render( gui::RefreshModes::GUI_REFRESH_DEEP );
+				}
+				else {
+					//TODO send to itself message to close
+					LOG_ERROR("Failed to communicate ");
+				}
 			}
 			else {
-				//TODO send to itself message to close
-				LOG_ERROR("Failed to communicate ");
+				LOG_ERROR("Received switch message outside of activation flow");
 			}
-
+		}
+		else if( state == State::ACTIVE_FORGROUND ) {
+			if( msg->getApplicationName() == this->GetName()) {
+				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
+					state = State::ACTIVE_BACKGROUND;
+				}
+				else {
+					//TODO send to itself message to close
+					LOG_ERROR("Failed to communicate ");
+				}
+			}
+			else {
+				LOG_ERROR("Received switch message outside of activation flow");
+			}
 		}
 		else {
 			LOG_ERROR("Wrong internal application to switch to active state");
@@ -86,9 +106,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWithData) ) {
 
 	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppFocus ) ) {
-
-	}
+//
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
 		state = State::DEACTIVATING;
 		sapm::ApplicationManager::messageConfirmClose(this);
@@ -108,9 +126,9 @@ sys::ReturnCodes Application::InitHandler() {
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
-	auto msg = std::make_shared<sapm::APMRegister>(this->GetName(), initState );
-	sys::Bus::SendUnicast(msg, "ApplicationManager", this);
-
+//	auto msg = std::make_shared<sapm::APMRegister>(this->GetName(), initState );
+//	sys::Bus::SendUnicast(msg, "ApplicationManager", this);
+	sapm::ApplicationManager::messageRegisterApplication( this, initState );
 
 	return (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
 }
@@ -128,40 +146,28 @@ void Application::setActiveWindow( const std::string& windowName ) {
 }
 
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitch, sender->GetName() );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitch, application );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
 
 bool Application::messageSwitchApplicationWithData( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWithData, sender->GetName() );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWithData, application );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
 
 bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh, sender->GetName() );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh, application );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
 
 bool Application::messageCloseApplication( sys::Service* sender, std::string application ) {
 
-	auto msg = std::make_shared<AppMessage>( MessageType::AppClose, sender->GetName() );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppClose, application );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
-
-bool Application::messageFocusApplication( sys::Service* sender, std::string application, bool focus ) {
-	auto msg = std::make_shared<AppFocusMessage>( application, focus );
-	auto ret = sys::Bus::SendUnicast(msg, application, sender, 1000 );
-	return (ret.first == sys::ReturnCodes::Success )?true:false;
-}
-
-//	{
-//
-//
-//	}
-
 
 } /* namespace app */

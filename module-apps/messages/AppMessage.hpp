@@ -17,25 +17,15 @@ namespace app {
  */
 class AppMessage: public sys::DataMessage {
 protected:
-	//name of the application that is sending message to application manager.
-	std::string senderName;
+	//name of the application to which switch is performed.
+	std::string application;
 public:
-	AppMessage( MessageType messageType, const std::string& senderName ) :
+	AppMessage( MessageType messageType, const std::string& application ) :
 		sys::DataMessage( static_cast<uint32_t>(messageType)),
-		senderName{senderName} {};
+		application{application} {};
 	virtual ~AppMessage() {};
 
-	std::string getSenderName() { return senderName;};
-};
-
-class AppFocusMessage : public AppMessage {
-protected:
-	bool focus;
-public:
-	AppFocusMessage( const std::string& senderName, const bool& focus ) :
-		AppMessage( MessageType::AppFocus, senderName ),
-		focus{ focus } {};
-	bool getFocus() { return focus; };
+	std::string getApplicationName() { return application;};
 };
 
 };

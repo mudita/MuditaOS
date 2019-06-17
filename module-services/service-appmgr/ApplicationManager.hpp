@@ -70,7 +70,7 @@ class ApplicationManager: public sys::Service {
 
 	//tries to switch the application
 	bool handleSwitchApplication( APMSwitch* msg);
-	bool handleSwitchApplicationWithData( APMSwitchData* msg);
+	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
 	bool handleCloseConfirmation( APMConfirmClose* msg );
 	bool handleSwitchConfirmation( APMConfirmSwitch* msg );
 	bool handleRegisterApplication( APMRegister* msg );
@@ -117,7 +117,7 @@ public:
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.
 	*/
-   static bool messageRegisterApplication( sys::Service* sender, const std::string& applicationName, const bool& status );
+   static bool messageRegisterApplication( sys::Service* sender, const bool& status );
 };
 
 } /* namespace sapm */
