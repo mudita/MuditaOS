@@ -17,7 +17,7 @@
 #include "service-gui/messages/DrawMessage.hpp"
 #include "ServiceEink.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-kbd/EventManager.hpp"
+#include "service-evtmgr/EventManager.hpp"
 
 
 #include "service-db/ServiceDB.hpp"
