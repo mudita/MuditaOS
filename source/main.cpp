@@ -74,10 +74,10 @@ public:
         //auto msg = std::make_shared<sys::DataMessage>(500);
         //sys::Bus::SendUnicast(msg,"Blinky",this);
         //LOG_DEBUG("Blinky service tick!");
-    	uint32_t start_tick = xTaskGetTickCount();
-		memset( mem, 0, 480*600);
-		uint32_t end_tick = xTaskGetTickCount();
-		//LOG_DEBUG("memset time: %d", end_tick-start_tick);
+//    	uint32_t start_tick = xTaskGetTickCount();
+//		memset( mem, 0, 480*600);
+//		uint32_t end_tick = xTaskGetTickCount();
+//		LOG_DEBUG("memset time: %d", end_tick-start_tick);
     }
 
     // Invoked during initialization
@@ -123,9 +123,9 @@ int SystemStart(sys::SystemManager* sysmgr)
     std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
     applications.push_back( std::move(clockLauncher) );
 
-//    //launcher for viewer application
-//	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
-//	applications.push_back( std::move(viewerLauncher) );
+    //launcher for viewer application
+	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
+	applications.push_back( std::move(viewerLauncher) );
 #endif
 
     //start application manager

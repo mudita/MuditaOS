@@ -18,6 +18,7 @@
 #include "log/log.hpp"
 //module-services
 #include "service-evtmgr/EventManager.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 //MessageType
 #include "MessageType.hpp"
 //this module
@@ -40,6 +41,15 @@ ApplicationClock::~ApplicationClock() {
 // Invoked upon receiving data message
 sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 
+	auto retMsg = Application::DataReceivedHandler(msgl);
+	//if message was handled by application's template there is no need to process further.
+	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
+		sys::ReturnCodes::Success ) ){
+		return retMsg;
+	}
+
+	//this variable defines whether message was processed.
+	bool handled = false;
 	//if keyboard message received
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
@@ -47,6 +57,9 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
 
 		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
+			if( msg->keyCode == bsp::KeyCodes::JoystickLeft ) {
+				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationViewer", "" );
+			}
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
 				incrementHour();
 				updateLabels();
@@ -56,8 +69,13 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 				updateLabels();
 			}
 		}
+		handled = true;
 	}
-	return std::make_shared<sys::ResponseMessage>( );
+
+	if( handled )
+		return std::make_shared<sys::ResponseMessage>();
+	else
+		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
 void ApplicationClock::updateLabels() {
@@ -87,16 +105,19 @@ void ApplicationClock::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ApplicationClock::InitHandler() {
 
+	auto ret = Application::InitHandler();
+	if( ret != sys::ReturnCodes::Success )
+		return ret;
+
 	createUserInterface();
 
 	setActiveWindow("Main");
 
-	render(gui::RefreshModes::GUI_REFRESH_FAST );
-
-	return sys::ReturnCodes::Success;
+	return ret;
 }
 
 sys::ReturnCodes ApplicationClock::DeinitHandler() {
+	DeleteTimer( timer_id );
 	return sys::ReturnCodes::Success;
 }
 
@@ -131,7 +152,6 @@ void ApplicationClock::createUserInterface() {
 	minuteLabel->setText("00");
 	minuteLabel->setRadius( 20 );
 	minuteLabel->setPenWidth(1);
-	//minuteLabel->setFilled(true);
 	minuteLabel->setFillColor( gui::Color(10,0));
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 

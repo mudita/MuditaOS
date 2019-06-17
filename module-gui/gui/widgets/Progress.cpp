@@ -87,19 +87,6 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 	commands.splice(commands.end(), baseCommands, it);
 	commands.splice(commands.end(), baseCommands);
 
-
-	//if( !childrenCommands.empty() )
-//		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
-/*	if( !baseCommands.empty() )
-		commands.insert( commands.end(), baseCommands.begin(), baseCommands.end());*/
-
-/*	if( !baseCommands.empty() )
-	{
-		commands.emplace_back(  baseCommands.back());
-		baseCommands.pop_back();
-		commands.emplace_back(  baseCommands.back());
-	//	commands.emplace_back(  baseCommands.begin());
-	}*/
 	return commands;
 }
 

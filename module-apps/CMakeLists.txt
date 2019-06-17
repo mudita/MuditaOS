@@ -45,8 +45,9 @@ include_directories( ../module-services )
 include_directories( ../module-gui )
 include_directories( ../module-os )
 include_directories( ../module-bsp )
+include_directories( ../module-db )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-services ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-services module-db ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
