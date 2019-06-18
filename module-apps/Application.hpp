@@ -71,11 +71,11 @@ public:
 	/**
 	 * Generic function for sending switch command. This will switch window within active application.
 	 */
-	int switchWindow( const std::string& windowName, uint32_t cmd, uint32_t dataSize=0, uint8_t* data=nullptr );
+	int switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data );
 	/**
 	 * Generic function for returning to switch window in active application without performing initialization of the window.
 	 */
-	int switchBackWindow( const std::string& windowName, uint32_t cmd, uint32_t dataSize=0, uint8_t* data=nullptr );
+	int switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data );
 	/**
 	 * Method allows refreshing currently active window
 	 */
@@ -94,8 +94,8 @@ public:
 	}
 
 	//static methods
-	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<SwitchData> data );
-	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, SwitchData* data=nullptr );
+	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data );
+	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data=nullptr );
 	static bool messageCloseApplication( sys::Service* sender, std::string application );
 	/**
 	 * @brief This method is used to send message to set focus of the application.

@@ -10,6 +10,11 @@
 #include "ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
+
+//TODO for tests only
+#include "module-apps/application-clock/ClockData.hpp"
+
+
 #include <utility>
 #include <memory>
 
@@ -52,11 +57,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			handleSwitchApplication( msg );
 			LOG_INFO("APMSwitch %s", msg->getSenderName().c_str());
 		}break;
-//		case static_cast<uint32_t>(MessageType::APMSwitchData): {
-//			sapm::APMSwitchWithData* msg = reinterpret_cast<sapm::APMSwitchWithData*>( msgl );
-//			handleSwitchApplicationWithData( msg );
-//			LOG_INFO("APMSwitchData %s", msg->getSenderName().c_str());
-//		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
 			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName().c_str());
@@ -113,7 +113,11 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 //	if( it!= applications.end()){
 //		it->second->lanucher->run(systemManager);
 //	}
-	messageSwitchApplication( this, "ApplicationClock", "", nullptr );
+
+	//TODO for testing only
+	auto data = std::make_unique<ClockData>( 12,25 );
+	messageSwitchApplication( this, "ApplicationClock", "", std::move(data) );
+
 
 	return sys::ReturnCodes::Success;
 }
@@ -265,7 +269,7 @@ bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 
 //Static methods
 
-bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) {
+bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
 
 	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
