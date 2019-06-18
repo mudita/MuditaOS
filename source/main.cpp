@@ -41,18 +41,28 @@
 #include "vfs.hpp"
 #include "keyboard/keyboard.hpp"
 
+//module-cellular
+#include "Modem/Modem.hpp"
+
 #include "SystemManager/SystemManager.hpp"
 
 class vfs vfs;
 
 class BlinkyService : public sys::Service {
 	gui::Window* win = nullptr;
+	std::unique_ptr<Modem> modem;
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(100,true);
+        timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
+
+        modem = std::make_unique<Modem>();
+/*        modem.reset();
+        modem = std::make_unique<Modem>();*/
+
+        modem->Init();
 
     }
 
@@ -71,7 +81,7 @@ public:
     void TickHandler(uint32_t id) override{
         //auto msg = std::make_shared<sys::DataMessage>(500);
         //sys::Bus::SendUnicast(msg,"Blinky",this);
-        //LOG_DEBUG("Blinky service tick!");
+        LOG_DEBUG("Blinky service tick!");
     }
 
     // Invoked during initialization
@@ -103,10 +113,10 @@ int SystemStart(sys::SystemManager* sysmgr)
     vfs.Init();
 
     bool ret;
-    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+/*    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);*/
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
@@ -123,7 +133,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 #endif
 
     //start application manager
-    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+    //ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;
