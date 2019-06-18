@@ -31,19 +31,39 @@ public:
 	std::string getApplicationName() { return application;};
 };
 
+//this message is used to notify application about switching event. Application will gain or lose focus upon receiving this message.
+//Application gains focus when it was in init or active background state. Application lose focus when it was in active foreground state.
 class AppSwitchMessage : public AppMessage {
 protected:
 	std::string window;
-	std::unique_ptr<SwitchData> data;
+	std::unique_ptr<gui::SwitchData> data;
 public:
-	AppSwitchMessage( const std::string& application, const std::string& window, std::unique_ptr<SwitchData> data ) :
+	AppSwitchMessage( const std::string& application, const std::string& window, std::unique_ptr<gui::SwitchData> data ) :
 		AppMessage( MessageType::AppSwitch, application),
 		window{window},
 		data {std::move(data)} {};
 	virtual ~AppSwitchMessage() {};
 
 	std::string getWindowName() { return window; };
-	std::unique_ptr<app::SwitchData>& getData() { return data; };
+	std::unique_ptr<gui::SwitchData>& getData() { return data; };
+};
+
+class AppSwitchWindowMessage : public AppMessage {
+protected:
+	std::string window;
+	uint32_t command;
+	std::unique_ptr<gui::SwitchData> data;
+public:
+	AppSwitchWindowMessage( const std::string& window, uint32_t command, std::unique_ptr<gui::SwitchData> data ) :
+		AppMessage( MessageType::AppSwitchWindow, "" ),
+		window{window},
+		command{ command },
+		data {std::move(data)} {};
+	virtual ~AppSwitchWindowMessage() {};
+
+	std::string getWindowName() { return window; };
+	const uint32_t& getCommand() { return command; };
+	std::unique_ptr<gui::SwitchData>& getData() { return data; };
 };
 
 };

@@ -10,7 +10,8 @@
 
 #include <list>
 #include "Item.hpp"
-#include "../Common.hpp"
+#include "Common.hpp"
+#include "SwitchData.hpp"
 
 namespace gui {
 
@@ -39,7 +40,7 @@ public:
 	virtual void getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h );
 	virtual void setFocusItem( Item* item );
 	virtual int getWindowID() {return windowID; };
-
+	virtual bool handleSwitchData( SwitchData* data );
 
 	//virtual methods from Item
 	bool onInput( const KeyEvent& key ) override;
