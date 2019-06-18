@@ -58,7 +58,7 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
 			if( msg->keyCode == bsp::KeyCodes::JoystickLeft ) {
-				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationViewer", "" );
+				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationViewer", "", nullptr );
 			}
 			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
 				incrementHour();

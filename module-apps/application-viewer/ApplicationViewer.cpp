@@ -60,7 +60,7 @@ sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
 			if( msg->keyCode == bsp::KeyCodes::JoystickLeft ) {
-				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationClock", "" );
+				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationClock", "", nullptr );
 			}
 
 

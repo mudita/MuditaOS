@@ -9,6 +9,9 @@
 #ifndef MODULE_APPS_MESSAGES_APPMESSAGE_HPP_
 #define MODULE_APPS_MESSAGES_APPMESSAGE_HPP_
 
+#include <memory>
+#include <string>
+#include "SwitchData.hpp"
 
 namespace app {
 
@@ -26,6 +29,21 @@ public:
 	virtual ~AppMessage() {};
 
 	std::string getApplicationName() { return application;};
+};
+
+class AppSwitchMessage : public AppMessage {
+protected:
+	std::string window;
+	std::unique_ptr<SwitchData> data;
+public:
+	AppSwitchMessage( const std::string& application, const std::string& window, std::unique_ptr<SwitchData> data ) :
+		AppMessage( MessageType::AppSwitch, application),
+		window{window},
+		data {std::move(data)} {};
+	virtual ~AppSwitchMessage() {};
+
+	std::string getWindowName() { return window; };
+	std::unique_ptr<app::SwitchData>& getData() { return data; };
 };
 
 };

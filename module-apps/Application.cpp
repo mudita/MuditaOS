@@ -16,7 +16,6 @@
 #include "gui/core/DrawCommand.hpp"
 //module-sys
 #include "SystemManager/SystemManager.hpp"
-
 #include "service-db/api/DBServiceAPI.hpp"
 
 
@@ -103,9 +102,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_ERROR("Wrong internal application to switch to active state");
 		}
 	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWithData) ) {
-
-	}
 //
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
 		state = State::DEACTIVATING;
@@ -145,17 +141,17 @@ void Application::setActiveWindow( const std::string& windowName ) {
 	}
 }
 
-bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitch, application );
+bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<SwitchData> data ) {
+	auto msg = std::make_shared<AppSwitchMessage>( application, window, std::move(data) );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
 
-bool Application::messageSwitchApplicationWithData( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWithData, application );
-	sys::Bus::SendUnicast(msg, application, sender );
-	return true;
-}
+//bool Application::messageSwitchApplicationWithData( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
+//	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWithData, application );
+//	sys::Bus::SendUnicast(msg, application, sender );
+//	return true;
+//}
 
 bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
 	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh, application );
