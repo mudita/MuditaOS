@@ -24,30 +24,6 @@ namespace app {
 class ApplicationClock: public Application {
 	uint32_t timer_id= 0;
 
-	uint32_t seconds = 0;
-	uint32_t hour = 0;
-	uint32_t minute = 0;
-	gui::Label* hourLabel = nullptr;
-	gui::Label* minuteLabel = nullptr;
-	gui::Image* dotImage[64];
-	gui::Progress* progressBar = nullptr;
-
-	/**
-	 * @brief Increments hours counter
-	 */
-	bool incrementHour();
-	/**
-	 * @brief Increments minutes counter
-	 */
-	bool incrementMinute();
-	/**
-	 * @brief Increments seconds counter
-	 */
-	bool incrementSecond();
-	/**
-	 * @brief Updates strings for hour and minutes
-	 */
-	void updateLabels();
 public:
 	ApplicationClock(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
