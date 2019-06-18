@@ -15,22 +15,8 @@ namespace app {
 class SwitchData {
 public:
 
-	SwitchData( uint8_t* data, uint32_t size ) : data{nullptr}, size{0} {
-//		this->data = new uint8_t[size];
-//		if( data ) {
-//			memcpy( this->data, data, size );
-//			this->size = size;
-//		}
-//		else
-//			this->size = 0;
-	}
-	~SwitchData() {
-		if( data )
-			delete []data;
-	}
-
-	uint8_t* data;
-	uint32_t size;
+	SwitchData() {};
+	virtual ~SwitchData() {};
 };
 
 } /* namespace app */

@@ -52,11 +52,11 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			handleSwitchApplication( msg );
 			LOG_INFO("APMSwitch %s", msg->getSenderName().c_str());
 		}break;
-		case static_cast<uint32_t>(MessageType::APMSwitchData): {
-			sapm::APMSwitchWithData* msg = reinterpret_cast<sapm::APMSwitchWithData*>( msgl );
-			handleSwitchApplicationWithData( msg );
-			LOG_INFO("APMSwitchData %s", msg->getSenderName().c_str());
-		}break;
+//		case static_cast<uint32_t>(MessageType::APMSwitchData): {
+//			sapm::APMSwitchWithData* msg = reinterpret_cast<sapm::APMSwitchWithData*>( msgl );
+//			handleSwitchApplicationWithData( msg );
+//			LOG_INFO("APMSwitchData %s", msg->getSenderName().c_str());
+//		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
 			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName().c_str());
@@ -113,7 +113,7 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 //	if( it!= applications.end()){
 //		it->second->lanucher->run(systemManager);
 //	}
-	messageSwitchApplication( this, "ApplicationClock", "");
+	messageSwitchApplication( this, "ApplicationClock", "", nullptr );
 
 	return sys::ReturnCodes::Success;
 }
@@ -148,7 +148,7 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 }
 
 //tries to switch the application
-bool ApplicationManager::handleSwitchApplication( APMSwitch* msg) {
+bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 
 	//first check if there is application specified in the message
 	auto it = applications.find(msg->getName());
@@ -166,6 +166,9 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg) {
 
 	//store the name of the application to be executed and start closing previous application
 	launchApplicationName = msg->getName();
+	//store window and data if there is any
+	it->second->switchData = std::move(msg->getData());
+	it->second->switchWindow = msg->getWindow();
 	state = State::CLOSING_PREV_APP;
 
 	//notify event manager which application should receive keyboard messages
@@ -185,7 +188,7 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg) {
 		//if application is not closeable send lost focus message
 		else {
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
-			app::Application::messageSwitchApplication(this, previousApplicationName, "");
+			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
 	}
 	//if there was no application to close or application can't be closed change internal state to
@@ -205,7 +208,7 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 		it->second->state = app::Application::State::ACTIVATING;
 		state = State::WAITING_GET_FOCUS_CONFIRMATION;
 
-		app::Application::messageSwitchApplication( this, launchApplicationName, "" );
+		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
 	}
 	return true;
 }
@@ -241,11 +244,6 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 	return false;
 }
 
-bool ApplicationManager::handleSwitchApplicationWithData( APMSwitchWithData* msg) {
-
-	return true;
-}
-
 bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 	auto it = applications.find( msg->getSenderName() );
 
@@ -254,7 +252,6 @@ bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 	if( it->second->closeable ) {
 		//internally send close message to allow response message to be sended to application
 		//that has confirmed close request.
-		//sys::SystemManager::DestroyService( previousApplicationName, this);
 		it->second->state = app::Application::State::DEACTIVATED;
 		auto msg = std::make_shared<sapm::APMDelayedClose>( this->GetName(), previousApplicationName );
 		sys::Bus::SendUnicast(msg, "ApplicationManager", this );
@@ -268,21 +265,13 @@ bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 
 //Static methods
 
-bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName ) {
+bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) {
 
-	auto msg = std::make_shared<sapm::APMSwitch>(sender->GetName(), applicationName, windowName );
+	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }
-bool ApplicationManager::messageSwitchApplicationWithData( sys::Service* sender,
-		const std::string& applicationName,
-		const std::string& windowName,
-		std::unique_ptr<app::SwitchData>& switchData ) {
-			auto msg = std::make_shared<sapm::APMSwitchWithData>(sender->GetName(), applicationName, windowName, std::move(switchData) );
-			sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 
-	return true;
-}
 bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );

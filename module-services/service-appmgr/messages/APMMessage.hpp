@@ -42,31 +42,17 @@ public:
 class APMSwitch : public APMMessage {
 	std::string application;
 	std::string window;
+	std::unique_ptr<app::SwitchData> data;
 public:
-	APMSwitch( const std::string& senderName, const std::string& applicationName, const std::string& windowName = "" ) :
+	APMSwitch( const std::string& senderName, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) :
 		APMMessage( MessageType::APMSwitch, senderName ),
 		application{ applicationName },
-		window{ windowName } {
+		window{ windowName },
+		data{ std::move(data) }{
 	}
 	const std::string& getName() const { return application; };
 	const std::string& getWindow() const { return window; };
-};
-
-class APMSwitchWithData : public APMMessage {
-protected:
-	std::string application;
-	std::string window;
-	std::unique_ptr<app::SwitchData> data;
-public:
-	APMSwitchWithData( const std::string& senderName, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data ) :
-		APMMessage( MessageType::APMSwitchData, senderName),
-		application{ applicationName },
-		window{ windowName },
-		data{ std::move(data)} {
-	}
-		std::string getApplication() { return application; };
-		std::string getWindow() { return window; };
-		std::unique_ptr<app::SwitchData>& getData() { return data; };
+	std::unique_ptr<app::SwitchData>& getData() { return data; };
 };
 
 class APMSwitchPrevApp : public APMMessage {
