@@ -57,7 +57,8 @@ enum class MessageType {
 	//keyboard messages
 	KBDKeyEvent,
 
-	AppSwitch,
+	AppSwitch, //application receives this message from application manager. It a signal to gain or loose focus.
+	AppSwitchWindow, //This is internal message transmitted within application to change window. Additional command and data are transmitted with it.
 	AppRefresh,
 	AppClose,
 	AppFocus,

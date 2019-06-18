@@ -9,7 +9,7 @@
 #ifndef MODULE_APPS_SWITCHDATA_HPP_
 #define MODULE_APPS_SWITCHDATA_HPP_
 
-namespace app {
+namespace gui {
 
 //class template that stores information that was sent along with switch message
 class SwitchData {
@@ -19,6 +19,6 @@ public:
 	virtual ~SwitchData() {};
 };
 
-} /* namespace app */
+} /* namespace gui */
 
 #endif /* MODULE_APPS_SWITCHDATA_HPP_ */

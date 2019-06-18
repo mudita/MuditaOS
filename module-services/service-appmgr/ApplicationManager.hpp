@@ -34,7 +34,7 @@ public:
 	//current state of the application
 	app::Application::State state = app::Application::State::DEACTIVATED;
 	//switching data stored when application manager had to run init function
-	std::unique_ptr<app::SwitchData> switchData = nullptr;
+	std::unique_ptr<gui::SwitchData> switchData = nullptr;
 	std::string switchWindow = "";
 };
 
@@ -93,7 +93,7 @@ public:
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
      */
-    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data );
+    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<gui::SwitchData> data );
     /**
 	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
 	 * Allows sending data to destination application.

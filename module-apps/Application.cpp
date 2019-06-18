@@ -51,10 +51,15 @@ void Application::render( gui::RefreshModes mode ) {
 void Application::blockEvents(bool isBlocked ) {
 	acceptInput = isBlocked;
 }
-int Application::switchWindow( const std::string& windowName, uint32_t cmd, uint32_t dataSize, uint8_t* data ) {
+int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
+
+	std::string window = windowName.empty()?"Main":windowName;
+	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
+	sys::Bus::SendUnicast(msg, this->GetName(), this );
+
 	return 0;
 }
-int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, uint32_t dataSize, uint8_t* data ) {
+int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 	return 0;
 }
 int Application::refreshWindow(gui::RefreshModes mode) {
@@ -66,14 +71,17 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
 
-		AppMessage* msg = reinterpret_cast<AppMessage*>( msgl );
-		//Application is starting or it is in the background. Upon switch command if name if correcct it goes forground
+		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
+		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
 		if( ( state == State::INITIALIZING ) ||	( state == State::ACTIVE_BACKGROUND )){
 
 			if( msg->getApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_FORGROUND;
-					render( gui::RefreshModes::GUI_REFRESH_DEEP );
+
+					//send window switch function
+					switchWindow( msg->getWindowName(), 0, std::move( msg->getData()));
+					handled = true;
 				}
 				else {
 					//TODO send to itself message to close
@@ -88,6 +96,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( msg->getApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_BACKGROUND;
+					handled = true;
 				}
 				else {
 					//TODO send to itself message to close
@@ -102,11 +111,24 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_ERROR("Wrong internal application to switch to active state");
 		}
 	}
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
+		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
+		//check if specified window is in the application
+		LOG_INFO("Switching to window: [%s] cmd: %d, data: %s", msg->getWindowName().c_str(), msg->getCommand(), (msg->getData()!=nullptr?"true":"false"));
+		auto it = windows.find( msg->getWindowName() );
+		if( it != windows.end() ) {
+
+			setActiveWindow( msg->getWindowName());
+			currentWindow->handleSwitchData( msg->getData().get() );
+		}
+		handled = true;
+	}
 //
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
 		state = State::DEACTIVATING;
 		sapm::ApplicationManager::messageConfirmClose(this);
 		//here should go all the cleaning
+		handled = true;
 	}
 
 	if( handled)
@@ -122,10 +144,7 @@ sys::ReturnCodes Application::InitHandler() {
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
-//	auto msg = std::make_shared<sapm::APMRegister>(this->GetName(), initState );
-//	sys::Bus::SendUnicast(msg, "ApplicationManager", this);
 	sapm::ApplicationManager::messageRegisterApplication( this, initState );
-
 	return (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
 }
 
@@ -141,19 +160,13 @@ void Application::setActiveWindow( const std::string& windowName ) {
 	}
 }
 
-bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<SwitchData> data ) {
+bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {
 	auto msg = std::make_shared<AppSwitchMessage>( application, window, std::move(data) );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
 
-//bool Application::messageSwitchApplicationWithData( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
-//	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWithData, application );
-//	sys::Bus::SendUnicast(msg, application, sender );
-//	return true;
-//}
-
-bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, SwitchData* data ) {
+bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data ) {
 	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh, application );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;

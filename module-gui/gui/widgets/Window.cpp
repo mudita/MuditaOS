@@ -36,6 +36,10 @@ void Window::getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16
 	mode = refreshMode;
 }
 
+bool Window::handleSwitchData( SwitchData* data ) {
+	return true;
+}
+
 void Window::setFocusItem( Item* item ) {
 
 	//check if item is a child of the window
