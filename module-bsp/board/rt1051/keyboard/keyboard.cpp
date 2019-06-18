@@ -7,8 +7,6 @@
  *  @details
  */
 
-#include "rt1051_keyboard.hpp"
-
 #include <stdio.h>
 #include <stdint.h>
 #include <assert.h>
@@ -21,8 +19,9 @@
 #include "fsl_common.h"
 #include "../common/i2c.h"
 #include "TCA8418.h"
-#include "keyboard/key_codes.hpp"
 #include "common.hpp"
+#include "key_codes.hpp"
+#include "keyboard.hpp"
 
 namespace bsp {
 
