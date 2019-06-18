@@ -24,10 +24,7 @@ class ApplicationDescription {
 public:
 
 	ApplicationDescription( std::string name, std::unique_ptr<app::ApplicationLauncher> lanucher, bool closeable );
-	~ApplicationDescription() {
-		if( switchData )
-			delete switchData;
-	}
+	virtual ~ApplicationDescription() {}
 	//name of the application. It's used to find proper application during switching
 	std::string name;
 	//launcher to application to the application's start function
@@ -37,7 +34,8 @@ public:
 	//current state of the application
 	app::Application::State state = app::Application::State::DEACTIVATED;
 	//switching data stored when application manager had to run init function
-	app::SwitchData* switchData;
+	std::unique_ptr<app::SwitchData> switchData = nullptr;
+	std::string switchWindow = "";
 };
 
 
@@ -70,7 +68,7 @@ class ApplicationManager: public sys::Service {
 
 	//tries to switch the application
 	bool handleSwitchApplication( APMSwitch* msg);
-	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
+//	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
 	bool handleCloseConfirmation( APMConfirmClose* msg );
 	bool handleSwitchConfirmation( APMConfirmSwitch* msg );
 	bool handleRegisterApplication( APMRegister* msg );
@@ -95,12 +93,12 @@ public:
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
      */
-    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName="" );
+    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData> data );
     /**
 	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
 	 * Allows sending data to destination application.
 	 */
-    static bool messageSwitchApplicationWithData( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
+//    static bool messageSwitchApplicationWithData( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
     /**
      * @Brief Function allows sending confirmation to the switch request. This is sent both by application that gains and looses focus.
      */

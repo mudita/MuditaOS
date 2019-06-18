@@ -94,8 +94,7 @@ public:
 	}
 
 	//static methods
-	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window="" );
-	static bool messageSwitchApplicationWithData( sys::Service* sender, std::string application, std::string window, SwitchData* data=nullptr );
+	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<SwitchData> data );
 	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, SwitchData* data=nullptr );
 	static bool messageCloseApplication( sys::Service* sender, std::string application );
 	/**
