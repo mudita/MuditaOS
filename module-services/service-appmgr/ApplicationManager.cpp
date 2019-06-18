@@ -8,6 +8,7 @@
  */
 #include "SystemManager/SystemManager.hpp"
 #include "ApplicationManager.hpp"
+#include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
 #include <utility>
 #include <memory>
@@ -166,6 +167,9 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg) {
 	//store the name of the application to be executed and start closing previous application
 	launchApplicationName = msg->getName();
 	state = State::CLOSING_PREV_APP;
+
+	//notify event manager which application should receive keyboard messages
+	EventManager::messageSetApplication( this, launchApplicationName );
 
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
