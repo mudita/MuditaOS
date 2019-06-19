@@ -8,7 +8,7 @@
  * @details
  */
 
-#include "cellular/linux_cellular.hpp"
+#include "Modem/MuxDaemon.hpp"
 #include <iostream>
 #include <memory>
 #include <cstring>
@@ -20,26 +20,8 @@
 
 TEST_CASE("Cellular module main test body")
 {
-    auto cellular = bsp::Cellular::Create("/dev/ttyUSB0");
+    MuxDaemon daemon;
 
-    while(1){
-
-        char buff[] = "AT\r\n";
-        std::cout << "BytesWritten: " <<  cellular->Write(buff,strlen(buff)) << "\n";
-
-        if(cellular->Wait(30000) == 1){
-            //read from
-            char buff[1024];
-            auto bytesWritten = cellular->Read(buff,sizeof buff);
-            buff[bytesWritten] = '\0';
-            std::cout << buff << "\n";
-
-        }
-        else{
-            std::cout << "timeout\n";
-        }
-    }
-
-
+    daemon.Start();
 }
 

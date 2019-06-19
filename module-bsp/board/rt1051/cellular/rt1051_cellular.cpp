@@ -215,7 +215,7 @@ namespace bsp {
         return 1;
     }
 
-    uint32_t RT1051Cellular::Read(void *buf, size_t nbytes) {
+    ssize_t RT1051Cellular::Read(void *buf, size_t nbytes) {
         return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
     }
 

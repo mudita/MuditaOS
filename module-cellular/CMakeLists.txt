@@ -21,8 +21,7 @@ endif()
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
-
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/Modem.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxDaemon.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

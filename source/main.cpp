@@ -42,7 +42,7 @@
 #include "keyboard/keyboard.hpp"
 
 //module-cellular
-#include "Modem/Modem.hpp"
+#include "Modem/MuxDaemon.hpp"
 
 #include "SystemManager/SystemManager.hpp"
 
@@ -50,7 +50,7 @@ class vfs vfs;
 
 class BlinkyService : public sys::Service {
 	gui::Window* win = nullptr;
-	std::unique_ptr<Modem> modem;
+	std::unique_ptr<MuxDaemon> muxdaemon;
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
@@ -58,11 +58,11 @@ public:
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
 
-        modem = std::make_unique<Modem>();
+        muxdaemon = std::make_unique<MuxDaemon>();
 /*        modem.reset();
         modem = std::make_unique<Modem>();*/
 
-        modem->Init();
+        muxdaemon->Start();
 
     }
 
