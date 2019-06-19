@@ -21,7 +21,7 @@ namespace bsp {
     class Cellular {
     public:
 
-        static std::unique_ptr<Cellular> Create(const char* term = "0");
+        static std::unique_ptr<Cellular> Create(const char* term = "/dev/ttyUSB0");
 
         Cellular() {}
         virtual ~Cellular() {}
@@ -33,7 +33,7 @@ namespace bsp {
 
         virtual uint32_t Wait(uint32_t timeout) = 0;
 
-        virtual uint32_t Read(void *buf, size_t nbytes) = 0;
+        virtual ssize_t Read(void *buf, size_t nbytes) = 0;
 
         virtual uint32_t Write(void *buf, size_t nbytes) = 0;
 

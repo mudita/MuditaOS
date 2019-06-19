@@ -11,6 +11,8 @@
 
 #include "linux_cellular.hpp"
 
+#include <iostream>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -34,8 +36,8 @@ namespace bsp
             fd = open(term,O_RDWR | O_NOCTTY | O_NONBLOCK);
 
             // Set serial port attributes
-            set_interface_attribs();
-            set_mincount(0);
+            //set_interface_attribs();
+            //set_mincount(0);
 
         }
 
@@ -77,8 +79,12 @@ namespace bsp
 
     }
 
-    uint32_t LinuxCellular::Read(void *buf, size_t nbytes) {
-        return read(fd,buf,nbytes);
+    ssize_t LinuxCellular::Read(void *buf, size_t nbytes) {
+        auto ret = read(fd,buf,nbytes);
+        if(ret == -1){
+            std::cout << "Read returned error: " << strerror(errno) << "\n";
+        }
+        return ret;
     }
 
     uint32_t LinuxCellular::Write(void *buf, size_t nbytes) {
@@ -86,9 +92,14 @@ namespace bsp
     }
 
     uint32_t LinuxCellular::Wait(uint32_t timeout) {
+
+        retry:
         auto event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, timeout);
         if(event_count == 0){
             return 0; // timeout
+        }
+        else if((event_count == -1) && (errno == EINTR)){
+            goto retry;
         }
         else{
             return 1;
