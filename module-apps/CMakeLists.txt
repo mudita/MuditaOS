@@ -33,11 +33,11 @@ set( SOURCES "Application.cpp" )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-message("${PROJECT_NAME}: add_subdirectory application-clock")
 add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
 add_subdirectory( application-test )
 add_subdirectory( application-viewer )
+add_subdirectory( application-desktop )
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )
