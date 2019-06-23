@@ -113,7 +113,6 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			int32_t temperature = EinkGetTemperatureInternal();
 
 			EinkStatus_e ret;
-			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
 			if( deepRefresh ) {
 				changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
 			}
@@ -132,11 +131,12 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to update frame");
 
-			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
 			if( deepRefresh ) {
+				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
 			}
 			else{
+				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
 			}
 
