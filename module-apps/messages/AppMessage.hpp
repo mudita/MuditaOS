@@ -48,6 +48,18 @@ public:
 	std::unique_ptr<gui::SwitchData>& getData() { return data; };
 };
 
+class AppRefreshMessage : public AppMessage {
+protected:
+	gui::RefreshModes mode;
+public:
+	AppRefreshMessage( const std::string& application, gui::RefreshModes mode ) :
+		AppMessage( MessageType::AppRefresh, application),
+		mode{ mode }{};
+	virtual ~AppRefreshMessage() {};
+
+	const gui::RefreshModes& getMode() { return mode; };
+};
+
 class AppSwitchWindowMessage : public AppMessage {
 protected:
 	std::string window;
