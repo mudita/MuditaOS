@@ -6,6 +6,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+
+#include "windows/PinWindow.hpp"
+#include "windows/DesktopMainWindow.hpp"
+
 #include "Application.hpp"
 #include "ApplicationDesktop.hpp"
 
@@ -75,7 +79,7 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("Main");
+	setActiveWindow("MainWindow");
 
 	return ret;
 }
@@ -95,8 +99,13 @@ sys::ReturnCodes ApplicationDesktop::SleepHandler() {
 
 void ApplicationDesktop::createUserInterface() {
 
-//	gui::ClockMainWindow* mainWindow = new gui::ClockMainWindow();
-//	windows.insert(std::pair<std::string,gui::Window*>(mainWindow->getName(), mainWindow));
+	gui::Window* window = nullptr;
+
+	window = new gui::DesktopMainWindow();
+	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+
+	window = new gui::PinWindow();
+	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 
 

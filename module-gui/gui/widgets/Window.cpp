@@ -25,9 +25,9 @@ Window::Window( std::string name, uint32_t id ) :
 Window::~Window() {
 }
 
-void Window::onBeforeShow( ShowMode mode, uint32_t command, void* data, uint32_t dataSize ) {
-
+void Window::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 }
+
 void Window::getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h ) {
 	x = widgetArea.x;
 	y = widgetArea.y;

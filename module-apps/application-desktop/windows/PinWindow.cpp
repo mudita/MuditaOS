@@ -13,6 +13,11 @@ namespace gui {
 PinWindow::PinWindow() : Window("PinWindow"){
 	setSize( 480, 600 );
 
+	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
+	bottomBar->setText( BottomBar::Side::LEFT, "SHOW");
+	bottomBar->setText( BottomBar::Side::CENTER, "CONFIRM");
+	bottomBar->setText( BottomBar::Side::RIGHT, "BACK");
+
 //	hourLabel = new gui::Label(this, 100+xOffset,300-160+yOffset,280,150);
 //	hourLabel->setFilled( false );
 //	hourLabel->setBorderColor( gui::ColorNoColor );
@@ -41,8 +46,8 @@ PinWindow::~PinWindow() {
 }
 
 void PinWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-	for( int i = 0; i<4; i++ )
-		dots[i]->setVisible(false);
+//	for( int i = 0; i<4; i++ )
+//		dots[i]->setVisible(false);
 }
 
 } /* namespace gui */

@@ -13,6 +13,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
+#include "gui/widgets/BottomBar.hpp"
 
 namespace gui {
 
@@ -20,6 +21,7 @@ namespace gui {
  *
  */
 class PinWindow: public Window {
+	gui::BottomBar* bottomBar;
 	gui::Label* description = nullptr;
 	gui::Image* confirmArrow = nullptr;
 	gui::Image* dots[4] = {  nullptr, nullptr, nullptr, nullptr };

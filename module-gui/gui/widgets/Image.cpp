@@ -23,6 +23,11 @@ Image::Image( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, cons
 	imageMap { nullptr }{
 	type = ItemType::IMAGE;
 
+	if( imageName.length() ) {
+		uint32_t id = ImageManager::getInstance().getImageMapID( imageName.c_str() );
+		setImageWithID( id );
+	}
+
 	setPosition(x, y);
 	updateDrawArea();
 }
