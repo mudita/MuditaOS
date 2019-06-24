@@ -27,7 +27,7 @@ BottomBar::BottomBar() {
 	addWidget(center);
 	addWidget(right);
 
-	setFillColor( ColorTray );
+	setFillColor( ColorFullWhite );
 	setBorderColor( ColorNoColor );
 	setFilled(true);
 	setSize(480, 50);
@@ -47,7 +47,7 @@ BottomBar::BottomBar( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t
 	addWidget(center);
 	addWidget(right);
 
-	setFillColor( ColorTray );
+	setFillColor( ColorFullWhite );
 	setBorderColor( ColorNoColor );
 	setFilled(true);
 	setSize(480, 50);
@@ -92,7 +92,7 @@ void BottomBar::setActive( BottomBar::Side side, bool active ) {
 			break;
 	};
 }
-void BottomBar::setText( BottomBar::Side side, const UTF8 str ) {
+void BottomBar::setText( BottomBar::Side side, const UTF8& str ) {
 	switch( side ) {
 		case Side::LEFT:
 			left->setText(str);

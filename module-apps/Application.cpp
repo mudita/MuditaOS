@@ -53,16 +53,22 @@ void Application::blockEvents(bool isBlocked ) {
 }
 int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 
-	std::string window = windowName.empty()?"Main":windowName;
+	std::string window = windowName.empty()?"MainWindow":windowName;
 	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
 	return 0;
 }
 int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
+	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWindowBack, this->GetName() );
+	sys::Bus::SendUnicast(msg, this->GetName(), this );
+
 	return 0;
 }
 int Application::refreshWindow(gui::RefreshModes mode) {
+	auto msg = std::make_shared<AppRefreshMessage>( this->GetName(), mode );
+	sys::Bus::SendUnicast(msg, this->GetName(), this );
+
 	return 0;
 }
 
@@ -120,6 +126,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			setActiveWindow( msg->getWindowName());
 			currentWindow->handleSwitchData( msg->getData().get() );
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		handled = true;
 	}
@@ -129,6 +136,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		sapm::ApplicationManager::messageConfirmClose(this);
 		//here should go all the cleaning
 		handled = true;
+	}
+	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
+		render( gui::RefreshModes::GUI_REFRESH_DEEP );
 	}
 
 	if( handled)
