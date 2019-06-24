@@ -9,7 +9,7 @@
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_PINWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_PINWINDOW_HPP_
 
-#include <module-gui/gui/widgets/Window.hpp>
+#include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
@@ -20,13 +20,13 @@ namespace gui {
 /*
  *
  */
-class PinWindow: public Window {
+class PinWindow: public AppWindow {
 	gui::BottomBar* bottomBar;
 	gui::Label* description = nullptr;
 	gui::Image* confirmArrow = nullptr;
 	gui::Image* dots[4] = {  nullptr, nullptr, nullptr, nullptr };
 public:
-	PinWindow();
+	PinWindow( app::Application* app );
 	virtual ~PinWindow();
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 };

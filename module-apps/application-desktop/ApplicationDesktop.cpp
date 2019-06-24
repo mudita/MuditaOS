@@ -101,10 +101,10 @@ void ApplicationDesktop::createUserInterface() {
 
 	gui::Window* window = nullptr;
 
-	window = new gui::DesktopMainWindow();
+	window = new gui::DesktopMainWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 
-	window = new gui::PinWindow();
+	window = new gui::PinWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 

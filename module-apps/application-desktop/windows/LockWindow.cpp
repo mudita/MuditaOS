@@ -10,7 +10,7 @@
 
 namespace gui {
 
-LockWindow::LockWindow() {
+LockWindow::LockWindow( app::Application* app ) : AppWindow( app, "LockWindow") {
 	// TODO Auto-generated constructor stub
 
 }

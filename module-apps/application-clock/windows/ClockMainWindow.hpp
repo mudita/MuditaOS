@@ -10,7 +10,7 @@
 #define MODULE_APPS_APPLICATION_CLOCK_WINDOWS_CLOCKMAINWINDOW_HPP_
 
 //module-gui
-#include "gui/widgets/Window.hpp"
+#include "AppWindow.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
@@ -23,7 +23,7 @@ namespace gui {
 /*
  *
  */
-class ClockMainWindow: public Window {
+class ClockMainWindow: public AppWindow {
 	uint32_t seconds = 0;
 	uint32_t hour = 0;
 	uint32_t minute = 0;
@@ -31,7 +31,7 @@ class ClockMainWindow: public Window {
 	gui::Label* minuteLabel = nullptr;
 	gui::Progress* progressBar = nullptr;
 public:
-	ClockMainWindow();
+	ClockMainWindow( app::Application* app );
 	virtual ~ClockMainWindow();
 
 	bool handleSwitchData( SwitchData* data ) override;

@@ -9,16 +9,16 @@
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_LOCKWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_LOCKWINDOW_HPP_
 
-#include <module-gui/gui/widgets/Window.hpp>
+#include "AppWindow.hpp"
 
 namespace gui {
 
 /*
  *
  */
-class LockWindow: public Window {
+class LockWindow: public AppWindow {
 public:
-	LockWindow();
+	LockWindow( app::Application* app );
 	virtual ~LockWindow();
 };
 

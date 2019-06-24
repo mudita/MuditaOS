@@ -120,7 +120,7 @@ sys::ReturnCodes ApplicationClock::SleepHandler() {
 
 void ApplicationClock::createUserInterface() {
 
-	gui::ClockMainWindow* mainWindow = new gui::ClockMainWindow();
+	gui::ClockMainWindow* mainWindow = new gui::ClockMainWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(mainWindow->getName(), mainWindow));
 }
 
