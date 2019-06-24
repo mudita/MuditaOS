@@ -20,6 +20,7 @@
 
 MuxDaemon::MuxDaemon() {
     cellular = bsp::Cellular::Create();
+    inSerialDataWorker = std::make_unique<InputSerialWorker>(this);
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -46,6 +47,9 @@ int MuxDaemon::Start() {
         }
     }
 
+    // Spawn input serial stream worker
+    inSerialDataWorker->Init();
+
     // Set up modem configuration
 
     // Set fixed baudrate = 115200
@@ -63,15 +67,15 @@ int MuxDaemon::Start() {
 
 
     char gsm_command[128] = {};
-    if (cmux_mode){
+    if (inputBuffer->cmux_mode){
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=1\r\n");
     }
     else {
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n"
-                , cmux_mode
-                , cmux_subset
-                , quectel_speeds[cmux_port_speed]
-                , cmux_N1
+                , inputBuffer->cmux_mode
+                , inputBuffer->cmux_subset
+                , quectel_speeds[inputBuffer->cmux_port_speed]
+                , inputBuffer->cmux_N1
         );
     }
 
@@ -82,7 +86,7 @@ int MuxDaemon::Start() {
 }
 
 int MuxDaemon::Exit() {
-
+    inSerialDataWorker->Deinit();
 }
 
 
@@ -107,13 +111,69 @@ int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
             return -1;
         }
         else{
-            LOG_DEBUG("Received unknonwn response");
+            LOG_DEBUG("Received unknown response");
             return -1;
         }
     }
     else{
         return -1;
     }
+}
+
+ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int length, unsigned char type) {
+
+/* flag, GSM0710_EA=1 C channel, frame type, length 1-2 */
+    unsigned char prefix[5] = { static_cast<unsigned  char>(MuxDefines ::GSM0710_FRAME_FLAG),
+                                static_cast<unsigned  char>(MuxDefines ::GSM0710_EA) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR), 0, 0, 0 };
+    unsigned char postfix[2] = { 0xFF, static_cast<unsigned char>(MuxDefines ::GSM0710_FRAME_FLAG )};
+    ssize_t prefix_length = 4;
+    int c;
+    unsigned char tmp[GSM0710Buffer::cmux_FRAME];
+
+    LOG_DEBUG("Sending frame to channel %d", channel);
+
+/* GSM0710_EA=1, Command, let's add address */
+    prefix[1] = prefix[1] | ((63 & (unsigned char) channel) << 2);
+/* let's set control field */
+    prefix[2] = type;
+    if ((type == static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH) || type == static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UI)) &&
+        uih_pf_bit_received == 1 &&
+        inputBuffer->GSM0710_COMMAND_IS(MuxDefines ::GSM0710_CONTROL_MSC, input[0]) ){
+        prefix[2] = prefix[2] | static_cast<unsigned char>(MuxDefines ::GSM0710_PF); //Set the P/F bit in Response if Command from modem had it set
+        uih_pf_bit_received = 0; //Reset the variable, so it is ready for next command
+    }
+/* let's not use too big frames */
+    length = std::min(GSM0710Buffer::cmux_N1, length);
+    if (!GSM0710Buffer::cmux_mode)//basic
+    {
+/* Modified acording PATCH CRC checksum */
+/* postfix[0] = frame_calc_crc (prefix + 1, prefix_length - 1); */
+/* length */
+        if (length > 127)
+        {
+            prefix_length = 5;
+            prefix[3] = (0x007F & length) << 1;
+            prefix[4] = (0x7F80 & length) >> 7;
+        }
+        else
+            prefix[3] = 1 | (length << 1);
+        postfix[0] = GSM0710Buffer::frameCalcCRC(prefix + 1, prefix_length - 1);
+
+        memcpy(tmp, prefix, prefix_length);
+
+        if (length > 0)
+        {
+            memcpy(tmp + prefix_length, input, length);
+        }
+
+        memcpy(tmp + prefix_length + length, postfix, 2);
+        c = prefix_length + length + 2;
+        syslogdump(">s ", tmp, c);
+
+        serial_device_write(&serial, tmp, c);
+    }
+
+    return length;
 }
 
 int MuxDaemon::memstr(const char *haystack, int length, const char *needle) {
