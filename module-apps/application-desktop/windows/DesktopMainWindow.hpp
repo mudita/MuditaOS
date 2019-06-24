@@ -9,7 +9,7 @@
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 
-#include <module-gui/gui/widgets/Window.hpp>
+#include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
@@ -22,7 +22,7 @@ namespace gui {
 /*
  *
  */
-class DesktopMainWindow: public Window {
+class DesktopMainWindow: public AppWindow {
 	gui::BottomBar* bottomBar;
 	gui::TopBar* topBar;
 	gui::Label* description = nullptr;
@@ -32,7 +32,7 @@ class DesktopMainWindow: public Window {
 	gui::Image* confirmArrow = nullptr;
 	gui::Image* dots[4] = {  nullptr, nullptr, nullptr, nullptr };
 public:
-	DesktopMainWindow();
+	DesktopMainWindow( app::Application* app );
 	virtual ~DesktopMainWindow();
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 };

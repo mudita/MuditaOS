@@ -20,7 +20,7 @@
 
 namespace gui {
 
-ClockMainWindow::ClockMainWindow() : gui::Window("Main") {
+ClockMainWindow::ClockMainWindow( app::Application* app ) : gui::AppWindow( app, "Main") {
 
 	setSize( 480, 600 );
 

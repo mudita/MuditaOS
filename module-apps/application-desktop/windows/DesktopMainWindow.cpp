@@ -6,12 +6,12 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include <module-apps/application-desktop/windows/DesktopMainWindow.hpp>
+#include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
 
 namespace gui {
 
-DesktopMainWindow::DesktopMainWindow() : Window("MainWindow"){
+DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
 	setSize( 480, 600 );
 
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
