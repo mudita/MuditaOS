@@ -22,6 +22,9 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxDaemon.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/InputSerialWorker.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/GSM0710.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxChannel.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -58,7 +61,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-utils module-vfs module-bsp )
+target_link_libraries(${PROJECT_NAME} module-utils module-vfs module-bsp module-sys )
 
 # Host target configuration(mainly used for unit testing)
 

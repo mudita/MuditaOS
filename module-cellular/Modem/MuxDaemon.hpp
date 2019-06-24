@@ -12,11 +12,20 @@
 #ifndef PUREPHONE_MUXDAEMON_HPP
 #define PUREPHONE_MUXDAEMON_HPP
 
+#include <vector>
+#include "MuxChannel.hpp"
 #include <stdint.h>
 #include "cellular/bsp_cellular.hpp"
+#include "Service/Worker.hpp"
+#include "InputSerialWorker.hpp"
+#include "GSM0710.hpp"
 
 
 class MuxDaemon {
+
+    friend InputSerialWorker;
+    friend void workerTaskFunction( void* ptr );
+
 public:
 
     MuxDaemon();
@@ -27,17 +36,13 @@ public:
 
 private:
 
-    enum class States
-    {
-        MUX_STATE_OPENING,
-        MUX_STATE_INITILIZING,
-        MUX_STATE_MUXING,
-        MUX_STATE_CLOSING,
-        MUX_STATE_OFF,
-        MUX_STATES_COUNT // keep this the last
-    };
-
     int SendAT(const char* cmd,uint32_t timeout);
+    ssize_t WriteMuxFrame(int channel,
+                          const unsigned char *input,
+                          int length,
+                          unsigned char type);
+
+
 
     /*
 * Purpose:  Compares two strings.
@@ -53,18 +58,21 @@ private:
             int length,
             const char *needle);
 
-    std::unique_ptr<bsp::Cellular> cellular;
-
-
-
-    States state = States::MUX_STATE_OPENING;
-
+    enum class States
+    {
+        MUX_STATE_OPENING,
+        MUX_STATE_INITILIZING,
+        MUX_STATE_MUXING,
+        MUX_STATE_CLOSING,
+        MUX_STATE_OFF,
+        MUX_STATES_COUNT // keep this the last
+    };
 
     /*
- * The following arrays must have equal length and the values must
- * correspond. also it has to correspond to the gsm0710 spec regarding
- * baud id of CMUX the command.
- */
+     * The following arrays must have equal length and the values must
+     * correspond. also it has to correspond to the gsm0710 spec regarding
+     * baud id of CMUX the command.
+     */
     constexpr static int baud_rates[] = {
             0, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600, 1500000, 2000000, 3000000, 4000000
     };
@@ -73,13 +81,21 @@ private:
             0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 20, 23, 26
     };
 
-    // some state
-    // +CMUX=<mode>[,<subset>[,<port_speed>[,<N1>[,<T1>[,<N2>[,<T2>[,<T3>[,<k>]]]]]]]]
-    const static int cmux_mode = 0;
-    const static int cmux_subset = 0;
-    const static int cmux_port_speed = 5; //115200 baud rate
-    const static int cmux_port_speed_default = 5; //115200 baud rate
-    const static int cmux_N1 = 127; //lots of modem only support short frame, like quectel 2G modules
+
+
+    std::unique_ptr<bsp::Cellular> cellular;
+    std::unique_ptr<InputSerialWorker> inSerialDataWorker;
+
+
+    States state = States::MUX_STATE_OPENING;
+
+    std::unique_ptr<GSM0710Buffer> inputBuffer;
+    std::vector<MuxChannel> channels;
+
+    uint32_t virtualPortsCount = 3;
+    int uih_pf_bit_received = 0;
+
+
 
 
 
