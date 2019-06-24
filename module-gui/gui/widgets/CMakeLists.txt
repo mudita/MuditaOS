@@ -17,6 +17,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Window.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayout.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Layout.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BottomBar.hpp"
@@ -34,5 +35,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Window.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayout.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Layout.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar.hpp"
 )
 

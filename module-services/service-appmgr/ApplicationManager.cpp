@@ -107,19 +107,14 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//search for application with specified name and run it
 	//TODO name of the app should be Homescreen but for tests is is "ApplicationClock"
-//	std::string runAppName = "ApplicationClock";
-//
-//	auto it = applications.find(runAppName);
-//	if( it!= applications.end()){
-//		it->second->lanucher->run(systemManager);
-//	}
+	std::string runAppName = "ApplicationDesktop";
 
-	//TODO for testing only
-	auto data = std::make_unique<ClockData>( 12,25 );
-	messageSwitchApplication( this, "ApplicationClock", "", std::move(data) );
+	auto it = applications.find(runAppName);
+	if( it!= applications.end()){
+		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
+	}
 
-
-	return sys::ReturnCodes::Success;
+  	return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ApplicationManager::DeinitHandler() {

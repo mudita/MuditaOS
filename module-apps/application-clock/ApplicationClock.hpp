@@ -43,7 +43,7 @@ class ApplicationClockLauncher : public ApplicationLauncher {
 public:
 	ApplicationClockLauncher() : ApplicationLauncher("ApplicationClock", true) {};
 	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<app::ApplicationClock>(name),sysmgr,1000);
+		return sysmgr->CreateService(std::make_shared<ApplicationClock>(name),sysmgr,1000);
 	};
 };
 
