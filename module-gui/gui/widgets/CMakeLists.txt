@@ -1,6 +1,6 @@
 target_sources( ${PROJECT_NAME}
 
-	PRIVATE
+	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Alignment.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BottomBar.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Image.cpp"

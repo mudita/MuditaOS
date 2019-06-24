@@ -1,0 +1,21 @@
+{
+    "common_open": "OPEN",
+    "common_back": "BACK",
+    "common_set": "SET",
+    "common_switch": "SWITCH",
+    "common_options": "OPTIONS",
+    "common_monday": "Monday",
+    "common_tuesday": "Tuesday",
+    "common_wendesday": "Wendesday",
+    "common_thursday": "Thursday",
+    "common_friday": "Friday",
+    "common_saturday": "Saturday",
+    "common_sunday": "Sunday",
+
+    "app_desktop_unlock": "UNLOCK",
+    "app_desktop_lock": "LOCK",
+
+    "settings_lang_PL": "PL",
+    "settings_lang_ENG": "ENG"
+
+}

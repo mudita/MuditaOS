@@ -13,6 +13,9 @@
 #include "Application.hpp"
 #include "ApplicationDesktop.hpp"
 
+#include "MessageType.hpp"
+
+
 namespace app {
 
 ApplicationDesktop::ApplicationDesktop(std::string name) :
@@ -20,7 +23,6 @@ ApplicationDesktop::ApplicationDesktop(std::string name) :
 }
 
 ApplicationDesktop::~ApplicationDesktop() {
-	// TODO Auto-generated destructor stub
 }
 
 // Invoked upon receiving data message
@@ -33,11 +35,11 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
 		return retMsg;
 	}
 
-//	//this variable defines whether message was processed.
+	//this variable defines whether message was processed.
 	bool handled = false;
-//	//if keyboard message received
-//	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
-//	{
+	//if keyboard message received
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
+	{
 //		KbdMessage* msg = static_cast<KbdMessage*>(msgl);
 //		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
 //
@@ -60,9 +62,8 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
 //				win->updateLabels();
 //			}
 //		}
-//		handled = true;
-//	}
-	handled = true;
+		handled = true;
+	}
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();

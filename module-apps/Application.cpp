@@ -12,12 +12,11 @@
 #include "service-gui/messages/DrawMessage.hpp"
 #include "service-appmgr/messages/APMMessage.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
 //module-gui
 #include "gui/core/DrawCommand.hpp"
 //module-sys
 #include "SystemManager/SystemManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-
 
 #include "Application.hpp"
 #include "MessageType.hpp"

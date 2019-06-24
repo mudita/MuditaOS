@@ -35,6 +35,10 @@ extern "C"
 
 namespace sgui {
 
+static uint32_t getTimeFunction() {
+	return xTaskGetTickCount();
+}
+
 ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
 		: sys::Service(name, 4096, sys::ServicePriority::Idle),
 		renderContext{ nullptr },
@@ -182,6 +186,9 @@ void ServiceGUI::TickHandler(uint32_t id) {
 
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
+
+	//set function for acquiring time in seconds from the system
+	gui::setTimeFunction( getTimeFunction );
 
 	//create semaphore to protect vector with commands waiting for rendering
 	semCommands = xSemaphoreCreateBinary();

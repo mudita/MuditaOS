@@ -5,6 +5,7 @@
  *      Author: robert
  */
 
+#include <iostream>
 #include <unistd.h>
 #include <string.h>
 
@@ -27,7 +28,7 @@ FontGlyph::~FontGlyph() {
 gui::Status FontGlyph::load( uint8_t* data, uint32_t& offset ) {
 	//character id
 	memcpy( &id, data + offset, sizeof(uint16_t) ); offset += sizeof(uint16_t);
-//	offset+=2;
+	std::cout<<"id:"<<id<<std::endl;
 	//offset in glyph data field
 	memcpy( &glyph_offset, data + offset, sizeof(uint32_t) ); offset += sizeof(uint32_t);
 	//width of the character image in the texture

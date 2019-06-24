@@ -13,6 +13,7 @@
 #include "AppWindow.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
+#include "gui/widgets/Progress.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 #include "gui/widgets/Progress.hpp"
@@ -27,9 +28,9 @@ class ClockMainWindow: public AppWindow {
 	uint32_t seconds = 0;
 	uint32_t hour = 0;
 	uint32_t minute = 0;
-	gui::Label* hourLabel = nullptr;
-	gui::Label* minuteLabel = nullptr;
-	gui::Progress* progressBar = nullptr;
+	Label* hourLabel = nullptr;
+	Label* minuteLabel = nullptr;
+	Progress* progressBar = nullptr;
 public:
 	ClockMainWindow( app::Application* app );
 	virtual ~ClockMainWindow();
