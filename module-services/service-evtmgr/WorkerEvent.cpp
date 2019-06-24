@@ -20,6 +20,7 @@ extern "C" {
 
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
+#include "service-evtmgr/messages/EVMessages.hpp"
 #include "module-bsp/bsp/keyboard/keyboard.hpp"
 
 static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
@@ -54,10 +55,10 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		bool received;
 		xQueueReceive(queue, &received, 0);
 
-		auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
+		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = lastPressed;
 		message->keyRelaseTime = xTaskGetTickCount();
-		message->keyState = KeyboardEvents::keyReleasedLong;
+		message->keyState = sevm::KeyboardEvents::keyReleasedLong;
 		sys::Bus::SendUnicast(message, "EventManager", this->service);
 
 		lastState = bsp::KeyEvents::Released;
@@ -110,7 +111,7 @@ bool WorkerEvent::deinit(void)
 
  void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
  {
-	 auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
+	 auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
 
 	message->keyCode = code;
 
@@ -122,7 +123,7 @@ bool WorkerEvent::deinit(void)
 		}
 
 
-		message->keyState =  KeyboardEvents::keyPressed;
+		message->keyState =  sevm::KeyboardEvents::keyPressed;
 		message->keyPressTime = xTaskGetTickCount();
 		message->keyRelaseTime = 0;
 
@@ -154,7 +155,7 @@ bool WorkerEvent::deinit(void)
 				{
 					xTimerStop(longPressTimerHandle, 0);
 
-					message->keyState =  KeyboardEvents::keyReleasedShort;
+					message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
 					message->keyCode = code;
 					message->keyRelaseTime = xTaskGetTickCount();
 					longPressTaskEnabled = false;
@@ -168,13 +169,13 @@ bool WorkerEvent::deinit(void)
 			}
 			else
 			{
-				message->keyState =  KeyboardEvents::keyReleasedShort;
+				message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
 				message->keyRelaseTime = xTaskGetTickCount();
 			}
 		}
 		else
 		{
-			message->keyState =  KeyboardEvents::keyReleasedShort;
+			message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
 			message->keyRelaseTime = xTaskGetTickCount();
 		}
 	}

@@ -269,10 +269,15 @@ uint32_t UTF8::operator[]( const uint32_t& idx ) const{
 	lastIndex = charCnt;
 	lastIndexData = dataPtr;
 
-	uint32_t returnValue = 0;
-	memcpy(static_cast<uint32_t*>(&returnValue), dataPtr, charLength(reinterpret_cast<const char*>(dataPtr)));
+	uint32_t dummy;
+	uint32_t retValue = decode( reinterpret_cast<const char*>(dataPtr), dummy );
+	return retValue;
 
-	return returnValue;
+//	uint32_t returnValue = 0;
+//	uint32_t tmp = charLength(reinterpret_cast<const char*>(dataPtr));
+//	memcpy(static_cast<uint32_t*>(&returnValue), dataPtr, tmp);
+//
+//	return returnValue;
 }
 
 UTF8 UTF8::operator+( const UTF8& utf ) {
@@ -571,4 +576,65 @@ UTF8 UTF8::deserialize(uint8_t* stream) {
 		return UTF8();
 	}
 	return UTF8( data, *sizeAllocated, *sizeUsed, *strLength );
+}
+
+uint32_t UTF8::decode( const char* utf8_char, uint32_t& length  ) const
+{
+    uint32_t ret = 0;
+    uint32_t len = 0;
+    //check if provided char is standars US-ASCII character. 0xxxxxxx
+    if( ( (*utf8_char) & UTF8_HEADER_1_MASK ) == 0 )
+    {
+        ret = *utf8_char;
+        len = 1;
+    }
+    else if( ( (*utf8_char) & UTF8_HEADER_2_MASK ) == UTF8_HEADER_2 ) //characters number is written on 2 bytes 110xxxxx 10xxxxxx
+    {
+        if( ( *(utf8_char + 1) & UTF8_EXT_MASK ) == UTF8_EXT )
+        {
+            ret = (*utf8_char) & 0x1F;
+            ret <<= 6;
+            ret += *(utf8_char+1) & 0x3F;
+            len = 2;
+        }
+        else
+            goto wrong_utf8_character;
+    }
+    else if( ( (*utf8_char) & UTF8_HEADER_3_MASK ) == UTF8_HEADER_3 ) //characters number is written on 3 bytes. 1110xxxx 10xxxxxx 10xxxxxx
+    {
+        if( ( (*(utf8_char + 1) & UTF8_EXT_MASK ) == UTF8_EXT ) &&
+            ( (*(utf8_char + 2) & UTF8_EXT_MASK ) == UTF8_EXT ) )
+        {
+            ret = (*utf8_char) & 0x7F;
+            ret <<= 6;
+            ret += *(utf8_char+1) & 0x3F;
+            ret <<= 6;
+            ret += *(utf8_char+2) & 0x3F;
+            len = 3;
+        }
+        else
+            goto wrong_utf8_character;
+    }
+    else if( ( (*(utf8_char) & UTF8_HEADER_4_MASK ) == UTF8_HEADER_4 ) ) //characters number is written on 3 bytes. 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+    {
+        if( ( (*(utf8_char + 1) & UTF8_EXT_MASK ) == UTF8_EXT ) &&
+            ( (*(utf8_char + 2) & UTF8_EXT_MASK ) == UTF8_EXT ) &&
+            ( (*(utf8_char + 3) & UTF8_EXT_MASK ) == UTF8_EXT ) )
+        {
+            ret = (*utf8_char) & 0x7F;
+            ret <<= 6;
+            ret += *(utf8_char+1) & 0x3F;
+            ret <<= 6;
+            ret += *(utf8_char+2) & 0x3F;
+            ret <<= 6;
+            ret += *(utf8_char+3) & 0x3F;
+            len = 4;
+        }
+        else
+            goto wrong_utf8_character;
+    }
+	length = len;
+    return ret;
+wrong_utf8_character:
+    return ret;
 }

@@ -7,25 +7,12 @@
 
 #include "EventManager.hpp"
 
-
 #include "log/log.hpp"
 
 #include "keyboard/keyboard.hpp"
 #include "WorkerEvent.hpp"
 #include "messages/EVMessages.hpp"
 
-
-sys::Message_t KbdMessage::Execute(sys::Service* service)
-{
-	// Ignore incoming data message if this service is not yet initialized
-	if(service->isReady){
-		return service->DataReceivedHandler(this);
-	}
-	else{
-		return std::make_shared<sys::ResponseMessage>();
-	}
-
-}
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -51,13 +38,13 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
-		KbdMessage* msg = reinterpret_cast<KbdMessage*>(msgl);
+		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
 		LOG_INFO("[EventManager] Received key info: key_code = %d, keyEvent = %d\n"
 				"press time: %d, release time %d", static_cast<int>(msg->keyCode),
 				static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
 
-		auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
+		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = msg->keyCode;
 		message->keyState = msg->keyState;
 

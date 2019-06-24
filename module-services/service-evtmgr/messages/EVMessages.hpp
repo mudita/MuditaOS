@@ -10,12 +10,48 @@
 #define MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_
 
 #include <string>
-
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 #include "SwitchData.hpp"
+#include "Service/Service.hpp"
+#include "MessageType.hpp"
+
 
 namespace sevm {
+
+enum class KeyboardEvents{
+	keyPressed,
+	keyReleasedShort,
+	keyReleasedLong
+};
+
+
+class KbdMessage : public sys::DataMessage
+{
+public:
+	KbdMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
+	{
+		type = Type::Data;
+
+	}
+
+	sys::Message_t Execute(sys::Service* service)
+	{
+		// Ignore incoming data message if this service is not yet initialized
+		if(service->isReady){
+			return service->DataReceivedHandler(this);
+		}
+		else{
+			return std::make_shared<sys::ResponseMessage>();
+		}
+
+	}
+
+	KeyboardEvents keyState = static_cast< KeyboardEvents>(0);
+	bsp::KeyCodes keyCode = static_cast<bsp::KeyCodes>(0);
+	int keyPressTime = 0;
+	int keyRelaseTime = 0;
+};
 
 /*
  * @brief Template for all messages that go to application manager
