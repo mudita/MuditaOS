@@ -43,7 +43,7 @@ void ApplicationTest::TickHandler(uint32_t id){
 	static uint32_t progress;
 
 	progress++;
-	/*bar->setCurrentProgress(progress % 100);*/
+//	bar->setCurrentProgress(progress % 101);
 	render(gui::RefreshModes::GUI_REFRESH_FAST );
 }
 // Invoked during initialization
@@ -81,35 +81,30 @@ void ApplicationTest::createUserInterface(){
 	color.intensivity = 5;
 
 	rectangle = new gui::Rect(clockWin,90, 250, 150, 150);
+
+	//rectangle->drawArea.w = 100;
+
 	rectangle->setPenWidth(5);
 	rectangle->setFillColor(color);
-	//rectangle->setFilled(true);
-	rectangle->setFilled(false);
+	rectangle->setFilled(true);
+	//rectangle->setFilled(false);
 	//rectangle->setPosition(90, 250);
 	//rectangle->setMaxSize(100, 100);
-	rectangle->setRadius(25);
-	rectangle->setFlat(gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT | /*gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT |*/
+	rectangle->setRadius(75);
+	rectangle->setFlat(/*gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT | *//*gui::RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT |*/
 						/*gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT |*/ gui::RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT) ;
-/*	rect = new gui::Rect(rectangle, 10, 10, 80, 80);
 
-	gui::Color color;
-	color.alpha = 0;
-	color.intensivity = 0;
-
-	rect->setFillColor(color);
-	rect->setFilled(true);
-	rect->setRadius(10);
-	gui::Rect* rect2 = new gui::Rect(rect, 10, 10, 20, 20);
-
-	color.alpha = 0;
-	color.intensivity = 15;
-	rect2->setFillColor(color);
-	rect2->setFilled(true);*/
+	rect = new gui::Rect (rectangle, -10, -10, 100, 100);
+	rect->setPenWidth(5);
+	rect2 = new gui::Rect (rect, 5, 5, 50, 50);
+	rect2->setPenWidth(5);
 
 
+/*
 	bar = new gui::Progress(clockWin, 40, 50, 400, 70);
 	bar->setTotalProgress(100);
 	bar->setCurrentProgress(1);
+*/
 
 }
 void ApplicationTest::destroyUserInterface(){

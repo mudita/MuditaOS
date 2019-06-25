@@ -110,7 +110,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	) {
 		return;
 	}
-
+	LOG_INFO("RECTANGLE x %d, y %d, w %d, h%d, areaW %d, areaH %d",
+			cmd->x, cmd->y, cmd->w, cmd->h, cmd->areaH, cmd->areaH);
 	//get copy of original context using x,y of draw coordinates and original size of the widget
 	Context* drawCtx;
 	bool copyContext = false;
@@ -125,7 +126,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	}
 	else {
 		copyContext = true;
-		drawCtx= ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
+		drawCtx= ctx->get( cmd->x + cmd->areaX, cmd->y + cmd->areaY, cmd->areaW, cmd->areaH );
 	}
 
 	//if rounding of corners is 0
@@ -150,7 +151,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	else {
 
 		//calculate centers of circle for all corners
-		int16_t xcTopRight = wgtX+cmd->w - cmd->radius;
+		int16_t xcTopRight = wgtX+cmd->areaW - cmd->radius;
 		int16_t xcTopLeft = wgtX+cmd->radius;
 		int16_t xcBottomRight = xcTopRight;
 		int16_t xcBottomLeft = xcTopLeft;
@@ -348,11 +349,11 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 				index = 0;
 				//X is growing faster
 				for( index=0; index<middleIndex; ++index ) {
-					drawHorizontalLine( drawCtx, xcBottomRight + Px[index] - cmd->penWidth, ycBottomRight + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, xcBottomRight + Px[index] - cmd->penWidth, ycBottomRight + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_UP);
 				}
 				//Y is growing faster
 				for( index=middleIndex; index<pointCount; ++index ) {
-					drawVerticalLine( drawCtx, xcBottomRight + Px[index], ycBottomRight + Py[index] - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+					drawVerticalLine( drawCtx, xcBottomRight + Px[index], ycBottomRight + Py[index] - cmd->penWidth /*+ 1*/, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 		}
@@ -370,7 +371,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 				}
 				//Y is growing faster
 				for( index=middleIndex; index<pointCount; ++index ) {
-					drawVerticalLine( drawCtx, xcTopLeft - Px[index] + 1, ycTopLeft - Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+					drawVerticalLine( drawCtx, xcTopLeft - Px[index] /*+ 1*/, ycTopLeft - Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_RIGHT);
 				}
 			}
 		}
@@ -384,11 +385,11 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 				index = 0;
 				//X is growing faster
 				for( index=0; index<middleIndex; ++index ) {
-					drawHorizontalLine( drawCtx, xcBottomLeft - Px[index], ycBottomLeft + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, xcBottomLeft - Px[index], ycBottomLeft + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_UP );
 				}
 				//Y is growing faster
 				for( index=middleIndex; index<pointCount; ++index ) {
-					drawVerticalLine( drawCtx, xcBottomLeft - Px[index] + 1, ycBottomLeft + Py[index] - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+					drawVerticalLine( drawCtx, xcBottomLeft - Px[index] , ycBottomLeft + Py[index] - cmd->penWidth , cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_RIGHT );
 				}
 			}
 		}
@@ -407,7 +408,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM ) {
 			xs = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
-			ys = wgtH;
+			ys = wgtH - 1;
 			le = wgtW - xs - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
 			drawHorizontalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
 		}
@@ -428,8 +429,10 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 	//if drawing was performed in temporary context
 	if( copyContext) {
-		//reinsert drawCtx into bast context
-		ctx->insert( cmd->x, cmd->y, drawCtx );
+		//reinsert drawCtx into last context
+
+//		ctx->insert( cmd->x, cmd->y, drawCtx );
+		ctx->insertArea( cmd->x, cmd->y,cmd->areaX, cmd->areaY, cmd->w, cmd->h, drawCtx );
 		//remove draw context
 		delete drawCtx;
 	}
