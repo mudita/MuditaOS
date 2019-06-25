@@ -219,7 +219,7 @@ namespace bsp {
         return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
     }
 
-    uint32_t RT1051Cellular::Wait(uint32_t timeout) {
+    ssize_t RT1051Cellular::Wait(uint32_t timeout) {
         if (blockedTaskHandle != nullptr) {
             LOG_FATAL("Wait called simultaneously from more than one thread!");
             return 0;

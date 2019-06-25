@@ -14,6 +14,8 @@
 
 #include <string>
 
+class MuxDaemon;
+
 class MuxChannel {
 public:
 
@@ -21,6 +23,9 @@ public:
         Opened,
         Closed
     };
+
+    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,const char* name="Default");
+    virtual ~MuxChannel();
 
     std::string& GetName(){
         return name;
@@ -34,11 +39,17 @@ public:
         state = state;
     }
 
+    int v24signals;
+    int frameAllowed;
     int disc_ua_pending;
+    uint32_t logicalNumber;
+
+
 
 private:
     std::string name;
     State state;
+    MuxDaemon* mux;
 
 };
 
