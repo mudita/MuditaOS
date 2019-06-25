@@ -33,6 +33,10 @@ public:
 	 */
 	void insert( int16_t ix, int16_t iy, Context* context );
 	/**
+	 * @brief Pastes provided context into current one. Overlapping content will be inserted into current context.
+	 */
+	void insertArea( int16_t ix, int16_t iy, int16_t iareaX, int16_t iareaY, int16_t iareaW, int16_t iareaH, Context* context );
+	/**
 	 * @brief Fills whole context with specified colour;
 	 */
 	void fill( uint8_t colour );

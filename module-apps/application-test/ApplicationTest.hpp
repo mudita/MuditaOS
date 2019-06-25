@@ -20,6 +20,7 @@ class ApplicationTest : public Application{
 	uint32_t timer_id= 0;
 	gui::Rect* rectangle;
 	gui::Rect* rect;
+	gui::Rect* rect2;
 	gui::Progress* bar;
 
 public:
