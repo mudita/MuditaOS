@@ -103,9 +103,12 @@ ImageMap* ImageManager::loadPixMap( std::string filename ) {
 		pixMap->setID( imageMaps.size());
 		std::set<char> delims{'/'};
 		std::vector<std::string> path = splitpath( filename, delims);
-		pixMap->setName( path[path.size()-1] );
+		std::string filename = path[path.size()-1];
+		filename = filename.substr( 0, filename.length()-4);
+
+   		pixMap->setName( filename );
 		//TODO remove commented code
-		//LOG_INFO("%s",path[path.size()-1].c_str());
+//		LOG_INFO("%s",filename.c_str());
 		imageMaps.push_back( pixMap );
 	}
 	delete[] data;
@@ -142,9 +145,11 @@ ImageMap* ImageManager::loadVecMap( std::string filename ) {
 		vecMap->setID( imageMaps.size());
 		std::set<char> delims{'/'};
 		std::vector<std::string> path = splitpath( filename, delims);
-		vecMap->setName( path[path.size()-1] );
+		std::string filename = path[path.size()-1];
+		filename = filename.substr( 0, filename.length()-4);
+		vecMap->setName( filename );
 		//TODO remove commented code
-		//LOG_INFO("%s",path[path.size()-1].c_str());
+		//LOG_INFO("%s",filename.c_str());
 		imageMaps.push_back( vecMap );
 	}
 	delete[] data;

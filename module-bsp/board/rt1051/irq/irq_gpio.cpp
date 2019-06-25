@@ -17,7 +17,7 @@
 #include "fsl_common.h"
 
 
-#include "keyboard/rt1051_keyboard.hpp"
+#include "keyboard/keyboard.hpp"
 
 
 #include "bsp_eink.h"
@@ -71,7 +71,7 @@ namespace bsp {
             uint32_t irq_mask = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_RF_BUTTON_PIN)) {
-                xHigherPriorityTaskWoken |= rt1501_keyboard_right_functional_IRQHandler();
+                xHigherPriorityTaskWoken |= keyboard_right_functional_IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
@@ -107,7 +107,7 @@ namespace bsp {
 
 
             if (irq_mask & (1 << BOARD_KEYBOARD_IRQ_GPIO_PIN)) {
-                xHigherPriorityTaskWoken |= rt1501_keyboard_IRQHandler();
+                xHigherPriorityTaskWoken |= keyboard_IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_USBC_NINT_PIN)) {

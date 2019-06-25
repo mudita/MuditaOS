@@ -42,13 +42,13 @@ public:
 class EventManager: public sys::Service {
 protected:
 	sys::Worker* EventWorker;
+	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
+	std::string targetApplication;
 public:
 	EventManager(const std::string& name);
     ~EventManager();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
-    // Invoked when timer ticked
-    void TickHandler(uint32_t id) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
@@ -59,7 +59,10 @@ public:
 
     sys::ReturnCodes SleepHandler() override;
 
-    uint32_t timer_id= 0;
+    /**
+	* @brief Sends request to application manager to switch from current application to specific window in application with specified name .
+	*/
+    static bool messageSetApplication( sys::Service* sender, const std::string& applicationName );
 };
 
 #endif /* MODULE_SERVICES_SERVICE_KBD_EventManager_HPP_ */

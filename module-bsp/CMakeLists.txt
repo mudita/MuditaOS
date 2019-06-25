@@ -17,8 +17,6 @@ endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
-set(SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/bsp/keyboard/keyboard.cpp" )
-
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
 endif()
@@ -57,12 +55,15 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/bsp
+        ${CMAKE_CURRENT_LIST_DIR}/bsp/keyboard
 
 
 )
 target_include_directories( ${PROJECT_NAME}  
 	PUBLIC 
 		"${CMAKE_SOURCE_DIR}/"
+		"${CMAKE_SOURCE_DIR}/bsp"
+		"${CMAKE_SOURCE_DIR}/bsp/keyboard"
 		"${CMAKE_SOURCE_DIR}/module-services/"  
 )
 

@@ -7,12 +7,12 @@
 
 #include "EventManager.hpp"
 
-#include "module-bsp/board/linux/keyboard/bsp_keyboard.hpp"
+
 #include "log/log.hpp"
 
 #include "keyboard/keyboard.hpp"
 #include "WorkerEvent.hpp"
-
+#include "messages/EVMessages.hpp"
 
 
 sys::Message_t KbdMessage::Execute(sys::Service* service)
@@ -37,10 +37,6 @@ EventManager::EventManager(const std::string& name)
 
 EventManager::~EventManager(){
 
-    timer_id = CreateTimer(1000,true);
-    ReloadTimer(timer_id);
-
-
 	LOG_INFO("[EventManager] Cleaning resources");
 	if( EventWorker != nullptr) {
 		EventWorker->deinit();
@@ -51,28 +47,37 @@ EventManager::~EventManager(){
 // Invoked upon receiving data message
 sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
-	KbdMessage* msg = static_cast<KbdMessage*>(msgl);
+	bool handled = false;
 
-	LOG_INFO("[EventManager] Received key info: key_code = %d, keyEvent = %d\n"
-			"press time: %d, release time %d", static_cast<int>(msg->keyCode),
-			static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
+		msgl->sender == this->GetName()) {
+		KbdMessage* msg = reinterpret_cast<KbdMessage*>(msgl);
 
-	auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
-	message->keyCode = msg->keyCode;
-	message->keyState = msg->keyState;
+		LOG_INFO("[EventManager] Received key info: key_code = %d, keyEvent = %d\n"
+				"press time: %d, release time %d", static_cast<int>(msg->keyCode),
+				static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
 
-//		sys::Bus::SendUnicast(message, "ApplicationClock", this);
-	sys::Bus::SendUnicast(message, "ApplicationViewer", this);
-//		sys::Bus::SendBroadcast(message, this);
-	return std::make_shared<sys::ResponseMessage>();
-}
+		auto message = std::make_shared<KbdMessage>(MessageType::KBDKeyEvent);
+		message->keyCode = msg->keyCode;
+		message->keyState = msg->keyState;
 
-// Invoked when timer ticked
-void EventManager::TickHandler(uint32_t id) {
+		if( targetApplication.empty() == false ) {
+			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+		handled = true;
+	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {
+		sevm::EVMFocusApplication* msg = reinterpret_cast<sevm::EVMFocusApplication*>( msgl );
+		if( msg->sender == "ApplicationManager" ) {
+			targetApplication = msg->getApplication();
+			handled = true;
+		}
+	}
 
-
-	LOG_INFO("[EventManager] send to worker\n");
-
+	if( handled )
+		return std::make_shared<sys::ResponseMessage>();
+	else
+		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
 // Invoked during initialization
@@ -83,7 +88,7 @@ sys::ReturnCodes EventManager::InitHandler() {
 
 	//create queues for worker
 	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
-	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(KeyState), 10 };
+	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qTimer);
@@ -98,6 +103,8 @@ sys::ReturnCodes EventManager::InitHandler() {
 }
 
 sys::ReturnCodes EventManager::DeinitHandler() {
+
+	EventWorker->deinit();
 	return sys::ReturnCodes::Success;
 }
 
@@ -110,6 +117,11 @@ sys::ReturnCodes EventManager::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 
+	auto msg = std::make_shared<sevm::EVMFocusApplication>( applicationName );
+	auto ret =  sys::Bus::SendUnicast(msg, "EventManager", sender,500  );
+	return (ret.first == sys::ReturnCodes::Success )?true:false;
+}
 
 

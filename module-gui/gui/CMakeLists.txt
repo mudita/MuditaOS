@@ -20,5 +20,6 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Common.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Common.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/SwitchData.hpp"
 )
 

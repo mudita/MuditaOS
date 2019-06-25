@@ -18,30 +18,13 @@
 #include "Service/Message.hpp"
 #include "Service/Common.hpp"
 #include "SystemManager/SystemManager.hpp"
+//module-db
+#include "Interface/SettingsRecord.hpp"
+
+#include "SwitchData.hpp"
 
 namespace app {
 
-//class template that stores information that was sent along with switch message
-class SwitchData {
-public:
-
-	SwitchData( uint8_t* data, uint32_t size ) : data{nullptr}, size{0} {
-//		this->data = new uint8_t[size];
-//		if( data ) {
-//			memcpy( this->data, data, size );
-//			this->size = size;
-//		}
-//		else
-//			this->size = 0;
-	}
-	~SwitchData() {
-		if( data )
-			delete []data;
-	}
-
-	uint8_t* data;
-	uint32_t size;
-};
 /*
  * @brief This is template for creating new applications
  */
@@ -57,7 +40,7 @@ public:
 		//Application Manager.
 		//Application Manager: Initialization is triggered by the switch message sent by other application to the application manager.
 		//Launcher for the application has been executed upon receiving switch command. Optional switch data has been
-		//saved and it will be provided when application manager recives APP_READY message.
+		//saved and it will be provided when application manager receives registration message.
 		INITIALIZING,
 		//Application manager sent variant of switch command to the selected application and it's now waiting for confirmation
 		//from the application
@@ -88,26 +71,41 @@ public:
 	/**
 	 * Generic function for sending switch command. This will switch window within active application.
 	 */
-	int switchWindow( const std::string& windowName, uint32_t cmd, uint32_t dataSize=0, uint8_t* data=nullptr );
+	int switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data );
 	/**
 	 * Generic function for returning to switch window in active application without performing initialization of the window.
 	 */
-	int switchBackWindow( const std::string& windowName, uint32_t cmd, uint32_t dataSize=0, uint8_t* data=nullptr );
+	int switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data );
 	/**
 	 * Method allows refreshing currently active window
 	 */
 	int refreshWindow(gui::RefreshModes mode);
+
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl);
 	/**
 	 * Sets active window of the application. This doesn't cause refresh. value -1 is for undefined state
 	 * and should be set when application is left using back button.
 	 */
+	sys::ReturnCodes InitHandler() override;
 	void setActiveWindow( const std::string& windowName );
 
-//	settings_t* getSettings() {
-//		return settings;
-//	}
+	SettingsRecord& getSettings() {
+		return settings;
+	}
+
+	//static methods
+	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data );
+	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data=nullptr );
+	static bool messageCloseApplication( sys::Service* sender, std::string application );
+	/**
+	 * @brief This method is used to send message to set focus of the application.
+	 * Application can gain or lose focus depending on the provided focus flag.
+	 */
+//	static bool messageFocusApplication( sys::Service* sender, std::string application, bool focus );
 
 protected:
+	//application's settings taken from database
+	SettingsRecord settings;
 	/**
 	 * Placeholder that can be used to create window and widgets.
 	 */

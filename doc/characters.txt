@@ -1,0 +1,5 @@
+english and polish characters
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÓóĄąĆćĘęŁłŃńŹźŻż
+
+homescreen clock characters
+0123456789:
