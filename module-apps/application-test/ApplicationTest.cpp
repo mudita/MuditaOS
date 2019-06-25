@@ -43,7 +43,7 @@ void ApplicationTest::TickHandler(uint32_t id){
 	static uint32_t progress;
 
 	progress++;
-//	bar->setCurrentProgress(progress % 101);
+	bar->setCurrentProgress(progress % 101);
 	render(gui::RefreshModes::GUI_REFRESH_FAST );
 }
 // Invoked during initialization
@@ -96,15 +96,13 @@ void ApplicationTest::createUserInterface(){
 
 	rect = new gui::Rect (rectangle, -10, -10, 100, 100);
 	rect->setPenWidth(5);
-	rect2 = new gui::Rect (rect, 5, 5, 50, 50);
+	rect2 = new gui::Rect (rect, 0, 0, 90, 50);
 	rect2->setPenWidth(5);
 
 
-/*
 	bar = new gui::Progress(clockWin, 40, 50, 400, 70);
 	bar->setTotalProgress(100);
 	bar->setCurrentProgress(1);
-*/
 
 }
 void ApplicationTest::destroyUserInterface(){

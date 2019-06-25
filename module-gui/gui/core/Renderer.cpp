@@ -110,8 +110,6 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	) {
 		return;
 	}
-	LOG_INFO("RECTANGLE x %d, y %d, w %d, h%d, areaW %d, areaH %d",
-			cmd->x, cmd->y, cmd->w, cmd->h, cmd->areaH, cmd->areaH);
 	//get copy of original context using x,y of draw coordinates and original size of the widget
 	Context* drawCtx;
 	bool copyContext = false;
@@ -126,7 +124,13 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	}
 	else {
 		copyContext = true;
-		drawCtx= ctx->get( cmd->x + cmd->areaX, cmd->y + cmd->areaY, cmd->areaW, cmd->areaH );
+		int16_t x = cmd->x;
+		int16_t y = cmd->y;
+		if(cmd->areaX < 0)
+			x += cmd->areaX;
+		if( cmd->areaY < 0 )
+			y += cmd->areaY;
+		drawCtx= ctx->get( x, y, cmd->areaW, cmd->areaH );
 	}
 
 	//if rounding of corners is 0
