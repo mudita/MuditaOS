@@ -48,13 +48,24 @@ enum class MessageType {
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
-	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
 	APMSwitchPrevApp, //Request to switch to previous application.
 	APMConfirmSwitch, //Used when application confirms that it is loosing focus and also when application confirms that is has gained focus
 	APMConfirmClose, //Sent by application to confirm completion of the close procedure
+	APMRegister, //when application finishes initHandler it is sending this messag to inform whether init was successful or not.
+	APMDeleydClose, //this message is sent internally from and to application manager to close specified application.
 
 	//keyboard messages
-	KBDKeyEvent
+	KBDKeyEvent,
+
+	AppSwitch, //application receives this message from application manager. It a signal to gain or loose focus.
+	AppSwitchWindowBack,//message to inform
+	AppSwitchWindow, //This is internal message transmitted within application to change window. Additional command and data are transmitted with it.
+	AppRefresh,
+	AppClose,
+	AppFocus,
+
+	EVMFocusApplication,
+	EVMKeyboardProfile,
 };
 
 

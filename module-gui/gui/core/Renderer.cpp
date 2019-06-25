@@ -611,37 +611,37 @@ void Renderer::render( Context* ctx, std::vector<DrawCommand*>& commands ) {
 	for( DrawCommand* cmd : commands ) {
 		switch( cmd->id ) {
 			case DrawCommandID::GUI_DRAW_CLEAR: {
-				uint32_t start_tick = xTaskGetTickCount();
+//				uint32_t start_tick = xTaskGetTickCount();
 //				vPortEnterCritical();
 				ctx->fill( 15 );
 //				vPortExitCritical();
-				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] ctx->fill( 15 ); Time: %d", end_tick - start_tick);
+//				uint32_t end_tick = xTaskGetTickCount();
+//				LOG_INFO("[ServiceGUI] ctx->fill( 15 ); Time: %d", end_tick - start_tick);
 			}break;
 			case DrawCommandID::GUI_DRAW_LINE: {
 
 			}break;
 			case DrawCommandID::GUI_DRAW_RECT: {
 
-				uint32_t start_tick = xTaskGetTickCount();
+//				uint32_t start_tick = xTaskGetTickCount();
 				drawRectangle( ctx, static_cast<CommandRectangle*>(cmd) );
-				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] drawRect Time: %d", end_tick - start_tick);
+//				uint32_t end_tick = xTaskGetTickCount();
+//				LOG_INFO("[ServiceGUI] drawRect Time: %d", end_tick - start_tick);
 
 			}break;
 			case DrawCommandID::GUI_DRAW_TEXT: {
 
-				uint32_t start_tick = xTaskGetTickCount();
+//				uint32_t start_tick = xTaskGetTickCount();
 				drawText( ctx, static_cast<CommandText*>(cmd) );
-				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] drawText time: %d", end_tick - start_tick);
+//				uint32_t end_tick = xTaskGetTickCount();
+//				LOG_INFO("[ServiceGUI] drawText time: %d", end_tick - start_tick);
 			}break;
 			case DrawCommandID::GUI_DRAW_IMAGE: {
 
-				uint32_t start_tick = xTaskGetTickCount();
+//				uint32_t start_tick = xTaskGetTickCount();
 				drawImage( ctx, static_cast<CommandImage*>(cmd) );
-				uint32_t end_tick = xTaskGetTickCount();
-				LOG_INFO("[ServiceGUI] drawImage time: %d", end_tick - start_tick);
+//				uint32_t end_tick = xTaskGetTickCount();
+//				LOG_INFO("[ServiceGUI] drawImage time: %d", end_tick - start_tick);
 			} break;
 			default:
 				break;

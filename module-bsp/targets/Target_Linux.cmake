@@ -2,7 +2,7 @@
 set(BOARD_SOURCES 
 	${CMAKE_CURRENT_SOURCE_DIR}/board/linux/board.cpp 
 	${CMAKE_CURRENT_SOURCE_DIR}/board/linux/eink/ED028TC1.c
-	"${CMAKE_CURRENT_SOURCE_DIR}/board/linux/keyboard/linux_keyboard.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/board/linux/keyboard/keyboard.cpp"
 		
 	CACHE INTERNAL "")
 

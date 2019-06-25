@@ -70,6 +70,7 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 	it ++;
 	CommandRectangle* fill = reinterpret_cast<CommandRectangle*>(*it);
 
+
 	uint32_t progressSize = 0;
 	int width = widgetArea.w;
 	progressSize = (current * width) / total;
@@ -77,6 +78,7 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 
 	commands.splice(commands.end(), baseCommands, it);
 	commands.splice(commands.end(), baseCommands);
+
 
 	return commands;
 }

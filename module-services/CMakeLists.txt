@@ -19,7 +19,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 add_subdirectory( service-gui )
 add_subdirectory( service-eink )
-add_subdirectory( service-kbd )
+add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 message("${PROJECT_NAME}: add_subdirectory service-db")
 add_subdirectory( service-db )
@@ -36,15 +36,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 
-
-
 target_include_directories(${PROJECT_NAME}
 
         PUBLIC
-
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/../source
-
+	        ${CMAKE_CURRENT_SOURCE_DIR}
+       		${CMAKE_CURRENT_SOURCE_DIR}/../source
 )
 
 

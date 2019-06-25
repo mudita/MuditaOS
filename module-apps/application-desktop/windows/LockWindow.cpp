@@ -1,21 +1,21 @@
 /*
- * @file ClokMainWindow.cpp
+ * @file LockWindow.cpp
  * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 6 cze 2019
+ * @date 19 cze 2019
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "ClokMainWindow.hpp"
+#include <module-apps/application-desktop/windows/LockWindow.hpp>
 
 namespace gui {
 
-ClokMainWindow::ClokMainWindow() {
+LockWindow::LockWindow() {
 	// TODO Auto-generated constructor stub
 
 }
 
-ClokMainWindow::~ClokMainWindow() {
+LockWindow::~LockWindow() {
 	// TODO Auto-generated destructor stub
 }
 

@@ -98,7 +98,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
-			LOG_INFO("[ServiceEink] Received framebuffer");
+//			LOG_INFO("[ServiceEink] Received framebuffer");
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
 			deepRefresh = dmsg->getDeepRefresh();
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer );
@@ -106,14 +106,13 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 		} break;
 		case static_cast<uint32_t>(MessageType::EinkDMATransfer): {
 
-			LOG_INFO("[ServiceEink] Received framebuffer");
-			uint32_t start_tick = xTaskGetTickCount();
+//			LOG_INFO("[ServiceEink] Received framebuffer");
+//			uint32_t start_tick = xTaskGetTickCount();
 			EinkPowerOn();
 
 			int32_t temperature = EinkGetTemperatureInternal();
 
 			EinkStatus_e ret;
-			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
 			if( deepRefresh ) {
 				changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
 			}
@@ -132,20 +131,21 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to update frame");
 
-			//changeWaveform( EinkWaveforms_e::EinkWaveformDU2, temperature );
 			if( deepRefresh ) {
+				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
 			}
 			else{
+				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
 			}
 
 			if( ret != EinkOK )
 				LOG_FATAL("Failed to refresh frame");
 			EinkPowerOff();
-			uint32_t end_tick = xTaskGetTickCount();
+//			uint32_t end_tick = xTaskGetTickCount();
 
-			LOG_INFO("[ServiceEink] RefreshTime: %d", end_tick - start_tick);
+//			LOG_INFO("[ServiceEink] RefreshTime: %d", end_tick - start_tick);
 
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
@@ -168,7 +168,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 // Invoked when timer ticked
 void ServiceEink::TickHandler(uint32_t id) {
 
-	LOG_INFO("[ServiceEink] Timer");
+//	LOG_INFO("[ServiceEink] Timer");
 }
 
 // Invoked during initialization
@@ -347,13 +347,6 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
 bool ServiceEink::deepClearScreen(int8_t temperature)
 {
     EinkWaveforms_e wv = waveformSettings.mode;
-
-//	changeWaveform( EinkWaveforms_e::EinkWaveformA2, temperature );
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
-//    EinkFillScreenWithColor(EinkDisplayColorBlack);
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
-//    EinkFillScreenWithColor(EinkDisplayColorBlack);
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
 
     EinkPowerOn();
 	changeWaveform( EinkWaveforms_e::EinkWaveformA2, temperature );

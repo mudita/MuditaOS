@@ -18,8 +18,6 @@
 
 #include "common.hpp"
 
-
-
 struct KeyState{
 	uint8_t event;
 	uint8_t code;
@@ -28,7 +26,7 @@ struct KeyState{
 enum class WorkerEventQueues{
 	queueService = 0,
 	queueKeyboardTimer,
-	queueKeyboardEvent
+	queueKeyboardIRQ
 };
 
 class WorkerEvent : public sys::Worker
@@ -43,7 +41,7 @@ private:
 	 * @param code key code
 	 * @note It sends message to service if event is processed succesfully.
 	 */
-	void keyboardEventCallback( bsp::KeyEvents event, bsp::KeyCodes code );
+	void processKeyEvent( bsp::KeyEvents event, bsp::KeyCodes code );
 	/**
 	 * @brief Starts long press timer.
 	 * @param time time to count in milliseconds.

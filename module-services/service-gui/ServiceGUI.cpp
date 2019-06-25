@@ -112,7 +112,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 					mode = dmsg->mode;
 				}
 
-				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+//				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
 
 				//lock access to commands vector, clear it and then copy commands from message to vector
 				if( xSemaphoreTake( semCommands, pdMS_TO_TICKS(1000) ) == pdTRUE ) {
@@ -127,13 +127,13 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 					sendToRender();
 				}
 
-				uint32_t mem = usermemGetFreeHeapSize();
-				LOG_WARN( "Heap Memory: %d", mem );
+//				uint32_t mem = usermemGetFreeHeapSize();
+//				LOG_WARN( "Heap Memory: %d", mem );
 			}
 
 		} break;
 		case static_cast<uint32_t>(MessageType::GUIRenderingFinished): {
-			LOG_INFO("Rendering finished");
+//			LOG_INFO("Rendering finished");
 			//increment counter holding number of drawn frames
 			rendering = false;
 			renderFrameCounter++;
@@ -152,22 +152,22 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
 		}break;
 		case static_cast<uint32_t>( MessageType::GUIFocusInfo ): {
 
-			LOG_INFO("[ServiceGUI] Received focus info");
+//			LOG_INFO("[ServiceGUI] Received focus info");
 		} break;
 		case static_cast<uint32_t>( MessageType::GUIDisplayReady ): {
 
-			LOG_INFO("[ServiceGUI]Display ready");
+//			LOG_INFO("[ServiceGUI]Display ready");
 			einkReady = true;
 			requestSent = false;
 			//mode = gui::RefreshModes::GUI_REFRESH_FAST;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
 			if( (renderFrameCounter != transferedFrameCounter) && (!rendering) ) {
-				LOG_INFO("[ServiceGUI]Sending buffer");
+//				LOG_INFO("[ServiceGUI]Sending buffer");
 				sendBuffer();
 			}
 			else {
-				LOG_INFO(" NO new buffer to send");
+//				LOG_INFO(" NO new buffer to send");
 			}
 
 		} break;
