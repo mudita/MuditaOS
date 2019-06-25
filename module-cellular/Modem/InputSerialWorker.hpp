@@ -14,6 +14,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "GSM0710.hpp"
 
 class MuxDaemon;
 
@@ -38,6 +39,7 @@ private:
 
     int ReadIncomingData();
     int ExtractFrames();
+    int HandleCtrlChannelCommands(GSM0710Frame* frame);
 
     //worker's task handle
     xTaskHandle taskHandle;

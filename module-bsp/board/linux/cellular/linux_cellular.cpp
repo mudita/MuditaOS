@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 
 
 
@@ -33,11 +34,49 @@ namespace bsp
         }
         else{
             // open serial port
-            fd = open(term,O_RDWR | O_NOCTTY | O_NONBLOCK);
+            fd = open(term,O_RDWR | O_NOCTTY);
 
             // Set serial port attributes
             //set_interface_attribs();
             //set_mincount(0);
+
+            /* *** Configure Port *** */
+            struct termios tty;
+            memset (&tty, 0, sizeof tty);
+
+/* Error Handling */
+            if ( tcgetattr ( fd, &tty ) != 0 )
+            {
+                std::cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << "\n";
+            }
+
+/* Set Baud Rate */
+            cfsetospeed (&tty, B115200);
+            cfsetispeed (&tty, B115200);
+
+/* Setting other Port Stuff */
+            tty.c_cflag     &=  ~PARENB;        // Make 8n1
+            tty.c_cflag     &=  ~CSTOPB;
+            tty.c_cflag     &=  ~CSIZE;
+            tty.c_cflag     |=  CS8;
+            tty.c_cflag     &=  ~CRTSCTS;       // no flow control
+            tty.c_lflag     =   0;          // no signaling chars, no echo, no canonical processing
+            tty.c_oflag     =   0;                  // no remapping, no delays
+            tty.c_cc[VMIN]      =   0;                  // read doesn't block
+            tty.c_cc[VTIME]     =   5;                  // 0.5 seconds read timeout
+
+            tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
+            tty.c_iflag     &=  ~(IXON | IXOFF | IXANY);// turn off s/w flow ctrl
+            tty.c_lflag     &=  ~(ICANON | ECHO | ECHOE | ISIG); // make raw
+            tty.c_oflag     &=  ~OPOST;              // make raw
+
+/* Flush Port, then applies attributes */
+            tcflush( fd, TCIFLUSH );
+
+            if ( tcsetattr ( fd, TCSANOW, &tty ) != 0)
+            {
+                std::cout << "Error " << errno << " from tcsetattr" << "\n";
+            }
 
         }
 
@@ -51,7 +90,6 @@ namespace bsp
         struct epoll_event event;
 
         event.events = EPOLLIN;
-        event.data.fd = fd;
 
         if(epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event))
         {
@@ -87,13 +125,14 @@ namespace bsp
         return ret;
     }
 
-    uint32_t LinuxCellular::Write(void *buf, size_t nbytes) {
+    ssize_t LinuxCellular::Write(void *buf, size_t nbytes) {
         return write(fd,buf,nbytes);
     }
 
     uint32_t LinuxCellular::Wait(uint32_t timeout) {
 
         retry:
+
         auto event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, timeout);
         if(event_count == 0){
             return 0; // timeout
@@ -132,8 +171,8 @@ namespace bsp
         tty.c_oflag &= ~OPOST;
 
         /* fetch bytes as they become available */
-        tty.c_cc[VMIN] = 1;
-        tty.c_cc[VTIME] = 1;
+        tty.c_cc[VMIN] = 0;
+        tty.c_cc[VTIME] = 0;
 
         if (tcsetattr(fd, TCSANOW, &tty) != 0) {
             printf("Error from tcsetattr: %s\n", strerror(errno));

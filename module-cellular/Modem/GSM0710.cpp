@@ -14,9 +14,10 @@
 #include "log/log.hpp"
 
 constexpr unsigned char GSM0710Buffer::crcTable[];
+const int GSM0710Buffer::cmux_N1;
 
 
-std::unique_ptr<GSM0710Frame> GSM0710Buffer::GetCompleteFrame(std::unique_ptr<GSM0710Frame> frame) {
+GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
     int end;
     unsigned int length_needed = 5;// channel, type, length, fcs, flag
     unsigned char fcs = 0xFF;
@@ -121,7 +122,7 @@ std::unique_ptr<GSM0710Frame> GSM0710Buffer::GetCompleteFrame(std::unique_ptr<GS
                     if (local_readp == endp)
                         local_readp = data;
                 }
-                if (GSM0710_FRAME_IS(MuxDefines ::GSM0710_TYPE_UI, frame.get()))
+                if (GSM0710_FRAME_IS(MuxDefines ::GSM0710_TYPE_UI, frame))
                 {
                     for (end = 0; end < frame->length; end++)
                         fcs = crcTable[fcs ^ (frame->data[end])];
@@ -178,7 +179,7 @@ std::unique_ptr<GSM0710Frame> GSM0710Buffer::GetCompleteFrame(std::unique_ptr<GS
     return frame;
 
     update_buffer_dropping_frame:
-    return GetCompleteFrame(std::move(frame));    /*continue extracting more frames if any*/
+    return GetCompleteFrame(frame);    /*continue extracting more frames if any*/
 }
 
 unsigned char GSM0710Buffer::frameCalcCRC(const unsigned char *input, int length) {

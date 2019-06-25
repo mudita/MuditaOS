@@ -141,11 +141,11 @@ public:
         }
     }
 
-    inline bool GSM0710_FRAME_IS(MuxDefines type,GSM0710Frame* frame){
+    static inline bool GSM0710_FRAME_IS(MuxDefines type,GSM0710Frame* frame){
         return (frame->control & ~static_cast<unsigned char>(MuxDefines::GSM0710_PF)) == static_cast<unsigned char>(type);
     }
 
-    inline bool GSM0710_COMMAND_IS(MuxDefines type,unsigned char frame){
+    static inline bool GSM0710_COMMAND_IS(MuxDefines type,unsigned char frame){
         return (frame & ~static_cast<unsigned char>(MuxDefines::GSM0710_CR)) == static_cast<unsigned char>(type);
     }
 
@@ -154,7 +154,7 @@ public:
             int length);
 
 
-    std::unique_ptr<GSM0710Frame> GetCompleteFrame(std::unique_ptr<GSM0710Frame> frame);
+    GSM0710Frame*  GetCompleteFrame(GSM0710Frame*  frame);
 
 };
 

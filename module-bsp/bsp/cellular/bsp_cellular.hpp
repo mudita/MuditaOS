@@ -35,7 +35,7 @@ namespace bsp {
 
         virtual ssize_t Read(void *buf, size_t nbytes) = 0;
 
-        virtual uint32_t Write(void *buf, size_t nbytes) = 0;
+        virtual ssize_t Write(void *buf, size_t nbytes) = 0;
 
     };
 

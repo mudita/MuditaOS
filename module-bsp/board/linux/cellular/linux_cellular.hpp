@@ -38,7 +38,7 @@ namespace bsp {
 
         ssize_t Read(void *buf, size_t nbytes) override final;
 
-        uint32_t Write(void *buf, size_t nbytes) override final;
+        ssize_t Write(void *buf, size_t nbytes) override final;
 
     private:
 

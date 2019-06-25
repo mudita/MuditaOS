@@ -19,29 +19,38 @@
 #include "Service/Worker.hpp"
 #include "InputSerialWorker.hpp"
 #include "GSM0710.hpp"
+#include "mutex.hpp"
 
 
 class MuxDaemon {
 
     friend InputSerialWorker;
-    friend void workerTaskFunction( void* ptr );
+    friend MuxChannel;
+
+    friend void workerTaskFunction(void *ptr);
 
 public:
 
     MuxDaemon();
+
     ~MuxDaemon();
 
     int Start();
+
     int Exit();
 
 private:
 
-    int SendAT(const char* cmd,uint32_t timeout);
+    int SendAT(const char *cmd, uint32_t timeout);
+
     ssize_t WriteMuxFrame(int channel,
                           const unsigned char *input,
                           int length,
                           unsigned char type);
 
+    ssize_t WriteSerialCache(unsigned char *input, size_t length);
+
+    int CloseMux();
 
 
     /*
@@ -58,8 +67,7 @@ private:
             int length,
             const char *needle);
 
-    enum class States
-    {
+    enum class States {
         MUX_STATE_OPENING,
         MUX_STATE_INITILIZING,
         MUX_STATE_MUXING,
@@ -81,6 +89,10 @@ private:
             0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 20, 23, 26
     };
 
+    constexpr static unsigned char closeChannelCmd[] = {
+            static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_CLD ) |
+            static_cast<unsigned char>(MuxDefines::GSM0710_CR),
+            static_cast<unsigned char>(MuxDefines::GSM0710_EA ) | (0 << 1)};
 
 
     std::unique_ptr<bsp::Cellular> cellular;
@@ -92,12 +104,10 @@ private:
     std::unique_ptr<GSM0710Buffer> inputBuffer;
     std::vector<MuxChannel> channels;
 
+    cpp_freertos::MutexStandard serOutMutex;
+
     uint32_t virtualPortsCount = 3;
     int uih_pf_bit_received = 0;
-
-
-
-
 
 
 };
