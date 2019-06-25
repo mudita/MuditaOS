@@ -33,16 +33,6 @@ void Progress::createWidgets() {
 	Rect::setRadius(widgetArea.h/2);
 }
 
-/*void Progress::updateProgress() {
-	int width = widgetArea.w;
-    float thickWidth = 0.0f;
-    if( total )
-        thickWidth = current*width/total;
-    if( thickWidth < 2*fillRect->radius )
-    	thickWidth = 2*fillRect->radius+1;
-    fillRect->setSize( static_cast<int>(thickWidth), fillRect->widgetArea.h );
-}*/
-
 void Progress::setTotalProgress( int value ) {
 	if( value < 0 )
 		value = 0;
@@ -51,7 +41,6 @@ void Progress::setTotalProgress( int value ) {
 
 	if( current > total )
 		current = total;
-//	updateProgress();
 }
 
 void Progress::setCurrentProgress( int value ) {
@@ -60,7 +49,6 @@ void Progress::setCurrentProgress( int value ) {
 	if( value > total )
 		value = total;
 	current = value;
-//	updateProgress();
 }
 
 void Progress::setCurrentPercent( int value ) {
@@ -80,13 +68,11 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 	auto it = baseCommands.begin();
 
 	it ++;
-
 	CommandRectangle* fill = reinterpret_cast<CommandRectangle*>(*it);
 
 	uint32_t progressSize = 0;
 	int width = widgetArea.w;
 	progressSize = (current * width) / total;
-
 	fill->w = progressSize;
 
 	commands.splice(commands.end(), baseCommands, it);
@@ -98,7 +84,6 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 bool Progress::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
 
 	fillRect->setSize(newDim.w, newDim.h);
-	//updateProgress();
 	return true;
 }
 
