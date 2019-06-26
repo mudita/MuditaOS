@@ -94,7 +94,6 @@ int SystemStart(sys::SystemManager* sysmgr)
     std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
     applications.push_back( std::move(viewerLauncher) );
 
-//#endif
     //start application manager
    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 

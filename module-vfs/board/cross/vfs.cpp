@@ -74,7 +74,16 @@ std::string vfs::getcurrdir(){
 
 }
 
-std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
+static inline bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+
+std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path, const std::string& ext){
     std::vector<DirectoryEntry> dir_list;
 
     FF_FindData_t *pxFindStruct;
@@ -114,7 +123,17 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
                 attribute = FileAttributes::Writable;
             }
 
-            dir_list.push_back(DirectoryEntry{pxFindStruct->pcFileName,attribute,pxFindStruct->ulFileSize});
+//            auto pathStr = p.path().string();
+//            auto path = pathStr.substr(pathStr.find_last_of("/\\")+1);
+
+            if( ext.empty() ) {
+            	dir_list.push_back(DirectoryEntry{pxFindStruct->pcFileName,attribute,pxFindStruct->ulFileSize});
+            }
+            else
+            {
+				if( hasEnding(pxFindStruct->pcFileName, ext ))
+					dir_list.push_back(DirectoryEntry{pxFindStruct->pcFileName,attribute,pxFindStruct->ulFileSize});
+            }
 
         } while( ff_findnext( pxFindStruct ) == 0 );
     }
