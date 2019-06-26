@@ -84,8 +84,11 @@ int MuxDaemon::Start() {
     inSerialDataWorker->Init();
 
     // Create virtual channels
-    for (uint32_t i = 0; i < virtualPortsCount; ++i) {
-        channels.push_back(MuxChannel(this,i));
+    channels.push_back(MuxChannel(this,0,"ControlChannel"));
+    channels.push_back(MuxChannel(this,1,"NotificationChannel"));
+
+    for (uint32_t i = 2; i < virtualPortsCount; ++i) {
+        channels.push_back(MuxChannel(this,i,("GenericChannel_" + std::to_string(i)).c_str()));
     }
 
     state = States::MUX_STATE_MUXING;
