@@ -70,7 +70,7 @@ void Rect::setCorners( RectangleCornerFlags corners ) {
 
 void Rect::setFlat( RectangleFlatFlags flats)
 {
-	this->flatEdges = flats;
+	flatEdges = flats;
 }
 
 void Rect::setFilled( bool val ) {
