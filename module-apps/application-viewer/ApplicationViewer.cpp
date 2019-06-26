@@ -26,6 +26,7 @@
 #include "log/log.hpp"
 //module-services
 #include "service-evtmgr/EventManager.hpp"
+#include "service-evtmgr/messages/EVMessages.hpp"
 //MessageType
 #include "MessageType.hpp"
 //this module
@@ -55,10 +56,10 @@ sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage* msgl) {
 	//if keyboard message received
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
-		KbdMessage* msg = static_cast<KbdMessage*>(msgl);
+		sevm::KbdMessage* msg = static_cast<sevm::KbdMessage*>(msgl);
 		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
 
-		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
+		if( msg->keyState == sevm::KeyboardEvents::keyReleasedShort ) {
 			if( msg->keyCode == bsp::KeyCodes::JoystickLeft ) {
 				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationClock", "", nullptr );
 			}

@@ -13,6 +13,7 @@
 //module-gui
 #include "gui/Common.hpp"
 #include "gui/widgets/Window.hpp"
+#include "gui/input/Translator.hpp"
 //module-sys
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
@@ -59,6 +60,11 @@ public:
 public:
 	Application(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
+
+	/**
+	 * Virtual methods
+	 */
+	void TickHandler(uint32_t id) override;
 
 	/**
 	 * Method responsible for rendering currently active window.
@@ -128,9 +134,20 @@ protected:
 	 * State of the application
 	 */
 	State state = State::DEACTIVATED;
+	/**
+	 * Timer for checking long press timeouts
+	 */
+	uint32_t longpressTimerID = 0;
+	/**
+	 * Object responsible for translating keyboard events into gui acceptable events
+	 */
+	std::unique_ptr<gui::Translator> translator;
 
-
-
+	//protected static methods
+	/**
+	 *
+	 */
+	static bool messageInputEventApplication( sys::Service* sender, std::string application , const gui::InputEvent& event );
 };
 
 class ApplicationLauncher {

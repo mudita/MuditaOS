@@ -14,6 +14,7 @@
 //module-gui
 #include "gui/core/Font.hpp"
 #include "gui/core/Context.hpp"
+#include "gui/input/Translator.hpp"
 
 //gui service
 #include "messages/GUIMessage.hpp"
@@ -24,16 +25,20 @@
 
 #include "ServiceGUI.hpp"
 
-#include "..//gui/core/ImageManager.hpp"
+#include "../gui/core/ImageManager.hpp"
 #include "log/log.hpp"
 
 extern "C"
-#include "module-os/memory/usermem.h"
+	#include "module-os/memory/usermem.h"
 
 #include "SystemManager/SystemManager.hpp"
 #include "WorkerGUI.hpp"
 
 namespace sgui {
+
+static uint32_t getTimeFunction() {
+	return xTaskGetTickCount();
+}
 
 ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
 		: sys::Service(name, 4096, sys::ServicePriority::Idle),
@@ -52,11 +57,16 @@ ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t s
 	renderContext = new gui::Context( screenWidth, screenHeight );
 	transferContext = new gui::Context( screenWidth, screenHeight );
 
+	//load fonts
 	gui::FontManager& fontManager = gui::FontManager::getInstance();
 	fontManager.init( "sys/assets" );
 
+	//load images
 	gui::ImageManager& imageManager = gui::ImageManager::getInstance();
 	imageManager.init( "sys/assets" );
+
+	//load keyboard profiles
+	translator.init("sys/assets");
 }
 
 ServiceGUI::~ServiceGUI(){
@@ -182,6 +192,9 @@ void ServiceGUI::TickHandler(uint32_t id) {
 
 // Invoked during initialization
 sys::ReturnCodes ServiceGUI::InitHandler() {
+
+	//set function for acquiring time in seconds from the system
+	gui::setTimeFunction( getTimeFunction );
 
 	//create semaphore to protect vector with commands waiting for rendering
 	semCommands = xSemaphoreCreateBinary();

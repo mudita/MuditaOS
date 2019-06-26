@@ -41,6 +41,7 @@ protected:
 	 */
 	uint32_t getDataBufferSize( uint32_t dataBytes );
 	bool expand( uint32_t size = stringExpansion );
+	uint32_t decode( const char* utf8_char, uint32_t& length  ) const;
 public:
 	UTF8();
 	UTF8( const char* str );

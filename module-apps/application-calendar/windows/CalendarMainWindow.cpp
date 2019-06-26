@@ -14,7 +14,7 @@
 
 namespace app {
 
-CalendarMainWindow::CalendarMainWindow( std::string name ) : Window( name ) {
+CalendarMainWindow::CalendarMainWindow( app::Application* app, std::string name ) : AppWindow( app, name ) {
 
 //	gui::VBox* vBox = new gui::VBox( this, 0, 0, 480, 600 );
 //
