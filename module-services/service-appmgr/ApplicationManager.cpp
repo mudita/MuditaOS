@@ -11,15 +11,14 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
 
-//TODO for tests only
-#include "module-apps/application-clock/ClockData.hpp"
-
+#include "service-db/api/DBServiceAPI.hpp"
 
 #include <utility>
 #include <memory>
 
 //module-utils
 #include "log/log.hpp"
+#include "i18/i18.hpp"
 
 namespace sapm {
 
@@ -29,7 +28,7 @@ ApplicationDescription::ApplicationDescription( std::string name, std::unique_pt
 }
 
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
-		std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
+	std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
 
@@ -105,8 +104,20 @@ void ApplicationManager::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ApplicationManager::InitHandler() {
 
+	//get settings to initialize language in applications
+	SettingsRecord settings = DBServiceAPI::SettingsGet(this);
+
+	if( settings.language == SettingsLanguage::ENGLISH ) {
+		utils::localize.Switch( utils::Lang::En );
+	}
+	if( settings.language == SettingsLanguage::POLISH ) {
+		utils::localize.Switch( utils::Lang::Pl );
+	}
+	else if( settings.language == SettingsLanguage::SPANISH ) {
+		utils::localize.Switch( utils::Lang::Sp );
+	}
+
 	//search for application with specified name and run it
-	//TODO name of the app should be Homescreen but for tests is is "ApplicationClock"
 	std::string runAppName = "ApplicationDesktop";
 
 	auto it = applications.find(runAppName);

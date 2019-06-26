@@ -17,6 +17,7 @@
 #include "Application.hpp"
 #include "SystemManager/SystemManager.hpp"
 #include "messages/APMMessage.hpp"
+#include "i18/i18.hpp"
 
 namespace sapm {
 
@@ -38,7 +39,6 @@ public:
 	std::string switchWindow = "";
 };
 
-
 /*
  *
  */
@@ -56,6 +56,9 @@ class ApplicationManager: public sys::Service {
 
 	std::map< std::string, ApplicationDescription* > applications;
 	sys::SystemManager* systemManager;
+
+	//
+	std::unique_ptr<utils::i18> i18;
 
 	//application that currently has focus. This means that is has rights to display screens and receive keyboard events.
 	std::string focusApplicationName = "";

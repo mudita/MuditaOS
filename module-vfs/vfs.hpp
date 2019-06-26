@@ -78,7 +78,17 @@ public:
 
     std::string getcurrdir();
 
-    std::vector<DirectoryEntry> listdir(const char* path);
+    /**
+     * @brief Informs whether end of file was reached
+     * @param stream to be checked.
+     * @return true - file pointer is at the end of file, false otherwise.
+     */
+    bool eof( FILE *stream );
+
+    /**
+     * ext is an optional extension
+     */
+    std::vector<DirectoryEntry> listdir(const char* path, const std::string& ext = "");
 
     /**
      * @brief Reads line of text from opened file.

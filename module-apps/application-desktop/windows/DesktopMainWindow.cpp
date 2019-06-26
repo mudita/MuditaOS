@@ -6,19 +6,22 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include <module-apps/application-desktop/windows/DesktopMainWindow.hpp>
+#include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
+
+#include "i18/i18.hpp"
+
 
 namespace gui {
 
-DesktopMainWindow::DesktopMainWindow() : Window("MainWindow"){
+DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
 	setSize( 480, 600 );
 
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, false );
-	bottomBar->setText( BottomBar::Side::CENTER, "UNLOCK");
+	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 
 	topBar = new gui::TopBar( this, 0,0, 480, 50 );
 
@@ -35,7 +38,7 @@ DesktopMainWindow::DesktopMainWindow() : Window("MainWindow"){
 	dayText->setFilled( false );
 	dayText->setBorderColor( gui::ColorNoColor );
 	dayText->setFont("gt_pressura_light_24");
-	dayText->setText("Wednesday");
+	dayText->setText(utils::localize.get("common_wendesday"));
 	dayText->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	dayMonth = new gui::Label(this, 264, 150, 190, 42 );
