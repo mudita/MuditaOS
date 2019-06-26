@@ -106,7 +106,7 @@ private:
 
     cpp_freertos::MutexStandard serOutMutex;
 
-    uint32_t virtualPortsCount = 3;
+    uint32_t virtualPortsCount = 4;
     int uih_pf_bit_received = 0;
 
 

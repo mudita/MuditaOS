@@ -55,8 +55,8 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(1000,true);
-        ReloadTimer(timer_id);
+        timer_id = CreateTimer(5000,true);
+        //ReloadTimer(timer_id);
 
         muxdaemon = std::make_unique<MuxDaemon>();
 /*        modem.reset();

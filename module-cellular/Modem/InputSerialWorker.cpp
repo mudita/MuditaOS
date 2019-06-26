@@ -185,9 +185,12 @@ int InputSerialWorker::ExtractFrames() {
                             muxDaemon->channels[frame->channel].disc_ua_pending = 0;
                         }
                     }
-                    if (frame->channel == muxDaemon->virtualPortsCount)
-                        //TODO: M.P dunno what is this for ??
-                        // ql_cmux_debug = 0;
+                    //TODO: M.P dunno what is this for ??
+#if 0
+                    if (frame->channel == muxDaemon->virtualPortsCount){
+                        ql_cmux_debug = 0;
+                        }
+#endif
                         break;
                 case MuxDefines::GSM0710_TYPE_DM:
                     if (muxDaemon->channels[frame->channel].GetState() == MuxChannel::State::Opened) {
@@ -246,10 +249,16 @@ int InputSerialWorker::ExtractFrames() {
                     muxDaemon->WriteMuxFrame(frame->channel, NULL, 0,
                                              static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UA) |
                                              static_cast<unsigned char>(MuxDefines::GSM0710_PF));
-                    if (frame->channel == muxDaemon->virtualPortsCount)
-                        //TODO: M.P dunno what is this for ??
-                        // ql_cmux_debug = 0;
+//TODO: M.P dunno what is this for ??
+#if 0
+                    if (frame->channel == muxDaemon->virtualPortsCount){
+                        ql_cmux_debug = 0;
+                        }
+#endif
                         break;
+
+                default:
+                    break;
             }
         }
     }
