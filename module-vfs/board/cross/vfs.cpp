@@ -125,6 +125,10 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path){
     return dir_list;
 }
 
+bool vfs::eof( FILE* stream ) {
+	return ff_feof( stream );
+}
+
 std::string vfs::getline( FILE* stream, uint32_t length ) {
 
 	uint32_t currentPosition = ftell(stream);

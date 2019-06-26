@@ -12,7 +12,7 @@
 |Volume up |  key [ R ] |
 
 - Voulme down 		- key [ F ]
-- Functional left 		- key [ Q ]
+- Functional left 	- key [ Q ]
 - Functional right 	- key [ E ]
 - Joystick up 		- key [ W ]
 - Joystick down		- key [ X ]

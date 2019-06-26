@@ -23,17 +23,17 @@ extern "C" {
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "module-bsp/bsp/keyboard/keyboard.hpp"
 
-static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
-{
-
-	xQueueHandle qhandle = reinterpret_cast<xQueueHandle> (pvTimerGetTimerID( xTimer ));
-
-	bool handled = true;
-
-	if( qhandle != NULL)
-		xQueueSend( qhandle, &handled, 1000);
-
-}
+//static void keyboardTaskPressTimerCallback(TimerHandle_t xTimer)
+//{
+//
+//	xQueueHandle qhandle = reinterpret_cast<xQueueHandle> (pvTimerGetTimerID( xTimer ));
+//
+//	bool handled = true;
+//
+//	if( qhandle != NULL)
+//		xQueueSend( qhandle, &handled, 1000);
+//
+//}
 
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
@@ -50,19 +50,19 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		//place some code here to handle messages from service
 
 	}
-	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardTimer) )
-	{
-		bool received;
-		xQueueReceive(queue, &received, 0);
-
-		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
-		message->keyCode = lastPressed;
-		message->keyRelaseTime = xTaskGetTickCount();
-		message->keyState = sevm::KeyboardEvents::keyReleasedLong;
-		sys::Bus::SendUnicast(message, "EventManager", this->service);
-
-		lastState = bsp::KeyEvents::Released;
-	}
+//	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardTimer) )
+//	{
+//		bool received;
+//		xQueueReceive(queue, &received, 0);
+//
+//		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
+//		message->keyCode = lastPressed;
+//		message->keyRelaseTime = xTaskGetTickCount();
+//		message->keyState = sevm::KeyboardEvents::keyReleasedLong;
+//		sys::Bus::SendUnicast(message, "EventManager", this->service);
+//
+//		lastState = bsp::KeyEvents::Released;
+//	}
 
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardIRQ) )
 	{
@@ -73,11 +73,11 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		uint8_t state, code;
 		bsp::keyboard_get_data(notification, state, code);
 
-		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(code));
-		if( (it != longPressParamsList.end()) && (state == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
-		{
-			longPressTimerStart(it->second);
-		}
+//		std::map<uint32_t, uint32_t>::iterator it = longPressParamsList.find(static_cast<int>(code));
+//		if( (it != longPressParamsList.end()) && (state == static_cast<uint8_t>(bsp::KeyEvents::Pressed)) )
+//		{
+//			longPressTimerStart(it->second);
+//		}
 
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
 
@@ -87,9 +87,9 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
-	std::pair<uint32_t, uint32_t> longPresKeyLeft = {static_cast<uint32_t>(bsp::KeyCodes::JoystickLeft), 500};
-
-	longPressParamsList.insert(longPresKeyLeft);
+//	std::pair<uint32_t, uint32_t> longPresKeyLeft = {static_cast<uint32_t>(bsp::KeyCodes::JoystickLeft), 500};
+//
+//	longPressParamsList.insert(longPresKeyLeft);
 
 	Worker::init(queues);
 	std::vector<xQueueHandle> qhanldes = this->getQueues();
@@ -99,7 +99,7 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 }
 bool WorkerEvent::deinit(void)
 {
-	xTimerDelete(longPressTimerHandle, 100);
+//	xTimerDelete(longPressTimerHandle, 100);
 	Worker::stop();
 	Worker::deinit();
 	bsp::keyboard_Deinit();
@@ -147,33 +147,33 @@ bool WorkerEvent::deinit(void)
 
 		lastState = bsp::KeyEvents::Released;
 		// If timer not yet triggered - the user pressed the button shortly
-		if( longPressTaskEnabled )
-		{
-			if(lastPressed == code)
-			{
-				if( xTimerIsTimerActive(longPressTimerHandle) )
-				{
-					xTimerStop(longPressTimerHandle, 0);
-
-					message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
-					message->keyCode = code;
-					message->keyRelaseTime = xTaskGetTickCount();
-					longPressTaskEnabled = false;
-				}
-				else
-				{
-					longPressTaskEnabled = false;
-					//message is currently send
-					return;
-				}
-			}
-			else
-			{
-				message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
-				message->keyRelaseTime = xTaskGetTickCount();
-			}
-		}
-		else
+//		if( longPressTaskEnabled )
+//		{
+//			if(lastPressed == code)
+//			{
+//				if( xTimerIsTimerActive(longPressTimerHandle) )
+//				{
+//					xTimerStop(longPressTimerHandle, 0);
+//
+//					message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
+//					message->keyCode = code;
+//					message->keyRelaseTime = xTaskGetTickCount();
+//					longPressTaskEnabled = false;
+//				}
+//				else
+//				{
+//					longPressTaskEnabled = false;
+//					//message is currently send
+//					return;
+//				}
+//			}
+//			else
+//			{
+//				message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
+//				message->keyRelaseTime = xTaskGetTickCount();
+//			}
+//		}
+//		else
 		{
 			message->keyState =  sevm::KeyboardEvents::keyReleasedShort;
 			message->keyRelaseTime = xTaskGetTickCount();
@@ -186,13 +186,13 @@ bool WorkerEvent::deinit(void)
  bool WorkerEvent::longPressTimerStart(uint32_t time)
  {
 
-	longPressTimerHandle = xTimerCreate("keyboardPressTimer", time, false,
-			queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardTimer)], &keyboardTaskPressTimerCallback);
-
-	longPressTaskEnabled = true;
-	if( xTimerStart( longPressTimerHandle, 0 ) != pdPASS )
-	{
-		return false;
-	}
+//	longPressTimerHandle = xTimerCreate("keyboardPressTimer", time, false,
+//			queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardTimer)], &keyboardTaskPressTimerCallback);
+//
+//	longPressTaskEnabled = true;
+//	if( xTimerStart( longPressTimerHandle, 0 ) != pdPASS )
+//	{
+//		return false;
+//	}
 	return true;
  }

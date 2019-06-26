@@ -60,9 +60,11 @@ enum class MessageType {
 	AppSwitch, //application receives this message from application manager. It a signal to gain or loose focus.
 	AppSwitchWindowBack,//message to inform
 	AppSwitchWindow, //This is internal message transmitted within application to change window. Additional command and data are transmitted with it.
+	AppInputEvent,//used after key event translation to send input event to application
 	AppRefresh,
 	AppClose,
 	AppFocus,
+
 
 	EVMFocusApplication,
 	EVMKeyboardProfile,

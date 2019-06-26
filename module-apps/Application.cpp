@@ -11,10 +11,12 @@
 //module-services
 #include "service-gui/messages/DrawMessage.hpp"
 #include "service-appmgr/messages/APMMessage.hpp"
+#include "service-evtmgr/messages/EVMessages.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 //module-gui
 #include "gui/core/DrawCommand.hpp"
+#include "gui/input/InputEvent.hpp"
 //module-sys
 #include "SystemManager/SystemManager.hpp"
 
@@ -27,12 +29,41 @@ namespace app {
 Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
 	Service( name, stackDepth, priority ){
 
-	// TODO Auto-generated constructor stub
+	longpressTimerID = CreateTimer( 1000 ,false);
+
+	//create translator and set default profile
+	translator = std::make_unique<gui::Translator>();
+//	translator->setProfile("home_screen");
+	translator->setProfile("lang_eng_lower");
 
 }
 
 Application::~Application() {
 	// TODO Auto-generated destructor stub
+}
+
+void Application::TickHandler(uint32_t id) {
+	if( id == longpressTimerID ) {
+		LOG_INFO( "longpressTimerID triggered");
+		gui::InputEvent iev = translator->translate(
+			false,
+			translator->getLastEvent().keyCode,
+			translator->getLastEvent().keyPressTime,
+			translator->getLastEvent().keyPressTime + translator->getLastEvent().timeout,
+			true );
+
+		//for press event check if there is a need for starting timer
+		if( (iev.state == gui::InputEvent::State::keyPressed) && ( iev.timeout != 0 ) ) {
+			Service::setTimerPeriod( longpressTimerID, iev.timeout );
+			Service::ReloadTimer( longpressTimerID );
+		}
+		else if(iev.state != gui::InputEvent::State::keyReleasedShort ) {
+			Service::stopTimer( longpressTimerID );
+		}
+
+		if( iev.state != gui::InputEvent::State::Undefined )
+			messageInputEventApplication( this, this->GetName(), iev );
+	}
 }
 
 void Application::render( gui::RefreshModes mode ) {
@@ -74,6 +105,35 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	bool handled = false;
 
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
+		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
+		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
+	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
+	{
+		sevm::KbdMessage* msg = static_cast<sevm::KbdMessage*>(msgl);
+
+		gui::InputEvent iev = translator->translate(
+			(msg->keyState==sevm::KeyboardEvents::keyPressed),
+			static_cast<uint32_t>(msg->keyCode),
+			msg->keyPressTime,
+			msg->keyRelaseTime
+			);
+
+		//for press event check if there is a need for starting timer
+		if( (iev.state == gui::InputEvent::State::keyPressed) && ( iev.timeout != 0 ) ) {
+			Service::setTimerPeriod( longpressTimerID, iev.timeout );
+			Service::ReloadTimer( longpressTimerID );
+		}
+		else if(iev.state != gui::InputEvent::State::keyReleasedShort ) {
+			Service::stopTimer( longpressTimerID );
+		}
+
+		if( iev.state != gui::InputEvent::State::Undefined )
+			messageInputEventApplication( this, this->GetName(), iev );
+
+		handled = true;
+	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
@@ -184,6 +244,12 @@ bool Application::messageRefreshApplication( sys::Service* sender, std::string a
 bool Application::messageCloseApplication( sys::Service* sender, std::string application ) {
 
 	auto msg = std::make_shared<AppMessage>( MessageType::AppClose, application );
+	sys::Bus::SendUnicast(msg, application, sender );
+	return true;
+}
+
+bool Application::messageInputEventApplication( sys::Service* sender, std::string application , const gui::InputEvent& event ) {
+	auto msg = std::make_shared<AppInputEventMessage>( event );
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
