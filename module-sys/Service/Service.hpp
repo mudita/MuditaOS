@@ -51,6 +51,12 @@ public:
 	void ReloadTimer(uint32_t id);
 	// Delete timer
 	void DeleteTimer(uint32_t id);
+	void setTimerPeriod(uint32_t id,uint32_t period);
+	/**
+	 * @brief Stops a timer with specified ID
+	 * @param id ID of the timer;
+	 */
+	void stopTimer(uint32_t id);
 
 
 	// Invoked when service received data message

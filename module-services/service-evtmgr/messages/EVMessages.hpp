@@ -15,6 +15,7 @@
 #include "SwitchData.hpp"
 #include "Service/Service.hpp"
 #include "MessageType.hpp"
+#include "key_codes.hpp"
 
 
 namespace sevm {

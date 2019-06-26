@@ -20,17 +20,17 @@ namespace gui {
  *
  */
 class KeyProfile {
-	//defines whether button can be pressed multiple times to get different characters.
-	bool cyclic;
-	//time to trigger long press timeout in keyboard's driver
-	//0 means that there is no timeout for holding the key
-	uint32_t timeout = 0;
-	uint32_t mapSize = 0;
-	std::vector<uint32_t> map;
 public:
+	uint32_t keyCode = 0;
+	bool cyclic = false;;
+	std::vector<uint32_t> chars;
+	std::vector<uint32_t> timeouts;
 
 	KeyProfile();
 	virtual ~KeyProfile();
+
+	void addCharacters( const std::string& s );
+	void addTimeouts( const std::string& s );
 };
 
 /*
@@ -39,12 +39,18 @@ public:
 class Profile {
 	std::string name;
 	std::map<uint32_t, KeyProfile*> keys;
+
+	void addCharacters( KeyProfile* pk, const std::string& s );
+	void addTimeouts( KeyProfile* pk, const std::string& s );
+	void addKeyProfile( KeyProfile* pk );
 public:
 	Profile();
 	virtual ~Profile();
 
-	void setName( std::string ) { this->name = name; };
+	void setName( std::string name ) { this->name = name; };
 	std::string getName(){ return name; };
+	bool load( std::string filename );
+	const KeyProfile* getKeyProfile( uint32_t keyCode );
 };
 
 } /* namespace gui */

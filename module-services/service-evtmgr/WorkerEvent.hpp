@@ -25,7 +25,7 @@ struct KeyState{
 
 enum class WorkerEventQueues{
 	queueService = 0,
-	queueKeyboardTimer,
+//	queueKeyboardTimer,
 	queueKeyboardIRQ
 };
 
@@ -33,7 +33,7 @@ class WorkerEvent : public sys::Worker
 {
 private:
 
-	TimerHandle_t longPressTimerHandle = NULL;
+//	TimerHandle_t longPressTimerHandle = NULL;
 
 	/**
 	 * @brief This method is responsible for catch and process keyboard event.
