@@ -35,7 +35,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
-add_subdirectory( application-test )
 add_subdirectory( application-viewer )
 add_subdirectory( application-desktop )
 

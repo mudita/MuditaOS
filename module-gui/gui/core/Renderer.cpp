@@ -1,4 +1,3 @@
-
 /*
  * Renderer.cpp
  *
@@ -111,7 +110,6 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	) {
 		return;
 	}
-
 	//get copy of original context using x,y of draw coordinates and original size of the widget
 	Context* drawCtx;
 	bool copyContext = false;
@@ -126,7 +124,13 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	}
 	else {
 		copyContext = true;
-		drawCtx= ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
+		int16_t x = cmd->x;
+		int16_t y = cmd->y;
+		if(cmd->areaX < 0)
+			x += cmd->areaX;
+		if( cmd->areaY < 0 )
+			y += cmd->areaY;
+		drawCtx= ctx->get( x, y, cmd->areaW, cmd->areaH );
 	}
 
 	//if rounding of corners is 0
@@ -151,7 +155,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	else {
 
 		//calculate centers of circle for all corners
-		int16_t xcTopRight = wgtX+cmd->w - cmd->radius;
+		int16_t xcTopRight = wgtX+cmd->areaW - cmd->radius;
 		int16_t xcTopLeft = wgtX+cmd->radius;
 		int16_t xcBottomRight = xcTopRight;
 		int16_t xcBottomLeft = xcTopLeft;
@@ -341,26 +345,26 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		}
 
 		//bottom right corner
-		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT ) {
-			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ) {
+		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_RIGHT ) {
+			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT ) {
 			}
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
 				index = 0;
 				//X is growing faster
 				for( index=0; index<middleIndex; ++index ) {
-					drawHorizontalLine( drawCtx, xcBottomRight + Px[index] - cmd->penWidth, ycBottomRight + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, xcBottomRight + Px[index] - cmd->penWidth, ycBottomRight + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_UP);
 				}
 				//Y is growing faster
 				for( index=middleIndex; index<pointCount; ++index ) {
-					drawVerticalLine( drawCtx, xcBottomRight + Px[index], ycBottomRight + Py[index] - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+					drawVerticalLine( drawCtx, xcBottomRight + Px[index], ycBottomRight + Py[index] - cmd->penWidth /*+ 1*/, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
 				}
 			}
 		}
 
-		//upper right corner
-		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT ) {
-			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ) {
+		//upper left corner
+		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT ) {
+			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ) {
 			}
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
@@ -371,25 +375,25 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 				}
 				//Y is growing faster
 				for( index=middleIndex; index<pointCount; ++index ) {
-					drawVerticalLine( drawCtx, xcTopLeft - Px[index] + 1, ycTopLeft - Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+					drawVerticalLine( drawCtx, xcTopLeft - Px[index] /*+ 1*/, ycTopLeft - Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_RIGHT);
 				}
 			}
 		}
 
 		//lower left corner
-		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT ) {
-			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ) {
+		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT ) {
+			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT ) {
 			}
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
 				index = 0;
 				//X is growing faster
 				for( index=0; index<middleIndex; ++index ) {
-					drawHorizontalLine( drawCtx, xcBottomLeft - Px[index], ycBottomLeft + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_DOWN );
+					drawHorizontalLine( drawCtx, xcBottomLeft - Px[index], ycBottomLeft + Py[index], cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_UP );
 				}
 				//Y is growing faster
 				for( index=middleIndex; index<pointCount; ++index ) {
-					drawVerticalLine( drawCtx, xcBottomLeft - Px[index] + 1, ycBottomLeft + Py[index] - cmd->penWidth + 1, cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_LEFT );
+					drawVerticalLine( drawCtx, xcBottomLeft - Px[index] , ycBottomLeft + Py[index] - cmd->penWidth , cmd->penWidth, 1, cmd->borderColor, gui::LineExpansionDirection::LINE_EXPAND_RIGHT );
 				}
 			}
 		}
@@ -407,10 +411,10 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 			drawHorizontalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM ) {
-			xs = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
-			ys = wgtH;
-			le = wgtW - xs - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
-			drawHorizontalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
+			xs = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+			ys = wgtH - 1;
+			le = wgtW - xs - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+			drawHorizontalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
 		}
 
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT ) {
@@ -429,8 +433,10 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 	//if drawing was performed in temporary context
 	if( copyContext) {
-		//reinsert drawCtx into bast context
-		ctx->insert( cmd->x, cmd->y, drawCtx );
+		//reinsert drawCtx into last context
+
+//		ctx->insert( cmd->x, cmd->y, drawCtx );
+		ctx->insertArea( cmd->x, cmd->y,cmd->areaX, cmd->areaY, cmd->w, cmd->h, drawCtx );
 		//remove draw context
 		delete drawCtx;
 	}
