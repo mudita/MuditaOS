@@ -44,6 +44,7 @@
 
 #include "SystemManager/SystemManager.hpp"
 
+#include "rtc/rtc.hpp"
 class vfs vfs;
 
 class BlinkyService : public sys::Service {
@@ -54,7 +55,7 @@ public:
             : sys::Service(name)
     {
     	mem = new uint8_t[480*600];
-        timer_id = CreateTimer(100,true);
+        timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
 
     }
@@ -74,15 +75,37 @@ public:
     void TickHandler(uint32_t id) override{
         //auto msg = std::make_shared<sys::DataMessage>(500);
         //sys::Bus::SendUnicast(msg,"Blinky",this);
-        //LOG_DEBUG("Blinky service tick!");
+        LOG_DEBUG("Blinky service tick!");
 //    	uint32_t start_tick = xTaskGetTickCount();
 //		memset( mem, 0, 480*600);
 //		uint32_t end_tick = xTaskGetTickCount();
 //		LOG_DEBUG("memset time: %d", end_tick-start_tick);
+
+        struct tm time;
+        BSP_RtcGetCurrentDateTime(&time);
+        LOG_DEBUG("Time hour: %d, min: %d, sec: %d", time.tm_hour, time.tm_min, time.tm_sec);
+
+        time_t timestamp;
+        BSP_RtcGetCurrentTimestamp(&timestamp);
+        LOG_DEBUG( "Timestamp %ld", static_cast<long>(timestamp) );
     }
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override{
+
+    	BSP_RtcInit();
+       struct tm time;
+	   time.tm_year = 119;
+	   time.tm_mon = 5;
+	   time.tm_mday = 26;
+	   time.tm_hour = 9;
+	   time.tm_min = 40;
+	   time.tm_sec = 0;
+	   BSP_RtcSetDateTime(&time);
+
+
+
+
         return sys::ReturnCodes::Success;
     }
 
