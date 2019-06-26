@@ -10,7 +10,6 @@
 //module-applications
 #include "application-clock/ApplicationClock.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
-#include "application-test/ApplicationTest.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 
 //module-services
@@ -128,10 +127,6 @@ int SystemStart(sys::SystemManager* sysmgr)
 //    //launcher for viewer application
 //	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
 //	applications.push_back( std::move(viewerLauncher) );
-
-//	//launcher for test application
-//	std::unique_ptr<app::ApplicationLauncher> testLauncher = std::unique_ptr<app::ApplicationTestLauncher>(new app::ApplicationTestLauncher());
-//	applications.push_back( std::move(testLauncher) );
 
     //launcher for viewer application
     std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
