@@ -35,8 +35,8 @@ public:
         return state;
     }
 
-    void SetState(State state){
-        state = state;
+    void SetState(State st){
+        state = st;
     }
 
     int v24signals;

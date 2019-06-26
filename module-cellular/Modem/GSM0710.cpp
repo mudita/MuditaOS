@@ -21,8 +21,6 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
     int end;
     unsigned int length_needed = 5;// channel, type, length, fcs, flag
     unsigned char fcs = 0xFF;
-    unsigned char *local_readp;
-    unsigned int local_datacount, local_datacount_backup;
 
     /*Find start flag*/
     while (!flag_found && GetDataLength() > 0)
@@ -46,13 +44,7 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
     }
 
     /* Okay, we're ready to analyze a proper frame header */
-
-    /*Make local copy of buffer pointer and data counter. They are shared between 2 threads, so we want to update them only after a frame extraction */
-    /*From now on, only operate on these local copies */
-    local_readp = readp;
-    local_datacount = local_datacount_backup = datacount; /* current no. of stored bytes in buffer */
-
-    if (local_datacount >= length_needed) /* enough data stored for 0710 frame header+footer? */
+    if (datacount >= length_needed) /* enough data stored for 0710 frame header+footer? */
     {
         if (frame != NULL)
         {
@@ -87,7 +79,7 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
         }
 
         length_needed += frame->length; /*length_needed : 1 length byte + payload + 1 fcs byte + 1 end frame flag */
-        LOG_DEBUG("length_needed: %d, available in local_datacount: %d",length_needed,local_datacount);
+        LOG_DEBUG("length_needed: %d, available in local_datacount: %d",length_needed,datacount);
 
         if (frame->length > cmux_N1) /* Field Sanity check if payload is bigger than the max size negotiated in +CMUX */
         {
@@ -96,7 +88,7 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
             dropped_count++;
             goto update_buffer_dropping_frame; /* throw whole frame away, up until and incl. local_readp */
         }
-        if (!(local_datacount >= length_needed))
+        if (!(datacount >= length_needed))
         {
             LOG_DEBUG("Leave, frame extraction cancelled. Frame not completely stored in re-assembly buffer yet");
             return NULL;
@@ -112,13 +104,13 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
                 {
                     frame->data = readp;
                     readp = data + (frame->length - end);
-                    local_datacount -= frame->length;
+                    datacount -= frame->length;
                 }
                 else
                 {
                     frame->data = readp;
                     readp += frame->length;
-                    local_datacount -= frame->length;
+                    datacount -= frame->length;
                     if (readp == endp)
                         readp = data;
                 }
