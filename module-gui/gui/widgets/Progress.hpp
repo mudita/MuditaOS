@@ -18,8 +18,6 @@ protected:
 	int total;
 	//current value of the progress.
 	int current;
-	//rectangle used to draw thin line.
-	gui::Rect* thinRect;
 	//rectangle used to draw thick line.
 	gui::Rect* fillRect;
 
@@ -27,10 +25,6 @@ protected:
 	 * Creates local widgets
 	 */
 	virtual void createWidgets();
-	/**
-	 * @brief Sets new sizes of thick and thin rects.
-	 */
-	virtual void updateProgress();
 public:
 	Progress();
 	Progress( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
