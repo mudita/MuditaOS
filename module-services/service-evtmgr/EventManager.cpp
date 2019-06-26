@@ -18,8 +18,6 @@ EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
 {
 	LOG_INFO("[EventManager] Initializing");
-
-
 }
 
 EventManager::~EventManager(){
@@ -39,10 +37,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
-
-//		LOG_INFO("[EventManager] Received key info: key_code = %d, keyEvent = %d\n"
-//				"press time: %d, release time %d", static_cast<int>(msg->keyCode),
-//				static_cast<int>(msg->keyState), msg->keyPressTime, msg->keyRelaseTime);
 
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = msg->keyCode;
@@ -76,11 +70,9 @@ sys::ReturnCodes EventManager::InitHandler() {
 	EventWorker = new WorkerEvent( this );
 
 	//create queues for worker
-//	sys::WorkerQueueInfo qTimer = {"qTimer", sizeof(bool), 10 };
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
 	std::list<sys::WorkerQueueInfo> list;
 
-//	list.push_back(qTimer);
 	list.push_back(qIrq);
 
 	EventWorker->init( list );
@@ -100,7 +92,6 @@ sys::ReturnCodes EventManager::DeinitHandler() {
 sys::ReturnCodes EventManager::WakeUpHandler() {
 	return sys::ReturnCodes::Success;
 }
-
 
 sys::ReturnCodes EventManager::SleepHandler() {
 	return sys::ReturnCodes::Success;
