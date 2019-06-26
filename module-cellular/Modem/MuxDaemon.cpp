@@ -83,15 +83,20 @@ int MuxDaemon::Start() {
     // Spawn input serial stream worker
     inSerialDataWorker->Init();
 
-    // Create virtual channels
-    channels.push_back(MuxChannel(this,0,"ControlChannel"));
-    channels.push_back(MuxChannel(this,1,"NotificationChannel"));
+    state = States::MUX_STATE_MUXING;
 
+    // Create virtual channels
+    // Mux channels must be initialized in sequence
+    channels.push_back(MuxChannel(this,0,"ControlChannel"));
+    vTaskDelay(500);
+    channels.push_back(MuxChannel(this,1,"NotificationChannel"));
+    vTaskDelay(500);
     for (uint32_t i = 2; i < virtualPortsCount; ++i) {
         channels.push_back(MuxChannel(this,i,("GenericChannel_" + std::to_string(i)).c_str()));
+        vTaskDelay(500);
     }
 
-    state = States::MUX_STATE_MUXING;
+
 }
 
 int MuxDaemon::Exit() {

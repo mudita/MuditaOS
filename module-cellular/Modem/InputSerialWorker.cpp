@@ -136,11 +136,20 @@ int InputSerialWorker::ExtractFrames() {
                 LOG_DEBUG("Writing %d byte frame received on channel %d to %s", frame->length, frame->channel,
                           muxDaemon->channels[frame->channel].GetName().c_str());
 
-                int write_result;
+                int write_result=0;
 
                 if (muxDaemon->channels[frame->channel].GetState() ==
                     MuxChannel::State::Opened) {//reopening, discard the data
-                    // TODO:M.P distribute frame to virtual channel
+
+                    {
+                        // TODO:M.P distribute frame to virtual channel
+                        char buff[256] = {0};
+                        memcpy(buff, frame->data, frame->length);
+                        write_result = frame->length;
+                        LOG_DEBUG("Raw data: %s",buff);
+                    }
+
+
                     // write_result = pseudo_device_write(&channellist[frame->channel], frame->data, frame->length);
                 } else {
                     LOG_INFO("channel %d closed, discard the frame", frame->channel);
