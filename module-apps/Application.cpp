@@ -57,9 +57,6 @@ void Application::TickHandler(uint32_t id) {
 			Service::setTimerPeriod( longpressTimerID, iev.timeout );
 			Service::ReloadTimer( longpressTimerID );
 		}
-		else if(iev.state != gui::InputEvent::State::keyReleasedShort ) {
-			Service::stopTimer( longpressTimerID );
-		}
 
 		if( iev.state != gui::InputEvent::State::Undefined )
 			messageInputEventApplication( this, this->GetName(), iev );
@@ -125,7 +122,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			Service::setTimerPeriod( longpressTimerID, iev.timeout );
 			Service::ReloadTimer( longpressTimerID );
 		}
-		else if(iev.state != gui::InputEvent::State::keyReleasedShort ) {
+		else if(iev.state == gui::InputEvent::State::keyReleasedShort ) {
 			Service::stopTimer( longpressTimerID );
 		}
 
