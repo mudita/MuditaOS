@@ -72,8 +72,7 @@ std::list<DrawCommand*> Progress::buildDrawList() {
 
 
 	uint32_t progressSize = 0;
-	int width = widgetArea.w;
-	progressSize = (current * width) / total;
+	progressSize = (current * widgetArea.w) / total;
 	fill->w = progressSize;
 
 	commands.splice(commands.end(), baseCommands, it);
