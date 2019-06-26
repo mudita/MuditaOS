@@ -23,6 +23,8 @@
 #include "irq/irq_gpio.hpp"
 #include "common/i2c.h"
 
+#include "rtc/rtc.hpp"
+
 namespace bsp {
 
 
@@ -234,7 +236,19 @@ namespace bsp {
 
         BOARD_PrintClocks();
 
+        BSP_RtcInit();
 
+        struct tm time;
+        time.tm_year = 119;
+        time.tm_mon = 5;
+        time.tm_mday = 26;
+        time.tm_hour = 9;
+        time.tm_min = 40;
+        time.tm_sec = 0;
+        BSP_RtcSetDateTime(&time);
+
+       vTaskDelay(5000);
+        BSP_RtcGetCurrentDateTime(&time);
     }
 
 

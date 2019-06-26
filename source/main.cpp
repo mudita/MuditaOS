@@ -126,7 +126,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 //
 //    //launcher for viewer application
 //	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
-//	applications.push_back( std::move(viewerLauncher) );
+//	applications.push_back( std::move(viewerLauncher)./ );
 //#endif
 
     //launcher for viewer application
