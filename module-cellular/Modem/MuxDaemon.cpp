@@ -86,14 +86,16 @@ int MuxDaemon::Start() {
     state = States::MUX_STATE_MUXING;
 
     // Create virtual channels
-    // Mux channels must be initialized in sequence
     channels.push_back(MuxChannel(this,0,"ControlChannel"));
-    vTaskDelay(500);
     channels.push_back(MuxChannel(this,1,"NotificationChannel"));
-    vTaskDelay(500);
     for (uint32_t i = 2; i < virtualPortsCount; ++i) {
         channels.push_back(MuxChannel(this,i,("GenericChannel_" + std::to_string(i)).c_str()));
-        vTaskDelay(500);
+    }
+
+    // Mux channels must be initialized in sequence
+    for(auto &w : channels){
+        w.Open();
+        vTaskDelay(200);
     }
 
 
@@ -199,15 +201,8 @@ int MuxDaemon::CloseMux() {
 
     for (auto &w : channels) {
         if (w.GetState() == MuxChannel::State::Opened) {
-            if (inputBuffer->cmux_mode) {
-                WriteMuxFrame(w.logicalNumber, NULL, 0,
-                              static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_CLD ) |
-                              static_cast<unsigned char>(MuxDefines::GSM0710_CR));
-            } else {
-                WriteMuxFrame(w.logicalNumber, closeChannelCmd, sizeof(closeChannelCmd), static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
-            }
-
             LOG_INFO("Logical channel %d closed", w.logicalNumber);
+            w.Close();
         }
     }
 

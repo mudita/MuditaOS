@@ -27,6 +27,9 @@ public:
     MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,const char* name="Default");
     virtual ~MuxChannel();
 
+    int Open();
+    int Close();
+
     std::string& GetName(){
         return name;
     }
