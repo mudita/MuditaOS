@@ -78,18 +78,18 @@ std::list<DrawCommand*> Window::buildDrawList() {
 //}
 
 
-bool Window::onInput( const KeyEvent& key ) {
+bool Window::onInput( const InputEvent& inputEvent) {
 	bool res;
 	if( focusItem != nullptr )
-		res =  focusItem->onInput(key);
+		res =  focusItem->onInput(inputEvent);
 
 	if( res )
 		return true;
 	//if focused item didn't handle the key event and it was navigation key
 	//check if moving focus is possible
 	gui::Item* newFocusItem = nullptr;
-	if( !res && key.keyState == KeyState::KEY_RELEASED_SHORT ) {
-		switch( key.keyCode ) {
+	if( !res && inputEvent.state == InputEvent::State::keyReleasedShort ) {
+		switch( inputEvent.keyCode ) {
 		case KeyCode::KEY_LEFT:
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);
 			break;

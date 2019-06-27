@@ -122,7 +122,6 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path, const std::strin
         }
 
         auto pathStr = p.path().string();
-
         auto path = pathStr.substr(pathStr.find_last_of("/\\")+1);
 
         if( ext.empty() ) {
