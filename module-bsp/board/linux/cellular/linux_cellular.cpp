@@ -12,12 +12,14 @@
 #include "linux_cellular.hpp"
 
 #include <iostream>
+#include <algorithm>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
+#include <ticks.hpp>
 
 
 
@@ -131,9 +133,19 @@ namespace bsp
 
     uint32_t LinuxCellular::Wait(uint32_t timeout) {
 
+        uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
+        uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
+        uint32_t timeElapsed = currentTime;
+
         retry:
 
-        auto event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, timeout);
+        if(timeElapsed >= timeoutNeeded) {
+            return 0; // timeout
+        }
+
+        auto event_count = epoll_wait(epoll_fd, events, MAX_EVENTS, timeoutNeeded-timeElapsed);
+        timeElapsed = cpp_freertos::Ticks::GetTicks();
+
         if(event_count == 0){
             return 0; // timeout
         }
