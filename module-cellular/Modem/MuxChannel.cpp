@@ -24,11 +24,22 @@ MuxChannel::MuxChannel(MuxDaemon *mux,uint32_t logicalNumber,const char *name) :
         state(State::Closed),
         mux(mux){
 
-    // Send virtrual channel request frame to GSM modem
-    mux->WriteMuxFrame(logicalNumber,NULL,0, static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_SABM) | static_cast<unsigned char>(MuxDefines ::GSM0710_PF));
+
 
 }
 
 MuxChannel::~MuxChannel() {
 
+}
+
+int MuxChannel::Open() {
+    // Send virtrual channel request frame to GSM modem
+    mux->WriteMuxFrame(logicalNumber,NULL,0, static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_SABM) | static_cast<unsigned char>(MuxDefines ::GSM0710_PF));
+}
+
+int MuxChannel::Close() {
+    if (mux->inputBuffer->cmux_mode)
+        mux->WriteMuxFrame(logicalNumber, NULL, 0, static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_CLD) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
+    else
+        mux->WriteMuxFrame(logicalNumber, mux->closeChannelCmd, sizeof(mux->closeChannelCmd), static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
 }

@@ -64,6 +64,7 @@ public:
 
         muxdaemon->Start();
 
+       // muxdaemon.reset();
     }
 
     ~BlinkyService(){
