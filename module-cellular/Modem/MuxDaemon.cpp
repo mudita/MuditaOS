@@ -28,7 +28,7 @@ MuxDaemon::MuxDaemon() {
 }
 
 MuxDaemon::~MuxDaemon() {
-    Exit();//TODO: M.P only temporary solution
+
 }
 
 
@@ -64,6 +64,12 @@ int MuxDaemon::Start() {
 
 
     // Set up modem configuration
+    if(hardwareControlFlowEnable){
+        SendAT("AT+IFC=2,2\r\n", 500); // enable flow control function for module
+    }
+    else{
+        SendAT("AT+IFC=0,0\r\n", 500); // disable flow control function for module
+    }
 
     // Set fixed baudrate = 115200
     SendAT("AT+IPR=115200\r", 500);
