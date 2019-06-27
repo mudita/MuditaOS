@@ -128,7 +128,7 @@ public:
 
         writep = data;
         readp = data;
-        endp = data + sizeof(data);
+        endp = data + GSM0710_BUFFER_SIZE;
     }
 
     ~GSM0710Buffer(){
