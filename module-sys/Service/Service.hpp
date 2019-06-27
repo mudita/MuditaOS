@@ -58,7 +58,6 @@ public:
 	 */
 	void stopTimer(uint32_t id);
 
-
 	// Invoked when service received data message
 	virtual Message_t DataReceivedHandler(DataMessage* msg) = 0;
 

@@ -23,6 +23,8 @@ namespace gui {
  *
  */
 class DesktopMainWindow: public AppWindow {
+protected:
+
 	gui::BottomBar* bottomBar;
 	gui::TopBar* topBar;
 	gui::Label* description = nullptr;
@@ -31,9 +33,29 @@ class DesktopMainWindow: public AppWindow {
 	gui::Label* dayMonth = nullptr;
 	gui::Image* confirmArrow = nullptr;
 	gui::Image* dots[4] = {  nullptr, nullptr, nullptr, nullptr };
+
+	/**
+	 * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
+	 */
+	uint32_t unclockTime = 3000;
+	/**
+	 * value of the system time when enter key was pressed.
+	 */
+	uint32_t unlockStartTime = 0;
+	/**
+	 * Flag used in detecting unlock seqience
+	 */
+	bool enterPressed = false;
+	/**
+	 * Flag informs whether window has been unlocked
+	 */
+	bool screenLocked = true;
 public:
 	DesktopMainWindow( app::Application* app );
 	virtual ~DesktopMainWindow();
+
+	//virtual methods
+	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 };
 

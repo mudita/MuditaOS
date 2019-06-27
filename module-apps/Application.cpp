@@ -33,8 +33,7 @@ Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriori
 
 	//create translator and set default profile
 	translator = std::make_unique<gui::Translator>();
-//	translator->setProfile("home_screen");
-	translator->setProfile("lang_eng_lower");
+	translator->setProfile("home_screen");
 
 }
 
@@ -47,7 +46,7 @@ void Application::TickHandler(uint32_t id) {
 		LOG_INFO( "longpressTimerID triggered");
 		gui::InputEvent iev = translator->translate(
 			false,
-			translator->getLastEvent().keyCode,
+			static_cast<int>(translator->getLastEvent().keyCode),
 			translator->getLastEvent().keyPressTime,
 			translator->getLastEvent().keyPressTime + translator->getLastEvent().timeout,
 			true );
@@ -104,6 +103,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
 		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
+		if( currentWindow != nullptr )
+			currentWindow->onInput( msg->getEvent() );
+
 		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
@@ -181,12 +183,18 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( it != windows.end() ) {
 
 			setActiveWindow( msg->getWindowName());
+
+			//determine show mode
+			gui::ShowMode mode = gui::ShowMode::GUI_SHOW_INIT;
+			if( previousWindow == currentWindow )
+				mode = gui::ShowMode::GUI_SHOW_RETURN;
 			currentWindow->handleSwitchData( msg->getData().get() );
+			currentWindow->onBeforeShow( mode, 0, msg->getData().get() );
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		handled = true;
 	}
-//
+
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
 		state = State::DEACTIVATING;
 		sapm::ApplicationManager::messageConfirmClose(this);
@@ -194,7 +202,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		handled = true;
 	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
-		render( gui::RefreshModes::GUI_REFRESH_DEEP );
+		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
+		currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
+		render( msg->getMode() );
 	}
 
 	if( handled)

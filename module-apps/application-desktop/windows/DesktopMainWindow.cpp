@@ -50,12 +50,53 @@ DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"M
 }
 
 DesktopMainWindow::~DesktopMainWindow() {
-	// TODO Auto-generated destructor stub
 }
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-//	for( int i = 0; i<4; i++ )
-//		dots[i]->setVisible(false);
+
+	//
+	if( screenLocked ) {
+		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
+		topBar->setActive( TopBar::Elements::LOCK, false );
+	}
+	else {
+		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
+		topBar->setActive( TopBar::Elements::LOCK, false );
+	}
+}
+
+bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
+	//check if any of the lower inheritance onInput methods catch the event
+	bool ret = AppWindow::onInput( inputEvent );
+	if( ret )
+		return true;
+
+	if( screenLocked ) {
+		//if enter was pressed
+		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+			unlockStartTime = xTaskGetTickCount();
+			enterPressed = true;
+		}
+		else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
+			//if interval between enter and pnd keys is less than time defined for unlocking
+			if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
+				screenLocked = false;
+				application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+			}
+			enterPressed = false;
+		}
+		else {
+			enterPressed = false;
+		}
+	}
+	else {
+		//lock screen if it was unlocked
+		if( (inputEvent.keyCode == KeyCode::KEY_PND) && (inputEvent.state == InputEvent::State::keyReleasedLong ) ) {
+			screenLocked = true;
+			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+		}
+	}
+	return false;
 }
 
 } /* namespace gui */
