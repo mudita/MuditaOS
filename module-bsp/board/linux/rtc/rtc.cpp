@@ -17,28 +17,37 @@
 
 //static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datetime_t *datetime);
 
-
+static time_t timestampOffset;
 RtcBspError_e BSP_RtcInit()
 {
 
+	timestampOffset = 0;
     return RtcBspOK;
 }
 
 RtcBspError_e BSP_RtcSetDateTimeFromTimestamp(time_t timestamp)
 {
 
+	time_t current = time(NULL);
+
+	timestampOffset = timestamp - current;
     return RtcBspOK;
 }
 
 RtcBspError_e BSP_RtcSetDateTime(struct tm* tim)
 {
 
+	time_t current = time(NULL);
+	time_t timestamp = mktime(tim);
+
+	timestampOffset = timestamp - current;
     return RtcBspOK;
 }
 
 RtcBspError_e BSP_RtcGetCurrentDateTime(struct tm* datetime)
 {
 	time_t t = time(NULL);
+	t += timestampOffset;
 	*datetime = *localtime(&t);
 
     return RtcBspOK;
@@ -47,7 +56,7 @@ RtcBspError_e BSP_RtcGetCurrentDateTime(struct tm* datetime)
 RtcBspError_e BSP_RtcGetCurrentTimestamp(time_t* timestamp)
 {
 
-	*timestamp = time(NULL);
+	*timestamp = time(NULL) + timestampOffset;
 
     return RtcBspOK;
 }

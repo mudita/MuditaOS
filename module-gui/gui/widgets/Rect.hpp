@@ -46,6 +46,7 @@ public:
 	void setPenFocusWidth( uint8_t width );
 	void setEdges( RectangleEdgeFlags edges );
 	void setCorners( RectangleCornerFlags corners );
+	void setFlat( RectangleFlatFlags flats);
 	void setFilled( bool val );
 
 	//virtaul methods

@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include "SwitchData.hpp"
+#include "gui/input/InputEvent.hpp"
 
 namespace app {
 
@@ -76,6 +77,18 @@ public:
 	std::string getWindowName() { return window; };
 	const uint32_t& getCommand() { return command; };
 	std::unique_ptr<gui::SwitchData>& getData() { return data; };
+};
+
+class AppInputEventMessage : public AppMessage {
+protected:
+	gui::InputEvent event;
+public:
+	AppInputEventMessage( gui::InputEvent evt ) :
+		AppMessage( MessageType::AppInputEvent, "" ),
+		event{evt} {};
+	virtual ~AppInputEventMessage() {};
+
+	const gui::InputEvent& getEvent() { return event; };
 };
 
 };

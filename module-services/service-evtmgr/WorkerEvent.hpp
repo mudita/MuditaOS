@@ -25,16 +25,12 @@ struct KeyState{
 
 enum class WorkerEventQueues{
 	queueService = 0,
-	queueKeyboardTimer,
 	queueKeyboardIRQ
 };
 
 class WorkerEvent : public sys::Worker
 {
 private:
-
-	TimerHandle_t longPressTimerHandle = NULL;
-
 	/**
 	 * @brief This method is responsible for catch and process keyboard event.
 	 * @param event key event
@@ -42,11 +38,6 @@ private:
 	 * @note It sends message to service if event is processed succesfully.
 	 */
 	void processKeyEvent( bsp::KeyEvents event, bsp::KeyCodes code );
-	/**
-	 * @brief Starts long press timer.
-	 * @param time time to count in milliseconds.
-	 */
-	bool longPressTimerStart(uint32_t time);
 	/**
 	 * @brief list of keys with long press enabled. First item is key code, second is long press time.
 	 */

@@ -1,0 +1,21 @@
+{
+    "common_open": "OTWÓRZ",
+    "common_back": "WRÓĆ",
+    "common_set": "USTAW",
+    "common_switch": "ZMIEŃ",
+    "common_options": "OPCJE",
+    "common_monday": "Poniedziałek",
+    "common_tuesday": "Wtorek",
+    "common_wendesday": "Środa",
+    "common_thursday": "Czwartek",
+    "common_friday": "Piątek",
+    "common_saturday": "Sobota",
+    "common_sunday": "Niedziela",
+
+    "app_desktop_unlock": "ODBLOKUJ",
+    "app_desktop_lock": "ZABLOKUJ",
+
+    "settings_lang_PL": "PL",
+    "settings_lang_ENG": "ENG"
+
+}

@@ -69,6 +69,10 @@ void vfs::rewind ( FILE * stream ){
     std::rewind(stream);
 }
 
+bool vfs::eof( FILE* stream ) {
+	return std::feof( stream );
+}
+
 size_t vfs::filelength( FILE *stream ){
 
     size_t currPos = std::ftell(stream);
@@ -89,12 +93,19 @@ std::string vfs::getcurrdir(){
     }
 }
 
-std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path)
+static inline bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
+    }
+}
+
+std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path, const std::string& ext)
 {
     std::vector<DirectoryEntry> dir_list;
     FileAttributes  attribute;
     size_t fileSize = 0;
-
 
     for(auto& p: fs::directory_iterator(path))
     {
@@ -114,7 +125,14 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char* path)
 
         auto path = pathStr.substr(pathStr.find_last_of("/\\")+1);
 
-        dir_list.push_back(DirectoryEntry{path,attribute, static_cast<uint32_t >(fileSize)});
+        if( ext.empty() ) {
+        	dir_list.push_back(DirectoryEntry{path,attribute, static_cast<uint32_t >(fileSize)});
+        }
+        else
+        {
+        	if( hasEnding(path, ext ))
+        		dir_list.push_back(DirectoryEntry{path,attribute, static_cast<uint32_t >(fileSize)});
+        }
     }
 
 

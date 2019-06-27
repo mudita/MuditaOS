@@ -10,7 +10,6 @@
 //module-applications
 #include "application-clock/ApplicationClock.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
-#include "application-test/ApplicationTest.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 
 //module-services
@@ -19,23 +18,8 @@
 #include "ServiceEink.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
-
-
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-
-//module-gui
-#include "gui/core/Font.hpp"
-#include "gui/core/BoundingBox.hpp"
-#include "gui/core/Context.hpp"
-#include "gui/core/Renderer.hpp"
-#include "gui/core/DrawCommand.hpp"
-#include "gui/core/Font.hpp"
-#include "gui/widgets/Window.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Image.hpp"
 
 //module-bsp
 #include "bsp.hpp"
@@ -47,22 +31,17 @@
 #include "rtc/rtc.hpp"
 class vfs vfs;
 
+int irq = 0;
 class BlinkyService : public sys::Service {
-	gui::Window* win = nullptr;
-	uint8_t* mem = nullptr;
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-    	mem = new uint8_t[480*600];
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
-
     }
 
     ~BlinkyService(){
-    	if( win )
-    		delete win;
     }
 
     // Invoked upon receiving data message
@@ -73,13 +52,9 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-        //auto msg = std::make_shared<sys::DataMessage>(500);
-        //sys::Bus::SendUnicast(msg,"Blinky",this);
+
+
         LOG_DEBUG("Blinky service tick!");
-//    	uint32_t start_tick = xTaskGetTickCount();
-//		memset( mem, 0, 480*600);
-//		uint32_t end_tick = xTaskGetTickCount();
-//		LOG_DEBUG("memset time: %d", end_tick-start_tick);
 
         struct tm time;
         BSP_RtcGetCurrentDateTime(&time);
@@ -87,24 +62,27 @@ public:
 
         time_t timestamp;
         BSP_RtcGetCurrentTimestamp(&timestamp);
-        LOG_DEBUG( "Timestamp %ld", static_cast<long>(timestamp) );
+        LOG_DEBUG( "IRQ %d", irq );
+
+
     }
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override{
 
     	BSP_RtcInit();
-       struct tm time;
-	   time.tm_year = 119;
-	   time.tm_mon = 5;
-	   time.tm_mday = 26;
-	   time.tm_hour = 9;
-	   time.tm_min = 40;
-	   time.tm_sec = 0;
-	   BSP_RtcSetDateTime(&time);
+        struct tm time;
+	    time.tm_year = 119;
+	    time.tm_mon = 5;
+	    time.tm_mday = 26;
+	    time.tm_hour = 9;
+	    time.tm_min = 40;
+ 	    time.tm_sec = 0;
+ 	    //BSP_RtcSetDateTime(&time);
+ 	    time_t timestamp = 1561608042;
+ 	    BSP_RtcSetDateTimeFromTimestamp(timestamp);
 
-
-
+ 	   BSP_RtcSetAlarmInSecondsFromNow(30);
 
         return sys::ReturnCodes::Success;
     }
@@ -123,8 +101,6 @@ public:
     }
 
     uint32_t timer_id= 0;
-
-
 };
 
 
@@ -142,17 +118,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
-//#if 1 // TODO: Robert please clean it up
-//    //launcher for clock application
-//    std::unique_ptr<app::ApplicationLauncher> clockLauncher = std::unique_ptr<app::ApplicationClockLauncher>(new app::ApplicationClockLauncher());
-//    applications.push_back( std::move(clockLauncher) );
-//
-//    //launcher for viewer application
-//	std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
-//	applications.push_back( std::move(viewerLauncher)./ );
-//#endif
-
-    //launcher for viewer application
+    //launcher for desktop application
     std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
     applications.push_back( std::move(viewerLauncher) );
 
