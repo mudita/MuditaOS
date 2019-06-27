@@ -35,20 +35,31 @@ MuxDaemon::~MuxDaemon() {
 int MuxDaemon::Start() {
     // At first send AT command to check if modem is turned on
     if (SendAT("AT\r\n", 500) == -1) {
-        // If no response, power up modem and try again
-        cellular->PowerUp();
 
-        uint32_t retries = 10;
-        while (--retries) {
-            if (SendAT("AT\r\n", 500) == 0) {
-                break;
+        LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
+        //We don't know in what cmux_mode modem currently is so send both types of closing signals
+        WriteMuxFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_CLD) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
+        WriteMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd), static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
+        vTaskDelay(500);
+        // Try sending AT command once again
+        if (SendAT("AT\r\n", 500) == -1){
+            LOG_INFO("Starting power up procedure...");
+            // If no response, power up modem and try again
+            cellular->PowerUp();
+
+            uint32_t retries = 10;
+            while (--retries) {
+                if (SendAT("AT\r\n", 500) == 0) {
+                    break;
+                }
+            }
+
+            if (retries == 0) {
+                LOG_FATAL("No communication with GSM modem");
+                return -1;
             }
         }
 
-        if (retries == 0) {
-            LOG_FATAL("No communication with GSM modem");
-            return -1;
-        }
     }
 
 
@@ -80,10 +91,10 @@ int MuxDaemon::Start() {
     // Start CMUX multiplexer
     SendAT(gsm_command, 500);
 
+    state = States::MUX_STATE_MUXING;
+
     // Spawn input serial stream worker
     inSerialDataWorker->Init();
-
-    state = States::MUX_STATE_MUXING;
 
     // Create virtual channels
     channels.push_back(MuxChannel(this,0,"ControlChannel"));
@@ -115,8 +126,7 @@ int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
 
     if (cellular->Wait(500)) {
 
-        //vTaskDelay(500);
-        usleep(1000*500);
+        vTaskDelay(50);
         auto bytesRead = cellular->Read(buff, sizeof buff);
 
         if (memstr((char *) buff, bytesRead, "OK")) {
