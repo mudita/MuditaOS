@@ -22,18 +22,18 @@ enum class MuxDefines {
     GSM0710_FRAME_ADV_ESC = 0x7D,// advanced mode escape symbol
     GSM0710_FRAME_ADV_ESC_COPML = 0x20,// advanced mode escape complement mask
     // bits: Poll/final, Command/Response, Extension
-    GSM0710_PF = 0x10,//16
+            GSM0710_PF = 0x10,//16
     GSM0710_CR = 0x02,//2
     GSM0710_EA = 0x01,//1
     // type of frames
-    GSM0710_TYPE_SABM = 0x2F,//47 Set Asynchronous Balanced Mode
+            GSM0710_TYPE_SABM = 0x2F,//47 Set Asynchronous Balanced Mode
     GSM0710_TYPE_UA = 0x63,//99 Unnumbered Acknowledgement
     GSM0710_TYPE_DM = 0x0F,//15 Disconnected Mode
     GSM0710_TYPE_DISC = 0x43,//67 Disconnect
     GSM0710_TYPE_UIH = 0xEF,//239 Unnumbered information with header check
     GSM0710_TYPE_UI = 0x03,//3 Unnumbered Acknowledgement
     // control channel commands
-    GSM0710_CONTROL_PN = (0x80 | GSM0710_EA),//?? DLC parameter negotiation
+            GSM0710_CONTROL_PN = (0x80 | GSM0710_EA),//?? DLC parameter negotiation
     GSM0710_CONTROL_CLD = (0xC0 | GSM0710_EA),//193 Multiplexer close down
     GSM0710_CONTROL_PSC = (0x40 | GSM0710_EA),//??? Power Saving Control
     GSM0710_CONTROL_TEST = (0x20 | GSM0710_EA),//33 Test Command
@@ -44,7 +44,7 @@ enum class MuxDefines {
     GSM0710_CONTROL_SNC = (0xD0 | GSM0710_EA),//?? Service Negotiation Command
     // V.24 signals: flow control, ready to communicate, ring indicator,
     // data valid
-    GSM0710_SIGNAL_FC = 0x02,
+            GSM0710_SIGNAL_FC = 0x02,
     GSM0710_SIGNAL_RTC = 0x04,
     GSM0710_SIGNAL_RTR = 0x08,
     GSM0710_SIGNAL_IC = 0x40,//64
@@ -98,31 +98,41 @@ public:
 
     // some state
     // +CMUX=<mode>[,<subset>[,<port_speed>[,<N1>[,<T1>[,<N2>[,<T2>[,<T3>[,<k>]]]]]]]]
-    const static int cmux_mode = 0;
+    uint32_t cmux_mode = 0;
     const static int cmux_subset = 0;
     const static int cmux_port_speed = 5; //115200 baud rate
     const static int cmux_port_speed_default = 5; //115200 baud rate
-    const static int vir_ports = 3; /* number of virtual ports to create */
-    const static int cmux_N1 = 127; //lots of modem only support short frame, like quectel 2G modules
-    const static uint32_t cmux_FRAME = (cmux_N1 + 6); //lots of modem only support short frame, like quectel 2G modules
-    const static uint32_t QUECTEL_CACHE_FRAMES = 20;
-    const static uint32_t GSM0710_BUFFER_SIZE = (2 * QUECTEL_CACHE_FRAMES * cmux_FRAME);
+    uint32_t vir_ports = 3; /* number of virtual ports to create */
+    uint32_t cmux_N1 = 127; //lots of modem only support short frame, like quectel 2G modules
+    uint32_t cmux_FRAME = (cmux_N1 + 6); //lots of modem only support short frame, like quectel 2G modules
+    uint32_t QUECTEL_CACHE_FRAMES = 20;
+    uint32_t GSM0710_BUFFER_SIZE = (2 * QUECTEL_CACHE_FRAMES * cmux_FRAME);
 
-    unsigned char data[GSM0710_BUFFER_SIZE];
-    unsigned char *readp;
-    unsigned char *writep;
-    unsigned char *endp;
-    unsigned int datacount;
-    unsigned int max_count;
-    int flag_found;// set if last character read was flag
-    unsigned long received_count;
-    unsigned long dropped_count;
+    unsigned char* data = nullptr;
+    unsigned char *readp = nullptr;
+    unsigned char *writep = nullptr;
+    unsigned char *endp = nullptr;
+    unsigned int datacount = 0;
+    unsigned int max_count = 0;
+    int flag_found = 0;// set if last character read was flag
+    unsigned long received_count = 0;
+    unsigned long dropped_count = 0;
 
 
-    GSM0710Buffer() {
+    GSM0710Buffer(uint32_t virtualPortsCount, uint32_t frameSize=127, uint32_t mode=0) :
+            cmux_mode(mode),
+            vir_ports(virtualPortsCount),
+            cmux_N1(frameSize) {
+
+        data = static_cast<unsigned char*>(malloc(GSM0710_BUFFER_SIZE));
+
         writep = data;
         readp = data;
         endp = data + sizeof(data);
+    }
+
+    ~GSM0710Buffer(){
+        free(data);
     }
 
     inline uint32_t GetFreeSpace() {
@@ -141,11 +151,12 @@ public:
         }
     }
 
-    static inline bool GSM0710_FRAME_IS(MuxDefines type,GSM0710Frame* frame){
-        return (frame->control & ~static_cast<unsigned char>(MuxDefines::GSM0710_PF)) == static_cast<unsigned char>(type);
+    static inline bool GSM0710_FRAME_IS(MuxDefines type, GSM0710Frame *frame) {
+        return (frame->control & ~static_cast<unsigned char>(MuxDefines::GSM0710_PF)) ==
+               static_cast<unsigned char>(type);
     }
 
-    static inline bool GSM0710_COMMAND_IS(MuxDefines type,unsigned char frame){
+    static inline bool GSM0710_COMMAND_IS(MuxDefines type, unsigned char frame) {
         return (frame & ~static_cast<unsigned char>(MuxDefines::GSM0710_CR)) == static_cast<unsigned char>(type);
     }
 
@@ -154,7 +165,7 @@ public:
             int length);
 
 
-    GSM0710Frame*  GetCompleteFrame(GSM0710Frame*  frame);
+    GSM0710Frame *GetCompleteFrame(GSM0710Frame *frame);
 
 };
 

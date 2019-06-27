@@ -101,14 +101,23 @@ private:
 
     States state = States::MUX_STATE_OPENING;
 
-    std::unique_ptr<GSM0710Buffer> inputBuffer;
+    std::unique_ptr<GSM0710Buffer> inputBuffer=nullptr;
     std::vector<MuxChannel> channels;
 
     cpp_freertos::MutexStandard serOutMutex;
 
-    uint32_t virtualPortsCount = 4;
-    bool hardwareControlFlowEnable = false;
     int uih_pf_bit_received = 0;
+
+    /**
+     * Multiplexer configuration
+     */
+
+    uint32_t baudRate = 115200;
+    uint32_t virtualPortsCount = 7; // max number of virtual channels supported by EG25
+    uint32_t frameSize = 127; // default basic frame size, can be extended to max 32kBytes if needed
+    bool hardwareControlFlowEnable = false;
+    bool cmuxMode = false;
+
 
 
 };
