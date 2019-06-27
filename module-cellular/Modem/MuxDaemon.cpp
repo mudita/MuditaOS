@@ -19,12 +19,65 @@
 #include "task.h"
 
 constexpr unsigned char MuxDaemon::closeChannelCmd[];
+const uint32_t MuxDaemon::frameSize;
+const uint32_t MuxDaemon::virtualPortsCount;
+const bool MuxDaemon::cmuxMode;
+
+namespace QuectelBaudrates {
+
+    // Default value for 115200 key
+    template<uint32_t Key>
+    struct Baudrates {
+        static const int Value = 5;
+    };
+
+    template<>
+    struct Baudrates<115200> {
+        static const int Value = 5;
+    };
+
+    template<>
+    struct Baudrates<230400> {
+        static const int Value = 6;
+    };
+
+    template<>
+    struct Baudrates<460800> {
+        static const int Value = 7;
+    };
+
+    template<>
+    struct Baudrates<921600> {
+        static const int Value = 8;
+    };
+
+    template<>
+    struct Baudrates<1500000> {
+        static const int Value = 16;
+    };
+
+    template<>
+    struct Baudrates<2000000> {
+        static const int Value = 20;
+    };
+
+    template<>
+    struct Baudrates<3000000> {
+        static const int Value = 23;
+    };
+
+    template<>
+    struct Baudrates<4000000> {
+        static const int Value = 26;
+    };
+
+}
 
 
 MuxDaemon::MuxDaemon() {
     cellular = bsp::Cellular::Create();
     inSerialDataWorker = std::make_unique<InputSerialWorker>(this);
-    inputBuffer = std::make_unique<GSM0710Buffer>(virtualPortsCount,frameSize,cmuxMode);
+    inputBuffer = std::make_unique<GSM0710Buffer>(virtualPortsCount, frameSize, cmuxMode);
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -38,11 +91,13 @@ int MuxDaemon::Start() {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
         //We don't know in what cmux_mode modem currently is so send both types of closing signals
-        WriteMuxFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_CLD) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
-        WriteMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd), static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
+        WriteMuxFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_CLD) |
+                                  static_cast<unsigned char>(MuxDefines::GSM0710_CR));
+        WriteMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
+                      static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
         vTaskDelay(500); // give modem some time to establish mux
         // Try sending AT command once again
-        if (SendAT("AT\r\n", 500) == -1){
+        if (SendAT("AT\r\n", 500) == -1) {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             cellular->PowerUp();
@@ -64,10 +119,9 @@ int MuxDaemon::Start() {
 
 
     // Set up modem configuration
-    if(hardwareControlFlowEnable){
+    if (hardwareControlFlowEnable) {
         SendAT("AT+IFC=2,2\r\n", 500); // enable flow control function for module
-    }
-    else{
+    } else {
         SendAT("AT+IFC=0,0\r\n", 500); // disable flow control function for module
     }
 
@@ -83,6 +137,8 @@ int MuxDaemon::Start() {
     SendAT("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r\n", 500);
     // Route URCs to UART1
     SendAT("AT+QURCCFG=\"urcport\",\"uart1\"\r\n", 500);
+    // Turn on signal strength change URC
+    SendAT("AT+QINDCFG=\"csq\",1\r\n", 500);
 
 
     char gsm_command[128] = {};
@@ -90,7 +146,7 @@ int MuxDaemon::Start() {
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=1\r\n");
     } else {
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", cmuxMode,
-                 inputBuffer->cmux_subset, quectel_speeds[inputBuffer->cmux_port_speed],frameSize
+                 cmuxSubset, QuectelBaudrates::Baudrates<baudRate>::Value, frameSize
         );
     }
 
@@ -103,14 +159,14 @@ int MuxDaemon::Start() {
     inSerialDataWorker->Init();
 
     // Create virtual channels
-    channels.push_back(MuxChannel(this,0,"ControlChannel"));
-    channels.push_back(MuxChannel(this,1,"NotificationChannel"));
+    channels.push_back(MuxChannel(this, 0, "ControlChannel"));
+    channels.push_back(MuxChannel(this, 1, "NotificationChannel"));
     for (uint32_t i = 2; i < virtualPortsCount; ++i) {
-        channels.push_back(MuxChannel(this,i,("GenericChannel_" + std::to_string(i)).c_str()));
+        channels.push_back(MuxChannel(this, i, ("GenericChannel_" + std::to_string(i)).c_str()));
     }
 
     // Mux channels must be initialized in sequence
-    for(auto &w : channels){
+    for (auto &w : channels) {
         w.Open();
         vTaskDelay(200);
     }
@@ -128,7 +184,7 @@ int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
     char buff[256] = {0};
 
     auto bytesWritten = cellular->Write(const_cast<char *>(cmd), strlen(cmd));
-    LOG_DEBUG("BytesWritten: %d",bytesWritten);
+    LOG_DEBUG("BytesWritten: %d", bytesWritten);
 
     if (cellular->Wait(500)) {
 
@@ -177,7 +233,7 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
     }
 /* let's not use too big frames */
     length = std::min(inputBuffer->cmux_N1, static_cast<uint32_t >(length));
-    if (!inputBuffer->cmux_mode)//basic
+    if (!cmuxMode)//basic
     {
 /* Modified acording PATCH CRC checksum */
 /* postfix[0] = frame_calc_crc (prefix + 1, prefix_length - 1); */
@@ -215,10 +271,11 @@ ssize_t MuxDaemon::WriteSerialCache(unsigned char *input, size_t length) {
 
 int MuxDaemon::CloseMux() {
 
-    for (auto &w : channels) {
-        if (w.GetState() == MuxChannel::State::Opened) {
-            LOG_INFO("Logical channel %d closed", w.logicalNumber);
-            w.Close();
+    // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
+    for (auto w = channels.size(); --w;) {
+        if (channels[w].GetState() == MuxChannel::State::Opened) {
+            LOG_INFO("Logical channel %d closed", channels[w].logicalNumber);
+            channels[w].Close();
         }
     }
 

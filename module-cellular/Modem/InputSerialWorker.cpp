@@ -141,16 +141,15 @@ int InputSerialWorker::ExtractFrames() {
                 if (muxDaemon->channels[frame->channel].GetState() ==
                     MuxChannel::State::Opened) {//reopening, discard the data
 
-                    {
+/*                    {
                         // TODO:M.P distribute frame to virtual channel
                         char buff[256] = {0};
                         memcpy(buff, frame->data, frame->length);
                         write_result = frame->length;
                         LOG_DEBUG("Raw data: %s",buff);
-                    }
+                    }*/
 
-
-                    // write_result = pseudo_device_write(&channellist[frame->channel], frame->data, frame->length);
+                    write_result = muxDaemon->channels[frame->channel].Send(frame->data,frame->length);
                 } else {
                     LOG_INFO("channel %d closed, discard the frame", frame->channel);
                     write_result = frame->length;

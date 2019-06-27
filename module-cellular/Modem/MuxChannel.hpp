@@ -13,10 +13,17 @@
 #define PUREPHONE_MUXCHANNEL_HPP
 
 #include <string>
+#include <memory>
+#include "Mailbox.hpp"
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "task.h"
 
 class MuxDaemon;
 
-class MuxChannel {
+
+class MuxChannel : public cpp_freertos::Thread {
+
 public:
 
     enum class State{
@@ -24,11 +31,27 @@ public:
         Closed
     };
 
-    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,const char* name="Default");
+    struct MuxChannelMsg{
+
+        MuxChannelMsg(uint8_t* data,size_t size){
+            m_data = static_cast<uint8_t *>(malloc(size));
+            m_size = size;
+        }
+
+        ~MuxChannelMsg(){
+            free(m_data);
+        }
+
+        uint8_t* m_data;
+        size_t m_size;
+    };
+
+    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,const char* name="Default",uint32_t stackDepth=1024);
     virtual ~MuxChannel();
 
     int Open();
     int Close();
+    int Send(uint8_t* data, size_t size);
 
     std::string& GetName(){
         return name;
@@ -50,6 +73,12 @@ public:
 
 
 private:
+
+    void Run() override final;
+
+    Mailbox<std::shared_ptr<MuxChannelMsg>> workerMsgQueue;
+    bool enableRunLoop = false;
+
     std::string name;
     State state;
     MuxDaemon* mux;
