@@ -24,7 +24,7 @@ constexpr unsigned char MuxDaemon::closeChannelCmd[];
 MuxDaemon::MuxDaemon() {
     cellular = bsp::Cellular::Create();
     inSerialDataWorker = std::make_unique<InputSerialWorker>(this);
-    inputBuffer = std::make_unique<GSM0710Buffer>();
+    inputBuffer = std::make_unique<GSM0710Buffer>(virtualPortsCount,frameSize,cmuxMode);
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -40,7 +40,7 @@ int MuxDaemon::Start() {
         //We don't know in what cmux_mode modem currently is so send both types of closing signals
         WriteMuxFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_CLD) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
         WriteMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd), static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
-        vTaskDelay(500);
+        vTaskDelay(500); // give modem some time to establish mux
         // Try sending AT command once again
         if (SendAT("AT\r\n", 500) == -1){
             LOG_INFO("Starting power up procedure...");
@@ -71,8 +71,8 @@ int MuxDaemon::Start() {
         SendAT("AT+IFC=0,0\r\n", 500); // disable flow control function for module
     }
 
-    // Set fixed baudrate = 115200
-    SendAT("AT+IPR=115200\r", 500);
+    // Set fixed baudrate
+    SendAT(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 500);
     // Turn off local echo
     SendAT("ATE0\r", 500);
     // Route URCs to first MUX channel
@@ -86,11 +86,11 @@ int MuxDaemon::Start() {
 
 
     char gsm_command[128] = {};
-    if (inputBuffer->cmux_mode) {
+    if (cmuxMode) {
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=1\r\n");
     } else {
-        snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", inputBuffer->cmux_mode,
-                 inputBuffer->cmux_subset, quectel_speeds[inputBuffer->cmux_port_speed], inputBuffer->cmux_N1
+        snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", cmuxMode,
+                 inputBuffer->cmux_subset, quectel_speeds[inputBuffer->cmux_port_speed],frameSize
         );
     }
 
@@ -159,7 +159,7 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
     unsigned char postfix[2] = {0xFF, static_cast<unsigned char>(MuxDefines::GSM0710_FRAME_FLAG )};
     ssize_t prefix_length = 4;
     int c;
-    unsigned char tmp[GSM0710Buffer::cmux_FRAME];
+    unsigned char tmp[inputBuffer->cmux_FRAME];
 
     LOG_DEBUG("Sending frame to channel %d", channel);
 
@@ -176,8 +176,8 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
         uih_pf_bit_received = 0; //Reset the variable, so it is ready for next command
     }
 /* let's not use too big frames */
-    length = std::min(GSM0710Buffer::cmux_N1, length);
-    if (!GSM0710Buffer::cmux_mode)//basic
+    length = std::min(inputBuffer->cmux_N1, static_cast<uint32_t >(length));
+    if (!inputBuffer->cmux_mode)//basic
     {
 /* Modified acording PATCH CRC checksum */
 /* postfix[0] = frame_calc_crc (prefix + 1, prefix_length - 1); */

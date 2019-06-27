@@ -14,7 +14,6 @@
 #include "log/log.hpp"
 
 constexpr unsigned char GSM0710Buffer::crcTable[];
-const int GSM0710Buffer::cmux_N1;
 
 
 GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
@@ -49,7 +48,7 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
         if (frame != NULL)
         {
             frame->channel = ((*readp & 252) >> 2); /*frame header address-byte read*/
-            if (frame->channel > vir_ports ) /* Field Sanity check if channel ID actually exists */
+            if (frame->channel >= vir_ports ) /* Field Sanity check if channel ID actually exists */
             {
                 LOG_WARN("Dropping frame: Corrupt! Channel Addr. field indicated %d, which does not exist",frame->channel);
                 flag_found = 0;
