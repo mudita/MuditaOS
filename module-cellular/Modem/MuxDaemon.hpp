@@ -76,18 +76,6 @@ private:
         MUX_STATES_COUNT // keep this the last
     };
 
-    /*
-     * The following arrays must have equal length and the values must
-     * correspond. also it has to correspond to the gsm0710 spec regarding
-     * baud id of CMUX the command.
-     */
-    constexpr static int baud_rates[] = {
-            0, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600, 1500000, 2000000, 3000000, 4000000
-    };
-
-    constexpr static int quectel_speeds[] = {
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 20, 23, 26
-    };
 
     constexpr static unsigned char closeChannelCmd[] = {
             static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_CLD ) |
@@ -112,11 +100,13 @@ private:
      * Multiplexer configuration
      */
 
-    uint32_t baudRate = 115200;
-    uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
-    uint32_t frameSize = 127; // default basic frame size, can be extended to max 32kBytes if needed
-    bool hardwareControlFlowEnable = false;
-    bool cmuxMode = false;
+    const static uint32_t baudRate = 115200;
+    const static uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
+    const static uint32_t frameSize = 1024; // default basic frame size, can be extended to max 32kBytes if needed
+    const static bool hardwareControlFlowEnable = false;
+    const static bool cmuxMode = false;
+    const static uint32_t cmuxSubset = 0;
+
 
 
 

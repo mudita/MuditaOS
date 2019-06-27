@@ -99,9 +99,6 @@ public:
     // some state
     // +CMUX=<mode>[,<subset>[,<port_speed>[,<N1>[,<T1>[,<N2>[,<T2>[,<T3>[,<k>]]]]]]]]
     uint32_t cmux_mode = 0;
-    const static int cmux_subset = 0;
-    const static int cmux_port_speed = 5; //115200 baud rate
-    const static int cmux_port_speed_default = 5; //115200 baud rate
     uint32_t vir_ports = 3; /* number of virtual ports to create */
     uint32_t cmux_N1 = 127; //lots of modem only support short frame, like quectel 2G modules
     uint32_t cmux_FRAME = (cmux_N1 + 6); //lots of modem only support short frame, like quectel 2G modules
