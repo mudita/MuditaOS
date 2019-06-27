@@ -1,0 +1,84 @@
+#name of the profile
+example_profile
+#for each key following 4 variables must be defined
+#key code, in example 31 
+#true if key is cyclic or false otherwise
+#characters assigned to the key
+#timeouts for each of the characters. 0 means that there is no timeout
+#NumericKey1 = 31,
+31
+false
+''
+0
+#NumericKey2 = 32,
+32
+true
+'a','b','c'
+0,0,0
+#NumericKey3 = 33,
+33
+true
+'d','e','f'
+0,0,0
+#NumericKey4 = 41,
+41
+true
+'g','h','i'
+0,0,0
+#NumericKey5 = 42,
+42
+true
+'j','k','l'
+0,0,0
+#NumericKey6 = 43,
+43
+true
+'m','n','o'
+0
+#NumericKey7 = 51,
+51
+true
+'p','q','r','s'
+0,0,0,0
+#NumericKey8 = 52,
+52
+true
+'t','u','v'
+0,0,0
+#NumericKey9 = 53,
+53
+true
+'w','x','y','z'
+0,0,0,0
+#NumericKey0 = 62,
+62
+false
+' '
+0
+#NumericKeyAst = 61,
+31
+false
+0x08
+0
+#NumericKeyPnd = 63,
+31
+false
+0x0A
+0
+#JoystickLeft = 11,
+#JoystickRight = 13,
+#JoystickUp = 2,
+#JoystickDown = 22,
+#JoystickEnter = 12,
+#FnLeft = 21,//1,
+#FnRight = 23,//3,
+23
+false
+''
+2000
+#VolUp = 4,
+#VolDown = 14,
+#Torch = 24,
+#SSwitchUp = 34,
+#SSwitchDown = 54,
+#SSwitchMid = 44

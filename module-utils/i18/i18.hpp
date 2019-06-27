@@ -27,9 +27,9 @@ namespace utils {
 
     class LangLoader{
 
-        const char* langEN_path = "/assets/lang/lang_en.json";
-        const char* langPL_path = "/assets/lang/lang_pl.json";
-        const char* langSP_path = "/assets/lang/lang_sp.json";
+        const char* langEN_path = "sys/assets/lang/lang_en.json";
+        const char* langPL_path = "sys/assets/lang/lang_pl.json";
+        const char* langSP_path = "sys/assets/lang/lang_sp.json";
 
 
     public:

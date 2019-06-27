@@ -29,13 +29,12 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-set( SOURCES "Application.cpp" )
+set( SOURCES "Application.cpp" "windows/AppWindow.cpp" )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
-add_subdirectory( application-test )
 add_subdirectory( application-viewer )
 add_subdirectory( application-desktop )
 
@@ -64,6 +63,8 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
 
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/messages
+        ${CMAKE_CURRENT_SOURCE_DIR}/windows
 )
 
 

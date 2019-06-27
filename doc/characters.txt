@@ -1,5 +1,5 @@
 english and polish characters
-!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÓóĄąĆćĘęŁłŃńŹźŻż
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÓóĄąĆćĘęŁłŃńŹźŻżŚś
 
 homescreen clock characters
 0123456789:

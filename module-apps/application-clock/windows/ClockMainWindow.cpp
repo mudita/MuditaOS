@@ -13,6 +13,7 @@
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
+#include "gui/widgets/Progress.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 #include "gui/core/ImageManager.hpp"
 #include "../ClockData.hpp"
@@ -20,7 +21,7 @@
 
 namespace gui {
 
-ClockMainWindow::ClockMainWindow() : gui::Window("Main") {
+ClockMainWindow::ClockMainWindow( app::Application* app ) : gui::AppWindow( app, "Main") {
 
 	setSize( 480, 600 );
 
@@ -44,7 +45,8 @@ ClockMainWindow::ClockMainWindow() : gui::Window("Main") {
 	minuteLabel->setFillColor( gui::Color(10,0));
 	minuteLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	progressBar = new gui::Progress(this, 480/2-90+xOffset, 300-6+yOffset, 180, 12 );
+	uint32_t x= 480/2-90+xOffset, y= 300-6+yOffset, w = 180, h =12;
+	progressBar = new Progress(this, x, y, w, h  );
 	progressBar->setTotalProgress(59);
 	progressBar->setCurrentProgress(0);
 }

@@ -6,11 +6,11 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include <module-apps/application-desktop/windows/PinWindow.hpp>
+#include "PinWindow.hpp"
 
 namespace gui {
 
-PinWindow::PinWindow() : Window("PinWindow"){
+PinWindow::PinWindow( app::Application* app ) : AppWindow(app, "PinWindow"){
 	setSize( 480, 600 );
 
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );

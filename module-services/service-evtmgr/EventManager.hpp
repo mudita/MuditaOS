@@ -16,32 +16,9 @@
 
 #include "common.hpp"
 
-enum class KeyboardEvents{
-	keyPressed,
-	keyReleasedShort,
-	keyReleasedLong
-};
-
-
-class KbdMessage : public sys::DataMessage
-{
-public:
-	KbdMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
-	{
-		type = Type::Data;
-
-	}
-	sys::Message_t Execute(sys::Service* service) override;
-
-	KeyboardEvents keyState = static_cast< KeyboardEvents>(0);
-	bsp::KeyCodes keyCode = static_cast<bsp::KeyCodes>(0);
-	int keyPressTime = 0;
-	int keyRelaseTime = 0;
-};
-
 class EventManager: public sys::Service {
 protected:
-	sys::Worker* EventWorker;
+	sys::Worker* EventWorker = nullptr;
 	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
 	std::string targetApplication;
 public:

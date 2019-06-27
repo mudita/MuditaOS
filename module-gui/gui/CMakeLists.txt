@@ -4,6 +4,7 @@ include_directories( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}"
 		"${CMAKE_CURRENT_LIST_DIR}/core"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets"
+		"${CMAKE_CURRENT_LIST_DIR}/input"
 )
 
 target_include_directories( ${PROJECT_NAME}
@@ -12,6 +13,7 @@ target_include_directories( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}"
 		"${CMAKE_CURRENT_LIST_DIR}/core"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets"
+		"${CMAKE_CURRENT_LIST_DIR}/input"
 )
 
 target_sources(${PROJECT_NAME}

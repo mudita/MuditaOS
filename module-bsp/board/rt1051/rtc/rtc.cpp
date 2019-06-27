@@ -251,10 +251,13 @@ time_t BSP_RtcGetSecondCounter()
  *      *                                                                                                                             *
  *      *******************************************************************************************************************************
  */
+extern int irq;
 void SNVS_HP_WRAPPER_IRQHandler()
 {
+	irq+=1;
     if (SNVS_HP_RTC_GetStatusFlags(SNVS) & kSNVS_RTC_AlarmInterruptFlag)
     {
+
     	//TODO service function call
         //RtcAlarmIrqHandler();
         /* Clear alarm flag */
