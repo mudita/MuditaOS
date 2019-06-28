@@ -18,6 +18,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "NotificationMuxChannel.hpp"
+#include "ControlMuxChannel.hpp"
+#include "CommunicationMuxChannel.hpp"
+
 constexpr unsigned char MuxDaemon::closeChannelCmd[];
 const uint32_t MuxDaemon::frameSize;
 const uint32_t MuxDaemon::virtualPortsCount;
@@ -159,11 +163,15 @@ int MuxDaemon::Start() {
     inSerialDataWorker->Init();
 
     // Create virtual channels
-    channels.push_back(MuxChannel(this, 0, "ControlChannel"));
-    channels.push_back(MuxChannel(this, 1, "NotificationChannel"));
-    for (uint32_t i = 2; i < virtualPortsCount; ++i) {
-        channels.push_back(MuxChannel(this, i, ("GenericChannel_" + std::to_string(i)).c_str()));
-    }
+
+    // Control channel is used for controlling Mux. It is not cosindered as logical channel i.e it can't receive normal data messages
+    channels.push_back(ControlMuxChannel(this));
+
+    // Notificiation channel is used mainly for receiving URC messages and handling various async requests
+    channels.push_back(NotificationMuxChannel(this));
+
+    // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
+    channels.push_back(CommunicationMuxChannel(this));
 
     // Mux channels must be initialized in sequence
     for (auto &w : channels) {
@@ -171,12 +179,13 @@ int MuxDaemon::Start() {
         vTaskDelay(200);
     }
 
-
+    return 0;
 }
 
 int MuxDaemon::Exit() {
     inSerialDataWorker->Deinit();
     CloseMux();
+    return 0;
 }
 
 
@@ -266,7 +275,7 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
 ssize_t MuxDaemon::WriteSerialCache(unsigned char *input, size_t length) {
     //TODO: M.P implement actual caching
     cpp_freertos::LockGuard lock(serOutMutex);
-    cellular->Write(input, length);
+    return cellular->Write(input, length);
 }
 
 int MuxDaemon::CloseMux() {
@@ -274,12 +283,13 @@ int MuxDaemon::CloseMux() {
     // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
     for (auto w = channels.size(); --w;) {
         if (channels[w].GetState() == MuxChannel::State::Opened) {
-            LOG_INFO("Logical channel %d closed", channels[w].logicalNumber);
+            LOG_INFO("Logical channel %d closed", channels[w].GetChannelNumber());
             channels[w].Close();
         }
     }
 
     channels.clear();
+    return 0;
 }
 
 int MuxDaemon::memstr(const char *haystack, int length, const char *needle) {

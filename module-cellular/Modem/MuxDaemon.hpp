@@ -39,14 +39,14 @@ public:
 
     int Exit();
 
-private:
-
-    int SendAT(const char *cmd, uint32_t timeout);
-
     ssize_t WriteMuxFrame(int channel,
                           const unsigned char *input,
                           int length,
                           unsigned char type);
+
+private:
+
+    int SendAT(const char *cmd, uint32_t timeout);
 
     ssize_t WriteSerialCache(unsigned char *input, size_t length);
 
@@ -102,7 +102,7 @@ private:
 
     const static uint32_t baudRate = 115200;
     const static uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
-    const static uint32_t frameSize = 1024; // default basic frame size, can be extended to max 32kBytes if needed
+    const static uint32_t frameSize = 127; // default basic frame size, can be extended to max 32kBytes if needed
     const static bool hardwareControlFlowEnable = false;
     const static bool cmuxMode = false;
     const static uint32_t cmuxSubset = 0;

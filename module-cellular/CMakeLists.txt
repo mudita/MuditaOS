@@ -25,6 +25,9 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/InputSerialWorker.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/GSM0710.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxChannel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ControlMuxChannel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/NotificationMuxChannel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/CommunicationMuxChannel.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

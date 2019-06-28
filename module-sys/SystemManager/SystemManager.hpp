@@ -13,7 +13,7 @@
 #include "timer.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
-#include "Mailbox.hpp"
+#include "Service/Mailbox.hpp"
 #include "Service/Bus.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
