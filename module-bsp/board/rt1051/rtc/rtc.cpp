@@ -250,12 +250,12 @@ time_t BSP_RtcGetSecondCounter()
  *      *                                                                                                                             *
  *      *******************************************************************************************************************************
  */
-extern int irq;
+
 extern "C"
 {
 	void SNVS_HP_WRAPPER_IRQHandler()
 	{
-		irq+=1;
+
 		if (SNVS_HP_RTC_GetStatusFlags(SNVS) & kSNVS_RTC_AlarmInterruptFlag)
 		{
 

@@ -31,7 +31,6 @@
 #include "rtc/rtc.hpp"
 class vfs vfs;
 
-int irq = 0;
 
 
 class BlinkyService : public sys::Service {
@@ -64,7 +63,7 @@ public:
 
         time_t timestamp;
         BSP_RtcGetCurrentTimestamp(&timestamp);
-        LOG_DEBUG( "IRQ %d", irq );
+
 
 
     }
@@ -81,7 +80,7 @@ public:
 	    time.tm_min = 0;
  	    time.tm_sec = 0;
  	    BSP_RtcSetDateTime(&time);
- 	    1561608000;
+
 // 	    time_t timestamp = 1561608000;
 // 	    BSP_RtcSetDateTimeFromTimestamp(timestamp);
 
