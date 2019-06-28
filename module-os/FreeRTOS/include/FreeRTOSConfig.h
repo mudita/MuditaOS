@@ -56,7 +56,7 @@ extern uint32_t SystemCoreClock;
 #define configTICK_RATE_HZ                      ((TickType_t)1000)
 #define configMAX_PRIORITIES                    5
 #define configMINIMAL_STACK_SIZE                ((unsigned short)128)       //< Number of uint32_t's. So value of 128 will mean 512 bytes
-#define configMAX_TASK_NAME_LEN                 20
+#define configMAX_TASK_NAME_LEN                 64
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 1
 #define configUSE_TASK_NOTIFICATIONS            1

@@ -120,9 +120,11 @@ namespace bsp
     }
 
     ssize_t LinuxCellular::Read(void *buf, size_t nbytes) {
+
+        retry:
         auto ret = read(fd,buf,nbytes);
-        if(ret == -1){
-            std::cout << "Read returned error: " << strerror(errno) << "\n";
+        if((ret == -1) && (errno == EINTR)){
+            goto retry;
         }
         return ret;
     }

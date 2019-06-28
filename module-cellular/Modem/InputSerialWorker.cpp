@@ -26,12 +26,9 @@ void workerTaskFunction(void *ptr) {
         worker->muxDaemon->cellular->Wait(UINT32_MAX);
         if (worker->ReadIncomingData() > 0) {
             if (worker->muxDaemon->inputBuffer->GetDataLength() > 0) {
-                //TODO:M.P implement
+
                 if (worker->ExtractFrames()) {
-                    int vir_port = 1;
-/*                    for (vir_port = 1; vir_port <= vir_ports; vir_port++) {
-                        pseudo_device_write(&channellist[vir_port], NULL, 0); //flush all data to virtual port
-                    }*/
+                    //TODO:M.P implement error handling ?
                 }
 
                 if (worker->muxDaemon->inputBuffer->readp !=
@@ -141,14 +138,7 @@ int InputSerialWorker::ExtractFrames() {
                 if (muxDaemon->channels[frame->channel].GetState() ==
                     MuxChannel::State::Opened) {//reopening, discard the data
 
-/*                    {
-                        // TODO:M.P distribute frame to virtual channel
-                        char buff[256] = {0};
-                        memcpy(buff, frame->data, frame->length);
-                        write_result = frame->length;
-                        LOG_DEBUG("Raw data: %s",buff);
-                    }*/
-
+                    // Send received message to virtual channel for further processing
                     write_result = muxDaemon->channels[frame->channel].Send(frame->data,frame->length);
                 } else {
                     LOG_INFO("channel %d closed, discard the frame", frame->channel);

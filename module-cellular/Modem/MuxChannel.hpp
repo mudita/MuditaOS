@@ -14,15 +14,18 @@
 
 #include <string>
 #include <memory>
-#include "Mailbox.hpp"
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "task.h"
 
+void MuxChannelWorker(void* pvp);
+
 class MuxDaemon;
 
 
-class MuxChannel : public cpp_freertos::Thread {
+class MuxChannel {
+
+    friend void MuxChannelWorker(void* pvp);
 
 public:
 
@@ -31,27 +34,34 @@ public:
         Closed
     };
 
+    enum class MuxChannelType{
+        Control,
+        Notification,
+        Communication,
+        Network
+    };
+
+
     struct MuxChannelMsg{
 
-        MuxChannelMsg(uint8_t* data,size_t size){
-            m_data = static_cast<uint8_t *>(malloc(size));
-            m_size = size;
+        MuxChannelMsg(uint8_t* data,size_t size)
+        : m_data{data,data+size}{
+
         }
 
         ~MuxChannelMsg(){
-            free(m_data);
         }
 
-        uint8_t* m_data;
-        size_t m_size;
+        std::string m_data;
     };
 
-    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,const char* name="Default",uint32_t stackDepth=1024);
+    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,MuxChannelType type,const char* name="Default",uint32_t stackSize=1024,uint32_t queueSize=4);
     virtual ~MuxChannel();
 
     int Open();
     int Close();
     int Send(uint8_t* data, size_t size);
+    virtual int ParseInMessage(MuxChannelMsg* msg);
 
     std::string& GetName(){
         return name;
@@ -65,22 +75,27 @@ public:
         state = st;
     }
 
+    uint32_t GetChannelNumber(){
+        return static_cast<uint32_t >(type);
+    }
+
     int v24signals;
     int frameAllowed;
     int disc_ua_pending;
-    uint32_t logicalNumber;
-
-
 
 private:
+    uint32_t workerQueueSize;
+    uint32_t workerStackSize; // in bytes
 
-    void Run() override final;
+    TaskHandle_t workerHandle = nullptr;
+    QueueHandle_t workerQueueHandle = nullptr;
 
-    Mailbox<std::shared_ptr<MuxChannelMsg>> workerMsgQueue;
-    bool enableRunLoop = false;
 
-    std::string name;
     State state;
+    MuxChannelType type;
+
+protected:
+    std::string name;
     MuxDaemon* mux;
 
 };
