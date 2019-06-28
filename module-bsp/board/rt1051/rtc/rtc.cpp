@@ -185,7 +185,6 @@ RtcBspError_e BSP_RtcGetAlarmTimestamp(uint32_t* secs)
 RtcBspError_e BSP_RtcEnableAlarmIrq()
 {
     uint32_t cnt = 100000;
-
     SNVS->HPCR |= SNVS_HPCR_HPTA_EN_MASK;
     while ((!(SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK)) && cnt)
     {
@@ -252,25 +251,27 @@ time_t BSP_RtcGetSecondCounter()
  *      *******************************************************************************************************************************
  */
 extern int irq;
-void SNVS_HP_WRAPPER_IRQHandler()
+extern "C"
 {
-	irq+=1;
-    if (SNVS_HP_RTC_GetStatusFlags(SNVS) & kSNVS_RTC_AlarmInterruptFlag)
-    {
+	void SNVS_HP_WRAPPER_IRQHandler()
+	{
+		irq+=1;
+		if (SNVS_HP_RTC_GetStatusFlags(SNVS) & kSNVS_RTC_AlarmInterruptFlag)
+		{
 
-    	//TODO service function call
-        //RtcAlarmIrqHandler();
-        /* Clear alarm flag */
-        SNVS_HP_RTC_ClearStatusFlags(SNVS, kSNVS_RTC_AlarmInterruptFlag);
-    }
-/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-  exception return operation might vector to incorrect interrupt */
-#if defined __CORTEX_M && (__CORTEX_M == 4U)
-    __DSB();
-#endif
+			//TODO service function call
+		  //  RtcAlarmIrqHandler();
+			/* Clear alarm flag */
+			SNVS_HP_RTC_ClearStatusFlags(SNVS, kSNVS_RTC_AlarmInterruptFlag);
+		}
+	/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
+	  exception return operation might vector to incorrect interrupt */
+	#if defined __CORTEX_M && (__CORTEX_M == 4U)
+		__DSB();
+	#endif
+	}
+
 }
-
-
 /*
  *  **********************************************************************************************************************
  *  *                                                                                                                    *

@@ -32,6 +32,8 @@
 class vfs vfs;
 
 int irq = 0;
+
+
 class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string& name)
@@ -76,13 +78,17 @@ public:
 	    time.tm_mon = 5;
 	    time.tm_mday = 26;
 	    time.tm_hour = 9;
-	    time.tm_min = 40;
+	    time.tm_min = 0;
  	    time.tm_sec = 0;
- 	    //BSP_RtcSetDateTime(&time);
- 	    time_t timestamp = 1561608042;
- 	    BSP_RtcSetDateTimeFromTimestamp(timestamp);
+ 	    BSP_RtcSetDateTime(&time);
+ 	    1561608000;
+// 	    time_t timestamp = 1561608000;
+// 	    BSP_RtcSetDateTimeFromTimestamp(timestamp);
 
- 	   BSP_RtcSetAlarmInSecondsFromNow(30);
+ 	   LOG_DEBUG("RTC alarm enabled");
+
+ 	   time.tm_sec = 15;
+ 	   BSP_RtcSetAlarmOnDate(&time);
 
         return sys::ReturnCodes::Success;
     }
