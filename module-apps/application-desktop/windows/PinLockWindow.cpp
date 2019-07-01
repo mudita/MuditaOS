@@ -15,6 +15,8 @@
 
 #include "PinLockWindow.hpp"
 
+#include "../ApplicationDesktop.hpp"
+
 namespace gui {
 
 PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockWindow"){
@@ -129,17 +131,6 @@ void PinLockWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* d
 
 	//change kbd profile to home_screen
 	application->setKeyboardProfile("home_screen");
-	if( mode == ShowMode::GUI_SHOW_INIT ) {
-	}
-
-	//erase previous charcters and set count of entered characters to 0
-	bottomBar->setActive( BottomBar::Side::CENTER, false );
-	charCount = 0;
-	for( uint32_t i=0; i<4; i++ ) {
-		charValue[i] = 0;
-		pinLabels[i]->setText("");
-	}
-
 	//set state
 	setVisibleState( state );
 }
@@ -173,6 +164,13 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				if( (state == State::EnteringPin) && (charCount == 4)) {
 
 					//TODO make pin chacking here, currentyly it always fails
+					if( application->getSettings().lockPassHash == (1000*charValue[0]+100*charValue[1]+10*charValue[2]+charValue[3] ) ) {
+						remainingAttempts = maxPasswordAttempts;
+						app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+						app->setScreenLocked(false);
+						application->switchWindow("MainWindow", 0, nullptr );
+						return true;
+					}
 
 					if( remainingAttempts == 1 ) {
 						state = State::PhoneBlocked;
@@ -195,7 +193,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				//fill next field with star and store value in array
 				if( charCount < 4 ) {
 					pinLabels[charCount]->setText("*");
-					charValue[charCount] = inputEvent.keyChar;
+					charValue[charCount] = inputEvent.keyChar-'0';
 					charCount++;
 
 					//if 4 char has been entered show bottom bar confirm

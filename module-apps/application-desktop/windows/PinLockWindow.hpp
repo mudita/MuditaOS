@@ -18,6 +18,7 @@
 namespace gui {
 
 class PinLockWindow: public AppWindow {
+	const uint32_t maxPasswordAttempts = 4;
 	enum class State {
 		EnteringPin,
 		WrongPinInfo,
@@ -30,7 +31,7 @@ class PinLockWindow: public AppWindow {
 	gui::Label* pinLabels[4] = { nullptr, nullptr, nullptr, nullptr };
 	gui::Image* lockImage = nullptr;
 	gui::Image* infoImage = nullptr;
-	uint32_t remainingAttempts = 4;
+	uint32_t remainingAttempts = maxPasswordAttempts;
 	//code of the entered character on specified position
 	uint32_t charValue[4] = {0};
 	//flag defines number of entered characters
