@@ -7,23 +7,26 @@
  * @details
  */
 
-#include "windows/PinWindow.hpp"
 #include "windows/DesktopMainWindow.hpp"
 
 #include "Application.hpp"
 #include "ApplicationDesktop.hpp"
 
 #include "MessageType.hpp"
+#include "windows/PinLockWindow.hpp"
 
 
 namespace app {
 
 ApplicationDesktop::ApplicationDesktop(std::string name) :
-	Application( name ) {
+	Application( name, 8192 ) {
 }
 
 ApplicationDesktop::~ApplicationDesktop() {
 }
+
+uint32_t ApplicationDesktop::getMisseedCalls() {return missedCalls; }
+uint32_t ApplicationDesktop::getUnreadMessages() { return unreadMessages; }
 
 // Invoked upon receiving data message
 sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
@@ -78,7 +81,7 @@ void ApplicationDesktop::createUserInterface() {
 	window = new gui::DesktopMainWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 
-	window = new gui::PinWindow(this);
+	window = new gui::PinLockWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 

@@ -13,9 +13,10 @@
 #include <functional>
 
 #include "KeyEvent.hpp"
-#include "../Common.hpp"
-#include "../core/DrawCommand.hpp"
-#include "../core/BoundingBox.hpp"
+#include "Common.hpp"
+#include "core/DrawCommand.hpp"
+#include "core/BoundingBox.hpp"
+#include "input/InputEvent.hpp"
 #include "Layout.hpp"
 #include "Navigation.hpp"
 
@@ -39,7 +40,7 @@ public:
 	typedef bool (*focusChangedCallback_t)(Item&);
 	typedef bool (*activatedCallback_t)(Item&, void* data );
 	typedef void (*dimensionChangedCallback_t)(Item&);
-	typedef bool (*inputCallback_t)(Item&, const KeyEvent& keyEvent );
+	typedef bool (*inputCallback_t)(Item&, const InputEvent& inputEvent );
 
 	//flag that informs whether item has a focus
 	bool focus;
@@ -108,7 +109,7 @@ public:
 
 	virtual bool onFocus( bool state ) { focus = state; return true; };
 	virtual bool onActivated( void* data ) { return false; };
-	virtual bool onInput( const KeyEvent& key ) { return false; };
+	virtual bool onInput( const InputEvent& inputEvent ) { return false; };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
 
 	virtual bool addWidget( Item* item );
