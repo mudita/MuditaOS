@@ -18,7 +18,7 @@
 
 
 #include "keyboard/keyboard.hpp"
-
+#include "battery-charger/battery_charger.hpp"
 
 #include "bsp_eink.h"
 
@@ -75,15 +75,15 @@ namespace bsp {
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INOKB_PIN)) {
-                //TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerINOKB_IRQHandler();
+            	//TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerINOKB_IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {
-                //TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerWCINOKB_IRQHandler();
+            	//TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerWCINOKB_IRQHandler();
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
-                //TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerINTB_IRQHandler();
+            	//TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerINTB_IRQHandler();
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN)) {

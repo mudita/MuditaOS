@@ -44,7 +44,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/i2c.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/irq/irq_gpio.cpp"
 
-
+		
+		
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/board.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/clock_config.c"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pin_mux.c"
@@ -52,7 +53,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/startup_mimxrt1052.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/system_MIMXRT1051.c"
 
-
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/battery-charger/battery_charger.cpp"
         CACHE INTERNAL ""
         )
 
