@@ -7,18 +7,13 @@
 
 #include "rtc/rtc.hpp"
 #include "fsl_snvs_hp.h"
-//#include "log.h"
-//#include "alarm_service.h"
 #include <time.h>
 
 #include "FreeRTOS.h"
 
 static  snvs_hp_rtc_config_t    s_rtcConfig;
-
 static uint32_t SNVS_HP_ConvertDatetimeToSeconds(const snvs_hp_rtc_datetime_t *datetime);
-
 static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datetime_t *datetime);
-
 
 RtcBspError_e BSP_RtcInit()
 {
@@ -29,7 +24,6 @@ RtcBspError_e BSP_RtcInit()
     /* Enable at the NVIC */
     NVIC_EnableIRQ(SNVS_HP_WRAPPER_IRQn);
 
-    //BSP_RtcEnableAlarmIrq();
     // Start the timer
     SNVS_HP_RTC_StartTimer(SNVS);
     return RtcBspOK;
@@ -181,10 +175,10 @@ RtcBspError_e BSP_RtcGetAlarmTimestamp(uint32_t* secs)
     *secs = SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
     return RtcBspOK;
 }
-
+static const uint32_t irqTimeout = 100000;
 RtcBspError_e BSP_RtcEnableAlarmIrq()
 {
-    uint32_t cnt = 100000;
+    uint32_t cnt = irqTimeout;
     SNVS->HPCR |= SNVS_HPCR_HPTA_EN_MASK;
     while ((!(SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK)) && cnt)
     {
@@ -201,7 +195,7 @@ RtcBspError_e BSP_RtcEnableAlarmIrq()
 
 RtcBspError_e BSP_RtcDisableAlarmIrq()
 {
-    uint32_t cnt = 100000;
+    uint32_t cnt = irqTimeout;
 
     SNVS->HPCR &= ~SNVS_HPCR_HPTA_EN_MASK;
     while ((SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK) && cnt)
@@ -264,11 +258,11 @@ extern "C"
 			/* Clear alarm flag */
 			SNVS_HP_RTC_ClearStatusFlags(SNVS, kSNVS_RTC_AlarmInterruptFlag);
 		}
-	/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
-	  exception return operation might vector to incorrect interrupt */
-	#if defined __CORTEX_M && (__CORTEX_M == 4U)
-		__DSB();
-	#endif
+		/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
+		  exception return operation might vector to incorrect interrupt */
+		#if defined __CORTEX_M && (__CORTEX_M == 4U)
+			__DSB();
+		#endif
 	}
 
 }
@@ -281,13 +275,11 @@ extern "C"
  *  *                                                                                                                    *
  *  **********************************************************************************************************************
  */
-
-#define SECONDS_IN_A_DAY (86400U)
-#define SECONDS_IN_A_HOUR (3600U)
-#define SECONDS_IN_A_MINUTE (60U)
-#define DAYS_IN_A_YEAR (365U)
-#define YEAR_RANGE_START (1970U)
-#define YEAR_RANGE_END (2099U)
+static const uint32_t SECONDS_IN_A_DAY = 86400;
+static const uint32_t SECONDS_IN_A_HOUR = 3600;
+static const uint32_t SECONDS_IN_A_MINUTE = 60;
+static const uint32_t DAYS_IN_A_YEAR = 365;
+static const uint32_t YEAR_RANGE_START = 1970;
 
 static uint32_t SNVS_HP_ConvertDatetimeToSeconds(const snvs_hp_rtc_datetime_t *datetime)
 {
@@ -389,6 +381,3 @@ static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datet
 
     datetime->day = days;
 }
-
-
-
