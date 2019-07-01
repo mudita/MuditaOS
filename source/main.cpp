@@ -28,6 +28,8 @@
 
 #include "SystemManager/SystemManager.hpp"
 
+#include "battery-charger/battery_charger.hpp"
+
 class vfs vfs;
 
 class BlinkyService : public sys::Service {
@@ -35,9 +37,9 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(100,true);
+        timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
-
+        BSP_BatteryChargerInit();
     }
 
     ~BlinkyService(){
@@ -52,7 +54,12 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
+
+        uint16_t val;
+        BSP_FuelGaugeRead(BSP_FUEL_GAUGE_RepCap_REG, &val);
+        LOG_INFO("Current capacity: %d", val);
     }
+
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override{
@@ -85,7 +92,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
