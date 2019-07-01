@@ -64,6 +64,7 @@ target_include_directories( ${PROJECT_NAME}
 		"${CMAKE_SOURCE_DIR}/"
 		"${CMAKE_SOURCE_DIR}/bsp"
 		"${CMAKE_SOURCE_DIR}/bsp/keyboard"
+		"${CMAKE_SOURCE_DIR}/bsp/rtc"
 		"${CMAKE_SOURCE_DIR}/module-services/"  
 )
 
