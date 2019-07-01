@@ -95,6 +95,8 @@ public:
 	sys::ReturnCodes InitHandler() override;
 	void setActiveWindow( const std::string& windowName );
 
+	void setKeyboardProfile( const std::string& profile );
+
 	SettingsRecord& getSettings() {
 		return settings;
 	}

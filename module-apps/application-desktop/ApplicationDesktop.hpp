@@ -18,6 +18,9 @@ namespace app {
  *
  */
 class ApplicationDesktop : public Application {
+protected:
+	uint32_t unreadMessages = 0;
+	uint32_t missedCalls = 0;
 public:
 	ApplicationDesktop( std::string name="ApplicationDesktop");
 	virtual ~ApplicationDesktop();
@@ -29,6 +32,9 @@ public:
 
 	void createUserInterface() ;
 	void destroyUserInterface();
+
+	uint32_t getMisseedCalls();
+	uint32_t getUnreadMessages();
 };
 
 class ApplicationDesktopLauncher : public ApplicationLauncher {

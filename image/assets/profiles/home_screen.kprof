@@ -51,26 +51,34 @@ false
 '0'
 0
 #NumericKeyAst = 61,
-31
+61
 false
 '*'
 0
 #NumericKeyPnd = 63,
-31
+63
 false
 '#'
-0
+3000
 #JoystickLeft = 11,
 #JoystickRight = 13,
 #JoystickUp = 2,
 #JoystickDown = 22,
 #JoystickEnter = 12,
+12
+false
+0x0D
+0
 #FnLeft = 21,//1,
+21
+false
+''
+0
 #FnRight = 23,//3,
 23
 false
 ''
-2000
+0
 #VolUp = 4,
 #VolDown = 14,
 #Torch = 24,

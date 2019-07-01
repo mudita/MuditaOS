@@ -1,35 +1,29 @@
 /*
- * @file ApplicationDesktop.cpp
+ * @file ApplicationCall.cpp
  * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 18 cze 2019
+ * @date 1 lip 2019
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-#include "windows/DesktopMainWindow.hpp"
-
 #include "Application.hpp"
-#include "ApplicationDesktop.hpp"
 
 #include "MessageType.hpp"
-#include "windows/PinLockWindow.hpp"
+#include "windows/CallMainWindow.hpp"
+#include "windows/EnterNumberWindow.hpp"
 
-
+#include "ApplicationCall.hpp"
 namespace app {
 
-ApplicationDesktop::ApplicationDesktop(std::string name) :
+ApplicationCall::ApplicationCall(std::string name) :
 	Application( name, 8192 ) {
 }
 
-ApplicationDesktop::~ApplicationDesktop() {
+ApplicationCall::~ApplicationCall() {
 }
 
-uint32_t ApplicationDesktop::getMisseedCalls() {return missedCalls; }
-uint32_t ApplicationDesktop::getUnreadMessages() { return unreadMessages; }
-
 // Invoked upon receiving data message
-sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	auto retMsg = Application::DataReceivedHandler(msgl);
 	//if message was handled by application's template there is no need to process further.
@@ -48,7 +42,7 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
 }
 
 // Invoked during initialization
-sys::ReturnCodes ApplicationDesktop::InitHandler() {
+sys::ReturnCodes ApplicationCall::InitHandler() {
 
 	auto ret = Application::InitHandler();
 	if( ret != sys::ReturnCodes::Success )
@@ -61,32 +55,32 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 	return ret;
 }
 
-sys::ReturnCodes ApplicationDesktop::DeinitHandler() {
+sys::ReturnCodes ApplicationCall::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationDesktop::WakeUpHandler() {
+sys::ReturnCodes ApplicationCall::WakeUpHandler() {
 	return sys::ReturnCodes::Success;
 }
 
 
-sys::ReturnCodes ApplicationDesktop::SleepHandler() {
+sys::ReturnCodes ApplicationCall::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-void ApplicationDesktop::createUserInterface() {
+void ApplicationCall::createUserInterface() {
 
 	gui::Window* window = nullptr;
 
-	window = new gui::DesktopMainWindow(this);
+	window = new gui::CallMainWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 
-	window = new gui::PinLockWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
+	window = new gui::EnterNumberWindow(this);
+	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 }
 
 
-void ApplicationDesktop::destroyUserInterface() {
+void ApplicationCall::destroyUserInterface() {
 }
 
 } /* namespace gui */
