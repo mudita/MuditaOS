@@ -38,7 +38,7 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(1000,true);
+        timer_id = CreateTimer(100,true);
         ReloadTimer(timer_id);
     }
 
@@ -53,41 +53,11 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-
-
         LOG_DEBUG("Blinky service tick!");
-
-        struct tm time;
-        BSP_RtcGetCurrentDateTime(&time);
-        LOG_DEBUG("Time hour: %d, min: %d, sec: %d", time.tm_hour, time.tm_min, time.tm_sec);
-
-        time_t timestamp;
-        BSP_RtcGetCurrentTimestamp(&timestamp);
-
-
-
     }
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override{
-
-    	BSP_RtcInit();
-        struct tm time;
-	    time.tm_year = 119;
-	    time.tm_mon = 5;
-	    time.tm_mday = 26;
-	    time.tm_hour = 9;
-	    time.tm_min = 0;
- 	    time.tm_sec = 0;
- 	    BSP_RtcSetDateTime(&time);
-
-// 	    time_t timestamp = 1561608000;
-// 	    BSP_RtcSetDateTimeFromTimestamp(timestamp);
-
- 	   LOG_DEBUG("RTC alarm enabled");
-
- 	   time.tm_sec = 15;
- 	   BSP_RtcSetAlarmOnDate(&time);
 
         return sys::ReturnCodes::Success;
     }
@@ -118,7 +88,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+//    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
