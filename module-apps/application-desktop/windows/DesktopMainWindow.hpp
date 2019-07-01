@@ -31,9 +31,10 @@ protected:
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;
 	gui::Label* dayMonth = nullptr;
-	gui::Image* confirmArrow = nullptr;
-	gui::Image* dots[4] = {  nullptr, nullptr, nullptr, nullptr };
-
+	gui::Label* notificationCalls = nullptr;
+	gui::Label* notificationMessages = nullptr;
+	gui::Image* callsImage = nullptr;
+	gui::Image* messagesImage = nullptr;
 	/**
 	 * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
 	 */
@@ -47,9 +48,15 @@ protected:
 	 */
 	bool enterPressed = false;
 	/**
-	 * Flag informs whether window has been unlocked
+	 * Flag informs whether window  has been unlocked
 	 */
 	bool screenLocked = true;
+	/**
+	 * Flag that defines if pin window should be displayed
+	 */
+	bool pinLockScreen = true;
+	//method hides or show widgets and sets bars according to provided state
+	void setVisibleState();
 public:
 	DesktopMainWindow( app::Application* app );
 	virtual ~DesktopMainWindow();

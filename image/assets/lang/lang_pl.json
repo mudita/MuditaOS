@@ -1,5 +1,7 @@
 {
     "common_open": "OTWÓRZ",
+    "common_confirm": "POTWIERDŹ",
+    "common_ok": "DALEJ",
     "common_back": "WRÓĆ",
     "common_set": "USTAW",
     "common_switch": "ZMIEŃ",
@@ -15,6 +17,13 @@
     "app_desktop_unlock": "ODBLOKUJ",
     "app_desktop_lock": "ZABLOKUJ",
     "app_desktop_menu": "MENU",
+    "app_desktop_emergency": "ALARMOWE",
+    "app_desktop_pin_lock": "Wprowadź hasło",
+    "app_desktop_pin_info1": "Błędne hasło",
+    "app_desktop_pin_info2": "Pozostało prób",
+    "app_desktop_pin_blocked1": "Telefon zablokowany",
+    "app_desktop_unread_messages": "nieprzeczytane wiadomości",
+    "app_desktop_missed_calls": "nieodebrane połączenia",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"

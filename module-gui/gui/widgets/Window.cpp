@@ -79,7 +79,7 @@ std::list<DrawCommand*> Window::buildDrawList() {
 
 
 bool Window::onInput( const InputEvent& inputEvent) {
-	bool res;
+	bool res = false;
 	if( focusItem != nullptr )
 		res =  focusItem->onInput(inputEvent);
 

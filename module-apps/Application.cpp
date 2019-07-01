@@ -203,7 +203,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
-		currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
+		//currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
 		render( msg->getMode() );
 	}
 
@@ -234,6 +234,10 @@ void Application::setActiveWindow( const std::string& windowName ) {
 		currentWindow = it->second;
 		acceptInput = true;
 	}
+}
+
+void Application::setKeyboardProfile( const std::string& profile ) {
+	translator->setProfile( profile );
 }
 
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {

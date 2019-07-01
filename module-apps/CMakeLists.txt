@@ -37,6 +37,7 @@ add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
 add_subdirectory( application-viewer )
 add_subdirectory( application-desktop )
+add_subdirectory( application-call )
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )
@@ -55,8 +56,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-
-
 
 target_include_directories(${PROJECT_NAME}
 

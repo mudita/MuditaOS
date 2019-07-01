@@ -65,7 +65,8 @@ public:
 	uint32_t timeout = 0;
 
 	InputEvent() {};
-	InputEvent( const State& state, const uint32_t& code, const uint32_t& key, const uint32_t& pressTime, const uint32_t& releaseTime, bool cycle, uint32_t timeout = 0 );
+	InputEvent( const State& state, const uint32_t& code, const uint32_t& key,
+			const uint32_t& pressTime, const uint32_t& releaseTime, bool cycle, uint32_t timeout = 0 );
 	virtual ~InputEvent(){};
 
 	std::string to_string() const{

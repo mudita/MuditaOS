@@ -70,11 +70,15 @@ false
 0x0D
 0
 #FnLeft = 21,//1,
+21
+false
+''
+0
 #FnRight = 23,//3,
 23
 false
 ''
-2000
+0
 #VolUp = 4,
 #VolDown = 14,
 #Torch = 24,
