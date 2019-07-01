@@ -46,10 +46,10 @@ DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"M
 	dayMonth->setFilled( false );
 	dayMonth->setBorderColor( gui::ColorNoColor );
 	dayMonth->setFont("gt_pressura_light_18");
-	dayMonth->setText("");
+	dayMonth->setText("01 Jan");
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
-	notificationCalls = new gui::Label(this, 86, 255, 190, 42 );
+	notificationCalls = new gui::Label(this, 86, 255, 390, 42 );
 	notificationCalls->setFilled( false );
 	notificationCalls->setBorderColor( gui::ColorNoColor );
 	notificationCalls->setFont("gt_pressura_light_24");
@@ -57,7 +57,7 @@ DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"M
 	notificationCalls->setText(calls);
 	notificationCalls->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	notificationMessages = new gui::Label(this, 86, 330, 190, 42 );
+	notificationMessages = new gui::Label(this, 86, 330, 390, 42 );
 	notificationMessages->setFilled( false );
 	notificationMessages->setBorderColor( gui::ColorNoColor );
 	notificationMessages->setFont("gt_pressura_light_24");
