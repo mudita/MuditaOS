@@ -18,6 +18,9 @@ typedef enum
     RtcBspError
 } RtcBspError_e;
 
+/*
+ * RTC functions are using FreeRTOS functions, RTC should be initialized after scheduler starts.
+ * */
 RtcBspError_e BSP_RtcInit();
 
 RtcBspError_e BSP_RtcEnableAlarmIrq();
