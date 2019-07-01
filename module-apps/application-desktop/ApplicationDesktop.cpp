@@ -54,6 +54,12 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 	if( ret != sys::ReturnCodes::Success )
 		return ret;
 
+	//if value of the pin hash is different than 0 it means that home screen is pin protected
+	if( settings.lockPassHash ) {
+		pinLocked = true;
+		screenLocked = true;
+	}
+
 	createUserInterface();
 
 	setActiveWindow("MainWindow");
@@ -85,6 +91,17 @@ void ApplicationDesktop::createUserInterface() {
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 
+bool ApplicationDesktop::getScreenLocked() {
+	return screenLocked;
+}
+
+bool ApplicationDesktop::getPinLocked() {
+	return pinLocked;
+}
+
+void ApplicationDesktop::setScreenLocked( bool val ) {
+	screenLocked = val;
+};
 
 void ApplicationDesktop::destroyUserInterface() {
 }
