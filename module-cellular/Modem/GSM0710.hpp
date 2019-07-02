@@ -94,6 +94,17 @@ class GSM0710Buffer {
             0x2C, 0x5E, 0xCF,
     };
 
+    enum class State{
+        SearchForNewFrame,
+        ParseFrameHeader,
+        ParseFramePayload
+    };
+
+    State state = State ::SearchForNewFrame;
+    size_t lengthNeeded = 5;// channel, type, length, fcs, flag
+    uint8_t fcs = 0xff;
+    std::unique_ptr<GSM0710Frame> currentFrame;
+
 public:
 
     // some state
@@ -121,6 +132,8 @@ public:
             vir_ports(virtualPortsCount),
             cmux_N1(frameSize) {
 
+        currentFrame = std::make_unique<GSM0710Frame>();
+
         data = static_cast<unsigned char*>(malloc(GSM0710_BUFFER_SIZE));
 
         writep = data;
@@ -147,6 +160,13 @@ public:
             readp = data;
         }
     }
+
+    inline void Update(unsigned char* rdp, unsigned int count){
+        readp = rdp;
+        datacount -= count;
+    }
+
+
 
     static inline bool GSM0710_FRAME_IS(MuxDefines type, GSM0710Frame *frame) {
         return (frame->control & ~static_cast<unsigned char>(MuxDefines::GSM0710_PF)) ==

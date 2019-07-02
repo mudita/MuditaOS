@@ -31,17 +31,18 @@ void workerTaskFunction(void *ptr) {
                     //TODO:M.P implement error handling ?
                 }
 
+/*                //TODO:M.P sth broken here
                 if (worker->muxDaemon->inputBuffer->readp !=
                     worker->muxDaemon->inputBuffer->data) { //relayout data in cache_buf
                     if (worker->muxDaemon->inputBuffer->GetDataLength()) {
-                        //LOGMUX(LOG_DEBUG, "memmove(0, %ld, %d)", (long)(serial_p->in_buf->readp - serial_p->in_buf->data), gsm0710_buffer_length(serial_p->in_buf));
+                        LOG_DEBUG("memmove(0, %ld, %d)", (long)(worker->muxDaemon->inputBuffer->readp - worker->muxDaemon->inputBuffer->data), worker->muxDaemon->inputBuffer->GetDataLength());
                         memmove(worker->muxDaemon->inputBuffer->data, worker->muxDaemon->inputBuffer->readp,
                                 worker->muxDaemon->inputBuffer->GetDataLength());
                     }
                     worker->muxDaemon->inputBuffer->readp = worker->muxDaemon->inputBuffer->data;
                     worker->muxDaemon->inputBuffer->writep =
                             worker->muxDaemon->inputBuffer->data + worker->muxDaemon->inputBuffer->GetDataLength();
-                }
+                }*/
             }
         }
     }

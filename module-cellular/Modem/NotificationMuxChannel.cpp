@@ -30,7 +30,7 @@ int NotificationMuxChannel::ParseInMessage(MuxChannel::MuxChannelMsg *msg) {
     if (msg->m_data.find("RING") != std::string::npos) {
         //TODO:M.P incoming call URC action
         LOG_DEBUG((name + ": incoming call...").c_str());
-        char* resp = "ATA\r\n";
+        char* resp = "AT\r";
         mux->WriteMuxFrame(GetChannelNumber(), reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
     }
 
@@ -40,9 +40,15 @@ int NotificationMuxChannel::ParseInMessage(MuxChannel::MuxChannelMsg *msg) {
         LOG_DEBUG((name + ": incoming call...").c_str());
     }
 
+    // Call aborted/failed
+    if (msg->m_data.find("NO CARRIER") != std::string::npos) {
+        //TODO:M.P handle it
+        LOG_DEBUG((name + ": call failed/aborted").c_str());
+    }
+
     // Received new SMS
-    if (msg->m_data.find("+CMT: ") != std::string::npos) {
+    if (msg->m_data.find("+CMTI: ") != std::string::npos) {
         //TODO:M.P handle new SMS
-        LOG_DEBUG((name + ": received new SMS").c_str());
+        LOG_DEBUG((name + ": received new SMS: " + msg->m_data).c_str());
     }
 }
