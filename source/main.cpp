@@ -39,7 +39,7 @@ public:
     {
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
-        BSP_BatteryChargerInit();
+        bsp::battery_Init();
     }
 
     ~BlinkyService(){
@@ -56,7 +56,7 @@ public:
         LOG_DEBUG("Blinky service tick!");
 
         uint16_t val;
-        BSP_FuelGaugeRead(BSP_FUEL_GAUGE_RepCap_REG, &val);
+        bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepCap_REG, &val);
         LOG_INFO("Current capacity: %d", val);
     }
 
