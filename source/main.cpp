@@ -55,8 +55,8 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(5000,true);
-        //ReloadTimer(timer_id);
+        timer_id = CreateTimer(3000,true);
+        ReloadTimer(timer_id);
 
         muxdaemon = std::make_unique<MuxDaemon>();
 /*        modem.reset();
@@ -83,6 +83,9 @@ public:
         //auto msg = std::make_shared<sys::DataMessage>(500);
         //sys::Bus::SendUnicast(msg,"Blinky",this);
         LOG_DEBUG("Blinky service tick!");
+
+        char* resp = "AT\r";
+        //muxdaemon->WriteMuxFrame(1, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
     }
 
     // Invoked during initialization

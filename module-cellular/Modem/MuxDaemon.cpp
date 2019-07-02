@@ -142,17 +142,22 @@ int MuxDaemon::Start() {
     // Route URCs to UART1
     SendAT("AT+QURCCFG=\"urcport\",\"uart1\"\r\n", 500);
     // Turn on signal strength change URC
-    SendAT("AT+QINDCFG=\"csq\",1\r\n", 500);
+   // SendAT("AT+QINDCFG=\"csq\",1\r\n", 500);
+    // Set Message format to Text
+    SendAT("AT+CMGF=1\r", 500);
+
+
 
 
     char gsm_command[128] = {};
-    if (cmuxMode) {
+    snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=0\r\n");
+/*    if (cmuxMode) {
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=1\r\n");
     } else {
         snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", cmuxMode,
                  cmuxSubset, QuectelBaudrates::Baudrates<baudRate>::Value, frameSize
         );
-    }
+    }*/
 
     // Start CMUX multiplexer
     SendAT(gsm_command, 500);
@@ -164,7 +169,7 @@ int MuxDaemon::Start() {
 
     // Create virtual channels
 
-    // Control channel is used for controlling Mux. It is not cosindered as logical channel i.e it can't receive normal data messages
+    // Control channel is used for controlling Mux. It is not considered as logical channel i.e it can't receive normal data messages
     channels.push_back(ControlMuxChannel(this));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
@@ -228,8 +233,15 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
 
     LOG_DEBUG("Sending frame to channel %d", channel);
 
-/* GSM0710_EA=1, Command, let's add address */
-    prefix[1] = prefix[1] | ((63 & (unsigned char) channel) << 2);
+    if(type & static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH)){
+        prefix[1] &= ~static_cast<unsigned char>(MuxDefines::GSM0710_CR);
+        prefix[1] = prefix[1] | ((63 & (unsigned char) channel) << 2);
+    }
+    else{
+        /* GSM0710_EA=1, Command, let's add address */
+        prefix[1] = prefix[1] | ((63 & (unsigned char) channel) << 2);
+    }
+
 /* let's set control field */
     prefix[2] = type;
     if ((type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH) ||
