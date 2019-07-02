@@ -13,6 +13,8 @@
 #include "WorkerEvent.hpp"
 #include "messages/EVMessages.hpp"
 
+#include "vfs.hpp"
+
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
