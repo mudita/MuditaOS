@@ -93,9 +93,13 @@ int SystemStart(sys::SystemManager* sysmgr)
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
+    //launcher for viewer
+    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
+	applications.push_back( std::move(viewerLauncher) );
+
     //launcher for desktop application
-    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
-    applications.push_back( std::move(viewerLauncher) );
+    std::unique_ptr<app::ApplicationLauncher> desktopLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
+    applications.push_back( std::move(desktopLauncher) );
 
     //start application manager
    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );

@@ -7,14 +7,16 @@
  * @details
  */
 
-#include "windows/DesktopMainWindow.hpp"
+
 
 #include "Application.hpp"
-#include "ApplicationDesktop.hpp"
 
 #include "MessageType.hpp"
+#include "windows/DesktopMainWindow.hpp"
 #include "windows/PinLockWindow.hpp"
+#include "windows/MenuWindow.hpp"
 
+#include "ApplicationDesktop.hpp"
 
 namespace app {
 
@@ -88,6 +90,9 @@ void ApplicationDesktop::createUserInterface() {
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 
 	window = new gui::PinLockWindow(this);
+	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
+
+	window = new gui::MenuWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 

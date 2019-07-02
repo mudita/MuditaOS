@@ -24,6 +24,16 @@
     "app_desktop_pin_blocked1": "Telefon zablokowany",
     "app_desktop_unread_messages": "nieprzeczytane wiadomości",
     "app_desktop_missed_calls": "nieodebrane połączenia",
+    "app_desktop_menu_phonebook": "KONTAKTY",
+    "app_desktop_menu_messages": "WIADOMOŚCI",
+    "app_desktop_menu_calendar": "KALENDARZ",
+    "app_desktop_menu_music": "MUZYKA",
+    "app_desktop_menu_notes": "NOTATKI",
+    "app_desktop_menu_alarm": "ALARMY",
+    "app_desktop_menu_meditation": "MEDYTACJA",
+    "app_desktop_menu_calculator": "KALKULATOR",
+    "app_desktop_menu_settings": "USTAWIENIA",
+    "app_desktop_menu_title": "Główne Menu",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
