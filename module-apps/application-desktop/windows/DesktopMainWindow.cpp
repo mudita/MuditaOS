@@ -126,8 +126,11 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 	}
 	else {
+		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+			application->switchWindow( "MenuWindow", 0, nullptr );
+		}
 		//lock screen if it was unlocked
-		if( (inputEvent.keyCode == KeyCode::KEY_PND) && (inputEvent.state == InputEvent::State::keyReleasedLong ) ) {
+		else if( (inputEvent.keyCode == KeyCode::KEY_PND) && (inputEvent.state == InputEvent::State::keyReleasedLong ) ) {
 			app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 			app->setScreenLocked(true);
 			screenLocked = true;

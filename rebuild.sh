@@ -20,11 +20,12 @@ MODULE_GUI_DIR="../module-gui"
 if [ -d "$MODULE_GUI_DIR" ]; then
 	
 	echo "Found module-gui, copying assets."
-	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
-	cp -R "../image/Luts.bin" "sys"
+#	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
+	cp -R ../image/* sys
+#	cp -R "../image/Luts.bin" "sys"
 	cp -R "../image/module-apps/application-viewer/viewerStates.txt" "sys"
 	#language profiles
-	cp -R "../image/assets" "sys"
+#	cp -R "../image/assets" "sys"
 fi
 
 #first parameter specifies platform, by default it is Linux
