@@ -97,7 +97,7 @@ int MuxChannel::Close() {
 }
 
 
-int MuxChannel::Send(uint8_t *data, size_t size) {
+int MuxChannel::DistributeMsg(uint8_t *data, size_t size) {
 
     MuxChannelMsg *msg = new MuxChannelMsg(data, size);
     xQueueSend(workerQueueHandle, &msg, 500);

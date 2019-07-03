@@ -86,8 +86,8 @@ GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {
                     //caused if we would expect a long frame because of an
                     //error in length field.
                     volatile uint32_t err =0;
-                    //Inc();
-                    currentFrame->length += 1;
+                    Inc();
+                    currentFrame->length += (*readp*128); /*Frame header 2nd length-byte read*/
                     fcs = crcTable[fcs ^ *readp];
                 }
 
