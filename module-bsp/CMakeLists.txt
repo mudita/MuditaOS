@@ -18,7 +18,6 @@ endif ()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/keyboard/keyboard.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
         )
 

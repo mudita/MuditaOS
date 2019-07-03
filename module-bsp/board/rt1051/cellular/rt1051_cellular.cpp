@@ -188,7 +188,7 @@ namespace bsp {
         DisableRx();
     }
 
-    uint32_t RT1051Cellular::Write(void *buf, size_t nbytes) {
+    ssize_t RT1051Cellular::Write(void *buf, size_t nbytes) {
         lpuart_transfer_t sendXfer;
         sendXfer.data = static_cast<uint8_t *>(buf);
         sendXfer.dataSize = nbytes;
@@ -219,7 +219,7 @@ namespace bsp {
         return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
     }
 
-    ssize_t RT1051Cellular::Wait(uint32_t timeout) {
+    uint32_t RT1051Cellular::Wait(uint32_t timeout) {
         if (blockedTaskHandle != nullptr) {
             LOG_FATAL("Wait called simultaneously from more than one thread!");
             return 0;
