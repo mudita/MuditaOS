@@ -20,14 +20,12 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
 
 //module-bsp
 #include "bsp.hpp"
 #include "vfs.hpp"
 #include "keyboard/keyboard.hpp"
-
-//module-cellular
-#include "Modem/MuxDaemon.hpp"
 
 #include "SystemManager/SystemManager.hpp"
 
@@ -38,20 +36,13 @@ class vfs vfs;
 
 class BlinkyService : public sys::Service {
 
+
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
         timer_id = CreateTimer(3000,true);
         ReloadTimer(timer_id);
-
-        muxdaemon = std::make_unique<MuxDaemon>();
-/*        modem.reset();
-        modem = std::make_unique<Modem>();*/
-
-        muxdaemon->Start();
-
-       // muxdaemon.reset();
     }
 
     ~BlinkyService(){
@@ -70,7 +61,7 @@ public:
         LOG_DEBUG("Blinky service tick!");
 
         char* resp = "ATI\r";
-        muxdaemon->WriteMuxFrame(1, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+        //muxdaemon->WriteMuxFrame(1, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
     }
 
     // Invoked during initialization
@@ -104,15 +95,16 @@ int SystemStart(sys::SystemManager* sysmgr)
 /*    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);*/
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);*/
+    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
     //launcher for desktop application
-    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
-    applications.push_back( std::move(viewerLauncher) );
+    //std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
+    //applications.push_back( std::move(viewerLauncher) );
 
     //start application manager
     //ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
