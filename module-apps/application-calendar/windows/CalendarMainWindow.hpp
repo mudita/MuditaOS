@@ -9,19 +9,20 @@
 #ifndef MODULE_APPS_APPLICATION_CALENDAR_WINDOWS_CALENDARMAINWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_CALENDAR_WINDOWS_CALENDARMAINWINDOW_HPP_
 
-#include "gui/widgets/Window.hpp"
+#include "windows/AppWindow.hpp"
+#include "Application.hpp"
 
 namespace app {
 
 /*
  *
  */
-class CalendarMainWindow: public gui::Window {
+class CalendarMainWindow: public gui::AppWindow {
 protected:
 	//labels with names of the days
 //	gui::Label days;
 public:
-	CalendarMainWindow( std::string name );
+	CalendarMainWindow( Application* app, std::string name );
 	virtual ~CalendarMainWindow();
 };
 

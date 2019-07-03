@@ -1,0 +1,87 @@
+#name of the profile
+home_screen
+#NumericKey1 = 31,
+31
+false
+'1'
+0
+#NumericKey2 = 32,
+32
+false
+'2'
+0
+#NumericKey3 = 33,
+33
+false
+'3'
+0
+#NumericKey4 = 41,
+41
+false
+'4'
+0
+#NumericKey5 = 42,
+42
+false
+'5'
+0
+#NumericKey6 = 43,
+43
+false
+'6'
+0
+#NumericKey7 = 51,
+51
+false
+'7'
+0
+#NumericKey8 = 52,
+52
+false
+'8'
+0
+#NumericKey9 = 53,
+53
+false
+'9'
+0
+#NumericKey0 = 62,
+62
+false
+'0'
+0
+#NumericKeyAst = 61,
+61
+false
+'*'
+0
+#NumericKeyPnd = 63,
+63
+false
+'#'
+3000
+#JoystickLeft = 11,
+#JoystickRight = 13,
+#JoystickUp = 2,
+#JoystickDown = 22,
+#JoystickEnter = 12,
+12
+false
+0x0D
+0
+#FnLeft = 21,//1,
+21
+false
+''
+0
+#FnRight = 23,//3,
+23
+false
+''
+0
+#VolUp = 4,
+#VolDown = 14,
+#Torch = 24,
+#SSwitchUp = 34,
+#SSwitchDown = 54,
+#SSwitchMid = 44

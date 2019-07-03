@@ -1,11 +1,10 @@
 target_sources( ${PROJECT_NAME}
 
-	PRIVATE
+	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Alignment.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BottomBar.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Image.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Item.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/KeyEvent.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Label.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ListItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ListItemProvider.cpp"
@@ -17,12 +16,12 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Window.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayout.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Layout.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BottomBar.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Image.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Item.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/KeyEvent.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Label.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ListItem.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ListItemProvider.hpp"
@@ -34,5 +33,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Window.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BoxLayout.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Layout.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/TopBar.hpp"
 )
 

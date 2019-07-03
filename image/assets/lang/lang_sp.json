@@ -1,0 +1,31 @@
+{
+    "common_open": "ABIERTA",
+    "common_confirm": "CONFIRMAR",
+    "common_ok": "OK",
+    "common_back": "ATRÁS",
+    "common_set": "CONJUNTO",
+    "common_switch": "CAMBIAR",
+    "common_options": "OPCIONES",
+    "common_monday": "Lunes",
+    "common_tuesday": "Martes",
+    "common_wendesday": "Miércoles",
+    "common_thursday": "Jueves",
+    "common_friday": "Viernes",
+    "common_saturday": "Sábado",
+    "common_sunday": "Domingo",
+
+    "app_desktop_unlock": "DESBLOQUEAR",
+    "app_desktop_lock": "BLOQUEAR",
+    "app_desktop_menu": "MENÚ",
+    "app_desktop_menu": "EMERGENCIA",
+    "app_desktop_pin_lock": "Enter passcode",
+    "app_desktop_pin_info1": "Wrong passcode",
+    "app_desktop_pin_info2": "Allowed unlock attempts",
+    "app_desktop_pin_blocked1": "Sorry, phone blocked",
+    "app_desktop_unread_messages": "unread messages",
+    "app_desktop_missed_calls": "missed calls",
+
+    "settings_lang_PL": "PL",
+    "settings_lang_ENG": "ENG"
+
+}

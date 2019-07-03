@@ -82,7 +82,7 @@ public:
 
 	//virtual methods from Item
 	std::list<DrawCommand*> buildDrawList() override;
-	bool onInput( const KeyEvent& key ) override;
+	bool onInput( const InputEvent& inputEvent ) override;
 	bool onActivated( void* data ) override ;
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 };

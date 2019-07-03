@@ -10,7 +10,8 @@
 
 #include <list>
 #include "Item.hpp"
-#include "../Common.hpp"
+#include "Common.hpp"
+#include "SwitchData.hpp"
 
 namespace gui {
 
@@ -35,14 +36,14 @@ public:
 	 */
 //	virtual bool onDatabaseMessage( const dbus_msg_t* msg );
 	//mode is respons
-	virtual void onBeforeShow( ShowMode mode, uint32_t command, void* data, uint32_t dataSize );
+	virtual void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data  );
 	virtual void getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h );
 	virtual void setFocusItem( Item* item );
 	virtual int getWindowID() {return windowID; };
-
+	virtual bool handleSwitchData( SwitchData* data );
 
 	//virtual methods from Item
-	bool onInput( const KeyEvent& key ) override;
+	bool onInput( const InputEvent& inputEvent ) override;
 	std::list<DrawCommand*> buildDrawList() override;
 	std::string getName() { return name; };
 };

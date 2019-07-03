@@ -50,10 +50,13 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink/eink_binarization_luts.c"
 
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/rt1051_keyboard.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/cellular/rt1051_cellular.cpp"
 
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/rt1051_keyboard.cpp"
+
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/rtc/rtc.cpp"
         CACHE INTERNAL ""
         )
 

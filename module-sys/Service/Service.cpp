@@ -111,6 +111,30 @@ void Service::DeleteTimer(uint32_t id)
 
 }
 
+// Set period
+void Service::setTimerPeriod(uint32_t id,uint32_t period)
+{
+	auto it = std::find_if(timersList.begin(),timersList.end(),[&] (std::unique_ptr<ServiceTimer>const &s) { return s->GetId() == id; });
+	if(it == timersList.end()){
+		// not found, error
+	}
+	else{
+        (*it)->SetPeriod(period,0);
+	}
+}
+
+// Set period
+void Service::stopTimer(uint32_t id)
+{
+	auto it = std::find_if(timersList.begin(),timersList.end(),[&] (std::unique_ptr<ServiceTimer>const &s) { return s->GetId() == id; });
+	if(it == timersList.end()){
+		// not found, error
+	}
+	else{
+        (*it)->Stop(0);
+	}
+}
+
 void Service::CloseHandler(){
 
     // Stop currently active timers
@@ -121,6 +145,7 @@ void Service::CloseHandler(){
     enableRunLoop = false;
 
 };
+
 
 
 

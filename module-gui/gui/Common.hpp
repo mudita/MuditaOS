@@ -90,6 +90,11 @@ enum class RectangleFlatFlags {
 	GUI_RECT_FLAT_BOTTOM_RIGHT   = 0x08
 };
 
+typedef uint32_t (*timeSecondsFunctionPtr)();
+
+uint32_t getTime();
+void setTimeFunction( timeSecondsFunctionPtr fptr );
+
 }
 
 #endif /* MIDDLEWARES_GUI_WIDGETS_COMMON_HPP_ */

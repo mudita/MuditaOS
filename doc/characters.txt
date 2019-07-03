@@ -1,0 +1,9 @@
+english and polish characters
+font sizes: 16,18, 24, 65 light, regular and bold
+!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_ `abcdefghijklmnopqrstuvwxyz{|}~ÓóĄąĆćĘęŁłŃńŹźŻżŚś
+
+homescreen clock characters
+sizes: 84, light, regular, bold
+0123456789:
+
+call entering screec has font size 42
