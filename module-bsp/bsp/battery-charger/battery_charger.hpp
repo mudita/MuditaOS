@@ -83,6 +83,14 @@ enum class batteryChargerRegisters{
 	VFRemCap_REG = 0x004A,
 	QH_REG = 0x004D,
 };
+
+	enum class batteryRetval{
+		battery_OK = 0,
+		battery_ChargerError,
+		battery_ChargerNotCharging,
+		battery_ChargerCharging
+	};
+
 	int battery_Init();
 
 	int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
@@ -96,6 +104,7 @@ enum class batteryChargerRegisters{
 	int battery_chargerTopControllerWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
 
 	int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value);
+
 
 }
 

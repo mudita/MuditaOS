@@ -58,6 +58,13 @@ public:
         uint16_t val;
         bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepCap_REG, &val);
         LOG_INFO("Current capacity: %d", val);
+        bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepSOC_REG, &val);
+        uint16_t percent = val & 0xff00;
+        percent = percent >> 8;
+        LOG_INFO("Current percent: %d", percent);
+        bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::VCELL_REG, &val);
+        float voltage = (float) val * 0.078125;
+        LOG_INFO("Current percent: %d", (uint32_t)voltage);
     }
 
 
