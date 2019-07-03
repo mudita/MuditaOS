@@ -140,7 +140,7 @@ int InputSerialWorker::ExtractFrames() {
                     MuxChannel::State::Opened) {//reopening, discard the data
 
                     // Send received message to virtual channel for further processing
-                    write_result = muxDaemon->channels[frame->channel].Send(frame->data,frame->length);
+                    write_result = muxDaemon->channels[frame->channel].DistributeMsg(frame->data,frame->length);
                 } else {
                     LOG_INFO("channel %d closed, discard the frame", frame->channel);
                     write_result = frame->length;
