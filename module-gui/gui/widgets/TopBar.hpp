@@ -15,6 +15,8 @@
 namespace gui {
 
 class TopBar: public Rect {
+	static const uint32_t signalOffset;
+	static const uint32_t batteryOffset;
 public:
 	enum class Elements {
 		SIGNAL = 0x01,

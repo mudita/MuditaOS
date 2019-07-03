@@ -19,6 +19,8 @@ namespace app {
  *
  */
 class ApplicationCall: public Application {
+protected:
+	std::string phoneNumber;
 public:
 	ApplicationCall( std::string name="ApplicationCall");
 	virtual ~ApplicationCall();
@@ -30,12 +32,14 @@ public:
 
 	void createUserInterface() ;
 	void destroyUserInterface();
+	void setDisplayedNumber( std::string num );
+	const std::string& getDisplayedNumber();
 
 	/**
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.
 	*/
-   static bool messageRegisterApplication( sys::Service* sender, const bool& status );
+//   static bool messageRegisterApplication( sys::Service* sender, const bool& status );
 };
 
 class ApplicationCallLauncher : public ApplicationLauncher {

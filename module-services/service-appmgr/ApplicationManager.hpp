@@ -74,6 +74,7 @@ class ApplicationManager: public sys::Service {
 //	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
 	bool handleCloseConfirmation( APMConfirmClose* msg );
 	bool handleSwitchConfirmation( APMConfirmSwitch* msg );
+	bool handleSwitchPrevApplication( APMSwitchPrevApp* msg );
 	bool handleRegisterApplication( APMRegister* msg );
 	bool startApplication( const std::string& appName );
 public:
@@ -113,7 +114,7 @@ public:
     /**
      * @brief Allows requesting Application Manager to run previous application.
      */
-    static bool messageSwitchPreviousApplication( sys::Service* sender, const std::string& prevAppName );
+    static bool messageSwitchPreviousApplication( sys::Service* sender );
     /**
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.

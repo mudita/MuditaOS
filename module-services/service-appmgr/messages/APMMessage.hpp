@@ -56,8 +56,12 @@ public:
 };
 
 class APMSwitchPrevApp : public APMMessage {
+	std::unique_ptr<gui::SwitchData> data;
 public:
-	APMSwitchPrevApp( const std::string& name ) : APMMessage( MessageType::APMSwitchPrevApp, name ) {}
+	APMSwitchPrevApp( const std::string& name, std::unique_ptr<gui::SwitchData> data = nullptr) :
+		APMMessage( MessageType::APMSwitchPrevApp, name ),
+		data{ std::move(data) } {}
+	std::unique_ptr<gui::SwitchData>& getData() { return data; };
 };
 
 class APMConfirmSwitch : public APMMessage {
@@ -87,7 +91,7 @@ protected:
 	std::string application;
 public:
 	APMDelayedClose( const std::string& senderName, std::string application  ) :
-	APMMessage( MessageType::APMRegister, senderName ),
+	APMMessage( MessageType::APMDeleydClose, senderName ),
 	application{ application } {}
 
 	const std::string& getApplication() { return application; };
