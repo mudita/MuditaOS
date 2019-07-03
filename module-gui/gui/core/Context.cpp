@@ -34,8 +34,8 @@ Context::~Context() {
 Context* Context::get( int16_t gx, int16_t gy, uint16_t width, uint16_t height ) {
 	Context* retContext = new Context( width, height );
 
-	retContext->x = x;
-	retContext->y = y;
+	retContext->x = gx;
+	retContext->y = gy;
 
 	//create bounding boxes for the current context and return context
 	BoundingBox currentBox = BoundingBox( 0, 0, w, h );
@@ -66,6 +66,30 @@ void Context::insert( int16_t ix, int16_t iy, Context* context ) {
 	//if boxes overlap copy part defined by result from current context to the new context.
 	if( BoundingBox::intersect( currentBox, insertBox, resultBox ) ) {
 		uint32_t sourceOffset = (resultBox.y - iy)*context->w + (resultBox.x-ix);
+		uint32_t destOffset = (resultBox.y)*w + (resultBox.x);
+		for( int32_t h=0; h<resultBox.h; h++) {
+			memcpy( data + destOffset, context->data + sourceOffset, resultBox.w );
+			sourceOffset += context->w;
+			destOffset += w;
+		}
+	}
+}
+
+void Context::insertArea( int16_t ix, int16_t iy, int16_t iareaX, int16_t iareaY, int16_t iareaW, int16_t iareaH, Context* context ) {
+	//create bounding boxes for the current context and return context
+	BoundingBox currentBox = BoundingBox( 0, 0, w, h );
+	BoundingBox insertBox = BoundingBox( ix, iy, iareaW, iareaH );
+	BoundingBox resultBox;
+
+	//if boxes overlap copy part defined by result from current context to the new context.
+	if( BoundingBox::intersect( currentBox, insertBox, resultBox ) ) {
+		int16_t xBoxOffset = 0;
+		int16_t yBoxOffset = 0;
+		if( iareaX < 0 )
+			xBoxOffset = iareaX;
+		if( iareaY < 0 )
+			yBoxOffset = iareaY;
+		uint32_t sourceOffset = (resultBox.y - iy - yBoxOffset )*context->w + (resultBox.x-ix - xBoxOffset) ;
 		uint32_t destOffset = (resultBox.y)*w + (resultBox.x);
 		for( int32_t h=0; h<resultBox.h; h++) {
 			memcpy( data + destOffset, context->data + sourceOffset, resultBox.w );

@@ -12,38 +12,23 @@
 #ifndef PUREPHONE_KEYBOARD_HPP
 #define PUREPHONE_KEYBOARD_HPP
 
-#include <functional>
 #include <stdint.h>
 
-
 #include "common.hpp"
-
-
-
-#include "service-kbd/WorkerEvent.hpp"
-
-#if defined(TARGET_RT1051)
-
-#include "keyboard/key_codes.hpp"
-
-#elif defined(TARGET_Linux)
-#include "keyboard/key_codes.hpp"
-    //TODO:M.P insert Linux specific headers here
-#else
-#error "Unsupported target"
-#endif
-
+#include "service-evtmgr/WorkerEvent.hpp"
+#include "key_codes.hpp"
 
 namespace bsp {
 
-    class keyboard {
-    public:
+	void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code);
 
-        RetCode Init(WorkerEvent* worker);
-        RetCode DeInit();
+	int32_t keyboard_Init(xQueueHandle qHandle);
 
-    };
+	int32_t keyboard_Deinit(void);
 
+	BaseType_t keyboard_IRQHandler(void);
+
+	BaseType_t keyboard_right_functional_IRQHandler(void);
 }
 
 

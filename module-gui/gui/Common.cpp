@@ -10,6 +10,8 @@
 
 namespace gui {
 
+static timeSecondsFunctionPtr timeSecondsFunction = nullptr;
+
 bool operator&( const gui::RectangleEdgeFlags& lhs, const gui::RectangleEdgeFlags& rhs ) {
 	return static_cast<uint32_t>(lhs) & static_cast<uint32_t>(rhs);
 }
@@ -22,6 +24,16 @@ RectangleEdgeFlags operator|( const RectangleEdgeFlags& lhs, const RectangleEdge
 RectangleEdgeFlags operator|=( RectangleEdgeFlags& lhs, const RectangleEdgeFlags& rhs ) {
 	lhs = lhs | rhs;
 	return lhs;
+}
+
+uint32_t getTime() {
+	if( timeSecondsFunction != nullptr )
+		return timeSecondsFunction();
+	return 0;
+}
+
+void setTimeFunction( timeSecondsFunctionPtr fptr ) {
+	timeSecondsFunction = fptr;
 }
 
 } //namespace gui

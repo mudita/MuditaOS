@@ -14,6 +14,8 @@
 //module-gui
 #include "ApplicationViewer.hpp"
 
+#include "service-appmgr/ApplicationManager.hpp"
+
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
@@ -23,7 +25,8 @@
 //module-utils
 #include "log/log.hpp"
 //module-services
-#include "service-kbd/EventManager.hpp"
+#include "service-evtmgr/EventManager.hpp"
+#include "service-evtmgr/messages/EVMessages.hpp"
 //MessageType
 #include "MessageType.hpp"
 //this module
@@ -41,13 +44,27 @@ ApplicationViewer::~ApplicationViewer() {
 // Invoked upon receiving data message
 sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage* msgl) {
 
-	//if keyboard message receivedz
+	auto retMsg = Application::DataReceivedHandler(msgl);
+	//if message was handled by application's template there is no need to process further.
+	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
+		sys::ReturnCodes::Success ) ){
+		return retMsg;
+	}
+
+	//this variable defines whether message was processed.
+	bool handled = false;
+	//if keyboard message received
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
-		KbdMessage* msg = static_cast<KbdMessage*>(msgl);
+		sevm::KbdMessage* msg = static_cast<sevm::KbdMessage*>(msgl);
 		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
 
-		if( msg->keyState == KeyboardEvents::keyReleasedShort ) {
+		if( msg->keyState == sevm::KeyboardEvents::keyReleasedShort ) {
+			if( msg->keyCode == bsp::KeyCodes::JoystickLeft ) {
+				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationClock", "", nullptr );
+			}
+
+
  			uint32_t oldState = currentState;
 			images[currentState]->setVisible(false);
 			if( msg->keyCode == bsp::KeyCodes::FnLeft ) {
@@ -66,10 +83,14 @@ sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage* msgl) {
 				else
 					render(gui::RefreshModes::GUI_REFRESH_FAST );
 			}
+			handled = true;
 		}
 	}
 
-	return std::make_shared<sys::ResponseMessage>( );
+	if( handled )
+		return std::make_shared<sys::ResponseMessage>();
+	else
+		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
     // Invoked when timer ticked
@@ -80,6 +101,10 @@ void ApplicationViewer::TickHandler(uint32_t id) {
 
 // Invoked during initialization
 sys::ReturnCodes ApplicationViewer::InitHandler() {
+
+	auto ret = Application::InitHandler();
+	if( ret != sys::ReturnCodes::Success )
+		return ret;
 
 	//load all states from file
 	auto file =  vfs.fopen("sys/viewerStates.txt","r");
@@ -132,9 +157,9 @@ sys::ReturnCodes ApplicationViewer::InitHandler() {
 
 	setActiveWindow("Main");
 
-	render(gui::RefreshModes::GUI_REFRESH_DEEP );
+//	render(gui::RefreshModes::GUI_REFRESH_DEEP );
 
-	return sys::ReturnCodes::Success;
+	return ret;
 }
 
 sys::ReturnCodes ApplicationViewer::DeinitHandler() {

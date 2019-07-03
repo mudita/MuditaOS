@@ -25,15 +25,19 @@ Window::Window( std::string name, uint32_t id ) :
 Window::~Window() {
 }
 
-void Window::onBeforeShow( ShowMode mode, uint32_t command, void* data, uint32_t dataSize ) {
-
+void Window::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 }
+
 void Window::getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h ) {
 	x = widgetArea.x;
 	y = widgetArea.y;
 	w = widgetArea.w;
 	h = widgetArea.h;
 	mode = refreshMode;
+}
+
+bool Window::handleSwitchData( SwitchData* data ) {
+	return true;
 }
 
 void Window::setFocusItem( Item* item ) {
@@ -74,18 +78,18 @@ std::list<DrawCommand*> Window::buildDrawList() {
 //}
 
 
-bool Window::onInput( const KeyEvent& key ) {
-	bool res;
+bool Window::onInput( const InputEvent& inputEvent) {
+	bool res = false;
 	if( focusItem != nullptr )
-		res =  focusItem->onInput(key);
+		res =  focusItem->onInput(inputEvent);
 
 	if( res )
 		return true;
 	//if focused item didn't handle the key event and it was navigation key
 	//check if moving focus is possible
 	gui::Item* newFocusItem = nullptr;
-	if( !res && key.keyState == KeyState::KEY_RELEASED_SHORT ) {
-		switch( key.keyCode ) {
+	if( !res && inputEvent.state == InputEvent::State::keyReleasedShort ) {
+		switch( inputEvent.keyCode ) {
 		case KeyCode::KEY_LEFT:
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);
 			break;

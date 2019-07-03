@@ -103,9 +103,12 @@ ImageMap* ImageManager::loadPixMap( std::string filename ) {
 		pixMap->setID( imageMaps.size());
 		std::set<char> delims{'/'};
 		std::vector<std::string> path = splitpath( filename, delims);
-		pixMap->setName( path[path.size()-1] );
+		std::string filename = path[path.size()-1];
+		filename = filename.substr( 0, filename.length()-4);
+
+   		pixMap->setName( filename );
 		//TODO remove commented code
-		//LOG_INFO("%s",path[path.size()-1].c_str());
+//		LOG_INFO("%s",filename.c_str());
 		imageMaps.push_back( pixMap );
 	}
 	delete[] data;
@@ -142,21 +145,15 @@ ImageMap* ImageManager::loadVecMap( std::string filename ) {
 		vecMap->setID( imageMaps.size());
 		std::set<char> delims{'/'};
 		std::vector<std::string> path = splitpath( filename, delims);
-		vecMap->setName( path[path.size()-1] );
+		std::string filename = path[path.size()-1];
+		filename = filename.substr( 0, filename.length()-4);
+		vecMap->setName( filename );
 		//TODO remove commented code
-		//LOG_INFO("%s",path[path.size()-1].c_str());
+		//LOG_INFO("%s",filename.c_str());
 		imageMaps.push_back( vecMap );
 	}
 	delete[] data;
 	return vecMap;
-}
-
-bool hasEnding2 (std::string const &fullString, std::string const &ending) {
-    if (fullString.length() >= ending.length()) {
-        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
-    } else {
-        return false;
-    }
 }
 
 std::vector<std::string> ImageManager::getImageMapList(std::string ext) {
@@ -164,13 +161,11 @@ std::vector<std::string> ImageManager::getImageMapList(std::string ext) {
 	std::vector<std::string> mapFiles;
 
 	LOG_INFO( "Scanning %s images folder: %s", ext.c_str(), mapFolder.c_str());
-	auto dirList = vfs.listdir(mapFolder.c_str());
+	auto dirList = vfs.listdir(mapFolder.c_str(), ext );
 
 	for( vfs::DirectoryEntry ent : dirList ) {
-		if( (ent.attributes != vfs::FileAttributes::Directory) &&
-			(hasEnding2( ent.fileName, ext) ) )  {
+		if( ent.attributes != vfs::FileAttributes::Directory)
 			mapFiles.push_back( mapFolder + "/" + ent.fileName );
-		}
 	}
 
 	LOG_INFO("Total number of images: %d", mapFiles.size());

@@ -20,6 +20,8 @@
 #include "irq/irq_gpio.hpp"
 #include "i2c.h"
 
+#include "rtc/rtc.hpp"
+
 namespace bsp {
 
 
@@ -240,6 +242,8 @@ namespace bsp {
         irq_gpio_Init();
 
         BOARD_PrintClocks();
+
+
 
 
     }
