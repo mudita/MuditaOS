@@ -34,6 +34,11 @@
     "app_desktop_menu_calculator": "CALCULATOR",
     "app_desktop_menu_settings": "SETTINGS",
     "app_desktop_menu_title": "Main Menu",
+    
+    "app_call_call": "CALL",
+    "app_call_clear": "CLEAR",
+    "app_call_reject": "REJECT",
+    "app_call_answer": "ANSWER",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"

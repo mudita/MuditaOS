@@ -17,7 +17,7 @@
     "app_desktop_unlock": "DESBLOQUEAR",
     "app_desktop_lock": "BLOQUEAR",
     "app_desktop_menu": "MENÚ",
-    "app_desktop_menu": "EMERGENCIA",
+    "app_desktop_emergency": "EMERGENCIA",
     "app_desktop_pin_lock": "Enter passcode",
     "app_desktop_pin_info1": "Wrong passcode",
     "app_desktop_pin_info2": "Allowed unlock attempts",
@@ -34,6 +34,11 @@
     "app_desktop_menu_calculator": "CALCULATOR",
     "app_desktop_menu_settings": "SETTINGS",
     "app_desktop_menu_title": "Main Menu",
+    
+    "app_call_call": "CALL",
+    "app_call_clear": "CLEAR",
+    "app_call_reject": "REJECT",
+    "app_call_answer": "ANSWER",
 
 
     "settings_lang_PL": "PL",

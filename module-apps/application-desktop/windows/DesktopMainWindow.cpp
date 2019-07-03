@@ -6,9 +6,17 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <memory>
+#include <functional>
+
 #include "../ApplicationDesktop.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
+
+//application-call
+#include "application-call/data/CallSwitchData.hpp"
+
 
 #include "i18/i18.hpp"
 
@@ -97,7 +105,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	if( ret )
 		return true;
 
-	//process only if key is released
+	//process only if key is short released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
 	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
 		return true;
@@ -125,7 +133,9 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			enterPressed = false;
 		}
 	}
+	//screen is unlocked
 	else {
+		//long press will
 		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 			application->switchWindow( "MenuWindow", 0, nullptr );
 		}
@@ -136,6 +146,15 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			screenLocked = true;
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+		}
+		//if numeric key was pressed record that key and send it to call application with a switch command
+		else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
+
+			char key[] = { char(inputEvent.keyChar) ,0};
+			std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
+			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
+
+			return true;
 		}
 	}
 	return false;

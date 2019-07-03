@@ -79,6 +79,13 @@ void ApplicationCall::createUserInterface() {
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 }
 
+void ApplicationCall::setDisplayedNumber( std::string num ) {
+	phoneNumber = num;
+}
+
+const std::string& ApplicationCall::getDisplayedNumber() {
+	return phoneNumber;
+}
 
 void ApplicationCall::destroyUserInterface() {
 }
