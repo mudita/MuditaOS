@@ -9,6 +9,7 @@
 
 //module-applications
 #include "application-clock/ApplicationClock.hpp"
+#include "application-call/ApplicationCall.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 
@@ -94,12 +95,16 @@ int SystemStart(sys::SystemManager* sysmgr)
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
     //launcher for viewer
-    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
-	applications.push_back( std::move(viewerLauncher) );
+//    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
+//	applications.push_back( std::move(viewerLauncher) );
 
     //launcher for desktop application
     std::unique_ptr<app::ApplicationLauncher> desktopLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
     applications.push_back( std::move(desktopLauncher) );
+
+    //launcher for call application
+    std::unique_ptr<app::ApplicationLauncher> callLauncher = std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher());
+	applications.push_back( std::move(callLauncher) );
 
     //start application manager
    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
