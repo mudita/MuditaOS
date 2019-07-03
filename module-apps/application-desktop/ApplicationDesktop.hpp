@@ -19,6 +19,9 @@ namespace app {
  */
 class ApplicationDesktop : public Application {
 protected:
+	//determines whether screen should be protected by pin verification
+	bool screenLocked = false;
+	bool pinLocked = false;
 	uint32_t unreadMessages = 0;
 	uint32_t missedCalls = 0;
 public:
@@ -32,14 +35,22 @@ public:
 
 	void createUserInterface() ;
 	void destroyUserInterface();
+	bool getScreenLocked();
+	void setScreenLocked( bool val );
+	bool getPinLocked();
 
 	uint32_t getMisseedCalls();
 	uint32_t getUnreadMessages();
+
+	/**
+	 * This static method will be used to lock the phone
+	 */
+//	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event );
 };
 
 class ApplicationDesktopLauncher : public ApplicationLauncher {
 public:
-	ApplicationDesktopLauncher() : ApplicationLauncher("ApplicationDesktop", true) {};
+	ApplicationDesktopLauncher() : ApplicationLauncher("ApplicationDesktop", false) {};
 	bool run(sys::SystemManager* sysmgr) override {
 		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr,1000);
 	};

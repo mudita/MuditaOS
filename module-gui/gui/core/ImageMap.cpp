@@ -16,7 +16,5 @@ ImageMap::ImageMap( uint16_t w, uint16_t h, uint8_t* data ) : id{0}, width{ w },
 }
 
 ImageMap::~ImageMap() {
-	if( data )
-		delete [] data;
 }
 } /* namespace gui */
