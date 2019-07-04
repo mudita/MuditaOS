@@ -15,6 +15,7 @@
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/PinLockWindow.hpp"
 #include "windows/MenuWindow.hpp"
+#include "windows/PowerOffWindow.hpp"
 
 #include "ApplicationDesktop.hpp"
 
@@ -93,6 +94,9 @@ void ApplicationDesktop::createUserInterface() {
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 
 	window = new gui::MenuWindow(this);
+	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
+
+	window = new gui::PowerOffWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 
