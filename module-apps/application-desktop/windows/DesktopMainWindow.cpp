@@ -105,56 +105,61 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	if( ret )
 		return true;
 
-	//process only if key is short released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return true;
+	//process shortpress
+	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
-	if( screenLocked ) {
-		//if enter was pressed
-		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-			unlockStartTime = xTaskGetTickCount();
-			enterPressed = true;
-		}
-		else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
-			//if interval between enter and pnd keys is less than time defined for unlocking
-			if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
-				//display pin lock screen or simply refresh current window to update labels
-				if( pinLockScreen )
-					application->switchWindow( "PinLockWindow", 0, nullptr );
-				else {
-					setVisibleState();
-					application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-				}
+		if( screenLocked ) {
+			//if enter was pressed
+			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+				unlockStartTime = xTaskGetTickCount();
+				enterPressed = true;
 			}
-			enterPressed = false;
+			else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
+				//if interval between enter and pnd keys is less than time defined for unlocking
+				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
+					//display pin lock screen or simply refresh current window to update labels
+					if( pinLockScreen )
+						application->switchWindow( "PinLockWindow", 0, nullptr );
+					else {
+						setVisibleState();
+						application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+					}
+				}
+				enterPressed = false;
+			}
+			else {
+				enterPressed = false;
+			}
 		}
+		//screen is unlocked
 		else {
-			enterPressed = false;
+			//pressing enter moves user to menu screen
+			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+				application->switchWindow( "MenuWindow", 0, nullptr );
+			}
+			//if numeric key was pressed record that key and send it to call application with a switch command
+			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
+
+				char key[] = { char(inputEvent.keyChar) ,0};
+				std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
+				sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
+
+				return true;
+			}
 		}
 	}
-	//screen is unlocked
-	else {
-		//long press will
-		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-			application->switchWindow( "MenuWindow", 0, nullptr );
-		}
-		//lock screen if it was unlocked
-		else if( (inputEvent.keyCode == KeyCode::KEY_PND) && (inputEvent.state == InputEvent::State::keyReleasedLong ) ) {
+	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
+		//long press of # locks screen if it was unlocked
+		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( screenLocked == false ) ) {
 			app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 			app->setScreenLocked(true);
 			screenLocked = true;
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 		}
-		//if numeric key was pressed record that key and send it to call application with a switch command
-		else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
-
-			char key[] = { char(inputEvent.keyChar) ,0};
-			std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
-			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
-
-			return true;
+		//long press of right function button muve user to power off window
+		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
+			application->switchWindow( "PowerOffWindow", 0, nullptr );
 		}
 	}
 	return false;
