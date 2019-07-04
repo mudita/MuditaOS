@@ -36,6 +36,16 @@ PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockW
 	infoImage = new gui::Image( this, 177,132,0,0, "pin_lock_info" );
 	infoImage->setVisible(false);
 
+	//title label
+	titleLabel = new gui::Label(this, 0, 60, 480, 40);
+	titleLabel->setFilled( false );
+	titleLabel->setVisible(false);
+	titleLabel->setBorderColor( gui::ColorFullBlack );
+	titleLabel->setFont("gt_pressura_regular_24");
+	titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
+	titleLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
 	//labels with stars for displaying entered digits
 	uint32_t pinLabelX = 82;
 	for( uint32_t i=0; i<4; i++ ){
@@ -52,7 +62,7 @@ PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockW
 
 	//labels with stars for displaying entered digits
 	uint32_t infoLabelY = 316-22;
-	for( uint32_t i=0; i<3; i++ ){
+	for( uint32_t i=0; i<2; i++ ){
 		infoLabels[i] = new gui::Label(this, 0, infoLabelY, 480, 30);
 		infoLabels[i]->setFilled( false );
 		infoLabels[i]->setBorderColor( gui::ColorNoColor );
@@ -81,10 +91,8 @@ void PinLockWindow::setVisibleState( const State& state ) {
 		//hide second info label
 		infoLabels[0]->setVisible(true);
 		infoLabels[1]->setVisible(false);
-		infoLabels[2]->setVisible(false);
 		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
 		infoLabels[1]->setText("");
-		infoLabels[2]->setText("");
 
 		//show pin icon
 		lockImage->setVisible(true);
@@ -97,12 +105,12 @@ void PinLockWindow::setVisibleState( const State& state ) {
 			pinLabels[i]->setText("");
 		}
 		//hide second info label
+		titleLabel->setVisible(true);
 		infoLabels[0]->setVisible(true);
 		infoLabels[1]->setVisible(true);
-		infoLabels[2]->setVisible(true);
-		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_info1"));
-		infoLabels[1]->setText(utils::localize.get("app_desktop_pin_info2"));
-		infoLabels[2]->setText(std::to_string(remainingAttempts));
+		titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
+		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_info2"));
+		infoLabels[1]->setText(std::to_string(remainingAttempts));
 
 		//show pin icon
 		lockImage->setVisible(false);
@@ -114,12 +122,11 @@ void PinLockWindow::setVisibleState( const State& state ) {
 			pinLabels[i]->setText("");
 		}
 		//hide second info label
+		titleLabel->setVisible(false);
 		infoLabels[0]->setVisible(true);
 		infoLabels[1]->setVisible(false);
-		infoLabels[2]->setVisible(false);
 		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_blocked1"));
 		infoLabels[1]->setText("");
-		infoLabels[2]->setText("");
 
 		//show pin icon
 		lockImage->setVisible(false);

@@ -4,6 +4,8 @@
     "common_ok": "OK",
     "common_back": "BACK",
     "common_set": "SET",
+    "common_yes": "Yes",
+    "common_no": "No",
     "common_switch": "SWITCH",
     "common_options": "OPTIONS",
     "common_monday": "Monday",
@@ -34,6 +36,8 @@
     "app_desktop_menu_calculator": "CALCULATOR",
     "app_desktop_menu_settings": "SETTINGS",
     "app_desktop_menu_title": "Main Menu",
+    "app_desktop_poweroff_title": "Turn Off",
+    "app_desktop_poweroff_question": "Select Yes to power down",
     
     "app_call_call": "CALL",
     "app_call_clear": "CLEAR",
