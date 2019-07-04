@@ -27,7 +27,8 @@ class PinLockWindow: public AppWindow {
 
 	gui::BottomBar* bottomBar = nullptr;
 	gui::TopBar* topBar = nullptr;
-	gui::Label* infoLabels[3] = { nullptr, nullptr, nullptr };
+	gui::Label* titleLabel = nullptr;
+	gui::Label* infoLabels[2] = { nullptr, nullptr };
 	gui::Label* pinLabels[4] = { nullptr, nullptr, nullptr, nullptr };
 	gui::Image* lockImage = nullptr;
 	gui::Image* infoImage = nullptr;
