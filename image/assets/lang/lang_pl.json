@@ -4,6 +4,8 @@
     "common_ok": "DALEJ",
     "common_back": "WRÓĆ",
     "common_set": "USTAW",
+    "common_yes": "Tak",
+    "common_no": "Nie",
     "common_switch": "ZMIEŃ",
     "common_options": "OPCJE",
     "common_monday": "Poniedziałek",
@@ -34,6 +36,8 @@
     "app_desktop_menu_calculator": "KALKULATOR",
     "app_desktop_menu_settings": "USTAWIENIA",
     "app_desktop_menu_title": "Główne Menu",
+    "app_desktop_poweroff_title": "Wyłączanie",
+    "app_desktop_poweroff_question": "Wybierz Tak by wyłączyć",
     
     "app_call_call": "DZWOŃ",
     "app_call_clear": "WYCZYŚĆ",
