@@ -15,7 +15,22 @@
 
 
 InputSerialWorker::InputSerialWorker(MuxDaemon *mux) : muxDaemon(mux) {
+    BaseType_t task_error = xTaskCreate(
+            workerTaskFunction,
+            "cellInSerWorker",
+            512, // in words
+            this,
+            taskPriority,
+            &taskHandle);
+    if (task_error != pdPASS) {
+        LOG_ERROR("Failed to start inputSerialWorker task");
+    }
+}
 
+InputSerialWorker::~InputSerialWorker() {
+    if (taskHandle) {
+        vTaskDelete(taskHandle);
+    }
 }
 
 
@@ -31,40 +46,10 @@ void workerTaskFunction(void *ptr) {
                     //TODO:M.P implement error handling ?
                 }
 
-                if (worker->muxDaemon->inputBuffer->readp !=
-                    worker->muxDaemon->inputBuffer->data) { //relayout data in cache_buf
-                    if (worker->muxDaemon->inputBuffer->GetDataLength()) {
-                        LOG_DEBUG("memmove(0, %ld, %d)", (long)(worker->muxDaemon->inputBuffer->readp - worker->muxDaemon->inputBuffer->data), worker->muxDaemon->inputBuffer->GetDataLength());
-                        memmove(worker->muxDaemon->inputBuffer->data, worker->muxDaemon->inputBuffer->readp,
-                                worker->muxDaemon->inputBuffer->GetDataLength());
-                    }
-                    worker->muxDaemon->inputBuffer->readp = worker->muxDaemon->inputBuffer->data;
-                    worker->muxDaemon->inputBuffer->writep =
-                            worker->muxDaemon->inputBuffer->data + worker->muxDaemon->inputBuffer->GetDataLength();
-                }
+                // Reorganize data in buffer if necessary
+                worker->muxDaemon->inputBuffer->ReorganizeBuffer();
             }
         }
-    }
-}
-
-bool InputSerialWorker::Init() {
-    BaseType_t task_error = xTaskCreate(
-            workerTaskFunction,
-            "cellInSerWorker",
-            512, // in words
-            this,
-            taskPriority,
-            &taskHandle);
-    if (task_error != pdPASS) {
-        LOG_ERROR("Failed to start inputSerialWorker task");
-        return false;
-    }
-    return true;
-}
-
-bool InputSerialWorker::Deinit() {
-    if (taskHandle) {
-        vTaskDelete(taskHandle);
     }
 }
 
@@ -133,13 +118,13 @@ int InputSerialWorker::ExtractFrames() {
                 LOG_DEBUG("Writing %d byte frame received on channel %d to %s", frame->length, frame->channel,
                           muxDaemon->channels[frame->channel].GetName().c_str());
 
-                int write_result=0;
+                int write_result = 0;
 
                 if (muxDaemon->channels[frame->channel].GetState() ==
                     MuxChannel::State::Opened) {//reopening, discard the data
 
                     // Send received message to virtual channel for further processing
-                    write_result = muxDaemon->channels[frame->channel].DistributeMsg(frame->data,frame->length);
+                    write_result = muxDaemon->channels[frame->channel].DistributeMsg(frame->data, frame->length);
                 } else {
                     LOG_INFO("channel %d closed, discard the frame", frame->channel);
                     write_result = frame->length;
@@ -183,13 +168,8 @@ int InputSerialWorker::ExtractFrames() {
                             muxDaemon->channels[frame->channel].disc_ua_pending = 0;
                         }
                     }
-                    //TODO: M.P dunno what is this for ??
-#if 0
-                    if (frame->channel == muxDaemon->virtualPortsCount){
-                        ql_cmux_debug = 0;
-                        }
-#endif
-                        break;
+                    break;
+
                 case MuxDefines::GSM0710_TYPE_DM:
                     if (muxDaemon->channels[frame->channel].GetState() == MuxChannel::State::Opened) {
                         // Remove channel
@@ -247,13 +227,8 @@ int InputSerialWorker::ExtractFrames() {
                     muxDaemon->WriteMuxFrame(frame->channel, NULL, 0,
                                              static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UA) |
                                              static_cast<unsigned char>(MuxDefines::GSM0710_PF));
-//TODO: M.P dunno what is this for ??
-#if 0
-                    if (frame->channel == muxDaemon->virtualPortsCount){
-                        ql_cmux_debug = 0;
-                        }
-#endif
-                        break;
+
+                    break;
 
                 default:
                     break;
@@ -265,50 +240,47 @@ int InputSerialWorker::ExtractFrames() {
 
 }
 
-int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame* frame) {
+int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
     unsigned char type, signals;
     int length = 0, i, type_length, channel, supported = 1;
     unsigned char *response;
 
     //struct ussp_operation op;
-    if (frame->length > 0)
-    {
+    if (frame->length > 0) {
         type = frame->data[0];// only a byte long types are handled now skip extra bytes
-        for (i = 0; (frame->length > i && (frame->data[i] & static_cast<unsigned char>(MuxDefines ::GSM0710_EA)) == 0); i++);
+        for (i = 0; (frame->length > i &&
+                     (frame->data[i] & static_cast<unsigned char>(MuxDefines::GSM0710_EA)) == 0); i++);
         i++;
         type_length = i;
-        if ((type & static_cast<unsigned char>(MuxDefines ::GSM0710_CR)) == static_cast<unsigned char>(MuxDefines ::GSM0710_CR))
-        {
+        if ((type & static_cast<unsigned char>(MuxDefines::GSM0710_CR)) ==
+            static_cast<unsigned char>(MuxDefines::GSM0710_CR)) {
 //command not ack extract frame length
-            while (frame->length > i)
-            {
+            while (frame->length > i) {
                 length = (length * 128) + ((frame->data[i] & 254) >> 1);
                 if ((frame->data[i] & 1) == 1)
                     break;
                 i++;
             }
             i++;
-            MuxDefines ftype = static_cast<MuxDefines >(type & ~static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
-            switch (ftype)
-            {
-                case MuxDefines ::GSM0710_CONTROL_CLD:
+            MuxDefines ftype = static_cast<MuxDefines >(type & ~static_cast<unsigned char>(MuxDefines::GSM0710_CR));
+            switch (ftype) {
+                case MuxDefines::GSM0710_CONTROL_CLD:
                     //TODO: M.P implement CMUX close
                     LOG_INFO("The mobile station requested mux-mode termination");
-                    muxDaemon->state = MuxDaemon::States ::MUX_STATE_CLOSING;
+                    muxDaemon->state = MuxDaemon::States::MUX_STATE_CLOSING;
                     break;
-                case MuxDefines ::GSM0710_CONTROL_PSC:
+                case MuxDefines::GSM0710_CONTROL_PSC:
                     LOG_INFO("Power Service Control command: ***");
                     LOG_INFO("Frame->data = %s / frame->length = %d", frame->data + i, frame->length - i);
                     break;
-                case MuxDefines ::GSM0710_CONTROL_TEST:
+                case MuxDefines::GSM0710_CONTROL_TEST:
                     LOG_INFO("Test command: ");
                     LOG_INFO("Frame->data = %s / frame->length = %d", frame->data + i, frame->length - i);
                     //serial->ping_number = 0;
                     break;
-                case MuxDefines ::GSM0710_CONTROL_MSC:
+                case MuxDefines::GSM0710_CONTROL_MSC:
                     LOG_INFO("GET MSC");
-                    if (i + 1 < frame->length)
-                    {
+                    if (i + 1 < frame->length) {
                         channel = ((frame->data[i] & 252) >> 2);
                         i++;
                         signals = (frame->data[i]);
@@ -317,61 +289,59 @@ int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame* frame) {
 //op.len = 0;
                         LOG_INFO("Modem status command on channel %d", channel);
                         muxDaemon->channels[channel].frameAllowed = ((signals &
-                                static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_FC)) != static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_FC));
-                        if ((signals & static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_FC)) == static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_FC))
+                                                                      static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC)) !=
+                                                                     static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC));
+                        if ((signals & static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC)) ==
+                            static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC))
                             LOG_INFO("No frames allowed");
-                        else
-                        {
+                        else {
 //op.arg |= USSP_CTS;
                             LOG_INFO("Frames allowed");
                         }
-                        if ((signals & static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_RTC)) == static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_RTC))
-                        {
+                        if ((signals & static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_RTC)) ==
+                            static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_RTC)) {
 //op.arg |= USSP_DSR;
                             LOG_INFO("Signal RTC");
                         }
-                        if ((signals & static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_IC)) == static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_IC))
-                        {
+                        if ((signals & static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_IC)) ==
+                            static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_IC)) {
 //op.arg |= USSP_RI;
                             LOG_INFO("Signal Ring");
                         }
-                        if ((signals & static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_DV)) == static_cast<unsigned char>(MuxDefines ::GSM0710_SIGNAL_DV))
-                        {
+                        if ((signals & static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_DV)) ==
+                            static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_DV)) {
 //op.arg |= USSP_DCD;
                             LOG_INFO("Signal DV");
                         }
-                    }
-                    else
+                    } else
                         LOG_ERROR("Modem status command, but no info. i: %d, len: %d, data-len: %d",
-                               i, length, frame->length);
+                                  i, length, frame->length);
                     break;
                 default:
                     LOG_ERROR("Unknown command (%d) from the control channel", type);
-                    if ((response = static_cast<unsigned char*>(malloc(sizeof(char) * (2 + type_length)))) != NULL)
-                    {
+                    if ((response = static_cast<unsigned char *>(malloc(sizeof(char) * (2 + type_length)))) != NULL) {
                         i = 0;
-                        response[i++] = static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_NSC);
+                        response[i++] = static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_NSC);
                         type_length &= 127; //supposes that type length is less than 128
-                        response[i++] = static_cast<unsigned char>(MuxDefines ::GSM0710_EA) | (type_length << 1);
-                        while (type_length--)
-                        {
+                        response[i++] = static_cast<unsigned char>(MuxDefines::GSM0710_EA) | (type_length << 1);
+                        while (type_length--) {
                             response[i] = frame->data[i - 2];
                             i++;
                         }
-                        muxDaemon->WriteMuxFrame(0, response, i, static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
+                        muxDaemon->WriteMuxFrame(0, response, i,
+                                                 static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
                         free(response);
                         supported = 0;
-                    }
-                    else
+                    } else
                         LOG_ERROR("Out of memory, when allocating space for response");
                     break;
             }
-            if (supported)
-            {
+            if (supported) {
 //acknowledge the command
-                frame->data[0] = frame->data[0] & ~static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
+                frame->data[0] = frame->data[0] & ~static_cast<unsigned char>(MuxDefines::GSM0710_CR);
                 LOG_INFO("response MSC...");
-                muxDaemon->WriteMuxFrame(0, frame->data, frame->length, static_cast<unsigned char>(MuxDefines ::GSM0710_TYPE_UIH));
+                muxDaemon->WriteMuxFrame(0, frame->data, frame->length,
+                                         static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
                 LOG_INFO("response MSC");
 #if 0
                 switch ((type & ~GSM0710_CR)){
@@ -388,19 +358,17 @@ int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame* frame) {
                 }
 #endif
             }
-        }
-        else
-        {
+        } else {
 //received ack for a command
-            if (GSM0710Buffer::GSM0710_COMMAND_IS(static_cast<MuxDefines >(type), static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_NSC)))
+            if (GSM0710Buffer::GSM0710_COMMAND_IS(static_cast<MuxDefines >(type),
+                                                  static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_NSC)))
                 LOG_ERROR("The mobile station didn't support the command sent");
-            else if(GSM0710Buffer::GSM0710_COMMAND_IS(static_cast<MuxDefines >(type),static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_MSC)))
-            {
-                LOG_INFO("Channel:%d FC:%d",(frame->data[i] & 252) >> 2,frame->data[0]&0x2);
+            else if (GSM0710Buffer::GSM0710_COMMAND_IS(static_cast<MuxDefines >(type),
+                                                       static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_MSC))) {
+                LOG_INFO("Channel:%d FC:%d", (frame->data[i] & 252) >> 2, frame->data[0] & 0x2);
                 LOG_INFO("\n\nGET ACK FOR MSC\n\n");
                 //sleep(1);
-            }
-            else
+            } else
                 LOG_INFO("Command acknowledged by the mobile station");
         }
     }

@@ -229,3 +229,17 @@ unsigned char GSM0710Buffer::frameCalcCRC(const unsigned char *input, int length
         fcs = crcTable[fcs ^ input[i]];
     return 0xFF - fcs;
 }
+
+void GSM0710Buffer::ReorganizeBuffer() {
+    if (readp !=
+        data) { //relayout data in cache_buf
+        if (GetDataLength()) {
+            LOG_DEBUG("memmove(0, %ld, %d)", (long)(readp - data), GetDataLength());
+            memmove(data, readp,
+                    GetDataLength());
+        }
+        readp = data;
+        writep =
+                data + GetDataLength();
+    }
+}

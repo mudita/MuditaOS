@@ -41,7 +41,7 @@ ServiceCellular::~ServiceCellular() {
 // Invoked when timer ticked
 void ServiceCellular::TickHandler(uint32_t id) {
     char* resp = "AT\r";
-    muxdaemon->WriteMuxFrame(1, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+    muxdaemon->WriteMuxFrame(2, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 }
 
 // Invoked during initialization

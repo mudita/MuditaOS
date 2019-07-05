@@ -80,7 +80,6 @@ namespace QuectelBaudrates {
 
 MuxDaemon::MuxDaemon() {
     cellular = bsp::Cellular::Create();
-    inSerialDataWorker = std::make_unique<InputSerialWorker>(this);
     inputBuffer = std::make_unique<GSM0710Buffer>(virtualPortsCount, frameSize, cmuxMode);
 }
 
@@ -164,7 +163,7 @@ int MuxDaemon::Start() {
     state = States::MUX_STATE_MUXING;
 
     // Spawn input serial stream worker
-    inSerialDataWorker->Init();
+    inSerialDataWorker = std::make_unique<InputSerialWorker>(this);
 
     // Create virtual channels
 
@@ -187,7 +186,6 @@ int MuxDaemon::Start() {
 }
 
 int MuxDaemon::Exit() {
-    inSerialDataWorker->Deinit();
     CloseMux();
     return 0;
 }
