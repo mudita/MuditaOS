@@ -31,6 +31,9 @@ ServiceCellular::ServiceCellular()
 
     muxdaemon->Start();
 
+    //vTaskDelay(3000);
+    //muxdaemon->Exit();
+
 }
 
 ServiceCellular::~ServiceCellular() {

@@ -59,7 +59,7 @@ void workerTaskFunction(void *ptr) {
 int InputSerialWorker::ReadIncomingData() {
     int length = 0;
 
-    switch (muxDaemon->state) {
+    switch (muxDaemon->GetState()) {
         case MuxDaemon::States::MUX_STATE_MUXING:
             length = std::min(inputBuffer->GetFreeSpace(),
                               (uint32_t) (inputBuffer->endp - inputBuffer->writep));
@@ -94,7 +94,7 @@ int InputSerialWorker::ReadIncomingData() {
             break;
 
         default:
-            LOG_WARN("Don't know how to handle reading in state %d", muxDaemon->state);
+            LOG_WARN("Don't know how to handle reading in state %d", muxDaemon->GetState());
             break;
     }
 
@@ -119,15 +119,15 @@ int InputSerialWorker::ExtractFrames() {
             //data from logical channel
             if (frame->channel > 0) {
                 LOG_DEBUG("Writing %d byte frame received on channel %d to %s", frame->length, frame->channel,
-                          muxDaemon->channels[frame->channel].GetName().c_str());
+                          muxDaemon->channels[frame->channel]->GetName().c_str());
 
                 int write_result = 0;
 
-                if (muxDaemon->channels[frame->channel].GetState() ==
+                if (muxDaemon->channels[frame->channel]->GetState() ==
                     MuxChannel::State::Opened) {//reopening, discard the data
 
                     // Send received message to virtual channel for further processing
-                    write_result = muxDaemon->channels[frame->channel].DistributeMsg(frame->data, frame->length);
+                    write_result = muxDaemon->channels[frame->channel]->SendData(frame->data, frame->length);
                 } else {
                     LOG_INFO("channel %d closed, discard the frame", frame->channel);
                     write_result = frame->length;
@@ -135,7 +135,7 @@ int InputSerialWorker::ExtractFrames() {
 
                 if (write_result < frame->length) {
                     LOG_INFO("write() returned. Written %d/%d bytes of frame to %s",
-                             write_result, frame->length, muxDaemon->channels[frame->channel].GetName().c_str());
+                             write_result, frame->length, muxDaemon->channels[frame->channel]->GetName().c_str());
 
                     //send_modem_status(frame->channel,1);
                     //fill_in_list(frame->channel,frame->data + write_result,frame->length - write_result);
@@ -154,59 +154,59 @@ int InputSerialWorker::ExtractFrames() {
             switch (frameType) {
                 case MuxDefines::GSM0710_TYPE_UA:
                     LOG_DEBUG("Frame is UA");
-                    if (muxDaemon->channels[frame->channel].GetState() == MuxChannel::State::Opened) {
+                    if (muxDaemon->channels[frame->channel]->GetState() == MuxChannel::State::Opened) {
                         // Remove channel
                         muxDaemon->channels.erase(muxDaemon->channels.begin() + frame->channel);
                         LOG_INFO("Logical channel %d for %s closed",
-                                 frame->channel, muxDaemon->channels[frame->channel].GetName().c_str());
+                                 frame->channel, muxDaemon->channels[frame->channel]->GetName().c_str());
                     } else {
-                        if (muxDaemon->channels[frame->channel].disc_ua_pending == 0) {
-                            muxDaemon->channels[frame->channel].SetState(MuxChannel::State::Opened);
+                        if (muxDaemon->channels[frame->channel]->disc_ua_pending == 0) {
+                            muxDaemon->channels[frame->channel]->SetState(MuxChannel::State::Opened);
                             if (frame->channel == 0) {
                                 LOG_DEBUG("Control channel opened");
                             } else
                                 LOG_INFO("Logical channel %d opened", frame->channel);
                         } else {
-                            LOG_INFO("UA to acknowledgde DISC on channel %d received", frame->channel);
-                            muxDaemon->channels[frame->channel].disc_ua_pending = 0;
+                            LOG_INFO("UA to acknowledge DISC on channel %d received", frame->channel);
+                            muxDaemon->channels[frame->channel]->disc_ua_pending = 0;
                         }
                     }
                     break;
 
                 case MuxDefines::GSM0710_TYPE_DM:
-                    if (muxDaemon->channels[frame->channel].GetState() == MuxChannel::State::Opened) {
+                    if (muxDaemon->channels[frame->channel]->GetState() == MuxChannel::State::Opened) {
                         // Remove channel
                         muxDaemon->channels.erase(muxDaemon->channels.begin() + frame->channel);
                         LOG_INFO("DM received, so the channel %d for %s was already closed",
-                                 frame->channel, muxDaemon->channels[frame->channel].GetName().c_str());
+                                 frame->channel, muxDaemon->channels[frame->channel]->GetName().c_str());
                     } else {
                         if (frame->channel == 0) {
                             LOG_INFO("Couldn't open control channel.\n->Terminating");
-                            muxDaemon->state = MuxDaemon::States::MUX_STATE_CLOSING;
+                            muxDaemon->SetState(MuxDaemon::States::MUX_STATE_CLOSING);
 //close channels
                         } else
                             LOG_INFO("Logical channel %d for %s couldn't be opened", frame->channel,
-                                     muxDaemon->channels[frame->channel].GetName().c_str());
+                                     muxDaemon->channels[frame->channel]->GetName().c_str());
                     }
                     break;
                 case MuxDefines::GSM0710_TYPE_DISC:
-                    if (muxDaemon->channels[frame->channel].GetState() == MuxChannel::State::Opened) {
-                        muxDaemon->channels[frame->channel].SetState(MuxChannel::State::Closed);
+                    if (muxDaemon->channels[frame->channel]->GetState() == MuxChannel::State::Opened) {
+                        muxDaemon->channels[frame->channel]->SetState(MuxChannel::State::Closed);
 
                         muxDaemon->WriteMuxFrame(frame->channel, NULL, 0,
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UA) |
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
                         if (frame->channel == 0) {
-                            muxDaemon->state = MuxDaemon::States::MUX_STATE_CLOSING;
+                            muxDaemon->SetState(MuxDaemon::States::MUX_STATE_CLOSING);
                             LOG_INFO("Control channel closed");
                         } else
                             LOG_INFO("Logical channel %d for %s closed", frame->channel,
-                                     muxDaemon->channels[frame->channel].GetName().c_str());
+                                     muxDaemon->channels[frame->channel]->GetName().c_str());
                     } else {
 //channel already closed
                         LOG_WARN("Received DISC even though channel %d for %s was already closed",
-                                 frame->channel, muxDaemon->channels[frame->channel].GetName().c_str());
+                                 frame->channel, muxDaemon->channels[frame->channel]->GetName().c_str());
                         // Send Mux frame
                         muxDaemon->WriteMuxFrame(frame->channel, NULL, 0,
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DM) |
@@ -215,17 +215,17 @@ int InputSerialWorker::ExtractFrames() {
                     break;
                 case MuxDefines::GSM0710_TYPE_SABM:
 //channel open request
-                    if (muxDaemon->channels[frame->channel].GetState() == MuxChannel::State::Opened) {
+                    if (muxDaemon->channels[frame->channel]->GetState() == MuxChannel::State::Opened) {
                         if (frame->channel == 0)
                             LOG_INFO("Control channel opened");
                         else
                             LOG_INFO("Logical channel %d for %s opened",
-                                     frame->channel, muxDaemon->channels[frame->channel].GetName().c_str());
+                                     frame->channel, muxDaemon->channels[frame->channel]->GetName().c_str());
                     } else
 //channel already opened
                         LOG_WARN("Received SABM even though channel %d for %s was already closed",
-                                 frame->channel, muxDaemon->channels[frame->channel].GetName().c_str());
-                    muxDaemon->channels[frame->channel].SetState(MuxChannel::State::Opened);
+                                 frame->channel, muxDaemon->channels[frame->channel]->GetName().c_str());
+                    muxDaemon->channels[frame->channel]->SetState(MuxChannel::State::Opened);
                     // Send mux frame
                     muxDaemon->WriteMuxFrame(frame->channel, NULL, 0,
                                              static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UA) |
@@ -270,7 +270,7 @@ int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
                 case MuxDefines::GSM0710_CONTROL_CLD:
                     //TODO: M.P implement CMUX close
                     LOG_INFO("The mobile station requested mux-mode termination");
-                    muxDaemon->state = MuxDaemon::States::MUX_STATE_CLOSING;
+                    muxDaemon->SetState(MuxDaemon::States::MUX_STATE_CLOSING);
                     break;
                 case MuxDefines::GSM0710_CONTROL_PSC:
                     LOG_INFO("Power Service Control command: ***");
@@ -291,7 +291,7 @@ int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
 //op.arg = USSP_RTS;
 //op.len = 0;
                         LOG_INFO("Modem status command on channel %d", channel);
-                        muxDaemon->channels[channel].frameAllowed = ((signals &
+                        muxDaemon->channels[channel]->frameAllowed = ((signals &
                                                                       static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC)) !=
                                                                      static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC));
                         if ((signals & static_cast<unsigned char>(MuxDefines::GSM0710_SIGNAL_FC)) ==
