@@ -47,10 +47,15 @@ static bsp::batteryRetval battery_setTemperatureThresholds(uint8_t maxTemperatur
 static bsp::batteryRetval battery_setServiceVoltageThresholds(uint16_t maxVoltage_mV, uint16_t minVoltage_mV);
 static bsp::batteryRetval battery_enableAlerts(void);
 static bsp::batteryRetval battery_enableIRQs(void);
+
+
+static xQueueHandle qHandleIrq = NULL;
+
 namespace bsp{
 
 	int battery_Init()
 	{
+		qHandleIrq = xQueueCreate(10, sizeof (uint8_t));
 		battery_loadConfiguration();
 		battery_setAvgCalcPeriods();
 		battery_setNominalBatteryCapacity(battery_nominalCapacitymAh);
@@ -58,8 +63,36 @@ namespace bsp{
 		battery_setTemperatureThresholds(battery_maxTemperatureDegrees, battery_minTemperatureDegrees);
 		battery_setServiceVoltageThresholds(battery_maxVoltagemV, battery_minVoltagemV);
 		battery_enableAlerts();
-		bsp::battery_chargerWrite(static_cast<bsp::batteryChargerRegisters>(0xb1), 0x88);
+
+
+		//battery mask
+		uint16_t batMask = 1 << 3;
+		uint16_t chargerMask = 1 << 4;
+		uint16_t mask = 0xff;
+		mask &= ~(batMask | chargerMask);
+		uint16_t val;
+		uint8_t config2 = 1<<7;
+		bsp::battery_chargerWrite(static_cast<bsp::batteryChargerRegisters>(0xb1), 0x0);
+		bsp::battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(0xbb), &val);
+		bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
+		bsp_i2c_Send(i2c, BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&config2, 1);
+		bsp::battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(0xbb), &val);
+		LOG_INFO("Config2 reg 0x%x", val);
+		mask = 1<<7;
+
+
+		bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &val);
+
+		LOG_INFO("status reg 0x%x", val);
+		bsp::battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, val);
+		bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &val);
+		LOG_INFO("status reg 0x%x", val);
+
 		battery_enableIRQs();
+		//irq status
+		bsp::battery_chargerTopControllerRead(bsp::batteryChargerRegisters::TOP_CONTROLL_IRQ_SRC_REG, &val);
+		LOG_INFO("TOP_CONTROLL_IRQ_SRC_REG reg 0x%x", val);
+
 		s_BSP_BatteryChargerIrqPinsInit();
 
 		return 0;
@@ -222,6 +255,7 @@ static bsp::batteryRetval battery_setServiceVoltageThresholds(uint16_t maxVoltag
 
 	if( bsp::battery_fuelGaugeWrite(bsp::batteryChargerRegisters::VALRT_Th_REG, regVal) != kStatus_Success )
 	{
+
 		LOG_ERROR("battery_setServiceVoltageThresholds failed.");
 		return bsp::batteryRetval::battery_ChargerError;
 	}
@@ -235,6 +269,9 @@ static bsp::batteryRetval battery_enableAlerts(void)
 	const uint16_t VOLTAGE_ALERT_STICKY = (1 << 12);
 	const uint16_t ENABLE_ALERTS        = (1 << 2);
 
+	uint16_t val;
+	bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::CONFIG_REG, &val);
+	LOG_INFO("ALERTS: 0x%x", val);
 	uint16_t regVal = SOC_ALERT_STICKY | TEMP_ALERT_STICKY | VOLTAGE_ALERT_STICKY | ENABLE_ALERTS;
 
 	if( bsp::battery_fuelGaugeWrite(bsp::batteryChargerRegisters::CONFIG_REG, regVal) != kStatus_Success )
@@ -242,32 +279,35 @@ static bsp::batteryRetval battery_enableAlerts(void)
 		LOG_ERROR("battery_enableAlerts failed.");
 		return bsp::batteryRetval::battery_ChargerError;
 	}
+	bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::CONFIG_REG, &val);
+		LOG_INFO("ALERTS: 0x%x", val);
 	return bsp::batteryRetval::battery_OK;
 }
 
 static bsp::batteryRetval battery_enableIRQs(void)
 {
-	uint16_t regVal;
-	if( bsp::battery_chargerTopControllerRead(bsp::batteryChargerRegisters::TOP_CONTROLL_IRQ_MASK_REG, &regVal) != kStatus_Success )
+	uint16_t val = 0xf8;
+
+	if( bsp::battery_chargerTopControllerRead(bsp::batteryChargerRegisters::TOP_CONTROLL_IRQ_MASK_REG, &val) != kStatus_Success )
 	{
 		LOG_ERROR("battery_enableIRQs read failed.");
 		return bsp::batteryRetval::battery_ChargerError;
 	}
 
-	const uint16_t irqMask = 3;
-	regVal &= ~irqMask;
-
-	if( bsp::battery_chargerTopControllerWrite(bsp::batteryChargerRegisters::TOP_CONTROLL_IRQ_MASK_REG, regVal) != kStatus_Success )
-	{
-		LOG_ERROR("battery_enableIRQs write failed.");
-		return bsp::batteryRetval::battery_ChargerError;
-	}
 	return bsp::batteryRetval::battery_OK;
 }
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler()
 {
-	return 0;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	 if(qHandleIrq != NULL){
+	        	uint8_t val = 0x01;
+	        	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
+	        }
+//	LOG_INFO("INOKB IRQ!!!");
+	return xHigherPriorityTaskWoken;
+
+
 }
 
 BaseType_t BSP_BatteryChargerWCINOKB_IRQHandler()
@@ -277,8 +317,15 @@ BaseType_t BSP_BatteryChargerWCINOKB_IRQHandler()
 
 BaseType_t BSP_BatteryChargerINTB_IRQHandler()
 {
-	return 0;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	 if(qHandleIrq != NULL){
+	        	uint8_t val = 0x01;
+	        	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
+	        }
+//	LOG_INFO("INTB IRQ!!!");
+	return xHigherPriorityTaskWoken;
 }
+
 
 /*
  * *****************************************************************************************************************************************************
