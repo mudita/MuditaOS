@@ -31,8 +31,20 @@ public:
      */
 
     const static uint32_t baudRate = 115200;
-    const static uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
+    const static uint32_t virtualPortsCount = 3;
     const static bool hardwareControlFlowEnable = false;
+
+    /**
+     * Multiplexer states
+     */
+    enum class States {
+        MUX_STATE_OPENING,
+        MUX_STATE_INITILIZING,
+        MUX_STATE_MUXING,
+        MUX_STATE_CLOSING,
+        MUX_STATE_OFF,
+        MUX_STATES_COUNT // keep this the last
+    };
 
     MuxDaemon();
 
@@ -46,6 +58,9 @@ public:
                           const unsigned char *input,
                           int length,
                           unsigned char type);
+
+    inline MuxDaemon::States GetState(){return state;}
+    inline void SetState(MuxDaemon::States st){state = st;}
 
 private:
 
@@ -76,14 +91,7 @@ private:
             int length,
             const char *needle);
 
-    enum class States {
-        MUX_STATE_OPENING,
-        MUX_STATE_INITILIZING,
-        MUX_STATE_MUXING,
-        MUX_STATE_CLOSING,
-        MUX_STATE_OFF,
-        MUX_STATES_COUNT // keep this the last
-    };
+
 
 
     constexpr static unsigned char closeChannelCmd[] = {
@@ -98,7 +106,7 @@ private:
 
     States state = States::MUX_STATE_OPENING;
 
-    std::vector<MuxChannel> channels;
+    std::vector<std::unique_ptr<MuxChannel>> channels;
 
     cpp_freertos::MutexStandard serOutMutex;
 

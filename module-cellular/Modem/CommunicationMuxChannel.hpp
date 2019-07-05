@@ -22,7 +22,7 @@ public:
 
 
 
-    int ParseInMessage(MuxChannelMsg* msg) override final;
+    int ParseInputData(uint8_t* data, size_t size) override final;
 
     ssize_t SendCommand(const char* cmd,uint32_t timeout = 1000);
 };

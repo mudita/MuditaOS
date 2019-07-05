@@ -24,7 +24,7 @@ public:
 
 
 
-    int ParseInMessage(MuxChannelMsg* msg) override final;
+    int ParseInputData(uint8_t* data, size_t size) override final;
 };
 
 

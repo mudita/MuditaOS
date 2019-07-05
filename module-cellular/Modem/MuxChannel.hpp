@@ -15,8 +15,9 @@
 #include <string>
 #include <memory>
 #include "FreeRTOS.h"
-#include "queue.h"
+#include "stream_buffer.h"
 #include "task.h"
+
 
 void MuxChannelWorker(void* pvp);
 
@@ -60,9 +61,11 @@ public:
     int Open();
     // Close mux channel
     int Close();
-    // Send message to specific mux channel thread
-    int DistributeMsg(uint8_t* data, size_t size);
-    virtual ssize_t SendCommand(const char* cmd,uint32_t timeout = 1000){}
+
+    //Distribute data to mux channel
+    ssize_t SendData(uint8_t* data, size_t size);
+
+    virtual ssize_t SendCommand(const char* cmd,uint32_t timeout = 1000){return 0;}
 
 
     std::string& GetName(){
@@ -89,18 +92,20 @@ private:
 
     friend void MuxChannelWorker(void* pvp);
 
-    uint32_t workerQueueSize;
+    static const uint32_t inputBufferSize = 512; // in bytes
+
+    bool enableWorkerLoop = false;
+
     uint32_t workerStackSize; // in bytes
 
     TaskHandle_t workerHandle = nullptr;
-    QueueHandle_t workerQueueHandle = nullptr;
-
+    StreamBufferHandle_t inputBuffer;
 
     State state;
     MuxChannelType type;
 
 protected:
-    virtual int ParseInMessage(MuxChannelMsg* msg);
+    virtual int ParseInputData(uint8_t* data, size_t size);
 
     std::string name;
     MuxDaemon* mux;

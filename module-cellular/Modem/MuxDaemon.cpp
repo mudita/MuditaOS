@@ -163,17 +163,17 @@ int MuxDaemon::Start() {
     // Create virtual channels
 
     // Control channel is used for controlling Mux. It is not considered as logical channel i.e it can't receive normal data messages
-    channels.push_back(ControlMuxChannel(this));
+    channels.push_back(std::make_unique<ControlMuxChannel>(this));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
-    channels.push_back(NotificationMuxChannel(this));
+    channels.push_back(std::make_unique<NotificationMuxChannel>(this));
 
     // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
-    channels.push_back(CommunicationMuxChannel(this));
+    channels.push_back(std::make_unique<CommunicationMuxChannel>(this));
 
     // Mux channels must be initialized in sequence
     for (auto &w : channels) {
-        w.Open();
+        w->Open();
         vTaskDelay(200);
     }
 
@@ -280,13 +280,12 @@ int MuxDaemon::CloseMux() {
 
     // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
     for (auto w = channels.size(); --w;) {
-        if (channels[w].GetState() == MuxChannel::State::Opened) {
-            LOG_INFO("Logical channel %d closed", channels[w].GetChannelNumber());
-            channels[w].Close();
+        if (channels[w]->GetState() == MuxChannel::State::Opened) {
+            LOG_INFO("Logical channel %d closed", channels[w]->GetChannelNumber());
+            channels[w]->Close();
         }
     }
 
-    channels.clear();
     return 0;
 }
 

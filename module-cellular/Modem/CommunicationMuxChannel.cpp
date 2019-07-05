@@ -23,8 +23,8 @@ CommunicationMuxChannel::~CommunicationMuxChannel() {
 
 }
 
-int CommunicationMuxChannel::ParseInMessage(MuxChannel::MuxChannelMsg *msg) {
-    LOG_FATAL((name + " received message: " + msg->m_data).c_str());
+int CommunicationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
+    //LOG_FATAL((name + " received message: " + msg->m_data).c_str());
 }
 
 ssize_t CommunicationMuxChannel::SendCommand(const char *cmd, uint32_t timeout) {

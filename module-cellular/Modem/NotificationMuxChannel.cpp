@@ -24,31 +24,41 @@ NotificationMuxChannel::~NotificationMuxChannel() {
 
 }
 
-int NotificationMuxChannel::ParseInMessage(MuxChannel::MuxChannelMsg *msg) {
+int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
+
+    std::string msgStr(data,data+size);
 
     // Incoming call
-    if (msg->m_data.find("RING") != std::string::npos) {
+    if (msgStr.find("RING") != std::string::npos) {
         //TODO:M.P incoming call URC action
         LOG_DEBUG((name + ": incoming call...").c_str());
-        char* resp = "AT\r";
+        char* resp = "ATA\r";
         mux->WriteMuxFrame(GetChannelNumber(), reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
     }
 
     // Incoming call
-    if (msg->m_data.find("+CRING") != std::string::npos) {
+    if (msgStr.find("+CRING") != std::string::npos) {
         //TODO:M.P incoming call URC action
         LOG_DEBUG((name + ": incoming call...").c_str());
     }
 
     // Call aborted/failed
-    if (msg->m_data.find("NO CARRIER") != std::string::npos) {
+    if (msgStr.find("NO CARRIER") != std::string::npos) {
         //TODO:M.P handle it
         LOG_DEBUG((name + ": call failed/aborted").c_str());
     }
 
     // Received new SMS
-    if (msg->m_data.find("+CMTI: ") != std::string::npos) {
+    if (msgStr.find("+CMTI: ") != std::string::npos) {
         //TODO:M.P handle new SMS
-        LOG_DEBUG((name + ": received new SMS: " + msg->m_data).c_str());
+        LOG_DEBUG((name + ": received new SMS notification").c_str());
     }
+
+    // Received signal strength change
+    if (msgStr.find("+QIND: \"csq\" ") != std::string::npos) {
+        //TODO:M.P handle new SMS
+        LOG_DEBUG((name + ": received signal strength change notification").c_str());
+    }
+
+    return 0;
 }
