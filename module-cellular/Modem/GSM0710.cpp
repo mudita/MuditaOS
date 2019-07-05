@@ -14,6 +14,7 @@
 #include "log/log.hpp"
 
 constexpr unsigned char GSM0710Buffer::crcTable[];
+const uint32_t GSM0710Buffer::cmux_N1;
 
 
 GSM0710Frame*  GSM0710Buffer::GetCompleteFrame(GSM0710Frame* frame) {

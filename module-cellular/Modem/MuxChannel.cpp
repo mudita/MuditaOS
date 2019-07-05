@@ -86,12 +86,8 @@ int MuxChannel::Close() {
     vQueueDelete(workerQueueHandle);
     vTaskDelete(workerHandle);
 
-    if (mux->inputBuffer->cmux_mode)
-        mux->WriteMuxFrame(GetChannelNumber(), NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_CLD) |
-                                                   static_cast<unsigned char>(MuxDefines::GSM0710_CR));
-    else
-        mux->WriteMuxFrame(GetChannelNumber(), mux->closeChannelCmd, sizeof(mux->closeChannelCmd),
-                           static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+    mux->WriteMuxFrame(GetChannelNumber(), mux->closeChannelCmd, sizeof(mux->closeChannelCmd),
+                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
     return 0;
 }

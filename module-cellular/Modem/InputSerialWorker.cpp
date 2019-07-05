@@ -15,6 +15,9 @@
 
 
 InputSerialWorker::InputSerialWorker(MuxDaemon *mux) : muxDaemon(mux) {
+
+    inputBuffer = std::make_unique<GSM0710Buffer>(mux->virtualPortsCount);
+
     BaseType_t task_error = xTaskCreate(
             workerTaskFunction,
             "cellInSerWorker",
@@ -35,19 +38,19 @@ InputSerialWorker::~InputSerialWorker() {
 
 
 void workerTaskFunction(void *ptr) {
-    InputSerialWorker *worker = reinterpret_cast<InputSerialWorker *>(ptr);
+    InputSerialWorker *inst = reinterpret_cast<InputSerialWorker *>(ptr);
 
     while (1) {
-        worker->muxDaemon->cellular->Wait(UINT32_MAX);
-        if (worker->ReadIncomingData() > 0) {
-            if (worker->muxDaemon->inputBuffer->GetDataLength() > 0) {
+        inst->muxDaemon->cellular->Wait(UINT32_MAX);
+        if (inst->ReadIncomingData() > 0) {
+            if (inst->inputBuffer->GetDataLength() > 0) {
 
-                if (worker->ExtractFrames()) {
+                if (inst->ExtractFrames()) {
                     //TODO:M.P implement error handling ?
                 }
 
                 // Reorganize data in buffer if necessary
-                worker->muxDaemon->inputBuffer->ReorganizeBuffer();
+                inst->inputBuffer->ReorganizeBuffer();
             }
         }
     }
@@ -58,29 +61,29 @@ int InputSerialWorker::ReadIncomingData() {
 
     switch (muxDaemon->state) {
         case MuxDaemon::States::MUX_STATE_MUXING:
-            length = std::min(muxDaemon->inputBuffer->GetFreeSpace(),
-                              (uint32_t) (muxDaemon->inputBuffer->endp - muxDaemon->inputBuffer->writep));
+            length = std::min(inputBuffer->GetFreeSpace(),
+                              (uint32_t) (inputBuffer->endp - inputBuffer->writep));
 
             if (length > 0) /*available space in buffer (not locked since we want to utilize all available space)*/
             {
-                length = muxDaemon->cellular->Read(muxDaemon->inputBuffer->writep, length);
+                length = muxDaemon->cellular->Read(inputBuffer->writep, length);
                 if (length > 0) {
                     LOG_DEBUG("READ SIZE : %d", length);
                     //syslogdump("<s ", serial->in_buf->writep, length);
-                    muxDaemon->inputBuffer->writep += length;
-                    if (muxDaemon->inputBuffer->writep == muxDaemon->inputBuffer->endp)
-                        muxDaemon->inputBuffer->writep = muxDaemon->inputBuffer->data;
+                    inputBuffer->writep += length;
+                    if (inputBuffer->writep == inputBuffer->endp)
+                        inputBuffer->writep = inputBuffer->data;
 
-                    muxDaemon->inputBuffer->datacount += length; /*updating the data-not-yet-read counter*/
+                    inputBuffer->datacount += length; /*updating the data-not-yet-read counter*/
                     LOG_DEBUG("GSM0710 buffer (up-to-date): written %d, free %d, stored %d",
-                              length, muxDaemon->inputBuffer->GetFreeSpace(), muxDaemon->inputBuffer->GetDataLength());
+                              length, inputBuffer->GetFreeSpace(), inputBuffer->GetDataLength());
 
-                    if (length > muxDaemon->inputBuffer->max_count) {
+                    if (length > inputBuffer->max_count) {
                         LOG_INFO("MAX READ SIZE : %d", length);
                         LOG_INFO("GSM0710 buffer (up-to-date): written %d, free %d, stored %d",
-                                 length, muxDaemon->inputBuffer->GetFreeSpace(),
-                                 muxDaemon->inputBuffer->GetDataLength());
-                        muxDaemon->inputBuffer->max_count = length;
+                                 length, inputBuffer->GetFreeSpace(),
+                                 inputBuffer->GetDataLength());
+                        inputBuffer->max_count = length;
                     }
                 } else {
                     LOG_INFO("READ SIZE : %d", length);
@@ -103,11 +106,11 @@ int InputSerialWorker::ExtractFrames() {
     GSM0710Frame local_frame;
     GSM0710Frame *frame = &local_frame;
 
-    while (muxDaemon->inputBuffer->GetCompleteFrame(frame) != NULL) {
+    while (inputBuffer->GetCompleteFrame(frame) != NULL) {
         frames_extracted++;
 
-        if ((muxDaemon->inputBuffer->GSM0710_FRAME_IS(MuxDefines::GSM0710_TYPE_UI, frame) ||
-             muxDaemon->inputBuffer->GSM0710_FRAME_IS(MuxDefines::GSM0710_TYPE_UIH, frame))) {
+        if ((inputBuffer->GSM0710_FRAME_IS(MuxDefines::GSM0710_TYPE_UI, frame) ||
+             inputBuffer->GSM0710_FRAME_IS(MuxDefines::GSM0710_TYPE_UIH, frame))) {
             LOG_DEBUG("Frame is UI or UIH");
             if (frame->control & static_cast<unsigned char>(MuxDefines::GSM0710_PF)) {
                 muxDaemon->uih_pf_bit_received = 1;

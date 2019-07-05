@@ -26,6 +26,14 @@ class MuxDaemon {
 
 public:
 
+    /**
+     * Multiplexer configuration
+     */
+
+    const static uint32_t baudRate = 115200;
+    const static uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
+    const static bool hardwareControlFlowEnable = false;
+
     MuxDaemon();
 
     ~MuxDaemon();
@@ -90,26 +98,11 @@ private:
 
     States state = States::MUX_STATE_OPENING;
 
-    std::unique_ptr<GSM0710Buffer> inputBuffer=nullptr;
     std::vector<MuxChannel> channels;
 
     cpp_freertos::MutexStandard serOutMutex;
 
     int uih_pf_bit_received = 0;
-
-    /**
-     * Multiplexer configuration
-     */
-
-    const static uint32_t baudRate = 115200;
-    const static uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
-    const static uint32_t frameSize = 127; // default basic frame size
-    const static bool hardwareControlFlowEnable = false;
-    const static bool cmuxMode = false;
-    const static uint32_t cmuxSubset = 0;
-
-
-
 
 };
 
