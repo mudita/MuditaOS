@@ -150,8 +150,8 @@ target_link_libraries(${PROJECT_NAME}
         module-cellular
         module-db
         module-gui
-        module-os
         module-bsp
+        module-os
         module-vfs
         module-services
         module-apps

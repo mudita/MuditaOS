@@ -13,6 +13,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "stream_buffer.h"
 
 #include "dma_config.h"
 #include "fsl_cache.h"
@@ -200,7 +201,7 @@ namespace bsp {
         if (LPUART_SendEDMA(CELLULAR_UART_BASE, &uartDmaHandle, &sendXfer) != kStatus_Success) {
             LOG_ERROR("Cellular: TX Failed!");
             DisableTx();
-            return 0;
+            return -1;
         }
 
         auto ulNotificationValue = ulTaskNotifyTake(pdFALSE, 100);
@@ -208,11 +209,11 @@ namespace bsp {
         if (ulNotificationValue == 0) {
             LOG_ERROR("Cellular Uart error: TX Transmission timeout");
             DisableTx();
-            return 0;
+            return -1;
         }
 
         DisableTx();
-        return 1;
+        return nbytes;
     }
 
     ssize_t RT1051Cellular::Read(void *buf, size_t nbytes) {

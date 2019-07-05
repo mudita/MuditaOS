@@ -31,7 +31,6 @@ void workerTaskFunction(void *ptr) {
                     //TODO:M.P implement error handling ?
                 }
 
-/*                //TODO:M.P sth broken here
                 if (worker->muxDaemon->inputBuffer->readp !=
                     worker->muxDaemon->inputBuffer->data) { //relayout data in cache_buf
                     if (worker->muxDaemon->inputBuffer->GetDataLength()) {
@@ -42,7 +41,7 @@ void workerTaskFunction(void *ptr) {
                     worker->muxDaemon->inputBuffer->readp = worker->muxDaemon->inputBuffer->data;
                     worker->muxDaemon->inputBuffer->writep =
                             worker->muxDaemon->inputBuffer->data + worker->muxDaemon->inputBuffer->GetDataLength();
-                }*/
+                }
             }
         }
     }

@@ -102,7 +102,7 @@ private:
 
     const static uint32_t baudRate = 115200;
     const static uint32_t virtualPortsCount = 4; // max number of virtual channels supported by EG25
-    const static uint32_t frameSize = 127; // default basic frame size, can be extended to max 32kBytes if needed
+    const static uint32_t frameSize = 127; // default basic frame size
     const static bool hardwareControlFlowEnable = false;
     const static bool cmuxMode = false;
     const static uint32_t cmuxSubset = 0;
