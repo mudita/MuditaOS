@@ -8,6 +8,7 @@
  */
 #include "../ApplicationDesktop.hpp"
 #include "MenuWindow.hpp"
+#include "Navigation.hpp"
 
 #include "i18/i18.hpp"
 
@@ -53,17 +54,25 @@ MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
 
 		tiles.push_back( tile );
 	}
+
+	//define navigtion between items
+	for( uint32_t i=0; i<3; i++ ) {
+		for( uint32_t j=0; j<3; j++ ) {
+			tiles[i*3 + j]->setNavigationItem( NavigationDirection::UP, tiles[ ((i+2)%3*3) + j] );
+			tiles[i*3 + j]->setNavigationItem( NavigationDirection::DOWN, tiles[ ((i+1)*3)%9 + j] );
+			tiles[i*3 + j]->setNavigationItem( NavigationDirection::RIGHT, tiles[i*3+ (j+1)%3] );
+			tiles[i*3 + j]->setNavigationItem( NavigationDirection::LEFT, tiles[i*3+ (j+2)%3] );
+		}
+	}
 }
 
 MenuWindow::~MenuWindow() {
 }
 
-gui::Item* createTile( uint32_t index, std::string iconName, std::string title );
-
-gui::Item* MenuWindow::createTile( uint32_t index, std::string iconName, std::string title ) {
-//	gui::Rect*
-	return nullptr;
-}
+//gui::Item* MenuWindow::createTile( uint32_t index, std::string iconName, std::string title ) {
+////	gui::Rect*
+//	return nullptr;
+//}
 
 void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
@@ -75,8 +84,10 @@ void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data
 bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
+	if( ret ) {
+		application->render( RefreshModes::GUI_REFRESH_FAST );
 		return true;
+	}
 
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&

@@ -1,38 +1,55 @@
-6
-[0 - enter-phone-old]
-rysunek-1-old
+9
+[0 - screen1]
+screen1
 F
 0
 1
 0
-[1 - calling-old]
-rysunek-2-old
+[1 - screen2]
+screen2
 F
 0
 2
 0
-[2 - call-old]
-rysunek-3-old
+[2 - screen]
+screen3
 F
 0
 3
 0
-[3 - enter-phone-new]
-rysunek-1-new
+[3 - screen4]
+screen4
 F
 0
 4
 0
-[4 - calling-new]
-rysunek-2-new
+[4 - screen5]
+screen5
 F
 0
 5
 0
-[5 - call-new]
-rysunek-3-new
+[5 - screen6]
+screen6
 F
 0
 1
 0
-
+[6 - screen7]
+screen7
+F
+0
+1
+0
+[7 - screen8]
+screen8
+F
+0
+1
+0
+[8 - screen9]
+screen9
+F
+0
+1
+0

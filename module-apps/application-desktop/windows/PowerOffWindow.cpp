@@ -63,6 +63,24 @@ PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerO
 	selectionLabels[1]->setText( utils::localize.get("common_yes") );
 
 	//define navigation between labels
+	selectionLabels[0]->setNavigationItem( NavigationDirection::LEFT, selectionLabels[1] );
+	selectionLabels[0]->setNavigationItem( NavigationDirection::RIGHT, selectionLabels[1] );
+
+	selectionLabels[1]->setNavigationItem( NavigationDirection::LEFT, selectionLabels[0] );
+	selectionLabels[1]->setNavigationItem( NavigationDirection::RIGHT, selectionLabels[0] );
+
+	//callbacks for getting focus
+	selectionLabels[0]->focusChangedCallback = [=] (gui::Item& item) {
+		LOG_INFO("label 0 focus %s", (selectionLabels[0]->focus?"gained":"lost") );
+		if( item.focus )
+			this->state = State::Return;
+		return true; };
+
+	selectionLabels[1]->focusChangedCallback = [=] (gui::Item& item) {
+		LOG_INFO("label 1 focus %s", (selectionLabels[1]->focus?"gained":"lost") );
+		if( item.focus )
+			this->state = State::PowerDown;
+		return true; };
 }
 
 PowerOffWindow::~PowerOffWindow() {
@@ -78,8 +96,11 @@ void PowerOffWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* 
 bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
+	if( ret ) {
+		LOG_INFO("State: %s", (state==State::PowerDown?"PowerDown":"Return"));
+		application->render(RefreshModes::GUI_REFRESH_FAST);
 		return true;
+	}
 
 	//proccess only short press, consume rest
 	if( inputEvent.state != gui::InputEvent::State::keyReleasedShort )
@@ -97,89 +118,6 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 			application->switchWindow( "MainWindow", 0, nullptr );
 		}
 	}
-
-//	if( inputEvent.state == gui::InputEvent::State::keyReleasedShort ) {
-//		//accept only LF, enter, RF, #, and numeric values
-//		if( state == State::EnteringPin ) {
-//			if( inputEvent.keyCode == KeyCode::KEY_LF ) {
-//				return true;
-//			}
-//			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-//				application->switchWindow( "MainWindow", 0, nullptr );
-//				return true;
-//			}
-//			else if( inputEvent.keyCode == KeyCode::KEY_PND ) {
-//				if( charCount > 0 ) {
-//					pinLabels[charCount-1]->setText("");
-//					charCount--;
-//					bottomBar->setActive( BottomBar::Side::CENTER, false );
-//					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-//				}
-//				return true;
-//			}
-//			else if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-//				if( (state == State::EnteringPin) && (charCount == 4)) {
-//
-//					//TODO make pin chacking here, currentyly it always fails
-//					if( application->getSettings().lockPassHash == (1000*charValue[0]+100*charValue[1]+10*charValue[2]+charValue[3] ) ) {
-//						remainingAttempts = maxPasswordAttempts;
-//						app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-//						app->setScreenLocked(false);
-//						application->switchWindow("MainWindow", 0, nullptr );
-//						return true;
-//					}
-//
-//					if( remainingAttempts == 1 ) {
-//						state = State::PhoneBlocked;
-//						bottomBar->setActive( BottomBar::Side::CENTER, false );
-//						setVisibleState( State::PhoneBlocked );
-//					}
-//					else {
-//						remainingAttempts--;
-//						setVisibleState( State::WrongPinInfo );
-//					}
-//					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-//				}
-//				else if( state == State::WrongPinInfo ) {
-//					setVisibleState( State::EnteringPin );
-//					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-//				}
-//				return true;
-//			}
-//			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
-//				//fill next field with star and store value in array
-//				if( charCount < 4 ) {
-//					pinLabels[charCount]->setText("*");
-//					charValue[charCount] = inputEvent.keyChar-'0';
-//					charCount++;
-//
-//					//if 4 char has been entered show bottom bar confirm
-//					if( charCount == 4 ) {
-//						bottomBar->setActive( BottomBar::Side::CENTER, true );
-//					}
-//					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-//				}
-//				return true;
-//			}
-//		}
-//		else if( state == State::WrongPinInfo ) {
-//			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-//				state = State::EnteringPin;
-//				setVisibleState( State::EnteringPin );
-//				application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-//			}
-//			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-//				state = State::EnteringPin;
-//				application->switchWindow( "MainWindow", 0, nullptr );
-//			}
-//		}
-//		else if( state == State::PhoneBlocked) {
-//			if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-//				application->switchWindow( "MainWindow", 0, nullptr );
-//				return true;
-//			}
-//		}
-//	}
 
 	return false;
 }
