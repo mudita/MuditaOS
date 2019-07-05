@@ -68,12 +68,12 @@ class GSM0710Buffer {
 public:
 
     // +CMUX=<mode>[,<subset>[,<port_speed>[,<N1>[,<T1>[,<N2>[,<T2>[,<T3>[,<k>]]]]]]]]
-    uint32_t cmux_mode = 0;
+    static const uint32_t cmux_mode = 0;
     uint32_t vir_ports = 3; /* number of virtual ports to create */
-    uint32_t cmux_N1 = 127; //lots of modem only support short frame, like quectel 2G modules
-    uint32_t cmux_FRAME = (cmux_N1 + 6); //lots of modem only support short frame, like quectel 2G modules
-    uint32_t QUECTEL_CACHE_FRAMES = 20;
-    uint32_t GSM0710_BUFFER_SIZE = (2 * QUECTEL_CACHE_FRAMES * cmux_FRAME);
+    static const uint32_t cmux_N1 = 127; //lots of modem only support short frame, like quectel 2G modules
+    static const uint32_t cmux_FRAME = (cmux_N1 + 6); //lots of modem only support short frame, like quectel 2G modules
+    static const uint32_t QUECTEL_CACHE_FRAMES = 20;
+    static const uint32_t GSM0710_BUFFER_SIZE = (2 * QUECTEL_CACHE_FRAMES * cmux_FRAME);
 
     unsigned char* data = nullptr;
     unsigned char *readp = nullptr;
@@ -84,10 +84,8 @@ public:
 
 
 
-    GSM0710Buffer(uint32_t virtualPortsCount, uint32_t frameSize=127, uint32_t mode=0) :
-            cmux_mode(mode),
-            vir_ports(virtualPortsCount),
-            cmux_N1(frameSize) {
+    GSM0710Buffer(uint32_t virtualPortsCount) :
+            vir_ports(virtualPortsCount){
 
         currentFrame = std::make_unique<GSM0710Frame>();
 

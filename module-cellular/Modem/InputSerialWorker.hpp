@@ -41,6 +41,8 @@ private:
     xTaskHandle taskHandle;
     const uint32_t taskPriority = 0;
 
+    std::unique_ptr<GSM0710Buffer> inputBuffer=nullptr;
+
 };
 
 

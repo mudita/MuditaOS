@@ -23,9 +23,7 @@
 #include "CommunicationMuxChannel.hpp"
 
 constexpr unsigned char MuxDaemon::closeChannelCmd[];
-const uint32_t MuxDaemon::frameSize;
 const uint32_t MuxDaemon::virtualPortsCount;
-const bool MuxDaemon::cmuxMode;
 
 namespace QuectelBaudrates {
 
@@ -80,7 +78,6 @@ namespace QuectelBaudrates {
 
 MuxDaemon::MuxDaemon() {
     cellular = bsp::Cellular::Create();
-    inputBuffer = std::make_unique<GSM0710Buffer>(virtualPortsCount, frameSize, cmuxMode);
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -148,14 +145,12 @@ int MuxDaemon::Start() {
     SendAT("AT+CNMI=1,2,0,1,0\r", 500);*/
 
 
+    // This driver supports only Basic mode (max frame length = 127bytes and no frame errors correction)
     char gsm_command[128] = {};
-    if (cmuxMode) {
-        snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=1\r\n");
-    } else {
-        snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", cmuxMode,
-                 cmuxSubset, QuectelBaudrates::Baudrates<baudRate>::Value, frameSize
-        );
-    }
+    snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", GSM0710Buffer::cmux_mode,
+             0, QuectelBaudrates::Baudrates<baudRate>::Value, GSM0710Buffer::cmux_N1
+    );
+
 
     // Start CMUX multiplexer
     SendAT(gsm_command, 500);
@@ -226,7 +221,7 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
     unsigned char postfix[2] = {0xFF, static_cast<unsigned char>(MuxDefines::GSM0710_FRAME_FLAG )};
     ssize_t prefix_length = 4;
     int c;
-    unsigned char tmp[inputBuffer->cmux_FRAME];
+    unsigned char tmp[GSM0710Buffer::cmux_FRAME];
 
     LOG_DEBUG("Sending frame to channel %d", channel);
 
@@ -238,14 +233,14 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
     if ((type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH) ||
          type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UI)) &&
         uih_pf_bit_received == 1 &&
-        inputBuffer->GSM0710_COMMAND_IS(MuxDefines::GSM0710_CONTROL_MSC, input[0])) {
+        GSM0710Buffer::GSM0710_COMMAND_IS(MuxDefines::GSM0710_CONTROL_MSC, input[0])) {
         prefix[2] = prefix[2] |
                     static_cast<unsigned char>(MuxDefines::GSM0710_PF); //Set the P/F bit in Response if Command from modem had it set
         uih_pf_bit_received = 0; //Reset the variable, so it is ready for next command
     }
 /* let's not use too big frames */
-    length = std::min(inputBuffer->cmux_N1, static_cast<uint32_t >(length));
-    if (!cmuxMode)//basic
+    length = std::min(GSM0710Buffer::cmux_N1, static_cast<uint32_t >(length));
+    // Only basic mode is supported
     {
 /* Modified acording PATCH CRC checksum */
 /* postfix[0] = frame_calc_crc (prefix + 1, prefix_length - 1); */
