@@ -23,19 +23,15 @@ void workerTaskFunction( void* ptr );
 class InputSerialWorker {
 public:
 
-    friend void workerTaskFunction( void* ptr );
-
     InputSerialWorker(MuxDaemon* mux);
-    virtual ~InputSerialWorker(){}
-
-    bool Init();
-    bool Deinit();
-
-    // Pointer to muxDaemon which is owner of this worker
-    MuxDaemon* muxDaemon;
+    ~InputSerialWorker();
 
 private:
 
+    friend void workerTaskFunction( void* ptr );
+
+    // Pointer to muxDaemon which is owner of this worker
+    MuxDaemon* muxDaemon;
 
     int ReadIncomingData();
     int ExtractFrames();

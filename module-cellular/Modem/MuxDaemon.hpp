@@ -24,11 +24,6 @@
 
 class MuxDaemon {
 
-    friend InputSerialWorker;
-    friend MuxChannel;
-
-    friend void workerTaskFunction(void *ptr);
-
 public:
 
     MuxDaemon();
@@ -45,6 +40,12 @@ public:
                           unsigned char type);
 
 private:
+
+    friend InputSerialWorker;
+    friend MuxChannel;
+
+    friend void workerTaskFunction(void *ptr);
+
 
     int SendAT(const char *cmd, uint32_t timeout);
 
