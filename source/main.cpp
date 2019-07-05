@@ -64,7 +64,22 @@ public:
         LOG_INFO("Current percent: %d", percent);
         bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::VCELL_REG, &val);
         float voltage = (float) val * 0.078125;
-        LOG_INFO("Current percent: %d", (uint32_t)voltage);
+        LOG_INFO("Current voltage: %d", (uint32_t)voltage);
+
+        bsp::battery_chargerTopControllerRead(static_cast<bsp::batteryChargerRegisters>(0x22), &val);
+        LOG_INFO("Interupt source: %d", val);
+        bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &val);
+
+        LOG_INFO("status reg 0x%x", val);
+
+        if(val & 0x0080)
+        {
+        	LOG_WARN("Clear status register");
+        	bsp::battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, val);
+        }
+
+        	//uint32_t pin = GPIO_PinRead(BOARD_BATTERY_CHARGER_INTB_GPIO, BOARD_BATTERY_CHARGER_INTB_PIN);
+       // LOG_INFO("INTB pin %d", pin);
     }
 
 
@@ -119,6 +134,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 }
 
 int main() {
+
 
 	LOG_PRINTF("Launching PurePhone..\n ");
 
