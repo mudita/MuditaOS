@@ -72,10 +72,15 @@ sys::ReturnCodes EventManager::InitHandler() {
 	EventWorker = new WorkerEvent( this );
 
 	//create queues for worker
+	//keyboard irq queue
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
+	//battery manager queue
+	sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10 };
+
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qIrq);
+	list.push_back(qBattery);
 
 	EventWorker->init( list );
 	EventWorker->run();

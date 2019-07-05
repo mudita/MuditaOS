@@ -39,7 +39,6 @@ public:
     {
         timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
-        bsp::battery_Init();
     }
 
     ~BlinkyService(){
@@ -55,7 +54,7 @@ public:
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
 
-        uint16_t val;
+       /* uint16_t val;
         bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepCap_REG, &val);
         LOG_INFO("Current capacity: %d", val);
         bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepSOC_REG, &val);
@@ -77,7 +76,7 @@ public:
         	LOG_WARN("Clear status register");
         	bsp::battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, val);
         }
-
+*/
         	//uint32_t pin = GPIO_PinRead(BOARD_BATTERY_CHARGER_INTB_GPIO, BOARD_BATTERY_CHARGER_INTB_PIN);
        // LOG_INFO("INTB pin %d", pin);
     }
@@ -114,7 +113,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    //ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;

@@ -22,6 +22,7 @@ extern "C" {
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "module-bsp/bsp/keyboard/keyboard.hpp"
+#include "module-bsp/bsp/battery-charger/battery_charger.hpp"
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
@@ -50,6 +51,24 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
 
 	}
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery) )
+	{
+		uint8_t notification;
+		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
+				return false;
+		}
+		if(notification == 0x01)
+		{
+			uint8_t battLevel;
+			bsp::battery_getData(battLevel);
+			LOG_INFO("Battery level: %d", battLevel);
+		}
+		if(notification == 0x02)
+		{
+			LOG_INFO("Plugged");
+		}
+	}
+
 	return true;
 }
 
@@ -58,7 +77,7 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	Worker::init(queues);
 	std::vector<xQueueHandle> qhanldes = this->getQueues();
 	bsp::keyboard_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
-
+	bsp::battery_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	return true;
 }
 bool WorkerEvent::deinit(void)
