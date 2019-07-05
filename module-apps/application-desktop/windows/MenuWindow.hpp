@@ -29,14 +29,14 @@ class MenuWindow: public AppWindow {
 		std::string applicationName;
 	};
 	std::vector<TileStrings> tileDefinitions {
-		TileStrings{"menu_phonebook","app_desktop_menu_phonebook","Phonebook"},
+		TileStrings{"menu_phone","app_desktop_menu_phone","Phonebook"},
+		TileStrings{"menu_contacts","app_desktop_menu_contacts","Contacts"},
 		TileStrings{"menu_messages","app_desktop_menu_messages","Messages"},
 		TileStrings{"menu_calendar","app_desktop_menu_calendar","Calendar"},
-		TileStrings{"menu_music","app_desktop_menu_music","Music"},
-		TileStrings{"menu_notes","app_desktop_menu_notes","Note"},
 		TileStrings{"menu_alarm","app_desktop_menu_alarm","Alarm"},
 		TileStrings{"menu_meditation","app_desktop_menu_meditation","Meditation"},
-		TileStrings{"menu_calculator","app_desktop_menu_calculator","Calculator"},
+		TileStrings{"menu_music_player","app_desktop_menu_music","Music"},
+		TileStrings{"menu_tools","app_desktop_menu_tools","Tools"},
 		TileStrings{"menu_settings","app_desktop_menu_settings","Settings"},
 			//TODO this is for tests of menu pages
 //		TileStrings{"menu_alarm","app_desktop_menu_meditation","Meditation"},
