@@ -304,7 +304,6 @@ BaseType_t BSP_BatteryChargerINOKB_IRQHandler()
 	        	uint8_t val = 0x01;
 	        	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
 	        }
-//	LOG_INFO("INOKB IRQ!!!");
 	return xHigherPriorityTaskWoken;
 
 
@@ -322,7 +321,6 @@ BaseType_t BSP_BatteryChargerINTB_IRQHandler()
 	        	uint8_t val = 0x01;
 	        	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
 	        }
-//	LOG_INFO("INTB IRQ!!!");
 	return xHigherPriorityTaskWoken;
 }
 

@@ -8,6 +8,8 @@
 #ifndef MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 #define MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 
+#include "service-evtmgr/WorkerEvent.hpp"
+
 namespace bsp{
 
 enum class batteryChargerRegisters{
@@ -91,7 +93,7 @@ enum class batteryChargerRegisters{
 		battery_ChargerCharging
 	};
 
-	int battery_Init();
+	int battery_Init(xQueueHandle qHandle);
 
 	int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
 
@@ -105,7 +107,7 @@ enum class batteryChargerRegisters{
 
 	int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value);
 
-
+	void battery_getData(uint8_t& levelPercent);
 }
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler();

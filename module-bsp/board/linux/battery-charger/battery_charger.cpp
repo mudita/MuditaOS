@@ -7,6 +7,9 @@
 #include <stdint.h>
 #include "FreeRTOS.h"
 
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include "board.h"
 #include "battery-charger/battery_charger.hpp"
 
@@ -14,21 +17,38 @@
 #define BSP_FUEL_GAUGE_I2C_ADDR                             (0x6C >> 1)
 #define BSP_TOP_CONTROLLER_I2C_ADDR                         (0xCC >> 1)
 
-static void s_BSP_BatteryChargerIrqPinsInit();
+
 
 
 static const uint16_t chargerRegs [][2] = {
 		{static_cast<uint16_t>(bsp::batteryChargerRegisters::RepCap_REG) , 2000},
 		{0,0}
 };
-namespace bsp{
-	int battery_Init()
-	{
-	//    s_BSP_BatteryChargerIrqPinsInit();
 
+static const uint32_t secondsToTick = 2;
+
+static xQueueHandle qHandleIrq = NULL;
+static TaskHandle_t battery_worker_handle = NULL;
+
+static uint8_t battLevel = 100;
+static bool plugged = false;
+namespace bsp{
+
+	static void battery_worker(void *pvp);
+
+	int battery_Init(xQueueHandle qHandle)
+	{
+		qHandleIrq = qHandle;
+		if (xTaskCreate(battery_worker, "keyboard", 512, qHandle, 0, &battery_worker_handle) != pdPASS) {
+				return 1;
+			}
 		return 0;
 	}
 
+	void battery_getData(uint8_t& levelPercent)
+	{
+			levelPercent = battLevel;
+	}
 	int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value)
 	{
 
@@ -93,6 +113,54 @@ namespace bsp{
 	//
 	//    bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
 	//    return (int)bsp_i2c_Receive(i2c, BSP_TOP_CONTROLLER_I2C_ADDR, registerAddress, (uint8_t*)value, sizeof(uint16_t));
+	}
+
+	static void battery_worker(void *pvp)
+	{
+
+			const char * myfifo = "/tmp/fifoBattKeys";
+
+			// Creating the named file(FIFO)
+			// mkfifo(<pathname>, <permission>)
+			mkfifo(myfifo, 0666);
+
+			// Open FIFO for write only
+			int fd;
+			fd = open(myfifo, O_RDONLY | O_NONBLOCK );
+
+
+			while(1)
+			{
+				uint8_t buff [10];
+				int32_t readedBytes = read(fd, buff, 10);
+
+				if(readedBytes > 0)
+				{
+
+
+
+					uint8_t notification = 0;
+					switch (buff[0])
+					{
+					case 'p':
+						notification = 0x02;
+						plugged = 1 - plugged;
+						break;
+					case ']':
+						notification = 0x01;
+						if(battLevel < 100)
+							battLevel++;
+						break;
+					case '[':
+						notification = 0x01;
+						if(battLevel > 1)
+							battLevel--;
+					break;
+					}
+					xQueueSend(qHandleIrq, &notification, 100);
+				}
+				vTaskDelay(50);
+		}
 	}
 }
 
