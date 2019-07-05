@@ -32,7 +32,7 @@ protected:
 
 	void updateBottomBar();
 public:
-	EnterNumberWindow( app::Application* app );
+	EnterNumberWindow( app::Application* app, std::string windowName = "EnterNumberWindow" );
 	virtual ~EnterNumberWindow();
 
 	bool onInput( const InputEvent& inputEvent ) override;
