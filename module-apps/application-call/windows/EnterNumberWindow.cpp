@@ -15,7 +15,7 @@
 
 namespace gui {
 
-EnterNumberWindow::EnterNumberWindow( app::Application* app ) : AppWindow(app,"EnterNumberWindow") {
+EnterNumberWindow::EnterNumberWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName ) {
 	setSize( 480, 600 );
 
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );

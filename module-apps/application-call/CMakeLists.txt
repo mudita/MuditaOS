@@ -19,10 +19,12 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EnterNumberWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CallSwitchData.hpp"
 )
 

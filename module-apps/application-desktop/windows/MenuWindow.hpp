@@ -53,7 +53,6 @@ protected:
 	gui::Label* title = nullptr;
 	std::vector<gui::Item*> tiles;
 
-	gui::Item* createTile( uint32_t index, std::string iconName, std::string title );
 public:
 	MenuWindow( app::Application* app );
 	virtual ~MenuWindow();
