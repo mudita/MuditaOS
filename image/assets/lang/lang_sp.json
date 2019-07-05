@@ -43,6 +43,7 @@
     "app_call_clear": "CLEAR",
     "app_call_reject": "REJECT",
     "app_call_answer": "ANSWER",
+    "app_call_emergency": "Emergency call",
 
 
     "settings_lang_PL": "PL",

@@ -105,7 +105,6 @@ bool Window::onInput( const InputEvent& inputEvent) {
 		default:
 			break;
 		}
-
 	}
 
 	if( newFocusItem != nullptr ) {

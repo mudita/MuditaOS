@@ -43,6 +43,7 @@
     "app_call_clear": "WYCZYŚĆ",
     "app_call_reject": "ODRZUĆ",
     "app_call_answer": "ODBIERZ",
+    "app_call_emergency": "Numer alarmowy",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
