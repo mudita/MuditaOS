@@ -119,8 +119,8 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 	}
 
 	//search for application with specified name and run it
-	//std::string runAppName = "ApplicationDesktop";
-	std::string runAppName = "ApplicationViewer";
+	std::string runAppName = "ApplicationDesktop";
+//	std::string runAppName = "ApplicationViewer";
 
 	auto it = applications.find(runAppName);
 	if( it!= applications.end()){

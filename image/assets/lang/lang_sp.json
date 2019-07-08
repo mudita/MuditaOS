@@ -36,6 +36,10 @@
     "app_desktop_menu_tools": "TOOLS",
     "app_desktop_menu_settings": "SETTINGS",
     "app_desktop_menu_title": "Main Menu",
+    "app_desktop_tools_title": "Tools",
+    "app_desktop_tools_notes": "NOTES",
+    "app_desktop_tools_calculator": "CALCULATOR",
+    "app_desktop_tools_recorder": "RECORDER",
     "app_desktop_poweroff_title": "Turn Off",
     "app_desktop_poweroff_question": "Select Yes to power down",
     
