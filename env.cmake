@@ -1,1 +1,0 @@
-set(TOOLCHAIN_PATH "/usr" CACHE INTERNAL "")
