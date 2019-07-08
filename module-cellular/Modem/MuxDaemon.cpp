@@ -81,6 +81,20 @@ MuxDaemon::MuxDaemon() {
 }
 
 MuxDaemon::~MuxDaemon() {
+    CloseMux();
+}
+
+std::unique_ptr<MuxDaemon> MuxDaemon::Create() {
+    auto inst = std::make_unique<MuxDaemon>();
+
+    auto ret = inst->Start();
+
+    if(ret != 0){
+        return nullptr;
+    }
+    else{
+        return inst;
+    }
 
 }
 
@@ -180,12 +194,6 @@ int MuxDaemon::Start() {
     return 0;
 }
 
-int MuxDaemon::Exit() {
-    CloseMux();
-    return 0;
-}
-
-
 int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
     char buff[256] = {0};
 
@@ -283,8 +291,13 @@ int MuxDaemon::CloseMux() {
         if (channels[w]->GetState() == MuxChannel::State::Opened) {
             LOG_INFO("Logical channel %d closed", channels[w]->GetChannelNumber());
             channels[w]->Close();
+            vTaskDelay(100);
         }
     }
+
+    // Close control channel
+    LOG_INFO("Control channel %d closed", channels[0]->GetChannelNumber());
+    channels[0]->Close();
 
     return 0;
 }
