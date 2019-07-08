@@ -15,7 +15,7 @@ extern "C"  {
 #include "chip.h"
 #include "fsl_dmamux.h"
 #include "fsl_edma.h"
-#include "eink/dma_config.h"
+#include "dma_config.h"
 }
 
 #endif /* MODULE_SERVICES_SERVICE_EINK_BOARD_RT1051_EINKINCLUDES_HPP_ */
