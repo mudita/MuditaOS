@@ -56,12 +56,7 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
-        //auto msg = std::make_shared<sys::DataMessage>(500);
-        //sys::Bus::SendUnicast(msg,"Blinky",this);
         LOG_DEBUG("Blinky service tick!");
-
-        char* resp = "ATI\r";
-        //muxdaemon->WriteMuxFrame(1, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
     }
 
     // Invoked during initialization
