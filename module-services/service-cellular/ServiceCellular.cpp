@@ -24,10 +24,19 @@ ServiceCellular::ServiceCellular()
         : sys::Service(serviceName, 1024 * 4, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceCellular] Initializing");
 
+
+    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
 
-    muxdaemon = MuxDaemon::Create();
+    muxdaemon = MuxDaemon::Create([](NotificationType type, std::string resp){
+
+        std::
+
+        sys::Bus::SendMulticast()
+
+    });
 
 
 /*    vTaskDelay(5000);

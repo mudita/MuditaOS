@@ -13,9 +13,11 @@
 #include <string.h>
 #include "MuxDaemon.hpp"
 
+class Service;
 
-NotificationMuxChannel::NotificationMuxChannel(MuxDaemon* mux):
-    MuxChannel(mux,1,MuxChannel::MuxChannelType ::Notification,"NotificationChannel")
+NotificationMuxChannel::NotificationMuxChannel(MuxDaemon* mux,NotificationCallback_t callback):
+    MuxChannel(mux,1,MuxChannel::MuxChannelType ::Notification,"NotificationChannel"),
+    notificationCallback(std::move(callback))
 {
 
 }
@@ -30,33 +32,32 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
 
     // Incoming call
     if (msgStr.find("RING") != std::string::npos) {
-        //TODO:M.P incoming call URC action
         LOG_TRACE((name + ": incoming call...").c_str());
-        char* resp = "ATA\r";
-        mux->WriteMuxFrame(GetChannelNumber(), reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+        notificationCallback(NotificationType::IncomingCall,"dummy");// TODO:M.P add incoming number parsing
     }
 
     // Incoming call
     if (msgStr.find("+CRING") != std::string::npos) {
-        //TODO:M.P incoming call URC action
         LOG_TRACE((name + ": incoming call...").c_str());
+        notificationCallback(NotificationType::IncomingCall,"dummy");// TODO:M.P add incoming number parsing
     }
 
     // Call aborted/failed
     if (msgStr.find("NO CARRIER") != std::string::npos) {
-        //TODO:M.P handle it
         LOG_TRACE((name + ": call failed/aborted").c_str());
+        notificationCallback(NotificationType::CallAborted,"dummy");//
     }
 
     // Received new SMS
     if (msgStr.find("+CMTI: ") != std::string::npos) {
-        //TODO:M.P handle new SMS
         LOG_TRACE((name + ": received new SMS notification").c_str());
+        notificationCallback(NotificationType::NewIncomingSMS,"dummy");// TODO:M.P add SMS nr parsing
     }
 
     // Received signal strength change
     if (msgStr.find("+QIND: \"csq\"") != std::string::npos) {
         LOG_TRACE((name + ": received signal strength change notification").c_str());
+        notificationCallback(NotificationType::SignalStrengthUpdate,"dummy");// TODO:M.P add signal strength parsing
     }
 
     return 0;
