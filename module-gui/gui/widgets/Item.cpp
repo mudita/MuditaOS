@@ -29,10 +29,10 @@ Item::Item() :
 	maxWidth { 0xFFFF },
 	navigationDirections{ nullptr } {
 
-	focusChangedCallback = nullptr;
-	activatedCallback = nullptr;
-	inputCallback = nullptr;
-	dimensionChangedCallback = nullptr;
+	focusChangedCallback = [](Item&){ return false;};
+	activatedCallback = [](Item&){ return false;};
+	inputCallback = [](Item&, InputEvent& inputEvent){ return false;};
+	dimensionChangedCallback = [](Item&,  void* data){ return false;};
 }
 
 Item::~Item() {

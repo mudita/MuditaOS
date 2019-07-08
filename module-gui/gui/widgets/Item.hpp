@@ -37,11 +37,6 @@ enum class ItemType {
 
 class Item {
 public:
-	typedef bool (*focusChangedCallback_t)(Item&);
-	typedef bool (*activatedCallback_t)(Item&, void* data );
-	typedef void (*dimensionChangedCallback_t)(Item&);
-	typedef bool (*inputCallback_t)(Item&, const InputEvent& inputEvent );
-
 	//flag that informs whether item has a focus
 	bool focus;
 	//type of the widget
@@ -74,41 +69,21 @@ public:
 	uint16_t maxWidth;
 
 	//callbacks
-	focusChangedCallback_t focusChangedCallback;
-	activatedCallback_t    activatedCallback;
-	inputCallback_t        inputCallback;
-	dimensionChangedCallback_t dimensionChangedCallback;
+	std::function<bool(Item&)> focusChangedCallback;
+	std::function<void(Item&,  void* data)> dimensionChangedCallback;
+	std::function<bool(Item&)> activatedCallback;
+	std::function<bool(Item&, InputEvent& inputEvent)> inputCallback;
 
 	bool setFocus( bool state ) {
-		bool newFocus = onFocus(state);
-		if( newFocus != focus ) {
+		if( state != focus ) {
 			focus = state;
-			if( focusChangedCallback )
-				focusChangedCallback( *this );
-
+			focusChangedCallback( *this );
 		};
 		return state;
 	}
 
-	bool addFocusChangedCallback( focusChangedCallback_t cfun ) {
-		focusChangedCallback = cfun;
-		return true;
-	}
-	bool addActivatedCallback( activatedCallback_t cfun ) {
-		activatedCallback = cfun;
-		return true;
-	}
-	bool addInputCallback( inputCallback_t cfun ) {
-		inputCallback = cfun;
-		return true;
-	}
-	bool addDimensionChangedCallback( dimensionChangedCallback_t cfun ) {
-		dimensionChangedCallback = cfun;
-		return true;
-	}
-
 	virtual bool onFocus( bool state ) { focus = state; return true; };
-	virtual bool onActivated( void* data ) { return false; };
+	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
 	virtual bool onInput( const InputEvent& inputEvent ) { return false; };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
 

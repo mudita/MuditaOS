@@ -61,9 +61,25 @@ false
 '#'
 3000
 #JoystickLeft = 11,
+11
+false
+''
+0
 #JoystickRight = 13,
+13
+false
+''
+0
 #JoystickUp = 2,
+2
+false
+''
+0
 #JoystickDown = 22,
+22
+false
+''
+0
 #JoystickEnter = 12,
 12
 false
@@ -78,7 +94,7 @@ false
 23
 false
 ''
-0
+3000
 #VolUp = 4,
 #VolDown = 14,
 #Torch = 24,

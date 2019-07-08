@@ -59,6 +59,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
 			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName().c_str());
+			handleSwitchPrevApplication( msg );
 		}break;
 		case static_cast<uint32_t>(MessageType::APMConfirmSwitch): {
 			sapm::APMConfirmSwitch* msg = reinterpret_cast<sapm::APMConfirmSwitch*>( msgl );
@@ -85,7 +86,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		} break;
 		case static_cast<int32_t>(MessageType::APMRegister) : {
 			sapm::APMRegister* msg = reinterpret_cast<sapm::APMRegister*>( msgl );
-			LOG_INFO("APMregister %s %d", msg->getSenderName().c_str(), msg->getStatus());
+			LOG_INFO("APMregister %s %s", msg->getSenderName().c_str(), (msg->getStatus()?"true":"false"));
 			handleRegisterApplication( msg );
 		} break;
 		default : {
@@ -119,6 +120,7 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//search for application with specified name and run it
 	std::string runAppName = "ApplicationDesktop";
+//	std::string runAppName = "ApplicationViewer";
 
 	auto it = applications.find(runAppName);
 	if( it!= applications.end()){
@@ -150,9 +152,16 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 		return false;
 	}
 
-	state = State::WAITING_NEW_APP_REGISTRATION;
-	LOG_INFO( "strting application: %s", appName.c_str());
-	it->second->lanucher->run(systemManager);
+	if( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) {
+		state = State::WAITING_GET_FOCUS_CONFIRMATION;
+		LOG_INFO( "switching focus to application: %s", appName.c_str());
+		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+	}
+	else {
+		state = State::WAITING_NEW_APP_REGISTRATION;
+		LOG_INFO( "starting application: %s", appName.c_str());
+		it->second->lanucher->run(systemManager);
+	}
 
 	return true;
 }
@@ -176,9 +185,67 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 
 	//store the name of the application to be executed and start closing previous application
 	launchApplicationName = msg->getName();
+
 	//store window and data if there is any
 	it->second->switchData = std::move(msg->getData());
 	it->second->switchWindow = msg->getWindow();
+	state = State::CLOSING_PREV_APP;
+
+	//notify event manager which application should receive keyboard messages
+	EventManager::messageSetApplication( this, launchApplicationName );
+
+	//check if there was previous application
+	if( !focusApplicationName.empty() ) {
+		previousApplicationName = focusApplicationName;
+		auto it = applications.find( previousApplicationName );
+
+		//if application's launcher defines that it can be closed send message with close signal
+		if( it->second->closeable ){
+			LOG_INFO( "Closing application: %s", previousApplicationName.c_str() );
+			state = State::WAITING_CLOSE_CONFIRMATION;
+			app::Application::messageCloseApplication( this, previousApplicationName );
+		}
+		//if application is not closeable send lost focus message
+		else {
+			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
+			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
+		}
+	}
+	//if there was no application to close or application can't be closed change internal state to
+	//STARTING_NEW_APP and send execute lanuchers for that application
+	else {
+		startApplication( it->second->name);
+	}
+
+	return true;
+}
+
+//tries to switch the application
+bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
+
+	//if there is no previous application return false and do nothing
+	if( previousApplicationName.empty() ) {
+		return false;
+	}
+
+	//check if previous application is stored in the description vector
+	auto it = applications.find( previousApplicationName );
+	if( it == applications.end() ) {
+		//specified application was not found, exiting
+		LOG_ERROR("Unable to find previous application");
+		return false;
+	}
+
+	//check if specified application is not the application that is currently running
+	if( focusApplicationName == previousApplicationName ) {
+		LOG_WARN("Trying to return currently active application");
+		return false;
+	}
+
+	//set name of the application to be executed and start closing previous application
+	launchApplicationName = previousApplicationName;
+	//store window and data if there is any
+	it->second->switchData = std::move(msg->getData());
 	state = State::CLOSING_PREV_APP;
 
 	//notify event manager which application should receive keyboard messages
@@ -286,7 +353,7 @@ bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
 
-	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender,500  );
+	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender,2000  );
 	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
@@ -295,9 +362,11 @@ bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
 	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
-bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender, const std::string& prevAppName ) {
+bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender ) {
 
-	return true;
+	auto msg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
+	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
+	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status ) {
