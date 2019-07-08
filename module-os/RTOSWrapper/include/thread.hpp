@@ -382,7 +382,7 @@ public: // TODO: M.P
          *  The name of this thread.
          */
 #ifndef CPP_FREERTOS_NO_CPP_STRINGS
-        const std::string Name;
+        std::string Name;
 #else
         char Name[configMAX_TASK_NAME_LEN];
 #endif
@@ -390,7 +390,7 @@ public: // TODO: M.P
         /**
          *  Stack depth of this Thread, in words.
          */
-        const uint16_t StackDepth;
+        uint16_t StackDepth;
 
         /**
          *  A saved / cached copy of what the Thread's priority is.

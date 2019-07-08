@@ -9,8 +9,9 @@
 
 #include "irq_gpio.hpp"
 
-#include "board.h"
+#include "common/board.h"
 #include "FreeRTOS.h"
+#include "queue.h"
 #include "task.h"
 #include "fsl_edma.h"
 #include "fsl_dmamux.h"
