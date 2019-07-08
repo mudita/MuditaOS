@@ -15,43 +15,48 @@
 #include "widgets/BottomBar.hpp"
 #include "widgets/TopBar.hpp"
 #include "widgets/Label.hpp"
+#include "widgets/Rect.hpp"
+
+#include "utf8/UTF8.hpp"
 
 namespace gui {
+
+//name of icon, description, name of application to run
+struct TileDescription{
+	std::string iconName;
+	std::string i18Desctiption;
+	std::function<bool(Item&)> activatedCallback;
+};
+
+class MenuPage : public gui::Rect {
+public:
+	enum class PageID {
+		MainPage= 1,
+		ToolsPage
+	};
+	PageID id;
+	uint32_t pageSize = 9;
+	gui::Label* title = nullptr;
+	std::vector<gui::Item*> tiles;
+
+	MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_t h,
+		const std::vector<TileDescription>& tilesDescription, const UTF8& title, MenuPage::PageID id );
+	virtual ~MenuPage();
+
+	const PageID& getID(){ return id; };
+};
 
 /*
  *
  */
 class MenuWindow: public AppWindow {
-	//name of icon, description, name of application to run
-	struct TileStrings{
-		std::string iconName;
-		std::string i18Desctiption;
-		std::string applicationName;
-	};
-	std::vector<TileStrings> tileDefinitions {
-		TileStrings{"menu_phone","app_desktop_menu_phone","Phonebook"},
-		TileStrings{"menu_contacts","app_desktop_menu_contacts","Contacts"},
-		TileStrings{"menu_messages","app_desktop_menu_messages","Messages"},
-		TileStrings{"menu_calendar","app_desktop_menu_calendar","Calendar"},
-		TileStrings{"menu_alarm","app_desktop_menu_alarm","Alarm"},
-		TileStrings{"menu_meditation","app_desktop_menu_meditation","Meditation"},
-		TileStrings{"menu_music_player","app_desktop_menu_music","Music"},
-		TileStrings{"menu_tools","app_desktop_menu_tools","Tools"},
-		TileStrings{"menu_settings","app_desktop_menu_settings","Settings"},
-			//TODO this is for tests of menu pages
-//		TileStrings{"menu_alarm","app_desktop_menu_meditation","Meditation"},
-//		TileStrings{"menu_calculator","app_desktop_menu_calculator","Calculator"},
-//		TileStrings{"menu_settings","app_desktop_menu_settings","Settings"},
-//		TileStrings{"menu_settings","app_desktop_menu_settings","Settings"}
-	};
 protected:
-	//page that is currently selected by the user.
-	uint32_t currentPage = 0;
-	uint32_t pageSize = 9;
 	gui::BottomBar* bottomBar = nullptr;
 	gui::TopBar* topBar = nullptr;
-	gui::Label* title = nullptr;
-	std::vector<gui::Item*> tiles;
+
+	//page that is currently selected by the user.
+	uint32_t currentPage =  0;
+	std::vector<gui::MenuPage*> pages;
 
 public:
 	MenuWindow( app::Application* app );
@@ -59,6 +64,8 @@ public:
 
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 	bool onInput( const InputEvent& inputEvent ) override;
+
+	void switchPage( uint32_t index );
 };
 
 } /* namespace gui */
