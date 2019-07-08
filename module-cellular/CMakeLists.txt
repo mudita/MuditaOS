@@ -64,7 +64,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-utils module-vfs module-bsp module-sys )
+target_link_libraries(${PROJECT_NAME} module-bsp module-utils module-vfs  module-sys )
 
 # Host target configuration(mainly used for unit testing)
 

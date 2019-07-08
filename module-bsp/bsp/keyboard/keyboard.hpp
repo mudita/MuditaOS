@@ -15,7 +15,6 @@
 #include <stdint.h>
 
 #include "common.hpp"
-#include "service-evtmgr/WorkerEvent.hpp"
 #include "key_codes.hpp"
 
 namespace bsp {
