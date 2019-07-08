@@ -1,6 +1,6 @@
 9
-[0 - screen1]
-screen1
+[0 - screen8]
+screen8
 F
 0
 1
@@ -33,23 +33,24 @@ F
 screen6
 F
 0
-1
+6
 0
 [6 - screen7]
 screen7
 F
 0
-1
+7
 0
-[7 - screen8]
-screen8
+[7 - screen1]
+screen1
 F
 0
-1
+2
 0
 [8 - screen9]
 screen9
 F
 0
-1
 0
+0
+

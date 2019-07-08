@@ -83,7 +83,7 @@ public:
 	}
 
 	virtual bool onFocus( bool state ) { focus = state; return true; };
-	virtual bool onActivated( void* data ) { return false; };
+	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
 	virtual bool onInput( const InputEvent& inputEvent ) { return false; };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
 
