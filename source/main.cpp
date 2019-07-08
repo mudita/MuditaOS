@@ -21,6 +21,7 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
 
 //module-bsp
 #include "bsp.hpp"
@@ -35,11 +36,13 @@ class vfs vfs;
 
 
 class BlinkyService : public sys::Service {
+
+
 public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-        timer_id = CreateTimer(100,true);
+        timer_id = CreateTimer(3000,true);
         ReloadTimer(timer_id);
     }
 
@@ -89,7 +92,8 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    //ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
@@ -107,7 +111,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 	applications.push_back( std::move(callLauncher) );
 
     //start application manager
-   ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;
