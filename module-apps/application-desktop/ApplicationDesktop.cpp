@@ -7,14 +7,17 @@
  * @details
  */
 
-#include "windows/DesktopMainWindow.hpp"
+
 
 #include "Application.hpp"
-#include "ApplicationDesktop.hpp"
 
 #include "MessageType.hpp"
+#include "windows/DesktopMainWindow.hpp"
 #include "windows/PinLockWindow.hpp"
+#include "windows/MenuWindow.hpp"
+#include "windows/PowerOffWindow.hpp"
 
+#include "ApplicationDesktop.hpp"
 
 namespace app {
 
@@ -54,6 +57,12 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 	if( ret != sys::ReturnCodes::Success )
 		return ret;
 
+	//if value of the pin hash is different than 0 it means that home screen is pin protected
+	if( settings.lockPassHash ) {
+		pinLocked = true;
+		screenLocked = true;
+	}
+
 	createUserInterface();
 
 	setActiveWindow("MainWindow");
@@ -83,8 +92,25 @@ void ApplicationDesktop::createUserInterface() {
 
 	window = new gui::PinLockWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
+
+	window = new gui::MenuWindow(this);
+	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
+
+	window = new gui::PowerOffWindow(this);
+	windows.insert(std::pair<std::string,gui::Window*>( window->getName(), window));
 }
 
+bool ApplicationDesktop::getScreenLocked() {
+	return screenLocked;
+}
+
+bool ApplicationDesktop::getPinLocked() {
+	return pinLocked;
+}
+
+void ApplicationDesktop::setScreenLocked( bool val ) {
+	screenLocked = val;
+};
 
 void ApplicationDesktop::destroyUserInterface() {
 }

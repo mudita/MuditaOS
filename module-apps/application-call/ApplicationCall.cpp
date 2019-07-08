@@ -11,6 +11,7 @@
 #include "MessageType.hpp"
 #include "windows/CallMainWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
+#include "windows/EmergencyCallWindow.hpp"
 
 #include "ApplicationCall.hpp"
 namespace app {
@@ -77,8 +78,18 @@ void ApplicationCall::createUserInterface() {
 
 	window = new gui::EnterNumberWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+
+	window = new gui::EmergencyCallWindow(this);
+	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 }
 
+void ApplicationCall::setDisplayedNumber( std::string num ) {
+	phoneNumber = num;
+}
+
+const std::string& ApplicationCall::getDisplayedNumber() {
+	return phoneNumber;
+}
 
 void ApplicationCall::destroyUserInterface() {
 }

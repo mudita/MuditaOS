@@ -43,9 +43,9 @@ bool Window::handleSwitchData( SwitchData* data ) {
 void Window::setFocusItem( Item* item ) {
 
 	//check if item is a child of the window
-	auto it = std::find(children.begin(), children.end(), item);
-	if( it == children.end())
-		return;
+//	auto it = std::find(children.begin(), children.end(), item);
+//	if( it == children.end())
+//		return;
 
 	//remove focus from previous item
 	if( focusItem != nullptr )
@@ -102,10 +102,13 @@ bool Window::onInput( const InputEvent& inputEvent) {
 		case KeyCode::KEY_DOWN:
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::DOWN);
 			break;
+		case KeyCode::KEY_ENTER:
+			if( focusItem )
+				return focusItem->onActivated(nullptr);
+			break;
 		default:
 			break;
 		}
-
 	}
 
 	if( newFocusItem != nullptr ) {

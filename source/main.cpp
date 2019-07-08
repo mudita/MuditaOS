@@ -9,6 +9,7 @@
 
 //module-applications
 #include "application-clock/ApplicationClock.hpp"
+#include "application-call/ApplicationCall.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 
@@ -87,22 +88,30 @@ int SystemStart(sys::SystemManager* sysmgr)
     vfs.Init();
 
     bool ret;
-/*    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);*/
-    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    //ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
+    //launcher for viewer
+    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
+	applications.push_back( std::move(viewerLauncher) );
+
     //launcher for desktop application
-    //std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
-    //applications.push_back( std::move(viewerLauncher) );
+    std::unique_ptr<app::ApplicationLauncher> desktopLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
+    applications.push_back( std::move(desktopLauncher) );
+
+    //launcher for call application
+    std::unique_ptr<app::ApplicationLauncher> callLauncher = std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher());
+	applications.push_back( std::move(callLauncher) );
 
     //start application manager
-    //ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
     if(ret){
         return 0;

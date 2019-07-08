@@ -15,6 +15,8 @@
 
 #include "PinLockWindow.hpp"
 
+#include "../ApplicationDesktop.hpp"
+
 namespace gui {
 
 PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockWindow"){
@@ -34,6 +36,16 @@ PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockW
 	infoImage = new gui::Image( this, 177,132,0,0, "pin_lock_info" );
 	infoImage->setVisible(false);
 
+	//title label
+	titleLabel = new gui::Label(this, 0, 60, 480, 40);
+	titleLabel->setFilled( false );
+	titleLabel->setVisible(false);
+	titleLabel->setBorderColor( gui::ColorFullBlack );
+	titleLabel->setFont("gt_pressura_regular_24");
+	titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
+	titleLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
 	//labels with stars for displaying entered digits
 	uint32_t pinLabelX = 82;
 	for( uint32_t i=0; i<4; i++ ){
@@ -50,7 +62,7 @@ PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockW
 
 	//labels with stars for displaying entered digits
 	uint32_t infoLabelY = 316-22;
-	for( uint32_t i=0; i<3; i++ ){
+	for( uint32_t i=0; i<2; i++ ){
 		infoLabels[i] = new gui::Label(this, 0, infoLabelY, 480, 30);
 		infoLabels[i]->setFilled( false );
 		infoLabels[i]->setBorderColor( gui::ColorNoColor );
@@ -79,10 +91,8 @@ void PinLockWindow::setVisibleState( const State& state ) {
 		//hide second info label
 		infoLabels[0]->setVisible(true);
 		infoLabels[1]->setVisible(false);
-		infoLabels[2]->setVisible(false);
 		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
 		infoLabels[1]->setText("");
-		infoLabels[2]->setText("");
 
 		//show pin icon
 		lockImage->setVisible(true);
@@ -95,12 +105,12 @@ void PinLockWindow::setVisibleState( const State& state ) {
 			pinLabels[i]->setText("");
 		}
 		//hide second info label
+		titleLabel->setVisible(true);
 		infoLabels[0]->setVisible(true);
 		infoLabels[1]->setVisible(true);
-		infoLabels[2]->setVisible(true);
-		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_info1"));
-		infoLabels[1]->setText(utils::localize.get("app_desktop_pin_info2"));
-		infoLabels[2]->setText(std::to_string(remainingAttempts));
+		titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
+		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_info2"));
+		infoLabels[1]->setText(std::to_string(remainingAttempts));
 
 		//show pin icon
 		lockImage->setVisible(false);
@@ -112,12 +122,11 @@ void PinLockWindow::setVisibleState( const State& state ) {
 			pinLabels[i]->setText("");
 		}
 		//hide second info label
+		titleLabel->setVisible(false);
 		infoLabels[0]->setVisible(true);
 		infoLabels[1]->setVisible(false);
-		infoLabels[2]->setVisible(false);
 		infoLabels[0]->setText(utils::localize.get("app_desktop_pin_blocked1"));
 		infoLabels[1]->setText("");
-		infoLabels[2]->setText("");
 
 		//show pin icon
 		lockImage->setVisible(false);
@@ -129,17 +138,6 @@ void PinLockWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* d
 
 	//change kbd profile to home_screen
 	application->setKeyboardProfile("home_screen");
-	if( mode == ShowMode::GUI_SHOW_INIT ) {
-	}
-
-	//erase previous charcters and set count of entered characters to 0
-	bottomBar->setActive( BottomBar::Side::CENTER, false );
-	charCount = 0;
-	for( uint32_t i=0; i<4; i++ ) {
-		charValue[i] = 0;
-		pinLabels[i]->setText("");
-	}
-
 	//set state
 	setVisibleState( state );
 }
@@ -173,6 +171,13 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				if( (state == State::EnteringPin) && (charCount == 4)) {
 
 					//TODO make pin chacking here, currentyly it always fails
+					if( application->getSettings().lockPassHash == (1000*charValue[0]+100*charValue[1]+10*charValue[2]+charValue[3] ) ) {
+						remainingAttempts = maxPasswordAttempts;
+						app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+						app->setScreenLocked(false);
+						application->switchWindow("MainWindow", 0, nullptr );
+						return true;
+					}
 
 					if( remainingAttempts == 1 ) {
 						state = State::PhoneBlocked;
@@ -195,7 +200,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				//fill next field with star and store value in array
 				if( charCount < 4 ) {
 					pinLabels[charCount]->setText("*");
-					charValue[charCount] = inputEvent.keyChar;
+					charValue[charCount] = inputEvent.keyChar-'0';
 					charCount++;
 
 					//if 4 char has been entered show bottom bar confirm

@@ -16,7 +16,6 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 
-
 namespace gui {
 
 /*
@@ -24,7 +23,6 @@ namespace gui {
  */
 class DesktopMainWindow: public AppWindow {
 protected:
-
 	gui::BottomBar* bottomBar;
 	gui::TopBar* topBar;
 	gui::Label* description = nullptr;
@@ -48,7 +46,7 @@ protected:
 	 */
 	bool enterPressed = false;
 	/**
-	 * Flag informs whether window  has been unlocked
+	 * Flag informs whether window has been unlocked
 	 */
 	bool screenLocked = true;
 	/**

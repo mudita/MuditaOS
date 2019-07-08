@@ -27,9 +27,16 @@ protected:
 	gui::TopBar* topBar = nullptr;
 	gui::Label* numberLabel = nullptr;
 
+	//string with currently displayed phone number
+	std::string number = "";
+
+	void updateBottomBar();
 public:
-	EnterNumberWindow( app::Application* app );
+	EnterNumberWindow( app::Application* app, std::string windowName = "EnterNumberWindow" );
 	virtual ~EnterNumberWindow();
+
+	bool onInput( const InputEvent& inputEvent ) override;
+	bool handleSwitchData( SwitchData* data ) override;
 };
 
 } /* namespace gui */

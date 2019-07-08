@@ -6,8 +6,17 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <memory>
+#include <functional>
+
+#include "../ApplicationDesktop.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
+
+//application-call
+#include "application-call/data/CallSwitchData.hpp"
+
 
 #include "i18/i18.hpp"
 
@@ -45,7 +54,7 @@ DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"M
 	dayMonth = new gui::Label(this, 264, 150, 190, 42 );
 	dayMonth->setFilled( false );
 	dayMonth->setBorderColor( gui::ColorNoColor );
-	dayMonth->setFont("gt_pressura_light_18");
+	dayMonth->setFont("gt_pressura_light_24");
 	dayMonth->setText("01 Jan");
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
@@ -83,10 +92,10 @@ void DesktopMainWindow::setVisibleState() {
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
-	//if screen is protected by pin lock always go back to locked stage
-	if( pinLockScreen ) {
-		screenLocked = true;
-	}
+	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+	pinLockScreen = ( app->getPinLocked() != 0 );
+	screenLocked = app->getScreenLocked();
+
 	setVisibleState();
 }
 
@@ -96,40 +105,61 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	if( ret )
 		return true;
 
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return true;
+	//process shortpress
+	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
-	if( screenLocked ) {
-		//if enter was pressed
-		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-			unlockStartTime = xTaskGetTickCount();
-			enterPressed = true;
-		}
-		else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
-			//if interval between enter and pnd keys is less than time defined for unlocking
-			if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
-				screenLocked = false;
-
-				//display pin lock screen or simply refresh current window to update labels
-				if( pinLockScreen )
-					application->switchWindow( "PinLockWindow", 0, nullptr );
-				else
-					application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+		if( screenLocked ) {
+			//if enter was pressed
+			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+				unlockStartTime = xTaskGetTickCount();
+				enterPressed = true;
 			}
-			enterPressed = false;
+			else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
+				//if interval between enter and pnd keys is less than time defined for unlocking
+				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
+					//display pin lock screen or simply refresh current window to update labels
+					if( pinLockScreen )
+						application->switchWindow( "PinLockWindow", 0, nullptr );
+					else {
+						setVisibleState();
+						application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+					}
+				}
+				enterPressed = false;
+			}
+			else {
+				enterPressed = false;
+			}
 		}
+		//screen is unlocked
 		else {
-			enterPressed = false;
+			//pressing enter moves user to menu screen
+			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+				application->switchWindow( "MenuWindow", 0, nullptr );
+			}
+			//if numeric key was pressed record that key and send it to call application with a switch command
+			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
+
+				char key[] = { char(inputEvent.keyChar) ,0};
+				std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
+				sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
+
+				return true;
+			}
 		}
 	}
-	else {
-		//lock screen if it was unlocked
-		if( (inputEvent.keyCode == KeyCode::KEY_PND) && (inputEvent.state == InputEvent::State::keyReleasedLong ) ) {
+	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
+		//long press of # locks screen if it was unlocked
+		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( screenLocked == false ) ) {
+			app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+			app->setScreenLocked(true);
 			screenLocked = true;
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+		}
+		//long press of right function button muve user to power off window
+		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
+			application->switchWindow( "PowerOffWindow", 0, nullptr );
 		}
 	}
 	return false;
