@@ -14,11 +14,6 @@
 #include <mutex.hpp>
 #include <condition_variable.hpp>
 
-
-namespace sys
-{
-
-
 using namespace cpp_freertos;
 
 template <typename T>
@@ -98,9 +93,6 @@ private:
 	ConditionVariable cond_;
 
 };
-
-
-}
 
 
 #endif /* SYSTEMMANAGER_MAILBOX_HPP_ */
