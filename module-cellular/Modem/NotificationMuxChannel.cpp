@@ -56,7 +56,6 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
 
     // Received signal strength change
     if (msgStr.find("+QIND: \"csq\" ") != std::string::npos) {
-        //TODO:M.P handle new SMS
         LOG_DEBUG((name + ": received signal strength change notification").c_str());
     }
 
