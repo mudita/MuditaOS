@@ -46,13 +46,13 @@ public:
         MUX_STATES_COUNT // keep this the last
     };
 
+    static std::unique_ptr<MuxDaemon> Create();
+
     MuxDaemon();
 
     ~MuxDaemon();
 
-    int Start();
 
-    int Exit();
 
     ssize_t WriteMuxFrame(int channel,
                           const unsigned char *input,
@@ -69,6 +69,7 @@ private:
 
     friend void workerTaskFunction(void *ptr);
 
+    int Start();
 
     int SendAT(const char *cmd, uint32_t timeout);
 

@@ -88,14 +88,14 @@ int SystemStart(sys::SystemManager* sysmgr)
     vfs.Init();
 
     bool ret;
-    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
+/*    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
-    //ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);*/
+    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
-    //vector with launchers to applications
+/*    //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
     //launcher for viewer
@@ -111,7 +111,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 	applications.push_back( std::move(callLauncher) );
 
     //start application manager
-    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
+    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );*/
 
     if(ret){
         return 0;

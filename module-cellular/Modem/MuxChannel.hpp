@@ -29,7 +29,10 @@ class MuxChannel {
 public:
 
     enum class State{
+        Init,
+        Opening,
         Opened,
+        Closing,
         Closed
     };
 

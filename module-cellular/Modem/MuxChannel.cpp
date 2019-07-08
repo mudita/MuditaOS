@@ -23,11 +23,6 @@ void MuxChannelWorker(void *pvp) {
         uint8_t buffer[MuxChannel::inputBufferSize] = {0};
         auto bytesReceived = xStreamBufferReceive(inst->inputBuffer, buffer,MuxChannel::inputBufferSize,pdMS_TO_TICKS(portMAX_DELAY));
 
-        // Check if incoming data is actually signal to close
-        if((inst->enableWorkerLoop == false) && (buffer[0] == 0) && (bytesReceived == 1)){
-            goto exit;
-        }
-
         switch (inst->type) {
 
             case MuxChannel::MuxChannelType::Notification: {
@@ -48,11 +43,6 @@ void MuxChannelWorker(void *pvp) {
         }
     }
 
-    exit:
-    LOG_DEBUG("Closing worker thread.");
-    vStreamBufferDelete(inst->inputBuffer);
-
-    vTaskDelete(NULL);
 }
 
 
@@ -64,7 +54,7 @@ MuxChannel::MuxChannel(MuxDaemon *mux, uint32_t logicalNumber, MuxChannelType ty
         frameAllowed(1),
         disc_ua_pending(0),
         workerStackSize(stackSize),
-        state(State::Closed),
+        state(State::Init),
         type(type),
         name(name),
         mux(mux){
@@ -74,6 +64,8 @@ MuxChannel::MuxChannel(MuxDaemon *mux, uint32_t logicalNumber, MuxChannelType ty
 
 MuxChannel::~MuxChannel() {
 
+    vTaskDelete(workerHandle);
+    vStreamBufferDelete(inputBuffer);
 }
 
 int MuxChannel::Open() {
@@ -82,6 +74,8 @@ int MuxChannel::Open() {
     inputBuffer = xStreamBufferCreate(inputBufferSize,1);
     xTaskCreate(MuxChannelWorker, (name + "_Worker").c_str(), workerStackSize / 4, this, 0, &workerHandle);
 
+
+    state = State ::Opening;
 
     // Send virtual channel request frame to GSM modem
     mux->WriteMuxFrame(GetChannelNumber(), NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_SABM) |
@@ -92,14 +86,11 @@ int MuxChannel::Open() {
 
 int MuxChannel::Close() {
 
-    enableWorkerLoop = false;
-
-    uint8_t dummy = 0;
-    // Send dummy data to kick worker thread out of suspend state
-    SendData(&dummy,sizeof dummy);
+    state = State ::Closing;
 
     mux->WriteMuxFrame(GetChannelNumber(), NULL, 0,
-                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DISC));
+                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DISC)|
+                       static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
     return 0;
 }
