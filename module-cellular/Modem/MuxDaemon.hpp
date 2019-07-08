@@ -20,6 +20,7 @@
 #include "InputSerialWorker.hpp"
 #include "GSM0710.hpp"
 #include "mutex.hpp"
+#include "NotificationMuxChannel.hpp"
 
 
 class MuxDaemon {
@@ -46,9 +47,9 @@ public:
         MUX_STATES_COUNT // keep this the last
     };
 
-    static std::unique_ptr<MuxDaemon> Create();
+    static std::unique_ptr<MuxDaemon> Create(NotificationMuxChannel::NotificationCallback_t callback);
 
-    MuxDaemon();
+    MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback);
 
     ~MuxDaemon();
 
@@ -112,6 +113,8 @@ private:
     cpp_freertos::MutexStandard serOutMutex;
 
     int uih_pf_bit_received = 0;
+
+    NotificationMuxChannel::NotificationCallback_t callback;
 
 };
 

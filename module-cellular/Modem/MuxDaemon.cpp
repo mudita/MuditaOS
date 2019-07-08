@@ -76,7 +76,9 @@ namespace QuectelBaudrates {
 }
 
 
-MuxDaemon::MuxDaemon() {
+MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback):
+callback(callback)
+{
     cellular = bsp::Cellular::Create();
 }
 
@@ -84,8 +86,8 @@ MuxDaemon::~MuxDaemon() {
     CloseMux();
 }
 
-std::unique_ptr<MuxDaemon> MuxDaemon::Create() {
-    auto inst = std::make_unique<MuxDaemon>();
+std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::NotificationCallback_t callback) {
+    auto inst = std::make_unique<MuxDaemon>(callback);
 
     auto ret = inst->Start();
 
@@ -180,7 +182,7 @@ int MuxDaemon::Start() {
     channels.push_back(std::make_unique<ControlMuxChannel>(this));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
-    channels.push_back(std::make_unique<NotificationMuxChannel>(this));
+    channels.push_back(std::make_unique<NotificationMuxChannel>(this,callback));
 
     // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
     channels.push_back(std::make_unique<CommunicationMuxChannel>(this));
