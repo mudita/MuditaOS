@@ -53,10 +53,10 @@ target_include_directories(${PROJECT_NAME}
 
         PUBLIC
 
-        ${CMAKE_CURRENT_LIST_DIR}
+       ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/bsp
         ${CMAKE_CURRENT_LIST_DIR}/bsp/keyboard
-
+		${CMAKE_CURRENT_LIST_DIR}/bsp/battery-charger
 
 )
 target_include_directories( ${PROJECT_NAME}  

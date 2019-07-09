@@ -53,45 +53,94 @@ static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp{
 
-	int battery_Init()
+	int battery_Init(xQueueHandle qHandle)
 	{
-		qHandleIrq = xQueueCreate(10, sizeof (uint8_t));
-		battery_loadConfiguration();
+		qHandleIrq = qHandle;
+
+		/*battery_loadConfiguration();
 		battery_setAvgCalcPeriods();
 		battery_setNominalBatteryCapacity(battery_nominalCapacitymAh);
 		battery_setChargingDischargingThresholds(battery_fullyChargedPercent, battery_DischargedPercent);
 		battery_setTemperatureThresholds(battery_maxTemperatureDegrees, battery_minTemperatureDegrees);
-		battery_setServiceVoltageThresholds(battery_maxVoltagemV, battery_minVoltagemV);
-		battery_enableAlerts();
+		battery_setServiceVoltageThresholds(battery_maxVoltagemV, battery_minVoltagemV);*/
+		//battery_enableAlerts();
 
 
 		//battery mask
-		uint16_t batMask = 1 << 3;
-		uint16_t chargerMask = 1 << 4;
-		uint16_t mask = 0xff;
-		mask &= ~(batMask | chargerMask);
-		uint16_t val;
-		uint8_t config2 = 1<<7;
-		bsp::battery_chargerWrite(static_cast<bsp::batteryChargerRegisters>(0xb1), 0x0);
-		bsp::battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(0xbb), &val);
-		bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
-		bsp_i2c_Send(i2c, BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&config2, 1);
-		bsp::battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(0xbb), &val);
-		LOG_INFO("Config2 reg 0x%x", val);
-		mask = 1<<7;
+		uint32_t val;
+		//top controller
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_TOP_CONTROLLER_I2C_ADDR, 0x20, (uint8_t*)&val, 1);
+		LOG_INFO("Charger id %x", val);
+		//interrupt source
+		val = 0;
+		bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_TOP_CONTROLLER_I2C_ADDR, 0x23, (uint8_t*)&val, 1 );
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_TOP_CONTROLLER_I2C_ADDR, 0x23, (uint8_t*)&val, 1);
+		LOG_INFO("0x23 interrupt source mask 0x%x", val);
 
 
-		bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &val);
 
-		LOG_INFO("status reg 0x%x", val);
-		bsp::battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, val);
-		bsp::battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &val);
-		LOG_INFO("status reg 0x%x", val);
+		//charger
+		val = 0xb7;
+		bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_BATTERY_CHARGER_I2C_ADDR, 0xb1, (uint8_t*)&val, 1 );
+		val = 0x0c;
+		bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_BATTERY_CHARGER_I2C_ADDR, 0xbd, (uint8_t*)&val, 1 );
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_BATTERY_CHARGER_I2C_ADDR, 0xb1, (uint8_t*)&val, 1);
+		LOG_INFO("0xb1 charger interrupt mask 0x%x", val);
+
+
+		//fuel guage
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0x0, (uint8_t*)&val, 2);
+		LOG_INFO("0x00 status reg 0x%x", val);
+
+		val = 0;
+				bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0x21, (uint8_t*)&val, 2);
+				LOG_INFO("0x21 device name reg 0x%x", val);
+
+
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0x2b, (uint8_t*)&val, 2);
+		LOG_INFO("0x2b misc cfg 0x%x", val);
+		val |= (1 << 10);
+
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&val, 2);
+		LOG_INFO("0xbb config2 reg 0x%x", val);
+		val = 0xffee;
+		uint8_t regVal[2] = {  0xff, 0xee };
+	//	bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&val, 3 );
+		bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&regVal[0], 1 );
+		bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&regVal[1], 1 );
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0xbb, (uint8_t*)&val, 2);
+		LOG_INFO("0xbb config2 reg 0x%x", val);
+
+		val = 0;
+				bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0x1d, (uint8_t*)&val, 2);
+				LOG_INFO("0x1d config reg 0x%x", val);
+
+		val = 0x4005;
+		bsp_i2c_Send(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0x1d, (uint8_t*)&val, 2 );
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_FUEL_GAUGE_I2C_ADDR, 0x1d, (uint8_t*)&val, 2);
+		LOG_INFO("0x1d config reg 0x%x", val);
+
+
 
 		battery_enableIRQs();
+		/*	bsp::battery_fuelGaugeWrite(static_cast<bsp::batteryChargerRegisters>(0xbb), config2);
+			bsp::battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(0xbb), &val);
+			LOG_INFO("Config2 reg 0x%x", val);
+			mask = 1<<7;
+	*/
 		//irq status
+/*
 		bsp::battery_chargerTopControllerRead(bsp::batteryChargerRegisters::TOP_CONTROLL_IRQ_SRC_REG, &val);
 		LOG_INFO("TOP_CONTROLL_IRQ_SRC_REG reg 0x%x", val);
+*/
 
 		s_BSP_BatteryChargerIrqPinsInit();
 
@@ -151,8 +200,22 @@ namespace bsp{
 		return (int)bsp_i2c_Receive(i2c, BSP_TOP_CONTROLLER_I2C_ADDR, static_cast<uint32_t>(registerAddress), (uint8_t*)value, sizeof(uint16_t));
 	}
 
+	void battery_getData(uint8_t& levelPercent)
+	{
+			levelPercent = 50;
+	}
 
-
+	void battery_getChargeStatus( bool& status)
+	{
+		uint16_t val = 0;
+		val = 0;
+		bsp_i2c_Receive(BOARD_GetI2CInstance(), BSP_BATTERY_CHARGER_I2C_ADDR, 0xb2, (uint8_t*)&val, 1);
+		LOG_INFO("0xb4 chg_details reg 0x%x", val);
+		if(val & 0x40)
+			status = true;
+		else
+			status = false;
+	}
 }
 
 static bsp::batteryRetval battery_loadConfiguration(void)
@@ -301,7 +364,7 @@ BaseType_t BSP_BatteryChargerINOKB_IRQHandler()
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	 if(qHandleIrq != NULL){
-	        	uint8_t val = 0x01;
+	        	uint8_t val = 0x02;
 	        	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
 	        }
 	return xHigherPriorityTaskWoken;

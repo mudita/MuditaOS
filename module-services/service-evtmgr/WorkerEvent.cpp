@@ -61,11 +61,18 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		{
 			uint8_t battLevel;
 			bsp::battery_getData(battLevel);
-			LOG_INFO("Battery level: %d", battLevel);
+			auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+			message->levelPercents = battLevel;
+			message->fullyCharged = false;
+			sys::Bus::SendUnicast(message, "EventManager", this->service);
 		}
 		if(notification == 0x02)
 		{
-			LOG_INFO("Plugged");
+			bool status;
+			bsp::battery_getChargeStatus(status);
+			auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+			message->plugged = status;
+			sys::Bus::SendUnicast(message, "EventManager", this->service);
 		}
 	}
 

@@ -68,6 +68,9 @@ enum class MessageType {
 
 	EVMFocusApplication,
 	EVMKeyboardProfile,
+	//battery charger messages
+	EVMBatteryLevel,
+	EVMChargerPlugged,
 };
 
 

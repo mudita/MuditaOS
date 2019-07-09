@@ -108,6 +108,8 @@ enum class batteryChargerRegisters{
 	int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value);
 
 	void battery_getData(uint8_t& levelPercent);
+
+	void battery_getChargeStatus( bool& status);
 }
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler();
