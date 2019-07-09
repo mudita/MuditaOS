@@ -17,6 +17,8 @@
 
 #include "MessageType.hpp"
 
+#include "messages/CellularMessage.hpp"
+
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
 
@@ -24,17 +26,14 @@ ServiceCellular::ServiceCellular()
         : sys::Service(serviceName, 1024 * 4, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceCellular] Initializing");
 
-
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
 
-    muxdaemon = MuxDaemon::Create([](NotificationType type, std::string resp){
+    muxdaemon = MuxDaemon::Create([this](NotificationType type, std::string resp){
 
-        std::
+        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(type),resp);
 
-        sys::Bus::SendMulticast()
+        sys::Bus::SendMulticast(msg,sys::BusChannels::ServiceCellularNotifications,this);
 
     });
 

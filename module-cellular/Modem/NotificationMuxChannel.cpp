@@ -51,13 +51,13 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
     // Received new SMS
     if (msgStr.find("+CMTI: ") != std::string::npos) {
         LOG_TRACE((name + ": received new SMS notification").c_str());
-        notificationCallback(NotificationType::NewIncomingSMS,"dummy");// TODO:M.P add SMS nr parsing
+        notificationCallback(NotificationType::NewIncomingSMS,"888777333");// TODO:M.P add SMS nr parsing
     }
 
     // Received signal strength change
     if (msgStr.find("+QIND: \"csq\"") != std::string::npos) {
         LOG_TRACE((name + ": received signal strength change notification").c_str());
-        notificationCallback(NotificationType::SignalStrengthUpdate,"dummy");// TODO:M.P add signal strength parsing
+        notificationCallback(NotificationType::SignalStrengthUpdate,"55");// TODO:M.P add signal strength parsing
     }
 
     return 0;
