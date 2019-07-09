@@ -46,7 +46,7 @@ class ApplicationCallLauncher : public ApplicationLauncher {
 public:
 	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", true) {};
 	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name),sysmgr,1000);
+		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name),sysmgr);
 	};
 };
 
