@@ -12,7 +12,7 @@
 #ifndef PUREPHONE_CELLULARSERVICEAPI_HPP
 #define PUREPHONE_CELLULARSERVICEAPI_HPP
 
-
+#include "../messages/CellularMessage.hpp"
 
 
 class CellularServiceAPI {

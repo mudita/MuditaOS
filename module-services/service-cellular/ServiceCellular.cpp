@@ -20,20 +20,46 @@
 #include "messages/CellularMessage.hpp"
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
+constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 
 ServiceCellular::ServiceCellular()
         : sys::Service(serviceName, 1024 * 4, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceCellular] Initializing");
 
-    testTimerID = CreateTimer(3000,true);
+    testTimerID = CreateTimer(3000, true);
     ReloadTimer(testTimerID);
 
-    muxdaemon = MuxDaemon::Create([this](NotificationType type, std::string resp){
+    muxdaemon = MuxDaemon::Create([this](NotificationType type, std::string resp) {
 
-        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(type),resp);
+        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(type));
 
-        sys::Bus::SendMulticast(msg,sys::BusChannels::ServiceCellularNotifications,this);
+        switch (type) {
+
+            case NotificationType::IncomingCall:
+                msg->data = resp;
+                break;
+
+            case NotificationType::CallAborted:
+                //TODO:M.P dummy ?
+
+                break;
+
+            case NotificationType::NewIncomingSMS:
+                //TODO:M.P fill message's fields
+                break;
+
+            case NotificationType::SignalStrengthUpdate:
+                msg->signalStrength = std::stoll(resp);
+                msg->dBmSignalStrength =
+                        msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0]))
+                        ? signalStrengthToDB[0] : signalStrengthToDB[msg->signalStrength];
+                break;
+
+        }
+
+
+        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
 
     });
 
@@ -52,7 +78,7 @@ ServiceCellular::~ServiceCellular() {
 
 // Invoked when timer ticked
 void ServiceCellular::TickHandler(uint32_t id) {
-    char* resp = "AT\r";
+    char *resp = "AT\r";
     //muxdaemon->WriteMuxFrame(2, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 }
 

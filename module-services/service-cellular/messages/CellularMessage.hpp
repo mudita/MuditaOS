@@ -13,6 +13,7 @@
 #define PUREPHONE_CELLULARMESSAGE_HPP
 
 #include <memory>
+#include <variant>
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
@@ -40,13 +41,15 @@ public:
     };
 
 
-    CellularNotificationMessage(Type type, const std::string &data) : CellularMessage(
-            MessageType::CellularNotification), type(type), data(data) {}
+    CellularNotificationMessage(Type type) : CellularMessage(
+            MessageType::CellularNotification), type(type){}
 
     ~CellularNotificationMessage() {}
 
     Type type;
     std::string data;
+    uint32_t signalStrength;
+    int32_t dBmSignalStrength;
 
 };
 
