@@ -28,16 +28,18 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
-	bottomBar->setActive( BottomBar::Side::RIGHT, false );
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_settings_title_main"));
+	bottomBar->setActive( BottomBar::Side::RIGHT, true );
+	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
+	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
 	topBar = new gui::TopBar( this, 0,0, 480, 50 );
+	topBar->setActive(TopBar::Elements::LOCK, false );
 
 	gui::Label* title = new gui::Label(this, 0, 50, 480, 50 );
 	title->setFilled( false );
 	title->setBorderColor( gui::ColorNoColor );
-	title->setFont("gt_pressura_light_24");
-	title->setText(utils::localize.get("common_wendesday"));
+	title->setFont("gt_pressura_bold_24");
+	title->setText(utils::localize.get("app_settings_title_main"));
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	//add option connectivity option
@@ -65,7 +67,7 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
 
 	//set possition and navigation for labels
-	uint32_t posY = 60;
+	uint32_t posY = 100;
 	uint32_t size = options.size();
 	for( uint32_t i=0; i<options.size(); i++ ){
 		options[i]->setPosition(0,posY);
@@ -73,8 +75,6 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
 		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
 	}
-
-
 }
 
 SettingsMainWindow::~SettingsMainWindow() {
@@ -86,36 +86,41 @@ gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::fun
 	label->setFilled( false );
 	label->setPenFocusWidth( 3 );
 	label->setPenWidth( 0 );
+	label->setFont("gt_pressura_regular_24");
+	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+	label->setRadius(11);
 
-	new gui::Image( label, 425, 24, 0, 0, "right_image_arrow" );
+	new gui::Image( label, 425, 24, 0, 0, "right_label_arrow" );
 
 	return label;
 }
 
 
 void SettingsMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-//
-//	app::ApplicationSettings* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-//	pinLockScreen = ( app->getPinLocked() != 0 );
-//	screenLocked = app->getScreenLocked();
-//
-//	setVisibleState();
+	setFocusItem( options[0] );
 }
 
 bool SettingsMainWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
-	//process shortpress
-	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
-
+	if( ret ) {
+		application->render( RefreshModes::GUI_REFRESH_FAST );
 		return true;
 	}
-	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
-		//long press of # locks screen if it was unlocked
+
+	//process only if key is released
+	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
+	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
+		return false;
+
+	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+		LOG_INFO("Enter pressed");
 	}
+	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MainWindow", nullptr );
+		return true;
+	}
+
 	return false;
 }
 
