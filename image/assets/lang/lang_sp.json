@@ -57,6 +57,11 @@
     "app_settings_security": "Security",
     "app_settings_language": "Language",
     "app_settings_about": "About Mudita Pure",
+    	"app_settings_title_languages": "Language Selection",
+    	"app_settings_language_english": "Inglesa",
+    	"app_settings_language_polish": "Polaco",
+    	"app_settings_language_german": "Alemana",
+    	"app_settings_language_spanish": "Española",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
