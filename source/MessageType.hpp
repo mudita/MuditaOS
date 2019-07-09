@@ -45,6 +45,9 @@ enum class MessageType {
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
 	DBContactGetCount,         // Get contacts count
 
+	//Cellular messages
+	CellularNotification,
+
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
