@@ -22,7 +22,7 @@
 namespace app {
 
 ApplicationDesktop::ApplicationDesktop(std::string name) :
-	Application( name, 8192 ) {
+	Application( name, 1024 ) {
 }
 
 ApplicationDesktop::~ApplicationDesktop() {

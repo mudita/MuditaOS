@@ -157,7 +157,7 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 	else {
 		state = State::WAITING_NEW_APP_REGISTRATION;
 		LOG_INFO( "starting application: %s", appName.c_str());
-		it->second->lanucher->run(systemManager);
+		it->second->lanucher->run(reinterpret_cast<sys::SystemManager*>(this));
 	}
 
 	return true;

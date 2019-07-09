@@ -17,7 +17,7 @@
 namespace app {
 
 ApplicationCall::ApplicationCall(std::string name) :
-	Application( name, 8192 ) {
+	Application( name, 1024 ) {
 }
 
 ApplicationCall::~ApplicationCall() {

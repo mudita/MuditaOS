@@ -16,7 +16,7 @@
 namespace app {
 
 ApplicationSettings::ApplicationSettings(std::string name) :
-	Application( name, 8192 ) {
+	Application( name, 1024 ) {
 }
 
 ApplicationSettings::~ApplicationSettings() {
