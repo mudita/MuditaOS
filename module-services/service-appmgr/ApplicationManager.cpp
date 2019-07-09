@@ -291,7 +291,7 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 }
 
 bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
-	//this is the case when application manager is waiting for newly started application to confir mthat it has
+	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
 	if( state == State::WAITING_GET_FOCUS_CONFIRMATION ) {
 		if( msg->getSenderName() == launchApplicationName ) {
@@ -353,25 +353,28 @@ bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
 
-	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender,2000  );
-	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	return true;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmClose>(sender->GetName() );
-	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
-	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	return true;
 }
 bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender ) {
 
 	auto msg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
-	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
-	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	return true;
 }
 
 bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status ) {
 	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status );
-	sys::Bus::SendUnicast(msg, "ApplicationManager", sender  );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender );
 	return true;
 }
 

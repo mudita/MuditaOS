@@ -38,7 +38,7 @@ protected:
 	//vector that holds currently visible list of items
 	std::vector<ListItem*> items;
 	//pointer to the item provider object
-	ListItemProvider* provider;
+	ListItemProvider* provider = nullptr;
 	//rounded rectangle used to draw scroll bar
 	Rect* scroll;
 	//space available for new items - this will change after any new item retrieved from provider

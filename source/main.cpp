@@ -12,6 +12,7 @@
 #include "application-call/ApplicationCall.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
+#include "application-settings/ApplicationSettings.hpp"
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
@@ -109,6 +110,10 @@ int SystemStart(sys::SystemManager* sysmgr)
     //launcher for call application
     std::unique_ptr<app::ApplicationLauncher> callLauncher = std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher());
 	applications.push_back( std::move(callLauncher) );
+
+	//launcher for settings application
+	std::unique_ptr<app::ApplicationLauncher> settingsLauncher = std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher());
+	applications.push_back( std::move(settingsLauncher) );
 
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
