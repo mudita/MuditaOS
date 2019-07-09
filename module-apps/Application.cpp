@@ -31,9 +31,11 @@ Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriori
 
 	longpressTimerID = CreateTimer( 1000 ,false);
 
+	LOG_INFO("!!!!!!!!!!!!!!!!!TIME: %d", xTaskGetTickCount() );
 	//create translator and set default profile
 	translator = std::make_unique<gui::Translator>();
 	translator->setProfile("home_screen");
+	LOG_INFO("!!!!!!!!!!!!!!!!!TIME: %d", xTaskGetTickCount() );
 
 }
 
@@ -67,11 +69,14 @@ void Application::render( gui::RefreshModes mode ) {
 		LOG_ERROR("Current window is not defined");
 		return;
 	}
+
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
+		LOG_INFO("!!!!!!!!!!!!!!!!!RENDER TIME: %d", xTaskGetTickCount() );
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
 		auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode);
 		sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+		LOG_INFO("!!!!!!!!!!!!!!!!!RENDER TIME: %d", xTaskGetTickCount() );
 	}
 }
 void Application::blockEvents(bool isBlocked ) {
@@ -79,10 +84,12 @@ void Application::blockEvents(bool isBlocked ) {
 }
 int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 
+	LOG_INFO("!!!!!!!!!!!!!!!!!SWITCH TIME: %d", xTaskGetTickCount() );
 	std::string window = windowName.empty()?"MainWindow":windowName;
 	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
+	LOG_INFO("!!!!!!!!!!!!!!!!!SWITCH TIME: %d", xTaskGetTickCount() );
 	return 0;
 }
 int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
@@ -107,6 +114,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			currentWindow->onInput( msg->getEvent() );
 
 		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
+		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
@@ -133,7 +141,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		handled = true;
 	}
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
@@ -175,7 +183,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_ERROR("Wrong internal application to switch to active state");
 		}
 	}
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
 		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
 		//check if specified window is in the application
 		LOG_INFO("Switching to window: [%s] cmd: %d, data: %s", msg->getWindowName().c_str(), msg->getCommand(), (msg->getData()!=nullptr?"true":"false"));
@@ -214,14 +222,22 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 }
 
 sys::ReturnCodes Application::InitHandler() {
+	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 1: %d", xTaskGetTickCount() );
 	bool initState= true;
 	state = State::INITIALIZING;
+	uint32_t start = xTaskGetTickCount();
 	settings = DBServiceAPI::SettingsGet(this);
+	uint32_t stop = xTaskGetTickCount();
+	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
+	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 2: %d", xTaskGetTickCount() );
 	sapm::ApplicationManager::messageRegisterApplication( this, initState );
-	return (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
+	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 3: %d", xTaskGetTickCount() );
+	sys::ReturnCodes retCode = (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
+//	LOG_INFO("*****************ReturnCode %d",static_cast<uint32_t>(retCode));
+	return retCode;
 }
 
 void Application::setActiveWindow( const std::string& windowName ) {
@@ -248,14 +264,14 @@ bool Application::messageSwitchApplication( sys::Service* sender, std::string ap
 
 bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data ) {
 	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh, application );
-	sys::Bus::SendUnicast(msg, application, sender );
+	sys::Bus::SendUnicast(msg, application, sender  );
 	return true;
 }
 
 bool Application::messageCloseApplication( sys::Service* sender, std::string application ) {
 
 	auto msg = std::make_shared<AppMessage>( MessageType::AppClose, application );
-	sys::Bus::SendUnicast(msg, application, sender );
+	sys::Bus::SendUnicast(msg, application, sender  );
 	return true;
 }
 
