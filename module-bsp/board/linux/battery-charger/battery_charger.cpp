@@ -49,6 +49,11 @@ namespace bsp{
 	{
 			levelPercent = battLevel;
 	}
+
+	void battery_getChargeStatus( bool& status)
+	{
+		status = plugged;
+	}
 	int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value)
 	{
 
@@ -187,9 +192,9 @@ BaseType_t BSP_BatteryChargerINTB_IRQHandler()
  * *****************************************************************************************************************************************************
  */
 
-	static void s_BSP_BatteryChargerIrqPinsInit()
+/*	static void s_BSP_BatteryChargerIrqPinsInit()
 	{
-/*		gpio_pin_config_t pinConfig;
+		gpio_pin_config_t pinConfig;
 
 		pinConfig.direction         = kGPIO_DigitalInput;
 		pinConfig.interruptMode     = kGPIO_IntRisingOrFallingEdge;
@@ -201,7 +206,7 @@ BaseType_t BSP_BatteryChargerINTB_IRQHandler()
 
 		GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_INOKB_GPIO, 1U << BOARD_BATTERY_CHARGER_INOKB_PIN);
 		GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_WCINOKB_GPIO, 1U << BOARD_BATTERY_CHARGER_WCINOKB_PIN);
-		GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_INTB_GPIO, 1U << BOARD_BATTERY_CHARGER_INTB_PIN);*/
+		GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_INTB_GPIO, 1U << BOARD_BATTERY_CHARGER_INTB_PIN);
 
-	}
+	}*/
 

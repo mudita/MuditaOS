@@ -15,7 +15,7 @@
 #include "SwitchData.hpp"
 #include "Service/Service.hpp"
 #include "MessageType.hpp"
-#include "key_codes.hpp"
+#include "bsp/keyboard/key_codes.hpp"
 
 
 namespace sevm {
@@ -54,6 +54,52 @@ public:
 	int keyRelaseTime = 0;
 };
 
+class BatteryLevelMessage : public sys::DataMessage
+{
+public:
+	BatteryLevelMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
+	{
+		type = Type::Data;
+
+	}
+
+	sys::Message_t Execute(sys::Service* service)
+	{
+		// Ignore incoming data message if this service is not yet initialized
+		if(service->isReady){
+			return service->DataReceivedHandler(this);
+		}
+		else{
+			return std::make_shared<sys::ResponseMessage>();
+		}
+
+	}
+	uint8_t levelPercents = 0;
+	bool fullyCharged = false;
+};
+
+class BatteryPlugMessage : public sys::DataMessage
+{
+public:
+	BatteryPlugMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
+	{
+		type = Type::Data;
+
+	}
+
+	sys::Message_t Execute(sys::Service* service)
+	{
+		// Ignore incoming data message if this service is not yet initialized
+		if(service->isReady){
+			return service->DataReceivedHandler(this);
+		}
+		else{
+			return std::make_shared<sys::ResponseMessage>();
+		}
+
+	}
+	bool plugged = false;
+};
 /*
  * @brief Template for all messages that go to application manager
  */

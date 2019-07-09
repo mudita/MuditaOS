@@ -58,6 +58,31 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			handled = true;
 		}
 	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
+		msgl->sender == this->GetName()) {
+		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
+
+		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+		message->levelPercents = msg->levelPercents;
+		message->fullyCharged = msg->fullyCharged;
+
+		if( targetApplication.empty() == false ) {
+			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+		handled = true;
+	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) &&
+		msgl->sender == this->GetName()) {
+		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
+
+		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+		message->plugged = msg->plugged;
+
+		if( targetApplication.empty() == false ) {
+			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+		handled = true;
+	}
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
