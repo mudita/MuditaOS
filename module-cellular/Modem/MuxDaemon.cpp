@@ -155,6 +155,10 @@ int MuxDaemon::Start() {
     SendAT("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
     // Turn on signal strength change URC
     SendAT("AT+QINDCFG=\"csq\",1\r", 500);
+    // Change incoming call notification from "RING" to "+CRING:type"
+    SendAT("AT+CRC=1\r", 500);
+    // Turn on caller's number presentation
+    SendAT("AT+CLIP=1\r", 500);
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format

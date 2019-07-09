@@ -30,6 +30,8 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
 
     std::string msgStr(data,data+size);
 
+#if 0 // M.P: those notifications are not used, instead we're using +CLIP URC as incoming call notification
+    // Additionaly we can fetch caller's number from it
     // Incoming call
     if (msgStr.find("RING") != std::string::npos) {
         LOG_TRACE((name + ": incoming call...").c_str());
@@ -41,11 +43,22 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
         LOG_TRACE((name + ": incoming call...").c_str());
         notificationCallback(NotificationType::IncomingCall,"dummy");// TODO:M.P add incoming number parsing
     }
+#endif
+
+    // Incoming call
+    if (msgStr.find("+CLIP: ") != std::string::npos) {
+        LOG_TRACE((name + ": incoming call...").c_str());
+
+        auto beg = msgStr.find("\"");
+        auto end = msgStr.find("\"",beg+1);
+        notificationCallback(NotificationType::IncomingCall,msgStr.substr(beg+1,end-beg-1));
+    }
+
 
     // Call aborted/failed
     if (msgStr.find("NO CARRIER") != std::string::npos) {
         LOG_TRACE((name + ": call failed/aborted").c_str());
-        notificationCallback(NotificationType::CallAborted,"dummy");//
+        notificationCallback(NotificationType::CallAborted,"");//
     }
 
     // Received new SMS
@@ -57,7 +70,9 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
     // Received signal strength change
     if (msgStr.find("+QIND: \"csq\"") != std::string::npos) {
         LOG_TRACE((name + ": received signal strength change notification").c_str());
-        notificationCallback(NotificationType::SignalStrengthUpdate,"55");// TODO:M.P add signal strength parsing
+        auto beg = msgStr.find(",");
+        auto end = msgStr.find(",",beg+1);
+        notificationCallback(NotificationType::SignalStrengthUpdate,msgStr.substr(beg+1,end-beg-1));
     }
 
     return 0;

@@ -22,6 +22,7 @@
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 //module-bsp
 #include "bsp.hpp"
@@ -42,6 +43,9 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
+
+        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+
         timer_id = CreateTimer(3000,true);
         ReloadTimer(timer_id);
     }
@@ -51,7 +55,9 @@ public:
 
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
-
+        CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+        std::cout << "Blinky service received notification\r\n Type:  " << std::to_string(
+                static_cast<uint32_t >(msg->type)) << "\r\nData: " << msg->data << "\n";
         return std::make_shared<sys::ResponseMessage>( );
     }
 
@@ -87,12 +93,12 @@ int SystemStart(sys::SystemManager* sysmgr)
 {
     vfs.Init();
 
-    bool ret;
+    bool ret=false;
 /*    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600 ),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);*/
+    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);*/
+    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
 /*    //vector with launchers to applications
