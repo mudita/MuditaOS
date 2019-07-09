@@ -52,7 +52,7 @@ class ApplicationDesktopLauncher : public ApplicationLauncher {
 public:
 	ApplicationDesktopLauncher() : ApplicationLauncher("ApplicationDesktop", false) {};
 	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr,100);
+		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr);
 	};
 };
 
