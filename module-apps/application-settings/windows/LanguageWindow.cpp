@@ -1,7 +1,7 @@
 /*
- * @file SettingsMainWindow.cpp
+ * @file LanguageWindow.cpp
  * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 8 lip 2019
+ * @date 9 lip 2019
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
@@ -18,11 +18,11 @@
 
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "SettingsMainWindow.hpp"
+#include "LanguageWindow.hpp"
 
 namespace gui {
 
-SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
+LanguageWindow::LanguageWindow( app::Application* app ) : AppWindow(app,"Languages"){
 	setSize( 480, 600 );
 
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
@@ -39,32 +39,27 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 	title->setFilled( false );
 	title->setBorderColor( gui::ColorNoColor );
 	title->setFont("gt_pressura_bold_24");
-	title->setText(utils::localize.get("app_settings_title_main"));
+	title->setText(utils::localize.get("app_settings_title_languages"));
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	//add option connectivity option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_connectivity"), [=] (gui::Item& item){ return true; }) );
-
-	//add option date and time option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_date_and_time"), [=](gui::Item&){ return true;}) );
-
-	//add option display option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_display"), [=](gui::Item&){ return true;} ));
-
-	//add option phone mode option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_phone_modes"), [=](gui::Item&){ return true;} ));
-
-	//add option security option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_security"), [=](gui::Item&){ return true;} ));
-
-	//add option language option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_language"), [=](gui::Item&){
-		LOG_INFO("switching to language page" );
-		application->switchWindow("Languages", 0, nullptr );
+	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_english"), [=] (gui::Item& item){
+		LOG_INFO("selected language: english" );
 		return true;} ));
 
-	//add option security option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
+	//add option date and time option
+	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_polish"), [=](gui::Item&){
+		LOG_INFO("selected language: polish" );
+		return true;} ));
+
+	//add option display option
+	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_german"), [=](gui::Item&){
+		LOG_INFO("selected language: german" );
+		return true;} ));
+
+	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_spanish"), [=](gui::Item&){
+		LOG_INFO("selected language: spanish" );
+		return true;} ));
 
 	//set possition and navigation for labels
 	uint32_t posY = 100;
@@ -77,10 +72,10 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 	}
 }
 
-SettingsMainWindow::~SettingsMainWindow() {
+LanguageWindow::~LanguageWindow() {
 }
 
-gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
+gui::Item* LanguageWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
 	gui::Label* label = new gui::Label( this, 17,0, 480-34, 60, text );
 	label->setMargins( gui::Margins(16,0,0,0) );
 	label->setFilled( false );
@@ -89,19 +84,16 @@ gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::fun
 	label->setFont("gt_pressura_regular_24");
 	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
 	label->setRadius(11);
-	label->activatedCallback = activatedCallback;
-
-	new gui::Image( label, 425-17, 24, 0, 0, "right_label_arrow" );
 
 	return label;
 }
 
 
-void SettingsMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void LanguageWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 	setFocusItem( options[0] );
 }
 
-bool SettingsMainWindow::onInput( const InputEvent& inputEvent ) {
+bool LanguageWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
 	if( ret ) {
@@ -120,7 +112,7 @@ bool SettingsMainWindow::onInput( const InputEvent& inputEvent ) {
 		LOG_INFO("Enter pressed");
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MainWindow", nullptr );
+		application->switchWindow( "MainWindow", 0, nullptr );
 		return true;
 	}
 
