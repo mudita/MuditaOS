@@ -11,7 +11,7 @@
  *              * UC8177c.pdf
  */
 
-#include "eink/dma_config.h"
+#include "dma_config.h"
 #include "fsl_dmamux.h"
 #include "fsl_edma.h"
 #include "ED028TC1.h"

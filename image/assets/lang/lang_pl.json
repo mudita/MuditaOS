@@ -47,6 +47,10 @@
 	"app_desktop_menu_tools": "NARZĘDZIA",
     "app_desktop_menu_settings": "USTAWIENIA",
     "app_desktop_menu_title": "Główne Menu",
+    "app_desktop_tools_title": "Narzędzia",
+    "app_desktop_tools_notes": "NOTATKI",
+    "app_desktop_tools_calculator": "KALKULATOR",
+    "app_desktop_tools_recorder": "DYKTAFON",
     
     "app_desktop_poweroff_title": "Wyłączanie",
     "app_desktop_poweroff_question": "Wybierz Tak by wyłączyć",

@@ -44,8 +44,8 @@ struct WorkerCommand {
  */
 class Worker {
 protected:
-	const uint32_t SERVICE_QUEUE_LENGTH = 10;
-	const uint32_t SERVICE_QUEUE_SIZE = sizeof( WorkerCommand );
+	const static uint32_t SERVICE_QUEUE_LENGTH = 10;
+	const static uint32_t SERVICE_QUEUE_SIZE = sizeof( WorkerCommand );
 
 	sys::Service* service;
 	//queue used by service to send commands to service.

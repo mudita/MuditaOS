@@ -90,7 +90,7 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp)
+target_link_libraries(${PROJECT_NAME} module-bsp module-utils)
 
 # Host target configuration(mainly used for unit testing)
 
