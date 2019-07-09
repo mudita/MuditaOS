@@ -31,11 +31,9 @@ Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriori
 
 	longpressTimerID = CreateTimer( 1000 ,false);
 
-	LOG_INFO("!!!!!!!!!!!!!!!!!TIME: %d", xTaskGetTickCount() );
 	//create translator and set default profile
 	translator = std::make_unique<gui::Translator>();
 	translator->setProfile("home_screen");
-	LOG_INFO("!!!!!!!!!!!!!!!!!TIME: %d", xTaskGetTickCount() );
 
 }
 
@@ -72,11 +70,9 @@ void Application::render( gui::RefreshModes mode ) {
 
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
-		LOG_INFO("!!!!!!!!!!!!!!!!!RENDER TIME: %d", xTaskGetTickCount() );
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
 		auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode);
 		sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-		LOG_INFO("!!!!!!!!!!!!!!!!!RENDER TIME: %d", xTaskGetTickCount() );
 	}
 }
 void Application::blockEvents(bool isBlocked ) {
@@ -84,12 +80,10 @@ void Application::blockEvents(bool isBlocked ) {
 }
 int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 
-	LOG_INFO("!!!!!!!!!!!!!!!!!SWITCH TIME: %d", xTaskGetTickCount() );
 	std::string window = windowName.empty()?"MainWindow":windowName;
 	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
-	LOG_INFO("!!!!!!!!!!!!!!!!!SWITCH TIME: %d", xTaskGetTickCount() );
 	return 0;
 }
 int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
@@ -222,7 +216,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 }
 
 sys::ReturnCodes Application::InitHandler() {
-	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 1: %d", xTaskGetTickCount() );
+//	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 1: %d", xTaskGetTickCount() );
 	bool initState= true;
 	state = State::INITIALIZING;
 	uint32_t start = xTaskGetTickCount();
@@ -232,9 +226,9 @@ sys::ReturnCodes Application::InitHandler() {
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
-	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 2: %d", xTaskGetTickCount() );
+//	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 2: %d", xTaskGetTickCount() );
 	sapm::ApplicationManager::messageRegisterApplication( this, initState );
-	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 3: %d", xTaskGetTickCount() );
+//	LOG_INFO("!!!!!!!!!!!!!!!!!INIT TIME 3: %d", xTaskGetTickCount() );
 	sys::ReturnCodes retCode = (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
 //	LOG_INFO("*****************ReturnCode %d",static_cast<uint32_t>(retCode));
 	return retCode;
