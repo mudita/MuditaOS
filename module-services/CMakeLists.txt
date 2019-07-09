@@ -23,7 +23,7 @@ add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 message("${PROJECT_NAME}: add_subdirectory service-db")
 add_subdirectory( service-db )
-
+add_subdirectory( service-powermgr )
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db  ${TARGET_LIBRARIES} )
