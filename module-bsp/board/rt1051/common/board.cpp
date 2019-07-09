@@ -18,10 +18,7 @@
 #include "dma_config.h"
 
 #include "irq/irq_gpio.hpp"
-#include "common/i2c.h"
-
-#include "irq/irq_gpio.hpp"
-#include "common/i2c.h"
+#include "i2c.h"
 
 #include "rtc/rtc.hpp"
 
@@ -216,11 +213,21 @@ namespace bsp {
 
     }
 
+    void Power_SW_Init( void ) {
+        gpio_pin_config_t gpio_config = {kGPIO_DigitalInput, 0, kGPIO_NoIntmode};
+
+        GPIO_PinInit(BOARD_POWER_SW_GPIO, BOARD_POWER_SW_GPIO_PIN, &gpio_config);
+        gpio_config.direction = kGPIO_DigitalOutput;
+        GPIO_PinInit(BOARD_POWER_HOLD_GPIO, BOARD_POWER_HOLD_GPIO_PIN, &gpio_config);
+        GPIO_PinWrite(BOARD_POWER_HOLD_GPIO, BOARD_POWER_HOLD_GPIO_PIN, 1U);   //set pwr pin to hold power switch
+    }
+
+
 
     void BoardInit(){
 
         PINMUX_InitBootPins();
-        //Power_SW_Init();
+        Power_SW_Init();
 
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();

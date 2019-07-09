@@ -21,12 +21,12 @@ add_subdirectory( service-gui )
 add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
-message("${PROJECT_NAME}: add_subdirectory service-db")
 add_subdirectory( service-db )
 add_subdirectory( service-powermgr )
+add_subdirectory( service-cellular )
 
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db  ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db module-cellular  ${TARGET_LIBRARIES} )
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
