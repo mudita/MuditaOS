@@ -146,7 +146,7 @@ static status_t BOARD_LPI2C_Send(LPI2C_Type *base, uint8_t deviceAddress, uint32
         {
         }
 
-        reVal = LPI2C_MasterSend(base, &subAddress, subAddressSize);
+        reVal = LPI2C_MasterSend(base, &subAddress, 1 /*subAddressSize*/);
         if (reVal != kStatus_Success)
         {
             return reVal;

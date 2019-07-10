@@ -39,12 +39,17 @@ namespace bsp{
 	int battery_Init(xQueueHandle qHandle)
 	{
 		qHandleIrq = qHandle;
-		if (xTaskCreate(battery_worker, "keyboard", 512, qHandle, 0, &battery_worker_handle) != pdPASS) {
+		if (xTaskCreate(battery_worker, "battery", 512, qHandle, 0, &battery_worker_handle) != pdPASS) {
 				return 1;
 			}
 		return 0;
 	}
 
+	void battery_Deinit(void)
+	{
+		qHandleIrq = NULL;
+		vTaskDelete(battery_worker_handle);
+	}
 	void battery_getData(uint8_t& levelPercent)
 	{
 			levelPercent = battLevel;

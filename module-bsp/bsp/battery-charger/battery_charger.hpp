@@ -12,79 +12,83 @@
 
 namespace bsp{
 
-enum class batteryChargerRegisters{
-	TOP_CONTROLL_PMIC_ID_REG = 0x0020,
-	TOP_CONTROLL_PMIC_VER_REG = 0x0021,
-	TOP_CONTROLL_IRQ_SRC_REG = 0x0022,
-	TOP_CONTROLL_IRQ_MASK_REG = 0x0023,
+	enum class batteryChargerRegisters{
+		TOP_CONTROLL_PMIC_ID_REG = 0x20,
+		TOP_CONTROLL_PMIC_VER_REG = 0x21,
+		TOP_CONTROLL_IRQ_SRC_REG = 0x22,
+		TOP_CONTROLL_IRQ_MASK_REG = 0x23,
+		SYSTEM_IRQ_REG = 0x24,
 
-	STATUS_REG = 0x0000,
-	VALRT_Th_REG = 0x0001,
-	TALRT_Th_REG = 0x0002,
-	SALRT_Th_REG = 0x0003,
-	AtRate_REG = 0x0004,
-	RepCap_REG = 0x0005,
-	RepSOC_REG = 0x0006,
-	Age_REG = 0x0007,
-	TEMP_REG = 0x0008,
-	VCELL_REG = 0x0009,
-	Current_REG = 0x000A,
-	AvgCurrent_REG = 0x000B,
-	QResidual_REG = 0x000C,
-	MixSOC_REG = 0x000D,
-	AvSOC_REG = 0x000E,
-	MixCap_REG = 0x000F,
+		STATUS_REG = 0x00,
+		VALRT_Th_REG = 0x01,
+		TALRT_Th_REG = 0x02,
+		SALRT_Th_REG = 0x03,
+		AtRate_REG = 0x04,
+		RepCap_REG = 0x05,
+		RepSOC_REG = 0x06,
+		Age_REG = 0x07,
+		TEMP_REG = 0x08,
+		VCELL_REG = 0x09,
+		Current_REG = 0x0A,
+		AvgCurrent_REG = 0x0B,
+		QResidual_REG = 0x0C,
+		MixSOC_REG = 0x0D,
+		AvSOC_REG = 0x0E,
+		MixCap_REG = 0x0F,
 
-	FullCAP_REG = 0x0010,
-	TTE_REG = 0x0011,
-	QRtable00_REG = 0x0012,
-	FullSOCthr_REG = 0x0013,
-	RSLOW_REG = 0x0014,
-	AvgTA_REG = 0x0016,
-	Cycles_REG = 0x0017,
-	DesignCap_REG = 0x0018,
-	AvgVCELL_REG = 0x0019,
-	MaxMinTemp_REG = 0x001A,
-	MaxMinVolt_REG = 0x001B,
-	MaxMinCurr_REG = 0x001C,
-	CONFIG_REG = 0x001D,
-	ICHGTERM_REG = 0x001E,
-	AvCap_REG = 0x001F,
+		FullCAP_REG = 0x10,
+		TTE_REG = 0x11,
+		QRtable00_REG = 0x12,
+		FullSOCthr_REG = 0x13,
+		RSLOW_REG = 0x14,
+		AvgTA_REG = 0x16,
+		Cycles_REG = 0x17,
+		DesignCap_REG = 0x18,
+		AvgVCELL_REG = 0x19,
+		MaxMinTemp_REG = 0x1A,
+		MaxMinVolt_REG = 0x1B,
+		MaxMinCurr_REG = 0x1C,
+		CONFIG_REG = 0x1D,
+		CONFIG2_REG = 0xBB,
+		ICHGTERM_REG = 0x1E,
+		AvCap_REG = 0x1F,
 
-	TTF_REG = 0x0020,
-	DevName_REG = 0x0021,
-	QRtable10_REG = 0x0022,
-	FullCAPNom_REG = 0x0023,
-	TempNom_REG = 0x0024,
-	TempLim_REG = 0x0025,
-	AIN0_REG = 0x0027,
-	LearnCFG_REG = 0x0028,
-	FilterCFG_REG = 0x0029,
-	RelaxCFG_REG = 0x002A,
-	MiscCFG_REG = 0x002B,
-	TGAIN_REG = 0x002C,
-	TOFF_REG = 0x002D,
-	CGAIN_REG = 0x002E,
-	COFF_REG = 0x002F,
+		TTF_REG = 0x20,
+		DevName_REG = 0x21,
+		QRtable10_REG = 0x22,
+		FullCAPNom_REG = 0x23,
+		TempNom_REG = 0x24,
+		TempLim_REG = 0x25,
+		AIN0_REG = 0x27,
+		LearnCFG_REG = 0x28,
+		FilterCFG_REG = 0x29,
+		RelaxCFG_REG = 0x2A,
+		MiscCFG_REG = 0x2B,
+		TGAIN_REG = 0x2C,
+		TOFF_REG = 0x2D,
+		CGAIN_REG = 0x2E,
+		COFF_REG = 0x2F,
 
-	QRtable20_REG = 0x0032,
-	AtTTF_REG = 0x0033,
-	FullCapRep_REG = 0x0035,
-	lavgEmpty_REG = 0x0036,
-	FCTC_REG = 0x0037,
-	RCOMP0_REG = 0x0038,
-	TempCo_REG = 0x0039,
-	VEmpty_REG = 0x003A,
-	TIMER_REG = 0x003E,
-	SHDNTIMER_REG = 0x003F,
+		QRtable20_REG = 0x32,
+		AtTTF_REG = 0x33,
+		FullCapRep_REG = 0x35,
+		lavgEmpty_REG = 0x36,
+		FCTC_REG = 0x37,
+		RCOMP0_REG = 0x38,
+		TempCo_REG = 0x39,
+		VEmpty_REG = 0x3A,
+		TIMER_REG = 0x3E,
+		SHDNTIMER_REG = 0x3F,
 
-	QRtable30_REG = 0x0042,
-	dQ_acc_REG = 0x0045,
-	dP_acc_REG = 0x0046,
-	ConvgCfg_REG = 0x0049,
-	VFRemCap_REG = 0x004A,
-	QH_REG = 0x004D,
-};
+		QRtable30_REG = 0x42,
+		dQ_acc_REG = 0x45,
+		dP_acc_REG = 0x46,
+		ConvgCfg_REG = 0x49,
+		VFRemCap_REG = 0x4A,
+		QH_REG = 0x4D,
+		CHG_INT_REG = 0xb0,
+		CHG_INT_OK = 0xb2
+	};
 
 	enum class batteryRetval{
 		battery_OK = 0,
@@ -93,23 +97,24 @@ enum class batteryChargerRegisters{
 		battery_ChargerCharging
 	};
 
+	enum class batteryIRQSource{
+		INTB = 0x01,
+		INOKB = 0x02
+	};
+
+
+
 	int battery_Init(xQueueHandle qHandle);
 
-	int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
+	void battery_Deinit(void);
 
-	int battery_fuelGaugeRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value);
-
-	int battery_chargerWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
-
-	int battery_chargerRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value);
-
-	int battery_chargerTopControllerWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value);
-
-	int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value);
-
-	void battery_getData(uint8_t& levelPercent);
+	void battery_getBatteryLevel(uint8_t& levelPercent);
 
 	void battery_getChargeStatus( bool& status);
+
+	void battery_ClearAllIRQs(void);
+
+	void battery_clearFuelGuageIRQ(void);
 }
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler();
