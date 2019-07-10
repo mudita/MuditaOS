@@ -60,7 +60,21 @@
     "app_call_reject": "ODRZUĆ",
     "app_call_answer": "ODBIERZ",
     "app_call_emergency": "Numer alarmowy",
-
+    
+    "app_settings_title_main": "Ustawienia",
+    "app_settings_connectivity": "Łączność",
+    "app_settings_date_and_time": "Data i Czas",
+    "app_settings_display": "Ekran",
+    "app_settings_phone_modes": "Tryby Pracy",
+    "app_settings_security": "Bezpieczeństwo",
+    "app_settings_language": "Język",
+    "app_settings_about": "O Mudita Pure",
+    	"app_settings_title_languages": "Wybór Języka",
+    	"app_settings_language_english": "Angielski",
+    	"app_settings_language_polish": "Polski",
+    	"app_settings_language_german": "Niemiecki",
+    	"app_settings_language_spanish": "Hiszpański",
+    	
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
 

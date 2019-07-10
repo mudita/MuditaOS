@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "service-appmgr/ApplicationManager.hpp"
 #include "../ApplicationDesktop.hpp"
 #include "MenuWindow.hpp"
 #include "Navigation.hpp"
@@ -38,10 +39,10 @@ MenuPage::MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_
 		const TileDescription& tileString = tilesDescription[i];
 		uint32_t pageRow = (i%pageSize) / 3;
 		uint32_t pageColumn = (i%pageSize) % 3;
-		gui::Rect* tile = new gui::Rect( this, 31 + pageColumn*(128 + 17 ), 50+pageRow*128, 128, 128 );
+		gui::Rect* tile = new gui::Rect( this, 31 + pageColumn*(128 + 17 ), 60+pageRow*(128+17), 128, 128 );
 		tile->setRadius(11);
 		tile->setPenFocusWidth(3);
-		tile->setPenWidth(0);
+		tile->setPenWidth(1);
 
 		gui::Image* tileImg = new gui::Image( tile, 0, 0, 0,0, tileString.iconName );
 		tileImg->setPosition( (tile->widgetArea.w - tileImg->widgetArea.w)/2, (tile->widgetArea.h - tileImg->widgetArea.h)/3 );
@@ -116,10 +117,13 @@ MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
 			LOG_INFO("page 1 tools" );
 			switchPage(1);
 			return true; } },},
-		TileDescription{"menu_settings","app_desktop_menu_settings",[=] (gui::Item& item){ return true; }},
+		TileDescription{"menu_settings","app_desktop_menu_settings",[=] (gui::Item& item){
+			LOG_INFO("page 1 settings" );
+			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationSettings", "MainWindow", nullptr );
+			return true; }},
 	};
 
-	MenuPage* page1 = new MenuPage( this, 0, 60, 480, 50+128*3, page1Definitions,
+	MenuPage* page1 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page1Definitions,
 		utils::localize.get("app_desktop_menu_title"), MenuPage::PageID::MainPage);
 	pages.push_back( page1 );
 
@@ -130,7 +134,7 @@ MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
 		TileDescription{"menu_tools_recorder",  "app_desktop_tools_recorder",[=] (gui::Item& item){ return true; }},
 	};
 
-	MenuPage* page2 = new MenuPage( this, 0, 60, 480, 50+128*3, page2Definitions,
+	MenuPage* page2 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page2Definitions,
 		utils::localize.get("app_desktop_tools_title"), MenuPage::PageID::ToolsPage );
 	pages.push_back( page2 );
 }
@@ -141,8 +145,6 @@ MenuWindow::~MenuWindow() {
 void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
 	//select middle row and middle column to assign focus to the element.
-//	setFocusItem( tiles[4] );
-//	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 	Item* item = pages[currentPage]->tiles[0];
 	setFocusItem(item);
 	pages[currentPage]->setVisible(true);
@@ -189,7 +191,7 @@ void MenuWindow::switchPage( uint32_t index ) {
 	//give focus to element
 	Item* item = pages[currentPage]->tiles[0];
 	setFocusItem(item);
-	application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+	application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP 	 );
 }
 
 } /* namespace gui */
