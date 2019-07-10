@@ -108,7 +108,7 @@ ImageMap* ImageManager::loadPixMap( std::string filename ) {
 
    		pixMap->setName( filename );
 		//TODO remove commented code
-//		LOG_INFO("%s",filename.c_str());
+		LOG_INFO("%s",filename.c_str());
 		imageMaps.push_back( pixMap );
 	}
 	delete[] data;
@@ -149,7 +149,7 @@ ImageMap* ImageManager::loadVecMap( std::string filename ) {
 		filename = filename.substr( 0, filename.length()-4);
 		vecMap->setName( filename );
 		//TODO remove commented code
-		//LOG_INFO("%s",filename.c_str());
+		LOG_INFO("%s",filename.c_str());
 		imageMaps.push_back( vecMap );
 	}
 	delete[] data;

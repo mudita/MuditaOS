@@ -66,7 +66,7 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 
 	//return error input event if there is no current profile or failed to set default profile
 	if( currentProfile == nullptr ) {
-		lastEvent = InputEvent(gui::InputEvent::State::Undefined,0,0,0,0);
+		lastEvent = InputEvent(gui::InputEvent::State::Undefined,0,0,0,0, false );
 		return lastEvent;
 	}
 
@@ -79,16 +79,18 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 			//find if this key is handled in currently loaded profile
 			const KeyProfile* keyProfile = currentProfile->getKeyProfile( keyCode );
 			if( keyProfile == nullptr) {
-				lastEvent = InputEvent(gui::InputEvent::State::Undefined,0,0,0,0);
+				lastEvent = InputEvent(gui::InputEvent::State::Undefined,0,0,0,0, false);
 				return lastEvent;
 			}
 
+			bool cycle = false;
 			//if there was previous key check if there is option for cyclic press
 			if( state == State::Released ) {
 				//if previous key supports cyclic behavior and current event key is the same as previously
 				if( (prevKeyProfile->cyclic) && prevKeyCode == keyCode ) {
 					//check if distance in time is less than specified for cycling
 					if( pressTime - prevTime <= cycleTime ) {
+						cycle = true;
 						cyclePosition = (cyclePosition+1)%prevKeyProfile->chars.size();
 					}
 					else
@@ -113,7 +115,7 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 			//change state to pressed
 			state = State::Pressed;
 
-			lastEvent = InputEvent(gui::InputEvent::State::keyPressed, keyCode, keyProfile->chars[cyclePosition], pressTime, 0, keyProfile->timeouts[cyclePosition] );
+			lastEvent = InputEvent(gui::InputEvent::State::keyPressed, keyCode, keyProfile->chars[cyclePosition], pressTime, 0, cycle, keyProfile->timeouts[cyclePosition] );
 
 			return lastEvent;
 		}
@@ -133,7 +135,7 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 			if( longPress )
 				eventState = gui::InputEvent::State::keyReleasedLong;
 
-			lastEvent = InputEvent( eventState, keyCode, prevKeyProfile->chars[cyclePosition], lastEvent.keyPressTime, releaseTime, prevKeyProfile->timeouts[cyclePosition] );
+			lastEvent = InputEvent( eventState, keyCode, prevKeyProfile->chars[cyclePosition], lastEvent.keyPressTime, releaseTime, false, prevKeyProfile->timeouts[cyclePosition] );
 			return lastEvent;
 		}
 		else {
@@ -141,7 +143,7 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 		}
 	}
 
-	lastEvent = InputEvent(gui::InputEvent::State::Undefined,0,0,0,0);
+	lastEvent = InputEvent(gui::InputEvent::State::Undefined,0,0,0,0, false, 0 );
 
 	return lastEvent;
 }

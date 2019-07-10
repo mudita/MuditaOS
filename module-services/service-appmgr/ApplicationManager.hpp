@@ -23,7 +23,6 @@ namespace sapm {
 
 class ApplicationDescription {
 public:
-
 	ApplicationDescription( std::string name, std::unique_ptr<app::ApplicationLauncher> lanucher, bool closeable );
 	virtual ~ApplicationDescription() {}
 	//name of the application. It's used to find proper application during switching
@@ -54,6 +53,8 @@ class ApplicationManager: public sys::Service {
 		WAITING_GET_FOCUS_CONFIRMATION
 	};
 
+	SettingsRecord settings;
+
 	std::map< std::string, ApplicationDescription* > applications;
 	sys::SystemManager* systemManager;
 
@@ -74,7 +75,9 @@ class ApplicationManager: public sys::Service {
 //	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
 	bool handleCloseConfirmation( APMConfirmClose* msg );
 	bool handleSwitchConfirmation( APMConfirmSwitch* msg );
+	bool handleSwitchPrevApplication( APMSwitchPrevApp* msg );
 	bool handleRegisterApplication( APMRegister* msg );
+	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
 	bool startApplication( const std::string& appName );
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
@@ -113,12 +116,16 @@ public:
     /**
      * @brief Allows requesting Application Manager to run previous application.
      */
-    static bool messageSwitchPreviousApplication( sys::Service* sender, const std::string& prevAppName );
+    static bool messageSwitchPreviousApplication( sys::Service* sender );
     /**
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.
 	*/
    static bool messageRegisterApplication( sys::Service* sender, const bool& status );
+   /**
+    * @brief Sends message to application manager to inform it about change of the phone's language performed by the user.
+    */
+   static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
 };
 
 } /* namespace sapm */

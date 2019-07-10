@@ -43,9 +43,9 @@ bool Window::handleSwitchData( SwitchData* data ) {
 void Window::setFocusItem( Item* item ) {
 
 	//check if item is a child of the window
-	auto it = std::find(children.begin(), children.end(), item);
-	if( it == children.end())
-		return;
+//	auto it = std::find(children.begin(), children.end(), item);
+//	if( it == children.end())
+//		return;
 
 	//remove focus from previous item
 	if( focusItem != nullptr )
@@ -78,18 +78,18 @@ std::list<DrawCommand*> Window::buildDrawList() {
 //}
 
 
-bool Window::onInput( const KeyEvent& key ) {
-	bool res;
+bool Window::onInput( const InputEvent& inputEvent) {
+	bool res = false;
 	if( focusItem != nullptr )
-		res =  focusItem->onInput(key);
+		res =  focusItem->onInput(inputEvent);
 
 	if( res )
 		return true;
 	//if focused item didn't handle the key event and it was navigation key
 	//check if moving focus is possible
 	gui::Item* newFocusItem = nullptr;
-	if( !res && key.keyState == KeyState::KEY_RELEASED_SHORT ) {
-		switch( key.keyCode ) {
+	if( (!res) && (focusItem != nullptr ) && (inputEvent.state == InputEvent::State::keyReleasedShort) ) {
+		switch( inputEvent.keyCode ) {
 		case KeyCode::KEY_LEFT:
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);
 			break;
@@ -102,10 +102,13 @@ bool Window::onInput( const KeyEvent& key ) {
 		case KeyCode::KEY_DOWN:
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::DOWN);
 			break;
+		case KeyCode::KEY_ENTER:
+			if( focusItem )
+				return focusItem->onActivated(nullptr);
+			break;
 		default:
 			break;
 		}
-
 	}
 
 	if( newFocusItem != nullptr ) {

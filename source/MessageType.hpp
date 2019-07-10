@@ -53,6 +53,8 @@ enum class MessageType {
 	APMConfirmClose, //Sent by application to confirm completion of the close procedure
 	APMRegister, //when application finishes initHandler it is sending this messag to inform whether init was successful or not.
 	APMDeleydClose, //this message is sent internally from and to application manager to close specified application.
+	APMChangeLanguage,//this message is sent from any application to inform application manager that it should send gui rebuild command to all
+					//applications in background and currently active application.
 
 	//keyboard messages
 	KBDKeyEvent,
@@ -62,6 +64,7 @@ enum class MessageType {
 	AppSwitchWindow, //This is internal message transmitted within application to change window. Additional command and data are transmitted with it.
 	AppInputEvent,//used after key event translation to send input event to application
 	AppRefresh,
+	AppRebuild,//message used to notify application that it should recreate it's GUI (i.e. language has beed changed by the user)
 	AppClose,
 	AppFocus,
 
