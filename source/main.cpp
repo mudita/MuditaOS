@@ -53,16 +53,6 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
-
-
-
-        uint8_t val = 0;
-        bsp::battery_getBatteryLevel(val);
-        LOG_INFO("Current percent: %d", val);
-
-
-      	uint32_t pin = GPIO_PinRead(BOARD_BATTERY_CHARGER_INTB_GPIO, BOARD_BATTERY_CHARGER_INTB_PIN);
-        LOG_INFO("INTB pin %d", pin);
     }
 
 
