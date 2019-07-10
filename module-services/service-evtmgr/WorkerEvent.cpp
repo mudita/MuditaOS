@@ -57,19 +57,22 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
 				return false;
 		}
-		if(notification == 0x01)
+		if(notification & static_cast<uint8_t>(bsp::batteryIRQSource::INTB))
 		{
 			uint8_t battLevel;
-			bsp::battery_getData(battLevel);
+
+			bsp::battery_getBatteryLevel(battLevel);
+			bsp::battery_clearFuelGuageIRQ();
 			auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 			message->levelPercents = battLevel;
 			message->fullyCharged = false;
 			sys::Bus::SendUnicast(message, "EventManager", this->service);
 		}
-		if(notification == 0x02)
+		if(notification & static_cast<uint8_t>(bsp::batteryIRQSource::INOKB))
 		{
 			bool status;
 			bsp::battery_getChargeStatus(status);
+			bsp::battery_ClearAllIRQs();
 			auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
 			message->plugged = status;
 			sys::Bus::SendUnicast(message, "EventManager", this->service);
@@ -92,6 +95,7 @@ bool WorkerEvent::deinit(void)
 	Worker::stop();
 	Worker::deinit();
 	bsp::keyboard_Deinit();
+	bsp::battery_Deinit();
 
 	return true;
 }
