@@ -88,7 +88,7 @@ bool Window::onInput( const InputEvent& inputEvent) {
 	//if focused item didn't handle the key event and it was navigation key
 	//check if moving focus is possible
 	gui::Item* newFocusItem = nullptr;
-	if( !res && inputEvent.state == InputEvent::State::keyReleasedShort ) {
+	if( (!res) && (focusItem != nullptr ) && (inputEvent.state == InputEvent::State::keyReleasedShort) ) {
 		switch( inputEvent.keyCode ) {
 		case KeyCode::KEY_LEFT:
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);

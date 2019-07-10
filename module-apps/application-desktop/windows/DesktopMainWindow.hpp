@@ -23,8 +23,8 @@ namespace gui {
  */
 class DesktopMainWindow: public AppWindow {
 protected:
-	gui::BottomBar* bottomBar;
-	gui::TopBar* topBar;
+	gui::BottomBar* bottomBar = nullptr;
+	gui::TopBar* topBar = nullptr;
 	gui::Label* description = nullptr;
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;

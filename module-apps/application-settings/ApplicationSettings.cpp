@@ -1,7 +1,7 @@
 /*
- * @file ApplicationCall.cpp
+ * @file ApplicationSesttings.cpp
  * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 lip 2019
+ * @date 8 lip 2019
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
@@ -9,22 +9,22 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
-#include "windows/CallMainWindow.hpp"
-#include "windows/EnterNumberWindow.hpp"
-#include "windows/EmergencyCallWindow.hpp"
+#include "windows/SettingsMainWindow.hpp"
+#include "windows/LanguageWindow.hpp"
 
-#include "ApplicationCall.hpp"
+#include "ApplicationSettings.hpp"
+
 namespace app {
 
-ApplicationCall::ApplicationCall(std::string name) :
+ApplicationSettings::ApplicationSettings(std::string name) :
 	Application( name, 2048 ) {
 }
 
-ApplicationCall::~ApplicationCall() {
+ApplicationSettings::~ApplicationSettings() {
 }
 
 // Invoked upon receiving data message
-sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	auto retMsg = Application::DataReceivedHandler(msgl);
 	//if message was handled by application's template there is no need to process further.
@@ -43,7 +43,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 }
 
 // Invoked during initialization
-sys::ReturnCodes ApplicationCall::InitHandler() {
+sys::ReturnCodes ApplicationSettings::InitHandler() {
 
 	auto ret = Application::InitHandler();
 	if( ret != sys::ReturnCodes::Success )
@@ -56,42 +56,31 @@ sys::ReturnCodes ApplicationCall::InitHandler() {
 	return ret;
 }
 
-sys::ReturnCodes ApplicationCall::DeinitHandler() {
+sys::ReturnCodes ApplicationSettings::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationCall::WakeUpHandler() {
+sys::ReturnCodes ApplicationSettings::WakeUpHandler() {
 	return sys::ReturnCodes::Success;
 }
 
 
-sys::ReturnCodes ApplicationCall::SleepHandler() {
+sys::ReturnCodes ApplicationSettings::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-void ApplicationCall::createUserInterface() {
+void ApplicationSettings::createUserInterface() {
 
 	gui::Window* window = nullptr;
 
-	window = new gui::CallMainWindow(this);
+	window = new gui::SettingsMainWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 
-	window = new gui::EnterNumberWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
-
-	window = new gui::EmergencyCallWindow(this);
+	window = new gui::LanguageWindow(this);
 	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
 }
 
-void ApplicationCall::setDisplayedNumber( std::string num ) {
-	phoneNumber = num;
+void ApplicationSettings::destroyUserInterface() {
 }
 
-const std::string& ApplicationCall::getDisplayedNumber() {
-	return phoneNumber;
-}
-
-void ApplicationCall::destroyUserInterface() {
-}
-
-} /* namespace gui */
+} /* namespace app */
