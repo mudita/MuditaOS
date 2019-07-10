@@ -105,6 +105,7 @@ public:
 	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data );
 	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data=nullptr );
 	static bool messageCloseApplication( sys::Service* sender, std::string application );
+	static bool messageRebuildApplication( sys::Service* sender, std::string application );
 	/**
 	 * @brief This method is used to send message to set focus of the application.
 	 * Application can gain or lose focus depending on the provided focus flag.

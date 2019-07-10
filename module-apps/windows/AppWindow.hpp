@@ -30,6 +30,7 @@ public:
 
 	app::Application* getApplication() { return application; };
 	void setApplication( app::Application* app ) { application = app; };
+	void rebuild() {};
 };
 
 } /* namespace gui */

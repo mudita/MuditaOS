@@ -32,7 +32,7 @@ public:
 
 class ApplicationSettingsLauncher : public ApplicationLauncher {
 public:
-	ApplicationSettingsLauncher() : ApplicationLauncher("ApplicationSettings", false) {};
+	ApplicationSettingsLauncher() : ApplicationLauncher("ApplicationSettings", true) {};
 	bool run(sys::SystemManager* sysmgr) override {
 		return sysmgr->CreateService(std::make_shared<ApplicationSettings>(name),sysmgr, 1000);
 	};

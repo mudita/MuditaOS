@@ -45,20 +45,24 @@ LanguageWindow::LanguageWindow( app::Application* app ) : AppWindow(app,"Languag
 	//add option connectivity option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_english"), [=] (gui::Item& item){
 		LOG_INFO("selected language: english" );
+		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::En );
 		return true;} ));
 
 	//add option date and time option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_polish"), [=](gui::Item&){
 		LOG_INFO("selected language: polish" );
+		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::Pl );
 		return true;} ));
 
 	//add option display option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_german"), [=](gui::Item&){
 		LOG_INFO("selected language: german" );
+		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::De );
 		return true;} ));
 
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_spanish"), [=](gui::Item&){
 		LOG_INFO("selected language: spanish" );
+		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::Sp );
 		return true;} ));
 
 	//set possition and navigation for labels
@@ -84,6 +88,7 @@ gui::Item* LanguageWindow::addOptionLabel( const std::string& text, std::functio
 	label->setFont("gt_pressura_regular_24");
 	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
 	label->setRadius(11);
+	label->activatedCallback = activatedCallback;
 
 	return label;
 }

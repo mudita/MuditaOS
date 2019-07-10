@@ -120,7 +120,7 @@ bool SettingsMainWindow::onInput( const InputEvent& inputEvent ) {
 		LOG_INFO("Enter pressed");
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MainWindow", nullptr );
+		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MenuWindow", nullptr );
 		return true;
 	}
 

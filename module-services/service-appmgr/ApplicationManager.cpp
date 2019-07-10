@@ -86,6 +86,16 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("APMregister %s %s", msg->getSenderName().c_str(), (msg->getStatus()?"true":"false"));
 			handleRegisterApplication( msg );
 		} break;
+		case static_cast<int32_t>(MessageType::APMChangeLanguage) : {
+			sapm::APMChangeLanguage* msg = reinterpret_cast<sapm::APMChangeLanguage*>( msgl );
+			std::string lang;
+			if( msg->getLanguage() == utils::Lang::En ) lang = "English";
+			if( msg->getLanguage() == utils::Lang::Pl ) lang = "Polish";
+			if( msg->getLanguage() == utils::Lang::De ) lang = "German";
+			if( msg->getLanguage() == utils::Lang::Sp ) lang = "Spanish";
+			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
+			handleLanguageChange( msg );
+		} break;
 		default : {
 			LOG_FATAL("Received unknown massage %d", msgType );
 		} break;
@@ -103,13 +113,16 @@ void ApplicationManager::TickHandler(uint32_t id) {
 sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//get settings to initialize language in applications
-	SettingsRecord settings = DBServiceAPI::SettingsGet(this);
+	settings = DBServiceAPI::SettingsGet(this);
 
 	if( settings.language == SettingsLanguage::ENGLISH ) {
 		utils::localize.Switch( utils::Lang::En );
 	}
-	if( settings.language == SettingsLanguage::POLISH ) {
+	else if( settings.language == SettingsLanguage::POLISH ) {
 		utils::localize.Switch( utils::Lang::Pl );
+	}
+	else if( settings.language == SettingsLanguage::GERMAN ) {
+		utils::localize.Switch( utils::Lang::De );
 	}
 	else if( settings.language == SettingsLanguage::SPANISH ) {
 		utils::localize.Switch( utils::Lang::Sp );
@@ -288,6 +301,45 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 	return true;
 }
 
+bool ApplicationManager::handleLanguageChange( sapm::APMChangeLanguage* msg ) {
+
+	//check if selected language is different than the one that is in the settings
+	//if they are the same, return doing nothing
+	SettingsLanguage requestedLanguage;
+	switch( msg->getLanguage()) {
+		case utils::Lang::En : requestedLanguage = SettingsLanguage::ENGLISH; break;
+		case utils::Lang::Pl : requestedLanguage = SettingsLanguage::POLISH; break;
+		case utils::Lang::De : requestedLanguage = SettingsLanguage::GERMAN; break;
+		case utils::Lang::Sp : requestedLanguage = SettingsLanguage::SPANISH; break;
+		default: requestedLanguage = SettingsLanguage::ENGLISH; break;
+	};
+
+	//if requested language is different than current update settings and i18 translations
+	if( requestedLanguage != settings.language ) {
+		settings = DBServiceAPI::SettingsGet(this);
+		settings.language = requestedLanguage;
+		DBServiceAPI::SettingsUpdate( this, settings );
+		utils::localize.Switch( msg->getLanguage() );
+	}
+	else {
+		LOG_WARN("Selected language is already set. Ignoring command.");
+		return true;
+	}
+
+	//iterate over all applications in the background or foreground state and send them rebuild command
+	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
+		if( it->second->state == app::Application::State::ACTIVE_BACKGROUND ||
+			it->second->state == app::Application::State::ACTIVE_FORGROUND ) {
+
+			app::Application::messageRebuildApplication(this, it->second->name);
+		}
+	}
+
+
+
+	return true;
+}
+
 bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
@@ -353,30 +405,42 @@ bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const s
 bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
-
-	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
+//	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmClose>(sender->GetName() );
-	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
+//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender ) {
 
 	auto msg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
-	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
+//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status ) {
 	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status );
-	sys::Bus::SendUnicast(msg, "ApplicationManager", sender );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
+//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+}
+
+bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lang language ) {
+	auto msg = std::make_shared<sapm::APMChangeLanguage>( sender->GetName(), language );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 } /* namespace sapm */

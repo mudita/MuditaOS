@@ -14,6 +14,8 @@
 
 #include "SwitchData.hpp"
 
+#include "i18/i18.hpp"
+
 namespace sapm {
 
 /*
@@ -95,6 +97,17 @@ public:
 	application{ application } {}
 
 	const std::string& getApplication() { return application; };
+};
+
+class APMChangeLanguage: public APMMessage {
+protected:
+	utils::Lang language;
+public:
+	APMChangeLanguage( const std::string& senderName, utils::Lang language ) :
+	APMMessage( MessageType::APMChangeLanguage, senderName ),
+	language{ language } {}
+
+	const utils::Lang& getLanguage() { return language; };
 };
 
 

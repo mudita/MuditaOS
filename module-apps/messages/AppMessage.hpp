@@ -20,16 +20,10 @@ namespace app {
  * @brief Template for all messages that go to application manager
  */
 class AppMessage: public sys::DataMessage {
-protected:
-	//name of the application to which switch is performed.
-	std::string application;
 public:
-	AppMessage( MessageType messageType, const std::string& application ) :
-		sys::DataMessage( static_cast<uint32_t>(messageType)),
-		application{application} {};
+	AppMessage( MessageType messageType ) :	sys::DataMessage( static_cast<uint32_t>(messageType)) {};
 	virtual ~AppMessage() {};
 
-	std::string getApplicationName() { return application;};
 };
 
 //this message is used to notify application about switching event. Application will gain or lose focus upon receiving this message.
@@ -38,23 +32,28 @@ class AppSwitchMessage : public AppMessage {
 protected:
 	std::string window;
 	std::unique_ptr<gui::SwitchData> data;
+	//name of the application to which switch is performed.
+	std::string application;
 public:
 	AppSwitchMessage( const std::string& application, const std::string& window, std::unique_ptr<gui::SwitchData> data ) :
-		AppMessage( MessageType::AppSwitch, application),
+		AppMessage( MessageType::AppSwitch ),
 		window{window},
-		data {std::move(data)} {};
+		data {std::move(data)},
+		application{ application} {};
 	virtual ~AppSwitchMessage() {};
 
 	std::string getWindowName() { return window; };
 	std::unique_ptr<gui::SwitchData>& getData() { return data; };
+	std::string getApplicationName() { return application;};
 };
 
 class AppRefreshMessage : public AppMessage {
 protected:
 	gui::RefreshModes mode;
 public:
-	AppRefreshMessage( const std::string& application, gui::RefreshModes mode ) :
-		AppMessage( MessageType::AppRefresh, application),
+//	AppRefreshMessage( const std::string& application, gui::RefreshModes mode ) :
+		AppRefreshMessage( gui::RefreshModes mode ) :
+		AppMessage( MessageType::AppRefresh ),
 		mode{ mode }{};
 	virtual ~AppRefreshMessage() {};
 
@@ -68,7 +67,7 @@ protected:
 	std::unique_ptr<gui::SwitchData> data;
 public:
 	AppSwitchWindowMessage( const std::string& window, uint32_t command, std::unique_ptr<gui::SwitchData> data ) :
-		AppMessage( MessageType::AppSwitchWindow, "" ),
+		AppMessage( MessageType::AppSwitchWindow ),
 		window{window},
 		command{ command },
 		data {std::move(data)} {};
@@ -84,13 +83,18 @@ protected:
 	gui::InputEvent event;
 public:
 	AppInputEventMessage( gui::InputEvent evt ) :
-		AppMessage( MessageType::AppInputEvent, "" ),
+		AppMessage( MessageType::AppInputEvent ),
 		event{evt} {};
 	virtual ~AppInputEventMessage() {};
 
 	const gui::InputEvent& getEvent() { return event; };
 };
 
+class AppRebuildMessage : public AppMessage {
+public:
+	AppRebuildMessage(): AppMessage( MessageType::AppRebuild ) {};
+	virtual ~AppRebuildMessage() {};
 };
 
+};
 #endif /* MODULE_APPS_MESSAGES_APPMESSAGE_HPP_ */
