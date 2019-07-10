@@ -100,7 +100,27 @@ ssize_t MuxChannel::SendData(uint8_t *data, size_t size) {
     return xStreamBufferSend(inputBuffer,data,size,100);
 }
 
-int MuxChannel::ParseInputData(uint8_t *data, size_t size){
-    //LOG_FATAL((name + " received message: " + msg->m_data).c_str());
-    return 0;
+std::vector<std::string> MuxChannel::Tokenizer(std::string &input, uint32_t maxTokenCount,
+                                               const std::string &delimiter) {
+    std::vector<std::string> strings;
+    uint32_t tokenCount = 0;
+
+
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (tokenCount<maxTokenCount))
+    {
+        if(pos == prev){
+            prev = pos + delimiter.size();
+            continue;
+        }
+
+        strings.push_back(input.substr(prev, pos - prev));
+        prev = pos + delimiter.size();
+        tokenCount++;
+    }
+
+    // To get the last substring (or only, if delimiter is not found)
+    input = input.substr(prev);
+    return strings;
 }

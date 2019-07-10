@@ -46,8 +46,10 @@ enum class MessageType {
 	DBContactGetCount,         // Get contacts count
 
 	//Cellular messages
-	CellularNotification,
-
+	CellularNotification,   // Async notification message
+    CellularDialNumber,     // Dial number
+    CellularAnswerIncomingCall, // Answer incoming call
+    CellularHangupCall,         // Hang up call
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window

@@ -53,5 +53,23 @@ public:
 
 };
 
+class CellularRequestMessage : public CellularMessage{
+public:
+
+    CellularRequestMessage(MessageType messageType):CellularMessage(messageType){}
+    ~CellularRequestMessage() {}
+
+    std::string data;
+
+};
+
+class CellularResponseMessage: public sys::ResponseMessage {
+public:
+    CellularResponseMessage(uint32_t retCode) : sys::ResponseMessage(),retCode(retCode) {};
+    virtual ~CellularResponseMessage() {};
+
+    uint32_t retCode;
+};
+
 
 #endif //PUREPHONE_CELLULARMESSAGE_HPP

@@ -118,7 +118,7 @@ int MuxDaemon::Start() {
             // If no response, power up modem and try again
             cellular->PowerUp();
 
-            uint32_t retries = 10;
+            uint32_t retries = 20;
             while (--retries) {
                 if (SendAT("AT\r", 500) == 0) {
                     break;
@@ -132,7 +132,6 @@ int MuxDaemon::Start() {
         }
 
     }
-
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
@@ -306,6 +305,11 @@ int MuxDaemon::CloseMux() {
     channels[0]->Close();
 
     return 0;
+}
+
+std::vector<std::string> MuxDaemon::SendCommandReponse(MuxChannel::MuxChannelType type, const char *cmd, size_t rxCount,
+                                                       uint32_t timeout) {
+    return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd,rxCount,timeout);
 }
 
 int MuxDaemon::memstr(const char *haystack, int length, const char *needle) {

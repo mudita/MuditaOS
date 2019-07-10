@@ -10,3 +10,47 @@
 
 
 #include "CellularServiceAPI.hpp"
+#include "Service/Bus.hpp"
+#include "../ServiceCellular.hpp"
+
+
+bool CellularServiceAPI::DialNumber(sys::Service* serv,const std::string& number) {
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularDialNumber);
+    msg->data = number;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceCellular::serviceName,serv,5000);
+    CellularResponseMessage* response = reinterpret_cast<CellularResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+
+}
+
+bool CellularServiceAPI::AnswerIncomingCall(sys::Service* serv) {
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularAnswerIncomingCall);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceCellular::serviceName,serv,5000);
+    CellularResponseMessage* response = reinterpret_cast<CellularResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool CellularServiceAPI::HangupCall(sys::Service* serv){
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceCellular::serviceName,serv,5000);
+    CellularResponseMessage* response = reinterpret_cast<CellularResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}

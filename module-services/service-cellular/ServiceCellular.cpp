@@ -27,8 +27,8 @@ ServiceCellular::ServiceCellular()
         : sys::Service(serviceName, 1024 * 4, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceCellular] Initializing");
 
-    testTimerID = CreateTimer(3000, true);
-    ReloadTimer(testTimerID);
+    //testTimerID = CreateTimer(3000, true);
+    //ReloadTimer(testTimerID);
 
     muxdaemon = MuxDaemon::Create([this](NotificationType type, std::string resp) {
 
@@ -78,8 +78,7 @@ ServiceCellular::~ServiceCellular() {
 
 // Invoked when timer ticked
 void ServiceCellular::TickHandler(uint32_t id) {
-    char *resp = "AT\r";
-    //muxdaemon->WriteMuxFrame(2, reinterpret_cast<unsigned char *>(resp),strlen(resp), static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+
 }
 
 // Invoked during initialization
@@ -106,7 +105,52 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
     switch (static_cast<MessageType >(msgl->messageType)) {
+
+        case MessageType ::CellularHangupCall:
+        {
+            CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
+            auto ret = muxdaemon->SendCommandReponse(MuxChannel::MuxChannelType::Communication,"ATH\r",1);
+            if((ret.size() == 1) && (ret[0] == "OK")){
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+            }else{
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+
+
+        }
+            break;
+
+        case MessageType ::CellularAnswerIncomingCall:
+        {
+            CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
+            auto ret = muxdaemon->SendCommandReponse(MuxChannel::MuxChannelType::Communication,"ATA\r",1);
+            if((ret.size() == 1) && (ret[0] == "OK")){
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+            }else{
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+            break;
+
+        case MessageType ::CellularDialNumber:
+        {
+            CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
+            auto ret = muxdaemon->SendCommandReponse(MuxChannel::MuxChannelType::Communication,("ATD" + msg->data + ";\r").c_str(),1);
+            if((ret.size() == 1) && (ret[0] == "OK")){
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+            }else{
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+            break;
+
+
+
+
         default:
             break;
     }
+
+
+    return responseMsg;
 }

@@ -14,8 +14,13 @@
 
 #include "../messages/CellularMessage.hpp"
 
+class Service;
 
 class CellularServiceAPI {
+public:
+    static bool DialNumber(sys::Service* serv,const std::string& number);
+    static bool AnswerIncomingCall(sys::Service* serv);
+    static bool HangupCall(sys::Service* serv);
 
 };
 
