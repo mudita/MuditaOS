@@ -37,9 +37,10 @@ public:
 
     sys::ReturnCodes SleepHandler() override;
 
+    static const char *serviceName;
 
 private:
-    static const char *serviceName;
+
     std::unique_ptr<MuxDaemon> muxdaemon;
     uint32_t testTimerID = 0;
 

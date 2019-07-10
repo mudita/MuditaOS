@@ -14,6 +14,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
 #include "task.h"
@@ -68,7 +69,7 @@ public:
     //Distribute data to mux channel
     ssize_t SendData(uint8_t* data, size_t size);
 
-    virtual ssize_t SendCommand(const char* cmd,uint32_t timeout = 1000){return 0;}
+    virtual std::vector<std::string> SendCommandReponse(const char* cmd,size_t rxCount,uint32_t timeout = 1000){return {};}
 
 
     std::string& GetName(){
@@ -86,6 +87,8 @@ public:
     uint32_t GetChannelNumber(){
         return static_cast<uint32_t >(type);
     }
+
+    static std::vector<std::string> Tokenizer(std::string& input,uint32_t maxTokenCount,const std::string& delimiter);
 
     int v24signals;
     int frameAllowed;
@@ -108,7 +111,7 @@ private:
     MuxChannelType type;
 
 protected:
-    virtual int ParseInputData(uint8_t* data, size_t size);
+    virtual int ParseInputData(uint8_t* data, size_t size){return 0;}
 
     std::string name;
     MuxDaemon* mux;

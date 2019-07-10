@@ -64,6 +64,9 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
+        auto ret = CellularServiceAPI::DialNumber(this,"888763698");
+
+
     }
 
     // Invoked during initialization
