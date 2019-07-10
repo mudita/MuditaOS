@@ -191,7 +191,7 @@ void MenuWindow::switchPage( uint32_t index ) {
 	//give focus to element
 	Item* item = pages[currentPage]->tiles[0];
 	setFocusItem(item);
-	application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+	application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP );
 }
 
 } /* namespace gui */
