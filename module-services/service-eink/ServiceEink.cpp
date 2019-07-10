@@ -111,6 +111,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			EinkPowerOn();
 
 			int32_t temperature = EinkGetTemperatureInternal();
+			LOG_INFO("temperature: %d", temperature );
 
 			EinkStatus_e ret;
 			if( deepRefresh ) {

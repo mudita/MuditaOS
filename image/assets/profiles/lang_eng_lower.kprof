@@ -61,9 +61,25 @@ false
 0x0A
 0
 #JoystickLeft = 11,
+11
+false
+''
+0
 #JoystickRight = 13,
+13
+false
+''
+0
 #JoystickUp = 2,
+2
+false
+''
+0
 #JoystickDown = 22,
+22
+false
+''
+0
 #JoystickEnter = 12,
 #FnLeft = 21,//1,
 #FnRight = 23,//3,

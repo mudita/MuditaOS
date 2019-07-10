@@ -132,8 +132,10 @@ sys::ReturnCodes EventManager::SleepHandler() {
 bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 
 	auto msg = std::make_shared<sevm::EVMFocusApplication>( applicationName );
-	auto ret =  sys::Bus::SendUnicast(msg, "EventManager", sender,500  );
-	return (ret.first == sys::ReturnCodes::Success )?true:false;
+//	auto ret =  sys::Bus::SendUnicast(msg, "EventManager", sender, 200 );
+//	return (ret.first == sys::ReturnCodes::Success )?true:false;
+	sys::Bus::SendUnicast(msg, "EventManager", sender );
+	return true;
 }
 
 

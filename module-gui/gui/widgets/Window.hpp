@@ -43,7 +43,7 @@ public:
 	virtual bool handleSwitchData( SwitchData* data );
 
 	//virtual methods from Item
-	bool onInput( const KeyEvent& key ) override;
+	bool onInput( const InputEvent& inputEvent ) override;
 	std::list<DrawCommand*> buildDrawList() override;
 	std::string getName() { return name; };
 };

@@ -5,6 +5,9 @@ build/
 
 lib/
 
+#no env.cmake
+env.cmake
+
 config/config_target\.h
 
 OzoneJlink\.jdebug\.user

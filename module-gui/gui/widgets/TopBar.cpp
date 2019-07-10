@@ -14,6 +14,9 @@ namespace gui {
 uint32_t TopBar::signalStrength = 5;
 uint32_t TopBar::batteryLevel = 5;
 
+const uint32_t TopBar::signalOffset = 35;
+const uint32_t TopBar::batteryOffset = 415;
+
 TopBar::TopBar() {
 
 	prepareWidget();
@@ -38,24 +41,24 @@ TopBar::~TopBar() {
 
 void TopBar::prepareWidget() {
 
-	signal[0] = new gui::Image( this, 25,17,0,0, "signal0" );
-	signal[1] = new gui::Image( this, 25,17,0,0, "signal1" );
-	signal[2] = new gui::Image( this, 25,17,0,0, "signal2" );
-	signal[3] = new gui::Image( this, 25,17,0,0, "signal3" );
-	signal[4] = new gui::Image( this, 25,17,0,0, "signal4" );
-	signal[5] = new gui::Image( this, 25,17,0,0, "signal5" );
+	signal[0] = new gui::Image( this, signalOffset,17,0,0, "signal0" );
+	signal[1] = new gui::Image( this, signalOffset,17,0,0, "signal1" );
+	signal[2] = new gui::Image( this, signalOffset,17,0,0, "signal2" );
+	signal[3] = new gui::Image( this, signalOffset,17,0,0, "signal3" );
+	signal[4] = new gui::Image( this, signalOffset,17,0,0, "signal4" );
+	signal[5] = new gui::Image( this, signalOffset,17,0,0, "signal5" );
 	for( uint32_t i=0; i<signalImgCount; ++i )
 		signal[i]->setVisible( false );
 
 	signal[signalStrength]->setVisible( true );
 
 	//icons for battery
-	battery[0] = new gui::Image( this, 425,17,0,0, "battery0" );
- 	battery[1] = new gui::Image( this, 425,17,0,0, "battery1" );
-	battery[2] = new gui::Image( this, 425,17,0,0, "battery2" );
-	battery[3] = new gui::Image( this, 425,17,0,0, "battery3" );
-	battery[4] = new gui::Image( this, 425,17,0,0, "battery4" );
-	battery[5] = new gui::Image( this, 425,17,0,0, "battery5" );
+	battery[0] = new gui::Image( this, batteryOffset,17,0,0, "battery0" );
+ 	battery[1] = new gui::Image( this, batteryOffset,17,0,0, "battery1" );
+	battery[2] = new gui::Image( this, batteryOffset,17,0,0, "battery2" );
+	battery[3] = new gui::Image( this, batteryOffset,17,0,0, "battery3" );
+	battery[4] = new gui::Image( this, batteryOffset,17,0,0, "battery4" );
+	battery[5] = new gui::Image( this, batteryOffset,17,0,0, "battery5" );
 	for( uint32_t i=0; i<batteryLevelCount; ++i )
 		battery[i]->setVisible( false );
 

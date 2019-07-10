@@ -1,44 +1,56 @@
+9
+[0 - screen8]
+screen8
+F
+0
+1
+0
+[1 - screen2]
+screen2
+F
+0
+2
+0
+[2 - screen]
+screen3
+F
+0
+3
+0
+[3 - screen4]
+screen4
+F
+0
+4
+0
+[4 - screen5]
+screen5
+F
+0
+5
+0
+[5 - screen6]
+screen6
+F
+0
+6
+0
+[6 - screen7]
+screen7
+F
+0
 7
-[0 - homescreen-locked]
-homescreen-locked.vpi
+0
+[7 - screen1]
+screen1
 F
 0
-3
+2
 0
-[1 - all-songs]
-all-songs.vpi
+[8 - screen9]
+screen9
 F
-1
-2
-1
-[2 - all-songs-player]
-all-songs-player.vpi
-F
-2
-5
-2
-[3 - meditation-timer-countdown]
-meditation-timer-countdown.vpi
-F
-3
-1
-3
-[4 - messages-conversation]
-messages-conversation.vpi
-F
-4
 0
-4
-[5 - receive-call]
-receive-call.vpi
-F
-6
-5
-5
-[6 - ongoing-call]
-ongoing-call.vpi
-F
-6
-4
-6
+0
+0
 

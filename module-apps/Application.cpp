@@ -33,8 +33,7 @@ Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriori
 
 	//create translator and set default profile
 	translator = std::make_unique<gui::Translator>();
-//	translator->setProfile("home_screen");
-	translator->setProfile("lang_eng_lower");
+	translator->setProfile("home_screen");
 
 }
 
@@ -47,7 +46,7 @@ void Application::TickHandler(uint32_t id) {
 		LOG_INFO( "longpressTimerID triggered");
 		gui::InputEvent iev = translator->translate(
 			false,
-			translator->getLastEvent().keyCode,
+			static_cast<int>(translator->getLastEvent().keyCode),
 			translator->getLastEvent().keyPressTime,
 			translator->getLastEvent().keyPressTime + translator->getLastEvent().timeout,
 			true );
@@ -68,6 +67,7 @@ void Application::render( gui::RefreshModes mode ) {
 		LOG_ERROR("Current window is not defined");
 		return;
 	}
+
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
@@ -87,13 +87,13 @@ int Application::switchWindow( const std::string& windowName, uint32_t cmd, std:
 	return 0;
 }
 int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWindowBack, this->GetName() );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWindowBack );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
 	return 0;
 }
 int Application::refreshWindow(gui::RefreshModes mode) {
-	auto msg = std::make_shared<AppRefreshMessage>( this->GetName(), mode );
+	auto msg = std::make_shared<AppRefreshMessage>( mode );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
 	return 0;
@@ -104,7 +104,11 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
 		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
+		if( currentWindow != nullptr )
+			currentWindow->onInput( msg->getEvent() );
+
 		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
+		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
@@ -145,7 +149,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("Application charger disconnected" );
 	}
 
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
+
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
@@ -187,7 +192,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_ERROR("Wrong internal application to switch to active state");
 		}
 	}
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
 		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
 		//check if specified window is in the application
 		LOG_INFO("Switching to window: [%s] cmd: %d, data: %s", msg->getWindowName().c_str(), msg->getCommand(), (msg->getData()!=nullptr?"true":"false"));
@@ -195,20 +200,32 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( it != windows.end() ) {
 
 			setActiveWindow( msg->getWindowName());
+
+			//determine show mode
+			gui::ShowMode mode = gui::ShowMode::GUI_SHOW_INIT;
+			if( previousWindow == currentWindow )
+				mode = gui::ShowMode::GUI_SHOW_RETURN;
 			currentWindow->handleSwitchData( msg->getData().get() );
+			currentWindow->onBeforeShow( mode, 0, msg->getData().get() );
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		handled = true;
 	}
-//
+
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
 		state = State::DEACTIVATING;
 		sapm::ApplicationManager::messageConfirmClose(this);
 		//here should go all the cleaning
 		handled = true;
 	}
+	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRebuild )) {
+
+		LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
+	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
-		render( gui::RefreshModes::GUI_REFRESH_DEEP );
+		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
+		//currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
+		render( msg->getMode() );
 	}
 
 	if( handled)
@@ -220,12 +237,16 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 sys::ReturnCodes Application::InitHandler() {
 	bool initState= true;
 	state = State::INITIALIZING;
+	uint32_t start = xTaskGetTickCount();
 	settings = DBServiceAPI::SettingsGet(this);
+	uint32_t stop = xTaskGetTickCount();
+	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
 	sapm::ApplicationManager::messageRegisterApplication( this, initState );
-	return (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
+	sys::ReturnCodes retCode = (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
+	return retCode;
 }
 
 void Application::setActiveWindow( const std::string& windowName ) {
@@ -240,6 +261,10 @@ void Application::setActiveWindow( const std::string& windowName ) {
 	}
 }
 
+void Application::setKeyboardProfile( const std::string& profile ) {
+	translator->setProfile( profile );
+}
+
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {
 	auto msg = std::make_shared<AppSwitchMessage>( application, window, std::move(data) );
 	sys::Bus::SendUnicast(msg, application, sender );
@@ -247,15 +272,21 @@ bool Application::messageSwitchApplication( sys::Service* sender, std::string ap
 }
 
 bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data ) {
-	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh, application );
-	sys::Bus::SendUnicast(msg, application, sender );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh );
+	sys::Bus::SendUnicast(msg, application, sender  );
 	return true;
 }
 
 bool Application::messageCloseApplication( sys::Service* sender, std::string application ) {
 
-	auto msg = std::make_shared<AppMessage>( MessageType::AppClose, application );
-	sys::Bus::SendUnicast(msg, application, sender );
+	auto msg = std::make_shared<AppMessage>( MessageType::AppClose );
+	sys::Bus::SendUnicast(msg, application, sender  );
+	return true;
+}
+
+bool Application::messageRebuildApplication( sys::Service* sender, std::string application ) {
+	auto msg = std::make_shared<AppRebuildMessage>();
+	sys::Bus::SendUnicast(msg, application, sender  );
 	return true;
 }
 
