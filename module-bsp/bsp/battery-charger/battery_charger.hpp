@@ -8,8 +8,6 @@
 #ifndef MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 #define MODULE_BSP_BSP_BATTERY_CHARGER_BATTERY_CHARGER_HPP_
 
-#include "service-evtmgr/WorkerEvent.hpp"
-
 namespace bsp{
 
 	enum class batteryChargerRegisters{
@@ -101,8 +99,6 @@ namespace bsp{
 		INTB = 0x01,
 		INOKB = 0x02
 	};
-
-	int vcell(void);
 
 	int battery_Init(xQueueHandle qHandle);
 
