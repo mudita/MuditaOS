@@ -307,8 +307,9 @@ int MuxDaemon::CloseMux() {
     return 0;
 }
 
-std::vector<std::string> MuxDaemon::SendCommandReponse(MuxChannel::MuxChannelType type, const char *cmd, size_t rxCount,
-                                                       uint32_t timeout) {
+std::vector<std::string> MuxDaemon::SendCommandResponse(MuxChannel::MuxChannelType type, const char *cmd,
+                                                        size_t rxCount,
+                                                        uint32_t timeout) {
     return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd,rxCount,timeout);
 }
 

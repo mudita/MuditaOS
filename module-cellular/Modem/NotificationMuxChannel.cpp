@@ -61,6 +61,12 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
         notificationCallback(NotificationType::CallAborted,"");//
     }
 
+    // Call busy
+    if (msgStr.find("BUSY") != std::string::npos) {
+        LOG_TRACE((name + ": call busy").c_str());
+        notificationCallback(NotificationType::CallBusy,"");//
+    }
+
     // Received new SMS
     if (msgStr.find("+CMTI: ") != std::string::npos) {
         LOG_TRACE((name + ": received new SMS notification").c_str());

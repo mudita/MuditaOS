@@ -13,6 +13,7 @@
 #define PUREPHONE_SERVICECELLULAR_HPP
 
 #include "Service/Service.hpp"
+#include "Modem/NotificationMuxChannel.hpp"
 
 class MuxDaemon;
 
@@ -42,7 +43,8 @@ public:
 private:
 
     std::unique_ptr<MuxDaemon> muxdaemon;
-    uint32_t testTimerID = 0;
+    uint32_t callStateTimer = 0;
+    NotificationMuxChannel::NotificationCallback_t notificationCallback;
 
     static constexpr int32_t signalStrengthToDB[] = {
             -109, //0
