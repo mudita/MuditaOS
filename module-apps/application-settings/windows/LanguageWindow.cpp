@@ -25,6 +25,23 @@ namespace gui {
 LanguageWindow::LanguageWindow( app::Application* app ) : AppWindow(app,"Languages"){
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void LanguageWindow::rebuild() {
+	//find which widget has focus
+	uint32_t index = 0;
+	for( uint32_t i=0; i<options.size(); i++ )
+		if( options[i] == getFocusItem()) {
+			index = i;
+			break;
+		}
+
+	destroyInterface();
+	buildInterface();
+	setFocusItem( options[index] );
+}
+void LanguageWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
@@ -35,7 +52,7 @@ LanguageWindow::LanguageWindow( app::Application* app ) : AppWindow(app,"Languag
 	topBar = new gui::TopBar( this, 0,0, 480, 50 );
 	topBar->setActive(TopBar::Elements::LOCK, false );
 
-	gui::Label* title = new gui::Label(this, 0, 50, 480, 50 );
+	title = new gui::Label(this, 0, 50, 480, 50 );
 	title->setFilled( false );
 	title->setBorderColor( gui::ColorNoColor );
 	title->setFont("gt_pressura_bold_24");
@@ -74,6 +91,16 @@ LanguageWindow::LanguageWindow( app::Application* app ) : AppWindow(app,"Languag
 		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
 		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
 	}
+}
+void LanguageWindow::destroyInterface() {
+	delete bottomBar;
+	delete topBar;
+	delete title;
+	for( uint32_t i=0; i<options.size(); i++ )
+		delete options[i];
+	this->focusItem = nullptr;
+	options.clear();
+	children.clear();
 }
 
 LanguageWindow::~LanguageWindow() {

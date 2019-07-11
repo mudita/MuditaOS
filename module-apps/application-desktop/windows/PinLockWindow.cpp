@@ -22,6 +22,13 @@ namespace gui {
 PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockWindow"){
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void PinLockWindow::rebuild() {
+
+}
+void PinLockWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, true );
 	bottomBar->setActive( BottomBar::Side::CENTER, false );
@@ -74,8 +81,23 @@ PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockW
 	infoLabels[0]->setText( utils::localize.get("app_desktop_pin_lock") );
 	infoLabels[1]->setText( utils::localize.get("app_desktop_pin_info2") );
 }
+void PinLockWindow::destroyInterface() {
+	delete bottomBar;
+	delete topBar;
+	delete titleLabel;
+	delete infoLabels[0];
+	delete infoLabels[1];
+	delete pinLabels[0];
+	delete pinLabels[1];
+	delete pinLabels[2];
+	delete pinLabels[3];
+	delete lockImage;
+	delete infoImage;
+	children.clear();
+}
 
 PinLockWindow::~PinLockWindow() {
+	destroyInterface();
 }
 
 void PinLockWindow::setVisibleState( const State& state ) {

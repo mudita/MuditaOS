@@ -20,6 +20,13 @@ namespace gui {
 PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerOffWindow"){
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void PowerOffWindow::rebuild() {
+
+}
+void PowerOffWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
@@ -82,8 +89,19 @@ PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerO
 			this->state = State::PowerDown;
 		return true; };
 }
+void PowerOffWindow::destroyInterface() {
+	delete bottomBar;
+	delete titleLabel;
+	delete infoLabel;
+
+	delete selectionLabels[0];
+	delete selectionLabels[1];
+	delete powerImage;
+	children.clear();
+}
 
 PowerOffWindow::~PowerOffWindow() {
+	destroyInterface();
 }
 
 void PowerOffWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {

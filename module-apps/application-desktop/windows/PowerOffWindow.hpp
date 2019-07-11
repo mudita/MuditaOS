@@ -40,6 +40,10 @@ public:
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 	bool onInput( const InputEvent& inputEvent ) override;
 
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
+
 };
 
 } /* namespace gui */
