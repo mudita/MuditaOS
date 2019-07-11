@@ -102,7 +102,7 @@ namespace bsp{
 		INOKB = 0x02
 	};
 
-
+	int vcell(void);
 
 	int battery_Init(xQueueHandle qHandle);
 

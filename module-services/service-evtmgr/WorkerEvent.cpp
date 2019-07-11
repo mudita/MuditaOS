@@ -62,7 +62,7 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 			uint8_t battLevel;
 
 			bsp::battery_getBatteryLevel(battLevel);
-			bsp::battery_clearFuelGuageIRQ();
+			bsp::battery_ClearAllIRQs();
 			auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 			message->levelPercents = battLevel;
 			message->fullyCharged = false;

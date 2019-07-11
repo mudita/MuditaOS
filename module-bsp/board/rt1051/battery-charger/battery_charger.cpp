@@ -14,6 +14,8 @@
 #define BSP_FUEL_GAUGE_I2C_ADDR                             (0x6C >> 1)
 #define BSP_TOP_CONTROLLER_I2C_ADDR                         (0xCC >> 1)
 
+static const uint32_t i2cSubaddresSize = 1;
+
 const char* battery_cfgFile = "batteryAdjustementConfig.cfg";
 const char* battery_cfgFilePrev = "batteryAdjustementConfig_old.cfg";
 
@@ -125,22 +127,18 @@ namespace bsp{
 	{
 		uint8_t val;
 		battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_REG, &val);
-		LOG_INFO("charger interrupts 0x%x", val);
 		if(val != 0 )
 		{
 			//write zero to clear irq source
 			battery_chargerWrite(bsp::batteryChargerRegisters::CHG_INT_REG, 0);
-			LOG_INFO("Clear charger interrupts");
-		}
+					}
 
 		uint16_t status = 0;
 		battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
-		LOG_INFO("fuelGuage interrupts 0x%x", status);
 		if(status != 0)
 		{
 			//write zero to clear irq source
 			battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, 0);
-			LOG_INFO("Clear fuelGuage interrupts");
 		}
 	}
 
@@ -154,7 +152,8 @@ namespace bsp{
 static int battery_fuelGaugeWrite(bsp::batteryChargerRegisters registerAddress, uint16_t value)
 {
 	bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
-	return (int)bsp_i2c_Send(i2c, BSP_FUEL_GAUGE_I2C_ADDR, static_cast<uint32_t>(registerAddress), (uint8_t*)&value, sizeof(uint16_t));
+	return (int)bsp_i2c_Send(i2c, BSP_FUEL_GAUGE_I2C_ADDR, static_cast<uint32_t>(registerAddress),
+			i2cSubaddresSize, reinterpret_cast<uint8_t*>(&value), sizeof(uint16_t));
 }
 
 static int battery_fuelGaugeRead(bsp::batteryChargerRegisters registerAddress, uint16_t* value)
@@ -165,14 +164,16 @@ static int battery_fuelGaugeRead(bsp::batteryChargerRegisters registerAddress, u
 	}
 
 	bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
-	return (int)bsp_i2c_Receive(i2c, BSP_FUEL_GAUGE_I2C_ADDR, static_cast<uint32_t>(registerAddress), (uint8_t*)value, sizeof(uint16_t));
+	return (int)bsp_i2c_Receive(i2c, BSP_FUEL_GAUGE_I2C_ADDR, static_cast<uint32_t>(registerAddress),
+			i2cSubaddresSize,reinterpret_cast<uint8_t*>(value), sizeof(uint16_t));
 }
 
 static int battery_chargerWrite(bsp::batteryChargerRegisters registerAddress, uint8_t value)
 {
 	bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
 
-	return (int)bsp_i2c_Send(i2c, BSP_BATTERY_CHARGER_I2C_ADDR, static_cast<uint32_t>(registerAddress), &value, 1);
+	return (int)bsp_i2c_Send(i2c, BSP_BATTERY_CHARGER_I2C_ADDR, static_cast<uint32_t>(registerAddress),
+			i2cSubaddresSize, &value, sizeof(uint8_t));
 }
 
 static int battery_chargerRead(bsp::batteryChargerRegisters registerAddress, uint8_t* value)
@@ -183,14 +184,16 @@ static int battery_chargerRead(bsp::batteryChargerRegisters registerAddress, uin
 	}
 
 	bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
-	return (int)bsp_i2c_Receive(i2c, BSP_BATTERY_CHARGER_I2C_ADDR, static_cast<uint32_t>(registerAddress), (uint8_t*)value, 1);
+	return (int)bsp_i2c_Receive(i2c, BSP_BATTERY_CHARGER_I2C_ADDR, static_cast<uint32_t>(registerAddress),
+			i2cSubaddresSize, value, sizeof(uint8_t));
 }
 
 static int battery_chargerTopControllerWrite(bsp::batteryChargerRegisters registerAddress, uint8_t value)
 {
 	bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
 
-	return (int)bsp_i2c_Send(i2c, BSP_TOP_CONTROLLER_I2C_ADDR, static_cast<uint32_t>(registerAddress), (uint8_t*)&value, 1);
+	return (int)bsp_i2c_Send(i2c, BSP_TOP_CONTROLLER_I2C_ADDR, static_cast<uint32_t>(registerAddress),
+			i2cSubaddresSize, &value, sizeof(uint8_t));
 }
 
 static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registerAddress, uint8_t* value)
@@ -201,7 +204,8 @@ static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registe
 	}
 
 	bsp_i2c_inst_t* i2c = (bsp_i2c_inst_t*)BOARD_GetI2CInstance();
-	return (int)bsp_i2c_Receive(i2c, BSP_TOP_CONTROLLER_I2C_ADDR, static_cast<uint32_t>(registerAddress), (uint8_t*)value, 1);
+	return (int)bsp_i2c_Receive(i2c, BSP_TOP_CONTROLLER_I2C_ADDR, static_cast<uint32_t>(registerAddress),
+			i2cSubaddresSize, value, sizeof(uint8_t));
 }
 
 

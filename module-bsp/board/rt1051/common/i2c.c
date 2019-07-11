@@ -54,14 +54,14 @@ status_t bsp_i2c_Init(bsp_i2c_inst_t* inst, uint32_t clkSrc_Hz)
 
 
 status_t bsp_i2c_Send(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subAddress,
-                 uint8_t *txBuff,uint8_t size)
+				uint32_t subAddressSize, uint8_t *txBuff,uint8_t size)
 {
 	status_t ret = kStatus_Success;
 	if(xSemaphoreTake(inst->lock,100) != pdPASS){
 		return kStatus_Timeout;
 	}
 
-	ret = BOARD_LPI2C_Send(inst->base,deviceAddress,subAddress,size,(uint8_t*)txBuff,size);
+	ret = BOARD_LPI2C_Send(inst->base,deviceAddress,subAddress,subAddressSize,(uint8_t*)txBuff,size);
 
 	xSemaphoreGive(inst->lock);
 
@@ -70,22 +70,22 @@ status_t bsp_i2c_Send(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subA
 
 
 status_t bsp_i2c_Receive(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subAddress,
-                uint8_t *rxBuff,uint8_t size)
+				uint32_t subAddressSize, uint8_t *rxBuff,uint8_t size)
 {
 	status_t ret = kStatus_Success;
 	if(xSemaphoreTake(inst->lock,100) != pdPASS){
 		return kStatus_Timeout;
 	}
 
-	ret = BOARD_LPI2C_Receive(inst->base,deviceAddress,subAddress,size,(uint8_t*)rxBuff,size);
+	ret = BOARD_LPI2C_Receive(inst->base,deviceAddress,subAddress,subAddressSize,(uint8_t*)rxBuff,size);
 
 	xSemaphoreGive(inst->lock);
 
 	return ret;
 }
 
-status_t bsp_i2c_ModifyReg(bsp_i2c_inst_t* inst,
-    uint8_t deviceAddress, uint32_t subAddress,uint16_t mask, uint8_t setClr,uint8_t size)
+status_t bsp_i2c_ModifyReg(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subAddress,
+				uint32_t subAddressSize, uint16_t mask, uint8_t setClr,uint8_t size)
 {
 
 	status_t ret = kStatus_Success;
@@ -146,7 +146,7 @@ static status_t BOARD_LPI2C_Send(LPI2C_Type *base, uint8_t deviceAddress, uint32
         {
         }
 
-        reVal = LPI2C_MasterSend(base, &subAddress, 1 /*subAddressSize*/);
+        reVal = LPI2C_MasterSend(base, &subAddress, subAddressSize);
         if (reVal != kStatus_Success)
         {
             return reVal;

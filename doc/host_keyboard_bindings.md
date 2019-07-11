@@ -5,7 +5,7 @@
 ## Table of contents
 1. [Functional buttons](#Functional buttons)
 1. [Numeric buttons](#Numeric buttons)
-
+1. [Battery buttons](#Battery buttons)
 
 
 ### Functional buttons <a name="Functional buttons"></a>
@@ -35,4 +35,7 @@
 - Numeric 9		- key [ 9 ]
 - Numeric Ast		- key [ Z ]
 - Numeric Pnd		- key [ C ]
-
+### Battery buttons <a name="Battery buttons"></a>
+ - Connect/disconnect wall adapter		- key [ P ]
+ - Decrease battery level		- key [ [ ]
+ - Increase battery level		- key [ ] ]
