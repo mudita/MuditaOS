@@ -92,6 +92,13 @@ MenuPage::~MenuPage() {
 MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void MenuWindow::rebuild() {
+
+}
+void MenuWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
@@ -138,8 +145,19 @@ MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
 		utils::localize.get("app_desktop_tools_title"), MenuPage::PageID::ToolsPage );
 	pages.push_back( page2 );
 }
+void MenuWindow::destroyInterface() {
+	delete bottomBar;
+	delete topBar;
+
+	std::vector<gui::MenuPage*> pages;
+	for( MenuPage* mp : pages )
+		delete mp;
+	pages.clear();
+	children.clear();
+}
 
 MenuWindow::~MenuWindow() {
+	destroyInterface();
 }
 
 void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {

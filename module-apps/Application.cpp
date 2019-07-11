@@ -206,6 +206,12 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRebuild )) {
 
 		LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
+		//for all windows call rebuild method
+		for( auto it = windows.begin(); it!= windows.end(); it++)
+			it->second->rebuild();
+		//if application has focus call deeprefresh
+		if( state == State::ACTIVE_FORGROUND )
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );

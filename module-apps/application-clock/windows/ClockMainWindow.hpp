@@ -56,6 +56,10 @@ public:
 	 * @brief Updates strings for hour and minutes
 	 */
 	void updateLabels();
+
+	void rebuild() {};
+	void buildInterface() {};
+	void destroyInterface() {};
 };
 
 } /* namespace gui */
