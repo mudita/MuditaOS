@@ -53,7 +53,8 @@ public:
 
     ~MuxDaemon();
 
-    std::vector<std::string> SendCommandReponse(MuxChannel::MuxChannelType type,const char* cmd,size_t rxCount,uint32_t timeout = 1000);
+    std::vector<std::string> SendCommandResponse(MuxChannel::MuxChannelType type, const char *cmd, size_t rxCount,
+                                                 uint32_t timeout = 1000);
 
     ssize_t WriteMuxFrame(int channel,
                           const unsigned char *input,

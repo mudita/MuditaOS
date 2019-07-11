@@ -35,6 +35,8 @@ public:
     enum class Type {
         IncomingCall,
         CallAborted,
+        CallBusy,
+        CallActive,
         NewIncomingSMS,
         SignalStrengthUpdate
 

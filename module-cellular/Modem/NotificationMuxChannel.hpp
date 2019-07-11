@@ -21,6 +21,8 @@ class MuxDaemon;
 enum class NotificationType{
     IncomingCall,
     CallAborted,
+    CallBusy,
+    CallActive,
     NewIncomingSMS,
     SignalStrengthUpdate
 };
