@@ -19,6 +19,8 @@
 
 #include "messages/CellularMessage.hpp"
 
+#include "Common.hpp"
+
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
@@ -138,7 +140,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
 
                 auto beg = ret[1].find(",",0);
                 beg = ret[1].find(",",beg+1);
-                if(std::stoul(ret[1].substr(beg+1,1)) == 0){
+                // If call changed to "Active" state stop callStateTimer(used for polling for call state)
+                if(std::stoul(ret[1].substr(beg+1,1)) == static_cast<uint32_t >(CallStates::Active)){
                     notificationCallback(NotificationType::CallActive,"");
                     stopTimer(callStateTimer);
                 }
