@@ -32,6 +32,7 @@
 #include "SystemManager/SystemManager.hpp"
 
 #include "rtc/rtc.hpp"
+
 class vfs vfs;
 
 
@@ -60,6 +61,7 @@ public:
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
     }
+
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override{
@@ -96,6 +98,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
     //ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
+
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
@@ -126,6 +129,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 }
 
 int main() {
+
 
 	LOG_PRINTF("Launching PurePhone..\n ");
 
