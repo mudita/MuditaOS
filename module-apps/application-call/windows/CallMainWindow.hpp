@@ -10,6 +10,7 @@
 #define MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLMAINWINDOW_HPP_
 
 #include "AppWindow.hpp"
+#include "Label.hpp"
 
 namespace gui {
 
@@ -18,9 +19,15 @@ namespace gui {
  * This window should not be displayed.
  */
 class CallMainWindow: public AppWindow {
+protected:
+	gui::Label* title;
 public:
 	CallMainWindow( app::Application* app );
 	virtual ~CallMainWindow();
+
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 };
 
 } /* namespace gui */

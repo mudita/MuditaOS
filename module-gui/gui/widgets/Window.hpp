@@ -24,7 +24,8 @@ protected:
 	RefreshModes refreshMode;
 	std::string name;
 	//pointer to the widget that has focus
-	Item* focusItem;
+	Item* focusItem = nullptr;
+
 public:
 
 	Window( std::string name, uint32_t id=GUIWindowID++ );
@@ -41,6 +42,19 @@ public:
 	virtual void setFocusItem( Item* item );
 	virtual int getWindowID() {return windowID; };
 	virtual bool handleSwitchData( SwitchData* data );
+
+	/**
+	 * This method rebuilds window using updated phone's settings. Internal state must be preserved.
+	 */
+	virtual void rebuild() {};
+	/**
+	 * Methods builds window's interface
+	 */
+	virtual void buildInterface() {};
+	/**
+	 * Methods builds window's interface
+	 */
+	virtual void destroyInterface() {};
 
 	//virtual methods from Item
 	bool onInput( const InputEvent& inputEvent ) override;

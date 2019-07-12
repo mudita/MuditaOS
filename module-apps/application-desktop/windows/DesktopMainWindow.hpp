@@ -23,8 +23,8 @@ namespace gui {
  */
 class DesktopMainWindow: public AppWindow {
 protected:
-	gui::BottomBar* bottomBar;
-	gui::TopBar* topBar;
+	gui::BottomBar* bottomBar = nullptr;
+	gui::TopBar* topBar = nullptr;
 	gui::Label* description = nullptr;
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;
@@ -59,9 +59,13 @@ public:
 	DesktopMainWindow( app::Application* app );
 	virtual ~DesktopMainWindow();
 
-	//virtual methods
+	//virtual methods gui::Window
 	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+	//virtual methods gui::AppWindow
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 };
 
 } /* namespace gui */

@@ -12,6 +12,7 @@
 #include "application-call/ApplicationCall.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
+#include "application-settings/ApplicationSettings.hpp"
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
@@ -22,7 +23,6 @@
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
-#include "service-powermgr/PowerMgr.hpp"
 
 //module-bsp
 #include "bsp.hpp"
@@ -32,6 +32,7 @@
 #include "SystemManager/SystemManager.hpp"
 
 #include "rtc/rtc.hpp"
+
 class vfs vfs;
 
 
@@ -60,6 +61,7 @@ public:
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
     }
+
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override{
@@ -93,9 +95,9 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    //ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+//    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
     //ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<PowerMgr>(),sysmgr);
+
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
@@ -112,6 +114,10 @@ int SystemStart(sys::SystemManager* sysmgr)
     std::unique_ptr<app::ApplicationLauncher> callLauncher = std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher());
 	applications.push_back( std::move(callLauncher) );
 
+	//launcher for settings application
+	std::unique_ptr<app::ApplicationLauncher> settingsLauncher = std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher());
+	applications.push_back( std::move(settingsLauncher) );
+
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );
 
@@ -123,6 +129,7 @@ int SystemStart(sys::SystemManager* sysmgr)
 }
 
 int main() {
+
 
 	LOG_PRINTF("Launching PurePhone..\n ");
 

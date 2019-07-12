@@ -23,9 +23,7 @@
 
 namespace gui {
 
-DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
-	setSize( 480, 600 );
-
+void DesktopMainWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
@@ -75,7 +73,28 @@ DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"M
 	notificationMessages->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 }
 
+void DesktopMainWindow::destroyInterface() {
+	delete bottomBar;
+	delete topBar;
+	delete description;
+	delete time;
+	delete dayText;
+	delete dayMonth;
+	delete notificationCalls;
+	delete notificationMessages;
+	delete callsImage;
+	delete messagesImage;
+	focusItem = nullptr;
+	children.clear();
+}
+
+DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
+	setSize( 480, 600 );
+	buildInterface();
+}
+
 DesktopMainWindow::~DesktopMainWindow() {
+	destroyInterface();
 }
 
 //method hides or show widgets and sets bars according to provided state
@@ -163,6 +182,11 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 	}
 	return false;
+}
+
+void DesktopMainWindow::rebuild() {
+	destroyInterface();
+	buildInterface();
 }
 
 } /* namespace gui */
