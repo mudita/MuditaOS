@@ -70,8 +70,7 @@ target_include_directories(${PROJECT_NAME}
 		"${CMAKE_SOURCE_DIR}/bsp/keyboard"
 
 		"${CMAKE_SOURCE_DIR}/bsp/battery-charger"
-		"${CMAKE_SOURCE_DIR}/module-services/"  
-
+		"${CMAKE_SOURCE_DIR}/module-os/"  
 
 		"${CMAKE_SOURCE_DIR}/bsp"
         

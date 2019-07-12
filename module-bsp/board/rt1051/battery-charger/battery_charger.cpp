@@ -4,6 +4,13 @@
  *  Created on: Jun 28, 2019
  *      Author: kuba
  */
+
+extern "C" {
+	#include "FreeRTOS.h"
+	#include "task.h"
+	#include "queue.h"
+}
+
 #include "../common/i2c.h"
 #include "fsl_gpio.h"
 #include "board.h"
@@ -386,10 +393,6 @@ static bsp::batteryRetval battery_enableTopIRQs(void)
 	return bsp::batteryRetval::battery_OK;
 }
 
-
-
-
-
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler()
 {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -416,7 +419,6 @@ BaseType_t BSP_BatteryChargerINTB_IRQHandler()
 	}
 	return xHigherPriorityTaskWoken;
 }
-
 
 static void s_BSP_BatteryChargerIrqPinsInit()
 {
