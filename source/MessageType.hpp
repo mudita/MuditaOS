@@ -68,6 +68,9 @@ enum class MessageType {
 
 	EVMFocusApplication,
 	EVMKeyboardProfile,
+
+	//Power manager
+	PMChangePowerMode,
 };
 
 

@@ -21,7 +21,7 @@
 #endif
 
 
-#include "common.hpp"
+#include "bsp/common.hpp"
 
 namespace bsp
 {
