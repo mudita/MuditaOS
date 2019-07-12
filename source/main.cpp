@@ -22,6 +22,7 @@
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include "service-powermgr/PowerMgr.hpp"
 
 //module-bsp
 #include "bsp.hpp"
@@ -92,8 +93,9 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+    //ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
     //ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<PowerMgr>(),sysmgr);
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;

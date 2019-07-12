@@ -102,6 +102,18 @@ lpm_power_mode_t APP_GetLPMPowerMode(void);
 /*******************************************************************************
  * Code
  ******************************************************************************/
+static void BOARD_SetLPClockGate(void)
+{
+    CCM->CCGR0 = 0x014030C5U;
+    CCM->CCGR1 = 0x541C0000U;
+    CCM->CCGR2 = 0x00150010U;
+    CCM->CCGR3 = 0x50040130U;
+
+    CCM->CCGR4 = 0x00005514U;
+    CCM->CCGR5 = 0x51001105U;
+    /* We can enable DCDC when need to config it and close it after configuration */
+    CCM->CCGR6 = 0x00540540U;
+}
 
 static void LPM_SetClockMode(clock_mode_t mode, uint32_t clpcr)
 {
@@ -308,7 +320,7 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
     /* Power off SYS PLL */
     CCM_ANALOG->PLL_SYS_SET = CCM_ANALOG_PLL_SYS_BYPASS_MASK;
     CCM_ANALOG->PLL_SYS_SET = CCM_ANALOG_PLL_SYS_POWERDOWN_MASK;
-    CCM_ANALOG->PFD_528_SET = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
+    //CCM_ANALOG->PFD_528_SET = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
 
 #if !(defined(XIP_EXTERNAL_FLASH) && (XIP_EXTERNAL_FLASH == 1))
     /* If XIP in hyper flash, should switch to ARM PLL before disble USB1 PLL */
@@ -425,7 +437,7 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
 
     CLOCK_DeinitSysPfd(kCLOCK_Pfd0);
     CLOCK_DeinitSysPfd(kCLOCK_Pfd1);
-    CLOCK_DeinitSysPfd(kCLOCK_Pfd2);
+//    CLOCK_DeinitSysPfd(kCLOCK_Pfd2);
     CLOCK_DeinitSysPfd(kCLOCK_Pfd3);
 }
 
@@ -534,7 +546,7 @@ void LPM_RestorePLLs(lpm_power_mode_t power_mode)
         {
         }
     }
-    CCM_ANALOG->PFD_528_CLR = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
+    //CCM_ANALOG->PFD_528_CLR = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
 
     /* Restore USB2 PLL */
     CCM_ANALOG->PLL_USB2_SET = CCM_ANALOG_PLL_USB2_BYPASS_MASK;
@@ -821,7 +833,7 @@ void LPM_SystemResumeDsm(void)
     LPM_DisableRbcBypass();
     LPM_SetClockMode(kCLOCK_ModeRun, clpcr);
 
-    LPM_DisableWakeupSource(vPortGetGptIrqn());
+    //LPM_DisableWakeupSource(vPortGetGptIrqn());
 }
 
 void LPM_SystemOverRunRecovery(void)
@@ -971,6 +983,8 @@ bool LPM_Init(lpm_power_mode_t run_mode)
 {
     uint32_t i;
     uint32_t tmp_reg = 0;
+
+    s_targetPowerMode = run_mode;
 
 #ifdef FSL_RTOS_FREE_RTOS
     s_mutex = xSemaphoreCreateMutex();
@@ -1313,7 +1327,7 @@ void APP_PowerPreSwitchHook(lpm_power_mode_t targetMode)
         while (!(kLPUART_TransmissionCompleteFlag & LPUART_GetStatusFlags((LPUART_Type *)BOARD_DEBUG_UART_BASEADDR)))
         {
         }
-        DbgConsole_Deinit();
+        //DbgConsole_Deinit();
 
         /*
          * Set pin for current leakage.
@@ -1338,11 +1352,16 @@ void APP_PowerPostSwitchHook(lpm_power_mode_t targetMode)
         IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, 0);
         IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, IOMUXC_SW_PAD_CTL_PAD_SPEED(2));
 
-        BOARD_InitDebugConsole();
+        //BOARD_InitDebugConsole();
     }
 }
 
 lpm_power_mode_t APP_GetLPMPowerMode(void)
 {
     return s_targetPowerMode;
+}
+
+void APP_SetLPMPowerMode(lpm_power_mode_t mode)
+{
+    s_targetPowerMode =  mode;
 }

@@ -246,6 +246,8 @@ void LPM_SystemLowPowerRun(void);
 
 void APP_PowerPostSwitchHook(lpm_power_mode_t targetMode);
 
+void APP_SetLPMPowerMode(lpm_power_mode_t mode);
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus*/
