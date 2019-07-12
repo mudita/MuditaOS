@@ -1,6 +1,7 @@
 {
     "common_open": "OPEN",
     "common_confirm": "CONFIRM",
+    "common_select": "SELECT",
     "common_ok": "OK",
     "common_back": "BACK",
     "common_set": "SET",

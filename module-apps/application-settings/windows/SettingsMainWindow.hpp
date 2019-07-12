@@ -26,6 +26,7 @@ namespace gui {
  */
 class SettingsMainWindow: public AppWindow {
 protected:
+	gui::Label* title;
 	gui::BottomBar* bottomBar = nullptr;
 	gui::TopBar* topBar = nullptr;
 	std::vector<gui::Item*> options;
@@ -38,6 +39,10 @@ public:
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 };
 
 } /* namespace gui */

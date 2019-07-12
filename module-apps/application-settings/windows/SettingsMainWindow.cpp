@@ -25,6 +25,23 @@ namespace gui {
 SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void SettingsMainWindow::rebuild() {
+	//find which widget has focus
+	uint32_t index = 0;
+	for( uint32_t i=0; i<options.size(); i++ )
+		if( options[i] == getFocusItem()) {
+			index = i;
+			break;
+		}
+
+	destroyInterface();
+	buildInterface();
+	setFocusItem( options[index] );
+}
+void SettingsMainWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
@@ -35,7 +52,7 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 	topBar = new gui::TopBar( this, 0,0, 480, 50 );
 	topBar->setActive(TopBar::Elements::LOCK, false );
 
-	gui::Label* title = new gui::Label(this, 0, 50, 480, 50 );
+	title = new gui::Label(this, 0, 50, 480, 50 );
 	title->setFilled( false );
 	title->setBorderColor( gui::ColorNoColor );
 	title->setFont("gt_pressura_bold_24");
@@ -66,7 +83,7 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 	//add option security option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
 
-	//set possition and navigation for labels
+	//set position and navigation for labels
 	uint32_t posY = 100;
 	uint32_t size = options.size();
 	for( uint32_t i=0; i<options.size(); i++ ){
@@ -76,8 +93,20 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
 	}
 }
+void SettingsMainWindow::destroyInterface() {
+	delete bottomBar;
+	delete topBar;
+	delete title;
+	for( uint32_t i=0; i<options.size(); i++ )
+		delete options[i];
+	options.clear();
+	this->focusItem = nullptr;
+	LOG_INFO("options size: %d", options.size());
+	children.clear();
+}
 
 SettingsMainWindow::~SettingsMainWindow() {
+	destroyInterface();
 }
 
 gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {

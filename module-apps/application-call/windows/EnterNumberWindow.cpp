@@ -18,6 +18,13 @@ namespace gui {
 EnterNumberWindow::EnterNumberWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName ) {
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void EnterNumberWindow::rebuild() {
+
+}
+void EnterNumberWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, true );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
@@ -39,8 +46,15 @@ EnterNumberWindow::EnterNumberWindow( app::Application* app, std::string windowN
 	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 }
+void EnterNumberWindow::destroyInterface() {
+	delete bottomBar;
+	delete topBar;
+	delete numberLabel;
+	children.clear();
+}
 
 EnterNumberWindow::~EnterNumberWindow() {
+	destroyInterface();
 }
 
 bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {

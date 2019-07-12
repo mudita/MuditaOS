@@ -9,6 +9,7 @@
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_POWEROFFWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_POWEROFFWINDOW_HPP_
 
+#include <vector>
 #include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
@@ -30,7 +31,7 @@ enum class State {
 	gui::Label* titleLabel = nullptr;
 	gui::Label* infoLabel = nullptr;
 
-	gui::Label* selectionLabels[2] = {nullptr};
+	std::vector<gui::Label*> selectionLabels;
 	gui::Image* powerImage = nullptr;
 	State state = State::Return;
 
@@ -39,6 +40,10 @@ public:
 	virtual ~PowerOffWindow();
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 	bool onInput( const InputEvent& inputEvent ) override;
+
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 
 };
 

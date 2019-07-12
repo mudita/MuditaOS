@@ -43,7 +43,7 @@ Application::~Application() {
 
 void Application::TickHandler(uint32_t id) {
 	if( id == longpressTimerID ) {
-		LOG_INFO( "longpressTimerID triggered");
+//		LOG_INFO( "longpressTimerID triggered");
 		gui::InputEvent iev = translator->translate(
 			false,
 			static_cast<int>(translator->getLastEvent().keyCode),
@@ -107,7 +107,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( currentWindow != nullptr )
 			currentWindow->onInput( msg->getEvent() );
 
-		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
+//		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
@@ -221,11 +221,19 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRebuild )) {
 
 		LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
+		//for all windows call rebuild method
+		for( auto it = windows.begin(); it!= windows.end(); it++)
+			it->second->rebuild();
+		//if application has focus call deeprefresh
+		if( state == State::ACTIVE_FORGROUND )
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+		handled = true;
 	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
 		//currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
 		render( msg->getMode() );
+		handled = true;
 	}
 
 	if( handled)
@@ -240,7 +248,7 @@ sys::ReturnCodes Application::InitHandler() {
 	uint32_t start = xTaskGetTickCount();
 	settings = DBServiceAPI::SettingsGet(this);
 	uint32_t stop = xTaskGetTickCount();
-	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
+//	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.

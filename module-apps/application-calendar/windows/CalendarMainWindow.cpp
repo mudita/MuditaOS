@@ -15,22 +15,32 @@
 namespace app {
 
 CalendarMainWindow::CalendarMainWindow( app::Application* app, std::string name ) : AppWindow( app, name ) {
+	setSize(480,600);
+	buildInterface();
+}
 
-//	gui::VBox* vBox = new gui::VBox( this, 0, 0, 480, 600 );
-//
-//	gui::Label title = new gui::Label(vBox, 0,0,480,600);
-//	timeLabel->setFont("gt_pressura_bold_65");
-//	timeLabel->setText("12:35");
-//	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-//	timeLabel->setMaxSize( 480, 180 );
-//
-//	vBox->addWidget(maxH1);
-//	vBox->addWidget(timeLabel);
-//	vBox->addWidget(maxH2);
+void CalendarMainWindow::rebuild() {
+
+}
+void CalendarMainWindow::buildInterface() {
+	//	gui::VBox* vBox = new gui::VBox( this, 0, 0, 480, 600 );
+	//
+	//	gui::Label title = new gui::Label(vBox, 0,0,480,600);
+	//	timeLabel->setFont("gt_pressura_bold_65");
+	//	timeLabel->setText("12:35");
+	//	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+	//	timeLabel->setMaxSize( 480, 180 );
+	//
+	//	vBox->addWidget(maxH1);
+	//	vBox->addWidget(timeLabel);
+	//	vBox->addWidget(maxH2);
+}
+void CalendarMainWindow::destroyInterface() {
+
 }
 
 CalendarMainWindow::~CalendarMainWindow() {
-	// TODO Auto-generated destructor stub
+	destroyInterface();
 }
 
 } /* namespace app */
