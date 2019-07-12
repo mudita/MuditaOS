@@ -12,7 +12,6 @@ extern "C" {
 	#include "task.h"
 }
 
-
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
@@ -21,8 +20,10 @@ extern "C" {
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
+
 #include "module-bsp/bsp/keyboard/keyboard.hpp"
 #include "module-bsp/bsp/battery-charger/battery_charger.hpp"
+#include "module-bsp/bsp/rtc/rtc.hpp"
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
@@ -36,7 +37,6 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		}
 		wcmd.command = 1;
 		//place some code here to handle messages from service
-
 	}
 
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardIRQ) )
@@ -49,8 +49,9 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		bsp::keyboard_get_data(notification, state, code);
 
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
-
+		bsp::rtc_SetAlarmInSecondsFromNow(5);
 	}
+
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery) )
 	{
 		uint8_t notification;
@@ -79,17 +80,28 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		}
 	}
 
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueRTC) )
+	{
+		uint8_t notification;
+		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
+				return false;
+		}
+		LOG_INFO("Rtc alarm received");
+	}
+
 	return true;
 }
 
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
 	Worker::init(queues);
-	std::vector<xQueueHandle> qhanldes = this->getQueues();
-	bsp::keyboard_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
-	bsp::battery_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
+	std::vector<xQueueHandle> qhandles = this->getQueues();
+	bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
+	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
+	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
 	return true;
 }
+
 bool WorkerEvent::deinit(void)
 {
 	Worker::stop();
@@ -99,8 +111,6 @@ bool WorkerEvent::deinit(void)
 
 	return true;
 }
-
-
 
  void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
  {

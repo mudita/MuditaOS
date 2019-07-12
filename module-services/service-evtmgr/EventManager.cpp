@@ -101,11 +101,14 @@ sys::ReturnCodes EventManager::InitHandler() {
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
 	//battery manager queue
 	sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10 };
+	//RTC irq queue
+	sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20 };
 
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qIrq);
 	list.push_back(qBattery);
+	list.push_back(qRTC);
 
 	EventWorker->init( list );
 	EventWorker->run();
