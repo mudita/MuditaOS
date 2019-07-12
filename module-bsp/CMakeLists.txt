@@ -57,10 +57,10 @@ target_include_directories(${PROJECT_NAME}
 
         PUBLIC
 
-        ${CMAKE_CURRENT_LIST_DIR}
+       ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/bsp
         ${CMAKE_CURRENT_LIST_DIR}/bsp/keyboard
-
+		${CMAKE_CURRENT_LIST_DIR}/bsp/battery-charger
 
         )
 target_include_directories(${PROJECT_NAME}
@@ -68,9 +68,14 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_SOURCE_DIR}/"
         "${CMAKE_SOURCE_DIR}/bsp/rtc"
 		"${CMAKE_SOURCE_DIR}/bsp/keyboard"
+
+		"${CMAKE_SOURCE_DIR}/bsp/battery-charger"
+		"${CMAKE_SOURCE_DIR}/module-os/"  
+
 		"${CMAKE_SOURCE_DIR}/bsp"
         
         )
+
 
 
 
