@@ -96,8 +96,23 @@ MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
 }
 
 void MenuWindow::rebuild() {
-
+	//find which widget has focus
+	uint32_t index = 0;
+	MenuPage* page = reinterpret_cast<MenuPage*>(pages[currentPage]);
+	for( uint32_t j=0; j<page->tiles.size(); j++ ) {
+		if( page->tiles[j] == getFocusItem()) {
+			index = j;
+			break;
+		}
+	}
+	focusItem = nullptr;
+	destroyInterface();
+	buildInterface();
+	page = reinterpret_cast<MenuPage*>(pages[currentPage]);
+	pages[currentPage]->setVisible(true);
+	setFocusItem( page->tiles[index] );
 }
+
 void MenuWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
@@ -149,10 +164,10 @@ void MenuWindow::destroyInterface() {
 	delete bottomBar;
 	delete topBar;
 
-	std::vector<gui::MenuPage*> pages;
 	for( MenuPage* mp : pages )
 		delete mp;
 	pages.clear();
+	focusItem = nullptr;
 	children.clear();
 }
 

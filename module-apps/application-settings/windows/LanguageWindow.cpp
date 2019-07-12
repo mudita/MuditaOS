@@ -46,7 +46,7 @@ void LanguageWindow::buildInterface() {
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
+	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_select"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
 	topBar = new gui::TopBar( this, 0,0, 480, 50 );
