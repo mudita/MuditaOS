@@ -16,7 +16,7 @@
 
 /* TCA8418 I2C bus address */
 #define TCA8418_I2C_ADDRESS     (0x34)
-
+#define TCA8418_I2C_ADDRESS_SIZE 1
 #define TCA8418_ROWS_COUNT	7
 #define TCA8418_COL_COUNT	4
 

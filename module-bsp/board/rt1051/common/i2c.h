@@ -31,13 +31,13 @@ typedef struct
 status_t bsp_i2c_Init(bsp_i2c_inst_t* inst, uint32_t clkSrc_Hz);
 
 status_t bsp_i2c_Send(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subAddress,
-                uint8_t *txBuff,uint8_t size);
+				uint32_t subAddressSize, uint8_t *txBuff,uint8_t size);
 
 status_t bsp_i2c_Receive(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subAddress,
-                uint8_t *rxBuff,uint8_t size);
+				uint32_t subAddressSize, uint8_t *rxBuff,uint8_t size);
 
-status_t bsp_i2c_ModifyReg(bsp_i2c_inst_t* inst,
-    uint8_t deviceAddress, uint32_t subAddress,uint16_t mask, uint8_t setClr,uint8_t size);
+status_t bsp_i2c_ModifyReg(bsp_i2c_inst_t* inst, uint8_t deviceAddress, uint32_t subAddress,
+				uint32_t subAddressSize, uint16_t mask, uint8_t setClr,uint8_t size);
 
 
 bsp_i2c_inst_t* BOARD_GetI2CInstance(void);
