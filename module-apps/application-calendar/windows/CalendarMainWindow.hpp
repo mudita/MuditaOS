@@ -24,6 +24,9 @@ protected:
 public:
 	CalendarMainWindow( Application* app, std::string name );
 	virtual ~CalendarMainWindow();
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 };
 
 } /* namespace app */
