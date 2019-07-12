@@ -13,6 +13,8 @@
 #include "WorkerEvent.hpp"
 #include "messages/EVMessages.hpp"
 
+#include "vfs.hpp"
+
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -56,6 +58,31 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			handled = true;
 		}
 	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
+		msgl->sender == this->GetName()) {
+		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
+
+		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+		message->levelPercents = msg->levelPercents;
+		message->fullyCharged = msg->fullyCharged;
+
+		if( targetApplication.empty() == false ) {
+			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+		handled = true;
+	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) &&
+		msgl->sender == this->GetName()) {
+		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
+
+		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+		message->plugged = msg->plugged;
+
+		if( targetApplication.empty() == false ) {
+			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+		handled = true;
+	}
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
@@ -70,10 +97,15 @@ sys::ReturnCodes EventManager::InitHandler() {
 	EventWorker = new WorkerEvent( this );
 
 	//create queues for worker
+	//keyboard irq queue
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
+	//battery manager queue
+	sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10 };
+
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qIrq);
+	list.push_back(qBattery);
 
 	EventWorker->init( list );
 	EventWorker->run();

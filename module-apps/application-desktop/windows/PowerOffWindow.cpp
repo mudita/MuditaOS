@@ -126,7 +126,6 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
 	if( ret ) {
-		LOG_INFO("State: %s", (state==State::PowerDown?"PowerDown":"Return"));
 		application->render(RefreshModes::GUI_REFRESH_FAST);
 		return true;
 	}

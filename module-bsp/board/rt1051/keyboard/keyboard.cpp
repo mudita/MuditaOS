@@ -67,18 +67,18 @@ namespace bsp {
         reg += (~(~0 << TCA8418_COL_COUNT)) << 8;
 
         /* Set registers to keypad mode */
-        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KP_GPIO1, (uint8_t *) &reg, 1);
+        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KP_GPIO1, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
         reg = reg >> 8;
-        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KP_GPIO2, (uint8_t *) &reg, 1);
+        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KP_GPIO2, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
         reg = reg >> 16;
-        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KP_GPIO3, (uint8_t *) &reg, 1);
+        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KP_GPIO3, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
 
         /* Enable column debouncing */
-        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_DEBOUNCE_DIS1, (uint8_t *) &reg, 1);
+        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_DEBOUNCE_DIS1, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
         reg = reg >> 8;
-        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_DEBOUNCE_DIS2, (uint8_t *) &reg, 1);
+        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_DEBOUNCE_DIS2, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
         reg = reg >> 16;
-        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_DEBOUNCE_DIS3, (uint8_t *) &reg, 1);
+        error |= bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_DEBOUNCE_DIS3, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
 
         if (error != kStatus_Success) {
             return error;
@@ -86,7 +86,7 @@ namespace bsp {
 
         reg = CFG_INT_CFG | CFG_OVR_FLOW_IEN | CFG_KE_IEN;
         // Enable interrupts
-        error = bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_CFG, (uint8_t *) &reg, 1);
+        error = bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_CFG, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
 
 
         // Clear keys FIFO, IRQs
@@ -94,16 +94,16 @@ namespace bsp {
         uint8_t i = 0;
 
         // Get key pressed/released count
-        bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_LCK_EC, (uint8_t *) &val, 1);
+        bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_LCK_EC, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &val, 1);
 
         uint8_t key_count = val & 0xF;
         for (i = 0; i < key_count; i++) {
-            bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_EVENT_A, (uint8_t *) &val, 1);
+            bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_EVENT_A, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &val, 1);
         }
 
         //Clear all interrupts, even IRQs we didn't check (GPI, CAD, LCK)
         reg = 0xff;
-        bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, (uint8_t *) &reg, 1);
+        bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
 
         if (s_right_functional_check_timer == NULL) {
             s_right_functional_check_timer = xTimerCreate(
@@ -134,7 +134,7 @@ namespace bsp {
 
         //Clear all interrupts, even IRQs we didn't check (GPI, CAD, LCK)
         uint8_t reg = 0xff;
-        bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, (uint8_t *) &reg, 1);
+        bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
 
         // Keep keyboard controller in reset state
         GPIO_PinWrite(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, 0);
@@ -151,7 +151,7 @@ namespace bsp {
     	if (notification & 0x01) {
 			uint8_t retval = 0;
 			// Read how many key events has been registered
-			bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_LCK_EC, (uint8_t *) &retval,
+			bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_LCK_EC, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &retval,
 							1);
 
 			uint8_t events_count = retval & 0xF;
@@ -160,7 +160,7 @@ namespace bsp {
 			for (i = 0; i < events_count; i++) {
 				uint8_t key = 0;
 				uint8_t rel_pres = 0;
-				bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_EVENT_A,
+				bsp_i2c_Receive(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_KEY_EVENT_A, TCA8418_I2C_ADDRESS_SIZE,
 								(uint8_t *) &retval,
 								1);
 
@@ -178,7 +178,7 @@ namespace bsp {
 			//Clear all interrupts
 			uint8_t reg = 0xff;
 
-			bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, (uint8_t *) &reg, 1);
+			bsp_i2c_Send(BOARD_GetI2CInstance(), TCA8418_I2C_ADDRESS, REG_INT_STAT, TCA8418_I2C_ADDRESS_SIZE, (uint8_t *) &reg, 1);
 
 		}
 

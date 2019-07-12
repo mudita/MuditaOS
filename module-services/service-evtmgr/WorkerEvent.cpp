@@ -22,6 +22,7 @@ extern "C" {
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "module-bsp/bsp/keyboard/keyboard.hpp"
+#include "module-bsp/bsp/battery-charger/battery_charger.hpp"
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
@@ -50,6 +51,34 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
 
 	}
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery) )
+	{
+		uint8_t notification;
+		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
+				return false;
+		}
+		if(notification & static_cast<uint8_t>(bsp::batteryIRQSource::INTB))
+		{
+			uint8_t battLevel;
+
+			bsp::battery_getBatteryLevel(battLevel);
+			bsp::battery_ClearAllIRQs();
+			auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+			message->levelPercents = battLevel;
+			message->fullyCharged = false;
+			sys::Bus::SendUnicast(message, "EventManager", this->service);
+		}
+		if(notification & static_cast<uint8_t>(bsp::batteryIRQSource::INOKB))
+		{
+			bool status;
+			bsp::battery_getChargeStatus(status);
+			bsp::battery_ClearAllIRQs();
+			auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+			message->plugged = status;
+			sys::Bus::SendUnicast(message, "EventManager", this->service);
+		}
+	}
+
 	return true;
 }
 
@@ -58,7 +87,7 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	Worker::init(queues);
 	std::vector<xQueueHandle> qhanldes = this->getQueues();
 	bsp::keyboard_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
-
+	bsp::battery_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	return true;
 }
 bool WorkerEvent::deinit(void)
@@ -66,6 +95,7 @@ bool WorkerEvent::deinit(void)
 	Worker::stop();
 	Worker::deinit();
 	bsp::keyboard_Deinit();
+	bsp::battery_Deinit();
 
 	return true;
 }

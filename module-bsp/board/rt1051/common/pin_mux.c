@@ -1868,7 +1868,7 @@ void PINMUX_InitJACKDET(void)
 
 void PINMUX_InitBatteryCharger(void)
 {
-#if PROJECT_CONFIG_IS_T1_BOARD == 1
+//#if PROJECT_CONFIG_IS_T1_BOARD == 1
     IOMUXC_SetPinMux(
             PINUMX_BATTERY_CHARGER_INOKB_IRQ,        /* GPIO_AD_B0_00 is configured as LPSPI1_SCK */
         0U);                                    /* Software Input On Field: Input Path is determined by functionality */
@@ -1904,7 +1904,7 @@ void PINMUX_InitBatteryCharger(void)
                        PAD_CONFIG_SPEED_SLOW_50MHz         |
                        PAD_CONFIG_PULL_KEEPER_DISABLED);
 
-#endif
+//#endif
 }
 
 void PINMUX_InitALS(void) {
