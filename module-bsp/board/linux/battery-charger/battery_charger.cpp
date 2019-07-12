@@ -5,7 +5,12 @@
  *      Author: kuba
  */
 #include <stdint.h>
-#include "FreeRTOS.h"
+
+extern "C" {
+	#include "FreeRTOS.h"
+	#include "task.h"
+	#include "queue.h"
+}
 
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -51,12 +56,12 @@ namespace bsp{
 		status = plugged;
 	}
 
-
+	//TODO function unused in linux driver, left for compatibility with target driver
 	void battery_ClearAllIRQs(void)
 	{
 
 	}
-
+	//TODO function unused in linux driver, left for compatibility with target driver
 	void battery_clearFuelGuageIRQ(void)
 	{
 
@@ -75,7 +80,6 @@ namespace bsp{
 			int fd;
 			fd = open(myfifo, O_RDONLY | O_NONBLOCK );
 
-
 			while(1)
 			{
 				uint8_t buff [10];
@@ -83,8 +87,6 @@ namespace bsp{
 
 				if(readedBytes > 0)
 				{
-
-
 
 					uint8_t notification = 0;
 					switch (buff[0])
