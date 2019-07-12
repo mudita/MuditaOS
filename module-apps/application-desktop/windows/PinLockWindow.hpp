@@ -28,8 +28,8 @@ class PinLockWindow: public AppWindow {
 	gui::BottomBar* bottomBar = nullptr;
 	gui::TopBar* topBar = nullptr;
 	gui::Label* titleLabel = nullptr;
-	gui::Label* infoLabels[2] = { nullptr, nullptr };
-	gui::Label* pinLabels[4] = { nullptr, nullptr, nullptr, nullptr };
+	std::vector<gui::Label*> infoLabels;
+	std::vector<gui::Label*> pinLabels;
 	gui::Image* lockImage = nullptr;
 	gui::Image* infoImage = nullptr;
 	uint32_t remainingAttempts = maxPasswordAttempts;

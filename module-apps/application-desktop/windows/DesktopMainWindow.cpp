@@ -84,6 +84,7 @@ void DesktopMainWindow::destroyInterface() {
 	delete notificationMessages;
 	delete callsImage;
 	delete messagesImage;
+	focusItem = nullptr;
 	children.clear();
 }
 
@@ -93,6 +94,7 @@ DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"M
 }
 
 DesktopMainWindow::~DesktopMainWindow() {
+	destroyInterface();
 }
 
 //method hides or show widgets and sets bars according to provided state
@@ -183,7 +185,8 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 }
 
 void DesktopMainWindow::rebuild() {
-
+	destroyInterface();
+	buildInterface();
 }
 
 } /* namespace gui */

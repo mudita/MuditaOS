@@ -26,7 +26,12 @@ PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockW
 }
 
 void PinLockWindow::rebuild() {
-
+	//find which widget has focus
+	destroyInterface();
+	buildInterface();
+	//set state
+	focusItem = nullptr;
+	setVisibleState( state );
 }
 void PinLockWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
@@ -56,25 +61,27 @@ void PinLockWindow::buildInterface() {
 	//labels with stars for displaying entered digits
 	uint32_t pinLabelX = 82;
 	for( uint32_t i=0; i<4; i++ ){
-		pinLabels[i] = new gui::Label(this, pinLabelX, 442-100, 63, 100);
-		pinLabels[i]->setFilled( false );
-		pinLabels[i]->setBorderColor( gui::ColorFullBlack );
-		pinLabels[i]->setPenWidth(2);
-		pinLabels[i]->setFont("gt_pressura_regular_65");
-		pinLabels[i]->setText("*");
-		pinLabels[i]->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-		pinLabels[i]->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+		gui::Label* label = new gui::Label(this, pinLabelX, 442-100, 63, 100);
+		label->setFilled( false );
+		label->setBorderColor( gui::ColorFullBlack );
+		label->setPenWidth(2);
+		label->setFont("gt_pressura_regular_65");
+		label->setText("*");
+		label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+		pinLabels.push_back( label );
 		pinLabelX += 84;
 	}
 
 	//labels with stars for displaying entered digits
 	uint32_t infoLabelY = 316-22;
 	for( uint32_t i=0; i<2; i++ ){
-		infoLabels[i] = new gui::Label(this, 0, infoLabelY, 480, 30);
-		infoLabels[i]->setFilled( false );
-		infoLabels[i]->setBorderColor( gui::ColorNoColor );
-		infoLabels[i]->setFont("gt_pressura_regular_24");
-		infoLabels[i]->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+		gui::Label* label = new gui::Label(this, 0, infoLabelY, 480, 30);
+		label->setFilled( false );
+		label->setBorderColor( gui::ColorNoColor );
+		label->setFont("gt_pressura_regular_24");
+		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+		infoLabels.push_back( label );
 		infoLabelY += 40;
 	}
 
@@ -85,14 +92,15 @@ void PinLockWindow::destroyInterface() {
 	delete bottomBar;
 	delete topBar;
 	delete titleLabel;
-	delete infoLabels[0];
-	delete infoLabels[1];
-	delete pinLabels[0];
-	delete pinLabels[1];
-	delete pinLabels[2];
-	delete pinLabels[3];
+	for( uint32_t i=0; i<infoLabels.size(); i++ )
+		delete infoLabels[i];
+	infoLabels.clear();
+	for( uint32_t i=0; i<pinLabels.size(); i++ )
+		delete pinLabels[i];
+	pinLabels.clear();
 	delete lockImage;
 	delete infoImage;
+	focusItem = nullptr;
 	children.clear();
 }
 

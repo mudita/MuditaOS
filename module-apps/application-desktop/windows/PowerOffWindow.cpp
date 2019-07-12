@@ -24,7 +24,17 @@ PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerO
 }
 
 void PowerOffWindow::rebuild() {
+	//find which widget has focus
+	uint32_t index = 0;
+	for( uint32_t i=0; i<selectionLabels.size(); i++ )
+		if( selectionLabels[i] == getFocusItem()) {
+			index = i;
+			break;
+		}
 
+	destroyInterface();
+	buildInterface();
+	setFocusItem( selectionLabels[index] );
 }
 void PowerOffWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
@@ -55,15 +65,16 @@ void PowerOffWindow::buildInterface() {
 
 	uint32_t pinLabelX = 46;
 	for( uint32_t i=0; i<4; i++ ){
-		selectionLabels[i] = new gui::Label(this, pinLabelX, 397, 193, 75);
-		selectionLabels[i]->setFilled( false );
-		selectionLabels[i]->setBorderColor( gui::ColorFullBlack );
-		selectionLabels[i]->setPenWidth(0);
-		selectionLabels[i]->setPenFocusWidth(2);
-		selectionLabels[i]->setRadius(5);
-		selectionLabels[i]->setFont("gt_pressura_regular_24");
-		selectionLabels[i]->setEdges( RectangleEdgeFlags::GUI_RECT_ALL_EDGES );
-		selectionLabels[i]->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+		gui::Label* label = new gui::Label(this, pinLabelX, 397, 193, 75);
+		label->setFilled( false );
+		label->setBorderColor( gui::ColorFullBlack );
+		label->setPenWidth(0);
+		label->setPenFocusWidth(2);
+		label->setRadius(5);
+		label->setFont("gt_pressura_regular_24");
+		label->setEdges( RectangleEdgeFlags::GUI_RECT_ALL_EDGES );
+		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+		selectionLabels.push_back( label );
 		pinLabelX += 193;
 	}
 	selectionLabels[0]->setText( utils::localize.get("common_no") );
@@ -78,13 +89,11 @@ void PowerOffWindow::buildInterface() {
 
 	//callbacks for getting focus
 	selectionLabels[0]->focusChangedCallback = [=] (gui::Item& item) {
-		LOG_INFO("label 0 focus %s", (selectionLabels[0]->focus?"gained":"lost") );
 		if( item.focus )
 			this->state = State::Return;
 		return true; };
 
 	selectionLabels[1]->focusChangedCallback = [=] (gui::Item& item) {
-		LOG_INFO("label 1 focus %s", (selectionLabels[1]->focus?"gained":"lost") );
 		if( item.focus )
 			this->state = State::PowerDown;
 		return true; };
@@ -94,9 +103,11 @@ void PowerOffWindow::destroyInterface() {
 	delete titleLabel;
 	delete infoLabel;
 
-	delete selectionLabels[0];
-	delete selectionLabels[1];
+	for( uint32_t i=0; i<selectionLabels.size(); i++ )
+		delete selectionLabels[i];
+	selectionLabels.clear();
 	delete powerImage;
+	focusItem = nullptr;
 	children.clear();
 }
 

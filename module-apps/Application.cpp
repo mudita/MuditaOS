@@ -212,11 +212,13 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		//if application has focus call deeprefresh
 		if( state == State::ACTIVE_FORGROUND )
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+		handled = true;
 	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
 		//currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
 		render( msg->getMode() );
+		handled = true;
 	}
 
 	if( handled)
