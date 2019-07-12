@@ -57,6 +57,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.cpp"
 
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/rtc/rtc.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/battery-charger/battery_charger.cpp"
+
         CACHE INTERNAL ""
         )
 

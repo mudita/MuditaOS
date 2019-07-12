@@ -12,6 +12,7 @@
 #include "gui/widgets/Window.hpp"
 #include "Application.hpp"
 
+
 namespace gui {
 
 /*
@@ -26,10 +27,12 @@ protected:
 public:
 
 	AppWindow( app::Application* app, std::string name, uint32_t id=GUIWindowID++ );
+	AppWindow( AppWindow* win );
 	virtual ~AppWindow();
 
 	app::Application* getApplication() { return application; };
 	void setApplication( app::Application* app ) { application = app; };
+
 };
 
 } /* namespace gui */

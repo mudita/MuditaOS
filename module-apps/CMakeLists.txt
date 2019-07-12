@@ -37,6 +37,7 @@ add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
 add_subdirectory( application-viewer )
 add_subdirectory( application-desktop )
+add_subdirectory( application-settings )
 add_subdirectory( application-call )
 
 include_directories( ../module-sys )

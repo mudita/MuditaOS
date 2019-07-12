@@ -78,6 +78,25 @@ int createFIFO( void )
 
 	return fd;
 }
+
+int createBattFifo( void )
+{
+	int fd;
+	const char * myfifo = "/tmp/fifoBattKeys";
+	fd = open(myfifo,O_WRONLY | O_NONBLOCK);
+
+	if(fd < 0)
+	{
+		mkfifo(myfifo, 0666);
+		fd = open(myfifo,O_WRONLY);
+	}
+
+	int error = errno;
+	perror("mkfifo");
+//	ENOENT
+
+	return fd;
+}
 int main( int argc, char* argv[] ) {
 
 
@@ -88,10 +107,11 @@ int main( int argc, char* argv[] ) {
 	char* dataMemory = reinterpret_cast<char*>(shm_ptr)+sizeof(shared_memory);
 
 	int fifoFd = createFIFO();
+	int fifoBattfd = createBattFifo();
 
 	auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
 
-	RWindow rendererWindow( dataMemory, fifoFd, FrameBufferWidth, FrameBufferHeight );
+	RWindow rendererWindow( dataMemory, fifoFd, fifoBattfd, FrameBufferWidth, FrameBufferHeight );
 	app->run( rendererWindow );
 
 

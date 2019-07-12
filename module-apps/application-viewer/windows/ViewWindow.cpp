@@ -16,6 +16,13 @@ namespace gui {
 ViewWindow::ViewWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
 	setSize( 480, 600 );
 
+	buildInterface();
+}
+
+void ViewWindow::rebuild() {
+
+}
+void ViewWindow::buildInterface() {
 	//load all states from file
 	auto file =  vfs.fopen("sys/viewerStates.txt","r");
 	//read line with number of states
@@ -72,8 +79,13 @@ ViewWindow::ViewWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
 		images.push_back( img );
 	}
 }
+void ViewWindow::destroyInterface() {
+	for( uint32_t i=0; i<images.size(); i++ )
+		delete images[i];
+}
 
 ViewWindow::~ViewWindow() {
+	destroyInterface();
 }
 
 void ViewWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {

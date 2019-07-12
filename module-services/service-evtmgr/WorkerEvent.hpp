@@ -25,7 +25,8 @@ struct KeyState{
 
 enum class WorkerEventQueues{
 	queueService = 0,
-	queueKeyboardIRQ
+	queueKeyboardIRQ,
+	queueBattery
 };
 
 class WorkerEvent : public sys::Worker
