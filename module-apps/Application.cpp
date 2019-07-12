@@ -135,7 +135,22 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		handled = true;
 	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) )
+	{
+		sevm::BatteryLevelMessage* msg = static_cast<sevm::BatteryLevelMessage*>(msgl);
+		LOG_INFO("Application battery level: %d", msg->levelPercents );
+	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) )
+	{
+		sevm::BatteryPlugMessage* msg = static_cast<sevm::BatteryPlugMessage*>(msgl);
+		if(msg->plugged == true)
+			LOG_INFO("Application charger connected" );
+		else
+			LOG_INFO("Application charger disconnected" );
+	}
+
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
+
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
