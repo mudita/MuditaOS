@@ -48,8 +48,8 @@ void SettingsMainWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-	topBar->setActive(TopBar::Elements::SIGNAL, false );
-	topBar->setActive(TopBar::Elements::BATTERY, false );
+	topBar->setActive(TopBar::Elements::SIGNAL, true );
+	topBar->setActive(TopBar::Elements::BATTERY, true );
 
 	title = new gui::Label(this, 0, 50, 480, 50 );
 	title->setFilled( false );
@@ -93,7 +93,7 @@ void SettingsMainWindow::buildInterface() {
 	}
 }
 void SettingsMainWindow::destroyInterface() {
-	destroyInterface();
+	AppWindow::destroyInterface();
 	delete title;
 	for( uint32_t i=0; i<options.size(); i++ )
 		delete options[i];

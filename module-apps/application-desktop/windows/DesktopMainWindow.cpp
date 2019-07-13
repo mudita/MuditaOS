@@ -28,6 +28,10 @@ void DesktopMainWindow::buildInterface() {
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 
+	topBar->setActive(TopBar::Elements::SIGNAL, true );
+	topBar->setActive(TopBar::Elements::LOCK, true );
+	topBar->setActive(TopBar::Elements::BATTERY, true );
+
 	callsImage = new gui::Image( this, 28,266,0,0, "phone" );
 	messagesImage = new gui::Image( this, 28, 341,0,0, "mail" );
 

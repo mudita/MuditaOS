@@ -20,14 +20,13 @@ AppWindow::~AppWindow() {
 
 
 void AppWindow::destroyInterface() {
-	delete bottomBar;
-	delete topBar;
 	children.remove(bottomBar);
 	children.remove(topBar);
+	delete bottomBar;
+	delete topBar;
 }
 
 void AppWindow::rebuild() {
-	buildInterface();
 }
 void AppWindow::buildInterface() {
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );

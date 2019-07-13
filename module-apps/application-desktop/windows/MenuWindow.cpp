@@ -120,6 +120,9 @@ void MenuWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
+	topBar->setActive(TopBar::Elements::SIGNAL, true  );
+	topBar->setActive(TopBar::Elements::BATTERY, true );
+
 	std::vector<TileDescription> page1Definitions {
 		//page1
 		TileDescription{"menu_phone","app_desktop_menu_phone",[=] (gui::Item& item) {
