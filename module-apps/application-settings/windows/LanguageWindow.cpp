@@ -42,8 +42,8 @@ void LanguageWindow::rebuild() {
 	setFocusItem( options[index] );
 }
 void LanguageWindow::buildInterface() {
+	AppWindow::buildInterface();
 	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
-	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_select"));
@@ -93,8 +93,7 @@ void LanguageWindow::buildInterface() {
 	}
 }
 void LanguageWindow::destroyInterface() {
-	delete bottomBar;
-	delete topBar;
+	AppWindow::destroyInterface();
 	delete title;
 	for( uint32_t i=0; i<options.size(); i++ )
 		delete options[i];

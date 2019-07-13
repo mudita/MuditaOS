@@ -34,15 +34,13 @@ void PinLockWindow::rebuild() {
 	setVisibleState( state );
 }
 void PinLockWindow::buildInterface() {
-	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
+	AppWindow::buildInterface();
 	bottomBar->setActive( BottomBar::Side::LEFT, true );
 	bottomBar->setActive( BottomBar::Side::CENTER, false );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
 	bottomBar->setText( BottomBar::Side::LEFT, utils::localize.get("app_desktop_emergency"));
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
-
-	topBar = new gui::TopBar( this, 0,0, 480, 50 );
 
 	lockImage = new gui::Image( this, 177,132,0,0, "pin_lock" );
 	infoImage = new gui::Image( this, 177,132,0,0, "pin_lock_info" );
@@ -89,8 +87,7 @@ void PinLockWindow::buildInterface() {
 	infoLabels[1]->setText( utils::localize.get("app_desktop_pin_info2") );
 }
 void PinLockWindow::destroyInterface() {
-	delete bottomBar;
-	delete topBar;
+	AppWindow::destroyInterface();
 	delete titleLabel;
 	for( uint32_t i=0; i<infoLabels.size(); i++ )
 		delete infoLabels[i];

@@ -51,9 +51,6 @@ public:
  */
 class MenuWindow: public AppWindow {
 protected:
-	gui::BottomBar* bottomBar = nullptr;
-	gui::TopBar* topBar = nullptr;
-
 	//page that is currently selected by the user.
 	uint32_t currentPage =  0;
 	std::vector<gui::MenuPage*> pages;

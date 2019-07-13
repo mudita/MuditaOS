@@ -245,9 +245,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 sys::ReturnCodes Application::InitHandler() {
 	bool initState= true;
 	state = State::INITIALIZING;
-	uint32_t start = xTaskGetTickCount();
+//	uint32_t start = xTaskGetTickCount();
 	settings = DBServiceAPI::SettingsGet(this);
-	uint32_t stop = xTaskGetTickCount();
+//	uint32_t stop = xTaskGetTickCount();
 //	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
 	initState = (settings.dbID == 1);
 

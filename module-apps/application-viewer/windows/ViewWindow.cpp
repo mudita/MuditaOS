@@ -20,9 +20,11 @@ ViewWindow::ViewWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
 }
 
 void ViewWindow::rebuild() {
-
+	destroyInterface();
+	buildInterface();
 }
 void ViewWindow::buildInterface() {
+	AppWindow::buildInterface();
 	//load all states from file
 	auto file =  vfs.fopen("sys/viewerStates.txt","r");
 	//read line with number of states
@@ -80,6 +82,7 @@ void ViewWindow::buildInterface() {
 	}
 }
 void ViewWindow::destroyInterface() {
+	destroyInterface();
 	for( uint32_t i=0; i<images.size(); i++ )
 		delete images[i];
 }

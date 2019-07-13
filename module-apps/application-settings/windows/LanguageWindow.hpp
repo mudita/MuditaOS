@@ -26,8 +26,6 @@ namespace gui {
  */
 class LanguageWindow: public AppWindow {
 protected:
-	gui::BottomBar* bottomBar = nullptr;
-	gui::TopBar* topBar = nullptr;
 	std::vector<gui::Item*> options;
 	gui::Label* title = nullptr;
 

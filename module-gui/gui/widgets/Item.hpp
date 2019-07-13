@@ -44,7 +44,7 @@ public:
 	//pointer to the parent Item
 	Item* parent;
 	//list of items that have the same parent.
-	std::vector<Item*> children;
+	std::list<Item*> children;
 	//bounding box of the item. This is in coordinates of the parent widget.
 	BoundingBox widgetArea;
 	//bounding box used for drawing. This is in coordinates of window
