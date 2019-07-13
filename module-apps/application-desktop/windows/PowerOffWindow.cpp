@@ -37,8 +37,7 @@ void PowerOffWindow::rebuild() {
 	setFocusItem( selectionLabels[index] );
 }
 void PowerOffWindow::buildInterface() {
-	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
-	bottomBar->setActive( BottomBar::Side::LEFT, false );
+	AppWindow::buildInterface();
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
@@ -99,7 +98,7 @@ void PowerOffWindow::buildInterface() {
 		return true; };
 }
 void PowerOffWindow::destroyInterface() {
-	delete bottomBar;
+	AppWindow::destroyInterface();
 	delete titleLabel;
 	delete infoLabel;
 

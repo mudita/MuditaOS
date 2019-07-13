@@ -27,7 +27,6 @@ enum class State {
 		Return,
 	};
 
-	gui::BottomBar* bottomBar = nullptr;
 	gui::Label* titleLabel = nullptr;
 	gui::Label* infoLabel = nullptr;
 

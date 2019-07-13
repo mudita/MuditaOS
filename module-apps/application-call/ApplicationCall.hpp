@@ -36,10 +36,9 @@ public:
 	const std::string& getDisplayedNumber();
 
 	/**
-	* @brief Sends information from application to manager about result of application's init function.
-	* If successful message will contain name and true value, otherwise false value will be transmitted.
-	*/
-//   static bool messageRegisterApplication( sys::Service* sender, const bool& status );
+	 * @brief Performs switch to call application providing first character in number.
+	 */
+	void messageSwitchToEnterPhone( sys::Service* sender );
 };
 
 class ApplicationCallLauncher : public ApplicationLauncher {

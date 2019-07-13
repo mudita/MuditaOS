@@ -23,8 +23,6 @@ namespace gui {
  */
 class EnterNumberWindow: public AppWindow {
 protected:
-	gui::BottomBar* bottomBar = nullptr;
-	gui::TopBar* topBar = nullptr;
 	gui::Label* numberLabel = nullptr;
 
 	//string with currently displayed phone number

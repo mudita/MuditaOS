@@ -24,10 +24,10 @@ void EmergencyCallWindow::rebuild() {
 
 }
 void EmergencyCallWindow::buildInterface() {
-
+	AppWindow::buildInterface();
 }
 void EmergencyCallWindow::destroyInterface() {
-
+	AppWindow::destroyInterface();
 }
 
 EmergencyCallWindow::~EmergencyCallWindow() {

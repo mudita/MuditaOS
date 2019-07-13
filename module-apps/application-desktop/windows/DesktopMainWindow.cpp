@@ -24,13 +24,9 @@
 namespace gui {
 
 void DesktopMainWindow::buildInterface() {
-	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
-	bottomBar->setActive( BottomBar::Side::LEFT, false );
+	AppWindow::buildInterface();
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
-	bottomBar->setActive( BottomBar::Side::RIGHT, false );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
-
-	topBar = new gui::TopBar( this, 0,0, 480, 50 );
 
 	callsImage = new gui::Image( this, 28,266,0,0, "phone" );
 	messagesImage = new gui::Image( this, 28, 341,0,0, "mail" );
@@ -74,8 +70,7 @@ void DesktopMainWindow::buildInterface() {
 }
 
 void DesktopMainWindow::destroyInterface() {
-	delete bottomBar;
-	delete topBar;
+	AppWindow::destroyInterface();
 	delete description;
 	delete time;
 	delete dayText;

@@ -9,6 +9,8 @@
 #ifndef MODULE_APPS_WINDOWS_APPWINDOW_HPP_
 #define MODULE_APPS_WINDOWS_APPWINDOW_HPP_
 
+#include "gui/widgets/TopBar.hpp"
+#include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Window.hpp"
 #include "Application.hpp"
 
@@ -21,6 +23,14 @@ namespace gui {
 class AppWindow: public Window {
 protected:
 	/**
+	 * Information bar for the buttons on the bottom of the page.
+	 */
+	gui::BottomBar* bottomBar = nullptr;
+	/**
+	 * Information bar for signal, battery and lock icon on the top of the screen.
+	 */
+	gui::TopBar* topBar = nullptr;
+	/**
 	 * Pointer to the application object that owns the window.
 	 */
 	app::Application* application = nullptr;
@@ -32,6 +42,10 @@ public:
 
 	app::Application* getApplication() { return application; };
 	void setApplication( app::Application* app ) { application = app; };
+
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 
 };
 
