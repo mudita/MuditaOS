@@ -17,7 +17,6 @@ namespace gui {
 
 EnterNumberWindow::EnterNumberWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName ) {
 	setSize( 480, 600 );
-
 	buildInterface();
 }
 
@@ -33,6 +32,9 @@ void EnterNumberWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::LEFT, utils::localize.get("app_call_call"));
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
+
+	topBar->setActive(TopBar::Elements::SIGNAL, true );
+	topBar->setActive(TopBar::Elements::BATTERY, true );
 
 	numberLabel = new gui::Label(this, 54, 145, 375, 100);
 	numberLabel->setFilled( false );

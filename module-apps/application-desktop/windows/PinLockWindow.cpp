@@ -42,6 +42,10 @@ void PinLockWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
+	topBar->setActive(TopBar::Elements::SIGNAL, true  );
+	topBar->setActive(TopBar::Elements::BATTERY, true  );
+	topBar->setActive(TopBar::Elements::LOCK, true  );
+
 	lockImage = new gui::Image( this, 177,132,0,0, "pin_lock" );
 	infoImage = new gui::Image( this, 177,132,0,0, "pin_lock_info" );
 	infoImage->setVisible(false);
