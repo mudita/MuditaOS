@@ -71,13 +71,13 @@ sys::ReturnCodes ApplicationSettings::SleepHandler() {
 
 void ApplicationSettings::createUserInterface() {
 
-	gui::Window* window = nullptr;
+	gui::AppWindow* window = nullptr;
 
 	window = new gui::SettingsMainWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::LanguageWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
 void ApplicationSettings::destroyUserInterface() {
