@@ -39,7 +39,11 @@ void Service::StartService()
 {
     Bus::Add(shared_from_this());
     enableRunLoop = true;
-	Start();
+    if(!Start()){
+        LogOutput::Output("FATAL ERROR: Start service failed!");
+        configASSERT(0);
+    }
+
 }
 
 

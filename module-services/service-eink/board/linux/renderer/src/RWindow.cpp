@@ -49,6 +49,10 @@ void RWindow::keyMapInit(void)
 	keyMap.insert( std::pair<int8_t,uint32_t>( '7', static_cast<uint32_t>(bsp::KeyCodes::NumericKey7)));
 	keyMap.insert( std::pair<int8_t,uint32_t>( '8', static_cast<uint32_t>(bsp::KeyCodes::NumericKey8)));
 	keyMap.insert( std::pair<int8_t,uint32_t>( '9', static_cast<uint32_t>(bsp::KeyCodes::NumericKey9)));
+
+	batteryKeyMap.insert( std::pair<int8_t,uint32_t>( '[', 1));
+	batteryKeyMap.insert( std::pair<int8_t,uint32_t>( ']', 2));
+	batteryKeyMap.insert( std::pair<int8_t,uint32_t>( 'p', 3));
 }
 void RWindow::updateDrawBuffer() {
 	for (size_t i = 0; i < width*height; i++)
@@ -83,6 +87,13 @@ bool RWindow::onKeyPress(GdkEventKey* event)
 				write(fifoFd, message, 2);
 			}
 
+			std::map<int8_t, uint32_t>::iterator batt_it = batteryKeyMap.find(key_code);
+			if(batt_it != batteryKeyMap.end())
+			{
+				uint8_t message = key_code;
+				write(fifoFdBatt, &message, 1);
+			}
+
 		}
 	}
 
@@ -113,10 +124,11 @@ bool RWindow::onKeyRelease(GdkEventKey* event)
     return false;
 }
 
-RWindow::RWindow( char* shmMemory, int fifo, int w, int h ) :
+RWindow::RWindow( char* shmMemory, int fifoKbd, int fifoBatt, int w, int h ) :
 	shmMemPtr{shmMemory},
 	rgbMemPtr{nullptr},
-	fifoFd{fifo},
+	fifoFd{fifoKbd},
+	fifoFdBatt{fifoBatt},
 	width{w},
 	height{h} {
 
