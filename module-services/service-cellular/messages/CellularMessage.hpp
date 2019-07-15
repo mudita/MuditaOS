@@ -50,8 +50,8 @@ public:
 
     Type type;
     std::string data;
-    uint32_t signalStrength;
-    int32_t dBmSignalStrength;
+    uint32_t signalStrength=0;
+    int32_t dBmSignalStrength=0;
 
 };
 

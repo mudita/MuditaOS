@@ -39,15 +39,14 @@ ServiceCellular::ServiceCellular()
 
         switch (type) {
 
+            case NotificationType ::CallBusy:
             case NotificationType ::CallActive:
+            case NotificationType::CallAborted:
+                // no data field is used
                 break;
 
             case NotificationType::IncomingCall:
                 msg->data = resp;
-                break;
-
-            case NotificationType::CallAborted:
-                // no parsing neededk
                 break;
 
             case NotificationType::NewIncomingSMS:
