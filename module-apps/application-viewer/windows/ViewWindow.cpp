@@ -10,6 +10,8 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/core/ImageManager.hpp"
 #include "ViewWindow.hpp"
+#include "AppWindow.hpp"
+#include "Application.hpp"
 
 namespace gui {
 

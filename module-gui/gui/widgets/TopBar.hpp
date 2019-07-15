@@ -45,11 +45,13 @@ public:
 	/**
 	 * @brief Sets charge level of the battery. This will cause appropriate image to be displayed.
 	 */
-	void setBatteryLevel( uint32_t level ) { batteryLevel = level; };
+	void setBatteryLevel( uint32_t level );
 	/**
 	 * @brief Sets signal strength. This will cause appropriate image to be displayed.
 	 */
 	void setSignalStrength( uint32_t sth) { signalStrength = sth; };
+	uint32_t getBatteryLevel() {return batteryLevel; };
+	uint32_t getSignalStrength() {return signalStrength; };
 };
 
 } /* namespace gui */
