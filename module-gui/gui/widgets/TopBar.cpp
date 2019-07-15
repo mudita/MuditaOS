@@ -89,4 +89,12 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 	};
 }
 
+void TopBar::setBatteryLevel( uint32_t level ) {
+	batteryLevel = level;
+	for( uint32_t i=0; i<batteryLevelCount; i++ ) {
+		battery[i]->setVisible( false );
+	}
+	battery[level]->setVisible( true );
+}
+
 } /* namespace gui */
