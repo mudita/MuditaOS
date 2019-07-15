@@ -46,11 +46,11 @@ protected:
 	/**
 	 * Flag informs whether window has been unlocked
 	 */
-	bool screenLocked = true;
+//	bool screenLocked = true;
 	/**
 	 * Flag that defines if pin window should be displayed
 	 */
-	bool pinLockScreen = true;
+//	bool pinLockScreen = false;
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState();
 public:
