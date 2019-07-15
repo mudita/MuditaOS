@@ -134,9 +134,8 @@ void Item::updateDrawArea() {
 
 	drawArea = result;
 
-	for( unsigned int i=0; i<children.size(); i++ ) {
-		children[i]->updateDrawArea();
-	}
+	for( gui::Item* it : children )
+		it->updateDrawArea();
 }
 
 Item* Item::getNavigationItem( NavigationDirection direction ) {

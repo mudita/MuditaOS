@@ -7,6 +7,7 @@
  * @details
  */
 
+#include <map>
 #include "windows/CalendarMainWindow.hpp"
 #include "ApplicationCalendar.hpp"
 
@@ -53,10 +54,10 @@ sys::ReturnCodes ApplicationCalendar::SleepHandler() {
 
 void ApplicationCalendar::createUserInterface() {
 
-	gui::Window* win = new CalendarMainWindow(this, "Main");
+	gui::AppWindow* win = new CalendarMainWindow(this, "Main");
 	win->setSize( 480, 600 );
 
-	windows.insert(std::pair<std::string,gui::Window*>(win->getName(), win));
+	windows.insert( std::pair<std::string,gui::AppWindow*>(win->getName(), win));
 }
 
 void ApplicationCalendar::destroyUserInterface() {

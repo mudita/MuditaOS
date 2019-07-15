@@ -58,8 +58,8 @@ public:
 	void updateLabels();
 
 	void rebuild() {};
-	void buildInterface() {};
-	void destroyInterface() {};
+	void buildInterface() { AppWindow::buildInterface(); };
+	void destroyInterface() { AppWindow::destroyInterface();};
 };
 
 } /* namespace gui */
