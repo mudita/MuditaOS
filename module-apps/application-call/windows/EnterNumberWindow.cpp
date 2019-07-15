@@ -17,7 +17,6 @@ namespace gui {
 
 EnterNumberWindow::EnterNumberWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName ) {
 	setSize( 480, 600 );
-
 	buildInterface();
 }
 
@@ -25,7 +24,8 @@ void EnterNumberWindow::rebuild() {
 
 }
 void EnterNumberWindow::buildInterface() {
-	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
+
+	AppWindow::buildInterface();
 	bottomBar->setActive( BottomBar::Side::LEFT, true );
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
@@ -33,8 +33,8 @@ void EnterNumberWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
 
-	topBar = new gui::TopBar( this, 0,0, 480, 50 );
-	topBar->setActive( gui::TopBar::Elements::LOCK, false );
+	topBar->setActive(TopBar::Elements::SIGNAL, true );
+	topBar->setActive(TopBar::Elements::BATTERY, true );
 
 	numberLabel = new gui::Label(this, 54, 145, 375, 100);
 	numberLabel->setFilled( false );
@@ -47,8 +47,7 @@ void EnterNumberWindow::buildInterface() {
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 }
 void EnterNumberWindow::destroyInterface() {
-	delete bottomBar;
-	delete topBar;
+	AppWindow::destroyInterface();
 	delete numberLabel;
 	children.clear();
 }
@@ -69,7 +68,12 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 //		return true;
 
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
-		if(inputEvent.keyCode == KeyCode::KEY_RF) {
+		if(inputEvent.keyCode == KeyCode::KEY_ENTER) {
+			auto app = reinterpret_cast<app::ApplicationCall*>( application );
+			std::string num = app->getDisplayedNumber();
+			LOG_INFO("number: %s", num.c_str());
+		}
+		else if(inputEvent.keyCode == KeyCode::KEY_RF) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
 
 			std::string num = app->getDisplayedNumber();

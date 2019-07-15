@@ -25,8 +25,6 @@ class PinLockWindow: public AppWindow {
 		PhoneBlocked
 	};
 
-	gui::BottomBar* bottomBar = nullptr;
-	gui::TopBar* topBar = nullptr;
 	gui::Label* titleLabel = nullptr;
 	std::vector<gui::Label*> infoLabels;
 	std::vector<gui::Label*> pinLabels;

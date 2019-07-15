@@ -89,10 +89,10 @@ sys::ReturnCodes ApplicationViewer::SleepHandler() {
 
 void ApplicationViewer::createUserInterface() {
 
-	gui::Window* window = nullptr;
+	gui::AppWindow* window = nullptr;
 
 	window = new gui::ViewWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
 void ApplicationViewer::destroyUserInterface() {
