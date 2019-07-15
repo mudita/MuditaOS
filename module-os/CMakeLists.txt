@@ -76,7 +76,6 @@ target_compile_definitions(${PROJECT_NAME}
         PUBLIC
 
         CPP_FREERTOS_CONDITION_VARIABLES
-        CPP_FREERTOS_NO_EXCEPTIONS
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 include(env.cmake)
 project(PurePhone)
@@ -85,15 +85,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 # Warnings related flags
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>)
-
-# Flags used only for .cpp files
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_noexcept)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>)
-
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
 target_sources(${CMAKE_PROJECT_NAME}
