@@ -38,7 +38,7 @@ private:
     int HandleCtrlChannelCommands(GSM0710Frame* frame);
 
     //worker's task handle
-    xTaskHandle taskHandle;
+    xTaskHandle taskHandle=nullptr;
     const uint32_t taskPriority = 0;
 
     std::unique_ptr<GSM0710Buffer> inputBuffer=nullptr;

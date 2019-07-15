@@ -65,7 +65,7 @@ std::vector<std::string> CommunicationMuxChannel::SendCommandReponse(const char 
         return tokens;
     }
 
-    auto ret = ulTaskNotifyTake(pdTRUE, timeout);
+    auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded-timeElapsed);
     timeElapsed = cpp_freertos::Ticks::GetTicks();
     if(ret){
 
