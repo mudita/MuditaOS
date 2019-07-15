@@ -68,7 +68,12 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 //		return true;
 
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
-		if(inputEvent.keyCode == KeyCode::KEY_RF) {
+		if(inputEvent.keyCode == KeyCode::KEY_ENTER) {
+			auto app = reinterpret_cast<app::ApplicationCall*>( application );
+			std::string num = app->getDisplayedNumber();
+			LOG_INFO("number: %s", num.c_str());
+		}
+		else if(inputEvent.keyCode == KeyCode::KEY_RF) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
 
 			std::string num = app->getDisplayedNumber();
