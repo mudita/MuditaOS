@@ -26,7 +26,7 @@ constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 
 ServiceCellular::ServiceCellular()
-        : sys::Service(serviceName, 1024, sys::ServicePriority::Idle) {
+        : sys::Service(serviceName, 2048, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceCellular] Initializing");
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);

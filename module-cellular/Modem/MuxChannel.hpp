@@ -58,7 +58,7 @@ public:
         std::string m_data;
     };
 
-    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,MuxChannelType type,const char* name="Default",uint32_t stackSize=1024,uint32_t queueSize=4);
+    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,MuxChannelType type,const char* name="Default",uint32_t stackSize=2048,uint32_t queueSize=4);
     virtual ~MuxChannel();
 
     // Open mux channel
