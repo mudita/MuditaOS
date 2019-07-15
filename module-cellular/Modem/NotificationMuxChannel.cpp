@@ -46,11 +46,11 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
 #endif
 
     // Incoming call
-    if (msgStr.find("+CLIP: ") != std::string::npos) {
+    if (auto ret = msgStr.find("+CLIP: ") != std::string::npos) {
         LOG_TRACE((name + ": incoming call...").c_str());
 
-        auto beg = msgStr.find("\"");
-        auto end = msgStr.find("\"",beg+1);
+        auto beg = msgStr.find("\"",ret);
+        auto end = msgStr.find("\"",ret + beg+1);
         notificationCallback(NotificationType::IncomingCall,msgStr.substr(beg+1,end-beg-1));
     }
 
@@ -74,10 +74,10 @@ int NotificationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
     }
 
     // Received signal strength change
-    if (msgStr.find("+QIND: \"csq\"") != std::string::npos) {
+    if (auto ret = msgStr.find("+QIND: \"csq\"") != std::string::npos) {
         LOG_TRACE((name + ": received signal strength change notification").c_str());
-        auto beg = msgStr.find(",");
-        auto end = msgStr.find(",",beg+1);
+        auto beg = msgStr.find(",",ret);
+        auto end = msgStr.find(",",ret + beg+1);
         notificationCallback(NotificationType::SignalStrengthUpdate,msgStr.substr(beg+1,end-beg-1));
     }
 
