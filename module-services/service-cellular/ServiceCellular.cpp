@@ -26,12 +26,12 @@ constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 
 ServiceCellular::ServiceCellular()
-        : sys::Service(serviceName, 1024 * 4, sys::ServicePriority::Idle) {
+        : sys::Service(serviceName, 1024, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceCellular] Initializing");
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 
-    callStateTimer = CreateTimer(500, true);
+    callStateTimer = CreateTimer(1000, true);
 
     notificationCallback = [this](NotificationType type, std::string resp) {
 
@@ -183,12 +183,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
                                                       ("ATD" + msg->data + ";\r").c_str(), 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
+                // activate call state timer
+                ReloadTimer(callStateTimer);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
 
-            // activate call state timer
-            ReloadTimer(callStateTimer);
+
         }
             break;
 
