@@ -20,6 +20,7 @@
 #include "InputSerialWorker.hpp"
 #include "GSM0710.hpp"
 #include "mutex.hpp"
+#include "NotificationMuxChannel.hpp"
 
 
 class MuxDaemon {
@@ -46,13 +47,14 @@ public:
         MUX_STATES_COUNT // keep this the last
     };
 
-    MuxDaemon();
+    static std::unique_ptr<MuxDaemon> Create(NotificationMuxChannel::NotificationCallback_t callback);
+
+    MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback);
 
     ~MuxDaemon();
 
-    int Start();
-
-    int Exit();
+    std::vector<std::string> SendCommandResponse(MuxChannel::MuxChannelType type, const char *cmd, size_t rxCount,
+                                                 uint32_t timeout = 1000);
 
     ssize_t WriteMuxFrame(int channel,
                           const unsigned char *input,
@@ -69,6 +71,7 @@ private:
 
     friend void workerTaskFunction(void *ptr);
 
+    int Start();
 
     int SendAT(const char *cmd, uint32_t timeout);
 
@@ -111,6 +114,8 @@ private:
     cpp_freertos::MutexStandard serOutMutex;
 
     int uih_pf_bit_received = 0;
+
+    NotificationMuxChannel::NotificationCallback_t callback;
 
 };
 

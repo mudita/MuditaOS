@@ -13,18 +13,35 @@
 #define PUREPHONE_NOTIFICATIONMUXCHANNEL_HPP
 
 #include "MuxChannel.hpp"
+#include <functional>
+#include <variant>
 
 class MuxDaemon;
+
+enum class NotificationType{
+    IncomingCall,
+    CallAborted,
+    CallBusy,
+    CallActive,
+    NewIncomingSMS,
+    SignalStrengthUpdate
+};
+
 
 class NotificationMuxChannel : public MuxChannel{
 public:
 
-    NotificationMuxChannel(MuxDaemon* mux);
+    using NotificationCallback_t =  std::function<void(NotificationType type, std::string resp)>;
+
+    NotificationMuxChannel(MuxDaemon* mux,NotificationCallback_t callback);
     ~NotificationMuxChannel();
 
 
 
     int ParseInputData(uint8_t* data, size_t size) override final;
+
+private:
+    NotificationCallback_t notificationCallback;
 };
 
 

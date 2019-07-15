@@ -13,6 +13,9 @@
 #define PUREPHONE_COMMUNICATIONMUXCHANNEL_HPP
 
 #include "MuxChannel.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "mutex.hpp"
 
 class CommunicationMuxChannel : public MuxChannel {
 public:
@@ -23,8 +26,12 @@ public:
 
 
     int ParseInputData(uint8_t* data, size_t size) override final;
+    std::vector<std::string> SendCommandReponse(const char* cmd,size_t rxCount,uint32_t timeout = 1000);
 
-    ssize_t SendCommand(const char* cmd,uint32_t timeout = 1000);
+private:
+    std::string responseBuffer;
+    TaskHandle_t blockedTaskHandle = nullptr;
+    cpp_freertos::MutexStandard mutex;
 };
 
 

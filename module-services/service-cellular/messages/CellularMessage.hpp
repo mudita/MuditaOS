@@ -12,9 +12,65 @@
 #ifndef PUREPHONE_CELLULARMESSAGE_HPP
 #define PUREPHONE_CELLULARMESSAGE_HPP
 
+#include <memory>
+#include <variant>
+#include "Service/Message.hpp"
+#include "MessageType.hpp"
 
-class CellularMessage {
 
+class CellularMessage : public sys::DataMessage {
+public:
+    CellularMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)),
+                                               type(messageType) {};
+
+    virtual ~CellularMessage() {};
+
+    MessageType type;
+
+};
+
+class CellularNotificationMessage : public CellularMessage {
+public:
+
+    enum class Type {
+        IncomingCall,
+        CallAborted,
+        CallBusy,
+        CallActive,
+        NewIncomingSMS,
+        SignalStrengthUpdate
+
+    };
+
+
+    CellularNotificationMessage(Type type) : CellularMessage(
+            MessageType::CellularNotification), type(type){}
+
+    ~CellularNotificationMessage() {}
+
+    Type type;
+    std::string data;
+    uint32_t signalStrength;
+    int32_t dBmSignalStrength;
+
+};
+
+class CellularRequestMessage : public CellularMessage{
+public:
+
+    CellularRequestMessage(MessageType messageType):CellularMessage(messageType){}
+    ~CellularRequestMessage() {}
+
+    std::string data;
+
+};
+
+class CellularResponseMessage: public sys::ResponseMessage {
+public:
+    CellularResponseMessage(uint32_t retCode) : sys::ResponseMessage(),retCode(retCode) {};
+    virtual ~CellularResponseMessage() {};
+
+    uint32_t retCode;
 };
 
 

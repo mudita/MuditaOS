@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 include(env.cmake)
 project(PurePhone)
@@ -86,15 +86,6 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>)
 
-# Flags used only for .cpp files
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_noexcept)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>)
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>)
-
-
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
 target_sources(${CMAKE_PROJECT_NAME}
         PRIVATE
@@ -105,10 +96,20 @@ target_sources(${CMAKE_PROJECT_NAME}
 
         )
 
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/config)
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR}/source)
+set(PROJECT_INCLUDES
+
+        ${CMAKE_CURRENT_SOURCE_DIR}/source
+        ${CMAKE_CURRENT_SOURCE_DIR}/config
+
+
+        CACHE INTERNAL "")
+
+target_include_directories(${PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+
+
+
 
 message("${PROJECT_NAME}: add_subdirectory module-sys")
 add_subdirectory(module-sys)
