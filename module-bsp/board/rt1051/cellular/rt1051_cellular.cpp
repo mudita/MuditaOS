@@ -18,6 +18,10 @@
 #include "dma_config.h"
 #include "fsl_cache.h"
 
+#include <vector>
+static char testbuff[4096] = {0};
+static uint32_t idx = 0;
+
 extern "C" {
 
 void LPUART1_IRQHandler(void) {
@@ -34,7 +38,7 @@ void LPUART1_IRQHandler(void) {
                 if (xStreamBufferSpacesAvailable(bsp::RT1051Cellular::uartRxStreamBuffer) < 8) {
                     //BSP_CellularDeassertRTS();
                 }
-
+                testbuff[idx++] = characterReceived;
                 xStreamBufferSendFromISR(bsp::RT1051Cellular::uartRxStreamBuffer,
                                          (void *) &characterReceived,
                                          1,
