@@ -133,6 +133,9 @@ int MuxDaemon::Start() {
 
     }
 
+    // Factory reset
+    SendAT("AT&F\r", 500);
+
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
         SendAT("AT+IFC=2,2\r\n", 500); // enable flow control function for module
@@ -166,7 +169,7 @@ int MuxDaemon::Start() {
 
     // This driver supports only Basic mode (max frame length = 127bytes and no frame errors correction)
     char gsm_command[128] = {};
-    snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r\n", GSM0710Buffer::cmux_mode,
+    snprintf(gsm_command, sizeof(gsm_command), "AT+CMUX=%d,%d,%d,%d\r", GSM0710Buffer::cmux_mode,
              0, QuectelBaudrates::Baudrates<baudRate>::Value, GSM0710Buffer::cmux_N1
     );
 
