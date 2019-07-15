@@ -1,6 +1,7 @@
 {
     "common_open": "ABIERTA",
     "common_confirm": "CONFIRMAR",
+    "common_select": "SELECT",
     "common_ok": "OK",
     "common_back": "ATRÁS",
     "common_set": "CONJUNTO",
@@ -48,7 +49,20 @@
     "app_call_reject": "REJECT",
     "app_call_answer": "ANSWER",
     "app_call_emergency": "Emergency call",
-
+    
+    "app_settings_title_main": "Settings",
+    "app_settings_connectivity": "Connectivity",
+    "app_settings_date_and_time": "Date and Time",
+    "app_settings_display": "Display",
+    "app_settings_phone_modes": "Phone Modes",
+    "app_settings_security": "Security",
+    "app_settings_language": "Language",
+    "app_settings_about": "About Mudita Pure",
+    	"app_settings_title_languages": "Language Selection",
+    	"app_settings_language_english": "Inglesa",
+    	"app_settings_language_polish": "Polaco",
+    	"app_settings_language_german": "Alemana",
+    	"app_settings_language_spanish": "Española",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"

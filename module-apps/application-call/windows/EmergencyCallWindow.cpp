@@ -20,6 +20,16 @@ EmergencyCallWindow::EmergencyCallWindow( app::Application* app ) : EnterNumberW
 	numberLabel->setText( utils::localize.get("app_call_emergency") );
 }
 
+void EmergencyCallWindow::rebuild() {
+
+}
+void EmergencyCallWindow::buildInterface() {
+
+}
+void EmergencyCallWindow::destroyInterface() {
+
+}
+
 EmergencyCallWindow::~EmergencyCallWindow() {
 	// TODO Auto-generated destructor stub
 }

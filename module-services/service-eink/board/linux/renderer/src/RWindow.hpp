@@ -33,12 +33,14 @@ protected:
 	std::map<uint32_t, uint32_t> keys;
 
 	std::map<int8_t, uint32_t> keyMap;
+	std::map<int8_t, uint32_t> batteryKeyMap;
 	//named pipe file descriptor
 	int fifoFd;
-
+	//named pipe file descriptor
+	int fifoFdBatt;
 	void keyMapInit(void);
 public:
-	RWindow( char* shmMemory, int fifo, int w, int h );
+	RWindow( char* shmMemory, int fifoKbd, int fifoBatt, int w, int h );
 	virtual ~RWindow();
 	bool onKeyPress(GdkEventKey* event);
 	bool onKeyRelease(GdkEventKey* event);

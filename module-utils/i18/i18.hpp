@@ -22,6 +22,7 @@ namespace utils {
     enum class Lang{
         En,
         Pl,
+		De,
         Sp
     };
 
@@ -29,6 +30,7 @@ namespace utils {
 
         const char* langEN_path = "sys/assets/lang/lang_en.json";
         const char* langPL_path = "sys/assets/lang/lang_pl.json";
+        const char* langDE_path = "sys/assets/lang/lang_de.json";
         const char* langSP_path = "sys/assets/lang/lang_sp.json";
 
 
@@ -48,10 +50,12 @@ namespace utils {
                 case Lang::Pl:
                     path = langPL_path;
                     break;
-
                 case Lang::En:
                     path = langEN_path;
                     break;
+                case Lang::De:
+					path = langDE_path;
+					break;
                 case Lang::Sp:
                     path = langSP_path;
                     break;
