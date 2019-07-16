@@ -22,7 +22,7 @@
 
 namespace gui {
 
-CallWindow::CallWindow( app::Application* app ) : AppWindow(app,"Languages"){
+CallWindow::CallWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName){
 	setSize( 480, 600 );
 
 	buildInterface();
@@ -89,17 +89,41 @@ void CallWindow::buildInterface() {
 //		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
 //	}
 }
+
 void CallWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-//	delete title;
-//	for( uint32_t i=0; i<options.size(); i++ )
-//		delete options[i];
-//	this->focusItem = nullptr;
-//	options.clear();
-	children.clear();
+	delete titleLabel;
+	delete numberLabel;
+	children.remove( titleLabel );
+	children.remove( numberLabel );
 }
 
 CallWindow::~CallWindow() {
+}
+
+void CallWindow::setVisibleState() {
+	//show state of the window
+	switch( state ) {
+		case State::CALLING: {
+			titleLabel->setText("CALLING");
+		}break;
+		case State::CALL_ENDED: {
+			titleLabel->setText("CALL_ENDED");
+		}break;
+		case State::CALL_IN_PROGRESS: {
+			titleLabel->setText("CALL_IN_PROGRESS");
+		}break;
+		case State::IDLE: {
+			titleLabel->setText("IDLE");
+		}break;
+		case State::RINGING: {
+			titleLabel->setText("RINGING");
+		}break;
+	};
+}
+
+bool CallWindow::handleSwitchData( SwitchData* data ) {
+	return true;
 }
 
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {

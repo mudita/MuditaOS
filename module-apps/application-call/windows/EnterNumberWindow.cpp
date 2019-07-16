@@ -10,6 +10,7 @@
 #include "EnterNumberWindow.hpp"
 #include "../ApplicationCall.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "i18/i18.hpp"
 
@@ -71,7 +72,10 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 		if(inputEvent.keyCode == KeyCode::KEY_ENTER) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
 			std::string num = app->getDisplayedNumber();
-			LOG_INFO("number: %s", num.c_str());
+			LOG_INFO("number: [%s]", num.c_str());
+			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
+//			auto ret = CellularServiceAPI::DialNumber(application,"694135409");
+			LOG_INFO("CALL RESULT: %s", (ret?"OK":"FAIL"));
 		}
 		else if(inputEvent.keyCode == KeyCode::KEY_RF) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
