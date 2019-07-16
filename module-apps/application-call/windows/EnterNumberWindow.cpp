@@ -73,8 +73,8 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
 			std::string num = app->getDisplayedNumber();
 			LOG_INFO("number: [%s]", num.c_str());
-//			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
-			auto ret = CellularServiceAPI::DialNumber(application,"694135409");
+			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
+//			auto ret = CellularServiceAPI::DialNumber(application,"694135409");
 			LOG_INFO("CALL RESULT: %s", (ret?"OK":"FAIL"));
 		}
 		else if(inputEvent.keyCode == KeyCode::KEY_RF) {
