@@ -37,9 +37,9 @@ EmergencyCallWindow::~EmergencyCallWindow() {
 bool EmergencyCallWindow::onInput( const InputEvent& inputEvent ) {
 	bool ret = EnterNumberWindow::onInput( inputEvent );
 
-	if( number.empty() ) {
-		numberLabel->setText( utils::localize.get("app_call_emergency") );
-	}
+//	if( number.empty() ) {
+//		numberLabel->setText( utils::localize.get("app_call_emergency") );
+//	}
 
 	return ret;
 }
