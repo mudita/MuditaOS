@@ -44,7 +44,7 @@ private:
 
     std::unique_ptr<MuxDaemon> muxdaemon;
     uint32_t callStateTimer = 0;
-    NotificationMuxChannel::NotificationCallback_t notificationCallback;
+    NotificationMuxChannel::NotificationCallback_t notificationCallback=nullptr;
 
     static constexpr int32_t signalStrengthToDB[] = {
             -109, //0

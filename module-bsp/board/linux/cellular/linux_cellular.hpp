@@ -55,9 +55,9 @@ namespace bsp {
 
         static const uint32_t MAX_EVENTS = 1;
 
-        int fd;
+        int fd = -1;
 
-        int epoll_fd;
+        int epoll_fd = -1;
 
         struct epoll_event event, events[MAX_EVENTS];
 

@@ -37,6 +37,10 @@ namespace bsp
         else {
             // open serial port
             fd = open(term, O_RDWR | O_NOCTTY | O_NONBLOCK);
+            if(fd == -1){
+                LOG_FATAL("Failed to open serial port");
+                return;
+            }
 
             struct termios t;
             memset(&t, 0, sizeof(t));
@@ -69,6 +73,7 @@ namespace bsp
         {
             LOG_FATAL("Failed to add file descriptor to epoll\n");
             close(epoll_fd);
+            close(fd);
         }
 
     }
