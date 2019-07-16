@@ -55,8 +55,10 @@ private:
             "time INTEGER,"
             "snooze INTEGER,"
             "status INTEGER,"
-            "path TEXT NOT_NULL,"
-            "FOREIGN KEY(thread_id) REFERENCES threads(_id) ON DELETE CASCADE );";
+            "path TEXT DEFAULT '');";
+    const char* alarmsInitialization =
+                "INSERT OR IGNORE INTO alarms (time, snooze, status, path) VALUES(0,0,0,'')";
+
 
 };
 

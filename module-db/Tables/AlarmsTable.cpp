@@ -16,7 +16,15 @@ AlarmsTable::~AlarmsTable() {
 }
 
 bool AlarmsTable::Create() {
-    return db->Execute(createTableQuery);
+	bool ret = true;
+	ret = db->Execute(createTableQuery);
+
+    if (!ret) {
+           return false;
+       }
+
+    ret = db->Execute(alarmsInitialization);
+    return ret;
 }
 
 bool AlarmsTable::Add(AlarmsTableRow entry) {
@@ -63,7 +71,7 @@ bool AlarmsTable::Update(AlarmsTableRow entry) {
             entry.time,
 			entry.snooze,
 			entry.status,
-			entry.path,
+			entry.path.c_str(),
             entry.ID
     );
 }
@@ -79,12 +87,12 @@ AlarmsTableRow AlarmsTable::GetByID(uint32_t id) {
                        (*retQuery)[1].GetUInt32(),    // time
                        (*retQuery)[2].GetUInt32(),    // snooze
                        (*retQuery)[3].GetUInt32(),    // status
-                       (*retQuery)[6].GetString(),    // path
+                       (*retQuery)[4].GetString(),    // path
     };
 }
 
 std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto retQuery = db->Query("SELECT * from sms ORDER BY date LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from alarms ORDER BY time ASC LIMIT %lu OFFSET %lu;",
                               limit,
                               offset);
 
@@ -99,7 +107,7 @@ std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffset(uint32_t offset, uint32_
             							(*retQuery)[1].GetUInt32(),    // time
 										(*retQuery)[2].GetUInt32(),    // snooze
 										(*retQuery)[3].GetUInt32(),    // status
-										(*retQuery)[6].GetString(),    // path
+										(*retQuery)[4].GetString(),    // path
         });
     } while (retQuery->NextRow());
 
@@ -124,7 +132,7 @@ AlarmsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, AlarmsTableF
             return std::vector<AlarmsTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from sms WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from alarms WHERE %s='%s' ORDER BY time LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -141,7 +149,7 @@ AlarmsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, AlarmsTableF
 										(*retQuery)[1].GetUInt32(),    // time
 										(*retQuery)[2].GetUInt32(),    // snooze
 										(*retQuery)[3].GetUInt32(),    // status
-										(*retQuery)[6].GetString(),    // path
+										(*retQuery)[4].GetString(),    // path
     	        });
     } while (retQuery->NextRow());
 
