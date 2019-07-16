@@ -25,9 +25,6 @@ class EnterNumberWindow: public AppWindow {
 protected:
 	gui::Label* numberLabel = nullptr;
 
-	//string with currently displayed phone number
-	std::string number = "";
-
 	void updateBottomBar();
 public:
 	EnterNumberWindow( app::Application* app, std::string windowName = "EnterNumberWindow" );
