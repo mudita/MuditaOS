@@ -12,6 +12,7 @@
 #ifndef PUREPHONE_INOUTSERIALWORKER_HPP
 #define PUREPHONE_INOUTSERIALWORKER_HPP
 
+#include <optional>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "GSM0710.hpp"
@@ -33,13 +34,13 @@ public:
         CMUX
     };
 
-    static std::unique_ptr<InOutSerialWorker> Create(MuxDaemon* mux);
+    static std::optional<std::unique_ptr<InOutSerialWorker>> Create(MuxDaemon* mux);
 
     InOutSerialWorker(MuxDaemon* mux);
     ~InOutSerialWorker();
 
 
-    void SwitchMode(Mode newMode);
+    void SwitchMode(const Mode newMode);
 
     // Write data to output buffers
     ssize_t WriteData(unsigned char *input, size_t length);
