@@ -91,7 +91,7 @@ std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::Notificatio
 
     auto ret = inst->Start();
 
-    if (ret != 0) {
+    if (ret == false) {
         return nullptr;
     } else {
         return inst;
@@ -100,12 +100,12 @@ std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::Notificatio
 }
 //#define SERIAL_PORT "dev/ttyUSB0"
 
-int MuxDaemon::Start() {
+bool MuxDaemon::Start() {
 
-    // Create and initialize bsp::Cellular module
-    cellular = bsp::Cellular::Create(SERIAL_PORT);
-    if (cellular == nullptr) {
-        return 0;
+    // Spawn input serial stream worker
+    inSerialDataWorker = InOutSerialWorker::Create(this);
+    if(inSerialDataWorker == nullptr){
+        return false;
     }
 
 
@@ -113,9 +113,6 @@ int MuxDaemon::Start() {
     if (SendAT("AT\r\n", 500) == -1) {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
-        //We don't know in what cmux_mode modem currently is so send both types of closing signals
-        WriteMuxFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_CONTROL_CLD) |
-                                  static_cast<unsigned char>(MuxDefines::GSM0710_CR));
         WriteMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
         vTaskDelay(500); // give modem some time to establish mux
@@ -132,13 +129,23 @@ int MuxDaemon::Start() {
                 }
             }
 
+            //
+            retries = 20;
+            while (--retries) {
+                if (SendAT("AT\r", 500) == 0) {
+                    break;
+                }
+            }
+
+
             if (retries == 0) {
                 LOG_FATAL("No communication with GSM modem");
                 return -1;
             }
         }
-
     }
+
+
 
     // Factory reset
     SendAT("AT&F\r", 500);
@@ -184,10 +191,8 @@ int MuxDaemon::Start() {
     // Start CMUX multiplexer
     SendAT(gsm_command, 500);
 
+    inSerialDataWorker->SwitchMode(InOutSerialWorker::Mode::CMUX);
     state = States::MUX_STATE_MUXING;
-
-    // Spawn input serial stream worker
-    inSerialDataWorker = std::make_unique<InputSerialWorker>(this);
 
     // Create virtual channels
 
@@ -206,7 +211,7 @@ int MuxDaemon::Start() {
         vTaskDelay(200);
     }
 
-    return 0;
+    return true;
 }
 
 int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
@@ -217,7 +222,7 @@ int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
 
     if (cellular->Wait(500)) {
 
-        vTaskDelay(50);
+        vTaskDelay(100);
         auto bytesRead = cellular->Read(buff, sizeof buff);
 
         if (memstr((char *) buff, bytesRead, "OK")) {
@@ -294,9 +299,7 @@ ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int le
 }
 
 ssize_t MuxDaemon::WriteSerialCache(unsigned char *input, size_t length) {
-    //TODO: M.P implement actual caching
-    cpp_freertos::LockGuard lock(serOutMutex);
-    return cellular->Write(input, length);
+
 }
 
 int MuxDaemon::CloseMux() {

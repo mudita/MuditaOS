@@ -104,7 +104,12 @@ namespace bsp {
     }
 
     ssize_t LinuxCellular::Write(void *buf, size_t nbytes) {
-        return write(fd, buf, nbytes);
+        retry:
+        auto ret = write(fd, buf, nbytes);
+        if((ret == -1) && (errno == EINTR)){
+            goto retry;
+        }
+        return ret;
     }
 
     uint32_t LinuxCellular::Wait(uint32_t timeout) {
