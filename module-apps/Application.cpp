@@ -23,6 +23,7 @@
 #include "Application.hpp"
 #include "MessageType.hpp"
 #include "messages/AppMessage.hpp"
+#include "windows/AppWindow.hpp"
 
 namespace app {
 
@@ -139,14 +140,29 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	{
 		sevm::BatteryLevelMessage* msg = static_cast<sevm::BatteryLevelMessage*>(msgl);
 		LOG_INFO("Application battery level: %d", msg->levelPercents );
+
+		if( currentWindow ) {
+			if( currentWindow->updateBatteryLevel( msg->levelPercents ) )
+				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+		}
+
+		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) )
 	{
 		sevm::BatteryPlugMessage* msg = static_cast<sevm::BatteryPlugMessage*>(msgl);
-		if(msg->plugged == true)
+		if(msg->plugged == true) {
+			//TODO show plug icon
 			LOG_INFO("Application charger connected" );
-		else
+		}
+		else {
+			//hide plug icon
 			LOG_INFO("Application charger disconnected" );
+		}
+
+		refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+
+		handled = true;
 	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
@@ -224,7 +240,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		//for all windows call rebuild method
 		for( auto it = windows.begin(); it!= windows.end(); it++)
 			it->second->rebuild();
-		//if application has focus call deeprefresh
+		//if application has focus call deep refresh
 		if( state == State::ACTIVE_FORGROUND )
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		handled = true;
@@ -245,9 +261,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 sys::ReturnCodes Application::InitHandler() {
 	bool initState= true;
 	state = State::INITIALIZING;
-	uint32_t start = xTaskGetTickCount();
+//	uint32_t start = xTaskGetTickCount();
 	settings = DBServiceAPI::SettingsGet(this);
-	uint32_t stop = xTaskGetTickCount();
+//	uint32_t stop = xTaskGetTickCount();
 //	LOG_INFO("DBServiceAPI::SettingsGet %d", stop-start);
 	initState = (settings.dbID == 1);
 

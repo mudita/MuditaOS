@@ -12,6 +12,7 @@
 #include "windows/CallMainWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
 #include "windows/EmergencyCallWindow.hpp"
+#include "windows/CallWindow.hpp"
 
 #include "ApplicationCall.hpp"
 namespace app {
@@ -71,16 +72,19 @@ sys::ReturnCodes ApplicationCall::SleepHandler() {
 
 void ApplicationCall::createUserInterface() {
 
-	gui::Window* window = nullptr;
+	gui::AppWindow* window = nullptr;
 
 	window = new gui::CallMainWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::EnterNumberWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+	window = new gui::CallWindow(this);
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::EmergencyCallWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
 void ApplicationCall::setDisplayedNumber( std::string num ) {

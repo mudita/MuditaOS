@@ -45,6 +45,13 @@ enum class MessageType {
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
 	DBContactGetCount,         // Get contacts count
 
+	//Cellular messages
+	CellularNotification,   // Async notification message
+    CellularDialNumber,     // Dial number
+    CellularAnswerIncomingCall, // Answer incoming call
+    CellularHangupCall,         // Hang up call
+
+    CellularListCurrentCalls,
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window

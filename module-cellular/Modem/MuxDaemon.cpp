@@ -76,11 +76,27 @@ namespace QuectelBaudrates {
 }
 
 
-MuxDaemon::MuxDaemon() {
+MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback):
+callback(callback)
+{
     cellular = bsp::Cellular::Create();
 }
 
 MuxDaemon::~MuxDaemon() {
+    CloseMux();
+}
+
+std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::NotificationCallback_t callback) {
+    auto inst = std::make_unique<MuxDaemon>(callback);
+
+    auto ret = inst->Start();
+
+    if(ret != 0){
+        return nullptr;
+    }
+    else{
+        return inst;
+    }
 
 }
 
@@ -102,7 +118,7 @@ int MuxDaemon::Start() {
             // If no response, power up modem and try again
             cellular->PowerUp();
 
-            uint32_t retries = 10;
+            uint32_t retries = 20;
             while (--retries) {
                 if (SendAT("AT\r", 500) == 0) {
                     break;
@@ -116,7 +132,6 @@ int MuxDaemon::Start() {
         }
 
     }
-
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
@@ -139,6 +154,10 @@ int MuxDaemon::Start() {
     SendAT("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
     // Turn on signal strength change URC
     SendAT("AT+QINDCFG=\"csq\",1\r", 500);
+    // Change incoming call notification from "RING" to "+CRING:type"
+    SendAT("AT+CRC=1\r", 500);
+    // Turn on caller's number presentation
+    SendAT("AT+CLIP=1\r", 500);
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
@@ -166,7 +185,7 @@ int MuxDaemon::Start() {
     channels.push_back(std::make_unique<ControlMuxChannel>(this));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
-    channels.push_back(std::make_unique<NotificationMuxChannel>(this));
+    channels.push_back(std::make_unique<NotificationMuxChannel>(this,callback));
 
     // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
     channels.push_back(std::make_unique<CommunicationMuxChannel>(this));
@@ -179,12 +198,6 @@ int MuxDaemon::Start() {
 
     return 0;
 }
-
-int MuxDaemon::Exit() {
-    CloseMux();
-    return 0;
-}
-
 
 int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
     char buff[256] = {0};
@@ -283,10 +296,21 @@ int MuxDaemon::CloseMux() {
         if (channels[w]->GetState() == MuxChannel::State::Opened) {
             LOG_INFO("Logical channel %d closed", channels[w]->GetChannelNumber());
             channels[w]->Close();
+            vTaskDelay(100);
         }
     }
 
+    // Close control channel
+    LOG_INFO("Control channel %d closed", channels[0]->GetChannelNumber());
+    channels[0]->Close();
+
     return 0;
+}
+
+std::vector<std::string> MuxDaemon::SendCommandResponse(MuxChannel::MuxChannelType type, const char *cmd,
+                                                        size_t rxCount,
+                                                        uint32_t timeout) {
+    return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd,rxCount,timeout);
 }
 
 int MuxDaemon::memstr(const char *haystack, int length, const char *needle) {
