@@ -21,7 +21,7 @@
 
 namespace bsp{
 
-    std::unique_ptr<Cellular> Cellular::Create(const char* term) {
+    std::optional<std::unique_ptr<Cellular>> Cellular::Create(const char* term) {
 
         std::unique_ptr<Cellular> inst;
 
@@ -37,7 +37,7 @@ namespace bsp{
             return inst;
         }
 
-        return nullptr;
+        return {};
     }
 
 }

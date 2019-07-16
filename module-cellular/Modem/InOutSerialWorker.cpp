@@ -15,14 +15,14 @@
 #include "cellular/bsp_cellular.hpp"
 
 
-std::unique_ptr<InOutSerialWorker> InOutSerialWorker::Create(MuxDaemon *mux) {
+std::optional<std::unique_ptr<InOutSerialWorker>> InOutSerialWorker::Create(MuxDaemon *mux) {
     auto inst = std::make_unique<InOutSerialWorker>(mux);
 
     if(inst->isInitialized){
         return inst;
     }
     else{
-        return nullptr;
+        return {};
     }
 }
 
@@ -47,8 +47,7 @@ InOutSerialWorker::InOutSerialWorker(MuxDaemon *mux) : muxDaemon(mux) {
     }
 
     // Create and initialize bsp::Cellular module
-    cellular = bsp::Cellular::Create(SERIAL_PORT);
-    if (cellular == nullptr) {
+    if (cellular = bsp::Cellular::Create(SERIAL_PORT).value_or(nullptr)) {
         return;
     }
 
@@ -422,7 +421,7 @@ int InOutSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
     return 0;
 }
 
-void InOutSerialWorker::SwitchMode(InOutSerialWorker::Mode newMode) {
+void InOutSerialWorker::SwitchMode(const InOutSerialWorker::Mode newMode) {
     mode = newMode;
 }
 

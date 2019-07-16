@@ -98,13 +98,11 @@ std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::Notificatio
     }
 
 }
-//#define SERIAL_PORT "dev/ttyUSB0"
 
 bool MuxDaemon::Start() {
 
     // Spawn input serial stream worker
-    inSerialDataWorker = InOutSerialWorker::Create(this);
-    if(inSerialDataWorker == nullptr){
+    if(inSerialDataWorker = InOutSerialWorker::Create(this).value_or(nullptr)){
         return false;
     }
 
