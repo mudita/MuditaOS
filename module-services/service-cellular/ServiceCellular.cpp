@@ -153,7 +153,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
         case MessageType::CellularHangupCall: {
-            CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
             auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "ATH\r", 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
@@ -166,7 +165,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
         case MessageType::CellularAnswerIncomingCall: {
-            CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
             auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "ATA\r", 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);

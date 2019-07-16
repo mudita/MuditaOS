@@ -115,7 +115,7 @@ private:
 
     int uih_pf_bit_received = 0;
 
-    NotificationMuxChannel::NotificationCallback_t callback;
+    NotificationMuxChannel::NotificationCallback_t callback = nullptr;
 
 };
 
