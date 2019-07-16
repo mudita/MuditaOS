@@ -76,10 +76,10 @@ namespace QuectelBaudrates {
 }
 
 
-MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback):
-callback(callback)
-{
-    cellular = bsp::Cellular::Create();
+MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
+        cellular(nullptr),
+        inSerialDataWorker(nullptr),
+        callback(callback) {
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -91,17 +91,24 @@ std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::Notificatio
 
     auto ret = inst->Start();
 
-    if(ret != 0){
+    if (ret != 0) {
         return nullptr;
-    }
-    else{
+    } else {
         return inst;
     }
 
 }
-
+//#define SERIAL_PORT "dev/ttyUSB0"
 
 int MuxDaemon::Start() {
+
+    // Create and initialize bsp::Cellular module
+    cellular = bsp::Cellular::Create(SERIAL_PORT);
+    if (cellular == nullptr) {
+        return 0;
+    }
+
+
     // At first send AT command to check if modem is turned on
     if (SendAT("AT\r\n", 500) == -1) {
 
@@ -188,7 +195,7 @@ int MuxDaemon::Start() {
     channels.push_back(std::make_unique<ControlMuxChannel>(this));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
-    channels.push_back(std::make_unique<NotificationMuxChannel>(this,callback));
+    channels.push_back(std::make_unique<NotificationMuxChannel>(this, callback));
 
     // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
     channels.push_back(std::make_unique<CommunicationMuxChannel>(this));
@@ -313,7 +320,7 @@ int MuxDaemon::CloseMux() {
 std::vector<std::string> MuxDaemon::SendCommandResponse(MuxChannel::MuxChannelType type, const char *cmd,
                                                         size_t rxCount,
                                                         uint32_t timeout) {
-    return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd,rxCount,timeout);
+    return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd, rxCount, timeout);
 }
 
 int MuxDaemon::memstr(const char *haystack, int length, const char *needle) {

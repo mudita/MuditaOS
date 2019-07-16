@@ -45,10 +45,7 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-
-        //busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-
-        timer_id = CreateTimer(4000,true);
+        timer_id = CreateTimer(1000,true);
         ReloadTimer(timer_id);
     }
 
@@ -57,19 +54,12 @@ public:
 
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
-        auto ret = CellularServiceAPI::HangupCall(this);
         return std::make_shared<sys::ResponseMessage>( );
     }
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
-        auto msg = std::make_shared<sys::DataMessage>(2);
-        sys::Bus::SendUnicast(msg,"Blinky",this);
-
-        //stopTimer(timer_id);
-
-
     }
 
 

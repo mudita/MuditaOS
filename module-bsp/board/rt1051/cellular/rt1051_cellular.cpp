@@ -18,10 +18,6 @@
 #include "dma_config.h"
 #include "fsl_cache.h"
 
-#include <vector>
-static char testbuff[4096] = {0};
-static uint32_t idx = 0;
-
 extern "C" {
 
 void LPUART1_IRQHandler(void) {
@@ -38,7 +34,6 @@ void LPUART1_IRQHandler(void) {
                 if (xStreamBufferSpacesAvailable(bsp::RT1051Cellular::uartRxStreamBuffer) < 8) {
                     //BSP_CellularDeassertRTS();
                 }
-                testbuff[idx++] = characterReceived;
                 xStreamBufferSendFromISR(bsp::RT1051Cellular::uartRxStreamBuffer,
                                          (void *) &characterReceived,
                                          1,
@@ -75,7 +70,7 @@ namespace bsp {
 
         uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, rxStreamBufferNotifyWatermark);
         if (uartRxStreamBuffer == NULL) {
-            LOG_ERROR("Cellular Uart error: Could not create the RX stream buffer!");
+            LOG_ERROR("Could not create the RX stream buffer!");
             return;
         }
 
@@ -98,6 +93,11 @@ namespace bsp {
                         rxTimeoutTimerHandle
                 );
 
+        if(rxTimeoutTimer == nullptr){
+            LOG_ERROR("Could not create rxTimeoutTimer");
+            return;
+        }
+
         lpuart_config_t s_cellularConfig;
 
         LPUART_GetDefaultConfig(&s_cellularConfig);
@@ -112,7 +112,7 @@ namespace bsp {
         s_cellularConfig.enableRx = false;
 
         if (LPUART_Init(CELLULAR_UART_BASE, &s_cellularConfig, UartGetPeripheralClock()) != kStatus_Success) {
-            LOG_ERROR("Cellular Uart config error: Could not initialize the uart!");
+            LOG_ERROR("Could not initialize the uart!");
             return;
         }
 
@@ -122,6 +122,8 @@ namespace bsp {
         NVIC_EnableIRQ(LPUART1_IRQn);
 
         EnableRx();
+
+        isInitialized = true;
     }
 
 
