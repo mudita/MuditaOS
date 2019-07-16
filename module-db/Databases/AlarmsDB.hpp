@@ -18,7 +18,6 @@ public:
     ~AlarmsDB();
 
     AlarmsTable alarms;
-    ThreadsTable threads;
 
     static const char* GetDBName(){return dbName;}
 

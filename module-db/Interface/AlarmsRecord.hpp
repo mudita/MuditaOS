@@ -16,23 +16,12 @@
 #include "../Common/Common.hpp"
 
 struct AlarmsRecord{
-	 uint32_t ID;
+	uint32_t ID;
 	uint32_t time;
 	uint32_t snooze;
 	uint32_t status;
 	UTF8    path;
 
-
-    uint32_t dbID;
-    uint32_t date;
-    uint32_t dateSent;
-    uint32_t errorCode;
-    UTF8 number;
-    UTF8 body;
-    bool isRead;
-    SMSType type;
-    uint32_t threadID;
-    uint32_t contactID;
 };
 
 enum class AlarmsRecordField{

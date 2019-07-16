@@ -12,11 +12,10 @@ const char *AlarmsDB::dbName = "sys/alarms.db";
 
 AlarmsDB::AlarmsDB() :
         Database(dbName),
-        alarms(this),
-        threads(this){
+        alarms(this){
 
         if(alarms.Create() == false) return;
-        if(threads.Create() == false) return;
+
 
         isInitialized = true;
 
