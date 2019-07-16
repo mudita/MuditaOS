@@ -22,7 +22,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxDaemon.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/InputSerialWorker.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/InOutSerialWorker.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/GSM0710.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxChannel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ControlMuxChannel.cpp

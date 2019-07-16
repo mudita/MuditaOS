@@ -26,7 +26,9 @@ constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 
 ServiceCellular::ServiceCellular()
-        : sys::Service(serviceName, 2048, sys::ServicePriority::Idle) {
+        : sys::Service(serviceName, 2048, sys::ServicePriority::Idle),
+        muxdaemon(nullptr){
+
     LOG_INFO("[ServiceCellular] Initializing");
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
@@ -69,16 +71,6 @@ ServiceCellular::ServiceCellular()
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
 
     };
-
-
-    muxdaemon = MuxDaemon::Create(notificationCallback);
-
-
-/*    vTaskDelay(5000);
-    muxdaemon.reset();
-
-    muxdaemon = MuxDaemon::Create();*/
-
 }
 
 ServiceCellular::~ServiceCellular() {
@@ -97,7 +89,13 @@ void ServiceCellular::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
-    return sys::ReturnCodes::Success;
+    muxdaemon = MuxDaemon::Create(notificationCallback);
+    if(muxdaemon){
+        return sys::ReturnCodes::Success;
+    }
+    else{
+        return sys::ReturnCodes::Failure;
+    }
 }
 
 sys::ReturnCodes ServiceCellular::DeinitHandler() {

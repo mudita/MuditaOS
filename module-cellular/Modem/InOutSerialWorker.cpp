@@ -1,6 +1,6 @@
 
 /*
- * @file InputSerialWorker.cpp
+ * @file InOutSerialWorker.cpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
  * @date 24.06.19
  * @brief
@@ -9,14 +9,30 @@
  */
 
 
-#include "InputSerialWorker.hpp"
+#include "InOutSerialWorker.hpp"
 #include "MuxDaemon.hpp"
 #include "log/log.hpp"
+#include "cellular/bsp_cellular.hpp"
 
 
-InputSerialWorker::InputSerialWorker(MuxDaemon *mux) : muxDaemon(mux) {
+std::unique_ptr<InOutSerialWorker> InOutSerialWorker::Create(MuxDaemon *mux) {
+    auto inst = std::make_unique<InOutSerialWorker>(mux);
+
+    if(inst->isInitialized){
+        return inst;
+    }
+    else{
+        return nullptr;
+    }
+}
+
+InOutSerialWorker::InOutSerialWorker(MuxDaemon *mux) : muxDaemon(mux) {
 
     inputBuffer = std::make_unique<GSM0710Buffer>(mux->virtualPortsCount);
+    if(inputBuffer = nullptr){
+        LOG_ERROR("Failed to create GSM0710Buffer");
+        return;
+    }
 
     BaseType_t task_error = xTaskCreate(
             workerTaskFunction,
@@ -27,10 +43,19 @@ InputSerialWorker::InputSerialWorker(MuxDaemon *mux) : muxDaemon(mux) {
             &taskHandle);
     if (task_error != pdPASS) {
         LOG_ERROR("Failed to start inputSerialWorker task");
+        return;
     }
+
+    // Create and initialize bsp::Cellular module
+    cellular = bsp::Cellular::Create(SERIAL_PORT);
+    if (cellular == nullptr) {
+        return;
+    }
+
+    isInitialized = true;
 }
 
-InputSerialWorker::~InputSerialWorker() {
+InOutSerialWorker::~InOutSerialWorker() {
     if (taskHandle) {
         vTaskDelete(taskHandle);
     }
@@ -38,25 +63,33 @@ InputSerialWorker::~InputSerialWorker() {
 
 
 void workerTaskFunction(void *ptr) {
-    InputSerialWorker *inst = reinterpret_cast<InputSerialWorker *>(ptr);
+    InOutSerialWorker *inst = reinterpret_cast<InOutSerialWorker *>(ptr);
 
     while (1) {
         inst->muxDaemon->cellular->Wait(UINT32_MAX);
-        if (inst->ReadIncomingData() > 0) {
-            if (inst->inputBuffer->GetDataLength() > 0) {
 
-                if (inst->ExtractFrames()) {
-                    //TODO:M.P implement error handling ?
+        // AT mode is used only during initialization phase
+        if (inst->mode == InOutSerialWorker::Mode::AT) {
+
+        }
+        // CMUX mode is default operation mode
+        else {
+            if (inst->ReadIncomingData() > 0) {
+                if (inst->inputBuffer->GetDataLength() > 0) {
+
+                    if (inst->ExtractFrames()) {
+                        //TODO:M.P implement error handling ?
+                    }
+
+                    // Reorganize data in buffer if necessary
+                    inst->inputBuffer->ReorganizeBuffer();
                 }
-
-                // Reorganize data in buffer if necessary
-                inst->inputBuffer->ReorganizeBuffer();
             }
         }
     }
 }
 
-int InputSerialWorker::ReadIncomingData() {
+int InOutSerialWorker::ReadIncomingData() {
     int length = 0;
 
     switch (muxDaemon->GetState()) {
@@ -101,7 +134,7 @@ int InputSerialWorker::ReadIncomingData() {
     return length;
 }
 
-int InputSerialWorker::ExtractFrames() {
+int InOutSerialWorker::ExtractFrames() {
     int frames_extracted = 0;
     GSM0710Frame local_frame;
     GSM0710Frame *frame = &local_frame;
@@ -254,7 +287,7 @@ int InputSerialWorker::ExtractFrames() {
 
 }
 
-int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
+int InOutSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
     unsigned char type, signals;
     int length = 0, i, type_length, channel, supported = 1;
     unsigned char *response;
@@ -387,4 +420,14 @@ int InputSerialWorker::HandleCtrlChannelCommands(GSM0710Frame *frame) {
         }
     }
     return 0;
+}
+
+void InOutSerialWorker::SwitchMode(InOutSerialWorker::Mode newMode) {
+    mode = newMode;
+}
+
+ssize_t InOutSerialWorker::WriteData(unsigned char *input, size_t length) {
+    //TODO: M.P implement actual caching
+    cpp_freertos::LockGuard lock(serOutMutex);
+    return cellular->Write(input, length);
 }

@@ -17,9 +17,8 @@
 #include <stdint.h>
 #include "cellular/bsp_cellular.hpp"
 #include "Service/Worker.hpp"
-#include "InputSerialWorker.hpp"
+#include "InOutSerialWorker.hpp"
 #include "GSM0710.hpp"
-#include "mutex.hpp"
 #include "NotificationMuxChannel.hpp"
 
 
@@ -66,12 +65,12 @@ public:
 
 private:
 
-    friend InputSerialWorker;
+    friend InOutSerialWorker;
     friend MuxChannel;
 
     friend void workerTaskFunction(void *ptr);
 
-    int Start();
+    bool Start();
 
     int SendAT(const char *cmd, uint32_t timeout);
 
@@ -104,14 +103,12 @@ private:
 
 
     std::unique_ptr<bsp::Cellular> cellular;
-    std::unique_ptr<InputSerialWorker> inSerialDataWorker;
+    std::unique_ptr<InOutSerialWorker> inSerialDataWorker;
 
 
     States state = States::MUX_STATE_OPENING;
 
     std::vector<std::unique_ptr<MuxChannel>> channels;
-
-    cpp_freertos::MutexStandard serOutMutex;
 
     int uih_pf_bit_received = 0;
 
