@@ -21,7 +21,7 @@ namespace bsp {
     class Cellular {
     public:
 
-        static std::unique_ptr<Cellular> Create(const char* term = "/dev/ttyUSB0");
+        static std::unique_ptr<Cellular> Create(const char* term = "/dev/ttyUSB1");
 
         Cellular() {}
         virtual ~Cellular() {}
