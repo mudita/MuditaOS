@@ -23,6 +23,7 @@ void CalendarMainWindow::rebuild() {
 
 }
 void CalendarMainWindow::buildInterface() {
+	AppWindow::buildInterface();
 	//	gui::VBox* vBox = new gui::VBox( this, 0, 0, 480, 600 );
 	//
 	//	gui::Label title = new gui::Label(vBox, 0,0,480,600);
@@ -36,7 +37,7 @@ void CalendarMainWindow::buildInterface() {
 	//	vBox->addWidget(maxH2);
 }
 void CalendarMainWindow::destroyInterface() {
-
+	AppWindow::destroyInterface();
 }
 
 CalendarMainWindow::~CalendarMainWindow() {

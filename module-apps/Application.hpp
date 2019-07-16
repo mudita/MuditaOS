@@ -12,7 +12,7 @@
 #include <map>
 //module-gui
 #include "gui/Common.hpp"
-#include "gui/widgets/Window.hpp"
+//#include "gui/widgets/Window.hpp"
 #include "gui/input/Translator.hpp"
 //module-sys
 #include "Service/Service.hpp"
@@ -23,6 +23,10 @@
 #include "Interface/SettingsRecord.hpp"
 
 #include "SwitchData.hpp"
+
+namespace gui {
+	class AppWindow;
+};
 
 namespace app {
 
@@ -126,9 +130,9 @@ protected:
 	/**
 	 * Map containing application's windows
 	 */
-	std::map<std::string, gui::Window*> windows;
-	gui::Window* currentWindow = nullptr;
-	gui::Window* previousWindow = nullptr;
+	std::map<std::string, gui::AppWindow*> windows;
+	gui::AppWindow* currentWindow = nullptr;
+	gui::AppWindow* previousWindow = nullptr;
 	/**
 	 * Flag defines whether keyboard input is processed
 	 */

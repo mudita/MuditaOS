@@ -36,51 +36,23 @@ namespace bsp
         }
         else {
             // open serial port
-            fd = open(term, O_RDWR | O_NOCTTY);
+            fd = open(term, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
-            // Set serial port attributes
-            //set_interface_attribs();
-            //set_mincount(0);
-
-
-            /* *** Configure Port *** */
-            struct termios tty;
-            memset (&tty, 0, sizeof tty);
-
-/* Error Handling */
-            if ( tcgetattr ( fd, &tty ) != 0 )
-            {
-                std::cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << "\n";
-            }
-
-/* Set Baud Rate */
-            cfsetospeed (&tty, B115200);
-            cfsetispeed (&tty, B115200);
-
-/* Setting other Port Stuff */
-            tty.c_cflag     &=  ~PARENB;        // Make 8n1
-            tty.c_cflag     &=  ~CSTOPB;
-            tty.c_cflag     &=  ~CSIZE;
-            tty.c_cflag     |=  CS8;
-            tty.c_cflag     &=  ~CRTSCTS;       // no flow control
-            tty.c_lflag     =   0;          // no signaling chars, no echo, no canonical processing
-            tty.c_oflag     =   0;                  // no remapping, no delays
-            tty.c_cc[VMIN]      =   0;                  // read doesn't block
-            tty.c_cc[VTIME]     =   5;                  // 0.5 seconds read timeout
-
-            tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
-            tty.c_iflag     &=  ~(IXON | IXOFF | IXANY);// turn off s/w flow ctrl
-            tty.c_lflag     &=  ~(ICANON | ECHO | ECHOE | ISIG); // make raw
-            tty.c_oflag     &=  ~OPOST;              // make raw
-
-/* Flush Port, then applies attributes */
-            tcflush( fd, TCIFLUSH );
-
-            if ( tcsetattr ( fd, TCSANOW, &tty ) != 0)
-            {
-                std::cout << "Error " << errno << " from tcsetattr" << "\n";
-            }
-        }
+            struct termios t;
+            memset(&t, 0, sizeof(t));
+            tcgetattr(fd, &t);
+            cfmakeraw(&t);
+            t.c_cflag |= CLOCAL;
+            //if(ctsrts == 1)
+              //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
+            //else
+                t.c_cflag &= ~(CRTSCTS);//disable the flow control on dev board
+            speed_t speed = B115200;
+            cfsetispeed(&t, speed);
+            cfsetospeed(&t, speed);
+            tcsetattr(fd, TCSANOW, &t);
+            int status = TIOCM_DTR | TIOCM_RTS;
+            ioctl(fd, TIOCMBIS, &status);        }
 
         epoll_fd = epoll_create1(0);
 

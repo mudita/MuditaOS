@@ -12,6 +12,8 @@
 #include "messages/APMMessage.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include <utility>
 #include <memory>
@@ -29,6 +31,8 @@ ApplicationDescription::ApplicationDescription( std::string name, std::unique_pt
 
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
 	std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
+
+	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
 
@@ -95,6 +99,28 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( msg->getLanguage() == utils::Lang::Sp ) lang = "Spanish";
 			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
 			handleLanguageChange( msg );
+		} break;
+		case static_cast<int32_t>(MessageType::CellularNotification): {
+		   CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+
+		   if (msg->type == CellularNotificationMessage::Type::CallAborted) {
+			   LOG_INFO("CallAborted");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
+			   LOG_INFO("CallBusy");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
+			   LOG_INFO("CallActive");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
+			   LOG_INFO("IncomingCall");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::NewIncomingSMS ) {
+			   LOG_INFO("NewIncomingSMS");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
+			   LOG_INFO("SignalStrengthUpdate");
+		   }
 		} break;
 		default : {
 			LOG_FATAL("Received unknown massage %d", msgType );
