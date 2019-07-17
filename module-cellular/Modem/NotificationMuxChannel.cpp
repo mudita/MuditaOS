@@ -15,8 +15,8 @@
 
 class Service;
 
-NotificationMuxChannel::NotificationMuxChannel(MuxDaemon* mux,NotificationCallback_t callback):
-    MuxChannel(mux,1,MuxChannel::MuxChannelType ::Notification,"NotificationChannel"),
+NotificationMuxChannel::NotificationMuxChannel(InOutSerialWorker* inout,NotificationCallback_t callback):
+    MuxChannel(inout,MuxChannel::MuxChannelType ::Notification,"NotificationChannel"),
     notificationCallback(std::move(callback))
 {
 

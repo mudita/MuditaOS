@@ -17,10 +17,12 @@
 #include "task.h"
 #include "mutex.hpp"
 
+class InOutSerialWorker;
+
 class CommunicationMuxChannel : public MuxChannel {
 public:
 
-    CommunicationMuxChannel(MuxDaemon* mux);
+    CommunicationMuxChannel(InOutSerialWorker* inout);
     ~CommunicationMuxChannel();
 
 
@@ -32,6 +34,7 @@ private:
     std::string responseBuffer;
     TaskHandle_t blockedTaskHandle = nullptr;
     cpp_freertos::MutexStandard mutex;
+    InOutSerialWorker* inout;
 };
 
 

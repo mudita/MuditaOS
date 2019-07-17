@@ -18,6 +18,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "InOutSerialWorker.hpp"
 #include "NotificationMuxChannel.hpp"
 #include "ControlMuxChannel.hpp"
 #include "CommunicationMuxChannel.hpp"
@@ -77,7 +78,6 @@ namespace QuectelBaudrates {
 
 
 MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
-        cellular(nullptr),
         inSerialDataWorker(nullptr),
         callback(callback) {
 }
@@ -99,6 +99,19 @@ std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::Notificatio
 
 }
 
+std::optional<MuxChannel*> MuxDaemon::GetMuxChannel(MuxChannel::MuxChannelType chan) {
+    if(static_cast<size_t >(chan) >= channels.size()){
+        return {};
+    }
+    else{
+        return channels[static_cast<size_t >(chan)].get();
+    }
+}
+
+void MuxDaemon::RemoveMuxChannel(MuxChannel::MuxChannelType chan) {
+    channels.erase(channels.begin() + static_cast<size_t >(chan));
+}
+
 bool MuxDaemon::Start() {
 
     // Spawn input serial stream worker
@@ -108,21 +121,21 @@ bool MuxDaemon::Start() {
 
 
     // At first send AT command to check if modem is turned on
-    if (SendAT("AT\r\n", 500) == -1) {
+    if (inSerialDataWorker->SendATCommand("AT\r\n", 500) == -1) {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
-        WriteMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
+        inSerialDataWorker->SendMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
         vTaskDelay(500); // give modem some time to establish mux
         // Try sending AT command once again
-        if (SendAT("AT\r", 500) == -1) {
+        if (inSerialDataWorker->SendATCommand("AT\r", 500) == -1) {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
-            cellular->PowerUp();
+            //TODO:M.P implement it cellular->PowerUp();
 
             uint32_t retries = 20;
             while (--retries) {
-                if (SendAT("AT\r", 500) == 0) {
+                if (inSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
                     break;
                 }
             }
@@ -130,7 +143,7 @@ bool MuxDaemon::Start() {
             //
             retries = 20;
             while (--retries) {
-                if (SendAT("AT\r", 500) == 0) {
+                if (inSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
                     break;
                 }
             }
@@ -146,33 +159,33 @@ bool MuxDaemon::Start() {
 
 
     // Factory reset
-    SendAT("AT&F\r", 500);
+    inSerialDataWorker->SendATCommand("AT&F\r", 500);
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
-        SendAT("AT+IFC=2,2\r\n", 500); // enable flow control function for module
+        inSerialDataWorker->SendATCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
     } else {
-        SendAT("AT+IFC=0,0\r", 500); // disable flow control function for module
+        inSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 500); // disable flow control function for module
     }
 
     // Set fixed baudrate
-    SendAT(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 500);
+    inSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 500);
     // Turn off local echo
-    SendAT("ATE0\r", 500);
+    inSerialDataWorker->SendATCommand("ATE0\r", 500);
     // Route URCs to first MUX channel
-    SendAT("AT+QCFG=\"cmux/urcport\",1\r", 500);
+    inSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 500);
     // Turn off RI pin for incoming calls
-    SendAT("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 500);
+    inSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 500);
     // Turn off RI pin for incoming sms
-    SendAT("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 500);
+    inSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 500);
     // Route URCs to UART1
-    SendAT("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
+    inSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
     // Turn on signal strength change URC
-    SendAT("AT+QINDCFG=\"csq\",1\r", 500);
+    inSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 500);
     // Change incoming call notification from "RING" to "+CRING:type"
-    SendAT("AT+CRC=1\r", 500);
+    inSerialDataWorker->SendATCommand("AT+CRC=1\r", 500);
     // Turn on caller's number presentation
-    SendAT("AT+CLIP=1\r", 500);
+    inSerialDataWorker->SendATCommand("AT+CLIP=1\r", 500);
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
@@ -187,7 +200,7 @@ bool MuxDaemon::Start() {
 
 
     // Start CMUX multiplexer
-    SendAT(gsm_command, 500);
+    inSerialDataWorker->SendATCommand(gsm_command, 500);
 
     inSerialDataWorker->SwitchMode(InOutSerialWorker::Mode::CMUX);
     state = States::MUX_STATE_MUXING;
@@ -195,13 +208,13 @@ bool MuxDaemon::Start() {
     // Create virtual channels
 
     // Control channel is used for controlling Mux. It is not considered as logical channel i.e it can't receive normal data messages
-    channels.push_back(std::make_unique<ControlMuxChannel>(this));
+    channels.push_back(std::make_unique<ControlMuxChannel>(inSerialDataWorker.get()));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
-    channels.push_back(std::make_unique<NotificationMuxChannel>(this, callback));
+    channels.push_back(std::make_unique<NotificationMuxChannel>(inSerialDataWorker.get(), callback));
 
     // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
-    channels.push_back(std::make_unique<CommunicationMuxChannel>(this));
+    channels.push_back(std::make_unique<CommunicationMuxChannel>(inSerialDataWorker.get()));
 
     // Mux channels must be initialized in sequence
     for (auto &w : channels) {
@@ -212,93 +225,6 @@ bool MuxDaemon::Start() {
     return true;
 }
 
-int MuxDaemon::SendAT(const char *cmd, uint32_t timeout) {
-    char buff[256] = {0};
-
-    auto bytesWritten = cellular->Write(const_cast<char *>(cmd), strlen(cmd));
-    LOG_DEBUG("BytesWritten: %d", bytesWritten);
-
-    if (cellular->Wait(500)) {
-
-        vTaskDelay(100);
-        auto bytesRead = cellular->Read(buff, sizeof buff);
-
-        if (memstr((char *) buff, bytesRead, "OK")) {
-            LOG_DEBUG("Received OK");
-            return 0;
-        } else if (memstr((char *) buff, bytesRead, "ERROR")) {
-            LOG_DEBUG("Received ERROR");
-            return -1;
-        } else {
-            LOG_DEBUG("Received unknown response");
-            return -1;
-        }
-    } else {
-        return -1;
-    }
-}
-
-ssize_t MuxDaemon::WriteMuxFrame(int channel, const unsigned char *input, int length, unsigned char type) {
-
-/* flag, GSM0710_EA=1 C channel, frame type, length 1-2 */
-    unsigned char prefix[5] = {static_cast<unsigned char>(MuxDefines::GSM0710_FRAME_FLAG),
-                               static_cast<unsigned char>(MuxDefines::GSM0710_EA) |
-                               static_cast<unsigned char>(MuxDefines::GSM0710_CR), 0, 0, 0};
-    unsigned char postfix[2] = {0xFF, static_cast<unsigned char>(MuxDefines::GSM0710_FRAME_FLAG )};
-    ssize_t prefix_length = 4;
-    int c;
-    unsigned char tmp[GSM0710Buffer::cmux_FRAME];
-
-    LOG_DEBUG("Sending frame to channel %d", channel);
-
-    /* GSM0710_EA=1, Command, let's add address */
-    prefix[1] = prefix[1] | ((63 & (unsigned char) channel) << 2);
-
-/* let's set control field */
-    prefix[2] = type;
-    if ((type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH) ||
-         type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UI)) &&
-        uih_pf_bit_received == 1 &&
-        GSM0710Buffer::GSM0710_COMMAND_IS(MuxDefines::GSM0710_CONTROL_MSC, input[0])) {
-        prefix[2] = prefix[2] |
-                    static_cast<unsigned char>(MuxDefines::GSM0710_PF); //Set the P/F bit in Response if Command from modem had it set
-        uih_pf_bit_received = 0; //Reset the variable, so it is ready for next command
-    }
-/* let's not use too big frames */
-    length = std::min(GSM0710Buffer::cmux_N1, static_cast<uint32_t >(length));
-    // Only basic mode is supported
-    {
-/* Modified acording PATCH CRC checksum */
-/* postfix[0] = frame_calc_crc (prefix + 1, prefix_length - 1); */
-/* length */
-        if (length > 127) {
-            prefix_length = 5;
-            prefix[3] = (0x007F & length) << 1;
-            prefix[4] = (0x7F80 & length) >> 7;
-        } else {
-            prefix[3] = 1 | (length << 1);
-        }
-        postfix[0] = GSM0710Buffer::frameCalcCRC(prefix + 1, prefix_length - 1);
-
-        memcpy(tmp, prefix, prefix_length);
-
-        if (length > 0) {
-            memcpy(tmp + prefix_length, input, length);
-        }
-
-        memcpy(tmp + prefix_length + length, postfix, 2);
-        c = prefix_length + length + 2;
-
-        //Write newly created frame into serial output buffer
-        WriteSerialCache(tmp, c);
-    }
-
-    return length;
-}
-
-ssize_t MuxDaemon::WriteSerialCache(unsigned char *input, size_t length) {
-
-}
 
 int MuxDaemon::CloseMux() {
 
@@ -322,19 +248,4 @@ std::vector<std::string> MuxDaemon::SendCommandResponse(MuxChannel::MuxChannelTy
                                                         size_t rxCount,
                                                         uint32_t timeout) {
     return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd, rxCount, timeout);
-}
-
-int MuxDaemon::memstr(const char *haystack, int length, const char *needle) {
-    int i;
-    int j = 0;
-    if (needle[0] == '\0')
-        return 1;
-    for (i = 0; i < length; i++)
-        if (needle[j] == haystack[i]) {
-            j++;
-            if (needle[j] == '\0') // Entire needle was found
-                return 1;
-        } else
-            j = 0;
-    return 0;
 }
