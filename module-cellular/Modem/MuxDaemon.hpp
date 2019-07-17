@@ -79,7 +79,7 @@ private:
             static_cast<unsigned char>(MuxDefines::GSM0710_EA ) | (0 << 1)};
 
 
-    std::unique_ptr<InOutSerialWorker> inSerialDataWorker;
+    std::unique_ptr<InOutSerialWorker> inOutSerialDataWorker;
 
 
     States state = States::MUX_STATE_OPENING;
