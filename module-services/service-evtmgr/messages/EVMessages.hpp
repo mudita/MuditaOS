@@ -100,6 +100,28 @@ public:
 	}
 	bool plugged = false;
 };
+
+class RtcMinuteAlarmMessage : public sys::DataMessage
+{
+public:
+	RtcMinuteAlarmMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
+	{
+		type = Type::Data;
+
+	}
+	sys::Message_t Execute(sys::Service* service)
+	{
+		// Ignore incoming data message if this service is not yet initialized
+		if(service->isReady){
+			return service->DataReceivedHandler(this);
+		}
+		else{
+			return std::make_shared<sys::ResponseMessage>();
+		}
+
+	}
+	uint32_t timestamp = 0;
+};
 /*
  * @brief Template for all messages that go to application manager
  */

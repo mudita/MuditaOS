@@ -45,6 +45,12 @@ enum class MessageType {
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
 	DBContactGetCount,         // Get contacts count
 
+	DBAlarmAdd,			// Add alarm record
+	DBAlarmRemove,    	// Remove alarm remove
+	DBAlarmUpdate,    	// Update alarm remove
+	DBAlarmGetLimitOffset,   // Get alarm records by limit,offset
+	DBAlarmGetCount,         // Get alarm count
+
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
@@ -74,6 +80,9 @@ enum class MessageType {
 	//battery charger messages
 	EVMBatteryLevel,
 	EVMChargerPlugged,
+	//rtc messages
+	EVMMinuteUpdated,
+
 };
 
 

@@ -19,6 +19,7 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/ContactRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
+#include "Interface/AlarmsRecord.hpp"
 
 class ServiceDB: public sys::Service {
 private:
@@ -26,11 +27,13 @@ private:
     std::unique_ptr<SettingsDB> settingsDB;
     std::unique_ptr<SmsDB> smsDB;
     std::unique_ptr<ContactsDB> contactsDB;
+    std::unique_ptr<AlarmsDB> alarmsDB;
 
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
+    std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
 protected:
 
 public:

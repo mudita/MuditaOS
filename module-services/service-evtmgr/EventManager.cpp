@@ -84,6 +84,19 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		handled = true;
 	}
 
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
+			msgl->sender == this->GetName() ){
+
+		sevm::RtcMinuteAlarmMessage* msg = reinterpret_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
+
+		auto message = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+		message->timestamp = msg->timestamp;
+
+		if( targetApplication.empty() == false ){
+			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+	}
+
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
 	else

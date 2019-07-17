@@ -148,6 +148,16 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		else
 			LOG_INFO("Application charger disconnected" );
 	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated))
+	{
+		sevm::RtcMinuteAlarmMessage* msg = static_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
+		LOG_INFO("Application time updated");
+
+		time_t timestamp = msg->timestamp;
+		struct tm time;
+		time =*localtime(&timestamp);
+		LOG_INFO("%02d:%02d", time.tm_hour, time.tm_min);
+	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
 
