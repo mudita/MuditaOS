@@ -49,7 +49,6 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		bsp::keyboard_get_data(notification, state, code);
 
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
-		bsp::rtc_SetAlarmInSecondsFromNow(5);
 	}
 
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery) )
@@ -86,7 +85,15 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
 				return false;
 		}
-		LOG_INFO("Rtc alarm received");
+
+		bsp::rtc_SetMinuteAlarm();
+
+		time_t timestamp;
+		bsp::rtc_GetCurrentTimestamp(&timestamp);
+
+		auto message = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+		message->timestamp = timestamp;
+		sys::Bus::SendUnicast(message, "EventManager", this->service);
 	}
 
 	return true;
@@ -99,6 +106,8 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
+
+	bsp::rtc_SetMinuteAlarm();
 	return true;
 }
 

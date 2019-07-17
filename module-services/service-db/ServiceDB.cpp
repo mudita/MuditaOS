@@ -263,7 +263,69 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
         }
             break;
 
+        case MessageType::DBAlarmAdd: {
+            DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = alarmsRecordInterface->Add(msg->record);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBAlarmAdd time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
+        }
+            break;
 
+        case MessageType::DBAlarmRemove: {
+        	DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = alarmsRecordInterface->RemoveByID(msg->id);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBAlarmRemove time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
+        }
+            break;
+
+        case MessageType::DBAlarmUpdate: {
+        	DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = alarmsRecordInterface->Update(msg->record);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBContactUpdate time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
+        }
+            break;
+
+        case MessageType::DBAlarmGetCount: {
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = alarmsRecordInterface->GetCount();
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBContactGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, true,ret);
+        }
+            break;
+
+        case MessageType::DBAlarmGetLimitOffset: {
+        	DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = alarmsRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBAlarmtGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            responseMsg = std::make_shared<DBAlarmResponseMessage>(std::move(ret), true);
+        }
+            break;
         default:
             // ignore this message
             return std::make_shared<sys::ResponseMessage>();
@@ -286,12 +348,14 @@ sys::ReturnCodes ServiceDB::InitHandler() {
     settingsDB = std::make_unique<SettingsDB>();
     contactsDB = std::make_unique<ContactsDB>();
     smsDB = std::make_unique<SmsDB>();
+    alarmsDB = std::make_unique<AlarmsDB>();
 
     // Create record interfaces
     settingsRecordInterface = std::make_unique<SettingsRecordInterface>(settingsDB.get());
     contactRecordInterface = std::make_unique<ContactRecordInterface>(contactsDB.get());
     smsRecordInterface = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
+    alarmsRecordInterface = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
 
     return sys::ReturnCodes::Success;
 }

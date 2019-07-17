@@ -63,5 +63,6 @@ namespace bsp {
 
 	time_t rtc_GetSecondCounter();
 
+	RtcBspError_e rtc_SetMinuteAlarm(void);
 }
 #endif /* MODULE_BSP_BSP_RTC_RTC_HPP_ */
