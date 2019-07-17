@@ -7,7 +7,7 @@
  * @details
  */
 #include "SystemManager/SystemManager.hpp"
-#include "ApplicationManager.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
 #include "application-call/data/CallSwitchData.hpp"

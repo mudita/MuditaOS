@@ -22,6 +22,7 @@ add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 add_subdirectory( service-db )
+add_subdirectory( service-powermgr )
 add_subdirectory( service-cellular )
 
 
