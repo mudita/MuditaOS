@@ -120,71 +120,71 @@ bool MuxDaemon::Start() {
 
 
     // At first send AT command to check if modem is turned on
-    if (inOutSerialDataWorker->SendATCommand("AT\r\n", 500) == -1) {
+    auto ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
+    if(ret.size() == 0 ){
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
-        inOutSerialDataWorker->SendMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
-                      static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+        inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
+                                         static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+
         vTaskDelay(500); // give modem some time to establish mux
+
         // Try sending AT command once again
-        if (inOutSerialDataWorker->SendATCommand("AT\r", 500) == -1) {
+        ret = inOutSerialDataWorker->SendATCommand("AT\r",2, 500);
+        if(ret.size() == 1 || ret.size() == 2){
+            // Modem can send echo response or not, in either case it means that modem is operating in AT mode
+
+        }
+        else{
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             //TODO:M.P implement it cellular->PowerUp();
-
             uint32_t retries = 20;
             while (--retries) {
-                if (inOutSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
+                ret = inOutSerialDataWorker->SendATCommand("AT\r", 500);
+                if ( ret.size() == 2) {
                     break;
                 }
             }
-
-            //
-            retries = 20;
-            while (--retries) {
-                if (inOutSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
-                    break;
-                }
-            }
-
 
             if (retries == 0) {
                 LOG_FATAL("No communication with GSM modem");
                 return -1;
             }
+
         }
     }
 
-
+    // Turn off local echo
+    inOutSerialDataWorker->SendATCommand("ATE0\r", 2);
 
     // Factory reset
-    inOutSerialDataWorker->SendATCommand("AT&F\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT&F\r", 1);
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
         inOutSerialDataWorker->SendATCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
     } else {
-        inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 500); // disable flow control function for module
+        inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 1); // disable flow control function for module
     }
 
     // Set fixed baudrate
-    inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 500);
-    // Turn off local echo
-    inOutSerialDataWorker->SendATCommand("ATE0\r", 500);
+    inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1);
+
     // Route URCs to first MUX channel
-    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 1);
     // Turn off RI pin for incoming calls
-    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 1);
     // Turn off RI pin for incoming sms
-    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 1);
     // Route URCs to UART1
-    inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 1);
     // Turn on signal strength change URC
-    inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 1);
     // Change incoming call notification from "RING" to "+CRING:type"
-    inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1);
     // Turn on caller's number presentation
-    inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1);
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
@@ -199,7 +199,7 @@ bool MuxDaemon::Start() {
 
 
     // Start CMUX multiplexer
-    inOutSerialDataWorker->SendATCommand(gsm_command, 500);
+    inOutSerialDataWorker->SendATCommand(gsm_command, 1);
 
     inOutSerialDataWorker->SwitchMode(InOutSerialWorker::Mode::CMUX);
     state = States::MUX_STATE_MUXING;
