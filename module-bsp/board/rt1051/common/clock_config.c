@@ -175,7 +175,7 @@ const clock_usb_pll_config_t usb1PllConfig_BOARD_BootClockRUN =
 /*******************************************************************************
  * Code for BOARD_BootClockRUN configuration
  ******************************************************************************/
-#if 1
+#if 0
 void BOARD_BootClockRUN(void)
 {
     /* Init RTC OSC clock frequency. */
@@ -659,9 +659,9 @@ void BOARD_BootClockRUN(void)
     CLOCK_DisableClock(kCLOCK_Lpi2c2);
     CLOCK_DisableClock(kCLOCK_Lpi2c3);
     /* Set LPI2C_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 0);
+    CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1);
     /* Set Lpi2c clock source. */
-    CLOCK_SetMux(kCLOCK_Lpi2cMux, 0);
+    CLOCK_SetMux(kCLOCK_Lpi2cMux, 1);
     /* Disable CAN clock gate. */
     CLOCK_DisableClock(kCLOCK_Can1);
     CLOCK_DisableClock(kCLOCK_Can2);
