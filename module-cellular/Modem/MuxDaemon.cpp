@@ -83,7 +83,7 @@ MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
 }
 
 MuxDaemon::~MuxDaemon() {
-    CloseMux();
+    CloseMultiplexer();
 }
 
 std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::NotificationCallback_t callback) {
@@ -127,39 +127,32 @@ bool MuxDaemon::Start() {
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
-        vTaskDelay(500); // give modem some time to establish mux
-
         // Try sending AT command once again
         ret = inOutSerialDataWorker->SendATCommand("AT\r",2, 500);
         if(ret.size() == 1 || ret.size() == 2){
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
-
+            return StartMultiplexer();
         }
         else{
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             //TODO:M.P implement it cellular->PowerUp();
-            uint32_t retries = 20;
-            while (--retries) {
-                ret = inOutSerialDataWorker->SendATCommand("AT\r", 500);
-                if ( ret.size() == 2) {
-                    break;
-                }
-            }
-
-            if (retries == 0) {
-                LOG_FATAL("No communication with GSM modem");
-                return -1;
-            }
-
         }
     }
+    else if ((ret.size() == 1 && ret[0] == "OK\r\n") || (ret.size() == 2 && ret[0] == "AT\r\n" && ret[1] == "OK\r\n")){
+        return StartMultiplexer();
+    }
+
+}
+
+bool MuxDaemon::StartMultiplexer() {
+
+    // Factory reset
+    inOutSerialDataWorker->SendATCommand("AT&F\r", 1);
 
     // Turn off local echo
     inOutSerialDataWorker->SendATCommand("ATE0\r", 2);
 
-    // Factory reset
-    inOutSerialDataWorker->SendATCommand("AT&F\r", 1);
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
@@ -225,7 +218,7 @@ bool MuxDaemon::Start() {
 }
 
 
-int MuxDaemon::CloseMux() {
+int MuxDaemon::CloseMultiplexer() {
 
     // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
     for (auto w = channels.size(); --w;) {

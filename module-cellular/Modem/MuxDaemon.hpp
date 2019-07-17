@@ -38,6 +38,7 @@ public:
      * Multiplexer states
      */
     enum class States {
+        MUX_STATE_POWERUP,
         MUX_STATE_OPENING,
         MUX_STATE_INITILIZING,
         MUX_STATE_MUXING,
@@ -62,6 +63,8 @@ public:
     void RemoveMuxChannel(MuxChannel::MuxChannelType chan);
 
 
+    bool StartMultiplexer();
+
     int uihPfBitReceived = 0;
 
 private:
@@ -70,7 +73,7 @@ private:
 
     bool Start();
 
-    int CloseMux();
+    int CloseMultiplexer();
 
 
     constexpr static unsigned char closeChannelCmd[] = {

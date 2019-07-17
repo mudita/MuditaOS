@@ -71,7 +71,10 @@ void workerTaskFunction(void *ptr) {
     InOutSerialWorker *inst = reinterpret_cast<InOutSerialWorker *>(ptr);
 
     while (1) {
-        inst->cellular->Wait(UINT32_MAX);
+        auto ret = inst->cellular->Wait(UINT32_MAX);
+        if(ret == 0){
+            continue;
+        }
 
         // AT mode is used only during initialization phase
         if (inst->mode == InOutSerialWorker::Mode::AT) {
