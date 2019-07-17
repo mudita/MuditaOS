@@ -21,6 +21,7 @@ namespace app {
 class ApplicationCall: public Application {
 protected:
 	std::string phoneNumber;
+	uint32_t timer_id= 0;
 public:
 	ApplicationCall( std::string name="ApplicationCall");
 	virtual ~ApplicationCall();

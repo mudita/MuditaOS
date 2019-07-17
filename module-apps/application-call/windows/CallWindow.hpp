@@ -20,8 +20,8 @@ class CallWindow: public AppWindow {
 public:
 	enum class State {
 		IDLE,
-		RINGING,
-		CALLING,
+		INCOMMING_CALL,
+		OUTGOING_CALL,
 		CALL_IN_PROGRESS,
 		CALL_ENDED
 	};
@@ -33,6 +33,9 @@ protected:
 	 * Manipulates widgets to handle currently set state of the window.
 	 */
 	void setVisibleState();
+	bool handleLeftButton();
+	bool handleCenterButton();
+	bool handleRightButton();
 public:
 	CallWindow( app::Application* app, std::string windowName = "CallWindow" );
 	virtual ~CallWindow();
