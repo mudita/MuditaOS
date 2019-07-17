@@ -31,6 +31,10 @@ public:
 
     MuxParser(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
 
+    ssize_t SendMuxFrame(int channel,
+                         const unsigned char *input,
+                         int length,
+                         unsigned char type);
 
     int ProcessNewData();
 

@@ -40,6 +40,64 @@ mux(mux), inOutSerialWorker(inOutSerial),cellular(cellular){
     isInitialized = true;
 }
 
+ssize_t MuxParser::SendMuxFrame(int channel, const unsigned char *input, int length, unsigned char type) {
+    /* flag, GSM0710_EA=1 C channel, frame type, length 1-2 */
+    unsigned char prefix[5] = {static_cast<unsigned char>(MuxDefines::GSM0710_FRAME_FLAG),
+                               static_cast<unsigned char>(MuxDefines::GSM0710_EA) |
+                               static_cast<unsigned char>(MuxDefines::GSM0710_CR), 0, 0, 0};
+    unsigned char postfix[2] = {0xFF, static_cast<unsigned char>(MuxDefines::GSM0710_FRAME_FLAG )};
+    ssize_t prefix_length = 4;
+    int c;
+    unsigned char tmp[GSM0710Buffer::cmux_FRAME];
+
+    LOG_DEBUG("Sending frame to channel %d", channel);
+
+    /* GSM0710_EA=1, Command, let's add address */
+    prefix[1] = prefix[1] | ((63 & (unsigned char) channel) << 2);
+
+/* let's set control field */
+    prefix[2] = type;
+    if ((type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH) ||
+         type == static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UI)) &&
+        mux->uihPfBitReceived == 1 &&
+        GSM0710Buffer::GSM0710_COMMAND_IS(MuxDefines::GSM0710_CONTROL_MSC, input[0])) {
+        prefix[2] = prefix[2] |
+                    static_cast<unsigned char>(MuxDefines::GSM0710_PF); //Set the P/F bit in Response if Command from modem had it set
+        mux->uihPfBitReceived = 0; //Reset the variable, so it is ready for next command
+    }
+/* let's not use too big frames */
+    length = std::min(GSM0710Buffer::cmux_N1, static_cast<uint32_t >(length));
+    // Only basic mode is supported
+    {
+/* Modified acording PATCH CRC checksum */
+/* postfix[0] = frame_calc_crc (prefix + 1, prefix_length - 1); */
+/* length */
+        if (length > 127) {
+            prefix_length = 5;
+            prefix[3] = (0x007F & length) << 1;
+            prefix[4] = (0x7F80 & length) >> 7;
+        } else {
+            prefix[3] = 1 | (length << 1);
+        }
+        postfix[0] = GSM0710Buffer::frameCalcCRC(prefix + 1, prefix_length - 1);
+
+        memcpy(tmp, prefix, prefix_length);
+
+        if (length > 0) {
+            memcpy(tmp + prefix_length, input, length);
+        }
+
+        memcpy(tmp + prefix_length + length, postfix, 2);
+        c = prefix_length + length + 2;
+
+        //Write newly created frame into serial output buffer
+        inOutSerialWorker->WriteData(tmp, c);
+    }
+
+    return length;
+}
+
+
 int MuxParser::ProcessNewData() {
     if (ReadIncomingData() > 0) {
         if (inputBuffer->GetDataLength() > 0) {
@@ -202,7 +260,7 @@ int MuxParser::ExtractFrames() {
                 case MuxDefines::GSM0710_TYPE_DISC:
                     if (muxChannelInst->GetState() == MuxChannel::State::Opened) {
 
-                        inOutSerialWorker->SendMuxFrame(frame->channel, NULL, 0,
+                        SendMuxFrame(frame->channel, NULL, 0,
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UA) |
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
@@ -222,7 +280,7 @@ int MuxParser::ExtractFrames() {
                         LOG_WARN("Received DISC even though channel %d for %s was already closed",
                                  frame->channel, muxChannelInst->GetName().c_str());
                         // Send Mux frame
-                        inOutSerialWorker->SendMuxFrame(frame->channel, NULL, 0,
+                        SendMuxFrame(frame->channel, NULL, 0,
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DM) |
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_PF));
                     }
@@ -241,7 +299,7 @@ int MuxParser::ExtractFrames() {
                                  frame->channel, muxChannelInst->GetName().c_str());
                     muxChannelInst->SetState(MuxChannel::State::Opened);
                     // Send mux frame
-                    inOutSerialWorker->SendMuxFrame(frame->channel, NULL, 0,
+                    SendMuxFrame(frame->channel, NULL, 0,
                                              static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UA) |
                                              static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
@@ -353,7 +411,7 @@ int MuxParser::HandleCtrlChannelCommands(GSM0710Frame *frame) {
                             response[i] = frame->data[i - 2];
                             i++;
                         }
-                        inOutSerialWorker->SendMuxFrame(0, response, i,
+                        SendMuxFrame(0, response, i,
                                                  static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
                         free(response);
                         supported = 0;
@@ -365,7 +423,7 @@ int MuxParser::HandleCtrlChannelCommands(GSM0710Frame *frame) {
 //acknowledge the command
                 frame->data[0] = frame->data[0] & ~static_cast<unsigned char>(MuxDefines::GSM0710_CR);
                 LOG_INFO("response MSC...");
-                inOutSerialWorker->SendMuxFrame(0, frame->data, frame->length,
+                SendMuxFrame(0, frame->data, frame->length,
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
                 LOG_INFO("response MSC");
 #if 0

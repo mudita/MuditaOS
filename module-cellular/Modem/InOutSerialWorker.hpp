@@ -13,6 +13,7 @@
 #define PUREPHONE_INOUTSERIALWORKER_HPP
 
 #include <optional>
+#include <vector>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "GSM0710.hpp"
@@ -44,12 +45,16 @@ public:
 
     void SwitchMode(const Mode newMode);
 
-    int SendATCommand(const char *cmd, uint32_t timeout);
+    // Write data to output buffers
+    ssize_t WriteData(unsigned char *input, size_t length);
 
-    ssize_t SendMuxFrame(int channel,
-                          const unsigned char *input,
-                          int length,
-                          unsigned char type);
+    std::vector<std::string> SendATCommand(const char* cmd,size_t rxCount,uint32_t timeout = 500);
+
+    ssize_t SendFrame(int channel,
+                         const unsigned char *input,
+                         int length,
+                         unsigned char type);
+
 
 private:
 
@@ -80,15 +85,9 @@ private:
     std::unique_ptr<MuxParser> muxParser;
     std::unique_ptr<ATParser> atParser;
 
-
-    // Write data to output buffers
-    ssize_t WriteData(unsigned char *input, size_t length);
-
-
     //worker's task handle
     xTaskHandle taskHandle=nullptr;
     const uint32_t taskPriority = 0;
-
 
     Mode mode = Mode::AT;
 

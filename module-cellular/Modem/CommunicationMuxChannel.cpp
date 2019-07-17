@@ -12,6 +12,7 @@
 #include "CommunicationMuxChannel.hpp"
 #include "MuxDaemon.hpp"
 #include "InOutSerialWorker.hpp"
+#include "ATParser.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "log/log.hpp"
@@ -54,7 +55,7 @@ std::vector<std::string> CommunicationMuxChannel::SendCommandReponse(const char 
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     auto cmdSigned = const_cast<char*>(cmd);
-    inout->SendMuxFrame(GetChannelNumber(), reinterpret_cast<unsigned char*>(cmdSigned),strlen(cmd),static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+    inout->SendFrame(GetChannelNumber(), reinterpret_cast<unsigned char*>(cmdSigned),strlen(cmd),static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
@@ -75,7 +76,7 @@ std::vector<std::string> CommunicationMuxChannel::SendCommandReponse(const char 
 
         cpp_freertos::LockGuard lock(mutex);
         //tokenize responseBuffer
-        auto ret = Tokenizer(responseBuffer,rxCount,"\r\n");
+        auto ret = ATParser::Tokenizer(responseBuffer,rxCount,"\r\n");
         tokens.insert(std::end(tokens),std::begin(ret),std::end(ret));
 
         if(tokens.size() < rxCount){

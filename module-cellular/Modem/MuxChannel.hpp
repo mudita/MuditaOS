@@ -88,7 +88,7 @@ public:
         return static_cast<uint32_t >(type);
     }
 
-    static std::vector<std::string> Tokenizer(std::string& input,uint32_t maxTokenCount,const std::string& delimiter);
+
 
     int v24signals;
     int frameAllowed;
