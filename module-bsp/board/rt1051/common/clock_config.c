@@ -175,7 +175,7 @@ const clock_usb_pll_config_t usb1PllConfig_BOARD_BootClockRUN =
 /*******************************************************************************
  * Code for BOARD_BootClockRUN configuration
  ******************************************************************************/
-#if 0
+#if 1
 void BOARD_BootClockRUN(void)
 {
     /* Init RTC OSC clock frequency. */

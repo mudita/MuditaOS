@@ -10,6 +10,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "messages/APMMessage.hpp"
+#include "application-call/data/CallSwitchData.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
@@ -114,6 +115,11 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		   }
 		   else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
 			   LOG_INFO("IncomingCall");
+			   std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
+			   //send to itself message to switch (run) call application
+			   if( focusApplicationName != "ApplicationCall") {
+				   messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
+			   }
 		   }
 		   else if( msg->type == CellularNotificationMessage::Type::NewIncomingSMS ) {
 			   LOG_INFO("NewIncomingSMS");

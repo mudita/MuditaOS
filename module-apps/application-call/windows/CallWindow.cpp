@@ -12,9 +12,11 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../ApplicationCall.hpp"
-
+#include "../data/CallSwitchData.hpp"
 
 #include "i18/i18.hpp"
+
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "Label.hpp"
 #include "Margins.hpp"
@@ -24,22 +26,12 @@ namespace gui {
 
 CallWindow::CallWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName){
 	setSize( 480, 600 );
-
 	buildInterface();
 }
 
 void CallWindow::rebuild() {
-	//find which widget has focus
-//	uint32_t index = 0;
-//	for( uint32_t i=0; i<options.size(); i++ )
-//		if( options[i] == getFocusItem()) {
-//			index = i;
-//			break;
-//		}
-
 	destroyInterface();
 	buildInterface();
-//	setFocusItem( options[index] );
 }
 void CallWindow::buildInterface() {
 	AppWindow::buildInterface();
@@ -49,45 +41,17 @@ void CallWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
 
-//	title = new gui::Label(this, 0, 50, 480, 50 );
-//	title->setFilled( false );
-//	title->setBorderColor( gui::ColorNoColor );
-//	title->setFont("gt_pressura_bold_24");
-//	title->setText(utils::localize.get("app_settings_title_languages"));
-//	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-//
-//	//add option connectivity option
-//	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_english"), [=] (gui::Item& item){
-//		LOG_INFO("selected language: english" );
-//		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::En );
-//		return true;} ));
-//
-//	//add option date and time option
-//	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_polish"), [=](gui::Item&){
-//		LOG_INFO("selected language: polish" );
-//		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::Pl );
-//		return true;} ));
-//
-//	//add option display option
-//	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_german"), [=](gui::Item&){
-//		LOG_INFO("selected language: german" );
-//		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::De );
-//		return true;} ));
-//
-//	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_spanish"), [=](gui::Item&){
-//		LOG_INFO("selected language: spanish" );
-//		sapm::ApplicationManager::messageChangeLanguage( application, utils::Lang::Sp );
-//		return true;} ));
-//
-//	//set possition and navigation for labels
-//	uint32_t posY = 100;
-//	uint32_t size = options.size();
-//	for( uint32_t i=0; i<options.size(); i++ ){
-//		options[i]->setPosition(17,posY);
-//		posY += 60;
-//		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
-//		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
-//	}
+	titleLabel = new gui::Label(this, 0, 50, 480, 50 );
+	titleLabel->setFilled( false );
+	titleLabel->setBorderColor( gui::ColorNoColor );
+	titleLabel->setFont("gt_pressura_bold_24");
+	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+
+	numberLabel = new gui::Label(this, 0, 150, 480, 50 );
+	numberLabel->setFilled( false );
+	numberLabel->setBorderColor( gui::ColorNoColor );
+	numberLabel->setFont("gt_pressura_bold_24");
+	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 }
 
 void CallWindow::destroyInterface() {
@@ -104,30 +68,144 @@ CallWindow::~CallWindow() {
 void CallWindow::setVisibleState() {
 	//show state of the window
 	switch( state ) {
-		case State::CALLING: {
-			titleLabel->setText("CALLING");
+		case State::INCOMMING_CALL: {
+			titleLabel->setText("INCOMMING_CALL");
+			bottomBar->setActive(gui::BottomBar::Side::LEFT, true );
+			bottomBar->setActive(gui::BottomBar::Side::CENTER, true );
+			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
+			bottomBar->setText( gui::BottomBar::Side::LEFT, "Accept" );
+			bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, "Reject" );
 		}break;
 		case State::CALL_ENDED: {
 			titleLabel->setText("CALL_ENDED");
+
+			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
+			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
+			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, "Return" );
 		}break;
 		case State::CALL_IN_PROGRESS: {
 			titleLabel->setText("CALL_IN_PROGRESS");
+
+			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
+			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
+			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
 		}break;
 		case State::IDLE: {
 			titleLabel->setText("IDLE");
 		}break;
-		case State::RINGING: {
-			titleLabel->setText("RINGING");
+		case State::OUTGOING_CALL: {
+			titleLabel->setText("OUTGOING_CALL");
+
+			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
+			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
+			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
 		}break;
 	};
 }
 
 bool CallWindow::handleSwitchData( SwitchData* data ) {
+	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
+	if( callData->getType() == app::CallSwitchData::Type::INCOMMING_CALL ) {
+		app::IncommingCallData* incData = reinterpret_cast<app::IncommingCallData*>( data );
+		state = State::INCOMMING_CALL;
+		numberLabel->setText( incData->getPhoneNumber());
+	}
+	setVisibleState();
+	application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+
 	return true;
 }
 
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-//	setFocusItem( options[0] );
+}
+
+//AnswerIncomingCall
+//HangupCall
+//auto ret = CellularServiceAPI::DialNumber(this,"");
+//		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+bool CallWindow::handleLeftButton() {
+	if( state == State::INCOMMING_CALL ) {
+		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
+		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
+		if( ret ) {
+			state = State::CALL_IN_PROGRESS;
+			setVisibleState();
+		}
+		else {
+			//TODO show some info
+		}
+
+
+		return true;
+	}
+	else if( state == State::OUTGOING_CALL ) {
+
+	}
+	else if( state == State::CALL_ENDED ) {
+
+	}
+	else if( state == State::CALL_IN_PROGRESS ) {
+
+	}
+	return false;
+}
+bool CallWindow::handleCenterButton() {
+	if( state == State::INCOMMING_CALL ) {
+		auto ret = CellularServiceAPI::HangupCall(application);
+		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
+		//TODO switch to message templates window
+		return true;
+	}
+	else if( state == State::OUTGOING_CALL ) {
+
+	}
+	else if( state == State::CALL_ENDED ) {
+
+	}
+	else if( state == State::CALL_IN_PROGRESS ) {
+
+	}
+	return false;
+}
+bool CallWindow::handleRightButton() {
+	if( state == State::INCOMMING_CALL ) {
+		auto ret = CellularServiceAPI::HangupCall(application);
+		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
+
+		state = State::CALL_ENDED;
+		//start 3 sek timer
+
+		//show enc call screen
+
+		//return to previous application
+		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+
+		return true;
+	}
+	else if( state == State::OUTGOING_CALL ) {
+
+	}
+	else if( state == State::CALL_ENDED ) {
+
+	}
+	else if( state == State::CALL_IN_PROGRESS ) {
+		auto ret = CellularServiceAPI::HangupCall(application);
+		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
+
+		state = State::CALL_ENDED;
+		//start 3 sek timer
+
+		//show enc call screen
+
+		//return to previous application
+		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+		return true;
+	}
+	return false;
 }
 
 bool CallWindow::onInput( const InputEvent& inputEvent ) {
@@ -140,18 +218,23 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 	}
 
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return false;
+	bool handled = false;
 
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
+	//process only if key is released
+	if( inputEvent.state != InputEvent::State::keyReleasedShort ) {
+		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+			handled = handleCenterButton();
+		}
+		else if( inputEvent.keyCode == KeyCode::KEY_LF ) {
+			handled = handleLeftButton();
+		}
+		else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+			handled = handleRightButton();
+		}
 	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
-		return true;
-	}
+
+	if( handled )
+		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
 
 	return false;
 }

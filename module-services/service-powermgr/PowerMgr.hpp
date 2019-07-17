@@ -33,8 +33,6 @@ public:
 		PowerModeLowPowerRun = LPM_PowerModeLowPowerRun,
     };
 
-    void APP_PrintRunFrequency();
-
     void SetPowerMode(PowerMode_t mode);
 };
 
