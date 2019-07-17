@@ -31,6 +31,16 @@ class InOutSerialWorker;
 
 class ATParser {
 public:
+
+    enum class Urc{
+        MeInitializationSuccessful,
+        FullFuncionalityAvailable,
+        SimCardReady,
+        SMSInitializationComplete,
+        PhonebookInitializationComplete
+
+    };
+
     static std::optional<std::unique_ptr<ATParser>> Create(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
 
     ATParser(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
@@ -43,6 +53,8 @@ public:
 
 private:
 
+    std::vector<Urc> ParseURC();
+
     MuxDaemon* mux = nullptr;
     InOutSerialWorker* inOutSerialWorker = nullptr;
     bsp::Cellular* cellular = nullptr;
@@ -51,6 +63,8 @@ private:
 
     TaskHandle_t blockedTaskHandle = nullptr;
     cpp_freertos::MutexStandard mutex;
+
+    std::vector<ATParser::Urc> urcs;
 
     bool isInitialized = false;
 
