@@ -42,11 +42,11 @@ InOutSerialWorker::InOutSerialWorker(MuxDaemon *mux) : muxDaemon(mux), atParser(
     }
 
     // Create and initialize bsp::Cellular module
-    if (cellular = bsp::Cellular::Create(SERIAL_PORT).value_or(nullptr)) {
+    if ((cellular = bsp::Cellular::Create(SERIAL_PORT).value_or(nullptr)) == nullptr) {
         return;
     }
 
-    if(muxParser = MuxParser::Create(muxDaemon,this,cellular.get()).value_or(nullptr)){
+    if((muxParser = MuxParser::Create(muxDaemon,this,cellular.get()).value_or(nullptr)) == nullptr){
         return;
     }
 

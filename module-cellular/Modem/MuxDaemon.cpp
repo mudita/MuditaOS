@@ -78,7 +78,7 @@ namespace QuectelBaudrates {
 
 
 MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
-        inSerialDataWorker(nullptr),
+        inOutSerialDataWorker(nullptr),
         callback(callback) {
 }
 
@@ -114,28 +114,27 @@ void MuxDaemon::RemoveMuxChannel(MuxChannel::MuxChannelType chan) {
 
 bool MuxDaemon::Start() {
 
-    // Spawn input serial stream worker
-    if(inSerialDataWorker = InOutSerialWorker::Create(this).value_or(nullptr)){
+    if((inOutSerialDataWorker = InOutSerialWorker::Create(this).value_or(nullptr)) == nullptr){
         return false;
     }
 
 
     // At first send AT command to check if modem is turned on
-    if (inSerialDataWorker->SendATCommand("AT\r\n", 500) == -1) {
+    if (inOutSerialDataWorker->SendATCommand("AT\r\n", 500) == -1) {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
-        inSerialDataWorker->SendMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
+        inOutSerialDataWorker->SendMuxFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
         vTaskDelay(500); // give modem some time to establish mux
         // Try sending AT command once again
-        if (inSerialDataWorker->SendATCommand("AT\r", 500) == -1) {
+        if (inOutSerialDataWorker->SendATCommand("AT\r", 500) == -1) {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             //TODO:M.P implement it cellular->PowerUp();
 
             uint32_t retries = 20;
             while (--retries) {
-                if (inSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
+                if (inOutSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
                     break;
                 }
             }
@@ -143,7 +142,7 @@ bool MuxDaemon::Start() {
             //
             retries = 20;
             while (--retries) {
-                if (inSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
+                if (inOutSerialDataWorker->SendATCommand("AT\r", 500) == 0) {
                     break;
                 }
             }
@@ -159,33 +158,33 @@ bool MuxDaemon::Start() {
 
 
     // Factory reset
-    inSerialDataWorker->SendATCommand("AT&F\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT&F\r", 500);
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
-        inSerialDataWorker->SendATCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
+        inOutSerialDataWorker->SendATCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
     } else {
-        inSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 500); // disable flow control function for module
+        inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 500); // disable flow control function for module
     }
 
     // Set fixed baudrate
-    inSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 500);
+    inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 500);
     // Turn off local echo
-    inSerialDataWorker->SendATCommand("ATE0\r", 500);
+    inOutSerialDataWorker->SendATCommand("ATE0\r", 500);
     // Route URCs to first MUX channel
-    inSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 500);
     // Turn off RI pin for incoming calls
-    inSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 500);
     // Turn off RI pin for incoming sms
-    inSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 500);
     // Route URCs to UART1
-    inSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 500);
     // Turn on signal strength change URC
-    inSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 500);
     // Change incoming call notification from "RING" to "+CRING:type"
-    inSerialDataWorker->SendATCommand("AT+CRC=1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 500);
     // Turn on caller's number presentation
-    inSerialDataWorker->SendATCommand("AT+CLIP=1\r", 500);
+    inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 500);
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
@@ -200,21 +199,21 @@ bool MuxDaemon::Start() {
 
 
     // Start CMUX multiplexer
-    inSerialDataWorker->SendATCommand(gsm_command, 500);
+    inOutSerialDataWorker->SendATCommand(gsm_command, 500);
 
-    inSerialDataWorker->SwitchMode(InOutSerialWorker::Mode::CMUX);
+    inOutSerialDataWorker->SwitchMode(InOutSerialWorker::Mode::CMUX);
     state = States::MUX_STATE_MUXING;
 
     // Create virtual channels
 
     // Control channel is used for controlling Mux. It is not considered as logical channel i.e it can't receive normal data messages
-    channels.push_back(std::make_unique<ControlMuxChannel>(inSerialDataWorker.get()));
+    channels.push_back(std::make_unique<ControlMuxChannel>(inOutSerialDataWorker.get()));
 
     // Notificiation channel is used mainly for receiving URC messages and handling various async requests
-    channels.push_back(std::make_unique<NotificationMuxChannel>(inSerialDataWorker.get(), callback));
+    channels.push_back(std::make_unique<NotificationMuxChannel>(inOutSerialDataWorker.get(), callback));
 
     // Communication channel is used for sending various requests to GSM modem (SMS/Dial and so on) in blocking manner
-    channels.push_back(std::make_unique<CommunicationMuxChannel>(inSerialDataWorker.get()));
+    channels.push_back(std::make_unique<CommunicationMuxChannel>(inOutSerialDataWorker.get()));
 
     // Mux channels must be initialized in sequence
     for (auto &w : channels) {
