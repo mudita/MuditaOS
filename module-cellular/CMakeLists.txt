@@ -25,6 +25,8 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ControlMuxChannel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/NotificationMuxChannel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/CommunicationMuxChannel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATParser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modem/MuxParser.cpp
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
