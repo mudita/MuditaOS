@@ -143,7 +143,7 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
 		case app::CallSwitchData::Type::UNDEFINED: {
 			return false;
 		}break;
-		case app::CallSwitchData::Type::NUMBER: {
+		case app::CallSwitchData::Type::ENTER_NUMBER: {
 			app::CallNumberData* numberData = reinterpret_cast<app::CallNumberData*>(data);
 			numberLabel->setText(numberData->getPhoneNumber());
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );

@@ -56,6 +56,7 @@ set(TARGET_COMPILE_OPTIONS
         $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
         $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> # "register" 
 
 
         CACHE INTERNAL ""
