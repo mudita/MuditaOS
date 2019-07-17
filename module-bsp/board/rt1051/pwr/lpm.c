@@ -984,6 +984,18 @@ bool LPM_Init(lpm_power_mode_t run_mode)
     uint32_t i;
     uint32_t tmp_reg = 0;
 
+    /* Boot ROM did initialize the XTAL, here we only sets external XTAL OSC freq */
+    CLOCK_SetXtalFreq(BOARD_XTAL0_CLK_HZ);
+    CLOCK_SetRtcXtalFreq(BOARD_XTAL32K_CLK_HZ);
+
+    /* Recover handshaking */
+	IOMUXC_GPR->GPR4 = 0x00000000;
+	IOMUXC_GPR->GPR7 = 0x00000000;
+	IOMUXC_GPR->GPR8 = 0x00000000;
+	IOMUXC_GPR->GPR12 = 0x00000000;
+
+	CCM->CCR &= ~CCM_CCR_REG_BYPASS_COUNT_MASK;
+
     s_targetPowerMode = run_mode;
 
 #ifdef FSL_RTOS_FREE_RTOS

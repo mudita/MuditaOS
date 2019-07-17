@@ -16,7 +16,6 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/PowerMgr.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/lpm.c"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/PowerMgr.hpp"
 )

@@ -39,7 +39,7 @@ int CommunicationMuxChannel::ParseInputData(uint8_t* data, size_t size) {
         responseBuffer.erase();
         LOG_INFO("Received unneeded data");
     }
-
+    //TODO Please add return value
 }
 
 
