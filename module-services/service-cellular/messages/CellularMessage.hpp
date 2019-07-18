@@ -39,7 +39,6 @@ public:
         CallActive,
         NewIncomingSMS,
         SignalStrengthUpdate,
-        PowerUpProcedureComplete,
         ServiceReady,
     };
 

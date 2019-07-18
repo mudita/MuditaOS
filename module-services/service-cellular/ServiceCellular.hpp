@@ -20,6 +20,15 @@ class MuxDaemon;
 class ServiceCellular : public sys::Service {
 
 public:
+
+    enum class State{
+        Idle,
+        PowerUpInProgress,
+        MultiplexerStartInProgress,
+        Ready,
+        Failed
+    };
+
     ServiceCellular();
 
     ~ServiceCellular();
@@ -45,6 +54,8 @@ private:
     std::unique_ptr<MuxDaemon> muxdaemon;
     uint32_t callStateTimer = 0;
     NotificationMuxChannel::NotificationCallback_t notificationCallback=nullptr;
+
+    State state = State ::Idle;
 
     static constexpr int32_t signalStrengthToDB[] = {
             -109, //0
