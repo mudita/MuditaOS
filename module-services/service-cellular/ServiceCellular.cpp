@@ -94,6 +94,10 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
 
     muxdaemon = MuxDaemon::Create(notificationCallback);
     if (muxdaemon) {
+
+        // Start power up procedure
+        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),GetName(),this);
+
         return sys::ReturnCodes::Success;
     } else {
         return sys::ReturnCodes::Failure;
@@ -138,6 +142,14 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
                 }
             } else {
                 //ignore the rest of notifications
+            }
+        }
+            break;
+
+        case MessageType ::CellularStartPowerUpProcedure:
+        {
+            if(!muxdaemon->PowerUpProcedure()){
+                LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
             }
         }
             break;

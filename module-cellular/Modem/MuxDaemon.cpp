@@ -117,7 +117,10 @@ bool MuxDaemon::Start() {
     if((inOutSerialDataWorker = InOutSerialWorker::Create(this).value_or(nullptr)) == nullptr){
         return false;
     }
+    return true;
+}
 
+bool MuxDaemon::PowerUpProcedure() {
 
     // At first send AT command to check if modem is turned on
     auto ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
@@ -149,7 +152,6 @@ bool MuxDaemon::Start() {
     else{
         return false;
     }
-
 }
 
 bool MuxDaemon::StartMultiplexer() {
