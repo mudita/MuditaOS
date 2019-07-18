@@ -15,6 +15,7 @@
 
 #include "vfs.hpp"
 
+#include "service-db/api/DBServiceAPI.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -49,6 +50,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
+
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {

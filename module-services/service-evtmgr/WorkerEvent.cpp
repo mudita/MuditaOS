@@ -17,6 +17,8 @@ extern "C" {
 #include "Service/Worker.hpp"
 #include "MessageType.hpp"
 
+
+
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
@@ -49,6 +51,7 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		bsp::keyboard_get_data(notification, state, code);
 
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
+
 	}
 
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery) )
@@ -90,7 +93,6 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
 		time_t timestamp;
 		bsp::rtc_GetCurrentTimestamp(&timestamp);
-
 		auto message = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
 		message->timestamp = timestamp;
 		sys::Bus::SendUnicast(message, "EventManager", this->service);
@@ -107,6 +109,7 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
 
+	bsp::rtc_SetDateTimeFromTimestamp(1563436000);
 	bsp::rtc_SetMinuteAlarm();
 	return true;
 }

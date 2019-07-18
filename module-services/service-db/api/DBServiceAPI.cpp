@@ -235,3 +235,75 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetLimitOffset(
         return std::make_unique<std::vector<ContactRecord>>();
     }
 }
+
+bool DBServiceAPI::AlarmAdd(sys::Service *serv, const AlarmsRecord &rec) {
+    std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmAdd,rec);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBAlarmResponseMessage* alarmResponse = reinterpret_cast<DBAlarmResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::AlarmRemove(sys::Service *serv, uint32_t id) {
+    std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmRemove);
+    msg->id = id;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBAlarmResponseMessage* alarmResponse = reinterpret_cast<DBAlarmResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec) {
+    std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmUpdate,rec);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBAlarmResponseMessage* alarmResponse = reinterpret_cast<DBAlarmResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+uint32_t DBServiceAPI::AlarmGetCount(sys::Service *serv) {
+    std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmGetCount);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBAlarmResponseMessage* alarmResponse = reinterpret_cast<DBAlarmResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)){
+        return alarmResponse->count;
+    }
+    else{
+        return false;
+    }
+}
+
+std::unique_ptr<std::vector<AlarmsRecord>> DBServiceAPI::AlarmGetLimitOffset(sys::Service *serv, uint32_t offset,
+                                                                                uint32_t limit) {
+    std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmGetLimitOffset);
+    msg->offset = offset;
+    msg->limit = limit;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBAlarmResponseMessage* alarmResponse = reinterpret_cast<DBAlarmResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)){
+        return std::move(alarmResponse->records);
+    }
+    else{
+        return std::make_unique<std::vector<AlarmsRecord>>();
+    }
+}
+
+
+

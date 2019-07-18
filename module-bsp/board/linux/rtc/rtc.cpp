@@ -82,7 +82,7 @@ namespace bsp{
 
 	RtcBspError_e rtc_SetAlarmOnTimestamp(uint32_t secs)
 	{
-		timestampAlarm = secs + timestampOffset;
+		timestampAlarm = secs ;
 		return RtcBspOK;
 	}
 
@@ -92,7 +92,7 @@ namespace bsp{
 		if(	rtc_GetCurrentTimestamp(&current) != RtcBspOK )
 			return RtcBspError;
 
-		current += secs + timestampOffset;
+		current += secs ;
 
 		if(	rtc_SetAlarmOnTimestamp(current)!= RtcBspOK )
 			return RtcBspError;
@@ -154,13 +154,12 @@ namespace bsp{
 		time_t timestamp;
 		rtc_GetCurrentTimestamp( &timestamp);
 
-		timestamp += timestampOffset;
 		uint32_t secondsToMinute = 60 - ( timestamp % 60 );
 
 		struct tm date;
 		rtc_GetCurrentDateTime(&date);
 
-		LOG_INFO("seconds %d", date.tm_sec);
+		LOG_INFO("seconds %d",  ( timestamp % 60 ));
 		LOG_INFO("seconds to minute %d", secondsToMinute);
 
 		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
@@ -171,10 +170,11 @@ static void rtc_worker(void *pvp)
 {
 	while(1)
 	{
-		time_t current = time(NULL);
+		time_t current;
+		bsp::rtc_GetCurrentTimestamp(&current);
 
 		uint8_t notification;
-		if(current + timestampOffset == timestampAlarm)
+		if(current == timestampAlarm)
 		{
 			notification = static_cast<uint8_t>(bsp::rtcIrqNotifications::alarmOcured);
 			xQueueSend(qHandleRtcIrq, &notification, 100);

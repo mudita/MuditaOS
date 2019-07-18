@@ -38,6 +38,7 @@ ServiceDB::~ServiceDB() {
     settingsDB.reset();
     contactsDB.reset();
     smsDB.reset();
+    alarmsDB.reset();
 
     Database::Deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -296,7 +297,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
 #endif
             auto ret = alarmsRecordInterface->Update(msg->record);
 #if SHOW_DB_ACCESS_PERF == 1
-            LOG_ERROR("DBContactUpdate time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+            LOG_ERROR("DBAlarmUpdate time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
             responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
         }
@@ -308,7 +309,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
 #endif
             auto ret = alarmsRecordInterface->GetCount();
 #if SHOW_DB_ACCESS_PERF == 1
-            LOG_ERROR("DBContactGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+            LOG_ERROR("DBAlarmGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
             responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, true,ret);
         }
