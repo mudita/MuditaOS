@@ -53,6 +53,7 @@ enum class MessageType {
 
     CellularListCurrentCalls,
     CellularStartPowerUpProcedure,
+    CellularStartMultiplexer,
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
