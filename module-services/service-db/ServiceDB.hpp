@@ -34,6 +34,7 @@ private:
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
     std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
+
 protected:
 
 public:

@@ -17,6 +17,8 @@
 #include "common.hpp"
 
 class EventManager: public sys::Service {
+private:
+	uint32_t getDBAlarmCount(void);
 protected:
 	sys::Worker* EventWorker = nullptr;
 	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.

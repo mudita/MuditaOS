@@ -49,6 +49,7 @@ public:
 
     std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,AlarmsRecordField field, const char* str) override final;
 
+    AlarmsRecord GetNext(time_t time);
 private:
     const uint32_t snippetLength = 45;
     AlarmsDB* alarmsDB;
