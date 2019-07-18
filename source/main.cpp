@@ -130,7 +130,6 @@ int SystemStart(sys::SystemManager* sysmgr)
 
 int main() {
 
-
 	LOG_PRINTF("Launching PurePhone..\n ");
 
     bsp::BoardInit();
