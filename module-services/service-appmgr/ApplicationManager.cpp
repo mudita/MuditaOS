@@ -33,7 +33,7 @@ ApplicationDescription::ApplicationDescription( std::string name, std::unique_pt
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
 	std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
 
-	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+//	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
 
@@ -101,33 +101,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
 			handleLanguageChange( msg );
 		} break;
-		case static_cast<int32_t>(MessageType::CellularNotification): {
-		   CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-
-		   if (msg->type == CellularNotificationMessage::Type::CallAborted) {
-			   LOG_INFO("CallAborted");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
-			   LOG_INFO("CallBusy");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
-			   LOG_INFO("CallActive");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
-			   LOG_INFO("IncomingCall");
-			   std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
-			   //send to itself message to switch (run) call application
-			   if( focusApplicationName != "ApplicationCall") {
-				   messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
-			   }
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::NewIncomingSMS ) {
-			   LOG_INFO("NewIncomingSMS");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-			   LOG_INFO("SignalStrengthUpdate");
-		   }
-		} break;
 		default : {
 			LOG_FATAL("Received unknown massage %d", msgType );
 		} break;
@@ -161,10 +134,16 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 	}
 
 	//search for application with specified name and run it
-	std::string runAppName = "ApplicationDesktop";
-//	std::string runAppName = "ApplicationViewer";
+	std::string runDesktopName = "ApplicationDesktop";
+	std::string runCallAppName = "ApplicationCall";
+//	std::string runCallAppName = "ApplicationViewer";
 
-	auto it = applications.find(runAppName);
+	auto it = applications.find(runCallAppName);
+	if( it!= applications.end()){
+		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
+	}
+
+	it = applications.find(runDesktopName);
 	if( it!= applications.end()){
 		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
 	}
