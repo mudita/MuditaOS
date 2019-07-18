@@ -18,6 +18,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "bsp/cellular/bsp_cellular.hpp"
 #include "InOutSerialWorker.hpp"
 #include "NotificationMuxChannel.hpp"
 #include "ControlMuxChannel.hpp"
@@ -79,7 +80,8 @@ namespace QuectelBaudrates {
 
 MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
         inOutSerialDataWorker(nullptr),
-        callback(callback) {
+        callback(callback),
+        cellular(nullptr){
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -114,9 +116,15 @@ void MuxDaemon::RemoveMuxChannel(MuxChannel::MuxChannelType chan) {
 
 bool MuxDaemon::Start() {
 
-    if((inOutSerialDataWorker = InOutSerialWorker::Create(this).value_or(nullptr)) == nullptr){
+    // Create and initialize bsp::Cellular module
+    if ((cellular = bsp::Cellular::Create(SERIAL_PORT).value_or(nullptr)) == nullptr) {
         return false;
     }
+
+    if((inOutSerialDataWorker = InOutSerialWorker::Create(this,cellular.get()).value_or(nullptr)) == nullptr){
+        return false;
+    }
+
     return true;
 }
 
@@ -142,7 +150,7 @@ bool MuxDaemon::PowerUpProcedure() {
         else{
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
-            //TODO:M.P implement it cellular->PowerUp();
+            cellular->PowerUp();
             return true;
         }
     }

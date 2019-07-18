@@ -19,8 +19,8 @@
 #include "ticks.hpp"
 
 
-std::optional<std::unique_ptr<InOutSerialWorker>> InOutSerialWorker::Create(MuxDaemon *mux) {
-    auto inst = std::make_unique<InOutSerialWorker>(mux);
+std::optional<std::unique_ptr<InOutSerialWorker>> InOutSerialWorker::Create(MuxDaemon *mux, bsp::Cellular *cellular) {
+    auto inst = std::make_unique<InOutSerialWorker>(mux,cellular);
 
     if (inst->isInitialized) {
         return inst;
@@ -29,18 +29,14 @@ std::optional<std::unique_ptr<InOutSerialWorker>> InOutSerialWorker::Create(MuxD
     }
 }
 
-InOutSerialWorker::InOutSerialWorker(MuxDaemon *mux) : muxDaemon(mux), atParser(nullptr), muxParser(nullptr) {
+InOutSerialWorker::InOutSerialWorker(MuxDaemon *mux, bsp::Cellular *cellular) : muxDaemon(mux), atParser(nullptr),
+                                                                                muxParser(nullptr), cellular(cellular) {
 
-    // Create and initialize bsp::Cellular module
-    if ((cellular = bsp::Cellular::Create(SERIAL_PORT).value_or(nullptr)) == nullptr) {
+    if ((muxParser = MuxParser::Create(muxDaemon, this, cellular).value_or(nullptr)) == nullptr) {
         return;
     }
 
-    if ((muxParser = MuxParser::Create(muxDaemon, this, cellular.get()).value_or(nullptr)) == nullptr) {
-        return;
-    }
-
-    if ((atParser = ATParser::Create(muxDaemon, this, cellular.get()).value_or(nullptr)) == nullptr) {
+    if ((atParser = ATParser::Create(muxDaemon, this, cellular).value_or(nullptr)) == nullptr) {
         return;
     }
 

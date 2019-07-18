@@ -37,10 +37,10 @@ public:
         CMUX
     };
 
-    InOutSerialWorker(MuxDaemon* mux);
+    InOutSerialWorker(MuxDaemon* mux,bsp::Cellular* cellular);
     ~InOutSerialWorker();
 
-    static std::optional<std::unique_ptr<InOutSerialWorker>> Create(MuxDaemon* mux);
+    static std::optional<std::unique_ptr<InOutSerialWorker>> Create(MuxDaemon* mux,bsp::Cellular* cellular);
 
 
     void SwitchMode(const Mode newMode);
@@ -77,8 +77,7 @@ private:
     // Pointer to muxDaemon which is owner of this worker
     MuxDaemon* muxDaemon;
 
-    // BSP cellular instance
-    std::unique_ptr<bsp::Cellular> cellular;
+    bsp::Cellular* cellular;
 
     cpp_freertos::MutexStandard serOutMutex;
 

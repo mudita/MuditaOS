@@ -22,6 +22,10 @@
 
 class InOutSerialWorker;
 
+namespace bsp{
+    class Cellular;
+}
+
 class MuxDaemon {
 
 public:
@@ -92,6 +96,9 @@ private:
     States state = States::MUX_STATE_OPENING;
 
     std::vector<std::unique_ptr<MuxChannel>> channels;
+
+    std::unique_ptr<bsp::Cellular> cellular;
+
 
 };
 
