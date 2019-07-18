@@ -20,7 +20,7 @@ namespace app {
 class ApplicationDesktop : public Application {
 protected:
 	//determines whether screen should be protected by pin verification
-	bool screenLocked = false;
+	bool screenLocked = true;
 	bool pinLocked = false;
 	uint32_t unreadMessages = 0;
 	uint32_t missedCalls = 0;

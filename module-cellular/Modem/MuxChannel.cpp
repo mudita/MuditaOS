@@ -23,11 +23,6 @@ void MuxChannelWorker(void *pvp) {
         uint8_t buffer[MuxChannel::inputBufferSize] = {0};
         auto bytesReceived = xStreamBufferReceive(inst->inputBuffer, buffer,MuxChannel::inputBufferSize,pdMS_TO_TICKS(portMAX_DELAY));
 
-        // Check if incoming data is actually signal to close
-        if((inst->enableWorkerLoop == false) && (buffer[0] == 0) && (bytesReceived == 1)){
-            goto exit;
-        }
-
         switch (inst->type) {
 
             case MuxChannel::MuxChannelType::Notification: {
@@ -48,11 +43,6 @@ void MuxChannelWorker(void *pvp) {
         }
     }
 
-    exit:
-    LOG_DEBUG("Closing worker thread.");
-    vStreamBufferDelete(inst->inputBuffer);
-
-    vTaskDelete(NULL);
 }
 
 
@@ -64,7 +54,7 @@ MuxChannel::MuxChannel(MuxDaemon *mux, uint32_t logicalNumber, MuxChannelType ty
         frameAllowed(1),
         disc_ua_pending(0),
         workerStackSize(stackSize),
-        state(State::Closed),
+        state(State::Init),
         type(type),
         name(name),
         mux(mux){
@@ -74,6 +64,8 @@ MuxChannel::MuxChannel(MuxDaemon *mux, uint32_t logicalNumber, MuxChannelType ty
 
 MuxChannel::~MuxChannel() {
 
+    vTaskDelete(workerHandle);
+    vStreamBufferDelete(inputBuffer);
 }
 
 int MuxChannel::Open() {
@@ -82,6 +74,8 @@ int MuxChannel::Open() {
     inputBuffer = xStreamBufferCreate(inputBufferSize,1);
     xTaskCreate(MuxChannelWorker, (name + "_Worker").c_str(), workerStackSize / 4, this, 0, &workerHandle);
 
+
+    state = State ::Opening;
 
     // Send virtual channel request frame to GSM modem
     mux->WriteMuxFrame(GetChannelNumber(), NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_SABM) |
@@ -92,14 +86,11 @@ int MuxChannel::Open() {
 
 int MuxChannel::Close() {
 
-    enableWorkerLoop = false;
-
-    uint8_t dummy = 0;
-    // Send dummy data to kick worker thread out of suspend state
-    SendData(&dummy,sizeof dummy);
+    state = State ::Closing;
 
     mux->WriteMuxFrame(GetChannelNumber(), NULL, 0,
-                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DISC));
+                       static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DISC)|
+                       static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
     return 0;
 }
@@ -109,7 +100,27 @@ ssize_t MuxChannel::SendData(uint8_t *data, size_t size) {
     return xStreamBufferSend(inputBuffer,data,size,100);
 }
 
-int MuxChannel::ParseInputData(uint8_t *data, size_t size){
-    //LOG_FATAL((name + " received message: " + msg->m_data).c_str());
-    return 0;
+std::vector<std::string> MuxChannel::Tokenizer(std::string &input, uint32_t maxTokenCount,
+                                               const std::string &delimiter) {
+    std::vector<std::string> strings;
+    uint32_t tokenCount = 0;
+
+
+    std::string::size_type pos = 0;
+    std::string::size_type prev = 0;
+    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (tokenCount<maxTokenCount))
+    {
+        if(pos == prev){
+            prev = pos + delimiter.size();
+            continue;
+        }
+
+        strings.push_back(input.substr(prev, pos - prev));
+        prev = pos + delimiter.size();
+        tokenCount++;
+    }
+
+    // To get the last substring (or only, if delimiter is not found)
+    input = input.substr(prev);
+    return strings;
 }

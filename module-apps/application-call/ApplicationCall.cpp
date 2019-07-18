@@ -12,12 +12,20 @@
 #include "windows/CallMainWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
 #include "windows/EmergencyCallWindow.hpp"
+#include "windows/CallWindow.hpp"
+
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "ApplicationCall.hpp"
 namespace app {
 
 ApplicationCall::ApplicationCall(std::string name) :
 	Application( name, 2048 ) {
+
+	timer_id = CreateTimer(3000,true);
+
+	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
 ApplicationCall::~ApplicationCall() {
@@ -33,6 +41,25 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		return retMsg;
 	}
 
+	uint32_t msgType = msgl->messageType;
+
+	switch( msgType ) {
+		case static_cast<int32_t>(MessageType::CellularNotification): {
+		   CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+
+		   if (msg->type == CellularNotificationMessage::Type::CallAborted) {
+			   LOG_INFO("CallAborted");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
+			   LOG_INFO("CallBusy");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
+			   LOG_INFO("CallActive");
+		   }
+		   else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
+		   }
+		} break;
+	};
 	//this variable defines whether message was processed.
 	bool handled = true;
 
@@ -71,16 +98,19 @@ sys::ReturnCodes ApplicationCall::SleepHandler() {
 
 void ApplicationCall::createUserInterface() {
 
-	gui::Window* window = nullptr;
+	gui::AppWindow* window = nullptr;
 
 	window = new gui::CallMainWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::EnterNumberWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+	window = new gui::CallWindow(this);
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::EmergencyCallWindow(this);
-	windows.insert(std::pair<std::string,gui::Window*>(window->getName(), window));
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
 void ApplicationCall::setDisplayedNumber( std::string num ) {

@@ -21,7 +21,7 @@ class CallSwitchData: public gui::SwitchData {
 public:
 	enum class Type {
 		UNDEFINED,
-		NUMBER,
+		ENTER_NUMBER,
 		INCOMMING_CALL
 	};
 protected:
@@ -37,8 +37,18 @@ class CallNumberData: public CallSwitchData {
 protected:
 	std::string phoneNumber;
 public:
-	CallNumberData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::NUMBER ), phoneNumber{ number }{};
+	CallNumberData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::ENTER_NUMBER ), phoneNumber{ number }{};
 	virtual ~CallNumberData(){};
+
+	const std::string& getPhoneNumber() const { return phoneNumber; };
+};
+
+class IncommingCallData: public CallSwitchData {
+protected:
+	std::string phoneNumber;
+public:
+	IncommingCallData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::INCOMMING_CALL ), phoneNumber{ number }{};
+	virtual ~IncommingCallData(){};
 
 	const std::string& getPhoneNumber() const { return phoneNumber; };
 };

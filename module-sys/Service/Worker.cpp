@@ -63,6 +63,10 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 
 	//create and add all queues to the set. First service queue is created.
 	serviceQueue = xQueueCreate(SERVICE_QUEUE_LENGTH, SERVICE_QUEUE_SIZE );
+	if(serviceQueue == nullptr){
+        deinit();
+        return false;
+	}
 	queues.push_back( serviceQueue );
 
 	//create and add all queues provided from service

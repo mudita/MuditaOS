@@ -24,13 +24,13 @@
 namespace gui {
 
 void DesktopMainWindow::buildInterface() {
-	bottomBar = new gui::BottomBar( this, 0, 599-50, 480, 50 );
-	bottomBar->setActive( BottomBar::Side::LEFT, false );
+	AppWindow::buildInterface();
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
-	bottomBar->setActive( BottomBar::Side::RIGHT, false );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 
-	topBar = new gui::TopBar( this, 0,0, 480, 50 );
+	topBar->setActive(TopBar::Elements::SIGNAL, true );
+	topBar->setActive(TopBar::Elements::LOCK, true );
+	topBar->setActive(TopBar::Elements::BATTERY, true );
 
 	callsImage = new gui::Image( this, 28,266,0,0, "phone" );
 	messagesImage = new gui::Image( this, 28, 341,0,0, "mail" );
@@ -74,8 +74,7 @@ void DesktopMainWindow::buildInterface() {
 }
 
 void DesktopMainWindow::destroyInterface() {
-	delete bottomBar;
-	delete topBar;
+	AppWindow::destroyInterface();
 	delete description;
 	delete time;
 	delete dayText;
@@ -99,7 +98,11 @@ DesktopMainWindow::~DesktopMainWindow() {
 
 //method hides or show widgets and sets bars according to provided state
 void DesktopMainWindow::setVisibleState() {
-	if( screenLocked ) {
+
+	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+
+//	if( screenLocked ) {
+	if( app->getScreenLocked() ) {
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 		topBar->setActive( TopBar::Elements::LOCK, true );
 	}
@@ -111,9 +114,9 @@ void DesktopMainWindow::setVisibleState() {
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
-	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-	pinLockScreen = ( app->getPinLocked() != 0 );
-	screenLocked = app->getScreenLocked();
+//	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+//	pinLockScreen = ( app->getPinLocked() != 0 );
+//	screenLocked = app->getScreenLocked();
 
 	setVisibleState();
 }
@@ -124,10 +127,12 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	if( ret )
 		return true;
 
+	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+
 	//process shortpress
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
-		if( screenLocked ) {
+		if( app->getScreenLocked() ) {
 			//if enter was pressed
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 				unlockStartTime = xTaskGetTickCount();
@@ -136,8 +141,9 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
 				//if interval between enter and pnd keys is less than time defined for unlocking
 				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
+					app->setScreenLocked(false);
 					//display pin lock screen or simply refresh current window to update labels
-					if( pinLockScreen )
+					if( app->getPinLocked())
 						application->switchWindow( "PinLockWindow", 0, nullptr );
 					else {
 						setVisibleState();
@@ -169,10 +175,9 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	}
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
 		//long press of # locks screen if it was unlocked
-		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( screenLocked == false ) ) {
+		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( app->getScreenLocked() == false ) ) {
 			app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 			app->setScreenLocked(true);
-			screenLocked = true;
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 		}

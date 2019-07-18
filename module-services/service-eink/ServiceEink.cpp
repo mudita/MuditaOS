@@ -111,7 +111,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			EinkPowerOn();
 
 			int32_t temperature = EinkGetTemperatureInternal();
-			LOG_INFO("temperature: %d", temperature );
+//			LOG_INFO("temperature: %d", temperature );
 
 			EinkStatus_e ret;
 			if( deepRefresh ) {
@@ -133,11 +133,11 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 				LOG_FATAL("Failed to update frame");
 
 			if( deepRefresh ) {
-				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
+//				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
 			}
 			else{
-				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
+//				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
 				ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
 			}
 
