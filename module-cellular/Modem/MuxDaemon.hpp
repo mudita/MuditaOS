@@ -67,6 +67,8 @@ public:
 
     int uihPfBitReceived = 0;
 
+    NotificationMuxChannel::NotificationCallback_t callback = nullptr;
+
 private:
 
     friend void workerTaskFunction(void *ptr);
@@ -74,6 +76,8 @@ private:
     bool Start();
 
     int CloseMultiplexer();
+
+    bool CheckATCommandResponse(const std::vector<std::string>& response);
 
 
     constexpr static unsigned char closeChannelCmd[] = {
@@ -88,8 +92,6 @@ private:
     States state = States::MUX_STATE_OPENING;
 
     std::vector<std::unique_ptr<MuxChannel>> channels;
-
-    NotificationMuxChannel::NotificationCallback_t callback = nullptr;
 
 };
 

@@ -38,8 +38,9 @@ public:
         CallBusy,
         CallActive,
         NewIncomingSMS,
-        SignalStrengthUpdate
-
+        SignalStrengthUpdate,
+        PowerUpProcedureComplete,
+        ServiceReady,
     };
 
 

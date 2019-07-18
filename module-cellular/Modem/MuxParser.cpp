@@ -110,6 +110,8 @@ int MuxParser::ProcessNewData() {
             inputBuffer->ReorganizeBuffer();
         }
     }
+
+    return 1;
 }
 
 
