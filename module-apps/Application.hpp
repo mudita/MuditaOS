@@ -163,6 +163,8 @@ protected:
 	std::string name;
 	//defines whether application can be closed when it looses focus
 	bool closeable = true;
+	//defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
+	bool startBackground = false;
 public:
 	ApplicationLauncher( std::string name, bool isCloseable ) : name{name}, closeable{isCloseable} {};
 	virtual ~ApplicationLauncher() {};
@@ -170,6 +172,7 @@ public:
 	bool isCloseable() { return closeable; };
 	//virtual method to run the application
 	virtual bool run(sys::SystemManager* sysmgr) {return true;};
+	virtual bool runBackground(sys::SystemManager* sysmgr) {return true;};
 };
 
 } /* namespace app */
