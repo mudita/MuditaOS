@@ -305,5 +305,17 @@ std::unique_ptr<std::vector<AlarmsRecord>> DBServiceAPI::AlarmGetLimitOffset(sys
     }
 }
 
+AlarmsRecord DBServiceAPI::AlarmGetNext(sys::Service *serv, time_t time) {
 
+    std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmGetNext);
+    msg->time = time;
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBAlarmResponseMessage* alarmResponse = reinterpret_cast<DBAlarmResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (alarmResponse->retCode == true)){
+    	return std::move((*alarmResponse->records)[0]);
+    }
+    else{
+        return AlarmsRecord{};
+    }
+}
 

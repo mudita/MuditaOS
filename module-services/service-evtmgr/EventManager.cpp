@@ -21,6 +21,8 @@ EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
 {
 	LOG_INFO("[EventManager] Initializing");
+
+	busChannels.push_back(sys::BusChannels::ServiceDatabaseAlarmNotifications);
 }
 
 EventManager::~EventManager(){
@@ -37,6 +39,13 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	bool handled = false;
 
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
+	{
+		LOG_INFO("DB updated");
+		AlarmsRecord record = DBServiceAPI::AlarmGetNext(this, 0);
+		LOG_INFO("Received alarm record ID: %d", record.ID);
+		LOG_INFO("Path %s", record.path.c_str());
+	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
@@ -49,6 +58,16 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
+		}
+		if(msg->keyState == sevm::KeyboardEvents::keyPressed)
+		{
+			AlarmsRecord alarma;
+				alarma.time=12;
+				alarma.snooze=34;
+				alarma.status=56;
+				alarma.path = "78";
+
+				DBServiceAPI::AlarmAdd(this, alarma);
 		}
 
 		handled = true;
@@ -85,7 +104,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		handled = true;
 	}
-
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
 			msgl->sender == this->GetName() ){
 

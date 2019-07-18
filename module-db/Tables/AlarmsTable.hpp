@@ -47,6 +47,8 @@ public:
     uint32_t GetCount() override final;
     uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
 
+    AlarmsTableRow GetNext(time_t time);
+
 private:
 
     const char* createTableQuery =

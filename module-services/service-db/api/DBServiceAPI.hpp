@@ -46,6 +46,7 @@ public:
     static bool AlarmUpdate(sys::Service* serv,const AlarmsRecord& rec);
     static uint32_t AlarmGetCount(sys::Service* serv);
     static std::unique_ptr<std::vector<AlarmsRecord>> AlarmGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+    static AlarmsRecord AlarmGetNext(sys::Service *serv, time_t time);
 
 };
 

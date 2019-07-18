@@ -122,6 +122,7 @@ public:
 	}
 	virtual ~DBAlarmMessage() {};
 	AlarmsRecord record;
+	time_t time;
 };
 
 class DBAlarmResponseMessage : public DBResponseMessage{

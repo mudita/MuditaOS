@@ -13,6 +13,8 @@
 
 #include "messages/DBMessage.hpp"
 
+#include"messages/DBNotificationMessage.hpp"
+
 #include "MessageType.hpp"
 
 #include "Database/Database.hpp"
@@ -274,6 +276,13 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
             LOG_ERROR("DBAlarmAdd time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
             responseMsg = std::make_shared<DBAlarmResponseMessage>(nullptr, ret);
+
+            if(ret == true)
+            {
+            	auto notificationMessage = std::make_shared<DBNotificationMessage>(MessageType::DBAlarmUpdateNotification);
+            	notificationMessage->notificationType = DBNotificatonType::Updated;
+            	sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDatabaseAlarmNotifications, this);
+            }
         }
             break;
 
@@ -327,6 +336,21 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
             responseMsg = std::make_shared<DBAlarmResponseMessage>(std::move(ret), true);
         }
             break;
+        case MessageType::DBAlarmGetNext: {
+        	DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = alarmsRecordInterface->GetNext(msg->time);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_ERROR("DBAlarmtGetNext time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+            auto records = std::make_unique<std::vector<AlarmsRecord>>();
+		   records->push_back(ret);
+		   responseMsg = std::make_shared<DBAlarmResponseMessage>(std::move(records), ret.ID == 0 ? false : true);
+        }
+            break;
+
         default:
             // ignore this message
             return std::make_shared<sys::ResponseMessage>();

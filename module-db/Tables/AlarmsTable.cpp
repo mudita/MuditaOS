@@ -176,5 +176,20 @@ uint32_t AlarmsTable::GetCountByFieldID(const char *field, uint32_t id) {
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
 
+AlarmsTableRow AlarmsTable::GetNext(time_t time)
+{
+	auto retQuery = db->Query("SELECT * from alarms WHERE status=1 AND time>%u ORDER BY time ASC LIMIT 1;", time % 86400);
+
+	if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+		return AlarmsTableRow();
+	}
+
+	return AlarmsTableRow{(*retQuery)[0].GetUInt32(),  // ID
+					   (*retQuery)[1].GetUInt32(),    // time
+					   (*retQuery)[2].GetUInt32(),    // snooze
+					   (*retQuery)[3].GetUInt32(),    // status
+					   (*retQuery)[4].GetString(),    // path
+	};
+}
 
 
