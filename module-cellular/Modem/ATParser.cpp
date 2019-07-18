@@ -40,7 +40,6 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
 
     cpp_freertos::LockGuard lock(mutex);
 
-
     auto pos = responseBuffer.find("RDY");
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::MeInitializationSuccessful);
@@ -71,10 +70,9 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     }
 
     // manage string buffer
-    if(responseBuffer.size() >= maxPos){
+    if (responseBuffer.size() >= maxPos) {
         responseBuffer.erase();
-    }
-    else{
+    } else {
         responseBuffer = responseBuffer.substr(maxPos);
     }
 
@@ -86,22 +84,25 @@ int ATParser::ProcessNewData() {
 
     auto length = cellular->Read(rawBuffer, sizeof(rawBuffer));
 
-    if (blockedTaskHandle) {
+    {
         cpp_freertos::LockGuard lock(mutex);
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
-        xTaskNotifyGive(blockedTaskHandle);
     }
-        // Received response data without active request, drop it
-    else {
-        urcs = ParseURC();
+
+    if (blockedTaskHandle) {
+        xTaskNotifyGive(blockedTaskHandle);
+    } else {
+        auto ret = ParseURC();
+        urcs.insert(std::end(urcs),std::begin(ret),std::end(ret));
         // GSM modem is considered as fully operational when it outputs URCs specified below:
         // 1) RDY
         // 2) +CFUN: 1
         // 3) +CPIN: READY
         // 4) +QIND: SMS DONE
         // 5) +QIND: PB DONE
-        if(urcs.size() == 5){
-            mux->StartMultiplexer();
+        if (urcs.size() == 5) {
+            mux->callback(NotificationType ::PowerUpProcedureComplete,"");
+            responseBuffer.erase();
         }
 
     }

@@ -127,8 +127,11 @@ bool MuxDaemon::Start() {
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
+        // GSM module needs some time to close multiplexer
+        vTaskDelay(1000);
+
         // Try sending AT command once again
-        ret = inOutSerialDataWorker->SendATCommand("AT\r",2, 500);
+        ret = inOutSerialDataWorker->SendATCommand("AT\r",2);
         if(ret.size() == 1 || ret.size() == 2){
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
             return StartMultiplexer();
@@ -137,10 +140,14 @@ bool MuxDaemon::Start() {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             //TODO:M.P implement it cellular->PowerUp();
+            return true;
         }
     }
-    else if ((ret.size() == 1 && ret[0] == "OK\r\n") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")){
+    else if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")){
         return StartMultiplexer();
+    }
+    else{
+        return false;
     }
 
 }
@@ -148,7 +155,7 @@ bool MuxDaemon::Start() {
 bool MuxDaemon::StartMultiplexer() {
 
     // Factory reset
-    inOutSerialDataWorker->SendATCommand("AT&F\r", 1);
+    inOutSerialDataWorker->SendATCommand("AT&F\r", 2);
 
     // Turn off local echo
     inOutSerialDataWorker->SendATCommand("ATE0\r", 2);
@@ -158,26 +165,26 @@ bool MuxDaemon::StartMultiplexer() {
     if (hardwareControlFlowEnable) {
         inOutSerialDataWorker->SendATCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
     } else {
-        inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 1); // disable flow control function for module
+        CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 1)); // disable flow control function for module
     }
 
     // Set fixed baudrate
-    inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1));
 
     // Route URCs to first MUX channel
-    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));
     // Turn off RI pin for incoming calls
-    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 1));
     // Turn off RI pin for incoming sms
-    inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 1));
     // Route URCs to UART1
-    inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 1));
     // Turn on signal strength change URC
-    inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 1);
+    CheckATCommandResponse( inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 1));
     // Change incoming call notification from "RING" to "+CRING:type"
-    inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1);
+    CheckATCommandResponse( inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
-    inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1));
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
@@ -192,7 +199,7 @@ bool MuxDaemon::StartMultiplexer() {
 
 
     // Start CMUX multiplexer
-    inOutSerialDataWorker->SendATCommand(gsm_command, 1);
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand(gsm_command, 1));
 
     inOutSerialDataWorker->SwitchMode(InOutSerialWorker::Mode::CMUX);
     state = States::MUX_STATE_MUXING;
@@ -220,18 +227,20 @@ bool MuxDaemon::StartMultiplexer() {
 
 int MuxDaemon::CloseMultiplexer() {
 
-    // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
-    for (auto w = channels.size(); --w;) {
-        if (channels[w]->GetState() == MuxChannel::State::Opened) {
-            LOG_INFO("Logical channel %d closed", channels[w]->GetChannelNumber());
-            channels[w]->Close();
-            vTaskDelay(100);
+    if(channels.size()){
+        // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
+        for (auto w = channels.size(); --w;) {
+            if (channels[w]->GetState() == MuxChannel::State::Opened) {
+                LOG_INFO("Logical channel %d closed", channels[w]->GetChannelNumber());
+                channels[w]->Close();
+                vTaskDelay(100);
+            }
         }
-    }
 
-    // Close control channel
-    LOG_INFO("Control channel %d closed", channels[0]->GetChannelNumber());
-    channels[0]->Close();
+        // Close control channel
+        LOG_INFO("Control channel %d closed", channels[0]->GetChannelNumber());
+        channels[0]->Close();
+    }
 
     return 0;
 }
@@ -240,4 +249,13 @@ std::vector<std::string> MuxDaemon::SendCommandResponse(MuxChannel::MuxChannelTy
                                                         size_t rxCount,
                                                         uint32_t timeout) {
     return channels[static_cast<uint32_t >(type)]->SendCommandReponse(cmd, rxCount, timeout);
+}
+
+bool MuxDaemon::CheckATCommandResponse(const std::vector<std::string> &response) {
+    if(response.size() == 1 && response[0] == "OK"){
+        return true;
+    }else{
+        LOG_ERROR("Invalid response");
+        return false;
+    }
 }

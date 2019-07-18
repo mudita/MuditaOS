@@ -46,7 +46,7 @@ public:
             : sys::Service(name)
     {
         timer_id = CreateTimer(1000,true);
-        ReloadTimer(timer_id);
+        //ReloadTimer(timer_id);
     }
 
     ~BlinkyService(){
