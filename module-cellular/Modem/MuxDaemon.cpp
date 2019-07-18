@@ -132,7 +132,9 @@ bool MuxDaemon::PowerUpProcedure() {
 
     // At first send AT command to check if modem is turned on
     auto ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
-    if(ret.size() == 0 ){
+    if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")) {
+        return StartMultiplexer();
+    } else {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
@@ -142,25 +144,19 @@ bool MuxDaemon::PowerUpProcedure() {
         vTaskDelay(1000);
 
         // Try sending AT command once again
-        ret = inOutSerialDataWorker->SendATCommand("AT\r",2);
-        if(ret.size() == 1 || ret.size() == 2){
+        ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
+        if (ret.size() == 1 || ret.size() == 2) {
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
             return StartMultiplexer();
-        }
-        else{
+        } else {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             cellular->PowerUp();
             return true;
         }
     }
-    else if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")){
-        return StartMultiplexer();
-    }
-    else{
-        return false;
-    }
 }
+
 
 bool MuxDaemon::StartMultiplexer() {
 
