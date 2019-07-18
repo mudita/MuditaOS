@@ -17,6 +17,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/ContactRecord.hpp"
+#include "Interface/AlarmsRecord.hpp"
 
 class DBServiceAPI {
 
@@ -40,6 +41,11 @@ public:
     static uint32_t ContactGetCount(sys::Service* serv);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
 
+    static bool AlarmAdd(sys::Service* serv,const AlarmsRecord& rec);
+    static bool AlarmRemove(sys::Service* serv,uint32_t id);
+    static bool AlarmUpdate(sys::Service* serv,const AlarmsRecord& rec);
+    static uint32_t AlarmGetCount(sys::Service* serv);
+    static std::unique_ptr<std::vector<AlarmsRecord>> AlarmGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
 
 };
 
