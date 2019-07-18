@@ -8,8 +8,13 @@ set(TOOLCHAIN_PREFIX "arm-none-eabi")
 
 # specify the cross compiler
 
-set (CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-gcc CACHE INTERNAL "")
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-g++ CACHE INTERNAL "")
+if(WIN32)
+        set (CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-gcc.exe CACHE INTERNAL "")
+        set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-g++.exe CACHE INTERNAL "")
+else()
+        set (CMAKE_C_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-gcc CACHE INTERNAL "")
+        set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PATH}/bin/${TOOLCHAIN_PREFIX}-g++ CACHE INTERNAL "")
+endif()
 
 set(LDSCRIPTSDIR "${CMAKE_CURRENT_LIST_DIR}/board/rt1051/ldscripts" CACHE INTERNAL "")
 
@@ -52,6 +57,7 @@ set(TARGET_COMPILE_OPTIONS
         $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
         $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> # "register" 
 
 
         CACHE INTERNAL ""
