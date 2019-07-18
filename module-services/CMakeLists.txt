@@ -22,6 +22,7 @@ add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 add_subdirectory( service-db )
+add_subdirectory( service-powermgr )
 add_subdirectory( service-cellular )
 
 
@@ -32,6 +33,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 

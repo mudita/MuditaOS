@@ -75,7 +75,7 @@ extern uint32_t SystemCoreClock;
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
-#define configTOTAL_HEAP_SIZE                   ((size_t)(1024*152))
+#define configTOTAL_HEAP_SIZE                   ((size_t)(1024*300))
 #define configAPPLICATION_ALLOCATED_HEAP        0
 
 /* Hook function related definitions. */
@@ -153,8 +153,8 @@ standard names. */
 #define xPortSysTickHandler SysTick_Handler
 
 /* if this is 0 then tickless idle will not fire */
-#define configPRE_SLEEP_PROCESSING( x ) PM_Pre_SleepHandler( &x );
-#define configPOST_SLEEP_PROCESSING( x ) PM_Post_SleepHandler( &x );
+#define configPRE_SLEEP_PROCESSING      vPortPRE_SLEEP_PROCESSING
+#define configPOST_SLEEP_PROCESSING     vPortPOST_SLEEP_PROCESSING
 //#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 100
 
 #define configSYSTICK_CLOCK_HZ			(100000U)

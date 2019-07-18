@@ -45,11 +45,21 @@ enum class MessageType {
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
 	DBContactGetCount,         // Get contacts count
 
+
 	DBAlarmAdd,			// Add alarm record
 	DBAlarmRemove,    	// Remove alarm remove
 	DBAlarmUpdate,    	// Update alarm remove
 	DBAlarmGetLimitOffset,   // Get alarm records by limit,offset
 	DBAlarmGetCount,         // Get alarm count
+
+
+	//Cellular messages
+	CellularNotification,   // Async notification message
+    CellularDialNumber,     // Dial number
+    CellularAnswerIncomingCall, // Answer incoming call
+    CellularHangupCall,         // Hang up call
+
+    CellularListCurrentCalls,
 
 
 	//application manager
@@ -77,6 +87,10 @@ enum class MessageType {
 
 	EVMFocusApplication,
 	EVMKeyboardProfile,
+
+	//Power manager
+	PMChangePowerMode,
+
 	//battery charger messages
 	EVMBatteryLevel,
 	EVMChargerPlugged,

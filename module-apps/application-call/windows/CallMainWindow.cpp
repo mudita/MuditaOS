@@ -19,9 +19,9 @@ CallMainWindow::CallMainWindow( app::Application* app ) : AppWindow(app,"MainWin
 }
 
 void CallMainWindow::rebuild() {
-
 }
 void CallMainWindow::buildInterface() {
+	AppWindow::buildInterface();
 	title = new gui::Label(this, 0, 100, 480, 116 );
 	title->setFilled( false );
 	title->setBorderColor( gui::ColorNoColor );
@@ -30,6 +30,7 @@ void CallMainWindow::buildInterface() {
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 }
 void CallMainWindow::destroyInterface() {
+	AppWindow::destroyInterface();
 }
 
 

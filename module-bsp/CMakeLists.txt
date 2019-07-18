@@ -41,6 +41,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
@@ -55,29 +56,29 @@ target_compile_definitions(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
 
-        PUBLIC
+	PUBLIC
 
-       ${CMAKE_CURRENT_LIST_DIR}
-        ${CMAKE_CURRENT_LIST_DIR}/bsp
-        ${CMAKE_CURRENT_LIST_DIR}/bsp/keyboard
-		${CMAKE_CURRENT_LIST_DIR}/bsp/battery-charger
+		"${CMAKE_CURRENT_LIST_DIR}/"
+        "${CMAKE_CURRENT_LIST_DIR}/bsp"
+        "${CMAKE_CURRENT_LIST_DIR}/bsp/rtc"
+		"${CMAKE_CURRENT_LIST_DIR}/bsp/keyboard"
+		"${CMAKE_CURRENT_LIST_DIR}/bsp/pwr"
+
+		"${CMAKE_CURRENT_LIST_DIR}/bsp/battery-charger"
+		"${CMAKE_CURRENT_LIST_DIR}/module-os/"
 
         )
 target_include_directories(${PROJECT_NAME}
         PUBLIC
         "${CMAKE_SOURCE_DIR}/"
+        "${CMAKE_SOURCE_DIR}/bsp"
         "${CMAKE_SOURCE_DIR}/bsp/rtc"
 		"${CMAKE_SOURCE_DIR}/bsp/keyboard"
+		"${CMAKE_SOURCE_DIR}/bsp/pwr"
 
 		"${CMAKE_SOURCE_DIR}/bsp/battery-charger"
 		"${CMAKE_SOURCE_DIR}/module-os/"  
-
-		"${CMAKE_SOURCE_DIR}/bsp"
-        
         )
-
-
-
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
