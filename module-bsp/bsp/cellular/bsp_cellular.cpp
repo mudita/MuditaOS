@@ -21,16 +21,24 @@
 
 namespace bsp{
 
-    std::unique_ptr<Cellular> Cellular::Create(const char* term) {
+    std::optional<std::unique_ptr<Cellular>> Cellular::Create(
+            [[maybe_unused]] const char* term) {
+
+        std::unique_ptr<Cellular> inst;
 
 #if defined(TARGET_RT1051)
-        return std::make_unique<bsp::RT1051Cellular>();
+        inst = std::make_unique<bsp::RT1051Cellular>();
 #elif defined(TARGET_Linux)
-        return std::make_unique<bsp::LinuxCellular>(term);
+        inst = std::make_unique<bsp::LinuxCellular>(term);
 #else
 #error "Unsupported target"
 #endif
 
+        if(inst->isInitialized){
+            return inst;
+        }
+
+        return {};
     }
 
 }

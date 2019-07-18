@@ -12,8 +12,8 @@
 #include "ControlMuxChannel.hpp"
 
 
-ControlMuxChannel::ControlMuxChannel(MuxDaemon *mux) :
-        MuxChannel(mux, 0, MuxChannel::MuxChannelType::Control, "ControlChannel") {
+ControlMuxChannel::ControlMuxChannel(InOutSerialWorker* inout) :
+        MuxChannel(inout,MuxChannel::MuxChannelType::Control, "ControlChannel") {
 
 }
 
