@@ -134,19 +134,19 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 	}
 
 	//search for application with specified name and run it
-	std::string runDesktopName = "ApplicationDesktop";
-	std::string runCallAppName = "ApplicationCall";
-//	std::string runCallAppName = "ApplicationViewer";
+//	std::string runDesktopName = "ApplicationDesktop";
+//	std::string runCallAppName = "ApplicationCall";
+	std::string runCallAppName = "ApplicationViewer";
 
 	auto it = applications.find(runCallAppName);
 	if( it!= applications.end()){
 		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
 	}
 
-	it = applications.find(runDesktopName);
-	if( it!= applications.end()){
-		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
-	}
+//	it = applications.find(runDesktopName);
+//	if( it!= applications.end()){
+//		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
+//	}
 
   	return sys::ReturnCodes::Success;
 }

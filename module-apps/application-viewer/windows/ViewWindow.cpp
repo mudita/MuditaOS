@@ -25,6 +25,7 @@ void ViewWindow::rebuild() {
 	destroyInterface();
 	buildInterface();
 }
+
 void ViewWindow::buildInterface() {
 	AppWindow::buildInterface();
 	//load all states from file
@@ -44,24 +45,51 @@ void ViewWindow::buildInterface() {
 
 			std::string screenName = vfs.getline(file);
 			std::string refreshModeStr = vfs.getline(file);
-			std::string leftStateStr = vfs.getline(file);
-			std::string middleStateStr = vfs.getline(file);
-			std::string rightStateStr = vfs.getline(file);
+			std::string buttonStr = vfs.getline(file);
 
-			int32_t leftState = -1;
-			int32_t middleState = -1;
-			int32_t rightState = -1;
+		    // Vector of string to save pairs of button code and image
+		    std::vector <std::string> tokens;
+		    std::stringstream check1(buttonStr);
+		    std::string intermediate;
+
+		    // Tokenizing w.r.t. space ' '
+		    while(getline(check1, intermediate, ','))
+		    {
+		        tokens.push_back(intermediate);
+		    }
 
 			bool deepRefresh = false;
 			if( refreshModeStr[0] == 'F' || refreshModeStr[0] == 'f' )
 				deepRefresh = true;
 
-			std::stringstream(leftStateStr) >> leftState;
-			std::stringstream(middleStateStr) >> middleState;
-			std::stringstream(rightStateStr) >> rightState;
-			states.push_back( ViewerState(stateName, screenName, deepRefresh, states.size(), leftState, middleState, rightState ) );
+			std::map<int, int> buttons;
+			for(unsigned int j = 0; j < tokens.size(); j++) {
+				LOG_INFO("TOKEN: %s", tokens[j].c_str());
+				std::vector <std::string> tokens2;
+				std::stringstream check2(tokens[j]);
+				while(getline(check2, intermediate, ' ')) {
+					tokens2.push_back(intermediate);
+				}
 
-			LOG_INFO( "State: %s Screen: %s deep: %d,  L:%d, M:%d, R:%d", stateName.c_str(), screenName.c_str(), deepRefresh, leftState, middleState, rightState );
+				if( tokens2.size() != 2 )
+					continue;
+
+				//convert first token to key id
+				auto it = buttonKeyCodes.find( tokens2[0]);
+				if( it != buttonKeyCodes.end()) {
+
+					int screenCode;
+					std::stringstream(tokens2[1]) >> screenCode;
+					LOG_INFO("[%d] [%d]", it->second, screenCode );
+
+					buttons.insert( std::pair<int,int>( it->second, screenCode ));
+
+				}
+			}
+
+			states.push_back( ViewerState(stateName, screenName, deepRefresh, states.size(), buttons ) );
+
+			LOG_INFO( "State: %s Screen: %s deep: %d", stateName.c_str(), screenName.c_str(), deepRefresh );
 		}
 		else {
 			err = true;
@@ -107,25 +135,20 @@ bool ViewWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 
 	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return true;
+	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
-	if( (inputEvent.keyCode == KeyCode::KEY_ENTER) ||
-		(inputEvent.keyCode == KeyCode::KEY_LF) ||
-		(inputEvent.keyCode == KeyCode::KEY_RF )) {
 		uint32_t oldState = currentState;
-		images[currentState]->setVisible(false);
-		if( inputEvent.keyCode == KeyCode::KEY_LF) {
-			currentState = states[currentState].leftState;
-		}
-		else if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-			currentState = states[currentState].middleState;
-		}
-		else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-			currentState = states[currentState].rightState;
-		}
-		images[currentState]->setVisible(true);
+
+		for( auto it = states[currentState].buttons.begin(); it!=states[currentState].buttons.end(); it++)
+			LOG_INFO("[%d %d]", it->first, it->second);
+
+		auto it = states[currentState].buttons.find(static_cast<int>(inputEvent.keyCode));
+		if( it == states[currentState].buttons.end() )
+			return false;
+
+		images[oldState]->setVisible(false);
+		currentState = it->second;
+				images[currentState]->setVisible(true);
 		if( oldState != currentState ) {
 			if( states[currentState].deepRefresh )
 				application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP );

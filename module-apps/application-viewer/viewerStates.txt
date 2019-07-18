@@ -2,73 +2,49 @@
 [0 - screen8]
 screen8
 F
-0
-1
-0
+KEY_ENTER 1
 [1 - screen2]
 screen2
 F
-0
-2
-0
+KEY_4 2
 [2 - screen2h]
 screen2h
 D
-0
-3
-0
+KEY_3 3
 [3 - screen2he]
 screen2he
 D
-0
-4
-0
+KEY_9 4
 [4 - screen2hey]
 screen2hey
 D
-0
-5
-0
+KEY_LF 0,KEY_ENTER 5,KEY_RF 0
 [5 - screen]
 screen3
 F
-0
-6
-0
+KEY_LF 0,KEY_ENTER 6,KEY_RF 0
 [6 - screen4]
 screen4
 F
-0
-7
-0
+KEY_LF 0,KEY_ENTER 7,KEY_RF 0
 [7 - screen7]
 screen7
 F
-8
-8
-8
+KEY_LF 8,KEY_ENTER 8,KEY_RF 8
 [8 - screen6]
 screen6
 F
-9
-9
-9
+KEY_LF 9,KEY_ENTER 9,KEY_RF 9
 [9 - screen5]
 screen5
 F
-0
-10
-10
+KEY_LF 0,KEY_ENTER 10,KEY_RF 10
 [10 - screen1]
 screen1
 F
-0
-11
-0
+KEY_LF 0,KEY_ENTER 11,KEY_RF 0
 [11 - screen9]
 screen9
 F
-0
-0
-0
+KEY_LF 0,KEY_ENTER 0,KEY_RF 0
 
