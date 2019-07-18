@@ -36,11 +36,11 @@ InOutSerialWorker::InOutSerialWorker(MuxDaemon *mux) : muxDaemon(mux), atParser(
         return;
     }
 
-    if((muxParser = MuxParser::Create(muxDaemon,this,cellular.get()).value_or(nullptr)) == nullptr){
+    if ((muxParser = MuxParser::Create(muxDaemon, this, cellular.get()).value_or(nullptr)) == nullptr) {
         return;
     }
 
-    if((atParser = ATParser::Create(muxDaemon,this,cellular.get()).value_or(nullptr)) == nullptr){
+    if ((atParser = ATParser::Create(muxDaemon, this, cellular.get()).value_or(nullptr)) == nullptr) {
         return;
     }
 
@@ -72,7 +72,7 @@ void workerTaskFunction(void *ptr) {
 
     while (1) {
         auto ret = inst->cellular->Wait(UINT32_MAX);
-        if(ret == 0){
+        if (ret == 0) {
             continue;
         }
 
@@ -80,7 +80,7 @@ void workerTaskFunction(void *ptr) {
         if (inst->mode == InOutSerialWorker::Mode::AT) {
             inst->atParser->ProcessNewData();
         }
-        // CMUX mode is default operation mode
+            // CMUX mode is default operation mode
         else {
             inst->muxParser->ProcessNewData();
         }
@@ -98,37 +98,13 @@ ssize_t InOutSerialWorker::WriteData(unsigned char *input, size_t length) {
     return cellular->Write(input, length);
 }
 
-std::vector<std::string> InOutSerialWorker::SendATCommand(const char* cmd,size_t rxCount,uint32_t timeout) {
+std::vector<std::string> InOutSerialWorker::SendATCommand(const char *cmd, size_t rxCount, uint32_t timeout) {
 
-    return atParser->SendCommand(cmd,rxCount,timeout);
-
-/*    char buff[256] = {0};
-
-    auto bytesWritten = cellular->Write(const_cast<char *>(cmd), strlen(cmd));
-    LOG_DEBUG("BytesWritten: %d", bytesWritten);
-
-    if (cellular->Wait(500)) {
-
-        vTaskDelay(100);
-        auto bytesRead = cellular->Read(buff, sizeof buff);
-
-        if (memstr((char *) buff, bytesRead, "OK")) {
-            LOG_DEBUG("Received OK");
-            return 0;
-        } else if (memstr((char *) buff, bytesRead, "ERROR")) {
-            LOG_DEBUG("Received ERROR");
-            return -1;
-        } else {
-            LOG_DEBUG("Received unknown response");
-            return -1;
-        }
-    } else {
-        return -1;
-    }*/
+    return atParser->SendCommand(cmd, rxCount, timeout);
 }
 
 ssize_t InOutSerialWorker::SendFrame(int channel, const unsigned char *input, int length, unsigned char type) {
-    return muxParser->SendMuxFrame(channel,input,length,type);
+    return muxParser->SendMuxFrame(channel, input, length, type);
 }
 
 int InOutSerialWorker::memstr(const char *haystack, int length, const char *needle) {

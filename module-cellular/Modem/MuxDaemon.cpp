@@ -139,7 +139,7 @@ bool MuxDaemon::Start() {
             //TODO:M.P implement it cellular->PowerUp();
         }
     }
-    else if ((ret.size() == 1 && ret[0] == "OK\r\n") || (ret.size() == 2 && ret[0] == "AT\r\n" && ret[1] == "OK\r\n")){
+    else if ((ret.size() == 1 && ret[0] == "OK\r\n") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")){
         return StartMultiplexer();
     }
 
