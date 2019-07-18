@@ -62,7 +62,7 @@ public:
     std::optional<MuxChannel*> GetMuxChannel(MuxChannel::MuxChannelType chan);
     void RemoveMuxChannel(MuxChannel::MuxChannelType chan);
 
-
+    bool PowerUpProcedure();
     bool StartMultiplexer();
 
     int uihPfBitReceived = 0;
