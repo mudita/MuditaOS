@@ -100,9 +100,6 @@ namespace bsp {
         if ((ret == -1) && (errno == EINTR)) {
             goto retry;
         }
-        else if(errno){
-            LOG_DEBUG("Read errno: %s",strerror(errno));
-        }
         return ret;
     }
 
