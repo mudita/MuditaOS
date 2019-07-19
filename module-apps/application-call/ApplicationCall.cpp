@@ -23,8 +23,8 @@
 #include "ApplicationCall.hpp"
 namespace app {
 
-ApplicationCall::ApplicationCall(std::string name) :
-	Application( name, 2048 ) {
+ApplicationCall::ApplicationCall(std::string name, bool startBackgound ) :
+	Application( name, startBackgound, 2048 ) {
 
 	timer_id = CreateTimer(3000,true);
 

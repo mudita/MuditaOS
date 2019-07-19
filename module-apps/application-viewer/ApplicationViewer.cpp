@@ -34,7 +34,7 @@
 namespace app {
 
 ApplicationViewer::ApplicationViewer(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, stackDepth, priority ) {
+	Application( name, false, stackDepth, priority ) {
 }
 
 ApplicationViewer::~ApplicationViewer() {

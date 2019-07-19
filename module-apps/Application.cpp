@@ -27,8 +27,9 @@
 
 namespace app {
 
-Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
-	Service( name, stackDepth, priority ){
+Application::Application(std::string name, bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
+	Service( name, stackDepth, priority ),
+	startBackground{ startBackground } {
 
 	longpressTimerID = CreateTimer( 1000 ,false);
 
@@ -268,7 +269,7 @@ sys::ReturnCodes Application::InitHandler() {
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
-	sapm::ApplicationManager::messageRegisterApplication( this, initState );
+	sapm::ApplicationManager::messageRegisterApplication( this, initState, startBackground );
 	sys::ReturnCodes retCode = (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
 	return retCode;
 }
