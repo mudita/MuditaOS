@@ -23,7 +23,7 @@ protected:
 	std::string phoneNumber;
 	uint32_t timer_id= 0;
 public:
-	ApplicationCall( std::string name="ApplicationCall");
+	ApplicationCall( std::string name="ApplicationCall", bool startBackgound = false );
 	virtual ~ApplicationCall();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
 	sys::ReturnCodes InitHandler() override;
@@ -47,6 +47,9 @@ public:
 	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false) {};
 	bool run(sys::SystemManager* sysmgr) override {
 		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name),sysmgr);
+	};
+	bool runBackground(sys::SystemManager* sysmgr) {
+		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name), sysmgr);
 	};
 };
 

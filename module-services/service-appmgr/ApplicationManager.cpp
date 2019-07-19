@@ -133,20 +133,30 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 		utils::localize.Switch( utils::Lang::Sp );
 	}
 
-	//search for application with specified name and run it
-//	std::string runDesktopName = "ApplicationDesktop";
-//	std::string runCallAppName = "ApplicationCall";
-	std::string runCallAppName = "ApplicationViewer";
 
-	auto it = applications.find(runCallAppName);
+	//search for application with specified name and run it
+#if 0 //change to 0 if you want to run only viewer application for kickstarter
+	std::string runDesktopName = "ApplicationDesktop";
+	std::string runCallAppName = "ApplicationCall";
+
+//	auto it = applications.find(runCallAppName);
+//	if( it!= applications.end()){
+//		it->second->lanucher->runBackground(reinterpret_cast<sys::SystemManager*>(this));
+//	}
+
+	auto it = applications.find(runDesktopName);
 	if( it!= applications.end()){
 		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
 	}
 
-//	it = applications.find(runDesktopName);
-//	if( it!= applications.end()){
-//		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
-//	}
+#else
+	std::string runCallAppName = "ApplicationViewer";
+
+	auto it = applications.find(runCallAppName);
+		if( it!= applications.end()){
+			messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
+		}
+#endif
 
   	return sys::ReturnCodes::Success;
 }
@@ -304,10 +314,17 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 	if( msg->getSenderName() == launchApplicationName ) {
 		auto it = applications.find(launchApplicationName);
 
-		it->second->state = app::Application::State::ACTIVATING;
-		state = State::WAITING_GET_FOCUS_CONFIRMATION;
+		//application starts in background
+		if( msg->getStartBackground()) {
+			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+			state = State::IDLE;
+		}
+		else {
+			it->second->state = app::Application::State::ACTIVATING;
+			state = State::WAITING_GET_FOCUS_CONFIRMATION;
 
-		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+			app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+		}
 	}
 	return true;
 }
@@ -438,8 +455,8 @@ bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender 
 //	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
-bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status ) {
-	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status );
+bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status, const bool& startBackground ) {
+	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status, startBackground );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 //	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
