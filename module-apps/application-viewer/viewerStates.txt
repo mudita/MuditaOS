@@ -1,4 +1,4 @@
-12
+15
 [0 - screen8]
 screen8
 F
@@ -6,27 +6,27 @@ KEY_ENTER 1
 [1 - screen2]
 screen2
 F
-KEY_4 2
+KEY_4 2,KEY_RF 6
 [2 - screen2h]
 screen2h
 D
-KEY_3 3
+KEY_3 3,KEY_RF 6
 [3 - screen2he]
 screen2he
 D
-KEY_9 4
+KEY_9 4,KEY_RF 6
 [4 - screen2hey]
 screen2hey
 D
-KEY_LF 0,KEY_ENTER 5,KEY_RF 0
-[5 - screen]
+KEY_LF 0,KEY_ENTER 5,KEY_RF 6
+[5 - screen3]
 screen3
 F
-KEY_LF 0,KEY_ENTER 6,KEY_RF 0
+KEY_LF 0,KEY_ENTER 6,KEY_RF 6
 [6 - screen4]
 screen4
 F
-KEY_LF 0,KEY_ENTER 7,KEY_RF 0
+KEY_DOWN 12,KEY_UP 14,KEY_RIGHT 13
 [7 - screen7]
 screen7
 F
@@ -42,9 +42,20 @@ KEY_LF 0,KEY_ENTER 10,KEY_RF 10
 [10 - screen1]
 screen1
 F
-KEY_LF 0,KEY_ENTER 11,KEY_RF 0
+KEY_LF 0,KEY_ENTER 11,KEY_RF 6
 [11 - screen9]
 screen9
 F
-KEY_LF 0,KEY_ENTER 0,KEY_RF 0
-
+KEY_LF 0,KEY_ENTER 0,KEY_RF 6
+[12 - screen4mu]
+screen4mu
+D
+KEY_ENTER 9,KEY_DOWN 14,KEY_UP 6
+[13 - screen4mes]
+screen4mes
+D
+KEY_ENTER 1,KEY_LEFT 6
+[14 - screen4med]
+screen4med
+D
+KEY_ENTER 5,KEY_DOWN 6,KEY_UP 13
