@@ -42,65 +42,68 @@ namespace bsp {
         ssize_t Write(void *buf, size_t nbytes) override final;
 
 
-
-        static StreamBufferHandle_t         uartRxStreamBuffer;
+        static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;
 
     private:
         void MSPInit();
+
         void MSPDeinit();
+
         void DMAInit();
+
         void DMADeinit();
 
         uint32_t UartGetPeripheralClock();
-        inline void EnableRx(){
+
+        inline void EnableRx() {
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
             LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
             LPUART_EnableRx(CELLULAR_UART_BASE, true);
         }
-        inline void DisableRx(){
+
+        inline void DisableRx() {
             LPUART_DisableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
             LPUART_EnableRx(CELLULAR_UART_BASE, false);
         }
-        inline void EnableTx(){
+
+        inline void EnableTx() {
             LPUART_EnableTx(CELLULAR_UART_BASE, true);
         }
-        inline void DisableTx(){
+
+        inline void DisableTx() {
             LPUART_EnableTx(CELLULAR_UART_BASE, false);
         }
 
-        inline void WakeupModem()
-        {
+        inline void WakeupModem() {
             GPIO_PinWrite(BSP_CELLULAR_UART_DTR_PORT, BSP_CELLULAR_UART_DTR_PIN, 0);
             GPIO_PinWrite(BSP_CELLULAR_WAKEUP_PORT, BSP_CELLULAR_WAKEUP_PIN, 0);
 
             vTaskDelay(pdMS_TO_TICKS(15));
         }
 
-        inline void EnableModemEnterSleepMode()
-        {
+        inline void EnableModemEnterSleepMode() {
             GPIO_PinWrite(BSP_CELLULAR_UART_DTR_PORT, BSP_CELLULAR_UART_DTR_PIN, 1);
             GPIO_PinWrite(BSP_CELLULAR_WAKEUP_PORT, BSP_CELLULAR_WAKEUP_PIN, 1);
         }
 
-        inline void InformModemHostAsleep()
-        {
+        inline void InformModemHostAsleep() {
             GPIO_PinWrite(BSP_CELLULAR_AP_RDY_PORT, BSP_CELLULAR_AP_RDY_PIN, !CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
         }
 
-        inline void InformModemHostWakeup()
-        {
+        inline void InformModemHostWakeup() {
             GPIO_PinWrite(BSP_CELLULAR_AP_RDY_PORT, BSP_CELLULAR_AP_RDY_PIN, CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
         }
 
 
-        static lpuart_edma_handle_t         uartDmaHandle;
-        static edma_handle_t                uartTxDmaHandle;
+        static lpuart_edma_handle_t uartDmaHandle;
+        static edma_handle_t uartTxDmaHandle;
 
         static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
 
-        static void rxTimeoutTimerHandle(TimerHandle_t xTimer );
+        static void rxTimeoutTimerHandle(TimerHandle_t xTimer);
+
         static TaskHandle_t blockedTaskHandle;
 
 
@@ -109,7 +112,6 @@ namespace bsp {
         const static uint32_t rxStreamBufferLength = 1024;
         const static uint32_t rxStreamBufferNotifyWatermark = 1;
         const static uint32_t CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE = 1;
-
 
 
     };

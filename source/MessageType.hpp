@@ -52,6 +52,8 @@ enum class MessageType {
     CellularHangupCall,         // Hang up call
 
     CellularListCurrentCalls,
+    CellularStartPowerUpProcedure,
+    CellularStartMultiplexer,
 
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window

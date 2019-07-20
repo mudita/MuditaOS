@@ -17,7 +17,7 @@
 class ControlMuxChannel : public MuxChannel  {
 public:
 
-    ControlMuxChannel(MuxDaemon* mux);
+    ControlMuxChannel(InOutSerialWorker* inout);
     ~ControlMuxChannel();
 
 };
