@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 include(env.cmake)
 project(PurePhone)
@@ -50,6 +52,7 @@ message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${SERIAL_PORT_PATH})
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DFSL_RTOS_FREE_RTOS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DUSB_STACK_FREERTOS)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING)
@@ -107,8 +110,6 @@ set(PROJECT_INCLUDES
 target_include_directories(${PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
-
-
 
 
 message("${PROJECT_NAME}: add_subdirectory module-sys")

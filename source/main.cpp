@@ -45,11 +45,8 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-
-        //busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-
-        timer_id = CreateTimer(3000,true);
-        ReloadTimer(timer_id);
+        timer_id = CreateTimer(1000,true);
+        //ReloadTimer(timer_id);
     }
 
     ~BlinkyService(){
@@ -63,10 +60,6 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
-        //auto ret = CellularServiceAPI::DialNumber(this,"");
-        stopTimer(timer_id);
-
-
     }
 
 
