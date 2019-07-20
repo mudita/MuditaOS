@@ -1,61 +1,61 @@
 15
-[0 - screen8]
+[0 - screen8 Menu screen]
 screen8
 F
-KEY_ENTER 1
-[1 - screen2]
+KEY_ENTER 6
+[1 - screen2 New Message]
 screen2
 F
-KEY_4 2,KEY_RF 6
-[2 - screen2h]
+KEY_4 2,KEY_RF 13
+[2 - screen2h New Message H]
 screen2h
 D
-KEY_3 3,KEY_RF 6
-[3 - screen2he]
+KEY_3 3,KEY_RF 13
+[3 - screen2he New Message HE]
 screen2he
 D
-KEY_9 4,KEY_RF 6
-[4 - screen2hey]
+KEY_9 4,KEY_RF 13
+[4 - screen2hey New Message HEY]
 screen2hey
 D
-KEY_LF 0,KEY_ENTER 5,KEY_RF 6
-[5 - screen3]
+KEY_ENTER 13,KEY_RF 13
+[5 - screen3 Meditation Timer]
 screen3
 F
-KEY_LF 0,KEY_ENTER 6,KEY_RF 6
+KEY_LF 0,KEY_ENTER 6,KEY_RF 14
 [6 - screen4]
 screen4
 F
-KEY_DOWN 12,KEY_UP 14,KEY_RIGHT 13
-[7 - screen7]
+KEY_DOWN 12,KEY_UP 14,KEY_RIGHT 13,KEY_RF 0,KEY_ENTER 7
+[7 - screen7 Calling]
 screen7
 F
 KEY_LF 8,KEY_ENTER 8,KEY_RF 8
-[8 - screen6]
+[8 - screen6 Call In Progress]
 screen6
 F
 KEY_LF 9,KEY_ENTER 9,KEY_RF 9
-[9 - screen5]
+[9 - screen5 Screen Ended]
 screen5
 F
 KEY_LF 0,KEY_ENTER 10,KEY_RF 10
-[10 - screen1]
+[10 - screen1 Message Thread]
 screen1
 F
 KEY_LF 0,KEY_ENTER 11,KEY_RF 6
-[11 - screen9]
+[11 - screen9 Music Player]
 screen9
 F
-KEY_LF 0,KEY_ENTER 0,KEY_RF 6
+KEY_LF 0,KEY_ENTER 0,KEY_RF 12
 [12 - screen4mu]
 screen4mu
 D
-KEY_ENTER 9,KEY_DOWN 14,KEY_UP 6
+KEY_ENTER 11,KEY_DOWN 14,KEY_UP 6,KEY_RF 0
 [13 - screen4mes]
 screen4mes
 D
-KEY_ENTER 1,KEY_LEFT 6
+KEY_ENTER 1,KEY_LEFT 6,KEY_RF 0
 [14 - screen4med]
 screen4med
 D
-KEY_ENTER 5,KEY_DOWN 6,KEY_UP 13
+KEY_ENTER 5,KEY_DOWN 6,KEY_UP 12,KEY_RF 0
