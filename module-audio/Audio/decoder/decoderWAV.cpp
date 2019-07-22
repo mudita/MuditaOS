@@ -16,8 +16,12 @@ namespace decoder {
             decoder(fileName),
             tag(std::make_unique<Tags>()) {
 
-        if (core::vfs::fread(&waveHeader, 1, sizeof(waveHeader), fd) != sizeof(WAVE_FormatTypeDef)) {
-            //error
+        if(fd == NULL){
+            return;
+        }
+
+        if (vfs.fread(&waveHeader, 1, sizeof(waveHeader), fd) != sizeof(WAVE_FormatTypeDef)) {
+            return;
         }
 
         tag->total_duration_s = (fileSize - sizeof(WAVE_FormatTypeDef)) / waveHeader.ByteRate;
@@ -39,7 +43,7 @@ namespace decoder {
         if (pos == std::string::npos) {
             tag->title.append(filePath);
         } else {
-            tag->title.append(&filePath[pos]);
+            tag->title.append(&filePath[pos+1]);
         }
 
         return std::make_unique<Tags>(*tag);
@@ -51,7 +55,7 @@ namespace decoder {
 
         // mono
         if (chanNumber == 1) {
-            samples_read = core::vfs::fread(pcmData, sizeof(int16_t), samplesToReadChann, fd);
+            samples_read = vfs.fread(pcmData, sizeof(int16_t), samplesToReadChann, fd);
             if (samples_read == 0) {
                 return samples_read;
             }
@@ -63,7 +67,7 @@ namespace decoder {
         }
             //stereo
         else {
-            samples_read = core::vfs::fread(pcmData, sizeof(int16_t), samplesToReadChann, fd);
+            samples_read = vfs.fread(pcmData, sizeof(int16_t), samplesToReadChann, fd);
         }
 
         if (samples_read) {
@@ -76,9 +80,9 @@ namespace decoder {
 
     void decoderWAV::setPosition(float pos){
 
-        core::vfs::fseek(fd,(fileSize*pos)+ sizeof(WAVE_FormatTypeDef),SEEK_SET);
+        vfs.fseek(fd,(fileSize*pos)+ sizeof(WAVE_FormatTypeDef),SEEK_SET);
         // Calculate new position
-        position = (float) ((float) (core::vfs::ftell(fd)/sizeof(int16_t) / chanNumber) / (float) (sampleRate));
+        position = (float) ((float) (vfs.ftell(fd)/sizeof(int16_t) / chanNumber) / (float) (sampleRate));
 
     }
 

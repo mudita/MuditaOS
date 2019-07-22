@@ -10,7 +10,7 @@
 #ifndef UNTITLED1_DECODERWAV_HPP
 #define UNTITLED1_DECODERWAV_HPP
 
-#include "decoder.h"
+#include "decoder.hpp"
 
 namespace decoder {
 
@@ -51,7 +51,6 @@ namespace decoder {
         WAVE_FormatTypeDef waveHeader;
         uint32_t bitsPerSample;
         std::unique_ptr<Tags> tag = nullptr;
-
     };
 
 }

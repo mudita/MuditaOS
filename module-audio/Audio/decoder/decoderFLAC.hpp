@@ -10,7 +10,7 @@
 #ifndef UNTITLED1_DECODERFLAC_HPP
 #define UNTITLED1_DECODERFLAC_HPP
 
-#include "decoder.h"
+#include "decoder.hpp"
 
 #include "dr_flac.h"
 

@@ -43,7 +43,7 @@ namespace decoder {
     void decoderMP3::setPosition(float pos){
         decoderNotFirstRun = false;
 
-        core::vfs::fseek(fd,(pos*fileSize)+firstValidFrameFileOffset,SEEK_SET);
+        vfs.fseek(fd,(pos*fileSize)+firstValidFrameFileOffset,SEEK_SET);
         
         //TODO: M.P Currently calculating MP3 position is unsupported, in general seeking is supported though.
         //position += (float) ((float) (samplesToReadChann / chanNumber) / (float) sampleRate);
@@ -51,10 +51,10 @@ namespace decoder {
 
     std::unique_ptr<Tags> decoderMP3::fetchTags() {
 
-        core::vfs::fseek(fd, firstValidFrameFileOffset + 4, SEEK_SET);
+        vfs.fseek(fd, firstValidFrameFileOffset + 4, SEEK_SET);
         auto buff = std::make_unique<uint8_t[]>(firstValidFrameByteSize);
 
-        core::vfs::fread(buff.get(), 1, firstValidFrameByteSize, fd);
+        vfs.fread(buff.get(), 1, firstValidFrameByteSize, fd);
 
         xing_info_t xinfo = {};
         if (parseXingHeader(buff.get(),firstValidFrameByteSize, &xinfo)) {
@@ -74,13 +74,13 @@ namespace decoder {
         tag->duration_hour = tag->duration_min / 60;
         tag->duration_sec = tag->total_duration_s % 60;
 
-        core::vfs::rewind(fd);
+        vfs.rewind(fd);
 
         // Parse ID3 tags
         // Allocate buffer for fetching initial part of MP3, 1Mbyte should be sufficient to fetch all necessary tags
         auto source =  std::make_unique<std::array<char, 1024 * 1024>>();
 
-        core::vfs::fread(&(*source)[0], 1, source->size(), fd);
+        vfs.fread(&(*source)[0], 1, source->size(), fd);
 
         if (atag::id3v2::is_tagged(*source)) {
 
@@ -99,11 +99,11 @@ namespace decoder {
             if (pos == std::string::npos) {
                 tag->title.append(filePath);
             } else {
-                tag->title.append(&filePath[pos]);
+                tag->title.append(&filePath[pos+1]);
             }
         }
 
-        core::vfs::rewind(fd);
+        vfs.rewind(fd);
 
         return std::make_unique<Tags>(*tag);
     }
@@ -118,9 +118,9 @@ namespace decoder {
 
         auto decBuffer = std::make_unique<uint8_t[]>(DECODER_BUFFER_SIZE);
 
-        core::vfs::rewind(fd);
+        vfs.rewind(fd);
 
-        if (core::vfs::fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
+        if (vfs.fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
             return false;
         }
 
@@ -129,7 +129,7 @@ namespace decoder {
         //refill buffer if necessary(only if over 87,5% of bytes are consumed)
         if (bufferIndex > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8))) {
             memcpy(&decBuffer[0], &decBuffer[bufferIndex], bytesAvailable);
-            uint32_t bytesRead = core::vfs::fread(&decBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+            uint32_t bytesRead = vfs.fread(&decBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
             if (bytesRead == 0) {
                 return false;
@@ -153,9 +153,9 @@ namespace decoder {
                 sampleRate = info.hz;
                 chanNumber = info.channels;
                 firstValidFrameByteSize = (144 * info.bitrate_kbps * 1000 / info.hz);
-                firstValidFrameFileOffset = core::vfs::ftell(fd) - bytesAvailable - firstValidFrameByteSize;
+                firstValidFrameFileOffset = vfs.ftell(fd) - bytesAvailable - firstValidFrameByteSize;
 
-                core::vfs::rewind(fd);
+                vfs.rewind(fd);
 
                 return true;
             }
@@ -183,10 +183,10 @@ namespace decoder {
         auto decBuffer = std::make_unique<uint8_t[]>(DECODER_BUFFER_SIZE);
 
         // Jump to the file beginning
-        core::vfs::rewind(fd);
+        vfs.rewind(fd);
 
         /* Fill decBuffer */
-        if (core::vfs::fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
+        if (vfs.fread(decBuffer.get(), 1, DECODER_BUFFER_SIZE, fd) == 0) {
             return 0;
         }
 
@@ -195,7 +195,7 @@ namespace decoder {
         //refill buffer if necessary(only if over 87,5% of bytes are consumed)
         if (bufferIndex > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8))) {
             memcpy(&decBuffer[0], &decBuffer[bufferIndex], bytesAvailable);
-            uint32_t bytesRead = core::vfs::fread(decBuffer.get() + bytesAvailable, 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+            uint32_t bytesRead = vfs.fread(decBuffer.get() + bytesAvailable, 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
             if (bytesRead != (DECODER_BUFFER_SIZE - bytesAvailable)) {
                 last_refill = true;
@@ -242,7 +242,7 @@ namespace decoder {
             pcmsamplesbuffer = std::make_unique<uint16_t[]>(pcmsamplesbuffer_size);
 
             // Fill decoderBuffer
-            uint32_t bytesRead = core::vfs::fread(decoderBuffer.get(), 1, DECODER_BUFFER_SIZE, fd);
+            uint32_t bytesRead = vfs.fread(decoderBuffer.get(), 1, DECODER_BUFFER_SIZE, fd);
 
             if (bytesRead == 0) {
                 return 0;
@@ -264,7 +264,7 @@ namespace decoder {
         //refill buffer if necessary(only if over 87,5% of bytes consumed)
         if ( !lastRefill && (decoderBufferIdx > (DECODER_BUFFER_SIZE - (DECODER_BUFFER_SIZE / 8)))) {
             memcpy(&decoderBuffer[0], &decoderBuffer[decoderBufferIdx], bytesAvailable);
-            uint32_t bytesRead = core::vfs::fread(&decoderBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
+            uint32_t bytesRead = vfs.fread(&decoderBuffer[bytesAvailable], 1, DECODER_BUFFER_SIZE - bytesAvailable, fd);
 
             if (bytesRead != (DECODER_BUFFER_SIZE - bytesAvailable)) {
                 lastRefill = true;
