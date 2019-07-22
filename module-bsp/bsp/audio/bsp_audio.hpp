@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <memory>
+#include "functional"
 
 namespace bsp {
 
@@ -28,37 +29,79 @@ namespace bsp {
             Bluetooth
         };
 
-        enum class Flags{
-            OutputMono = 1<<0,
-            OutPutStereo =  1<<1,
-            InputLeft = 1<<2,
-            InputRight = 1<<3
+        enum class Flags {
+            OutputMono = 1 << 0,
+            OutPutStereo = 1 << 1,
+            InputLeft = 1 << 2,
+            InputRight = 1 << 3
         };
 
         using AudioFormat = struct {
             uint32_t sampleRate_Hz;   /*!< Sample rate of audio data */
             uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
             uint32_t flags;             /*!< In/Out configuration flags */
-            uint8_t *data;           /*!< Data start address to transfer per channel */
-            size_t dataSize;         /*!< Transfer size per channel */
         };
+        /**
+* User defined callback.
+* It will be invoked when opened stream needs more frames to process( outputBuffer will be != NULL) or if requested frames count
+* are available to user( inputBuffer will be != NULL).
+* From this callback you can safely use file operations, system calls etc This is because audiostream
+* callbacks are not invoked from IRQ context.
+*
+* If there is more data to process or read user should return:
+*  'AudiostreamCallbackContinue'
+*  if there is no more data to process or read user should return:
+*  'AudiostreamCallbackComplete'
+*  this will close stream and clean up all internally allocated resources.
+*  In case of error return:
+*  'AudiostreamCallbackAbort'
+*  this has the same effect as AudiostreamCallbackComplete.
+*
+* @param stream[in] - pointer to valid stream
+* @param inputBuffer[in] - pointer to buffer where user should copy PCM data
+* @param outputBuffer[out] - pointer to buffer containing valid PCM data
+* @param framesPerBuffer[in] - how many frames user should copy or read from buffer
+* @param userData[in] - user specified data
+* @return audiostream_callback_err_t
+*/
 
-        static std::optional<std::unique_ptr<Audio>> Create(Type type);
-        virtual int32_t Start(const AudioFormat& format) = 0;
+        using audioCallback_t = std::function<int32_t(const void *inputBuffer,
+                                                      void *outputBuffer,
+                                                      unsigned long framesPerBuffer)>;
+
+
+        static std::optional<std::unique_ptr<Audio>> Create(Type type,audioCallback_t callback);
+
+        virtual int32_t Start(const AudioFormat &format) = 0;
+
         virtual int32_t Stop() = 0;
+
         virtual int32_t Pause() = 0;
+
         virtual int32_t Resume() = 0;
-        virtual int32_t OutputVolumeCtrl(uint32_t volume) = 0;
+
+        virtual int32_t OutputVolumeCtrl(uint32_t vol) = 0;
+
         virtual int32_t InputGainCtrl(int8_t gain) = 0;
+
         virtual int32_t OutputPathCtrl(uint32_t outputPath) = 0;
+
         virtual int32_t InputPathCtrl(uint32_t inputPath) = 0;
 
-        Audio() {}
+        virtual uint32_t GetOutputVolume() = 0;
+
+        virtual int8_t GetInputGain() = 0;
+
+
+
+
+        Audio(audioCallback_t callback):callback(callback) {}
+
         virtual ~Audio() {}
 
     protected:
 
-
+        audioCallback_t callback;
 
         bool isInitialized = false;
     };
