@@ -18,10 +18,15 @@
 using namespace bsp;
 
 TEST_CASE( "Testing Linux Audiocodec" ) {
-    auto audiocodec = Audio::Create(Audio::Type::Audiocodec);
+    auto audiocodec = Audio::Create(Audio::Type::Audiocodec,[](const void *inputBuffer,
+                                                               void *outputBuffer,
+                                                               unsigned long framesPerBuffer)->int32_t {
+
+    });
+
     REQUIRE(audiocodec);
 
-    Audio::AudioFormat format{.sampleRate_Hz=44100,.bitWidth=16,.flags=static_cast<uint32_t >(Audio::Flags ::OutPutStereo),.dataSize=4096};
+    Audio::AudioFormat format{.sampleRate_Hz=44100,.bitWidth=16,.flags=static_cast<uint32_t >(Audio::Flags ::OutPutStereo)};
 
     REQUIRE(audiocodec.value()->Start(format) == 0);
 

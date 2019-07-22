@@ -21,7 +21,7 @@
 
 namespace bsp{
 
-    std::optional<std::unique_ptr<Audio>> Audio::Create(bsp::Audio::Type type) {
+    std::optional<std::unique_ptr<Audio>> Audio::Create(bsp::Audio::Type type,audioCallback_t callback) {
 
         std::unique_ptr<Audio> inst;
 
@@ -29,7 +29,7 @@ namespace bsp{
 
             case Type ::Audiocodec:
             {
-                inst = std::make_unique<bsp::LinuxAudiocodec>();
+                inst = std::make_unique<bsp::LinuxAudiocodec>(callback );
             }
                 break;
 
