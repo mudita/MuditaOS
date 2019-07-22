@@ -17,6 +17,7 @@
 #include <variant>
 
 class MuxDaemon;
+class InOutSerialWorker;
 
 enum class NotificationType{
     IncomingCall,
@@ -24,7 +25,9 @@ enum class NotificationType{
     CallBusy,
     CallActive,
     NewIncomingSMS,
-    SignalStrengthUpdate
+    SignalStrengthUpdate,
+    PowerUpProcedureComplete,
+    ServiceReady
 };
 
 
@@ -33,7 +36,7 @@ public:
 
     using NotificationCallback_t =  std::function<void(NotificationType type, std::string resp)>;
 
-    NotificationMuxChannel(MuxDaemon* mux,NotificationCallback_t callback);
+    NotificationMuxChannel(InOutSerialWorker* inout,NotificationCallback_t callback);
     ~NotificationMuxChannel();
 
 

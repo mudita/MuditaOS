@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.14)
 project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
-set(CMAKE_CXX_STANDARD 14)
-
 message("PROJECT TARGET: ${PROJECT_TARGET}")
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
@@ -22,6 +20,7 @@ add_subdirectory( service-eink )
 add_subdirectory( service-evtmgr )
 add_subdirectory( service-appmgr )
 add_subdirectory( service-db )
+add_subdirectory( service-powermgr )
 add_subdirectory( service-cellular )
 
 

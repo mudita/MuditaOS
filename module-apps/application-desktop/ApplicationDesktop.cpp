@@ -60,8 +60,9 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 	//if value of the pin hash is different than 0 it means that home screen is pin protected
 	if( settings.lockPassHash ) {
 		pinLocked = true;
-		screenLocked = true;
 	}
+
+	screenLocked = true;
 
 	createUserInterface();
 

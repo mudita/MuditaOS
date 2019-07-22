@@ -17,22 +17,33 @@ namespace gui {
  *
  */
 class CallWindow: public AppWindow {
-protected:
+public:
 	enum class State {
 		IDLE,
-		RINGING,
-		CALLING,
+		INCOMMING_CALL,
+		OUTGOING_CALL,
 		CALL_IN_PROGRESS,
 		CALL_ENDED
 	};
-
+protected:
+	gui::Label* titleLabel = nullptr;
+	gui::Label* numberLabel = nullptr;
+	State state = State::IDLE;
+	/**
+	 * Manipulates widgets to handle currently set state of the window.
+	 */
+	void setVisibleState();
+	bool handleLeftButton();
+	bool handleCenterButton();
+	bool handleRightButton();
 public:
-	CallWindow( app::Application* app );
+	CallWindow( app::Application* app, std::string windowName = "CallWindow" );
 	virtual ~CallWindow();
 
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+	bool handleSwitchData( SwitchData* data ) override;
 
 	void rebuild() override;
 	void buildInterface() override;

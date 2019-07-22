@@ -27,7 +27,7 @@ constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 ServiceCellular::ServiceCellular()
         : sys::Service(serviceName, 2048, sys::ServicePriority::Idle),
-        muxdaemon(nullptr){
+          muxdaemon(nullptr) {
 
     LOG_INFO("[ServiceCellular] Initializing");
 
@@ -41,8 +41,14 @@ ServiceCellular::ServiceCellular()
 
         switch (type) {
 
-            case NotificationType ::CallBusy:
-            case NotificationType ::CallActive:
+            case NotificationType::PowerUpProcedureComplete:
+            {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer),GetName(),this);
+                return;
+            }
+            case NotificationType::ServiceReady:
+            case NotificationType::CallBusy:
+            case NotificationType::CallActive:
             case NotificationType::CallAborted:
                 // no data field is used
                 break;
@@ -90,10 +96,14 @@ void ServiceCellular::TickHandler(uint32_t id) {
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
     muxdaemon = MuxDaemon::Create(notificationCallback);
-    if(muxdaemon){
+    if (muxdaemon) {
+
+        // Start power up procedure
+        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),GetName(),this);
+        state = State ::PowerUpInProgress;
+
         return sys::ReturnCodes::Success;
-    }
-    else{
+    } else {
         return sys::ReturnCodes::Failure;
     }
 }
@@ -124,22 +134,50 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
                 (msg->type == CellularNotificationMessage::Type::CallBusy)) {
                 stopTimer(callStateTimer);
-            } else {
-                //ignore the rest of notifications
+            }else {
+                //ignore rest of notifications
             }
         }
             break;
+
+        case MessageType ::CellularStartPowerUpProcedure:
+        {
+
+            if(!muxdaemon->PowerUpProcedure()){
+                LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
+                state = State ::Failed;
+            }
+            state = State ::MultiplexerStartInProgress;
+        }
+            break;
+
+        case MessageType ::CellularStartMultiplexer:
+        {
+            if (muxdaemon->StartMultiplexer()) {
+
+                state = State ::Ready;
+                // Propagate "ServiceReady" notification into system
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
+                        static_cast<CellularNotificationMessage::Type >(NotificationType::ServiceReady)),
+                                        sys::BusChannels::ServiceCellularNotifications, this);
+            } else {
+                LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
+                state = State ::Failed;
+            }
+        }
+            break;
+
 
 
         case MessageType::CellularListCurrentCalls: {
             auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "AT+CLCC\r", 3);
             if ((ret.size() == 3) && (ret[2] == "OK")) {
 
-                auto beg = ret[1].find(",",0);
-                beg = ret[1].find(",",beg+1);
+                auto beg = ret[1].find(",", 0);
+                beg = ret[1].find(",", beg + 1);
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
-                if(std::stoul(ret[1].substr(beg+1,1)) == static_cast<uint32_t >(CallStates::Active)){
-                    notificationCallback(NotificationType::CallActive,"");
+                if (std::stoul(ret[1].substr(beg + 1, 1)) == static_cast<uint32_t >(CallStates::Active)) {
+                    notificationCallback(NotificationType::CallActive, "");
                     stopTimer(callStateTimer);
                 }
 
