@@ -17,9 +17,9 @@
 
 namespace bsp{
 
-    class LinuxAudiocodec : public Audio{
+    class LinuxAudiocodec : public AudioDevice{
     public:
-        LinuxAudiocodec(Audio::audioCallback_t callback);
+        LinuxAudiocodec(AudioDevice::audioCallback_t callback);
         virtual ~LinuxAudiocodec();
 
         int32_t Start(const AudioFormat& format) override final;
@@ -34,8 +34,8 @@ namespace bsp{
         int8_t GetInputGain() override final;
 
     private:
-        bsp::Audio::AudioFormat currentFormat;
-        bsp::Audio::AudioFormat pauseResumeFormat;
+        bsp::AudioDevice::AudioFormat currentFormat;
+        bsp::AudioDevice::AudioFormat pauseResumeFormat;
         PaStream *stream;
         float outputVolume = 1.0;
         int8_t inputGain=0;

@@ -16,7 +16,7 @@
 
 namespace bsp {
 
-    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : Audio(callback), stream(nullptr) {
+    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr) {
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
@@ -45,25 +45,25 @@ namespace bsp {
         }
     }
 
-    int32_t LinuxAudiocodec::Start(const bsp::Audio::AudioFormat &format) {
+    int32_t LinuxAudiocodec::Start(const bsp::AudioDevice::AudioFormat &format) {
 
         uint32_t outChan = 0;
         uint32_t inChan = 0;
 
 
-        if (format.flags & static_cast<uint32_t >(Audio::Flags::InputLeft)) {
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) {
             inChan++;
         }
 
-        if (format.flags & static_cast<uint32_t >(Audio::Flags::InputRight)) {
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputRight)) {
             inChan++;
         }
 
-        if (format.flags & static_cast<uint32_t >(Audio::Flags::OutputMono)) {
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::OutputMono)) {
             outChan++;
         }
 
-        if (format.flags & static_cast<uint32_t >(Audio::Flags::OutPutStereo)) {
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)) {
             outChan = 2;
         }
 

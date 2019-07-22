@@ -20,7 +20,7 @@
 
 namespace bsp {
 
-    class Audio {
+    class AudioDevice {
     public:
 
         enum class Type {
@@ -41,6 +41,7 @@ namespace bsp {
             uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
             uint32_t flags;             /*!< In/Out configuration flags */
         };
+
         /**
 * User defined callback.
 * It will be invoked when opened stream needs more frames to process( outputBuffer will be != NULL) or if requested frames count
@@ -70,7 +71,7 @@ namespace bsp {
                                                       unsigned long framesPerBuffer)>;
 
 
-        static std::optional<std::unique_ptr<Audio>> Create(Type type,audioCallback_t callback);
+        static std::optional<std::unique_ptr<AudioDevice>> Create(Type type,audioCallback_t callback);
 
         virtual int32_t Start(const AudioFormat &format) = 0;
 
@@ -95,9 +96,9 @@ namespace bsp {
 
 
 
-        Audio(audioCallback_t callback):callback(callback) {}
+        AudioDevice(audioCallback_t callback):callback(callback) {}
 
-        virtual ~Audio() {}
+        virtual ~AudioDevice() {}
 
     protected:
 
