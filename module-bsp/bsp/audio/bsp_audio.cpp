@@ -14,7 +14,7 @@
 #if defined(TARGET_RT1051)
 
 #elif defined(TARGET_Linux)
-
+#include "audio/linux_audiocodec.hpp"
 #else
 #error "Unsupported target"
 #endif
@@ -29,7 +29,7 @@ namespace bsp{
 
             case Type ::Audiocodec:
             {
-
+                inst = std::make_unique<bsp::LinuxAudiocodec>();
             }
                 break;
 
