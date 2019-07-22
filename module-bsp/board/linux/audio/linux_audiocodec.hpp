@@ -13,9 +13,9 @@
 #define PUREPHONE_LINUX_AUDIOCODEC_HPP
 
 #include "audio/bsp_audio.hpp"
+#include "portaudio.h"
 
 namespace bsp{
-
 
     class LinuxAudiocodec : public Audio{
     public:
@@ -30,6 +30,18 @@ namespace bsp{
         int32_t InputGainCtrl(int8_t gain) override final;
         int32_t OutputPathCtrl(uint32_t outputPath) override final;
         int32_t InputPathCtrl(uint32_t inputPath) override final;
+
+    private:
+        bsp::Audio::AudioFormat format;
+        PaStream *stream;
+
+        static int portAudioCallback( const void *inputBuffer, void *outputBuffer,
+                                   unsigned long framesPerBuffer,
+                                   const PaStreamCallbackTimeInfo* timeInfo,
+                                   PaStreamCallbackFlags statusFlags,
+                                   void *userData );
+
+
     };
 }
 

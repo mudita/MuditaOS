@@ -28,18 +28,19 @@ namespace bsp {
             Bluetooth
         };
 
-        enum class MonoStereo {
-            Stereo,
-            MonoLeft,
-            MonoRight
+        enum class Flags{
+            OutputMono = 1<<0,
+            OutPutStereo =  1<<1,
+            InputLeft = 1<<2,
+            InputRight = 1<<3
         };
 
         using AudioFormat = struct {
             uint32_t sampleRate_Hz;   /*!< Sample rate of audio data */
             uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
-            MonoStereo stereo;         /*!< Mono or stereo */
-            uint8_t *data;           /*!< Data start address to transfer. */
-            size_t dataSize;         /*!< Transfer size. */
+            uint32_t flags;             /*!< In/Out configuration flags */
+            uint8_t *data;           /*!< Data start address to transfer per channel */
+            size_t dataSize;         /*!< Transfer size per channel */
         };
 
         static std::optional<std::unique_ptr<Audio>> Create(Type type);
