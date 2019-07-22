@@ -46,7 +46,7 @@ public:
             : sys::Service(name)
     {
         timer_id = CreateTimer(1000,true);
-        ReloadTimer(timer_id);
+        //ReloadTimer(timer_id);
     }
 
     ~BlinkyService(){
@@ -95,8 +95,8 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
+//  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
+//    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
 
     //vector with launchers to applications

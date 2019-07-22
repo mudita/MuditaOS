@@ -38,8 +38,8 @@ public:
         CallBusy,
         CallActive,
         NewIncomingSMS,
-        SignalStrengthUpdate
-
+        SignalStrengthUpdate,
+        ServiceReady,
     };
 
 

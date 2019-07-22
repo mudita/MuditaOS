@@ -11,14 +11,17 @@
 
 #include "CommunicationMuxChannel.hpp"
 #include "MuxDaemon.hpp"
+#include "InOutSerialWorker.hpp"
+#include "ATParser.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "log/log.hpp"
 #include "ticks.hpp"
 
 
-CommunicationMuxChannel::CommunicationMuxChannel(MuxDaemon* mux):
-        MuxChannel(mux,2,MuxChannel::MuxChannelType ::Communication,"CommunicationChannel")
+CommunicationMuxChannel::CommunicationMuxChannel(InOutSerialWorker* inout):
+        MuxChannel(inout,MuxChannel::MuxChannelType ::Communication,"CommunicationChannel"),
+        inout(inout)
 {
     responseBuffer.reserve(256); // reserve 256bytes in order to avoid unnecessary allocations
 }
@@ -52,7 +55,7 @@ std::vector<std::string> CommunicationMuxChannel::SendCommandReponse(const char 
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     auto cmdSigned = const_cast<char*>(cmd);
-    mux->WriteMuxFrame(GetChannelNumber(), reinterpret_cast<unsigned char*>(cmdSigned),strlen(cmd),static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
+    inout->SendFrame(GetChannelNumber(), reinterpret_cast<unsigned char*>(cmdSigned),strlen(cmd),static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
@@ -73,7 +76,7 @@ std::vector<std::string> CommunicationMuxChannel::SendCommandReponse(const char 
 
         cpp_freertos::LockGuard lock(mutex);
         //tokenize responseBuffer
-        auto ret = Tokenizer(responseBuffer,rxCount,"\r\n");
+        auto ret = ATParser::Tokenizer(responseBuffer,rxCount,"\r\n");
         tokens.insert(std::end(tokens),std::begin(ret),std::end(ret));
 
         if(tokens.size() < rxCount){

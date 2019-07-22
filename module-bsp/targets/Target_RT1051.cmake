@@ -58,6 +58,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/rtc/rtc.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/battery-charger/battery_charger.cpp"
+		
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pwr/lpm.c"
 
         CACHE INTERNAL ""
         )
@@ -70,6 +72,7 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/cmsis
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink
+            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pwr
 
 
         CACHE INTERNAL "")
