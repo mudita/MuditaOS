@@ -112,6 +112,67 @@ TEST_CASE( "Decoder tests" ) {
 
     }
 
+    SECTION("Sample2.flac-> with tags")
+    {
+
+        auto dec = decoder::decoder::Create((cwd + "/sample2.flac").c_str());
+        REQUIRE(dec != nullptr);
+        auto tag = dec->fetchTags();
+
+        SECTION( "Init values:" ) {
+        REQUIRE( tag->total_duration_s == 5 );
+        REQUIRE( tag->artist == "sample1_artist" );
+        REQUIRE( tag->album == "sample1_album" );
+        REQUIRE( tag->title == "sample1_title" );
+        REQUIRE( tag->genre == "Easy Listening" );
+        REQUIRE( tag->year == "1999" );
+        REQUIRE( tag->sample_rate == 44100 );
+        REQUIRE( tag->num_channel == 2 );
+        }
+
+        /*    SECTION( "Set positions:" ) {
+                dec->setPosition(0.5);
+                REQUIRE( dec->getCurrentPosition() == 336/2 );
+                dec->setPosition(0);
+                REQUIRE( dec->getCurrentPosition() == 0 );
+                dec->setPosition(1);
+                REQUIRE( dec->getCurrentPosition() == 336 );
+                dec->setPosition(0.25);
+                REQUIRE( dec->getCurrentPosition() == 336/4 );
+            }*/
+
+    }
+
+    SECTION("Sample2.mp3-> with tags")
+    {
+
+        auto dec = decoder::decoder::Create((cwd + "/sample2.mp3").c_str());
+        REQUIRE(dec != nullptr);
+        auto tag = dec->fetchTags();
+
+        SECTION( "Init values:" ) {
+        REQUIRE( tag->total_duration_s == 5 );
+        REQUIRE( tag->artist == "sample1_artist" );
+        REQUIRE( tag->album == "sample1_album" );
+        REQUIRE( tag->title == "sample1_title" );
+        REQUIRE( tag->genre == "" ); // idtag lib has problems with some tags, skip it
+        REQUIRE( tag->year == "1999" );
+        REQUIRE( tag->sample_rate == 44100 );
+        REQUIRE( tag->num_channel == 2 );
+        }
+
+        /*    SECTION( "Set positions:" ) {
+                dec->setPosition(0.5);
+                REQUIRE( dec->getCurrentPosition() == 336/2 );
+                dec->setPosition(0);
+                REQUIRE( dec->getCurrentPosition() == 0 );
+                dec->setPosition(1);
+                REQUIRE( dec->getCurrentPosition() == 336 );
+                dec->setPosition(0.25);
+                REQUIRE( dec->getCurrentPosition() == 336/4 );
+            }*/
+
+    }
 
 }
 
