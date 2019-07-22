@@ -8,4 +8,4 @@
     - Incoming SMS notification
     - DB operations (callog, handling sms database)
 - Fix deinit/close procedure on RT1051(currently it's not working)
-- Add SIM card support (mainly PIN code support and insert/remove events support during normal operation)
+- Add SIM card support (mainly entering PIN code and insert/remove events support during normal operation)
