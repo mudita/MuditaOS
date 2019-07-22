@@ -12,7 +12,7 @@
 #include "InOutSerialWorker.hpp"
 #include "MuxDaemon.hpp"
 #include "log/log.hpp"
-#include "cellular/bsp_cellular.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
 #include "MuxParser.hpp"
 #include "ATParser.hpp"
 

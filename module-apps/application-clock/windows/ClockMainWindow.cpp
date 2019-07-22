@@ -8,7 +8,7 @@
  */
 
 //module-gui
-#include <module-apps/application-clock/windows/ClockMainWindow.hpp>
+#include "application-clock/windows/ClockMainWindow.hpp"
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/Item.hpp"
 #include "gui/widgets/Image.hpp"
