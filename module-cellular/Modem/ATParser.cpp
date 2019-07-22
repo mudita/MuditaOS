@@ -40,8 +40,6 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
 
     cpp_freertos::LockGuard lock(mutex);
 
-    LOG_FATAL(responseBuffer.c_str());
-
     auto pos = responseBuffer.find("RDY");
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::MeInitializationSuccessful);
