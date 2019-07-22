@@ -26,13 +26,17 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 //module-bsp
-#include "bsp.hpp"
-#include "vfs.hpp"
-#include "keyboard/keyboard.hpp"
+#include "bsp/bsp.hpp"
+#include "bsp/rtc/rtc.hpp"
+#include "bsp/keyboard/keyboard.hpp"
 
+//module-vfs
+#include "vfs.hpp"
+
+//module-sys
 #include "SystemManager/SystemManager.hpp"
 
-#include "rtc/rtc.hpp"
+
 
 class vfs vfs;
 
