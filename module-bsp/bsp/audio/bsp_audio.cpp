@@ -21,28 +21,47 @@
 
 namespace bsp{
 
-    std::optional<std::unique_ptr<Audio>> Audio::Create(bsp::Audio::Type type,audioCallback_t callback) {
+    std::optional<std::unique_ptr<AudioDevice>> AudioDevice::Create(bsp::AudioDevice::Type type,audioCallback_t callback) {
 
-        std::unique_ptr<Audio> inst;
+        std::unique_ptr<AudioDevice> inst;
 
         switch(type){
 
             case Type ::Audiocodec:
             {
+#if defined(TARGET_RT1051)
+
+#elif defined(TARGET_Linux)
                 inst = std::make_unique<bsp::LinuxAudiocodec>(callback );
+#else
+                #error "Unsupported target"
+#endif
+
             }
                 break;
 
 
             case Type ::Bluetooth:
             {
+#if defined(TARGET_RT1051)
 
+#elif defined(TARGET_Linux)
+
+#else
+#error "Unsupported target"
+#endif
             }
                 break;
 
             case Type::Cellular:
             {
+#if defined(TARGET_RT1051)
 
+#elif defined(TARGET_Linux)
+
+#else
+#error "Unsupported target"
+#endif
             }
                 break;
 
