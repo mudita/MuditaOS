@@ -1,0 +1,11 @@
+22-07-2019 Mateusz Piesta mateusz.piesta@mudita.com:
+- Add low power modes support
+- Add hardware control flow
+- Add parsing incoming SMS + notifications
+- Add to Cellular Service API:
+    - Send SMS
+    - Remove SMSes
+    - Incoming SMS notification
+    - DB operations (callog, handling sms database)
+- Fix deinit/close procedure on RT1051(currently it's not working)
+- Add SIM card support (mainly PIN code support and insert/remove events support during normal operation)
