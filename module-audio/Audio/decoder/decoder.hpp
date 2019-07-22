@@ -15,7 +15,7 @@
 #include <memory>
 #include <cstring>
 
-#include "vfs/vfs.hpp"
+#include "vfs.hpp"
 
 namespace decoder {
 
@@ -106,12 +106,13 @@ namespace decoder {
         uint32_t sampleRate = 0;
         uint32_t chanNumber = 0;
         float position = 0;
-        core::FILE *fd = nullptr;
+        vfs::FILE *fd = nullptr;
         uint32_t  fileSize = 0;
         std::string filePath;
 
         // Worker buffer used for converting mono stream to stereo
         std::unique_ptr<int16_t[]> workerBuffer;
+
     };
 
 }

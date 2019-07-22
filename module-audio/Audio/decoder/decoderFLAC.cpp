@@ -42,7 +42,7 @@ namespace decoder {
             if (pos == std::string::npos) {
                 tags->title.append(filePath);
             } else {
-                tags->title.append(&filePath[pos]);
+                tags->title.append(&filePath[pos+1]);
             }
         }
         return std::make_unique<Tags>(*tags);
@@ -96,13 +96,13 @@ namespace decoder {
 
     size_t decoderFLAC::drflac_read(void *pUserData, void *pBufferOut, size_t bytesToRead) {
         decoderFLAC *userdata = (decoderFLAC *) pUserData;
-        return core::vfs::fread(pBufferOut, 1, bytesToRead, userdata->fd);
+        return vfs.fread(pBufferOut, 1, bytesToRead, userdata->fd);
     }
 
 
     drflac_bool32 decoderFLAC::drflac_seek(void *pUserData, int offset, drflac_seek_origin origin) {
         decoderFLAC *userdata = (decoderFLAC *) pUserData;
-        return !core::vfs::fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
+        return !vfs.fseek(userdata->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
     }
 
 

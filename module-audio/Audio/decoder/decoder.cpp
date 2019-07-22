@@ -7,7 +7,7 @@
  *  @details
  */
 
-#include "decoder.h"
+#include "decoder.hpp"
 
 #include "decoderMP3.hpp"
 #include "decoderFLAC.hpp"
@@ -20,19 +20,21 @@ namespace decoder {
             : filePath(fileName),
               workerBuffer(std::make_unique<int16_t[]>(workerBufferSize)) {
 
-        fd = core::vfs::fopen(fileName, "r");
+        fd = vfs.fopen(fileName, "r");
         if (fd == NULL) {
             return;
         }
 
-        core::vfs::fseek(fd,0,SEEK_END);
-        fileSize = core::vfs::ftell(fd);
-        core::vfs::rewind(fd);
+        vfs.fseek(fd,0,SEEK_END);
+        fileSize = vfs.ftell(fd);
+        vfs.rewind(fd);
 
     }
 
      decoder::~decoder() {
-         core::vfs::fclose(fd);
+        if(fd){
+            vfs.fclose(fd);
+        }
     }
 
     std::unique_ptr<decoder> decoder::Create(const char *file) {
