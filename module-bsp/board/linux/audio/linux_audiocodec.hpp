@@ -45,9 +45,6 @@ namespace bsp{
                                    PaStreamCallbackFlags statusFlags,
                                    void *userData );
 
-        std::unique_ptr<int16_t []> workerBuffer = nullptr;
-
-
     };
 }
 
