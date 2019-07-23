@@ -16,8 +16,7 @@
 
 namespace bsp {
 
-    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr),
-                                                                 workerBuffer(std::make_unique<int16_t[]>(4096 * 4)) {
+    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr) {
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
