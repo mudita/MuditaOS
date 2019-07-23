@@ -17,7 +17,7 @@ extern "C" {
 
 static time_t timestampOffset;
 static time_t timestampAlarm;
-
+time_t localOffset;
 static xQueueHandle qHandleRtcIrq = NULL;
 static TaskHandle_t rtcWorkerHandle = NULL;
 
@@ -39,6 +39,9 @@ namespace bsp{
 	{
 
 		time_t current = time(NULL);
+		struct tm* local = localtime(&current);
+
+		localOffset = local->tm_gmtoff;
 
 		timestampOffset = timestamp - current;
 		return RtcBspOK;
@@ -149,18 +152,15 @@ namespace bsp{
 		return seconds;
 	}
 
-	RtcBspError_e rtc_SetMinuteAlarm(void)
+	RtcBspError_e rtc_SetMinuteAlarm(time_t timestamp)
 	{
-		time_t timestamp;
-		rtc_GetCurrentTimestamp( &timestamp);
-
 		uint32_t secondsToMinute = 60 - ( timestamp % 60 );
 
 		struct tm date;
 		rtc_GetCurrentDateTime(&date);
 
-		LOG_INFO("seconds %d",  ( timestamp % 60 ));
-		LOG_INFO("seconds to minute %d", secondsToMinute);
+/*		LOG_INFO("seconds %d",  ( timestamp % 60 ));
+		LOG_INFO("seconds to minute %d", secondsToMinute);*/
 
 		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
 	}

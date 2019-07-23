@@ -89,10 +89,16 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 				return false;
 		}
 
-		bsp::rtc_SetMinuteAlarm();
-
 		time_t timestamp;
 		bsp::rtc_GetCurrentTimestamp(&timestamp);
+		bsp::rtc_SetMinuteAlarm(timestamp);
+
+		struct tm time;
+
+		bsp::rtc_GetCurrentDateTime(&time);
+		LOG_INFO("date %02d:%02d", time.tm_hour, time.tm_min);
+		LOG_INFO("timestamp %02d:%02d", ((timestamp % 86400) / 3600), ((timestamp % 3600) / 60));
+
 		auto message = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
 		message->timestamp = timestamp;
 		sys::Bus::SendUnicast(message, "EventManager", this->service);
@@ -109,8 +115,12 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
 
-	bsp::rtc_SetDateTimeFromTimestamp(1563436000);
-	bsp::rtc_SetMinuteAlarm();
+
+	bsp::rtc_SetDateTimeFromTimestamp( 1563926330);
+//	bsp::rtc_SetDateTimeFromTimestamp(1563436015);
+	time_t timestamp;
+	bsp::rtc_GetCurrentTimestamp(&timestamp);
+	bsp::rtc_SetMinuteAlarm(timestamp);
 	return true;
 }
 

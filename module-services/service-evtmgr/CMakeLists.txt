@@ -16,6 +16,7 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/EventManager.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/alarm/EventManagerAlarm.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/WorkerEvent.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/EventManager.hpp"

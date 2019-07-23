@@ -18,11 +18,18 @@
 
 class EventManager: public sys::Service {
 private:
-	uint32_t getDBAlarmCount(void);
+	bool GetAlarmDbEmpty(void);
+	void HandleAlarmTrigger(sys::DataMessage* msgl);
+	void GetNextAlarmTimestamp(time_t timestamp);
 protected:
 	sys::Worker* EventWorker = nullptr;
 	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
 	std::string targetApplication;
+	uint32_t alarmTimestamp;
+	uint32_t alarmID;
+	bool alarmDBEmpty = false;
+	bool alarmUpdated = false;
+	bool alarmIsValid = false;
 public:
 	EventManager(const std::string& name);
     ~EventManager();

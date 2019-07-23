@@ -87,6 +87,18 @@ TEST_CASE("Alarms Table tests")
 	// Get count of elements by invalid field's ID
 	REQUIRE(alarmsDb.alarms.GetCountByFieldID("invalid_field", 0) == 0);
 
+	// Update existing element in table
+	alarmsRow.ID = 4;
+	alarmsRow.path = "updated";
+	alarmsRow.time = 2222;
+	REQUIRE(alarmsDb.alarms.Update(alarmsRow));
+
+	// Get record by time
+	auto alarmByTime = alarmsDb.alarms.GetNext(2000);
+
+	REQUIRE(alarmByTime.ID == 4);
+	REQUIRE(alarmByTime.time == 2222);
+
 	// Table should have now 3 elements
 	REQUIRE(alarmsDb.alarms.RemoveByID(3));
 

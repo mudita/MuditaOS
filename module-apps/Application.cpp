@@ -172,7 +172,10 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		time_t timestamp = msg->timestamp;
 		struct tm time;
 		time =*localtime(&timestamp);
-		LOG_INFO("%02d:%02d", time.tm_hour, time.tm_min);
+		//LOG_INFO("%02d:%02d", time.tm_hour - time.tm_gmtoff / 3600, time.tm_min);
+		uint32_t hour = (timestamp % 86400) / 3600;
+		uint32_t min = (timestamp % 3600) / 60;
+		LOG_INFO("%02d:%02d", hour , min);
 	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {

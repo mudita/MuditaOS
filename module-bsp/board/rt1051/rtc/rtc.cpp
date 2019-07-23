@@ -241,7 +241,22 @@ namespace bsp{
 
 		return seconds;
 	}
+
+	RtcBspError_e rtc_SetMinuteAlarm(time_t timestamp)
+	{
+		uint32_t secondsToMinute = 60 - ( timestamp % 60 );
+
+		struct tm date;
+		rtc_GetCurrentDateTime(&date);
+
+/*		LOG_INFO("seconds %d",  ( timestamp % 60 ));
+		LOG_INFO("seconds to minute %d", secondsToMinute);*/
+
+		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
+	}
 }
+
+
 
 extern "C"
 {

@@ -142,6 +142,14 @@ public:
 	const std::string& getApplication() const { return application; };
 };
 
+class EVMAlarmSwitchData :public gui::SwitchData
+{
+public:
+	EVMAlarmSwitchData() {};
+	EVMAlarmSwitchData(uint32_t id) : dbID(id) {};
+	~EVMAlarmSwitchData() {};
+	uint32_t dbID = 0;
+};
 } /* namespace sevm*/
 
 #endif /* MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_ */

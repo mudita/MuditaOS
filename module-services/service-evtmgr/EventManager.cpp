@@ -22,6 +22,8 @@ EventManager::EventManager(const std::string& name)
 {
 	LOG_INFO("[EventManager] Initializing");
 
+	alarmTimestamp = 0;
+	alarmID = 0;
 	busChannels.push_back(sys::BusChannels::ServiceDatabaseAlarmNotifications);
 }
 
@@ -41,10 +43,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
 	{
-		LOG_INFO("DB updated");
-		AlarmsRecord record = DBServiceAPI::AlarmGetNext(this, 0);
-		LOG_INFO("Received alarm record ID: %d", record.ID);
-		LOG_INFO("Path %s", record.path.c_str());
+		alarmUpdated = false;
+		alarmDBEmpty = GetAlarmDbEmpty();
 	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
@@ -59,18 +59,18 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
-		if(msg->keyState == sevm::KeyboardEvents::keyPressed)
-		{
-			AlarmsRecord alarma;
-				alarma.time=12;
-				alarma.snooze=34;
-				alarma.status=56;
-				alarma.path = "78";
-
-				DBServiceAPI::AlarmAdd(this, alarma);
-		}
-
 		handled = true;
+
+		if(msg->keyState == sevm::KeyboardEvents::keyReleasedShort)
+		{
+			AlarmsRecord record;
+			record.time = 0;
+			record.status = 1;
+			record.snooze = 0;
+			record.path = "test.mp3";
+
+			DBServiceAPI::AlarmAdd(this, record);
+		}
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {
 		sevm::EVMFocusApplication* msg = reinterpret_cast<sevm::EVMFocusApplication*>( msgl );
@@ -107,14 +107,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
 			msgl->sender == this->GetName() ){
 
-		sevm::RtcMinuteAlarmMessage* msg = reinterpret_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
-
-		auto message = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
-		message->timestamp = msg->timestamp;
-
-		if( targetApplication.empty() == false ){
-			sys::Bus::SendUnicast(message, targetApplication, this);
-		}
+		HandleAlarmTrigger(msgl);
 	}
 
 	if( handled )
