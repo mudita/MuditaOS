@@ -12,8 +12,29 @@
 #ifndef PUREPHONE_AUDIO_HPP
 #define PUREPHONE_AUDIO_HPP
 
+#include <memory>
+#include <optional>
+
+class decoder;
+
+class Tags;
+
+namespace bsp {
+    class AudioDevice;
+}
 
 class Audio {
+public:
+
+    Audio();
+
+    virtual ~Audio();
+
+
+
+private:
+
+
 
 };
 

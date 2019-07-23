@@ -34,7 +34,6 @@ namespace bsp{
         int8_t GetInputGain() override final;
 
     private:
-        bsp::AudioDevice::AudioFormat currentFormat;
         bsp::AudioDevice::AudioFormat pauseResumeFormat;
         PaStream *stream;
         float outputVolume = 1.0;
@@ -45,6 +44,8 @@ namespace bsp{
                                    const PaStreamCallbackTimeInfo* timeInfo,
                                    PaStreamCallbackFlags statusFlags,
                                    void *userData );
+
+        std::unique_ptr<int16_t []> workerBuffer = nullptr;
 
 
     };
