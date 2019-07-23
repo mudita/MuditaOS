@@ -23,7 +23,7 @@ bool AlarmsTable::Create() {
            return false;
        }
 
-    ret = db->Execute(alarmsInitialization);
+   // ret = db->Execute(alarmsInitialization);
     return ret;
 }
 
@@ -178,7 +178,7 @@ uint32_t AlarmsTable::GetCountByFieldID(const char *field, uint32_t id) {
 
 AlarmsTableRow AlarmsTable::GetNext(time_t time)
 {
-	auto retQuery = db->Query("SELECT * from alarms WHERE status=1 AND time>%u ORDER BY time ASC LIMIT 1;", time % 86400);
+	auto retQuery = db->Query("SELECT * from alarms WHERE status=1 AND time>=%u ORDER BY time ASC LIMIT 1;", time );
 
 	if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
 		return AlarmsTableRow();
