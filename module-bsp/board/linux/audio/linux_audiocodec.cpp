@@ -16,13 +16,13 @@
 
 namespace bsp {
 
-    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr) {
+    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr),
+                                                                 workerBuffer(std::make_unique<int16_t[]>(4096 * 4)) {
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
             return;
         }
-
 
         isInitialized = true;
     }
@@ -96,6 +96,7 @@ namespace bsp {
         }
 
         currentFormat = format;
+        pauseResumeFormat = {};
 
         return paNoError;
     }
@@ -108,7 +109,6 @@ namespace bsp {
 
         stream = nullptr;
         currentFormat = {};
-        pauseResumeFormat = {};
 
         return 0;
     }
@@ -117,17 +117,37 @@ namespace bsp {
                                            const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags,
                                            void *userData) {
 
-        LinuxAudiocodec* ptr = reinterpret_cast<LinuxAudiocodec*>(userData);
+        LinuxAudiocodec *ptr = reinterpret_cast<LinuxAudiocodec *>(userData);
 
-        if(inputBuffer){
+        uint32_t framesToFetch = 0;
+
+        if (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::OutPutStereo)) {
+            framesToFetch = framesPerBuffer * 2;
+        }
+
+        if (inputBuffer) {
             //TODO:M.P volume scaling
         }
 
-        if(outputBuffer){
-            //TODO:M.P volume scaling
+
+        auto ret = ptr->callback(inputBuffer, outputBuffer, framesToFetch);
+        if (ret == 0) {
+            // close stream
+            return paComplete;
+        } else if (ret <= framesToFetch) {
+
+            // Scale output buffer
+            if (outputBuffer) {
+                int16_t *pBuff = reinterpret_cast<int16_t *>(outputBuffer);
+                std::transform(pBuff, pBuff + framesToFetch, pBuff,
+                               [ptr](int16_t c) -> int16_t {
+                                   return c * ptr->outputVolume;
+                               });
+            }
+            return paContinue;
         }
 
-        return ptr->callback(inputBuffer,outputBuffer,framesPerBuffer);
+        return paAbort;
     }
 
     int32_t LinuxAudiocodec::InputGainCtrl(int8_t gain) {
@@ -139,7 +159,7 @@ namespace bsp {
         if (vol >= 100) {
             outputVolume = 1.0;
         } else {
-            outputVolume = vol / 100;
+            outputVolume = (float) vol / 100;
         }
 
         return 0;

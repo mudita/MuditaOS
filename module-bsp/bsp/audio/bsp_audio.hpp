@@ -95,6 +95,8 @@ namespace bsp {
 
 
 
+        bsp::AudioDevice::AudioFormat GetCurrentFormat(){return currentFormat;}
+
 
         AudioDevice(audioCallback_t callback):callback(callback) {}
 
@@ -102,7 +104,8 @@ namespace bsp {
 
     protected:
 
-        audioCallback_t callback;
+        bsp::AudioDevice::AudioFormat currentFormat;
+        audioCallback_t callback = nullptr;
 
         bool isInitialized = false;
     };
