@@ -11,14 +11,14 @@
 
 #include "Profile.hpp"
 
-Profile::Profile(const std::string& name,const Type type, uint32_t vol, int8_t gain, uint32_t outPath, uint32_t inPath,
+Profile::Profile(const std::string& name,const Type type, uint32_t vol, float gain, uint32_t outPath, uint32_t inPath,
                  bsp::AudioDevice::Type devType, std::function<int32_t()> callback)
         : name(name),type(type), outputVolume(vol), inputGain(gain), outputPath(outPath), inputPath(inPath),
           audioDeviceType(devType), dbAccessCallback(callback) {
 }
 
 
-void Profile::SetInputGain(int8_t gain) {
+void Profile::SetInputGain(float gain) {
     inputGain = gain;
     dbAccessCallback();
 }

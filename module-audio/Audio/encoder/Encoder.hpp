@@ -34,6 +34,9 @@ public:
     float getCurrentPosition() {
         return position;
     }
+
+    uint32_t GetFileSize(){return fileSize;}
+
     const Format format;
 protected:
 

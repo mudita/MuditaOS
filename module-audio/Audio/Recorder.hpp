@@ -16,6 +16,7 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include <Audio/encoder/Encoder.hpp>
 
 class Encoder;
 class Tags;
@@ -35,7 +36,7 @@ public:
         Pause
     };
 
-    Recorder(const char *file, const Profile* profile);
+    Recorder(const char *file, const Profile* profile,const Encoder::Format& frmt);
     virtual ~Recorder();
 
     int32_t Start();
@@ -52,12 +53,17 @@ public:
 
     const Profile* GetProfile(){return profile;}
 
+    float GetPosition(){return enc->getCurrentPosition();}
+
+    uint32_t GetSize(){return enc->GetFileSize();}
+
 private:
     std::unique_ptr<Encoder> enc;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
     const Profile* profile;
     State state = State ::Idle;
     std::function<int32_t (int32_t)> errorCallback = nullptr;
+    const Encoder::Format format;
 };
 
 

@@ -16,8 +16,8 @@
 
 using namespace bsp;
 
-Recorder::Recorder(const char *file, const Profile *profile):profile(profile) {
-    enc = Encoder::Create(file,Encoder::Format{.chanNr=1,.sampleRate=44100,.sampleSiz=16});
+Recorder::Recorder(const char *file, const Profile *profile,const Encoder::Format& frmt):profile(profile),format(frmt) {
+    enc = Encoder::Create(file,format);
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
@@ -44,8 +44,17 @@ int32_t Recorder::Start() {
     audioDevice->InputPathCtrl(profile->GetInputPath());
 
     state = State::Recording;
+
+    uint32_t flags = 0;
+    if(format.chanNr == 2){
+       flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft) | static_cast<uint32_t >(AudioDevice::Flags::InputRight);
+    }
+    else if(format.chanNr == 1){
+        flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft);
+    }
+
     return audioDevice->Start(
-            AudioDevice::AudioFormat{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=static_cast<uint32_t >(AudioDevice::Flags::InputLeft)});
+            AudioDevice::AudioFormat{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags});
 }
 
 int32_t Recorder::Stop() {
