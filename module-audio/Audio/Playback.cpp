@@ -16,13 +16,18 @@
 
 using namespace bsp;
 
-Playback::Playback(const char *file, const Profile *profile) : dec(nullptr), audioDevice(nullptr), profile(profile) {
+Playback::Playback(const char *file, const Profile *profile) : audioDevice(nullptr),dec(nullptr), profile(profile) {
     dec = decoder::Create(file);
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
-        return dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
+        auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
+        if(ret == 0){
+            state = State ::Idle;
+            endOfFileCallback();
+        }
+        return ret;
 
     }).value_or(nullptr);
 }
@@ -31,7 +36,7 @@ Playback::~Playback() {
 
 }
 
-int32_t Playback::Play() {
+int32_t Playback::Play(std::function<int32_t ()> eofCallback) {
     auto tags = dec->fetchTags();
 
     // Set audio device's parameters
@@ -40,6 +45,7 @@ int32_t Playback::Play() {
     audioDevice->OutputPathCtrl(profile->GetOutputPath());
     audioDevice->InputPathCtrl(profile->GetInputPath());
 
+    endOfFileCallback = eofCallback;
     state = State::Play;
     return audioDevice->Start(
             AudioDevice::AudioFormat{.sampleRate_Hz=tags->sample_rate, .bitWidth=16, .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)});
@@ -74,7 +80,12 @@ int32_t Playback::SwitchProfile(const Profile *prof) {
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
-        return dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
+        auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
+        if(ret == 0){
+            state = State ::Idle;
+            endOfFileCallback();
+        }
+        return ret;
 
     }).value_or(nullptr);
 
@@ -83,12 +94,12 @@ int32_t Playback::SwitchProfile(const Profile *prof) {
             break;
 
         case State ::Play:
-            Play();
+            Play(endOfFileCallback);
             break;
 
         case State ::Pause:
             //TODO:M.P remove this nasty hack..
-            Play();
+            Play(endOfFileCallback);
             Pause();
             break;
 

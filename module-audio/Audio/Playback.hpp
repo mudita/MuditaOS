@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <optional>
+#include <functional>
 
 class decoder;
 class Tags;
@@ -36,7 +37,7 @@ public:
     Playback(const char *file, const Profile* profile);
     virtual ~Playback();
 
-    int32_t Play();
+    int32_t Play(std::function<int32_t ()> eofCallback);
 
     int32_t Stop();
 
@@ -46,13 +47,18 @@ public:
 
     uint32_t GetPosition();
 
+    State GetState(){return state;}
+
+    const Profile* GetProfile(){return profile;}
+
     int32_t SwitchProfile(const Profile* prof);
 
 private:
-    std::unique_ptr<decoder> dec;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
+    std::unique_ptr<decoder> dec;
     const Profile* profile;
     State state = State ::Idle;
+    std::function<int32_t ()> endOfFileCallback = nullptr;
 };
 
 

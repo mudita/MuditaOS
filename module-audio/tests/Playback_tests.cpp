@@ -30,17 +30,82 @@ TEST_CASE( "Playback tests" ) {
 
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
-        ProfilePlaybackLoudspeaker  profileLoudspeaker(nullptr,100,0);
-        ProfilePlaybackHeadphones   profileHeadphones(nullptr,20,0);
-        Playback sample1((cwd + "/sample1.wav").c_str(),&profileLoudspeaker);
-        sample1.Play();
+        SECTION("Full playback"){
+            ProfilePlaybackLoudspeaker  profileLoudspeaker(nullptr,100,0);
+            Playback sample1((cwd + "/sample1.wav").c_str(),&profileLoudspeaker);
+            sample1.Play([]()->int32_t{
+                std::cout<<"End of file reached!\n";
+                return 0;
+            });
+            sleep(6);
+            REQUIRE(sample1.GetState() == Playback::State::Idle);
+        }
 
-        sleep(1);
-        sample1.Pause();
-        sample1.SwitchProfile(&profileHeadphones);
-        sample1.Resume();
+        SECTION("Switch profile during playback"){
+            ProfilePlaybackLoudspeaker  profileLoudspeaker(nullptr,100,0);
+            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20,0);
+            Playback sample1((cwd + "/sample1.wav").c_str(),&profileLoudspeaker);
+            sample1.Play([]()->int32_t{
+                std::cout<<"End of file reached!\n";
+                return 0;
+            });
+            sleep(1);
+            sample1.SwitchProfile(&profileHeadphones);
+            REQUIRE(sample1.GetProfile()->GetName() == "Playback Headphones");
+            sleep(5);
+            REQUIRE(sample1.GetState() == Playback::State::Idle);
+        }
 
-        sleep(6);
+        SECTION("Destroy playback object before end of file"){
+            {
+                ProfilePlaybackLoudspeaker profileLoudspeaker(nullptr, 100, 0);
+                Playback sample1((cwd + "/sample1.wav").c_str(), &profileLoudspeaker);
+                sample1.Play([]()->int32_t{
+                    std::cout<<"End of file reached!\n";
+                    return 0;
+                });
+                sleep(1);
+            }
+        }
+
+        SECTION("Pause/Resume/Stop sequence"){
+            ProfilePlaybackLoudspeaker profileLoudspeaker(nullptr, 100, 0);
+            Playback sample1((cwd + "/sample1.wav").c_str(), &profileLoudspeaker);
+            sample1.Play([]()->int32_t{
+                std::cout<<"End of file reached!\n";
+                return 0;
+            });
+            sleep(1);
+            sample1.Pause();
+            REQUIRE(sample1.GetState() == Playback::State::Pause);
+            sleep(1);
+            sample1.Resume();
+            REQUIRE(sample1.GetState() == Playback::State::Play);
+            sleep(1);
+            sample1.Stop();
+            REQUIRE(sample1.GetState() == Playback::State::Idle);
+        }
+
+        SECTION("Pause/Resume/Stop sequence with profile switching"){
+            ProfilePlaybackLoudspeaker profileLoudspeaker(nullptr, 100, 0);
+            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20,0);
+            Playback sample1((cwd + "/sample1.wav").c_str(), &profileLoudspeaker);
+            sample1.Play([]()->int32_t{
+                std::cout<<"End of file reached!\n";
+                return 0;
+            });
+            sleep(1);
+            sample1.Pause();
+            sample1.SwitchProfile(&profileHeadphones);
+            REQUIRE(sample1.GetState() == Playback::State::Pause);
+            REQUIRE(sample1.GetProfile()->GetName() == "Playback Headphones");
+            sleep(1);
+            sample1.Resume();
+            REQUIRE(sample1.GetState() == Playback::State::Play);
+            sleep(1);
+            sample1.Stop();
+            REQUIRE(sample1.GetState() == Playback::State::Idle);
+        }
 
     }
 
