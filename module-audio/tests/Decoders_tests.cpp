@@ -1,11 +1,10 @@
-
 /*
- * @file main_tests.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 14.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
+ *  @file Decoders_tests.cpp
+ *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
+ *  @date 24.07.19
+ *  @brief  
+ *  @copyright Copyright (C) 2019 mudita.com
+ *  @details
  */
 
 #include <iostream>
@@ -39,18 +38,18 @@ TEST_CASE( "Decoder tests" ) {
         REQUIRE( tag->title == "sample1.wav" );
         REQUIRE( tag->sample_rate == 44100 );
         REQUIRE( tag->num_channel == 2 );
-        }
+    }
 
-        /*    SECTION( "Set positions:" ) {
-                dec->setPosition(0.5);
-                REQUIRE( dec->getCurrentPosition() == 336/2 );
-                dec->setPosition(0);
-                REQUIRE( dec->getCurrentPosition() == 0 );
-                dec->setPosition(1);
-                REQUIRE( dec->getCurrentPosition() == 336 );
-                dec->setPosition(0.25);
-                REQUIRE( dec->getCurrentPosition() == 336/4 );
-            }*/
+    /*    SECTION( "Set positions:" ) {
+            dec->setPosition(0.5);
+            REQUIRE( dec->getCurrentPosition() == 336/2 );
+            dec->setPosition(0);
+            REQUIRE( dec->getCurrentPosition() == 0 );
+            dec->setPosition(1);
+            REQUIRE( dec->getCurrentPosition() == 336 );
+            dec->setPosition(0.25);
+            REQUIRE( dec->getCurrentPosition() == 336/4 );
+        }*/
 
     }
 
@@ -68,18 +67,18 @@ TEST_CASE( "Decoder tests" ) {
         REQUIRE( tag->title == "sample1.mp3" );
         REQUIRE( tag->sample_rate == 44100 );
         REQUIRE( tag->num_channel == 2 );
-        }
+    }
 
-        /*    SECTION( "Set positions:" ) {
-                dec->setPosition(0.5);
-                REQUIRE( dec->getCurrentPosition() == 336/2 );
-                dec->setPosition(0);
-                REQUIRE( dec->getCurrentPosition() == 0 );
-                dec->setPosition(1);
-                REQUIRE( dec->getCurrentPosition() == 336 );
-                dec->setPosition(0.25);
-                REQUIRE( dec->getCurrentPosition() == 336/4 );
-            }*/
+    /*    SECTION( "Set positions:" ) {
+            dec->setPosition(0.5);
+            REQUIRE( dec->getCurrentPosition() == 336/2 );
+            dec->setPosition(0);
+            REQUIRE( dec->getCurrentPosition() == 0 );
+            dec->setPosition(1);
+            REQUIRE( dec->getCurrentPosition() == 336 );
+            dec->setPosition(0.25);
+            REQUIRE( dec->getCurrentPosition() == 336/4 );
+        }*/
 
     }
 
@@ -97,18 +96,18 @@ TEST_CASE( "Decoder tests" ) {
         REQUIRE( tag->title == "sample1.flac" );
         REQUIRE( tag->sample_rate == 44100 );
         REQUIRE( tag->num_channel == 2 );
-        }
+    }
 
-        /*    SECTION( "Set positions:" ) {
-                dec->setPosition(0.5);
-                REQUIRE( dec->getCurrentPosition() == 336/2 );
-                dec->setPosition(0);
-                REQUIRE( dec->getCurrentPosition() == 0 );
-                dec->setPosition(1);
-                REQUIRE( dec->getCurrentPosition() == 336 );
-                dec->setPosition(0.25);
-                REQUIRE( dec->getCurrentPosition() == 336/4 );
-            }*/
+    /*    SECTION( "Set positions:" ) {
+            dec->setPosition(0.5);
+            REQUIRE( dec->getCurrentPosition() == 336/2 );
+            dec->setPosition(0);
+            REQUIRE( dec->getCurrentPosition() == 0 );
+            dec->setPosition(1);
+            REQUIRE( dec->getCurrentPosition() == 336 );
+            dec->setPosition(0.25);
+            REQUIRE( dec->getCurrentPosition() == 336/4 );
+        }*/
 
     }
 
@@ -128,18 +127,18 @@ TEST_CASE( "Decoder tests" ) {
         REQUIRE( tag->year == "1999" );
         REQUIRE( tag->sample_rate == 44100 );
         REQUIRE( tag->num_channel == 2 );
-        }
+    }
 
-        /*    SECTION( "Set positions:" ) {
-                dec->setPosition(0.5);
-                REQUIRE( dec->getCurrentPosition() == 336/2 );
-                dec->setPosition(0);
-                REQUIRE( dec->getCurrentPosition() == 0 );
-                dec->setPosition(1);
-                REQUIRE( dec->getCurrentPosition() == 336 );
-                dec->setPosition(0.25);
-                REQUIRE( dec->getCurrentPosition() == 336/4 );
-            }*/
+    /*    SECTION( "Set positions:" ) {
+            dec->setPosition(0.5);
+            REQUIRE( dec->getCurrentPosition() == 336/2 );
+            dec->setPosition(0);
+            REQUIRE( dec->getCurrentPosition() == 0 );
+            dec->setPosition(1);
+            REQUIRE( dec->getCurrentPosition() == 336 );
+            dec->setPosition(0.25);
+            REQUIRE( dec->getCurrentPosition() == 336/4 );
+        }*/
 
     }
 
@@ -159,18 +158,18 @@ TEST_CASE( "Decoder tests" ) {
         REQUIRE( tag->year == "1999" );
         REQUIRE( tag->sample_rate == 44100 );
         REQUIRE( tag->num_channel == 2 );
-        }
+    }
 
-        /*    SECTION( "Set positions:" ) {
-                dec->setPosition(0.5);
-                REQUIRE( dec->getCurrentPosition() == 336/2 );
-                dec->setPosition(0);
-                REQUIRE( dec->getCurrentPosition() == 0 );
-                dec->setPosition(1);
-                REQUIRE( dec->getCurrentPosition() == 336 );
-                dec->setPosition(0.25);
-                REQUIRE( dec->getCurrentPosition() == 336/4 );
-            }*/
+    /*    SECTION( "Set positions:" ) {
+            dec->setPosition(0.5);
+            REQUIRE( dec->getCurrentPosition() == 336/2 );
+            dec->setPosition(0);
+            REQUIRE( dec->getCurrentPosition() == 0 );
+            dec->setPosition(1);
+            REQUIRE( dec->getCurrentPosition() == 336 );
+            dec->setPosition(0.25);
+            REQUIRE( dec->getCurrentPosition() == 336/4 );
+        }*/
 
     }
 
