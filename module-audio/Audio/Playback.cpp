@@ -13,10 +13,11 @@
 #include "bsp/audio/bsp_audio.hpp"
 #include "decoder/decoder.hpp"
 #include "Profiles/Profile.hpp"
+#include "Common.hpp"
 
 using namespace bsp;
 
-Playback::Playback(const char *file, const Profile *profile) : audioDevice(nullptr),dec(nullptr), profile(profile) {
+Playback::Playback(const char *file, const Profile *profile) : Operation(profile),dec(nullptr)  {
     dec = decoder::Create(file);
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
@@ -25,7 +26,7 @@ Playback::Playback(const char *file, const Profile *profile) : audioDevice(nullp
         auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
         if(ret == 0){
             state = State ::Idle;
-            endOfFileCallback();
+            eventCallback(0); // TODO:M.P pass proper err code
         }
         return ret;
 
@@ -36,7 +37,12 @@ Playback::~Playback() {
 
 }
 
-int32_t Playback::Play(std::function<int32_t ()> eofCallback) {
+int32_t Playback::Start(std::function<int32_t (uint32_t)> callback) {
+
+    if(state == State::Active || state == State::Paused){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
     auto tags = dec->fetchTags();
 
     // Set audio device's parameters
@@ -45,28 +51,41 @@ int32_t Playback::Play(std::function<int32_t ()> eofCallback) {
     audioDevice->OutputPathCtrl(profile->GetOutputPath());
     audioDevice->InputPathCtrl(profile->GetInputPath());
 
-    endOfFileCallback = eofCallback;
-    state = State::Play;
+    eventCallback = callback;
+    state = State::Active;
     return audioDevice->Start(
             AudioDevice::AudioFormat{.sampleRate_Hz=tags->sample_rate, .bitWidth=16, .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)});
 }
 
 int32_t Playback::Stop() {
+    if(state == State::Idle){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
     state = State::Idle;
     return audioDevice->Stop();
 }
 
 int32_t Playback::Pause() {
-    state = State::Pause;
+
+    if(state == State::Paused || state == State::Idle){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
+    state = State::Paused;
     return audioDevice->Pause();
 }
 
 int32_t Playback::Resume() {
-    state = State::Play;
+
+    if(state == State::Active || state == State::Idle){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
+    state = State::Active;
     return audioDevice->Resume();
 }
 
-uint32_t Playback::GetPosition() {
+Operation::Position Playback::GetPosition() {
     return dec->getCurrentPosition();
 
 }
@@ -83,7 +102,7 @@ int32_t Playback::SwitchProfile(const Profile *prof) {
         auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
         if(ret == 0){
             state = State ::Idle;
-            endOfFileCallback();
+            eventCallback(0);// TODO:M.P pass proper err code
         }
         return ret;
 
@@ -93,13 +112,15 @@ int32_t Playback::SwitchProfile(const Profile *prof) {
         case State ::Idle:
             break;
 
-        case State ::Play:
-            Play(endOfFileCallback);
+        case State ::Active:
+            state = State ::Idle;
+            Start(eventCallback);
             break;
 
-        case State ::Pause:
+        case State ::Paused:
             //TODO:M.P remove this nasty hack..
-            Play(endOfFileCallback);
+            state = State ::Idle;
+            Start(eventCallback);
             Pause();
             break;
 

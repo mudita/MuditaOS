@@ -16,49 +16,31 @@
 #include <optional>
 #include <functional>
 
+#include "Operation.hpp"
+
 class decoder;
-class Tags;
-class Profile;
-
-namespace bsp {
-    class AudioDevice;
-}
 
 
-class Playback {
+class Playback : public Operation {
 public:
-
-    enum class State{
-        Idle,
-        Play,
-        Pause
-    };
 
     Playback(const char *file, const Profile* profile);
     virtual ~Playback();
 
-    int32_t Play(std::function<int32_t ()> eofCallback);
+    int32_t Start(std::function<int32_t (uint32_t)> callback) override final;
 
-    int32_t Stop();
+    int32_t Stop() override final;
 
-    int32_t Pause();
+    int32_t Pause() override final;
 
-    int32_t Resume();
+    int32_t Resume() override final;
 
-    uint32_t GetPosition();
+    int32_t SwitchProfile(const Profile* prof)  override final;
 
-    State GetState(){return state;}
-
-    const Profile* GetProfile(){return profile;}
-
-    int32_t SwitchProfile(const Profile* prof);
+    Position GetPosition() override final;
 
 private:
-    std::unique_ptr<bsp::AudioDevice> audioDevice;
     std::unique_ptr<decoder> dec;
-    const Profile* profile;
-    State state = State ::Idle;
-    std::function<int32_t ()> endOfFileCallback = nullptr;
 };
 
 

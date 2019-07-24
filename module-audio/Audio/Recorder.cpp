@@ -13,10 +13,12 @@
 #include "encoder/Encoder.hpp"
 #include "bsp/audio/bsp_audio.hpp"
 #include "Profiles/Profile.hpp"
+#include "Common.hpp"
 
 using namespace bsp;
 
-Recorder::Recorder(const char *file, const Profile *profile,const Encoder::Format& frmt):profile(profile),format(frmt) {
+Recorder::Recorder(const char *file, const Profile *profile,const Encoder::Format& frmt):Operation(profile),format(frmt) {
+
     enc = Encoder::Create(file,format);
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
@@ -25,7 +27,7 @@ Recorder::Recorder(const char *file, const Profile *profile,const Encoder::Forma
         auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void*>(inputBuffer)));
         if(ret == 0){
             state = State ::Idle;
-            errorCallback(0);
+            eventCallback(0);//TODO:M.P pass correct err code
         }
         return ret;
 
@@ -36,14 +38,20 @@ Recorder::~Recorder() {
 
 }
 
-int32_t Recorder::Start() {
+int32_t Recorder::Start(std::function<int32_t (uint32_t)> callback) {
+
+    if(state == State::Paused || state == State::Active){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
     // Set audio device's parameters
     audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
     audioDevice->InputGainCtrl(profile->GetInputGain());
     audioDevice->OutputPathCtrl(profile->GetOutputPath());
     audioDevice->InputPathCtrl(profile->GetInputPath());
 
-    state = State::Recording;
+    eventCallback = callback;
+    state = State::Active;
 
     uint32_t flags = 0;
     if(format.chanNr == 2){
@@ -58,21 +66,36 @@ int32_t Recorder::Start() {
 }
 
 int32_t Recorder::Stop() {
+
+    if(state == State::Paused || state == State::Idle){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
     state = State::Idle;
     return audioDevice->Stop();
 }
 
 int32_t Recorder::Pause() {
-    state = State::Pause;
+
+    if(state == State::Paused || state == State::Idle){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
+    state = State::Paused;
     return audioDevice->Pause();
 }
 
 int32_t Recorder::Resume() {
-    state = State::Recording;
+
+    if(state == State::Active || state == State::Idle){
+        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    }
+
+    state = State::Active;
     return audioDevice->Resume();
 }
 
-int32_t Recorder::SwitchProfile(const Profile *prof) {
+int32_t Recorder::SwitchProfile(const Profile* prof) {
     profile = prof;
 
     audioDevice.reset();
@@ -93,13 +116,15 @@ int32_t Recorder::SwitchProfile(const Profile *prof) {
         case State ::Idle:
             break;
 
-        case State ::Recording:
-            Start();
+        case State ::Active:
+            state = State ::Idle;
+            Start(eventCallback);
             break;
 
-        case State ::Pause:
+        case State ::Paused:
             //TODO:M.P remove this nasty hack..
-            Start();
+            state = State ::Idle;
+            Start(eventCallback);
             Pause();
             break;
 
@@ -108,4 +133,8 @@ int32_t Recorder::SwitchProfile(const Profile *prof) {
 
     //TODO:M.P add error handling
     return 0;
+}
+
+Operation::Position Recorder::GetPosition() {
+    return enc->getCurrentPosition();
 }

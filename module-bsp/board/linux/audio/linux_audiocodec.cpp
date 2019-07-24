@@ -16,7 +16,7 @@
 
 namespace bsp {
 
-    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr) {
+    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr),pauseResumeFormat{} {
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
@@ -95,7 +95,6 @@ namespace bsp {
         }
 
         currentFormat = format;
-        pauseResumeFormat = {};
 
         return paNoError;
     }
