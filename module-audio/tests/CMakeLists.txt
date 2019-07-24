@@ -9,9 +9,9 @@ project(unittest_module-audio VERSION 1.0
 
 add_executable( ${PROJECT_NAME}
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/main_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Playback_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Decoders_tests.cpp"
         )
 
 target_link_libraries( ${PROJECT_NAME} PRIVATE module-audio portaudio )
