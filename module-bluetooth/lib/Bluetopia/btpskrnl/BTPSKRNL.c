@@ -1132,7 +1132,13 @@ ThreadHandle_t BTPSAPI BTPS_CreateThread(Thread_t ThreadFunction, unsigned int S
          ThreadWrapperInfo->ThreadParameter = ThreadParameter;
 
          /* Next attempt to create a thread using the default priority. */
-         Result = xTaskCreate(ThreadWrapper, (char const *)ThreadWrapperInfo->Name, StackSize / sizeof(portSTACK_TYPE), ThreadWrapperInfo, DEFAULT_THREAD_PRIORITY, &ThreadWrapperInfo->Thread);
+         Result = xTaskCreate(ThreadWrapper,
+                             (char const *)ThreadWrapperInfo->Name,
+                             StackSize / sizeof(portSTACK_TYPE),
+                             ThreadWrapperInfo,
+                             DEFAULT_THREAD_PRIORITY,
+                             (TaskHandle_t*)&ThreadWrapperInfo->Thread
+                             );
          if(Result != pdPASS)
          {
             /* An error occurred while attempting to create the thread. */
