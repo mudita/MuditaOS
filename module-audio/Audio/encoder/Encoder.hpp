@@ -13,13 +13,36 @@
 #define PUREPHONE_ENCODER_HPP
 
 #include <memory>
+#include "vfs.hpp"
 
 class Encoder {
 public:
 
-    virtual uint32_t Encode(int16_t *pcmData) = 0;
+    struct Format{
+        uint32_t chanNr;
+        uint32_t sampleRate;
+        uint32_t sampleSiz;
+    };
 
-    static std::unique_ptr<Encoder> Create(const char *file);
+    static std::unique_ptr<Encoder> Create(const char *file,const Format& frmt);
+
+    Encoder(const char* file,const Format& frmt);
+    virtual ~Encoder();
+
+    virtual uint32_t Encode(uint32_t samplesToWrite,int16_t* pcmData) = 0;
+
+    float getCurrentPosition() {
+        return position;
+    }
+    const Format format;
+protected:
+
+    float position = 0;
+    vfs::FILE *fd = nullptr;
+    uint32_t fileSize = 0;
+    std::string filePath;
+
+    bool isInitialized = false;
 };
 
 

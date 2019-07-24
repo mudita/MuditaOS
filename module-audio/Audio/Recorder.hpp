@@ -15,8 +15,9 @@
 
 #include <memory>
 #include <optional>
+#include <functional>
 
-class encoder;
+class Encoder;
 class Tags;
 class Profile;
 
@@ -45,14 +46,18 @@ public:
 
     int32_t Resume();
 
-
     int32_t SwitchProfile(const Profile* prof);
 
+    State GetState(){return state;}
+
+    const Profile* GetProfile(){return profile;}
+
 private:
-    std::unique_ptr<encoder> dec;
+    std::unique_ptr<Encoder> enc;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
     const Profile* profile;
     State state = State ::Idle;
+    std::function<int32_t (int32_t)> errorCallback = nullptr;
 };
 
 

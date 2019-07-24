@@ -118,7 +118,7 @@ namespace bsp {
 
         LinuxAudiocodec *ptr = reinterpret_cast<LinuxAudiocodec *>(userData);
 
-        uint32_t framesToFetch = 0;
+        uint32_t framesToFetch = framesPerBuffer;
 
         if (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::OutPutStereo)) {
             framesToFetch = framesPerBuffer * 2;

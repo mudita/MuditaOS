@@ -25,6 +25,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/xing_header.c"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/Encoder.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/EncoderWAV.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Playback.cpp"
