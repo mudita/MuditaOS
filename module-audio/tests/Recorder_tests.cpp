@@ -12,30 +12,135 @@
 #include <memory>
 #include <cstring>
 #include <unistd.h>
-
+#include <filesystem>
 
 #include "catch.hpp"
 
 #include "vfs.hpp"
 
 #include "Audio/Recorder.hpp"
-#include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
-#include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
+#include "Audio/Profiles/ProfileRecordingHeadset.hpp"
+#include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
+
+namespace fs = std::filesystem;
+std::string testOutPath{};
 
 TEST_CASE( "Recorder tests" ) {
 
-    auto cwd = vfs.getcurrdir();
-    cwd = cwd.substr(0,cwd.find_last_of("/\\"));
-    cwd = cwd.append("/module-audio/tests/samples");
+    SECTION("INIT"){
+        fs::path dir = fs::current_path();
 
-    SECTION("Simple recording"){
-        ProfilePlaybackLoudspeaker  profileLoudspeaker(nullptr,100,0);
-        Recorder record((cwd + "/rec1.wav").c_str(),&profileLoudspeaker);
+        std::uintmax_t n = fs::remove_all(dir / "tests_out/audio");
+        std::cout << "Deleted " << n << " files or directories\n";
+
+        fs::create_directories(dir / "tests_out/audio");
+
+        testOutPath = dir / "tests_out/audio/";
+    }
+
+    SECTION("Simple stereo recording 44100"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "stereotrec_44100.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=2,.sampleRate=44100,.sampleSiz=16});
         record.Start();
         REQUIRE(record.GetState() == Recorder::State::Recording);
         sleep(2);
         record.Stop();
         REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple mono recording 44100"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "monorec1_44100.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=1,.sampleRate=44100,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple stereo recording 22050"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "stereotrec_22050.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=2,.sampleRate=22050,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple mono recording 22050"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "monorec1_22050.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=1,.sampleRate=22050,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple stereo recording 16000"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "stereotrec_16000.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=2,.sampleRate=16000,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple mono recording 16000"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "monorec1_16000.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=1,.sampleRate=16000,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple stereo recording 8000"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "stereotrec_8000.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=2,.sampleRate=8000,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+    SECTION("Simple mono recording 8000"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        Recorder record((testOutPath + "monorec1_8000.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=1,.sampleRate=8000,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(2);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+    }
+
+
+
+SECTION("Simple stereo recording with profile switching 44100"){
+        ProfileRecordingOnBoardMic  profileRecordingOnBoardMic(nullptr,20.0);
+        ProfileRecordingHeadset  profileRecordingHeadset(nullptr,50.0);
+        Recorder record((testOutPath + "rec1.wav").c_str(),&profileRecordingOnBoardMic,Encoder::Format{.chanNr=2,.sampleRate=44100,.sampleSiz=16});
+        record.Start();
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(1);
+        record.SwitchProfile(&profileRecordingHeadset);
+        REQUIRE(record.GetState() == Recorder::State::Recording);
+        sleep(5);
+        record.Stop();
+        REQUIRE(record.GetState() == Recorder::State::Idle);
+        REQUIRE( record.GetPosition() == Approx(6).margin(0.1) );
     }
 
 }

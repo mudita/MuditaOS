@@ -37,7 +37,7 @@ namespace bsp{
         bsp::AudioDevice::AudioFormat pauseResumeFormat;
         PaStream *stream;
         float outputVolume = 1.0;
-        int8_t inputGain=0;
+        float inputGain=1.0;
 
         static int portAudioCallback( const void *inputBuffer, void *outputBuffer,
                                    unsigned long framesPerBuffer,

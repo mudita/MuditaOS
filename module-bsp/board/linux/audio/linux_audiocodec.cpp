@@ -124,8 +124,16 @@ namespace bsp {
             framesToFetch = framesPerBuffer * 2;
         }
 
+        if ((ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputLeft)) && (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputRight))) {
+            framesToFetch = framesPerBuffer * 2;
+        }
+
         if (inputBuffer) {
-            //TODO:M.P volume scaling
+            int16_t *pBuff = reinterpret_cast<int16_t *>(const_cast<void*>(inputBuffer));
+            std::transform(pBuff, pBuff + framesToFetch, pBuff,
+                           [ptr](int16_t c) -> int16_t {
+                               return c * ptr->inputGain;
+                           });
         }
 
 

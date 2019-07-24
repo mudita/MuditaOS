@@ -47,13 +47,13 @@ public:
 
     };
 
-    Profile(const std::string& name,const Type type, uint32_t vol, int8_t gain, uint32_t outPath, uint32_t inPath,bsp::AudioDevice::Type devType,
+    Profile(const std::string& name,const Type type, uint32_t vol, float gain, uint32_t outPath, uint32_t inPath,bsp::AudioDevice::Type devType,
             std::function<int32_t()> callback);
 
 
     void SetOutputVolume(uint32_t vol);
 
-    void SetInputGain(int8_t gain);
+    void SetInputGain(float gain);
 
     void SetOutputPath(uint32_t path);
 
@@ -61,7 +61,7 @@ public:
 
     uint32_t GetOutputVolume() const { return outputVolume; }
 
-    int8_t GetInputGain() const { return inputGain; }
+    float GetInputGain() const { return inputGain; }
 
     uint32_t GetOutputPath() const{return outputPath;}
 
@@ -74,7 +74,7 @@ public:
 
 protected:
     uint32_t outputVolume;
-    int8_t inputGain;
+    float inputGain;
     uint32_t outputPath;
     uint32_t inputPath;
 

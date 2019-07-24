@@ -31,8 +31,8 @@ TEST_CASE( "Playback tests" ) {
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
         SECTION("Full playback"){
-            ProfilePlaybackLoudspeaker  profileLoudspeaker(nullptr,100,0);
-            Playback sample1((cwd + "/sample1.wav").c_str(),&profileLoudspeaker);
+            ProfilePlaybackLoudspeaker  profileRecordingHeadset(nullptr,100);
+            Playback sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
             sample1.Play([]()->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
@@ -42,9 +42,9 @@ TEST_CASE( "Playback tests" ) {
         }
 
         SECTION("Switch profile during playback"){
-            ProfilePlaybackLoudspeaker  profileLoudspeaker(nullptr,100,0);
-            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20,0);
-            Playback sample1((cwd + "/sample1.wav").c_str(),&profileLoudspeaker);
+            ProfilePlaybackLoudspeaker  profileRecordingHeadset(nullptr,100);
+            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20);
+            Playback sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
             sample1.Play([]()->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
@@ -58,8 +58,8 @@ TEST_CASE( "Playback tests" ) {
 
         SECTION("Destroy playback object before end of file"){
             {
-                ProfilePlaybackLoudspeaker profileLoudspeaker(nullptr, 100, 0);
-                Playback sample1((cwd + "/sample1.wav").c_str(), &profileLoudspeaker);
+                ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
+                Playback sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
                 sample1.Play([]()->int32_t{
                     std::cout<<"End of file reached!\n";
                     return 0;
@@ -69,8 +69,8 @@ TEST_CASE( "Playback tests" ) {
         }
 
         SECTION("Pause/Resume/Stop sequence"){
-            ProfilePlaybackLoudspeaker profileLoudspeaker(nullptr, 100, 0);
-            Playback sample1((cwd + "/sample1.wav").c_str(), &profileLoudspeaker);
+            ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
+            Playback sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
             sample1.Play([]()->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
@@ -87,9 +87,9 @@ TEST_CASE( "Playback tests" ) {
         }
 
         SECTION("Pause/Resume/Stop sequence with profile switching"){
-            ProfilePlaybackLoudspeaker profileLoudspeaker(nullptr, 100, 0);
-            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20,0);
-            Playback sample1((cwd + "/sample1.wav").c_str(), &profileLoudspeaker);
+            ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
+            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20);
+            Playback sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
             sample1.Play([]()->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;

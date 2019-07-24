@@ -16,8 +16,8 @@
 
 class ProfilePlaybackLoudspeaker : public Profile {
 public:
-    ProfilePlaybackLoudspeaker(std::function<int32_t()> callback, uint32_t volume, int8_t gain) : Profile(
-            "Playback Loudspeaker",Type::PlaybackLoudspeaker, volume, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
+    ProfilePlaybackLoudspeaker(std::function<int32_t()> callback, uint32_t volume) : Profile(
+            "Playback Loudspeaker",Type::PlaybackLoudspeaker, volume, 0.0, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
 };
 
 #endif //PUREPHONE_PROFILEPLAYBACKLOUDSPEAKER_HPP
