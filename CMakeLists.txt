@@ -145,6 +145,9 @@ add_subdirectory(module-services)
 message("${PROJECT_NAME}: add_subdirectory module-apps")
 add_subdirectory(module-apps)
 
+message("${PROJECT_NAME}: add_subdirectory module-bluetooth")
+add_subdirectory(module-bluetooth)
+
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
@@ -169,6 +172,7 @@ target_link_libraries(${PROJECT_NAME}
         module-gui
         module-services
         module-apps
+        module-bluetooth
         ${TARGET_LIBRARIES}
         )
 
