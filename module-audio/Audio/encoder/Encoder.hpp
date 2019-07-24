@@ -17,7 +17,7 @@
 class Encoder {
 public:
 
-    virtual uint32_t Encode(int16_t *pcmData,uint32_t samplesToRead, ) = 0;
+    virtual uint32_t Encode(int16_t *pcmData) = 0;
 
     static std::unique_ptr<Encoder> Create(const char *file);
 };

@@ -69,6 +69,8 @@ public:
 
     bsp::AudioDevice::Type GetAudioDeviceType() const {return audioDeviceType;}
 
+    const std::string& GetName() const {return name;}
+
 
 protected:
     uint32_t outputVolume;

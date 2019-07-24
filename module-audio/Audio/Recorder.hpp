@@ -49,7 +49,7 @@ public:
     int32_t SwitchProfile(const Profile* prof);
 
 private:
-    std::unique_ptr<decoder> dec;
+    std::unique_ptr<encoder> dec;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
     const Profile* profile;
     State state = State ::Idle;
