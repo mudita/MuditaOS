@@ -32,6 +32,8 @@ public:
 
     int32_t Resume() override final;
 
+    int32_t SendEvent(const Event evt,const EventData* data=nullptr) override final {return 0;}
+
     int32_t SwitchProfile(const Profile::Type type)  override final;
 
     Position GetPosition() override final {return 0.0;}

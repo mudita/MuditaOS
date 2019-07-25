@@ -16,33 +16,48 @@
 #include <optional>
 #include <functional>
 
+#include "Audio/Common.hpp"
+
 #include "Audio/encoder/Encoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
+
+class EventData {
+public:
+    ~EventData() {}
+
+};
 
 class Operation {
 public:
 
-    enum class State{
+    enum class State {
         Idle,
         Active,
         Paused
     };
 
-    enum class Type{
+    enum class Type {
         Idle,
         Playback,
         Recorder,
         Router
     };
 
-    using Position = float;
+    enum class Event {
+        HeadphonesPlugin,
+        HeadphonesUnplug,
+        BTHeadsetOn,
+        BTHeadsetOff,
+        BTA2DPOn,
+        BTA2DPOff,
+    };
 
-    Operation();
-    virtual ~Operation(){}
+    virtual ~Operation() {}
 
-    static std::optional<std::unique_ptr<Operation>> Create(Type t,const char* fileName,const Encoder::Format& frmt={});
+    static std::optional<std::unique_ptr<Operation>>
+    Create(Type t, const char *fileName, const Encoder::Format &frmt = {});
 
-    virtual int32_t Start(std::function<int32_t (uint32_t)> callback) = 0;
+    virtual int32_t Start(std::function<int32_t(uint32_t)> callback) = 0;
 
     virtual int32_t Stop() = 0;
 
@@ -50,24 +65,30 @@ public:
 
     virtual int32_t Resume() = 0;
 
+    virtual int32_t SendEvent(const Event evt, const EventData *data) = 0;
+
     virtual int32_t SwitchProfile(const Profile::Type type) = 0;
 
     virtual Position GetPosition() = 0;
 
-    State GetState(){return state;}
+    State GetState() { return state; }
 
-    const Profile* GetProfile(){return profile;}
+    const Profile *GetProfile() { return profile; }
 
 protected:
 
-    const Profile* profile;
+    const Profile *profile;
     std::vector<std::unique_ptr<Profile>> availableProfiles;
-    State state = State ::Idle;
-    std::function<int32_t (uint32_t)> eventCallback = nullptr;
+    State state = State::Idle;
+    std::function<int32_t(uint32_t)> eventCallback = nullptr;
 
     bool isInitialized = false;
 
-    std::optional<Profile*> GetProfile(const Profile::Type type);
+    std::optional<Profile *> GetProfile(const Profile::Type type);
+
+    std::function<int32_t(const void *inputBuffer,
+                          void *outputBuffer,
+                          unsigned long framesPerBuffer)> audioCallback=nullptr;
 
 };
 

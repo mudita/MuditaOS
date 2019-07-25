@@ -155,7 +155,7 @@ SECTION("Simple stereo recording with profile switching 44100"){
         record.SwitchProfile(Profile::Type::RecordingHeadset);
         REQUIRE(record.GetState() == RecorderOperation::State::Active);
         sleep(5);
-        record.Stop();f
+        record.Stop();
         REQUIRE(record.GetState() == RecorderOperation::State::Idle);
         REQUIRE( record.GetPosition() == Approx(6).margin(0.1) );
     }
