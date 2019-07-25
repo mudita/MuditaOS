@@ -1,5 +1,5 @@
 /*
- *  @file Recorder.cpp
+ *  @file PlaybackOperation.cpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 23.07.19
  *  @brief  
@@ -9,40 +9,41 @@
 
 
 
-#include "Recorder.hpp"
-#include "encoder/Encoder.hpp"
+#include "PlaybackOperation.hpp"
 #include "bsp/audio/bsp_audio.hpp"
-#include "Profiles/Profile.hpp"
-#include "Common.hpp"
+#include "Audio/decoder/decoder.hpp"
+#include "Audio/Profiles/Profile.hpp"
+#include "Audio/Common.hpp"
 
 using namespace bsp;
 
-Recorder::Recorder(const char *file, const Profile *profile,const Encoder::Format& frmt):Operation(profile),format(frmt) {
-
-    enc = Encoder::Create(file,format);
+PlaybackOperation::PlaybackOperation(const char *file, const Profile *profile) : Operation(profile),dec(nullptr)  {
+    dec = decoder::Create(file);
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
-        auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void*>(inputBuffer)));
+        auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
         if(ret == 0){
             state = State ::Idle;
-            eventCallback(0);//TODO:M.P pass correct err code
+            eventCallback(0); // TODO:M.P pass proper err code
         }
         return ret;
 
     }).value_or(nullptr);
 }
 
-Recorder::~Recorder() {
+PlaybackOperation::~PlaybackOperation() {
 
 }
 
-int32_t Recorder::Start(std::function<int32_t (uint32_t)> callback) {
+int32_t PlaybackOperation::Start(std::function<int32_t (uint32_t)> callback) {
 
-    if(state == State::Paused || state == State::Active){
+    if(state == State::Active || state == State::Paused){
         return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
     }
+
+    auto tags = dec->fetchTags();
 
     // Set audio device's parameters
     audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
@@ -52,30 +53,19 @@ int32_t Recorder::Start(std::function<int32_t (uint32_t)> callback) {
 
     eventCallback = callback;
     state = State::Active;
-
-    uint32_t flags = 0;
-    if(format.chanNr == 2){
-       flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft) | static_cast<uint32_t >(AudioDevice::Flags::InputRight);
-    }
-    else if(format.chanNr == 1){
-        flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft);
-    }
-
     return audioDevice->Start(
-            AudioDevice::AudioFormat{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags});
+            AudioDevice::AudioFormat{.sampleRate_Hz=tags->sample_rate, .bitWidth=16, .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)});
 }
 
-int32_t Recorder::Stop() {
-
-    if(state == State::Paused || state == State::Idle){
+int32_t PlaybackOperation::Stop() {
+    if(state == State::Idle){
         return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
     }
-
     state = State::Idle;
     return audioDevice->Stop();
 }
 
-int32_t Recorder::Pause() {
+int32_t PlaybackOperation::Pause() {
 
     if(state == State::Paused || state == State::Idle){
         return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
@@ -85,7 +75,7 @@ int32_t Recorder::Pause() {
     return audioDevice->Pause();
 }
 
-int32_t Recorder::Resume() {
+int32_t PlaybackOperation::Resume() {
 
     if(state == State::Active || state == State::Idle){
         return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
@@ -95,7 +85,12 @@ int32_t Recorder::Resume() {
     return audioDevice->Resume();
 }
 
-int32_t Recorder::SwitchProfile(const Profile* prof) {
+Operation::Position PlaybackOperation::GetPosition() {
+    return dec->getCurrentPosition();
+
+}
+
+int32_t PlaybackOperation::SwitchProfile(const Profile *prof) {
     profile = prof;
 
     audioDevice.reset();
@@ -104,9 +99,10 @@ int32_t Recorder::SwitchProfile(const Profile* prof) {
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
-        auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void*>(inputBuffer)));
+        auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
         if(ret == 0){
             state = State ::Idle;
+            eventCallback(0);// TODO:M.P pass proper err code
         }
         return ret;
 
@@ -133,8 +129,4 @@ int32_t Recorder::SwitchProfile(const Profile* prof) {
 
     //TODO:M.P add error handling
     return 0;
-}
-
-Operation::Position Recorder::GetPosition() {
-    return enc->getCurrentPosition();
 }

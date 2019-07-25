@@ -1,5 +1,5 @@
 /*
- *  @file Recorder.hpp
+ *  @file RecorderOperation.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 23.07.19
  *  @brief  
@@ -9,8 +9,8 @@
 
 
 
-#ifndef PUREPHONE_RECORDER_HPP
-#define PUREPHONE_RECORDER_HPP
+#ifndef PUREPHONE_RECORDEROPERATION_HPP
+#define PUREPHONE_RECORDEROPERATION_HPP
 
 
 #include "Operation.hpp"
@@ -18,12 +18,12 @@
 
 class Encoder;
 
-class Recorder : public Operation{
+class RecorderOperation : public Operation{
 public:
 
 
-    Recorder(const char *file, const Profile* profile,const Encoder::Format& frmt);
-    virtual ~Recorder();
+    RecorderOperation(const char *file, const Profile* profile,const Encoder::Format& frmt);
+    virtual ~RecorderOperation();
 
     int32_t Start(std::function<int32_t (uint32_t)> callback) override final;
 
@@ -41,8 +41,9 @@ public:
 
 private:
     std::unique_ptr<Encoder> enc;
+    std::unique_ptr<bsp::AudioDevice> audioDevice;
     const Encoder::Format format;
 };
 
 
-#endif //PUREPHONE_RECORDER_HPP
+#endif //PUREPHONE_RECORDEROPERATION_HPP

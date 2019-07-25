@@ -53,7 +53,6 @@ public:
     const Profile* GetProfile(){return profile;}
 
 protected:
-    std::unique_ptr<bsp::AudioDevice> audioDevice;
     const Profile* profile;
     State state = State ::Idle;
     std::function<int32_t (uint32_t)> eventCallback = nullptr;

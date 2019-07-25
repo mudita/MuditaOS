@@ -1,5 +1,5 @@
 /*
- *  @file Playback.hpp
+ *  @file PlaybackOperation.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 23.07.19
  *  @brief  
@@ -9,8 +9,8 @@
 
 
 
-#ifndef PUREPHONE_PLAYBACK_HPP
-#define PUREPHONE_PLAYBACK_HPP
+#ifndef PUREPHONE_PLAYBACKOPERATION_HPP
+#define PUREPHONE_PLAYBACKOPERATION_HPP
 
 #include <memory>
 #include <optional>
@@ -21,11 +21,11 @@
 class decoder;
 
 
-class Playback : public Operation {
+class PlaybackOperation : public Operation {
 public:
 
-    Playback(const char *file, const Profile* profile);
-    virtual ~Playback();
+    PlaybackOperation(const char *file, const Profile* profile);
+    virtual ~PlaybackOperation();
 
     int32_t Start(std::function<int32_t (uint32_t)> callback) override final;
 
@@ -41,7 +41,8 @@ public:
 
 private:
     std::unique_ptr<decoder> dec;
+    std::unique_ptr<bsp::AudioDevice> audioDevice;
 };
 
 
-#endif //PUREPHONE_PLAYBACK_HPP
+#endif //PUREPHONE_PLAYBACKOPERATION_HPP
