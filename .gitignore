@@ -25,5 +25,6 @@ build-rt1051/
 
 \.idea/workspace\.xml
 
-
 src/git-fame
+
+compile_commands.json
