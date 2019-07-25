@@ -22,12 +22,12 @@ using namespace bsp;
 RecorderOperation::RecorderOperation(const char *file,const Encoder::Format& frmt):format(frmt) {
 
     //TODO:M.P should be fetched from DB
-    availableProfiles.push_back(ProfileRecordingHeadset(nullptr,10.0));
-    availableProfiles.push_back(ProfileRecordingOnBoardMic(nullptr,20.0));
-    profile = availableProfiles[0];
+    availableProfiles.push_back(std::make_unique<ProfileRecordingOnBoardMic>(nullptr,20.0));
+    availableProfiles.push_back(std::make_unique<ProfileRecordingHeadset>(nullptr,10.0));
+    profile = availableProfiles[0].get();
 
     enc = Encoder::Create(file,format);
-    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
@@ -53,10 +53,10 @@ int32_t RecorderOperation::Start(std::function<int32_t (uint32_t)> callback) {
     }
 
     // Set audio device's parameters
-    audioDevice->OutputVolumeCtrl(profile.GetOutputVolume());
-    audioDevice->InputGainCtrl(profile.GetInputGain());
-    audioDevice->OutputPathCtrl(profile.GetOutputPath());
-    audioDevice->InputPathCtrl(profile.GetInputPath());
+    audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
+    audioDevice->InputGainCtrl(profile->GetInputGain());
+    audioDevice->OutputPathCtrl(profile->GetOutputPath());
+    audioDevice->InputPathCtrl(profile->GetInputPath());
 
     eventCallback = callback;
     state = State::Active;
@@ -113,7 +113,7 @@ int32_t RecorderOperation::SwitchProfile(const Profile::Type type) {
         return static_cast<int32_t >(RetCode ::UnsupportedProfile);
     }
 
-    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
