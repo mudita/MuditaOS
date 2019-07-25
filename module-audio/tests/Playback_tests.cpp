@@ -17,7 +17,7 @@
 
 #include "vfs.hpp"
 
-#include "Audio/Playback.hpp"
+#include "Audio/Operation/PlaybackOperation.hpp"
 #include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 
@@ -32,19 +32,19 @@ TEST_CASE( "Playback tests" ) {
     {
         SECTION("Full playback"){
             ProfilePlaybackLoudspeaker  profileRecordingHeadset(nullptr,100);
-            Playback sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
+            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
             sample1.Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
             sleep(6);
-            REQUIRE(sample1.GetState() == Playback::State::Idle);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
         }
 
         SECTION("Switch profile during playback"){
             ProfilePlaybackLoudspeaker  profileRecordingHeadset(nullptr,100);
             ProfilePlaybackHeadphones   profileHeadphones(nullptr,20);
-            Playback sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
+            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
             sample1.Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
@@ -53,13 +53,13 @@ TEST_CASE( "Playback tests" ) {
             sample1.SwitchProfile(&profileHeadphones);
             REQUIRE(sample1.GetProfile()->GetName() == "Playback Headphones");
             sleep(5);
-            REQUIRE(sample1.GetState() == Playback::State::Idle);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
         }
 
         SECTION("Destroy playback object before end of file"){
             {
                 ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
-                Playback sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
+                PlaybackOperation sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
                 sample1.Start([](uint32_t)->int32_t{
                     std::cout<<"End of file reached!\n";
                     return 0;
@@ -70,26 +70,26 @@ TEST_CASE( "Playback tests" ) {
 
         SECTION("Pause/Resume/Stop sequence"){
             ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
-            Playback sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
+            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
             sample1.Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
             sleep(1);
             sample1.Pause();
-            REQUIRE(sample1.GetState() == Playback::State::Paused);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Paused);
             sleep(1);
             sample1.Resume();
-            REQUIRE(sample1.GetState() == Playback::State::Active);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Active);
             sleep(1);
             sample1.Stop();
-            REQUIRE(sample1.GetState() == Playback::State::Idle);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
         }
 
         SECTION("Pause/Resume/Stop sequence with profile switching"){
             ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
             ProfilePlaybackHeadphones   profileHeadphones(nullptr,20);
-            Playback sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
+            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
             sample1.Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
@@ -97,14 +97,14 @@ TEST_CASE( "Playback tests" ) {
             sleep(1);
             sample1.Pause();
             sample1.SwitchProfile(&profileHeadphones);
-            REQUIRE(sample1.GetState() == Playback::State::Paused);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Paused);
             REQUIRE(sample1.GetProfile()->GetName() == "Playback Headphones");
             sleep(1);
             sample1.Resume();
-            REQUIRE(sample1.GetState() == Playback::State::Active);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Active);
             sleep(1);
             sample1.Stop();
-            REQUIRE(sample1.GetState() == Playback::State::Idle);
+            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
         }
 
     }

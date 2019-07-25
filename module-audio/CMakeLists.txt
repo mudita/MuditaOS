@@ -28,10 +28,13 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/EncoderWAV.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Audio.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Playback.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Recorder.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/Operation.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/PlaybackOperation.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RecorderOperation.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/IdleOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/Profile.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/State/State.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/State/StateMachine.cpp"
 
         )
 
