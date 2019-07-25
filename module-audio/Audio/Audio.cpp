@@ -11,15 +11,15 @@
 
 #include "Audio.hpp"
 
-#include "decoder/decoder.hpp"
-#include "bsp/audio/bsp_audio.hpp"
+#include "Operation/Operation.hpp"
 
 
-Audio::Audio(){
+Audio::Audio():currentOperation(){
+
+    auto ret  = Operation::Create(Operation::Type::Idle,"");
+    if(ret){
+        currentOperation = std::move(ret.value());
+    }
 
 }
 
-
-Audio::~Audio() {
-
-}

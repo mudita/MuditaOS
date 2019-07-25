@@ -19,37 +19,36 @@
 
 using namespace bsp;
 
-PlaybackOperation::PlaybackOperation(const char *file) :dec(nullptr)  {
+PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
 
-    //TODO:M.P should be fetched from DB
-    availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr,100));
-    availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr,20));
-    profile = availableProfiles[0].get();
-
-    dec = decoder::Create(file);
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
-                                                                            void *outputBuffer,
-                                                                            unsigned long framesPerBuffer) -> int32_t {
+    audioCallback = [this](const void *inputBuffer,
+                           void *outputBuffer,
+                           unsigned long framesPerBuffer) -> int32_t {
 
         auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
-        if(ret == 0){
-            state = State ::Idle;
+        if (ret == 0) {
+            state = State::Idle;
             eventCallback(0); // TODO:M.P pass proper err code
         }
         return ret;
+    };
 
-    }).value_or(nullptr);
+    //TODO:M.P should be fetched from DB
+    availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 100));
+    availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 20));
+    profile = availableProfiles[0].get();
 
-
+    dec = decoder::Create(file);
+    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
 
     isInitialized = true;
 }
 
-int32_t PlaybackOperation::Start(std::function<int32_t (uint32_t)> callback) {
+int32_t PlaybackOperation::Start(std::function<int32_t(uint32_t)> callback) {
 
-    if(state == State::Active || state == State::Paused){
-        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    if (state == State::Active || state == State::Paused) {
+        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
 
     auto tags = dec->fetchTags();
@@ -67,8 +66,8 @@ int32_t PlaybackOperation::Start(std::function<int32_t (uint32_t)> callback) {
 }
 
 int32_t PlaybackOperation::Stop() {
-    if(state == State::Idle){
-        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    if (state == State::Idle) {
+        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
     state = State::Idle;
     return audioDevice->Stop();
@@ -76,8 +75,8 @@ int32_t PlaybackOperation::Stop() {
 
 int32_t PlaybackOperation::Pause() {
 
-    if(state == State::Paused || state == State::Idle){
-        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    if (state == State::Paused || state == State::Idle) {
+        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
 
     state = State::Paused;
@@ -86,54 +85,64 @@ int32_t PlaybackOperation::Pause() {
 
 int32_t PlaybackOperation::Resume() {
 
-    if(state == State::Active || state == State::Idle){
-        return static_cast<int32_t >(RetCode ::InvokedInIncorrectState);
+    if (state == State::Active || state == State::Idle) {
+        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
 
     state = State::Active;
     return audioDevice->Resume();
 }
 
-Operation::Position PlaybackOperation::GetPosition() {
+Position PlaybackOperation::GetPosition() {
     return dec->getCurrentPosition();
 
+}
+
+int32_t PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data) {
+
+    switch (evt) {
+        case Event ::HeadphonesPlugin:
+            SwitchProfile(Profile::Type::PlaybackHeadphones);
+            break;
+        case Event ::HeadphonesUnplug:
+            SwitchProfile(Profile::Type::PlaybackLoudspeaker);
+            break;
+        case Event ::BTA2DPOn:
+            break;
+        case Event ::BTA2DPOff:
+            break;
+        case Event ::BTHeadsetOn:
+            break;
+        case Event ::BTHeadsetOff:
+            break;
+
+    }
+    return static_cast<int32_t >(RetCode::Success);
 }
 
 int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
 
     auto ret = GetProfile(type);
-    if(ret){
+    if (ret) {
         profile = ret.value();
+    } else {
+        return static_cast<int32_t >(RetCode::UnsupportedProfile);
     }
-    else{
-        return static_cast<int32_t >(RetCode ::UnsupportedProfile);
-    }
 
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
-                                                                            void *outputBuffer,
-                                                                            unsigned long framesPerBuffer) -> int32_t {
+    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
-        auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
-        if(ret == 0){
-            state = State ::Idle;
-            eventCallback(0);// TODO:M.P pass proper err code
-        }
-        return ret;
-
-    }).value_or(nullptr);
-
-    switch(state){
-        case State ::Idle:
+    switch (state) {
+        case State::Idle:
             break;
 
-        case State ::Active:
-            state = State ::Idle;
+        case State::Active:
+            state = State::Idle;
             Start(eventCallback);
             break;
 
-        case State ::Paused:
+        case State::Paused:
             //TODO:M.P remove this nasty hack..
-            state = State ::Idle;
+            state = State::Idle;
             Start(eventCallback);
             Pause();
             break;

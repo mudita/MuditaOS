@@ -12,6 +12,8 @@
 #ifndef PUREPHONE_COMMON_HPP
 #define PUREPHONE_COMMON_HPP
 
+using Position = float;
+
 enum class RetCode{
     Success = 0,
     InvokedInIncorrectState,

@@ -38,6 +38,8 @@ public:
 
     int32_t Resume() override final;
 
+    int32_t SendEvent(const Event evt,const EventData* data=nullptr) override final;
+
     int32_t SwitchProfile(const Profile::Type type)  override final;
 
     Position GetPosition() override final;
@@ -45,6 +47,7 @@ public:
 private:
     std::unique_ptr<decoder> dec;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
+
 };
 
 
