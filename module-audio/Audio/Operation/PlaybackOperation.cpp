@@ -22,12 +22,12 @@ using namespace bsp;
 PlaybackOperation::PlaybackOperation(const char *file) :dec(nullptr)  {
 
     //TODO:M.P should be fetched from DB
-    availableProfiles.push_back(ProfilePlaybackLoudspeaker(nullptr,100));
-    availableProfiles.push_back(ProfilePlaybackHeadphones(nullptr,20));
-    profile = availableProfiles[0];
+    availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr,100));
+    availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr,20));
+    profile = availableProfiles[0].get();
 
     dec = decoder::Create(file);
-    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
@@ -55,10 +55,10 @@ int32_t PlaybackOperation::Start(std::function<int32_t (uint32_t)> callback) {
     auto tags = dec->fetchTags();
 
     // Set audio device's parameters
-    audioDevice->OutputVolumeCtrl(profile.GetOutputVolume());
-    audioDevice->InputGainCtrl(profile.GetInputGain());
-    audioDevice->OutputPathCtrl(profile.GetOutputPath());
-    audioDevice->InputPathCtrl(profile.GetInputPath());
+    audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
+    audioDevice->InputGainCtrl(profile->GetInputGain());
+    audioDevice->OutputPathCtrl(profile->GetOutputPath());
+    audioDevice->InputPathCtrl(profile->GetInputPath());
 
     eventCallback = callback;
     state = State::Active;
@@ -109,7 +109,7 @@ int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
         return static_cast<int32_t >(RetCode ::UnsupportedProfile);
     }
 
-    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 

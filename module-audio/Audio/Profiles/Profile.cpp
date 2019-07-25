@@ -45,6 +45,11 @@ Profile::Profile(const std::string& name,const Type type, uint32_t vol, float ga
           audioDeviceType(devType), dbAccessCallback(callback) {
 }
 
+Profile& Profile::operator=(Profile other) {
+    std::swap(this->name, other.name);
+    return *this;
+}
+
 
 void Profile::SetInputGain(float gain) {
     inputGain = gain;

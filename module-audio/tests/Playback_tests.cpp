@@ -50,7 +50,7 @@ TEST_CASE( "Playback tests" ) {
             });
             sleep(1);
             playbackRet.value()->SwitchProfile(Profile::Type::PlaybackHeadphones);
-            REQUIRE(playbackRet.value()->GetProfile().GetName() == "Playback Headphones");
+            REQUIRE(playbackRet.value()->GetProfile()->GetName() == "Playback Headphones");
             sleep(5);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
@@ -96,7 +96,7 @@ TEST_CASE( "Playback tests" ) {
             playbackRet.value()->Pause();
             playbackRet.value()->SwitchProfile(Profile::Type::PlaybackHeadphones);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Paused);
-            REQUIRE(playbackRet.value()->GetProfile().GetName() == "Playback Headphones");
+            REQUIRE(playbackRet.value()->GetProfile()->GetName() == "Playback Headphones");
             sleep(1);
             playbackRet.value()->Resume();
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Active);

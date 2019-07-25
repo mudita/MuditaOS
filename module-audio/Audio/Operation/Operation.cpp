@@ -50,12 +50,12 @@ std::optional<std::unique_ptr<Operation>> Operation::Create(Operation::Type t,co
     }
 }
 
-std::optional<Profile> Operation::GetProfile(const Profile::Type type) {
-    auto ret = std::find_if(availableProfiles.begin(),availableProfiles.end(),[type](auto &w){return w.GetType() == type;});
+std::optional<Profile*>  Operation::GetProfile(const Profile::Type type) {
+    auto ret = std::find_if(availableProfiles.begin(),availableProfiles.end(),[type](const auto &w){return w->GetType() == type;});
     if(ret == availableProfiles.end()){
         return {};
     }
     else{
-        return *ret;
+        return (*ret).get();
     }
 }

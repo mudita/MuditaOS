@@ -56,18 +56,18 @@ public:
 
     State GetState(){return state;}
 
-    const Profile GetProfile(){return profile;}
+    const Profile* GetProfile(){return profile;}
 
 protected:
 
-    Profile profile;
-    std::vector<Profile > availableProfiles;
+    const Profile* profile;
+    std::vector<std::unique_ptr<Profile>> availableProfiles;
     State state = State ::Idle;
     std::function<int32_t (uint32_t)> eventCallback = nullptr;
 
     bool isInitialized = false;
 
-    std::optional<Profile> GetProfile(const Profile::Type type);
+    std::optional<Profile*> GetProfile(const Profile::Type type);
 
 };
 
