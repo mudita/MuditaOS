@@ -47,6 +47,10 @@ public:
 
     };
 
+    static std::unique_ptr<Profile> Create(const Type t,std::function<int32_t()> callback=nullptr,uint32_t vol = 0,float gain = 0.0);
+
+    Profile(){}
+
     Profile(const std::string& name,const Type type, uint32_t vol, float gain, uint32_t outPath, uint32_t inPath,bsp::AudioDevice::Type devType,
             std::function<int32_t()> callback);
 
@@ -71,19 +75,21 @@ public:
 
     const std::string& GetName() const {return name;}
 
+    Type GetType(){return type;}
+
 
 protected:
-    uint32_t outputVolume;
-    float inputGain;
-    uint32_t outputPath;
-    uint32_t inputPath;
+    uint32_t outputVolume=100;
+    float inputGain=0.0;
+    uint32_t outputPath=0;
+    uint32_t inputPath=0;
 
-    const std::string name;
-    const Type type;
+    std::string name;
+    Type type=Type::Idle;
 
-    std::function<int32_t()> dbAccessCallback;
+    std::function<int32_t()> dbAccessCallback=nullptr;
 
-    const bsp::AudioDevice::Type audioDeviceType;
+    bsp::AudioDevice::Type audioDeviceType=bsp::AudioDevice::Type ::Audiocodec;
 };
 
 

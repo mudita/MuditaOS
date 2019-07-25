@@ -20,12 +20,15 @@
 
 class decoder;
 
+namespace bsp{
+    class AudioDevice;
+}
+
 
 class PlaybackOperation : public Operation {
 public:
 
-    PlaybackOperation(const char *file, const Profile* profile);
-    virtual ~PlaybackOperation();
+    PlaybackOperation(const char *file);
 
     int32_t Start(std::function<int32_t (uint32_t)> callback) override final;
 
@@ -35,7 +38,7 @@ public:
 
     int32_t Resume() override final;
 
-    int32_t SwitchProfile(const Profile* prof)  override final;
+    int32_t SwitchProfile(const Profile::Type type)  override final;
 
     Position GetPosition() override final;
 

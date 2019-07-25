@@ -13,13 +13,21 @@
 #include "bsp/audio/bsp_audio.hpp"
 #include "Audio/decoder/decoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
+#include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
+#include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 #include "Audio/Common.hpp"
 
 using namespace bsp;
 
-PlaybackOperation::PlaybackOperation(const char *file, const Profile *profile) : Operation(profile),dec(nullptr)  {
+PlaybackOperation::PlaybackOperation(const char *file) :dec(nullptr)  {
+
+    //TODO:M.P should be fetched from DB
+    availableProfiles.push_back(ProfilePlaybackLoudspeaker(nullptr,100));
+    availableProfiles.push_back(ProfilePlaybackHeadphones(nullptr,20));
+    profile = availableProfiles[0];
+
     dec = decoder::Create(file);
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
@@ -31,10 +39,11 @@ PlaybackOperation::PlaybackOperation(const char *file, const Profile *profile) :
         return ret;
 
     }).value_or(nullptr);
-}
 
-PlaybackOperation::~PlaybackOperation() {
 
+
+
+    isInitialized = true;
 }
 
 int32_t PlaybackOperation::Start(std::function<int32_t (uint32_t)> callback) {
@@ -46,10 +55,10 @@ int32_t PlaybackOperation::Start(std::function<int32_t (uint32_t)> callback) {
     auto tags = dec->fetchTags();
 
     // Set audio device's parameters
-    audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
-    audioDevice->InputGainCtrl(profile->GetInputGain());
-    audioDevice->OutputPathCtrl(profile->GetOutputPath());
-    audioDevice->InputPathCtrl(profile->GetInputPath());
+    audioDevice->OutputVolumeCtrl(profile.GetOutputVolume());
+    audioDevice->InputGainCtrl(profile.GetInputGain());
+    audioDevice->OutputPathCtrl(profile.GetOutputPath());
+    audioDevice->InputPathCtrl(profile.GetInputPath());
 
     eventCallback = callback;
     state = State::Active;
@@ -90,12 +99,17 @@ Operation::Position PlaybackOperation::GetPosition() {
 
 }
 
-int32_t PlaybackOperation::SwitchProfile(const Profile *prof) {
-    profile = prof;
+int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
 
-    audioDevice.reset();
+    auto ret = GetProfile(type);
+    if(ret){
+        profile = ret.value();
+    }
+    else{
+        return static_cast<int32_t >(RetCode ::UnsupportedProfile);
+    }
 
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 

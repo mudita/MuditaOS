@@ -17,7 +17,7 @@
 
 #include "vfs.hpp"
 
-#include "Audio/Operation/PlaybackOperation.hpp"
+#include "Audio/Operation/Operation.hpp"
 #include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 
@@ -31,36 +31,35 @@ TEST_CASE( "Playback tests" ) {
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
         SECTION("Full playback"){
-            ProfilePlaybackLoudspeaker  profileRecordingHeadset(nullptr,100);
-            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
-            sample1.Start([](uint32_t)->int32_t{
+            auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
             sleep(6);
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
 
         SECTION("Switch profile during playback"){
-            ProfilePlaybackLoudspeaker  profileRecordingHeadset(nullptr,100);
-            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20);
-            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(),&profileRecordingHeadset);
-            sample1.Start([](uint32_t)->int32_t{
+            auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
             sleep(1);
-            sample1.SwitchProfile(&profileHeadphones);
-            REQUIRE(sample1.GetProfile()->GetName() == "Playback Headphones");
+            playbackRet.value()->SwitchProfile(Profile::Type::PlaybackHeadphones);
+            REQUIRE(playbackRet.value()->GetProfile().GetName() == "Playback Headphones");
             sleep(5);
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
 
         SECTION("Destroy playback object before end of file"){
             {
-                ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
-                PlaybackOperation sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
-                sample1.Start([](uint32_t)->int32_t{
+                auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
+                REQUIRE(playbackRet);
+                    playbackRet.value()->Start([](uint32_t)->int32_t{
                     std::cout<<"End of file reached!\n";
                     return 0;
                 });
@@ -69,42 +68,41 @@ TEST_CASE( "Playback tests" ) {
         }
 
         SECTION("Pause/Resume/Stop sequence"){
-            ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
-            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
-            sample1.Start([](uint32_t)->int32_t{
+            auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
             sleep(1);
-            sample1.Pause();
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Paused);
+            playbackRet.value()->Pause();
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Paused);
             sleep(1);
-            sample1.Resume();
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Active);
+            playbackRet.value()->Resume();
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Active);
             sleep(1);
-            sample1.Stop();
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
+            playbackRet.value()->Stop();
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
 
         SECTION("Pause/Resume/Stop sequence with profile switching"){
-            ProfilePlaybackLoudspeaker profileRecordingHeadset(nullptr, 100);
-            ProfilePlaybackHeadphones   profileHeadphones(nullptr,20);
-            PlaybackOperation sample1((cwd + "/sample1.wav").c_str(), &profileRecordingHeadset);
-            sample1.Start([](uint32_t)->int32_t{
+            auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
             sleep(1);
-            sample1.Pause();
-            sample1.SwitchProfile(&profileHeadphones);
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Paused);
-            REQUIRE(sample1.GetProfile()->GetName() == "Playback Headphones");
+            playbackRet.value()->Pause();
+            playbackRet.value()->SwitchProfile(Profile::Type::PlaybackHeadphones);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Paused);
+            REQUIRE(playbackRet.value()->GetProfile().GetName() == "Playback Headphones");
             sleep(1);
-            sample1.Resume();
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Active);
+            playbackRet.value()->Resume();
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Active);
             sleep(1);
-            sample1.Stop();
-            REQUIRE(sample1.GetState() == PlaybackOperation::State::Idle);
+            playbackRet.value()->Stop();
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
 
     }

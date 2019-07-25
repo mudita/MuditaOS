@@ -21,7 +21,7 @@
 class IdleOperation : public Operation {
 public:
 
-    IdleOperation(const char *file, const Profile* profile);
+    IdleOperation(const char *file);
     ~IdleOperation();
 
     int32_t Start([[maybe_unused]] std::function<int32_t (uint32_t)> callback) override final {return 0;}
@@ -32,7 +32,7 @@ public:
 
     int32_t Resume() override final {return 0;}
 
-    int32_t SwitchProfile(const Profile* prof)  override final {return 0;}
+    int32_t SwitchProfile(const Profile::Type type)  override final {return 0;}
 
     Position GetPosition() override final {return 0.0;}
 };

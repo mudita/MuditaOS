@@ -18,12 +18,15 @@
 
 class Encoder;
 
+namespace bsp{
+    class AudioDevice;
+}
+
 class RecorderOperation : public Operation{
 public:
 
 
-    RecorderOperation(const char *file, const Profile* profile,const Encoder::Format& frmt);
-    virtual ~RecorderOperation();
+    RecorderOperation(const char *file,const Encoder::Format& frmt);
 
     int32_t Start(std::function<int32_t (uint32_t)> callback) override final;
 
@@ -33,7 +36,7 @@ public:
 
     int32_t Resume() override final;
 
-    int32_t SwitchProfile(const Profile* prof)  override final;
+    int32_t SwitchProfile(const Profile::Type type)  override final;
 
     Position GetPosition() override final;
 

@@ -12,8 +12,9 @@
 #include "IdleOperation.hpp"
 
 
-IdleOperation::IdleOperation([[maybe_unused]] const char *file, const Profile *profile) : Operation(profile) {
+IdleOperation::IdleOperation([[maybe_unused]] const char *file) {
     //TODO: M.P switch off audio PLL here
+    isInitialized = true;
 }
 
 IdleOperation::~IdleOperation() {

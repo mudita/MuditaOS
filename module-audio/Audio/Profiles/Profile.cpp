@@ -11,6 +11,34 @@
 
 #include "Profile.hpp"
 
+#include "ProfileRecordingOnBoardMic.hpp"
+#include "ProfileRecordingHeadset.hpp"
+#include "ProfilePlaybackHeadphones.hpp"
+#include "ProfilePlaybackLoudspeaker.hpp"
+
+std::unique_ptr<Profile> Profile::Create(const Type t,std::function<int32_t()> callback, uint32_t vol, float gain) {
+    std::unique_ptr<Profile> inst;
+
+    switch(t){
+        case Type ::PlaybackHeadphones:
+            inst = std::make_unique<ProfilePlaybackHeadphones>(callback,vol);
+            break;
+        case Type::PlaybackLoudspeaker:
+            inst = std::make_unique<ProfilePlaybackLoudspeaker>(callback,vol);
+            break;
+        case Type::RecordingBuiltInMic:
+            inst = std::make_unique<ProfileRecordingOnBoardMic>(callback,gain);
+            break;
+        case Type::RecordingHeadset:
+            inst = std::make_unique<ProfileRecordingHeadset>(callback,gain);
+            break;
+        default:
+            break;
+    }
+
+    return inst;
+}
+
 Profile::Profile(const std::string& name,const Type type, uint32_t vol, float gain, uint32_t outPath, uint32_t inPath,
                  bsp::AudioDevice::Type devType, std::function<int32_t()> callback)
         : name(name),type(type), outputVolume(vol), inputGain(gain), outputPath(outPath), inputPath(inPath),
