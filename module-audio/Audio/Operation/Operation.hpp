@@ -16,12 +16,8 @@
 #include <optional>
 #include <functional>
 
-class Profile;
-
-namespace bsp {
-    class AudioDevice;
-}
-
+#include "Audio/encoder/Encoder.hpp"
+#include "Audio/Profiles/Profile.hpp"
 
 class Operation {
 public:
@@ -32,9 +28,19 @@ public:
         Paused
     };
 
+    enum class Type{
+        Idle,
+        Playback,
+        Recorder,
+        Router
+    };
+
     using Position = float;
 
-    Operation(const Profile* prof);
+    Operation();
+    virtual ~Operation(){}
+
+    static std::optional<std::unique_ptr<Operation>> Create(Type t,const char* fileName,const Encoder::Format& frmt={});
 
     virtual int32_t Start(std::function<int32_t (uint32_t)> callback) = 0;
 
@@ -44,18 +50,24 @@ public:
 
     virtual int32_t Resume() = 0;
 
-    virtual int32_t SwitchProfile(const Profile* prof) = 0;
+    virtual int32_t SwitchProfile(const Profile::Type type) = 0;
 
     virtual Position GetPosition() = 0;
 
     State GetState(){return state;}
 
-    const Profile* GetProfile(){return profile;}
+    const Profile GetProfile(){return profile;}
 
 protected:
-    const Profile* profile;
+
+    Profile profile;
+    std::vector<Profile > availableProfiles;
     State state = State ::Idle;
     std::function<int32_t (uint32_t)> eventCallback = nullptr;
+
+    bool isInitialized = false;
+
+    std::optional<Profile> GetProfile(const Profile::Type type);
 
 };
 

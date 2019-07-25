@@ -13,14 +13,21 @@
 #include "Audio/encoder/Encoder.hpp"
 #include "bsp/audio/bsp_audio.hpp"
 #include "Audio/Profiles/Profile.hpp"
+#include "Audio/Profiles/ProfileRecordingHeadset.hpp"
+#include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 #include "Audio/Common.hpp"
 
 using namespace bsp;
 
-RecorderOperation::RecorderOperation(const char *file, const Profile *profile,const Encoder::Format& frmt):Operation(profile),format(frmt) {
+RecorderOperation::RecorderOperation(const char *file,const Encoder::Format& frmt):format(frmt) {
+
+    //TODO:M.P should be fetched from DB
+    availableProfiles.push_back(ProfileRecordingHeadset(nullptr,10.0));
+    availableProfiles.push_back(ProfileRecordingOnBoardMic(nullptr,20.0));
+    profile = availableProfiles[0];
 
     enc = Encoder::Create(file,format);
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 
@@ -32,11 +39,12 @@ RecorderOperation::RecorderOperation(const char *file, const Profile *profile,co
         return ret;
 
     }).value_or(nullptr);
+
+
+
+    isInitialized = true;
 }
 
-RecorderOperation::~RecorderOperation() {
-
-}
 
 int32_t RecorderOperation::Start(std::function<int32_t (uint32_t)> callback) {
 
@@ -45,10 +53,10 @@ int32_t RecorderOperation::Start(std::function<int32_t (uint32_t)> callback) {
     }
 
     // Set audio device's parameters
-    audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
-    audioDevice->InputGainCtrl(profile->GetInputGain());
-    audioDevice->OutputPathCtrl(profile->GetOutputPath());
-    audioDevice->InputPathCtrl(profile->GetInputPath());
+    audioDevice->OutputVolumeCtrl(profile.GetOutputVolume());
+    audioDevice->InputGainCtrl(profile.GetInputGain());
+    audioDevice->OutputPathCtrl(profile.GetOutputPath());
+    audioDevice->InputPathCtrl(profile.GetInputPath());
 
     eventCallback = callback;
     state = State::Active;
@@ -95,12 +103,17 @@ int32_t RecorderOperation::Resume() {
     return audioDevice->Resume();
 }
 
-int32_t RecorderOperation::SwitchProfile(const Profile* prof) {
-    profile = prof;
+int32_t RecorderOperation::SwitchProfile(const Profile::Type type) {
 
-    audioDevice.reset();
+    auto ret = GetProfile(type);
+    if(ret){
+        profile = ret.value();
+    }
+    else{
+        return static_cast<int32_t >(RetCode ::UnsupportedProfile);
+    }
 
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), [this](const void *inputBuffer,
+    audioDevice = AudioDevice::Create(profile.GetAudioDeviceType(), [this](const void *inputBuffer,
                                                                             void *outputBuffer,
                                                                             unsigned long framesPerBuffer) -> int32_t {
 

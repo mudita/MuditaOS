@@ -14,7 +14,8 @@
 
 enum class RetCode{
     Success = 0,
-    InvokedInIncorrectState
+    InvokedInIncorrectState,
+    UnsupportedProfile
 
 };
 

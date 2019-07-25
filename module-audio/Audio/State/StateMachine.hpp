@@ -14,16 +14,25 @@
 
 
 #include <memory>
+#include "State.hpp"
+
+class Event{
+
+};
 
 class StateMachine {
 public:
 
+    StateMachine();
 
+    bool Switch(const State::Type t,const char* fileName);
 
 
 protected:
     void ExternalEvent(uint8_t newState, const void* pData = nullptr);
     void InternalEvent(uint8_t newState, const void* pData = nullptr);
+
+    std::unique_ptr<State> currentState;
 
 };
 
