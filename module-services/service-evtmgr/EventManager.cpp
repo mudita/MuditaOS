@@ -43,8 +43,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
 	{
-		alarmUpdated = false;
-		alarmDBEmpty = GetAlarmDbEmpty();
+
+		alarmDBEmpty = false;
+		alarmIsValid = false;
 	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
@@ -64,7 +65,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		if(msg->keyState == sevm::KeyboardEvents::keyReleasedShort)
 		{
 			AlarmsRecord record;
-			record.time = 0;
+			record.time = 120;
 			record.status = 1;
 			record.snooze = 0;
 			record.path = "test.mp3";

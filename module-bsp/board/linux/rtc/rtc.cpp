@@ -61,7 +61,7 @@ namespace bsp{
 	{
 		time_t t = time(NULL);
 		t += timestampOffset;
-		*datetime = *localtime(&t);
+		*datetime = *gmtime(&t);
 
 		return RtcBspOK;
 	}
@@ -158,9 +158,6 @@ namespace bsp{
 
 		struct tm date;
 		rtc_GetCurrentDateTime(&date);
-
-/*		LOG_INFO("seconds %d",  ( timestamp % 60 ));
-		LOG_INFO("seconds to minute %d", secondsToMinute);*/
 
 		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
 	}
