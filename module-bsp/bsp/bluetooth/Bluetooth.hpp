@@ -1,11 +1,14 @@
 #pragma once
+
 #include <cstdint>      // uint32
 #include <sys/types.h>  // ssize_t
+#include <cstdarg>
+#include <FreeRTOS.h>
+#include <thread.hpp>
 
 /// c++ low level driver overlay
 
 namespace bsp {
-
 
     class BTdev {
         public:
@@ -15,29 +18,31 @@ namespace bsp {
                 ErrorTimeout,
                 ErrorBSP,
             };
-
             enum LogLvl {
                 LogNone,
                 LogError,
                 LogWarning,
                 LogDebug,
             };
-            typedef int(*LogFoo)(const char*,...);
+            typedef int(*LogFoo)(const char*,va_list args);
         private:
             LogFoo flog;
         public:
             LogLvl loglvl;
+            bool is_open;
             static const unsigned int default_timeout_ms = 1000;
             static const unsigned int default_buff_size = 1024;
+            static const unsigned int default_baudrate = 115200;
             struct _circ {
                 char* buff;
                 unsigned int head, tail, threshold;
                 const unsigned int size;
                 volatile unsigned int len;
-                _circ(unsigned int size, int threshold=0) : head(0), tail(0), threshold(threshold), size(size) {};
+                _circ(unsigned int size, int threshold=0) : head(0), tail(0), threshold(threshold), size(size), len(0) { buff = new char[size];};
+                ~_circ() { delete[] buff; }
                 inline int push(char val) {
                     int ret=0;
-                    if(len < size) {
+                    if(len<size) {
                         buff[tail++]=val;
                         if(tail==size) tail=0;
                         ++len;
@@ -48,11 +53,13 @@ namespace bsp {
                 }
                 inline int pop(char* val) {
                     int ret=0;
-                    if(val!=NULL) {
+                    if(val!=nullptr) {
                         if(len) {
                             *val = buff[head];
                             if(head == 0) head=size; else head--;
                             --len;
+                        } else {
+                            ret =-1;
                         }
                     } else {
                         ret=-2;
@@ -65,11 +72,11 @@ namespace bsp {
                 }
                 inline void flush() {
                     len=0;
-                    head=tail;
+                    head=tail=0;
                 }
             } in, out;
 
-            BTdev(unsigned int in_size, unsigned int out_size);
+            BTdev(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size, int threshold=0);
             virtual ~BTdev();
 
             // device generall
@@ -83,20 +90,28 @@ namespace bsp {
             void register_log(LogFoo foo) { flog = foo; }
             void log(LogLvl lvl,const char* val, ...);
             // uart specyfic
-            virtual Error set_baudrate(uint32_t bd);
-            virtual Error set_rts(bool on); // == virtual Error uart_flow(bool on);
-            virtual Error set_reset(bool on);
-            virtual int read_cts();
+            virtual Error set_baudrate(uint32_t bd)=0;
+            virtual Error set_rts(bool on)=0; // == virtual Error uart_flow(bool on);
+            virtual Error set_reset(bool on)=0;
+            virtual int read_cts()=0;
     };
 
     /// definitions needed by BT stack
     class Bluetopia : public BTdev {
         public:
-            Bluetopia(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size);
+            Bluetopia(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size, int threshold=0);
+            virtual ~Bluetopia();
             static Bluetopia *getInstance();
-            unsigned long get_tick(void);
-            virtual void set_irq(bool enable);
-            virtual ssize_t write_blocking(char* buf, ssize_t len);
+            virtual void set_irq(bool enable) = 0;
+            virtual ssize_t write_blocking(char* buf, ssize_t len) =0;
+            virtual void wait_data() = 0;
+            virtual void set_data() =0;
+            xSemaphoreHandle sem_data;
+
+            void (*com_cb)(unsigned int transport_id, unsigned int datalen, unsigned char *buff, unsigned long param);
+            unsigned long com_cb_param;
+            long rx_thread;
+            TaskHandle_t thandle;
     };
 
 

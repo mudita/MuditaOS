@@ -18,11 +18,10 @@ endif()
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/BT/glucode/HCITRANS.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/BT/StackWorker.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/lib/Bluetopia/btpskrnl/BTPSKRNL.c
-    ${CMAKE_CURRENT_LIST_DIR}/lib/Bluetopia/btpsvend/BTPSVEND.c
-    ${CMAKE_CURRENT_LIST_DIR}/lib/Bluetopia/btvs/BTVS.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/BT/BluetoothWorker.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/BT/Stack.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/BT/profiles/A2DP.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/BT/profiles/GAVD.cpp
     #    ${CMAKE_CURRENT_LIST_DIR}/lib/Bluetopia/hcitrans/HCITRANS.c
     #    ${CMAKE_CURRENT_LIST_DIR}/lib/src/A3DPDemo_SRC.c
     #    ${CMAKE_CURRENT_LIST_DIR}/lib/src/HAL.c
@@ -38,6 +37,8 @@ else()
     include(targets/Target_Linux.cmake)
 endif()
 
+message("Sources: " ${SOURCES})
+
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 # # Board specific compilation definitions,options,include directories and features
@@ -45,11 +46,13 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC   ${PROJECT_CONFIG_DEFINITIONS
                                                     ${PROJECT_TARGET}
                                                     ${TARGET_COMPILE_DEFINITIONS}
                                                     -D__SUPPORT_CC256XC_PATCH__
+                                                    -DDEBUG_ENABLED
                                                     )
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
+if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 target_include_directories(
     ${PROJECT_NAME}
     PUBLIC
@@ -80,19 +83,26 @@ message(STATUS "SS1BTAVC_32_M7:  " ${SS1BTAVC_32_M7})
 message(STATUS "SS1BTAVR_32_M7:  " ${SS1BTAVR_32_M7})
 message(STATUS "SS1BTGAV_32_M7:  " ${SS1BTGAV_32_M7})
 
-
 target_link_libraries(
     ${PROJECT_NAME}
-    module-bsp
-    module-utils
-    module-vfs
-    module-sys
     ${Bluetopia_32_M7}
     ${SS1BTAUD_32_M7}
     ${SS1BTAVC_32_M7}
     ${SS1BTAVR_32_M7}
     ${SS1BTGAV_32_M7}
+    module-bsp
+    module-utils
+    module-vfs
+    module-sys
 )
+else()
+target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC
+    ${BOARD_DIR_INCLUDES}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+endif()
 
 # Host target configuration(mainly used for unit testing)
 if(DEFINED BUILD_UNIT_TESTS)

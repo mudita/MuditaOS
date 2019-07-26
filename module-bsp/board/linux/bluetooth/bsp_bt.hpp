@@ -4,14 +4,12 @@
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
 #include "timers.h"
-#include "board.h"
-#include "fsl_lpuart.h"
 
 #include <memory>
 
 
 namespace bsp {
-class BluetopiaHW : protected Bluetopia
+class BluetopiaHW : public Bluetopia
 {
     public:
         BluetopiaHW(LogLvl lvl=LogError);
@@ -34,14 +32,9 @@ class BluetopiaHW : protected Bluetopia
         virtual int read_cts() override;
         ssize_t write_blocking(char *buf, ssize_t len) override;
         virtual void set_irq(bool enable) override;
-        virtual void wait_data() override;
-        virtual void set_data() override;
 
     private:
         // for init
-        void configure_uart_io();
-        void configure_lpuart();
-        void configure_cts_irq();
         uint32_t UartGetPeripheralClock();
 };
 };

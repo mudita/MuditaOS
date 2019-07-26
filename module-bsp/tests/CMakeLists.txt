@@ -4,12 +4,10 @@ cmake_minimum_required(VERSION 3.12)
 project(unittest_module-bsp VERSION 1.0
         DESCRIPTION "BSP module library")
 
-
-
-
 add_executable( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/bsp_audio_tests.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/tests-main.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/tests-bluetooth.cpp"
         )
 
 
