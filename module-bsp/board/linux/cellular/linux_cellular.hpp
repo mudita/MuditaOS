@@ -42,11 +42,6 @@ namespace bsp {
 
     private:
 
-        int set_interface_attribs();
-
-        void set_mincount(int mcount);
-
-
         static constexpr speed_t baud_bits[] = {
                 0, B9600, B19200, B38400, B57600, B115200, B230400, B460800, B921600, B1500000, B2000000, B3000000, B4000000
         };
@@ -55,9 +50,9 @@ namespace bsp {
 
         static const uint32_t MAX_EVENTS = 1;
 
-        int fd;
+        int fd = -1;
 
-        int epoll_fd;
+        int epoll_fd = -1;
 
         struct epoll_event event, events[MAX_EVENTS];
 

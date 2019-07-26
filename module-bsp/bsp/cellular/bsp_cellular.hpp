@@ -12,6 +12,7 @@
 #ifndef PUREPHONE_BSP_CELLULAR_HPP
 #define PUREPHONE_BSP_CELLULAR_HPP
 
+#include <optional>
 #include <stdint.h>
 #include <stddef.h>
 #include <memory>
@@ -21,7 +22,7 @@ namespace bsp {
     class Cellular {
     public:
 
-        static std::unique_ptr<Cellular> Create(const char* term = "/dev/ttyUSB0");
+        static std::optional<std::unique_ptr<Cellular>> Create(const char* term = "/dev/ttyUSB0");
 
         Cellular() {}
         virtual ~Cellular() {}
@@ -36,6 +37,9 @@ namespace bsp {
         virtual ssize_t Read(void *buf, size_t nbytes) = 0;
 
         virtual ssize_t Write(void *buf, size_t nbytes) = 0;
+
+    protected:
+        bool isInitialized = false;
 
     };
 

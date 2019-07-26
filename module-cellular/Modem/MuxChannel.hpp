@@ -22,7 +22,7 @@
 
 void MuxChannelWorker(void* pvp);
 
-class MuxDaemon;
+class InOutSerialWorker;
 
 
 class MuxChannel {
@@ -58,7 +58,7 @@ public:
         std::string m_data;
     };
 
-    MuxChannel(MuxDaemon* mux,uint32_t logicalNumber,MuxChannelType type,const char* name="Default",uint32_t stackSize=1024,uint32_t queueSize=4);
+    MuxChannel(InOutSerialWorker* inout,MuxChannelType type,const char* name="Default",uint32_t stackSize=2048,uint32_t queueSize=4);
     virtual ~MuxChannel();
 
     // Open mux channel
@@ -88,7 +88,7 @@ public:
         return static_cast<uint32_t >(type);
     }
 
-    static std::vector<std::string> Tokenizer(std::string& input,uint32_t maxTokenCount,const std::string& delimiter);
+
 
     int v24signals;
     int frameAllowed;
@@ -114,7 +114,7 @@ protected:
     virtual int ParseInputData(uint8_t* data, size_t size){return 0;}
 
     std::string name;
-    MuxDaemon* mux;
+    InOutSerialWorker* inout;
 
 };
 
