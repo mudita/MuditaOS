@@ -18,7 +18,6 @@
 
 class EventManager: public sys::Service {
 private:
-	bool GetAlarmDbEmpty(void);
 	void HandleAlarmTrigger(sys::DataMessage* msgl);
 	void GetNextAlarmTimestamp(time_t timestamp);
 protected:
@@ -28,8 +27,8 @@ protected:
 	uint32_t alarmTimestamp;
 	uint32_t alarmID;
 	bool alarmDBEmpty = false;
-	bool alarmUpdated = false;
 	bool alarmIsValid = false;
+	bool noValidAlarm = false;
 public:
 	EventManager(const std::string& name);
     ~EventManager();
