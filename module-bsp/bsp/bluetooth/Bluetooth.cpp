@@ -1,8 +1,21 @@
 #include "Bluetooth.hpp"
 #include <cstdarg>
 
+#if defined(TARGET_RT1051)
+#include "bluetooth/bsp_bt.hpp"
+#elif defined(TARGET_Linux)
+#include "bluetooth/bsp_bt.hpp"
+#else
+#error "Unsupported target"
+#endif
+
 namespace bsp {
-    BTdev::BTdev(unsigned int in_size, unsigned int out_size) : flog(nullptr), in(in_size), out(out_size)
+    BTdev::BTdev(unsigned int in_size, unsigned int out_size, int threshold) : flog(nullptr), in(in_size, threshold), out(out_size, threshold)
+    {
+        is_open = false;
+    }
+
+    BTdev::~BTdev()
     {
     }
 
@@ -16,9 +29,16 @@ namespace bsp {
         }
     }
 
-    Bluetopia::Bluetopia(unsigned int in_size, unsigned int out_size) : BTdev(in_size,out_size)
+    Bluetopia::Bluetopia(unsigned int in_size, unsigned int out_size, int threshold) : BTdev(in_size,out_size, threshold),rx_thread(0), thandle(NULL)
     {
     }
 
-    unsigned long get_tick();
+    Bluetopia::~Bluetopia()
+    {
+    }
+
+    Bluetopia *Bluetopia::getInstance()
+    {
+        return BluetopiaHW::getInstance();
+    }
 };

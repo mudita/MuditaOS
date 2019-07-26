@@ -101,3 +101,5 @@ if(DEFINED BUILD_UNIT_TESTS)
 
 endif()
 
+message("cyclic dependency!")
+target_link_libraries(${PROJECT_NAME} ${module-bluetooth})

@@ -21,6 +21,7 @@ add_subdirectory( service-appmgr )
 add_subdirectory( service-db )
 add_subdirectory( service-cellular )
 add_subdirectory( service-audio )
+add_subdirectory( service-bluetooth )
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db module-cellular module-audio  ${TARGET_LIBRARIES} )
