@@ -61,17 +61,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
 		handled = true;
-
-		if(msg->keyState == sevm::KeyboardEvents::keyReleasedShort)
-		{
-			AlarmsRecord record;
-			record.time = 120;
-			record.status = 1;
-			record.snooze = 0;
-			record.path = "test.mp3";
-
-			DBServiceAPI::AlarmAdd(this, record);
-		}
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {
 		sevm::EVMFocusApplication* msg = reinterpret_cast<sevm::EVMFocusApplication*>( msgl );

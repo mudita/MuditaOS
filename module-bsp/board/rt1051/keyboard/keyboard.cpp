@@ -1,4 +1,4 @@
-/*
+ /*
  *  @file bsp_keyboard.c
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 25 oct 2018
