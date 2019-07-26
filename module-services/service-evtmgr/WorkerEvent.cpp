@@ -113,9 +113,6 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
 
-
-	bsp::rtc_SetDateTimeFromTimestamp( 1563926330);
-//	bsp::rtc_SetDateTimeFromTimestamp(1563436015);
 	time_t timestamp;
 	bsp::rtc_GetCurrentTimestamp(&timestamp);
 	bsp::rtc_SetMinuteAlarm(timestamp);
