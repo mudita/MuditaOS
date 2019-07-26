@@ -5,8 +5,7 @@
 /*      Copyright 2015 Texas Instruments Incorporated.                        */
 /*      All Rights Reserved.                                                  */
 /*                                                                            */
-/*  HCITRCFG - HCI Transport Layer Configuration parameters.                  */
-/*                                                                            */
+/*  HCITRCFG - HCI Transport Layer Configuration parameters.                  */ /*                                                                            */
 /*  Author:  Marcus Funk                                                      */
 /*                                                                            */
 /*** MODIFICATION HISTORY *****************************************************/
@@ -51,4 +50,4 @@
 /* Define the following to enable debug logging of HCI traffic.  If
    this macro is defined, all incomming and outgoing traffic will be
    logged via BTPS_OutputMessage().                                  */
-// #define HCITR_ENABLE_DEBUG_LOGGING
+#define HCITR_ENABLE_DEBUG_LOGGING

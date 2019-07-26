@@ -171,13 +171,19 @@ target_link_libraries(${PROJECT_NAME}
         module-db
         module-gui
         module-services
-        module-apps
+        -Wl,--start-group
         module-bluetooth
+        ${Bluetopia_32_M7}
+        ${SS1BTAUD_32_M7}
+        ${SS1BTAVC_32_M7}
+        ${SS1BTAVR_32_M7}
+        ${SS1BTGAV_32_M7}
+        -Wl,--end-group
+        module-apps
         ${TARGET_LIBRARIES}
         )
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
-
 
 set(HEX_FILE ${PROJECT_BUILD_DIRECTORY}/${CMAKE_PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BUILD_DIRECTORY}/boot.bin)

@@ -1,14 +1,18 @@
 #include "bsp_bt.hpp"
+#include "log/log.hpp"
 
 namespace bsp {
 
-BluetopiaHW::BluetopiaHW(LogLvl lvl)
+BluetopiaHW::BluetopiaHW(LogLvl lvl) : Bluetopia(default_buff_size,default_buff_size,32)
 {
     set_logging(lvl);
     configure_uart_io();
     configure_lpuart();
     configure_cts_irq();
-    log(LogDebug,"Init done!\n");
+    LOG_INFO("Init done!");
+}
+
+BluetopiaHW::~BluetopiaHW() {
 }
 
 Bluetopia *BluetopiaHW::getInstance()
@@ -22,25 +26,29 @@ Bluetopia *BluetopiaHW::getInstance()
 
 void BluetopiaHW::open()
 {
-    log(LogDebug,"open!\n");
+    LOG_INFO("open!");
+    vSemaphoreCreateBinary(sem_data);
     set_irq(true);
+    is_open = true;
+    set_rts(true);
 }
 
 void BluetopiaHW::close()
 {
-    log(LogDebug,"close!\n");
+    LOG_INFO("close!");
+    set_rts(false);
     set_irq(false);
+    is_open = false;
 }
 
 void BluetopiaHW::sleep_ms(ssize_t ms)
 {
-    log(LogDebug,"sleep %d [ms]!\n", ms);
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
 BTdev::Error BluetopiaHW::flush()
 {
-    log(LogDebug,"flush [%d] %s\n", out.len, out.tail<out.head?"reverse":"normal");
+    // LOG_INFO("flush [%d] %s", out.len, out.tail<out.head?"reverse":"normal");
     Error err = Success;
     int i=0;
     for(i=0; i<default_timeout_ms; ++i) {
@@ -51,7 +59,7 @@ BTdev::Error BluetopiaHW::flush()
         }
     }
     if(i==default_timeout_ms) {
-        printf("BT CTS error!\n");
+        LOG_ERROR("BT CTS error!");
         err = ErrorTimeout;
     }
     char* from = &out.buff[out.head];
@@ -68,7 +76,7 @@ BTdev::Error BluetopiaHW::flush()
 
 ssize_t BluetopiaHW::write(char *buf, size_t nbytes)
 {
-    log(LogDebug, "write ->\n");
+    // LOG_INFO( "write -> [%.*s]",nbytes, buf);
     ssize_t i=0;
     // if CTS set -> ignore return 0, can use threshold_guard here too
     for (i=0; i<nbytes; ++i) {
@@ -84,6 +92,7 @@ ssize_t BluetopiaHW::write_blocking(char *buf, ssize_t len)
     int llen = 0;
     while (llen != len) {
         llen += write(buf, len);
+        // no error check here!
         flush();
     }
     return llen;
@@ -110,11 +119,11 @@ uint32_t BluetopiaHW::UartGetPeripheralClock()
 
 BTdev::Error BluetopiaHW::set_baudrate(uint32_t bd)
 {
-    log(LogDebug, "Set baudrate: %d", bd);
+    LOG_INFO( "Set baudrate: %d", bd);
     Error ret = Success;
     int err=0;
     if((err=LPUART_SetBaudRate(BSP_BLUETOOTH_UART_BASE, bd, UartGetPeripheralClock()))!=0) {
-        printf("BT error: baudrate [%lu] set err: %d\n", bd, err);
+        LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
         ret = ErrorBSP;
     }
     return ret;
@@ -123,21 +132,26 @@ BTdev::Error BluetopiaHW::set_baudrate(uint32_t bd)
 // set flow on -> true, set flow off -> false
 BTdev::Error BluetopiaHW::set_rts(bool on)
 {
-    log(LogDebug, "RTS %s", on?"on":"off");
     GPIO_PinWrite(BSP_BLUETOOTH_UART_RTS_PORT, BSP_BLUETOOTH_UART_RTS_PIN, on?0U:1U);
     return Success;
 }
 
 BTdev::Error BluetopiaHW::set_reset(bool on)
 {
-    log(LogDebug, "reset %s", on?"on":"off");
-    GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on?0U:1U);
+    LOG_INFO("reset %s", on?"on":"off");
+    GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on?1U:0U);
     return Success;
 }
 
-int read_cts()
+int BluetopiaHW::read_cts()
 {
     return GPIO_PinRead(BSP_BLUETOOTH_UART_CTS_PORT, BSP_BLUETOOTH_UART_CTS_PIN);
+}
+
+ssize_t BluetopiaHW::read(void*, size_t nbytes)
+{
+    LOG_INFO("not implemented");
+    return 0;
 }
 
 /// ---- PRIVATES
@@ -175,7 +189,7 @@ void BluetopiaHW::configure_lpuart()
     bt_c.enableRx       = false;
 
     if (LPUART_Init(BSP_BLUETOOTH_UART_BASE, &bt_c, UartGetPeripheralClock()) != kStatus_Success) {
-        printf("BT: UART config error Could not initialize the uart!\n");
+        LOG_ERROR("BT: UART config error Could not initialize the uart!");
         return;
     }
 
@@ -202,10 +216,28 @@ void BluetopiaHW::set_irq(bool enable)
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, false);
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
-    LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+    if(enable) {
+        LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+    } else {
+        LPUART_DisableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
+    }
     //LPUART_EnableInterrupts(BSP_BLUETOOTH_UART_BASE, kLPUART_RxDataRegFullInterruptEnable|kLPUART_TxDataRegEmptyInterruptEnable|kLPUART_TransmissionCompleteInterruptEnable|kLPUART_RxOverrunInterruptEnable );
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, true);
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
+}
+
+void BluetopiaHW::wait_data()
+{
+    while(in.len == 0) {
+        // TODO checkme
+        xSemaphoreTake(sem_data, -1);
+    }
+}
+
+void BluetopiaHW::set_data()
+{
+    long tmp;
+    xSemaphoreGiveFromISR(sem_data, &tmp);
 }
 
 };
@@ -224,10 +256,11 @@ extern "C" {
         if(isrReg & kLPUART_RxDataRegFullFlag)
         {
             characterReceived = LPUART_ReadByte(BSP_BLUETOOTH_UART_BASE);
-            bsp::BTdev *bt = bsp::BluetopiaHW::getInstance();
+            bsp::Bluetopia *bt = bsp::BluetopiaHW::getInstance();
             if(bt->in.push(characterReceived) != 0) {
+                // LOG_ERROR("BT: error no RX space!");
             } else {
-                printf("BT: error no RX space!\n");
+                bt->set_data();
             }
             if(bt->in.threshold_guard()) {
                 bt->set_rts(false);
