@@ -14,6 +14,7 @@
 #include "MuxDaemon.hpp"
 #include "NotificationMuxChannel.hpp"
 #include "CommunicationMuxChannel.hpp"
+#include "InOutSerialWorker.hpp"
 
 void MuxChannelWorker(void *pvp) {
     MuxChannel *inst = reinterpret_cast<MuxChannel *>(pvp);
@@ -46,7 +47,7 @@ void MuxChannelWorker(void *pvp) {
 }
 
 
-MuxChannel::MuxChannel(MuxDaemon *mux, uint32_t logicalNumber, MuxChannelType type, const char *name,
+MuxChannel::MuxChannel(InOutSerialWorker *inout,MuxChannelType type, const char *name,
                        uint32_t stackSize, uint32_t queueSize) :
         v24signals(
                 static_cast<int >(MuxDefines::GSM0710_SIGNAL_DV ) | static_cast<int >(MuxDefines::GSM0710_SIGNAL_RTR) |
@@ -57,7 +58,7 @@ MuxChannel::MuxChannel(MuxDaemon *mux, uint32_t logicalNumber, MuxChannelType ty
         state(State::Init),
         type(type),
         name(name),
-        mux(mux){
+        inout(inout){
 
 
 }
@@ -78,7 +79,7 @@ int MuxChannel::Open() {
     state = State ::Opening;
 
     // Send virtual channel request frame to GSM modem
-    mux->WriteMuxFrame(GetChannelNumber(), NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_SABM) |
+    inout->SendFrame(GetChannelNumber(), NULL, 0, static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_SABM) |
                                                static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
     return 0;
@@ -88,7 +89,7 @@ int MuxChannel::Close() {
 
     state = State ::Closing;
 
-    mux->WriteMuxFrame(GetChannelNumber(), NULL, 0,
+    inout->SendFrame(GetChannelNumber(), NULL, 0,
                        static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_DISC)|
                        static_cast<unsigned char>(MuxDefines::GSM0710_PF));
 
@@ -100,27 +101,4 @@ ssize_t MuxChannel::SendData(uint8_t *data, size_t size) {
     return xStreamBufferSend(inputBuffer,data,size,100);
 }
 
-std::vector<std::string> MuxChannel::Tokenizer(std::string &input, uint32_t maxTokenCount,
-                                               const std::string &delimiter) {
-    std::vector<std::string> strings;
-    uint32_t tokenCount = 0;
 
-
-    std::string::size_type pos = 0;
-    std::string::size_type prev = 0;
-    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (tokenCount<maxTokenCount))
-    {
-        if(pos == prev){
-            prev = pos + delimiter.size();
-            continue;
-        }
-
-        strings.push_back(input.substr(prev, pos - prev));
-        prev = pos + delimiter.size();
-        tokenCount++;
-    }
-
-    // To get the last substring (or only, if delimiter is not found)
-    input = input.substr(prev);
-    return strings;
-}

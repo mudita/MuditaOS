@@ -61,6 +61,8 @@ enum class MessageType {
     CellularHangupCall,         // Hang up call
 
     CellularListCurrentCalls,
+    CellularStartPowerUpProcedure,
+    CellularStartMultiplexer,
 
 
 	//application manager

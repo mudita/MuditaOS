@@ -45,11 +45,8 @@ public:
     BlinkyService(const std::string& name)
             : sys::Service(name)
     {
-
-        //busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-
-        timer_id = CreateTimer(3000,true);
-        ReloadTimer(timer_id);
+        timer_id = CreateTimer(1000,true);
+        //ReloadTimer(timer_id);
     }
 
     ~BlinkyService(){
@@ -63,10 +60,6 @@ public:
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override{
         LOG_DEBUG("Blinky service tick!");
-        //auto ret = CellularServiceAPI::DialNumber(this,"");
-        stopTimer(timer_id);
-
-
     }
 
 
@@ -103,7 +96,7 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
 //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
 
     //vector with launchers to applications
@@ -136,7 +129,6 @@ int SystemStart(sys::SystemManager* sysmgr)
 }
 
 int main() {
-
 
 	LOG_PRINTF("Launching PurePhone..\n ");
 
