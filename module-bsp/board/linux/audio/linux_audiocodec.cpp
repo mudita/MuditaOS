@@ -16,7 +16,7 @@
 
 namespace bsp {
 
-    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr),pauseResumeFormat{} {
+    LinuxAudiocodec::LinuxAudiocodec(audioCallback_t callback) : AudioDevice(callback), stream(nullptr) {
         PaError err = Pa_Initialize();
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
@@ -66,6 +66,8 @@ namespace bsp {
             outChan = 2;
         }
 
+        currentFormat = format;
+
         /* Open an audio I/O stream. */
         PaError err = Pa_OpenDefaultStream(&stream,
                                            inChan,          /* no input channels */
@@ -83,6 +85,10 @@ namespace bsp {
                                            this); /*This is a pointer that will be passed to
                                                    your callback*/
         if (err != paNoError) {
+
+            if(err == paInvalidSampleRate){
+                LOG_FATAL("dsad");
+            }
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
             return err;
         }
@@ -94,13 +100,11 @@ namespace bsp {
             return err;
         }
 
-        currentFormat = format;
-
         return paNoError;
     }
 
     int32_t LinuxAudiocodec::Stop() {
-        PaError err = Pa_StopStream(stream);
+        PaError err = Pa_CloseStream(stream);
         if (err != paNoError) {
             LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
         }
@@ -139,7 +143,7 @@ namespace bsp {
         auto ret = ptr->callback(inputBuffer, outputBuffer, framesToFetch);
         if (ret == 0) {
             // close stream
-            return paComplete;
+            return paAbort;
         } else if (ret <= framesToFetch) {
 
             // Scale output buffer
@@ -156,18 +160,13 @@ namespace bsp {
         return paAbort;
     }
 
-    int32_t LinuxAudiocodec::InputGainCtrl(int8_t gain) {
+    int32_t LinuxAudiocodec::InputGainCtrl(float gain) {
         inputGain = gain;
         return 0;
     }
 
-    int32_t LinuxAudiocodec::OutputVolumeCtrl(uint32_t vol) {
-        if (vol >= 100) {
-            outputVolume = 1.0;
-        } else {
-            outputVolume = (float) vol / 100;
-        }
-
+    int32_t LinuxAudiocodec::OutputVolumeCtrl(float vol) {
+        outputVolume = vol;
         return 0;
     }
 
@@ -178,22 +177,4 @@ namespace bsp {
     int32_t LinuxAudiocodec::OutputPathCtrl([[maybe_unused]] uint32_t outputPath) {
         return 0;
     }
-
-    int32_t LinuxAudiocodec::Pause() {
-        pauseResumeFormat = currentFormat;
-        return Stop();
-    }
-
-    int32_t LinuxAudiocodec::Resume() {
-        return Start(pauseResumeFormat);
-    }
-
-    int8_t LinuxAudiocodec::GetInputGain() {
-        return inputGain;
-    }
-
-    uint32_t LinuxAudiocodec::GetOutputVolume() {
-        return outputVolume;
-    }
-
 }

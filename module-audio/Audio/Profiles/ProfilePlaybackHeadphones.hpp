@@ -17,7 +17,7 @@
 
 class ProfilePlaybackHeadphones: public Profile {
 public:
-    ProfilePlaybackHeadphones(std::function<int32_t()> callback, uint32_t volume) : Profile(
+    ProfilePlaybackHeadphones(std::function<int32_t()> callback, float volume) : Profile(
             "Playback Headphones",Type::PlaybackHeadphones, volume, 0.0, 0, 0,bsp::AudioDevice::Type::Audiocodec, callback) {}
 };
 

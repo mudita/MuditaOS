@@ -16,7 +16,7 @@
 
 class ProfilePlaybackLoudspeaker : public Profile {
 public:
-    ProfilePlaybackLoudspeaker(std::function<int32_t()> callback, uint32_t volume) : Profile(
+    ProfilePlaybackLoudspeaker(std::function<int32_t()> callback, float volume) : Profile(
             "Playback Loudspeaker",Type::PlaybackLoudspeaker, volume, 0.0, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
 };
 

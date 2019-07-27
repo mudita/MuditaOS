@@ -70,8 +70,10 @@ int32_t RecorderOperation::Start(std::function<int32_t(uint32_t)> callback) {
         flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft);
     }
 
-    return audioDevice->Start(
-            AudioDevice::AudioFormat{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags});
+    audioFormat = AudioDevice::AudioFormat{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags};
+
+
+    return audioDevice->Start(audioFormat);
 }
 
 int32_t RecorderOperation::Stop() {
@@ -91,7 +93,7 @@ int32_t RecorderOperation::Pause() {
     }
 
     state = State::Paused;
-    return audioDevice->Pause();
+    return audioDevice->Stop();
 }
 
 int32_t RecorderOperation::Resume() {
@@ -101,7 +103,7 @@ int32_t RecorderOperation::Resume() {
     }
 
     state = State::Active;
-    return audioDevice->Resume();
+    return audioDevice->Start(audioFormat);
 }
 
 int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data) {

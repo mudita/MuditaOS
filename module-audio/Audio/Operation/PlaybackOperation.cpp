@@ -34,8 +34,8 @@ PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
     };
 
     //TODO:M.P should be fetched from DB
-    availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 100));
-    availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 20));
+    availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 1.0));
+    availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 0.2));
     profile = availableProfiles[0].get();
 
     dec = decoder::Create(file);
@@ -61,8 +61,8 @@ int32_t PlaybackOperation::Start(std::function<int32_t(uint32_t)> callback) {
 
     eventCallback = callback;
     state = State::Active;
-    return audioDevice->Start(
-            AudioDevice::AudioFormat{.sampleRate_Hz=tags->sample_rate, .bitWidth=16, .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)});
+    currentFormat = AudioDevice::AudioFormat{.sampleRate_Hz=tags->sample_rate, .bitWidth=16, .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)};
+    return audioDevice->Start(currentFormat);
 }
 
 int32_t PlaybackOperation::Stop() {
@@ -80,7 +80,7 @@ int32_t PlaybackOperation::Pause() {
     }
 
     state = State::Paused;
-    return audioDevice->Pause();
+    return audioDevice->Stop();
 }
 
 int32_t PlaybackOperation::Resume() {
@@ -90,7 +90,7 @@ int32_t PlaybackOperation::Resume() {
     }
 
     state = State::Active;
-    return audioDevice->Resume();
+    return audioDevice->Start(currentFormat);
 }
 
 Position PlaybackOperation::GetPosition() {

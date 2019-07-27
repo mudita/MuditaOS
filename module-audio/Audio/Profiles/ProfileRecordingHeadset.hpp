@@ -16,8 +16,8 @@
 
 class ProfileRecordingHeadset : public Profile {
 public:
-    ProfileRecordingHeadset(std::function<int32_t()> callback, int8_t gain) : Profile(
-            "Recording Headset",Type::RecordingHeadset, 0, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
+    ProfileRecordingHeadset(std::function<int32_t()> callback, float gain) : Profile(
+            "Recording Headset",Type::RecordingHeadset, 0.0, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
 };
 
 

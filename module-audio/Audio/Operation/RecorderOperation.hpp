@@ -15,12 +15,10 @@
 
 #include "Operation.hpp"
 #include <Audio/encoder/Encoder.hpp>
+#include "bsp/audio/bsp_audio.hpp"
 
 class Encoder;
 
-namespace bsp{
-    class AudioDevice;
-}
 
 class RecorderOperation : public Operation{
 public:
@@ -48,6 +46,7 @@ private:
     std::unique_ptr<Encoder> enc;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
     const Encoder::Format format;
+    bsp::AudioDevice::AudioFormat audioFormat;
 };
 
 

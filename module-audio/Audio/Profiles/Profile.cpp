@@ -16,7 +16,7 @@
 #include "ProfilePlaybackHeadphones.hpp"
 #include "ProfilePlaybackLoudspeaker.hpp"
 
-std::unique_ptr<Profile> Profile::Create(const Type t,std::function<int32_t()> callback, uint32_t vol, float gain) {
+std::unique_ptr<Profile> Profile::Create(const Type t,std::function<int32_t()> callback, float vol, float gain) {
     std::unique_ptr<Profile> inst;
 
     switch(t){
@@ -39,7 +39,7 @@ std::unique_ptr<Profile> Profile::Create(const Type t,std::function<int32_t()> c
     return inst;
 }
 
-Profile::Profile(const std::string& name,const Type type, uint32_t vol, float gain, uint32_t outPath, uint32_t inPath,
+Profile::Profile(const std::string& name,const Type type, float vol, float gain, uint32_t outPath, uint32_t inPath,
                  bsp::AudioDevice::Type devType, std::function<int32_t()> callback)
         : name(name),type(type), outputVolume(vol), inputGain(gain), outputPath(outPath), inputPath(inPath),
           audioDeviceType(devType), dbAccessCallback(callback) {

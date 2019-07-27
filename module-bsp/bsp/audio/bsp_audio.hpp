@@ -77,22 +77,17 @@ namespace bsp {
 
         virtual int32_t Stop() = 0;
 
-        virtual int32_t Pause() = 0;
+        virtual int32_t OutputVolumeCtrl(float vol) = 0;
 
-        virtual int32_t Resume() = 0;
-
-        virtual int32_t OutputVolumeCtrl(uint32_t vol) = 0;
-
-        virtual int32_t InputGainCtrl(int8_t gain) = 0;
+        virtual int32_t InputGainCtrl(float gain) = 0;
 
         virtual int32_t OutputPathCtrl(uint32_t outputPath) = 0;
 
         virtual int32_t InputPathCtrl(uint32_t inputPath) = 0;
 
-        virtual uint32_t GetOutputVolume() = 0;
+        float GetOutputVolume(){return outputVolume;}
 
-        virtual int8_t GetInputGain() = 0;
-
+        float GetInputGain(){return inputGain;}
 
 
         bsp::AudioDevice::AudioFormat GetCurrentFormat(){return currentFormat;}
@@ -108,6 +103,9 @@ namespace bsp {
         audioCallback_t callback = nullptr;
 
         bool isInitialized = false;
+
+        float outputVolume = 1.0;
+        float inputGain=1.0;
     };
 
 }
