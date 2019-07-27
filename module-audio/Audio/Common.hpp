@@ -17,7 +17,8 @@ using Position = float;
 enum class RetCode{
     Success = 0,
     InvokedInIncorrectState,
-    UnsupportedProfile
+    UnsupportedProfile,
+    InvalidFormat
 
 };
 

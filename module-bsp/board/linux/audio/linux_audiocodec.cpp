@@ -44,69 +44,31 @@ namespace bsp {
         }
     }
 
-    int32_t LinuxAudiocodec::Start(const bsp::AudioDevice::AudioFormat &format) {
+    int32_t LinuxAudiocodec::Start(const bsp::AudioDevice::Format &format) {
 
-        uint32_t outChan = 0;
-        uint32_t inChan = 0;
-
-
-        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) {
-            inChan++;
+        if(!TryOpenStream(format)){
+            return paInternalError;
         }
 
-        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputRight)) {
-            inChan++;
-        }
-
-        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::OutputMono)) {
-            outChan++;
-        }
-
-        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)) {
-            outChan = 2;
+        auto err = Pa_StartStream(stream);
+        if (err != paNoError) {
+            LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
+            return err;
         }
 
         currentFormat = format;
 
-        /* Open an audio I/O stream. */
-        PaError err = Pa_OpenDefaultStream(&stream,
-                                           inChan,          /* no input channels */
-                                           outChan,          /* stereo output */
-                                           paInt16,  /* TODO:M.P only 16bit samples are supported */
-                                           format.sampleRate_Hz,
-                                           paFramesPerBufferUnspecified, /* frames per buffer, i.e. the number
-                                                   of sample frames that PortAudio will
-                                                   request from the callback. Many apps
-                                                   may want to use
-                                                   paFramesPerBufferUnspecified, which
-                                                   tells PortAudio to pick the best,
-                                                   possibly changing, buffer size.*/
-                                           portAudioCallback, /* this is your callback function */
-                                           this); /*This is a pointer that will be passed to
-                                                   your callback*/
-        if (err != paNoError) {
+        return 0;
 
-            if(err == paInvalidSampleRate){
-                LOG_FATAL("dsad");
-            }
-            LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
-            return err;
-        }
-
-
-        err = Pa_StartStream(stream);
-        if (err != paNoError) {
-            LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
-            return err;
-        }
-
-        return paNoError;
     }
 
     int32_t LinuxAudiocodec::Stop() {
-        PaError err = Pa_CloseStream(stream);
-        if (err != paNoError) {
-            LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
+
+        if (stream) {
+            PaError err = Pa_CloseStream(stream);
+            if (err != paNoError) {
+                LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
+            }
         }
 
         stream = nullptr;
@@ -127,15 +89,16 @@ namespace bsp {
             framesToFetch = framesPerBuffer * 2;
         }
 
-        if ((ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputLeft)) && (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputRight))) {
+        if ((ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputLeft)) &&
+            (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputRight))) {
             framesToFetch = framesPerBuffer * 2;
         }
 
         if (inputBuffer) {
-            int16_t *pBuff = reinterpret_cast<int16_t *>(const_cast<void*>(inputBuffer));
+            int16_t *pBuff = reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer));
             std::transform(pBuff, pBuff + framesToFetch, pBuff,
                            [ptr](int16_t c) -> int16_t {
-                               return c * ptr->inputGain;
+                               return (float)c * ptr->currentFormat.inputGain;
                            });
         }
 
@@ -151,7 +114,7 @@ namespace bsp {
                 int16_t *pBuff = reinterpret_cast<int16_t *>(outputBuffer);
                 std::transform(pBuff, pBuff + framesToFetch, pBuff,
                                [ptr](int16_t c) -> int16_t {
-                                   return c * ptr->outputVolume;
+                                   return (float)c * ptr->currentFormat.outputVolume;
                                });
             }
             return paContinue;
@@ -161,12 +124,12 @@ namespace bsp {
     }
 
     int32_t LinuxAudiocodec::InputGainCtrl(float gain) {
-        inputGain = gain;
+        currentFormat.inputGain = gain;
         return 0;
     }
 
     int32_t LinuxAudiocodec::OutputVolumeCtrl(float vol) {
-        outputVolume = vol;
+        currentFormat.outputVolume = vol;
         return 0;
     }
 
@@ -176,5 +139,62 @@ namespace bsp {
 
     int32_t LinuxAudiocodec::OutputPathCtrl([[maybe_unused]] uint32_t outputPath) {
         return 0;
+    }
+
+    bool LinuxAudiocodec::TryOpenStream(const bsp::AudioDevice::Format &format) {
+        uint32_t outChan = 0;
+        uint32_t inChan = 0;
+
+
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) {
+            inChan++;
+        }
+
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputRight)) {
+            inChan++;
+        }
+
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::OutputMono)) {
+            outChan++;
+        }
+
+        if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)) {
+            outChan = 2;
+        }
+        /* Open an audio I/O stream. */
+        PaError err = Pa_OpenDefaultStream(&stream,
+                                           inChan,          /* no input channels */
+                                           outChan,          /* stereo output */
+                                           paInt16,  /* TODO:M.P only 16bit samples are supported */
+                                           format.sampleRate_Hz,
+                                           paFramesPerBufferUnspecified, /* frames per buffer, i.e. the number
+                                                   of sample frames that PortAudio will
+                                                   request from the callback. Many apps
+                                                   may want to use
+                                                   paFramesPerBufferUnspecified, which
+                                                   tells PortAudio to pick the best,
+                                                   possibly changing, buffer size.*/
+                                           portAudioCallback, /* this is your callback function */
+                                           this); /*This is a pointer that will be passed to
+                                                   your callback*/
+
+        if (err != paNoError) {
+            LOG_ERROR("PortAudio error: %s\n", Pa_GetErrorText(err));
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    bool LinuxAudiocodec::IsFormatSupported(const bsp::AudioDevice::Format &format) {
+        auto ret = TryOpenStream(format);
+        if (ret) {
+            Stop();
+            return true;
+        } else {
+            return false;
+        }
+
     }
 }

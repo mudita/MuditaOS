@@ -44,7 +44,7 @@ public:
 private:
     std::unique_ptr<decoder> dec;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
-    bsp::AudioDevice::AudioFormat currentFormat;
+    bsp::AudioDevice::Format currentFormat;
 
 };
 

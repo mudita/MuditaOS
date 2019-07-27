@@ -26,7 +26,7 @@ TEST_CASE( "Testing Linux Audiocodec" ) {
 
     REQUIRE(audiocodec);
 
-    AudioDevice::AudioFormat format{.sampleRate_Hz=44100,.bitWidth=16,.flags=static_cast<uint32_t >(AudioDevice::Flags ::OutPutStereo)};
+    AudioDevice::Format format{.sampleRate_Hz=44100,.bitWidth=16,.flags=static_cast<uint32_t >(AudioDevice::Flags ::OutPutStereo)};
 
     REQUIRE(audiocodec.value()->Start(format) == 0);
 

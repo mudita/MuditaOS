@@ -22,12 +22,13 @@ namespace bsp{
         LinuxAudiocodec(AudioDevice::audioCallback_t callback);
         virtual ~LinuxAudiocodec();
 
-        int32_t Start(const AudioFormat& format) override final;
+        int32_t Start(const Format& format) override final;
         int32_t Stop() override final;
         int32_t OutputVolumeCtrl(float vol) override final;
         int32_t InputGainCtrl(float gain) override final;
         int32_t OutputPathCtrl(uint32_t outputPath) override final;
         int32_t InputPathCtrl(uint32_t inputPath) override final;
+        bool IsFormatSupported(const Format& format) override final;
 
     private:
         PaStream *stream;
@@ -38,6 +39,8 @@ namespace bsp{
                                    const PaStreamCallbackTimeInfo* timeInfo,
                                    PaStreamCallbackFlags statusFlags,
                                    void *userData );
+
+        bool TryOpenStream(const bsp::AudioDevice::Format &format);
 
     };
 }

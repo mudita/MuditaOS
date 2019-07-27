@@ -70,10 +70,16 @@ int32_t RecorderOperation::Start(std::function<int32_t(uint32_t)> callback) {
         flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft);
     }
 
-    audioFormat = AudioDevice::AudioFormat{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags};
+    audioFormat = AudioDevice::Format{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags};
+
+    if(audioDevice->IsFormatSupported(audioFormat)){
+        return audioDevice->Start(audioFormat);
+    }
+    else{
+        return static_cast<int32_t >(RetCode ::InvalidFormat);
+    }
 
 
-    return audioDevice->Start(audioFormat);
 }
 
 int32_t RecorderOperation::Stop() {
@@ -120,6 +126,8 @@ int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData
         case Event::BTHeadsetOff:
             SwitchProfile(Profile::Type::RecordingBuiltInMic);
             break;
+        default:
+            return static_cast<int32_t >(RetCode::UnsupportedProfile);
 
     }
 
@@ -139,20 +147,13 @@ int32_t RecorderOperation::SwitchProfile(const Profile::Type type) {
 
     switch (state) {
         case State::Idle:
+        case State::Paused:
             break;
 
         case State::Active:
             state = State::Idle;
             Start(eventCallback);
             break;
-
-        case State::Paused:
-            //TODO:M.P remove this nasty hack..
-            state = State::Idle;
-            Start(eventCallback);
-            Pause();
-            break;
-
     }
 
 

@@ -36,10 +36,14 @@ namespace bsp {
             InputRight = 1 << 3
         };
 
-        using AudioFormat = struct {
+        using Format = struct {
             uint32_t sampleRate_Hz;   /*!< Sample rate of audio data */
             uint32_t bitWidth;        /*!< Data length of audio data, usually 8/16/24/32 bits */
             uint32_t flags;             /*!< In/Out configuration flags */
+            float outputVolume=0.0;
+            float inputGain=0.0;
+            uint32_t inputPath=0;
+            uint32_t outputPath=0;
         };
 
         /**
@@ -73,7 +77,7 @@ namespace bsp {
 
         static std::optional<std::unique_ptr<AudioDevice>> Create(Type type,audioCallback_t callback);
 
-        virtual int32_t Start(const AudioFormat &format) = 0;
+        virtual int32_t Start(const Format &format) = 0;
 
         virtual int32_t Stop() = 0;
 
@@ -85,12 +89,18 @@ namespace bsp {
 
         virtual int32_t InputPathCtrl(uint32_t inputPath) = 0;
 
-        float GetOutputVolume(){return outputVolume;}
+        virtual bool IsFormatSupported(const Format& format) = 0;
 
-        float GetInputGain(){return inputGain;}
+        float GetOutputVolume(){return currentFormat.outputVolume;}
+
+        float GetInputGain(){return currentFormat.inputGain;}
+
+        uint32_t GetOutputPath(){return currentFormat.outputPath;}
+
+        uint32_t GetInputPath(){return currentFormat.inputPath;}
 
 
-        bsp::AudioDevice::AudioFormat GetCurrentFormat(){return currentFormat;}
+        bsp::AudioDevice::Format GetCurrentFormat(){return currentFormat;}
 
 
         AudioDevice(audioCallback_t callback):callback(callback) {}
@@ -99,13 +109,10 @@ namespace bsp {
 
     protected:
 
-        bsp::AudioDevice::AudioFormat currentFormat;
+        bsp::AudioDevice::Format currentFormat;
         audioCallback_t callback = nullptr;
 
         bool isInitialized = false;
-
-        float outputVolume = 1.0;
-        float inputGain=1.0;
     };
 
 }
