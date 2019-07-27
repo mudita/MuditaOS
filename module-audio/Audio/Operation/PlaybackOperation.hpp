@@ -15,14 +15,11 @@
 #include <memory>
 #include <optional>
 #include <functional>
+#include "bsp/audio/bsp_audio.hpp"
 
 #include "Operation.hpp"
 
 class decoder;
-
-namespace bsp{
-    class AudioDevice;
-}
 
 
 class PlaybackOperation : public Operation {
@@ -47,6 +44,7 @@ public:
 private:
     std::unique_ptr<decoder> dec;
     std::unique_ptr<bsp::AudioDevice> audioDevice;
+    bsp::AudioDevice::AudioFormat currentFormat;
 
 };
 

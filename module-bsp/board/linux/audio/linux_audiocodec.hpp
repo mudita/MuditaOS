@@ -24,20 +24,14 @@ namespace bsp{
 
         int32_t Start(const AudioFormat& format) override final;
         int32_t Stop() override final;
-        int32_t Pause() override final;
-        int32_t Resume() override final;
-        int32_t OutputVolumeCtrl(uint32_t vol) override final;
-        int32_t InputGainCtrl(int8_t gain) override final;
+        int32_t OutputVolumeCtrl(float vol) override final;
+        int32_t InputGainCtrl(float gain) override final;
         int32_t OutputPathCtrl(uint32_t outputPath) override final;
         int32_t InputPathCtrl(uint32_t inputPath) override final;
-        uint32_t GetOutputVolume() override final;
-        int8_t GetInputGain() override final;
 
     private:
-        bsp::AudioDevice::AudioFormat pauseResumeFormat;
         PaStream *stream;
-        float outputVolume = 1.0;
-        float inputGain=1.0;
+
 
         static int portAudioCallback( const void *inputBuffer, void *outputBuffer,
                                    unsigned long framesPerBuffer,

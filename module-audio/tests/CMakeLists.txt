@@ -11,7 +11,7 @@ add_executable( ${PROJECT_NAME}
 
         "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Playback_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Recorder_tests.cpp"
+        #"${CMAKE_CURRENT_SOURCE_DIR}/Recorder_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Decoders_tests.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/StateMachine_tests.cpp"
         )
