@@ -49,9 +49,12 @@ TEST_CASE( "Playback tests" ) {
                 return 0;
             });
             sleep(1);
-            playbackRet.value()->SwitchProfile(Profile::Type::PlaybackHeadphones);
+            playbackRet.value()->SendEvent(Operation::Event::HeadphonesPlugin,nullptr);
             REQUIRE(playbackRet.value()->GetProfile()->GetName() == "Playback Headphones");
-            sleep(5);
+            sleep(2);
+            playbackRet.value()->SendEvent(Operation::Event::HeadphonesUnplug,nullptr);
+            REQUIRE(playbackRet.value()->GetProfile()->GetName() == "Playback Loudspeaker");
+            sleep(3);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
 
@@ -94,10 +97,9 @@ TEST_CASE( "Playback tests" ) {
             });
             sleep(1);
             playbackRet.value()->Pause();
-            playbackRet.value()->SwitchProfile(Profile::Type::PlaybackHeadphones);
+            playbackRet.value()->SendEvent(Operation::Event::HeadphonesPlugin,nullptr);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Paused);
             REQUIRE(playbackRet.value()->GetProfile()->GetName() == "Playback Headphones");
-            sleep(1);
             playbackRet.value()->Resume();
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Active);
             sleep(1);

@@ -47,21 +47,23 @@ PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
 
 int32_t PlaybackOperation::Start(std::function<int32_t(uint32_t)> callback) {
 
-    if (state == State::Active || state == State::Paused) {
+    if (state == State::Active || state == State::Paused ) {
         return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
 
     auto tags = dec->fetchTags();
 
-    // Set audio device's parameters
-    audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
-    audioDevice->InputGainCtrl(profile->GetInputGain());
-    audioDevice->OutputPathCtrl(profile->GetOutputPath());
-    audioDevice->InputPathCtrl(profile->GetInputPath());
-
     eventCallback = callback;
     state = State::Active;
-    currentFormat = AudioDevice::AudioFormat{.sampleRate_Hz=tags->sample_rate, .bitWidth=16, .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo)};
+
+    currentFormat = AudioDevice::Format{.sampleRate_Hz=tags->sample_rate,
+            .bitWidth=16,
+            .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo),
+            .outputVolume=profile->GetOutputVolume(),
+            .inputGain=profile->GetInputGain(),
+            .inputPath=profile->GetInputPath(),
+            .outputPath=profile->GetOutputPath()
+    };
     return audioDevice->Start(currentFormat);
 }
 
@@ -88,7 +90,6 @@ int32_t PlaybackOperation::Resume() {
     if (state == State::Active || state == State::Idle) {
         return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
-
     state = State::Active;
     return audioDevice->Start(currentFormat);
 }
@@ -101,20 +102,22 @@ Position PlaybackOperation::GetPosition() {
 int32_t PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data) {
 
     switch (evt) {
-        case Event ::HeadphonesPlugin:
+        case Event::HeadphonesPlugin:
             SwitchProfile(Profile::Type::PlaybackHeadphones);
             break;
-        case Event ::HeadphonesUnplug:
+        case Event::HeadphonesUnplug:
             SwitchProfile(Profile::Type::PlaybackLoudspeaker);
             break;
-        case Event ::BTA2DPOn:
+        case Event::BTA2DPOn:
             break;
-        case Event ::BTA2DPOff:
+        case Event::BTA2DPOff:
             break;
-        case Event ::BTHeadsetOn:
+        case Event::BTHeadsetOn:
             break;
-        case Event ::BTHeadsetOff:
+        case Event::BTHeadsetOff:
             break;
+        default:
+            return static_cast<int32_t >(RetCode::UnsupportedProfile);
 
     }
     return static_cast<int32_t >(RetCode::Success);
@@ -131,20 +134,24 @@ int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
 
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
+    currentFormat = AudioDevice::Format{.sampleRate_Hz=currentFormat.sampleRate_Hz,
+            .bitWidth=16,
+            .flags=currentFormat.flags,
+            .outputVolume=profile->GetOutputVolume(),
+            .inputGain=profile->GetInputGain(),
+            .inputPath=profile->GetInputPath(),
+            .outputPath=profile->GetOutputPath()
+    };
+
+
     switch (state) {
         case State::Idle:
+        case State::Paused:
             break;
 
         case State::Active:
             state = State::Idle;
             Start(eventCallback);
-            break;
-
-        case State::Paused:
-            //TODO:M.P remove this nasty hack..
-            state = State::Idle;
-            Start(eventCallback);
-            Pause();
             break;
 
     }

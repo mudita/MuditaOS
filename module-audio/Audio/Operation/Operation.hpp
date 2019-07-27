@@ -67,7 +67,7 @@ public:
 
     virtual int32_t SendEvent(const Event evt, const EventData *data) = 0;
 
-    virtual int32_t SwitchProfile(const Profile::Type type) = 0;
+
 
     virtual Position GetPosition() = 0;
 
@@ -83,6 +83,8 @@ protected:
     std::function<int32_t(uint32_t)> eventCallback = nullptr;
 
     bool isInitialized = false;
+
+    virtual int32_t SwitchProfile(const Profile::Type type) = 0;
 
     std::optional<Profile *> GetProfile(const Profile::Type type);
 
