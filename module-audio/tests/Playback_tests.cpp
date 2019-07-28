@@ -28,6 +28,8 @@ TEST_CASE( "Playback tests" ) {
     cwd = cwd.substr(0,cwd.find_last_of("/\\"));
     cwd = cwd.append("/module-audio/tests/samples");
 
+#if 0
+
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
         SECTION("Full playback"){
@@ -127,6 +129,57 @@ TEST_CASE( "Playback tests" ) {
 
     }
 
+    SECTION("Sample3.flac 16bit 44100Hz mono"){
+
+        SECTION("Full playback"){
+            auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample3.flac").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
+                std::cout<<"End of file reached!\n";
+            return 0;
+            });
+            sleep(6);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
+        }
+
+    }
+
+#endif
+
+    SECTION("Sample1.mp3 16bit 44100Hz stereo"){
+
+        SECTION("Full playback"){
+            auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.mp3").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
+                std::cout<<"End of file reached!\n";
+            return 0;
+            });
+            sleep(6);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
+        }
+
+    }
+
+#if 0
+    SECTION("Sample3.mp3 16bit 44100Hz mono"){
+
+        SECTION("Full playback"){
+            auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample3.mp3").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
+                std::cout<<"End of file reached!\n";
+            return 0;
+            });
+            sleep(6);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
+        }
+
+    }
+#endif
 }
 
 

@@ -308,7 +308,7 @@ uint32_t decoderMP3::decode(uint32_t samplesToRead, int16_t *pcmData) {
 
     // Manage samples in internal buffer
     pcmsamplesbuffer_idx = samplesFetched - samplesToReadChann;
-    memcpy(&pcmsamplesbuffer[0], &pcmsamplesbuffer[samplesToReadChann], pcmsamplesbuffer_idx * sizeof(int16_t));
+    memmove(&pcmsamplesbuffer[0], &pcmsamplesbuffer[samplesToReadChann], pcmsamplesbuffer_idx * sizeof(int16_t));
 
     // Mono
     if (chanNumber == 1) {
