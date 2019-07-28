@@ -21,7 +21,6 @@ public:
     struct Format{
         uint32_t chanNr;
         uint32_t sampleRate;
-        uint32_t sampleSiz;
     };
 
     static std::unique_ptr<Encoder> Create(const char *file,const Format& frmt);

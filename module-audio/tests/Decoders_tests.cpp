@@ -173,5 +173,34 @@ TEST_CASE( "Decoder tests" ) {
 
     }
 
+    SECTION("Sample3.wav-> mono no tags")
+    {
+
+        auto dec = decoder::decoder::Create((cwd + "/sample3.wav").c_str());
+        REQUIRE(dec != nullptr);
+        auto tag = dec->fetchTags();
+
+        SECTION( "Init values:" ) {
+            REQUIRE( tag->total_duration_s == 5 );
+            REQUIRE( tag->artist == "" );
+            REQUIRE( tag->album == "" );
+            REQUIRE( tag->title == "sample3.wav" );
+            REQUIRE( tag->sample_rate == 44100 );
+            REQUIRE( tag->num_channel == 1 );
+        }
+
+        /*    SECTION( "Set positions:" ) {
+                dec->setPosition(0.5);
+                REQUIRE( dec->getCurrentPosition() == 336/2 );
+                dec->setPosition(0);
+                REQUIRE( dec->getCurrentPosition() == 0 );
+                dec->setPosition(1);
+                REQUIRE( dec->getCurrentPosition() == 336 );
+                dec->setPosition(0.25);
+                REQUIRE( dec->getCurrentPosition() == 336/4 );
+            }*/
+
+    }
+
 }
 

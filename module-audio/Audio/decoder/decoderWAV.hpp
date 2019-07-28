@@ -45,6 +45,7 @@ private:
         uint32_t SubChunk2Size; /* 40 */
     };
 
+    std::vector<int32_t > pcmsamplesbuffer;
     WAVE_FormatTypeDef waveHeader;
     uint32_t bitsPerSample;
     std::unique_ptr<Tags> tag = nullptr;

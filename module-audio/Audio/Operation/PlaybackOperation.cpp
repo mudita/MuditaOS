@@ -57,13 +57,14 @@ int32_t PlaybackOperation::Start(std::function<int32_t(uint32_t)> callback) {
     state = State::Active;
 
     currentFormat = AudioDevice::Format{.sampleRate_Hz=tags->sample_rate,
-            .bitWidth=16,
-            .flags=static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo),
+            .bitWidth=16, // M.P: Only 16-bit samples are supported
+            .flags= tags->num_channel == 2 ? static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo) : static_cast<uint32_t >(AudioDevice::Flags::OutputMono),
             .outputVolume=profile->GetOutputVolume(),
             .inputGain=profile->GetInputGain(),
             .inputPath=profile->GetInputPath(),
             .outputPath=profile->GetOutputPath()
     };
+
     return audioDevice->Start(currentFormat);
 }
 

@@ -53,12 +53,6 @@ int32_t RecorderOperation::Start(std::function<int32_t(uint32_t)> callback) {
         return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
     }
 
-    // Set audio device's parameters
-    audioDevice->OutputVolumeCtrl(profile->GetOutputVolume());
-    audioDevice->InputGainCtrl(profile->GetInputGain());
-    audioDevice->OutputPathCtrl(profile->GetOutputPath());
-    audioDevice->InputPathCtrl(profile->GetInputPath());
-
     eventCallback = callback;
     state = State::Active;
 
@@ -70,7 +64,14 @@ int32_t RecorderOperation::Start(std::function<int32_t(uint32_t)> callback) {
         flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft);
     }
 
-    audioFormat = AudioDevice::Format{.sampleRate_Hz=enc->format.sampleRate, .bitWidth=enc->format.sampleSiz, .flags=flags};
+    audioFormat = AudioDevice::Format{.sampleRate_Hz=format.sampleRate,
+            .bitWidth=16, // M.P Only 16-bit samples are supported
+            .flags=flags,
+            .outputVolume=profile->GetOutputVolume(),
+            .inputGain=profile->GetInputGain(),
+            .inputPath=profile->GetInputPath(),
+            .outputPath=profile->GetOutputPath()
+    };
 
     if(audioDevice->IsFormatSupported(audioFormat)){
         return audioDevice->Start(audioFormat);
@@ -144,6 +145,15 @@ int32_t RecorderOperation::SwitchProfile(const Profile::Type type) {
     }
 
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+
+    audioFormat = AudioDevice::Format{.sampleRate_Hz=audioFormat.sampleRate_Hz,
+            .bitWidth=16,
+            .flags=audioFormat.flags,
+            .outputVolume=profile->GetOutputVolume(),
+            .inputGain=profile->GetInputGain(),
+            .inputPath=profile->GetInputPath(),
+            .outputPath=profile->GetOutputPath()
+    };
 
     switch (state) {
         case State::Idle:

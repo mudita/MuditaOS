@@ -39,6 +39,7 @@ TEST_CASE( "Playback tests" ) {
             });
             sleep(6);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
         }
 
         SECTION("Switch profile during playback"){
@@ -56,6 +57,7 @@ TEST_CASE( "Playback tests" ) {
             REQUIRE(playbackRet.value()->GetProfile()->GetName() == "Playback Loudspeaker");
             sleep(3);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
         }
 
         SECTION("Destroy playback object before end of file"){
@@ -105,6 +107,22 @@ TEST_CASE( "Playback tests" ) {
             sleep(1);
             playbackRet.value()->Stop();
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+        }
+
+    }
+
+    SECTION("Sample3.wav 16bit 44100Hz mono"){
+
+        SECTION("Full playback"){
+            auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample3.wav").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
+                std::cout<<"End of file reached!\n";
+            return 0;
+            });
+            sleep(6);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
         }
 
     }

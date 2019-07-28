@@ -21,6 +21,9 @@ decoderWAV::decoderWAV(const char *fileName) :
         return;
     }
 
+    //TODO:M.P; implement support for sample size different than 16bit
+    //pcmsamplesbuffer.reserve(1024);
+
     tag->total_duration_s = (fileSize - sizeof(WAVE_FormatTypeDef)) / waveHeader.ByteRate;
     tag->duration_min = tag->total_duration_s / 60;
     tag->duration_hour = tag->duration_min / 60;
@@ -48,28 +51,34 @@ std::unique_ptr<Tags> decoderWAV::fetchTags() {
 
 uint32_t decoderWAV::decode(uint32_t samplesToRead, int16_t *pcmData) {
     uint32_t samples_read = 0;
-    uint32_t samplesToReadChann = chanNumber == 1 ? samplesToRead / 2 : samplesToRead;
 
-    // mono
-    if (chanNumber == 1) {
-        samples_read = vfs.fread(pcmData, sizeof(int16_t), samplesToReadChann, fd);
-        if (samples_read == 0) {
-            return samples_read;
-        }
+/* TODO:M.P; implement support for sample size different than 16bit
+    if(samplesToRead > pcmsamplesbuffer.max_size()){
+        pcmsamplesbuffer.resize(samplesToRead);
+    }*/
 
-        // Internally mono recordings are converted to stereo by doubling samples.
-        decoder::convertmono2stereo(pcmData, samplesToReadChann);
-        samples_read *= 2;
-        samplesToReadChann *= 2;
-    }
-        //stereo
-    else {
-        samples_read = vfs.fread(pcmData, sizeof(int16_t), samplesToReadChann, fd);
+    switch (bitsPerSample){
+        case 8:
+            //TODO:M.P not supported
+            break;
+
+        case 16:
+            samples_read = vfs.fread(pcmData, sizeof(int16_t), samplesToRead, fd);
+            break;
+
+        case 24:
+            //TODO:M.P not supported
+            break;
+
+        case 32:
+            //TODO:M.P not supported
+            break;
+
     }
 
     if (samples_read) {
         /* Calculate frame duration in seconds */
-        position += (float) ((float) (samplesToReadChann / 2) / (float) (sampleRate));
+        position += (float) ((float) (chanNumber == 2 ? samplesToRead/chanNumber : samplesToRead ) / (float) (sampleRate));
     }
 
     return samples_read;
