@@ -19,7 +19,7 @@ EncoderWAV::EncoderWAV(const char *fileName, const Encoder::Format &frmt) : Enco
     /* Initialize the encoder structure */
     WaveFormat.SampleRate = format.sampleRate;        /* Audio sampling frequency */
     WaveFormat.NbrChannels = format.chanNr;          /* Number of channels: 1:Mono or 2:Stereo */
-    WaveFormat.BitPerSample = format.sampleSiz;        /* Number of bits per sample (16, 24 or 32) */
+    WaveFormat.BitPerSample = 16;           /* Number of bits per sample (16, 24 or 32) */
     WaveFormat.FileSize = 0x001D4C00;    /* Total length of useful audio data (payload) */
     WaveFormat.SubChunk1Size = 44;       /* The file header chunk size */
     WaveFormat.ByteRate = (WaveFormat.SampleRate * \
@@ -45,7 +45,7 @@ uint32_t EncoderWAV::Encode(uint32_t samplesToWrite,int16_t* pcmData) {
     /*
      * Write int16_t PCM samples to file.
      */
-    auto byteswritten = vfs.fwrite(pcmData,format.sampleSiz/8,samplesToWrite,fd);
+    auto byteswritten = vfs.fwrite(pcmData,sizeof(int16_t),samplesToWrite,fd);
     if(byteswritten != samplesToWrite){
         return 0;
     }
