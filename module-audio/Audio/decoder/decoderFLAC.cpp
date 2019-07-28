@@ -50,25 +50,12 @@ std::unique_ptr<Tags> decoderFLAC::fetchTags() {
 uint32_t decoderFLAC::decode(uint32_t samplesToRead, int16_t *pcmData) {
 
     uint32_t samples_read = 0;
-    uint32_t samplesToReadChann = chanNumber == 1 ? samplesToRead / 2 : samplesToRead;
 
-    // Mono
-    if (chanNumber == 1) {
-        samples_read = drflac_read_s16(flac, samplesToReadChann, (drflac_int16 *) pcmData);
-
-        // Internally mono recordings are converted to stereo by doubling samples.
-        decoder::convertmono2stereo(pcmData, samplesToReadChann);
-        samplesToReadChann *= 2;
-        samples_read *= 2;
-    }
-        // Stereo
-    else {
-        samples_read = drflac_read_s16(flac, samplesToReadChann, (drflac_int16 *) pcmData);
-    }
+    samples_read = drflac_read_s16(flac, samplesToRead, (drflac_int16 *) pcmData);
 
     if (samples_read) {
         /* Calculate frame duration in seconds */
-        position += (float) ((float) (samplesToReadChann / 2) / (float) sampleRate);
+        position += (float) ((float) (samplesToRead) / (float) sampleRate);
     }
 
     return samples_read;
