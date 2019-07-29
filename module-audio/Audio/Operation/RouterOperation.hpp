@@ -19,29 +19,32 @@
 
 #include "Operation.hpp"
 
-class RouterOperation : public Operation {
-public:
+namespace audio {
 
-    RouterOperation(const char *file);
+    class RouterOperation : public Operation {
+    public:
 
-    int32_t Start([[maybe_unused]] std::function<int32_t (AudioEvents event)> callback) override final;
+        RouterOperation(const char *file);
 
-    int32_t Stop() override final;
+        int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
 
-    int32_t Pause() override final;
+        int32_t Stop() override final;
 
-    int32_t Resume() override final;
+        int32_t Pause() override final;
 
-    int32_t SendEvent(const Event evt,const EventData* data=nullptr) override final {return 0;}
+        int32_t Resume() override final;
 
-    int32_t SwitchProfile(const Profile::Type type)  override final;
+        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final { return 0; }
 
-    int32_t SetOutputVolume(float vol) override final;
+        int32_t SwitchProfile(const Profile::Type type) override final;
 
-    int32_t SetInputGain(float gain) override final;
+        int32_t SetOutputVolume(float vol) override final;
 
-    Position GetPosition() override final {return 0.0;}
-};
+        int32_t SetInputGain(float gain) override final;
 
+        Position GetPosition() override final { return 0.0; }
+    };
+
+}
 
 #endif //PUREPHONE_ROUTEROPERATION_HPP

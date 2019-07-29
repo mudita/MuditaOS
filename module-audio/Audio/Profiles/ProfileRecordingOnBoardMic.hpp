@@ -14,10 +14,14 @@
 
 #include "Profile.hpp"
 
-class ProfileRecordingOnBoardMic : public Profile {
-public:
-    ProfileRecordingOnBoardMic(std::function<int32_t()> callback, float gain) : Profile(
-            "Recording On Board Microphone",Type::RecordingBuiltInMic, 0.0, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
-};
+namespace audio {
 
+    class ProfileRecordingOnBoardMic : public Profile {
+    public:
+        ProfileRecordingOnBoardMic(std::function<int32_t()> callback, float gain) : Profile(
+                "Recording On Board Microphone", Type::RecordingBuiltInMic, 0.0, gain, 0, 0,
+                bsp::AudioDevice::Type::Audiocodec, callback) {}
+    };
+
+}
 #endif //PUREPHONE_PROFILERECORDINGONBOARDMIC_HPP

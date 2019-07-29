@@ -14,11 +14,15 @@
 
 #include "Profile.hpp"
 
-class ProfileRecordingHeadset : public Profile {
-public:
-    ProfileRecordingHeadset(std::function<int32_t()> callback, float gain) : Profile(
-            "Recording Headset",Type::RecordingHeadset, 0.0, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec, callback) {}
-};
+namespace audio {
 
+    class ProfileRecordingHeadset : public Profile {
+    public:
+        ProfileRecordingHeadset(std::function<int32_t()> callback, float gain) : Profile(
+                "Recording Headset", Type::RecordingHeadset, 0.0, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec,
+                callback) {}
+    };
+
+}
 
 #endif //PUREPHONE_PROFILERECORDINGHEADSET_HPP

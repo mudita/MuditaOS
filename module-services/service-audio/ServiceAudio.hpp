@@ -42,8 +42,8 @@ public:
     static const char *serviceName;
 
 private:
-    Audio audio;
-    std::function<uint32_t (AudioEvents event)> audioCallback = nullptr;
+    audio::Audio audio;
+    std::function<uint32_t (audio::AudioEvents event)> audioCallback = nullptr;
 };
 
 

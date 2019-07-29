@@ -61,11 +61,11 @@ public:
 
 class AudioResponseMessage: public sys::ResponseMessage {
 public:
-    AudioResponseMessage(RetCode retCode,Tags tags={}) : sys::ResponseMessage(),retCode(retCode),tags(tags) {};
+    AudioResponseMessage(audio::RetCode retCode,audio::Tags tags={}) : sys::ResponseMessage(),retCode(retCode),tags(tags) {};
     virtual ~AudioResponseMessage() {};
 
-    RetCode retCode;
-    Tags tags;
+    audio::RetCode retCode;
+    audio::Tags tags;
 };
 
 #endif //PUREPHONE_AUDIOMESSAGE_HPP

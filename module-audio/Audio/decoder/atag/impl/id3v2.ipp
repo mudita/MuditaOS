@@ -201,7 +201,7 @@ tag parse(const Source& s, Predicate pred)
     static_assert(detail::is_source<Source>::value, "Source requirements not met");
 
     // TODO consider using std::error_code instead
-    if(s.size() < 10) { throw "source must be at least 10 bytes long"; }
+    //TODO:M.P:(s.size() < 10) { throw "source must be at least 10 bytes long"; }
 
     const int tag_start = find_tag_start(s);
     if(tag_start == -1) { return {}; }
@@ -263,7 +263,7 @@ simple_tag simple_parse(const Source& s)
 {
     //static_assert(detail::is_source<Source>::value, "Source requirements not met");
 
-    if(s.size() < 10) { throw "source must be at least 10 bytes long"; }
+    //TODO:M.P:if(s.size() < 10) { throw "source must be at least 10 bytes long"; }
 
     const int tag_start = find_tag_start(s);
     if(tag_start == -1) { return {}; }

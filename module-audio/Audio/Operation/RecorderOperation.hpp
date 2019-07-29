@@ -17,41 +17,45 @@
 #include <Audio/encoder/Encoder.hpp>
 #include "bsp/audio/bsp_audio.hpp"
 
-class Encoder;
+namespace audio {
+
+    class Encoder;
 
 
-class RecorderOperation : public Operation{
-public:
+    class RecorderOperation : public Operation {
+    public:
 
 
-    RecorderOperation(const char *file,const Encoder::Format& frmt);
+        RecorderOperation(const char *file, const Encoder::Format &frmt);
 
-    int32_t Start(std::function<int32_t (AudioEvents event)> callback) override final;
+        int32_t Start(std::function<int32_t(AudioEvents event)> callback) override final;
 
-    int32_t Stop() override final;
+        int32_t Stop() override final;
 
-    int32_t Pause() override final;
+        int32_t Pause() override final;
 
-    int32_t Resume() override final;
+        int32_t Resume() override final;
 
-    int32_t SendEvent(const Event evt,const EventData* data=nullptr) override final;
+        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final;
 
-    int32_t SwitchProfile(const Profile::Type type)  override final;
+        int32_t SwitchProfile(const Profile::Type type) override final;
 
-    int32_t SetOutputVolume(float vol) override final;
+        int32_t SetOutputVolume(float vol) override final;
 
-    int32_t SetInputGain(float gain) override final;
+        int32_t SetInputGain(float gain) override final;
 
-    Position GetPosition() override final;
+        Position GetPosition() override final;
 
-    uint32_t GetSize(){return enc->GetFileSize();}
+        uint32_t GetSize() { return enc->GetFileSize(); }
 
-private:
-    std::unique_ptr<Encoder> enc;
-    std::unique_ptr<bsp::AudioDevice> audioDevice;
-    const Encoder::Format format;
-    bsp::AudioDevice::Format audioFormat;
-};
+    private:
+        std::unique_ptr<Encoder> enc;
+        std::unique_ptr<bsp::AudioDevice> audioDevice;
+        const Encoder::Format format;
+        bsp::AudioDevice::Format audioFormat;
+    };
+
+}
 
 
 #endif //PUREPHONE_RECORDEROPERATION_HPP

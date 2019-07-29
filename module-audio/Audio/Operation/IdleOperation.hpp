@@ -18,30 +18,35 @@
 
 #include "Operation.hpp"
 
-class IdleOperation : public Operation {
-public:
+namespace audio {
 
-    IdleOperation(const char *file);
-    ~IdleOperation();
+    class IdleOperation : public Operation {
+    public:
 
-    int32_t Start([[maybe_unused]] std::function<int32_t (AudioEvents event)> callback) override final {return 0;}
+        IdleOperation(const char *file);
 
-    int32_t Stop() override final {return 0;}
+        ~IdleOperation();
 
-    int32_t Pause() override final {return 0;}
+        int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final { return 0; }
 
-    int32_t Resume() override final {return 0;}
+        int32_t Stop() override final { return 0; }
 
-    int32_t SendEvent(const Event evt,const EventData* data=nullptr) override final {return 0;}
+        int32_t Pause() override final { return 0; }
 
-    int32_t SwitchProfile(const Profile::Type type)  override final {return 0;}
+        int32_t Resume() override final { return 0; }
 
-    int32_t SetOutputVolume(float vol) override final;
+        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final { return 0; }
 
-    int32_t SetInputGain(float gain) override final;
+        int32_t SwitchProfile(const Profile::Type type) override final { return 0; }
 
-    Position GetPosition() override final {return 0.0;}
-};
+        int32_t SetOutputVolume(float vol) override final;
 
+        int32_t SetInputGain(float gain) override final;
+
+        Position GetPosition() override final { return 0.0; }
+    };
+
+
+}
 
 #endif //PUREPHONE_IDLEOPERATION_HPP
