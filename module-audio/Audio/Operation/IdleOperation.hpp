@@ -24,7 +24,7 @@ public:
     IdleOperation(const char *file);
     ~IdleOperation();
 
-    int32_t Start([[maybe_unused]] std::function<int32_t (uint32_t)> callback) override final {return 0;}
+    int32_t Start([[maybe_unused]] std::function<int32_t (AudioEvents event)> callback) override final {return 0;}
 
     int32_t Stop() override final {return 0;}
 

@@ -16,7 +16,7 @@
 #include <optional>
 #include <functional>
 
-#include "Audio/Common.hpp"
+#include "Audio/AudioCommon.hpp"
 
 #include "Audio/encoder/Encoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
@@ -57,7 +57,7 @@ public:
     static std::optional<std::unique_ptr<Operation>>
     Create(Type t, const char *fileName, const Encoder::Format &frmt = {});
 
-    virtual int32_t Start(std::function<int32_t(uint32_t)> callback) = 0;
+    virtual int32_t Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
     virtual int32_t Stop() = 0;
 
@@ -86,7 +86,7 @@ protected:
     Profile *profile;
     std::vector<std::unique_ptr<Profile>> availableProfiles;
     State state = State::Idle;
-    std::function<int32_t(uint32_t)> eventCallback = nullptr;
+    std::function<int32_t(AudioEvents event)> eventCallback = nullptr;
 
     bool isInitialized = false;
 

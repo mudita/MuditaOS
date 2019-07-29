@@ -24,7 +24,7 @@ public:
 
     RouterOperation(const char *file);
 
-    int32_t Start([[maybe_unused]] std::function<int32_t (uint32_t)> callback) override final;
+    int32_t Start([[maybe_unused]] std::function<int32_t (AudioEvents event)> callback) override final;
 
     int32_t Stop() override final;
 

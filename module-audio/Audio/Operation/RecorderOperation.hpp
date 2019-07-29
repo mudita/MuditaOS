@@ -26,7 +26,7 @@ public:
 
     RecorderOperation(const char *file,const Encoder::Format& frmt);
 
-    int32_t Start(std::function<int32_t (uint32_t)> callback) override final;
+    int32_t Start(std::function<int32_t (AudioEvents event)> callback) override final;
 
     int32_t Stop() override final;
 
