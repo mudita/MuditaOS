@@ -16,7 +16,7 @@
 #include "log/log.hpp"
 
 
-Audio::Audio(std::function<int32_t(uint32_t)> asyncCallback) : currentOperation(), asyncCallback(asyncCallback) {
+Audio::Audio(std::function<int32_t(AudioEvents event)> asyncCallback) : currentOperation(), asyncCallback(asyncCallback) {
 
     auto ret = Operation::Create(Operation::Type::Idle, "");
     if (ret) {
@@ -26,6 +26,16 @@ Audio::Audio(std::function<int32_t(uint32_t)> asyncCallback) : currentOperation(
 
 Position Audio::GetPosition() {
     return currentOperation->GetPosition();
+}
+
+std::optional<Tags> Audio::GetFileTags(const char *filename) {
+    auto ret = decoder::Create(filename);
+    if(ret == nullptr){
+        return {};
+    }
+    else{
+        return *ret->fetchTags();
+    };
 }
 
 int32_t Audio::SendEvent(const Operation::Event evt, const EventData *data) {

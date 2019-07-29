@@ -9,8 +9,8 @@
 
 
 
-#ifndef PUREPHONE_COMMON_HPP
-#define PUREPHONE_COMMON_HPP
+#ifndef PUREPHONE_AUDIOCOMMON_HPP
+#define PUREPHONE_AUDIOCOMMON_HPP
 
 using Position = float;
 using Volume = float;
@@ -22,7 +22,13 @@ enum class RetCode{
     UnsupportedProfile,
     InvalidFormat,
     OperationCreateFailed,
+    FileDoesntExist
 
 };
 
-#endif //PUREPHONE_COMMON_HPP
+enum class AudioEvents{
+    EndOfFile,
+    FileSystemNoSpace
+};
+
+#endif //PUREPHONE_AUDIOCOMMON_HPP

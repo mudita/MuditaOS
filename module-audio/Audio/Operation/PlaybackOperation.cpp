@@ -15,7 +15,7 @@
 #include "Audio/Profiles/Profile.hpp"
 #include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
-#include "Audio/Common.hpp"
+#include "Audio/AudioCommon.hpp"
 
 #include "log/log.hpp"
 
@@ -30,7 +30,7 @@ PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
         auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
         if (ret == 0) {
             state = State::Idle;
-            eventCallback(0); // TODO:M.P pass proper err code
+            eventCallback(AudioEvents::EndOfFile); // TODO:M.P pass proper err code
         }
         return ret;
     };
@@ -51,7 +51,7 @@ PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
     isInitialized = true;
 }
 
-int32_t PlaybackOperation::Start(std::function<int32_t(uint32_t)> callback) {
+int32_t PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback) {
 
     if (state == State::Active || state == State::Paused ) {
         return static_cast<int32_t >(RetCode::InvokedInIncorrectState);

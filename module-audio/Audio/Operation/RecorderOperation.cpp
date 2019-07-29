@@ -15,7 +15,7 @@
 #include "Audio/Profiles/Profile.hpp"
 #include "Audio/Profiles/ProfileRecordingHeadset.hpp"
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
-#include "Audio/Common.hpp"
+#include "Audio/AudioCommon.hpp"
 
 using namespace bsp;
 
@@ -28,7 +28,7 @@ RecorderOperation::RecorderOperation(const char *file, const Encoder::Format &fr
         auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer)));
         if (ret == 0) {
             state = State::Idle;
-            eventCallback(0);//TODO:M.P pass correct err code
+            eventCallback(AudioEvents::FileSystemNoSpace);
         }
         return ret;
 
@@ -47,7 +47,7 @@ RecorderOperation::RecorderOperation(const char *file, const Encoder::Format &fr
 }
 
 
-int32_t RecorderOperation::Start(std::function<int32_t(uint32_t)> callback) {
+int32_t RecorderOperation::Start(std::function<int32_t(AudioEvents event)> callback) {
 
     if (state == State::Paused || state == State::Active) {
         return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
