@@ -28,7 +28,7 @@ TEST_CASE( "Playback tests" ) {
     cwd = cwd.substr(0,cwd.find_last_of("/\\"));
     cwd = cwd.append("/module-audio/tests/samples");
 
-#if 0
+#if 1
 
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
@@ -144,8 +144,25 @@ TEST_CASE( "Playback tests" ) {
         }
 
     }
-
 #endif
+
+    SECTION("Sample1.flac 16bit 44100Hz stereo"){
+
+        SECTION("Full playback"){
+            auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.flac").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
+                std::cout<<"End of file reached!\n";
+            return 0;
+            });
+            sleep(6);
+            REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
+        }
+
+    }
+
+
 
     SECTION("Sample1.mp3 16bit 44100Hz stereo"){
 
@@ -158,12 +175,11 @@ TEST_CASE( "Playback tests" ) {
             });
             sleep(6);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
-            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.1) );
         }
 
     }
 
-#if 0
     SECTION("Sample3.mp3 16bit 44100Hz mono"){
 
         SECTION("Full playback"){
@@ -175,11 +191,11 @@ TEST_CASE( "Playback tests" ) {
             });
             sleep(6);
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
-            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.01) );
+            REQUIRE( playbackRet.value()->GetPosition() == Approx(5).margin(0.1) );
         }
 
     }
-#endif
+
 }
 
 

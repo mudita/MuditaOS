@@ -55,7 +55,7 @@ uint32_t decoderFLAC::decode(uint32_t samplesToRead, int16_t *pcmData) {
 
     if (samples_read) {
         /* Calculate frame duration in seconds */
-        position += (float) ((float) (samplesToRead) / (float) sampleRate);
+        position += (float) ((float) (chanNumber == 2 ? samplesToRead/chanNumber : samplesToRead) / (float) sampleRate);
     }
 
     return samples_read;
