@@ -34,11 +34,6 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/RouterOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Operation/IdleOperation.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Audio/Profiles/Profile.cpp"
-
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/State/State.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/State/StateIdle.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/Audio/State/StateMachine.cpp"
-
         )
 
 if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")

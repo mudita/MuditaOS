@@ -12,23 +12,27 @@
 #ifndef PUREPHONE_AUDIOCOMMON_HPP
 #define PUREPHONE_AUDIOCOMMON_HPP
 
-using Position = float;
-using Volume = float;
-using Gain = float;
+namespace audio {
 
-enum class RetCode{
-    Success = 0,
-    InvokedInIncorrectState,
-    UnsupportedProfile,
-    InvalidFormat,
-    OperationCreateFailed,
-    FileDoesntExist
+    using Position = float;
+    using Volume = float;
+    using Gain = float;
 
-};
+    enum class RetCode {
+        Success = 0,
+        InvokedInIncorrectState,
+        UnsupportedProfile,
+        InvalidFormat,
+        OperationCreateFailed,
+        FileDoesntExist
 
-enum class AudioEvents{
-    EndOfFile,
-    FileSystemNoSpace
-};
+    };
+
+    enum class AudioEvents {
+        EndOfFile,
+        FileSystemNoSpace
+    };
+
+}
 
 #endif //PUREPHONE_AUDIOCOMMON_HPP

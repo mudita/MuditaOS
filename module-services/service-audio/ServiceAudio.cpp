@@ -15,6 +15,8 @@
 
 const char *ServiceAudio::serviceName = "ServiceAudio";
 
+using namespace audio;
+
 
 ServiceAudio::ServiceAudio() : sys::Service(serviceName, 2048, sys::ServicePriority::Idle),
                                audio([this](AudioEvents event) -> int32_t {

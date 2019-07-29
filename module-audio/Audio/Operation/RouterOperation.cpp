@@ -11,20 +11,23 @@
 
 #include "RouterOperation.hpp"
 
+namespace audio {
 
-RouterOperation::RouterOperation(const char *file){
+    RouterOperation::RouterOperation(const char *file) {
 
-    isInitialized = true;
-}
+        isInitialized = true;
+    }
 
-int32_t RouterOperation::SetOutputVolume(float vol) {
-    profile->SetOutputVolume(vol);
-    //audioDevice->OutputVolumeCtrl(vol);
-    return static_cast<int32_t >(RetCode::Success);
-}
+    int32_t RouterOperation::SetOutputVolume(float vol) {
+        profile->SetOutputVolume(vol);
+        //audioDevice->OutputVolumeCtrl(vol);
+        return static_cast<int32_t >(RetCode::Success);
+    }
 
-int32_t RouterOperation::SetInputGain(float gain) {
-    profile->SetInputGain(gain);
-    //audioDevice->InputGainCtrl(gain);
-    return static_cast<int32_t >(RetCode::Success);
+    int32_t RouterOperation::SetInputGain(float gain) {
+        profile->SetInputGain(gain);
+        //audioDevice->InputGainCtrl(gain);
+        return static_cast<int32_t >(RetCode::Success);
+    }
+
 }

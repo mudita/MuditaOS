@@ -11,22 +11,24 @@
 
 #include "IdleOperation.hpp"
 
+namespace audio {
 
-IdleOperation::IdleOperation([[maybe_unused]] const char *file) {
-    //TODO: M.P switch off audio PLL here
-    isInitialized = true;
-}
+    IdleOperation::IdleOperation([[maybe_unused]] const char *file) {
+        //TODO: M.P switch off audio PLL here
+        isInitialized = true;
+    }
 
-IdleOperation::~IdleOperation() {
-    //TODO: M.P switch on audio PLL here
-}
+    IdleOperation::~IdleOperation() {
+        //TODO: M.P switch on audio PLL here
+    }
 
-int32_t IdleOperation::SetOutputVolume(float vol) {
-    profile->SetOutputVolume(vol);
-    return static_cast<int32_t >(RetCode::Success);
-}
+    int32_t IdleOperation::SetOutputVolume(float vol) {
+        profile->SetOutputVolume(vol);
+        return static_cast<int32_t >(RetCode::Success);
+    }
 
-int32_t IdleOperation::SetInputGain(float gain) {
-    profile->SetInputGain(gain);
-    return static_cast<int32_t >(RetCode::Success);
+    int32_t IdleOperation::SetInputGain(float gain) {
+        profile->SetInputGain(gain);
+        return static_cast<int32_t >(RetCode::Success);
+    }
 }

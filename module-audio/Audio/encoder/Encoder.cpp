@@ -17,31 +17,35 @@
 #include <memory>
 #include <cstring>
 
-Encoder::Encoder(const char *fileName,const Format& frmt)
-        : filePath(fileName),format(frmt) {
+namespace audio {
 
-    fd = vfs.fopen(fileName, "w");
-    if (fd == NULL) {
-        return;
-    }
-    isInitialized = true;
-}
+    Encoder::Encoder(const char *fileName, const Format &frmt)
+            : filePath(fileName), format(frmt) {
 
-Encoder::~Encoder() {
-    if (fd) {
-        vfs.fclose(fd);
-    }
-}
-
-std::unique_ptr<Encoder> Encoder::Create(const char *file,const Format& frmt) {
-    std::unique_ptr<Encoder> enc;
-    if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
-        enc = std::make_unique<EncoderWAV>(file,frmt);
+        fd = vfs.fopen(fileName, "w");
+        if (fd == NULL) {
+            return;
+        }
+        isInitialized = true;
     }
 
-    if (enc->isInitialized) {
-        return enc;
-    } else {
-        return nullptr;
+    Encoder::~Encoder() {
+        if (fd) {
+            vfs.fclose(fd);
+        }
     }
+
+    std::unique_ptr<Encoder> Encoder::Create(const char *file, const Format &frmt) {
+        std::unique_ptr<Encoder> enc;
+        if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
+            enc = std::make_unique<EncoderWAV>(file, frmt);
+        }
+
+        if (enc->isInitialized) {
+            return enc;
+        } else {
+            return nullptr;
+        }
+    }
+
 }

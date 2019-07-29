@@ -19,38 +19,42 @@
 
 #include "Operation.hpp"
 
-class decoder;
+namespace audio {
+
+    class decoder;
 
 
-class PlaybackOperation : public Operation {
-public:
+    class PlaybackOperation : public Operation {
+    public:
 
-    PlaybackOperation(const char *file);
+        PlaybackOperation(const char *file);
 
-    int32_t Start(std::function<int32_t (AudioEvents event)> callback) override final;
+        int32_t Start(std::function<int32_t(AudioEvents event)> callback) override final;
 
-    int32_t Stop() override final;
+        int32_t Stop() override final;
 
-    int32_t Pause() override final;
+        int32_t Pause() override final;
 
-    int32_t Resume() override final;
+        int32_t Resume() override final;
 
-    int32_t SendEvent(const Event evt,const EventData* data=nullptr) override final;
+        int32_t SendEvent(const Event evt, const EventData *data = nullptr) override final;
 
-    int32_t SwitchProfile(const Profile::Type type)  override final;
+        int32_t SwitchProfile(const Profile::Type type) override final;
 
-    int32_t SetOutputVolume(float vol) override final;
+        int32_t SetOutputVolume(float vol) override final;
 
-    int32_t SetInputGain(float gain) override final;
+        int32_t SetInputGain(float gain) override final;
 
-    Position GetPosition() override final;
+        Position GetPosition() override final;
 
-private:
-    std::unique_ptr<decoder> dec;
-    std::unique_ptr<bsp::AudioDevice> audioDevice;
-    bsp::AudioDevice::Format currentFormat;
+    private:
+        std::unique_ptr<decoder> dec;
+        std::unique_ptr<bsp::AudioDevice> audioDevice;
+        bsp::AudioDevice::Format currentFormat;
 
-};
+    };
+
+}
 
 
 #endif //PUREPHONE_PLAYBACKOPERATION_HPP

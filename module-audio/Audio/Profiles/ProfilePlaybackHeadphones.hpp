@@ -15,10 +15,15 @@
 
 #include "Profile.hpp"
 
-class ProfilePlaybackHeadphones: public Profile {
-public:
-    ProfilePlaybackHeadphones(std::function<int32_t()> callback, float volume) : Profile(
-            "Playback Headphones",Type::PlaybackHeadphones, volume, 0.0, 0, 0,bsp::AudioDevice::Type::Audiocodec, callback) {}
-};
+namespace audio {
+
+    class ProfilePlaybackHeadphones : public Profile {
+    public:
+        ProfilePlaybackHeadphones(std::function<int32_t()> callback, float volume) : Profile(
+                "Playback Headphones", Type::PlaybackHeadphones, volume, 0.0, 0, 0, bsp::AudioDevice::Type::Audiocodec,
+                callback) {}
+    };
+
+}
 
 #endif //PUREPHONE_PROFILEPLAYBACKHEADPHONES_HPP

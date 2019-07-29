@@ -13,6 +13,8 @@
 #include "Service/Bus.hpp"
 #include "../ServiceAudio.hpp"
 
+using namespace audio;
+
 
 RetCode AudioServiceAPI::PlaybackStart(sys::Service *serv, const std::string &fileName) {
     std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);

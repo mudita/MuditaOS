@@ -19,163 +19,166 @@
 
 #include "log/log.hpp"
 
-using namespace bsp;
+namespace audio {
 
-PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
+    PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
 
-    audioCallback = [this](const void *inputBuffer,
-                           void *outputBuffer,
-                           unsigned long framesPerBuffer) -> int32_t {
+        audioCallback = [this](const void *inputBuffer,
+                               void *outputBuffer,
+                               unsigned long framesPerBuffer) -> int32_t {
 
-        auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
-        if (ret == 0) {
-            state = State::Idle;
-            eventCallback(AudioEvents::EndOfFile); // TODO:M.P pass proper err code
+            auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
+            if (ret == 0) {
+                state = State::Idle;
+                eventCallback(AudioEvents::EndOfFile); // TODO:M.P pass proper err code
+            }
+            return ret;
+        };
+
+        //TODO:M.P should be fetched from DB
+        availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 1.0));
+        availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 0.2));
+        profile = availableProfiles[0].get();
+
+        dec = decoder::Create(file);
+        if (dec == nullptr) {
+            LOG_ERROR("File doesn't exist");
+            return;
         }
-        return ret;
-    };
-
-    //TODO:M.P should be fetched from DB
-    availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 1.0));
-    availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 0.2));
-    profile = availableProfiles[0].get();
-
-    dec = decoder::Create(file);
-    if(dec == nullptr){
-        LOG_ERROR("File doesn't exist");
-        return;
-    }
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        audioDevice = bsp::AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
 
-    isInitialized = true;
-}
-
-int32_t PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback) {
-
-    if (state == State::Active || state == State::Paused ) {
-        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+        isInitialized = true;
     }
 
-    auto tags = dec->fetchTags();
+    int32_t PlaybackOperation::Start(std::function<int32_t(AudioEvents event)> callback) {
 
-    eventCallback = callback;
-    state = State::Active;
+        if (state == State::Active || state == State::Paused) {
+            return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+        }
 
-    currentFormat = AudioDevice::Format{.sampleRate_Hz=tags->sample_rate,
-            .bitWidth=16, // M.P: Only 16-bit samples are supported
-            .flags= tags->num_channel == 2 ? static_cast<uint32_t >(AudioDevice::Flags::OutPutStereo) : static_cast<uint32_t >(AudioDevice::Flags::OutputMono),
-            .outputVolume=profile->GetOutputVolume(),
-            .inputGain=profile->GetInputGain(),
-            .inputPath=profile->GetInputPath(),
-            .outputPath=profile->GetOutputPath()
-    };
+        auto tags = dec->fetchTags();
 
-    return audioDevice->Start(currentFormat);
-}
+        eventCallback = callback;
+        state = State::Active;
 
-int32_t PlaybackOperation::Stop() {
-    if (state == State::Idle) {
-        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
-    }
-    state = State::Idle;
-    return audioDevice->Stop();
-}
+        currentFormat = bsp::AudioDevice::Format{.sampleRate_Hz=tags->sample_rate,
+                .bitWidth=16, // M.P: Only 16-bit samples are supported
+                .flags= tags->num_channel == 2 ? static_cast<uint32_t >(bsp::AudioDevice::Flags::OutPutStereo)
+                                               : static_cast<uint32_t >(bsp::AudioDevice::Flags::OutputMono),
+                .outputVolume=profile->GetOutputVolume(),
+                .inputGain=profile->GetInputGain(),
+                .inputPath=profile->GetInputPath(),
+                .outputPath=profile->GetOutputPath()
+        };
 
-int32_t PlaybackOperation::Pause() {
-
-    if (state == State::Paused || state == State::Idle) {
-        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+        return audioDevice->Start(currentFormat);
     }
 
-    state = State::Paused;
-    return audioDevice->Stop();
-}
-
-int32_t PlaybackOperation::Resume() {
-
-    if (state == State::Active || state == State::Idle) {
-        return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+    int32_t PlaybackOperation::Stop() {
+        if (state == State::Idle) {
+            return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+        }
+        state = State::Idle;
+        return audioDevice->Stop();
     }
-    state = State::Active;
-    return audioDevice->Start(currentFormat);
-}
 
-int32_t PlaybackOperation::SetOutputVolume(float vol) {
-    profile->SetOutputVolume(vol);
-    audioDevice->OutputVolumeCtrl(vol);
-    return static_cast<int32_t >(RetCode::Success);
-}
+    int32_t PlaybackOperation::Pause() {
 
-int32_t PlaybackOperation::SetInputGain(float gain) {
-    profile->SetInputGain(gain);
-    audioDevice->InputGainCtrl(gain);
-    return static_cast<int32_t >(RetCode::Success);
-}
+        if (state == State::Paused || state == State::Idle) {
+            return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+        }
 
-Position PlaybackOperation::GetPosition() {
-    return dec->getCurrentPosition();
+        state = State::Paused;
+        return audioDevice->Stop();
+    }
 
-}
+    int32_t PlaybackOperation::Resume() {
 
-int32_t PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data) {
+        if (state == State::Active || state == State::Idle) {
+            return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
+        }
+        state = State::Active;
+        return audioDevice->Start(currentFormat);
+    }
 
-    switch (evt) {
-        case Event::HeadphonesPlugin:
-            SwitchProfile(Profile::Type::PlaybackHeadphones);
-            break;
-        case Event::HeadphonesUnplug:
-            SwitchProfile(Profile::Type::PlaybackLoudspeaker);
-            break;
-        case Event::BTA2DPOn:
-            break;
-        case Event::BTA2DPOff:
-            break;
-        case Event::BTHeadsetOn:
-            break;
-        case Event::BTHeadsetOff:
-            break;
-        default:
+    int32_t PlaybackOperation::SetOutputVolume(float vol) {
+        profile->SetOutputVolume(vol);
+        audioDevice->OutputVolumeCtrl(vol);
+        return static_cast<int32_t >(RetCode::Success);
+    }
+
+    int32_t PlaybackOperation::SetInputGain(float gain) {
+        profile->SetInputGain(gain);
+        audioDevice->InputGainCtrl(gain);
+        return static_cast<int32_t >(RetCode::Success);
+    }
+
+    Position PlaybackOperation::GetPosition() {
+        return dec->getCurrentPosition();
+
+    }
+
+    int32_t PlaybackOperation::SendEvent(const Operation::Event evt, const EventData *data) {
+
+        switch (evt) {
+            case Event::HeadphonesPlugin:
+                SwitchProfile(Profile::Type::PlaybackHeadphones);
+                break;
+            case Event::HeadphonesUnplug:
+                SwitchProfile(Profile::Type::PlaybackLoudspeaker);
+                break;
+            case Event::BTA2DPOn:
+                break;
+            case Event::BTA2DPOff:
+                break;
+            case Event::BTHeadsetOn:
+                break;
+            case Event::BTHeadsetOff:
+                break;
+            default:
+                return static_cast<int32_t >(RetCode::UnsupportedProfile);
+
+        }
+        return static_cast<int32_t >(RetCode::Success);
+    }
+
+    int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
+
+        auto ret = GetProfile(type);
+        if (ret) {
+            profile = ret.value();
+        } else {
             return static_cast<int32_t >(RetCode::UnsupportedProfile);
+        }
 
-    }
-    return static_cast<int32_t >(RetCode::Success);
-}
+        audioDevice = bsp::AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
-int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
-
-    auto ret = GetProfile(type);
-    if (ret) {
-        profile = ret.value();
-    } else {
-        return static_cast<int32_t >(RetCode::UnsupportedProfile);
-    }
-
-    audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
-
-    currentFormat = AudioDevice::Format{.sampleRate_Hz=currentFormat.sampleRate_Hz,
-            .bitWidth=16,
-            .flags=currentFormat.flags,
-            .outputVolume=profile->GetOutputVolume(),
-            .inputGain=profile->GetInputGain(),
-            .inputPath=profile->GetInputPath(),
-            .outputPath=profile->GetOutputPath()
-    };
+        currentFormat = bsp::AudioDevice::Format{.sampleRate_Hz=currentFormat.sampleRate_Hz,
+                .bitWidth=16,
+                .flags=currentFormat.flags,
+                .outputVolume=profile->GetOutputVolume(),
+                .inputGain=profile->GetInputGain(),
+                .inputPath=profile->GetInputPath(),
+                .outputPath=profile->GetOutputPath()
+        };
 
 
-    switch (state) {
-        case State::Idle:
-        case State::Paused:
-            break;
+        switch (state) {
+            case State::Idle:
+            case State::Paused:
+                break;
 
-        case State::Active:
-            state = State::Idle;
-            Start(eventCallback);
-            break;
+            case State::Active:
+                state = State::Idle;
+                Start(eventCallback);
+                break;
 
+        }
+
+
+        //TODO:M.P add error handling
+        return 0;
     }
 
-
-    //TODO:M.P add error handling
-    return 0;
 }
