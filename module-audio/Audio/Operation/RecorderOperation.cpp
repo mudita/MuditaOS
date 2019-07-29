@@ -171,6 +171,18 @@ int32_t RecorderOperation::SwitchProfile(const Profile::Type type) {
     return 0;
 }
 
+int32_t RecorderOperation::SetOutputVolume(float vol) {
+    profile->SetOutputVolume(vol);
+    audioDevice->OutputVolumeCtrl(vol);
+    return static_cast<int32_t >(RetCode::Success);
+}
+
+int32_t RecorderOperation::SetInputGain(float gain) {
+    profile->SetInputGain(gain);
+    audioDevice->InputGainCtrl(gain);
+    return static_cast<int32_t >(RetCode::Success);
+}
+
 Position RecorderOperation::GetPosition() {
     return enc->getCurrentPosition();
 }

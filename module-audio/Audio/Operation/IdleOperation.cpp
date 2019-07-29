@@ -20,3 +20,13 @@ IdleOperation::IdleOperation([[maybe_unused]] const char *file) {
 IdleOperation::~IdleOperation() {
     //TODO: M.P switch on audio PLL here
 }
+
+int32_t IdleOperation::SetOutputVolume(float vol) {
+    profile->SetOutputVolume(vol);
+    return static_cast<int32_t >(RetCode::Success);
+}
+
+int32_t IdleOperation::SetInputGain(float gain) {
+    profile->SetInputGain(gain);
+    return static_cast<int32_t >(RetCode::Success);
+}
