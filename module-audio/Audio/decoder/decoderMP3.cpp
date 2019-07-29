@@ -272,13 +272,16 @@ uint32_t decoderMP3::decode(uint32_t samplesToRead, int16_t *pcmData) {
         decoderBufferIdx = 0;
     }
 
-    uint32_t samplesToReadChann = chanNumber == 1 ? samplesToRead / 2 : samplesToRead;
+    uint32_t samplesToReadChann = samplesToRead;
 
 
     while (1) {
+        uint32_t smpl = 0;
+        if(samplesFetched < samplesToReadChann){
+            smpl = mp3dec_decode_frame(mp3d, &decoderBuffer[decoderBufferIdx], bytesAvailable,
+                                                (short *) &pcmsamplesbuffer[samplesFetched], &info);
+        }
 
-        uint32_t smpl = mp3dec_decode_frame(mp3d, &decoderBuffer[decoderBufferIdx], bytesAvailable,
-                                            (short *) &pcmsamplesbuffer[samplesFetched], &info);
         bytesAvailable -= info.frame_bytes;
         decoderBufferIdx += info.frame_bytes;
 
@@ -310,15 +313,9 @@ uint32_t decoderMP3::decode(uint32_t samplesToRead, int16_t *pcmData) {
     pcmsamplesbuffer_idx = samplesFetched - samplesToReadChann;
     memmove(&pcmsamplesbuffer[0], &pcmsamplesbuffer[samplesToReadChann], pcmsamplesbuffer_idx * sizeof(int16_t));
 
-    // Mono
-    if (chanNumber == 1) {
-        // Internally mono recordings are converted to stereo by doubling samples
-        decoder::convertmono2stereo(pcmData, samplesToReadChann);
-        samplesToReadChann *= 2;
-    }
 
     /* Calculate frame duration in seconds */
-    position += (float) ((float) (samplesToReadChann / 2) / (float) sampleRate);
+    position += (float) ((float) (chanNumber == 2 ? samplesToRead/chanNumber : samplesToRead ) / (float) sampleRate);
 
     return samplesToRead;
 }
