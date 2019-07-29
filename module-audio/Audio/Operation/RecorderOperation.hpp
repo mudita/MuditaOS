@@ -38,6 +38,10 @@ public:
 
     int32_t SwitchProfile(const Profile::Type type)  override final;
 
+    int32_t SetOutputVolume(float vol) override final;
+
+    int32_t SetInputGain(float gain) override final;
+
     Position GetPosition() override final;
 
     uint32_t GetSize(){return enc->GetFileSize();}

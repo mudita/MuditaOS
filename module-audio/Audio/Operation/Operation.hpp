@@ -67,9 +67,15 @@ public:
 
     virtual int32_t SendEvent(const Event evt, const EventData *data) = 0;
 
+    virtual int32_t SetOutputVolume(float vol) = 0;
 
+    virtual int32_t SetInputGain(float gain) = 0;
 
     virtual Position GetPosition() = 0;
+
+    Volume GetOutputVolume() { return profile->GetOutputVolume(); }
+
+    Gain GetInputGain() { return profile->GetInputGain(); }
 
     State GetState() { return state; }
 
@@ -77,7 +83,7 @@ public:
 
 protected:
 
-    const Profile *profile;
+    Profile *profile;
     std::vector<std::unique_ptr<Profile>> availableProfiles;
     State state = State::Idle;
     std::function<int32_t(uint32_t)> eventCallback = nullptr;
@@ -90,7 +96,7 @@ protected:
 
     std::function<int32_t(const void *inputBuffer,
                           void *outputBuffer,
-                          unsigned long framesPerBuffer)> audioCallback=nullptr;
+                          unsigned long framesPerBuffer)> audioCallback = nullptr;
 
 };
 

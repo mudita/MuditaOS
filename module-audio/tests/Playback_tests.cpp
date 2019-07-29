@@ -28,10 +28,12 @@ TEST_CASE( "Playback tests" ) {
     cwd = cwd.substr(0,cwd.find_last_of("/\\"));
     cwd = cwd.append("/module-audio/tests/samples");
 
-#if 1
+
 
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
+
+#if 0
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
             REQUIRE(playbackRet);
@@ -110,6 +112,24 @@ TEST_CASE( "Playback tests" ) {
             playbackRet.value()->Stop();
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
+#endif
+
+        SECTION("Output volume control and input gain during playback"){
+            auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
+            REQUIRE(playbackRet);
+            playbackRet.value()->Start([](uint32_t)->int32_t{
+            std::cout<<"End of file reached!\n";
+                return 0;
+            });
+            sleep(1);
+            playbackRet.value()->SetOutputVolume(0.1);
+            REQUIRE(playbackRet.value()->GetOutputVolume() == 0.1f);
+            sleep(1);
+            playbackRet.value()->SetOutputVolume(0.5);
+            REQUIRE(playbackRet.value()->GetOutputVolume() == 0.5f);
+            sleep(1);
+
+        }
 
     }
 
@@ -144,7 +164,7 @@ TEST_CASE( "Playback tests" ) {
         }
 
     }
-#endif
+
 
     SECTION("Sample1.flac 16bit 44100Hz stereo"){
 

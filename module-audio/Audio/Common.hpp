@@ -13,12 +13,15 @@
 #define PUREPHONE_COMMON_HPP
 
 using Position = float;
+using Volume = float;
+using Gain = float;
 
 enum class RetCode{
     Success = 0,
     InvokedInIncorrectState,
     UnsupportedProfile,
-    InvalidFormat
+    InvalidFormat,
+    OperationCreateFailed,
 
 };
 

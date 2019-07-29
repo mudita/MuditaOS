@@ -54,7 +54,7 @@ public:
     Profile(const std::string& name,const Type type, float vol, float gain, uint32_t outPath, uint32_t inPath,bsp::AudioDevice::Type devType,
             std::function<int32_t()> callback);
 
-    void SetOutputVolume(uint32_t vol);
+    void SetOutputVolume(float vol);
 
     void SetInputGain(float gain);
 

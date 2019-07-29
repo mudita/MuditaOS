@@ -14,10 +14,10 @@
 
 #include <memory>
 #include <optional>
+#include <functional>
 
 #include "Common.hpp"
-
-class Operation;
+#include "Operation/Operation.hpp"
 
 class Audio {
 public:
@@ -29,42 +29,40 @@ public:
         Routing,
     };
 
-    enum class Event{
-        HeadphonesPlugIn,
-        HeadphonesUnplug,
+    Audio(std::function<int32_t (uint32_t)> asyncCallback);
 
-    };
-
-    Audio();
+    //Events
+    int32_t SendEvent(const Operation::Event evt, const EventData *data);
 
     //utilities
     Position GetPosition();
+    State GetCurrentState() const {return currentState;}
 
-    //Playback
+    //Range 0-1
+    int32_t SetOutputVolume(Volume vol);
+    //Range -10 <-> +10
+    int32_t SetInputGain(Gain gain);
 
-    int32_t PlaybackStart(const char *fileName);
+    Volume GetOutputVolume(){return currentOperation->GetOutputVolume();}
+    Gain GetInputGain(){return currentOperation->GetInputGain();}
 
-    int32_t PlaybackStop();
+    //TODO:M.P Set/Get inputGain/outputVolume for each profile
 
-    int32_t PlaybackPause();
-
-    int32_t PlaybackResume();
-
-    // Recording
-
-    int32_t RecordingStart(const char *fileName);
-
-    int32_t RecordingStop();
-
-    int32_t RecordingPause();
-
-    int32_t RecordingResume();
+    //Operations
+    int32_t Start(Operation::Type op,const char *fileName);
+    int32_t Stop();
+    int32_t Pause();
+    int32_t Resume();
 
 
 private:
 
     State currentState = State::Idle;
     std::unique_ptr<Operation> currentOperation;
+
+    std::function<int32_t (uint32_t)> asyncCallback = nullptr;
+
+
 };
 
 

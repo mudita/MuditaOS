@@ -48,20 +48,28 @@ Profile::Profile(const std::string& name,const Type type, float vol, float gain,
 
 void Profile::SetInputGain(float gain) {
     inputGain = gain;
-    dbAccessCallback();
+    if(dbAccessCallback) {
+        dbAccessCallback();
+    }
 }
 
-void Profile::SetOutputVolume(uint32_t vol) {
+void Profile::SetOutputVolume(float vol) {
     outputVolume = vol;
-    dbAccessCallback();
+    if(dbAccessCallback) {
+        dbAccessCallback();
+    }
 }
 
 void Profile::SetInputPath(int8_t path) {
     inputPath = path;
-    dbAccessCallback();
+    if(dbAccessCallback) {
+        dbAccessCallback();
+    }
 }
 
 void Profile::SetOutputPath(uint32_t path) {
     outputPath = path;
-    dbAccessCallback();
+    if(dbAccessCallback) {
+        dbAccessCallback();
+    }
 }

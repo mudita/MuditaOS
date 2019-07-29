@@ -17,6 +17,8 @@
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 #include "Audio/Common.hpp"
 
+#include "log/log.hpp"
+
 using namespace bsp;
 
 PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
@@ -39,6 +41,10 @@ PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
     profile = availableProfiles[0].get();
 
     dec = decoder::Create(file);
+    if(dec == nullptr){
+        LOG_ERROR("File doesn't exist");
+        return;
+    }
     audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
 
@@ -93,6 +99,18 @@ int32_t PlaybackOperation::Resume() {
     }
     state = State::Active;
     return audioDevice->Start(currentFormat);
+}
+
+int32_t PlaybackOperation::SetOutputVolume(float vol) {
+    profile->SetOutputVolume(vol);
+    audioDevice->OutputVolumeCtrl(vol);
+    return static_cast<int32_t >(RetCode::Success);
+}
+
+int32_t PlaybackOperation::SetInputGain(float gain) {
+    profile->SetInputGain(gain);
+    audioDevice->InputGainCtrl(gain);
+    return static_cast<int32_t >(RetCode::Success);
 }
 
 Position PlaybackOperation::GetPosition() {
