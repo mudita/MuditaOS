@@ -61,9 +61,9 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 		
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pwr/lpm.c"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
+		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
 
-		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/rt1051_audiocodec.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/rt1051_audiocodec.cpp"
 
         CACHE INTERNAL ""
         )
