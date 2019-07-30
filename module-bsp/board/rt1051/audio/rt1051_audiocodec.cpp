@@ -21,16 +21,18 @@ namespace bsp {
 
     sai_edma_handle_t RT1051Audiocodec::txHandle = {};
     sai_edma_handle_t RT1051Audiocodec::rxHandle = {};
-    edma_handle_t dmaTxHandle = {};
-    static edma_handle_t dmaRxHandle = {};
-
+    edma_handle_t RT1051Audiocodec::dmaTxHandle = {};
+    edma_handle_t RT1051Audiocodec::dmaRxHandle = {};
+    int16_t RT1051Audiocodec::inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE*2] = {};
+    int16_t RT1051Audiocodec::outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE*2] = {};
 
     RT1051Audiocodec::RT1051Audiocodec(bsp::AudioDevice::audioCallback_t callback) : AudioDevice(callback), config{} {
-
+        isInitialized = true;
+        Init();
     }
 
     RT1051Audiocodec::~RT1051Audiocodec() {
-
+        Deinit();
     }
 
     int32_t RT1051Audiocodec::Start(const bsp::AudioDevice::Format &format) {
@@ -38,9 +40,12 @@ namespace bsp {
         uint32_t outChan = 0;
         uint32_t inChan = 0;
 
-        SAIFormat fmt = {};
-        fmt.bitWidth = format.bitWidth;
-        fmt.sampleRate_Hz = format.sampleRate_Hz;
+        saiInFormat.bitWidth = format.bitWidth;
+        saiInFormat.sampleRate_Hz = format.sampleRate_Hz;
+        saiInFormat.stereo = kSAI_Stereo;
+        saiOutFormat.bitWidth = format.bitWidth;
+        saiOutFormat.sampleRate_Hz = format.sampleRate_Hz;
+        saiOutFormat.stereo = kSAI_Stereo;
 
 
         if (format.flags & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) {
@@ -83,10 +88,33 @@ namespace bsp {
         if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
             LOG_ERROR("Error during creating  output audiocodec task");
         }
+        codecParams.sampleRate =CodecParamsMAX98090::SampleRate ::Rate44K1Hz;
+        codecParams.outputPath=CodecParamsMAX98090::OutputPath ::Loudspeaker;
+        codecParams.outVolume = 100;
+        codec.Start(codecParams);
+    }
 
+    int32_t RT1051Audiocodec::Stop() {
 
     }
 
+    int32_t RT1051Audiocodec::OutputVolumeCtrl(float vol) {
+
+    }
+
+    int32_t RT1051Audiocodec::InputGainCtrl(float gain) {
+
+    }
+
+    int32_t RT1051Audiocodec::InputPathCtrl(uint32_t inputPath) {
+
+    }
+
+    int32_t RT1051Audiocodec::OutputPathCtrl(uint32_t outputPath){
+
+    }
+
+    bool RT1051Audiocodec::IsFormatSupported(const bsp::AudioDevice::Format &format) {}
 
 
 
@@ -173,19 +201,22 @@ namespace bsp {
         sai_transfer_format_t sai_format = {0};
         sai_transfer_t xfer = {0};
 
+        saiInFormat.data = (uint8_t*)inBuffer;
+        saiInFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE*saiInFormat.bitWidth/8;
+
         /* Configure the audio format */
-        sai_format.bitWidth = saiFormat.bitWidth;
+        sai_format.bitWidth = saiInFormat.bitWidth;
         sai_format.channel = 0U;
-        sai_format.sampleRate_Hz = saiFormat.sampleRate_Hz;
+        sai_format.sampleRate_Hz = saiInFormat.sampleRate_Hz;
         sai_format.masterClockHz = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol = config.protocol;
-        sai_format.stereo = saiFormat.stereo;
+        sai_format.stereo = saiInFormat.stereo;
 #if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, rxCallback, &saiFormat, &dmaRxHandle);
+        SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, rxCallback, this, &dmaRxHandle);
 
         SAI_TransferRxSetFormatEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -195,8 +226,8 @@ namespace bsp {
         /* Reset SAI Rx internal logic */
         SAI_RxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
 
-        xfer.data = saiFormat.data;
-        xfer.dataSize = saiFormat.dataSize / 2;
+        xfer.data = saiInFormat.data;
+        xfer.dataSize = saiInFormat.dataSize / 2;
         SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &xfer);
     }
 
@@ -204,19 +235,22 @@ namespace bsp {
         sai_transfer_format_t sai_format = {0};
         sai_transfer_t xfer = {0};
 
+        saiOutFormat.data = (uint8_t*)outBuffer;
+        saiOutFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE*saiInFormat.bitWidth/8;
+
         /* Configure the audio format */
-        sai_format.bitWidth = saiFormat.bitWidth;
+        sai_format.bitWidth = saiOutFormat.bitWidth;
         sai_format.channel = 0U;
-        sai_format.sampleRate_Hz = saiFormat.sampleRate_Hz;
+        sai_format.sampleRate_Hz = saiOutFormat.sampleRate_Hz;
         sai_format.masterClockHz = mclkSourceClockHz;
         sai_format.isFrameSyncCompact = false;
         sai_format.protocol = config.protocol;
-        sai_format.stereo = saiFormat.stereo;
+        sai_format.stereo = saiOutFormat.stereo;
 #if defined(FSL_FEATURE_SAI_FIFO_COUNT) && (FSL_FEATURE_SAI_FIFO_COUNT > 1)
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, txCallback, &saiFormat, &dmaTxHandle);
+        SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, txCallback, this, &dmaTxHandle);
 
         SAI_TransferTxSetFormatEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -226,8 +260,8 @@ namespace bsp {
         /* Reset SAI Tx internal logic */
         SAI_TxSoftwareReset(BOARD_AUDIOCODEC_SAIx, kSAI_ResetTypeSoftware);
 
-        xfer.data = saiFormat.data;
-        xfer.dataSize = saiFormat.dataSize / 2;
+        xfer.data = saiOutFormat.data;
+        xfer.dataSize = saiOutFormat.dataSize / 2;
         SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &xfer);
     }
 
@@ -286,21 +320,21 @@ namespace bsp {
 
             if (ulNotificationValue & static_cast<uint32_t >(RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer)) {
                 if (inst->GetAudioCallback()(nullptr, inst->outBuffer,
-                                             RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE)) {
+                                             RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) != RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                     goto cleanup;
                 }
             }
 
             if (ulNotificationValue & static_cast<uint32_t >(RT1051Audiocodec::irq_state_t::IRQStateFullTransfer)) {
                 if (inst->GetAudioCallback()(nullptr,&inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE],
-                                             RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE)) {
+                                             RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) != RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
                     goto cleanup;
                 }
             }
         }
 
         cleanup:
-        inst->InStop();
+        inst->OutStop();
         vTaskDelete(NULL);
     }
 
@@ -312,8 +346,8 @@ namespace bsp {
 
         if (state == RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer) {
 
-            xfer.dataSize = inst->saiFormat.dataSize / 2;
-            xfer.data = inst->saiFormat.data + (inst->saiFormat.dataSize / 2);
+            xfer.dataSize = inst->saiInFormat.dataSize / 2;
+            xfer.data = inst->saiInFormat.data + (inst->saiInFormat.dataSize / 2);
             SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &inst->rxHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
@@ -325,8 +359,8 @@ namespace bsp {
 
         } else {
 
-            xfer.dataSize = inst->saiFormat.dataSize / 2;
-            xfer.data = inst->saiFormat.data;
+            xfer.dataSize = inst->saiInFormat.dataSize / 2;
+            xfer.data = inst->saiInFormat.data;
             SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &inst->rxHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
@@ -351,8 +385,8 @@ namespace bsp {
 
         if (state == RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer) {
 
-            xfer.dataSize = inst->saiFormat.dataSize / 2;
-            xfer.data = inst->saiFormat.data + (inst->saiFormat.dataSize / 2);
+            xfer.dataSize = inst->saiOutFormat.dataSize / 2;
+            xfer.data = inst->saiOutFormat.data + (inst->saiOutFormat.dataSize / 2);
             SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &inst->txHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
@@ -364,8 +398,8 @@ namespace bsp {
 
 
         } else {
-            xfer.dataSize = inst->saiFormat.dataSize / 2;
-            xfer.data = inst->saiFormat.data;
+            xfer.dataSize = inst->saiOutFormat.dataSize / 2;
+            xfer.data = inst->saiOutFormat.data;
             SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &inst->txHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
@@ -376,6 +410,8 @@ namespace bsp {
             state = RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer;
 
         }
+
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 
 }

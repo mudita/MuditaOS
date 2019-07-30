@@ -19,6 +19,8 @@
 #include "task.h"
 #include "macros.h"
 
+#include "CodecMAX98090.hpp"
+
 namespace bsp{
 
 
@@ -66,11 +68,14 @@ namespace bsp{
             size_t dataSize; /*!< Transfer size. */
         };
 
-        SAIFormat saiFormat;
+        SAIFormat saiInFormat;
+        SAIFormat saiOutFormat;
         uint32_t mclkSourceClockHz = 0;
         sai_config_t config;
         TaskHandle_t inWorkerThread = nullptr;
         TaskHandle_t outWorkerThread = nullptr;
+        CodecParamsMAX98090 codecParams;
+        CodecMAX98090 codec;
 
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
