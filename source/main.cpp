@@ -58,7 +58,8 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl) override {
 
-        auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/shortsample.mp3");
+       // auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/shortsample.mp3");
+        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/sample1.wav");
 
         return std::make_shared<sys::ResponseMessage>();
     }

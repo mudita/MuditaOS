@@ -13,6 +13,7 @@
 
 #if defined(TARGET_RT1051)
 
+#include "audio/rt1051_audiocodec.hpp"
 #elif defined(TARGET_Linux)
 #include "audio/linux_audiocodec.hpp"
 #else
@@ -30,7 +31,7 @@ namespace bsp{
             case Type ::Audiocodec:
             {
 #if defined(TARGET_RT1051)
-
+                inst = std::make_unique<bsp::RT1051Audiocodec>(callback );
 #elif defined(TARGET_Linux)
                 inst = std::make_unique<bsp::LinuxAudiocodec>(callback );
 #else
