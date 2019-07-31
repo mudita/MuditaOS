@@ -20,6 +20,14 @@ Bluetopia *BluetopiaHW::getInstance()
     return inst;
 }
 
+void Bluetopia::wait_data()
+{
+}
+
+void Bluetopia::set_data()
+{
+}
+
 void BluetopiaHW::open()
 {
     log(LogDebug,"open!\n");
