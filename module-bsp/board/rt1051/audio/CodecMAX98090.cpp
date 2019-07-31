@@ -302,6 +302,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param) {
     currentParams = params;
 
     // Set volume to 0 before enabling codec to avoid pops/clicks
+    auto currVol = currentParams.outVolume;
     SetOutputVolume(0);
 
     // Turn on device
@@ -309,7 +310,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param) {
     bsp_i2c_Send(i2CInst, MAX98090_I2C_ADDR, MAX98090_REG_DEVICE_SHUTDOWN, 1, (uint8_t *) &dev_shutdown,
                  1);
 
-    SetOutputVolume(100);
+    SetOutputVolume(currVol);
 
     return CodecRetCode::Success;
 }
