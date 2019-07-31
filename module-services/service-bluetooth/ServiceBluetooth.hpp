@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Service/Service.hpp"
+#include "module-bluetooth/BT/BluetoothWorker.hpp"
 
 class ServiceBluetooth: public sys::Service  {
 
@@ -18,4 +19,5 @@ public:
 private:
     static const char* serviceName;
     uint32_t testTimerID;
+    BluetoothWorker *worker;
 };

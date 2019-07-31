@@ -4,7 +4,7 @@
 #if defined(TARGET_RT1051)
 #include "bluetooth/bsp_bt.hpp"
 #elif defined(TARGET_Linux)
-#include "bluetooth/bsp_bt.hpp"
+#include "bluetooth/test/bsp_bt.hpp"
 #else
 #error "Unsupported target"
 #endif

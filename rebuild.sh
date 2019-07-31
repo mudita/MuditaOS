@@ -10,6 +10,7 @@ if [ ! -d "$BUILD_DIR" ]; then
 	mkdir "$BUILD_DIR"
 fi
 
+
 #first parameter specifies platform, by default it is Linux
 TARGET="Target_Linux.cmake"
 TARGET_SET="false"
@@ -21,6 +22,7 @@ if [ "$1" != "" ]; then
 		echo "Building for Linux."
 		TARGET="Target_Linux.cmake"
 		TARGET_SET="true"
+		BT="DBT_STACK_SEL=\"BlueKitchen\""
 	fi
 	if [ "$1" = "assets" ]; then
 		echo "Copying assets folder"
@@ -43,6 +45,7 @@ if [ "$1" != "" ]; then
 	if [ "$1" = "rt1051" ]; then
 		echo "Building for RT1051."
 		TARGET="Target_RT1051.cmake"
+		BT="DBT_STACK_SEL=\"Bluetopia\""
 	fi
 	if [ "$1" = "release" ]; then
 		echo "Building for RT1051."
@@ -88,6 +91,5 @@ fi
 if [ "$BUILD_TESTS" = "true" ]; then
 	cmake -DCMAKE_BUILD_TYPE="$TYPE" -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
 else
-	echo "cmake -DCMAKE_BUILD_TYPE=\"$TYPE\" -DCMAKE_TOOLCHAIN_FILE=../\"$TARGET\" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../"
-	cmake -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
+	cmake -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${BT} ../
 fi

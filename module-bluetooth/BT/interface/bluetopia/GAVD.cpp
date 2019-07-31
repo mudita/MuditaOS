@@ -1,4 +1,5 @@
-#include "GAVD.hpp"
+#include "../../profiles/GAVD.hpp"
+#include "BtDev.hpp"
 #include "log/log.hpp"
 
 extern "C" {
