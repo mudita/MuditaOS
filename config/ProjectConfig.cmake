@@ -7,3 +7,22 @@ set(PROJECT_CONFIG_DEFINITIONS
 
         CACHE INTERNAL ""
         )
+
+message("Select bt!")
+if(NOT DEFINED BT_STACK_SEL)
+    if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+        message(STATUS "Bluetopia wont work with Linux, select BlueKitchen")
+        set(BT_STACK "BlueKitchen")
+    else()
+        message(STATUS "Bluetopia selected default for CrossDev")
+        set(BT_STACK "Bluetopia")
+    endif()
+else()
+    if(BT_STACK_SEL STREQUAL "BlueKitchen")
+        message(STATUS "BlueKitchen selected")
+        set(BT_STACK "BlueKitchen")
+    else()
+        message(STATUS "Bluetopia selected")
+        set(BT_STACK "Bluetopia")
+    endif()
+endif()

@@ -1,4 +1,4 @@
-#include "Stack.hpp"
+#include "BtDev.hpp"
 #include <cstring>
 
 extern "C" {
@@ -9,6 +9,10 @@ BtDev::BtDev()
 {
     val = new BD_ADDR_t;
     memset(val, 0, sizeof *val);
+}
+
+BtDev::~BtDev()
+{
 }
 
 /// might as well return rvalue reference

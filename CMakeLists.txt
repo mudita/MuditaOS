@@ -152,7 +152,6 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
-
 # M.P: Please don't change the order of modules in the first group ("module-bsp" - "module-utils")
 # They have to be arranged in specific order because of circular dependencies that need to be correctly resolved
 # In case of doubt please contact me: mateusz.piesta@mudita.com
@@ -171,6 +170,13 @@ target_link_libraries(${PROJECT_NAME}
         module-db
         module-gui
         module-services
+        module-apps
+        ${TARGET_LIBRARIES}
+        )
+
+# bluekitchen comes as library, right now it has circ dependency, which is why start/end grous are used
+if(${BT_STACK} STREQUAL "Bluetopia")
+target_link_libraries(${PROJECT_NAME}
         -Wl,--start-group
         module-bluetooth
         ${Bluetopia_32_M7}
@@ -178,10 +184,12 @@ target_link_libraries(${PROJECT_NAME}
         ${SS1BTAVC_32_M7}
         ${SS1BTAVR_32_M7}
         ${SS1BTGAV_32_M7}
-        -Wl,--end-group
-        module-apps
-        ${TARGET_LIBRARIES}
-        )
+        -Wl,--end-group)
+else()
+target_link_libraries(${PROJECT_NAME}
+    module-bluetooth
+    )
+endif()
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 

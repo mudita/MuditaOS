@@ -3,8 +3,6 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
-#include "module-bluetooth/BT/BluetoothWorker.hpp"
-
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
 
 
@@ -12,8 +10,8 @@ ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
     LOG_INFO("[ServiceBluetooth] Initializing");
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
-    //// TODO TESTING
-    BluetoothWorker();
+    //// TODO TESTING - creating dangling pointer right now
+    worker = BluetoothWorker::create();
 }
 
 ServiceBluetooth::~ServiceBluetooth() {
