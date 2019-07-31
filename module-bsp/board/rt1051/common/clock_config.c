@@ -792,8 +792,11 @@ void BOARD_BootClockRUN(void)
     /* Disable Usb1 PLL output for USBPHY1. */
     CCM_ANALOG->PLL_USB1 &= ~CCM_ANALOG_PLL_USB1_EN_USB_CLKS_MASK;
 #endif
+
+#if 0 //TODO:M.P Removed, audio PLL is managed by audio bsp
     /* DeInit Audio PLL. */
     CLOCK_DeinitAudioPll();
+
     /* Bypass Audio PLL. */
     CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllAudio, 1);
     /* Set divider for Audio PLL. */
@@ -801,6 +804,8 @@ void BOARD_BootClockRUN(void)
     CCM_ANALOG->MISC2 &= ~CCM_ANALOG_MISC2_AUDIO_DIV_MSB_MASK;
     /* Enable Audio PLL output. */
     CCM_ANALOG->PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_ENABLE_MASK;
+#endif
+
     /* DeInit Video PLL. */
     CLOCK_DeinitVideoPll();
     /* Bypass Video PLL. */
@@ -837,6 +842,8 @@ void BOARD_BootClockRUN(void)
     /* Set SystemCoreClock variable. */
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 
+    /* DeInit Audio PLL //TODO:M.P Removed, audio PLL is managed by audio bsp */
+    CLOCK_DeinitAudioPll();
     /* DeInit Video PLL. */
     CLOCK_DeinitVideoPll();
     /* DeInit Enet PLL. */

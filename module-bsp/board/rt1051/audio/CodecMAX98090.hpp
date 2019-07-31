@@ -34,7 +34,8 @@ public:
         Rate44K1Hz = 44100,
         Rate48KHz  = 48000,
         Rate32KHz  = 32000,
-        Rate96KHz  = 96000
+        Rate96KHz  = 96000,
+        Invalid
     };
 
     enum class OutputPath{
@@ -55,6 +56,25 @@ public:
         Mono,
         Stereo
     };
+
+    static SampleRate ValToSampleRate(uint32_t rate){
+        switch(rate){
+            case 8000:
+                return SampleRate ::Rate8KHz;
+            case 16000:
+                return SampleRate::Rate16KHz;
+            case 32000:
+                return SampleRate::Rate32KHz;
+            case 44100:
+                return SampleRate::Rate44K1Hz;
+            case 48000:
+                return SampleRate::Rate48KHz;
+            case 96000:
+                return SampleRate::Rate96KHz;
+            default:
+                return SampleRate ::Invalid;
+        }
+    }
 
     uint32_t GetSampleRateVal(){
         switch(sampleRate){

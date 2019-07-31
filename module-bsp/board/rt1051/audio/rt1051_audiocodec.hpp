@@ -56,8 +56,8 @@ namespace bsp{
         /*! @brief Internals state of Rx/Tx callback, needed for double buffering technique */
         enum class irq_state_t
         {
-            IRQStateHalfTransfer=0,
-            IRQStateFullTransfer=1
+            IRQStateHalfTransfer=1<<0,
+            IRQStateFullTransfer=1<<1
         };
 
         struct SAIFormat{
