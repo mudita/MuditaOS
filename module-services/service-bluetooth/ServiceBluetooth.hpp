@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Service/Service.hpp"
-#include "module-bluetooth/BT/BluetoothWorker.hpp"
+#include "module-bluetooth/Bluetooth/BluetoothWorker.hpp"
 
 class ServiceBluetooth: public sys::Service  {
 
