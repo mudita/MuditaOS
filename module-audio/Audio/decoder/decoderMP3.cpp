@@ -36,6 +36,7 @@ namespace audio {
     }
 
     decoderMP3::~decoderMP3() {
+        mp3dec_deinit(mp3d);
         free(mp3d);
     }
 
@@ -77,13 +78,13 @@ namespace audio {
         vfs.rewind(fd);
 
         // Parse ID3 tags
-        // Allocate buffer for fetching two parts of MP3: init and last, 1Mbyte should be sufficient to fetch all necessary tags
-        auto source = std::make_unique<std::array<char, 1024 * 1024>>();
+        // Allocate buffer for fetching two parts of MP3: init and last, 512Kbytes should be sufficient to fetch all necessary tags
+        auto source = std::make_unique<std::array<char, 512*1024>>();
 
-        // Read beginning of MP3(512kbytes)
+        // Read beginning of MP3(256kbytes)
         vfs.fread(&(*source)[0], 1, source->size()/2, fd);
 
-        // Read last section of MP3(512kbytes)
+        // Read last section of MP3(256kbytes)
         vfs.fseek(fd,-(source->size()/2),SEEK_END);
         vfs.fread(&(*source)[source->size()/2], 1, source->size()/2, fd);
 

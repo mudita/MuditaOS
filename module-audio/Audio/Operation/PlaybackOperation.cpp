@@ -21,13 +21,23 @@
 
 namespace audio {
 
+
+#define PERF_STATS_ON        1
+
     PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
 
         audioCallback = [this](const void *inputBuffer,
                                void *outputBuffer,
                                unsigned long framesPerBuffer) -> int32_t {
 
+#if PERF_STATS_ON == 1
+            auto tstamp = xTaskGetTickCount();
+#endif
             auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
+#if PERF_STATS_ON == 1
+            LOG_DEBUG("Dec:%dms", xTaskGetTickCount() - tstamp);
+            LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));
+#endif
             if (ret == 0) {
                 state = State::Idle;
                 eventCallback(AudioEvents::EndOfFile); // TODO:M.P pass proper err code
@@ -62,8 +72,9 @@ namespace audio {
         eventCallback = callback;
         state = State::Active;
 
-        currentProfile->SetInOutFlags(tags->num_channel == 2 ? static_cast<uint32_t >(bsp::AudioDevice::Flags::OutPutStereo)
-                                                      : static_cast<uint32_t >(bsp::AudioDevice::Flags::OutputMono));
+        currentProfile->SetInOutFlags(
+                tags->num_channel == 2 ? static_cast<uint32_t >(bsp::AudioDevice::Flags::OutPutStereo)
+                                       : static_cast<uint32_t >(bsp::AudioDevice::Flags::OutputMono));
 
         currentProfile->SetSampleRate(tags->sample_rate);
 

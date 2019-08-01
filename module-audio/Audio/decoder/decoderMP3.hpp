@@ -48,7 +48,7 @@ namespace audio {
 
         std::unique_ptr<Tags> tag;
 
-        const uint32_t DECODER_BUFFER_SIZE = 1024 * 128;
+        const uint32_t DECODER_BUFFER_SIZE = 1024 * 24;
 
 
         mp3dec_t *mp3d = nullptr;
