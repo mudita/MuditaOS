@@ -9,7 +9,7 @@
 #define HAVE_MALLOC
 #define HAVE_POSIX_FILE_IO
 #define HAVE_BTSTACK_STDIN
-#define HAVE_POSIX_TIME
+// #define HAVE_POSIX_TIME
 #define HAVE_EM9304_PATCH_CONTAINER
 
 // BTstack features that can be enabled
@@ -26,6 +26,8 @@
 #define ENABLE_ATT_DELAYED_RESPONSE
 #define ENABLE_LOG_ERROR
 #define ENABLE_LOG_INFO
+#define ENABLE_LOG_WARNING
+// #define ENABLE_LOG_DEBUG
 #define ENABLE_SCO_OVER_HCI
 #define ENABLE_SDP_DES_DUMP
 // #define ENABLE_EHCILL

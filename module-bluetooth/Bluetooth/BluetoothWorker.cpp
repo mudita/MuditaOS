@@ -1,5 +1,6 @@
 #include "BluetoothWorker.hpp"
 #include "profiles/GAVD.hpp"
+#include "profiles/GAP.hpp"
 #include "log/log.hpp"
 
 #include <WorkerImpl.hpp>
@@ -19,13 +20,20 @@ BluetoothWorker::~BluetoothWorker()
 {
 }
 
+std::vector<Device> BluetoothWorker::scan()
+{
+    std::vector<Device> empty;
+    GAP *prof = GAP::create();
+    prof->scan();
+    return empty;
+}
+
 BluetoothWorker::Error BluetoothWorker::aud_init()
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
     Error err = SuccessBt;
     LOG_INFO("Initialize AUD profile");
-    BtProfile *prof = new GAVD();
-    profiles.push_back(prof);
+    BtProfile *prof = GAVD::create();
     if (prof->init(&stack) != BtProfile::SuccessBtProfile) {
         LOG_ERROR("AUD init failure!");
     } else {

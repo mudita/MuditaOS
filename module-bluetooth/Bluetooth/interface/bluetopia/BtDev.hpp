@@ -3,13 +3,14 @@
 
 // Uncean of library :( - shall inlcude depending on library selected
 #include <string>
+#include <Bluetooth/Device.hpp>
 
 extern "C" {
     struct _tagBD_ADDR_t;
     typedef _tagBD_ADDR_t BD_ADDR_t;
 }
 
-struct BtDev
+struct BtDev : public Device
 {
     BD_ADDR_t *val;
     BtDev();

@@ -6,15 +6,17 @@
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
 
 
-ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
+ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName), worker(NULL) {
     LOG_INFO("[ServiceBluetooth] Initializing");
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
     //// TODO TESTING - creating dangling pointer right now
-    worker = BluetoothWorker::create();
+    BluetoothWorker::create();
+    worker->scan();
 }
 
 ServiceBluetooth::~ServiceBluetooth() {
+    free(worker);
     LOG_INFO("[ServiceBluetooth] Cleaning resources");
 }
 
