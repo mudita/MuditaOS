@@ -77,10 +77,15 @@ namespace audio {
         vfs.rewind(fd);
 
         // Parse ID3 tags
-        // Allocate buffer for fetching initial part of MP3, 1Mbyte should be sufficient to fetch all necessary tags
+        // Allocate buffer for fetching two parts of MP3: init and last, 1Mbyte should be sufficient to fetch all necessary tags
         auto source = std::make_unique<std::array<char, 1024 * 1024>>();
 
-        vfs.fread(&(*source)[0], 1, source->size(), fd);
+        // Read beginning of MP3(512kbytes)
+        vfs.fread(&(*source)[0], 1, source->size()/2, fd);
+
+        // Read last section of MP3(512kbytes)
+        vfs.fseek(fd,-(source->size()/2),SEEK_END);
+        vfs.fread(&(*source)[source->size()/2], 1, source->size()/2, fd);
 
         if (atag::id3v2::is_tagged(*source)) {
 
