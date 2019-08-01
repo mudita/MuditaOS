@@ -87,7 +87,6 @@ int BTPSAPI HCITR_COMSuspend(unsigned int HCITransportID)
 
 int BTPSAPI HCITR_EnableDebugLogging(Boolean_t Enable)
 {
-    Bluetopia::getInstance()->set_logging(BTdev::LogDebug);
     return 0;
 }
 

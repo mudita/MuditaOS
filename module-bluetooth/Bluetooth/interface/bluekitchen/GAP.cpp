@@ -1,5 +1,6 @@
 #include <Bluetooth/profiles/GAP.hpp>
 #include <Bluetooth/Device.hpp>
+#include <log/log.hpp>
 
 extern "C" {
 #include "btstack.h"
@@ -54,7 +55,7 @@ enum STATE state = INIT;
 
 #define INQUIRY_INTERVAL 5
 static void start_scan(void){
-    printf("Starting inquiry scan..\n");
+    LOG_INFO("Starting inquiry scan..");
     gap_inquiry_start(INQUIRY_INTERVAL);
 }
 
@@ -72,7 +73,7 @@ static void do_next_remote_name_request(void){
         // remote name request
         if (devices[i].state == REMOTE_NAME_REQUEST){
             devices[i].state = REMOTE_NAME_INQUIRED;
-            printf("Get remote name of %s...\n", bd_addr_to_str(devices[i].address));
+            LOG_INFO("Get remote name of %s...", bd_addr_to_str(devices[i].address));
             gap_remote_name_request( devices[i].address, devices[i].pageScanRepetitionMode,  devices[i].clockOffset | 0x8000);
             return;
         }
@@ -138,25 +139,25 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
                 dev.pageScanRepetitionMode = gap_event_inquiry_result_get_page_scan_repetition_mode(packet);
                 dev.clockOffset = gap_event_inquiry_result_get_clock_offset(packet);
                 // print info
-                printf("Device found: %s ", bd_addr_to_str(addr));
-                printf("with COD: 0x%06x, ", (unsigned int)gap_event_inquiry_result_get_class_of_device(packet));
-                printf("pageScan %d, ", dev.pageScanRepetitionMode);
-                printf("clock offset 0x%04x", dev.clockOffset);
+                LOG_INFO("Device found: %s ", bd_addr_to_str(addr));
+                LOG_INFO("with COD: 0x%06x, ", (unsigned int)gap_event_inquiry_result_get_class_of_device(packet));
+                LOG_INFO("pageScan %d, ", dev.pageScanRepetitionMode);
+                LOG_INFO("clock offset 0x%04x", dev.clockOffset);
                 if (gap_event_inquiry_result_get_rssi_available(packet)) {
-                    printf(", rssi %d dBm", (int8_t)gap_event_inquiry_result_get_rssi(packet));
+                    LOG_INFO(", rssi %d dBm", (int8_t)gap_event_inquiry_result_get_rssi(packet));
                 }
                 if (gap_event_inquiry_result_get_name_available(packet)) {
                     char name_buffer[240];
                     int name_len = gap_event_inquiry_result_get_name_len(packet);
                     memcpy(name_buffer, gap_event_inquiry_result_get_name(packet), name_len);
                     name_buffer[name_len] = 0;
-                    printf(", name '%s'", name_buffer);
+                    LOG_INFO(", name '%s'", name_buffer);
                     dev.state = REMOTE_NAME_FETCHED;
                     ;
                 } else {
                     dev.state = REMOTE_NAME_REQUEST;
                 }
-                printf("\n");
+                LOG_INFO("");
                 devices.push_back(dev);
             } break;
 
@@ -174,15 +175,15 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
                     index = getDeviceIndexForAddress(devices,addr);
                     if (index >= 0) {
                         if (packet[2] == 0) {
-                            printf("Name: '%s'\n", &packet[9]);
+                            LOG_INFO("Name: '%s'", &packet[9]);
                             devices[index].state = REMOTE_NAME_FETCHED;
                             devices[index].name=reinterpret_cast<char*>(&packet[9]);
                         } else {
-                            printf("Failed to get name: page timeout\n");
+                            LOG_INFO("Failed to get name: page timeout");
                         }
                     }
                     if(index+1 == devices.size()) {
-                        printf("Scanned all\n");
+                        LOG_INFO("Scanned all");
                         state = DONE;
                     }
                     continue_remote_names();
@@ -200,6 +201,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
 
 GAPi::GAPi()
 {
+    LOG_INFO("GAP create");
     hci_set_inquiry_mode(INQUIRY_MODE_RSSI_AND_EIR);
     // TODO this should somehow get context, and store devices to GAT response devices, not global
     cb_handler.callback = &packet_handler;

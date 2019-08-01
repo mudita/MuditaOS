@@ -4,7 +4,6 @@ namespace bsp {
 
 BluetopiaHW::BluetopiaHW(LogLvl lvl) : Bluetopia(64,64,0)
 {
-    set_logging(lvl);
     log(LogDebug,"Init done!\n");
 }
 

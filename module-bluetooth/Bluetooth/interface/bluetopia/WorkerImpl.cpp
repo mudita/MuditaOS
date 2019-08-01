@@ -41,7 +41,6 @@ WorkerImpl::WorkerImpl() : active_features(0)
     host = std::make_unique<BtDev>(BtDev());
     hci = std::make_unique<HCI>(HCI());
     bt->open();
-    bt->set_logging(BTdev::LogDebug);
     if (initialize_stack() != SuccessBt) {
         LOG_ERROR("initialize_stack error!");
         return;
