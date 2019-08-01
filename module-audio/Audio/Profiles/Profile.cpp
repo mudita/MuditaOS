@@ -41,39 +41,48 @@ namespace audio {
         return inst;
     }
 
-    Profile::Profile(const std::string &name, const Type type, float vol, float gain, uint32_t outPath, uint32_t inPath,
-                     bsp::AudioDevice::Type devType, std::function<int32_t()> callback)
-            : name(name), type(type), outputVolume(vol), inputGain(gain), outputPath(outPath), inputPath(inPath),
+    Profile::Profile(const std::string &name, const Type type, const bsp::AudioDevice::Format &fmt,
+                     bsp::AudioDevice::Type devType,
+                     std::function<int32_t()> callback)
+            : name(name), type(type), audioFormat(fmt),
               audioDeviceType(devType), dbAccessCallback(callback) {
     }
 
 
     void Profile::SetInputGain(float gain) {
-        inputGain = gain;
+        audioFormat.inputGain = gain;
         if (dbAccessCallback) {
             dbAccessCallback();
         }
     }
 
     void Profile::SetOutputVolume(float vol) {
-        outputVolume = vol;
+        audioFormat.outputVolume = vol;
         if (dbAccessCallback) {
             dbAccessCallback();
         }
     }
 
-    void Profile::SetInputPath(int8_t path) {
-        inputPath = path;
+    void Profile::SetInputPath(bsp::AudioDevice::InputPath path) {
+        audioFormat.inputPath = path;
         if (dbAccessCallback) {
             dbAccessCallback();
         }
     }
 
-    void Profile::SetOutputPath(uint32_t path) {
-        outputPath = path;
+    void Profile::SetOutputPath(bsp::AudioDevice::OutputPath path) {
+        audioFormat.outputPath = path;
         if (dbAccessCallback) {
             dbAccessCallback();
         }
+    }
+
+    void Profile::SetInOutFlags(uint32_t flags) {
+        audioFormat.flags = flags;
+    }
+
+    void Profile::SetSampleRate(uint32_t samplerate) {
+        audioFormat.sampleRate_Hz = samplerate;
     }
 
 }

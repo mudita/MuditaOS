@@ -26,7 +26,7 @@ namespace audio {
     public:
 
 
-        RecorderOperation(const char *file, const Encoder::Format &frmt);
+        RecorderOperation(const char *file);
 
         int32_t Start(std::function<int32_t(AudioEvents event)> callback) override final;
 
@@ -51,8 +51,6 @@ namespace audio {
     private:
         std::unique_ptr<Encoder> enc;
         std::unique_ptr<bsp::AudioDevice> audioDevice;
-        const Encoder::Format format;
-        bsp::AudioDevice::Format audioFormat;
     };
 
 }

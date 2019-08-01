@@ -54,7 +54,7 @@ public:
 
     enum class MonoStereo{
         Mono,
-        Stereo
+        Stereoq
     };
 
     static SampleRate ValToSampleRate(uint32_t rate){
@@ -104,8 +104,6 @@ public:
     InputPath inputPath = InputPath ::None;
     OutputPath outputPath = OutputPath ::None;
     SampleRate sampleRate = SampleRate ::Rate44K1Hz;
-    MonoStereo monoStereo = MonoStereo ::Stereo;
-
 };
 
 class CodecMAX98090 : public Codec {

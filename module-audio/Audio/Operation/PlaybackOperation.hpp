@@ -50,8 +50,6 @@ namespace audio {
     private:
         std::unique_ptr<decoder> dec;
         std::unique_ptr<bsp::AudioDevice> audioDevice;
-        bsp::AudioDevice::Format currentFormat;
-
     };
 
 }

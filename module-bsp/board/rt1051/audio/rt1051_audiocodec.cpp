@@ -23,8 +23,8 @@ namespace bsp {
     sai_edma_handle_t RT1051Audiocodec::rxHandle = {};
     edma_handle_t RT1051Audiocodec::dmaTxHandle = {};
     edma_handle_t RT1051Audiocodec::dmaRxHandle = {};
-    int16_t RT1051Audiocodec::inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE*2] = {};
-    int16_t RT1051Audiocodec::outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE*2] = {};
+    int16_t RT1051Audiocodec::inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
+    int16_t RT1051Audiocodec::outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
 
     RT1051Audiocodec::RT1051Audiocodec(bsp::AudioDevice::audioCallback_t callback) : AudioDevice(callback), config{} {
         isInitialized = true;
@@ -65,133 +65,142 @@ namespace bsp {
         }
 
         //Full duplex mono
-        if(inChan == 1 && outChan == 1){
-
+        if (inChan == 1 && outChan == 1) {
             saiInFormat.stereo = kSAI_MonoLeft;
             saiOutFormat.stereo = kSAI_MonoLeft;
-
             InStart();
             OutStart();
-
-            if (xTaskCreate(inWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating input audiocodec task");
-            }
-
-            if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating  output audiocodec task");
-            }
         }
-        //Full duplex stereo
-        else if(inChan == 2 && outChan == 2){
-
+            //Full duplex stereo
+        else if (inChan == 2 && outChan == 2) {
             saiInFormat.stereo = kSAI_Stereo;
             saiOutFormat.stereo = kSAI_Stereo;
-
             InStart();
             OutStart();
-
-            if (xTaskCreate(inWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating input audiocodec task");
-            }
-
-            if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating  output audiocodec task");
-            }
         }
-        // Half duplex stereo out
-        else if(outChan == 2 && inChan == 0){
-
+            // Half duplex stereo out
+        else if (outChan == 2 && inChan == 0) {
             saiOutFormat.stereo = kSAI_Stereo;
             OutStart();
-
-            if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating  output audiocodec task");
-            }
         }
-        // Half duplex stereo in
-        else if(inChan == 2 && outChan == 0){
-
+            // Half duplex stereo in
+        else if (inChan == 2 && outChan == 0) {
             saiInFormat.stereo = kSAI_Stereo;
             InStart();
-
-            if (xTaskCreate(inWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating input audiocodec task");
-            }
         }
-        // Half duplex mono out
-        else if(outChan == 1 && inChan == 0){
-
+            // Half duplex mono out
+        else if (outChan == 1 && inChan == 0) {
             saiOutFormat.stereo = kSAI_MonoLeft;
             OutStart();
-
-            if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating  output audiocodec task");
-            }
         }
-        // Half duplex mono in
-        else if(inChan == 1 && outChan == 0){
-
-            saiInFormat.stereo = kSAI_MonoLeft;
+            // Half duplex mono in
+        else if (inChan == 1 && outChan == 0) {
+            saiInFormat.stereo = kSAI_MonoRight;
             InStart();
-
-            if (xTaskCreate(inWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
-                LOG_ERROR("Error during creating input audiocodec task");
-            }
-        }
-        else{
+        } else {
             //Not supported
             LOG_ERROR("Format configuration not supported");
         }
 
-
         codecParams.sampleRate = CodecParamsMAX98090::ValToSampleRate(format.sampleRate_Hz);
-        if(codecParams.sampleRate ==  CodecParamsMAX98090::SampleRate::Invalid){
+        if (codecParams.sampleRate == CodecParamsMAX98090::SampleRate::Invalid) {
             LOG_ERROR("Unsupported sample rate");
         }
 
-        //Fill out buffer with data
-        GetAudioCallback()(nullptr, outBuffer,
-                                 RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE*2);
+        if (outChan) {
 
+            if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
+                LOG_ERROR("Error during creating  output audiocodec task");
+            }
 
-        codecParams.outputPath=CodecParamsMAX98090::OutputPath ::Loudspeaker;
+            //Fill out buffer with data
+            GetAudioCallback()(nullptr, outBuffer,
+                               RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE * 2);
+        }
+
+        if (inChan) {
+            if (xTaskCreate(inWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
+                LOG_ERROR("Error during creating input audiocodec task");
+            }
+        }
+
+        codecParams.inputPath = static_cast<CodecParamsMAX98090::InputPath >(format.inputPath); // TODO:M.P fix me
+        codecParams.outputPath = static_cast<CodecParamsMAX98090::OutputPath >(format.outputPath); // TODO:M.P fix me
         codecParams.outVolume = format.outputVolume;
+        codecParams.inGain = format.inputGain;
         codec.Start(codecParams);
+
+        // Store format passed
+        currentFormat = format;
+
+        return 0;
     }
 
     int32_t RT1051Audiocodec::Stop() {
 
         codec.Stop();
 
-        if(outWorkerThread){
-            vTaskDelete(outWorkerThread);
-        }
-        if(inWorkerThread){
-            vTaskDelete(inWorkerThread);
-        }
-
         InStop();
         OutStop();
+
+        if (outWorkerThread) {
+            vTaskDelete(outWorkerThread);
+            outWorkerThread = nullptr;
+        }
+        if (inWorkerThread) {
+            vTaskDelete(inWorkerThread);
+            inWorkerThread = nullptr;
+        }
+
+
+        currentFormat = {};
+        return 0;
 
     }
 
     int32_t RT1051Audiocodec::OutputVolumeCtrl(float vol) {
-
+        currentFormat.outputVolume = vol;
+        CodecParamsMAX98090 params;
+        params.outVolume = vol;
+        params.opCmd = CodecParamsMAX98090::Cmd::SetOutVolume;
+        codec.Ioctrl(params);
+        return 0;
     }
 
     int32_t RT1051Audiocodec::InputGainCtrl(float gain) {
-
+        currentFormat.inputGain = gain;
+        CodecParamsMAX98090 params;
+        params.inGain = gain;
+        params.opCmd = CodecParamsMAX98090::Cmd::SetInGain;
+        codec.Ioctrl(params);
+        return 0;
     }
 
-    int32_t RT1051Audiocodec::InputPathCtrl(uint32_t inputPath) {
-
+    int32_t RT1051Audiocodec::InputPathCtrl(InputPath inputPath) {
+        currentFormat.inputPath = inputPath;
+        CodecParamsMAX98090 params;
+        params.inputPath = static_cast<CodecParamsMAX98090::InputPath>(inputPath); // TODO: M.P fix me
+        params.opCmd = CodecParamsMAX98090::Cmd::SetInput;
+        codec.Ioctrl(params);
+        return 0;
     }
 
-    int32_t RT1051Audiocodec::OutputPathCtrl(uint32_t outputPath){
-
+    int32_t RT1051Audiocodec::OutputPathCtrl(OutputPath outputPath) {
+        currentFormat.outputPath = outputPath;
+        CodecParamsMAX98090 params;
+        params.outputPath = static_cast<CodecParamsMAX98090::OutputPath >(outputPath); // TODO: M.P fix me
+        params.opCmd = CodecParamsMAX98090::Cmd::SetOutput;
+        codec.Ioctrl(params);
+        return 0;
     }
 
-    bool RT1051Audiocodec::IsFormatSupported(const bsp::AudioDevice::Format &format) {}
+    bool RT1051Audiocodec::IsFormatSupported(const bsp::AudioDevice::Format &format) {
+
+        if (CodecParamsMAX98090::ValToSampleRate(format.sampleRate_Hz) == CodecParamsMAX98090::SampleRate::Invalid) {
+            return false;
+        }
+        return true;
+    }
 
 
 
@@ -256,8 +265,8 @@ namespace bsp {
 
     void RT1051Audiocodec::PLLInit() {
         auto ret = CLOCK_GetPllFreq(kCLOCK_PllAudio);
-        LOG_DEBUG("Audio PLL frequency: %lu",ret);
-        if ( ret != 0) {
+        LOG_DEBUG("Audio PLL frequency: %lu", ret);
+        if (ret != 0) {
             // Audio PLL initiaized already, skip initialization process
         } else {
             /*
@@ -280,8 +289,8 @@ namespace bsp {
         sai_transfer_format_t sai_format = {0};
         sai_transfer_t xfer = {0};
 
-        saiInFormat.data = (uint8_t*)inBuffer;
-        saiInFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE*saiInFormat.bitWidth/8;
+        saiInFormat.data = (uint8_t *) inBuffer;
+        saiInFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE * saiInFormat.bitWidth / 8;
 
         /* Configure the audio format */
         sai_format.bitWidth = saiInFormat.bitWidth;
@@ -314,8 +323,8 @@ namespace bsp {
         sai_transfer_format_t sai_format = {0};
         sai_transfer_t xfer = {0};
 
-        saiOutFormat.data = (uint8_t*)outBuffer;
-        saiOutFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE*saiInFormat.bitWidth/8;
+        saiOutFormat.data = (uint8_t *) outBuffer;
+        saiOutFormat.dataSize = CODEC_CHANNEL_PCM_BUFFER_SIZE * saiInFormat.bitWidth / 8;
 
         /* Configure the audio format */
         sai_format.bitWidth = saiOutFormat.bitWidth;
@@ -346,18 +355,18 @@ namespace bsp {
 
     void RT1051Audiocodec::OutStop() {
         SAI_TxDisableInterrupts(BOARD_AUDIOCODEC_SAIx, kSAI_FIFOErrorInterruptEnable);
-        if(txHandle.dmaHandle) {
+        if (txHandle.dmaHandle) {
             SAI_TransferTerminateSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle);
         }
-        memset(&txHandle,0,sizeof(txHandle));
+        memset(&txHandle, 0, sizeof(txHandle));
     }
 
     void RT1051Audiocodec::InStop() {
         SAI_RxDisableInterrupts(BOARD_AUDIOCODEC_SAIx, kSAI_FIFOErrorInterruptEnable);
-        if(rxHandle.dmaHandle){
+        if (rxHandle.dmaHandle) {
             SAI_TransferAbortReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle);
         }
-        memset(&rxHandle,0,sizeof(rxHandle));
+        memset(&rxHandle, 0, sizeof(rxHandle));
     }
 
 
@@ -373,25 +382,26 @@ namespace bsp {
                             portMAX_DELAY);    /* Block indefinitely. */
 
             if (ulNotificationValue & static_cast<uint32_t >(RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer)) {
-                auto framesFetched = inst->GetAudioCallback()(nullptr, inst->inBuffer,
-                                                              RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                auto framesFetched = inst->GetAudioCallback()(inst->inBuffer, nullptr,
+                RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
                 if (framesFetched == 0) {
                     goto cleanup;
-                }
-                else if(framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE){
-                    memset(&inst->inBuffer[framesFetched],0,RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE-framesFetched);
+                } else if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                    memset(&inst->inBuffer[framesFetched], 0,
+                           RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
                 }
             }
 
             if (ulNotificationValue & static_cast<uint32_t >(RT1051Audiocodec::irq_state_t::IRQStateFullTransfer)) {
-                auto framesFetched = inst->GetAudioCallback()(nullptr,&inst->inBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE],
-                                                              RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                auto framesFetched = inst->GetAudioCallback()(
+                        &inst->inBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE], nullptr,
+                RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
                 if (framesFetched == 0) {
                     goto cleanup;
-                }
-                else if(framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE){
-                    memset(&inst->inBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE+framesFetched],0,RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE-framesFetched);
+                } else if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                    memset(&inst->inBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched], 0,
+                           RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
                 }
             }
         }
@@ -416,24 +426,25 @@ namespace bsp {
 
             if (ulNotificationValue & static_cast<uint32_t >(RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer)) {
                 auto framesFetched = inst->GetAudioCallback()(nullptr, inst->outBuffer,
-                                         RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
+                                                              RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
                 if (framesFetched == 0) {
                     goto cleanup;
-                }
-                else if(framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE){
-                    memset(&inst->outBuffer[framesFetched],0,RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE-framesFetched);
+                } else if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                    memset(&inst->outBuffer[framesFetched], 0,
+                           RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
                 }
             }
 
             if (ulNotificationValue & static_cast<uint32_t >(RT1051Audiocodec::irq_state_t::IRQStateFullTransfer)) {
-                auto framesFetched = inst->GetAudioCallback()(nullptr,&inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE],
+                auto framesFetched = inst->GetAudioCallback()(nullptr,
+                                                              &inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE],
                                                               RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE);
 
                 if (framesFetched == 0) {
                     goto cleanup;
-                }
-                else if(framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE){
-                    memset(&inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE+framesFetched],0,RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE-framesFetched);
+                } else if (framesFetched < RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE) {
+                    memset(&inst->outBuffer[RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE + framesFetched], 0,
+                           RT1051Audiocodec::CODEC_CHANNEL_PCM_BUFFER_SIZE - framesFetched);
                 }
             }
         }
@@ -453,8 +464,8 @@ namespace bsp {
 
         if (state == RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer) {
 
-            xfer.dataSize = inst->saiInFormat.dataSize / 2;
-            xfer.data = inst->saiInFormat.data + (inst->saiInFormat.dataSize / 2);
+            xfer.dataSize = inst->saiInFormat.dataSize;
+            xfer.data = inst->saiInFormat.data + (inst->saiInFormat.dataSize);
             SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &inst->rxHandle, &xfer);
 
             /* Notify the task that the transmission is complete. */
@@ -466,7 +477,7 @@ namespace bsp {
 
         } else {
 
-            xfer.dataSize = inst->saiInFormat.dataSize / 2;
+            xfer.dataSize = inst->saiInFormat.dataSize;
             xfer.data = inst->saiInFormat.data;
             SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &inst->rxHandle, &xfer);
 

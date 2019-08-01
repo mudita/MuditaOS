@@ -26,8 +26,8 @@ namespace bsp{
         int32_t Stop() override final;
         int32_t OutputVolumeCtrl(float vol) override final;
         int32_t InputGainCtrl(float gain) override final;
-        int32_t OutputPathCtrl(uint32_t outputPath) override final;
-        int32_t InputPathCtrl(uint32_t inputPath) override final;
+        int32_t OutputPathCtrl(OutputPath outputPath) override final;
+        int32_t InputPathCtrl(InputPath inputPath) override final;
         bool IsFormatSupported(const Format& format) override final;
 
     private:

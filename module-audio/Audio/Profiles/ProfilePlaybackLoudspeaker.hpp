@@ -19,8 +19,18 @@ namespace audio {
     class ProfilePlaybackLoudspeaker : public Profile {
     public:
         ProfilePlaybackLoudspeaker(std::function<int32_t()> callback, float volume) : Profile(
-                "Playback Loudspeaker", Type::PlaybackLoudspeaker, volume, 0.0, 0, 0,
-                bsp::AudioDevice::Type::Audiocodec, callback) {}
+                "Playback Loudspeaker",
+                Type::PlaybackLoudspeaker,
+                bsp::AudioDevice::Format{.sampleRate_Hz=0,
+                        .bitWidth=16,
+                        .flags=0,
+                        .outputVolume=volume,
+                        .inputGain=0,
+                        .inputPath=bsp::AudioDevice::InputPath::None,
+                        .outputPath=bsp::AudioDevice::OutputPath::Loudspeaker
+                },
+                bsp::AudioDevice::Type::Audiocodec,
+                callback) {}
     };
 
 }

@@ -38,14 +38,14 @@ namespace audio {
         //TODO:M.P should be fetched from DB
         availableProfiles.push_back(std::make_unique<ProfilePlaybackLoudspeaker>(nullptr, 1.0));
         availableProfiles.push_back(std::make_unique<ProfilePlaybackHeadphones>(nullptr, 0.2));
-        profile = availableProfiles[0].get();
+        currentProfile = availableProfiles[0].get();
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
             LOG_ERROR("File doesn't exist");
             return;
         }
-        audioDevice = bsp::AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
 
         isInitialized = true;
@@ -62,17 +62,12 @@ namespace audio {
         eventCallback = callback;
         state = State::Active;
 
-        currentFormat = bsp::AudioDevice::Format{.sampleRate_Hz=tags->sample_rate,
-                .bitWidth=16, // M.P: Only 16-bit samples are supported
-                .flags= tags->num_channel == 2 ? static_cast<uint32_t >(bsp::AudioDevice::Flags::OutPutStereo)
-                                               : static_cast<uint32_t >(bsp::AudioDevice::Flags::OutputMono),
-                .outputVolume=profile->GetOutputVolume(),
-                .inputGain=profile->GetInputGain(),
-                .inputPath=profile->GetInputPath(),
-                .outputPath=profile->GetOutputPath()
-        };
+        currentProfile->SetInOutFlags(tags->num_channel == 2 ? static_cast<uint32_t >(bsp::AudioDevice::Flags::OutPutStereo)
+                                                      : static_cast<uint32_t >(bsp::AudioDevice::Flags::OutputMono));
 
-        return audioDevice->Start(currentFormat);
+        currentProfile->SetSampleRate(tags->sample_rate);
+
+        return audioDevice->Start(currentProfile->GetAudioFormat());
     }
 
     int32_t PlaybackOperation::Stop() {
@@ -99,17 +94,17 @@ namespace audio {
             return static_cast<int32_t >(RetCode::InvokedInIncorrectState);
         }
         state = State::Active;
-        return audioDevice->Start(currentFormat);
+        return audioDevice->Start(currentProfile->GetAudioFormat());
     }
 
     int32_t PlaybackOperation::SetOutputVolume(float vol) {
-        profile->SetOutputVolume(vol);
+        currentProfile->SetOutputVolume(vol);
         audioDevice->OutputVolumeCtrl(vol);
         return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t PlaybackOperation::SetInputGain(float gain) {
-        profile->SetInputGain(gain);
+        currentProfile->SetInputGain(gain);
         audioDevice->InputGainCtrl(gain);
         return static_cast<int32_t >(RetCode::Success);
     }
@@ -145,23 +140,20 @@ namespace audio {
 
     int32_t PlaybackOperation::SwitchProfile(const Profile::Type type) {
 
+        uint32_t currentSampleRate = currentProfile->GetSampleRate();
+        uint32_t currentInOutFlags = currentProfile->GetInOutFlags();
+
         auto ret = GetProfile(type);
         if (ret) {
-            profile = ret.value();
+            currentProfile = ret.value();
         } else {
             return static_cast<int32_t >(RetCode::UnsupportedProfile);
         }
 
-        audioDevice = bsp::AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
-        currentFormat = bsp::AudioDevice::Format{.sampleRate_Hz=currentFormat.sampleRate_Hz,
-                .bitWidth=16,
-                .flags=currentFormat.flags,
-                .outputVolume=profile->GetOutputVolume(),
-                .inputGain=profile->GetInputGain(),
-                .inputPath=profile->GetInputPath(),
-                .outputPath=profile->GetOutputPath()
-        };
+        currentProfile->SetSampleRate(currentSampleRate);
+        currentProfile->SetInOutFlags(currentInOutFlags);
 
 
         switch (state) {

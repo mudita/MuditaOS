@@ -57,7 +57,7 @@ namespace audio {
         virtual ~Operation() {}
 
         static std::optional<std::unique_ptr<Operation>>
-        Create(Type t, const char *fileName, const Encoder::Format &frmt = {});
+        Create(Type t, const char *fileName);
 
         virtual int32_t Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
@@ -75,17 +75,17 @@ namespace audio {
 
         virtual Position GetPosition() = 0;
 
-        Volume GetOutputVolume() { return profile->GetOutputVolume(); }
+        Volume GetOutputVolume() { return currentProfile->GetOutputVolume(); }
 
-        Gain GetInputGain() { return profile->GetInputGain(); }
+        Gain GetInputGain() { return currentProfile->GetInputGain(); }
 
         State GetState() { return state; }
 
-        const Profile *GetProfile() { return profile; }
+        const Profile *GetProfile() { return currentProfile; }
 
     protected:
 
-        Profile *profile;
+        Profile *currentProfile;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
         State state = State::Idle;
         std::function<int32_t(AudioEvents event)> eventCallback = nullptr;

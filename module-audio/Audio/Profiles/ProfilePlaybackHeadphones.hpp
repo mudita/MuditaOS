@@ -20,7 +20,16 @@ namespace audio {
     class ProfilePlaybackHeadphones : public Profile {
     public:
         ProfilePlaybackHeadphones(std::function<int32_t()> callback, float volume) : Profile(
-                "Playback Headphones", Type::PlaybackHeadphones, volume, 0.0, 0, 0, bsp::AudioDevice::Type::Audiocodec,
+                "Playback Headphones", Type::PlaybackHeadphones,
+                bsp::AudioDevice::Format{.sampleRate_Hz=0,
+                        .bitWidth=16,
+                        .flags=0,
+                        .outputVolume=volume,
+                        .inputGain=0,
+                        .inputPath=bsp::AudioDevice::InputPath::None,
+                        .outputPath=bsp::AudioDevice::OutputPath::Headphones
+                },
+                bsp::AudioDevice::Type::Audiocodec,
                 callback) {}
     };
 

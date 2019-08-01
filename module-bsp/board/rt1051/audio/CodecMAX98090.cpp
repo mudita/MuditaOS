@@ -304,6 +304,7 @@ CodecRetCode CodecMAX98090::Start(const CodecParams &param) {
     // Set volume to 0 before enabling codec to avoid pops/clicks
     auto currVol = currentParams.outVolume;
     SetOutputVolume(0);
+    SetInputGain(currentParams.inGain);
 
     // Turn on device
     dev_shutdown.shdn = 1;
@@ -339,7 +340,7 @@ CodecRetCode CodecMAX98090::Ioctrl(const CodecParams &param) {
 
     const CodecParamsMAX98090 &params = static_cast<const CodecParamsMAX98090 &>(param);
 
-    CodecRetCode ret = CodecRetCode ::Success;
+    CodecRetCode ret = CodecRetCode::Success;
 
     switch (params.opCmd) {
         case CodecParamsMAX98090::Cmd::SetOutVolume:
@@ -386,7 +387,7 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol) {
         case CodecParamsMAX98090::OutputPath::HeadphonesMono: {
             // Scale input volume(range 0 - 100) to MAX98090 range(decibels hardcoded as specific hex values)
             float scale_factor = 0.31;
-            uint8_t volume = (float) (vol * scale_factor);
+            uint8_t volume = (float) (vol * 100 * scale_factor);
             max98090_reg_lhp_vol_ctrl_t lvol = {0};
             max98090_reg_rhp_vol_ctrl_t rvol = {0};
 
@@ -443,19 +444,21 @@ CodecRetCode CodecMAX98090::SetOutputVolume(const float vol) {
 }
 
 CodecRetCode CodecMAX98090::SetInputGain(const float gain) {
+    float gainToSet = gain;
+
     if (gain > 10) {
-        return CodecRetCode::InvalidArgument;
+        gainToSet = 10;
     }
 
     max98090_reg_lrec_dig_gain_t lgain = {0};
     lgain.avl = 3; // fine gain - 0dB
-    lgain.avlg = gain; // coarse gain
+    lgain.avlg = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
     bsp_i2c_Send(i2CInst, MAX98090_I2C_ADDR, MAX98090_REG_LREC_DIG_GAIN, 1, (uint8_t *) &lgain, 1);
 
     //coarse gain - 18dB, fine gain - 0dB
     max98090_reg_rrec_dig_gain_t rgain = {0};
     rgain.avr = 3; // fine gain - 0dB
-    rgain.avrg = gain; // coarse gain
+    rgain.avrg = gainToSet * 0.7; // coarse gain (0.7 used as scaling factor)
     bsp_i2c_Send(i2CInst, MAX98090_I2C_ADDR, MAX98090_REG_RREC_DIG_GAIN, 1, (uint8_t *) &rgain, 1);
 
     return CodecRetCode::Success;
@@ -521,46 +524,42 @@ CodecRetCode CodecMAX98090::SetInputPath(const CodecParamsMAX98090::InputPath pa
 CodecRetCode CodecMAX98090::SetMute(const bool enable) {
     // Set/clr 7th bit in register which controls mute/unmute
     uint8_t mask = 0x80;
-    uint8_t regl,regr = 0;
+    uint8_t regl, regr = 0;
 
-    switch(currentParams.outputPath)
-    {
-        case CodecParamsMAX98090::OutputPath ::Headphones:
-        {
+    switch (currentParams.outputPath) {
+        case CodecParamsMAX98090::OutputPath::Headphones: {
             regl = MAX98090_REG_LHP_VOL_CTRL;
             regr = MAX98090_REG_RHP_VOL_CTRL;
         }
             break;
 
-        case CodecParamsMAX98090::OutputPath ::Earspeaker:
-        {
+        case CodecParamsMAX98090::OutputPath::Earspeaker: {
             regl = MAX98090_REG_RECV_VOL_CTRL;
             regr = 0;
         }
             break;
 
-        case CodecParamsMAX98090::OutputPath ::Loudspeaker:
-        {
+        case CodecParamsMAX98090::OutputPath::Loudspeaker: {
             regl = MAX98090_REG_LSPK_VOL_CTRL;
             regr = MAX98090_REG_RSPK_VOL_CTRL;
         }
             break;
 
         default:
-            return CodecRetCode ::InvalidArgument;
+            return CodecRetCode::InvalidArgument;
     }
 
-    if(regl){
-        bsp_i2c_ModifyReg(i2CInst,MAX98090_I2C_ADDR,regl,1,mask,enable,1);
+    if (regl) {
+        bsp_i2c_ModifyReg(i2CInst, MAX98090_I2C_ADDR, regl, 1, mask, enable, 1);
     }
-    if(regr){
-        bsp_i2c_ModifyReg(i2CInst,MAX98090_I2C_ADDR,regr,1,mask,enable ,1);
+    if (regr) {
+        bsp_i2c_ModifyReg(i2CInst, MAX98090_I2C_ADDR, regr, 1, mask, enable, 1);
     }
-    return CodecRetCode ::Success;
+    return CodecRetCode::Success;
 }
 
 std::optional<uint32_t> CodecMAX98090::Probe() {
     uint8_t id = 0;
-    bsp_i2c_Send(BOARD_GetI2CInstance(),MAX98090_I2C_ADDR, MAX98090_REG_REVID,1,&id,1);
+    bsp_i2c_Send(BOARD_GetI2CInstance(), MAX98090_I2C_ADDR, MAX98090_REG_REVID, 1, &id, 1);
     return id;
 }

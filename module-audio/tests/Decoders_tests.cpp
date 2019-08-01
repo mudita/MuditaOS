@@ -17,6 +17,7 @@
 
 #include "Audio/decoder/decoder.hpp"
 
+using namespace audio;
 
 TEST_CASE( "Decoder tests" ) {
 

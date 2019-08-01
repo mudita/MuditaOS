@@ -47,7 +47,7 @@ namespace audio {
         //Range 0-1
         int32_t SetOutputVolume(Volume vol);
 
-        //Range -10 <-> +10
+        //Range 0-10
         int32_t SetInputGain(Gain gain);
 
         Volume GetOutputVolume() { return currentOperation->GetOutputVolume(); }

@@ -19,7 +19,15 @@ namespace audio {
     class ProfileRecordingOnBoardMic : public Profile {
     public:
         ProfileRecordingOnBoardMic(std::function<int32_t()> callback, float gain) : Profile(
-                "Recording On Board Microphone", Type::RecordingBuiltInMic, 0.0, gain, 0, 0,
+                "Recording On Board Microphone", Type::RecordingBuiltInMic,
+                bsp::AudioDevice::Format{.sampleRate_Hz=44100,
+                        .bitWidth=16,
+                        .flags=static_cast<uint32_t >(bsp::AudioDevice::Flags::InputLeft), // microphone use left audio channel
+                        .outputVolume=0,
+                        .inputGain=gain,
+                        .inputPath=bsp::AudioDevice::InputPath::Microphone,
+                        .outputPath=bsp::AudioDevice::OutputPath::None
+                },
                 bsp::AudioDevice::Type::Audiocodec, callback) {}
     };
 

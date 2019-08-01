@@ -67,7 +67,7 @@ namespace audio {
 
     int32_t Audio::Start(Operation::Type op, const char *fileName) {
 
-        auto ret = Operation::Create(op, fileName, Encoder::Format{.chanNr=1, .sampleRate=44100});
+        auto ret = Operation::Create(op, fileName);
         if (ret) {
 
             switch (op) {
