@@ -29,7 +29,6 @@ set(SOURCES
 
         )
 
-message("PROJECT TARGET: ${PROJECT_TARGET}")
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")

@@ -19,7 +19,6 @@ endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
-message("PROJECT TARGET: ${PROJECT_TARGET}")
 if( NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
 else()
