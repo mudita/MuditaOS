@@ -21,6 +21,7 @@
 #include "Audio/Profiles/ProfilePlaybackLoudspeaker.hpp"
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 
+using namespace audio;
 
 TEST_CASE( "Playback tests" ) {
 
@@ -33,11 +34,11 @@ TEST_CASE( "Playback tests" ) {
     SECTION("Sample1.wav 16bit 44100Hz stereo")
     {
 
-#if 0
+
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
@@ -49,7 +50,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Switch profile during playback"){
             auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
@@ -68,7 +69,7 @@ TEST_CASE( "Playback tests" ) {
             {
                 auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
                 REQUIRE(playbackRet);
-                    playbackRet.value()->Start([](uint32_t)->int32_t{
+                    playbackRet.value()->Start([](AudioEvents event)->int32_t{
                     std::cout<<"End of file reached!\n";
                     return 0;
                 });
@@ -79,7 +80,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Pause/Resume/Stop sequence"){
             auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
@@ -97,7 +98,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Pause/Resume/Stop sequence with profile switching"){
             auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
                 return 0;
             });
@@ -112,12 +113,11 @@ TEST_CASE( "Playback tests" ) {
             playbackRet.value()->Stop();
             REQUIRE(playbackRet.value()->GetState() == Operation::State::Idle);
         }
-#endif
 
         SECTION("Output volume control and input gain during playback"){
             auto playbackRet =  Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.wav").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
             std::cout<<"End of file reached!\n";
                 return 0;
             });
@@ -138,7 +138,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample3.wav").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
             return 0;
             });
@@ -154,7 +154,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample3.flac").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
             return 0;
             });
@@ -171,7 +171,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.flac").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
             return 0;
             });
@@ -189,7 +189,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample1.mp3").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
             return 0;
             });
@@ -205,7 +205,7 @@ TEST_CASE( "Playback tests" ) {
         SECTION("Full playback"){
             auto playbackRet = Operation::Create(Operation::Type ::Playback,(cwd + "/sample3.mp3").c_str());
             REQUIRE(playbackRet);
-            playbackRet.value()->Start([](uint32_t)->int32_t{
+            playbackRet.value()->Start([](AudioEvents event)->int32_t{
                 std::cout<<"End of file reached!\n";
             return 0;
             });

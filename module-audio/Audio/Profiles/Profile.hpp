@@ -54,7 +54,7 @@ namespace audio {
 
         Profile() {}
 
-        Profile(const std::string &name, const Type type, float vol, float gain, uint32_t outPath, uint32_t inPath,
+        Profile(const std::string &name, const Type type, const bsp::AudioDevice::Format &fmt,
                 bsp::AudioDevice::Type devType,
                 std::function<int32_t()> callback);
 
@@ -62,19 +62,29 @@ namespace audio {
 
         void SetInputGain(float gain);
 
-        void SetOutputPath(uint32_t path);
+        void SetInOutFlags(uint32_t flags);
 
-        void SetInputPath(int8_t path);
+        void SetSampleRate(uint32_t samplerate);
 
-        float GetOutputVolume() const { return outputVolume; }
+        void SetOutputPath(bsp::AudioDevice::OutputPath path);
 
-        float GetInputGain() const { return inputGain; }
+        void SetInputPath(bsp::AudioDevice::InputPath path);
 
-        uint32_t GetOutputPath() const { return outputPath; }
+        float GetOutputVolume() const { return audioFormat.outputVolume; }
 
-        uint32_t GetInputPath() const { return inputPath; }
+        float GetInputGain() const { return audioFormat.inputGain; }
+
+        uint32_t GetSampleRate(){return audioFormat.sampleRate_Hz;}
+
+        uint32_t GetInOutFlags(){return audioFormat.flags;}
+
+        bsp::AudioDevice::OutputPath GetOutputPath() const { return audioFormat.outputPath; }
+
+        bsp::AudioDevice::InputPath GetInputPath() const { return audioFormat.inputPath; }
 
         bsp::AudioDevice::Type GetAudioDeviceType() const { return audioDeviceType; }
+
+        bsp::AudioDevice::Format GetAudioFormat(){return audioFormat;}
 
         const std::string &GetName() const { return name; }
 
@@ -82,17 +92,15 @@ namespace audio {
 
 
     protected:
-        float outputVolume = 1.0;
-        float inputGain = 1.0;
-        uint32_t outputPath = 0;
-        uint32_t inputPath = 0;
+        bsp::AudioDevice::Format audioFormat;
+        bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
 
         std::string name;
         Type type = Type::Idle;
 
         std::function<int32_t()> dbAccessCallback = nullptr;
 
-        bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
+
     };
 
 }

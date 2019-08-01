@@ -29,6 +29,20 @@ namespace bsp {
             Bluetooth
         };
 
+        enum class InputPath{
+            Headphones,
+            Microphone,
+            None
+        };
+
+        enum class OutputPath{
+            Headphones,
+            HeadphonesMono,
+            Earspeaker,
+            Loudspeaker,
+            None
+        };
+
         enum class Flags {
             OutputMono = 1 << 0,
             OutPutStereo = 1 << 1,
@@ -42,8 +56,8 @@ namespace bsp {
             uint32_t flags;             /*!< In/Out configuration flags */
             float outputVolume=0.0;
             float inputGain=0.0;
-            uint32_t inputPath=0;
-            uint32_t outputPath=0;
+            InputPath inputPath=InputPath ::None;
+            OutputPath outputPath=OutputPath ::None;
         };
 
         /**
@@ -85,9 +99,9 @@ namespace bsp {
 
         virtual int32_t InputGainCtrl(float gain) = 0;
 
-        virtual int32_t OutputPathCtrl(uint32_t outputPath) = 0;
+        virtual int32_t OutputPathCtrl(OutputPath outputPath) = 0;
 
-        virtual int32_t InputPathCtrl(uint32_t inputPath) = 0;
+        virtual int32_t InputPathCtrl(InputPath inputPath) = 0;
 
         virtual bool IsFormatSupported(const Format& format) = 0;
 
@@ -95,9 +109,9 @@ namespace bsp {
 
         float GetInputGain(){return currentFormat.inputGain;}
 
-        uint32_t GetOutputPath(){return currentFormat.outputPath;}
+        OutputPath GetOutputPath(){return currentFormat.outputPath;}
 
-        uint32_t GetInputPath(){return currentFormat.inputPath;}
+        InputPath GetInputPath(){return currentFormat.inputPath;}
 
 
         bsp::AudioDevice::Format GetCurrentFormat(){return currentFormat;}

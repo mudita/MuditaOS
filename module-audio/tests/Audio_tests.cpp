@@ -18,8 +18,10 @@
 
 #include "Audio/Audio.hpp"
 
+using namespace audio;
+
 namespace fs = std::filesystem;
-std::string testOutPath{};
+static std::string testOutPath{};
 
 TEST_CASE( "Audio API tests" ) {
 
@@ -43,7 +45,7 @@ TEST_CASE( "Audio API tests" ) {
 
     SECTION("Switch: Idle->Playback->Recording->Idle"){
 
-        Audio audioTest([](uint32_t)->int32_t{std::cout << "End of file\n"; return 0;});
+        Audio audioTest([](AudioEvents events)->int32_t{std::cout << "End of file\n"; return 0;});
 
         REQUIRE(audioTest.Start(Operation::Type::Playback,(cwd + "/sample1.wav").c_str()) == static_cast<int32_t >(RetCode::Success));
         REQUIRE(audioTest.GetCurrentState() == Audio::State::Playback);

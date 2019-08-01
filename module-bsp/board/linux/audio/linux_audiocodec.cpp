@@ -133,11 +133,11 @@ namespace bsp {
         return 0;
     }
 
-    int32_t LinuxAudiocodec::InputPathCtrl([[maybe_unused]] uint32_t inputPath) {
+    int32_t LinuxAudiocodec::InputPathCtrl([[maybe_unused]] InputPath inputPath) {
         return 0;
     }
 
-    int32_t LinuxAudiocodec::OutputPathCtrl([[maybe_unused]] uint32_t outputPath) {
+    int32_t LinuxAudiocodec::OutputPathCtrl([[maybe_unused]] OutputPath outputPath) {
         return 0;
     }
 

@@ -21,7 +21,7 @@ namespace audio {
 
     using namespace bsp;
 
-    RecorderOperation::RecorderOperation(const char *file, const Encoder::Format &frmt) : format(frmt) {
+    RecorderOperation::RecorderOperation(const char *file) {
 
         audioCallback = [this](const void *inputBuffer,
                                void *outputBuffer,
@@ -39,10 +39,22 @@ namespace audio {
         //TODO:M.P should be fetched from DB
         availableProfiles.push_back(std::make_unique<ProfileRecordingOnBoardMic>(nullptr, 20.0));
         availableProfiles.push_back(std::make_unique<ProfileRecordingHeadset>(nullptr, 10.0));
-        profile = availableProfiles[0].get();
 
-        enc = Encoder::Create(file, format);
-        audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        currentProfile = availableProfiles[0].get();
+
+        uint32_t channels = 0;
+        if (currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) {
+            channels++;
+        }
+        if (currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputRight)) {
+            channels++;
+        }
+
+        enc = Encoder::Create(file, Encoder::Format{
+                .chanNr=channels,
+                .sampleRate=currentProfile->GetSampleRate()
+        });
+        audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
 
         isInitialized = true;
@@ -58,25 +70,8 @@ namespace audio {
         eventCallback = callback;
         state = State::Active;
 
-        uint32_t flags = 0;
-        if (format.chanNr == 2) {
-            flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft) |
-                    static_cast<uint32_t >(AudioDevice::Flags::InputRight);
-        } else if (format.chanNr == 1) {
-            flags = static_cast<uint32_t >(AudioDevice::Flags::InputLeft);
-        }
-
-        audioFormat = AudioDevice::Format{.sampleRate_Hz=format.sampleRate,
-                .bitWidth=16, // M.P Only 16-bit samples are supported
-                .flags=flags,
-                .outputVolume=profile->GetOutputVolume(),
-                .inputGain=profile->GetInputGain(),
-                .inputPath=profile->GetInputPath(),
-                .outputPath=profile->GetOutputPath()
-        };
-
-        if (audioDevice->IsFormatSupported(audioFormat)) {
-            return audioDevice->Start(audioFormat);
+        if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
+            return audioDevice->Start(currentProfile->GetAudioFormat());
         } else {
             return static_cast<int32_t >(RetCode::InvalidFormat);
         }
@@ -111,7 +106,7 @@ namespace audio {
         }
 
         state = State::Active;
-        return audioDevice->Start(audioFormat);
+        return audioDevice->Start(currentProfile->GetAudioFormat());
     }
 
     int32_t RecorderOperation::SendEvent(const Operation::Event evt, const EventData *data) {
@@ -140,21 +135,12 @@ namespace audio {
 
         auto ret = GetProfile(type);
         if (ret) {
-            profile = ret.value();
+            currentProfile = ret.value();
         } else {
             return static_cast<int32_t >(RetCode::UnsupportedProfile);
         }
 
-        audioDevice = AudioDevice::Create(profile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
-
-        audioFormat = AudioDevice::Format{.sampleRate_Hz=audioFormat.sampleRate_Hz,
-                .bitWidth=16,
-                .flags=audioFormat.flags,
-                .outputVolume=profile->GetOutputVolume(),
-                .inputGain=profile->GetInputGain(),
-                .inputPath=profile->GetInputPath(),
-                .outputPath=profile->GetOutputPath()
-        };
+        audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
         switch (state) {
             case State::Idle:
@@ -173,13 +159,13 @@ namespace audio {
     }
 
     int32_t RecorderOperation::SetOutputVolume(float vol) {
-        profile->SetOutputVolume(vol);
+        currentProfile->SetOutputVolume(vol);
         audioDevice->OutputVolumeCtrl(vol);
         return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t RecorderOperation::SetInputGain(float gain) {
-        profile->SetInputGain(gain);
+        currentProfile->SetInputGain(gain);
         audioDevice->InputGainCtrl(gain);
         return static_cast<int32_t >(RetCode::Success);
     }

@@ -19,13 +19,13 @@ namespace audio {
     }
 
     int32_t RouterOperation::SetOutputVolume(float vol) {
-        profile->SetOutputVolume(vol);
+        currentProfile->SetOutputVolume(vol);
         //audioDevice->OutputVolumeCtrl(vol);
         return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t RouterOperation::SetInputGain(float gain) {
-        profile->SetInputGain(gain);
+        currentProfile->SetInputGain(gain);
         //audioDevice->InputGainCtrl(gain);
         return static_cast<int32_t >(RetCode::Success);
     }

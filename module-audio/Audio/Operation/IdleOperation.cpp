@@ -23,12 +23,12 @@ namespace audio {
     }
 
     int32_t IdleOperation::SetOutputVolume(float vol) {
-        profile->SetOutputVolume(vol);
+        currentProfile->SetOutputVolume(vol);
         return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t IdleOperation::SetInputGain(float gain) {
-        profile->SetInputGain(gain);
+        currentProfile->SetInputGain(gain);
         return static_cast<int32_t >(RetCode::Success);
     }
 }

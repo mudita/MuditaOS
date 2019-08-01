@@ -22,8 +22,10 @@
 #include "Audio/Profiles/ProfileRecordingHeadset.hpp"
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 
+using namespace audio;
+
 namespace fs = std::filesystem;
-std::string testOutPath{};
+static std::string testOutPath{};
 
 TEST_CASE( "RecorderOperation tests" ) {
 
@@ -37,10 +39,10 @@ TEST_CASE( "RecorderOperation tests" ) {
 
         testOutPath = dir / "tests_out/audio/";
     }
-
+#if 0
     SECTION("Simple stereo recording 44100"){
-        RecorderOperation record((testOutPath + "stereotrec_44100.wav").c_str(),Encoder::Format{.chanNr=2,.sampleRate=44100});
-        record.Start([](uint32_t)->int32_t{
+        RecorderOperation record((testOutPath + "stereotrec_44100.wav").c_str());
+        record.Start([](AudioEvents event)->int32_t{
             std::cout<<"Error!\n";
             return 0;
         });
@@ -50,10 +52,11 @@ TEST_CASE( "RecorderOperation tests" ) {
         REQUIRE(record.GetState() == RecorderOperation::State::Idle);
         REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
     }
+#endif
 
     SECTION("Simple mono recording 44100"){
-        RecorderOperation record((testOutPath + "monorec1_44100.wav").c_str(),Encoder::Format{.chanNr=1,.sampleRate=44100});
-        record.Start([](uint32_t)->int32_t{
+        RecorderOperation record((testOutPath + "monorec1_44100.wav").c_str());
+        record.Start([](AudioEvents event)->int32_t{
             std::cout<<"Error!\n";
             return 0;
         });
@@ -63,90 +66,11 @@ TEST_CASE( "RecorderOperation tests" ) {
         REQUIRE(record.GetState() == RecorderOperation::State::Idle);
         REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
     }
-
-    SECTION("Simple stereo recording 22050"){
-        RecorderOperation record((testOutPath + "stereotrec_22050.wav").c_str(),Encoder::Format{.chanNr=2,.sampleRate=22050});
-        record.Start([](uint32_t)->int32_t{
-            std::cout<<"Error!\n";
-            return 0;
-        });
-        REQUIRE(record.GetState() == RecorderOperation::State::Active);
-        sleep(2);
-        record.Stop();
-        REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
-    }
-
-    SECTION("Simple mono recording 22050"){
-        RecorderOperation record((testOutPath + "monorec1_22050.wav").c_str(),Encoder::Format{.chanNr=1,.sampleRate=22050});
-        record.Start([](uint32_t)->int32_t{
-            std::cout<<"Error!\n";
-            return 0;
-        });
-        REQUIRE(record.GetState() == RecorderOperation::State::Active);
-        sleep(2);
-        record.Stop();
-        REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
-    }
-
-    SECTION("Simple stereo recording 16000"){
-        RecorderOperation record((testOutPath + "stereotrec_16000.wav").c_str(),Encoder::Format{.chanNr=2,.sampleRate=16000});
-        record.Start([](uint32_t)->int32_t{
-            std::cout<<"Error!\n";
-            return 0;
-        });
-        REQUIRE(record.GetState() == RecorderOperation::State::Active);
-        sleep(2);
-        record.Stop();
-        REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
-    }
-
-    SECTION("Simple mono recording 16000"){
-        RecorderOperation record((testOutPath + "monorec1_16000.wav").c_str(),Encoder::Format{.chanNr=1,.sampleRate=16000});
-        record.Start([](uint32_t)->int32_t{
-            std::cout<<"Error!\n";
-            return 0;
-        });
-        REQUIRE(record.GetState() == RecorderOperation::State::Active);
-        sleep(2);
-        record.Stop();
-        REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
-    }
-
-    SECTION("Simple stereo recording 8000"){
-        RecorderOperation record((testOutPath + "stereotrec_8000.wav").c_str(),Encoder::Format{.chanNr=2,.sampleRate=8000});
-        record.Start([](uint32_t)->int32_t{
-            std::cout<<"Error!\n";
-            return 0;
-        });
-        REQUIRE(record.GetState() == RecorderOperation::State::Active);
-        sleep(2);
-        record.Stop();
-        REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
-    }
-
-    SECTION("Simple mono recording 8000"){
-        RecorderOperation record((testOutPath + "monorec1_8000.wav").c_str(),Encoder::Format{.chanNr=1,.sampleRate=8000});
-        record.Start([](uint32_t)->int32_t{
-            std::cout<<"Error!\n";
-            return 0;
-        });
-        REQUIRE(record.GetState() == RecorderOperation::State::Active);
-        sleep(2);
-        record.Stop();
-        REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
-    }
-
 
 
 SECTION("Simple stereo recording with profile switching 44100"){
-        RecorderOperation record((testOutPath + "rec1.wav").c_str(),Encoder::Format{.chanNr=2,.sampleRate=44100});
-        record.Start([](uint32_t)->int32_t{
+        RecorderOperation record((testOutPath + "rec1.wav").c_str());
+        record.Start([](AudioEvents event)->int32_t{
             std::cout<<"Error!\n";
             return 0;
         });

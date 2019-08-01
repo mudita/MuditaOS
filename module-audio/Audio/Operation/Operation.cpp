@@ -26,7 +26,7 @@ namespace audio {
 
 
     std::optional<std::unique_ptr<Operation>>
-    Operation::Create(Operation::Type t, const char *fileName, [[maybe_unused]]const Encoder::Format &frmt) {
+    Operation::Create(Operation::Type t, const char *fileName) {
         std::unique_ptr<Operation> inst;
 
         switch (t) {
@@ -40,7 +40,7 @@ namespace audio {
                 //TODO:M.P inst = std::make_unique<RouterOperation>(fileName,prof);
                 break;
             case Type::Recorder:
-                inst = std::make_unique<RecorderOperation>(fileName, frmt);
+                inst = std::make_unique<RecorderOperation>(fileName);
                 break;
         }
 

@@ -19,7 +19,16 @@ namespace audio {
     class ProfileRecordingHeadset : public Profile {
     public:
         ProfileRecordingHeadset(std::function<int32_t()> callback, float gain) : Profile(
-                "Recording Headset", Type::RecordingHeadset, 0.0, gain, 0, 0, bsp::AudioDevice::Type::Audiocodec,
+                "Recording Headset", Type::RecordingHeadset,
+                bsp::AudioDevice::Format{.sampleRate_Hz=44100,
+                        .bitWidth=16,
+                        .flags=static_cast<uint32_t >(bsp::AudioDevice::Flags::InputLeft), // microphone use left audio channel
+                        .outputVolume=0,
+                        .inputGain=gain,
+                        .inputPath=bsp::AudioDevice::InputPath::Headphones,
+                        .outputPath=bsp::AudioDevice::OutputPath::None
+                },
+                bsp::AudioDevice::Type::Audiocodec,
                 callback) {}
     };
 
