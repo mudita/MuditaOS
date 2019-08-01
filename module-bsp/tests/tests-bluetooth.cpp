@@ -17,7 +17,6 @@ TEST_CASE("TC1") {
         bt->log(BTdev::LogError,"Test! Shouldnt print");
         bt->register_log(vprintf);
         bt->log(BTdev::LogError,"Test prints\n");
-        bt->set_logging(BTdev::LogDebug);
         bt->log(BTdev::LogDebug, "Now logs everything\n");
         bt->log(BTdev::LogWarning, "LOG: %u\n",10);
 

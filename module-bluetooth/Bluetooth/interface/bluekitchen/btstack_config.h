@@ -7,7 +7,9 @@
 
 // Port related features
 #define HAVE_MALLOC
+#ifndef TARGET_RT1051
 #define HAVE_POSIX_FILE_IO
+#endif
 #define HAVE_BTSTACK_STDIN
 // #define HAVE_POSIX_TIME
 #define HAVE_EM9304_PATCH_CONTAINER

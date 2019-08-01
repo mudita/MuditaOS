@@ -34,9 +34,5 @@ class BluetopiaHW : public Bluetopia
         virtual void set_irq(bool enable) override;
         virtual void wait_data() override;
         virtual void set_data() override;
-
-    private:
-        // for init
-        uint32_t UartGetPeripheralClock();
 };
 };

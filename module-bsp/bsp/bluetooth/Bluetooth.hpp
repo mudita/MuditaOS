@@ -79,34 +79,56 @@ namespace bsp {
             BTdev(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size, int threshold=0);
             virtual ~BTdev();
 
-            // device generall
+            // generall
             virtual void open() = 0;    // enable device -> irq enable
             virtual void close() = 0;   // disable device -> irq disable
-            virtual void sleep_ms(ssize_t ms) = 0; // task sleep
             virtual ssize_t read(void *buf, size_t nbytes) = 0; // read from internal in buffor
-            virtual ssize_t write(char *buf, size_t nbytes) = 0; // write to internal out buffor
-            virtual Error flush() = 0;  // flush interal out buffor
-            virtual void set_logging(LogLvl lvl) { loglvl = lvl; }
-            void register_log(LogFoo foo) { flog = foo; }
             void log(LogLvl lvl,const char* val, ...);
             // uart specyfic
-            virtual Error set_baudrate(uint32_t bd)=0;
-            virtual Error set_rts(bool on)=0; // == virtual Error uart_flow(bool on);
-            virtual Error set_reset(bool on)=0;
-            virtual int read_cts()=0;
+    };
+
+    // Common stuff for Bluetopia and bluekitchen +clean listing for overrrides
+    class BluetoothCommon : public BTdev
+    {
+        public:
+            static const ssize_t baudrate =115200;
+            static const ssize_t off_threshold =16;
+            static const ssize_t on_threshold =32;
+        public:
+            BluetoothCommon(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size, int threshold=0);
+            virtual ~BluetoothCommon();
+            // uart specyfic Common part
+            virtual void open() override;
+            virtual void close() override;
+            ssize_t write(char *buf, size_t nbytes);
+            ssize_t write_blocking(char *buf, ssize_t len);
+            Error flush();
+            Error set_baudrate(uint32_t bd);
+            Error set_rts(bool on);
+            Error set_reset(bool on);
+            int read_cts();
+            void sleep_ms(ssize_t ms);
+            void set_irq(bool enable);
+            // Part to override
+            virtual ssize_t read(void *buf, size_t nbytes) override = 0;
+
+        private:
+            void configure_uart_io();
+            void configure_lpuart();
+            void configure_cts_irq();
+            xSemaphoreHandle sem_data;
     };
 
     /// definitions needed by BT stack
-    class Bluetopia : public BTdev {
+    class Bluetopia : public BluetoothCommon {
         public:
             Bluetopia(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size, int threshold=0);
             virtual ~Bluetopia();
             static Bluetopia *getInstance();
-            virtual void set_irq(bool enable) = 0;
-            virtual ssize_t write_blocking(char* buf, ssize_t len) =0;
-            virtual void wait_data() = 0;
-            virtual void set_data() =0;
-            xSemaphoreHandle sem_data;
+
+            virtual ssize_t read(void *buf, size_t nbytes) override;
+            void wait_data();
+            void set_data();
 
             void (*com_cb)(unsigned int transport_id, unsigned int datalen, unsigned char *buff, unsigned long param);
             unsigned long com_cb_param;
@@ -114,14 +136,17 @@ namespace bsp {
             TaskHandle_t thandle;
     };
 
-
-    class BlueKitchen : public BTdev {
+    class BlueKitchen : public BluetoothCommon {
         public:
-            // uart
             BlueKitchen(unsigned int in_size=default_buff_size, unsigned int out_size=default_buff_size);
-            int send_async();
-            int recieve_async();
-            int notify_send();
-            int notify_received();
+            virtual ~BlueKitchen();
+            static BlueKitchen *getInstance();
+
+            virtual ssize_t read(void *buf, size_t nbytes) override;
+            volatile uint32_t to_read;
+            char* read_buff;
+
+            void (*read_ready_cb)(void);
+            void (*write_done_cb)(void);
     };
 };
