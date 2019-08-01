@@ -33,6 +33,7 @@ extern "C" {
 #endif
 
 void mp3dec_init(mp3dec_t *dec);
+void mp3dec_deinit(mp3dec_t *dec);
 int mp3dec_decode_frame(mp3dec_t *dec, const unsigned char *mp3, int mp3_bytes, short *pcm, mp3dec_frame_info_t *info);
 
 #ifdef __cplusplus
@@ -1639,18 +1640,33 @@ static int mp3d_find_frame(const uint8_t *mp3, int mp3_bytes, int *free_format_b
     *ptr_frame_bytes = 0;
     return i;
 }
-
+static mp3dec_scratch_t* scratch = NULL;
 void mp3dec_init(mp3dec_t *dec)
 {
+    if(scratch){
+        free(scratch);
+    }
+    scratch = (mp3dec_scratch_t*)malloc(sizeof(mp3dec_scratch_t));
+    memset(scratch,0,sizeof(mp3dec_scratch_t));
+
     dec->header[0] = 0;
 }
+
+void mp3dec_deinit(mp3dec_t *dec)
+{
+    if(scratch){
+        free(scratch);
+        scratch = NULL;
+    }
+}
+
+
 
 int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, short *pcm, mp3dec_frame_info_t *info)
 {
     int i = 0, igr, frame_size = 0, success = 1;
     const uint8_t *hdr;
     bs_t bs_frame[1];
-    mp3dec_scratch_t scratch;
 
     if (mp3_bytes > 4 && dec->header[0] == 0xff && hdr_compare(dec->header, mp3))
     {
@@ -1687,23 +1703,23 @@ int mp3dec_decode_frame(mp3dec_t *dec, const uint8_t *mp3, int mp3_bytes, short 
 
     if (info->layer == 3)
     {
-        int main_data_begin = L3_read_side_info(bs_frame, scratch.gr_info, hdr);
+        int main_data_begin = L3_read_side_info(bs_frame, scratch->gr_info, hdr);
         if (main_data_begin < 0 || bs_frame->pos > bs_frame->limit)
         {
             mp3dec_init(dec);
             return 0;
         }
-        success = L3_restore_reservoir(dec, bs_frame, &scratch, main_data_begin);
+        success = L3_restore_reservoir(dec, bs_frame, scratch, main_data_begin);
         if (success)
         {
             for (igr = 0; igr < (HDR_TEST_MPEG1(hdr) ? 2 : 1); igr++, pcm += 576*info->channels)
             {
-                memset(scratch.grbuf[0], 0, 576*2*sizeof(float));
-                L3_decode(dec, &scratch, scratch.gr_info + igr*info->channels, info->channels);
-                mp3d_synth_granule(dec->qmf_state, scratch.grbuf[0], 18, info->channels, pcm, scratch.syn[0]);
+                memset(scratch->grbuf[0], 0, 576*2*sizeof(float));
+                L3_decode(dec, scratch, scratch->gr_info + igr*info->channels, info->channels);
+                mp3d_synth_granule(dec->qmf_state, scratch->grbuf[0], 18, info->channels, pcm, scratch->syn[0]);
             }
         }
-        L3_save_reservoir(dec, &scratch);
+        L3_save_reservoir(dec, scratch);
     } else
     {
 #ifdef MINIMP3_ONLY_MP3

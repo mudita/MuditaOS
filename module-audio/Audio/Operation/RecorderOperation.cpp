@@ -19,6 +19,8 @@
 
 namespace audio {
 
+#define PERF_STATS_ON        1
+
     using namespace bsp;
 
     RecorderOperation::RecorderOperation(const char *file) {
@@ -27,7 +29,14 @@ namespace audio {
                                void *outputBuffer,
                                unsigned long framesPerBuffer) -> int32_t {
 
+#if PERF_STATS_ON == 1
+            auto tstamp = xTaskGetTickCount();
+#endif
             auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer)));
+#if PERF_STATS_ON == 1
+            LOG_DEBUG("Enc:%dms", xTaskGetTickCount() - tstamp);
+            LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));
+#endif
             if (ret == 0) {
                 state = State::Idle;
                 eventCallback(AudioEvents::FileSystemNoSpace);

@@ -303,7 +303,7 @@ namespace bsp {
         xfer.dataSize = saiOutFormat.dataSize;
         SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &xfer);
 
-        if (xTaskCreate(outWorkerTask, "outaudiocodec", 7 * 1024, this, 0, &outWorkerThread) != pdPASS) {
+        if (xTaskCreate(outWorkerTask, "outaudiocodec", 768, this, 0, &outWorkerThread) != pdPASS) {
             LOG_ERROR("Error during creating  output audiocodec task");
         }
 
