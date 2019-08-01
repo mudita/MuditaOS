@@ -512,6 +512,9 @@ typedef struct
 
     // Variable length extra data. We attach this to the end of the object so we can avoid unnecessary mallocs.
     drflac_uint8 pExtraData[1];
+
+    //M.P: Preallocated scratch buffer used during decoding in order to save on stack usage
+    drflac_int32* scratchBuffer;
 } drflac;
 
 
@@ -4663,6 +4666,9 @@ drflac* drflac_open_with_metadata_private(drflac_read_proc onRead, drflac_seek_p
         } while (1);
     }
 
+    //M.P: Preallocated scratch buffer used during decoding in order to save on stack usage
+    pFlac->scratchBuffer = (drflac_int32*)DRFLAC_MALLOC(4096*sizeof(drflac_int32));
+    
     return pFlac;
 }
 
@@ -4926,7 +4932,7 @@ void drflac_close(drflac* pFlac)
     }
 #endif
 #endif
-
+    DRFLAC_FREE(pFlac->scratchBuffer);
     DRFLAC_FREE(pFlac);
 }
 
@@ -5178,20 +5184,19 @@ drflac_uint64 drflac_read_s32(drflac* pFlac, drflac_uint64 samplesToRead, drflac
 
 drflac_uint64 drflac_read_s16(drflac* pFlac, drflac_uint64 samplesToRead, drflac_int16* pBufferOut)
 {
-	//TODO:M.P optimize it!!!
     // This reads samples in 2 passes and can probably be optimized.
     drflac_uint64 totalSamplesRead = 0;
 
     while (samplesToRead > 0) {
-        drflac_int32 samples32[4096];
-        drflac_uint64 samplesJustRead = drflac_read_s32(pFlac, (samplesToRead > 4096) ? 4096 : samplesToRead, samples32);
+        //drflac_int32 samples32[4096]; M.P: replaced with dyn allocated one in order to save on stack
+        drflac_uint64 samplesJustRead = drflac_read_s32(pFlac, (samplesToRead > 4096) ? 4096 : samplesToRead, pFlac->scratchBuffer);
         if (samplesJustRead == 0) {
             break;  // Reached the end.
         }
 
         // s32 -> s16
         for (drflac_uint64 i = 0; i < samplesJustRead; ++i) {
-            pBufferOut[i] = (drflac_int16)(samples32[i] >> 16);
+            pBufferOut[i] = (drflac_int16)(pFlac->scratchBuffer[i] >> 16);
         }
 
         totalSamplesRead += samplesJustRead;
