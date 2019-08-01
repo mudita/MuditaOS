@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.14)
 project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
-message("PROJECT TARGET: ${PROJECT_TARGET}")
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
