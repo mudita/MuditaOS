@@ -16,17 +16,29 @@ static BTPSCONST AUD_Stream_Format_t AudioSRCSupportedFormats[] =
    { 44100, 1, 0 }
 };
 #define NUM_SRC_SUPPORTED_FORMATS (sizeof(AudioSRCSupportedFormats)/sizeof(AUD_Stream_Format_t))
-// <---
 
 static void BTPSAPI AUD_Event_Callback(unsigned int id, AUD_Event_Data_t *AUD_Event_Data, unsigned long CallbackParameter);
+// <---
+//
 
-GAVD::GAVD()
+class GAVDi : public GAVD {
+public:
+    GAVDi();
+    ErrorBtProfile init(Stack *stack) override;
+};
+
+GAVD *GAVD::create()
+{
+    return new GAVDi();
+}
+
+GAVDi::GAVDi()
 {
     // TODO add depends
     st=State::ProfileInactive;
 }
 
-BtProfile::ErrorBtProfile GAVD::init(Stack *stack)
+BtProfile::ErrorBtProfile GAVDi::init(Stack *stack)
 {
     ErrorBtProfile err = ErrorBtProfile::SuccessBtProfile;
     LOG_INFO("GAVD init");

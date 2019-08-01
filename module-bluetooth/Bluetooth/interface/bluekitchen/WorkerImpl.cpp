@@ -16,7 +16,7 @@ extern "C" {
 #include <btstack_link_key_db_fs.h>
 #include <btstack_memory.h>
 #include <btstack_run_loop.h>
-#include <btstack_run_loop_posix.h>
+#include <btstack_run_loop_freertos.h>
 #include <bluetooth_company_id.h>
 #include <hci.h>
 #include <hci_dump.h>
@@ -26,17 +26,13 @@ extern "C" {
 #include <btstack_chipset_cc256x.h>
 };
 
+#include "Bluetooth/profiles/GAP.hpp"
+
 #define TLV_DB_PATH_PREFIX "/tmp/btstack_"
 #define TLV_DB_PATH_POSTFIX ".tlv"
 static char tlv_db_path[100];
 static const btstack_tlv_t * tlv_impl;
 static btstack_tlv_posix_t   tlv_context;
-
-int btstack_main()
-{
-    // profiles etc... code from example comes in play here
-    return 1;
-}
 
 static void local_version_information_handler(uint8_t * packet);
 
@@ -154,11 +150,17 @@ static void local_version_information_handler(uint8_t * packet){
     }
 }
 
+void run_btstack(void*)
+{
+    printf("start BtStack\n");
+    btstack_run_loop_execute();
+}
+
 BluetoothWorker::Error WorkerImpl::initialize_stack()
 {
     Error err= SuccessBt;
     btstack_memory_init();
-    btstack_run_loop_init(btstack_run_loop_posix_get_instance());
+    btstack_run_loop_init(btstack_run_loop_freertos_get_instance());
 
     const char *pklg_path = "/tmp/hci_dump.pklg";
     hci_dump_open(pklg_path, HCI_DUMP_PACKETLOGGER);
@@ -178,29 +180,22 @@ BluetoothWorker::Error WorkerImpl::initialize_stack()
     hci_event_callback_registration.callback = &hci_packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
 
-    signal(SIGINT, sigint_handler);
+    // signal(SIGINT, sigint_handler);
 
-    // setup app
-    btstack_main();
-
-    // go
-    btstack_run_loop_execute();
-
+    xTaskCreate(run_btstack, std::string("BtStack").c_str(), 8192, NULL, tskIDLE_PRIORITY, &handle);
     return err;
 }
 
-WorkerImpl::WorkerImpl()
+WorkerImpl::WorkerImpl() : handle(NULL)
 {
     initialize_stack();
+}
+
+WorkerImpl::~WorkerImpl() {
+    // TODO destroy task in handle
 }
 
 WorkerImpl *WorkerImpl::create()
 {
     return new WorkerImpl();
-}
-
-BluetoothWorker::Error WorkerImpl::aud_init()
-{
-    Error ret= SuccessBt;
-    return ret;
 }

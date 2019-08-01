@@ -4,6 +4,6 @@
 /// generic audio video class
 class GAVD : public BtProfile {
     public:
-        GAVD();
-        virtual ErrorBtProfile init(Stack *stack) override;
+        ErrorBtProfile init(Stack *stack) =0;
+        static GAVD *create();
 };
