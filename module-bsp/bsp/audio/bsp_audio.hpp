@@ -47,7 +47,8 @@ namespace bsp {
             OutputMono = 1 << 0,
             OutPutStereo = 1 << 1,
             InputLeft = 1 << 2,
-            InputRight = 1 << 3
+            InputRight = 1 << 3,
+            InputStereo = 1<< 4
         };
 
         using Format = struct {

@@ -44,7 +44,7 @@ namespace audio {
     }
 
     int32_t Audio::SetOutputVolume(Volume vol) {
-        float volSet = 0;
+        float volSet = vol;
         if (vol > 1) {
             volSet = 1;
         }
@@ -55,7 +55,7 @@ namespace audio {
     }
 
     int32_t Audio::SetInputGain(Gain gain) {
-        float gainToSet = 0;
+        float gainToSet = gain;
         if (gain > 10) {
             gainToSet = 10.0;
         }
