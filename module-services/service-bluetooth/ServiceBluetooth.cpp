@@ -2,16 +2,18 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
+#include <log/log.hpp>
 
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
 
-
-ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName), worker(NULL) {
+ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
     LOG_INFO("[ServiceBluetooth] Initializing");
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
     //// TODO TESTING - creating dangling pointer right now
-    BluetoothWorker::create();
+    LOG_INFO("create!\n");
+    worker=BluetoothWorker::create();
+    LOG_INFO("scan!\n");
     worker->scan();
 }
 

@@ -45,6 +45,7 @@ if [ "$1" != "" ]; then
 	if [ "$1" = "rt1051" ]; then
 		echo "Building for RT1051."
 		TARGET="Target_RT1051.cmake"
+		#BT="DBT_STACK_SEL=\"BlueKitchen\""
 		BT="DBT_STACK_SEL=\"Bluetopia\""
 	fi
 	if [ "$1" = "release" ]; then

@@ -2,7 +2,7 @@
 #include <cstdarg>
 
 #if defined(TARGET_RT1051)
-#include "bluetooth/bsp_bt.hpp"
+#include "bluetooth/Bluetooth.hpp"
 #elif defined(TARGET_Linux)
 #include "bluetooth/test/bsp_bt.hpp"
 #else
@@ -29,7 +29,7 @@ namespace bsp {
         }
     }
 
-    Bluetopia::Bluetopia(unsigned int in_size, unsigned int out_size, int threshold) : BTdev(in_size,out_size, threshold),rx_thread(0), thandle(NULL)
+    Bluetopia::Bluetopia(unsigned int in_size, unsigned int out_size, int threshold) : BluetoothCommon(in_size,out_size, threshold),rx_thread(0), thandle(NULL)
     {
     }
 
@@ -39,6 +39,6 @@ namespace bsp {
 
     Bluetopia *Bluetopia::getInstance()
     {
-        return BluetopiaHW::getInstance();
+        return Bluetopia::getInstance();
     }
 };

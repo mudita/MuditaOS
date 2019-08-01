@@ -1,52 +1,52 @@
-#include "bsp_bt.hpp"
+#include "bsp/bluetooth/Bluetooth.hpp"
 #include "log/log.hpp"
+#include "FreeRTOS.h"
+#include "fsl_lpuart.h"
+#include "board.h"
 
-namespace bsp {
+using namespace bsp;
 
-BluetopiaHW::BluetopiaHW(LogLvl lvl) : Bluetopia(default_buff_size,default_buff_size,32)
+// TODO it's plain copy same as in cellular - this is kind of wrong
+uint32_t UartGetPeripheralClock();
+
+
+BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, int threshold):
+    BTdev(in_size,out_size,threshold)
 {
-    set_logging(lvl);
     configure_uart_io();
     configure_lpuart();
     configure_cts_irq();
-    LOG_INFO("Init done!");
+    LOG_INFO("Bluetooth HW init done!");
 }
 
-BluetopiaHW::~BluetopiaHW() {
-}
-
-Bluetopia *BluetopiaHW::getInstance()
+BluetoothCommon::~BluetoothCommon()
 {
-    static BluetopiaHW *inst = NULL;
-    if(inst==NULL) {
-        inst = new BluetopiaHW();
-    }
-    return inst;
 }
 
-void BluetopiaHW::open()
+void BluetoothCommon::open()
 {
-    LOG_INFO("open!");
+    LOG_INFO("Bluetooth HW open!");
     vSemaphoreCreateBinary(sem_data);
     set_irq(true);
     is_open = true;
     set_rts(true);
 }
 
-void BluetopiaHW::close()
+void BluetoothCommon::close()
 {
     LOG_INFO("close!");
+    // TODO destroy semaphore
     set_rts(false);
     set_irq(false);
     is_open = false;
 }
 
-void BluetopiaHW::sleep_ms(ssize_t ms)
+void BluetoothCommon::sleep_ms(ssize_t ms)
 {
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-BTdev::Error BluetopiaHW::flush()
+BTdev::Error BluetoothCommon::flush()
 {
     // LOG_INFO("flush [%d] %s", out.len, out.tail<out.head?"reverse":"normal");
     Error err = Success;
@@ -74,7 +74,7 @@ BTdev::Error BluetopiaHW::flush()
     return err;
 }
 
-ssize_t BluetopiaHW::write(char *buf, size_t nbytes)
+ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 {
     // LOG_INFO( "write -> [%.*s]",nbytes, buf);
     ssize_t i=0;
@@ -87,19 +87,49 @@ ssize_t BluetopiaHW::write(char *buf, size_t nbytes)
     return i;
 }
 
-ssize_t BluetopiaHW::write_blocking(char *buf, ssize_t len)
+ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
 {
     int llen = 0;
     while (llen != len) {
         llen += write(buf, len);
-        // no error check here!
+        // no error check here! TODO
         flush();
     }
     return llen;
 }
 
-// TODO it's plain copy same as in cellular - this is kind of wrong
-uint32_t BluetopiaHW::UartGetPeripheralClock()
+BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
+{
+    LOG_INFO( "Set baudrate: %d", bd);
+    Error ret = Success;
+    int err=0;
+    if((err=LPUART_SetBaudRate(BSP_BLUETOOTH_UART_BASE, bd, UartGetPeripheralClock()))!=0) {
+        LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
+        ret = ErrorBSP;
+    }
+    return ret;
+}
+
+// set flow on -> true, set flow off -> false
+BTdev::Error BluetoothCommon::set_rts(bool on)
+{
+    GPIO_PinWrite(BSP_BLUETOOTH_UART_RTS_PORT, BSP_BLUETOOTH_UART_RTS_PIN, on?0U:1U);
+    return Success;
+}
+
+BTdev::Error BluetoothCommon::set_reset(bool on)
+{
+    LOG_INFO("reset %s", on?"on":"off");
+    GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on?1U:0U);
+    return Success;
+}
+
+int BluetoothCommon::read_cts()
+{
+    return GPIO_PinRead(BSP_BLUETOOTH_UART_CTS_PORT, BSP_BLUETOOTH_UART_CTS_PIN);
+}
+
+uint32_t UartGetPeripheralClock()
 {
     const int UART_PERIPHERAL_PLL_DIVIDER = 6;
     uint32_t freq = 0;
@@ -116,47 +146,7 @@ uint32_t BluetopiaHW::UartGetPeripheralClock()
     return freq;
 }
 
-
-BTdev::Error BluetopiaHW::set_baudrate(uint32_t bd)
-{
-    LOG_INFO( "Set baudrate: %d", bd);
-    Error ret = Success;
-    int err=0;
-    if((err=LPUART_SetBaudRate(BSP_BLUETOOTH_UART_BASE, bd, UartGetPeripheralClock()))!=0) {
-        LOG_ERROR("BT error: baudrate [%lu] set err: %d", bd, err);
-        ret = ErrorBSP;
-    }
-    return ret;
-}
-
-// set flow on -> true, set flow off -> false
-BTdev::Error BluetopiaHW::set_rts(bool on)
-{
-    GPIO_PinWrite(BSP_BLUETOOTH_UART_RTS_PORT, BSP_BLUETOOTH_UART_RTS_PIN, on?0U:1U);
-    return Success;
-}
-
-BTdev::Error BluetopiaHW::set_reset(bool on)
-{
-    LOG_INFO("reset %s", on?"on":"off");
-    GPIO_PinWrite(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN, on?1U:0U);
-    return Success;
-}
-
-int BluetopiaHW::read_cts()
-{
-    return GPIO_PinRead(BSP_BLUETOOTH_UART_CTS_PORT, BSP_BLUETOOTH_UART_CTS_PIN);
-}
-
-ssize_t BluetopiaHW::read(void*, size_t nbytes)
-{
-    LOG_INFO("not implemented");
-    return 0;
-}
-
-/// ---- PRIVATES
-
-void BluetopiaHW::configure_uart_io()
+void BluetoothCommon::configure_uart_io()
 {
     gpio_pin_config_t gpio_init_structure;
     gpio_init_structure.direction       = kGPIO_DigitalOutput;
@@ -175,7 +165,7 @@ void BluetopiaHW::configure_uart_io()
     GPIO_PinInit(BSP_BLUETOOTH_SHUTDOWN_PORT, BSP_BLUETOOTH_SHUTDOWN_PIN ,&gpio_init_structure);
 }
 
-void BluetopiaHW::configure_lpuart()
+void BluetoothCommon::configure_lpuart()
 {
     lpuart_config_t bt_c;
     LPUART_GetDefaultConfig(&bt_c);
@@ -199,7 +189,7 @@ void BluetopiaHW::configure_lpuart()
     NVIC_EnableIRQ(LPUART2_IRQn);
 }
 
-void BluetopiaHW::configure_cts_irq()
+void BluetoothCommon::configure_cts_irq()
 {
     DisableIRQ(GPIO1_Combined_16_31_IRQn);
     GPIO_PortEnableInterrupts(GPIO1, 0xFFFFFFFF);
@@ -210,7 +200,7 @@ void BluetopiaHW::configure_cts_irq()
     NVIC_SetPriority(GPIO1_Combined_16_31_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
 }
 
-void BluetopiaHW::set_irq(bool enable)
+void BluetoothCommon::set_irq(bool enable)
 {
     //printf("%s\n", __FUNCTION__);
     LPUART_EnableRx(BSP_BLUETOOTH_UART_BASE, false);
@@ -226,53 +216,8 @@ void BluetopiaHW::set_irq(bool enable)
     LPUART_EnableTx(BSP_BLUETOOTH_UART_BASE, true);
 }
 
-void BluetopiaHW::wait_data()
+extern "C"
 {
-    while(in.len == 0) {
-        // TODO checkme
-        xSemaphoreTake(sem_data, -1);
-    }
-}
-
-void BluetopiaHW::set_data()
-{
-    long tmp;
-    xSemaphoreGiveFromISR(sem_data, &tmp);
-}
-
-};
-
-extern "C" {
-    /* IN LIB: now it's simple on RX instead
-       > The following function handles the GPIO interrupt from the
-       > Bluetooth CTS line.  will make sure that the transmit interrupt is
-       > enabled when the flow control line is low.
-       */
-    void LPUART2_IRQHandler(void)
-    {
-        uint32_t isrReg = LPUART_GetStatusFlags(BSP_BLUETOOTH_UART_BASE);
-        static char characterReceived  = 0;
-
-        if(isrReg & kLPUART_RxDataRegFullFlag)
-        {
-            characterReceived = LPUART_ReadByte(BSP_BLUETOOTH_UART_BASE);
-            bsp::Bluetopia *bt = bsp::BluetopiaHW::getInstance();
-            if(bt->in.push(characterReceived) != 0) {
-                // LOG_ERROR("BT: error no RX space!");
-            } else {
-                bt->set_data();
-            }
-            if(bt->in.threshold_guard()) {
-                bt->set_rts(false);
-            }
-        }
-        // TODO ths should be handled - othervise uart might be `nicelly` blocked
-        if(isrReg & kLPUART_RxOverrunFlag) {
-            printf("Overrun\n");
-        }
-        LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, isrReg);
-    }
-
     void GPIO1_Combined_16_31_IRQHandler(void)
     {
         uint32_t irq_mask = GPIO_GetPinsInterruptFlags(GPIO2);
