@@ -1,4 +1,4 @@
-#include "BT/profiles/GAVD.hpp"
+#include "Bluetooth/profiles/GAVD.hpp"
 
 GAVD::GAVD()
 {
