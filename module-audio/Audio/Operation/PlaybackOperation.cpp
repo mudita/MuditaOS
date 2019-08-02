@@ -18,6 +18,8 @@
 #include "Audio/AudioCommon.hpp"
 
 #include "log/log.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
 
 namespace audio {
 
@@ -35,8 +37,7 @@ namespace audio {
 #endif
             auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
 #if PERF_STATS_ON == 1
-            LOG_DEBUG("Dec:%dms", xTaskGetTickCount() - tstamp);
-            LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));
+            // LOG_DEBUG("Dec:%dms", xTaskGetTickCount() - tstamp); M.P: left here on purpose, it's handy during sf tests on hardware
 #endif
             if (ret == 0) {
                 state = State::Idle;

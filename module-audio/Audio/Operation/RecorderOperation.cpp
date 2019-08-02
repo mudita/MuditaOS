@@ -17,6 +17,10 @@
 #include "Audio/Profiles/ProfileRecordingOnBoardMic.hpp"
 #include "Audio/AudioCommon.hpp"
 
+#include "log/log.hpp"
+#include "FreeRTOS.h"
+#include "task.h"
+
 namespace audio {
 
 #define PERF_STATS_ON        1
@@ -35,7 +39,7 @@ namespace audio {
             auto ret = enc->Encode(framesPerBuffer, reinterpret_cast<int16_t *>(const_cast<void *>(inputBuffer)));
 #if PERF_STATS_ON == 1
             LOG_DEBUG("Enc:%dms", xTaskGetTickCount() - tstamp);
-            LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));
+            // LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));  M.P: left here on purpose, it's handy during sf tests on hardware
 #endif
             if (ret == 0) {
                 state = State::Idle;
