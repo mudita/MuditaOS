@@ -46,8 +46,7 @@ namespace audio {
             dec = std::make_unique<decoderFLAC>(file);
         }
 
-        if (dec->fileSize == 0) {
-            //error
+        if (!dec->isInitialized) {
             return nullptr;
         } else {
             return dec;

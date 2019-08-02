@@ -15,6 +15,10 @@ namespace audio {
             decoder(fileName),
             tag(std::make_unique<Tags>()) {
 
+        if(fileSize == 0){
+            return;
+        }
+
         if (fd == NULL) {
             return;
         }
@@ -36,6 +40,8 @@ namespace audio {
         sampleRate = waveHeader.SampleRate;
         bitsPerSample = waveHeader.BitPerSample;
         chanNumber = waveHeader.NbrChannels;
+
+        isInitialized = true;
     }
 
     std::unique_ptr<Tags> decoderWAV::fetchTags() {

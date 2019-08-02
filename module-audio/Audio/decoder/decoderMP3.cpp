@@ -23,16 +23,19 @@ namespace audio {
             decoder(fileName),
             tag(std::make_unique<Tags>()) {
 
+        if(fileSize == 0){
+            return;
+        }
 
         mp3d = static_cast<mp3dec_t *>(malloc(sizeof(mp3dec_t)));
 
         mp3dec_init(mp3d);
 
         if (!find_first_valid_frame()) {
-            //error
+            return;
         }
 
-
+        isInitialized = true;
     }
 
     decoderMP3::~decoderMP3() {

@@ -23,10 +23,16 @@ namespace audio {
             : decoder(fileName),
               tags(std::make_unique<Tags>()) {
 
+        if(fileSize == 0){
+            return;
+        }
+
         flac = drflac_open_with_metadata(drflac_read, drflac_seek, drflac_meta, this);
         if (flac == NULL) {
-            //error
+            return;
         }
+
+        isInitialized = true;
     }
 
 

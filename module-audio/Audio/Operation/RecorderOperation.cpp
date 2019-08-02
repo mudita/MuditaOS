@@ -67,8 +67,18 @@ namespace audio {
                 .chanNr=channels,
                 .sampleRate=currentProfile->GetSampleRate()
         });
-        audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
 
+        if(enc == nullptr){
+            LOG_ERROR("Error during initializing encoder");
+            return;
+        }
+
+
+        audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        if(audioDevice == nullptr){
+            LOG_ERROR("Error creating AudioDevice");
+            return;
+        }
 
         isInitialized = true;
     }
