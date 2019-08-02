@@ -19,6 +19,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/DriverInterface.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -55,29 +58,11 @@ target_compile_definitions(${PROJECT_NAME}
         )
 
 target_include_directories(${PROJECT_NAME}
-
-	PUBLIC
-
-		"${CMAKE_CURRENT_LIST_DIR}/"
-        "${CMAKE_CURRENT_LIST_DIR}/bsp"
-        "${CMAKE_CURRENT_LIST_DIR}/bsp/rtc"
-		"${CMAKE_CURRENT_LIST_DIR}/bsp/keyboard"
-		"${CMAKE_CURRENT_LIST_DIR}/bsp/pwr"
-
-		"${CMAKE_CURRENT_LIST_DIR}/bsp/battery-charger"
-		"${CMAKE_CURRENT_LIST_DIR}/module-os/"
-
-        )
-target_include_directories(${PROJECT_NAME}
         PUBLIC
-        "${CMAKE_SOURCE_DIR}/"
-        "${CMAKE_SOURCE_DIR}/bsp"
-        "${CMAKE_SOURCE_DIR}/bsp/rtc"
-		"${CMAKE_SOURCE_DIR}/bsp/keyboard"
-		"${CMAKE_SOURCE_DIR}/bsp/pwr"
+        "${CMAKE_CURRENT_SOURCE_DIR}"
 
-		"${CMAKE_SOURCE_DIR}/bsp/battery-charger"
-		"${CMAKE_SOURCE_DIR}/module-os/"  
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/bsp"
         )
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})

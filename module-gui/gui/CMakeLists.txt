@@ -19,7 +19,7 @@ target_include_directories( ${PROJECT_NAME}
 target_sources(${PROJECT_NAME}
 
 	PRIVATE
-		"${CMAKE_CURRENT_LIST_DIR}/Common.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/AudioCommon.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Common.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/SwitchData.hpp"
