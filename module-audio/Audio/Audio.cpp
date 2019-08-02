@@ -59,8 +59,8 @@ namespace audio {
         if (gain > 10) {
             gainToSet = 10.0;
         }
-        if (gain < -10) {
-            gainToSet = -10;
+        if (gain < 0) {
+            gainToSet = 0;
         }
         return currentOperation->SetInputGain(gainToSet);
     }
@@ -83,7 +83,7 @@ namespace audio {
             }
             currentOperation = std::move(ret.value());
         } else {
-            // If creating operation specified fallback to IdleOperation which is guaranteed to work
+            // If creating operation failed fallback to IdleOperation which is guaranteed to work
             currentOperation = Operation::Create(Operation::Type::Idle, "").value_or(nullptr);
             currentState = State ::Idle;
             return static_cast<int32_t >(RetCode::OperationCreateFailed);
