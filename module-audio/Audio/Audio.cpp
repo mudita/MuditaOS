@@ -83,6 +83,9 @@ namespace audio {
             }
             currentOperation = std::move(ret.value());
         } else {
+            // If creating operation specified fallback to IdleOperation which is guaranteed to work
+            currentOperation = Operation::Create(Operation::Type::Idle, "").value_or(nullptr);
+            currentState = State ::Idle;
             return static_cast<int32_t >(RetCode::OperationCreateFailed);
         }
 

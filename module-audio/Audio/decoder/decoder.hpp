@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <string>
 #include <memory>
+#include <optional>
 #include <cstring>
 
 #include "vfs.hpp"
@@ -111,6 +112,8 @@ namespace audio {
 
         // Worker buffer used for converting mono stream to stereo
         std::unique_ptr<int16_t[]> workerBuffer;
+
+        bool isInitialized = false;
 
     };
 

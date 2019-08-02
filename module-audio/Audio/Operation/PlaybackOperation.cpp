@@ -37,7 +37,8 @@ namespace audio {
 #endif
             auto ret = dec->decode(framesPerBuffer, reinterpret_cast<int16_t *>(outputBuffer));
 #if PERF_STATS_ON == 1
-            // LOG_DEBUG("Dec:%dms", xTaskGetTickCount() - tstamp); M.P: left here on purpose, it's handy during sf tests on hardware
+             LOG_DEBUG("Dec:%dms", xTaskGetTickCount() - tstamp);
+            // LOG_DEBUG("Watermark:%lu",uxTaskGetStackHighWaterMark2(NULL));  M.P: left here on purpose, it's handy during sf tests on hardware
 #endif
             if (ret == 0) {
                 state = State::Idle;
@@ -53,10 +54,14 @@ namespace audio {
 
         dec = decoder::Create(file);
         if (dec == nullptr) {
-            LOG_ERROR("File doesn't exist");
+            LOG_ERROR("Error during initializing decoder");
             return;
         }
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
+        if(audioDevice == nullptr){
+            LOG_ERROR("Error creating AudioDevice");
+            return;
+        }
 
 
         isInitialized = true;
