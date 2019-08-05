@@ -24,7 +24,8 @@ namespace audio {
         UnsupportedProfile,
         InvalidFormat,
         OperationCreateFailed,
-        FileDoesntExist
+        FileDoesntExist,
+        FailedToAllocateMemory
 
     };
 

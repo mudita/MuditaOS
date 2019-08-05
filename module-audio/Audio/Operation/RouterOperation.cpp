@@ -26,7 +26,7 @@ namespace audio {
                                      unsigned long framesPerBuffer) -> int32_t {
 
             if (framesPerBuffer > audioDeviceBuffer.capacity()) {
-                audioDeviceBuffer.resize(framesPerBuffer);
+                audioDeviceBuffer.reserve(framesPerBuffer);
             }
 
             if (inputBuffer) {
@@ -35,11 +35,12 @@ namespace audio {
                 }
                 else{
                     memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
+                    audioDeviceBuffer.resize(framesPerBuffer);
                 }
 
                 if (recorderWorkerHandle) {
-                    //memcpy(&channel1Buffer[0],inputBuffer,framesPerBuffer * sizeof(int16_t));
-                    // xTaskNotify(recorderWorkerHandle,static_cast<uint32_t>(RecorderEvent ::Channel1Ready),eSetBits);
+                    channel1Buffer = audioDeviceBuffer;
+                    xTaskNotify(recorderWorkerHandle,static_cast<uint32_t>(RecorderEvent ::Channel1Ready),eSetBits);
                 }
 
             }
@@ -56,15 +57,16 @@ namespace audio {
                                              unsigned long framesPerBuffer) -> int32_t {
 
             if (framesPerBuffer > audioDeviceCellularBuffer.capacity()) {
-                audioDeviceCellularBuffer.resize(framesPerBuffer);
+                audioDeviceCellularBuffer.reserve(framesPerBuffer);
             }
 
             if (inputBuffer) {
                 memcpy(&audioDeviceCellularBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
+                audioDeviceCellularBuffer.resize(framesPerBuffer);
 
                 if (recorderWorkerHandle) {
-                    //memcpy(&channel2Buffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-                    //xTaskNotify(recorderWorkerHandle, static_cast<uint32_t>(RecorderEvent::Channel2Ready), eSetBits);
+                    channel2Buffer = audioDeviceCellularBuffer;
+                    xTaskNotify(recorderWorkerHandle, static_cast<uint32_t>(RecorderEvent::Channel2Ready), eSetBits);
                 }
             }
 
@@ -151,6 +153,7 @@ namespace audio {
         audioDeviceCellular->Stop();
 
         StopRecording();
+        return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t RouterOperation::Pause() {
@@ -161,6 +164,7 @@ namespace audio {
         state = State::Paused;
         audioDevice->Stop();
         audioDeviceCellular->Stop();
+        return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t RouterOperation::Resume() {
@@ -171,6 +175,7 @@ namespace audio {
         state = State::Active;
         audioDevice->Start(currentProfile->GetAudioFormat());
         audioDeviceCellular->Start(currentProfile->GetAudioFormat());
+        return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t RouterOperation::SendEvent(const audio::Operation::Event evt, const audio::EventData *data) {
@@ -188,10 +193,10 @@ namespace audio {
                 //TODO:M.P SwitchProfile(Profile::Type::RecordingBuiltInMic);
                 break;
             case Event::StartCallRecording:
-                //StartRecording(); TODO: M.P For now it's still in development
+                StartRecording(); //TODO: M.P For now it's still in development
                 break;
             case Event::StopCallRecording:
-                //StopRecording(); TODO: M.P For now it's still in development
+                StopRecording(); //TODO: M.P For now it's still in development
                 break;
             case Event ::CallMute:
                 Mute(true);
@@ -221,9 +226,9 @@ namespace audio {
             return static_cast<int32_t >(RetCode::UnsupportedProfile);
         }
 
-        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
-/*        audioDeviceCellular = bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, audioCallback).value_or(
-                nullptr);*/
+        audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(nullptr);
+        audioDeviceCellular = bsp::AudioDevice::Create(bsp::AudioDevice::Type::Cellular, audioDeviceCellularCallback).value_or(
+                nullptr);
 
         switch (state) {
             case State::Idle:
@@ -238,11 +243,12 @@ namespace audio {
 
 
         //TODO:M.P add error handling
-        return 0;
+        return static_cast<int32_t >(RetCode::Success);
     }
 
     bool RouterOperation::Mute(bool enable) {
         muteEnable = enable;
+        return true;
     }
 
     int32_t RouterOperation::StartRecording() {
@@ -258,15 +264,20 @@ namespace audio {
             channels = 2;
         }
 
-        enc = Encoder::Create("callrec.wav",
+        //TODO:M.P create record file's name dynamically based on current date/time
+        enc = Encoder::Create("sys/callrec.wav",
                               Encoder::Format{.chanNr=channels, .sampleRate=currentProfile->GetSampleRate()});
 
+        if(enc == nullptr){
+            return static_cast<int32_t >(RetCode::FileDoesntExist);
+        }
 
         if (xTaskCreate(recorderWorker, "recworker", 512, this, 0, &recorderWorkerHandle) != pdPASS) {
             LOG_ERROR("Creating recworker failed");
+            return static_cast<int32_t >(RetCode::FailedToAllocateMemory);
         }
 
-
+        return static_cast<int32_t >(RetCode::Success);
     }
 
     int32_t RouterOperation::StopRecording() {
@@ -274,6 +285,7 @@ namespace audio {
             vTaskDelete(recorderWorkerHandle);
             enc.reset();
         }
+        return static_cast<int32_t >(RetCode::Success);
     }
 
     void recorderWorker(void *pvp) {
@@ -302,10 +314,12 @@ namespace audio {
             int16_t *mixed_ptr = &inst->mixBuffer[0];
             int32_t mixed_sample = 0;
 
+            inst->mixBuffer.resize(inst->channel1Buffer.size());
+
             // Mix samples & encode them
             if (chan1_ready && chan2_ready) {
 
-                for (uint32_t i = 0; i < inst->mixBuffer.capacity(); i++) {
+                for (uint32_t i = 0; i < inst->mixBuffer.size(); i++) {
                     mixed_sample = *chan1_ptr + *chan2_ptr;
                     if (mixed_sample > INT16_MAX) {
                         *mixed_ptr = INT16_MAX;
@@ -320,7 +334,7 @@ namespace audio {
                     chan2_ptr++;
                 }
 
-                size_t bytesWritten = inst->enc->Encode(inst->mixBuffer.capacity(), &inst->mixBuffer[0]);
+                size_t bytesWritten = inst->enc->Encode(inst->mixBuffer.size(), &inst->mixBuffer[0]);
                 if (bytesWritten == 0) {
                     LOG_ERROR("Encoder failed");
                 }

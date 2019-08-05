@@ -67,10 +67,12 @@ public:
         //ret = AudioServiceAPI::Stop(this);
 
 
-        //auto ret = AudioServiceAPI::RoutingStart(this);
+        auto ret = AudioServiceAPI::RoutingStart(this);
         //AudioServiceAPI::RoutingRecordCtrl(this,true);
-        //vTaskDelay(3000);
-        //AudioServiceAPI::Stop(this);
+        vTaskDelay(1000);
+        AudioServiceAPI::RoutingSpeakerPhone(this,true);
+        vTaskDelay(2000);
+        AudioServiceAPI::Stop(this);
 #endif
         return std::make_shared<sys::ResponseMessage>();
 
