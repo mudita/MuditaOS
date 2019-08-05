@@ -22,6 +22,7 @@ namespace audio {
         Success = 0,
         InvokedInIncorrectState,
         UnsupportedProfile,
+        UnsupportedEvent,
         InvalidFormat,
         OperationCreateFailed,
         FileDoesntExist,

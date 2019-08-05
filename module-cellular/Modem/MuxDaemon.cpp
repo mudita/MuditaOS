@@ -81,7 +81,7 @@ namespace QuectelBaudrates {
 MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
         inOutSerialDataWorker(nullptr),
         callback(callback),
-        cellular(nullptr){
+        cellular(nullptr) {
 }
 
 MuxDaemon::~MuxDaemon() {
@@ -101,11 +101,10 @@ std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::Notificatio
 
 }
 
-std::optional<MuxChannel*> MuxDaemon::GetMuxChannel(MuxChannel::MuxChannelType chan) {
-    if(static_cast<size_t >(chan) >= channels.size()){
+std::optional<MuxChannel *> MuxDaemon::GetMuxChannel(MuxChannel::MuxChannelType chan) {
+    if (static_cast<size_t >(chan) >= channels.size()) {
         return {};
-    }
-    else{
+    } else {
         return channels[static_cast<size_t >(chan)].get();
     }
 }
@@ -121,7 +120,7 @@ bool MuxDaemon::Start() {
         return false;
     }
 
-    if((inOutSerialDataWorker = InOutSerialWorker::Create(this,cellular.get()).value_or(nullptr)) == nullptr){
+    if ((inOutSerialDataWorker = InOutSerialWorker::Create(this, cellular.get()).value_or(nullptr)) == nullptr) {
         return false;
     }
 
@@ -171,11 +170,13 @@ bool MuxDaemon::StartMultiplexer() {
     if (hardwareControlFlowEnable) {
         inOutSerialDataWorker->SendATCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
     } else {
-        CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 1)); // disable flow control function for module
+        CheckATCommandResponse(
+                inOutSerialDataWorker->SendATCommand("AT+IFC=0,0\r", 1)); // disable flow control function for module
     }
 
     // Set fixed baudrate
-    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1));
+    CheckATCommandResponse(
+            inOutSerialDataWorker->SendATCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1));
 
     // Route URCs to first MUX channel
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));
@@ -186,15 +187,21 @@ bool MuxDaemon::StartMultiplexer() {
     // Route URCs to UART1
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 1));
     // Turn on signal strength change URC
-    CheckATCommandResponse( inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 1));
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 1));
     // Change incoming call notification from "RING" to "+CRING:type"
-    CheckATCommandResponse( inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1));
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1));
 
-    //vTaskDelay(5000);
     // Audio configuraton, custom PCM, 16bit linear samples, primary mode, 16kHz, master,
-    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
+    /*
+     * M.P: Quectel confirmed that during init phase of modem sends 'ready notification" way before audio subsystem is initialized
+     * hence in order to properly configure audio we have literally ping modem with conf command until it responds with success ret code...
+    */
+    while (CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1))) {
+        vTaskDelay(1000);
+    };
+
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
@@ -237,7 +244,7 @@ bool MuxDaemon::StartMultiplexer() {
 
 int MuxDaemon::CloseMultiplexer() {
 
-    if(channels.size()){
+    if (channels.size()) {
         // Virtual channels need to be deinitialized in reversed order i.e control channel should be closed at the end
         for (auto w = channels.size(); --w;) {
             if (channels[w]->GetState() == MuxChannel::State::Opened) {
@@ -262,9 +269,9 @@ std::vector<std::string> MuxDaemon::SendCommandResponse(MuxChannel::MuxChannelTy
 }
 
 bool MuxDaemon::CheckATCommandResponse(const std::vector<std::string> &response) {
-    if(response.size() == 1 && response[0] == "OK"){
+    if (response.size() == 1 && response[0] == "OK") {
         return true;
-    }else{
+    } else {
         LOG_ERROR("Invalid response");
         return false;
     }

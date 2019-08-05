@@ -184,6 +184,7 @@ namespace audio {
                 SwitchProfile(Profile::Type::RoutingHeadset);
                 break;
             case Event::HeadphonesUnplug:
+                //TODO: Switch to routing bt profile if present
                 SwitchProfile(Profile::Type::RoutingEarspeaker);
                 break;
             case Event::BTHeadsetOn:
@@ -193,10 +194,10 @@ namespace audio {
                 //TODO:M.P SwitchProfile(Profile::Type::RecordingBuiltInMic);
                 break;
             case Event::StartCallRecording:
-                StartRecording(); //TODO: M.P For now it's still in development
+                //StartRecording(); TODO: M.P For now it's still in development
                 break;
             case Event::StopCallRecording:
-                StopRecording(); //TODO: M.P For now it's still in development
+                //StopRecording(); TODO: M.P For now it's still in development
                 break;
             case Event ::CallMute:
                 Mute(true);
@@ -208,10 +209,11 @@ namespace audio {
                 SwitchProfile(Profile::Type::RoutingSpeakerphone);
                 break;
             case Event ::CallSpeakerphoneOff:
+                //TODO: Switch to routing headphones/bt profile if present
                 SwitchProfile(Profile::Type::RoutingEarspeaker);
                 break;
             default:
-                return static_cast<int32_t >(RetCode::UnsupportedProfile);
+                return static_cast<int32_t >(RetCode::UnsupportedEvent);
 
         }
 
