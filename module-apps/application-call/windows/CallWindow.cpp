@@ -17,7 +17,6 @@
 #include "i18/i18.hpp"
 
 #include "service-cellular/api/CellularServiceAPI.hpp"
-#include "service-audio/api/AudioServiceAPI.hpp"
 
 #include "Label.hpp"
 #include "Margins.hpp"
@@ -131,8 +130,6 @@ void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data
 bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
-		AudioServiceAPI::RoutingStart(application);
-		//AudioServiceAPI::RoutingRecordCtrl(application,true);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
 		if( ret ) {
@@ -160,7 +157,6 @@ bool CallWindow::handleLeftButton() {
 bool CallWindow::handleCenterButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
-		AudioServiceAPI::Stop(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 		//TODO switch to message templates window
 		return true;
@@ -179,7 +175,6 @@ bool CallWindow::handleCenterButton() {
 bool CallWindow::handleRightButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
-        AudioServiceAPI::Stop(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
 		state = State::CALL_ENDED;
@@ -200,7 +195,6 @@ bool CallWindow::handleRightButton() {
 	}
 	else if( state == State::CALL_IN_PROGRESS ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
-        AudioServiceAPI::Stop(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
 		state = State::CALL_ENDED;
