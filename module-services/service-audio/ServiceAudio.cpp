@@ -109,7 +109,6 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
         case MessageType::AudioRoutingStart: {
-            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
             responseMsg = std::make_shared<AudioResponseMessage>(
                     static_cast<RetCode >(audio.Start(Operation::Type::Router)));
         }
