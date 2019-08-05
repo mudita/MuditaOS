@@ -24,6 +24,42 @@ RetCode AudioServiceAPI::PlaybackStart(sys::Service *serv, const std::string &fi
     return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
 }
 
+RetCode AudioServiceAPI::RecordingStart(sys::Service *serv, const std::string &fileName) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
+    msg->fileName = fileName;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
+audio::RetCode AudioServiceAPI::RoutingStart(sys::Service *serv) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingStart);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
+audio::RetCode AudioServiceAPI::RoutingRecordCtrl(sys::Service *serv, bool enable) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingRecordCtrl);
+    msg->enable = enable;
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
+audio::RetCode AudioServiceAPI::RoutingMute(sys::Service *serv, bool enable) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
+    msg->enable = enable;
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
+audio::RetCode AudioServiceAPI::RoutingSpeakerPhone(sys::Service *serv, bool enable) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
+    msg->enable = enable;
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
 RetCode AudioServiceAPI::Stop(sys::Service *serv) {
     std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioStop);
 
@@ -45,13 +81,7 @@ RetCode AudioServiceAPI::Resume(sys::Service *serv) {
     return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
 }
 
-RetCode AudioServiceAPI::RecordingStart(sys::Service *serv, const std::string &fileName) {
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
-    msg->fileName = fileName;
 
-    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
-    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
-}
 
 RetCode AudioServiceAPI::SetInputGain(sys::Service *serv, const Gain gain) {
     std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioSetInputGain);
