@@ -9,8 +9,8 @@
 
 
 
-#ifndef PUREPHONE_RT1051_AUDIOCODEC_HPP
-#define PUREPHONE_RT1051_AUDIOCODEC_HPP
+#ifndef PUREPHONE_RT1051AUDIOCODEC_HPP
+#define PUREPHONE_RT1051AUDIOCODEC_HPP
 
 
 #include "audio/bsp_audio.hpp"
@@ -24,19 +24,19 @@
 namespace bsp{
 
 
-    void txCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-    void rxCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-    void inWorkerTask(void* pvp);
-    void outWorkerTask(void* pvp);
+    void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+    void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+    void inAudioCodecWorkerTask(void* pvp);
+    void outAudioCodecWorkerTask(void* pvp);
 
     class RT1051Audiocodec : public AudioDevice{
 
     public:
 
-        friend void txCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-        friend void rxCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-        friend void inWorkerTask(void* pvp);
-        friend void outWorkerTask(void* pvp);
+        friend void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+        friend void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+        friend void inAudioCodecWorkerTask(void* pvp);
+        friend void outAudioCodecWorkerTask(void* pvp);
 
         RT1051Audiocodec(AudioDevice::audioCallback_t callback);
         virtual ~RT1051Audiocodec();
@@ -102,4 +102,4 @@ namespace bsp{
 }
 
 
-#endif //PUREPHONE_RT1051_AUDIOCODEC_HPP
+#endif //PUREPHONE_RT1051AUDIOCODEC_HPP

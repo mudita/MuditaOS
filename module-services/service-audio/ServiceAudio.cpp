@@ -156,6 +156,22 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl) {
         }
             break;
 
+        case MessageType::AudioRoutingMute: {
+            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                    static_cast<RetCode >(audio.SendEvent(
+                            msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute)));
+        }
+            break;
+
+        case MessageType::AudioRoutingSpeakerhone: {
+            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                    static_cast<RetCode >(audio.SendEvent(
+                            msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff)));
+        }
+            break;
+
         case MessageType::AudioSetOutputVolume: {
             AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
             responseMsg = std::make_shared<AudioResponseMessage>(

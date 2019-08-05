@@ -65,6 +65,8 @@ enum class MessageType {
     AudioResume,
 
     AudioRoutingRecordCtrl,
+    AudioRoutingMute,
+    AudioRoutingSpeakerhone,
 
     AudioSetOutputVolume,
     AudioSetInputGain,

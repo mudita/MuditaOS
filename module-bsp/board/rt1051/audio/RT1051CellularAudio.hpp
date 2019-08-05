@@ -21,19 +21,19 @@
 namespace bsp{
 
 
-    void txCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-    void rxCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-    void inWorkerTask(void* pvp);
-    void outWorkerTask(void* pvp);
+    void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+    void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+    void inCellularWorkerTask(void* pvp);
+    void outCellularWorkerTask(void* pvp);
 
     class RT1051CellularAudio : public AudioDevice{
 
     public:
 
-        friend void txCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-        friend void rxCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
-        friend void inWorkerTask(void* pvp);
-        friend void outWorkerTask(void* pvp);
+        friend void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+        friend void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
+        friend void inCellularWorkerTask(void* pvp);
+        friend void outCellularWorkerTask(void* pvp);
 
         RT1051CellularAudio(AudioDevice::audioCallback_t callback);
         virtual ~RT1051CellularAudio();

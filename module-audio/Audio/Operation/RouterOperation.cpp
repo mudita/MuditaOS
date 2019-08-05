@@ -30,23 +30,22 @@ namespace audio {
             }
 
             if (inputBuffer) {
-                memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-/*                std::copy(static_cast<int16_t *>(const_cast<void *>(inputBuffer)),
-                          static_cast<int16_t *>(const_cast<void *>(inputBuffer)) + framesPerBuffer,
-                          audioDeviceBuffer.begin());*/
+                if(muteEnable){
+                    memset(&audioDeviceBuffer[0], 0, framesPerBuffer * sizeof(int16_t));
+                }
+                else{
+                    memcpy(&audioDeviceBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
+                }
 
-                if(recorderWorkerHandle){
-                    memcpy(&channel1Buffer[0],inputBuffer,framesPerBuffer * sizeof(int16_t));
-                   // xTaskNotify(recorderWorkerHandle,static_cast<uint32_t>(RecorderEvent ::Channel1Ready),eSetBits);
+                if (recorderWorkerHandle) {
+                    //memcpy(&channel1Buffer[0],inputBuffer,framesPerBuffer * sizeof(int16_t));
+                    // xTaskNotify(recorderWorkerHandle,static_cast<uint32_t>(RecorderEvent ::Channel1Ready),eSetBits);
                 }
 
             }
 
             if (outputBuffer) {
                 memcpy(outputBuffer, &audioDeviceCellularBuffer[0], framesPerBuffer * sizeof(int16_t));
-/*                std::copy(audioDeviceCellularBuffer.begin(), audioDeviceCellularBuffer.end(),
-                          static_cast<int16_t *>(const_cast<void *>(outputBuffer))
-                );*/
             }
             return framesPerBuffer;
 
@@ -62,21 +61,15 @@ namespace audio {
 
             if (inputBuffer) {
                 memcpy(&audioDeviceCellularBuffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
-/*                std::copy(static_cast<int16_t *>(const_cast<void *>(inputBuffer)),
-                          static_cast<int16_t *>(const_cast<void *>(inputBuffer)) + framesPerBuffer,
-                          audioDeviceCellularBuffer.begin());*/
 
-                if(recorderWorkerHandle) {
-                    memcpy(&channel2Buffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
+                if (recorderWorkerHandle) {
+                    //memcpy(&channel2Buffer[0], inputBuffer, framesPerBuffer * sizeof(int16_t));
                     //xTaskNotify(recorderWorkerHandle, static_cast<uint32_t>(RecorderEvent::Channel2Ready), eSetBits);
                 }
             }
 
             if (outputBuffer) {
                 memcpy(outputBuffer, &audioDeviceBuffer[0], framesPerBuffer * sizeof(int16_t));
-/*                std::copy(audioDeviceBuffer.begin(), audioDeviceBuffer.end(),
-                          static_cast<int16_t *>(const_cast<void *>(outputBuffer))
-                );*/
             }
             return framesPerBuffer;
 
@@ -87,10 +80,10 @@ namespace audio {
 
         //TODO:M.P should be fetched from DB
         availableProfiles.push_back(std::make_unique<ProfileRoutingEarspeaker>(nullptr, 1, 5));
-        availableProfiles.push_back(std::make_unique<ProfileRoutingSpeakerphone>(nullptr, 1, 5));
+        availableProfiles.push_back(std::make_unique<ProfileRoutingSpeakerphone>(nullptr, 1, 2));
         availableProfiles.push_back(std::make_unique<ProfileRoutingHeadset>(nullptr, 1, 5));
 
-        currentProfile = availableProfiles[0].get();
+        currentProfile = availableProfiles[1].get(); // todo change back to 0
 
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(
                 nullptr);
@@ -200,6 +193,18 @@ namespace audio {
             case Event::StopCallRecording:
                 //StopRecording(); TODO: M.P For now it's still in development
                 break;
+            case Event ::CallMute:
+                Mute(true);
+                break;
+            case Event ::CallUnmute:
+                Mute(false);
+                break;
+            case Event ::CallSpeakerphoneOn:
+                SwitchProfile(Profile::Type::RoutingSpeakerphone);
+                break;
+            case Event ::CallSpeakerphoneOff:
+                SwitchProfile(Profile::Type::RoutingEarspeaker);
+                break;
             default:
                 return static_cast<int32_t >(RetCode::UnsupportedProfile);
 
@@ -236,13 +241,17 @@ namespace audio {
         return 0;
     }
 
+    bool RouterOperation::Mute(bool enable) {
+        muteEnable = enable;
+    }
+
     int32_t RouterOperation::StartRecording() {
         channel1Buffer.reserve(1024);
         channel2Buffer.reserve(1024);
         mixBuffer.reserve(1024);
 
         uint32_t channels = 0;
-        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t >(bsp::AudioDevice::Flags::InputLeft))||
+        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t >(bsp::AudioDevice::Flags::InputLeft)) ||
             (currentProfile->GetInOutFlags() & static_cast<uint32_t >(bsp::AudioDevice::Flags::InputRight))) {
             channels = 1;
         } else if (currentProfile->GetInOutFlags() & static_cast<uint32_t >(bsp::AudioDevice::Flags::InputStereo)) {
@@ -250,7 +259,7 @@ namespace audio {
         }
 
         enc = Encoder::Create("callrec.wav",
-                              Encoder::Format{.chanNr=channels,.sampleRate=currentProfile->GetSampleRate()});
+                              Encoder::Format{.chanNr=channels, .sampleRate=currentProfile->GetSampleRate()});
 
 
         if (xTaskCreate(recorderWorker, "recworker", 512, this, 0, &recorderWorkerHandle) != pdPASS) {
@@ -261,7 +270,7 @@ namespace audio {
     }
 
     int32_t RouterOperation::StopRecording() {
-        if(recorderWorkerHandle) {
+        if (recorderWorkerHandle) {
             vTaskDelete(recorderWorkerHandle);
             enc.reset();
         }
@@ -269,11 +278,11 @@ namespace audio {
 
     void recorderWorker(void *pvp) {
         uint32_t ulNotificationValue = 0;
-        RouterOperation* inst = reinterpret_cast<RouterOperation*>(pvp);
+        RouterOperation *inst = reinterpret_cast<RouterOperation *>(pvp);
         static bool chan1_ready = 0;
         static bool chan2_ready = 0;
 
-        while(1) {
+        while (1) {
             xTaskNotifyWait(0x00,               /* Don't clear any bits on entry. */
                             UINT32_MAX,          /* Clear all bits on exit. */
                             &ulNotificationValue, /* Receives the notification value. */

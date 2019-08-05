@@ -46,6 +46,20 @@ audio::RetCode AudioServiceAPI::RoutingRecordCtrl(sys::Service *serv, bool enabl
     return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
 }
 
+audio::RetCode AudioServiceAPI::RoutingMute(sys::Service *serv, bool enable) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
+    msg->enable = enable;
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
+audio::RetCode AudioServiceAPI::RoutingSpeakerPhone(sys::Service *serv, bool enable) {
+    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
+    msg->enable = enable;
+    auto ret = sys::Bus::SendUnicast(msg,ServiceAudio::serviceName,serv,5000);
+    return reinterpret_cast<AudioResponseMessage*>(ret.second.get())->retCode;
+}
+
 RetCode AudioServiceAPI::Stop(sys::Service *serv) {
     std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioStop);
 
