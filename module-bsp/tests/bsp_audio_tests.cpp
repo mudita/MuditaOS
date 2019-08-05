@@ -26,11 +26,25 @@ TEST_CASE( "Testing Linux Audiocodec" ) {
 
     REQUIRE(audiocodec);
 
-    AudioDevice::Format format{.sampleRate_Hz=44100,.bitWidth=16,.flags=static_cast<uint32_t >(AudioDevice::Flags ::OutPutStereo)};
+    auto audiocellular = AudioDevice::Create(AudioDevice::Type::Cellular,[](const void *inputBuffer,
+                                                                           void *outputBuffer,
+                                                                           unsigned long framesPerBuffer)->int32_t {
 
-    REQUIRE(audiocodec.value()->Start(format) == 0);
+    });
+
+    REQUIRE(audiocellular);
+
+    AudioDevice::Format formataudiocodec{.sampleRate_Hz=44100,.bitWidth=16,.flags=static_cast<uint32_t >(AudioDevice::Flags ::OutPutStereo)};
+
+    REQUIRE(audiocodec.value()->Start(formataudiocodec) == 0);
+
+    AudioDevice::Format formatcellular{.sampleRate_Hz=16000,.bitWidth=16,.flags=static_cast<uint32_t >(AudioDevice::Flags ::InputStereo) | static_cast<uint32_t >(AudioDevice::Flags ::OutPutStereo)};
+
+    REQUIRE(audiocellular.value()->Start(formatcellular) == 0);
 
     REQUIRE(audiocodec.value()->Stop() == 0);
+    REQUIRE(audiocellular.value()->Stop() == 0);
+
 
 }
 

@@ -40,6 +40,9 @@ namespace audio {
         if ((strstr(file, ".wav") != NULL) || (strstr(file, ".WAV") != NULL)) {
             enc = std::make_unique<EncoderWAV>(file, frmt);
         }
+        else{
+            return nullptr;
+        }
 
         if (enc->isInitialized) {
             return enc;
