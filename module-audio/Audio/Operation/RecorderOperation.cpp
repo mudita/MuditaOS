@@ -139,16 +139,18 @@ namespace audio {
                 SwitchProfile(Profile::Type::RecordingHeadset);
                 break;
             case Event::HeadphonesUnplug:
+                //TODO: Switch to recording bt profile if present
                 SwitchProfile(Profile::Type::RecordingBuiltInMic);
                 break;
             case Event::BTHeadsetOn:
                 SwitchProfile(Profile::Type::RecordingBTHeadset);
                 break;
             case Event::BTHeadsetOff:
+                //TODO: Switch to recording headphones profile if present
                 SwitchProfile(Profile::Type::RecordingBuiltInMic);
                 break;
             default:
-                return static_cast<int32_t >(RetCode::UnsupportedProfile);
+                return static_cast<int32_t >(RetCode::UnsupportedEvent);
 
         }
 
