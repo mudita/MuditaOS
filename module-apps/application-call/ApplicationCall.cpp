@@ -49,34 +49,41 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
 			CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 
+		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>( windows.find( "CallWindow")->second);
+
 		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
-		   LOG_INFO("CallAborted");
+		   LOG_INFO("---------------------------------CallAborted");
+		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
+		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
-		   LOG_INFO("CallBusy");
+		   LOG_INFO("---------------------------------CallBusy");
+		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
+		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
-		   LOG_INFO("CallActive");
+		   LOG_INFO("---------------------------------CallActive");
+		   callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
+		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
-		   LOG_INFO("IncomingCall 1 %s", msg->data.c_str());
+			LOG_INFO("---------------------------------IncomingCall");
 		   std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
-		   LOG_INFO("IncomingCall 2");
 		   //send to itself message to switch (run) call application
 		   if( state == State::ACTIVE_FORGROUND ) {
-			   LOG_INFO("FORGROUND");
+			   switchWindow( "CallWindow",0,nullptr );
 		   }
 		   else {
-			   LOG_INFO("BACKGROUND");
+			   callWindow->setState( gui::CallWindow::State::INCOMMING_CALL );
 			   sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
 //			   ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
 		   }
 		}
 		else if( msg->type == CellularNotificationMessage::Type::NewIncomingSMS ) {
-		   LOG_INFO("NewIncomingSMS");
+		   LOG_INFO("---------------------------------NewIncomingSMS");
 		}
 		else if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-		   LOG_INFO("SignalStrengthUpdate");
+		   LOG_INFO("---------------------------------SignalStrengthUpdate");
 		}
 		handled = true;
 	}

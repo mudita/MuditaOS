@@ -13,6 +13,7 @@
 #include "application-viewer/ApplicationViewer.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
 #include "application-settings/ApplicationSettings.hpp"
+#include "application-notes/ApplicationNotes.hpp"
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
@@ -96,27 +97,26 @@ int SystemStart(sys::SystemManager* sysmgr)
     ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"),sysmgr);
     ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(),sysmgr);
 //  ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"),sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
+    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(),sysmgr);
 
 
     //vector with launchers to applications
     std::vector< std::unique_ptr<app::ApplicationLauncher> > applications;
 
     //launcher for viewer
-    std::unique_ptr<app::ApplicationLauncher> viewerLauncher = std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher());
-	applications.push_back( std::move(viewerLauncher) );
+    applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
 
     //launcher for desktop application
-    std::unique_ptr<app::ApplicationLauncher> desktopLauncher = std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher());
-    applications.push_back( std::move(desktopLauncher) );
+    applications.push_back(std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher()));
 
     //launcher for call application
-    std::unique_ptr<app::ApplicationLauncher> callLauncher = std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher());
-	applications.push_back( std::move(callLauncher) );
+    applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
 
 	//launcher for settings application
-	std::unique_ptr<app::ApplicationLauncher> settingsLauncher = std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher());
-	applications.push_back( std::move(settingsLauncher) );
+    applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
+
+	//launcher for notes application
+    applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
 
     //start application manager
     ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager",sysmgr,applications),sysmgr );

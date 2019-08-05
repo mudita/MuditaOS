@@ -18,7 +18,7 @@ namespace app {
  */
 class ApplicationSettings: public app::Application {
 public:
-	ApplicationSettings( std::string name="ApplicationSettings");
+	ApplicationSettings( std::string name="ApplicationSettings", bool startBackgound = false);
 	virtual ~ApplicationSettings();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
 	sys::ReturnCodes InitHandler() override;
@@ -32,9 +32,13 @@ public:
 
 class ApplicationSettingsLauncher : public ApplicationLauncher {
 public:
-	ApplicationSettingsLauncher() : ApplicationLauncher("ApplicationSettings", true) {};
+	ApplicationSettingsLauncher() : ApplicationLauncher("ApplicationSettings", true) {
+	};
 	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationSettings>(name),sysmgr, 1000);
+		return sysmgr->CreateService(std::make_shared<ApplicationSettings>(name),sysmgr);
+	};
+	bool runBackground(sys::SystemManager* sysmgr) {
+		return sysmgr->CreateService(std::make_shared<ApplicationSettings>(name, true), sysmgr);
 	};
 };
 

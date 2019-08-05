@@ -65,6 +65,11 @@ void CallWindow::destroyInterface() {
 CallWindow::~CallWindow() {
 }
 
+void CallWindow::setState( State state ) {
+	this->state = state;
+	setVisibleState();
+}
+
 void CallWindow::setVisibleState() {
 	//show state of the window
 	switch( state ) {
@@ -131,15 +136,6 @@ bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
-		if( ret ) {
-			state = State::CALL_IN_PROGRESS;
-			setVisibleState();
-		}
-		else {
-			//TODO show some info
-		}
-
-
 		return true;
 	}
 	else if( state == State::OUTGOING_CALL ) {
@@ -176,34 +172,22 @@ bool CallWindow::handleRightButton() {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
-		state = State::CALL_ENDED;
-		//start 3 sek timer
-
-		//show enc call screen
-
-		//return to previous application
-		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
-
 		return true;
 	}
 	else if( state == State::OUTGOING_CALL ) {
-
+		auto ret = CellularServiceAPI::HangupCall(application);
+		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 	}
 	else if( state == State::CALL_ENDED ) {
-
+		//return to previous application
+		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+		return true;
 	}
 	else if( state == State::CALL_IN_PROGRESS ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
-		state = State::CALL_ENDED;
-		//start 3 sek timer
-
-		//show enc call screen
-
-		//return to previous application
-		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
-		return true;
+ 		return true;
 	}
 	return false;
 }
@@ -233,8 +217,8 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 		}
 	}
 
-	if( handled )
-		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
+//	if( handled )
+//		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
 
 	return false;
 }
