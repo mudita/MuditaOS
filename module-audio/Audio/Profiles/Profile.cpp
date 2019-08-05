@@ -13,8 +13,13 @@
 
 #include "ProfileRecordingOnBoardMic.hpp"
 #include "ProfileRecordingHeadset.hpp"
+
 #include "ProfilePlaybackHeadphones.hpp"
 #include "ProfilePlaybackLoudspeaker.hpp"
+
+#include "ProfileRoutingEarspeaker.hpp"
+#include "ProfileRoutingHeadset.hpp"
+#include "ProfileRoutingSpeakerphone.hpp"
 
 namespace audio {
 
@@ -33,6 +38,15 @@ namespace audio {
                 break;
             case Type::RecordingHeadset:
                 inst = std::make_unique<ProfileRecordingHeadset>(callback, gain);
+                break;
+            case Type::RoutingHeadset:
+                inst = std::make_unique<ProfileRoutingHeadset>(callback, vol, gain);
+                break;
+            case Type::RoutingSpeakerphone:
+                inst = std::make_unique<ProfileRoutingSpeakerphone>(callback, vol, gain);
+                break;
+            case Type::RoutingEarspeaker:
+                inst = std::make_unique<ProfileRoutingEarspeaker>(callback, vol, gain);
                 break;
             default:
                 break;

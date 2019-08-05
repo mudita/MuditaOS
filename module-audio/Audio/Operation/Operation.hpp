@@ -52,6 +52,8 @@ namespace audio {
             BTHeadsetOff,
             BTA2DPOn,
             BTA2DPOff,
+            StartCallRecording,
+            StopCallRecording,
         };
 
         virtual ~Operation() {}
@@ -67,7 +69,7 @@ namespace audio {
 
         virtual int32_t Resume() = 0;
 
-        virtual int32_t SendEvent(const Event evt, const EventData *data) = 0;
+        virtual int32_t SendEvent(const Event evt, const EventData *data=nullptr) = 0;
 
         virtual int32_t SetOutputVolume(float vol) = 0;
 

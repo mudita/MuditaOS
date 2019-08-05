@@ -24,11 +24,11 @@ namespace audio {
 
         enum class Type {
             // Profiles used only during call
-                    CallSpeakerphone,
-            CallHeadset,
-            CallBTHeadset,
-            CallHeadphones,
-            CallEarspeaker,
+            RoutingSpeakerphone,
+            RoutingHeadset,
+            RoutingBTHeadset,
+            RoutingHeadphones,
+            RoutingEarspeaker,
 
             // Recording profiles
                     RecordingBuiltInMic,

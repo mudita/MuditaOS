@@ -57,6 +57,7 @@ public:
 
     std::string fileName;
     float val;
+    bool enable;
 };
 
 class AudioResponseMessage: public sys::ResponseMessage {

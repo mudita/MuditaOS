@@ -18,7 +18,7 @@ const char *ServiceAudio::serviceName = "ServiceAudio";
 using namespace audio;
 
 
-ServiceAudio::ServiceAudio() : sys::Service(serviceName, 4096*2, sys::ServicePriority::Idle),
+ServiceAudio::ServiceAudio() : sys::Service(serviceName, 4096 * 2, sys::ServicePriority::Idle),
                                audio([this](AudioEvents event) -> int32_t {
                                    switch (event) {
                                        case AudioEvents::EndOfFile: {
@@ -108,6 +108,13 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl) {
         }
             break;
 
+        case MessageType::AudioRoutingStart: {
+            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                    static_cast<RetCode >(audio.Start(Operation::Type::Router)));
+        }
+            break;
+
         case MessageType::AudioStop: {
             responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode >(audio.Stop()));
 
@@ -138,6 +145,14 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl) {
                 responseMsg = std::make_shared<AudioResponseMessage>(RetCode::FileDoesntExist);
             }
 
+        }
+            break;
+
+        case MessageType::AudioRoutingRecordCtrl: {
+            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                    static_cast<RetCode >(audio.SendEvent(
+                            msg->enable ? Operation::Event::StartCallRecording : Operation::Event::StopCallRecording)));
         }
             break;
 
