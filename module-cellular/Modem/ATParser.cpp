@@ -111,6 +111,7 @@ int ATParser::ProcessNewData() {
         if (urcs.size() == 5) {
             mux->callback(NotificationType ::PowerUpProcedureComplete,"");
             responseBuffer.erase();
+            urcs.clear();
         }
 
     }

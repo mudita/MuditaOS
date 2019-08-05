@@ -67,6 +67,7 @@ public:
     void RemoveMuxChannel(MuxChannel::MuxChannelType chan);
 
     bool PowerUpProcedure();
+    bool ConfProcedure();
     bool StartMultiplexer();
 
     int uihPfBitReceived = 0;

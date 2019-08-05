@@ -132,7 +132,7 @@ bool MuxDaemon::PowerUpProcedure() {
     // At first send AT command to check if modem is turned on
     auto ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
     if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")) {
-        return StartMultiplexer();
+        return ConfProcedure();
     } else {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
@@ -146,7 +146,7 @@ bool MuxDaemon::PowerUpProcedure() {
         ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
         if (ret.size() == 1 || ret.size() == 2) {
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
-            return StartMultiplexer();
+            return ConfProcedure();
         } else {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
@@ -156,8 +156,10 @@ bool MuxDaemon::PowerUpProcedure() {
     }
 }
 
+//TODO:M.P Fetch configuration from JSON/XML file
+bool MuxDaemon::ConfProcedure() {
 
-bool MuxDaemon::StartMultiplexer() {
+    LOG_DEBUG("Configuring modem...");
 
     // Factory reset
     inOutSerialDataWorker->SendATCommand("AT&F\r", 2);
@@ -193,18 +195,34 @@ bool MuxDaemon::StartMultiplexer() {
     // Turn on caller's number presentation
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1));
 
+    /*    // Set Message format to Text
+    SendAT("AT+CMGF=1\r", 500);
+    // Set SMS received report format
+    SendAT("AT+CNMI=1,2,0,1,0\r", 500);*/
+
     // Audio configuraton, custom PCM, 16bit linear samples, primary mode, 16kHz, master,
     /*
      * M.P: Quectel confirmed that during init phase of modem sends 'ready notification" way before audio subsystem is initialized
      * hence in order to properly configure audio we have literally ping modem with conf command until it responds with success ret code...
     */
-    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
 
-/*    // Set Message format to Text
-    SendAT("AT+CMGF=1\r", 500);
-    // Set SMS received report format
-    SendAT("AT+CNMI=1,2,0,1,0\r", 500);*/
+    auto audioConfRet = inOutSerialDataWorker->SendATCommand("AT+QDAI?\r",2);
+    if(audioConfRet.size() == 2 && !audioConfRet[0].compare("AT+QDAI=1,0,0,5,0,1")){
+        // GSM modem is configured properly, skip audio configuration
+        StartMultiplexer();
+        return true;
+    }
+    else{
+        CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
+        cellular->Restart();
+        LOG_DEBUG("GSM module first run, performing reset...");
+        return false;
+    }
+}
 
+bool MuxDaemon::StartMultiplexer() {
+
+    LOG_DEBUG("Configuring multiplexer...");
 
     // This driver supports only Basic mode (max frame length = 127bytes and no frame errors correction)
     char gsm_command[128] = {};
