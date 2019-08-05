@@ -198,9 +198,7 @@ bool MuxDaemon::StartMultiplexer() {
      * M.P: Quectel confirmed that during init phase of modem sends 'ready notification" way before audio subsystem is initialized
      * hence in order to properly configure audio we have literally ping modem with conf command until it responds with success ret code...
     */
-    while (CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1))) {
-        vTaskDelay(1000);
-    };
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
 
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
