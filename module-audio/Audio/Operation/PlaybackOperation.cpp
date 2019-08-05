@@ -24,7 +24,7 @@
 namespace audio {
 
 
-#define PERF_STATS_ON        1
+#define PERF_STATS_ON        0
 
     PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
 
