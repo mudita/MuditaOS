@@ -24,7 +24,7 @@
 namespace audio {
 
 
-#define PERF_STATS_ON        1
+#define PERF_STATS_ON        0
 
     PlaybackOperation::PlaybackOperation(const char *file) : dec(nullptr) {
 
@@ -138,6 +138,7 @@ namespace audio {
                 SwitchProfile(Profile::Type::PlaybackHeadphones);
                 break;
             case Event::HeadphonesUnplug:
+                //TODO: Switch to playback headphones/bt profile if present
                 SwitchProfile(Profile::Type::PlaybackLoudspeaker);
                 break;
             case Event::BTA2DPOn:
@@ -149,7 +150,7 @@ namespace audio {
             case Event::BTHeadsetOff:
                 break;
             default:
-                return static_cast<int32_t >(RetCode::UnsupportedProfile);
+                return static_cast<int32_t >(RetCode::UnsupportedEvent);
 
         }
         return static_cast<int32_t >(RetCode::Success);

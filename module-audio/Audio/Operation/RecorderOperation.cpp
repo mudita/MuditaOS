@@ -23,7 +23,7 @@
 
 namespace audio {
 
-#define PERF_STATS_ON        1
+#define PERF_STATS_ON        0
 
     using namespace bsp;
 
@@ -56,26 +56,27 @@ namespace audio {
         currentProfile = availableProfiles[0].get();
 
         uint32_t channels = 0;
-        if (currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) {
-            channels++;
+        if ((currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputLeft)) ||
+            (currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputRight))) {
+            channels = 1;
+        } else if (currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputStereo)) {
+            channels = 2;
         }
-        if (currentProfile->GetInOutFlags() & static_cast<uint32_t >(AudioDevice::Flags::InputRight)) {
-            channels++;
-        }
+
 
         enc = Encoder::Create(file, Encoder::Format{
                 .chanNr=channels,
                 .sampleRate=currentProfile->GetSampleRate()
         });
 
-        if(enc == nullptr){
+        if (enc == nullptr) {
             LOG_ERROR("Error during initializing encoder");
             return;
         }
 
 
         audioDevice = AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioCallback).value_or(nullptr);
-        if(audioDevice == nullptr){
+        if (audioDevice == nullptr) {
             LOG_ERROR("Error creating AudioDevice");
             return;
         }
@@ -138,16 +139,18 @@ namespace audio {
                 SwitchProfile(Profile::Type::RecordingHeadset);
                 break;
             case Event::HeadphonesUnplug:
+                //TODO: Switch to recording bt profile if present
                 SwitchProfile(Profile::Type::RecordingBuiltInMic);
                 break;
             case Event::BTHeadsetOn:
                 SwitchProfile(Profile::Type::RecordingBTHeadset);
                 break;
             case Event::BTHeadsetOff:
+                //TODO: Switch to recording headphones profile if present
                 SwitchProfile(Profile::Type::RecordingBuiltInMic);
                 break;
             default:
-                return static_cast<int32_t >(RetCode::UnsupportedProfile);
+                return static_cast<int32_t >(RetCode::UnsupportedEvent);
 
         }
 

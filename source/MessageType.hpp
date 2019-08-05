@@ -59,9 +59,14 @@ enum class MessageType {
     AudioNotification,
     AudioPlaybackStart,
     AudioRecorderStart,
+    AudioRoutingStart,
     AudioStop,
     AudioPause,
     AudioResume,
+
+    AudioRoutingRecordCtrl,
+    AudioRoutingMute,
+    AudioRoutingSpeakerhone,
 
     AudioSetOutputVolume,
     AudioSetInputGain,

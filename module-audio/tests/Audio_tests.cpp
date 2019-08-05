@@ -41,7 +41,7 @@ TEST_CASE( "Audio API tests" ) {
 
         testOutPath = dir / "tests_out/audio/";
     }
-#endif
+
 
     SECTION("Switch: Idle->Playback->Recording->Idle"){
 
@@ -52,6 +52,19 @@ TEST_CASE( "Audio API tests" ) {
         sleep(1);
         REQUIRE(audioTest.Start(Operation::Type::Recorder,"rec1.wav") == static_cast<int32_t >(RetCode::Success));
         REQUIRE(audioTest.GetCurrentState() == Audio::State::Recording);
+        sleep(1);
+        REQUIRE(audioTest.Stop() == static_cast<int32_t >(RetCode::Success));
+        REQUIRE(audioTest.GetCurrentState() == Audio::State::Idle);
+
+        fs::remove("rec1.wav");
+    }
+#endif
+    SECTION("Switch: Idle->Routing->Idle"){
+
+        Audio audioTest([](AudioEvents events)->int32_t{std::cout << "End of file\n"; return 0;});
+
+        REQUIRE(audioTest.Start(Operation::Type::Router,"") == static_cast<int32_t >(RetCode::Success));
+        REQUIRE(audioTest.GetCurrentState() == Audio::State::Routing);
         sleep(1);
         REQUIRE(audioTest.Stop() == static_cast<int32_t >(RetCode::Success));
         REQUIRE(audioTest.GetCurrentState() == Audio::State::Idle);
