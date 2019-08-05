@@ -60,11 +60,19 @@ public:
 
 #if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
-        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/teee.flac");
-        AudioServiceAPI::SetOutputVolume(this,0.6);
+        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/teee.flac");
+        //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
         //vTaskDelay(3000);
         //ret = AudioServiceAPI::Stop(this);
+
+
+        auto ret = AudioServiceAPI::RoutingStart(this);
+        //AudioServiceAPI::RoutingRecordCtrl(this,true);
+        vTaskDelay(1000);
+        AudioServiceAPI::RoutingSpeakerPhone(this,true);
+        vTaskDelay(2000);
+        AudioServiceAPI::Stop(this);
 #endif
         return std::make_shared<sys::ResponseMessage>();
 

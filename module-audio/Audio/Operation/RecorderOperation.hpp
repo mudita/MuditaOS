@@ -19,8 +19,6 @@
 
 namespace audio {
 
-    class Encoder;
-
 
     class RecorderOperation : public Operation {
     public:

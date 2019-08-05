@@ -89,8 +89,7 @@ namespace bsp {
             framesToFetch = framesPerBuffer * 2;
         }
 
-        if ((ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputLeft)) &&
-            (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputRight))) {
+        if (ptr->currentFormat.flags & static_cast<uint32_t >(Flags::InputStereo)) {
             framesToFetch = framesPerBuffer * 2;
         }
 

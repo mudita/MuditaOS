@@ -37,7 +37,7 @@ namespace audio {
                 inst = std::make_unique<PlaybackOperation>(fileName);
                 break;
             case Type::Router:
-                //TODO:M.P inst = std::make_unique<RouterOperation>(fileName,prof);
+                inst = std::make_unique<RouterOperation>(fileName);
                 break;
             case Type::Recorder:
                 inst = std::make_unique<RecorderOperation>(fileName);
