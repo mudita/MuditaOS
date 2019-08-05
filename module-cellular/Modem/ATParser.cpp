@@ -70,7 +70,10 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     }
 
     // manage string buffer
-    if (responseBuffer.size() >= maxPos) {
+    if(maxPos == 0){
+
+    }
+    else if (responseBuffer.size() >= maxPos) {
         responseBuffer.erase();
     } else {
         responseBuffer = responseBuffer.substr(maxPos);
