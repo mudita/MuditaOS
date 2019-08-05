@@ -44,6 +44,7 @@ ServiceCellular::ServiceCellular()
             case NotificationType::PowerUpProcedureComplete: {
                 sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
                                       GetName(), this);
+                state = State ::ModemConfigurationInProgress;
                 return;
             }
             case NotificationType::ServiceReady:
@@ -151,7 +152,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
         case MessageType::CellularStartPowerUpProcedure: {
-            if (!muxdaemon->PowerUpProcedure()) {
+            if (muxdaemon->PowerUpProcedure() != MuxDaemon::ConfState::Success) {
                 LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
                 state = State::Failed;
             }else{
@@ -161,21 +162,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             break;
 
         case MessageType::CellularStartConfProcedure: {
-            // Start configuration procedure, if it's first run modem will need to be restarted
-            if (!muxdaemon->ConfProcedure()) {
-
-            } else {
-                state = State::MultiplexerStartInProgress;
-                sys::Bus::SendUnicast(
-                        std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer), GetName(),
-                        this);
-            }
-
-        }
-            break;
-
-        case MessageType::CellularStartMultiplexer: {
-            if (muxdaemon->StartMultiplexer()) {
+            // Start configuration procedure, if it's first run modem will be restarted
+            if (muxdaemon->ConfProcedure() == MuxDaemon::ConfState::Success) {
                 LOG_DEBUG("[ServiceCellular] Modem is fully operational");
 
                 state = State::Ready;
@@ -183,13 +171,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
                         static_cast<CellularNotificationMessage::Type >(NotificationType::ServiceReady)),
                                         sys::BusChannels::ServiceCellularNotifications, this);
-            } else {
+
+            }else {
                 LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
                 state = State::Failed;
             }
         }
             break;
-
 
         case MessageType::CellularListCurrentCalls: {
             auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "AT+CLCC\r", 3);
