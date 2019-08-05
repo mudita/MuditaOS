@@ -140,6 +140,7 @@ void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data
 bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
+
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
 		return true;
 	}

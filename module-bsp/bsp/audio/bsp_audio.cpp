@@ -13,9 +13,11 @@
 
 #if defined(TARGET_RT1051)
 
-#include "audio/rt1051_audiocodec.hpp"
+#include "audio/RT1051Audiocodec.hpp"
+#include "audio/RT1051CellularAudio.hpp"
 #elif defined(TARGET_Linux)
 #include "audio/linux_audiocodec.hpp"
+#include "audio/LinuxCellularAudio.hpp"
 #else
 #error "Unsupported target"
 #endif
@@ -57,9 +59,9 @@ namespace bsp{
             case Type::Cellular:
             {
 #if defined(TARGET_RT1051)
-
+                inst = std::make_unique<bsp::RT1051CellularAudio>(callback );
 #elif defined(TARGET_Linux)
-
+                inst = std::make_unique<bsp::LinuxCellularAudio>(callback );
 #else
 #error "Unsupported target"
 #endif

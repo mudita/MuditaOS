@@ -35,7 +35,7 @@ namespace audio {
         Audio(std::function<int32_t(AudioEvents event)> asyncCallback);
 
         //Events
-        int32_t SendEvent(const Operation::Event evt, const EventData *data);
+        int32_t SendEvent(const Operation::Event evt, const EventData *data=nullptr);
 
         //utilities
         Position GetPosition();
@@ -57,7 +57,7 @@ namespace audio {
         //TODO:M.P Set/Get inputGain/outputVolume for each profile
 
         //Operations
-        int32_t Start(Operation::Type op, const char *fileName);
+        int32_t Start(Operation::Type op, const char *fileName="");
 
         int32_t Stop();
 
