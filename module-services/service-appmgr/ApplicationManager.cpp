@@ -297,7 +297,7 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		//if application is not closeable send lost focus message
 		else {
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
-			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
+			app::Application::messageSwitchApplication(this, previousApplicationName, "LastWindow", nullptr);
 		}
 	}
 	//if there was no application to close or application can't be closed change internal state to

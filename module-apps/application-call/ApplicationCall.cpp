@@ -26,7 +26,7 @@ namespace app {
 ApplicationCall::ApplicationCall(std::string name, bool startBackgound ) :
 	Application( name, startBackgound, 2048 ) {
 
-	timer_id = CreateTimer(3000,true);
+	timerCall = CreateTimer(1000,true);
 
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
@@ -53,13 +53,15 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
 		   LOG_INFO("---------------------------------CallAborted");
+		   callEndTime = callDuration + 3;
 		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
-		   LOG_INFO("---------------------------------CallBusy");
-		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
-		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+			callEndTime = callDuration + 3;
+		    LOG_INFO("---------------------------------CallBusy");
+		    callWindow->setState( gui::CallWindow::State::CALL_ENDED );
+		    refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
 		   LOG_INFO("---------------------------------CallActive");
@@ -68,19 +70,24 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
 			LOG_INFO("---------------------------------IncomingCall");
-		   std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
-		   //send to itself message to switch (run) call application
-		   if( state == State::ACTIVE_FORGROUND ) {
-			   switchWindow( "CallWindow",0,nullptr );
-		   }
-		   else {
-			   callWindow->setState( gui::CallWindow::State::INCOMMING_CALL );
-			   sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
-//			   ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
-		   }
+			runCallTimer();
+			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
+			//send to itself message to switch (run) call application
+			if( state == State::ACTIVE_FORGROUND ) {
+				switchWindow( "CallWindow",0, std::move(data) );
+			}
+			else {
+				callWindow->setState( gui::CallWindow::State::INCOMMING_CALL );
+				sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
+			}
 		}
-		else if( msg->type == CellularNotificationMessage::Type::NewIncomingSMS ) {
-		   LOG_INFO("---------------------------------NewIncomingSMS");
+		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
+			LOG_INFO("---------------------------------Ringing");
+			runCallTimer();
+			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
+			if( state == State::ACTIVE_FORGROUND ) {
+				switchWindow( "CallWindow",0, nullptr );
+			}
 		}
 		else if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
 		   LOG_INFO("---------------------------------SignalStrengthUpdate");
@@ -122,6 +129,25 @@ sys::ReturnCodes ApplicationCall::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+// Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
+void ApplicationCall::TickHandler(uint32_t id) {
+	LOG_INFO("+++++CALL TIMER");
+	++callDuration;
+
+	LOG_WARN("CALL DURATION: %d", callDuration);
+	if( callDuration > callEndTime ) {
+		LOG_WARN("STOPING TIMER AFTER 3s:");
+		stopTimer(timerCall);
+		sapm::ApplicationManager::messageSwitchPreviousApplication( this );
+	}
+}
+
+void ApplicationCall::stopCallTimer() {
+	LOG_INFO("+++++++++++STOP CALL TIMER");
+	stopTimer(timerCall);
+	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
+}
+
 void ApplicationCall::createUserInterface() {
 
 	gui::AppWindow* window = nullptr;
@@ -145,6 +171,11 @@ void ApplicationCall::setDisplayedNumber( std::string num ) {
 
 const std::string& ApplicationCall::getDisplayedNumber() {
 	return phoneNumber;
+}
+
+void ApplicationCall::runCallTimer() {
+	callDuration = 0;
+	ReloadTimer(timerCall);
 }
 
 void ApplicationCall::destroyUserInterface() {

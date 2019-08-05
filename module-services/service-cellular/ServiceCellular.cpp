@@ -46,6 +46,9 @@ ServiceCellular::ServiceCellular()
                                       GetName(), this);
                 return;
             }
+            case NotificationType::Ringing:
+            	//TODO R.B added to clear build warning.
+            	break;
             case NotificationType::ServiceReady:
             case NotificationType::CallBusy:
             case NotificationType::CallActive:
@@ -195,6 +198,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             }
             stopTimer(callStateTimer);
 
+            // Propagate "CallAborted" notification into system
+            sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
+            	static_cast<CellularNotificationMessage::Type >(NotificationType::CallAborted)),
+                sys::BusChannels::ServiceCellularNotifications, this);
         }
             break;
 

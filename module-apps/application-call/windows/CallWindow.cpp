@@ -113,6 +113,11 @@ void CallWindow::setVisibleState() {
 }
 
 bool CallWindow::handleSwitchData( SwitchData* data ) {
+
+	if( data == nullptr )
+		LOG_ERROR("Received null pointer");
+		return false;
+
 	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
 	if( callData->getType() == app::CallSwitchData::Type::INCOMMING_CALL ) {
 		app::IncommingCallData* incData = reinterpret_cast<app::IncommingCallData*>( data );
