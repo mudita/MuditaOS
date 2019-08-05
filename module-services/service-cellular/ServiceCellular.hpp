@@ -25,7 +25,6 @@ public:
         Idle,
         PowerUpInProgress,
         ModemConfigurationInProgress,
-        MultiplexerStartInProgress,
         Ready,
         Failed
     };

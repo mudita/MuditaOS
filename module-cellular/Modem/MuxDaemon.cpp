@@ -127,7 +127,7 @@ bool MuxDaemon::Start() {
     return true;
 }
 
-bool MuxDaemon::PowerUpProcedure() {
+MuxDaemon::ConfState MuxDaemon::PowerUpProcedure() {
 
     // At first send AT command to check if modem is turned on
     auto ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
@@ -151,13 +151,13 @@ bool MuxDaemon::PowerUpProcedure() {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             cellular->PowerUp();
-            return true;
+            return ConfState ::Success;
         }
     }
 }
 
 //TODO:M.P Fetch configuration from JSON/XML file
-bool MuxDaemon::ConfProcedure() {
+MuxDaemon::ConfState MuxDaemon::ConfProcedure() {
 
     LOG_DEBUG("Configuring modem...");
 
@@ -209,18 +209,17 @@ bool MuxDaemon::ConfProcedure() {
     auto audioConfRet = inOutSerialDataWorker->SendATCommand("AT+QDAI?\r",2);
     if(audioConfRet.size() == 2 && !audioConfRet[0].compare("AT+QDAI=1,0,0,5,0,1")){
         // GSM modem is configured properly, skip audio configuration
-        StartMultiplexer();
-        return true;
+        return StartMultiplexer();
     }
     else{
         CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
         cellular->Restart();
         LOG_DEBUG("GSM module first run, performing reset...");
-        return false;
+        return ConfState ::ModemNeedsReset;
     }
 }
 
-bool MuxDaemon::StartMultiplexer() {
+MuxDaemon::ConfState MuxDaemon::StartMultiplexer() {
 
     LOG_DEBUG("Configuring multiplexer...");
 
@@ -254,7 +253,7 @@ bool MuxDaemon::StartMultiplexer() {
         vTaskDelay(200);
     }
 
-    return true;
+    return ConfState ::Success;
 }
 
 
