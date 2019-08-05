@@ -41,9 +41,9 @@ ServiceCellular::ServiceCellular()
 
         switch (type) {
 
-            case NotificationType::PowerUpProcedureComplete:
-            {
-                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer),GetName(),this);
+            case NotificationType::PowerUpProcedureComplete: {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+                                      GetName(), this);
                 return;
             }
             case NotificationType::ServiceReady:
@@ -98,9 +98,19 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
     muxdaemon = MuxDaemon::Create(notificationCallback);
     if (muxdaemon) {
 
-        // Start power up procedure
-        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),GetName(),this);
-        state = State ::PowerUpInProgress;
+        // Start procedure is as follow:
+        /*
+         * 1) Power-up
+         * 2) Init configuration of GSM modem
+         * 3) Optional modem reset and jump to 1) (only if it's first run of modem)
+         * 4) Start multiplexer
+         * 5) Modem fully-operational
+         */
+
+        // Start power-up procedure
+        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
+                              GetName(), this);
+        state = State::PowerUpInProgress;
 
         return sys::ReturnCodes::Success;
     } else {
@@ -134,39 +144,51 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
                 (msg->type == CellularNotificationMessage::Type::CallBusy)) {
                 stopTimer(callStateTimer);
-            }else {
+            } else {
                 //ignore rest of notifications
             }
         }
             break;
 
-        case MessageType ::CellularStartPowerUpProcedure:
-        {
-
-            if(!muxdaemon->PowerUpProcedure()){
+        case MessageType::CellularStartPowerUpProcedure: {
+            if (!muxdaemon->PowerUpProcedure()) {
                 LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
-                state = State ::Failed;
+                state = State::Failed;
+            }else{
+                state = State::PowerUpInProgress;
             }
-            state = State ::MultiplexerStartInProgress;
         }
             break;
 
-        case MessageType ::CellularStartMultiplexer:
-        {
-            if (muxdaemon->StartMultiplexer()) {
+        case MessageType::CellularStartConfProcedure: {
+            // Start configuration procedure, if it's first run modem will need to be restarted
+            if (!muxdaemon->ConfProcedure()) {
 
-                state = State ::Ready;
+            } else {
+                state = State::MultiplexerStartInProgress;
+                sys::Bus::SendUnicast(
+                        std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer), GetName(),
+                        this);
+            }
+
+        }
+            break;
+
+        case MessageType::CellularStartMultiplexer: {
+            if (muxdaemon->StartMultiplexer()) {
+                LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+                state = State::Ready;
                 // Propagate "ServiceReady" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
                         static_cast<CellularNotificationMessage::Type >(NotificationType::ServiceReady)),
                                         sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
-                state = State ::Failed;
+                state = State::Failed;
             }
         }
             break;
-
 
 
         case MessageType::CellularListCurrentCalls: {

@@ -24,6 +24,7 @@ public:
     enum class State{
         Idle,
         PowerUpInProgress,
+        ModemConfigurationInProgress,
         MultiplexerStartInProgress,
         Ready,
         Failed
