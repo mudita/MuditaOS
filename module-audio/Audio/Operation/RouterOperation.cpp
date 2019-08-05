@@ -85,7 +85,7 @@ namespace audio {
         availableProfiles.push_back(std::make_unique<ProfileRoutingSpeakerphone>(nullptr, 1, 2));
         availableProfiles.push_back(std::make_unique<ProfileRoutingHeadset>(nullptr, 1, 5));
 
-        currentProfile = availableProfiles[1].get(); // todo change back to 0
+        currentProfile = availableProfiles[0].get();
 
         audioDevice = bsp::AudioDevice::Create(currentProfile->GetAudioDeviceType(), audioDeviceCallback).value_or(
                 nullptr);
