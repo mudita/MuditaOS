@@ -132,6 +132,7 @@ bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
 		AudioServiceAPI::RoutingStart(application);
+		//AudioServiceAPI::RoutingRecordCtrl(application,true);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
 		if( ret ) {
@@ -178,6 +179,7 @@ bool CallWindow::handleCenterButton() {
 bool CallWindow::handleRightButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
+        AudioServiceAPI::Stop(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
 		state = State::CALL_ENDED;
@@ -198,6 +200,7 @@ bool CallWindow::handleRightButton() {
 	}
 	else if( state == State::CALL_IN_PROGRESS ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
+        AudioServiceAPI::Stop(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
 		state = State::CALL_ENDED;
