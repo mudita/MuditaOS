@@ -136,11 +136,6 @@ void HBox::resizeItems() {
 			break;
 	}
 
-//	for( Item* item : children )
-//		std::cout<<"x: "<< item->widgetArea.x<<" y: "<< item->widgetArea.y<<
-//		" w: "<< item->widgetArea.w<<" h: "<< item->widgetArea.h<<std::endl;
-//
-//	std::cout<<std::endl;
 	Rect::updateDrawArea();
 }
 
@@ -234,11 +229,6 @@ void VBox::resizeItems() {
 			break;
 	}
 
-//	for( Item* item : children )
-//		std::cout<<"x: "<< item->widgetArea.x<<" y: "<< item->widgetArea.y<<
-//		" w: "<< item->widgetArea.w<<" h: "<< item->widgetArea.h<<std::endl;
-//
-//	std::cout<<std::endl;
 	Rect::updateDrawArea();
 }
 } /* namespace gui */

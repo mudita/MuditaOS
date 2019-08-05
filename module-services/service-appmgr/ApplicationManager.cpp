@@ -135,16 +135,16 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 
 	//search for application with specified name and run it
-#if 0 //change to 0 if you want to run only viewer application for kickstarter
+#if 1 //change to 0 if you want to run only viewer application for kickstarter
 	std::string runDesktopName = "ApplicationDesktop";
 	std::string runCallAppName = "ApplicationCall";
 
-//	auto it = applications.find(runCallAppName);
-//	if( it!= applications.end()){
-//		it->second->lanucher->runBackground(reinterpret_cast<sys::SystemManager*>(this));
-//	}
+	auto it = applications.find(runCallAppName);
+	if( it!= applications.end()){
+		it->second->lanucher->runBackground(reinterpret_cast<sys::SystemManager*>(this));
+	}
 
-	auto it = applications.find(runDesktopName);
+	it = applications.find(runDesktopName);
 	if( it!= applications.end()){
 		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
 	}
@@ -310,10 +310,13 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 }
 
 bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
-	//check if this is register message from recently launched application
-	if( msg->getSenderName() == launchApplicationName ) {
-		auto it = applications.find(launchApplicationName);
 
+	if( msg->getSenderName() == launchApplicationName ) {
+
+		//check if this is register message from recently launched application
+		auto it = applications.find(msg->getSenderName());
+		if( it == applications.end())
+			return false;
 		//application starts in background
 		if( msg->getStartBackground()) {
 			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
@@ -325,6 +328,10 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 
 			app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
 		}
+	}
+	else {
+		auto it = applications.find(msg->getSenderName());
+		it->second->state = app::Application::State::ACTIVE_BACKGROUND;
 	}
 	return true;
 }
@@ -435,40 +442,30 @@ bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmClose>(sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender ) {
 
 	auto msg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status, const bool& startBackground ) {
 	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status, startBackground );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lang language ) {
 	auto msg = std::make_shared<sapm::APMChangeLanguage>( sender->GetName(), language );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 } /* namespace sapm */

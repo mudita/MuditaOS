@@ -25,7 +25,7 @@ protected:
 	uint32_t unreadMessages = 0;
 	uint32_t missedCalls = 0;
 public:
-	ApplicationDesktop( std::string name="ApplicationDesktop");
+	ApplicationDesktop( std::string name="ApplicationDesktop" );
 	virtual ~ApplicationDesktop();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
 	sys::ReturnCodes InitHandler() override;
@@ -54,6 +54,9 @@ public:
 	bool run(sys::SystemManager* sysmgr) override {
 		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr);
 	};
+	bool runBackground(sys::SystemManager* sysmgr) override {
+		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr);
+};
 };
 
 

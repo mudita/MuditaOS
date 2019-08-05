@@ -1,30 +1,27 @@
 /*
- * @file ApplicationSesttings.cpp
+ * @file ApplicationNotes.cpp
  * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 8 lip 2019
+ * @date 30 lip 2019
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "Application.hpp"
-
 #include "MessageType.hpp"
-#include "windows/SettingsMainWindow.hpp"
-#include "windows/LanguageWindow.hpp"
+#include "windows/NotesMainWindow.hpp"
 
-#include "ApplicationSettings.hpp"
+#include "ApplicationNotes.hpp"
 
 namespace app {
 
-ApplicationSettings::ApplicationSettings(std::string name, bool startBackgound) :
+ApplicationNotes::ApplicationNotes(std::string name, bool startBackgound) :
 	Application( name, startBackgound, 2048 ) {
 }
 
-ApplicationSettings::~ApplicationSettings() {
+ApplicationNotes::~ApplicationNotes() {
 }
 
 // Invoked upon receiving data message
-sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	auto retMsg = Application::DataReceivedHandler(msgl);
 	//if message was handled by application's template there is no need to process further.
@@ -43,7 +40,7 @@ sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage* msgl) 
 }
 
 // Invoked during initialization
-sys::ReturnCodes ApplicationSettings::InitHandler() {
+sys::ReturnCodes ApplicationNotes::InitHandler() {
 
 	auto ret = Application::InitHandler();
 	if( ret != sys::ReturnCodes::Success )
@@ -56,31 +53,28 @@ sys::ReturnCodes ApplicationSettings::InitHandler() {
 	return ret;
 }
 
-sys::ReturnCodes ApplicationSettings::DeinitHandler() {
+sys::ReturnCodes ApplicationNotes::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationSettings::WakeUpHandler() {
+sys::ReturnCodes ApplicationNotes::WakeUpHandler() {
 	return sys::ReturnCodes::Success;
 }
 
 
-sys::ReturnCodes ApplicationSettings::SleepHandler() {
+sys::ReturnCodes ApplicationNotes::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-void ApplicationSettings::createUserInterface() {
+void ApplicationNotes::createUserInterface() {
 
 	gui::AppWindow* window = nullptr;
 
-	window = new gui::SettingsMainWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
-	window = new gui::LanguageWindow(this);
+	window = new gui::NotesMainWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
-void ApplicationSettings::destroyUserInterface() {
+void ApplicationNotes::destroyUserInterface() {
 }
 
 } /* namespace app */

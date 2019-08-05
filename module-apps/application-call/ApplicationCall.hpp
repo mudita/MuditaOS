@@ -49,7 +49,7 @@ public:
 		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name),sysmgr);
 	};
 	bool runBackground(sys::SystemManager* sysmgr) {
-		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name), sysmgr);
+		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name, true), sysmgr);
 	};
 };
 

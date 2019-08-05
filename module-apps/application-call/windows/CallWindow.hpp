@@ -40,6 +40,11 @@ public:
 	CallWindow( app::Application* app, std::string windowName = "CallWindow" );
 	virtual ~CallWindow();
 
+	/**
+	 * Used by application to update window's state
+	 */
+	void setState( State state );
+
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
