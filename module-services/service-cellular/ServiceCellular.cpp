@@ -41,9 +41,9 @@ ServiceCellular::ServiceCellular()
 
         switch (type) {
 
-            case NotificationType::PowerUpProcedureComplete:
-            {
-                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer),GetName(),this);
+            case NotificationType::PowerUpProcedureComplete: {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer),
+                                      GetName(), this);
                 return;
             }
             case NotificationType::ServiceReady:
@@ -99,8 +99,9 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
     if (muxdaemon) {
 
         // Start power up procedure
-        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),GetName(),this);
-        state = State ::PowerUpInProgress;
+        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
+                              GetName(), this);
+        state = State::PowerUpInProgress;
 
         return sys::ReturnCodes::Success;
     } else {
@@ -134,39 +135,36 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
                 (msg->type == CellularNotificationMessage::Type::CallBusy)) {
                 stopTimer(callStateTimer);
-            }else {
+            } else {
                 //ignore rest of notifications
             }
         }
             break;
 
-        case MessageType ::CellularStartPowerUpProcedure:
-        {
+        case MessageType::CellularStartPowerUpProcedure: {
 
-            if(!muxdaemon->PowerUpProcedure()){
+            if (!muxdaemon->PowerUpProcedure()) {
                 LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
-                state = State ::Failed;
+                state = State::Failed;
             }
-            state = State ::MultiplexerStartInProgress;
+            state = State::MultiplexerStartInProgress;
         }
             break;
 
-        case MessageType ::CellularStartMultiplexer:
-        {
+        case MessageType::CellularStartMultiplexer: {
             if (muxdaemon->StartMultiplexer()) {
 
-                state = State ::Ready;
+                state = State::Ready;
                 // Propagate "ServiceReady" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
                         static_cast<CellularNotificationMessage::Type >(NotificationType::ServiceReady)),
                                         sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
-                state = State ::Failed;
+                state = State::Failed;
             }
         }
             break;
-
 
 
         case MessageType::CellularListCurrentCalls: {
@@ -204,6 +202,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "ATA\r", 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
+                // Propagate "CallActive" notification into system
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
+                        static_cast<CellularNotificationMessage::Type >(NotificationType::CallActive)),
+                                        sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
@@ -218,6 +220,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
                 ReloadTimer(callStateTimer);
+                // Propagate "Ringing" notification into system
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
+                        static_cast<CellularNotificationMessage::Type >(NotificationType::Ringing)),
+                                        sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
