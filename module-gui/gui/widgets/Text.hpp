@@ -9,7 +9,7 @@
 #ifndef MODULE_GUI_GUI_WIDGETS_TEXT_HPP_
 #define MODULE_GUI_GUI_WIDGETS_TEXT_HPP_
 
-//#include <strstream>
+//#include <strstream>P
 
 #include "utf8/UTF8.hpp"
 

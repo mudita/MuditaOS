@@ -83,6 +83,14 @@ void Application::blockEvents(bool isBlocked ) {
 int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 
 	std::string window = windowName.empty()?"MainWindow":windowName;
+
+	//case to handle returning to previous application
+	if( window == "LastWindow" ) {
+		window = currentWindow->getName();
+	}
+
+//	LOG_INFO("================== LAST WINDOW: %s", window.c_str());
+
 	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
@@ -167,7 +175,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
-
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
