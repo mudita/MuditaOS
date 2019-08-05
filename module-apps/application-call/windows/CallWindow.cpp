@@ -217,8 +217,8 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 		}
 	}
 
-//	if( handled )
-//		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
+	if( handled )
+		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
 
 	return false;
 }

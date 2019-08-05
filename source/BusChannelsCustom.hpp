@@ -9,6 +9,6 @@
 
 // Custom Bus channels
 ServiceCellularNotifications,
-Test2CustomBusChannel
+ServiceAudioNotifications
 
 #endif //MODULE_CORE_BUSCHANNELSCUSTOM_HPP

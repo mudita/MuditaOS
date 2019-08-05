@@ -259,8 +259,6 @@ void OnProjectLoad (void) {
   Project.SetTIFSpeed ("1 MHz");
   Project.AddSvdFile ("$(InstallDir)/Config/CPU/Cortex-M7F.svd");
   Project.AddPathSubstitute ("/home/mati/Software/Mudita/git/PurePhone", "$(ProjectDir)");
-  Project.AddPathSubstitute ("/home/mati/software/mudita/git/purephone", "$(ProjectDir)");
-  Project.AddPathSubstitute ("C:\Projects\PurePhone", "$(ProjectDir)");
   Project.SetOSPlugin("FreeRTOSPlugin");
   //
   // User settings

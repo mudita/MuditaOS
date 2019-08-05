@@ -55,6 +55,18 @@ enum class MessageType {
     CellularStartPowerUpProcedure,
     CellularStartMultiplexer,
 
+    //Audio service messages
+    AudioNotification,
+    AudioPlaybackStart,
+    AudioRecorderStart,
+    AudioStop,
+    AudioPause,
+    AudioResume,
+
+    AudioSetOutputVolume,
+    AudioSetInputGain,
+    AudioGetFileTags,
+
 	//application manager
 	APMSwitch, //request to switch to given application, optionally also to specified window
 	APMSwitchPrevApp, //Request to switch to previous application.

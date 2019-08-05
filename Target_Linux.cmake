@@ -32,6 +32,7 @@ set(TARGET_LIBRARIES
 
 		rt
         pthread
+		portaudio
 
         CACHE INTERNAL ""
         )

@@ -29,7 +29,7 @@
 #include "log/log.hpp"
 
 extern "C"
-	#include "module-os/memory/usermem.h"
+	#include "memory/usermem.h"
 
 #include "SystemManager/SystemManager.hpp"
 #include "WorkerGUI.hpp"

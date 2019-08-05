@@ -21,8 +21,8 @@ extern "C" {
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
-#include "module-bsp/bsp/keyboard/keyboard.hpp"
-#include "module-bsp/bsp/battery-charger/battery_charger.hpp"
+#include "bsp/keyboard/keyboard.hpp"
+#include "bsp/battery-charger/battery_charger.hpp"
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
