@@ -191,8 +191,10 @@ bool MuxDaemon::StartMultiplexer() {
     CheckATCommandResponse( inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1));
+
+    //vTaskDelay(5000);
     // Audio configuraton, custom PCM, 16bit linear samples, primary mode, 16kHz, master,
-    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,0,1,1\r", 1));
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
 /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format

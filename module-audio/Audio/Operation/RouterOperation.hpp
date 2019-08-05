@@ -27,15 +27,16 @@
 
 namespace audio {
 
-    void recorderWorker(void* pvp);
+    void recorderWorker(void *pvp);
 
     class RouterOperation : public Operation {
 
-        friend void recorderWorker(void* pvp);
+        friend void recorderWorker(void *pvp);
 
     public:
 
         RouterOperation(const char *file);
+
         ~RouterOperation();
 
         int32_t Start([[maybe_unused]] std::function<int32_t(AudioEvents event)> callback) override final;
@@ -58,10 +59,9 @@ namespace audio {
 
     private:
 
-        enum class RecorderEvent
-        {
-            Channel1Ready = (1<<0),
-            Channel2Ready = (1<<2)
+        enum class RecorderEvent {
+            Channel1Ready = (1 << 0),
+            Channel2Ready = (1 << 2)
         };
 
         std::unique_ptr<Encoder> enc;
@@ -76,19 +76,22 @@ namespace audio {
                               void *outputBuffer,
                               unsigned long framesPerBuffer)> audioDeviceCellularCallback = nullptr;
 
-        std::vector<int16_t > audioDeviceBuffer;
-        std::vector<int16_t > audioDeviceCellularBuffer;
+        std::vector<int16_t> audioDeviceBuffer;
+        std::vector<int16_t> audioDeviceCellularBuffer;
 
         TaskHandle_t recorderWorkerHandle = nullptr;
-        std::vector<int16_t > channel1Buffer;
-        std::vector<int16_t > channel2Buffer;
-        std::vector<int16_t > mixBuffer;
+        std::vector<int16_t> channel1Buffer;
+        std::vector<int16_t> channel2Buffer;
+        std::vector<int16_t> mixBuffer;
+
+        bool muteEnable = false;
+
+        bool Mute(bool enable);
 
         int32_t StartRecording();
+
         int32_t StopRecording();
     };
-
-
 
 
 }

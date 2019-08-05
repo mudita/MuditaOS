@@ -9,7 +9,7 @@
 
 
 
-#include "rt1051_audiocodec.hpp"
+#include "RT1051Audiocodec.hpp"
 #include "board.h"
 #include "dma_config.h"
 #include "fsl_dmamux.h"
@@ -251,7 +251,7 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, rxCallback, this, &dmaRxHandle);
+        SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, rxAudioCodecCallback, this, &dmaRxHandle);
 
         SAI_TransferRxSetFormatEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -265,7 +265,7 @@ namespace bsp {
         xfer.dataSize = saiInFormat.dataSize;
         SAI_TransferReceiveEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &xfer);
 
-        if (xTaskCreate(inWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
+        if (xTaskCreate(inAudioCodecWorkerTask, "inaudiocodec", 1024, this, 0, &inWorkerThread) != pdPASS) {
             LOG_ERROR("Error during creating input audiocodec task");
         }
     }
@@ -289,7 +289,7 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, txCallback, this, &dmaTxHandle);
+        SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, txAudioCodecCallback, this, &dmaTxHandle);
 
         SAI_TransferTxSetFormatEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -303,7 +303,7 @@ namespace bsp {
         xfer.dataSize = saiOutFormat.dataSize;
         SAI_TransferSendEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &xfer);
 
-        if (xTaskCreate(outWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
+        if (xTaskCreate(outAudioCodecWorkerTask, "outaudiocodec", 1024, this, 0, &outWorkerThread) != pdPASS) {
             LOG_ERROR("Error during creating  output audiocodec task");
         }
 
@@ -329,7 +329,7 @@ namespace bsp {
     }
 
 
-    void inWorkerTask(void *pvp) {
+    void inAudioCodecWorkerTask(void *pvp) {
         uint32_t ulNotificationValue = 0;
 
         RT1051Audiocodec *inst = reinterpret_cast<RT1051Audiocodec *>(pvp);
@@ -372,7 +372,7 @@ namespace bsp {
         vTaskDelete(NULL);
     }
 
-    void outWorkerTask(void *pvp) {
+    void outAudioCodecWorkerTask(void *pvp) {
         uint32_t ulNotificationValue = 0;
 
         RT1051Audiocodec *inst = reinterpret_cast<RT1051Audiocodec *>(pvp);
@@ -415,7 +415,7 @@ namespace bsp {
         vTaskDelete(NULL);
     }
 
-    void rxCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
+    void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
         static RT1051Audiocodec::irq_state_t state = RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer;
         RT1051Audiocodec *inst = (RT1051Audiocodec *) userData;
         sai_transfer_t xfer = {0};
@@ -454,7 +454,7 @@ namespace bsp {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 
-    void txCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
+    void txAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
         static RT1051Audiocodec::irq_state_t state = RT1051Audiocodec::irq_state_t::IRQStateHalfTransfer;
         RT1051Audiocodec *inst = (RT1051Audiocodec *) userData;
         sai_transfer_t xfer = {0};

@@ -219,7 +219,7 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferRxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, rxCallback, this, &dmaRxHandle);
+        SAI_TransferRxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, rxCellularCallback, this, &dmaRxHandle);
 
         SAI_TransferRxSetFormatEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -233,7 +233,7 @@ namespace bsp {
         xfer.dataSize = saiInFormat.dataSize;
         SAI_TransferReceiveEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &xfer);
 
-        if (xTaskCreate(inWorkerTask, "incellaudio", 512, this, 0, &inWorkerThread) != pdPASS) {
+        if (xTaskCreate(inCellularWorkerTask, "incellaudio", 512, this, 0, &inWorkerThread) != pdPASS) {
             LOG_ERROR("Error during creating input cellular audio task");
         }
     }
@@ -257,7 +257,7 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferTxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, txCallback, this, &dmaTxHandle);
+        SAI_TransferTxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, txCellularCallback, this, &dmaTxHandle);
 
         SAI_TransferTxSetFormatEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -271,7 +271,7 @@ namespace bsp {
         xfer.dataSize = saiOutFormat.dataSize;
         SAI_TransferSendEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, &xfer);
 
-        if (xTaskCreate(outWorkerTask, "outcellaudio", 512, this, 0, &outWorkerThread) != pdPASS) {
+        if (xTaskCreate(outCellularWorkerTask, "outcellaudio", 512, this, 0, &outWorkerThread) != pdPASS) {
             LOG_ERROR("Error during creating  output cellular audio task");
         }
 
@@ -297,7 +297,7 @@ namespace bsp {
     }
 
 
-    void inWorkerTask(void *pvp) {
+    void inCellularWorkerTask(void *pvp) {
         uint32_t ulNotificationValue = 0;
 
         RT1051CellularAudio *inst = reinterpret_cast<RT1051CellularAudio *>(pvp);
@@ -339,7 +339,7 @@ namespace bsp {
         vTaskDelete(NULL);
     }
 
-    void outWorkerTask(void *pvp) {
+    void outCellularWorkerTask(void *pvp) {
         uint32_t ulNotificationValue = 0;
 
         RT1051CellularAudio *inst = reinterpret_cast<RT1051CellularAudio *>(pvp);
@@ -381,7 +381,7 @@ namespace bsp {
         vTaskDelete(NULL);
     }
 
-    void rxCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
+    void rxCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
         static RT1051CellularAudio::irq_state_t state = RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer;
         RT1051CellularAudio *inst = (RT1051CellularAudio *) userData;
         sai_transfer_t xfer = {0};
@@ -420,7 +420,7 @@ namespace bsp {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }
 
-    void txCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
+    void txCellularCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData) {
         static RT1051CellularAudio::irq_state_t state = RT1051CellularAudio::irq_state_t::IRQStateHalfTransfer;
         RT1051CellularAudio *inst = (RT1051CellularAudio *) userData;
         sai_transfer_t xfer = {0};

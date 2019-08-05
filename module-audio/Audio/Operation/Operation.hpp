@@ -54,6 +54,10 @@ namespace audio {
             BTA2DPOff,
             StartCallRecording,
             StopCallRecording,
+            CallMute,
+            CallUnmute,
+            CallSpeakerphoneOn,
+            CallSpeakerphoneOff,
         };
 
         virtual ~Operation() {}

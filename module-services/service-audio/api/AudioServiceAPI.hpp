@@ -24,6 +24,8 @@ public:
     static audio::RetCode RecordingStart(sys::Service* serv,const std::string& fileName);
     static audio::RetCode RoutingStart(sys::Service* serv);
     static audio::RetCode RoutingRecordCtrl(sys::Service* serv,bool enable);
+    static audio::RetCode RoutingMute(sys::Service* serv,bool enable);
+    static audio::RetCode RoutingSpeakerPhone(sys::Service* serv,bool enable);
     static audio::RetCode Stop(sys::Service* serv);
     static audio::RetCode Pause(sys::Service* serv);
     static audio::RetCode Resume(sys::Service* serv);
