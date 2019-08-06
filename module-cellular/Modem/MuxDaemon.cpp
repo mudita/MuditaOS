@@ -136,6 +136,7 @@ MuxDaemon::ConfState MuxDaemon::PowerUpProcedure() {
     } else {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
+        inOutSerialDataWorker->SendFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_CLD) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
@@ -167,6 +168,12 @@ MuxDaemon::ConfState MuxDaemon::ConfProcedure() {
     // Turn off local echo
     inOutSerialDataWorker->SendATCommand("ATE0\r", 2);
 
+    // Print current firmware version
+    LOG_INFO("GSM modem info:");
+    auto retVersion = inOutSerialDataWorker->SendATCommand("ATI\r", 4);
+    for(uint32_t i = 0; i< retVersion.size()-1;++i){ // skip final "OK"
+        LOG_INFO(retVersion[i].c_str());
+    }
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
