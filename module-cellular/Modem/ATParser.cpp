@@ -109,6 +109,7 @@ int ATParser::ProcessNewData() {
         // 4) +QIND: SMS DONE
         // 5) +QIND: PB DONE
         if (urcs.size() == 5) {
+            cpp_freertos::LockGuard lock(mutex);
             mux->callback(NotificationType ::PowerUpProcedureComplete,"");
             responseBuffer.erase();
             urcs.clear();
@@ -120,6 +121,11 @@ int ATParser::ProcessNewData() {
 
 std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, uint32_t timeout) {
     std::vector<std::string> tokens;
+
+    {
+        cpp_freertos::LockGuard lock(mutex);
+        responseBuffer.erase();
+    }
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     auto cmdSigned = const_cast<char *>(cmd);

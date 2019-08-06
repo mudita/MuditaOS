@@ -54,7 +54,8 @@ public:
     enum class ConfState{
         Success,
         Failure,
-        ModemNeedsReset
+        ModemNeedsReset,
+        PowerUp
     };
 
     static std::unique_ptr<MuxDaemon> Create(NotificationMuxChannel::NotificationCallback_t callback);
@@ -74,7 +75,8 @@ public:
 
     ConfState PowerUpProcedure();
     ConfState ConfProcedure();
-
+    ConfState AudioConfProcedure();
+    ConfState StartMultiplexer();
 
     int uihPfBitReceived = 0;
 
@@ -83,8 +85,6 @@ public:
 private:
 
     friend void workerTaskFunction(void *ptr);
-
-    ConfState StartMultiplexer();
 
     bool Start();
 
