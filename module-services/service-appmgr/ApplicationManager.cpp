@@ -62,6 +62,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
+
 			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName().c_str());
 			handleSwitchPrevApplication( msg );
 		}break;
@@ -185,7 +186,7 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	if( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) {
 		state = State::WAITING_GET_FOCUS_CONFIRMATION;
-		LOG_INFO( "switching focus to application: %s", appName.c_str());
+		LOG_INFO( "switching focus to application: [%s] window [%s]", appName.c_str(), it->second->switchWindow.c_str());
 		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
 	}
 	else {
@@ -401,6 +402,7 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 
 			auto it = applications.find(previousApplicationName);
 			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+			it->second->switchWindow = "LastWindow";
 			startApplication( launchApplicationName );
 			return true;
 		}
