@@ -103,7 +103,7 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
         /*
          * 1) Power-up
          * 2) Init configuration of GSM modem
-         * 3) Optional modem reset and jump to 1) (only if it's first run of modem)
+         * 3) Audio configuration
          * 4) Start multiplexer
          * 5) Modem fully-operational
          */
