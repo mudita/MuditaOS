@@ -90,14 +90,12 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
+			AudioServiceAPI::RoutingSpeakerPhone(this,true);
 			runCallTimer();
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
 				switchWindow( "CallWindow",0, nullptr );
 			}
-		}
-		else if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-		   LOG_INFO("---------------------------------SignalStrengthUpdate");
 		}
 		handled = true;
 	}

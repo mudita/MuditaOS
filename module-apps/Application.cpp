@@ -14,6 +14,8 @@
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 //module-gui
 #include "gui/core/DrawCommand.hpp"
 #include "gui/input/InputEvent.hpp"
@@ -114,6 +116,18 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	bool handled = false;
+
+	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
+		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
+
+			if( currentWindow->updateSignalStrength( msg->signalStrength ) )
+				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+
+		    LOG_INFO("---------------------------------SignalStrengthUpdate %d", msg->signalStrength );
+		}
+		handled = true;
+	}
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
 		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
