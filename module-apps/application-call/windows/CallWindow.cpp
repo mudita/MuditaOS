@@ -14,6 +14,8 @@
 #include "../ApplicationCall.hpp"
 #include "../data/CallSwitchData.hpp"
 
+#include "service-audio/api/AudioServiceAPI.hpp"
+
 #include "i18/i18.hpp"
 
 #include "service-cellular/api/CellularServiceAPI.hpp"
@@ -52,6 +54,83 @@ void CallWindow::buildInterface() {
 	numberLabel->setBorderColor( gui::ColorNoColor );
 	numberLabel->setFont("gt_pressura_bold_24");
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+
+	rectSpeaker = new gui::Rect( this, 230-80, 400, 80, 80 );
+	rectSpeaker->setFilled( false );
+	rectSpeaker->setRadius(40);
+	rectSpeaker->setPenFocusWidth(3);
+	rectSpeaker->setPenWidth(1);
+
+	imageSpeaker[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rectSpeaker, 20, 20, 0,0, "speaker_on" );
+	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rectSpeaker, 20, 20, 0,0, "speaker_off" );
+	imageSpeaker[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
+	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
+
+	rectMute = new gui::Rect( this, 250, 400, 80, 80 );
+	rectMute->setFilled( false );
+	rectMute->setRadius(40);
+	rectMute->setPenFocusWidth(3);
+	rectMute->setPenWidth(1);
+
+	imageMicrophone[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rectMute, 20, 20, 0,0, "microphone_on" );
+	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rectMute, 20, 20, 0,0, "microphone_off" );
+	imageMicrophone[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
+	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
+
+	rectSpeaker->setVisible(false);
+	rectMute->setVisible(false);
+
+
+	//define navigation between labels
+	rectSpeaker->setNavigationItem( NavigationDirection::LEFT, rectMute );
+	rectSpeaker->setNavigationItem( NavigationDirection::RIGHT, rectMute );
+
+	rectMute->setNavigationItem( NavigationDirection::LEFT, rectSpeaker );
+	rectMute->setNavigationItem( NavigationDirection::RIGHT, rectSpeaker );
+
+	//focus callbacks
+	rectSpeaker->focusChangedCallback = [=] (gui::Item& item){
+		LOG_INFO("Speaker gets focus" );
+		return true; };
+
+	rectMute->focusChangedCallback = [=] (gui::Item& item){
+		LOG_INFO("Mute gets focus" );
+		return true; };
+
+	//activation callbacks
+	rectSpeaker->activatedCallback = [=] (gui::Item& item){
+		LOG_INFO("Speaker activated" );
+		//update icon
+		imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(false);
+		speakerState = (speakerState == AudioState::ON)?AudioState::OFF:AudioState::ON;
+		imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
+
+		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+
+		(speakerState == AudioState::ON)?
+			AudioServiceAPI::RoutingSpeakerPhone(this->application,true):
+			AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
+
+		return true; };
+
+	rectMute->activatedCallback = [=] (gui::Item& item){
+		LOG_INFO("Mute activated" );
+
+		//update icon
+		imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(false);
+		microphoneState = (microphoneState == AudioState::ON)?AudioState::OFF:AudioState::ON;
+		imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
+
+		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+
+		(microphoneState == AudioState::ON)?
+			AudioServiceAPI::RoutingMute(this->application,true):
+			AudioServiceAPI::RoutingMute(this->application,false);
+
+		return true; };
+
+	bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
+
 }
 
 void CallWindow::destroyInterface() {
@@ -71,6 +150,9 @@ void CallWindow::setState( State state ) {
 }
 
 void CallWindow::setVisibleState() {
+
+	rectSpeaker->setVisible(false);
+	rectMute->setVisible(false);
 	//show state of the window
 	switch( state ) {
 		case State::INCOMMING_CALL: {
@@ -97,6 +179,14 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
+
+			rectSpeaker->setVisible(true);
+			rectMute->setVisible(true);
+
+			imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
+			imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
+
+			setFocusItem( rectSpeaker );
 		}break;
 		case State::IDLE: {
 			titleLabel->setText("IDLE");
@@ -131,12 +221,10 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 }
 
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+	AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
+	AudioServiceAPI::RoutingMute(this->application,false);
 }
 
-//AnswerIncomingCall
-//HangupCall
-//auto ret = CellularServiceAPI::DialNumber(this,"");
-//		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
 bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);

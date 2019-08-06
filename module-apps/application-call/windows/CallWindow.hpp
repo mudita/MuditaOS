@@ -10,6 +10,8 @@
 #define MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
 
 #include "AppWindow.hpp"
+#include "Rect.hpp"
+#include "Image.hpp"
 
 namespace gui {
 
@@ -26,8 +28,23 @@ public:
 		CALL_ENDED
 	};
 protected:
+
+	enum class AudioState {
+		ON,
+		OFF
+	};
 	gui::Label* titleLabel = nullptr;
 	gui::Label* numberLabel = nullptr;
+	gui::Label* durationLabel = nullptr;
+
+	gui::Image* imageSpeaker[2] = {nullptr,nullptr};
+	gui::Image* imageMicrophone[2] = {nullptr,nullptr};
+	gui::Rect* rectSpeaker = nullptr;
+	gui::Rect* rectMute = nullptr;
+
+	AudioState microphoneState = AudioState::ON;
+	AudioState speakerState = AudioState::OFF;
+
 	State state = State::IDLE;
 	/**
 	 * Manipulates widgets to handle currently set state of the window.

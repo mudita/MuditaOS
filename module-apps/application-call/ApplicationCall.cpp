@@ -17,6 +17,7 @@
 
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include "service-audio/api/AudioServiceAPI.hpp"
 
 #include "service-appmgr/ApplicationManager.hpp"
 
@@ -24,7 +25,7 @@
 namespace app {
 
 ApplicationCall::ApplicationCall(std::string name, bool startBackgound ) :
-	Application( name, startBackgound, 2048 ) {
+	Application( name, startBackgound, 4096 ) {
 
 	timerCall = CreateTimer(1000,true);
 
@@ -53,6 +54,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
 		   LOG_INFO("---------------------------------CallAborted");
+		   AudioServiceAPI::Stop(this);
 		   callEndTime = callDuration + 3;
 		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
@@ -60,16 +62,20 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
 			callEndTime = callDuration + 3;
 		    LOG_INFO("---------------------------------CallBusy");
+		    AudioServiceAPI::Stop(this);
 		    callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		    refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
 		   LOG_INFO("---------------------------------CallActive");
+		   //reset call duration
+		   callDuration = 0;
 		   callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
 		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
 			LOG_INFO("---------------------------------IncomingCall");
+			AudioServiceAPI::RoutingStart(this);
 			runCallTimer();
 			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
 			//send to itself message to switch (run) call application
@@ -83,6 +89,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
 			LOG_INFO("---------------------------------Ringing");
+			AudioServiceAPI::RoutingStart(this);
 			runCallTimer();
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
@@ -131,19 +138,16 @@ sys::ReturnCodes ApplicationCall::SleepHandler() {
 
 // Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
 void ApplicationCall::TickHandler(uint32_t id) {
-	LOG_INFO("+++++CALL TIMER");
 	++callDuration;
 
 	LOG_WARN("CALL DURATION: %d", callDuration);
 	if( callDuration > callEndTime ) {
-		LOG_WARN("STOPING TIMER AFTER 3s:");
 		stopTimer(timerCall);
 		sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 	}
 }
 
 void ApplicationCall::stopCallTimer() {
-	LOG_INFO("+++++++++++STOP CALL TIMER");
 	stopTimer(timerCall);
 	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 }
