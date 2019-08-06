@@ -24,11 +24,14 @@ protected:
 	sys::Worker* EventWorker = nullptr;
 	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
 	std::string targetApplication;
+	//alarm timestamp in seconds from midnight
 	uint32_t alarmTimestamp;
+	//ID of alarm waiting to trigger
 	uint32_t alarmID;
+	//flag set when there is no alarm to trigger in current day
 	bool alarmDBEmpty = false;
+	//flag set when there is alarm to handle
 	bool alarmIsValid = false;
-	bool noValidAlarm = false;
 public:
 	EventManager(const std::string& name);
     ~EventManager();

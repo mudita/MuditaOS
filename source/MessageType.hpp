@@ -51,7 +51,7 @@ enum class MessageType {
 	DBAlarmUpdate,    	// Update alarm remove
 	DBAlarmGetLimitOffset,   // Get alarm records by limit,offset
 	DBAlarmGetCount,         // Get alarm count
-	DBAlarmGetNext,         // Get next alarm record
+	DBAlarmGetNext,         // Get alarm, closest or equal to current timestamp.
 	DBAlarmUpdateNotification,
 
 	//Cellular messages
@@ -98,7 +98,7 @@ enum class MessageType {
 	EVMBatteryLevel,
 	EVMChargerPlugged,
 	//rtc messages
-	EVMMinuteUpdated,
+	EVMMinuteUpdated,//This message is send to current application on every minute time change.
 
 };
 

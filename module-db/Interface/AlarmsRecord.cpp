@@ -46,16 +46,14 @@ std::unique_ptr<std::vector<AlarmsRecord>> AlarmsRecordInterface::GetLimitOffset
 
     switch(field){
         case AlarmsRecordField::Time:
-        	alarm = alarmsDB->alarms.GetLimitOffsetByField(offset,limit,AlarmsTableFields::Status,str);
+        	alarm = alarmsDB->alarms.GetLimitOffsetByField(offset,limit,AlarmsTableFields::Time,str);
             break;
-
         case AlarmsRecordField::Snooze:
         	alarm = alarmsDB->alarms.GetLimitOffsetByField(offset,limit,AlarmsTableFields::Snooze,str);
             break;
         case AlarmsRecordField::Status:
-        	alarm = alarmsDB->alarms.GetLimitOffsetByField(offset,limit,AlarmsTableFields::Snooze,str);
+        	alarm = alarmsDB->alarms.GetLimitOffsetByField(offset,limit,AlarmsTableFields::Status,str);
         	break;
-
         default:
             return records;
     }
