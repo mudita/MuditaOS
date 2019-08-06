@@ -25,6 +25,7 @@ public:
         Idle,
         PowerUpInProgress,
         ModemConfigurationInProgress,
+        AudioConfigurationInProgress,
         Ready,
         Failed
     };
