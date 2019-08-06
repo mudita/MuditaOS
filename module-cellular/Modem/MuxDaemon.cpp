@@ -205,10 +205,11 @@ MuxDaemon::ConfState MuxDaemon::ConfProcedure() {
 
 MuxDaemon::ConfState MuxDaemon::AudioConfProcedure() {
 
-
     auto audioConfRet = inOutSerialDataWorker->SendATCommand("AT+QDAI?\r", 1);
 
-
+    // There is possibility for SendATCommand to capture invalid response (it can be ERROR or async URC)
+    // Hence we are checking here for beginning of valid response for "AT+QDAI?" command. AudioConfProcedure
+    // procedure will be invoked from AudioService's context as many times as needed.
     if(audioConfRet[0].compare(0,strlen("+QDAI:"),"+QDAI:",strlen("+QDAI:")) != 0){
         return ConfState ::Failure;
     }
@@ -216,6 +217,13 @@ MuxDaemon::ConfState MuxDaemon::AudioConfProcedure() {
         return ConfState ::Success;
     }
     else {
+        // Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
+        // Quectel confirmed that during init phase modem sends "ready notification" way before
+        // audio subsystem is initialized. The only recommended solution for this is to send configuration
+        // command repetitively until modem responds with OK. Due to our system characteristic we can't use here simple
+        // while loop with vTaskDelay as this function will be invoked from AudioService context. By design service's
+        // routines should be as fast as they can and non blocking. Therefore there is possibility for audioservice to block
+        // for too long waiting in while loop which will trigger SystemManager ping/pong failure procedure.
         if(!CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1)) ){
             vTaskDelay(1000);
             return ConfState ::Failure;
