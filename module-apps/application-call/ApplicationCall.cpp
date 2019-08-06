@@ -57,21 +57,21 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		   AudioServiceAPI::Stop(this);
 		   callEndTime = callDuration + 3;
 		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
-		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+		   refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
 			callEndTime = callDuration + 3;
 		    LOG_INFO("---------------------------------CallBusy");
 		    AudioServiceAPI::Stop(this);
 		    callWindow->setState( gui::CallWindow::State::CALL_ENDED );
-		    refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+		    refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
 		   LOG_INFO("---------------------------------CallActive");
 		   //reset call duration
 		   callDuration = 0;
 		   callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
-		   refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+		   refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
 			LOG_INFO("---------------------------------IncomingCall");
@@ -137,6 +137,13 @@ sys::ReturnCodes ApplicationCall::SleepHandler() {
 // Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
 void ApplicationCall::TickHandler(uint32_t id) {
 	++callDuration;
+
+	auto it = windows.find("CallWindow");
+	if( currentWindow == it->second ) {
+		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>(currentWindow);
+		callWindow->updateDuration( callDuration );
+		refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+	}
 
 	LOG_WARN("CALL DURATION: %d", callDuration);
 	if( callDuration > callEndTime ) {

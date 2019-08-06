@@ -97,4 +97,20 @@ void TopBar::setBatteryLevel( uint32_t level ) {
 	battery[level]->setVisible( true );
 }
 
+void TopBar::setSignalStrength( uint32_t sth) {
+
+	uint32_t signalStrength = 0;
+	if( sth >= 2) signalStrength = 1;
+	if( sth >= 10) signalStrength = 2;
+	if( sth >= 15) signalStrength = 3;
+	if( sth >= 20) signalStrength = 4;
+	if( sth >= 25) signalStrength = 5;
+
+	this->signalStrength = signalStrength;
+	for( uint32_t i=0; i<batteryLevelCount; i++ ) {
+		signal[i]->setVisible( false );
+	}
+	signal[signalStrength]->setVisible( true );
+};
+
 } /* namespace gui */

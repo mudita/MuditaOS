@@ -49,7 +49,7 @@ public:
 	/**
 	 * @brief Sets signal strength. This will cause appropriate image to be displayed.
 	 */
-	void setSignalStrength( uint32_t sth) { signalStrength = sth; };
+	void setSignalStrength( uint32_t sth);
 	uint32_t getBatteryLevel() {return batteryLevel; };
 	uint32_t getSignalStrength() {return signalStrength; };
 };
