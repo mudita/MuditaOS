@@ -8,6 +8,8 @@
  */
 #include <memory>
 #include <functional>
+#include <sstream>
+#include <iomanip>
 
 #include "service-appmgr/ApplicationManager.hpp"
 
@@ -42,12 +44,17 @@ void CallWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_select"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-
 	titleLabel = new gui::Label(this, 0, 50, 480, 50 );
 	titleLabel->setFilled( false );
 	titleLabel->setBorderColor( gui::ColorNoColor );
 	titleLabel->setFont("gt_pressura_bold_24");
 	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+
+	durationLabel = new gui::Label(this, 0, 270, 480, 50 );
+	durationLabel->setFilled( false );
+	durationLabel->setBorderColor( gui::ColorNoColor );
+	durationLabel->setFont("gt_pressura_regular_24");
+	durationLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	numberLabel = new gui::Label(this, 0, 150, 480, 50 );
 	numberLabel->setFilled( false );
@@ -55,50 +62,56 @@ void CallWindow::buildInterface() {
 	numberLabel->setFont("gt_pressura_bold_24");
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	rectSpeaker = new gui::Rect( this, 230-80, 400, 80, 80 );
-	rectSpeaker->setFilled( false );
-	rectSpeaker->setRadius(40);
-	rectSpeaker->setPenFocusWidth(3);
-	rectSpeaker->setPenWidth(1);
+	//create circles to hold images inside
+	for( uint32_t i=0; i<3; ++i ) {
+		rects[i] = new gui::Rect( this, 0,0, 80, 80 );
+		rects[i]->setFilled( false );
+		rects[i]->setRadius(40);
+		rects[i]->setPenFocusWidth(3);
+		rects[i]->setPenWidth(1);
+	}
 
-	imageSpeaker[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rectSpeaker, 20, 20, 0,0, "speaker_on" );
-	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rectSpeaker, 20, 20, 0,0, "speaker_off" );
+	rects[static_cast<uint32_t>(FocusRects::Messages)]->setPosition( 200, 400 );
+	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setPosition( 150, 400 );
+	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setPosition( 250, 400 );
+	rects[static_cast<uint32_t>(FocusRects::Messages)]->setPenWidth(3);
+
+	imageSpeaker[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Speaker)], 20, 20, 0,0, "speaker_on" );
+	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Speaker)], 20, 20, 0,0, "speaker_off" );
 	imageSpeaker[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
 	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
 
-	rectMute = new gui::Rect( this, 250, 400, 80, 80 );
-	rectMute->setFilled( false );
-	rectMute->setRadius(40);
-	rectMute->setPenFocusWidth(3);
-	rectMute->setPenWidth(1);
+	imageMessage = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Messages)], 15, 15, 0,0, "menu_messages" );
 
-	imageMicrophone[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rectMute, 20, 20, 0,0, "microphone_on" );
-	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rectMute, 20, 20, 0,0, "microphone_off" );
+	imageMicrophone[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0,0, "microphone_on" );
+	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0,0, "microphone_off" );
 	imageMicrophone[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
 	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
 
-	rectSpeaker->setVisible(false);
-	rectMute->setVisible(false);
-
-
 	//define navigation between labels
-	rectSpeaker->setNavigationItem( NavigationDirection::LEFT, rectMute );
-	rectSpeaker->setNavigationItem( NavigationDirection::RIGHT, rectMute );
+	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setNavigationItem( NavigationDirection::LEFT,
+		rects[static_cast<uint32_t>(FocusRects::Micrphone)]);
+	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setNavigationItem( NavigationDirection::RIGHT,
+		rects[static_cast<uint32_t>(FocusRects::Micrphone)]);
 
-	rectMute->setNavigationItem( NavigationDirection::LEFT, rectSpeaker );
-	rectMute->setNavigationItem( NavigationDirection::RIGHT, rectSpeaker );
+	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setNavigationItem( NavigationDirection::LEFT,
+		rects[static_cast<uint32_t>(FocusRects::Speaker)]);
+	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setNavigationItem( NavigationDirection::RIGHT,
+		rects[static_cast<uint32_t>(FocusRects::Speaker)]);
 
 	//focus callbacks
-	rectSpeaker->focusChangedCallback = [=] (gui::Item& item){
+	rects[static_cast<uint32_t>(FocusRects::Speaker)]->focusChangedCallback = [=] (gui::Item& item){
 		LOG_INFO("Speaker gets focus" );
+		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_speaker"));
 		return true; };
 
-	rectMute->focusChangedCallback = [=] (gui::Item& item){
+	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->focusChangedCallback = [=] (gui::Item& item){
 		LOG_INFO("Mute gets focus" );
+		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_mute"));
 		return true; };
 
 	//activation callbacks
-	rectSpeaker->activatedCallback = [=] (gui::Item& item){
+	rects[static_cast<uint32_t>(FocusRects::Speaker)]->activatedCallback = [=] (gui::Item& item){
 		LOG_INFO("Speaker activated" );
 		//update icon
 		imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(false);
@@ -113,7 +126,7 @@ void CallWindow::buildInterface() {
 
 		return true; };
 
-	rectMute->activatedCallback = [=] (gui::Item& item){
+	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->activatedCallback = [=] (gui::Item& item){
 		LOG_INFO("Mute activated" );
 
 		//update icon
@@ -151,8 +164,11 @@ void CallWindow::setState( State state ) {
 
 void CallWindow::setVisibleState() {
 
-	rectSpeaker->setVisible(false);
-	rectMute->setVisible(false);
+	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(false);
+	rects[static_cast<uint32_t>(FocusRects::Messages)]->setVisible(false);
+	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(false);
+	durationLabel->setVisible(false);
+
 	//show state of the window
 	switch( state ) {
 		case State::INCOMMING_CALL: {
@@ -163,6 +179,8 @@ void CallWindow::setVisibleState() {
 			bottomBar->setText( gui::BottomBar::Side::LEFT, "Accept" );
 			bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, "Reject" );
+
+			rects[static_cast<uint32_t>(FocusRects::Messages)]->setVisible(true);
 		}break;
 		case State::CALL_ENDED: {
 			titleLabel->setText("CALL_ENDED");
@@ -174,19 +192,20 @@ void CallWindow::setVisibleState() {
 		}break;
 		case State::CALL_IN_PROGRESS: {
 			titleLabel->setText("CALL_IN_PROGRESS");
+			durationLabel->setVisible(true);
 
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
 
-			rectSpeaker->setVisible(true);
-			rectMute->setVisible(true);
+			rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(true);
+			rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(true);
 
 			imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
 			imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
 
-			setFocusItem( rectSpeaker );
+			setFocusItem( rects[static_cast<uint32_t>(FocusRects::Speaker)] );
 		}break;
 		case State::IDLE: {
 			titleLabel->setText("IDLE");
@@ -200,6 +219,28 @@ void CallWindow::setVisibleState() {
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
 		}break;
 	};
+}
+
+void CallWindow::updateDuration( uint32_t duration ) {
+	uint32_t seconds = 0;
+	uint32_t minutes = 0;
+	uint32_t hours = 0;
+	uint32_t days = 0;
+
+	days = duration / 86400; duration -= days*86400;
+	hours = duration / 3600; duration -= hours*3600;
+	minutes = duration / 60; duration -= minutes*60;
+	seconds = duration;
+
+	std::stringstream ss;
+	if( days ) ss<<days<<":";
+	if( hours ) ss<<hours<<":";
+	if( hours && minutes<10) ss << "0";
+	ss<<minutes << ":";
+	ss<<std::setfill('0') << std::setw(2) << seconds;
+
+	durationLabel->setText( ss.str());
+
 }
 
 bool CallWindow::handleSwitchData( SwitchData* data ) {
@@ -223,6 +264,7 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 	AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
 	AudioServiceAPI::RoutingMute(this->application,false);
+	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_speaker"));
 }
 
 bool CallWindow::handleLeftButton() {

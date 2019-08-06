@@ -121,12 +121,12 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
 
-			if( currentWindow->updateSignalStrength( msg->signalStrength ) )
+			if( currentWindow->updateSignalStrength( msg->signalStrength ) ) {
 				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-
+			}
+			handled = true;
 		    LOG_INFO("---------------------------------SignalStrengthUpdate %d", msg->signalStrength );
 		}
-		handled = true;
 	}
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {

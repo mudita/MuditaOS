@@ -29,6 +29,12 @@ public:
 	};
 protected:
 
+	enum class FocusRects {
+		Messages,
+		Speaker,
+		Micrphone,
+	};
+
 	enum class AudioState {
 		ON,
 		OFF
@@ -39,8 +45,8 @@ protected:
 
 	gui::Image* imageSpeaker[2] = {nullptr,nullptr};
 	gui::Image* imageMicrophone[2] = {nullptr,nullptr};
-	gui::Rect* rectSpeaker = nullptr;
-	gui::Rect* rectMute = nullptr;
+	gui::Rect* rects[3] = {nullptr};
+	gui::Image* imageMessage = nullptr;
 
 	AudioState microphoneState = AudioState::ON;
 	AudioState speakerState = AudioState::OFF;
@@ -61,6 +67,7 @@ public:
 	 * Used by application to update window's state
 	 */
 	void setState( State state );
+	void updateDuration( uint32_t duration );
 
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;
