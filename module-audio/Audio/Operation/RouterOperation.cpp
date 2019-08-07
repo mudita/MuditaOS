@@ -81,7 +81,7 @@ namespace audio {
         audioDeviceCellularBuffer.reserve(1024);
 
         //TODO:M.P should be fetched from DB
-        availableProfiles.push_back(std::make_unique<ProfileRoutingEarspeaker>(nullptr, 1, 5));
+        availableProfiles.push_back(std::make_unique<ProfileRoutingEarspeaker>(nullptr, 1, 2));
         availableProfiles.push_back(std::make_unique<ProfileRoutingSpeakerphone>(nullptr, 1, 2));
         availableProfiles.push_back(std::make_unique<ProfileRoutingHeadset>(nullptr, 1, 5));
 
