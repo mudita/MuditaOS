@@ -148,9 +148,7 @@ void ApplicationCall::TickHandler(uint32_t id) {
 		}
 	}
 
-	LOG_WARN("CALL DURATION: %d END OF TIME:%d" , callDuration, callEndTime );
 	if( callDuration >= callEndTime ) {
-		LOG_INFO("switching to precv calldur: %d endTime: %d", callDuration, callEndTime );
 		stopTimer(timerCall);
 		sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 	}

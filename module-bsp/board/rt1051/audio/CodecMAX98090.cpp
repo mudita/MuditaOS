@@ -19,9 +19,7 @@ CodecMAX98090::CodecMAX98090() : i2CInst(BOARD_GetI2CInstance()) {
 }
 
 CodecMAX98090::~CodecMAX98090() {
-    max98090_reg_swreset_t reset = {0};
-    reset.swreset = 1;
-    bsp_i2c_Send(i2CInst, MAX98090_I2C_ADDR, MAX98090_REG_SWRESET, 1, (uint8_t *) &reset, 1);
+    Reset();
 }
 
 CodecRetCode CodecMAX98090::Start(const CodecParams &param) {
@@ -499,6 +497,12 @@ CodecRetCode CodecMAX98090::MicBias(const bool enable) {
 }
 
 CodecRetCode CodecMAX98090::Reset() {
+
+    // Turn off device
+    max98090_reg_shutdown_t dev_shutdown = {.shdn=0};
+    bsp_i2c_Send(i2CInst, MAX98090_I2C_ADDR, MAX98090_REG_DEVICE_SHUTDOWN, 1, (uint8_t *) &dev_shutdown, 1);
+
+    // Set all registers to default state
     max98090_reg_swreset_t reset = {0};
     reset.swreset = 1;
     bsp_i2c_Send(i2CInst, MAX98090_I2C_ADDR, MAX98090_REG_SWRESET, 1, (uint8_t *) &reset, 1);

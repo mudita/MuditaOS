@@ -74,8 +74,6 @@ void Application::render( gui::RefreshModes mode ) {
 		return;
 	}
 
-	LOG_WARN("RENDERING %s", GetName().c_str());
-
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
@@ -218,9 +216,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_FORGROUND;
 
-					//send window switch function
-					LOG_WARN("SWITING TO WINDOW: [%s][%s]", msg->getApplicationName().c_str(), msg->getWindowName().c_str());
-
 					switchWindow( msg->getWindowName(), 0, std::move( msg->getData()));
 					handled = true;
 				}
@@ -255,7 +250,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
 		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
 		//check if specified window is in the application
-		LOG_INFO("Switching to window: [%s] cmd: %d, data: %s", msg->getWindowName().c_str(), msg->getCommand(), (msg->getData()!=nullptr?"true":"false"));
 		auto it = windows.find( msg->getWindowName() );
 		if( it != windows.end() ) {
 

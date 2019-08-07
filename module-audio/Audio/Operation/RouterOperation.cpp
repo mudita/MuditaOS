@@ -27,6 +27,7 @@ namespace audio {
 
             if (framesPerBuffer > audioDeviceBuffer.capacity()) {
                 audioDeviceBuffer.reserve(framesPerBuffer);
+                std::fill(std::begin(audioDeviceBuffer), std::end(audioDeviceBuffer), 0);
             }
 
             if (inputBuffer) {
@@ -58,6 +59,7 @@ namespace audio {
 
             if (framesPerBuffer > audioDeviceCellularBuffer.capacity()) {
                 audioDeviceCellularBuffer.reserve(framesPerBuffer);
+                std::fill(std::begin(audioDeviceCellularBuffer), std::end(audioDeviceCellularBuffer), 0);
             }
 
             if (inputBuffer) {
@@ -78,7 +80,9 @@ namespace audio {
         };
 
         audioDeviceBuffer.reserve(1024);
+        std::fill(std::begin(audioDeviceBuffer), std::end(audioDeviceBuffer), 0);
         audioDeviceCellularBuffer.reserve(1024);
+        std::fill(std::begin(audioDeviceCellularBuffer), std::end(audioDeviceCellularBuffer), 0);
 
         //TODO:M.P should be fetched from DB
         availableProfiles.push_back(std::make_unique<ProfileRoutingEarspeaker>(nullptr, 1, 2));
