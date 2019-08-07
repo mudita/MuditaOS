@@ -15,11 +15,16 @@
 
 #include "vfs.hpp"
 
+#include "service-db/api/DBServiceAPI.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
 {
 	LOG_INFO("[EventManager] Initializing");
+
+	alarmTimestamp = 0;
+	alarmID = 0;
+	busChannels.push_back(sys::BusChannels::ServiceDatabaseAlarmNotifications);
 }
 
 EventManager::~EventManager(){
@@ -36,6 +41,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	bool handled = false;
 
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
+	{
+
+		alarmDBEmpty = false;
+		alarmIsValid = false;
+	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
@@ -83,6 +94,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		handled = true;
 	}
+	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
+			msgl->sender == this->GetName() ){
+
+		HandleAlarmTrigger(msgl);
+	}
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
@@ -101,11 +117,14 @@ sys::ReturnCodes EventManager::InitHandler() {
 	sys::WorkerQueueInfo qIrq = {"qIrq", sizeof(uint8_t), 10 };
 	//battery manager queue
 	sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10 };
+	//RTC irq queue
+	sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20 };
 
 	std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qIrq);
 	list.push_back(qBattery);
+	list.push_back(qRTC);
 
 	EventWorker->init( list );
 	EventWorker->run();
