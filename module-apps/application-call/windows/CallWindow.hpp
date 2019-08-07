@@ -10,6 +10,8 @@
 #define MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
 
 #include "AppWindow.hpp"
+#include "Rect.hpp"
+#include "Image.hpp"
 
 namespace gui {
 
@@ -20,14 +22,35 @@ class CallWindow: public AppWindow {
 public:
 	enum class State {
 		IDLE,
-		INCOMMING_CALL,
+		INCOMING_CALL,
 		OUTGOING_CALL,
 		CALL_IN_PROGRESS,
 		CALL_ENDED
 	};
 protected:
+
+	enum class FocusRects {
+		Messages,
+		Speaker,
+		Micrphone,
+	};
+
+	enum class AudioState {
+		ON,
+		OFF
+	};
 	gui::Label* titleLabel = nullptr;
 	gui::Label* numberLabel = nullptr;
+	gui::Label* durationLabel = nullptr;
+
+	gui::Image* imageSpeaker[2] = {nullptr,nullptr};
+	gui::Image* imageMicrophone[2] = {nullptr,nullptr};
+	gui::Rect* rects[3] = {nullptr};
+	gui::Image* imageMessage = nullptr;
+
+	AudioState microphoneState = AudioState::ON;
+	AudioState speakerState = AudioState::OFF;
+
 	State state = State::IDLE;
 	/**
 	 * Manipulates widgets to handle currently set state of the window.
@@ -39,6 +62,14 @@ protected:
 public:
 	CallWindow( app::Application* app, std::string windowName = "CallWindow" );
 	virtual ~CallWindow();
+
+	/**
+	 * Used by application to update window's state
+	 */
+	void setState( State state );
+	const State& getState();
+	void updateDuration( uint32_t duration );
+	void setCallNumber( std::string );
 
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;

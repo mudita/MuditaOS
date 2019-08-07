@@ -14,6 +14,8 @@
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 //module-gui
 #include "gui/core/DrawCommand.hpp"
 #include "gui/input/InputEvent.hpp"
@@ -27,14 +29,17 @@
 
 namespace app {
 
-Application::Application(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
-	Service( name, stackDepth, priority ){
+Application::Application(std::string name, bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
+	Service( name, stackDepth, priority ),
+	startBackground{ startBackground } {
 
 	longpressTimerID = CreateTimer( 1000 ,false);
 
 	//create translator and set default profile
 	translator = std::make_unique<gui::Translator>();
 	translator->setProfile("home_screen");
+
+	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 
 }
 
@@ -81,7 +86,16 @@ void Application::blockEvents(bool isBlocked ) {
 }
 int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 
-	std::string window = windowName.empty()?"MainWindow":windowName;
+	std::string window;
+
+	//case to handle returning to previous application
+	if( windowName == "LastWindow" ) {
+		window = currentWindow->getName();
+	}
+	else {
+		window = windowName.empty()?"MainWindow":windowName;
+	}
+
 	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
@@ -102,6 +116,20 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	bool handled = false;
+
+	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
+		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
+			if( ( state == State::ACTIVE_FORGROUND ) && (currentWindow->updateSignalStrength( msg->signalStrength) ) ) {
+				//loop and update all widnows
+				for ( auto it = windows.begin(); it != windows.end(); it++ ) {
+					it->second->updateSignalStrength( msg->signalStrength);
+				}
+				handled = true;
+				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+			}
+		}
+	}
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
 		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
@@ -161,7 +189,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 
 		refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated))
@@ -176,10 +203,10 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		uint32_t hour = (timestamp % 86400) / 3600;
 		uint32_t min = (timestamp % 3600) / 60;
 		LOG_INFO("%02d:%02d", hour , min);
+		handled = true;
 	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
-
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
@@ -189,7 +216,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_FORGROUND;
 
-					//send window switch function
 					switchWindow( msg->getWindowName(), 0, std::move( msg->getData()));
 					handled = true;
 				}
@@ -224,7 +250,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
 		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
 		//check if specified window is in the application
-		LOG_INFO("Switching to window: [%s] cmd: %d, data: %s", msg->getWindowName().c_str(), msg->getCommand(), (msg->getData()!=nullptr?"true":"false"));
 		auto it = windows.find( msg->getWindowName() );
 		if( it != windows.end() ) {
 
@@ -281,7 +306,7 @@ sys::ReturnCodes Application::InitHandler() {
 	initState = (settings.dbID == 1);
 
 	//send response to application manager true if successful, false otherwise.
-	sapm::ApplicationManager::messageRegisterApplication( this, initState );
+	sapm::ApplicationManager::messageRegisterApplication( this, initState, startBackground );
 	sys::ReturnCodes retCode = (initState?sys::ReturnCodes::Success:sys::ReturnCodes::Failure);
 	return retCode;
 }

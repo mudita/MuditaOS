@@ -80,12 +80,15 @@ public:
 class APMRegister: public APMMessage {
 protected:
 	bool status;
+	bool startBackground;
 public:
-	APMRegister( const std::string& senderName, const bool& status ) :
+	APMRegister( const std::string& senderName, const bool& status, const bool& startBackground  ) :
 	APMMessage( MessageType::APMRegister, senderName ),
-	status{ status } {}
+	status{ status },
+	startBackground{ startBackground }{}
 
 	const bool& getStatus() { return status; };
+	const bool& getStartBackground() { return startBackground; };
 };
 
 class APMDelayedClose: public APMMessage {

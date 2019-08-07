@@ -24,6 +24,7 @@ enum class NotificationType{
     CallAborted,
     CallBusy,
     CallActive,
+    Ringing,
     NewIncomingSMS,
     SignalStrengthUpdate,
     PowerUpProcedureComplete,

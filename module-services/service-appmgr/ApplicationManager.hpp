@@ -121,7 +121,7 @@ public:
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.
 	*/
-   static bool messageRegisterApplication( sys::Service* sender, const bool& status );
+   static bool messageRegisterApplication( sys::Service* sender, const bool& status,const bool& startBackground );
    /**
     * @brief Sends message to application manager to inform it about change of the phone's language performed by the user.
     */

@@ -7,6 +7,8 @@
     "common_set": "SET",
     "common_yes": "Yes",
     "common_no": "No",
+    "common_speaker": "SPEAKER",
+    "common_mute": "MUTE",
     "common_switch": "SWITCH",
     "common_options": "OPTIONS",
     "common_monday": "Monday",

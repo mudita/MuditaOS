@@ -42,6 +42,10 @@ public:
 	bool run(sys::SystemManager* sysmgr) override {
 		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr,1000);
 	};
+	bool runBackground(sys::SystemManager* sysmgr) {
+		startBackground = true;
+		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr,1000);
+	};
 };
 
 } /* namespace app */

@@ -33,7 +33,7 @@ ApplicationDescription::ApplicationDescription( std::string name, std::unique_pt
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
 	std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
 
-	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+//	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
 
@@ -62,6 +62,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
+
 			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName().c_str());
 			handleSwitchPrevApplication( msg );
 		}break;
@@ -101,33 +102,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
 			handleLanguageChange( msg );
 		} break;
-		case static_cast<int32_t>(MessageType::CellularNotification): {
-		   CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-
-		   if (msg->type == CellularNotificationMessage::Type::CallAborted) {
-			   LOG_INFO("CallAborted");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
-			   LOG_INFO("CallBusy");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
-			   LOG_INFO("CallActive");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
-			   LOG_INFO("IncomingCall");
-			   std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
-			   //send to itself message to switch (run) call application
-			   if( focusApplicationName != "ApplicationCall") {
-				   messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
-			   }
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::NewIncomingSMS ) {
-			   LOG_INFO("NewIncomingSMS");
-		   }
-		   else if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-			   LOG_INFO("SignalStrengthUpdate");
-		   }
-		} break;
 		default : {
 			LOG_FATAL("Received unknown massage %d", msgType );
 		} break;
@@ -160,14 +134,30 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 		utils::localize.Switch( utils::Lang::Sp );
 	}
 
-	//search for application with specified name and run it
-	std::string runAppName = "ApplicationDesktop";
-//	std::string runAppName = "ApplicationViewer";
 
-	auto it = applications.find(runAppName);
+	//search for application with specified name and run it
+#if 1 //change to 0 if you want to run only viewer application for kickstarter
+	std::string runDesktopName = "ApplicationDesktop";
+	std::string runCallAppName = "ApplicationCall";
+
+	auto it = applications.find(runCallAppName);
+	if( it!= applications.end()){
+		it->second->lanucher->runBackground(reinterpret_cast<sys::SystemManager*>(this));
+	}
+
+	it = applications.find(runDesktopName);
 	if( it!= applications.end()){
 		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
 	}
+
+#else
+	std::string runCallAppName = "ApplicationViewer";
+
+	auto it = applications.find(runCallAppName);
+		if( it!= applications.end()){
+			messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
+		}
+#endif
 
   	return sys::ReturnCodes::Success;
 }
@@ -196,7 +186,7 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	if( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) {
 		state = State::WAITING_GET_FOCUS_CONFIRMATION;
-		LOG_INFO( "switching focus to application: %s", appName.c_str());
+		LOG_INFO( "switching focus to application: [%s] window [%s]", appName.c_str(), it->second->switchWindow.c_str());
 		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
 	}
 	else {
@@ -308,7 +298,7 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		//if application is not closeable send lost focus message
 		else {
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
-			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
+			app::Application::messageSwitchApplication(this, previousApplicationName, "LastWindow", nullptr);
 		}
 	}
 	//if there was no application to close or application can't be closed change internal state to
@@ -321,14 +311,28 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 }
 
 bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
-	//check if this is register message from recently launched application
+
 	if( msg->getSenderName() == launchApplicationName ) {
-		auto it = applications.find(launchApplicationName);
 
-		it->second->state = app::Application::State::ACTIVATING;
-		state = State::WAITING_GET_FOCUS_CONFIRMATION;
+		//check if this is register message from recently launched application
+		auto it = applications.find(msg->getSenderName());
+		if( it == applications.end())
+			return false;
+		//application starts in background
+		if( msg->getStartBackground()) {
+			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+			state = State::IDLE;
+		}
+		else {
+			it->second->state = app::Application::State::ACTIVATING;
+			state = State::WAITING_GET_FOCUS_CONFIRMATION;
 
-		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+			app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+		}
+	}
+	else {
+		auto it = applications.find(msg->getSenderName());
+		it->second->state = app::Application::State::ACTIVE_BACKGROUND;
 	}
 	return true;
 }
@@ -398,6 +402,7 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 
 			auto it = applications.find(previousApplicationName);
 			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+			it->second->switchWindow = "LastWindow";
 			startApplication( launchApplicationName );
 			return true;
 		}
@@ -439,40 +444,30 @@ bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret =  sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmClose>(sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender ) {
 
 	auto msg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500);
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
-bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status ) {
-	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status );
+bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const bool& status, const bool& startBackground ) {
+	auto msg = std::make_shared<sapm::APMRegister>(sender->GetName(), status, startBackground );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lang language ) {
 	auto msg = std::make_shared<sapm::APMChangeLanguage>( sender->GetName(), language );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
-//	auto ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 500 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 }
 
 } /* namespace sapm */

@@ -62,7 +62,7 @@ public:
 		DEACTIVATING
 	};
 public:
-	Application(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	Application(std::string name, bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
 	/**
@@ -149,6 +149,10 @@ protected:
 	 * Object responsible for translating keyboard events into gui acceptable events
 	 */
 	std::unique_ptr<gui::Translator> translator;
+	/**
+	 * Flag defines how application will behave after registration. It can go forground or background
+	 */
+	bool startBackground = false;
 
 	//protected static methods
 	/**
@@ -163,6 +167,8 @@ protected:
 	std::string name;
 	//defines whether application can be closed when it looses focus
 	bool closeable = true;
+	//defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
+	bool startBackground = false;
 public:
 	ApplicationLauncher( std::string name, bool isCloseable ) : name{name}, closeable{isCloseable} {};
 	virtual ~ApplicationLauncher() {};
@@ -170,6 +176,7 @@ public:
 	bool isCloseable() { return closeable; };
 	//virtual method to run the application
 	virtual bool run(sys::SystemManager* sysmgr) {return true;};
+	virtual bool runBackground(sys::SystemManager* sysmgr) {return true;};
 };
 
 } /* namespace app */

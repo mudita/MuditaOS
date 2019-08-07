@@ -72,13 +72,18 @@ bool AppWindow::updateBatteryLevel( uint32_t percentage ) {
 }
 //updates battery level in the window
 bool AppWindow::updateSignalStrength( uint32_t strength ) {
-	return false;
+
+	uint32_t newStrength = 0;
+	if( strength >= 2 ) newStrength = 1;
+	if( strength >= 10 ) newStrength = 2;
+	if( strength >= 15 ) newStrength = 3;
+	if( strength >= 20 ) newStrength = 4;
+	if( strength >= 25 ) newStrength = 5;
+	topBar->setSignalStrength( newStrength );
+	return true;
 }
 
 std::list<DrawCommand*> AppWindow::buildDrawList() {
-	//update top bar and bottom bar
-	topBar->setBatteryLevel( topBar->getBatteryLevel());
-
 	return Window::buildDrawList();
 }
 
