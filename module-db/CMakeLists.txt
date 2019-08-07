@@ -31,6 +31,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/ContactsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SmsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SettingsDB.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/AlarmsDB.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
@@ -41,12 +42,14 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsRingtonesTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsAddressTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SettingsTable.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/Tables/AlarmsTable.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ContactRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ThreadRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SettingsRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/AlarmsRecord.cpp
 
         )
 
