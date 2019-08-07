@@ -42,7 +42,7 @@ namespace sys
         InitHandler();
 
         if(userInit){
-            userInit(this);
+            userInit();
         }
 
         while (enableRunLoop) {
@@ -55,9 +55,11 @@ namespace sys
         EndScheduler();
     }
 
-    void SystemManager::StartSystem()
+    void SystemManager::StartSystem(std::function<int()> init)
     {
         LogOutput::Output("Initializing system...");
+
+        userInit = init;
 
         // Start System manager
         StartService();
@@ -73,7 +75,7 @@ namespace sys
         return true;
     }
 
-    bool SystemManager::CreateService(std::shared_ptr<Service> service,Service* s,TickType_t timeout){
+    bool SystemManager::CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout){
 
 
         CriticalSection::Enter();
@@ -83,7 +85,7 @@ namespace sys
         service->StartService();
 
         auto msg = std::make_shared<SystemMessage>(SystemMessageType::Start);
-        auto ret = Bus::SendUnicast(msg,service->GetName(),s,timeout);
+        auto ret = Bus::SendUnicast(msg,service->GetName(),caller,timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
@@ -94,10 +96,10 @@ namespace sys
         }
     }
 
-    bool SystemManager::DestroyService(const std::string& name,Service* s,TickType_t timeout){
+    bool SystemManager::DestroyService(const std::string& name,Service* caller,TickType_t timeout){
 
         auto msg = std::make_shared<SystemMessage>(SystemMessageType::Exit);
-        auto ret = Bus::SendUnicast(msg,name,s,timeout);
+        auto ret = Bus::SendUnicast(msg,name,caller,timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
@@ -119,10 +121,10 @@ namespace sys
         }
     }
 
-    bool SystemManager::SuspendService(const std::string& name,Service* s,TickType_t timeout){
+    bool SystemManager::SuspendService(const std::string& name,Service* caller,TickType_t timeout){
 
         auto msg = std::make_shared<SystemMessage>(SystemMessageType::GoSleep);
-        auto ret = Bus::SendUnicast(msg,name,s,timeout);
+        auto ret = Bus::SendUnicast(msg,name,caller,timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
@@ -133,10 +135,10 @@ namespace sys
         }
     }
 
-    bool SystemManager::ResumeService(const std::string& name,Service* s,TickType_t timeout){
+    bool SystemManager::ResumeService(const std::string& name,Service* caller,TickType_t timeout){
 
         auto msg = std::make_shared<SystemMessage>(SystemMessageType::Wakeup);
-        auto ret = Bus::SendUnicast(msg,name,s,timeout);
+        auto ret = Bus::SendUnicast(msg,name,caller,timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
         if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
@@ -145,11 +147,6 @@ namespace sys
         else{
             return false;
         }
-    }
-
-    void SystemManager::RegisterInitFunction(std::function<int(SystemManager* sysmgr)> init)
-    {
-        userInit = init;
     }
 
     ReturnCodes SystemManager::InitHandler(){

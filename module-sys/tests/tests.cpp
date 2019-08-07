@@ -14,21 +14,16 @@
 #include "Test1/CommandsService.hpp"
 #include "Test1/TestService1.hpp"
 
-int InitServices(sys::SystemManager* sysmgr)
-{
-    auto ret = sys::SystemManager::CreateService(std::make_shared<CommandsService>("CommandsService"),sysmgr);
-    REQUIRE(ret);
-
-    return 0;
-}
-
 TEST_CASE( "Test case 1" ) {
 
-        auto sysmgr = std::make_shared<sys::SystemManager>(5000);
+        auto sysmgr = std::make_shared<sys::SystemManager>(50000);
 
-        sysmgr->StartSystem();
+        sysmgr->StartSystem([sysmgr]()->int{
+            auto ret = sys::SystemManager::CreateService(std::make_shared<CommandsService>("CommandsService"),sysmgr.get());
+            REQUIRE(ret);
 
-        sysmgr->RegisterInitFunction(InitServices);
+            return 0;
+        });
 
         cpp_freertos::Thread::StartScheduler();
 
