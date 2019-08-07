@@ -315,6 +315,7 @@ Name: alarms
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | time | (m) | INTEGER | Number of seconds from midnight that needs to elapse to genereate alarm event.  |
+| snooze | (m) | INTEGER | Number of seconds from alarm that needs to elapse to genereate alarm event after snooze.  |
 | status | (m) | INTEGER | State of the timer as defined in the table below. |
 |path | (m) | TEXT | Path to sound file that should be played when alarm event is generated. |
 

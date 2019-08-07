@@ -11,253 +11,270 @@
 
 #include "FreeRTOS.h"
 
+static xQueueHandle qHandleRtcIrq = NULL;
+
 static  snvs_hp_rtc_config_t    s_rtcConfig;
 static uint32_t SNVS_HP_ConvertDatetimeToSeconds(const snvs_hp_rtc_datetime_t *datetime);
 static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datetime_t *datetime);
+namespace bsp{
 
-RtcBspError_e BSP_RtcInit()
-{
-    SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
-    SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
-;
-    NVIC_SetPriority(SNVS_HP_WRAPPER_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
-    /* Enable at the NVIC */
-    NVIC_EnableIRQ(SNVS_HP_WRAPPER_IRQn);
+	RtcBspError_e rtc_Init(xQueueHandle qHandle)
+	{
+		qHandleRtcIrq = qHandle;
 
-    // Start the timer
-    SNVS_HP_RTC_StartTimer(SNVS);
-    return RtcBspOK;
+		SNVS_HP_RTC_GetDefaultConfig(&s_rtcConfig);
+		SNVS_HP_RTC_Init(SNVS, &s_rtcConfig);
+
+		NVIC_SetPriority(SNVS_HP_WRAPPER_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+		/* Enable at the NVIC */
+		NVIC_EnableIRQ(SNVS_HP_WRAPPER_IRQn);
+
+		// Start the timer
+		SNVS_HP_RTC_StartTimer(SNVS);
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_SetDateTimeFromTimestamp(time_t timestamp)
+	{
+		snvs_hp_rtc_datetime_t rtcDateTime;
+
+		SNVS_HP_ConvertSecondsToDatetime((uint32_t)timestamp, &rtcDateTime);
+		portENTER_CRITICAL();
+
+		SNVS_HP_RTC_StopTimer(SNVS);
+		SNVS_HP_RTC_SetDatetime(SNVS, &rtcDateTime);
+		SNVS_HP_RTC_StartTimer(SNVS);
+
+		portEXIT_CRITICAL();
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_SetDateTime(struct tm* time)
+	{
+		if (time == NULL)
+		{
+			return RtcBspError;
+		}
+
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		rtcDate.year    = time->tm_year + 1900;
+		rtcDate.month   = time->tm_mon  + 1;
+		rtcDate.day     = time->tm_mday;
+		rtcDate.hour    = time->tm_hour;
+		rtcDate.minute  = time->tm_min;
+		rtcDate.second  = time->tm_sec;
+
+		portENTER_CRITICAL();
+		SNVS_HP_RTC_StopTimer(SNVS);
+		SNVS_HP_RTC_SetDatetime(SNVS, &rtcDate);
+		SNVS_HP_RTC_StartTimer(SNVS);
+		portEXIT_CRITICAL();
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_GetCurrentDateTime(struct tm* datetime)
+	{
+		if (datetime == NULL)
+		{
+			return RtcBspError;
+		}
+
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		SNVS_HP_RTC_GetDatetime(SNVS, &rtcDate);
+
+		datetime->tm_year  = rtcDate.year    - 1900;
+		datetime->tm_mon   = rtcDate.month   - 1;
+		datetime->tm_mday  = rtcDate.day;
+		datetime->tm_hour  = rtcDate.hour;
+		datetime->tm_min   = rtcDate.minute;
+		datetime->tm_sec   = rtcDate.second;
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_GetCurrentTimestamp(time_t* timestamp)
+	{
+		if (timestamp == NULL)
+		{
+			return RtcBspError;
+		}
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		SNVS_HP_RTC_GetDatetime(SNVS, &rtcDate);
+		*timestamp = (time_t)SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_SetAlarmOnDate(struct tm* datetime)
+	{
+		if (datetime == NULL)
+		{
+			return RtcBspError;
+		}
+
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		rtcDate.year    = datetime->tm_year + 1900;
+		rtcDate.month   = datetime->tm_mon  + 1;
+		rtcDate.day     = datetime->tm_mday;
+		rtcDate.hour    = datetime->tm_hour;
+		rtcDate.minute  = datetime->tm_min;
+		rtcDate.second  = datetime->tm_sec;
+
+		rtc_EnableAlarmIrq();
+		SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate);
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_SetAlarmOnTimestamp(uint32_t secs)
+	{
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		SNVS_HP_ConvertSecondsToDatetime(secs, &rtcDate);
+
+		if (SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate) != kStatus_Success)
+		{
+			return RtcBspError;
+		}
+
+		rtc_EnableAlarmIrq();
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_SetAlarmInSecondsFromNow(uint32_t secs)
+	{
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		SNVS_HP_RTC_GetDatetime(SNVS, &rtcDate);
+
+		uint32_t seconds = SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
+
+		seconds += secs;
+
+		SNVS_HP_ConvertSecondsToDatetime(seconds, &rtcDate);
+
+		rtc_EnableAlarmIrq();
+		SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate);
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_GetAlarmTimestamp(uint32_t* secs)
+	{
+		if (secs == NULL)
+		{
+			return RtcBspError;
+		}
+
+		snvs_hp_rtc_datetime_t rtcDate;
+
+		SNVS_HP_RTC_GetAlarm(SNVS, &rtcDate);
+
+		*secs = SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
+		return RtcBspOK;
+	}
+	static const uint32_t irqTimeout = 100000;
+	RtcBspError_e rtc_EnableAlarmIrq()
+	{
+		uint32_t cnt = irqTimeout;
+		SNVS->HPCR |= SNVS_HPCR_HPTA_EN_MASK;
+		while ((!(SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK)) && cnt)
+		{
+			cnt--;
+		}
+
+		if (cnt == 0)
+		{
+			return RtcBspError;
+		}
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_DisableAlarmIrq()
+	{
+		uint32_t cnt = irqTimeout;
+
+		SNVS->HPCR &= ~SNVS_HPCR_HPTA_EN_MASK;
+		while ((SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK) && cnt)
+		{
+			cnt--;
+		}
+
+		if (cnt == 0)
+		{
+			return RtcBspError;
+		}
+
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_MaskAlarmIrq()
+	{
+		NVIC_DisableIRQ(SNVS_HP_WRAPPER_IRQn);
+		return RtcBspOK;
+	}
+
+	RtcBspError_e rtc_UnmaskAlarmIrq()
+	{
+		NVIC_EnableIRQ(SNVS_HP_WRAPPER_IRQn);
+		return RtcBspOK;
+	}
+
+	time_t rtc_GetSecondCounter()
+	{
+		time_t seconds = 0;
+		time_t tmp = 0;
+
+		do
+		{
+			seconds = tmp;
+			tmp = (SNVS->HPRTCMR << 17U) | (SNVS->HPRTCLR >> 15U);
+		} while (tmp != seconds);
+
+		return seconds;
+	}
+
+	RtcBspError_e rtc_SetMinuteAlarm(time_t timestamp)
+	{
+		uint32_t secondsToMinute = 60 - ( timestamp % 60 );
+
+		struct tm date;
+		rtc_GetCurrentDateTime(&date);
+
+/*		LOG_INFO("seconds %d",  ( timestamp % 60 ));
+		LOG_INFO("seconds to minute %d", secondsToMinute);*/
+
+		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
+	}
 }
 
-RtcBspError_e BSP_RtcSetDateTimeFromTimestamp(time_t timestamp)
-{
-    snvs_hp_rtc_datetime_t rtcDateTime;
 
-    SNVS_HP_ConvertSecondsToDatetime((uint32_t)timestamp, &rtcDateTime);
-    portENTER_CRITICAL();
-
-    SNVS_HP_RTC_StopTimer(SNVS);
-    SNVS_HP_RTC_SetDatetime(SNVS, &rtcDateTime);
-    SNVS_HP_RTC_StartTimer(SNVS);
-
-    portEXIT_CRITICAL();
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcSetDateTime(struct tm* time)
-{
-    if (time == NULL)
-    {
-        return RtcBspError;
-    }
-
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    rtcDate.year    = time->tm_year + 1900;
-    rtcDate.month   = time->tm_mon  + 1;
-    rtcDate.day     = time->tm_mday;
-    rtcDate.hour    = time->tm_hour;
-    rtcDate.minute  = time->tm_min;
-    rtcDate.second  = time->tm_sec;
-
-    portENTER_CRITICAL();
-    SNVS_HP_RTC_StopTimer(SNVS);
-    SNVS_HP_RTC_SetDatetime(SNVS, &rtcDate);
-    SNVS_HP_RTC_StartTimer(SNVS);
-    portEXIT_CRITICAL();
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcGetCurrentDateTime(struct tm* datetime)
-{
-    if (datetime == NULL)
-    {
-        return RtcBspError;
-    }
-
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    SNVS_HP_RTC_GetDatetime(SNVS, &rtcDate);
-
-    datetime->tm_year  = rtcDate.year    - 1900;
-    datetime->tm_mon   = rtcDate.month   - 1;
-    datetime->tm_mday  = rtcDate.day;
-    datetime->tm_hour  = rtcDate.hour;
-    datetime->tm_min   = rtcDate.minute;
-    datetime->tm_sec   = rtcDate.second;
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcGetCurrentTimestamp(time_t* timestamp)
-{
-    if (timestamp == NULL)
-    {
-        return RtcBspError;
-    }
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    SNVS_HP_RTC_GetDatetime(SNVS, &rtcDate);
-    *timestamp = (time_t)SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcSetAlarmOnDate(struct tm* datetime)
-{
-    if (datetime == NULL)
-    {
-        return RtcBspError;
-    }
-
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    rtcDate.year    = datetime->tm_year + 1900;
-    rtcDate.month   = datetime->tm_mon  + 1;
-    rtcDate.day     = datetime->tm_mday;
-    rtcDate.hour    = datetime->tm_hour;
-    rtcDate.minute  = datetime->tm_min;
-    rtcDate.second  = datetime->tm_sec;
-
-    BSP_RtcEnableAlarmIrq();
-    SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate);
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcSetAlarmOnTimestamp(uint32_t secs)
-{
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    SNVS_HP_ConvertSecondsToDatetime(secs, &rtcDate);
-
-    if (SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate) != kStatus_Success)
-    {
-        return RtcBspError;
-    }
-
-    BSP_RtcEnableAlarmIrq();
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcSetAlarmInSecondsFromNow(uint32_t secs)
-{
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    SNVS_HP_RTC_GetDatetime(SNVS, &rtcDate);
-
-    uint32_t seconds = SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
-
-    seconds += secs;
-
-    SNVS_HP_ConvertSecondsToDatetime(seconds, &rtcDate);
-
-    BSP_RtcEnableAlarmIrq();
-    SNVS_HP_RTC_SetAlarm(SNVS, &rtcDate);
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcGetAlarmTimestamp(uint32_t* secs)
-{
-    if (secs == NULL)
-    {
-        return RtcBspError;
-    }
-
-    snvs_hp_rtc_datetime_t rtcDate;
-
-    SNVS_HP_RTC_GetAlarm(SNVS, &rtcDate);
-
-    *secs = SNVS_HP_ConvertDatetimeToSeconds(&rtcDate);
-    return RtcBspOK;
-}
-static const uint32_t irqTimeout = 100000;
-RtcBspError_e BSP_RtcEnableAlarmIrq()
-{
-    uint32_t cnt = irqTimeout;
-    SNVS->HPCR |= SNVS_HPCR_HPTA_EN_MASK;
-    while ((!(SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK)) && cnt)
-    {
-        cnt--;
-    }
-
-    if (cnt == 0)
-    {
-        return RtcBspError;
-    }
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcDisableAlarmIrq()
-{
-    uint32_t cnt = irqTimeout;
-
-    SNVS->HPCR &= ~SNVS_HPCR_HPTA_EN_MASK;
-    while ((SNVS->HPCR & SNVS_HPCR_HPTA_EN_MASK) && cnt)
-    {
-        cnt--;
-    }
-
-    if (cnt == 0)
-    {
-        return RtcBspError;
-    }
-
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcMaskAlarmIrq()
-{
-    NVIC_DisableIRQ(SNVS_HP_WRAPPER_IRQn);
-    return RtcBspOK;
-}
-
-RtcBspError_e BSP_RtcUnmaskAlarmIrq()
-{
-    NVIC_EnableIRQ(SNVS_HP_WRAPPER_IRQn);
-    return RtcBspOK;
-}
-
-time_t BSP_RtcGetSecondCounter()
-{
-    time_t seconds = 0;
-    time_t tmp = 0;
-
-    do
-    {
-        seconds = tmp;
-        tmp = (SNVS->HPRTCMR << 17U) | (SNVS->HPRTCLR >> 15U);
-    } while (tmp != seconds);
-
-    return seconds;
-}
-
-/**
- *      *******************************************************************************************************************************
- *      *                                                                                                                             *
- *      *                                      STATIC FUNCTIONS DEFINITIONS                                                           *
- *      *                                                                                                                             *
- *      *******************************************************************************************************************************
- */
 
 extern "C"
 {
 	void SNVS_HP_WRAPPER_IRQHandler()
 	{
-
+		BaseType_t xHigherPriorityTaskWoken = 0;
 		if (SNVS_HP_RTC_GetStatusFlags(SNVS) & kSNVS_RTC_AlarmInterruptFlag)
 		{
-
+			uint8_t notification = static_cast<uint8_t>(bsp::rtcIrqNotifications::alarmOcured);
+			bsp::rtc_DisableAlarmIrq();
+			xQueueSendFromISR(qHandleRtcIrq,&notification, &xHigherPriorityTaskWoken);
 			//TODO service function call
 		  //  RtcAlarmIrqHandler();
 			/* Clear alarm flag */
 			SNVS_HP_RTC_ClearStatusFlags(SNVS, kSNVS_RTC_AlarmInterruptFlag);
 		}
+		 // Switch context if necessary
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 		/* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
 		  exception return operation might vector to incorrect interrupt */
 		#if defined __CORTEX_M && (__CORTEX_M == 4U)
