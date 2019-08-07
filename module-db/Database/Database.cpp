@@ -118,6 +118,7 @@ std::unique_ptr<QueryResult> Database::Query(const char *format, ...) {
     va_list ap;
     auto szQuery = std::make_unique<char[]>(maxQueryLen);
     va_start(ap, format);
+    szQuery.get()[0] = 0;
     int res = vsnprintf(szQuery.get(), maxQueryLen, format, ap);
     va_end(ap);
 

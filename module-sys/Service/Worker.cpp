@@ -91,8 +91,6 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 		}
 	}
 
-
-
 	return true;
 }
 bool Worker::deinit() {

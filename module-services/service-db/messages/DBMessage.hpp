@@ -19,6 +19,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/ContactRecord.hpp"
+#include "Interface/AlarmsRecord.hpp"
 
 
 class DBMessage: public sys::DataMessage {
@@ -114,4 +115,21 @@ public:
     std::unique_ptr<std::vector<ContactRecord>> records;
 };
 
+class DBAlarmMessage : public DBMessage{
+public:
+	DBAlarmMessage(MessageType messageType, const AlarmsRecord& rec = AlarmsRecord{}) : DBMessage(messageType), record(rec){
+
+	}
+	virtual ~DBAlarmMessage() {};
+	AlarmsRecord record;
+	time_t time;
+};
+
+class DBAlarmResponseMessage : public DBResponseMessage{
+public:
+	DBAlarmResponseMessage(std::unique_ptr<std::vector<AlarmsRecord>> rec,uint32_t retCode=0,uint32_t  count=0) : DBResponseMessage(retCode,count),records(std::move(rec)){};
+	virtual ~DBAlarmResponseMessage() {};
+
+	std::unique_ptr<std::vector<AlarmsRecord>> records;
+};
 #endif //PUREPHONE_DBMESSAGE_HPP
