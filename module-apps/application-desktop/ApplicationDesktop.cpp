@@ -41,7 +41,6 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
 		return retMsg;
 	}
 
-	//this variable defines whether message was processed.
 	bool handled = true;
 
 	if( handled )

@@ -42,6 +42,7 @@ void CallWindow::buildInterface() {
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_select"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+	bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
 
 	titleLabel = new gui::Label(this, 0, 50, 480, 50 );
 	titleLabel->setFilled( false );
@@ -49,16 +50,16 @@ void CallWindow::buildInterface() {
 	titleLabel->setFont("gt_pressura_bold_24");
 	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-	durationLabel = new gui::Label(this, 0, 270, 480, 50 );
+	durationLabel = new gui::Label(this, 0, 240, 480, 80 );
 	durationLabel->setFilled( false );
 	durationLabel->setBorderColor( gui::ColorNoColor );
-	durationLabel->setFont("gt_pressura_regular_24");
+	durationLabel->setFont("gt_pressura_regular_44");
 	durationLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	numberLabel = new gui::Label(this, 0, 150, 480, 50 );
+	numberLabel = new gui::Label(this, 0, 120, 480, 80 );
 	numberLabel->setFilled( false );
 	numberLabel->setBorderColor( gui::ColorNoColor );
-	numberLabel->setFont("gt_pressura_bold_24");
+	numberLabel->setFont("gt_pressura_bold_44");
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	//create circles to hold images inside
@@ -136,12 +137,10 @@ void CallWindow::buildInterface() {
 		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
 
 		(microphoneState == AudioState::ON)?
-			AudioServiceAPI::RoutingMute(this->application,true):
-			AudioServiceAPI::RoutingMute(this->application,false);
+			AudioServiceAPI::RoutingMute(this->application,false):
+			AudioServiceAPI::RoutingMute(this->application,true);
 
 		return true; };
-
-	bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
 
 }
 

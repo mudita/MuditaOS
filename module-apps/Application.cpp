@@ -72,6 +72,8 @@ void Application::render( gui::RefreshModes mode ) {
 		return;
 	}
 
+	LOG_WARN("RENDERING %s", GetName().c_str());
+
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
@@ -122,10 +124,11 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
 
 			if( currentWindow->updateSignalStrength( msg->signalStrength ) ) {
-				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+				LOG_INFO("---------------------------------SignalStrengthUpdate %d", msg->signalStrength );
+				if( state == State::ACTIVE_FORGROUND )
+					refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 			}
 			handled = true;
-		    LOG_INFO("---------------------------------SignalStrengthUpdate %d", msg->signalStrength );
 		}
 	}
 
