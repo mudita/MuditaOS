@@ -62,8 +62,6 @@ void TopBar::prepareWidget() {
 	for( uint32_t i=0; i<batteryLevelCount; ++i )
 		battery[i]->setVisible( false );
 
-	battery[batteryLevel]->setVisible( true );
-
 	//icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
 }
@@ -99,15 +97,8 @@ void TopBar::setBatteryLevel( uint32_t level ) {
 
 void TopBar::setSignalStrength( uint32_t sth) {
 
-	uint32_t signalStrength = 0;
-	if( sth >= 2) signalStrength = 1;
-	if( sth >= 10) signalStrength = 2;
-	if( sth >= 15) signalStrength = 3;
-	if( sth >= 20) signalStrength = 4;
-	if( sth >= 25) signalStrength = 5;
-
-	this->signalStrength = signalStrength;
-	for( uint32_t i=0; i<batteryLevelCount; i++ ) {
+	signalStrength = sth;
+	for( uint32_t i=0; i<signalImgCount; i++ ) {
 		signal[i]->setVisible( false );
 	}
 	signal[signalStrength]->setVisible( true );

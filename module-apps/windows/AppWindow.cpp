@@ -91,6 +91,7 @@ bool AppWindow::updateSignalStrength( uint32_t strength ) {
 std::list<DrawCommand*> AppWindow::buildDrawList() {
 	//update top bar and bottom bar
 	topBar->setBatteryLevel( topBar->getBatteryLevel());
+	topBar->setSignalStrength( topBar->getSignalStrength());
 
 	return Window::buildDrawList();
 }
