@@ -82,7 +82,7 @@ private:
             ");";
 
     const char* settingsInitialization =
-            "INSERT OR IGNORE INTO settings ( time_format_12, time_auto, brightness_auto, brightness_level, bigger_font, pin_mode, pin_days, pin_days_left, pin1_string,pin2_string, active_sim,network_operator,lock_pass_hash,language) VALUES(0,1,1,0,0,1,0,0,'','',1,'',0,1)";
+    		"INSERT OR IGNORE INTO settings (_id, time_format_12, time_auto, brightness_auto, brightness_level, bigger_font, pin_mode, pin_days, pin_days_left, pin1_string,pin2_string, active_sim,network_operator,lock_pass_hash,language) VALUES(1,0,1,1,0,0,1,0,0,'','',1,'',0,1)";
 
 };
 
