@@ -11,7 +11,7 @@
 
 namespace gui {
 
-uint32_t TopBar::signalStrength = 5;
+uint32_t TopBar::signalStrength = 0;
 uint32_t TopBar::batteryLevel = 5;
 
 const uint32_t TopBar::signalOffset = 35;

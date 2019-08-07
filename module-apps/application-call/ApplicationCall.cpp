@@ -79,7 +79,6 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 				LOG_INFO("ignoring call incoming");
 			}
 			AudioServiceAPI::RoutingStart(this);
-//			AudioServiceAPI::RoutingSpeakerPhone(this,true);
 			runCallTimer();
 			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
 			//send to itself message to switch (run) call application
@@ -94,7 +93,6 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
-//			AudioServiceAPI::RoutingSpeakerPhone(this,true);
 			runCallTimer();
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
@@ -145,18 +143,23 @@ void ApplicationCall::TickHandler(uint32_t id) {
 	auto it = windows.find("CallWindow");
 	if( currentWindow == it->second ) {
 		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>(currentWindow);
-		callWindow->updateDuration( callDuration );
-		refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+
+		if( callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS ) {
+			callWindow->updateDuration( callDuration );
+			refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+		}
 	}
 
-	LOG_WARN("CALL DURATION: %d", callDuration);
-	if( callDuration > callEndTime ) {
+	LOG_WARN("CALL DURATION: %d END OF TIME:%d" , callDuration, callEndTime );
+	if( callDuration >= callEndTime ) {
+		LOG_INFO("switching to precv calldur: %d endTime: %d", callDuration, callEndTime );
 		stopTimer(timerCall);
 		sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 	}
 }
 
 void ApplicationCall::stopCallTimer() {
+	LOG_INFO("switching to precv calldur: %d endTime: %d", callDuration, callEndTime );
 	stopTimer(timerCall);
 	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 }
@@ -188,6 +191,7 @@ const std::string& ApplicationCall::getDisplayedNumber() {
 
 void ApplicationCall::runCallTimer() {
 	callDuration = 0;
+	callEndTime = -1;
 	ReloadTimer(timerCall);
 }
 
