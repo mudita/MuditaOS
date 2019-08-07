@@ -45,6 +45,15 @@ enum class MessageType {
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
 	DBContactGetCount,         // Get contacts count
 
+
+	DBAlarmAdd,			// Add alarm record
+	DBAlarmRemove,    	// Remove alarm remove
+	DBAlarmUpdate,    	// Update alarm remove
+	DBAlarmGetLimitOffset,   // Get alarm records by limit,offset
+	DBAlarmGetCount,         // Get alarm count
+	DBAlarmGetNext,         // Get alarm, closest or equal to current timestamp.
+	DBAlarmUpdateNotification,
+
 	//Cellular messages
 	CellularNotification,   // Async notification message
     CellularDialNumber,     // Dial number
@@ -105,6 +114,9 @@ enum class MessageType {
 	//battery charger messages
 	EVMBatteryLevel,
 	EVMChargerPlugged,
+	//rtc messages
+	EVMMinuteUpdated,//This message is send to current focused application on every minute time change.
+
 };
 
 
