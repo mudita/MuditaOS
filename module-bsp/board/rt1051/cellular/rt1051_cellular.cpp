@@ -195,6 +195,18 @@ namespace bsp {
         DisableRx();
     }
 
+    void RT1051Cellular::Restart() {
+        const uint16_t RESET_DELAY_MS = 460;
+
+        InformModemHostWakeup();
+        WakeupModem();
+
+        GPIO_PinWrite(BSP_CELLULAR_RESET_PORT, BSP_CELLULAR_RESET_PIN, 1);
+        vTaskDelay(pdMS_TO_TICKS(RESET_DELAY_MS));
+        GPIO_PinWrite(BSP_CELLULAR_RESET_PORT, BSP_CELLULAR_RESET_PIN, 0);
+
+    }
+
     ssize_t RT1051Cellular::Write(void *buf, size_t nbytes) {
         lpuart_transfer_t sendXfer;
         sendXfer.data = static_cast<uint8_t *>(buf);
