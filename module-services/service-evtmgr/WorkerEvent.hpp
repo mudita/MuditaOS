@@ -9,14 +9,14 @@
 #define MODULE_SERVICES_SERVICE_KBD_WorkerEvent_HPP_
 
 
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "bsp/keyboard/key_codes.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
 
 #include "EventManager.hpp"
 
-#include "common.hpp"
+#include "bsp/common.hpp"
 
 struct KeyState{
 	uint8_t event;

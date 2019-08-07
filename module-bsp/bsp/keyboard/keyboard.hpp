@@ -14,7 +14,7 @@
 
 #include <stdint.h>
 
-#include "common.hpp"
+#include "bsp/common.hpp"
 #include "key_codes.hpp"
 
 namespace bsp {

@@ -8,13 +8,13 @@
 #ifndef MODULE_SERVICES_SERVICE_KBD_EVENTMANAGER_HPP_
 #define MODULE_SERVICES_SERVICE_KBD_EVENTMANAGER_HPP_
 
-#include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "bsp/keyboard/key_codes.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
 #include "MessageType.hpp"
 
-#include "common.hpp"
+#include "bsp/common.hpp"
 
 class EventManager: public sys::Service {
 private:

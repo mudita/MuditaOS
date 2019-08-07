@@ -20,8 +20,8 @@
 #include "../common/i2c.h"
 #include "TCA8418.h"
 #include "common.hpp"
-#include "key_codes.hpp"
-#include "keyboard.hpp"
+#include "keyboard/key_codes.hpp"
+#include "keyboard/keyboard.hpp"
 
 namespace bsp {
 

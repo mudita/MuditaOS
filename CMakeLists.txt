@@ -136,6 +136,9 @@ add_subdirectory(module-db)
 message("${PROJECT_NAME}: add_subdirectory module-cellular")
 add_subdirectory(module-cellular)
 
+message("${PROJECT_NAME}: add_subdirectory module-audio")
+add_subdirectory(module-audio)
+
 message("${PROJECT_NAME}: add_subdirectory module-services")
 add_subdirectory(module-services)
 
@@ -162,6 +165,7 @@ target_link_libraries(${PROJECT_NAME}
 
         module-sys
         module-cellular
+        module-audio
         module-db
         module-gui
         module-services

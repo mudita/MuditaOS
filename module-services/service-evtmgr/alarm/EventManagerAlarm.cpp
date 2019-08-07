@@ -9,7 +9,7 @@
 
 #include "log/log.hpp"
 
-#include "keyboard/keyboard.hpp"
+#include "bsp/keyboard/keyboard.hpp"
 #include "../WorkerEvent.hpp"
 #include "../messages/EVMessages.hpp"
 
