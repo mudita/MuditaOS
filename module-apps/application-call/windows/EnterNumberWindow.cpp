@@ -138,6 +138,13 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 }
 
 bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
+
+	if( data == nullptr )
+	{
+		LOG_ERROR("Received null pointer");
+		return false;
+	}
+
 	app::CallSwitchData *callData = reinterpret_cast<app::CallSwitchData*>(data);
 	switch( callData->getType()) {
 		case app::CallSwitchData::Type::UNDEFINED: {

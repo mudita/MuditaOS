@@ -36,6 +36,7 @@ add_subdirectory( application-viewer )
 add_subdirectory( application-desktop )
 add_subdirectory( application-settings )
 add_subdirectory( application-call )
+add_subdirectory( application-notes )
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )

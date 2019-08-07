@@ -22,7 +22,7 @@
 namespace app {
 
 ApplicationDesktop::ApplicationDesktop(std::string name) :
-	Application( name, 4096 ) {
+	Application( name ) {
 }
 
 ApplicationDesktop::~ApplicationDesktop() {
@@ -41,7 +41,6 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl) {
 		return retMsg;
 	}
 
-	//this variable defines whether message was processed.
 	bool handled = true;
 
 	if( handled )

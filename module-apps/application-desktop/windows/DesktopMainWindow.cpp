@@ -101,7 +101,6 @@ void DesktopMainWindow::setVisibleState() {
 
 	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 
-//	if( screenLocked ) {
 	if( app->getScreenLocked() ) {
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 		topBar->setActive( TopBar::Elements::LOCK, true );
@@ -141,7 +140,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
 				//if interval between enter and pnd keys is less than time defined for unlocking
 				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
-					app->setScreenLocked(false);
+//					app->setScreenLocked(false);
 					//display pin lock screen or simply refresh current window to update labels
 					if( app->getPinLocked())
 						application->switchWindow( "PinLockWindow", 0, nullptr );

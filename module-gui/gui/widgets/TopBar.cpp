@@ -11,7 +11,7 @@
 
 namespace gui {
 
-uint32_t TopBar::signalStrength = 5;
+uint32_t TopBar::signalStrength = 0;
 uint32_t TopBar::batteryLevel = 5;
 
 const uint32_t TopBar::signalOffset = 35;
@@ -62,8 +62,6 @@ void TopBar::prepareWidget() {
 	for( uint32_t i=0; i<batteryLevelCount; ++i )
 		battery[i]->setVisible( false );
 
-	battery[batteryLevel]->setVisible( true );
-
 	//icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
 }
@@ -96,5 +94,14 @@ void TopBar::setBatteryLevel( uint32_t level ) {
 	}
 	battery[level]->setVisible( true );
 }
+
+void TopBar::setSignalStrength( uint32_t sth) {
+
+	signalStrength = sth;
+	for( uint32_t i=0; i<signalImgCount; i++ ) {
+		signal[i]->setVisible( false );
+	}
+	signal[signalStrength]->setVisible( true );
+};
 
 } /* namespace gui */
