@@ -39,6 +39,8 @@ Application::Application(std::string name, bool startBackground, uint32_t stackD
 	translator = std::make_unique<gui::Translator>();
 	translator->setProfile("home_screen");
 
+	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+
 }
 
 Application::~Application() {
@@ -96,8 +98,6 @@ int Application::switchWindow( const std::string& windowName, uint32_t cmd, std:
 		window = windowName.empty()?"MainWindow":windowName;
 	}
 
-	LOG_INFO("================== LAST WINDOW: [%s] [%s]", windowName.c_str(), window.c_str());
-
 	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
@@ -122,13 +122,14 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
 		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-
-			if( currentWindow->updateSignalStrength( msg->signalStrength ) ) {
-				LOG_INFO("---------------------------------SignalStrengthUpdate %d", msg->signalStrength );
-				if( state == State::ACTIVE_FORGROUND )
-					refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+			if( ( state == State::ACTIVE_FORGROUND ) && (currentWindow->updateSignalStrength( msg->signalStrength) ) ) {
+				//loop and update all widnows
+				for ( auto it = windows.begin(); it != windows.end(); it++ ) {
+					it->second->updateSignalStrength( msg->signalStrength);
+				}
+				handled = true;
+				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 			}
-			handled = true;
 		}
 	}
 
@@ -190,7 +191,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 
 		refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated))
@@ -205,6 +205,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		uint32_t hour = (timestamp % 86400) / 3600;
 		uint32_t min = (timestamp % 3600) / 60;
 		LOG_INFO("%02d:%02d", hour , min);
+		handled = true;
 	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {

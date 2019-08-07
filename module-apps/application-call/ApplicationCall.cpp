@@ -28,8 +28,6 @@ ApplicationCall::ApplicationCall(std::string name, bool startBackgound ) :
 	Application( name, startBackgound, 4096 ) {
 
 	timerCall = CreateTimer(1000,true);
-
-	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
 ApplicationCall::~ApplicationCall() {
