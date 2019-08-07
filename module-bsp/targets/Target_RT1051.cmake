@@ -61,6 +61,13 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 		
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pwr/lpm.c"
 
+		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
+
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/RT1051Audiocodec.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/RT1051CellularAudio.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/CodecMAX98090.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/qfilter.c"
+
         CACHE INTERNAL ""
         )
 

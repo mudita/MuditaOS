@@ -1,0 +1,13 @@
+05-08-2019: Mateusz Piesta mateusz.piesta@mudita.com:
+- Capturing jack insert/remove events and profile switching
+- Load profiles configuration from DB (vol, gain etc)
+- Store profile conf changes into DB (vol, gain etc)
+- Switch audio profiles in GSM module (AT+QAUDMOD)
+- Finish call recording feature
+    - It works on RT1051,
+    - There are problems on Linux with sending vTaskNotify from portaudio thread)
+    - more testings needed and final touches
+- Implement proper profile switching from/to different kinds of headphones
+- More unit tests
+- Make voice calls possible on linux (via conf files)
+- Enhance Routing Operation on Linux (audio samples routing can be used for proper unit tests etc.)

@@ -23,9 +23,10 @@ extern "C" {
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 
-#include "module-bsp/bsp/keyboard/keyboard.hpp"
-#include "module-bsp/bsp/battery-charger/battery_charger.hpp"
-#include "module-bsp/bsp/rtc/rtc.hpp"
+#include "bsp/keyboard/keyboard.hpp"
+#include "bsp/battery-charger/battery_charger.hpp"
+#include "bsp/rtc/rtc.hpp"
+
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 

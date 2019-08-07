@@ -44,29 +44,34 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::MeInitializationSuccessful);
         maxPos = std::max(pos + strlen("RDY"), maxPos);
+        LOG_DEBUG("Received URC: MeInitializationSuccessful");
     }
 
     pos = responseBuffer.find("+CFUN: 1");
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::FullFuncionalityAvailable);
         maxPos = std::max(pos + strlen("+CFUN: 1"), maxPos);
+        LOG_DEBUG("Received URC: FullFuncionalityAvailable");
     }
     pos = responseBuffer.find("+CPIN: READY");
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::SimCardReady);
         maxPos = std::max(pos + strlen("+CPIN: READY"), maxPos);
+        LOG_DEBUG("Received URC: SimCardReady");
     }
 
     pos = responseBuffer.find("+QIND: SMS DONE");
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::SMSInitializationComplete);
         maxPos = std::max(pos + strlen("+QIND: SMS DONE"), maxPos);
+        LOG_DEBUG("Received URC: SMSInitializationComplete");
     }
 
     pos = responseBuffer.find("+QIND: PB DONE");
     if (pos != std::string::npos) {
         resp.push_back(ATParser::Urc::PhonebookInitializationComplete);
         maxPos = std::max(pos + strlen("+QIND: PB DONE"), maxPos);
+        LOG_DEBUG("Received URC: PhonebookInitializationComplete");
     }
 
     // manage string buffer
