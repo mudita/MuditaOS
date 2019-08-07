@@ -79,7 +79,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 				LOG_INFO("ignoring call incoming");
 			}
 			AudioServiceAPI::RoutingStart(this);
-			AudioServiceAPI::RoutingSpeakerPhone(this,true);
+//			AudioServiceAPI::RoutingSpeakerPhone(this,true);
 			runCallTimer();
 			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
 			//send to itself message to switch (run) call application
@@ -94,7 +94,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
-			AudioServiceAPI::RoutingSpeakerPhone(this,true);
+//			AudioServiceAPI::RoutingSpeakerPhone(this,true);
 			runCallTimer();
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {

@@ -16,11 +16,10 @@
 #include "../ApplicationCall.hpp"
 #include "../data/CallSwitchData.hpp"
 
-#include "service-audio/api/AudioServiceAPI.hpp"
-
 #include "i18/i18.hpp"
 
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include "service-audio/api/AudioServiceAPI.hpp"
 
 #include "Label.hpp"
 #include "Margins.hpp"
@@ -270,14 +269,15 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 }
 
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-	AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
-	AudioServiceAPI::RoutingMute(this->application,false);
+//	AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
+//	AudioServiceAPI::RoutingMute(this->application,false);
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_speaker"));
 }
 
 bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
+//		AudioServiceAPI::RoutingStart(application);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
 		return true;

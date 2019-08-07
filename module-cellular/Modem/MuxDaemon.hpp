@@ -51,6 +51,13 @@ public:
         MUX_STATES_COUNT // keep this the last
     };
 
+    enum class ConfState{
+        Success,
+        Failure,
+        ModemNeedsReset,
+        PowerUp
+    };
+
     static std::unique_ptr<MuxDaemon> Create(NotificationMuxChannel::NotificationCallback_t callback);
 
     MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback);
@@ -66,8 +73,10 @@ public:
     std::optional<MuxChannel*> GetMuxChannel(MuxChannel::MuxChannelType chan);
     void RemoveMuxChannel(MuxChannel::MuxChannelType chan);
 
-    bool PowerUpProcedure();
-    bool StartMultiplexer();
+    ConfState PowerUpProcedure();
+    ConfState ConfProcedure();
+    ConfState AudioConfProcedure();
+    ConfState StartMultiplexer();
 
     int uihPfBitReceived = 0;
 
