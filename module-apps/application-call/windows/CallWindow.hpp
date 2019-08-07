@@ -22,7 +22,7 @@ class CallWindow: public AppWindow {
 public:
 	enum class State {
 		IDLE,
-		INCOMMING_CALL,
+		INCOMING_CALL,
 		OUTGOING_CALL,
 		CALL_IN_PROGRESS,
 		CALL_ENDED
@@ -67,7 +67,9 @@ public:
 	 * Used by application to update window's state
 	 */
 	void setState( State state );
+	const State& getState();
 	void updateDuration( uint32_t duration );
+	void setCallNumber( std::string );
 
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;
