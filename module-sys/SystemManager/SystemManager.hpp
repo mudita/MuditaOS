@@ -44,25 +44,22 @@ public:
 
 	~SystemManager();
 
-	void StartSystem();
+	void StartSystem(std::function<int()> init);
 
 	// Invoke system close procedure
 	static bool CloseSystem(Service* s);
 
 	// Create new service
-	static bool CreateService(std::shared_ptr<Service> service,Service* s,TickType_t timeout=5000);
+	static bool CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout=5000);
 
 	// Destroy existing service
-	static bool DestroyService(const std::string& name,Service* s,TickType_t timeout=5000);
+	static bool DestroyService(const std::string& name,Service* caller,TickType_t timeout=5000);
 
 	// Suspend specified serivice
-	static bool SuspendService(const std::string& name,Service* s,TickType_t timeout=5000);
+	static bool SuspendService(const std::string& name,Service* caller,TickType_t timeout=5000);
 
 	// Resume specified service
-	static bool ResumeService(const std::string& name,Service* s,TickType_t timeout=5000);
-
-	// Register init procedure which will be invoked upon system start
-	void RegisterInitFunction(std::function<int(SystemManager* sysmgr)> init);
+	static bool ResumeService(const std::string& name,Service* caller,TickType_t timeout=5000);
 
 private:
 
@@ -89,7 +86,7 @@ private:
     TickType_t pingInterval;
 	uint32_t    pingPongTimerID;
 
-    std::function<int(SystemManager* sysmgr)> userInit;
+    std::function<int()> userInit;
 
 	static std::vector<std::shared_ptr<Service>> servicesList;
 

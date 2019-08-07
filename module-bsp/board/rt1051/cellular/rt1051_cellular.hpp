@@ -35,6 +35,8 @@ namespace bsp {
 
         void PowerDown() override final;
 
+        void Restart() override final;
+
         uint32_t Wait(uint32_t timeout) override final;
 
         ssize_t Read(void *buf, size_t nbytes) override final;

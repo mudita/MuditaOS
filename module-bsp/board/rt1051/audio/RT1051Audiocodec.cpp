@@ -30,7 +30,7 @@ namespace bsp {
                                                                                      saiInFormat{}, saiOutFormat{},
                                                                                      config{}, codecParams{}, codec{} {
         isInitialized = true;
-        Init();
+
     }
 
     RT1051Audiocodec::~RT1051Audiocodec() {
@@ -39,6 +39,8 @@ namespace bsp {
     }
 
     int32_t RT1051Audiocodec::Start(const bsp::AudioDevice::Format &format) {
+
+        Init();
 
         saiInFormat.bitWidth = format.bitWidth;
         saiInFormat.sampleRate_Hz = format.sampleRate_Hz;

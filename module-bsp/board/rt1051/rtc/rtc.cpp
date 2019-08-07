@@ -252,7 +252,7 @@ namespace bsp{
 /*		LOG_INFO("seconds %d",  ( timestamp % 60 ));
 		LOG_INFO("seconds to minute %d", secondsToMinute);*/
 
-		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
+		return rtc_SetAlarmInSecondsFromNow(secondsToMinute);
 	}
 }
 

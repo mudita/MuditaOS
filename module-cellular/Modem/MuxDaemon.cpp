@@ -127,15 +127,16 @@ bool MuxDaemon::Start() {
     return true;
 }
 
-bool MuxDaemon::PowerUpProcedure() {
+MuxDaemon::ConfState MuxDaemon::PowerUpProcedure() {
 
     // At first send AT command to check if modem is turned on
     auto ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
     if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")) {
-        return StartMultiplexer();
+        return ConfState ::Success;
     } else {
 
         LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
+        inOutSerialDataWorker->SendFrame(0, NULL, 0, static_cast<unsigned char>(MuxDefines ::GSM0710_CONTROL_CLD) | static_cast<unsigned char>(MuxDefines ::GSM0710_CR));
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
@@ -146,18 +147,20 @@ bool MuxDaemon::PowerUpProcedure() {
         ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
         if (ret.size() == 1 || ret.size() == 2) {
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
-            return StartMultiplexer();
+            return ConfState ::Success;
         } else {
             LOG_INFO("Starting power up procedure...");
             // If no response, power up modem and try again
             cellular->PowerUp();
-            return true;
+            return ConfState::PowerUp;
         }
     }
 }
 
+//TODO:M.P Fetch configuration from JSON/XML file
+MuxDaemon::ConfState MuxDaemon::ConfProcedure() {
 
-bool MuxDaemon::StartMultiplexer() {
+    LOG_DEBUG("Configuring modem...");
 
     // Factory reset
     inOutSerialDataWorker->SendATCommand("AT&F\r", 2);
@@ -165,6 +168,12 @@ bool MuxDaemon::StartMultiplexer() {
     // Turn off local echo
     inOutSerialDataWorker->SendATCommand("ATE0\r", 2);
 
+    // Print current firmware version
+    LOG_INFO("GSM modem info:");
+    auto retVersion = inOutSerialDataWorker->SendATCommand("ATI\r", 4);
+    for(uint32_t i = 0; i< retVersion.size()-1;++i){ // skip final "OK"
+        LOG_INFO(retVersion[i].c_str());
+    }
 
     // Set up modem configuration
     if (hardwareControlFlowEnable) {
@@ -193,18 +202,50 @@ bool MuxDaemon::StartMultiplexer() {
     // Turn on caller's number presentation
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1));
 
-    // Audio configuraton, custom PCM, 16bit linear samples, primary mode, 16kHz, master,
-    /*
-     * M.P: Quectel confirmed that during init phase of modem sends 'ready notification" way before audio subsystem is initialized
-     * hence in order to properly configure audio we have literally ping modem with conf command until it responds with success ret code...
-    */
-    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1));
-
-/*    // Set Message format to Text
+    /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);
     // Set SMS received report format
     SendAT("AT+CNMI=1,2,0,1,0\r", 500);*/
 
+    return ConfState ::Success;
+}
+
+MuxDaemon::ConfState MuxDaemon::AudioConfProcedure() {
+
+    auto audioConfRet = inOutSerialDataWorker->SendATCommand("AT+QDAI?\r", 1);
+
+    // There is possibility for SendATCommand to capture invalid response (it can be ERROR or async URC)
+    // Hence we are checking here for beginning of valid response for "AT+QDAI?" command. AudioConfProcedure
+    // procedure will be invoked from AudioService's context as many times as needed.
+    if(audioConfRet[0].compare(0,strlen("+QDAI:"),"+QDAI:",strlen("+QDAI:")) != 0){
+        return ConfState ::Failure;
+    }
+    else if(audioConfRet[0].compare("+QDAI: 1,0,0,5,0,1,1,1") == 0){
+        return ConfState ::Success;
+    }
+    else {
+        // Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
+        // Quectel confirmed that during init phase modem sends "ready notification" way before
+        // audio subsystem is initialized. The only recommended solution for this is to send configuration
+        // command repetitively until modem responds with OK. Due to our system characteristic we can't use here simple
+        // while loop with vTaskDelay as this function will be invoked from AudioService context. By design service's
+        // routines should be as fast as they can and non blocking. Therefore there is possibility for audioservice to block
+        // for too long waiting in while loop which will trigger SystemManager ping/pong failure procedure.
+        if(!CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QDAI=1,0,0,5,0,1\r", 1)) ){
+            vTaskDelay(1000);
+            return ConfState ::Failure;
+        }else{
+            cellular->Restart();
+            LOG_DEBUG("GSM module first run, performing reset...");
+            return ConfState::ModemNeedsReset;
+        }
+
+    }
+}
+
+MuxDaemon::ConfState MuxDaemon::StartMultiplexer() {
+
+    LOG_DEBUG("Configuring multiplexer...");
 
     // This driver supports only Basic mode (max frame length = 127bytes and no frame errors correction)
     char gsm_command[128] = {};
@@ -236,7 +277,7 @@ bool MuxDaemon::StartMultiplexer() {
         vTaskDelay(200);
     }
 
-    return true;
+    return ConfState::Success;
 }
 
 
