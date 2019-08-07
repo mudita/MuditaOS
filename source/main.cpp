@@ -68,12 +68,13 @@ public:
         //ret = AudioServiceAPI::Stop(this);
 
 
-        auto ret = AudioServiceAPI::RoutingStart(this);
+/*        auto ret = AudioServiceAPI::RoutingStart(this);
         //AudioServiceAPI::RoutingRecordCtrl(this,true);
         vTaskDelay(1000);
-        AudioServiceAPI::RoutingSpeakerPhone(this,true);
+        //AudioServiceAPI::RoutingSpeakerPhone(this,true);
         vTaskDelay(2000);
-        AudioServiceAPI::Stop(this);
+        AudioServiceAPI::Stop(this);*/
+
 #endif
         return std::make_shared<sys::ResponseMessage>();
 
@@ -114,48 +115,6 @@ public:
     uint32_t timer_id = 0;
 };
 
-
-int SystemStart(sys::SystemManager *sysmgr) {
-    vfs.Init();
-
-    bool ret = false;
-    ret = sysmgr->CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceEink>("ServiceEink"), sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<EventManager>("EventManager"), sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceDB>(), sysmgr);
-//    ret |= sysmgr->CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceCellular>(), sysmgr);
-    ret |= sysmgr->CreateService(std::make_shared<ServiceAudio>(), sysmgr);
-
-    //vector with launchers to applications
-    std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
-
-    //launcher for viewer
-    applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
-
-    //launcher for desktop application
-    applications.push_back(std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher()));
-
-    //launcher for call application
-    applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
-
-	//launcher for settings application
-    applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
-
-	//launcher for notes application
-    applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-
-    //start application manager
-    ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr, applications),
-                                 sysmgr);
-
-    if (ret) {
-        return 0;
-    }
-
-    return 0;
-}
-
 int main() {
 
     LOG_PRINTF("Launching PurePhone..\n ");
@@ -164,9 +123,48 @@ int main() {
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
-    sysmgr->StartSystem();
+    sysmgr->StartSystem([sysmgr]()->int{
 
-    sysmgr->RegisterInitFunction(SystemStart);
+        vfs.Init();
+
+        bool ret = false;
+        ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink"), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
+
+        //vector with launchers to applications
+        std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
+        //launcher for viewer
+		applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
+
+		//launcher for desktop application
+		applications.push_back(std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher()));
+
+		//launcher for call application
+		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
+
+		//launcher for settings application
+		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
+
+		//launcher for notes application
+		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
+
+		//start application manager
+        ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
+                                     sysmgr.get());
+
+        if (ret) {
+            return 0;
+        }
+
+        return 0;
+
+
+    });
 
     cpp_freertos::Thread::StartScheduler();
 
