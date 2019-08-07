@@ -162,6 +162,10 @@ void CallWindow::setState( State state ) {
 	setVisibleState();
 }
 
+const CallWindow::State& CallWindow::getState() {
+	return state;
+}
+
 void CallWindow::setVisibleState() {
 
 	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(false);
@@ -171,7 +175,7 @@ void CallWindow::setVisibleState() {
 
 	//show state of the window
 	switch( state ) {
-		case State::INCOMMING_CALL: {
+		case State::INCOMING_CALL: {
 			titleLabel->setText("INCOMMING_CALL");
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, true );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, true );
@@ -221,6 +225,10 @@ void CallWindow::setVisibleState() {
 	};
 }
 
+void CallWindow::setCallNumber( std::string ) {
+
+}
+
 void CallWindow::updateDuration( uint32_t duration ) {
 	uint32_t seconds = 0;
 	uint32_t minutes = 0;
@@ -252,7 +260,7 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
 	if( callData->getType() == app::CallSwitchData::Type::INCOMMING_CALL ) {
 		app::IncommingCallData* incData = reinterpret_cast<app::IncommingCallData*>( data );
-		state = State::INCOMMING_CALL;
+		state = State::INCOMING_CALL;
 		numberLabel->setText( incData->getPhoneNumber());
 	}
 	setVisibleState();
@@ -268,7 +276,7 @@ void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data
 }
 
 bool CallWindow::handleLeftButton() {
-	if( state == State::INCOMMING_CALL ) {
+	if( state == State::INCOMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
@@ -286,7 +294,7 @@ bool CallWindow::handleLeftButton() {
 	return false;
 }
 bool CallWindow::handleCenterButton() {
-	if( state == State::INCOMMING_CALL ) {
+	if( state == State::INCOMING_CALL ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 		//TODO switch to message templates window
@@ -304,7 +312,7 @@ bool CallWindow::handleCenterButton() {
 	return false;
 }
 bool CallWindow::handleRightButton() {
-	if( state == State::INCOMMING_CALL ) {
+	if( state == State::INCOMING_CALL ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 
