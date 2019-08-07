@@ -100,6 +100,28 @@ public:
 	}
 	bool plugged = false;
 };
+
+class RtcMinuteAlarmMessage : public sys::DataMessage
+{
+public:
+	RtcMinuteAlarmMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
+	{
+		type = Type::Data;
+
+	}
+	sys::Message_t Execute(sys::Service* service)
+	{
+		// Ignore incoming data message if this service is not yet initialized
+		if(service->isReady){
+			return service->DataReceivedHandler(this);
+		}
+		else{
+			return std::make_shared<sys::ResponseMessage>();
+		}
+
+	}
+	uint32_t timestamp = 0;
+};
 /*
  * @brief Template for all messages that go to application manager
  */
@@ -120,6 +142,14 @@ public:
 	const std::string& getApplication() const { return application; };
 };
 
+class EVMAlarmSwitchData :public gui::SwitchData
+{
+public:
+	EVMAlarmSwitchData() {};
+	EVMAlarmSwitchData(uint32_t id) : dbID(id) {};
+	~EVMAlarmSwitchData() {};
+	uint32_t dbID = 0;
+};
 } /* namespace sevm*/
 
 #endif /* MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_ */

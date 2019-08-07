@@ -139,7 +139,7 @@ UTF8::UTF8( const UTF8& utf ) {
 		sizeAllocated = stringExpansion;
 		data = new uint8_t[sizeAllocated];
 		memset(data,0,sizeAllocated);
-		sizeUsed = 0;
+		sizeUsed = 1;
 	}
 	lastIndex = 0;
 	lastIndexData = data;

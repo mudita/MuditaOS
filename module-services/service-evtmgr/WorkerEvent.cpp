@@ -12,17 +12,21 @@ extern "C" {
 	#include "task.h"
 }
 
-
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "Service/Worker.hpp"
 #include "MessageType.hpp"
 
+
+
 #include "WorkerEvent.hpp"
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
+
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "bsp/rtc/rtc.hpp"
+
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
@@ -36,7 +40,6 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		}
 		wcmd.command = 1;
 		//place some code here to handle messages from service
-
 	}
 
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardIRQ) )
@@ -51,6 +54,7 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
 
 	}
+
 	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueBattery) )
 	{
 		uint8_t notification;
@@ -79,17 +83,43 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		}
 	}
 
+	if( queueID == static_cast<uint32_t>(WorkerEventQueues::queueRTC) )
+	{
+		uint8_t notification;
+		if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
+				return false;
+		}
+
+		time_t timestamp;
+		bsp::rtc_GetCurrentTimestamp(&timestamp);
+		bsp::rtc_SetMinuteAlarm(timestamp);
+
+		struct tm time;
+
+		bsp::rtc_GetCurrentDateTime(&time);
+
+		auto message = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
+		message->timestamp = timestamp;
+		sys::Bus::SendUnicast(message, "EventManager", this->service);
+	}
+
 	return true;
 }
 
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
 	Worker::init(queues);
-	std::vector<xQueueHandle> qhanldes = this->getQueues();
-	bsp::keyboard_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
-	bsp::battery_Init(qhanldes[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
+	std::vector<xQueueHandle> qhandles = this->getQueues();
+	bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
+	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
+	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
+
+	time_t timestamp;
+	bsp::rtc_GetCurrentTimestamp(&timestamp);
+	bsp::rtc_SetMinuteAlarm(timestamp);
 	return true;
 }
+
 bool WorkerEvent::deinit(void)
 {
 	Worker::stop();
@@ -99,8 +129,6 @@ bool WorkerEvent::deinit(void)
 
 	return true;
 }
-
-
 
  void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
  {
