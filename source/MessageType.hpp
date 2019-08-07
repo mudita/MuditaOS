@@ -62,7 +62,8 @@ enum class MessageType {
 
     CellularListCurrentCalls,
     CellularStartPowerUpProcedure,
-    CellularStartMultiplexer,
+    CellularStartConfProcedure,
+    CellularStartAudioConfProcedure,
 
     //Audio service messages
     AudioNotification,

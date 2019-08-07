@@ -93,6 +93,10 @@ namespace bsp {
 
     }
 
+    void LinuxCellular::Restart() {
+
+    }
+
     ssize_t LinuxCellular::Read(void *buf, size_t nbytes) {
 
         retry:

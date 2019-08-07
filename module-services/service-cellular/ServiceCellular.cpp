@@ -41,9 +41,10 @@ ServiceCellular::ServiceCellular()
 
         switch (type) {
 
-            case NotificationType::PowerUpProcedureComplete:
-            {
-                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartMultiplexer),GetName(),this);
+            case NotificationType::PowerUpProcedureComplete: {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+                                      GetName(), this);
+                state = State ::ModemConfigurationInProgress;
                 return;
             }
             case NotificationType::ServiceReady:
@@ -98,9 +99,19 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
     muxdaemon = MuxDaemon::Create(notificationCallback);
     if (muxdaemon) {
 
-        // Start power up procedure
-        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),GetName(),this);
-        state = State ::PowerUpInProgress;
+        // Start procedure is as follow:
+        /*
+         * 1) Power-up
+         * 2) Init configuration of GSM modem
+         * 3) Audio configuration
+         * 4) Start multiplexer
+         * 5) Modem fully-operational
+         */
+
+        // Start power-up procedure
+        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
+                              GetName(), this);
+        state = State::PowerUpInProgress;
 
         return sys::ReturnCodes::Success;
     } else {
@@ -134,40 +145,67 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
             if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
                 (msg->type == CellularNotificationMessage::Type::CallBusy)) {
                 stopTimer(callStateTimer);
-            }else {
+            } else {
                 //ignore rest of notifications
             }
         }
             break;
 
-        case MessageType ::CellularStartPowerUpProcedure:
-        {
-
-            if(!muxdaemon->PowerUpProcedure()){
-                LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
-                state = State ::Failed;
+        case MessageType::CellularStartPowerUpProcedure: {
+            auto powerRet = muxdaemon->PowerUpProcedure();
+            if (powerRet == MuxDaemon::ConfState::Success) {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+                                      GetName(), this);
             }
-            state = State ::MultiplexerStartInProgress;
+            else if(powerRet == MuxDaemon::ConfState::PowerUp){
+                state = State::PowerUpInProgress;
+            }
+            else{
+                LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
+                state = State::Failed;
+            }
         }
             break;
 
-        case MessageType ::CellularStartMultiplexer:
-        {
-            if (muxdaemon->StartMultiplexer()) {
+        case MessageType::CellularStartConfProcedure: {
+            // Start configuration procedure, if it's first run modem will be restarted
+            auto confRet = muxdaemon->ConfProcedure();
+            if (confRet == MuxDaemon::ConfState::Success) {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
+                                      GetName(), this);
+                state = State::AudioConfigurationInProgress;
+            }
+            else {
+                LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
+                state = State::Failed;
+            }
+        }
+            break;
 
-                state = State ::Ready;
+        case MessageType ::CellularStartAudioConfProcedure:
+        {
+            auto audioRet = muxdaemon->AudioConfProcedure();
+            if(audioRet == MuxDaemon::ConfState::Success){
+
+                muxdaemon->StartMultiplexer();
+                LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+                state = State::Ready;
                 // Propagate "ServiceReady" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
                         static_cast<CellularNotificationMessage::Type >(NotificationType::ServiceReady)),
                                         sys::BusChannels::ServiceCellularNotifications, this);
-            } else {
-                LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
-                state = State ::Failed;
+            }
+            else if(audioRet == MuxDaemon::ConfState::Failure){
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
+                                      GetName(), this);
+            }
+            else{
+                // Reset procedure started, do nothing here
+                state = State::PowerUpInProgress;
             }
         }
-            break;
-
-
+        break;
 
         case MessageType::CellularListCurrentCalls: {
             auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "AT+CLCC\r", 3);
