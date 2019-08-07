@@ -30,7 +30,6 @@ namespace bsp {
                                                                                      saiInFormat{}, saiOutFormat{},
                                                                                      config{}{
         isInitialized = true;
-        Init();
     }
 
     RT1051CellularAudio::~RT1051CellularAudio() {
@@ -39,6 +38,8 @@ namespace bsp {
     }
 
     int32_t RT1051CellularAudio::Start(const bsp::AudioDevice::Format &format) {
+
+        Init();
 
         saiInFormat.bitWidth = format.bitWidth;
         saiInFormat.sampleRate_Hz = format.sampleRate_Hz;

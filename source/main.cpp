@@ -67,12 +67,18 @@ public:
         //ret = AudioServiceAPI::Stop(this);
 
 
-        auto ret = AudioServiceAPI::RoutingStart(this);
+/*        auto ret = AudioServiceAPI::RoutingStart(this);
         //AudioServiceAPI::RoutingRecordCtrl(this,true);
         vTaskDelay(1000);
-        AudioServiceAPI::RoutingSpeakerPhone(this,true);
+        //AudioServiceAPI::RoutingSpeakerPhone(this,true);
         vTaskDelay(2000);
-        AudioServiceAPI::Stop(this);
+        AudioServiceAPI::Stop(this);*/
+        AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        vTaskDelay(1000);
+        AudioServiceAPI::RoutingSpeakerPhone(this,true);
+        AudioServiceAPI::RoutingSpeakerPhone(this,false);
+        //vTaskDelay(2000);
+
 #endif
         return std::make_shared<sys::ResponseMessage>();
 
