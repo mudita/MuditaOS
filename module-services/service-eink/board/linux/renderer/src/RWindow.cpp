@@ -5,12 +5,12 @@
  *      Author: robert
  */
 #include <map>
-#include <iostream>
 #include <gtk/gtk.h>
 
 #include "RWindow.hpp"
 
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
+#include "module-bsp/bsp/common.hpp"
 static gboolean
 viewUpdate(gpointer data)
 {

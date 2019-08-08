@@ -10,9 +10,6 @@
 
 #include "fsl_common.h"
 #include "board.h"
-#include "fsl_lpi2c.h"
-#include "fsl_lpuart.h"
-#include "fsl_semc.h"
 #include "fsl_clock.h"
 #include "pin_mux.h"
 #include "dma_config.h"
@@ -20,7 +17,7 @@
 #include "irq/irq_gpio.hpp"
 #include "i2c.h"
 
-#include "rtc/rtc.hpp"
+#include "bsp/rtc/rtc.hpp"
 
 namespace bsp {
 

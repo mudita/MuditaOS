@@ -11,7 +11,7 @@
 #include "bsp_cellular.hpp"
 
 #if defined(TARGET_RT1051)
-#include "cellular/rt1051_cellular.hpp"
+#include "board/rt1051/bsp/cellular/rt1051_cellular.hpp"
 #elif defined(TARGET_Linux)
 #include "cellular/linux_cellular.hpp"
 #else

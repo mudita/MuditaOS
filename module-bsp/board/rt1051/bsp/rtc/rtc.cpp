@@ -5,7 +5,7 @@
  *      Author: kuba
  */
 
-#include "rtc/rtc.hpp"
+#include "bsp/rtc/rtc.hpp"
 #include "fsl_snvs_hp.h"
 #include <time.h>
 

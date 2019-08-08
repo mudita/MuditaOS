@@ -124,6 +124,9 @@ add_subdirectory(module-os)
 message("${PROJECT_NAME}: add_subdirectory module-bsp")
 add_subdirectory(module-bsp)
 
+message("${PROJECT_NAME}: add_subdirectory module-drivers")
+add_subdirectory(module-drivers)
+
 message("${PROJECT_NAME}: add_subdirectory module-vfs")
 add_subdirectory(module-vfs)
 

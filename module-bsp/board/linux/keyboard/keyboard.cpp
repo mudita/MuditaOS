@@ -20,7 +20,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include "keyboard/keyboard.hpp"
+#include "bsp/keyboard/keyboard.hpp"
 
 namespace bsp {
 

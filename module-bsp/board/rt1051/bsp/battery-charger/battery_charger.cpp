@@ -11,10 +11,10 @@ extern "C" {
 	#include "queue.h"
 }
 
-#include "../common/i2c.h"
+#include "i2c.h"
 #include "fsl_gpio.h"
 #include "board.h"
-#include "battery-charger/battery_charger.hpp"
+#include "bsp/battery-charger/battery_charger.hpp"
 #include "vfs.hpp"
 
 #define BSP_BATTERY_CHARGER_I2C_ADDR                        (0xD2 >> 1)

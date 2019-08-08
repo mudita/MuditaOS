@@ -12,7 +12,7 @@
 #ifndef PUREPHONE_RT1501_CELLULAR_HPP
 #define PUREPHONE_RT1501_CELLULAR_HPP
 
-#include "cellular/bsp_cellular.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
 
 #include "FreeRTOS.h"
 #include "stream_buffer.h"
