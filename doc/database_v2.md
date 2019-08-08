@@ -125,7 +125,7 @@ Possible values of the type field in the contacts' table
 | Name | Value |  Desciption |
 | -------- | ------- | -------------------|
 | USER| 0| ID defines that contact was created by the user and should be displayed in the applications that manipulate contacts. | 
-| MESSAGE | 1| ID defines that contact was created for messaging purposes. Possible reasons are: user created draft of the message, user received a message from unknown number. |
+| TEMPORARY | 1| ID defines that contact was created for unknown messager/caller purposes. Possible reasons are: user created draft of the message, user received a message/call from unknown number |
 
 2. Contacts name table
 Name: contact_names
