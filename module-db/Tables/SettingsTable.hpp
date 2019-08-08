@@ -43,7 +43,7 @@ class SettingsTable : public Table<SettingsTableRow,SettingsTableFields> {
 public:
 
     SettingsTable(Database* db);
-    ~SettingsTable();
+    virtual ~SettingsTable();
 
     bool Create() override final;
     bool Update(SettingsTableRow entry) override final;

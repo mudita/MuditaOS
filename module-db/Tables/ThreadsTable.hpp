@@ -39,7 +39,7 @@ class ThreadsTable : public Table<ThreadsTableRow,ThreadsTableFields> {
 public:
 
     ThreadsTable(Database* db);
-    ~ThreadsTable();
+    virtual ~ThreadsTable();
 
     bool Create() override final;
     bool Add(ThreadsTableRow entry) override final;
