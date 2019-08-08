@@ -38,6 +38,7 @@
     "app_desktop_menu_music": "MUSIC",
     "app_desktop_menu_tools": "TOOLS",
     "app_desktop_menu_settings": "SETTINGS",
+    "app_desktop_menu_phonebook": "PHONEBOOK",
     "app_desktop_menu_title": "Main Menu",
     "app_desktop_tools_title": "Tools",
     "app_desktop_tools_notes": "NOTES",
@@ -65,6 +66,10 @@
     	"app_settings_language_polish": "Polaco",
     	"app_settings_language_german": "Alemana",
     	"app_settings_language_spanish": "Española",
+
+
+    "app_phonebook_title_main": "Phonebook",
+    "app_phonebook_empty": "No friends :(",
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
