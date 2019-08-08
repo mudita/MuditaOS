@@ -66,12 +66,12 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
 		   LOG_INFO("---------------------------------CallActive");
-		   //reset call duration
-		   callDuration = 0;
 		   callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
 		   refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
+			//reset call duration
+		    callDuration = 0;
 			LOG_INFO("---------------------------------IncomingCall");
 			if( callWindow->getState() == gui::CallWindow::State::INCOMING_CALL ) {
 				LOG_INFO("ignoring call incoming");
@@ -89,6 +89,8 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 			}
 		}
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
+			//reset call duration
+		    callDuration = 0;
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
 			runCallTimer();
@@ -99,7 +101,6 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		handled = true;
 	}
-
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();

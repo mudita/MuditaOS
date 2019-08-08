@@ -49,66 +49,10 @@ This document describes details of different user information database tables:
 | contact_address | Table that holds records with information about addresses assigned to given contact. |
 | preferences | (TBD) |
 
-### Design considerations <a name="considerations"></a>
-
-**Contacts table**
-
-* ~~Unique ID (u)~~
-* ~~Name (m)~~
-* ~~Surname (o)~~
-* ~~Primary number (m)~~
-* ~~Address (o)~~
-* ~~Other number (o)~~
-* ~~Group (o, r)~~
-* ~~Note (o)~~
-
-Contacts functionality:
-* ~~Adding/deleting/modyfing contact~~
-* ~~Searching for contact by number~~
-* ~~Searching for contact by name~~
-* ~~Adding contact to different groups~~
-
-
-**Group**
-~~Unique ID (u)~~
-~~Group Name (m)~~
-
-Group functionality: 
-~~3 predefined groups:~~
-* ~~ALL~~
-* ~~Blacklist~~
-* ~~Whitelist~~
-
-
-**SMS**
-* ~~Unique ID (u)~~
-* ~~Sender number (m)~~
-* ~~Sender contact (o, r)~~
-* ~~Receiver number (m)~~
-* ~~Receiver contact (o, r)~~
-* ~~Date/Time (m)~~
-* ~~Text (m)~~
-
-
-SMS functionality:
-* ~~Saving message as a draft~~
-* ~~Saving message as OUT after filling in the text field & recipient (either from phonebook or by phone number)~~
-* ~~Saving recieved message (as IN)~~
-* ~~Getting single saved message (by phone number or text)~~
-* ~~Getting all messages by number~~
-* ~~Getting all messages from database~~
-* ~~Getting number of messages~~
-* ~~Getting number of messages by phone number~~
-* ~~Getting range of messages (eg. to list them on the screen but only those that fit)~~
-
-**Preferences (TBD)**
-
-* timezone (+/- n hours from UTC)
-* language
-
 ### Design <a name="tables"></a>
 #### Database tables
-1. Contacts joining table
+
+#### 1. Contacts joining table
 Name: contacts
 
 | Field | Scope | Type | Desciption |
@@ -127,7 +71,7 @@ Possible values of the type field in the contacts' table
 | USER| 0| ID defines that contact was created by the user and should be displayed in the applications that manipulate contacts. | 
 | MESSAGE | 1| ID defines that contact was created for messaging purposes. Possible reasons are: user created draft of the message, user received a message from unknown number. |
 
-2. Contacts name table
+#### 2. Contacts name table
 Name: contact_names
 
 | Field | Scope | Type | Desciption |
@@ -137,7 +81,7 @@ Name: contact_names
 | name_primary | (m) | TEXT | Name  | 
 | name_alternative | (m) | TEXT | Alternative name for user. |
 
-3. Contacts number table
+#### 3. Contacts number table
 Name: contact_numbers
 
 | Field | Scope | Type | Desciption |
@@ -159,7 +103,7 @@ Possible values of the type field
 | PAGER| 4 | ID defines that number is a pager number|
 | OTHER| 5| ID defines that number is for device other than defined above. |
 
-4. Contacts ring assets table
+#### 4. Contacts ring assets table
 Name: contact_rings
 
 | Field | Scope | Type | Desciption |
@@ -168,7 +112,7 @@ Name: contact_rings
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**) | Unique ID of the joining record in the contacts table.  |
 | asset_path | (m) | TEXT | UTF8 encoded path on the device's memory card to the audio asset that should be played when given contact is calling | 
 
-5. Contacts address table
+#### 5. Contacts address table
 Name: contact_address
 
 | Field | Scope | Type | Desciption |
@@ -191,7 +135,7 @@ Possible values of the address type field
 | WORK| 1| ID defines that address is work address. |
 | OTHER| 2| ID defines that address doesn't belong to any of the types defined above. |
 
-6. SMS messages table
+#### 6. SMS messages table
 Name: sms
 
 | Field | Scope | Type | Desciption |
@@ -219,7 +163,7 @@ Possible values of the type field
 
 NOTE: Date is designed to be stored in UNIX (EPOCH) format - number of seconds since 1970-01-01 00:00:00 UTC.
 
-7. SMS threads table
+#### 7. SMS threads table
 Name: threads
 
 | Field | Scope | Type | Desciption |
@@ -232,7 +176,7 @@ Name: threads
 | snippet | (m) | TEXT | First row of the last message in given thread. Text is encoded in UTF8 and has up to 45 characters. |
 | last_dir | (m) | INTEGER | Defines direction of the last message in the thread. Values are same as in type field of the sms message. |
 
-8. SMS threads counter table
+####8. SMS threads counter table
 Name: threads_count
 
 | Field | Scope | Type | Desciption |
@@ -240,7 +184,7 @@ Name: threads_count
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | count | (m) | INTEGER | Fields used to count sms threads. Every new thread increments value stored in count by 1. Removing any of the threads will cause decrementation of the count value by 1. Those operations are performed by database via triggers: **on_thread_insert ** and **on_thread_remove** |
 
-9. SMS template table
+####9. SMS template table
 Name: sms_template
 
 | Field | Scope | Type | Desciption |
@@ -250,7 +194,7 @@ Name: sms_template
 | body | (m) | TEXT | Text field for storing body of the sms template |
 
 
-10. Phone settings
+####10. Phone settings
 Name: settings
 
 | Field | Scope | Type | Desciption |
@@ -287,7 +231,7 @@ Table describes possible values of **language** field.
 | GERMAN| 0x04| German language. |
 | SPANISH| 0x08| Spanish language. |
 
-11. Table with BT paired devices.
+####11. Table with BT paired devices.
 Name: bt_devices.
 
 | Field | Scope | Type | Desciption |
@@ -298,7 +242,7 @@ Name: bt_devices.
 | name | (m) | TEXT | Name of the device. |
 | link_key | (m) | TEXT | Pairing key. |
 
-12. Table with information about notes.
+####12. Table with information about notes.
 Name: notes.
 
 | Field | Scope | Type | Desciption |
@@ -308,7 +252,7 @@ Name: notes.
 | snippet | (m) | TEXT | Up to 60 first characters from the note. |
 | path | (m) | TEXT | Path to the note's file in the file system. |
 
-13. Table with information about alarms
+####13. Table with information about alarms
 Name: alarms
 
 | Field | Scope | Type | Desciption |
@@ -343,6 +287,11 @@ For communication & control 2 DBUS channels are created:
 
 * ```DB_TASK_CHANNEL_DB_RESPONSES```
 * ```DB_TASK_CHANNEL_DB_COMMANDS```
+
+**Preferences (TBD)**
+
+* timezone (+/- n hours from UTC)
+* language
 
 Commands available:
 
