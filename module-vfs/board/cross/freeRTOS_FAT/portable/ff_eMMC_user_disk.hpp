@@ -11,7 +11,7 @@
 #define FREERTOS_PLUS_FAT_PORTABLE_FF_EMMC_USER_DISK_H_
 
 #include "vfs.hpp"
-#include "eMMC/eMMC.hpp"
+#include "board/cross/eMMC/eMMC.hpp"
 
 FF_Disk_t *FF_eMMC_user_DiskInit( const char *pcName,bsp::eMMC* emmc);
 BaseType_t FF_eMMC_user_DiskDelete( FF_Disk_t *pxDisk );

@@ -27,6 +27,9 @@ public:
     virtual ssize_t Read(uint8_t *data, const size_t len, const DriverParams &params) = 0;
 
     virtual int32_t Ioctl(const IoctlParams &ioctlParams) = 0;
+
+private:
+    static std::weak_ptr<DriverI2C> instance;
 };
 
 
