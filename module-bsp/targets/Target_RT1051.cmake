@@ -40,46 +40,42 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/system_MIMXRT1051.c"
 
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_mmc.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_sdmmc_common.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_sdmmc_event.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC/fsl_sdmmc_host.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eMMC/fsl_mmc.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eMMC/fsl_sdmmc_common.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eMMC/fsl_sdmmc_event.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eMMC/fsl_sdmmc_host.c"
         
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink/bsp_eink.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink/ED028TC1.c"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink/eink_binarization_luts.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink/bsp_eink.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink/ED028TC1.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/eink/eink_binarization_luts.c"
 
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keyboard/keyboard.cpp"
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/cellular/rt1051_cellular.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/cellular/rt1051_cellular.cpp"
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/keyboard/keyboard.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keyboard/keyboard.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/rtc/rtc.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/battery-charger/battery_charger.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
 		
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pwr/lpm.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pwr/lpm.c"
 
 		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
 
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/RT1051Audiocodec.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/RT1051CellularAudio.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/CodecMAX98090.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/audio/qfilter.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
 
         CACHE INTERNAL ""
         )
 
 set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 
-            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051
-            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common
+			${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/cmsis
-            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eMMC
-            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/eink
-            ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/pwr
 
 
         CACHE INTERNAL "")

@@ -13,8 +13,8 @@
 
 #if defined(TARGET_RT1051)
 
-#include "audio/RT1051Audiocodec.hpp"
-#include "audio/RT1051CellularAudio.hpp"
+#include "board/rt1051/bsp/audio/RT1051Audiocodec.hpp"
+#include "board/rt1051/bsp/audio/RT1051CellularAudio.hpp"
 #elif defined(TARGET_Linux)
 #include "audio/linux_audiocodec.hpp"
 #include "audio/LinuxCellularAudio.hpp"

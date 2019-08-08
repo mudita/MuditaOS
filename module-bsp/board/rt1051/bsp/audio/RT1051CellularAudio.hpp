@@ -12,7 +12,7 @@
 #ifndef PUREPHONE_RT1051CELLULARAUDIO_HPP
 #define PUREPHONE_RT1051CELLULARAUDIO_HPP
 
-#include "audio/bsp_audio.hpp"
+#include "bsp/audio/bsp_audio.hpp"
 #include "fsl_sai_edma.h"
 #include "FreeRTOS.h"
 #include "task.h"

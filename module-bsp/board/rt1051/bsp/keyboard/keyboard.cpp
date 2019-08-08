@@ -19,9 +19,8 @@
 #include "fsl_common.h"
 #include "../common/i2c.h"
 #include "TCA8418.h"
-#include "common.hpp"
-#include "keyboard/key_codes.hpp"
-#include "keyboard/keyboard.hpp"
+#include "bsp/common.hpp"
+#include "bsp/keyboard/key_codes.hpp"
 
 namespace bsp {
 

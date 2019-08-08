@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(module-bsp VERSION 1.0
-        DESCRIPTION "VFS module library")
+project(module-drivers VERSION 1.0
+        DESCRIPTION "Drivers module library")
 
 if (NOT DEFINED PROJECT_LIB_DIRECTORY)
     set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
@@ -18,8 +18,8 @@ endif ()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
-		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/DriverInterface.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -41,7 +41,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${BOARD_DIR_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
@@ -59,11 +59,13 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}"
 
+        PRIVATE
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers"
         )
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
-target_link_libraries(${PROJECT_NAME} module-os module-drivers ${TARGET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} module-os ${TARGET_LIBRARIES})
 
 # Host target configuration(mainly used for unit testing)
 

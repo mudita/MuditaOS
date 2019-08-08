@@ -5,7 +5,7 @@
  *      Author: kuba
  */
 
-#include "rtc/rtc.hpp"
+#include "bsp/rtc/rtc.hpp"
 #include <time.h>
 
 extern "C" {
@@ -159,7 +159,7 @@ namespace bsp{
 		struct tm date;
 		rtc_GetCurrentDateTime(&date);
 
-		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
+		return rtc_SetAlarmInSecondsFromNow(secondsToMinute);
 	}
 }
 

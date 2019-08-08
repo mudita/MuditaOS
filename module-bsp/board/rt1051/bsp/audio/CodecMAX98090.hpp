@@ -13,7 +13,7 @@
 #define PUREPHONE_CODECMAX98090_HPP
 
 #include "Codec.hpp"
-#include "../common/i2c.h"
+#include "i2c.h"
 
 class CodecParamsMAX98090 : public CodecParams {
 public:

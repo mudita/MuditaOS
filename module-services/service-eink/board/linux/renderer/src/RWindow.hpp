@@ -17,7 +17,6 @@
 
 
 #include "module-bsp/bsp/keyboard/key_codes.hpp"
-#include "module-bsp/bsp/common.hpp"
 class RWindow : public Gtk::Window{
 protected:
 	RArea drawArea;
