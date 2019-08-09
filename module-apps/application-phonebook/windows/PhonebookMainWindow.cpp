@@ -15,6 +15,8 @@
 
 #include "service-db/api/DBServiceAPI.hpp"
 
+#include <log/log.hpp>
+
 namespace gui {
 
 PhonebookMainWindow::PhonebookMainWindow(app::Application *app) : AppWindow(app, "MainWindow") {
@@ -102,27 +104,34 @@ gui::Item *PhonebookMainWindow::addOptionLabel(const UTF8 &text, std::function<b
 void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) { setFocusItem(options[0]); }
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
-    // check if any of the lower inheritance onInput methods catch the event
-    bool ret = AppWindow::onInput(inputEvent);
-    if (ret) {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        return true;
+	//check if any of the lower inheritance onInput methods catch the event
+	bool ret = AppWindow::onInput( inputEvent );
+	if( ret ) {
+		//refresh window only when key is other than enter
+		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
+			application->render( RefreshModes::GUI_REFRESH_FAST );
+		return true;
+	}
+
+	//process only if key is released
+	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
+	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
+		return false;
+
+    if( inputEvent.keyCode == KeyCode::KEY_1) {
+        LOG_INFO("Pressed 1");
+        application->switchWindow("NewContact",0,nullptr);
     }
+	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+		LOG_INFO("Enter pressed");
+	}
+	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MenuWindow", nullptr );
+		return true;
+	}
 
-    // process only if key is released
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-        return false;
+	return false;
 
-    if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
-        LOG_INFO("Enter pressed");
-    } else if (inputEvent.keyCode == KeyCode::KEY_RF) {
-        sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationDesktop", "MenuWindow", nullptr);
-        return true;
-    }
-
-    return false;
 }
 
 } /* namespace gui */
