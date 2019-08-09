@@ -179,6 +179,24 @@ public:
 	virtual bool runBackground(sys::SystemManager* sysmgr) {return true;};
 };
 
+template <class T>
+class ApplicationLauncherT : public ApplicationLauncher
+{
+    public:
+    ApplicationLauncherT(std::string name, bool isCloseable=true) : ApplicationLauncher(name, isCloseable) {}
+    virtual bool run(sys::SystemManager* sysmgr) override {
+		return sysmgr->CreateService(std::make_shared<T>(name),sysmgr);
+	};
+    bool runBackground(sys::SystemManager *sysmgr) override {
+        return sysmgr->CreateService(std::make_shared<T>(name, true), sysmgr);
+    };
+};
+
+template <class T>
+std::unique_ptr<ApplicationLauncherT<T>> CreateLauncher(std::string name, bool isCloseable=true) {
+    return std::move(std::unique_ptr<ApplicationLauncherT<T>>(new ApplicationLauncherT<T>(name, isCloseable)));
+}
+
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_HPP_ */

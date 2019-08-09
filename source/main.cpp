@@ -163,9 +163,9 @@ int main() {
 
 		//launcher for notes application
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-        // launcher for phonebook
-		applications.push_back(std::unique_ptr<app::ApplicationPhonebookLauncher>(new app::ApplicationPhonebookLauncher()));
 
+        // create launcher for phonebook, all launchers could be created like that
+		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
