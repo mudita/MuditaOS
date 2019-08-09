@@ -15,7 +15,6 @@
 #include "dma_config.h"
 
 #include "irq/irq_gpio.hpp"
-#include "i2c.h"
 
 #include "bsp/rtc/rtc.hpp"
 
@@ -233,8 +232,6 @@ namespace bsp {
         BOARD_ConfigAudioCodec();
         BOARD_InitDMA();
         BOARD_ConfigCellular();
-        
-        bsp_i2c_Init(BOARD_GetI2CInstance(), BOARD_KEYBOARD_I2C_CLOCK_FREQ);
 
         irq_gpio_Init();
 

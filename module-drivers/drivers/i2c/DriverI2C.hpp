@@ -17,26 +17,40 @@
 namespace drivers {
 
 
-    enum class I2CInstances{
-        I2C1
+    enum class I2CInstances {
+        I2C1,
+        I2C2
     };
 
-    class DriverI2CParams {
+    struct DriverI2CParams {
+        uint32_t baudrate;
+        //TODO:M.P add slave conf
+    };
 
+    struct I2CAddress {
+        uint32_t deviceAddress;
+        uint32_t subAddress;
+        size_t subAddressSize;
     };
 
 
     class DriverI2C : public DriverInterface<DriverI2C> {
     public:
 
-        static std::shared_ptr<DriverI2C> Create(const I2CInstances inst,const DriverI2CParams& params);
+        static std::shared_ptr<DriverI2C> Create(const I2CInstances inst, const DriverI2CParams &params);
 
-        DriverI2C(){}
-        virtual ~DriverI2C(){}
+        DriverI2C(const DriverI2CParams& params): parameters(params) {}
 
-        virtual ssize_t Write(const uint8_t *data, const size_t len, const DriverI2CParams &params) = 0;
+        virtual ~DriverI2C() {}
 
-        virtual ssize_t Read(uint8_t *data, const size_t len, const DriverI2CParams &params) = 0;
+        virtual ssize_t Write(const I2CAddress &addr, const uint8_t *txBuff, const size_t size) = 0;
+
+        virtual ssize_t Read(const I2CAddress &addr, uint8_t *rxBuff, const size_t size) = 0;
+
+        virtual ssize_t Modify(const I2CAddress &addr, const uint32_t mask, bool setClr, const size_t size) = 0;
+
+    protected:
+        const DriverI2CParams parameters;
 
     };
 
