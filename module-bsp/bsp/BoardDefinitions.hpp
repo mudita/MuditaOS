@@ -13,6 +13,7 @@
 #define PUREPHONE_BOARDDEFINITIONS_HPP
 
 #include "drivers/i2c/DriverI2C.hpp"
+#include "drivers/pll/DriverPLL.hpp"
 
 enum class BoardDefinitions{
     AUDIOCODEC_I2C_BAUDRATE = 100000,
@@ -23,6 +24,8 @@ enum class BoardDefinitions{
 
     BATTERY_CHARGER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     BATTERY_CHARGER_I2C = AUDIOCODEC_I2C,
+
+    AUDIO_PLL = static_cast<int >(drivers::PLLInstances::Audio),
 };
 
 #endif //PUREPHONE_BOARDDEFINITIONS_HPP

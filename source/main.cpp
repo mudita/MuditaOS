@@ -61,13 +61,13 @@ public:
 
 #if 1 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
-        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
-        vTaskDelay(3000);
-        ret = AudioServiceAPI::Stop(this);
-        vTaskDelay(500);
-        ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        //vTaskDelay(3000);
+        //ret = AudioServiceAPI::Stop(this);
+        //vTaskDelay(500);
+        //ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
 
 /*        auto ret = AudioServiceAPI::RoutingStart(this);
