@@ -21,6 +21,9 @@
 
 #include "CodecMAX98090.hpp"
 
+#include "drivers/DriverInterface.hpp"
+#include "drivers/pll/DriverPLL.hpp"
+
 namespace bsp{
 
 
@@ -76,6 +79,7 @@ namespace bsp{
         TaskHandle_t outWorkerThread = nullptr;
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
+        std::shared_ptr<drivers::DriverPLL> pll;
 
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
@@ -91,7 +95,6 @@ namespace bsp{
 
         void Init();
         void Deinit();
-        void PLLInit();
         void OutStart();
         void InStart();
         void OutStop();

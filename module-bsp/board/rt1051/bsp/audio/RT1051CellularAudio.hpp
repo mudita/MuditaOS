@@ -18,6 +18,9 @@
 #include "task.h"
 #include "macros.h"
 
+#include "drivers/DriverInterface.hpp"
+#include "drivers/pll/DriverPLL.hpp"
+
 namespace bsp{
 
 
@@ -71,6 +74,7 @@ namespace bsp{
         sai_config_t config;
         TaskHandle_t inWorkerThread = nullptr;
         TaskHandle_t outWorkerThread = nullptr;
+        std::shared_ptr<drivers::DriverPLL> pll;
 
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
@@ -86,7 +90,6 @@ namespace bsp{
 
         void Init();
         void Deinit();
-        void PLLInit();
         void OutStart();
         void InStart();
         void OutStop();

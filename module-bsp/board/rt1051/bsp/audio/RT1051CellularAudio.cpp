@@ -16,8 +16,12 @@
 
 #include "log/log.hpp"
 
+#include "bsp/BoardDefinitions.hpp"
+
 
 namespace bsp {
+
+    using namespace drivers;
 
     sai_edma_handle_t RT1051CellularAudio::txHandle = {};
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
@@ -127,7 +131,7 @@ namespace bsp {
     void RT1051CellularAudio::Init() {
         edma_config_t dmaConfig = {0};
 
-        PLLInit();
+        pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
 
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_CELLULAR_AUDIO_SAIx_MCLK_MASK;
@@ -173,32 +177,9 @@ namespace bsp {
 
     void RT1051CellularAudio::Deinit() {
         memset(&config, 0, sizeof config);
-        //CLOCK_DeinitAudioPll();
         //DMAMUX_Deinit(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE);
         //EDMA_Deinit(BSP_AUDIOCODEC_SAIx_DMA);
         SAI_Deinit(BOARD_CELLULAR_AUDIO_SAIx);
-    }
-
-    void RT1051CellularAudio::PLLInit() {
-        auto ret = CLOCK_GetPllFreq(kCLOCK_PllAudio);
-        LOG_DEBUG("Audio PLL frequency: %lu", ret);
-        if (ret != 0) {
-            // Audio PLL initiaized already, skip initialization process
-        } else {
-            /*
-             * AUDIO PLL setting: Frequency = Fref * (DIV_SELECT + NUM / DENOM)
-             *                              = 24 * (32 + 77/100)
-             *                              = 786.48 MHz
-             */
-            const clock_audio_pll_config_t audioPllConfig = {
-                    .loopDivider = 32,  /* PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
-                    .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */
-                    .numerator = 77,    /* 30 bit numerator of fractional loop divider. */
-                    .denominator = 100, /* 30 bit denominator of fractional loop divider */
-            };
-
-            CLOCK_InitAudioPll(&audioPllConfig);
-        }
     }
 
     void RT1051CellularAudio::InStart() {
