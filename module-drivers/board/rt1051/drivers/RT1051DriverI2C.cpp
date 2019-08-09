@@ -12,38 +12,151 @@
 #include "RT1051DriverI2C.hpp"
 #include "log/log.hpp"
 #include "../board.h"
+#include "../fsl_drivers/fsl_clock.h"
 
 namespace drivers {
 
 
-    RT1051DriverI2C::RT1051DriverI2C(const I2CInstances inst,const DriverI2CParams &params){
+    RT1051DriverI2C::RT1051DriverI2C(const I2CInstances inst,const DriverI2CParams &params): DriverI2C(params){
 
         lpi2c_master_config_t lpi2cConfig = {0};
 
-        /*
-         * lpi2cConfig.debugEnable = false;
-         * lpi2cConfig.ignoreAck = false;
-         * lpi2cConfig.pinConfig = kLPI2C_2PinOpenDrain;
-         * lpi2cConfig.baudRate_Hz = 100000U;
-         * lpi2cConfig.busIdleTimeout_ns = 0;
-         * lpi2cConfig.pinLowTimeout_ns = 0;
-         * lpi2cConfig.sdaGlitchFilterWidth_ns = 0;
-         * lpi2cConfig.sclGlitchFilterWidth_ns = 0;
-         */
+        switch (inst){
+            case I2CInstances ::I2C1:
+                base = LPI2C1;
+                break;
+            case I2CInstances ::I2C2:
+                base = LPI2C2;
+                break;
+        }
+
         LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
-        LPI2C_MasterInit(BOARD_KEYBOARD_I2C_BASEADDR, &lpi2cConfig, BOARD_KEYBOARD_I2C_CLOCK_FREQ);
+        LPI2C_MasterInit(base, &lpi2cConfig, ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U)));
     }
 
     RT1051DriverI2C::~RT1051DriverI2C() {
-        LPI2C_MasterDeinit(BOARD_KEYBOARD_I2C_BASEADDR);
+        LPI2C_MasterDeinit(base);
     }
 
-    ssize_t RT1051DriverI2C::Write(const uint8_t *data, const size_t len, const DriverI2CParams &params) {
-
+    ssize_t RT1051DriverI2C::Write(const drivers::I2CAddress &addr, const uint8_t *txBuff, const size_t size) {
+        cpp_freertos::LockGuard lock(mutex);
+        auto ret = BOARD_LPI2C_Send(base,addr.deviceAddress,addr.subAddress,addr.subAddressSize, const_cast<uint8_t *>(txBuff),size);
+        if(ret != kStatus_Success){
+            return -1; // TODO:M.P: fix me
+        }else{
+            return size;
+        }
     }
 
-    ssize_t RT1051DriverI2C::Read(uint8_t *data, const size_t len, const DriverI2CParams &params) {
 
+    ssize_t RT1051DriverI2C::Read(const drivers::I2CAddress &addr, uint8_t *rxBuff, const size_t size) {
+        cpp_freertos::LockGuard lock(mutex);
+        auto ret = BOARD_LPI2C_Receive(base,addr.deviceAddress,addr.subAddress,addr.subAddressSize,rxBuff,size);
+        if(ret != kStatus_Success){
+            return -1; // TODO:M.P: fix me
+        }else{
+            return size;
+        }
+    }
+
+    ssize_t RT1051DriverI2C::Modify(const drivers::I2CAddress &addr, const uint32_t mask, bool setClr,
+                                    const size_t size) {
+        cpp_freertos::LockGuard lock(mutex);
+        uint16_t rx = 0;
+        auto ret = BOARD_LPI2C_Receive(base,addr.deviceAddress,addr.subAddress,addr.subAddressSize, (uint8_t*)&rx,
+                                   size);
+
+        // Set specified bits
+        if(setClr ){
+            rx |=mask;
+        }
+        else{
+            rx &=~mask;
+        }
+
+        ret |= BOARD_LPI2C_Send(base,addr.deviceAddress,addr.subAddress,addr.subAddressSize, (uint8_t*)&rx,
+                                size);
+
+        if(ret != kStatus_Success){
+            return -1; // TODO:M.P: fix me
+        }else{
+            return size;
+        }
+    }
+
+    status_t RT1051DriverI2C::BOARD_LPI2C_Send(LPI2C_Type *base, uint8_t deviceAddress, uint32_t subAddress,
+                                     uint8_t subAddressSize, uint8_t *txBuff, uint8_t txBuffSize)
+    {
+        status_t reVal;
+
+        /* Send master blocking data to slave */
+        reVal = LPI2C_MasterStart(base, deviceAddress, kLPI2C_Write);
+        if (kStatus_Success == reVal)
+        {
+            while (LPI2C_MasterGetStatusFlags(base) & kLPI2C_MasterNackDetectFlag)
+            {
+            }
+
+            reVal = LPI2C_MasterSend(base, &subAddress, subAddressSize);
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+
+            reVal = LPI2C_MasterSend(base, txBuff, txBuffSize);
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+
+            reVal = LPI2C_MasterStop(base);
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+        }
+
+        return reVal;
+    }
+
+    status_t RT1051DriverI2C::BOARD_LPI2C_Receive(LPI2C_Type *base, uint8_t deviceAddress, uint32_t subAddress,
+                                        uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize)
+    {
+        status_t reVal;
+
+        reVal = LPI2C_MasterStart(base, deviceAddress, kLPI2C_Write);
+        if (kStatus_Success == reVal)
+        {
+            while (LPI2C_MasterGetStatusFlags(base) & kLPI2C_MasterNackDetectFlag)
+            {
+            }
+
+            reVal = LPI2C_MasterSend(base, &subAddress, subAddressSize);
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+
+            reVal = LPI2C_MasterRepeatedStart(base, deviceAddress, kLPI2C_Read);
+
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+
+            reVal = LPI2C_MasterReceive(base, rxBuff, rxBuffSize);
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+
+            reVal = LPI2C_MasterStop(base);
+            if (reVal != kStatus_Success)
+            {
+                return reVal;
+            }
+        }
+        return reVal;
     }
 
 }

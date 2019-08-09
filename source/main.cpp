@@ -64,8 +64,10 @@ public:
         auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
-        //vTaskDelay(3000);
-        //ret = AudioServiceAPI::Stop(this);
+        vTaskDelay(3000);
+        ret = AudioServiceAPI::Stop(this);
+        vTaskDelay(500);
+        ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
 
 /*        auto ret = AudioServiceAPI::RoutingStart(this);
@@ -124,12 +126,7 @@ int main() {
 
     LOG_PRINTF("Launching PurePhone..\n ");
 
-    DriverI2CParams params;
-
-    auto ret = DriverInterface<DriverI2C>::Create(I2CInstances ::I2C1,params);
-
-
-#if 0
+#if 1
     bsp::BoardInit();
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);

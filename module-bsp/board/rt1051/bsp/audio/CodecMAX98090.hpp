@@ -9,11 +9,12 @@
 
 
 
-#ifndef PUREPHONE_MAX98090_HPP
+#ifndef PUREPHONE_CODECMAX98090_HPP
 #define PUREPHONE_CODECMAX98090_HPP
 
 #include "Codec.hpp"
-#include "i2c.h"
+#include "drivers/DriverInterface.hpp"
+#include "drivers/i2c/DriverI2C.hpp"
 
 class CodecParamsMAX98090 : public CodecParams {
 public:
@@ -125,7 +126,8 @@ public:
     CodecRetCode Ioctrl(const CodecParams &param) override final;
 
 private:
-    bsp_i2c_inst_t* i2CInst;
+    std::shared_ptr<drivers::DriverI2C> i2c;
+    drivers::I2CAddress i2cAddr;
     CodecParamsMAX98090 currentParams;
 
 
@@ -144,4 +146,4 @@ private:
 };
 
 
-#endif //PUREPHONE_MAX98090_HPP
+#endif //PUREPHONE_CODECMAX98090_HPP
