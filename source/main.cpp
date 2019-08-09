@@ -115,10 +115,21 @@ public:
     uint32_t timer_id = 0;
 };
 
+#include "module-drivers/drivers/DriverInterface.hpp"
+#include "module-drivers/drivers/i2c/DriverI2C.hpp"
+
+using namespace drivers;
+
 int main() {
 
     LOG_PRINTF("Launching PurePhone..\n ");
 
+    DriverI2CParams params;
+
+    auto ret = DriverInterface<DriverI2C>::Create(I2CInstances ::I2C1,params);
+
+
+#if 0
     bsp::BoardInit();
 
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
@@ -167,6 +178,6 @@ int main() {
     });
 
     cpp_freertos::Thread::StartScheduler();
-
+#endif
     return 0;
 }

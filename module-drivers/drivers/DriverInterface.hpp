@@ -13,34 +13,43 @@
 #define PUREPHONE_DRIVERINTERFACE_HPP
 
 #include <memory>
+#include "critical.hpp"
 
-class DriverParams {
-
-};
-
-class IoctlParams {
-
-};
-
-class DriverInterface {
-
-public:
+namespace drivers {
 
     template<typename T>
-    std::shared_ptr<DriverInterface> Create(T, const DriverParams &params){
-        return T::Create(params);
-    }
+    class DriverInterface {
 
-    DriverInterface(const DriverParams &params);
-    virtual ~DriverInterface();
+    public:
+        template<typename I, typename P>
+        static std::shared_ptr<T> Create(const I instance, const P &params) {
 
-    virtual ssize_t Write(const uint8_t *data, const size_t len, const DriverParams &params) = 0;
+            cpp_freertos::CriticalSection::Enter();
+            std::shared_ptr<T> inst = singleton.lock();
 
-    virtual ssize_t Read(uint8_t *data, const size_t len, const DriverParams &params) = 0;
+            if (!inst) {
+#if defined(TARGET_RT1051)
+                inst = T::Create(instance, params);
+#elif defined(TARGET_Linux)
+#else
+#error "Unsupported target"
+#endif
 
-    virtual int32_t Ioctl(const IoctlParams &ioctlParams) = 0;
+                singleton = inst;
+            }
 
-};
+            cpp_freertos::CriticalSection::Exit();
+
+            return inst;
+        }
+
+    protected:
+        static std::weak_ptr<T> singleton;
+    };
+
+    template<typename I>
+    std::weak_ptr<I> DriverInterface<I>::singleton;
+}
 
 
 #endif //PUREPHONE_DRIVERINTERFACE_HPP
