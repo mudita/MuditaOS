@@ -10,6 +10,7 @@
 
 
 #include "DriverI2C.hpp"
+#include "critical.hpp"
 
 #if defined(TARGET_RT1051)
 #include "board/rt1051/drivers/RT1051DriverI2C.hpp"
@@ -20,20 +21,18 @@
 #error "Unsupported target"
 #endif
 
+namespace drivers {
 
-//TODO:M.P this is only unfinished template, I will continue work on this during power manager development
-std::shared_ptr<DriverI2C> DriverI2C::Create(const DriverParams &params) {
-
-    std::shared_ptr<DriverI2C> inst = instance.lock();
-
-    if(!inst){
-
-    }
+    std::shared_ptr<DriverI2C> DriverI2C::Create(const drivers::I2CInstances inst,
+                                                 const drivers::DriverI2CParams &params) {
+        {
 #if defined(TARGET_RT1051)
-
+            return  std::make_shared<RT1051DriverI2C>(inst,params);
 #elif defined(TARGET_Linux)
-#else
-                #error "Unsupported target"
+            #else
+#error "Unsupported target"
 #endif
-    return nullptr;
+        }
+    }
+
 }

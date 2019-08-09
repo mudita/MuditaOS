@@ -10,3 +10,9 @@
 
 
 #include "DriverInterface.hpp"
+
+#include "i2c/DriverI2C.hpp"
+
+namespace drivers {
+
+}
