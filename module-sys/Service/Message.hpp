@@ -121,11 +121,11 @@ namespace sys
     {
     public:
 
-        ResponseMessage(ReturnCodes retCode = ReturnCodes::Success): Message(),retCode(retCode)
+        ResponseMessage(ReturnCodes retCode = ReturnCodes::Success,uint32_t responseTo=0): Message(),responseTo(responseTo),retCode(retCode)
         {
             type = Type::Response;
         }
-
+        uint32_t responseTo;
         ReturnCodes retCode;
 
         Message_t Execute(Service* service) override;

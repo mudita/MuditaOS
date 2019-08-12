@@ -20,7 +20,7 @@ class ApplicationSettings: public app::Application {
 public:
 	ApplicationSettings( std::string name="ApplicationSettings", bool startBackgound = false);
 	virtual ~ApplicationSettings();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 	sys::ReturnCodes WakeUpHandler() override;

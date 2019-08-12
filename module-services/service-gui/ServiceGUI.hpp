@@ -64,7 +64,7 @@ public:
     ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight );
     ~ServiceGUI();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override;
 

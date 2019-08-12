@@ -36,7 +36,7 @@ public:
 	EventManager(const std::string& name);
     ~EventManager();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

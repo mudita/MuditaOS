@@ -65,7 +65,7 @@ private:
 
 	void TickHandler(uint32_t id) override;
 
-    Message_t DataReceivedHandler(DataMessage* msg) override;
+    Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp) override;
 
     ReturnCodes InitHandler() override;
 

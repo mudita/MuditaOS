@@ -27,7 +27,7 @@ protected:
 public:
 	ApplicationCall( std::string name="ApplicationCall", bool startBackgound = false );
 	virtual ~ApplicationCall();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 	sys::ReturnCodes WakeUpHandler() override;
