@@ -9,11 +9,12 @@
 #ifndef MODULE_GUI_GUI_WIDGETS_TEXT_HPP_
 #define MODULE_GUI_GUI_WIDGETS_TEXT_HPP_
 
-//#include <strstream>P
+#include <list>
 
 #include "utf8/UTF8.hpp"
 
 #include "BoxLayout.hpp"
+#include "Label.hpp"
 #include "Rect.hpp"
 
 namespace gui {
@@ -30,25 +31,76 @@ public:
 		CONTINUE_SPACE //line was broken on the space character because next word doesn't fit current line.
 	};
 
-protected:
-	VBox labelsBox;
+	/**
+	 * Types of expanding the text field
+	 */
+	enum class ExpandMode {
+		EXPAND_UP,
+		EXPAND_DOWN,
+		EXPAND_NONE //defult
+	};
 
+	/**
+	 * Modes of work of the text editor
+	 */
+	enum class EditMode	{
+		BROWSE,
+		EDIT
+	};
+
+	/**
+	 * @brief Type of the text field
+	 */
+	enum class TextType{
+		SINGLE_LINE = 1,
+		MULTI_LINE
+	};
+protected:
 	class TextLine {
 	public:
-		UTF8 text;
-		LineEndType endType;
+		UTF8* text = nullptr;
+		uint32_t startIndex = 0;
+		uint32_t endIndex = 0;
+		LineEndType endType = LineEndType::EOT;
+		uint32_t pixelLength = 0;
 
-		TextLine( const UTF8 );
+		TextLine( UTF8* text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength );
 	};
+
+	std::list<TextLine*> textLines;
+
+	EditMode editMode = EditMode::EDIT;
+	ExpandMode expandMode = ExpandMode::EXPAND_NONE;
+	TextType textType = TextType::MULTI_LINE;
+	//maximum number of lines until which widget will expand its size;
+	uint32_t maxExpansionLines = 0;
+	//width of the cursor
+	uint32_t cursorWidth = 2;
+	//font pointer
+	Font* font;
+	//index of the first visible row of the text
+	uint32_t firstRow = 0;
+
+	void splitTextToLines( const UTF8& text);
+
 public:
 	Text();
-	Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, const UTF8& text = "", bool expandVertically = false);
+	Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, ExpandMode expandMode, TextType textType, const UTF8& text = "");
 	virtual ~Text();
+
+	void setEditMode( EditMode mode );
+	void setCursorWidth( uint32_t w );
+	virtual void setText( const UTF8& text );
+	virtual void clear();
+	virtual UTF8 getText();
+	void setFont( const UTF8& fontName );
 
 	//virtual methods
 	std::list<DrawCommand*> buildDrawList() override;
 	void setPosition( const short& x, const short& y ) override;
 	void setSize( const short& w, const short& h ) override;
+
+
 };
 
 } /* namespace gui */
