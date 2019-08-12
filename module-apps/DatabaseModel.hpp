@@ -27,7 +27,7 @@ protected:
 	/**
 	 * Number of elements requested from database in single message
 	 */
-	int pageSize;
+	int pageSize = 1;
 	/**
 	 * Pointer to application that owns the model
 	 */
@@ -43,79 +43,101 @@ protected:
 	//vector that holds records received from database - first last records, than previous records and finally next records
 	std::vector<std::shared_ptr<T>> records;
 public:
-	virtual void destroyRecord( T* record ) {
-		LOG_FATAL("!!! You should provide custom destroy function ");
-	}
 
 	virtual void requestRecordsCount() {
 	}
 
 	virtual bool updateRecords( std::unique_ptr<std::vector<T>> records, const uint32_t offset, const uint32_t limit, uint32_t count ) {
-		return true;
+		//calculate for which page is received data using offset value
+		int page = getPage(offset);
+		int currentPage = firstIndex / pageSize;
+
+		if( (page >= currentPage - 1) && ( page <= currentPage + 1)){
+			//remove old records
+			for( int i=(pageSize*(page-currentPage) + pageSize); i<(pageSize*(page-currentPage+1) + pageSize); i++ ) {
+				LOG_INFO("value i: %d", i);
+				this->records[i] = nullptr;
+			}
+
+			//store new records
+			for( unsigned int i=0; i<count; i++ ) {
+					this->records[i+(pageSize*(page-currentPage) + pageSize)] = std::shared_ptr<T>( new T(records.get()->operator [](i)) );
+			}
+
+			//return true (for refreshing window) only if current page was modified.
+			if( page == currentPage )
+				return true;
+			return false;
+		}
+		else {
+			//alarms are out of current scope
+			LOG_ERROR("Received records out of scope");
+			return false;
+		}
+		return false;
 	}
 
 	virtual void movePrevWindow() {
 
-//		uint32_t currentPage = firstIndex / pageSize;
-//		//check if it is possible to move to previous window
-//		if( currentPage <= 0 )
-//			return;
-//
-//		//erase records from next window
-//		for( int i=0; i<pageSize; i++ )
-//			if( records[i+2*pageSize]) {
-//				destroyRecord(records[i+2*pageSize]);
-//				records[i+2*pageSize] = nullptr;
-//			}
-//
-//		//moves current records to next records and prev records to current records
-//		std::copy_backward(std::begin(records), std::begin(records) + pageSize*2, std::end(records) );
-//
-//		//clear first window to nullptr
-//		std::fill( records.begin(), records.begin()+pageSize, nullptr );
-//
-//		//lock the application for keyboard input
-//		application->blockEvents(true);
-//
-//		//request records for next window
-//		uint32_t prevPage = currentPage - 2;
-//		if( prevPage >= 0) {
-//			requestRecords(pageSize*prevPage, pageSize );
-//		}
-//		firstIndex -= pageSize;
-//		if( firstIndex < 0 )
-//			firstIndex = 0;
+		uint32_t currentPage = firstIndex / pageSize;
+		//check if it is possible to move to previous window
+		if( currentPage <= 0 )
+			return;
+
+		//erase records from next window
+		for( int i=0; i<pageSize; i++ )
+			if( records[i+2*pageSize]) {
+				records[i+2*pageSize] = nullptr;
+			}
+
+		//moves current records to next records and prev records to current records
+		std::copy_backward(std::begin(records), std::begin(records) + pageSize*2, std::end(records) );
+
+		//clear first window to nullptr
+		std::fill( records.begin(), records.begin()+pageSize, nullptr );
+
+		//lock the application for keyboard input
+		application->blockEvents(true);
+
+		//request records for next window
+		uint32_t prevPage = currentPage - 2;
+		if( prevPage >= 0) {
+			requestRecords(pageSize*prevPage, pageSize );
+		}
+		firstIndex -= pageSize;
+		if( firstIndex < 0 )
+			firstIndex = 0;
 	}
 
 	virtual void moveNextWindow() {
 
-//		uint32_t currentPage = firstIndex / pageSize;
-//		uint32_t pageCount = (recordsCount % pageSize == 0) ? recordsCount/pageSize : (recordsCount/pageSize)  + 1;
-//		//check if it is possible to move to next window
-//		if( currentPage >= pageCount )
-//			return;
-//
-//		//erase first window with indicies from 0 up to pageSize -1
-//		for( int i=0; i<pageSize; i++ )
-//			if( records[i] )
-//				destroyRecord(records[i]);
-//
-//		//move current and next window so current window becomes prev window and next becomes current.
-//		std::copy_n(std::begin(records)+pageSize, 2*pageSize, begin(records));
-//
-//		//clear last window to nullptr
-//		std::fill( records.begin()+2*pageSize, records.end(), nullptr );
-//
-//		//lock the application for keyboard input
-//		application->blockEvents(true);
-//
-//		//request records for next window
-//		uint32_t nextPage = currentPage + 2;
-//		if( nextPage < pageCount )
-//			requestRecords(pageSize*nextPage, pageSize );
-//		firstIndex += pageSize;
-//		if( firstIndex > recordsCount )
-//			firstIndex = recordsCount/pageCount;
+		uint32_t currentPage = firstIndex / pageSize;
+		uint32_t pageCount = (recordsCount % pageSize == 0) ? recordsCount/pageSize : (recordsCount/pageSize)  + 1;
+		//check if it is possible to move to next window
+		if( currentPage >= pageCount )
+			return;
+
+		//erase first window with indicies from 0 up to pageSize -1
+		for( int i=0; i<pageSize; i++ )
+			if( records[i] )
+				records[i] = nullptr;
+
+		//move current and next window so current window becomes prev window and next becomes current.
+		std::copy_n(std::begin(records)+pageSize, 2*pageSize, begin(records));
+
+		//clear last window to nullptr
+		std::fill( records.begin()+2*pageSize, records.end(), nullptr );
+
+		//lock the application for keyboard input
+		application->blockEvents(true);
+
+		//request records for next window
+		uint32_t nextPage = currentPage + 2;
+		if( nextPage < pageCount )
+			requestRecords(pageSize*nextPage, pageSize );
+		firstIndex += pageSize;
+		if( firstIndex > recordsCount )
+			firstIndex = recordsCount/pageCount;
 	}
 
 	virtual void requestRecords( const uint32_t offset, const uint32_t limit ) {
@@ -147,30 +169,28 @@ public:
 		std::fill( records.begin(), records.end(), nullptr );
 	}
 
-	DatabaseModel( Application* app ) :
-		pageSize{3},
+	DatabaseModel( Application* app, int pageSize ) :
+		pageSize{pageSize},
 		application{app},
 		recordsCount{ -1 },
 		firstIndex{ 0 } {
 
-		records.resize(pageSize);
+		records.resize( pageSize*3 );
 		std::fill( records.begin(), records.end(), nullptr );
 	}
 
 	virtual ~DatabaseModel() {
 		LOG_INFO("~DatabaseModel");
-//		for( auto& r : records )
-//			destroyRecord(r);
-//		records.clear();
+		records.clear();
 	}
 
 	virtual void clear() {
-//		for( auto& r : records ) {
-//			destroyRecord(r);
-//		}
-//		std::fill( records.begin(), records.end(), nullptr );
-//		firstIndex = 0;
-//		recordsCount = -1;
+
+		records.clear();
+
+		std::fill( records.begin(), records.end(), nullptr );
+		firstIndex = 0;
+		recordsCount = -1;
 	}
 
 	int getRecordsCount() { return recordsCount; };
@@ -179,7 +199,7 @@ public:
 		return  (index % pageSize == 0) ? index/pageSize : (index/pageSize)  + 1;
 	}
 
-	T* getRecord( int index ) {
+	std::shared_ptr<T> getRecord( int index ) {
 
 		//if index is greater than number of records or smaller than 0
 		if( (index<0) || (index>recordsCount-1)){

@@ -26,9 +26,6 @@ ApplicationNotes::~ApplicationNotes() {
 // Invoked upon receiving data message
 sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
-	uint32_t msgType = msgl->messageType;
-	LOG_WARN("msg id: %d looking for: %d", msgType, static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset) );
-
 	auto retMsg = Application::DataReceivedHandler(msgl);
 	//if message was handled by application's template there is no need to process further.
 	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
@@ -38,11 +35,15 @@ sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl,sys:
 
 	bool handled = false;
 
-	switch( msgType ) {
-		case static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset): {
-			DBNotesResponseMessage* msg = reinterpret_cast<DBNotesResponseMessage*>( msgl );
-			notesModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count );
-		}break;
+	//handle database response
+	if( resp != nullptr ) {
+		uint32_t msgType = resp->responseTo;
+		switch( msgType ) {
+			case static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset): {
+				DBNotesResponseMessage* msg = reinterpret_cast<DBNotesResponseMessage*>( resp );
+				notesModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count );
+			}break;
+		}
 	}
 
 	if( handled )
