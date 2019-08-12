@@ -1,23 +1,28 @@
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "AppWindow.hpp"
 #include <widgets/BoxLayout.hpp>
 
 namespace gui {
 
-class PhonebookNewContact : public AppWindow {
+class PhonebookNewContact : public AppWindow
+{
   protected:
-      std::unique_ptr<gui::Label> title;
-      // TODO -> make this new class inheriting on vbox...
+    std::vector<gui::Item> options;
+    gui::Label *title;
+    // TODO -> make this new class inheriting on vbox...
     struct Input {
-        std::unique_ptr<gui::Label> name;
-        std::unique_ptr<gui::Label> input;
-        void build(PhonebookNewContact *parent, const UTF8 &text);
-    } name1; // , name2, nr1, nr2, email;
-    std::unique_ptr<gui::VBox> box;
+        gui::Label name, input;
+        Input(Input &&) = default;
+        Input(gui::VBox* box, const UTF8 &text);
+        virtual ~Input();
+    };
+    std::vector<Input *> el;
+    gui::VBox *box;
+    unsigned int pos;
 
   public:
     PhonebookNewContact(app::Application *app);

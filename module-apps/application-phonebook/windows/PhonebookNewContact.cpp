@@ -12,25 +12,37 @@
 
 namespace gui {
 
-void PhonebookNewContact::Input::build(PhonebookNewContact *ptr,const UTF8 &text)
+PhonebookNewContact::Input::Input(gui::VBox* box, const UTF8 &text)
 {
-    gui::Label *el = new gui::Label();
-    el->setMaxSize(480, 50);
-    el->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    el->setText(text);
-    el->setFont("gt_pressura_bold_16");
-    ptr->box->addWidget(el);
+    const unsigned int wall_offset = 10;
+    if (!box) {
+        return;
+    }
+    name.setMaxSize(box->getMaxWidth() - wall_offset * 2, 40);
+    name.setPosition(wall_offset, 0);
+    name.setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    name.setText(text);
+    name.setFont("gt_pressura_bold_16");
+    name.setPenFocusWidth(3);
+    name.setPenWidth(1);
+    box->addWidget(&name);
 
-    el = new gui::Label();
-    el->setMaxSize(480, 50);
-    el->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-    el->setPenWidth(5);
-    el->setFont("gt_pressura_regular_16");
-    ptr->box->addWidget(el);
-
+    input.setMaxSize(box->getMaxWidth() - wall_offset * 2, 40);
+    input.setPosition(wall_offset, 0);
+    input.setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    input.setPenWidth(3);
+    input.setFont("gt_pressura_regular_16");
+    input.setPenFocusWidth(3);
+    input.setPenWidth(1);
+    box->addWidget(&input);
 }
 
-PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, "NewContact")
+PhonebookNewContact::Input::~Input()
+{
+    LOG_INFO("Input destroyed?");
+}
+
+PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, "NewContact"), title(nullptr), box(nullptr)
 {
     setSize(480, 600);
     buildInterface();
@@ -40,6 +52,13 @@ void PhonebookNewContact::rebuild()
 {
     destroyInterface();
     buildInterface();
+    for ( auto l : el) {
+        if (getFocusItem() == &l->input) {
+            LOG_INFO("Focus changed to: %s", l->name.getText());
+            setFocusItem(&l->input);
+            break;
+        }
+    }
 }
 
 void PhonebookNewContact::buildInterface() {
@@ -52,19 +71,28 @@ void PhonebookNewContact::buildInterface() {
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-    title = std::make_unique<gui::Label>(this, 0, 50, 480, 50);
+    title = new gui::Label(this, 0, 30, 480, 50);
     title->setFilled(false);
     title->setBorderColor(gui::ColorNoColor);
     title->setFont("gt_pressura_bold_24");
     title->setText(utils::localize.get("app_phonebook_title_add_contact"));
     title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-    box = std::make_unique<gui::VBox>(this, 0, 150, 480, 450);
-    box->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    name1.build(this, utils::localize.get("app_phonebook_first_name"));
-    // , name2, nr1, nr2, email
+    if(!box) {
+        box = new gui::VBox(this, 10, 100, 480, 500);
+        box->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        el.push_back(new Input(box, utils::localize.get("app_phonebook_first_name")));
+        el.push_back(new Input(box, utils::localize.get("app_phonebook_number")));
+        el.push_back(new Input(box, utils::localize.get("app_phonebook_second_number")));
+        el.push_back(new Input(box, utils::localize.get("app_phonebook_email")));
 
+        for (unsigned int i =0; i < el.size(); ++i) {
+            el[i]->input.setNavigationItem(NavigationDirection::DOWN,   &el[i+1==el.size()?i:i+1]->input);
+            el[i]->input.setNavigationItem(NavigationDirection::UP,     &el[i==0?0:i-1]->input);
+        }
+    }
 }
+
 void PhonebookNewContact::destroyInterface()
 {
     AppWindow::destroyInterface();
@@ -73,38 +101,38 @@ void PhonebookNewContact::destroyInterface()
 
 PhonebookNewContact::~PhonebookNewContact()
 {
+    for( auto p : el) {
+        delete p;
+    }
     destroyInterface();
+    delete box;
 }
 
+void PhonebookNewContact::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+    setFocusItem(&el[0]->input);
+}
 
-void PhonebookNewContact::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data)
+bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 {
+    // check if any of the lower inheritance onInput methods catch the event
+    bool ret = AppWindow::onInput(inputEvent);
+    if (ret) {
+        // refresh window only when key is other than enter
+        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
+            application->render(RefreshModes::GUI_REFRESH_FAST);
+        return true;
+    }
+
+    // process only if key is released
+    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+        return false;
+
+    LOG_INFO("Key pressed %d", inputEvent.keyCode);
+    if (inputEvent.keyCode == KeyCode::KEY_RF) {
+        sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+        return true;
+    }
+
+    return false;
 }
-
-bool PhonebookNewContact::onInput(const InputEvent &inputEvent) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
-			application->render( RefreshModes::GUI_REFRESH_FAST );
-		return true;
-	}
-
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return false;
-
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-		return true;
-	}
-
-	return false;
-}
-
 }
