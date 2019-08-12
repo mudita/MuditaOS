@@ -20,7 +20,6 @@ struct NotesRecord{
 	uint32_t date;
 	UTF8    snippet;
 	UTF8    path;
-
 };
 
 enum class NotesRecordField{
@@ -48,7 +47,7 @@ public:
 
     std::unique_ptr<std::vector<NotesRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<NotesRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,NotesRecordField field, const char* str) override final;
+std::unique_ptr<std::vector<NotesRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,NotesRecordField field, const char* str) override final;
 
 private:
     const uint32_t snippetLength = 60;
