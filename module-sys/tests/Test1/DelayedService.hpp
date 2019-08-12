@@ -25,7 +25,7 @@ public:
     }
 
     // Invoked when service received data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override{
 
 
         cpp_freertos::Thread::Delay(100);
