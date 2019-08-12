@@ -32,6 +32,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SmsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SettingsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/AlarmsDB.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/NotesDB.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp

@@ -8,6 +8,7 @@
  */
 #include "MessageType.hpp"
 #include "windows/NotesMainWindow.hpp"
+#include "service-db/messages/DBMessage.hpp"
 
 #include "ApplicationNotes.hpp"
 
@@ -15,6 +16,8 @@ namespace app {
 
 ApplicationNotes::ApplicationNotes(std::string name, bool startBackgound) :
 	Application( name, startBackgound, 2048 ) {
+
+	notesModel = new NotesModel( this );
 }
 
 ApplicationNotes::~ApplicationNotes() {
@@ -23,6 +26,9 @@ ApplicationNotes::~ApplicationNotes() {
 // Invoked upon receiving data message
 sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl) {
 
+	uint32_t msgType = msgl->messageType;
+	LOG_WARN("msg id: %d looking for: %d", msgType, static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset) );
+
 	auto retMsg = Application::DataReceivedHandler(msgl);
 	//if message was handled by application's template there is no need to process further.
 	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
@@ -30,8 +36,14 @@ sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl) {
 		return retMsg;
 	}
 
-	//this variable defines whether message was processed.
-	bool handled = true;
+	bool handled = false;
+
+	switch( msgType ) {
+		case static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset): {
+			DBNotesResponseMessage* msg = reinterpret_cast<DBNotesResponseMessage*>( msgl );
+			notesModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count );
+		}break;
+	}
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
@@ -47,6 +59,8 @@ sys::ReturnCodes ApplicationNotes::InitHandler() {
 		return ret;
 
 	createUserInterface();
+
+	notesModel->requestRecordsCount();
 
 	setActiveWindow("MainWindow");
 

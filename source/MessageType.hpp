@@ -65,6 +65,12 @@ enum class MessageType {
     CellularStartConfProcedure,
     CellularStartAudioConfProcedure,
 
+	DBNotesAdd,       // Add new note's record
+	DBNotesRemove,    // Remove selected note's record
+	DBNotesUpdate,    // Update selected note's record
+	DBNotesGetLimitOffset,   // Get notes records by limit,offset
+	DBNotesGetCount,         // Get notes reocrds count
+
     //Audio service messages
     AudioNotification,
     AudioPlaybackStart,

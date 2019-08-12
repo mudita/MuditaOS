@@ -20,6 +20,7 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/AlarmsRecord.hpp"
+#include "Interface/NotesRecord.hpp"
 
 class ServiceDB: public sys::Service {
 private:
@@ -28,12 +29,14 @@ private:
     std::unique_ptr<SmsDB> smsDB;
     std::unique_ptr<ContactsDB> contactsDB;
     std::unique_ptr<AlarmsDB> alarmsDB;
+    std::unique_ptr<NotesDB> notesDB;
 
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
     std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
+    std::unique_ptr<NotesRecordInterface> notesRecordInterface;
 
 protected:
 
@@ -60,3 +63,4 @@ public:
 
 
 #endif //PUREPHONE_SERVICEDB_HPP
+
