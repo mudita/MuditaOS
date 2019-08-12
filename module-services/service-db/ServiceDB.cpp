@@ -409,7 +409,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 #if SHOW_DB_ACCESS_PERF == 1
 			LOG_ERROR("DBNotesGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
-			responseMsg = std::make_shared<DBNotesResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size() );
+			responseMsg = std::make_shared<DBNotesResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
 		} break;
 
 
@@ -419,7 +419,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
     }
 
 
-
+    responseMsg->responseTo = static_cast<uint32_t >(msgl->messageType);
     return responseMsg;
 }
 
