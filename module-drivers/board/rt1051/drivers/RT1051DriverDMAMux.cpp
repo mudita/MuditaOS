@@ -10,15 +10,14 @@
 
 
 #include "RT1051DriverDMAMux.hpp"
-
-
+#include <algorithm>
 
 
 namespace drivers {
 
     RT1051DriverDMAMux::RT1051DriverDMAMux(const drivers::DMAMuxInstances &inst,
                                            const drivers::DriverDMAMuxParams &params) : DriverDMAMux(params),
-                                                                                        instance(inst){
+                                                                                        instance(inst) {
         switch (instance) {
             case DMAMuxInstances::DMAMUX0: {
                 base = DMAMUX;
@@ -31,33 +30,35 @@ namespace drivers {
     RT1051DriverDMAMux::~RT1051DriverDMAMux() {
         switch (instance) {
             case DMAMuxInstances::DMAMUX0: {
-                Disable();
+                for (auto &w : channels) {
+                    DMAMUX_DisableChannel(base, w);
+                }
                 DMAMUX_Deinit(DMAMUX);
             }
                 break;
         }
     }
 
-    void RT1051DriverDMAMux::Enable() {
-            if(parameters.rxChannel != UINT32_MAX){
-                DMAMUX_SetSource(base, parameters.rxChannel,
-                                 (uint8_t) parameters.rxSource);
-                DMAMUX_EnableChannel(base, parameters.rxChannel);
-
-
-            }
-
-            if(parameters.txChannel != UINT32_MAX){
-                DMAMUX_SetSource(base, parameters.txChannel,
-                                 (uint8_t) parameters.txSource);
-                DMAMUX_EnableChannel(base, parameters.txChannel);
-            }
-
+    void RT1051DriverDMAMux::Enable(const uint32_t channel, const uint32_t source) {
+        cpp_freertos::LockGuard lock(mutex);
+        if (std::find(std::begin(channels), std::end(channels), channel) == std::end(channels)) {
+            DMAMUX_SetSource(base, channel,
+                             (uint8_t) source);
+            DMAMUX_EnableChannel(base, channel);
+        } else {
+            LOG_ERROR("Trying to enable channel that is already enabled");
+        }
     }
 
-    void RT1051DriverDMAMux::Disable() {
-        DMAMUX_DisableChannel(base,parameters.txChannel);
-        DMAMUX_DisableChannel(base,parameters.rxChannel);
+    void RT1051DriverDMAMux::Disable(const uint32_t channel) {
+        cpp_freertos::LockGuard lock(mutex);
+        auto ret = std::find(std::begin(channels), std::end(channels), channel);
+        if (ret != std::end(channels)) {
+            DMAMUX_DisableChannel(base, channel);
+            channels.erase(ret);
+        } else {
+            LOG_ERROR("Trying to disable channel that doesn't exist");
+        }
     }
 
 }

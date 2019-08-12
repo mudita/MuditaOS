@@ -12,8 +12,10 @@
 #ifndef PUREPHONE_RT1051DRIVERDMAMUX_HPP
 #define PUREPHONE_RT1051DRIVERDMAMUX_HPP
 
+#include <vector>
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "../fsl_drivers/fsl_dmamux.h"
+#include "mutex.hpp"
 
 namespace drivers {
 
@@ -24,13 +26,15 @@ namespace drivers {
 
         ~RT1051DriverDMAMux();
 
-        void Enable() override final;
+        void Enable(const uint32_t channel,const uint32_t source) override final;
 
-        void Disable() override final;
+        void Disable(const uint32_t channel) override final;
 
     private:
+        cpp_freertos::MutexStandard mutex;
         DMAMuxInstances instance;
         DMAMUX_Type *base;
+        std::vector<uint32_t > channels;
     };
 
 }

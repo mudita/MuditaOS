@@ -119,6 +119,7 @@ public:
 
 #include "module-drivers/drivers/DriverInterface.hpp"
 #include "module-drivers/drivers/i2c/DriverI2C.hpp"
+#include "module-drivers/drivers/sai/DriverSAI.hpp"
 
 using namespace drivers;
 
@@ -126,9 +127,11 @@ int main() {
 
     LOG_PRINTF("Launching PurePhone..\n ");
 
-#if 1
     bsp::BoardInit();
 
+    DriverInterface<DriverSAI>::Create(SAIInstances::SAI_1,DriverSAIParams{});
+
+#if 0
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
