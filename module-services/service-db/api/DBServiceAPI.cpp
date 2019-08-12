@@ -372,22 +372,6 @@ uint32_t DBServiceAPI::NotesGetCount(sys::Service *serv) {
     }
 }
 
-//std::unique_ptr<std::vector<NotesRecord>> DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset,
-//                                                                                uint32_t limit) {
-//    std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesGetLimitOffset);
-//    msg->offset = offset;
-//    msg->limit = limit;
-//
-//    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
-//    DBNotesResponseMessage* notesResponse = reinterpret_cast<DBNotesResponseMessage*>(ret.second.get());
-//    if((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)){
-//        return std::move(notesResponse->records);
-//    }
-//    else{
-//        return std::make_unique<std::vector<NotesRecord>>();
-//    }
-//}
-
 bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) {
     std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesGetLimitOffset);
     msg->offset = offset;
@@ -395,13 +379,5 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
 
     sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv);
     return true;
-
-//    DBNotesResponseMessage* notesResponse = reinterpret_cast<DBNotesResponseMessage*>(ret.second.get());
-//    if((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)){
-//        return std::move(notesResponse->records);
-//    }
-//    else{
-//        return std::make_unique<std::vector<NotesRecord>>();
-//    }
 }
 
