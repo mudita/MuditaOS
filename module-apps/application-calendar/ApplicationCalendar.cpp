@@ -21,7 +21,7 @@ ApplicationCalendar::~ApplicationCalendar() {
 }
 
 // Invoked upon receiving data message
-sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 	return std::make_shared<sys::ResponseMessage>( );
 }
 

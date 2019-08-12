@@ -51,7 +51,7 @@ ApplicationManager::~ApplicationManager() {
 
 }
 
-sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
 	uint32_t msgType = msgl->messageType;
 
@@ -103,7 +103,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			handleLanguageChange( msg );
 		} break;
 		default : {
-			LOG_FATAL("Received unknown massage %d", msgType );
 		} break;
 	};
 
