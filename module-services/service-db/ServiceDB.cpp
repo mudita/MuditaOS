@@ -13,7 +13,7 @@
 
 #include "messages/DBMessage.hpp"
 
-#include"messages/DBNotificationMessage.hpp"
+#include "messages/DBNotificationMessage.hpp"
 
 #include "MessageType.hpp"
 
@@ -41,6 +41,7 @@ ServiceDB::~ServiceDB() {
     contactsDB.reset();
     smsDB.reset();
     alarmsDB.reset();
+    notesDB.reset();
 
     Database::Deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -351,10 +352,72 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
         }
             break;
 
+/****** Notes */
+		case MessageType::DBNotesAdd: {
+			DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = notesRecordInterface->Add(msg->record);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBNotesAdd time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+				responseMsg = std::make_shared<DBNotesResponseMessage>(nullptr, ret);
+			} break;
+
+		case MessageType::DBNotesRemove: {
+			DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = notesRecordInterface->RemoveByID(msg->id);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBNotesRemove time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBNotesResponseMessage>(nullptr, ret);
+		} break;
+
+		case MessageType::DBNotesUpdate: {
+			DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = notesRecordInterface->Update(msg->record);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBNotesUpdate time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBNotesResponseMessage>(nullptr, ret);
+		} break;
+
+		case MessageType::DBNotesGetCount: {
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = notesRecordInterface->GetCount();
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBNotesGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBNotesResponseMessage>(nullptr, true, 0, 0, ret);
+		} break;
+
+		case MessageType::DBNotesGetLimitOffset: {
+			DBNotesMessage *msg = reinterpret_cast<DBNotesMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = notesRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBNotesGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBNotesResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size() );
+		} break;
+
+
         default:
             // ignore this message
             return std::make_shared<sys::ResponseMessage>();
     }
+
 
 
     return responseMsg;
@@ -374,6 +437,7 @@ sys::ReturnCodes ServiceDB::InitHandler() {
     contactsDB = std::make_unique<ContactsDB>();
     smsDB = std::make_unique<SmsDB>();
     alarmsDB = std::make_unique<AlarmsDB>();
+    notesDB = std::make_unique<NotesDB>();
 
     // Create record interfaces
     settingsRecordInterface = std::make_unique<SettingsRecordInterface>(settingsDB.get());
@@ -381,6 +445,7 @@ sys::ReturnCodes ServiceDB::InitHandler() {
     smsRecordInterface = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
     alarmsRecordInterface = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
+    notesRecordInterface = std::make_unique<NotesRecordInterface>(notesDB.get());
 
     return sys::ReturnCodes::Success;
 }

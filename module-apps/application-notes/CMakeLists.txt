@@ -15,9 +15,12 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationNotes.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/NotesModel.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NotesMainWindow.cpp"
+		
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationNotes.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/NotesModel.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/NotesMainWindow.hpp"
 )
 

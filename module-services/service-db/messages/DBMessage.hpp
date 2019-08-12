@@ -20,6 +20,7 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/ContactRecord.hpp"
 #include "Interface/AlarmsRecord.hpp"
+#include "Interface/NotesRecord.hpp"
 
 
 class DBMessage: public sys::DataMessage {
@@ -29,9 +30,9 @@ public:
 
     MessageType type;
 
-    uint32_t id;
-    uint32_t offset;
-    uint32_t limit;
+    uint32_t id = 0;
+    uint32_t offset = 0;
+    uint32_t limit = 0;
 };
 
 class DBResponseMessage: public sys::ResponseMessage {
@@ -122,7 +123,7 @@ public:
 	}
 	virtual ~DBAlarmMessage() {};
 	AlarmsRecord record;
-	time_t time;
+	time_t time = 0;
 };
 
 class DBAlarmResponseMessage : public DBResponseMessage{
@@ -132,4 +133,32 @@ public:
 
 	std::unique_ptr<std::vector<AlarmsRecord>> records;
 };
+
+class DBNotesMessage : public DBMessage{
+public:
+    DBNotesMessage(MessageType messageType,const NotesRecord& rec = NotesRecord{}): DBMessage(messageType),record(rec){
+
+    }
+    virtual ~DBNotesMessage() {}
+
+    NotesRecord record;
+};
+
+class DBNotesResponseMessage: public DBResponseMessage {
+public:
+    DBNotesResponseMessage(std::unique_ptr<std::vector<NotesRecord>> rec,uint32_t retCode=0,uint32_t limit=0,uint32_t offset=0, uint32_t count=0) :
+    	DBResponseMessage(retCode,count),records(std::move(rec)),
+		limit( limit ),
+		offset( offset )
+	{
+    	this->count = count;
+	};
+    virtual ~DBNotesResponseMessage() {};
+
+    std::unique_ptr<std::vector<NotesRecord>> records;
+    uint32_t limit = 0;
+	uint32_t offset = 0;
+};
+
+
 #endif //PUREPHONE_DBMESSAGE_HPP

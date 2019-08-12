@@ -159,7 +159,7 @@ namespace bsp{
 		struct tm date;
 		rtc_GetCurrentDateTime(&date);
 
-		rtc_SetAlarmInSecondsFromNow(secondsToMinute);
+		return rtc_SetAlarmInSecondsFromNow(secondsToMinute);
 	}
 }
 
