@@ -34,7 +34,7 @@ public:
     }
 
     // Invoked when service received data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
