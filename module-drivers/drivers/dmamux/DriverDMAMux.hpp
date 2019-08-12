@@ -35,8 +35,8 @@ namespace drivers {
 
         virtual ~DriverDMAMux() {}
 
-        virtual void Enable() = 0;
-        virtual void Disable() = 0;
+        virtual void Enable(const uint32_t channel,const uint32_t source) = 0;
+        virtual void Disable(const uint32_t channel) = 0;
 
     protected:
         const DriverDMAMuxParams parameters;

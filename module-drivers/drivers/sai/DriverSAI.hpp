@@ -18,14 +18,14 @@ namespace drivers {
 
 
     enum class SAIInstances {
-        SAI1,
-        SAI2,
-        SAI3
+        SAI_1,
+        SAI_2,
+        SAI_3
     };
 
     struct DriverSAIParams {
 
-        enum class Protocol{
+        enum class Protocol {
             LeftJustified,
             RightJusstified,
             I2S,
@@ -33,14 +33,14 @@ namespace drivers {
             PCMB
         };
 
-        enum class MonoStereo{
-            Stereo=0,
+        enum class MonoStereo {
+            Stereo = 0,
             MonoRight,
             MonoLeft
         };
 
         uint32_t bitWidth;
-        uint32_t channel =0;
+        uint32_t channel = 0;
         uint32_t sampleRate;
         uint32_t masterClock;
         Protocol protocol;
@@ -49,8 +49,8 @@ namespace drivers {
 
     };
 
-    struct TransferParams{
-        uint8_t * data;
+    struct TransferParams {
+        uint8_t *data;
         size_t size;
     };
 
@@ -59,12 +59,17 @@ namespace drivers {
 
         static std::shared_ptr<DriverSAI> Create(const SAIInstances inst, const DriverSAIParams &params);
 
-        DriverSAI(const DriverSAIParams& params): parameters(params) {}
+        DriverSAI(const DriverSAIParams &params) : parameters(params) {}
 
         virtual ~DriverSAI() {}
 
-        virtual int32_t StartOutTransfer(const TransferParams& tx) = 0;
-        virtual int32_t StartInTransfer(const TransferParams& rx) = 0;
+        virtual int32_t StartOutTransfer(const TransferParams &tx) = 0;
+
+        virtual int32_t StartInTransfer(const TransferParams &rx) = 0;
+
+        virtual int32_t StopOutTransfer() = 0;
+
+        virtual int32_t StopInTransfer() = 0;
 
     protected:
         const DriverSAIParams parameters;

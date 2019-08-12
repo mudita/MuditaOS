@@ -12,7 +12,7 @@
 #include "DriverSAI.hpp"
 
 #if defined(TARGET_RT1051)
-#include "board/rt1051/drivers/RT1051DriverPLL.hpp"
+#include "board/rt1051/drivers/RT1051DriverSAI.hpp"
 #elif defined(TARGET_Linux)
 
 //#include ""
@@ -26,7 +26,7 @@ namespace drivers {
                                                  const drivers::DriverSAIParams &params) {
         {
 #if defined(TARGET_RT1051)
-            //return  std::make_shared<RT1051DriverPLL>(inst,params);
+            return  std::make_shared<RT1051DriverSAI>(inst,params);
 #elif defined(TARGET_Linux)
             #else
 #error "Unsupported target"

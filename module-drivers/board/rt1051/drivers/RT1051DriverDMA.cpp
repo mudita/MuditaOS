@@ -13,9 +13,10 @@
 #include <algorithm>
 
 
-namespace drivers{
+namespace drivers {
 
-    RT1051DriverDMA::RT1051DriverDMA(const drivers::DMAInstances &inst, const drivers::DriverDMAParams &params):DriverDMA(params) {
+    RT1051DriverDMA::RT1051DriverDMA(const drivers::DMAInstances &inst, const drivers::DriverDMAParams &params)
+            : DriverDMA(params) {
         switch (instance) {
             case DMAInstances::DMA_0: {
                 base = DMA0;
@@ -29,7 +30,7 @@ namespace drivers{
     }
 
     RT1051DriverDMA::~RT1051DriverDMA() {
-        for(auto &w : channelHandles){
+        for (auto &w : channelHandles) {
             EDMA_AbortTransfer(&w.second);
         }
         EDMA_Deinit(base);
@@ -47,10 +48,9 @@ namespace drivers{
          * dmaConfig.enableDebugMode = false;
          */
 
-        if(channelHandles.find(channel) == channelHandles.end()){
+        if (channelHandles.find(channel) == channelHandles.end()) {
             EDMA_CreateHandle(&channelHandles[channel], base, channel);
-        }
-        else{
+        } else {
             // dma already exists
             LOG_ERROR("DMA channel handle exists already");
         }
@@ -60,21 +60,20 @@ namespace drivers{
 
     int32_t RT1051DriverDMA::RemoveHandle(const uint32_t channel) {
         cpp_freertos::LockGuard lock(mutex);
-        if(channelHandles.find(channel) != channelHandles.end()){
+        if (channelHandles.find(channel) != channelHandles.end()) {
             EDMA_AbortTransfer(&channelHandles[channel]);
-        }
-        else{
+            channelHandles.erase(channel);
+        } else {
             // dma already exists
             LOG_ERROR("Trying to remove non-existent dma channel handle");
         }
     }
 
-    void* RT1051DriverDMA::GetHandle(const uint32_t channel) {
+    void *RT1051DriverDMA::GetHandle(const uint32_t channel) {
         cpp_freertos::LockGuard lock(mutex);
-        if(channelHandles.find(channel) != channelHandles.end()){
+        if (channelHandles.find(channel) != channelHandles.end()) {
             return &channelHandles[channel];
-        }
-        else{
+        } else {
             // dma already exists
             LOG_ERROR("DMA channel doesn't exist");
         }
