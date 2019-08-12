@@ -14,7 +14,7 @@
 
 
 enum class TestServiceDataMessageType{
-    Plain,
+    Plain=1,
     Delayed,
     DelayedFail,
     SendData
@@ -58,7 +58,7 @@ public:
     }
 
     // Invoked when service received data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override{
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override{
 
         TestServiceDataMessage* msg = static_cast<TestServiceDataMessage*>(msgl);
 
