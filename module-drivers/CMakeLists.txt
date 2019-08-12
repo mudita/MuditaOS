@@ -20,7 +20,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/DriverInterface.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
 
         )
 
