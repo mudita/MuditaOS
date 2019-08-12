@@ -24,7 +24,7 @@ ApplicationNotes::~ApplicationNotes() {
 }
 
 // Invoked upon receiving data message
-sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
 	uint32_t msgType = msgl->messageType;
 	LOG_WARN("msg id: %d looking for: %d", msgType, static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset) );

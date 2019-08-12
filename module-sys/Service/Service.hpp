@@ -59,7 +59,7 @@ public:
 	void stopTimer(uint32_t id);
 
 	// Invoked when service received data message
-	virtual Message_t DataReceivedHandler(DataMessage* msg) = 0;
+	virtual Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp) = 0;
 
 	// Invoked when timer ticked
 	virtual void TickHandler(uint32_t id){};

@@ -115,6 +115,7 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 }
 
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
+
 	bool handled = false;
 
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {

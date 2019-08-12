@@ -48,7 +48,7 @@ ServiceDB::~ServiceDB() {
 }
 
 // Invoked upon receiving data message
-sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl) {
+sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp) {
 
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
