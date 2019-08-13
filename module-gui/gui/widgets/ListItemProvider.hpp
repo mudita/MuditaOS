@@ -17,7 +17,7 @@ class ListView;
 
 class ListItemProvider {
 protected:
-	ListView* list;
+	ListView* list = nullptr;
 public:
 	ListItemProvider();
 	virtual ~ListItemProvider();

@@ -87,4 +87,6 @@ std::list<DrawCommand*> AppWindow::buildDrawList() {
 	return Window::buildDrawList();
 }
 
+bool AppWindow::onDatabaseMessage( sys::Message* msg ){ return false; }
+
 } /* namespace gui */

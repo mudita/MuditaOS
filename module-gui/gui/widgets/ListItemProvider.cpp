@@ -10,12 +10,9 @@
 namespace gui {
 
 ListItemProvider::ListItemProvider() {
-	// TODO Auto-generated constructor stub
-
 }
 
 ListItemProvider::~ListItemProvider() {
-	// TODO Auto-generated destructor stub
 }
 
 ListItem* ListItemProvider::getItem( int index ) {

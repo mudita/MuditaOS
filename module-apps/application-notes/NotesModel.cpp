@@ -7,7 +7,7 @@
  * @details
  */
 #include "service-db/api/DBServiceAPI.hpp"
-
+#include "widgets/NotesItem.hpp"
 
 #include "NotesModel.hpp"
 
@@ -44,4 +44,24 @@ bool NotesModel::updateRecords( std::unique_ptr<std::vector<NotesRecord>> record
 	DatabaseModel::updateRecords( std::move(records), offset, limit, count );
 
 	return true;
+}
+
+gui::ListItem* NotesModel::getItem( int index ) {
+	std::shared_ptr<NotesRecord> note = getRecord( index );
+
+	SettingsRecord& settings = application->getSettings();
+
+	if( note == nullptr )
+		return nullptr;
+
+	gui::NotesItem* item = new gui::NotesItem(this, !settings.timeFormat12 );
+	if( item != nullptr ) {
+		item->setNote(note);
+		return item;
+	}
+
+	return nullptr;
+}
+int NotesModel::getItemCount() {
+	return recordsCount;
 }
