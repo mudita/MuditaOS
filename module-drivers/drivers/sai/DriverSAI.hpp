@@ -13,6 +13,10 @@
 #define PUREPHONE_DRIVERSAI_HPP
 
 #include "../DriverInterface.hpp"
+#include "drivers/dma/DriverDMA.hpp"
+#include "drivers/dmamux/DriverDMAMux.hpp"
+#include "drivers/pll/DriverPLL.hpp"
+#include <functional>
 
 namespace drivers {
 
@@ -39,12 +43,20 @@ namespace drivers {
             MonoLeft
         };
 
+        enum class MasterSlave{
+            Master,
+            Slave
+        };
+
         uint32_t bitWidth;
         uint32_t channel = 0;
         uint32_t sampleRate;
         uint32_t masterClock;
         Protocol protocol;
         MonoStereo monostereo;
+        MasterSlave masterslave;
+        uint32_t rxDMAChannel;
+        uint32_t txDMAChannel;
 
 
     };
@@ -52,6 +64,10 @@ namespace drivers {
     struct TransferParams {
         uint8_t *data;
         size_t size;
+    };
+
+    struct TransferFormat {
+
     };
 
     class DriverSAI : public DriverInterface<DriverSAI> {
@@ -70,6 +86,11 @@ namespace drivers {
         virtual int32_t StopOutTransfer() = 0;
 
         virtual int32_t StopInTransfer() = 0;
+
+        virtual int32_t SetOutTransferEndCallback(std::function<int32_t()> callback) = 0;
+
+        virtual int32_t SetInTransferEndCallback(std::function<int32_t()> callback) = 0;
+
 
     protected:
         const DriverSAIParams parameters;
