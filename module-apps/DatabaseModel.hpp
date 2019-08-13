@@ -91,10 +91,12 @@ public:
 			}
 
 		//moves current records to next records and prev records to current records
-		std::copy_backward(std::begin(records), std::begin(records) + pageSize*2, std::end(records) );
+		for( int i=3*pageSize-1; i>=pageSize; --i )
+			records[i] = records[i-pageSize];
 
 		//clear first window to nullptr
-		std::fill( records.begin(), records.begin()+pageSize, nullptr );
+		for( int i = 0; i<pageSize; ++i )
+			records[i] = nullptr;
 
 		//lock the application for keyboard input
 		application->blockEvents(true);
@@ -117,16 +119,18 @@ public:
 		if( currentPage >= pageCount )
 			return;
 
-		//erase first window with indicies from 0 up to pageSize -1
+		//erase firswt window with indicies from 0 up to pageSize -1
 		for( int i=0; i<pageSize; i++ )
 			if( records[i] )
 				records[i] = nullptr;
 
 		//move current and next window so current window becomes prev window and next becomes current.
-		std::copy_n(std::begin(records)+pageSize, 2*pageSize, begin(records));
+		for( int i=0; i<2*pageSize; ++i )
+			records[i] = records[i+pageSize];
 
 		//clear last window to nullptr
-		std::fill( records.begin()+2*pageSize, records.end(), nullptr );
+		for( int i= 2*pageSize; i<3*pageSize; ++i )
+			records[i] = nullptr;
 
 		//lock the application for keyboard input
 		application->blockEvents(true);
@@ -140,8 +144,7 @@ public:
 			firstIndex = recordsCount/pageCount;
 	}
 
-	virtual void requestRecords( const uint32_t offset, const uint32_t limit ) {
-	}
+	virtual void requestRecords( const uint32_t offset, const uint32_t limit ) = 0;
 
 	bool setRecordsCount( int count ) {
 
@@ -193,7 +196,9 @@ public:
 		recordsCount = -1;
 	}
 
-	int getRecordsCount() { return recordsCount; };
+	int getRecordsCount() {
+		return recordsCount;
+	}
 
 	int getPage( uint32_t index ) {
 		return  (index % pageSize == 0) ? index/pageSize : (index/pageSize)  + 1;
@@ -211,7 +216,7 @@ public:
 		}
 		//if index is in next window
 		if( (index >= firstIndex + pageSize) && ( index < firstIndex+2*pageSize) ) {
-			std::shared_ptr<T> record = records[pageSize + index-firstIndex];
+			std::shared_ptr<T> record = records[pageSize + index - firstIndex];
 			moveNextWindow();
 			return record;
 		}

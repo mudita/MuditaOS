@@ -34,6 +34,10 @@ void NotesModel::requestRecordsCount() {
 	}
 }
 
+void NotesModel::requestRecords( const uint32_t offset, const uint32_t limit ) {
+	DBServiceAPI::NotesGetLimitOffset(application, offset, limit );
+}
+
 bool NotesModel::updateRecords( std::unique_ptr<std::vector<NotesRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count ) {
 
 	LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);

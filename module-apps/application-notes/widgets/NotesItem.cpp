@@ -12,11 +12,11 @@ namespace gui {
 
 NotesItem::NotesItem(NotesModel* model, bool mode24H) : model{model}, mode24H{mode24H} {
 	minWidth = 436;
-	minHeight = 109;
-	maxWidth = 480-2*11;
-	maxHeight = 109;
+	minHeight = 146;
+	maxWidth = 436;
+	maxHeight = 146;
 
-	setRadius( 5 );
+	setRadius( 8 );
 
 	setPenFocusWidth(3);
 	setPenWidth(0);
@@ -36,7 +36,7 @@ NotesItem::NotesItem(NotesModel* model, bool mode24H) : model{model}, mode24H{mo
 	snippet = new gui::Label( this, 0,0,0,0);
 	snippet->setPenFocusWidth(0);
 	snippet->setPenWidth(0);
-	snippet->setFont("gt_pressura_bold_24");
+	snippet->setFont("gt_pressura_regular_16");
 	snippet->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER} );
 
 }
