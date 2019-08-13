@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "Label.hpp"
 #include "Image.hpp"
 #include "TopBar.hpp"
 
@@ -64,6 +65,14 @@ void TopBar::prepareWidget() {
 
 	//icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
+
+	//time label
+	timeLabel = new Label(this, 0, 0, 480, this->drawArea.h );
+	timeLabel->setFilled( false );
+	timeLabel->setBorderColor( gui::ColorNoColor );
+	timeLabel->setFont("gt_pressura_bold_24");
+	timeLabel->setText("00:00");
+	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 }
 
 void TopBar::setActive( TopBar::Elements element, bool active ) {
@@ -76,6 +85,8 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 		} break;
 		case Elements::LOCK: {
 			lock->setVisible(active);
+			if( active )
+				timeLabel->setVisible(false);
 		} break;
 		case Elements::SIGNAL: {
 			for( uint32_t i=0; i<TopBar::batteryLevelCount; ++i )
@@ -83,6 +94,11 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 			if( active )
 				signal[signalStrength]->setVisible(true);
 
+		} break;
+		case Elements::TIME: {
+			timeLabel->setVisible(active);
+			if( active )
+				lock->setVisible(false);
 		} break;
 	};
 }

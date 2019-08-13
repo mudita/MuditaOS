@@ -10,6 +10,7 @@
 #define MODULE_GUI_GUI_WIDGETS_TOPBAR_HPP_
 
 #include "Rect.hpp"
+#include "Label.hpp"
 #include "Image.hpp"
 
 namespace gui {
@@ -22,12 +23,19 @@ public:
 		SIGNAL = 0x01,
 		LOCK,
 		BATTERY,
+		TIME,
+	};
+	enum class TimeMode {
+		TIME_12H,
+		TIME_24H
 	};
 	static const uint32_t signalImgCount = 6;
 	static const uint32_t batteryLevelCount = 6;
+	static uint32_t time;
 protected:
 	static uint32_t signalStrength;
 	static uint32_t batteryLevel;
+	Label* timeLabel;
 	Image* signal[6];
 	Image* lock;
 	Image* battery[6];
@@ -38,8 +46,16 @@ public:
 	TopBar();
 	TopBar( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h );
 	virtual ~TopBar();
+
+
+	/**
+	 * @brief Sets mode of time displaying according to TimeMode enum
+	 * @note Variable is common for all instances of TopBar
+	 */
+
 	/**
 	 * @brief Hides or shows images.
+	 * @note LOCK and TIME are located in the same place so only 1 can be active at the same time.
 	 */
 	void setActive( TopBar::Elements element, bool active );
 	/**

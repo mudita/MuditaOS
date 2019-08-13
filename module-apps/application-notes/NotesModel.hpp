@@ -28,6 +28,7 @@ public:
 	//virtual methods
 	void requestRecordsCount() override;
 	bool updateRecords( std::unique_ptr<std::vector<NotesRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count ) override;
+	void requestRecords( const uint32_t offset, const uint32_t limit ) override;
 
 	//virtual methods for ListViewProvider
 	gui::ListItem* getItem( int index );
