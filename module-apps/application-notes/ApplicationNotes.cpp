@@ -16,8 +16,6 @@ namespace app {
 
 ApplicationNotes::ApplicationNotes(std::string name, bool startBackgound) :
 	Application( name, startBackgound, 2048 ) {
-
-	notesModel = new NotesModel( this );
 }
 
 ApplicationNotes::~ApplicationNotes() {
@@ -40,8 +38,8 @@ sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl,sys:
 		uint32_t msgType = resp->responseTo;
 		switch( msgType ) {
 			case static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset): {
-				DBNotesResponseMessage* msg = reinterpret_cast<DBNotesResponseMessage*>( resp );
-				notesModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count );
+				if( currentWindow->onDatabaseMessage( resp ) )
+					refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 			}break;
 		}
 	}
@@ -60,8 +58,6 @@ sys::ReturnCodes ApplicationNotes::InitHandler() {
 		return ret;
 
 	createUserInterface();
-
-	notesModel->requestRecordsCount();
 
 	setActiveWindow("MainWindow");
 

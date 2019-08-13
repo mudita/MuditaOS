@@ -13,7 +13,7 @@
 
 #include "../ApplicationNotes.hpp"
 
-
+#include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
 
 #include "Label.hpp"
@@ -22,7 +22,9 @@
 
 namespace gui {
 
-NotesMainWindow::NotesMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
+NotesMainWindow::NotesMainWindow( app::Application* app ) :
+	AppWindow(app,"MainWindow"),
+	notesModel{ new NotesModel( app ) }{
 	setSize( 480, 600 );
 
 	buildInterface();
@@ -34,6 +36,13 @@ void NotesMainWindow::rebuild() {
 }
 void NotesMainWindow::buildInterface() {
 	AppWindow::buildInterface();
+
+	list = new gui::ListView(this, 16, 104, 480-32, 440 );
+	list->setMaxElements(3);
+	list->setPageSize(3);
+
+	setFocusItem(list);
+
 //	bottomBar->setActive( BottomBar::Side::CENTER, true );
 //	bottomBar->setActive( BottomBar::Side::RIGHT, true );
 //	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
@@ -99,7 +108,10 @@ NotesMainWindow::~NotesMainWindow() {
 }
 
 void NotesMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-//	setFocusItem( options[0] );
+	notesModel->clear();
+	notesModel->requestRecordsCount();
+	list->clear();
+	list->setElementsCount( notesModel->getItemCount() );
 }
 
 bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
@@ -124,6 +136,14 @@ bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
 		sapm::ApplicationManager::messageSwitchPreviousApplication(application);
 		return true;
 	}
+
+	return false;
+}
+
+bool NotesMainWindow::onDatabaseMessage( sys::Message* msgl ) {
+	DBNotesResponseMessage* msg = reinterpret_cast<DBNotesResponseMessage*>( msgl );
+	if( notesModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count ) )
+		return true;
 
 	return false;
 }

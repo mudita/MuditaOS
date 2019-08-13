@@ -211,13 +211,13 @@ public:
 		}
 		//if index is in next window
 		if( (index >= firstIndex + pageSize) && ( index < firstIndex+2*pageSize) ) {
-			T* record = records[pageSize + index-firstIndex];
+			std::shared_ptr<T> record = records[pageSize + index-firstIndex];
 			moveNextWindow();
 			return record;
 		}
 		//if index is in previous window
 		if( (index >= firstIndex - pageSize) && ( index < firstIndex) ) {
-			T* record = records[index+ pageSize-firstIndex];
+			std::shared_ptr<T> record = records[index+ pageSize-firstIndex];
 			movePrevWindow();
 			return record;
 		}

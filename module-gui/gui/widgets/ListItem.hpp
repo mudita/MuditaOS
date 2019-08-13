@@ -15,10 +15,10 @@ namespace gui {
 class ListItem: public Rect {
 public:
 	//TODO move this to protected area and provide getters and setters
-	int minHeight;
-	int minWidth;
-	int maxHeight;
-	int maxWidth;
+	int minHeight = 0;
+	int minWidth = 0;
+	int maxHeight = 0xFFFF;
+	int maxWidth = 0xFFFF;
 
 	ListItem();
 	virtual ~ListItem();
