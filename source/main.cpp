@@ -129,9 +129,9 @@ int main() {
 
     bsp::BoardInit();
 
-    DriverInterface<DriverSAI>::Create(SAIInstances::SAI_1,DriverSAIParams{});
+    //DriverInterface<DriverSAI>::Create(SAIInstances::SAI_1,DriverSAIParams{});
 
-#if 0
+#if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{

@@ -22,6 +22,8 @@ enum class BoardDefinitions{
     AUDIOCODEC_I2C = static_cast<int >(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
     AUDIOCODEC_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
+    AUDIOCODEC_TX_DMA_CHANNEL = 6,
+    AUDIOCODEC_RX_DMA_CHANNEL = 7,
 
     KEYBOARD_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     KEYBOARD_I2C = AUDIOCODEC_I2C,
