@@ -23,6 +23,8 @@
 
 #include "drivers/DriverInterface.hpp"
 #include "drivers/pll/DriverPLL.hpp"
+#include "drivers/dmamux/DriverDMAMux.hpp"
+#include "drivers/dma/DriverDMA.hpp"
 
 namespace bsp{
 
@@ -80,7 +82,8 @@ namespace bsp{
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
         std::shared_ptr<drivers::DriverPLL> pll;
-
+        std::shared_ptr<drivers::DriverDMA> dma;
+        std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static edma_handle_t dmaTxHandle;
