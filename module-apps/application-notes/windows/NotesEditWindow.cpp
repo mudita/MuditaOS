@@ -1,11 +1,12 @@
 /*
- * @file NotesMainWindow.cpp
+ * @file NotesEditWindow.cpp
  * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 31 lip 2019
+ * @date 13 sie 2019
  * @brief
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+
 #include <memory>
 #include <functional>
 
@@ -18,58 +19,55 @@
 
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "NotesMainWindow.hpp"
+#include "Text.hpp"
+#include "NotesEditWindow.hpp"
 
 namespace gui {
 
-NotesMainWindow::NotesMainWindow( app::Application* app ) :
-	AppWindow(app,"MainWindow"),
-	notesModel{ new NotesModel( app ) }{
+NotesEditWindow::NotesEditWindow( app::Application* app ) :
+	AppWindow(app,"EditWindow") {
 	setSize( 480, 600 );
 
 	buildInterface();
 }
 
-void NotesMainWindow::rebuild() {
+void NotesEditWindow::rebuild() {
 	destroyInterface();
 	buildInterface();
 }
-void NotesMainWindow::buildInterface() {
+void NotesEditWindow::buildInterface() {
 	AppWindow::buildInterface();
-
-	list = new gui::ListView(this, 16, 104, 480-32, 440 );
-	list->setMaxElements(3);
-	list->setPageSize(3);
-	list->setProvider( notesModel );
-
-	setFocusItem(list);
 
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
+	gui::Label* title = new gui::Label(this, 0, 108, 480, 42 );
+	title->setFilled( false );
+	title->setBorderColor( gui::ColorNoColor );
+	title->setFont("gt_pressura_light_24");
+	title->setText("New Note");
+	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
+	text = new gui::Text( this, 0, 150, 480, 400 );
+
 	topBar->setActive(TopBar::Elements::TIME, true );
 
 }
-void NotesMainWindow::destroyInterface() {
+void NotesEditWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 	children.clear();
-	delete notesModel;
 }
 
-NotesMainWindow::~NotesMainWindow() {
+NotesEditWindow::~NotesEditWindow() {
 	destroyInterface();
 }
 
-void NotesMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-	notesModel->clear();
-	notesModel->requestRecordsCount();
-	list->clear();
-	list->setElementsCount( notesModel->getItemCount() );
+void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 }
 
-bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
+bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
 	if( ret ) {
@@ -88,23 +86,13 @@ bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
 		LOG_INFO("Enter pressed");
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+		application->switchWindow( "MainWindow", 0, nullptr );
 		return true;
 	}
-	else if( inputEvent.keyCode == KeyCode::KEY_LEFT ) {
-		application->switchWindow( "EditWindow", 0, nullptr );
-		return true;
-	}
-
-	return false;
-}
-
-bool NotesMainWindow::onDatabaseMessage( sys::Message* msgl ) {
-	DBNotesResponseMessage* msg = reinterpret_cast<DBNotesResponseMessage*>( msgl );
-	if( notesModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count ) )
-		return true;
 
 	return false;
 }
 
 } /* namespace gui */
+
+
