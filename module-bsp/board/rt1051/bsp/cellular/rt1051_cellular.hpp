@@ -20,7 +20,11 @@
 #include "board.h"
 #include "fsl_lpuart.h"
 #include "fsl_lpuart_edma.h"
-#include "fsl_dmamux.h"
+
+#include "drivers/DriverInterface.hpp"
+#include "drivers/pll/DriverPLL.hpp"
+#include "drivers/dmamux/DriverDMAMux.hpp"
+#include "drivers/dma/DriverDMA.hpp"
 
 namespace bsp {
 
@@ -98,9 +102,11 @@ namespace bsp {
             GPIO_PinWrite(BSP_CELLULAR_AP_RDY_PORT, BSP_CELLULAR_AP_RDY_PIN, CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
         }
 
+        std::shared_ptr<drivers::DriverPLL> pll;
+        std::shared_ptr<drivers::DriverDMA> dma;
+        std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
         static lpuart_edma_handle_t uartDmaHandle;
-        static edma_handle_t uartTxDmaHandle;
 
         static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
 

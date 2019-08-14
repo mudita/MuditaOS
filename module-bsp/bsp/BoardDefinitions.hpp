@@ -25,11 +25,26 @@ enum class BoardDefinitions{
     AUDIOCODEC_TX_DMA_CHANNEL = 6,
     AUDIOCODEC_RX_DMA_CHANNEL = 7,
 
+    CELLULAR_AUDIO_DMAMUX = AUDIOCODEC_DMAMUX,
+    CELLULAR_AUDIO_DMA = AUDIOCODEC_DMA,
+    CELLULAR_AUDIO_TX_DMA_CHANNEL = 3,
+    CELLULAR_AUDIO_RX_DMA_CHANNEL = 4,
+
     KEYBOARD_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     KEYBOARD_I2C = AUDIOCODEC_I2C,
 
     BATTERY_CHARGER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     BATTERY_CHARGER_I2C = AUDIOCODEC_I2C,
+
+    CELLULAR_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
+    CELLULAR_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
+    CELLULAR_TX_DMA_CHANNEL = 5,
+
+    EINK_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
+    EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
+    EINK_TX_DMA_CHANNEL = 0,
+    EINK_RX_DMA_CHANNEL = 1,
+    EINK_MEMCPY_DMA_CHANNEL = 2,
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::Audio),
 

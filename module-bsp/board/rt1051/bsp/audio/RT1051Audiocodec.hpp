@@ -86,9 +86,7 @@ namespace bsp{
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
-        static edma_handle_t dmaTxHandle;
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);
-        static edma_handle_t dmaRxHandle;
 
         // CODEC_CHANNEL_PCM_BUFFER_SIZE * 2 for double buffering
         static ALIGN_(4) int16_t inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE*2];

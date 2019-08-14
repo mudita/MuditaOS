@@ -10,6 +10,7 @@
 
 
 #include "rt1051_cellular.hpp"
+#include "menums/magic_enum.hpp"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -17,6 +18,8 @@
 
 #include "dma_config.h"
 #include "fsl_cache.h"
+
+#include "bsp/BoardDefinitions.hpp"
 
 extern "C" {
 
@@ -56,9 +59,11 @@ void LPUART1_IRQHandler(void) {
 
 namespace bsp {
 
+    using namespace drivers;
+    using namespace magic_enum;
+
     TimerHandle_t                   RT1051Cellular::rxTimeoutTimer = nullptr;
     lpuart_edma_handle_t            RT1051Cellular::uartDmaHandle = {};
-    edma_handle_t                   RT1051Cellular::uartTxDmaHandle = {};
     TaskHandle_t                    RT1051Cellular::blockedTaskHandle = nullptr;
     StreamBufferHandle_t            RT1051Cellular::uartRxStreamBuffer = nullptr;
 
@@ -152,7 +157,6 @@ namespace bsp {
         DMADeinit();
 
         memset(&uartDmaHandle,0,sizeof uartDmaHandle);
-        memset(&uartTxDmaHandle,0,sizeof uartTxDmaHandle);
         blockedTaskHandle = nullptr;
 
     }
@@ -302,24 +306,24 @@ namespace bsp {
     }
 
     void RT1051Cellular::DMAInit() {
-        DMAMUX_SetSource(BSP_CELLULAR_UART_TX_DMA_DMAMUX_BASE, BSP_CELLULAR_UART_TX_DMA_CH, kDmaRequestMuxLPUART1Tx);
 
-        DMAMUX_EnableChannel(BSP_CELLULAR_UART_TX_DMA_DMAMUX_BASE, BSP_CELLULAR_UART_TX_DMA_CH);
+        //TODO:M.P add PLL support
+        //pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
+        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::CELLULAR_DMA),DriverDMAParams{});
+        dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::CELLULAR_DMAMUX),DriverDMAMuxParams{});
 
-        EDMA_CreateHandle(&uartTxDmaHandle, BSP_CELLULAR_UART_TX_DMA_BASE, BSP_CELLULAR_UART_TX_DMA_CH);
+        dma->CreateHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
+        dmamux->Enable(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL),kDmaRequestMuxLPUART1Tx); // TODO: M.P fix BSP_CELLULAR_UART_TX_DMA_CH
 
         LPUART_TransferCreateHandleEDMA(CELLULAR_UART_BASE,
                                         &uartDmaHandle,
                                         DMATxCompletedCb,
                                         NULL,
-                                        &uartTxDmaHandle,
+                                        reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL))),
                                         NULL);
     }
 
     void RT1051Cellular::DMADeinit() {
-        EDMA_AbortTransfer(&uartTxDmaHandle);
-
-        DMAMUX_DisableChannel(BSP_CELLULAR_UART_TX_DMA_DMAMUX_BASE, BSP_CELLULAR_UART_TX_DMA_CH);
     }
 
     uint32_t RT1051Cellular::UartGetPeripheralClock() {

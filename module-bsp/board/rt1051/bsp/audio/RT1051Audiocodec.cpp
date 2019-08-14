@@ -161,7 +161,6 @@ namespace bsp {
 
 
     void RT1051Audiocodec::Init() {
-        edma_config_t dmaConfig = {0};
 
         pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
         dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
