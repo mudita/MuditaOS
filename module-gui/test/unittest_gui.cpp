@@ -259,7 +259,7 @@ bool drawWindowWithLabelsTest( uint8_t* frameBuffer ) {
 	//renderer class that will perform drawing
 	gui::Renderer renderer;
 
-	gui::Window* win = new gui::Window(0);
+	gui::Window* win = new gui::Window("MAIN");
 	win->setSize( 480, 600 );
 
 	//add label with time
@@ -310,7 +310,7 @@ bool drawWindowWithHBoxTest( uint8_t* frameBuffer ) {
 	//renderer class that will perform drawing
 	gui::Renderer renderer;
 
-	gui::Window* win = new gui::Window(0);
+	gui::Window* win = new gui::Window("MAIN");
 	win->setSize( 480, 600 );
 
 	gui::HBox* hBox = new gui::HBox( win, 50, 50, 380, 500 );
