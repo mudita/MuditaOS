@@ -391,6 +391,35 @@ bool drawWindowWithHBoxTest( uint8_t* frameBuffer ) {
 	return true;
 }
 
+#include <dirent.h>
+#include <errno.h>
+bool set_working_directory(std::string &dir)
+{
+    char* currdirname=get_current_dir_name();
+    if ( dir.c_str()[0] != '/' ) {
+        if( dir.c_str()[0] == '.') {
+            dir = std::string(dir.begin() +1, dir.end());
+        } else {
+            dir = "/"+dir;
+        }
+        dir = std::string(currdirname) + dir;
+    }
+    free(currdirname);
+
+    if (chdir(dir.c_str())) {
+        LOG_ERROR("Changing directory to: %s failed", dir.c_str());
+    }
+    dir += "/assets";
+    DIR *check_path = opendir(dir.c_str());
+    if( ENOENT == errno || check_path == NULL) {
+        LOG_ERROR("Working directory set: %s failure", dir.c_str());
+        return 1;
+    } else {
+        closedir(check_path);
+    }
+    return 0;
+}
+
 int main( int argc, char* argv[] ) {
 
 	LOG_INFO("RUNNING UNIT TEST FOR GUI");
@@ -410,10 +439,12 @@ int main( int argc, char* argv[] ) {
 		basePath = argv[1];
 	}
 
-	chdir(basePath.c_str());
-	string assetsPath = basePath+"/assets";
-	gui::FontManager::getInstance().init( assetsPath );
-	assetsPath = basePath+"/assets";
+    if( set_working_directory(basePath) ) {
+        LOG_INFO("Tu run this test successfully provide path to assets, i.e. ./build/unittest_gui build/sys");
+        return 1;
+    }
+
+	gui::FontManager::getInstance().init(basePath);
     //TODO:M.P unit test for GUI should be fixed/updated gui::PixMapManager::getInstance().init( assetsPath );
 
 	//create and map shared memory
