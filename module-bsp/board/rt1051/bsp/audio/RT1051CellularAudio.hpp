@@ -77,9 +77,13 @@ namespace bsp{
         sai_config_t config;
         TaskHandle_t inWorkerThread = nullptr;
         TaskHandle_t outWorkerThread = nullptr;
-        std::shared_ptr<drivers::DriverPLL> pll;
+
+        // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverDMA> dma;
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
+        std::shared_ptr<drivers::DriverPLL> pll;
+
+
 
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);

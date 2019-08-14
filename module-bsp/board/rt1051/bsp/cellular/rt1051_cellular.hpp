@@ -102,9 +102,12 @@ namespace bsp {
             GPIO_PinWrite(BSP_CELLULAR_AP_RDY_PORT, BSP_CELLULAR_AP_RDY_PIN, CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
         }
 
-        std::shared_ptr<drivers::DriverPLL> pll;
+        // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverDMA> dma;
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
+        std::shared_ptr<drivers::DriverPLL> pll;
+
+
 
         static lpuart_edma_handle_t uartDmaHandle;
 

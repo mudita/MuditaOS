@@ -37,13 +37,6 @@ extern "C" {
 #define BSP_EINK_LPSPI_DMA_RX_PERI_SEL                  (uint8_t) kDmaRequestMuxLPSPI1Rx
 #define BSP_EINK_LPSPI_DMA_RX_CH                        1
 
-/**
- *   Eink INTERNAL MEMORY COPYING DMA config
- */
-#define BSP_EINK_MEMCPY_DMA_DMAMUX_BASE                 DMAMUX
-#define BSP_EINK_MEMCPY_DMA_DMA_BASE                    DMA0
-#define BSP_EINK_MEMCPY_DMA_CH                          2
-
 /*
  *   **********************************************************************************************************************
  *   *                                                                                                                    *
@@ -53,16 +46,10 @@ extern "C" {
  */
 
 /* DMA */
-#define BSP_CELLULAR_AUDIO_SAIx_DMA                     DMA0
-#define BSP_CELLULAR_AUDIO_SAIx_DMAMUX_BASE             DMAMUX
-#define BSP_CELLULAR_AUDIO_SAIx_DMA_TX_CHANNEL              (3U)
-#define BSP_CELLULAR_AUDIO_SAIx_DMA_RX_CHANNEL              (4U)
+
 #define BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE	            kDmaRequestMuxSai1Tx
 #define BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE         	kDmaRequestMuxSai1Rx
 
-#define BSP_CELLULAR_UART_TX_DMA_DMAMUX_BASE            DMAMUX
-#define BSP_CELLULAR_UART_TX_DMA_BASE                   DMA0
-#define BSP_CELLULAR_UART_TX_DMA_CH                     5
 
 /*
  *   **********************************************************************************************************************
@@ -71,11 +58,6 @@ extern "C" {
  *   *                                                                                                                    *
  *   **********************************************************************************************************************
  */
-
-#define BSP_AUDIOCODEC_SAIx_DMA                     DMA0
-#define BSP_AUDIOCODEC_SAIx_DMAMUX_BASE             DMAMUX
-#define BSP_AUDIOCODEC_SAIx_DMA_TX_CHANNEL              (6U)
-#define BSP_AUDIOCODEC_SAIx_DMA_RX_CHANNEL              (7U)
 #define BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE	kDmaRequestMuxSai2Tx
 #define BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE	kDmaRequestMuxSai2Rx
 

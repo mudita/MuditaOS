@@ -49,7 +49,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(2000, true);
+        timer_id = CreateTimer(5000, true);
         ReloadTimer(timer_id);
     }
 
@@ -61,7 +61,7 @@ public:
 
 #if 1 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
-        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
         //vTaskDelay(3000);
@@ -117,12 +117,6 @@ public:
 
     uint32_t timer_id = 0;
 };
-
-#include "module-drivers/drivers/DriverInterface.hpp"
-#include "module-drivers/drivers/i2c/DriverI2C.hpp"
-#include "module-drivers/drivers/sai/DriverSAI.hpp"
-
-using namespace drivers;
 
 int main() {
 

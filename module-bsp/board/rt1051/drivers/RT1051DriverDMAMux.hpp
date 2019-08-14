@@ -26,7 +26,7 @@ namespace drivers {
 
         ~RT1051DriverDMAMux();
 
-        void Enable(const uint32_t channel,const uint32_t source) override final;
+        void Enable(const uint32_t channel,const uint32_t source=UINT32_MAX) override final;
 
         void Disable(const uint32_t channel) override final;
 
