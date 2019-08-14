@@ -8,6 +8,7 @@
  */
 #include "MessageType.hpp"
 #include "windows/NotesMainWindow.hpp"
+#include "windows/NotesEditWindow.hpp"
 #include "service-db/messages/DBMessage.hpp"
 
 #include "ApplicationNotes.hpp"
@@ -82,6 +83,9 @@ void ApplicationNotes::createUserInterface() {
 	gui::AppWindow* window = nullptr;
 
 	window = new gui::NotesMainWindow(this);
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+	window = new gui::NotesEditWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 

@@ -34,7 +34,8 @@ Text::Text() :
 	font = FontManager::getInstance().getFont(fontID);
 }
 
-Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, ExpandMode expandMode, TextType textType, const UTF8& text) :
+Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h,
+		const UTF8& text, ExpandMode expandMode, TextType textType) :
 	Rect( parent, x, y, w, h ),
 	expandMode{ expandMode},
 	textType{ textType} {
@@ -96,6 +97,17 @@ void Text::splitTextToLines( const UTF8& text) {
 
 //		TextLine* textLine =
 	}
+}
+
+std::list<DrawCommand*> Text::buildDrawList() {
+	return Item::buildDrawList();
+}
+void Text::setPosition( const short& x, const short& y ) {
+
+}
+
+void Text::setSize( const short& w, const short& h ) {
+
 }
 
 } /* namespace gui */

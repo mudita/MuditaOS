@@ -19,7 +19,7 @@ NotesItem::NotesItem(NotesModel* model, bool mode24H) : model{model}, mode24H{mo
 	setRadius( 8 );
 
 	setPenFocusWidth(3);
-	setPenWidth(0);
+	setPenWidth(1);
 
 	hour = new gui::Label( this, 0,0,0,0);
 	hour->setPenFocusWidth(0);

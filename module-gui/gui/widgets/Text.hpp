@@ -85,7 +85,8 @@ protected:
 
 public:
 	Text();
-	Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, ExpandMode expandMode, TextType textType, const UTF8& text = "");
+	Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h,
+			const UTF8& text = "", ExpandMode expandMode = ExpandMode::EXPAND_NONE, TextType textType = TextType::MULTI_LINE );
 	virtual ~Text();
 
 	void setEditMode( EditMode mode );
