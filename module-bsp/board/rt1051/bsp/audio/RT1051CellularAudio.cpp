@@ -10,9 +10,9 @@
 
 
 #include "RT1051CellularAudio.hpp"
+#include "menums/magic_enum.hpp"
 #include "board.h"
 #include "dma_config.h"
-#include "fsl_dmamux.h"
 
 #include "log/log.hpp"
 
@@ -22,17 +22,17 @@
 namespace bsp {
 
     using namespace drivers;
+    using namespace magic_enum;
 
     sai_edma_handle_t RT1051CellularAudio::txHandle = {};
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
-    edma_handle_t RT1051CellularAudio::dmaTxHandle = {};
-    edma_handle_t RT1051CellularAudio::dmaRxHandle = {};
     int16_t RT1051CellularAudio::inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
     int16_t RT1051CellularAudio::outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
 
     RT1051CellularAudio::RT1051CellularAudio(bsp::AudioDevice::audioCallback_t callback) : AudioDevice(callback),
-                                                                                     saiInFormat{}, saiOutFormat{},
-                                                                                     config{}{
+                                                                                           saiInFormat{},
+                                                                                           saiOutFormat{},
+                                                                                           config{} {
         isInitialized = true;
     }
 
@@ -129,36 +129,23 @@ namespace bsp {
 
 
     void RT1051CellularAudio::Init() {
-        edma_config_t dmaConfig = {0};
 
-        pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
+        pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions::AUDIO_PLL),
+                                                 DriverPLLParams{});
+        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions::CELLULAR_AUDIO_DMA),
+                                                 DriverDMAParams{});
+        dmamux = DriverInterface<DriverDMAMux>::Create(
+                static_cast<DMAMuxInstances >(BoardDefinitions::CELLULAR_AUDIO_DMAMUX), DriverDMAMuxParams{});
 
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_CELLULAR_AUDIO_SAIx_MCLK_MASK;
 
-        EDMA_GetDefaultConfig(&dmaConfig);
-        EDMA_Init(BSP_CELLULAR_AUDIO_SAIx_DMA, &dmaConfig);
-        DMAMUX_Init(BSP_CELLULAR_AUDIO_SAIx_DMAMUX_BASE);
-
-
-        /* Create EDMA handle */
-        /*
-         * dmaConfig.enableRoundRobinArbitration = false;
-         * dmaConfig.enableHaltOnError = true;
-         * dmaConfig.enableContinuousLinkMode = false;
-         * dmaConfig.enableDebugMode = false;
-         */
-        EDMA_CreateHandle(&dmaTxHandle, BSP_CELLULAR_AUDIO_SAIx_DMA, BSP_CELLULAR_AUDIO_SAIx_DMA_TX_CHANNEL);
-        EDMA_CreateHandle(&dmaRxHandle, BSP_CELLULAR_AUDIO_SAIx_DMA, BSP_CELLULAR_AUDIO_SAIx_DMA_RX_CHANNEL);
-
-        DMAMUX_SetSource(BSP_CELLULAR_AUDIO_SAIx_DMAMUX_BASE, BSP_CELLULAR_AUDIO_SAIx_DMA_TX_CHANNEL,
-                         (uint8_t) BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE);
-        DMAMUX_EnableChannel(BSP_CELLULAR_AUDIO_SAIx_DMAMUX_BASE, BSP_CELLULAR_AUDIO_SAIx_DMA_TX_CHANNEL);
-
-        DMAMUX_SetSource(BSP_CELLULAR_AUDIO_SAIx_DMAMUX_BASE, BSP_CELLULAR_AUDIO_SAIx_DMA_RX_CHANNEL,
-                         (uint8_t) BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE);
-        DMAMUX_EnableChannel(BSP_CELLULAR_AUDIO_SAIx_DMAMUX_BASE, BSP_CELLULAR_AUDIO_SAIx_DMA_RX_CHANNEL);
-
+        dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
+        dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+        dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL),
+                       BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE
+        dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL),
+                       BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE
 
         mclkSourceClockHz = BOARD_CELLULAR_AUDIO_SAIx_CLK_FREQ;
 
@@ -177,8 +164,6 @@ namespace bsp {
 
     void RT1051CellularAudio::Deinit() {
         memset(&config, 0, sizeof config);
-        //DMAMUX_Deinit(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE);
-        //EDMA_Deinit(BSP_AUDIOCODEC_SAIx_DMA);
         SAI_Deinit(BOARD_CELLULAR_AUDIO_SAIx);
     }
 
@@ -201,7 +186,9 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferRxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, rxCellularCallback, this, &dmaRxHandle);
+        SAI_TransferRxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, rxCellularCallback, this,
+                                       reinterpret_cast<edma_handle_t *>(dma->GetHandle(
+                                               enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL))));
 
         SAI_TransferRxSetFormatEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -239,7 +226,9 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferTxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, txCellularCallback, this, &dmaTxHandle);
+        SAI_TransferTxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, txCellularCallback, this,
+                                       reinterpret_cast<edma_handle_t *>(dma->GetHandle(
+                                               enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL))));
 
         SAI_TransferTxSetFormatEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);

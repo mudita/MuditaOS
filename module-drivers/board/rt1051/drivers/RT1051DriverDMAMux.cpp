@@ -22,6 +22,7 @@ namespace drivers {
             case DMAMuxInstances::DMAMUX0: {
                 base = DMAMUX;
                 DMAMUX_Init(base);
+                LOG_DEBUG("Init: DMAMUX0");
             }
                 break;
         }
@@ -34,6 +35,7 @@ namespace drivers {
                     DMAMUX_DisableChannel(base, w);
                 }
                 DMAMUX_Deinit(DMAMUX);
+                LOG_DEBUG("Deinit DMAMUX0");
             }
                 break;
         }

@@ -11,6 +11,7 @@
 
 #include "RT1051DriverDMA.hpp"
 #include <algorithm>
+#include "log/log.hpp"
 
 
 namespace drivers {
@@ -24,6 +25,7 @@ namespace drivers {
 
                 EDMA_GetDefaultConfig(&dmaConfig);
                 EDMA_Init(base, &dmaConfig);
+                LOG_DEBUG("Init: DMA0");
             }
                 break;
         }
@@ -34,6 +36,7 @@ namespace drivers {
             EDMA_AbortTransfer(&w.second);
         }
         EDMA_Deinit(base);
+        LOG_DEBUG("Deinit: DMA0");
     }
 
     int32_t RT1051DriverDMA::CreateHandle(const uint32_t channel) {
@@ -49,7 +52,6 @@ namespace drivers {
          */
 
         if (channelHandles.find(channel) == channelHandles.end()) {
-            //channelHandles.insert(std::pair<uint32_t ,edma_handle_t>(channel,edma_handle_t{}));
             EDMA_CreateHandle(&channelHandles[channel], base, channel);
         } else {
             // dma already exists

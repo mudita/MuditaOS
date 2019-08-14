@@ -230,7 +230,6 @@ namespace bsp {
 
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
-        BOARD_InitDMA();
         BOARD_ConfigCellular();
 
         irq_gpio_Init();

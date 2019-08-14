@@ -12,14 +12,19 @@
 #include "fsl_lpspi.h"
 #include "fsl_lpspi_edma.h"
 #include "fsl_common.h"
-#include "fsl_edma.h"
-#include "fsl_dmamux.h"
 //#include "log/log.hpp"
 #include "dma_config.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "queue.h"
+
+#include "menums/magic_enum.hpp"
+#include "drivers/DriverInterface.hpp"
+#include "drivers/pll/DriverPLL.hpp"
+#include "drivers/dmamux/DriverDMAMux.hpp"
+#include "drivers/dma/DriverDMA.hpp"
+#include "bsp/BoardDefinitions.hpp"
 
 #define BSP_EINK_LPSPI_PCS_TO_SCK_DELAY 1000
 #define BSP_EINK_LPSPI_SCK_TO_PSC_DELAY 1000
@@ -80,8 +85,12 @@ typedef struct _bsp_eink_driver
 
 } bsp_eink_driver_t;
 
+using namespace drivers;
+using namespace magic_enum;
 static lpspi_master_config_t s_eink_lpspi_master_config;
-
+static std::shared_ptr<drivers::DriverPLL> pll;
+static std::shared_ptr<drivers::DriverDMA> dma;
+static std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
 static uint32_t BSP_EINK_LPSPI_GetFreq(void)
 {
@@ -99,16 +108,14 @@ lpspi_edma_resource_t BSP_EINK_LPSPI_EdmaResource = {
 };
 
 AT_NONCACHEABLE_SECTION(lpspi_master_edma_handle_t BSP_EINK_LPSPI_EdmaHandle);
-edma_handle_t BSP_EINK_LPSPI_EdmaTxDataToTxRegHandle;
-edma_handle_t BSP_EINK_LPSPI_EdmaRxRegToRxDataHandle;
 
 
 static bsp_eink_driver_t BSP_EINK_LPSPI_EdmaDriverState = {
     &BSP_EINK_LPSPI_Resource,
     &BSP_EINK_LPSPI_EdmaResource,
     &BSP_EINK_LPSPI_EdmaHandle,
-    &BSP_EINK_LPSPI_EdmaTxDataToTxRegHandle,
-    &BSP_EINK_LPSPI_EdmaRxRegToRxDataHandle,
+    nullptr,// will be filled in init function
+    nullptr,// will be filled in init function
 };
 
 static SemaphoreHandle_t    bsp_eink_TransferComplete;
@@ -216,17 +223,18 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     // fsl_lpspi doesn't support configuring autopcs feature
     BSP_EINK_LPSPI_BASE->CFGR1 |= LPSPI_CFGR1_AUTOPCS(0);
 
-    memset(lpspi->edmaRxRegToRxDataHandle, 0, sizeof(edma_handle_t));
-    memset(lpspi->edmaTxDataToTxRegHandle, 0, sizeof(edma_handle_t));
+    //TODO:M.P add PLL support
+    //pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
+    dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
+    dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::EINK_DMAMUX),DriverDMAMuxParams{});
 
-    EDMA_CreateHandle(lpspi->edmaRxRegToRxDataHandle, dmaResource->rxEdmaBase, dmaResource->rxEdmaChannel);
-    EDMA_CreateHandle(lpspi->edmaTxDataToTxRegHandle, dmaResource->txEdmaBase, dmaResource->txEdmaChannel);
+    dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
+    dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+    dmamux->Enable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_TX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_TX_PERI_SEL
+    dmamux->Enable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_RX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_RX_PERI_SEL
 
-    DMAMUX_SetSource(dmaResource->rxDmamuxBase, dmaResource->rxEdmaChannel, dmaResource->rxDmaRequest);
-    DMAMUX_EnableChannel(dmaResource->rxDmamuxBase, dmaResource->rxEdmaChannel);
-
-    DMAMUX_SetSource(dmaResource->txDmamuxBase, dmaResource->txEdmaChannel, dmaResource->txDmaRequest);
-    DMAMUX_EnableChannel(dmaResource->txDmamuxBase, dmaResource->txEdmaChannel);
+    BSP_EINK_LPSPI_EdmaDriverState.edmaTxDataToTxRegHandle = reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL)));
+    BSP_EINK_LPSPI_EdmaDriverState.edmaRxRegToRxDataHandle = reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL)));
 
     LPSPI_SetMasterSlaveMode(BSP_EINK_LPSPI_BASE, kLPSPI_Master);
     LPSPI_MasterTransferCreateHandleEDMA(BSP_EINK_LPSPI_BASE,
@@ -270,6 +278,10 @@ void BSP_EinkDeinit(void)
         vQueueDelete(bsp_eink_TransferComplete);
         bsp_eink_TransferComplete = NULL;
     }
+
+    dma.reset();
+    dmamux.reset();
+    //pll.reset(); TODO:M.P
 }
 
 status_t BSP_EinkWriteData(void* txBuffer, uint32_t len, eink_spi_cs_config_e cs)
