@@ -19,25 +19,37 @@
 
 namespace drivers {
 
+
+    void edmaCallback(struct _edma_handle *handle, void *userData, bool transferDone, uint32_t tcds);
+
     class RT1051DriverDMA : public DriverDMA {
+
+        friend void edmaCallback(struct _edma_handle *handle, void *userData, bool transferDone, uint32_t tcds);
     public:
 
         RT1051DriverDMA(const DMAInstances &inst, const DriverDMAParams &params);
 
         ~RT1051DriverDMA();
 
-         int32_t CreateHandle(const uint32_t channel) override final;
+         int32_t CreateHandle(const uint32_t channel,std::function<void()> callback=nullptr) override final;
 
          int32_t RemoveHandle(const uint32_t channel) override final;
 
          void* GetHandle(const uint32_t channel) override final;
 
+
     private:
+
+        struct DMAEntry{
+            edma_handle_t handle;
+            std::function<void()> callback;
+        };
+
         cpp_freertos::MutexStandard mutex;
         DMAInstances instance;
         DMA_Type *base;
 
-        std::map<uint32_t, edma_handle_t> channelHandles;
+        std::map<uint32_t, DMAEntry> channelHandles;
     };
 
 }

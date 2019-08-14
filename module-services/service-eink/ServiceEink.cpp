@@ -184,8 +184,6 @@ sys::ReturnCodes ServiceEink::InitHandler() {
 		LOG_FATAL("Error: Could not initialize Eink display!\n");
 	}
 
-	EinkMemcpyDmaInit( s_EinkServiceDMAMemcpyCallback );
-
 	//TODO remove screen clearing code below.
 	EinkPowerOn();
 

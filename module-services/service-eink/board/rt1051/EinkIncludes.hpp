@@ -10,8 +10,8 @@
 #define MODULE_SERVICES_SERVICE_EINK_BOARD_RT1051_EINKINCLUDES_HPP_
 
 //module-bsp
-extern "C"  {
 #include "board/rt1051/bsp/eink/ED028TC1.h"
+extern "C"  {
 #include "chip.h"
 #include "fsl_dmamux.h"
 #include "fsl_edma.h"

@@ -34,6 +34,13 @@
 #include "eink_binarization_luts.h"
 #include "macros.h"
 
+#include "menums/magic_enum.hpp"
+#include "drivers/DriverInterface.hpp"
+#include "drivers/pll/DriverPLL.hpp"
+#include "drivers/dmamux/DriverDMAMux.hpp"
+#include "drivers/dma/DriverDMA.hpp"
+#include "bsp/BoardDefinitions.hpp"
+
 #define EPD_BOOSTER_START_PERIOD_10MS       0
 #define EPD_BOOSTER_START_PERIOD_20MS       1
 #define EPD_BOOSTER_START_PERIOD_30MS       2
@@ -79,6 +86,11 @@
 
 /// This is DMA handle for internal frame buffer memory-to-memory copying operation
 static edma_handle_t            s_einkMemcpyDma_handle;
+
+using namespace drivers;
+using namespace magic_enum;
+static std::shared_ptr<drivers::DriverDMA> dma;
+static std::shared_ptr<drivers::DriverDMAMux> dmamux;
 
 #define EINK_LUTS_FILE_PATH "/Luts.bin"
 
@@ -1016,7 +1028,7 @@ EinkFillScreenWithColor (EinkDisplayColorFilling_e colorFill)
 
     uint8_t background = colorFill;
 
-    char* bg = malloc(BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
+    char* bg = (char*)malloc(BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8);
     if (bg == NULL)
     {
 //        LOG_ERROR("Could not create the buffer for the background plane");
@@ -1426,14 +1438,4 @@ static uint8_t* s_EinkTransformAnimationFrameCoordinateSystem_4Bpp(
     return dataOut;
 }
 
-EinkStatus_e EinkMemcpyDmaInit( edma_callback memcpyCallback )
-{
-    DMAMUX_EnableAlwaysOn(BSP_EINK_MEMCPY_DMA_DMAMUX_BASE, BSP_EINK_MEMCPY_DMA_CH, true);
-    DMAMUX_EnableChannel(BSP_EINK_MEMCPY_DMA_DMAMUX_BASE, BSP_EINK_MEMCPY_DMA_CH);
-
-    EDMA_CreateHandle(&s_einkMemcpyDma_handle, BSP_EINK_MEMCPY_DMA_DMA_BASE, BSP_EINK_MEMCPY_DMA_CH);
-    EDMA_SetCallback(&s_einkMemcpyDma_handle, memcpyCallback, NULL);
-
-	return EinkOK;
-}
 

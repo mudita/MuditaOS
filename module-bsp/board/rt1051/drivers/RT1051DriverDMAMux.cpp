@@ -44,8 +44,11 @@ namespace drivers {
     void RT1051DriverDMAMux::Enable(const uint32_t channel, const uint32_t source) {
         cpp_freertos::LockGuard lock(mutex);
         if (std::find(std::begin(channels), std::end(channels), channel) == std::end(channels)) {
-            DMAMUX_SetSource(base, channel,
-                             (uint8_t) source);
+            if(source != UINT32_MAX){
+                DMAMUX_SetSource(base, channel,
+                                 (uint8_t) source);
+            }
+
             DMAMUX_EnableChannel(base, channel);
         } else {
             LOG_ERROR("Trying to enable channel that is already enabled");

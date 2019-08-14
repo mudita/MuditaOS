@@ -44,7 +44,6 @@ enum class BoardDefinitions{
     EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
     EINK_TX_DMA_CHANNEL = 0,
     EINK_RX_DMA_CHANNEL = 1,
-    EINK_MEMCPY_DMA_CHANNEL = 2,
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::Audio),
 

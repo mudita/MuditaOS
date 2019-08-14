@@ -14,6 +14,7 @@
 
 
 #include "../DriverInterface.hpp"
+#include <functional>
 
 namespace drivers {
 
@@ -35,7 +36,7 @@ namespace drivers {
 
         virtual ~DriverDMA() {}
 
-        virtual int32_t CreateHandle(const uint32_t channel) = 0;
+        virtual int32_t CreateHandle(const uint32_t channel,std::function<void()> callback=nullptr) = 0;
 
         virtual int32_t RemoveHandle(const uint32_t channel) = 0;
 

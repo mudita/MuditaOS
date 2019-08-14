@@ -32,7 +32,7 @@ namespace drivers{
                         .denominator = 100, /* 30 bit denominator of fractional loop divider */
                 };
                 CLOCK_InitAudioPll(&audioPllConfig);
-                LOG_DEBUG("Init Audio PLL: %lu",CLOCK_GetPllFreq(kCLOCK_PllAudio));
+                LOG_DEBUG("Init Audio PLL: %luHz",CLOCK_GetPllFreq(kCLOCK_PllAudio));
             }
                 break;
             case PLLInstances ::Ethernet:

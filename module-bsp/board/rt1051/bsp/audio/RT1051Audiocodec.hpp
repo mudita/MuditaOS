@@ -81,9 +81,13 @@ namespace bsp{
         TaskHandle_t outWorkerThread = nullptr;
         CodecParamsMAX98090 codecParams;
         CodecMAX98090 codec;
-        std::shared_ptr<drivers::DriverPLL> pll;
+
+        // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverDMA> dma;
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
+        std::shared_ptr<drivers::DriverPLL> pll;
+
+
 
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t txHandle);
         static AT_NONCACHEABLE_SECTION_INIT(sai_edma_handle_t rxHandle);
