@@ -50,6 +50,7 @@ namespace drivers {
             }
 
             DMAMUX_EnableChannel(base, channel);
+            channels.push_back(channel);
         } else {
             LOG_ERROR("Trying to enable channel that is already enabled");
         }

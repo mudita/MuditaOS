@@ -79,9 +79,9 @@ namespace bsp{
         TaskHandle_t outWorkerThread = nullptr;
 
         // M.P: It is important to destroy these drivers in specific order
-        std::shared_ptr<drivers::DriverDMA> dma;
-        std::shared_ptr<drivers::DriverDMAMux> dmamux;
         std::shared_ptr<drivers::DriverPLL> pll;
+        std::shared_ptr<drivers::DriverDMAMux> dmamux;
+        std::shared_ptr<drivers::DriverDMA> dma;
 
 
 

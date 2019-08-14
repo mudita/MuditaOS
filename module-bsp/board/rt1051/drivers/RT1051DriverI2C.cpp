@@ -12,12 +12,12 @@
 #include "RT1051DriverI2C.hpp"
 #include "log/log.hpp"
 #include "../board.h"
-#include "../fsl_drivers/fsl_clock.h"
+#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
 
-    RT1051DriverI2C::RT1051DriverI2C(const I2CInstances inst,const DriverI2CParams &params): DriverI2C(params){
+    RT1051DriverI2C::RT1051DriverI2C(const I2CInstances inst,const DriverI2CParams &params): DriverI2C(params,inst){
 
         lpi2c_master_config_t lpi2cConfig = {0};
 
@@ -29,12 +29,14 @@ namespace drivers {
                 base = LPI2C2;
                 break;
         }
-
+        //auto ret = magic_enum::enum_name(instance);
+        LOG_DEBUG("Init: %s",std::string(magic_enum::enum_name(instance)).c_str());
         LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
         LPI2C_MasterInit(base, &lpi2cConfig, ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U)));
     }
 
     RT1051DriverI2C::~RT1051DriverI2C() {
+        LOG_DEBUG("Deinit: %s", std::string(magic_enum::enum_name(instance)).c_str());
         LPI2C_MasterDeinit(base);
     }
 
