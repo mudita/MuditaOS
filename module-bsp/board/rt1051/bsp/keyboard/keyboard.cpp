@@ -150,9 +150,6 @@ namespace bsp {
 
     status_t keyboard_Deinit(void) {
 
-        i2c.reset();
-        i2cAddr = {};
-
         /* Enable GPIO pin interrupt */
         GPIO_PortDisableInterrupts(BOARD_KEYBOARD_IRQ_GPIO, 1U << BOARD_KEYBOARD_IRQ_GPIO_PIN);
         GPIO_PortDisableInterrupts(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
@@ -167,6 +164,9 @@ namespace bsp {
 
         //Clear IRQ queue handle
         qHandleIrq = NULL;
+
+        i2c.reset();
+        i2cAddr = {};
 
         return kStatus_Success;
     }

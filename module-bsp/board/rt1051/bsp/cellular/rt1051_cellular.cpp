@@ -309,8 +309,9 @@ namespace bsp {
 
         //TODO:M.P add PLL support
         //pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
-        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::CELLULAR_DMA),DriverDMAParams{});
         dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::CELLULAR_DMAMUX),DriverDMAMuxParams{});
+        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::CELLULAR_DMA),DriverDMAParams{});
+
 
         dma->CreateHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
         dmamux->Enable(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL),kDmaRequestMuxLPUART1Tx); // TODO: M.P fix BSP_CELLULAR_UART_TX_DMA_CH
@@ -324,6 +325,8 @@ namespace bsp {
     }
 
     void RT1051Cellular::DMADeinit() {
+        dma->RemoveHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
+        dmamux->Disable(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
     }
 
     uint32_t RT1051Cellular::UartGetPeripheralClock() {

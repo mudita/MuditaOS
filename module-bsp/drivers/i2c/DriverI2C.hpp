@@ -39,7 +39,7 @@ namespace drivers {
 
         static std::shared_ptr<DriverI2C> Create(const I2CInstances inst, const DriverI2CParams &params);
 
-        DriverI2C(const DriverI2CParams& params): parameters(params) {}
+        DriverI2C(const DriverI2CParams& params,const I2CInstances inst): parameters(params),instance(inst) {}
 
         virtual ~DriverI2C() {}
 
@@ -50,6 +50,7 @@ namespace drivers {
         virtual ssize_t Modify(const I2CAddress &addr, const uint32_t mask, bool setClr, const size_t size) = 0;
 
     protected:
+        I2CInstances instance;
         const DriverI2CParams parameters;
 
     };

@@ -225,8 +225,9 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
 
     //TODO:M.P add PLL support
     //pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
-    dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
     dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::EINK_DMAMUX),DriverDMAMuxParams{});
+    dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
+
 
     dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
     dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
@@ -279,8 +280,14 @@ void BSP_EinkDeinit(void)
         bsp_eink_TransferComplete = NULL;
     }
 
+    dma->RemoveHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
+    dma->RemoveHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+    dmamux->Disable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
+    dmamux->Disable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+
     dma.reset();
     dmamux.reset();
+
     //pll.reset(); TODO:M.P
 }
 

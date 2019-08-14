@@ -26,8 +26,8 @@ extern "C" {
 
 static const uint32_t i2cSubaddresSize = 1;
 
-const char *battery_cfgFile = "batteryAdjustementConfig.cfg";
-const char *battery_cfgFilePrev = "batteryAdjustementConfig_old.cfg";
+const char *battery_cfgFile = "sys/batteryAdjustementConfig.cfg";
+const char *battery_cfgFilePrev = "sys/batteryAdjustementConfig_old.cfg";
 
 static const uint16_t BATT_SERVICE_AVG_CURRENT_PERIOD = 0x00;    //< 0.1758 ms * 2^(2 + BATT_SERVICE_AVG_CURRENT_PERIOD)         == 700ms
 static const uint16_t BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD = 0x00;    //< 0.1758 ms * 2^(6 + BATT_SERVICE_AVG_CELL_VOLTAGE_PERIOD)    == 11.25 s
@@ -297,7 +297,11 @@ static bsp::batteryRetval battery_loadConfiguration(void) {
 }
 
 static bsp::batteryRetval battery_storeConfiguration(void) {
-    ff_rename(battery_cfgFile, battery_cfgFilePrev, false);
+    //TODO:M.P procedure below seems to crash system, it should be fixed.
+    if(ff_rename(battery_cfgFile, battery_cfgFilePrev, false) != 0){
+        LOG_ERROR("Could not move configuration file");
+        return bsp::batteryRetval::battery_ChargerError;
+    }
 
     vfs::FILE *fd = NULL;
 

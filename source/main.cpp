@@ -62,6 +62,7 @@ public:
 #if 1 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
         auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        vTaskDelay(3000);
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
         //vTaskDelay(3000);
@@ -79,6 +80,8 @@ public:
          AudioServiceAPI::Stop(this);*/
 
 #endif
+        sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
+
         return std::make_shared<sys::ResponseMessage>();
 
     }
@@ -134,15 +137,15 @@ int main() {
         vfs.Init();
 
         bool ret = false;
-        ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
+        //ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink"), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
 
-        //vector with launchers to applications
+/*        //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
         //launcher for viewer
 		applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
@@ -161,7 +164,7 @@ int main() {
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
-                                     sysmgr.get());
+                                     sysmgr.get());*/
 
         if (ret) {
             return 0;

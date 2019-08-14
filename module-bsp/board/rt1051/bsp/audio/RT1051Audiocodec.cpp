@@ -163,8 +163,9 @@ namespace bsp {
     void RT1051Audiocodec::Init() {
 
         pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
-        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
         dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::AUDIOCODEC_DMAMUX),DriverDMAMuxParams{});
+        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
+
 
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_AUDIOCODEC_SAIx_MCLK_MASK;
@@ -191,6 +192,10 @@ namespace bsp {
     void RT1051Audiocodec::Deinit() {
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_AUDIOCODEC_SAIx);
+        dma->RemoveHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
+        dma->RemoveHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
+        dmamux->Disable(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
+        dmamux->Disable(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
     }
 
     void RT1051Audiocodec::InStart() {
