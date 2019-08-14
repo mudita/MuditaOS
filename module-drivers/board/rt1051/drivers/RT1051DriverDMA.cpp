@@ -16,7 +16,7 @@
 namespace drivers {
 
     RT1051DriverDMA::RT1051DriverDMA(const drivers::DMAInstances &inst, const drivers::DriverDMAParams &params)
-            : DriverDMA(params) {
+            : DriverDMA(params),instance(inst) {
         switch (instance) {
             case DMAInstances::DMA_0: {
                 base = DMA0;
@@ -49,6 +49,7 @@ namespace drivers {
          */
 
         if (channelHandles.find(channel) == channelHandles.end()) {
+            //channelHandles.insert(std::pair<uint32_t ,edma_handle_t>(channel,edma_handle_t{}));
             EDMA_CreateHandle(&channelHandles[channel], base, channel);
         } else {
             // dma already exists

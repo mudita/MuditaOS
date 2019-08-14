@@ -12,8 +12,7 @@
 #include "RT1051Audiocodec.hpp"
 #include "board.h"
 #include "dma_config.h"
-#include "fsl_dmamux.h"
-
+#include "menums/magic_enum.hpp"
 #include "log/log.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
@@ -22,11 +21,10 @@
 namespace bsp {
 
     using namespace drivers;
+    using namespace magic_enum;
 
     sai_edma_handle_t RT1051Audiocodec::txHandle = {};
     sai_edma_handle_t RT1051Audiocodec::rxHandle = {};
-    edma_handle_t RT1051Audiocodec::dmaTxHandle = {};
-    edma_handle_t RT1051Audiocodec::dmaRxHandle = {};
     int16_t RT1051Audiocodec::inBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
     int16_t RT1051Audiocodec::outBuffer[CODEC_CHANNEL_PCM_BUFFER_SIZE * 2] = {};
 
@@ -166,33 +164,16 @@ namespace bsp {
         edma_config_t dmaConfig = {0};
 
         pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
+        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
+        dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::AUDIOCODEC_DMAMUX),DriverDMAMuxParams{});
 
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_AUDIOCODEC_SAIx_MCLK_MASK;
 
-        EDMA_GetDefaultConfig(&dmaConfig);
-        EDMA_Init(BSP_AUDIOCODEC_SAIx_DMA, &dmaConfig);
-        DMAMUX_Init(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE);
-
-
-        /* Create EDMA handle */
-        /*
-         * dmaConfig.enableRoundRobinArbitration = false;
-         * dmaConfig.enableHaltOnError = true;
-         * dmaConfig.enableContinuousLinkMode = false;
-         * dmaConfig.enableDebugMode = false;
-         */
-        EDMA_CreateHandle(&dmaTxHandle, BSP_AUDIOCODEC_SAIx_DMA, BSP_AUDIOCODEC_SAIx_DMA_TX_CHANNEL);
-        EDMA_CreateHandle(&dmaRxHandle, BSP_AUDIOCODEC_SAIx_DMA, BSP_AUDIOCODEC_SAIx_DMA_RX_CHANNEL);
-
-        DMAMUX_SetSource(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE, BSP_AUDIOCODEC_SAIx_DMA_TX_CHANNEL,
-                         (uint8_t) BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE);
-        DMAMUX_EnableChannel(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE, BSP_AUDIOCODEC_SAIx_DMA_TX_CHANNEL);
-
-        DMAMUX_SetSource(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE, BSP_AUDIOCODEC_SAIx_DMA_RX_CHANNEL,
-                         (uint8_t) BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE);
-        DMAMUX_EnableChannel(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE, BSP_AUDIOCODEC_SAIx_DMA_RX_CHANNEL);
-
+        dma->CreateHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
+        dma->CreateHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
+        dmamux->Enable(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE
+        dmamux->Enable(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE
 
         mclkSourceClockHz = BOARD_AUDIOCODEC_SAIx_CLK_FREQ;
 
@@ -210,8 +191,6 @@ namespace bsp {
 
     void RT1051Audiocodec::Deinit() {
         memset(&config, 0, sizeof config);
-        //DMAMUX_Deinit(BSP_AUDIOCODEC_SAIx_DMAMUX_BASE);
-        //EDMA_Deinit(BSP_AUDIOCODEC_SAIx_DMA);
         SAI_Deinit(BOARD_AUDIOCODEC_SAIx);
     }
 
@@ -234,7 +213,7 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, rxAudioCodecCallback, this, &dmaRxHandle);
+        SAI_TransferRxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, rxAudioCodecCallback, this, reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL))));
 
         SAI_TransferRxSetFormatEDMA(BOARD_AUDIOCODEC_SAIx, &rxHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -272,8 +251,7 @@ namespace bsp {
         sai_format.watermark = FSL_FEATURE_SAI_FIFO_COUNT / 2U;
 #endif
 
-        SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, txAudioCodecCallback, this, &dmaTxHandle);
-
+        SAI_TransferTxCreateHandleEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, txAudioCodecCallback, this, reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL))));
         SAI_TransferTxSetFormatEDMA(BOARD_AUDIOCODEC_SAIx, &txHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
 
