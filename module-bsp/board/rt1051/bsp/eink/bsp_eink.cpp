@@ -91,6 +91,8 @@ static lpspi_master_config_t s_eink_lpspi_master_config;
 static std::shared_ptr<drivers::DriverPLL> pll;
 static std::shared_ptr<drivers::DriverDMA> dma;
 static std::shared_ptr<drivers::DriverDMAMux> dmamux;
+static std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
+static std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
 
 static uint32_t BSP_EINK_LPSPI_GetFreq(void)
 {
@@ -229,13 +231,13 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
 
 
-    dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
-    dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+    txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
+    rxDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
     dmamux->Enable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_TX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_TX_PERI_SEL
     dmamux->Enable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_RX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_RX_PERI_SEL
 
-    BSP_EINK_LPSPI_EdmaDriverState.edmaTxDataToTxRegHandle = reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL)));
-    BSP_EINK_LPSPI_EdmaDriverState.edmaRxRegToRxDataHandle = reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL)));
+    BSP_EINK_LPSPI_EdmaDriverState.edmaTxDataToTxRegHandle = reinterpret_cast<edma_handle_t*>(txDMAHandle->GetHandle());
+    BSP_EINK_LPSPI_EdmaDriverState.edmaRxRegToRxDataHandle = reinterpret_cast<edma_handle_t*>(rxDMAHandle->GetHandle());
 
     LPSPI_SetMasterSlaveMode(BSP_EINK_LPSPI_BASE, kLPSPI_Master);
     LPSPI_MasterTransferCreateHandleEDMA(BSP_EINK_LPSPI_BASE,
@@ -280,8 +282,6 @@ void BSP_EinkDeinit(void)
         bsp_eink_TransferComplete = NULL;
     }
 
-    dma->RemoveHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
-    dma->RemoveHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
     dmamux->Disable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
     dmamux->Disable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
 

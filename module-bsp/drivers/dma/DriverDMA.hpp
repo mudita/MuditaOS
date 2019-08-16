@@ -27,6 +27,11 @@ namespace drivers {
 
     };
 
+    class DriverDMAHandle{
+    public:
+        virtual void* GetHandle() = 0;
+    };
+
     class DriverDMA : public DriverInterface<DriverDMA> {
     public:
 
@@ -36,11 +41,7 @@ namespace drivers {
 
         virtual ~DriverDMA() {}
 
-        virtual int32_t CreateHandle(const uint32_t channel,std::function<void()> callback=nullptr) = 0;
-
-        virtual int32_t RemoveHandle(const uint32_t channel) = 0;
-
-        virtual void* GetHandle(const uint32_t channel) = 0;
+        virtual std::unique_ptr<DriverDMAHandle> CreateHandle(const uint32_t channel,std::function<void()> callback=nullptr) = 0;
 
     protected:
         const DriverDMAParams parameters;

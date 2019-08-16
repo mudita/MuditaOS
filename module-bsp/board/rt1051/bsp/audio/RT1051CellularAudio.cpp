@@ -143,8 +143,8 @@ namespace bsp {
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_CELLULAR_AUDIO_SAIx_MCLK_MASK;
 
-        dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
-        dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+        txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
+        rxDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
         dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL),
                        BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE
         dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL),
@@ -168,8 +168,6 @@ namespace bsp {
     void RT1051CellularAudio::Deinit() {
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_CELLULAR_AUDIO_SAIx);
-        dma->RemoveHandle(enum_integer(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
-        dma->RemoveHandle(enum_integer(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
         dmamux->Disable(enum_integer(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
         dmamux->Disable(enum_integer(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
     }
@@ -194,8 +192,7 @@ namespace bsp {
 #endif
 
         SAI_TransferRxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, rxCellularCallback, this,
-                                       reinterpret_cast<edma_handle_t *>(dma->GetHandle(
-                                               enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL))));
+                                       reinterpret_cast<edma_handle_t *>(rxDMAHandle->GetHandle()));
 
         SAI_TransferRxSetFormatEDMA(BOARD_CELLULAR_AUDIO_SAIx, &rxHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
@@ -234,8 +231,7 @@ namespace bsp {
 #endif
 
         SAI_TransferTxCreateHandleEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, txCellularCallback, this,
-                                       reinterpret_cast<edma_handle_t *>(dma->GetHandle(
-                                               enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL))));
+                                       reinterpret_cast<edma_handle_t *>(txDMAHandle->GetHandle()));
 
         SAI_TransferTxSetFormatEDMA(BOARD_CELLULAR_AUDIO_SAIx, &txHandle, &sai_format, mclkSourceClockHz,
                                     mclkSourceClockHz);
