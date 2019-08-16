@@ -196,7 +196,7 @@ int32_t Font::getKerning( uint32_t id1, uint32_t id2 ) {
 	return kern->amount;
 }
 
-uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed )
+uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const uint32_t& delimiter )
 {
 	spaceConsumed = 0;
 
@@ -242,6 +242,11 @@ uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint3
 		}
 		idLast = idCurrent;
 		++stringChars;
+
+		//check for delimiter
+		if( idCurrent == delimiter ) {
+			break;
+		}
 	}
 	spaceConsumed = space - availableSpace;
 	return stringChars;

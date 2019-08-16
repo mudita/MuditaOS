@@ -14,7 +14,7 @@
 
 namespace gui {
 
-Text::TextLine::TextLine( UTF8* text, uint32_t startIndex, uint32_t endIndex, Text::LineEndType endType, uint32_t pixelLength ) :
+Text::TextLine::TextLine( const UTF8& text, uint32_t startIndex, uint32_t endIndex, Text::LineEndType endType, uint32_t pixelLength ) :
 	text{text},
 	startIndex{ startIndex },
 	endIndex{endIndex},
@@ -59,7 +59,7 @@ void Text::setCursorWidth( uint32_t w ) {
 }
 
 void Text::setText( const UTF8& text ) {
-
+	splitTextToLines(text);
 }
 void Text::clear(){
 
@@ -92,11 +92,94 @@ void Text::splitTextToLines( const UTF8& text) {
 	if( text.length() == 0 )
 		return;
 
+	//copy provided text to internal buffer
 	uint32_t index = 0;
-	while( index != text.length()) {
+	uint32_t totalLength = text.length();
 
-//		TextLine* textLine =
+	while( index < totalLength ) {
+
+		UTF8 textCopy = text.substr(index,totalLength-index);
+		//find how many character fit in the widget's width
+		//this doesnt include any line breaking conditinos like enter or space because line is too long
+		uint32_t spaceConsumed = 0;
+		uint32_t charCount = font->getCharCountInSpace( textCopy, widgetArea.w, spaceConsumed );
+		UTF8 tmpText = textCopy.substr( 0, charCount );
+
+		//some default values
+		uint32_t startIndex = 0;
+		uint32_t endIndex = totalLength;
+		LineEndType lineEndType = LineEndType::EOT;
+
+		//check if this is not the end of the text
+		if( index + charCount == totalLength ) {
+			//try to find first enter.
+			uint32_t enterIndex = tmpText.find( "\n",0);
+			if( enterIndex != UTF8::npos ) {
+				endIndex = index+enterIndex;
+				index += enterIndex + 1;
+				lineEndType = LineEndType::BREAK;
+				textLines.push_back( new TextLine( tmpText.substr(0,enterIndex), startIndex, endIndex, lineEndType, spaceConsumed ) );
+				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+			} //no enter found last line can be copied as a whole.
+			else {
+				startIndex = index;
+				endIndex = totalLength;
+				textLines.push_back( new TextLine( tmpText, startIndex, endIndex, lineEndType, spaceConsumed ) );
+				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+				index += charCount;
+			}
+		}
+		//if it wasn't the last line search for enter or space and break the line on it.
+		else {
+
+			startIndex = index;
+
+			//try to find first enter.
+			uint32_t enterIndex = tmpText.find( "\n",0);
+			if( enterIndex != UTF8::npos ) {
+				endIndex = index+enterIndex;
+				index += enterIndex + 1;
+				lineEndType = LineEndType::BREAK;
+				textLines.push_back( new TextLine( tmpText.substr(0,enterIndex), startIndex, endIndex, lineEndType, spaceConsumed ) );
+				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+			}
+			else {
+				//if there was no enter look for last space in the tmpText and break line on it
+				uint32_t spaceIndex = tmpText.findLast( " ",tmpText.length()-1);
+
+				//if there was no space take as many characters as possible and add CONTINUE ending
+				if( spaceIndex == UTF8::npos ) {
+					endIndex = index+charCount;
+					index += charCount;
+					lineEndType = LineEndType::CONTINUE;
+					textLines.push_back( new TextLine( tmpText, startIndex, endIndex, lineEndType, spaceConsumed ) );
+					LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+				}
+				else {
+					lineEndType = LineEndType::CONTINUE_SPACE;
+
+					uint32_t spaceWidth = font->getPixelWidth(" ",0,1);
+					//if space is last character in string erase it and add appropriate CONTINUE_SPACE ending
+					if( spaceIndex == tmpText.length()-1 ) {
+						endIndex = index+charCount-1;
+						index += charCount;
+						textLines.push_back( new TextLine( tmpText.substr(0,tmpText.length()-1),
+							startIndex, endIndex, lineEndType, spaceConsumed - spaceWidth) );
+						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+					}
+					else {
+						endIndex = index+spaceIndex;
+						index += spaceIndex+1;
+						textLines.push_back( new TextLine( tmpText.substr(0,spaceIndex),
+							startIndex, endIndex, lineEndType, spaceConsumed - spaceWidth) );
+						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+					}
+				}
+			}
+		}
 	}
+//	for( TextLine* tl : textLines )
+//		LOG_INFO("Text Input Line: [%s]", tl->text.c_str());
 }
 
 std::list<DrawCommand*> Text::buildDrawList() {

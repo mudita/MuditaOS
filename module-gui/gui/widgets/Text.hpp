@@ -58,13 +58,13 @@ public:
 protected:
 	class TextLine {
 	public:
-		UTF8* text = nullptr;
+		UTF8 text;
 		uint32_t startIndex = 0;
 		uint32_t endIndex = 0;
 		LineEndType endType = LineEndType::EOT;
 		uint32_t pixelLength = 0;
 
-		TextLine( UTF8* text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength );
+		TextLine( const UTF8& text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength );
 	};
 
 	std::list<TextLine*> textLines;
@@ -80,8 +80,12 @@ protected:
 	Font* font;
 	//index of the first visible row of the text
 	uint32_t firstRow = 0;
+	//internal copy of the text that is displayed
+//	UTF8 rawText;
+
 
 	void splitTextToLines( const UTF8& text);
+	TextLine* createNewLine();
 
 public:
 	Text();
