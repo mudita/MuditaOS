@@ -16,6 +16,17 @@
 
 namespace drivers {
 
+    RT1051DriverDMAHandle::RT1051DriverDMAHandle(const DMA_Type *base,const uint32_t channel,std::function<void()> callback) {
+        EDMA_CreateHandle(&handle, const_cast<DMA_Type*>(base), channel);
+        if(callback){
+            EDMA_SetCallback(&handle, edmaCallback, this);
+        }
+    }
+
+    RT1051DriverDMAHandle::~RT1051DriverDMAHandle() {
+        EDMA_AbortTransfer(&handle);
+    }
+
     RT1051DriverDMA::RT1051DriverDMA(const drivers::DMAInstances &inst, const drivers::DriverDMAParams &params)
             : DriverDMA(params),instance(inst) {
         switch (instance) {
@@ -32,14 +43,11 @@ namespace drivers {
     }
 
     RT1051DriverDMA::~RT1051DriverDMA() {
-        for (auto &w : channelHandles) {
-            EDMA_AbortTransfer(&w.second.handle);
-        }
         EDMA_Deinit(base);
         LOG_DEBUG("Deinit: DMA0");
     }
 
-    int32_t RT1051DriverDMA::CreateHandle(const uint32_t channel,std::function<void()> callback) {
+    std::unique_ptr<DriverDMAHandle> RT1051DriverDMA::CreateHandle(const uint32_t channel,std::function<void()> callback) {
 
         cpp_freertos::LockGuard lock(mutex);
 
@@ -50,44 +58,13 @@ namespace drivers {
          * dmaConfig.enableContinuousLinkMode = false;
          * dmaConfig.enableDebugMode = false;
          */
-
-        if (channelHandles.find(channel) == channelHandles.end()) {
-            EDMA_CreateHandle(&channelHandles[channel].handle, base, channel);
-            if(callback){
-                EDMA_SetCallback(&channelHandles[channel].handle, edmaCallback, &channelHandles[channel]);
-                channelHandles[channel].callback = callback;
-            }
-        } else {
-            // dma already exists
-            LOG_ERROR("DMA channel handle exists already");
-        }
-
+        return std::make_unique<RT1051DriverDMAHandle>(base,channel,callback);
 
     }
 
-    int32_t RT1051DriverDMA::RemoveHandle(const uint32_t channel) {
-        cpp_freertos::LockGuard lock(mutex);
-        if (channelHandles.find(channel) != channelHandles.end()) {
-            EDMA_AbortTransfer(&channelHandles[channel].handle);
-            channelHandles.erase(channel);
-        } else {
-            // dma already exists
-            LOG_ERROR("Trying to remove non-existent dma channel handle");
-        }
-    }
-
-    void *RT1051DriverDMA::GetHandle(const uint32_t channel) {
-        cpp_freertos::LockGuard lock(mutex);
-        if (channelHandles.find(channel) != channelHandles.end()) {
-            return &channelHandles[channel];
-        } else {
-            // dma already exists
-            LOG_ERROR("DMA channel doesn't exist");
-        }
-    }
 
     void edmaCallback(struct _edma_handle *handle, void *userData, bool transferDone, uint32_t tcds){
-        RT1051DriverDMA::DMAEntry* entry = reinterpret_cast<RT1051DriverDMA::DMAEntry*>(userData);
+        RT1051DriverDMAHandle* entry = reinterpret_cast<RT1051DriverDMAHandle*>(userData);
         entry->callback();
     }
 

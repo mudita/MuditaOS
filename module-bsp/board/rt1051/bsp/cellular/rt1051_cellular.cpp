@@ -313,19 +313,18 @@ namespace bsp {
         dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::CELLULAR_DMA),DriverDMAParams{});
 
 
-        dma->CreateHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
+        txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
         dmamux->Enable(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL),kDmaRequestMuxLPUART1Tx); // TODO: M.P fix BSP_CELLULAR_UART_TX_DMA_CH
 
         LPUART_TransferCreateHandleEDMA(CELLULAR_UART_BASE,
                                         &uartDmaHandle,
                                         DMATxCompletedCb,
                                         NULL,
-                                        reinterpret_cast<edma_handle_t*>(dma->GetHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL))),
+                                        reinterpret_cast<edma_handle_t*>(txDMAHandle->GetHandle()),
                                         NULL);
     }
 
     void RT1051Cellular::DMADeinit() {
-        dma->RemoveHandle(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
         dmamux->Disable(enum_integer(BoardDefinitions ::CELLULAR_TX_DMA_CHANNEL));
     }
 

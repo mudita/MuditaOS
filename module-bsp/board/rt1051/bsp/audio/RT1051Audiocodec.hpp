@@ -86,6 +86,8 @@ namespace bsp{
         std::shared_ptr<drivers::DriverPLL> pll;
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
         std::shared_ptr<drivers::DriverDMA> dma;
+        std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
+        std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
 
 
 
