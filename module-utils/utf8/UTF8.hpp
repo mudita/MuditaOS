@@ -105,7 +105,7 @@ public:
 	UTF8 split(const uint32_t& idx);
 	/**
 	 * @brief Creates substring from current string. New string is limited by /r or /n.
-	 * @return subrstring created from curret string. Returns empty string in case of failure.
+	 * @return subrstring created from current string. Returns empty string in case of failure.
 	 */
 	UTF8 getLine(void);
 	/**

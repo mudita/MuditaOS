@@ -43,14 +43,15 @@ void NotesEditWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-	gui::Label* title = new gui::Label(this, 0, 108, 480, 42 );
+	gui::Label* title = new gui::Label(this, 0, 50, 480, 42 );
 	title->setFilled( false );
 	title->setBorderColor( gui::ColorNoColor );
-	title->setFont("gt_pressura_light_24");
+	title->setFont("gt_pressura_bold_24");
 	title->setText("New Note");
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	text = new gui::Text( this, 0, 150, 480, 400 );
+	text = new gui::Text( this, 11, 150, 480-22, 400 );
+	text->setFont("gt_pressura_bold_24");
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
@@ -65,6 +66,8 @@ NotesEditWindow::~NotesEditWindow() {
 }
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+	LOG_INFO("SETTING TEXT");
+	text->setText("Very long test line ABCDEFGHIJKLMNOPQRST123456789\nabcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345");
 }
 
 bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
