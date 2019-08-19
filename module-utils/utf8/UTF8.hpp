@@ -42,6 +42,7 @@ protected:
 	uint32_t getDataBufferSize( uint32_t dataBytes );
 	bool expand( uint32_t size = stringExpansion );
 	uint32_t decode( const char* utf8_char, uint32_t& length  ) const;
+
 public:
 	UTF8();
 	UTF8( const char* str );
@@ -115,6 +116,27 @@ public:
 	 * @return true if there was no error, false otherwise
 	 */
 	bool removeChar( const uint32_t& pos = 0, const uint32_t& count = 1);
+	/**
+	 * @brief Inserts character into string on specified position. If position is not specified (UTF8::npos) char is added at the end to current string.
+	 * @param charPtr pointer to the memory where UTF8 character is located.
+	 * @param index index in the current string where character should be inserted.
+	 * @return true is operation was successful false otherwise.
+	 */
+	bool insert( const char* charPtr, const uint32_t& index = UTF8::npos );
+	/**
+	 * @brief Inserts character into string on specified position. If position is not specified (UTF8::npos) char is added at the end to current string.
+	 * @param charCode code of the character to insert.
+	 * @param index index in the current string where character should be inserted.
+	 * @return true is operation was successful false otherwise.
+	 */
+	bool insertCode( const uint32_t& charCode, const uint32_t& index = UTF8::npos );
+	/**
+	 * @brief Inserts string into current string on specified position. If position is not specified (UTF8::npos) is appended at the end of the current string.
+	 * @param str String to be inserted into current object.
+	 * @param index index in the current string where character should be inserted.
+	 * @return true is operation was successful false otherwise.
+	 */
+	bool insertString( const UTF8& str, const uint32_t& index = UTF8::npos );
 
 	/*
 	 * @brief Check if string has only ASCII characters
@@ -126,6 +148,15 @@ public:
 			return true;
 		return false;
 	}
+	/**
+	 * @brief Returns pointer to character encoded using provided Unicode value.
+	 * @param code Unicode of the character.
+	 * @param dest uint32 variable where encoded variable will be stored.
+	 * @param length number of useful bytes in dest variable.
+	 * @return True if encoding was successful, false otherwise
+	 * @note function returns false if character is within prohibited range - <U+D800, U+DFFF> or above value of U+10FFFF.
+	 */
+	static bool encode( const uint16_t& code, uint32_t& dest, uint32_t& length );
 	/**
 	 * PUBLIC METHODS
 	 */

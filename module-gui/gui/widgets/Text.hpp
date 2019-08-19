@@ -55,6 +55,14 @@ public:
 		SINGLE_LINE = 1,
 		MULTI_LINE
 	};
+
+	enum class MoveDirection {
+		MOVE_UP,
+		MOVE_DOWN,
+		MOVE_LEFT,
+		MOVE_RIGHT
+	};
+
 protected:
 	class TextLine {
 	public:
@@ -67,7 +75,20 @@ protected:
 		TextLine( const UTF8& text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength );
 	};
 
+	//holds list of all lines that  text was divided to.
 	std::list<TextLine*> textLines;
+	//holds list of labels for displaying currently visible text lines.
+	std::list<gui::Label*> labelLines;
+	//pointer to the first visible line of text
+	std::list<TextLine*>::iterator firstLine = textLines.end();
+	//pointer to the last visible line.
+	std::list<TextLine*>::iterator lastLine = textLines.end();
+	//row where cursor is located ( 0 - first row from top )
+	uint32_t cursorRow = 0;
+	// column where cursor is located( 0 - position before first character in the line )
+	uint32_t cursotColumn = 0;
+
+
 
 	EditMode editMode = EditMode::EDIT;
 	ExpandMode expandMode = ExpandMode::EXPAND_NONE;
@@ -81,11 +102,43 @@ protected:
 	//index of the first visible row of the text
 	uint32_t firstRow = 0;
 	//internal copy of the text that is displayed
-//	UTF8 rawText;
-
 
 	void splitTextToLines( const UTF8& text);
-	TextLine* createNewLine();
+	/**
+	 * Iterate over lines starting from the one that is provided. Function concatenate lines and performs new split.
+	 * Function stops on the last line or it there is a lines break ( enter ) or if last concatenated line doesn;t change after update.
+	 */
+
+	void reworkLines( TextLine* textLine );
+	/**
+	 * Moves cursor in specified direction
+	 */
+	bool moveCursor( const MoveDirection& direction );
+	/**
+	 * Function is used to move text up and down in the browsing mode
+	 */
+	bool handleBrowsing( const InputEvent& inputEvent );
+	/**
+	 * Function is used to move cursor in all directions when in the Wdit mode.
+	 */
+	bool handleNavigation( const InputEvent& inputEvent );
+	/**
+	 * Handles enter key
+	 */
+	bool handleEnter();
+	bool handleBackspace();
+	/**
+	 * Inserts character provided from external source into currently selected line.
+	 */
+	bool handleChar( const InputEvent& inputEvent );
+	/**
+	 * Updates cursor position in the text widget
+	 */
+	void updateCursor();
+	/**
+	 * Returns text line where cursor is located
+	 */
+	TextLine* getCursorTextLine();
 
 public:
 	Text();
@@ -100,12 +153,13 @@ public:
 	virtual UTF8 getText();
 	void setFont( const UTF8& fontName );
 
-	//virtual methods
+	//virtual methods from Item
 	std::list<DrawCommand*> buildDrawList() override;
 	void setPosition( const short& x, const short& y ) override;
 	void setSize( const short& w, const short& h ) override;
-
-
+	bool onInput( const InputEvent& inputEvent ) override;
+	bool onActivated( void* data ) override ;
+	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 };
 
 } /* namespace gui */
