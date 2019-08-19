@@ -128,7 +128,17 @@ public:
 	 * @return Number of pixels in width occupied by selected part of the text.
 	 */
 	uint32_t getPixelWidth( const UTF8& str, const uint32_t start, const uint32_t count );
+	/**
+	 * @brief Calculates how many pixels will occupy string.
+	 * @param str String used as a source of text.
+	 * @return Number of pixels in width occupied by string.
+	 */
+	uint32_t getPixelWidth( const UTF8& str );
 	uint32_t getCharPixelWidth( uint32_t charCode );
+
+	const std::string getName() {
+		return info.face;
+	}
 };
 
 class FontManager {

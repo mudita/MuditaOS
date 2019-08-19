@@ -36,6 +36,10 @@ Text::Text() :
 
 	//insert first empty text line
 	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
+	firstLine = textLines.begin();
+	lastLine = textLines.begin();
+	setBorderColor( gui::ColorFullBlack );
+	setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
 }
 
 Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h,
@@ -51,6 +55,10 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 
 	//insert first empty text line
 	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
+	firstLine = textLines.begin();
+	lastLine = textLines.begin();
+	setBorderColor( gui::ColorFullBlack );
+	setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
 }
 
 Text::~Text() {
@@ -67,15 +75,27 @@ void Text::setCursorWidth( uint32_t w ) {
 
 void Text::setText( const UTF8& text ) {
 	clear();
+	//erase default empty line
+	delete textLines.front();
+	textLines.pop_front();
+	textLines.clear();
+	//split and add new lines
 	splitTextToLines(text);
+	recalculateDrawParams();
 }
 void Text::clear(){
 	//if there are text lines erase them.
 	if( !textLines.empty() ) {
-		while( !textLines.empty() )
+		while( !textLines.empty() ) {
 			delete textLines.front();
 			textLines.pop_front();
+		}
 	}
+	textLines.clear();
+	//insert first empty text line
+	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
+	firstLine = textLines.begin();
+	lastLine = textLines.begin();
 }
 
 UTF8 Text::getText() {
@@ -92,6 +112,7 @@ void Text::setFont( const UTF8& fontName) {
 	} else {
 		LOG_ERROR("Font not found");
 	}
+	recalculateDrawParams();
 }
 
 void Text::splitTextToLines( const UTF8& text) {
@@ -103,13 +124,15 @@ void Text::splitTextToLines( const UTF8& text) {
 	uint32_t index = 0;
 	uint32_t totalLength = text.length();
 
+	uint32_t availableSpace = getAvailableHPixelSpace();
+
 	while( index < totalLength ) {
 
 		UTF8 textCopy = text.substr(index,totalLength-index);
 		//find how many character fit in the widget's width
 		//this doesnt include any line breaking conditinos like enter or space because line is too long
 		uint32_t spaceConsumed = 0;
-		uint32_t charCount = font->getCharCountInSpace( textCopy, widgetArea.w, spaceConsumed );
+		uint32_t charCount = font->getCharCountInSpace( textCopy, availableSpace, spaceConsumed );
 		UTF8 tmpText = textCopy.substr( 0, charCount );
 
 		//some default values
@@ -185,24 +208,29 @@ void Text::splitTextToLines( const UTF8& text) {
 			}
 		}
 	}
+
+	firstLine = textLines.begin();
+	lastLine = textLines.begin();
 //	for( TextLine* tl : textLines )
 //		LOG_INFO("Text Input Line: [%s]", tl->text.c_str());
 }
 
-void Text::reworkLines( TextLine* textLine ) {
+void Text::reworkLines( std::list<TextLine*>::iterator it ) {
 
 }
 
 
 std::list<DrawCommand*> Text::buildDrawList() {
-	return Item::buildDrawList();
+	return Rect::buildDrawList();
 }
 void Text::setPosition( const short& x, const short& y ) {
-
+	Rect::setPosition(x, y);
+	recalculateDrawParams();
 }
 
 void Text::setSize( const short& w, const short& h ) {
-
+	Rect::setSize( w, h );
+	recalculateDrawParams();
 }
 
 bool Text::onInput( const InputEvent& inputEvent ) {
@@ -219,10 +247,10 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 	}
 	//backspace handling
 	else if( inputEvent.keyChar  == 0x08 ) {
-		handleBackspace();
+		return handleBackspace();
 	}
 	else { //normal char -> add and check pixel width
-		handleChar( inputEvent );
+		return handleChar( inputEvent );
 	}
 
 	return false;
@@ -323,14 +351,35 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 	TextLine* currentTextLine = getCursorTextLine();
 
 	//calculate width of the character that is going to be inserted
-	font->getCharPixelWidth( inputEvent.keyChar );
+	uint32_t charWidth = font->getCharPixelWidth( inputEvent.keyChar );
 
 	//insert character into string in currently selected line
-//	currentTextLine->text.
+	if( currentTextLine->text.insertCode( inputEvent.keyChar, cursorColumn ) == false )
+		return false;
+
 	//if sum of the old string and width of the new character are greater than available space run lines rework procedure
+	uint32_t linesCount = textLines.size();
+	uint32_t availableSpace = getAvailableHPixelSpace();
+	uint32_t currentWidth = currentTextLine->pixelLength;
+	if( currentWidth + charWidth > availableSpace ) {
+		auto it = firstLine;
+		std::advance(it, cursorRow );
+		reworkLines( it );
+
+		//change cursor position
+	}
+	//no line splitting, update pixel width and proceed
+	else {
+		currentTextLine->pixelLength = font->getPixelWidth( currentTextLine->text );
+		++cursorColumn;
+	}
 
 	//if number of text lines have increased, text widget is multi-line and expandable change widgets space
+	if( linesCount != textLines.size()) {
 
+	}
+
+	recalculateDrawParams();
 	//calculate new position of the cursor
 
 	return true;
@@ -341,6 +390,60 @@ Text::TextLine* Text::getCursorTextLine() {
 	//TODO add check for distance to advance
 	std::advance(it, cursorRow );
 	return *it;
+}
+
+void Text::recalculateDrawParams() {
+
+	//calculate number of lines for displaying text
+	int32_t h = widgetArea.h - margins.top - margins.bottom - 2*radius;
+	if( h < 0 )
+		h = 0;
+
+	//remove all old labels
+	for( uint32_t i=0; i<labelLines.size(); ++i ) {
+		removeWidget( labelLines[i]);
+		delete labelLines[i];
+	}
+
+	labelLines.clear();
+
+	//calculate how many rows can fit in available height.
+	uint32_t rowCount = h / font->info.line_height;
+	rowCount = (rowCount == 0)?1:rowCount;
+
+	if( textType == TextType::SINGLE_LINE ) {
+		rowCount = 1;
+	}
+
+	//if there is not enough space for single line start from 0 and ignore vertical margins
+	uint32_t startY = ( h < font->info.line_height )?0:margins.top;
+
+	//create labels to display text. There will be always at least one.
+	for( uint32_t i=0; i<rowCount; i++ ) {
+		gui::Label* label = new gui::Label( this, margins.left, startY, widgetArea.w - margins.left - margins.right, font->info.line_height );
+		label->setFilled( false );
+		label->setFont( font-> getName() );
+		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+		label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+		labelLines.push_back( label );
+		startY += font->info.line_height;
+	}
+
+	//assign text to all lines
+	auto textIterator = firstLine;
+	for( uint32_t i=0; i<labelLines.size(); i++ ) {
+		if( textIterator == textLines.end())
+			break;
+		labelLines[i]->setText( (*textIterator)->text );
+		lastLine = textIterator;
+		textIterator++;
+
+	}
+}
+
+void Text::setMargins( const Margins& margins ) {
+	this->margins = margins;
+	recalculateDrawParams();
 }
 
 } /* namespace gui */
