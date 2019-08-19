@@ -20,7 +20,7 @@ CodecMAX98090::CodecMAX98090() : i2cAddr{} {
 
     i2cAddr.deviceAddress = MAX98090_I2C_ADDR;
     i2cAddr.subAddressSize = 1; // MAX98090 uses 1byte addressing
-    i2c = DriverInterface<DriverI2C>::Create(static_cast<I2CInstances >(BoardDefinitions::AUDIOCODEC_I2C),
+    i2c = DriverI2C::Create(static_cast<I2CInstances >(BoardDefinitions::AUDIOCODEC_I2C),
                                              DriverI2CParams{.baudrate=static_cast<uint32_t >(BoardDefinitions::AUDIOCODEC_I2C_BAUDRATE)});
     Reset();
 }

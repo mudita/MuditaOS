@@ -13,8 +13,9 @@
 #define PUREPHONE_DRIVERDMA_HPP
 
 
-#include "../DriverInterface.hpp"
 #include <functional>
+#include <memory>
+#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -32,7 +33,7 @@ namespace drivers {
         virtual void* GetHandle() = 0;
     };
 
-    class DriverDMA : public DriverInterface<DriverDMA> {
+    class DriverDMA  {
     public:
 
         static std::shared_ptr<DriverDMA> Create(const DMAInstances inst, const DriverDMAParams &params);
@@ -45,6 +46,8 @@ namespace drivers {
 
     protected:
         const DriverDMAParams parameters;
+    private:
+        static std::weak_ptr<DriverDMA> singleton[magic_enum::enum_count<DMAInstances>()];
 
     };
 

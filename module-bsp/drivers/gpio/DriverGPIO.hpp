@@ -12,8 +12,9 @@
 #ifndef PUREPHONE_DRIVERGPIO_HPP
 #define PUREPHONE_DRIVERGPIO_HPP
 
-#include "../DriverInterface.hpp"
+#include <memory>
 #include <functional>
+#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -51,7 +52,7 @@ namespace drivers {
         uint32_t pin;
     };
 
-    class DriverGPIO : public DriverInterface<DriverGPIO> {
+    class DriverGPIO {
     public:
         static std::shared_ptr<DriverGPIO> Create(const GPIOInstances inst, const DriverGPIOParams &params);
 
@@ -85,6 +86,9 @@ namespace drivers {
 
     protected:
         const DriverGPIOParams parameters;
+
+    private:
+        static std::weak_ptr<DriverGPIO> singleton[magic_enum::enum_count<GPIOInstances>()];
 
     };
 

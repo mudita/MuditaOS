@@ -12,8 +12,8 @@
 #ifndef PUREPHONE_DRIVERPLL_HPP
 #define PUREPHONE_DRIVERPLL_HPP
 
-
-#include "../DriverInterface.hpp"
+#include <memory>
+#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -31,7 +31,7 @@ namespace drivers {
 
     };
 
-    class DriverPLL : public DriverInterface<DriverPLL> {
+    class DriverPLL {
     public:
 
         static std::shared_ptr<DriverPLL> Create(const PLLInstances inst, const DriverPLLParams &params);
@@ -42,6 +42,8 @@ namespace drivers {
 
     protected:
         const DriverPLLParams parameters;
+    private:
+        static std::weak_ptr<DriverPLL> singleton[magic_enum::enum_count<PLLInstances>()];
 
     };
 

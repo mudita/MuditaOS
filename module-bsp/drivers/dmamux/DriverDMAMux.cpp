@@ -10,6 +10,9 @@
 
 
 #include "DriverDMAMux.hpp"
+#include "critical.hpp"
+#include "menums/magic_enum.hpp"
+
 #if defined(TARGET_RT1051)
 #include "board/rt1051/drivers/RT1051DriverDMAMux.hpp"
 #elif defined(TARGET_Linux)
@@ -21,15 +24,30 @@
 
 namespace drivers {
 
-    std::shared_ptr<DriverDMAMux> DriverDMAMux::Create(const drivers::DMAMuxInstances inst,
+    std::weak_ptr<DriverDMAMux> DriverDMAMux::singleton[magic_enum::enum_count<DMAMuxInstances>()];
+
+    std::shared_ptr<DriverDMAMux> DriverDMAMux::Create(const drivers::DMAMuxInstances instance,
                                                  const drivers::DriverDMAMuxParams &params) {
         {
+
+            cpp_freertos::CriticalSection::Enter();
+            std::shared_ptr<DriverDMAMux> inst = singleton[magic_enum::enum_integer(instance)].lock();
+
+            if (!inst) {
 #if defined(TARGET_RT1051)
-            return  std::make_shared<RT1051DriverDMAMux>(inst,params);
+                inst = std::make_shared<RT1051DriverDMAMux>(instance,params);
 #elif defined(TARGET_Linux)
-            #else
+                #else
 #error "Unsupported target"
 #endif
+
+                singleton[magic_enum::enum_integer(instance)] = inst;
+            }
+
+            cpp_freertos::CriticalSection::Exit();
+
+            return inst;
+
         }
     }
 

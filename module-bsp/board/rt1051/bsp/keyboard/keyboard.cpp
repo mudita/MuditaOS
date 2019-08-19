@@ -48,10 +48,10 @@ namespace bsp {
 
     status_t keyboard_Init(xQueueHandle qHandle) {
 
-        i2c = DriverInterface<DriverI2C>::Create(static_cast<I2CInstances >(BoardDefinitions::KEYBOARD_I2C),
+        i2c = DriverI2C::Create(static_cast<I2CInstances >(BoardDefinitions::KEYBOARD_I2C),
                                                  DriverI2CParams{.baudrate=static_cast<uint32_t >(BoardDefinitions::KEYBOARD_I2C_BAUDRATE)});
 
-        gpio = DriverInterface<DriverGPIO>::Create(static_cast<GPIOInstances >(BoardDefinitions::KEYBOARD_GPIO),
+        gpio = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::KEYBOARD_GPIO),
                                                    DriverGPIOParams{});
 
         qHandleIrq = qHandle;

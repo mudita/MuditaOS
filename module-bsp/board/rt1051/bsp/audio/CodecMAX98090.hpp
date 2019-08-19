@@ -13,7 +13,6 @@
 #define PUREPHONE_CODECMAX98090_HPP
 
 #include "Codec.hpp"
-#include "drivers/DriverInterface.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 
 class CodecParamsMAX98090 : public CodecParams {

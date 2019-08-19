@@ -21,10 +21,13 @@
 #include "fsl_lpuart.h"
 #include "fsl_lpuart_edma.h"
 
-#include "drivers/DriverInterface.hpp"
+
+#include "bsp/BoardDefinitions.hpp"
+
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
+#include "drivers/gpio/DriverGPIO.hpp"
 
 namespace bsp {
 
@@ -83,27 +86,30 @@ namespace bsp {
         }
 
         inline void WakeupModem() {
-            GPIO_PinWrite(BSP_CELLULAR_UART_DTR_PORT, BSP_CELLULAR_UART_DTR_PIN, 0);
-            GPIO_PinWrite(BSP_CELLULAR_WAKEUP_PORT, BSP_CELLULAR_WAKEUP_PIN, 0);
+            gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN),0);
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN),0);
 
             vTaskDelay(pdMS_TO_TICKS(15));
         }
 
         inline void EnableModemEnterSleepMode() {
-            GPIO_PinWrite(BSP_CELLULAR_UART_DTR_PORT, BSP_CELLULAR_UART_DTR_PIN, 1);
-            GPIO_PinWrite(BSP_CELLULAR_WAKEUP_PORT, BSP_CELLULAR_WAKEUP_PIN, 1);
+            gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN),1);
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN),1);
         }
 
         inline void InformModemHostAsleep() {
-            GPIO_PinWrite(BSP_CELLULAR_AP_RDY_PORT, BSP_CELLULAR_AP_RDY_PIN, !CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),!CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
         }
 
         inline void InformModemHostWakeup() {
-            GPIO_PinWrite(BSP_CELLULAR_AP_RDY_PORT, BSP_CELLULAR_AP_RDY_PIN, CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
         }
 
         // M.P: It is important to destroy these drivers in specific order
         std::shared_ptr<drivers::DriverPLL> pll;
+        std::shared_ptr<drivers::DriverGPIO> gpio_1;
+        std::shared_ptr<drivers::DriverGPIO> gpio_2;
+        std::shared_ptr<drivers::DriverGPIO> gpio_3;
         std::shared_ptr<drivers::DriverDMAMux> dmamux;
         std::shared_ptr<drivers::DriverDMA> dma;
         std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;

@@ -21,7 +21,6 @@
 
 #include "CodecMAX98090.hpp"
 
-#include "drivers/DriverInterface.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
