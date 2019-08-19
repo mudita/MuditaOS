@@ -35,7 +35,6 @@
 #include "macros.h"
 
 #include "menums/magic_enum.hpp"
-#include "drivers/DriverInterface.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"

@@ -96,7 +96,7 @@ namespace bsp {
 
 
     int battery_Init(xQueueHandle qHandle) {
-        i2c = DriverInterface<DriverI2C>::Create(static_cast<I2CInstances >(BoardDefinitions::BATTERY_CHARGER_I2C),
+        i2c = DriverI2C::Create(static_cast<I2CInstances >(BoardDefinitions::BATTERY_CHARGER_I2C),
                                                  DriverI2CParams{.baudrate=static_cast<uint32_t >(BoardDefinitions::BATTERY_CHARGER_I2C_BAUDRATE)});
 
         qHandleIrq = qHandle;
@@ -452,7 +452,7 @@ BaseType_t BSP_BatteryChargerINTB_IRQHandler() {
 
 static void s_BSP_BatteryChargerIrqPinsInit() {
 
-    gpio = DriverInterface<DriverGPIO>::Create(static_cast<GPIOInstances >(BoardDefinitions::BATTERY_CHARGER_GPIO),
+    gpio = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::BATTERY_CHARGER_GPIO),
                                                DriverGPIOParams{});
 
     gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,

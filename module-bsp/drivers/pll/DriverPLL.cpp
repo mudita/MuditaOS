@@ -10,6 +10,7 @@
 
 
 #include "DriverPLL.hpp"
+#include "critical.hpp"
 
 #if defined(TARGET_RT1051)
 #include "board/rt1051/drivers/RT1051DriverPLL.hpp"
@@ -22,15 +23,30 @@
 
 namespace drivers {
 
-    std::shared_ptr<DriverPLL> DriverPLL::Create(const drivers::PLLInstances inst,
+    std::weak_ptr<DriverPLL> DriverPLL::singleton[magic_enum::enum_count<PLLInstances>()];
+
+    std::shared_ptr<DriverPLL> DriverPLL::Create(const drivers::PLLInstances instance,
                                                  const drivers::DriverPLLParams &params) {
         {
+
+            cpp_freertos::CriticalSection::Enter();
+            std::shared_ptr<DriverPLL> inst = singleton[magic_enum::enum_integer(instance)].lock();
+
+            if (!inst) {
 #if defined(TARGET_RT1051)
-            return  std::make_shared<RT1051DriverPLL>(inst,params);
+                inst = std::make_shared<RT1051DriverPLL>(instance,params);
 #elif defined(TARGET_Linux)
-            #else
+                #else
 #error "Unsupported target"
 #endif
+
+                singleton[magic_enum::enum_integer(instance)] = inst;
+            }
+
+            cpp_freertos::CriticalSection::Exit();
+
+            return inst;
+
         }
     }
 

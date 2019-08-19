@@ -130,13 +130,13 @@ namespace bsp {
 
     void RT1051CellularAudio::Init() {
 
-        pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions::AUDIO_PLL),
+        pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions::AUDIO_PLL),
                                                  DriverPLLParams{});
 
-        dmamux = DriverInterface<DriverDMAMux>::Create(
+        dmamux = DriverDMAMux::Create(
                 static_cast<DMAMuxInstances >(BoardDefinitions::CELLULAR_AUDIO_DMAMUX), DriverDMAMuxParams{});
 
-        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions::CELLULAR_AUDIO_DMA),
+        dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions::CELLULAR_AUDIO_DMA),
                                                  DriverDMAParams{});
 
 

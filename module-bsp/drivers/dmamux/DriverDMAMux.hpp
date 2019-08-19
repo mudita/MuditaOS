@@ -12,8 +12,8 @@
 #ifndef PUREPHONE_DRIVERDMAMUX_HPP
 #define PUREPHONE_DRIVERDMAMUX_HPP
 
-
-#include "../DriverInterface.hpp"
+#include <memory>
+#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -26,7 +26,7 @@ namespace drivers {
 
     };
 
-    class DriverDMAMux : public DriverInterface<DriverDMAMux> {
+    class DriverDMAMux {
     public:
 
         static std::shared_ptr<DriverDMAMux> Create(const DMAMuxInstances inst, const DriverDMAMuxParams &params);
@@ -40,6 +40,9 @@ namespace drivers {
 
     protected:
         const DriverDMAMuxParams parameters;
+
+    private:
+        static std::weak_ptr<DriverDMAMux> singleton[magic_enum::enum_count<DMAMuxInstances>()];
 
     };
 

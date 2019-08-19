@@ -12,11 +12,12 @@
 #ifndef PUREPHONE_DRIVERSAI_HPP
 #define PUREPHONE_DRIVERSAI_HPP
 
-#include "../DriverInterface.hpp"
+#include <memory>
+#include <functional>
 #include "drivers/dma/DriverDMA.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/pll/DriverPLL.hpp"
-#include <functional>
+
 
 namespace drivers {
 
@@ -70,7 +71,7 @@ namespace drivers {
 
     };
 
-    class DriverSAI : public DriverInterface<DriverSAI> {
+    class DriverSAI {
     public:
 
         static std::shared_ptr<DriverSAI> Create(const SAIInstances inst, const DriverSAIParams &params);

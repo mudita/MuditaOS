@@ -12,7 +12,8 @@
 #ifndef PUREPHONE_DRIVERI2C_HPP
 #define PUREPHONE_DRIVERI2C_HPP
 
-#include "../DriverInterface.hpp"
+#include <memory>
+#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -34,7 +35,7 @@ namespace drivers {
     };
 
 
-    class DriverI2C : public DriverInterface<DriverI2C> {
+    class DriverI2C {
     public:
 
         static std::shared_ptr<DriverI2C> Create(const I2CInstances inst, const DriverI2CParams &params);
@@ -52,6 +53,9 @@ namespace drivers {
     protected:
         I2CInstances instance;
         const DriverI2CParams parameters;
+
+    private:
+        static std::weak_ptr<DriverI2C> singleton[magic_enum::enum_count<I2CInstances>()];
 
     };
 

@@ -162,9 +162,9 @@ namespace bsp {
 
     void RT1051Audiocodec::Init() {
 
-        pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
-        dmamux = DriverInterface<DriverDMAMux>::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::AUDIOCODEC_DMAMUX),DriverDMAMuxParams{});
-        dma = DriverInterface<DriverDMA>::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
+        pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
+        dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::AUDIOCODEC_DMAMUX),DriverDMAMuxParams{});
+        dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
 
 
         // Enable MCLK clock
