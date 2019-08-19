@@ -128,6 +128,7 @@ public:
 	 * @return Number of pixels in width occupied by selected part of the text.
 	 */
 	uint32_t getPixelWidth( const UTF8& str, const uint32_t start, const uint32_t count );
+	uint32_t getCharPixelWidth( uint32_t charCode );
 };
 
 class FontManager {

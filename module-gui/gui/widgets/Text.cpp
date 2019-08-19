@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <iterator>
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "../core/Font.hpp"
@@ -32,6 +33,9 @@ Text::Text() :
 	setPenFocusWidth( 3 );
 	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
 	font = FontManager::getInstance().getFont(fontID);
+
+	//insert first empty text line
+	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
 }
 
 Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h,
@@ -45,9 +49,12 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
 	font = FontManager::getInstance().getFont(fontID);
 
+	//insert first empty text line
+	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
 }
 
 Text::~Text() {
+	clear();
 }
 
 void Text::setEditMode( EditMode mode ) {
@@ -59,11 +66,18 @@ void Text::setCursorWidth( uint32_t w ) {
 }
 
 void Text::setText( const UTF8& text ) {
+	clear();
 	splitTextToLines(text);
 }
 void Text::clear(){
-
+	//if there are text lines erase them.
+	if( !textLines.empty() ) {
+		while( !textLines.empty() )
+			delete textLines.front();
+			textLines.pop_front();
+	}
 }
+
 UTF8 Text::getText() {
 	return "";
 }
@@ -81,13 +95,6 @@ void Text::setFont( const UTF8& fontName) {
 }
 
 void Text::splitTextToLines( const UTF8& text) {
-
-	//if there are text lines erase them.
-	if( !textLines.empty() ) {
-		while( !textLines.empty() )
-			delete textLines.front();
-			textLines.pop_front();
-	}
 
 	if( text.length() == 0 )
 		return;
@@ -182,6 +189,11 @@ void Text::splitTextToLines( const UTF8& text) {
 //		LOG_INFO("Text Input Line: [%s]", tl->text.c_str());
 }
 
+void Text::reworkLines( TextLine* textLine ) {
+
+}
+
+
 std::list<DrawCommand*> Text::buildDrawList() {
 	return Item::buildDrawList();
 }
@@ -191,6 +203,144 @@ void Text::setPosition( const short& x, const short& y ) {
 
 void Text::setSize( const short& w, const short& h ) {
 
+}
+
+bool Text::onInput( const InputEvent& inputEvent ) {
+
+	//process only short release events
+	if( inputEvent.state != InputEvent::State::keyReleasedShort ) {
+		return false;
+	}
+
+	//if char is a new line char then create new line and move caret and return
+	if( inputEvent.keyChar == 0x0A) {
+		if( textType == TextType::MULTI_LINE )
+			return handleEnter();
+	}
+	//backspace handling
+	else if( inputEvent.keyChar  == 0x08 ) {
+		handleBackspace();
+	}
+	else { //normal char -> add and check pixel width
+		handleChar( inputEvent );
+	}
+
+	return false;
+}
+
+bool Text::onActivated( void* data ) {
+	return false;
+}
+
+bool Text::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
+	return false;
+}
+
+bool Text::moveCursor( const MoveDirection& direction ) {
+
+	//if cursor is standing on the first line return false to allow focus change to previous widget
+	if( firstLine == textLines.begin()) {
+
+		//TODO add check for bariers preventing navigation to other widgets.
+
+		return false;
+	}
+
+	if( direction == MoveDirection::MOVE_LEFT ) {
+
+	}
+	else if( direction == MoveDirection::MOVE_RIGHT ) {
+
+	}
+	else if( direction == MoveDirection::MOVE_DOWN ) {
+
+	}
+	else if( direction == MoveDirection::MOVE_UP ) {
+		--firstLine;
+	}
+
+
+	return false;
+}
+
+bool Text::handleBrowsing( const InputEvent& inputEvent ) {
+	switch( inputEvent.keyCode )
+	{
+		case (KeyCode::KEY_UP):
+		{
+			return moveCursor( MoveDirection::MOVE_UP );
+		} break;
+		case KeyCode::KEY_DOWN:
+		{
+			return moveCursor( MoveDirection::MOVE_DOWN );
+		} break;
+		default:
+		{
+			LOG_ERROR("Received unknown navigation key");
+		}
+	};
+	return false;
+}
+
+bool Text::handleNavigation( const InputEvent& inputEvent ) {
+	switch( inputEvent.keyCode )
+	{
+		case (KeyCode::KEY_UP):
+		{
+			return moveCursor( MoveDirection::MOVE_UP );
+		} break;
+		case KeyCode::KEY_DOWN:
+		{
+			return moveCursor( MoveDirection::MOVE_DOWN );
+		} break;
+		case KeyCode::KEY_LEFT:
+		{
+			return moveCursor( MoveDirection::MOVE_LEFT );
+		} break;
+		case KeyCode::KEY_RIGHT:
+		{
+			return moveCursor( MoveDirection::MOVE_RIGHT );
+		} break;
+		default:
+		{
+			LOG_ERROR("Received unknown navigation key");
+		}
+	};
+	return false;
+}
+
+bool Text::handleEnter() {
+	return true;
+}
+
+bool Text::handleBackspace() {
+	return true;
+}
+
+bool Text::handleChar( const InputEvent& inputEvent ) {
+
+	//get text line where cursor is standing
+	TextLine* currentTextLine = getCursorTextLine();
+
+	//calculate width of the character that is going to be inserted
+	font->getCharPixelWidth( inputEvent.keyChar );
+
+	//insert character into string in currently selected line
+//	currentTextLine->text.
+	//if sum of the old string and width of the new character are greater than available space run lines rework procedure
+
+	//if number of text lines have increased, text widget is multi-line and expandable change widgets space
+
+	//calculate new position of the cursor
+
+	return true;
+}
+
+Text::TextLine* Text::getCursorTextLine() {
+	auto it = firstLine;
+	//TODO add check for distance to advance
+	std::advance(it, cursorRow );
+	return *it;
 }
 
 } /* namespace gui */

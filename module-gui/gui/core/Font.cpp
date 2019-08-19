@@ -300,6 +300,15 @@ uint32_t Font::getPixelWidth( const UTF8& str, const uint32_t start, const uint3
 	return stringPixelWidth;
 }
 
+uint32_t Font::getCharPixelWidth( uint32_t charCode ) {
+	FontGlyph* glyph = glyphs.find(charCode)->second;
+
+	if( glyph != NULL)
+		return  glyph->xadvance ;
+
+	return 0;
+}
+
 FontManager::FontManager() {
 }
 
