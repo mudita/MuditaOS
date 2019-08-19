@@ -24,7 +24,7 @@ namespace drivers {
         ~RT1051DriverGPIO();
 
         // Configures specific pin
-        int32_t ConfPin(const DriverGPIOPinParams& params);
+        int32_t ConfPin(const DriverGPIOPinParams &params);
 
         // Sets the output level of the multiple GPIO pins to the logic 1.
         void SetPort(const uint32_t mask) override final;
@@ -40,6 +40,12 @@ namespace drivers {
 
         // Reads the current input value of the GPIO port.
         uint8_t ReadPin(const uint32_t pin) override final;
+
+        void EnableInterrupt(const uint32_t mask) override final;
+
+        void DisableInterrupt(const uint32_t mask) override final;
+
+        void ClearPortInterrupts(const uint32_t mask) override final;
 
     private:
         GPIOInstances instance;
