@@ -714,7 +714,7 @@ uint32_t UTF8::decode( const char* utf8_char, uint32_t& length  ) const
 {
     uint32_t ret = 0;
     uint32_t len = 0;
-    //check if provided char is standars US-ASCII character. 0xxxxxxx
+    //check if provided char is standards US-ASCII character. 0xxxxxxx
     if( ( (*utf8_char) & UTF8_HEADER_1_MASK ) == 0 )
     {
         ret = *utf8_char;

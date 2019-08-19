@@ -10,6 +10,7 @@
 #define MODULE_GUI_GUI_WIDGETS_TEXT_HPP_
 
 #include <list>
+#include <vector>
 
 #include "utf8/UTF8.hpp"
 
@@ -78,7 +79,7 @@ protected:
 	//holds list of all lines that  text was divided to.
 	std::list<TextLine*> textLines;
 	//holds list of labels for displaying currently visible text lines.
-	std::list<gui::Label*> labelLines;
+	std::vector<gui::Label*> labelLines;
 	//pointer to the first visible line of text
 	std::list<TextLine*>::iterator firstLine = textLines.end();
 	//pointer to the last visible line.
@@ -86,7 +87,7 @@ protected:
 	//row where cursor is located ( 0 - first row from top )
 	uint32_t cursorRow = 0;
 	// column where cursor is located( 0 - position before first character in the line )
-	uint32_t cursotColumn = 0;
+	uint32_t cursorColumn = 0;
 
 
 
@@ -101,7 +102,10 @@ protected:
 	Font* font;
 	//index of the first visible row of the text
 	uint32_t firstRow = 0;
-	//internal copy of the text that is displayed
+	//number of visible rows
+
+	//margins for text
+	Margins margins;
 
 	void splitTextToLines( const UTF8& text);
 	/**
@@ -109,7 +113,7 @@ protected:
 	 * Function stops on the last line or it there is a lines break ( enter ) or if last concatenated line doesn;t change after update.
 	 */
 
-	void reworkLines( TextLine* textLine );
+	void reworkLines( std::list<TextLine*>::iterator it );
 	/**
 	 * Moves cursor in specified direction
 	 */
@@ -139,6 +143,15 @@ protected:
 	 * Returns text line where cursor is located
 	 */
 	TextLine* getCursorTextLine();
+	/**
+	 * Returns horizontal pixel space available for text.
+	 */
+	uint32_t getAvailableHPixelSpace() {
+		int32_t space = widgetArea.w - margins.left - margins.right;
+		return (space < 0 )?0:space;
+	}
+
+	void recalculateDrawParams();
 
 public:
 	Text();
@@ -152,6 +165,7 @@ public:
 	virtual void clear();
 	virtual UTF8 getText();
 	void setFont( const UTF8& fontName );
+	virtual void setMargins( const Margins& margins );
 
 	//virtual methods from Item
 	std::list<DrawCommand*> buildDrawList() override;

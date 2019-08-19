@@ -48,14 +48,17 @@ void NotesEditWindow::buildInterface() {
 	title->setBorderColor( gui::ColorNoColor );
 	title->setFont("gt_pressura_bold_24");
 	title->setText("New Note");
-	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	text = new gui::Text( this, 11, 150, 480-22, 400 );
 	text->setFont("gt_pressura_bold_24");
+	text->setRadius(5);
+	text->setMargins( gui::Margins(10, 10, 10, 10));
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
 }
+
 void NotesEditWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 	children.clear();
@@ -66,6 +69,7 @@ NotesEditWindow::~NotesEditWindow() {
 }
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+	setFocusItem( text );
 	LOG_INFO("SETTING TEXT");
 	text->setText("Very long test line ABCDEFGHIJKLMNOPQRST123456789\nabcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345");
 }

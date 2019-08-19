@@ -300,6 +300,10 @@ uint32_t Font::getPixelWidth( const UTF8& str, const uint32_t start, const uint3
 	return stringPixelWidth;
 }
 
+uint32_t Font::getPixelWidth( const UTF8& str ) {
+	return getPixelWidth( str, 0, str.length() );
+}
+
 uint32_t Font::getCharPixelWidth( uint32_t charCode ) {
 	FontGlyph* glyph = glyphs.find(charCode)->second;
 
