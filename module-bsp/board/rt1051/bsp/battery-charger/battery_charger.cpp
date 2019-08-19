@@ -11,14 +11,14 @@ extern "C" {
 #include "queue.h"
 }
 
-#include "fsl_gpio.h"
-#include "board.h"
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "vfs.hpp"
 
+#include "menums/magic_enum.hpp"
+
 #include "bsp/BoardDefinitions.hpp"
-#include "drivers/DriverInterface.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
+#include "drivers/gpio/DriverGPIO.hpp"
 
 #define BSP_BATTERY_CHARGER_I2C_ADDR                        (0xD2 >> 1)
 #define BSP_FUEL_GAUGE_I2C_ADDR                             (0x6C >> 1)
@@ -47,8 +47,10 @@ static const uint16_t battery_maxVoltagemV = 4200;
 static const uint16_t battery_minVoltagemV = 3700;
 
 using namespace drivers;
+using namespace magic_enum;
 
 static std::shared_ptr<drivers::DriverI2C> i2c;
+static std::shared_ptr<drivers::DriverGPIO> gpio;
 
 static bsp::batteryRetval battery_loadConfiguration(void);
 
@@ -128,13 +130,14 @@ namespace bsp {
     void battery_Deinit(void) {
         battery_storeConfiguration();
 
-        GPIO_PortDisableInterrupts(BOARD_BATTERY_CHARGER_INOKB_GPIO, 1U << BOARD_BATTERY_CHARGER_INOKB_PIN);
-        GPIO_PortDisableInterrupts(BOARD_BATTERY_CHARGER_WCINOKB_GPIO, 1U << BOARD_BATTERY_CHARGER_WCINOKB_PIN);
-        GPIO_PortDisableInterrupts(BOARD_BATTERY_CHARGER_INTB_GPIO, 1U << BOARD_BATTERY_CHARGER_INTB_PIN);
+        gpio->DisableInterrupt(1 << enum_integer(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
+        gpio->DisableInterrupt(1 << enum_integer(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
+        gpio->DisableInterrupt(1 << enum_integer(BoardDefinitions::BATTERY_CHARGER_WCINOKB));
 
         qHandleIrq = NULL;
 
         i2c.reset();
+        gpio.reset();
     }
 
 
@@ -448,25 +451,29 @@ BaseType_t BSP_BatteryChargerINTB_IRQHandler() {
 }
 
 static void s_BSP_BatteryChargerIrqPinsInit() {
-    gpio_pin_config_t pinConfig;
 
-    pinConfig.direction = kGPIO_DigitalInput;
-    pinConfig.interruptMode = kGPIO_IntRisingOrFallingEdge;
-    pinConfig.outputLogic = 0;
+    gpio = DriverInterface<DriverGPIO>::Create(static_cast<GPIOInstances >(BoardDefinitions::BATTERY_CHARGER_GPIO),
+                                               DriverGPIOParams{});
 
-    GPIO_PinInit(BOARD_BATTERY_CHARGER_INOKB_GPIO, BOARD_BATTERY_CHARGER_INOKB_PIN, &pinConfig);
-    GPIO_PinInit(BOARD_BATTERY_CHARGER_WCINOKB_GPIO, BOARD_BATTERY_CHARGER_WCINOKB_PIN, &pinConfig);
+    gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
+            .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+            .defLogic = 0,
+            .pin = enum_integer(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN)});
 
-    pinConfig.direction = kGPIO_DigitalInput;
-    pinConfig.interruptMode = kGPIO_IntFallingEdge;
-    pinConfig.outputLogic = 0;
+    gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
+            .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+            .defLogic = 0,
+            .pin = enum_integer(BoardDefinitions::BATTERY_CHARGER_WCINOKB)});
 
-    GPIO_PinInit(BOARD_BATTERY_CHARGER_INTB_GPIO, BOARD_BATTERY_CHARGER_INTB_PIN, &pinConfig);
 
-    GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_INOKB_GPIO, 1U << BOARD_BATTERY_CHARGER_INOKB_PIN);
-    GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_WCINOKB_GPIO, 1U << BOARD_BATTERY_CHARGER_WCINOKB_PIN);
-    GPIO_PortEnableInterrupts(BOARD_BATTERY_CHARGER_INTB_GPIO, 1U << BOARD_BATTERY_CHARGER_INTB_PIN);
+    gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
+            .irqMode=DriverGPIOPinParams::InterruptMode::IntFallingEdge,
+            .defLogic = 0,
+            .pin = enum_integer(BoardDefinitions::BATTERY_CHARGER_INTB_PIN)});
 
+    gpio->EnableInterrupt(1<< enum_integer(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
+    gpio->EnableInterrupt(1<< enum_integer(BoardDefinitions::BATTERY_CHARGER_WCINOKB));
+    gpio->EnableInterrupt(1<< enum_integer(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
 }
 
 

@@ -24,7 +24,6 @@
 
 #include "bsp/BoardDefinitions.hpp"
 #include "menums/magic_enum.hpp"
-#include "drivers/DriverInterface.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 

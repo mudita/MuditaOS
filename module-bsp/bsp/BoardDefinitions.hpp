@@ -40,6 +40,10 @@ enum class BoardDefinitions{
 
     BATTERY_CHARGER_I2C_BAUDRATE = AUDIOCODEC_I2C_BAUDRATE,
     BATTERY_CHARGER_I2C = AUDIOCODEC_I2C,
+    BATTERY_CHARGER_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
+    BATTERY_CHARGER_INOKB_PIN = 12,
+    BATTERY_CHARGER_WCINOKB = 13,
+    BATTERY_CHARGER_INTB_PIN = 14,
 
     CELLULAR_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     CELLULAR_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
