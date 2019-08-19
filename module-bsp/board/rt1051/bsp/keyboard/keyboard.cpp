@@ -1,11 +1,11 @@
- /*
- *  @file bsp_keyboard.c
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 25 oct 2018
- *  @brief Keyboard BSP implementation
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
+/*
+*  @file bsp_keyboard.c
+*  @author Mateusz Piesta (mateusz.piesta@mudita.com)
+*  @date 25 oct 2018
+*  @brief Keyboard BSP implementation
+*  @copyright Copyright (C) 2018 mudita.com
+*  @details
+*/
 
 #include <stdio.h>
 #include <stdint.h>
@@ -23,16 +23,20 @@
 #include "bsp/keyboard/key_codes.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
-
+#include "menums/magic_enum.hpp"
 #include "drivers/DriverInterface.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
+#include "drivers/gpio/DriverGPIO.hpp"
 
 namespace bsp {
 
     using namespace drivers;
+    using namespace magic_enum;
 
     static std::shared_ptr<drivers::DriverI2C> i2c;
-    static drivers::I2CAddress i2cAddr = {.deviceAddress=TCA8418_I2C_ADDRESS,.subAddressSize=TCA8418_I2C_ADDRESS_SIZE};
+    static drivers::I2CAddress i2cAddr = {.deviceAddress=TCA8418_I2C_ADDRESS, .subAddressSize=TCA8418_I2C_ADDRESS_SIZE};
+    static std::shared_ptr<DriverGPIO> gpio;
+
 
 #define KEYBOARD_CONTACT_OSCILLATION_TIMEOUT_MS    20
 
@@ -43,32 +47,38 @@ namespace bsp {
 
     static xQueueHandle qHandleIrq = NULL;
 
-    status_t keyboard_Init(xQueueHandle qHandle){
+    status_t keyboard_Init(xQueueHandle qHandle) {
 
         i2c = DriverInterface<DriverI2C>::Create(static_cast<I2CInstances >(BoardDefinitions::KEYBOARD_I2C),
                                                  DriverI2CParams{.baudrate=static_cast<uint32_t >(BoardDefinitions::KEYBOARD_I2C_BAUDRATE)});
 
-    	qHandleIrq = qHandle;
-        /* Define the init structure for the input RF key pin*/
-        gpio_pin_config_t right_functional_pin_config = {kGPIO_DigitalInput, 0, kGPIO_IntRisingOrFallingEdge};
-        /* Init input KEYBOARD IRQ. */
-        GPIO_PinInit(BOARD_KEYBOARD_RF_BUTTON_PORT, BOARD_KEYBOARD_RF_BUTTON_PIN, &right_functional_pin_config);
-        /* Define the init structure for the output RST pin*/
-        gpio_pin_config_t rstpin_config = {kGPIO_DigitalOutput, 0, kGPIO_NoIntmode};
-        /* Init output CS GPIO. */
-        GPIO_PinInit(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, &rstpin_config);
-        /* Define the init structure for the input IRQ pin*/
-        gpio_pin_config_t irqpin_config = {kGPIO_DigitalInput, 0, kGPIO_IntFallingEdge};
-        /* Init input KEYBOARD IRQ. */
-        GPIO_PinInit(BOARD_KEYBOARD_IRQ_GPIO, BOARD_KEYBOARD_IRQ_GPIO_PIN, &irqpin_config);
+        gpio = DriverInterface<DriverGPIO>::Create(static_cast<GPIOInstances >(BoardDefinitions::KEYBOARD_GPIO),
+                                                   DriverGPIOParams{});
+
+        qHandleIrq = qHandle;
+
+        gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
+                .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+                .defLogic = 0,
+                .pin = enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON)});
+
+        gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
+                .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
+                .defLogic = 0,
+                .pin = enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN)});
+
+        gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
+                .irqMode=DriverGPIOPinParams::InterruptMode::IntFallingEdge,
+                .defLogic = 0,
+                .pin = enum_integer(BoardDefinitions::KEYBOARD_IRQ_PIN)});
 
 
 
 
         // Reset keyboard controller
-        GPIO_PinWrite(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, 0);
+        gpio->WritePin(enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN),0);
         vTaskDelay(100);
-        GPIO_PinWrite(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, 1);
+        gpio->WritePin(enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN),1);
         vTaskDelay(100);
 
         uint32_t reg = 0;
@@ -160,67 +170,67 @@ namespace bsp {
         i2c->Write(i2cAddr, (uint8_t *) &reg, 1);
 
         // Keep keyboard controller in reset state
-        GPIO_PinWrite(BOARD_KEYBOARD_RESET_GPIO, BOARD_KEYBOARD_RESET_GPIO_PIN, 0);
+        gpio->WritePin(enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN),0);
 
         //Clear IRQ queue handle
         qHandleIrq = NULL;
 
         i2c.reset();
         i2cAddr = {};
+        gpio.reset();
 
         return kStatus_Success;
     }
 
 
-    void keyboard_get_data(const uint8_t& notification, uint8_t& event, uint8_t& code)
-    {
-    	if (notification & 0x01) {
-			uint8_t retval = 0;
-			// Read how many key events has been registered
+    void keyboard_get_data(const uint8_t &notification, uint8_t &event, uint8_t &code) {
+        if (notification & 0x01) {
+            uint8_t retval = 0;
+            // Read how many key events has been registered
             i2cAddr.subAddress = REG_KEY_LCK_EC;
             i2c->Read(i2cAddr, (uint8_t *) &retval, 1);
 
-			uint8_t events_count = retval & 0xF;
-			uint8_t i = 0;
-			// Iterate over and parse each event
-			for (i = 0; i < events_count; i++) {
-				uint8_t key = 0;
-				uint8_t rel_pres = 0;
+            uint8_t events_count = retval & 0xF;
+            uint8_t i = 0;
+            // Iterate over and parse each event
+            for (i = 0; i < events_count; i++) {
+                uint8_t key = 0;
+                uint8_t rel_pres = 0;
 
                 i2cAddr.subAddress = REG_KEY_EVENT_A;
                 i2c->Read(i2cAddr, (uint8_t *) &retval, 1);
 
-				key = retval & 0x7F;
-				// rel_pres: 0 - key release, 1 - key press
-				rel_pres = (retval & 0x80) >> 7; // key release/pressed is stored on the last bit
+                key = retval & 0x7F;
+                // rel_pres: 0 - key release, 1 - key press
+                rel_pres = (retval & 0x80) >> 7; // key release/pressed is stored on the last bit
 
-				if (rel_pres == 0) {
-				} else {
-				}
-				code = key;
-				event = rel_pres;
-			}
+                if (rel_pres == 0) {
+                } else {
+                }
+                code = key;
+                event = rel_pres;
+            }
 
-			//Clear all interrupts
-			uint8_t reg = 0xff;
+            //Clear all interrupts
+            uint8_t reg = 0xff;
 
             i2cAddr.subAddress = REG_INT_STAT;
             i2c->Write(i2cAddr, (uint8_t *) &reg, 1);
 
-		}
+        }
 
-		if (notification & 0x02) {
+        if (notification & 0x02) {
 
-			code = static_cast<uint8_t>(bsp::KeyCodes::FnRight);
-			event = static_cast<uint8_t>(KeyEvents::Pressed);
-		}
+            code = static_cast<uint8_t>(bsp::KeyCodes::FnRight);
+            event = static_cast<uint8_t>(KeyEvents::Pressed);
+        }
 
-		if (notification & 0x04) {
+        if (notification & 0x04) {
 
-			code = static_cast<uint8_t>(KeyCodes::FnRight);
-			event = static_cast<uint8_t>(KeyEvents::Released);
-		}
-	}
+            code = static_cast<uint8_t>(KeyCodes::FnRight);
+            event = static_cast<uint8_t>(KeyEvents::Released);
+        }
+    }
 
     BaseType_t keyboard_right_functional_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
@@ -244,9 +254,9 @@ namespace bsp {
 
     BaseType_t keyboard_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if(qHandleIrq != NULL){
-        	uint8_t val = 0x01;
-        	xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
+        if (qHandleIrq != NULL) {
+            uint8_t val = 0x01;
+            xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
         }
         return xHigherPriorityTaskWoken;
     }
@@ -261,15 +271,15 @@ namespace bsp {
         if (right_functional_current_state == s_rigth_functional_last_state) {
             if (right_functional_current_state == 0) {
                 // RIGHT FUNCTIONAL PRESSED
-            	if(qHandleIrq != NULL){
-					uint8_t val = 0x02;
-					xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
+                if (qHandleIrq != NULL) {
+                    uint8_t val = 0x02;
+                    xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
                 }
             } else {
-            	// RIGHT FUNCTIONAL RELEASED
-            	if(qHandleIrq != NULL){
-					uint8_t val = 0x04;
-					xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken );
+                // RIGHT FUNCTIONAL RELEASED
+                if (qHandleIrq != NULL) {
+                    uint8_t val = 0x04;
+                    xQueueSendFromISR(qHandleIrq, &val, &xHigherPriorityTaskWoken);
                 }
             }
         }

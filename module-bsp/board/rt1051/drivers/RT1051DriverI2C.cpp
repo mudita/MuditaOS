@@ -29,7 +29,6 @@ namespace drivers {
                 base = LPI2C2;
                 break;
         }
-        //auto ret = magic_enum::enum_name(instance);
         LOG_DEBUG("Init: %s",std::string(magic_enum::enum_name(instance)).c_str());
         LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
         LPI2C_MasterInit(base, &lpi2cConfig, ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U)));
