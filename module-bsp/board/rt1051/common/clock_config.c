@@ -537,63 +537,65 @@ void BOARD_BootClockRUN(void)
     /* Set Oscillator ready counter value. */
     CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(127);
     /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
-    CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 1); /* Set PERIPH_CLK2 MUX to OSC */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     /* Set PERIPH_CLK MUX to PERIPH_CLK2 */
+    /* OSC_CLK (24M) */
+    CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+    /* PERIPH_CLK2_SEL */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
     /* Setting the VDD_SOC to 1.275V. It is necessary to config AHB to 600Mhz. */
     DCDC->REG3 = (DCDC->REG3 & (~DCDC_REG3_TRG_MASK)) | DCDC_REG3_TRG(0x13);
     /* Waiting for DCDC_STS_DC_OK bit is asserted */
     while (DCDC_REG0_STS_DC_OK_MASK != (DCDC_REG0_STS_DC_OK_MASK & DCDC->REG0))
     {
     }
+
     /* Set AHB_PODF. */
-    CLOCK_SetDiv(kCLOCK_AhbDiv, 0);
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 0);	//CBCDR
+
     /* Disable IPG clock gate. */
     CLOCK_DisableClock(kCLOCK_Adc1);
     CLOCK_DisableClock(kCLOCK_Adc2);
     CLOCK_DisableClock(kCLOCK_Xbar1);
     CLOCK_DisableClock(kCLOCK_Xbar2);
     CLOCK_DisableClock(kCLOCK_Xbar3);
+
     /* Set IPG_PODF. */
-    CLOCK_SetDiv(kCLOCK_IpgDiv, 3);
+    /* AHB_CLK/4 */
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 3);	//CBCDR
+
     /* Set ARM_PODF. */
-    CLOCK_SetDiv(kCLOCK_ArmDiv, 1);
+    /* PLL1/2 (864MHz / 2 = 432 MHz) */
+    CLOCK_SetDiv(kCLOCK_ArmDiv, 1);	//CACRR
+
     /* Disable PERCLK clock gate. */
     CLOCK_DisableClock(kCLOCK_Gpt1);
     CLOCK_DisableClock(kCLOCK_Gpt1S);
     CLOCK_DisableClock(kCLOCK_Gpt2);
     CLOCK_DisableClock(kCLOCK_Gpt2S);
     CLOCK_DisableClock(kCLOCK_Pit);
+
     /* Set PERCLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1);
+    /* IPG_CLK_ROOT/2 */
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1);	//CSCMR1
     /* Set per clock source. */
-    CLOCK_SetMux(kCLOCK_PerclkMux, 0);
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0);	//CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
+
     /* Disable USDHC1 clock gate. */
     CLOCK_DisableClock(kCLOCK_Usdhc1);
     /* Set USDHC1_PODF. */
-    CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1);
+    CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1);	//CSCDR1
     /* Set Usdhc1 clock source. */
-    CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0);
+    /* PLL2_PFD2/2 = 396MHz/2 = 198MHz */
+    CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0);	//CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
+
     /* Disable USDHC2 clock gate. */
     //CLOCK_DisableClock(kCLOCK_Usdhc2);
     CLOCK_EnableClock(kCLOCK_Usdhc2);
     /* Set USDHC2_PODF. */
-    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2);
+    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2);	//CSCDR1
     /* Set Usdhc2 clock source. */
-    CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0);
-/* In SDK projects, SDRAM (configured by SEMC) will be initialized in either debug script or dcd.
- * With this macro SKIP_SYSCLK_INIT, system pll (selected to be SEMC source clock in SDK projects) will be left
- * unchanged.
- * Note: If another clock source is selected for SEMC, user may want to avoid changing that clock as well.*/
-#ifndef SKIP_SYSCLK_INIT
-    /* Disable Semc clock gate. */
-    CLOCK_DisableClock(kCLOCK_Semc);
-    /* Set SEMC_PODF. */
-    CLOCK_SetDiv(kCLOCK_SemcDiv, 7);
-    /* Set Semc alt clock source. */
-    CLOCK_SetMux(kCLOCK_SemcAltMux, 0);
-    /* Set Semc clock source. */
-    CLOCK_SetMux(kCLOCK_SemcMux, 0);
-#endif
+    /* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
+    CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0);	//CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
+
 /* In SDK projects, external flash (configured by FLEXSPI) will be initialized by dcd.
  * With this macro XIP_EXTERNAL_FLASH, usb1 pll (selected to be FLEXSPI clock source in SDK projects) will be left
  * unchanged.
@@ -602,16 +604,18 @@ void BOARD_BootClockRUN(void)
     /* Disable Flexspi clock gate. */
     CLOCK_DisableClock(kCLOCK_FlexSpi);
     /* Set FLEXSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0);
+    CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0);	//CSCMR1
     /* Set Flexspi clock source. */
-    CLOCK_SetMux(kCLOCK_FlexspiMux, 3);
+    CLOCK_SetMux(kCLOCK_FlexspiMux, 3);	//CSCMR1  (30-29) 0 - semc_clk_reet_pre, 1 - pll3_sw_clk, 2 - PLL2_PFD2, 3 - PLL3_PFD0
 #endif
+
     /* Disable CSI clock gate. */
     CLOCK_DisableClock(kCLOCK_Csi);
     /* Set CSI_PODF. */
-    CLOCK_SetDiv(kCLOCK_CsiDiv, 1);
+    CLOCK_SetDiv(kCLOCK_CsiDiv, 1);	//CSCDR3
     /* Set Csi clock source. */
-    CLOCK_SetMux(kCLOCK_CsiMux, 0);
+    CLOCK_SetMux(kCLOCK_CsiMux, 0);	//CSCDR3  (10-9) 0 - osc_clk, 1 - PLL2_PFD2, 2 - pll3_120M, 3 - PLL3_PFD1
+
     /* Disable LPSPI clock gate. */
     //CLOCK_DisableClock(kCLOCK_Lpspi1);
     CLOCK_EnableClock(kCLOCK_Lpspi1);
@@ -619,59 +623,68 @@ void BOARD_BootClockRUN(void)
     CLOCK_DisableClock(kCLOCK_Lpspi3);
     CLOCK_DisableClock(kCLOCK_Lpspi4);
     /* Set LPSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_LpspiDiv, 7);
+    CLOCK_SetDiv(kCLOCK_LpspiDiv, 7);	//CBCMR
     /* Set Lpspi clock source. */
-    CLOCK_SetMux(kCLOCK_LpspiMux, 3);
+    /* PLL2_PFD2/8 = 396MHz / 8 = 49,5MHz */
+    CLOCK_SetMux(kCLOCK_LpspiMux, 3);	//CBCMR  (5-4) 0 - PLL3_PFD1, 1 - PLL3_PFD0, 2 - PLL2, 3 - PLL2_PFD2
+
     /* Disable TRACE clock gate. */
     CLOCK_DisableClock(kCLOCK_Trace);
     /* Set TRACE_PODF. */
-    CLOCK_SetDiv(kCLOCK_TraceDiv, 2);
+    CLOCK_SetDiv(kCLOCK_TraceDiv, 2);	//CSCDR1
     /* Set Trace clock source. */
-    CLOCK_SetMux(kCLOCK_TraceMux, 2);
+    /* PLL2_PFD0/4 disabled*/
+    CLOCK_SetMux(kCLOCK_TraceMux, 2);	//CBCMR  (15-14) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL2_PFD1
+
+    /* SAI clock disabled - controlled by driver */
     /* Disable SAI1 clock gate. */
-    CLOCK_EnableClock(kCLOCK_Sai1);
+    CLOCK_DisableClock(kCLOCK_Sai1);
     CLOCK_DisableClock(kCLOCK_Sai1);
     /* Set SAI1_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Sai1PreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_Sai1PreDiv, 1);	//CS1CDR
     /* Set SAI1_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Sai1Div, 63);
+    CLOCK_SetDiv(kCLOCK_Sai1Div, 63);	//CS1CDR
     /* Set Sai1 clock source. */
-    CLOCK_SetMux(kCLOCK_Sai1Mux, 2);
+    CLOCK_SetMux(kCLOCK_Sai1Mux, 2);	//CSCMR1  (11-10) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
     /* Disable SAI2 clock gate. */
     //CLOCK_DisableClock(kCLOCK_Sai2);
     CLOCK_EnableClock(kCLOCK_Sai2);
     /* Set SAI2_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Sai2PreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_Sai2PreDiv, 1);	//CS2CDR
     /* Set SAI2_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Sai2Div, 63);
+    CLOCK_SetDiv(kCLOCK_Sai2Div, 63);	//CS2CDR
     /* Set Sai2 clock source. */
-    CLOCK_SetMux(kCLOCK_Sai2Mux, 2);
+    CLOCK_SetMux(kCLOCK_Sai2Mux, 2);	//CSCMR1  (13-12) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
     /* Disable SAI3 clock gate. */
     CLOCK_DisableClock(kCLOCK_Sai3);
     /* Set SAI3_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Sai3PreDiv, 3);
+    CLOCK_SetDiv(kCLOCK_Sai3PreDiv, 3);	//CS1CDR
     /* Set SAI3_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Sai3Div, 1);
+    CLOCK_SetDiv(kCLOCK_Sai3Div, 1);	//CS1CDR
     /* Set Sai3 clock source. */
-    CLOCK_SetMux(kCLOCK_Sai3Mux, 0);
+    CLOCK_SetMux(kCLOCK_Sai3Mux, 0);	//CSCMR1  (15-14) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+
     /* Disable Lpi2c clock gate. */
     CLOCK_DisableClock(kCLOCK_Lpi2c1);
     CLOCK_DisableClock(kCLOCK_Lpi2c2);
     CLOCK_DisableClock(kCLOCK_Lpi2c3);
     /* Set LPI2C_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1);
+    CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1);	//CSCDR2
     /* Set Lpi2c clock source. */
-    CLOCK_SetMux(kCLOCK_Lpi2cMux, 1);
+    /* OSC_CLK (24MHz/2 = 12MHz */
+    CLOCK_SetMux(kCLOCK_Lpi2cMux, 1);	//CSCDR2  (18) 0 - pll3_60m, 1 - osc_clk
+
     /* Disable CAN clock gate. */
     CLOCK_DisableClock(kCLOCK_Can1);
     CLOCK_DisableClock(kCLOCK_Can2);
     CLOCK_DisableClock(kCLOCK_Can1S);
     CLOCK_DisableClock(kCLOCK_Can2S);
     /* Set CAN_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_CanDiv, 1);
+    CLOCK_SetDiv(kCLOCK_CanDiv, 1);		//CSCMR2
     /* Set Can clock source. */
-    CLOCK_SetMux(kCLOCK_CanMux, 2);
+    CLOCK_SetMux(kCLOCK_CanMux, 2);		//CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided clock 80M), 3 - disable
     /* Disable UART clock gate. */
+
     //CLOCK_DisableClock(kCLOCK_Lpuart1);
     CLOCK_EnableClock(kCLOCK_Lpuart1);
     CLOCK_DisableClock(kCLOCK_Lpuart2);
@@ -682,44 +695,56 @@ void BOARD_BootClockRUN(void)
     CLOCK_DisableClock(kCLOCK_Lpuart7);
     CLOCK_DisableClock(kCLOCK_Lpuart8);
     /* Set UART_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_UartDiv, 0);
+    CLOCK_SetDiv(kCLOCK_UartDiv, 0);	//CSCDR1
     /* Set Uart clock source. */
-    CLOCK_SetMux(kCLOCK_UartMux, 1);
+    /* OSC_CLK (24MHz)/1 */
+    CLOCK_SetMux(kCLOCK_UartMux, 1);	//CSCDR1  (6) 0 - pll3_80m, 1 - osc_clk
+
     /* Disable LCDIF clock gate. */
     CLOCK_DisableClock(kCLOCK_LcdPixel);
     /* Set LCDIF_PRED. */
-    CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1);	//CSCDR2
     /* Set LCDIF_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_LcdifDiv, 3);
+    CLOCK_SetDiv(kCLOCK_LcdifDiv, 3);	//CBCMR
     /* Set Lcdif pre clock source. */
-    CLOCK_SetMux(kCLOCK_LcdifPreMux, 5);
+    /* PLL3_PFD1 (664.62MHz/4/2 = 83.08MHz disabled */
+    CLOCK_SetMux(kCLOCK_LcdifPreMux, 5);	//CSCDR2  (17-15) 0 - Pll2, 1 - PLL3_PFD3, 2 - PLL5, 3 - PLL2_PFD0, 4 - PLL2_PFD1, 5 - PLL3_PFD1, 6,7 - reserved
+
     /* Disable SPDIF clock gate. */
     CLOCK_DisableClock(kCLOCK_Spdif);
     /* Set SPDIF0_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Spdif0PreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_Spdif0PreDiv, 1);	//CDCDR
     /* Set SPDIF0_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Spdif0Div, 7);
+    CLOCK_SetDiv(kCLOCK_Spdif0Div, 7);		//CDCDR
     /* Set Spdif clock source. */
-    CLOCK_SetMux(kCLOCK_SpdifMux, 3);
+    /* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
+    CLOCK_SetMux(kCLOCK_SpdifMux, 3);		//CDCDR  (21-20) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+
     /* Disable Flexio1 clock gate. */
     CLOCK_DisableClock(kCLOCK_Flexio1);
     /* Set FLEXIO1_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Flexio1PreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_Flexio1PreDiv, 1);	//CDCDR
     /* Set FLEXIO1_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Flexio1Div, 7);
+    CLOCK_SetDiv(kCLOCK_Flexio1Div, 7);		//CDCDR
     /* Set Flexio1 clock source. */
-    CLOCK_SetMux(kCLOCK_Flexio1Mux, 3);
+    /* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
+    CLOCK_SetMux(kCLOCK_Flexio1Mux, 3);		//CDCDR (8-7) 0 - PLL4, 1 - PlLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+
     /* Disable Flexio2 clock gate. */
     CLOCK_DisableClock(kCLOCK_Flexio2);
     /* Set FLEXIO2_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Flexio2PreDiv, 1);
+    CLOCK_SetDiv(kCLOCK_Flexio2PreDiv, 1);	//CS1CDR
     /* Set FLEXIO2_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Flexio2Div, 7);
+    CLOCK_SetDiv(kCLOCK_Flexio2Div, 7);		//CS1CDR
     /* Set Flexio2 clock source. */
-    CLOCK_SetMux(kCLOCK_Flexio2Mux, 3);
+    /* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
+    CLOCK_SetMux(kCLOCK_Flexio2Mux, 3);		//CSCMR2 (20-19) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+
     /* Set Pll3 sw clock source. */
-    CLOCK_SetMux(kCLOCK_Pll3SwMux, 0);
+    /* PLL3_main = 480 MHz */
+    CLOCK_SetMux(kCLOCK_Pll3SwMux, 0);		//CCSR  (0) 0 - pll3_main_clk, 1 - pll3_bypass_clock
     /* Set lvds1 clock source. */
+
     CCM_ANALOG->MISC1 =
         (CCM_ANALOG->MISC1 & (~CCM_ANALOG_MISC1_LVDS1_CLK_SEL_MASK)) | CCM_ANALOG_MISC1_LVDS1_CLK_SEL(0);
     /* Set clock out1 divider. */
@@ -756,11 +781,7 @@ void BOARD_BootClockRUN(void)
     IOMUXC_GPR->GPR5 &= ~IOMUXC_GPR_GPR5_VREF_1M_CLK_GPT2_MASK;
     /* Init ARM PLL. */
     CLOCK_InitArmPll(&armPllConfig_BOARD_BootClockRUN);
-/* In SDK projects, SDRAM (configured by SEMC) will be initialized in either debug script or dcd.
- * With this macro SKIP_SYSCLK_INIT, system pll (selected to be SEMC source clock in SDK projects) will be left
- * unchanged.
- * Note: If another clock source is selected for SEMC, user may want to avoid changing that clock as well.*/
-//#ifndef SKIP_SYSCLK_INIT
+
     /* Init System PLL. */
     //CLOCK_InitSysPll(&sysPllConfig_BOARD_BootClockRUN);
     /* Init System pfd0. */
@@ -773,7 +794,7 @@ void BOARD_BootClockRUN(void)
     //CLOCK_InitSysPfd(kCLOCK_Pfd3, 16);
     /* Disable pfd offset. */
     CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
-//#endif
+
 /* In SDK projects, external flash (configured by FLEXSPI) will be initialized by dcd.
  * With this macro XIP_EXTERNAL_FLASH, usb1 pll (selected to be FLEXSPI clock source in SDK projects) will be left
  * unchanged.
@@ -791,19 +812,6 @@ void BOARD_BootClockRUN(void)
     CLOCK_InitUsb1Pfd(kCLOCK_Pfd3, 19);
     /* Disable Usb1 PLL output for USBPHY1. */
     CCM_ANALOG->PLL_USB1 &= ~CCM_ANALOG_PLL_USB1_EN_USB_CLKS_MASK;
-#endif
-
-#if 0 //TODO:M.P Removed, audio PLL is managed by audio bsp
-    /* DeInit Audio PLL. */
-    CLOCK_DeinitAudioPll();
-
-    /* Bypass Audio PLL. */
-    CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllAudio, 1);
-    /* Set divider for Audio PLL. */
-    CCM_ANALOG->MISC2 &= ~CCM_ANALOG_MISC2_AUDIO_DIV_LSB_MASK;
-    CCM_ANALOG->MISC2 &= ~CCM_ANALOG_MISC2_AUDIO_DIV_MSB_MASK;
-    /* Enable Audio PLL output. */
-    CCM_ANALOG->PLL_AUDIO |= CCM_ANALOG_PLL_AUDIO_ENABLE_MASK;
 #endif
 
     /* DeInit Video PLL. */
@@ -832,17 +840,21 @@ void BOARD_BootClockRUN(void)
     /* Enable Usb2 PLL output. */
     CCM_ANALOG->PLL_USB2 |= CCM_ANALOG_PLL_USB2_ENABLE_MASK;
     /* Set preperiph clock source. */
-    CLOCK_SetMux(kCLOCK_PrePeriphMux, 3);
+    /* PLL1/2 = 432MHz */
+    CLOCK_SetMux(kCLOCK_PrePeriphMux, 3);		//CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
     /* Set periph clock source. */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 0);
+    /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 0);			//CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
     /* Set PERIPH_CLK2_PODF. */
-    CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
+    /* PLL3_SW_CLK/1 = 480MHz */
+    CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);		//CBCDR
     /* Set periph clock2 clock source. */
-    CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 0);
+    /* PLL3_SW_CLK = 480MHz */
+    CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 0);		//CBCMR  (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
     /* Set SystemCoreClock variable. */
     SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 
-    /* DeInit Audio PLL //TODO:M.P Removed, audio PLL is managed by audio bsp */
+    /* DeInit Audio PLL //M.P Removed, audio PLL is managed by audio bsp */
     CLOCK_DeinitAudioPll();
     /* DeInit Video PLL. */
     CLOCK_DeinitVideoPll();
