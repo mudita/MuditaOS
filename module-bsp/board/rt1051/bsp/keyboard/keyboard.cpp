@@ -151,8 +151,8 @@ namespace bsp {
         }
 
         /* Enable GPIO pin interrupt */
-        GPIO_PortEnableInterrupts(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
-        GPIO_PortEnableInterrupts(BOARD_KEYBOARD_IRQ_GPIO, 1U << BOARD_KEYBOARD_IRQ_GPIO_PIN);
+        gpio->EnableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->EnableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_IRQ_PIN));
 
         return kStatus_Success;
     }
@@ -160,9 +160,9 @@ namespace bsp {
 
     status_t keyboard_Deinit(void) {
 
-        /* Enable GPIO pin interrupt */
-        GPIO_PortDisableInterrupts(BOARD_KEYBOARD_IRQ_GPIO, 1U << BOARD_KEYBOARD_IRQ_GPIO_PIN);
-        GPIO_PortDisableInterrupts(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
+        /* Disable GPIO pin interrupt */
+        gpio->DisableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->DisableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_IRQ_PIN));
 
         //Clear all interrupts, even IRQs we didn't check (GPI, CAD, LCK)
         uint8_t reg = 0xff;
@@ -234,12 +234,12 @@ namespace bsp {
 
     BaseType_t keyboard_right_functional_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        GPIO_ClearPinsInterruptFlags(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
+        gpio->ClearPortInterrupts(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
 
         if (s_right_functional_check_timer != NULL) {
-            GPIO_DisableInterrupts(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
+            gpio->DisableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
 
-            if (GPIO_ReadPinInput(BOARD_KEYBOARD_RF_BUTTON_PORT, BOARD_KEYBOARD_RF_BUTTON_PIN) == 0) {
+            if (gpio->ReadPin(enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON)) == 0) {
                 s_rigth_functional_last_state = 0;
             } else {
                 s_rigth_functional_last_state = 1;
@@ -284,6 +284,6 @@ namespace bsp {
             }
         }
 
-        GPIO_EnableInterrupts(BOARD_KEYBOARD_RF_BUTTON_PORT, 1U << BOARD_KEYBOARD_RF_BUTTON_PIN);
+        gpio->EnableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
     }
 }

@@ -80,4 +80,17 @@ uint8_t RT1051DriverGPIO::ReadPin(const uint32_t pin) {
 }
 
 
+void RT1051DriverGPIO::EnableInterrupt(const uint32_t mask) {
+    GPIO_EnableInterrupts(base,mask);
+}
+
+void RT1051DriverGPIO::DisableInterrupt(const uint32_t mask) {
+    GPIO_DisableInterrupts(base,mask);
+}
+
+void RT1051DriverGPIO::ClearPortInterrupts(const uint32_t mask) {
+    GPIO_PortClearInterruptFlags(base,mask);
+}
+
+
 }

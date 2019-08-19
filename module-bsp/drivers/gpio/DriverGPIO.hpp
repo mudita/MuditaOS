@@ -80,6 +80,8 @@ namespace drivers {
 
         virtual void DisableInterrupt(const uint32_t mask) = 0;
 
+        virtual void ClearPortInterrupts(const uint32_t mask) = 0;
+
 
     protected:
         const DriverGPIOParams parameters;
