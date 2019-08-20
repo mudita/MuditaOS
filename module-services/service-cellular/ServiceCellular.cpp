@@ -26,7 +26,7 @@ constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 
 ServiceCellular::ServiceCellular()
-        : sys::Service(serviceName, 2048, sys::ServicePriority::Idle),
+        : sys::Service(serviceName),
           muxdaemon(nullptr) {
 
     LOG_INFO("[ServiceCellular] Initializing");

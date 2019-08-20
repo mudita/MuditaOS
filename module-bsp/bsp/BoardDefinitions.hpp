@@ -63,54 +63,6 @@ enum class BoardDefinitions{
     CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN = 10,
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
 
-#define BSP_CELLULAR_UART_CTS_PORT                           GPIO1
-#define BSP_CELLULAR_UART_CTS_PIN                            14
-#define BSP_CELLULAR_UART_CTS_PAD                            GPIO_AD_B0_14
-
-#define BSP_CELLULAR_UART_RTS_PORT                           GPIO1
-#define BSP_CELLULAR_UART_RTS_PIN                            15
-#define BSP_CELLULAR_UART_RTS_PAD                            GPIO_AD_B0_15
-
-#define BSP_CELLULAR_UART_DTR_PORT                           GPIO3
-#define BSP_CELLULAR_UART_DTR_PIN                            27
-#define BSP_CELLULAR_UART_DTR_PAD                            GPIO_EMC_41
-
-#define BSP_CELLULAR_POWER_PORT                              GPIO2
-#define BSP_CELLULAR_POWER_PIN                               18
-#define BSP_CELLULAR_POWER_PAD                               GPIO_B1_02
-
-#define BSP_CELLULAR_RESET_PORT                              GPIO2
-#define BSP_CELLULAR_RESET_PIN                               17
-#define BSP_CELLULAR_RESET_PAD                               GPIO_B1_01
-
-#define BSP_CELLULAR_RI_PORT                                 GPIO2
-#define BSP_CELLULAR_RI_PIN                                  21
-#define BSP_CELLULAR_RI_PAD                                  GPIO_B1_05
-
-#define BSP_CELLULAR_AP_RDY_PORT                             GPIO2
-#define BSP_CELLULAR_AP_RDY_PIN                              16
-#define BSP_CELLULAR_AP_RDY_PAD                              GPIO_B1_00
-
-#define BSP_CELLULAR_WAKEUP_PORT                             GPIO2
-#define BSP_CELLULAR_WAKEUP_PIN                              19
-#define BSP_CELLULAR_WAKEUP_PAD                              GPIO_B1_03
-
-#define BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT                GPIO2
-#define BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN                 11
-#define BSP_CELLULAR_SIM_CARD_1_INSERTED_PAD                 GPIO_B0_11
-
-#define BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT                GPIO2
-#define BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN                 10
-#define BSP_CELLULAR_SIM_CARD_2_INSERTED_PAD                 GPIO_B0_10
-
-#define BSP_CELLULAR_SIM_CARD_PRESENCE_PORT                  GPIO2
-#define BSP_CELLULAR_SIM_CARD_PRESENCE_PIN                   9
-#define BSP_CELLULAR_SIM_CARD_PRESENCE_PAD                   GPIO_B0_09
-
-#define BSP_CELLULAR_SIM_CARD_SELECTION_PORT                 GPIO2
-#define BSP_CELLULAR_SIM_CARD_SELECTION_PIN                  20
-#define BSP_CELLULAR_SIM_CARD_SELECTION_PAD                  GPIO_B1_04
-
     EINK_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
     EINK_TX_DMA_CHANNEL = 0,
