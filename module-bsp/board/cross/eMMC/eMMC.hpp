@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #if defined(TARGET_RT1051)
-#include <eMMC/fsl_mmc.h>
+#include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #else
 #error "Unsupported target"
 #endif

@@ -12,9 +12,7 @@
 #include "eMMC.hpp"
 
 #if defined(TARGET_RT1051)
-
-#include "fsl_mmc.h"
-
+#include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #elif defined(TARGET_Linux)
 
 #else
