@@ -121,6 +121,9 @@ ContactsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactTab
         case ContactTableFields ::SpeedDial:
             fieldName="speeddial";
             break;
+        case ContactTableFields::Favourites:
+            fieldName="favourites";
+            break;
         default:
             return std::vector<ContactsTableRow>();
     }

@@ -41,6 +41,7 @@ public:
     static bool ContactUpdate(sys::Service* serv,const ContactRecord& rec);
     static uint32_t ContactGetCount(sys::Service* serv);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffsetByFavourites(sys::Service *serv, uint32_t offset, uint32_t limit);
 
     static bool AlarmAdd(sys::Service* serv,const AlarmsRecord& rec);
     static bool AlarmRemove(sys::Service* serv,uint32_t id);

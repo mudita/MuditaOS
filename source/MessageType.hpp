@@ -43,6 +43,7 @@ enum class MessageType {
 	DBContactRemove,    // Remove contact remove
 	DBContactUpdate,    // Update contact remove
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
+    DBContactGetLimitOffsetByFavourites, // Get contact records by limit offset by field
 	DBContactGetCount,         // Get contacts count
 
 
