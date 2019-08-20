@@ -33,7 +33,8 @@ struct ContactsTableRow {
 };
 
 enum class ContactTableFields{
-    SpeedDial
+    SpeedDial,
+    Favourites,
 };
 
 class ContactsTable : public Table<ContactsTableRow,ContactTableFields> {

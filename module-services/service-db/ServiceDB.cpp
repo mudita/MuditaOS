@@ -272,6 +272,14 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
         }
             break;
 
+        case MessageType::DBContactGetLimitOffsetByFavourites:
+        {
+            DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
+            auto ret = contactRecordInterface->GetLimitOffsetByField(msg->offset, msg->limit, ContactRecordField::Favourites, "1");
+            responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true);
+        }
+        break;
+
         case MessageType::DBAlarmAdd: {
             DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1

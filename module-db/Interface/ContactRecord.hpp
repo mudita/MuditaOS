@@ -53,6 +53,7 @@ struct ContactRecord{
 enum class ContactRecordField {
     PrimaryName,
     NumberE164,
+    Favourites,
 };
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField> {
@@ -93,6 +94,10 @@ private:
 
     /// get multiple numbers by split numbers_id
     std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
+    /// get favourite contact list
+    std::unique_ptr<std::vector<ContactRecord>> getFavourites(uint32_t offset, uint32_t limit, const char* str);
+    /// helper function to avoid needles code copies
+    void contact_from_contacts_records(std::vector<ContactRecord> *record, std::vector<ContactsTableRow> &contacts);
 };
 
 

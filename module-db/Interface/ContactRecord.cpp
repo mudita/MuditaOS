@@ -240,33 +240,28 @@ uint32_t ContactRecordInterface::GetCount() {
     return contactDB->contacts.GetCount();
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto records =  std::make_unique<std::vector<ContactRecord>>();
-
-    auto ret = contactDB->contacts.GetLimitOffset(offset,limit);
-
-    for(const auto &w : ret){
+void ContactRecordInterface::contact_from_contacts_records(std::vector<ContactRecord> *records, std::vector<ContactsTableRow> &contacts) {
+    for(const auto &w : contacts){
 
         auto nrs = getNumbers(w.numbersID);
         if(nrs.size() == 0){
-            return records;
+            return;
         }
 
         auto ring = contactDB->ringtones.GetByID(w.ringID);
         if(ring.ID == 0){
-            return records;
+            return;
         }
 
         auto address = contactDB->address.GetByID(std::stoul(w.addressIDs));
         if(address.ID == 0){
-            return records;
+            return;
         }
 
         auto name = contactDB->name.GetByID(w.nameID);
         if(name.ID == 0){
-            return records;
+            return;
         }
-
         records->push_back(ContactRecord{
             .dbID = w.ID,
             .primaryName = name.namePrimary,
@@ -287,6 +282,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             .speeddial=static_cast<uint8_t >(w.speedDial)
         });
     }
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
+    auto records =  std::make_unique<std::vector<ContactRecord>>();
+    auto contacts = contactDB->contacts.GetLimitOffset(offset,limit);
+    contact_from_contacts_records(records.get(), contacts);
     return records;
 }
 
@@ -405,7 +406,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 });
             }
         }
+        break;
+        case ContactRecordField::Favourites:
+        {
+            records = getFavourites(offset, limit, str);
             break;
+        }
     }
 
     return records;
@@ -422,4 +428,12 @@ std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std:
         nrs.push_back(ContactRecord::Number(nr.numberUser, nr.numbere164, nr.type));
     }
     return nrs;
+}
+
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::getFavourites(uint32_t offset, uint32_t limit, const char* str) {
+    auto records =  std::make_unique<std::vector<ContactRecord>>();
+    auto contacts = contactDB->contacts.GetLimitOffsetByField(offset, limit, ContactTableFields::Favourites, str);
+    contact_from_contacts_records(records.get(), contacts);
+    return records;
 }
