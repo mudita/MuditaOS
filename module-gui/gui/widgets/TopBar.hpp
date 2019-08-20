@@ -68,6 +68,9 @@ public:
 	void setSignalStrength( uint32_t sth);
 	uint32_t getBatteryLevel() {return batteryLevel; };
 	uint32_t getSignalStrength() {return signalStrength; };
+
+	void setTime( const UTF8& time );
+	void setTime( const uint32_t& time, bool mode24H );
 };
 
 } /* namespace gui */

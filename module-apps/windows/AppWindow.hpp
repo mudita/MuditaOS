@@ -54,6 +54,8 @@ public:
 	bool updateBatteryLevel( uint32_t percentage );
 	//updates battery level in the window
 	bool updateSignalStrength( uint32_t strength );
+	bool updateTime( const UTF8& timeStr );
+	bool updateTime( const uint32_t& timestamp, bool mode24H );
 
 	void rebuild() override;
 	void buildInterface() override;

@@ -330,6 +330,20 @@ bool UTF8::operator==( const UTF8& utf ) const {
 const char* UTF8::c_str() const {
 	return reinterpret_cast<const char*>(data);
 }
+
+void UTF8::clear() {
+
+	if( data )
+		delete data;
+
+	data = new uint8_t[stringExpansion];
+	sizeAllocated = stringExpansion;
+	sizeUsed = 1;
+	strLength = 0;
+	lastIndex = 0;
+	lastIndexData = data;
+}
+
 UTF8 UTF8::substr( const uint32_t begin, const uint32_t length) const {
 
 	if( ( begin + length > this->length() ) ||

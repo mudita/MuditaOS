@@ -120,4 +120,12 @@ void TopBar::setSignalStrength( uint32_t sth) {
 	signal[signalStrength]->setVisible( true );
 };
 
+void TopBar::setTime( const UTF8& time ) {
+	timeLabel->setText(time);
+}
+
+void TopBar::setTime( const uint32_t& time, bool mode24H ) {
+
+}
+
 } /* namespace gui */

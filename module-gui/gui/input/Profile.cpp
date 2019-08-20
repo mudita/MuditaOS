@@ -7,6 +7,7 @@
  * @details
  */
 #include <string>
+#include <iomanip>
 #include <algorithm>
 #include <sstream>
 #include "log/log.hpp"
@@ -127,8 +128,10 @@ void Profile::addCharacters( KeyProfile* pk, const std::string& s ) {
 			pk->chars.push_back(charKey);
 		}
 		else if( ts.substr(0,2) == "0x"){
-			std::stringstream(ts) >> charKey;
-			pk->chars.push_back(charKey);
+			std::stringstream ss;
+			ss << std::hex << ts;
+			ss >> charKey;
+c			pk->chars.push_back(charKey);
 		}
 	}
 }
