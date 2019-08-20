@@ -111,6 +111,10 @@ void GPIO_PinInit(GPIO_Type *base, uint32_t pin, const gpio_pin_config_t *Config
     GPIO_SetPinInterruptConfig(base, pin, Config->interruptMode);
 }
 
+void GPIO_Deinit(GPIO_Type *base){
+    CLOCK_DisableClock(s_gpioClock[GPIO_GetInstance(base)]);
+}
+
 void GPIO_PinWrite(GPIO_Type *base, uint32_t pin, uint8_t output)
 {
     assert(pin < 32);

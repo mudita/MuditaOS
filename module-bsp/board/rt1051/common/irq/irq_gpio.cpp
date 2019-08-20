@@ -9,19 +9,15 @@
 
 #include "irq_gpio.hpp"
 
-#include "common/board.h"
+#include "board.h"
 #include "FreeRTOS.h"
 #include "queue.h"
-#include "task.h"
-#include "fsl_edma.h"
-#include "fsl_dmamux.h"
 #include "fsl_common.h"
 
+#include "bsp/keyboard/keyboard.hpp"
+#include "bsp/battery-charger/battery_charger.hpp"
 
-#include "keyboard/keyboard.hpp"
-#include "battery-charger/battery_charger.hpp"
-
-#include "bsp_eink.h"
+#include "board/rt1051/bsp/eink/bsp_eink.h"
 
 #if 0 //TODO:M.P implement the rest of BSP drivers
 

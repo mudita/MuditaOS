@@ -12,7 +12,7 @@
 #ifndef PUREPHONE_LINUX_AUDIOCODEC_HPP
 #define PUREPHONE_LINUX_AUDIOCODEC_HPP
 
-#include "audio/bsp_audio.hpp"
+#include "bsp/audio/bsp_audio.hpp"
 #include "portaudio.h"
 
 namespace bsp{

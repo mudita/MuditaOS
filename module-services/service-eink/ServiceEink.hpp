@@ -13,7 +13,7 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 //eink bsp
-#include "eink/ED028TC1.h"
+#include "EinkIncludes.hpp"
 
 class ServiceEink: public sys::Service {
 protected:

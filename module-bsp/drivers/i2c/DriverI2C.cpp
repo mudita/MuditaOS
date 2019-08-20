@@ -11,15 +11,44 @@
 
 #include "DriverI2C.hpp"
 
+#include "critical.hpp"
 
-//TODO:M.P this is only unfinished template, I will continue work on this during power manager development
-std::shared_ptr<DriverI2C> DriverI2C::Create(const DriverParams &params) {
 #if defined(TARGET_RT1051)
-
+#include "board/rt1051/drivers/RT1051DriverI2C.hpp"
 #elif defined(TARGET_Linux)
-    //inst = std::make_unique<bsp::LinuxAudiocodec>(callback );
+
+//#include ""
 #else
-                #error "Unsupported target"
+#error "Unsupported target"
 #endif
-    return nullptr;
+
+namespace drivers {
+
+    std::weak_ptr<DriverI2C> DriverI2C::singleton[magic_enum::enum_count<I2CInstances>()];
+
+    std::shared_ptr<DriverI2C> DriverI2C::Create(const drivers::I2CInstances instance,
+                                                 const drivers::DriverI2CParams &params) {
+        {
+
+            cpp_freertos::CriticalSection::Enter();
+            std::shared_ptr<DriverI2C> inst = singleton[magic_enum::enum_integer(instance)].lock();
+
+            if (!inst) {
+#if defined(TARGET_RT1051)
+                inst = std::make_shared<RT1051DriverI2C>(instance,params);
+#elif defined(TARGET_Linux)
+                #else
+#error "Unsupported target"
+#endif
+
+                singleton[magic_enum::enum_integer(instance)] = inst;
+            }
+
+            cpp_freertos::CriticalSection::Exit();
+
+            return inst;
+
+        }
+    }
+
 }

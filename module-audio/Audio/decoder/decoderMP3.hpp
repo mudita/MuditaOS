@@ -13,7 +13,6 @@
 
 #include "minimp3.h"
 
-#include <iostream>
 #include <cstring>
 #include "decoder.hpp"
 

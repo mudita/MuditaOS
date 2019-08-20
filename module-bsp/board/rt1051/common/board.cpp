@@ -10,17 +10,13 @@
 
 #include "fsl_common.h"
 #include "board.h"
-#include "fsl_lpi2c.h"
-#include "fsl_lpuart.h"
-#include "fsl_semc.h"
 #include "fsl_clock.h"
 #include "pin_mux.h"
 #include "dma_config.h"
 
 #include "irq/irq_gpio.hpp"
-#include "i2c.h"
 
-#include "rtc/rtc.hpp"
+#include "bsp/rtc/rtc.hpp"
 
 namespace bsp {
 
@@ -234,10 +230,7 @@ namespace bsp {
 
         BOARD_InitDebugConsole();
         BOARD_ConfigAudioCodec();
-        BOARD_InitDMA();
         BOARD_ConfigCellular();
-        
-        bsp_i2c_Init(BOARD_GetI2CInstance(), BOARD_KEYBOARD_I2C_CLOCK_FREQ);
 
         irq_gpio_Init();
 

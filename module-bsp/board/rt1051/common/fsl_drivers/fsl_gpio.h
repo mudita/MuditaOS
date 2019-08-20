@@ -105,6 +105,14 @@ void GPIO_PinInit(GPIO_Type *base, uint32_t pin, const gpio_pin_config_t *Config
 /*@}*/
 
 /*!
+ * @name GPIO Deinitializes specified GPIO
+ * @{
+ */
+
+void GPIO_Deinit(GPIO_Type *base);
+
+
+/*!
  * @name GPIO Reads and Write Functions
  * @{
  */
