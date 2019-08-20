@@ -12,7 +12,7 @@
 #ifndef PUREPHONE_LINUX_CELLULAR_HPP
 #define PUREPHONE_LINUX_CELLULAR_HPP
 
-#include "cellular/bsp_cellular.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
 
 
 #include <cstring>

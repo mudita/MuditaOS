@@ -8,7 +8,7 @@
  */
 
 #include "../../vfs.hpp"
-#include "eMMC/eMMC.hpp"
+#include "board/cross/eMMC/eMMC.hpp"
 #include "ff_eMMC_user_disk.hpp"
 
 vfs::vfs():

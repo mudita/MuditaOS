@@ -19,7 +19,7 @@
 #else
 
 #include "ff_stdio.h"
-#include "eMMC/eMMC.hpp"
+#include "board/cross/eMMC/eMMC.hpp"
 #endif
 
 class vfs {

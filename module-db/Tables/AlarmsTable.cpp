@@ -23,7 +23,7 @@ bool AlarmsTable::Create() {
            return false;
        }
 
-   // ret = db->Execute(alarmsInitialization);
+    ret = db->Execute(alarmsInitialization);
     return ret;
 }
 

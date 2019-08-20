@@ -5,7 +5,7 @@
  *      Author: kuba
  */
 
-#include "rtc/rtc.hpp"
+#include "bsp/rtc/rtc.hpp"
 #include <time.h>
 
 extern "C" {

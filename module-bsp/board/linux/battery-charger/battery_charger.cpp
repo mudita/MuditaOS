@@ -16,7 +16,7 @@ extern "C" {
 #include <fcntl.h>
 
 #include "board.h"
-#include "battery-charger/battery_charger.hpp"
+#include "bsp/battery-charger/battery_charger.hpp"
 
 #define BSP_BATTERY_CHARGER_I2C_ADDR                        (0xD2 >> 1)
 #define BSP_FUEL_GAUGE_I2C_ADDR                             (0x6C >> 1)

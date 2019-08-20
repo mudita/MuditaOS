@@ -20,8 +20,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/DriverInterface.cpp"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
+        #"${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
         )
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -43,7 +48,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES}) #M.P: fix me, should be declared as PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
@@ -61,8 +66,6 @@ target_include_directories(${PROJECT_NAME}
         PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}"
 
-        PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp"
         )
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})

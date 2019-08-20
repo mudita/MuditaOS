@@ -4,7 +4,6 @@
  *  Created on: 24 kwi 2019
  *      Author: robert
  */
-#include <iostream>
 #include <gtkmm.h>
 #include <cairomm/context.h>
 #include <gdkmm/pixbuf.h>

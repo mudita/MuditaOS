@@ -58,6 +58,8 @@ private:
             "snooze INTEGER,"
             "status INTEGER,"
             "path TEXT DEFAULT '');";
+   // "INSERT or ignore INTO alarms (_id, time, snooze, status, path ) VALUES (1,0,0,0,'');"
+    const char* alarmsInitialization = "INSERT or ignore INTO alarms (_id, time, snooze, status, path ) VALUES (1,0,0,0,'');";
 };
 
 #endif /* MODULE_DB_TABLES_ALARMSTABLE_HPP_ */
