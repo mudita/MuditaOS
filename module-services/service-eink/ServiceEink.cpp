@@ -39,28 +39,6 @@ enum class EinkWorkerCommands {
 	CopyComplete
 };
 
-
-/// This is DMA handle for internal frame buffer memory-to-memory copying operation
-//static edma_handle_t            s_einkMemcpyDma_handle;
-
-/**
- * @brief This function is a callback for the memory to memory Eink HW copying completed event
- * @param
- */
-static void s_EinkServiceDMAMemcpyCallback(edma_handle_t *handle, void *param, bool transferDone, uint32_t tcds)
-{
-    if (isIRQ())
-    {
-        BaseType_t xhigherpriorityTaskToBeWokenUp = 0;
-        xTaskNotifyFromISR((TaskHandle_t)param, 0, eNoAction, &xhigherpriorityTaskToBeWokenUp);
-        portEND_SWITCHING_ISR( xhigherpriorityTaskToBeWokenUp );
-    }
-    else
-    {
-        xTaskNotify((TaskHandle_t)param, 0, eNoAction);
-    }
-}
-
 ServiceEink::ServiceEink(const std::string& name)
 	: sys::Service(name),
 	  timerID { 0 },
@@ -183,8 +161,6 @@ sys::ReturnCodes ServiceEink::InitHandler() {
 	{
 		LOG_FATAL("Error: Could not initialize Eink display!\n");
 	}
-
-	EinkMemcpyDmaInit( s_EinkServiceDMAMemcpyCallback );
 
 	//TODO remove screen clearing code below.
 	EinkPowerOn();

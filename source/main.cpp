@@ -49,7 +49,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(2000, true);
+        timer_id = CreateTimer(5000, true);
         //ReloadTimer(timer_id);
     }
 
@@ -61,21 +61,27 @@ public:
 
 #if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
-        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/teee.flac");
+        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        vTaskDelay(3000);
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
         //vTaskDelay(3000);
         //ret = AudioServiceAPI::Stop(this);
+        //vTaskDelay(500);
+        //ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
 
-/*        auto ret = AudioServiceAPI::RoutingStart(this);
-        //AudioServiceAPI::RoutingRecordCtrl(this,true);
-        vTaskDelay(1000);
-        //AudioServiceAPI::RoutingSpeakerPhone(this,true);
-        vTaskDelay(2000);
-        AudioServiceAPI::Stop(this);*/
+       //auto ret = AudioServiceAPI::RoutingStart(this);
+        /*
+         //AudioServiceAPI::RoutingRecordCtrl(this,true);
+         vTaskDelay(1000);
+         //AudioServiceAPI::RoutingSpeakerPhone(this,true);
+         vTaskDelay(2000);
+         AudioServiceAPI::Stop(this);*/
 
 #endif
+        //sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
+
         return std::make_shared<sys::ResponseMessage>();
 
     }
@@ -121,6 +127,7 @@ int main() {
 
     bsp::BoardInit();
 
+#if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
@@ -167,6 +174,6 @@ int main() {
     });
 
     cpp_freertos::Thread::StartScheduler();
-
+#endif
     return 0;
 }

@@ -162,7 +162,6 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
 
 
-
         module-sys
         module-cellular
         module-audio
