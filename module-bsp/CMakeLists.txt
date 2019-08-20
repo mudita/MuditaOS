@@ -70,7 +70,7 @@ target_include_directories(${PROJECT_NAME}
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 
-target_link_libraries(${PROJECT_NAME} module-os module-drivers ${TARGET_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} module-os ${TARGET_LIBRARIES})
 
 # Host target configuration(mainly used for unit testing)
 
