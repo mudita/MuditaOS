@@ -72,6 +72,11 @@ public:
 	const char* c_str() const ;
 
 	/**
+	 * @brief Removes all content from the string and reduce assigned memory to default value.
+	 */
+	void clear();
+
+	/**
 	*@brief Creates substring from current string. New string starts from begin parameter and contains number of characters passed by length.
 	*@param begin Index of the first character in newly created string.
 	*@param length Number of characters to copy.

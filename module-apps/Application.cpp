@@ -6,6 +6,8 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <sstream>
+#include <iomanip>
 //module-utils
 #include "log/log.hpp"
 //module-services
@@ -200,10 +202,20 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		time_t timestamp = msg->timestamp;
 		struct tm time;
 		time =*localtime(&timestamp);
-		//LOG_INFO("%02d:%02d", time.tm_hour - time.tm_gmtoff / 3600, time.tm_min);
 		uint32_t hour = (timestamp % 86400) / 3600;
 		uint32_t min = (timestamp % 3600) / 60;
-		LOG_INFO("%02d:%02d", hour , min);
+
+		std::ostringstream stringStream;
+		stringStream << std::setfill('0') << std::setw(2) << hour << ":" << min;
+
+		std::string timeStr = stringStream.str();
+
+		LOG_INFO("%s", timeStr.c_str() );
+
+		currentWindow->updateTime( timeStr );
+		if( state == State::ACTIVE_FORGROUND )
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+
 		handled = true;
 	}
 

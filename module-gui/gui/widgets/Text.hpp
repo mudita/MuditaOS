@@ -74,6 +74,20 @@ protected:
 		uint32_t pixelLength = 0;
 
 		TextLine( const UTF8& text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength );
+		/**
+		 * Returns text with appropriate ending.
+		 */
+		UTF8 getText() {
+			return text;
+		}
+		UTF8 getTextWithEnding() {
+			UTF8 retText = text;
+			if( endType == LineEndType::BREAK )
+				retText.insert("\n");
+			else if( endType == LineEndType::CONTINUE_SPACE )
+				retText.insert(" ");
+			return retText;
+		}
 	};
 
 	//holds list of all lines that  text was divided to.
@@ -112,8 +126,12 @@ protected:
 	 * Iterate over lines starting from the one that is provided. Function concatenate lines and performs new split.
 	 * Function stops on the last line or it there is a lines break ( enter ) or if last concatenated line doesn;t change after update.
 	 */
-
 	void reworkLines( std::list<TextLine*>::iterator it );
+	/**
+	 * Splites text in two on ENTER, space or dot.
+	 * @return true if line was actually splitted
+	 */
+	bool splitText( UTF8& source, UTF8& remaining, LineEndType& endType, uint32_t availableSpace );
 	/**
 	 * Moves cursor in specified direction
 	 */

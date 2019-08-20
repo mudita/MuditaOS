@@ -211,11 +211,106 @@ void Text::splitTextToLines( const UTF8& text) {
 
 	firstLine = textLines.begin();
 	lastLine = textLines.begin();
-//	for( TextLine* tl : textLines )
-//		LOG_INFO("Text Input Line: [%s]", tl->text.c_str());
+}
+
+bool Text::splitText( UTF8& source, UTF8& remaining, LineEndType& endType, uint32_t availableSpace ){
+
+	uint32_t spaceConsumed;
+	uint32_t charCount = font->getCharCountInSpace( source, availableSpace, spaceConsumed );
+	//this is sub-string that fits available space.
+	UTF8 searchStr = source.substr( 0, charCount );
+
+	//try to find first enter.
+	uint32_t enterIndex = searchStr.find( "\n",0);
+	if( enterIndex != UTF8::npos ) {
+		endType = LineEndType::BREAK;
+		remaining = source.substr( enterIndex, source.length() - 1 - enterIndex );
+		source.split( enterIndex );
+		LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+		return true;
+	}
+	else {
+		//if there was no enter look for last space in the source and break line on it
+		uint32_t spaceIndex = searchStr.findLast( " ",searchStr.length()-1);
+
+		//if there was no space take as many characters as possible and add CONTINUE ending
+		if( spaceIndex == UTF8::npos ) {
+			remaining = source.split( charCount );
+			endType = LineEndType::CONTINUE;
+			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+			return true;
+		}
+		else {
+			endType = LineEndType::CONTINUE_SPACE;
+
+			remaining = source.substr( spaceIndex+1, source.length() - 1 - spaceIndex);
+			source.split( spaceIndex );
+			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+			return true;
+		}
+	}
+	return false;
 }
 
 void Text::reworkLines( std::list<TextLine*>::iterator it ) {
+
+	//iterate until end of text lines or till line that fits available space has break line ending (enter).
+	while( it != textLines.end() ) {
+
+		//if current line has BREAK of EOT line ending check if current text fits available space
+		//finish procedure
+		uint32_t availableSpace = getAvailableHPixelSpace();
+		uint32_t consumedSpace;
+
+		if( ((*it)->endType == LineEndType::BREAK) || ((*it)->endType == LineEndType::EOT) ) {
+			consumedSpace = font->getPixelWidth( (*it)->getText() );
+			if( consumedSpace < availableSpace )
+				break;
+		}
+
+		//check if there is next line
+		auto itNext = it;
+		itNext++;
+
+		UTF8 mergedLinesText = (*it)->getTextWithEnding();
+
+		//if processed text line is not finished with break end type
+		if( ((*it)->endType != LineEndType::BREAK ) && (itNext != textLines.end()) ) {
+
+			//merge text from two lines
+			mergedLinesText += (*itNext)->getTextWithEnding();
+			//assign end type from next line to the current line
+			(*it)->endType = (*itNext)->endType;
+
+			//remove next line as the text was taken to the current line
+			delete (*itNext );
+			textLines.erase( itNext );
+		}
+
+		LineEndType endType;
+		UTF8 remainingText;
+		bool splitFlag = splitText( mergedLinesText, remainingText, endType, availableSpace );
+
+		//if there was a split update current and next item in the list
+		if( splitFlag ) {
+
+			(*it)->text = std::move(mergedLinesText);
+			(*it)->pixelLength = font->getPixelWidth( (*it)->getText() );
+
+			itNext = it;
+			itNext++;
+			textLines.insert( itNext, new TextLine( remainingText,
+				0, remainingText.length(), (*it)->endType, font->getPixelWidth( remainingText ) ) );
+
+			(*it)->endType = endType;
+		}
+
+		//proceed to next line
+		it++;
+
+	}
+
+	//TODO starting from first modified line up to last modified line update start and end index
 
 }
 
@@ -338,6 +433,28 @@ bool Text::handleNavigation( const InputEvent& inputEvent ) {
 }
 
 bool Text::handleEnter() {
+
+	//get textline where cursor is located
+	auto it = firstLine;
+	std::advance(it, cursorRow );
+	reworkLines( it );
+
+	//split current text in line using cursors position
+	UTF8 remainingText = (*it)->text.split( cursorColumn );
+
+	//store old type of line ending set new type of ending to the current line
+	LineEndType endType = (*it)->endType;
+	(*it)->endType = LineEndType::BREAK;
+
+	//create and add new line using remaining parts of text
+	auto itNext = it;
+	++itNext;
+	textLines.insert( itNext, new TextLine( remainingText, 0, remainingText.length(), endType, font->getPixelWidth( remainingText) ) );
+	cursorRow++;
+	cursorColumn = 0;
+
+	recalculateDrawParams();
+
 	return true;
 }
 
@@ -366,7 +483,7 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 		std::advance(it, cursorRow );
 		reworkLines( it );
 
-		//change cursor position
+		//change cursor position to the end of current line
 	}
 	//no line splitting, update pixel width and proceed
 	else {

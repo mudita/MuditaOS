@@ -69,6 +69,7 @@ NotesEditWindow::~NotesEditWindow() {
 }
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+	application->setKeyboardProfile( "lang_eng_lower" );
 	setFocusItem( text );
 	LOG_INFO("SETTING TEXT");
 	text->setText("Very long test line ABCDEFGHIJKLMNOPQRST123456789\nabcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345");
