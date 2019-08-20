@@ -62,6 +62,7 @@ enum class BoardDefinitions{
     CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN = 11,
     CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN = 10,
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
+    CELLULAR_GPIO_2_SIMSEL_PIN = 20,
 
     EINK_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),

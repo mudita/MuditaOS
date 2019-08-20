@@ -278,6 +278,8 @@ namespace bsp {
                 1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
         );
 
+        // INPUTS
+
         gpio_1->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 1,
@@ -298,6 +300,7 @@ namespace bsp {
                 .defLogic = 1,
                 .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN)});
 
+        // OUTPUTS
 
         gpio_1->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
@@ -323,7 +326,12 @@ namespace bsp {
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN)});
+                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMSEL_PIN)});
+
+        gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
+                .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
+                .defLogic = 0,
+                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
