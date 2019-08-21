@@ -416,7 +416,6 @@ void BOARD_BootClockRUN(void)
 
 /* ADC */
 void clkADCsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if (instance == 1) CLOCK_EnableClock(kCLOCK_Adc1);
@@ -437,7 +436,6 @@ void clkADCsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* XBAR */
 void clkXBARsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if (instance == 1) CLOCK_EnableClock(kCLOCK_Xbar1);
@@ -462,7 +460,6 @@ void clkXBARsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* GPT */
 void clkGPTsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if (instance == 1) { CLOCK_EnableClock(kCLOCK_Gpt1); CLOCK_EnableClock(kCLOCK_Gpt1S); }
@@ -487,7 +484,6 @@ void clkGPTsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* PIT */
 void clkPITsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		CLOCK_EnableClock(kCLOCK_Pit);
@@ -499,7 +495,6 @@ void clkPITsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* USDHC */
 void clkUSDHCsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) {
@@ -525,7 +520,6 @@ void clkUSDHCsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* FLEXSPI */
 void clkFLEXSPIsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		/* FLEXSPI */
@@ -539,7 +533,6 @@ void clkFLEXSPIsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* CSI */
 void clkCSIsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		CLOCK_EnableClock(kCLOCK_Csi);
@@ -552,7 +545,6 @@ void clkCSIsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* LPSPI */
 void clkLPSPICsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi1);
@@ -569,7 +561,6 @@ void clkLPSPICsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* TRACE */
 void clkTRACEsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		CLOCK_EnableClock(kCLOCK_Trace);
@@ -582,7 +573,6 @@ void clkTRACEsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* SAI */
 void clkSAIsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai1);
@@ -604,7 +594,6 @@ void clkSAIsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* LPI2C */
 void clkLPI2Csetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c1);
@@ -622,7 +611,6 @@ void clkLPI2Csetup( uint8_t instance, uint8_t enabled ) {
 }
 /* CAN */
 void clkCANsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) { CLOCK_EnableClock(kCLOCK_Can1); CLOCK_EnableClock(kCLOCK_Can1S); }
@@ -637,7 +625,6 @@ void clkCANsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* LPUART */
 void clkLPUARTsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart1);
@@ -664,7 +651,6 @@ void clkLPUARTsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* LCDIF */
 void clkLCDIFsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		CLOCK_EnableClock(kCLOCK_LcdPixel);
@@ -677,7 +663,6 @@ void clkLCDIFsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* SPDIF */
 void clkSPDIFsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
 
 	if (enabled) {
 		CLOCK_EnableClock(kCLOCK_Spdif);
@@ -690,7 +675,7 @@ void clkSPDIFsetup( uint8_t instance, uint8_t enabled ) {
 }
 /* FLEXIO */
 void clkFLEXIOsetup( uint8_t instance, uint8_t enabled ) {
-	void instance;
+	
 
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Flexio1);
@@ -743,7 +728,7 @@ void clkPLL2_PFD0setup( uint8_t enabled ) {
 		CLOCK_InitSysPfd(kCLOCK_Pfd0, 27);
 	}
 	else {
-		CLOCK_DeinitSysPfd(kCLOCK_Pfd0, 27);
+		CLOCK_DeinitSysPfd(kCLOCK_Pfd0);
 	}
 }
 void clkPLL2_PFD1setup( uint8_t enabled ) {
@@ -751,7 +736,7 @@ void clkPLL2_PFD1setup( uint8_t enabled ) {
 		CLOCK_InitSysPfd(kCLOCK_Pfd1, 16);
 	}
 	else {
-		CLOCK_DeinitSysPfd(kCLOCK_Pfd1, 16);
+		CLOCK_DeinitSysPfd(kCLOCK_Pfd1);
 	}
 }
 void clkPLL2_PFD2setup( uint8_t enabled ) {
@@ -759,7 +744,7 @@ void clkPLL2_PFD2setup( uint8_t enabled ) {
 		CLOCK_InitSysPfd(kCLOCK_Pfd2, 24);
 	}
 	else {
-		CLOCK_DeinitSysPfd(kCLOCK_Pfd2, 24);
+		CLOCK_DeinitSysPfd(kCLOCK_Pfd2);
 	}
 }
 void clkPLL2_PFD3setup( uint8_t enabled ) {
@@ -767,7 +752,7 @@ void clkPLL2_PFD3setup( uint8_t enabled ) {
 		CLOCK_InitSysPfd(kCLOCK_Pfd3, 16);
 	}
 	else {
-		CLOCK_DeinitSysPfd(kCLOCK_Pfd3, 16);
+		CLOCK_DeinitSysPfd(kCLOCK_Pfd3);
 	}
 }
 
@@ -791,7 +776,7 @@ void clkPLL3_PFD0setup( uint8_t enabled ) {
 		CLOCK_InitUsb1Pfd(kCLOCK_Pfd0, 33);
 	}
 	else {
-		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd0, 33);
+		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd0);
 	}
 }
 void clkPLL3_PFD1setup( uint8_t enabled ) {
@@ -800,7 +785,7 @@ void clkPLL3_PFD1setup( uint8_t enabled ) {
 		CLOCK_InitUsb1Pfd(kCLOCK_Pfd1, 16);
 	}
 	else {
-		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd1, 16);
+		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd1);
 	}
 }
 void clkPLL3_PFD2setup( uint8_t enabled ) {
@@ -809,7 +794,7 @@ void clkPLL3_PFD2setup( uint8_t enabled ) {
 		CLOCK_InitUsb1Pfd(kCLOCK_Pfd2, 17);
 	}
 	else {
-		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd2, 17);
+		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd2);
 	}
 }
 void clkPLL3_PFD3setup( uint8_t enabled ) {
@@ -818,7 +803,7 @@ void clkPLL3_PFD3setup( uint8_t enabled ) {
 		CLOCK_InitUsb1Pfd(kCLOCK_Pfd3, 19);
 	}
 	else {
-		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd3, 19);
+		CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd3);
 	}
 }
 
@@ -840,13 +825,13 @@ void clkPLL4setup( uint8_t enabled ) {
 }
 
 void clkPLL5setup( uint8_t enabled ) {
-	const clock_audio_pll_config_t videoPllConfig_BOARD_BootClockRUN =
+	const clock_video_pll_config_t videoPllConfig_BOARD_BootClockRUN =
 	{
 			.loopDivider = 54,  /*!< PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
 			.postDivider = 16,  /*!< Divider after the PLL, should only be 1, 2, 4, 8, 16. */
 			.numerator = 77,    /*!< 30 bit numerator of fractional loop divider.*/
 			.denominator = 100, /*!< 30 bit denominator of fractional loop divider */
-			.uint8_t src = kCLOCK_PllClkSrc24M          /*!< Pll clock source, reference _clock_pll_clk_src */
+			.src = kCLOCK_PllClkSrc24M          /*!< Pll clock source, reference _clock_pll_clk_src */
 	};
 	if (enabled) {
 		CLOCK_InitVideoPll(&videoPllConfig_BOARD_BootClockRUN);
