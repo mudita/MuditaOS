@@ -184,6 +184,8 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     	return kStatus_Fail;
     }
 
+    //pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EINK_PLL),DriverPLLParams{});
+
     lpspi->eventRegister = EventWaitNotRegistered;
 
     gpio = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::EINK_GPIO),
@@ -228,8 +230,6 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     // fsl_lpspi doesn't support configuring autopcs feature
     BSP_EINK_LPSPI_BASE->CFGR1 |= LPSPI_CFGR1_AUTOPCS(0);
 
-    //TODO:M.P add PLL support
-    //pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
     dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::EINK_DMAMUX),DriverDMAMuxParams{});
     dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
 
@@ -284,6 +284,8 @@ void BSP_EinkDeinit(void)
         vQueueDelete(bsp_eink_TransferComplete);
         bsp_eink_TransferComplete = NULL;
     }
+
+    pll.reset();
 
     dmamux->Disable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
     dmamux->Disable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));

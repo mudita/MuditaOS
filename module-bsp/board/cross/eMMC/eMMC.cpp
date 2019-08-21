@@ -11,6 +11,8 @@
 
 #include "eMMC.hpp"
 
+#include "bsp/BoardDefinitions.hpp"
+
 #if defined(TARGET_RT1051)
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #elif defined(TARGET_Linux)
@@ -23,9 +25,13 @@
 namespace bsp
 {
 
+    using namespace drivers;
+
     RetCode eMMC::Init()
     {
     #if defined(TARGET_RT1051)
+
+        //pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EMMC_PLL),DriverPLLParams{});
 
         mmcCard.busWidth = kMMC_DataBusWidth8bit;
         mmcCard.busTiming = kMMC_HighSpeedTiming;

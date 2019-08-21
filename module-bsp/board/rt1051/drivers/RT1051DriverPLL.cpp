@@ -10,54 +10,91 @@
 
 
 #include "RT1051DriverPLL.hpp"
-#include "../fsl_drivers/fsl_clock.h"
 #include "log/log.hpp"
+#include "menums/magic_enum.hpp"
+#include "../common/clock_config.h"
 
-namespace drivers{
+namespace drivers {
 
-    RT1051DriverPLL::RT1051DriverPLL(const drivers::PLLInstances &inst, const drivers::DriverPLLParams &params) : DriverPLL(params),instance(inst){
+    using namespace magic_enum;
 
-        switch(instance){
-            case PLLInstances ::Audio:
-            {
-                /*
-                 * AUDIO PLL setting: Frequency = Fref * (DIV_SELECT + NUM / DENOM)
-                 *                              = 24 * (32 + 77/100)
-                 *                              = 786.48 MHz
-                 */
-                const clock_audio_pll_config_t audioPllConfig = {
-                        .loopDivider = 32,  /* PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
-                        .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */
-                        .numerator = 77,    /* 30 bit numerator of fractional loop divider. */
-                        .denominator = 100, /* 30 bit denominator of fractional loop divider */
-                };
-                CLOCK_InitAudioPll(&audioPllConfig);
-                LOG_DEBUG("Init Audio PLL: %luHz",CLOCK_GetPllFreq(kCLOCK_PllAudio));
+    RT1051DriverPLL::RT1051DriverPLL(const drivers::PLLInstances &inst, const drivers::DriverPLLParams &params)
+            : DriverPLL(params), instance(inst) {
+
+        switch (instance) {
+            case PLLInstances::PLL4_Audio: {
+                clkPLL4setup(CLK_ENABLE);
             }
                 break;
-            case PLLInstances ::Ethernet:
-            case PLLInstances ::Video:
-            case PLLInstances ::USB_1:
-            case PLLInstances ::USB_2:
-                // not used
+            case PLLInstances::PLL3: {
+                clkPLL3setup(CLK_ENABLE);
+            }
+                break;
+            case PLLInstances::PLL3_PFD0: {
+                clkPLL3_PFD0setup(CLK_ENABLE);
+            }
+                break;
+            case PLLInstances::PLL3_PFD1: {
+                clkPLL3_PFD1setup(CLK_ENABLE);
+            }
+                break;
+            case PLLInstances::PLL3_PFD2: {
+                clkPLL3_PFD2setup(CLK_ENABLE);
+            }
+                break;
+            case PLLInstances::PLL2_PFD2:
+                clkPLL2_PFD2setup(CLK_ENABLE);
+                break;
+            case PLLInstances::PLL1_ARM: {
+                clkPLL1setup(CLK_ENABLE);
+            }
+                break;
+            case PLLInstances::OSC_24M: {
+                //not used
+            }
                 break;
         }
+        LOG_DEBUG("Init %s",std::string(magic_enum::enum_name(instance)).c_str());
+
     }
 
 
     RT1051DriverPLL::~RT1051DriverPLL() {
-        switch(instance){
-            case PLLInstances ::Audio:
-            {
-                CLOCK_DeinitAudioPll();
-                LOG_DEBUG("Deinit Audio PLL");
+        switch (instance) {
+            case PLLInstances::PLL4_Audio: {
+                clkPLL4setup(CLK_DISABLE);
             }
                 break;
-            case PLLInstances ::Ethernet:
-            case PLLInstances ::Video:
-                // not used
+            case PLLInstances::PLL3: {
+                clkPLL3setup(CLK_DISABLE);
+            }
+                break;
+            case PLLInstances::PLL3_PFD0: {
+                clkPLL3_PFD0setup(CLK_DISABLE);
+            }
+                break;
+            case PLLInstances::PLL3_PFD1: {
+                clkPLL3_PFD1setup(CLK_DISABLE);
+            }
+                break;
+            case PLLInstances::PLL3_PFD2: {
+                clkPLL3_PFD2setup(CLK_DISABLE);
+            }
+                break;
+            case PLLInstances::PLL2_PFD2:
+                clkPLL2_PFD2setup(CLK_DISABLE);
+                break;
+            case PLLInstances::PLL1_ARM: {
+                clkPLL1setup(CLK_DISABLE);
+            }
+                break;
+            case PLLInstances::OSC_24M: {
+                //not used
+            }
                 break;
         }
+
+        LOG_DEBUG("Deinit %s",std::string(magic_enum::enum_name(instance)).c_str());
     }
 
 }
