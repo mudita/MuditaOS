@@ -62,6 +62,7 @@ int32_t RT1051DriverGPIO::ConfPin(const drivers::DriverGPIOPinParams &params) {
     conf.outputLogic = static_cast<uint8_t >(params.defLogic);
     conf.interruptMode = static_cast<gpio_interrupt_mode_t>(params.irqMode);
     GPIO_PinInit(base,params.pin,&conf);
+    return 0;
 }
 
 void RT1051DriverGPIO::SetPort(const uint32_t mask) {
