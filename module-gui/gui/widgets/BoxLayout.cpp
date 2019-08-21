@@ -92,6 +92,7 @@ void HBox::resizeItems() {
 		while ((i != boxElements.end()) && (freeSpace > 0))
 		{
 			//element was already updated in previous run and no further modification is possible or required
+            newY = (*i).item->widgetArea.y;
 			if( (*i).noUpdate ) {
 				(*i).item->setPosition( newX, newY );
 				newX += (*i).item->widgetArea.w;
@@ -184,6 +185,7 @@ void VBox::resizeItems() {
 
 		while ((i != boxElements.end()) && (freeSpace > 0))
 		{
+            newX = (*i).item->widgetArea.x;
 			//element was already updated in previous run and no further modification is possible or required
 			if( (*i).noUpdate ) {
 				(*i).item->setPosition( newX, newY );
