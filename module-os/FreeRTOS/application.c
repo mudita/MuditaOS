@@ -1,5 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
+#include "log/log.hpp"
 
 #include <assert.h>
 
@@ -75,7 +76,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                     signed char *pcTaskName )
 {
     (void)xTask;
-    assert(0);
+    LOG_FATAL("Stack overflow:%s",pcTaskName);
 }
 
 void vApplicationTickHook()
