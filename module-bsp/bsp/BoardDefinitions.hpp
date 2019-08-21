@@ -72,10 +72,12 @@ enum class BoardDefinitions{
     EINK_CS_PIN = 13,
     EINK_RESET_PIN=16,
     EINK_BUSY_PIN=17,
+    EINK_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
 
+    EMMC_PLL = static_cast<int >(drivers::PLLInstances::PLL2_PFD2),
 
+    AUDIO_PLL = static_cast<int >(drivers::PLLInstances::PLL4_Audio),
 
-    AUDIO_PLL = static_cast<int >(drivers::PLLInstances::Audio),
 
 
 };

@@ -350,17 +350,19 @@ void BOARD_BootClockRUN(void)
 
 	/* USB1 PLL */
 	/* Init Usb1 PLL. */
-	clkPLL3setup(CLK_ENABLE);
+	clkPLL3setup(CLK_DISABLE);
 	/* Init Usb1 pfd0. */
-	clkPLL3_PFD0setup(CLK_ENABLE);
+	clkPLL3_PFD0setup(CLK_DISABLE);
 	/* Init Usb1 pfd1. */
-	clkPLL3_PFD1setup(CLK_ENABLE);
+	clkPLL3_PFD1setup(CLK_DISABLE);
 	/* Init Usb1 pfd2. */
-	clkPLL3_PFD2setup(CLK_ENABLE);
+	clkPLL3_PFD2setup(CLK_DISABLE);
 	/* Init Usb1 pfd3. */
-	clkPLL3_PFD3setup(CLK_ENABLE);
+	clkPLL3_PFD3setup(CLK_DISABLE);
 	/* Disable Usb1 PLL output for USBPHY1. */
 	CCM_ANALOG->PLL_USB1 &= ~CCM_ANALOG_PLL_USB1_EN_USB_CLKS_MASK;
+	/* Bypass Usb1 PLL */
+    CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllUsb1, 1);
 
 	/* VideoPLL */
 	/* DeInit Video PLL. */
@@ -409,7 +411,7 @@ void BOARD_BootClockRUN(void)
 	/* Set SystemCoreClock variable. */
 	SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
 
-	/* DeInit Audio PLL //M.P Removed, audio PLL is managed by audio bsp */
+	/* DeInit Audio PLL */
 	clkPLL4setup(CLK_DISABLE);
 
 }
