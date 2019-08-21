@@ -156,6 +156,113 @@ void BOARD_BootClockRUN(void)
 	/* Set per clock source. */
 	CLOCK_SetMux(kCLOCK_PerclkMux, 0);	//CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
 
+
+
+
+	/* Set USDHC1_PODF. */
+	CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1);	//CSCDR1
+	/* Set Usdhc1 clock source. */
+	/* PLL2_PFD2/2 = 396MHz/2 = 198MHz */
+	CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0);	//CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
+
+	/* Set USDHC2_PODF. */
+	CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2);	//CSCDR1
+	/* Set Usdhc2 clock source. */
+	/* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
+	CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0);	//CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
+
+	/* Set FLEXSPI_PODF. */
+	CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0);	//CSCMR1
+	/* Set Flexspi clock source. */
+	CLOCK_SetMux(kCLOCK_FlexspiMux, 3);	//CSCMR1  (30-29) 0 - semc_clk_reet_pre, 1 - pll3_sw_clk, 2 - PLL2_PFD2, 3 - PLL3_PFD0
+
+	/* Set CSI_PODF. */
+	CLOCK_SetDiv(kCLOCK_CsiDiv, 1);	//CSCDR3
+	/* Set Csi clock source. */
+	CLOCK_SetMux(kCLOCK_CsiMux, 0);	//CSCDR3  (10-9) 0 - osc_clk, 1 - PLL2_PFD2, 2 - pll3_120M, 3 - PLL3_PFD1
+
+	/* Set LPSPI_PODF. */
+	CLOCK_SetDiv(kCLOCK_LpspiDiv, 7);	//CBCMR
+	/* Set Lpspi clock source. */
+	/* PLL2_PFD2/8 = 396MHz / 8 = 49,5MHz */
+	CLOCK_SetMux(kCLOCK_LpspiMux, 3);	//CBCMR  (5-4) 0 - PLL3_PFD1, 1 - PLL3_PFD0, 2 - PLL2, 3 - PLL2_PFD2
+
+	/* Set TRACE_PODF. */
+	CLOCK_SetDiv(kCLOCK_TraceDiv, 2);	//CSCDR1
+	/* Set Trace clock source. */
+	/* PLL2_PFD0/4 disabled*/
+	CLOCK_SetMux(kCLOCK_TraceMux, 2);	//CBCMR  (15-14) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL2_PFD1
+
+	/* Set SAI1_CLK_PRED. */
+	CLOCK_SetDiv(kCLOCK_Sai1PreDiv, 1);	//CS1CDR
+	/* Set SAI1_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Sai1Div, 63);	//CS1CDR
+	/* Set Sai1 clock source. */
+	CLOCK_SetMux(kCLOCK_Sai1Mux, 2);	//CSCMR1  (11-10) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+
+	/* Set SAI2_CLK_PRED. */
+	CLOCK_SetDiv(kCLOCK_Sai2PreDiv, 1);	//CS2CDR
+	/* Set SAI2_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Sai2Div, 63);	//CS2CDR
+	/* Set Sai2 clock source. */
+	CLOCK_SetMux(kCLOCK_Sai2Mux, 2);	//CSCMR1  (13-12) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+
+	/* Set SAI3_CLK_PRED. */
+	CLOCK_SetDiv(kCLOCK_Sai3PreDiv, 3);	//CS1CDR
+	/* Set SAI3_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Sai3Div, 1);	//CS1CDR
+	/* Set Sai3 clock source. */
+	CLOCK_SetMux(kCLOCK_Sai3Mux, 0);	//CSCMR1  (15-14) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+
+	/* Set LPI2C_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1);	//CSCDR2
+	/* Set Lpi2c clock source. */
+	/* OSC_CLK (24MHz/2 = 12MHz */
+	CLOCK_SetMux(kCLOCK_Lpi2cMux, 1);	//CSCDR2  (18) 0 - pll3_60m, 1 - osc_clk
+
+	/* Set CAN_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_CanDiv, 1);		//CSCMR2
+	/* Set Can clock source. */
+	CLOCK_SetMux(kCLOCK_CanMux, 2);		//CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided clock 80M), 3 - disable
+
+	/* Set UART_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_UartDiv, 0);	//CSCDR1
+	/* Set Uart clock source. */
+	/* OSC_CLK (24MHz)/1 */
+	CLOCK_SetMux(kCLOCK_UartMux, 1);	//CSCDR1  (6) 0 - pll3_80m, 1 - osc_clk
+
+	/* Set LCDIF_PRED. */
+	CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1);	//CSCDR2
+	/* Set LCDIF_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_LcdifDiv, 3);	//CBCMR
+	/* Set Lcdif pre clock source. */
+	/* PLL3_PFD1 (664.62MHz/4/2 = 83.08MHz disabled */
+	CLOCK_SetMux(kCLOCK_LcdifPreMux, 5);	//CSCDR2  (17-15) 0 - Pll2, 1 - PLL3_PFD3, 2 - PLL5, 3 - PLL2_PFD0, 4 - PLL2_PFD1, 5 - PLL3_PFD1, 6,7 - reserved
+
+	/* Set SPDIF0_CLK_PRED. */
+	CLOCK_SetDiv(kCLOCK_Spdif0PreDiv, 1);	//CDCDR
+	/* Set SPDIF0_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Spdif0Div, 7);		//CDCDR
+	/* Set Spdif clock source. */
+	/* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
+	CLOCK_SetMux(kCLOCK_SpdifMux, 3);		//CDCDR  (21-20) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+
+	/* Set FLEXIO1_CLK_PRED. */
+	CLOCK_SetDiv(kCLOCK_Flexio1PreDiv, 1);	//CDCDR
+	/* Set FLEXIO1_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Flexio1Div, 7);		//CDCDR
+	/* Set Flexio1 clock source. */
+	/* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
+	CLOCK_SetMux(kCLOCK_Flexio1Mux, 3);		//CDCDR (8-7) 0 - PLL4, 1 - PlLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+
+	/* Set FLEXIO2_CLK_PRED. */
+	CLOCK_SetDiv(kCLOCK_Flexio2PreDiv, 1);	//CS1CDR
+	/* Set FLEXIO2_CLK_PODF. */
+	CLOCK_SetDiv(kCLOCK_Flexio2Div, 7);		//CS1CDR
+	/* Set Flexio2 clock source. */
+	/* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
+	CLOCK_SetMux(kCLOCK_Flexio2Mux, 3);		//CSCMR2 (20-19) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+
 	clkFLEXSPIsetup( CLK_INSTANCE_ALL, CLK_DISABLE );
 
 	/* ADC */
@@ -397,23 +504,11 @@ void clkUSDHCsetup( uint8_t instance, uint8_t enabled ) {
 	if (enabled) {
 		if ((instance == 1) || (instance == 0)) {
 			/* USDHC */
-			/* Disable USDHC1 clock gate. */
 			CLOCK_EnableClock(kCLOCK_Usdhc1);
-			/* Set USDHC1_PODF. */
-			CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1);	//CSCDR1
-			/* Set Usdhc1 clock source. */
-			/* PLL2_PFD2/2 = 396MHz/2 = 198MHz */
-			CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0);	//CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 		}
 
 		if ((instance == 2) || (instance == 0)) {
-			/* Disable USDHC2 clock gate. */
 			CLOCK_EnableClock(kCLOCK_Usdhc2);
-			/* Set USDHC2_PODF. */
-			CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2);	//CSCDR1
-			/* Set Usdhc2 clock source. */
-			/* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
-			CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0);	//CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 		}
 	}
 	else {
@@ -435,10 +530,6 @@ void clkFLEXSPIsetup( uint8_t instance, uint8_t enabled ) {
 	if (enabled) {
 		/* FLEXSPI */
 		CLOCK_EnableClock(kCLOCK_FlexSpi);
-		/* Set FLEXSPI_PODF. */
-		CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0);	//CSCMR1
-		/* Set Flexspi clock source. */
-		CLOCK_SetMux(kCLOCK_FlexspiMux, 3);	//CSCMR1  (30-29) 0 - semc_clk_reet_pre, 1 - pll3_sw_clk, 2 - PLL2_PFD2, 3 - PLL3_PFD0
 	}
 	else {
 		/* FLEXSPI */
@@ -452,10 +543,6 @@ void clkCSIsetup( uint8_t instance, uint8_t enabled ) {
 
 	if (enabled) {
 		CLOCK_EnableClock(kCLOCK_Csi);
-		/* Set CSI_PODF. */
-		CLOCK_SetDiv(kCLOCK_CsiDiv, 1);	//CSCDR3
-		/* Set Csi clock source. */
-		CLOCK_SetMux(kCLOCK_CsiMux, 0);	//CSCDR3  (10-9) 0 - osc_clk, 1 - PLL2_PFD2, 2 - pll3_120M, 3 - PLL3_PFD1
 	}
 	else {
 		/* CSI */
@@ -468,11 +555,6 @@ void clkLPSPICsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set LPSPI_PODF. */
-		CLOCK_SetDiv(kCLOCK_LpspiDiv, 7);	//CBCMR
-		/* Set Lpspi clock source. */
-		/* PLL2_PFD2/8 = 396MHz / 8 = 49,5MHz */
-		CLOCK_SetMux(kCLOCK_LpspiMux, 3);	//CBCMR  (5-4) 0 - PLL3_PFD1, 1 - PLL3_PFD0, 2 - PLL2, 3 - PLL2_PFD2
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi1);
 		if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi2);
 		if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi3);
@@ -490,11 +572,6 @@ void clkTRACEsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set TRACE_PODF. */
-		CLOCK_SetDiv(kCLOCK_TraceDiv, 2);	//CSCDR1
-		/* Set Trace clock source. */
-		/* PLL2_PFD0/4 disabled*/
-		CLOCK_SetMux(kCLOCK_TraceMux, 2);	//CBCMR  (15-14) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL2_PFD1
 		CLOCK_EnableClock(kCLOCK_Trace);
 	}
 	else {
@@ -508,31 +585,8 @@ void clkSAIsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set SAI1_CLK_PRED. */
-		CLOCK_SetDiv(kCLOCK_Sai1PreDiv, 1);	//CS1CDR
-		/* Set SAI1_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Sai1Div, 63);	//CS1CDR
-		/* Set Sai1 clock source. */
-		CLOCK_SetMux(kCLOCK_Sai1Mux, 2);	//CSCMR1  (11-10) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
-
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai1);
-
-		/* Set SAI2_CLK_PRED. */
-		CLOCK_SetDiv(kCLOCK_Sai2PreDiv, 1);	//CS2CDR
-		/* Set SAI2_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Sai2Div, 63);	//CS2CDR
-		/* Set Sai2 clock source. */
-		CLOCK_SetMux(kCLOCK_Sai2Mux, 2);	//CSCMR1  (13-12) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
-
 		if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai2);
-
-		/* Set SAI3_CLK_PRED. */
-		CLOCK_SetDiv(kCLOCK_Sai3PreDiv, 3);	//CS1CDR
-		/* Set SAI3_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Sai3Div, 1);	//CS1CDR
-		/* Set Sai3 clock source. */
-		CLOCK_SetMux(kCLOCK_Sai3Mux, 0);	//CSCMR1  (15-14) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
-
 		if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai3);
 
 	}
@@ -553,12 +607,6 @@ void clkLPI2Csetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set LPI2C_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1);	//CSCDR2
-		/* Set Lpi2c clock source. */
-		/* OSC_CLK (24MHz/2 = 12MHz */
-		CLOCK_SetMux(kCLOCK_Lpi2cMux, 1);	//CSCDR2  (18) 0 - pll3_60m, 1 - osc_clk
-
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c1);
 		if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c2);
 		if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c3);
@@ -577,10 +625,6 @@ void clkCANsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set CAN_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_CanDiv, 1);		//CSCMR2
-		/* Set Can clock source. */
-		CLOCK_SetMux(kCLOCK_CanMux, 2);		//CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided clock 80M), 3 - disable
 		if ((instance == 1) || (instance == 0)) { CLOCK_EnableClock(kCLOCK_Can1); CLOCK_EnableClock(kCLOCK_Can1S); }
 		if ((instance == 2) || (instance == 0)) { CLOCK_EnableClock(kCLOCK_Can2); CLOCK_EnableClock(kCLOCK_Can2S); }
 	}
@@ -596,12 +640,6 @@ void clkLPUARTsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set UART_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_UartDiv, 0);	//CSCDR1
-		/* Set Uart clock source. */
-		/* OSC_CLK (24MHz)/1 */
-		CLOCK_SetMux(kCLOCK_UartMux, 1);	//CSCDR1  (6) 0 - pll3_80m, 1 - osc_clk
-
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart1);
 		if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart2);
 		if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart3);
@@ -629,13 +667,6 @@ void clkLCDIFsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set LCDIF_PRED. */
-		CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1);	//CSCDR2
-		/* Set LCDIF_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_LcdifDiv, 3);	//CBCMR
-		/* Set Lcdif pre clock source. */
-		/* PLL3_PFD1 (664.62MHz/4/2 = 83.08MHz disabled */
-		CLOCK_SetMux(kCLOCK_LcdifPreMux, 5);	//CSCDR2  (17-15) 0 - Pll2, 1 - PLL3_PFD3, 2 - PLL5, 3 - PLL2_PFD0, 4 - PLL2_PFD1, 5 - PLL3_PFD1, 6,7 - reserved
 		CLOCK_EnableClock(kCLOCK_LcdPixel);
 	}
 	else {
@@ -649,13 +680,6 @@ void clkSPDIFsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set SPDIF0_CLK_PRED. */
-		CLOCK_SetDiv(kCLOCK_Spdif0PreDiv, 1);	//CDCDR
-		/* Set SPDIF0_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Spdif0Div, 7);		//CDCDR
-		/* Set Spdif clock source. */
-		/* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
-		CLOCK_SetMux(kCLOCK_SpdifMux, 3);		//CDCDR  (21-20) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
 		CLOCK_EnableClock(kCLOCK_Spdif);
 	}
 	else {
@@ -669,22 +693,7 @@ void clkFLEXIOsetup( uint8_t instance, uint8_t enabled ) {
 	void instance;
 
 	if (enabled) {
-		/* Set FLEXIO1_CLK_PRED. */
-		CLOCK_SetDiv(kCLOCK_Flexio1PreDiv, 1);	//CDCDR
-		/* Set FLEXIO1_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Flexio1Div, 7);		//CDCDR
-		/* Set Flexio1 clock source. */
-		/* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
-		CLOCK_SetMux(kCLOCK_Flexio1Mux, 3);		//CDCDR (8-7) 0 - PLL4, 1 - PlLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
 		if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Flexio1);
-
-		/* Set FLEXIO2_CLK_PRED. */
-		CLOCK_SetDiv(kCLOCK_Flexio2PreDiv, 1);	//CS1CDR
-		/* Set FLEXIO2_CLK_PODF. */
-		CLOCK_SetDiv(kCLOCK_Flexio2Div, 7);		//CS1CDR
-		/* Set Flexio2 clock source. */
-		/* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
-		CLOCK_SetMux(kCLOCK_Flexio2Mux, 3);		//CSCMR2 (20-19) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
 		if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Flexio2);
 	}
 	else {
