@@ -103,7 +103,7 @@ protected:
 	// column where cursor is located( 0 - position before first character in the line )
 	uint32_t cursorColumn = 0;
 
-
+	Rect* cursor = nullptr;
 
 	EditMode editMode = EditMode::EDIT;
 	ExpandMode expandMode = ExpandMode::EXPAND_NONE;
@@ -160,7 +160,7 @@ protected:
 	/**
 	 * Returns text line where cursor is located
 	 */
-	TextLine* getCursorTextLine();
+	std::list<TextLine*>::iterator  getCursorTextLine();
 	/**
 	 * Returns horizontal pixel space available for text.
 	 */

@@ -210,7 +210,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		std::string timeStr = stringStream.str();
 
-		LOG_INFO("%s", timeStr.c_str() );
+//		LOG_INFO("%s", timeStr.c_str() );
 
 		currentWindow->updateTime( timeStr );
 		if( state == State::ACTIVE_FORGROUND )

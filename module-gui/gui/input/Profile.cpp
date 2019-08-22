@@ -131,7 +131,7 @@ void Profile::addCharacters( KeyProfile* pk, const std::string& s ) {
 			std::stringstream ss;
 			ss << std::hex << ts;
 			ss >> charKey;
-c			pk->chars.push_back(charKey);
+			pk->chars.push_back(charKey);
 		}
 	}
 }

@@ -34,6 +34,9 @@ Text::Text() :
 	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
 	font = FontManager::getInstance().getFont(fontID);
 
+	cursor = new Rect( this, 0,0,1,1);
+	cursor->setFilled( true );
+
 	//insert first empty text line
 	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
 	firstLine = textLines.begin();
@@ -52,6 +55,9 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 	setPenFocusWidth( 3 );
 	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
 	font = FontManager::getInstance().getFont(fontID);
+
+	cursor = new Rect( this, 0,0,1,1);
+	cursor->setFilled( true );
 
 	//insert first empty text line
 	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
@@ -149,7 +155,7 @@ void Text::splitTextToLines( const UTF8& text) {
 				index += enterIndex + 1;
 				lineEndType = LineEndType::BREAK;
 				textLines.push_back( new TextLine( tmpText.substr(0,enterIndex), startIndex, endIndex, lineEndType, spaceConsumed ) );
-				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+//				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 			} //no enter found last line can be copied as a whole.
 			else {
 				startIndex = index;
@@ -171,7 +177,7 @@ void Text::splitTextToLines( const UTF8& text) {
 				index += enterIndex + 1;
 				lineEndType = LineEndType::BREAK;
 				textLines.push_back( new TextLine( tmpText.substr(0,enterIndex), startIndex, endIndex, lineEndType, spaceConsumed ) );
-				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+//				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 			}
 			else {
 				//if there was no enter look for last space in the tmpText and break line on it
@@ -183,7 +189,7 @@ void Text::splitTextToLines( const UTF8& text) {
 					index += charCount;
 					lineEndType = LineEndType::CONTINUE;
 					textLines.push_back( new TextLine( tmpText, startIndex, endIndex, lineEndType, spaceConsumed ) );
-					LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+//					LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 				}
 				else {
 					lineEndType = LineEndType::CONTINUE_SPACE;
@@ -195,14 +201,14 @@ void Text::splitTextToLines( const UTF8& text) {
 						index += charCount;
 						textLines.push_back( new TextLine( tmpText.substr(0,tmpText.length()-1),
 							startIndex, endIndex, lineEndType, spaceConsumed - spaceWidth) );
-						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+//						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 					}
 					else {
 						endIndex = index+spaceIndex;
 						index += spaceIndex+1;
 						textLines.push_back( new TextLine( tmpText.substr(0,spaceIndex),
 							startIndex, endIndex, lineEndType, spaceConsumed - spaceWidth) );
-						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+//						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 					}
 				}
 			}
@@ -226,7 +232,7 @@ bool Text::splitText( UTF8& source, UTF8& remaining, LineEndType& endType, uint3
 		endType = LineEndType::BREAK;
 		remaining = source.substr( enterIndex, source.length() - 1 - enterIndex );
 		source.split( enterIndex );
-		LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+//		LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
 		return true;
 	}
 	else {
@@ -237,7 +243,7 @@ bool Text::splitText( UTF8& source, UTF8& remaining, LineEndType& endType, uint3
 		if( spaceIndex == UTF8::npos ) {
 			remaining = source.split( charCount );
 			endType = LineEndType::CONTINUE;
-			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+//			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
 			return true;
 		}
 		else {
@@ -245,7 +251,7 @@ bool Text::splitText( UTF8& source, UTF8& remaining, LineEndType& endType, uint3
 
 			remaining = source.substr( spaceIndex+1, source.length() - 1 - spaceIndex);
 			source.split( spaceIndex );
-			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
+//			LOG_INFO("Split Text: source: [%s] remaining: [%s]", source.c_str(), remaining.c_str());
 			return true;
 		}
 	}
@@ -330,25 +336,48 @@ void Text::setSize( const short& w, const short& h ) {
 
 bool Text::onInput( const InputEvent& inputEvent ) {
 
+
+//	LOG_INFO("%d %s", inputEvent.keyCode, (inputEvent.cycle?"TRUE":"FALSE"));
 	//process only short release events
 	if( inputEvent.state != InputEvent::State::keyReleasedShort ) {
 		return false;
 	}
 
+	//check if this is navigation event
+	bool res;
+	if( editMode == EditMode::BROWSE )
+		res = handleBrowsing( inputEvent );
+	else
+		res = handleNavigation( inputEvent );
+
+	//if navigation/browsing was detected and handled return
+	if( res )
+		return true;
+
+	res = false;
+	if( inputEvent.cycle ) {
+		handleBackspace();
+		res = handleChar( inputEvent );
+		if( res )
+			updateCursor();
+		return res;
+	}
+
 	//if char is a new line char then create new line and move caret and return
 	if( inputEvent.keyChar == 0x0A) {
 		if( textType == TextType::MULTI_LINE )
-			return handleEnter();
+			res = handleEnter();
 	}
 	//backspace handling
 	else if( inputEvent.keyChar  == 0x08 ) {
-		return handleBackspace();
+		res = handleBackspace();
 	}
 	else { //normal char -> add and check pixel width
-		return handleChar( inputEvent );
+		res = handleChar( inputEvent );
 	}
-
-	return false;
+	if( res )
+		updateCursor();
+	return res;
 }
 
 bool Text::onActivated( void* data ) {
@@ -437,7 +466,6 @@ bool Text::handleEnter() {
 	//get textline where cursor is located
 	auto it = firstLine;
 	std::advance(it, cursorRow );
-	reworkLines( it );
 
 	//split current text in line using cursors position
 	UTF8 remainingText = (*it)->text.split( cursorColumn );
@@ -453,19 +481,63 @@ bool Text::handleEnter() {
 	cursorRow++;
 	cursorColumn = 0;
 
+	reworkLines( it );
+
 	recalculateDrawParams();
 
 	return true;
 }
 
 bool Text::handleBackspace() {
+
+	//if cursor is in column 0 and there is no previous line return
+	if( (cursorColumn == 0) && (firstLine == textLines.begin()) )
+		return true;
+
+	//if cursor is in position other than 0 remove previous character and run lines rework
+	auto it = getCursorTextLine();
+	if( cursorColumn > 0 ) {
+		TextLine* currentTextLine = (*it);
+		currentTextLine->text.removeChar( cursorColumn - 1 );
+		currentTextLine = (*it);
+	}
+	//this is when cursor is located at the beginning of the line and there are previous lines
+	else {
+		auto itNext = it;
+		//go to previous line
+		it--;
+
+		TextLine* currentTextLine = (*it);
+
+		//if ending is equal to LineEndType::CONTINUE delete last char from current string
+		if( currentTextLine->endType == LineEndType::CONTINUE ) {
+			currentTextLine->text.removeChar(currentTextLine->text.length()-1);
+		}
+
+		currentTextLine->text += (*itNext)->text;
+
+		(*it)->endType = (*itNext)->endType;
+
+		//delete next line
+		textLines.erase(itNext);
+
+		//set new first visible line
+		firstLine = it;
+	}
+
+	cursorColumn--;
+
+	reworkLines( it );
+	recalculateDrawParams();
+
 	return true;
 }
 
 bool Text::handleChar( const InputEvent& inputEvent ) {
 
 	//get text line where cursor is standing
-	TextLine* currentTextLine = getCursorTextLine();
+	auto it = getCursorTextLine();
+	TextLine* currentTextLine = (*it);
 
 	//calculate width of the character that is going to be inserted
 	uint32_t charWidth = font->getCharPixelWidth( inputEvent.keyChar );
@@ -479,8 +551,7 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 	uint32_t availableSpace = getAvailableHPixelSpace();
 	uint32_t currentWidth = currentTextLine->pixelLength;
 	if( currentWidth + charWidth > availableSpace ) {
-		auto it = firstLine;
-		std::advance(it, cursorRow );
+		++cursorColumn;
 		reworkLines( it );
 
 		//change cursor position to the end of current line
@@ -502,11 +573,20 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 	return true;
 }
 
-Text::TextLine* Text::getCursorTextLine() {
+std::list<Text::TextLine*>::iterator Text::getCursorTextLine() {
 	auto it = firstLine;
 	//TODO add check for distance to advance
 	std::advance(it, cursorRow );
-	return *it;
+	return it;
+}
+
+void Text::updateCursor() {
+	cursor->setSize( 2, font->info.line_height );
+	auto it = firstLine;
+
+	uint32_t posX = margins.left + font->getPixelWidth( (*it)->text, 0, cursorColumn );
+	uint32_t posY = margins.top + cursorRow*font->info.line_height;
+	cursor->setPosition( posX, posY );
 }
 
 void Text::recalculateDrawParams() {
