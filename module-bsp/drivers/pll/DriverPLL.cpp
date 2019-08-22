@@ -23,14 +23,14 @@
 
 namespace drivers {
 
-    std::weak_ptr<DriverPLL> DriverPLL::singleton[magic_enum::enum_count<PLLInstances>()];
+    std::weak_ptr<DriverPLL> DriverPLL::singleton[static_cast<uint32_t >(PLLInstances ::COUNT)];
 
     std::shared_ptr<DriverPLL> DriverPLL::Create(const drivers::PLLInstances instance,
                                                  const drivers::DriverPLLParams &params) {
         {
 
             cpp_freertos::CriticalSection::Enter();
-            std::shared_ptr<DriverPLL> inst = singleton[magic_enum::enum_integer(instance)].lock();
+            std::shared_ptr<DriverPLL> inst = singleton[static_cast<uint32_t >(instance)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
@@ -40,7 +40,7 @@ namespace drivers {
 #error "Unsupported target"
 #endif
 
-                singleton[magic_enum::enum_integer(instance)] = inst;
+                singleton[static_cast<uint32_t >(instance)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();

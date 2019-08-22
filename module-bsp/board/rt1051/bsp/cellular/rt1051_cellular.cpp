@@ -10,8 +10,6 @@
 
 
 #include "rt1051_cellular.hpp"
-#include "menums/magic_enum.hpp"
-
 #include "FreeRTOS.h"
 #include "task.h"
 #include "stream_buffer.h"
@@ -59,7 +57,6 @@ void LPUART1_IRQHandler(void) {
 namespace bsp {
 
     using namespace drivers;
-    using namespace magic_enum;
 
     TimerHandle_t                   RT1051Cellular::rxTimeoutTimer = nullptr;
     lpuart_edma_handle_t            RT1051Cellular::uartDmaHandle = {};
@@ -169,10 +166,10 @@ namespace bsp {
         InformModemHostWakeup();
 
         TickType_t tick = xTaskGetTickCount();
-        gpio_2->WritePin(enum_integer(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);
+        gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);
         vTaskDelayUntil(&tick, POWER_UP_DELAY_MS);
         //BSP_CellularSetPowerState(CellularPowerStateTurningOn);
-        gpio_2->WritePin(enum_integer(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 0);
+        gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 0);
 
         EnableRx();
     }
@@ -184,10 +181,10 @@ namespace bsp {
         InformModemHostWakeup();
 
         TickType_t tick = xTaskGetTickCount();
-        gpio_2->WritePin(enum_integer(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);
+        gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);
         vTaskDelayUntil(&tick, POWER_DOWN_DELAY_MS);
         //BSP_CellularSetPowerState(CellularPowerStateTurningOff);
-        gpio_2->WritePin(enum_integer(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 0);
+        gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 0);
         //vTaskDelay(pdMS_TO_TICKS(POWER_DOWN_IN_PROGRESS_DELAY_MS));
 
 /*        while (s_cellularPowerState != CellularPowerStatePoweredDown)
@@ -204,9 +201,9 @@ namespace bsp {
         InformModemHostWakeup();
         WakeupModem();
 
-        gpio_2->WritePin(enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN), 1);
+        gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN), 1);
         vTaskDelay(pdMS_TO_TICKS(RESET_DELAY_MS));
-        gpio_2->WritePin(enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN), 0);
+        gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN), 0);
 
     }
 
@@ -265,17 +262,17 @@ namespace bsp {
         gpio_3 = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::CELLULAR_GPIO_3), DriverGPIOParams{});
 
         gpio_2->ClearPortInterrupts(
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN) |
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN) |
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
         );
 
         gpio_2->DisableInterrupt(
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN) |
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
-                1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN) |
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
+                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
         );
 
         // INPUTS
@@ -283,66 +280,66 @@ namespace bsp {
         gpio_1->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 1,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 1,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 1,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 1,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN)});
 
         // OUTPUTS
 
         gpio_1->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_1_RTS_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_RTS_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN)});
 
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMSEL_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMSEL_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN)});
 
 
         gpio_3->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN)});
 
 
 /*        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
@@ -350,10 +347,10 @@ namespace bsp {
     }
 
     void RT1051Cellular::MSPDeinit() {
-        gpio_2->DisableInterrupt(1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN));
-        gpio_2->DisableInterrupt(1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN));
-        gpio_2->DisableInterrupt(1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN));
-        gpio_1->DisableInterrupt(1 << enum_integer(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN));
+        gpio_2->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN));
+        gpio_2->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN));
+        gpio_2->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN));
+        gpio_1->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN));
     }
 
     void RT1051Cellular::DMAInit() {
@@ -365,8 +362,8 @@ namespace bsp {
         dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions::CELLULAR_DMA), DriverDMAParams{});
 
 
-        txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL));
-        dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL),
+        txDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL));
+        dmamux->Enable(static_cast<uint32_t >(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL),
                        kDmaRequestMuxLPUART1Tx); // TODO: M.P fix BSP_CELLULAR_UART_TX_DMA_CH
 
         LPUART_TransferCreateHandleEDMA(CELLULAR_UART_BASE,
@@ -378,7 +375,7 @@ namespace bsp {
     }
 
     void RT1051Cellular::DMADeinit() {
-        dmamux->Disable(enum_integer(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL));
+        dmamux->Disable(static_cast<uint32_t >(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL));
     }
 
     uint32_t RT1051Cellular::UartGetPeripheralClock() {
