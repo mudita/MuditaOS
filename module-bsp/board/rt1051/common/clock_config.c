@@ -76,33 +76,31 @@ void BOARD_InitBootClocks(void)
  *      |                    | LPI2C           | 12MHz
  *      |                    | UART            | 24MHz
  * ---------------------------------------------------------
- *  2   | PLL1 (ARM)         | core            | 516MHz
- *      |                    | ADC, XBAR       | 129MHz
- *      |                    | PIT, GPT        | 64,5MHz
- *      |                    | SEMC            | 129MHz
+ *  2   | PLL1 (ARM)         | NOT USED        |
  * ---------------------------------------------------------
- *  3   | PLL2_PFD2 (SYS)    | USDHC1          | 198MHz
- *      |                    | USDHC2          | 132MHz
- *      |                    | LPSPI           | 49,5MHz
+ *  3   | PLL2 (SYS)         | CORE            | 528MHz
+ * ---------------------------------------------------------
+ *  4   | PLL2_PFD0          | NOT USED
+ * ---------------------------------------------------------
+ *  5   | PLL2_PFD1          | NOT USED
+ * ---------------------------------------------------------
+ *  6   | PLL2_PFD2          | USDHC1          | 198MHz (PLL2_PFD2/3)
+ *      |                    | USDHC2          | 132MHz (PLL2_PFD2/3)
+ *      |                    | LPSPI           | 49,5MHz (PLL2_PFD2/8)
  *      |                    | TRACE           | 117,33MHz
+ *      |                    | SEMC            | 163,86MHz (PLL2_PFD2/2)
  * ---------------------------------------------------------
- *  4   | PLL3_PFD0 (USB1)   | FlexSPI         | 261,81MHz
+ *  7   | PLL2_PFD3          | NOT USED
  * ---------------------------------------------------------
- *  5   | PLL3               | CAN             | 40MHz
- *      |                    | SPDIF0          | 30MHz
- *      |                    | FLEXIO1         | 30MHz
- *      |                    | FLEXIO2         | 30MHz
- *      |                    | SAI1_MCLK3      | 30MHz
- *      |                    | SAI2_MCLK3      | 30MHz
- *      |                    | SAI3_MCLK3      | 30MHz
+ *  8   | PLL3_PFD0 (USB1)   | NOT USED        |
  * ---------------------------------------------------------
- *  6   | PLL3_PFD1          | LCDIF           | 67,5MHz
+ *  9   | PLL3               | NOT USED        |
  * ---------------------------------------------------------
- *  7   | PLL3_PFD2          | SAI3            | 63,52MHz
- *      |                    | SAI3_MCLK1      | 63,52MHz
- *      |                    | MQS_MCLK        | 63,52MHz
+ *  10  | PLL3_PFD1          | NOT USED        |
  * ---------------------------------------------------------
- *  8   | PLL4 (audio)       | SAI1            | 6,14MHz
+ *  11  | PLL3_PFD2          | NOT USED        |
+ * ---------------------------------------------------------
+ *  12  | PLL4 (audio)       | SAI1            | 6,14MHz
  *      |                    | SAI2            | 6,14MHz
  *      |                    | SAI1_MCLK1      | 6,14MHz
  *      |                    | SAI1_MCLK2      | 6,14MHz
@@ -343,8 +341,12 @@ void BOARD_BootClockRUN(void)
 	clkPLL1setup(CLK_DISABLE);
     CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllArm, 1);
 
-	/* Init System pfd0. */
-	clkPLL2_PFD0setup(CLK_ENABLE);
+    clkPLL2setup(CLK_ENABLE);
+	/* Deinit System pfd0. */
+	clkPLL2_PFD0setup(CLK_DISABLE);
+	clkPLL2_PFD1setup(CLK_DISABLE);
+	clkPLL2_PFD3setup(CLK_DISABLE);
+
 
 	/* Disable pfd offset. */
 	CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
