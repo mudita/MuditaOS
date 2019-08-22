@@ -10,7 +10,6 @@
 
 
 #include "RT1051CellularAudio.hpp"
-#include "menums/magic_enum.hpp"
 #include "board.h"
 #include "dma_config.h"
 
@@ -22,7 +21,6 @@
 namespace bsp {
 
     using namespace drivers;
-    using namespace magic_enum;
 
     sai_edma_handle_t RT1051CellularAudio::txHandle = {};
     sai_edma_handle_t RT1051CellularAudio::rxHandle = {};
@@ -143,11 +141,11 @@ namespace bsp {
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_CELLULAR_AUDIO_SAIx_MCLK_MASK;
 
-        txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
-        rxDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
-        dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL),
+        txDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL));
+        rxDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+        dmamux->Enable(static_cast<uint32_t >(BoardDefinitions::CELLULAR_AUDIO_TX_DMA_CHANNEL),
                        BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_TX_SOURCE
-        dmamux->Enable(enum_integer(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL),
+        dmamux->Enable(static_cast<uint32_t >(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL),
                        BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE
 
         mclkSourceClockHz = BOARD_CELLULAR_AUDIO_SAIx_CLK_FREQ;
@@ -168,8 +166,8 @@ namespace bsp {
     void RT1051CellularAudio::Deinit() {
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_CELLULAR_AUDIO_SAIx);
-        dmamux->Disable(enum_integer(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
-        dmamux->Disable(enum_integer(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
+        dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::CELLULAR_AUDIO_TX_DMA_CHANNEL));
+        dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::CELLULAR_AUDIO_RX_DMA_CHANNEL));
     }
 
     void RT1051CellularAudio::InStart() {

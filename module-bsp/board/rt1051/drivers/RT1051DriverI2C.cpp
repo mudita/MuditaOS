@@ -12,7 +12,6 @@
 #include "RT1051DriverI2C.hpp"
 #include "log/log.hpp"
 #include "../board.h"
-#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -21,21 +20,29 @@ namespace drivers {
 
         lpi2c_master_config_t lpi2cConfig = {0};
 
-        switch (inst){
+        switch (instance){
             case I2CInstances ::I2C1:
                 base = LPI2C1;
+                LOG_DEBUG("Init: I2C1");
                 break;
             case I2CInstances ::I2C2:
                 base = LPI2C2;
+                LOG_DEBUG("Init: I2C2");
                 break;
         }
-        LOG_DEBUG("Init: %s",std::string(magic_enum::enum_name(instance)).c_str());
         LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
         LPI2C_MasterInit(base, &lpi2cConfig, ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U)));
     }
 
     RT1051DriverI2C::~RT1051DriverI2C() {
-        LOG_DEBUG("Deinit: %s", std::string(magic_enum::enum_name(instance)).c_str());
+        switch (instance){
+            case I2CInstances ::I2C1:
+                LOG_DEBUG("Deinit: I2C1");
+                break;
+            case I2CInstances ::I2C2:
+                LOG_DEBUG("Deinit: I2C2");
+                break;
+        }
         LPI2C_MasterDeinit(base);
     }
 
