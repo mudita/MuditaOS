@@ -23,14 +23,12 @@
 #include "bsp/keyboard/key_codes.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
-#include "menums/magic_enum.hpp"
 #include "drivers/i2c/DriverI2C.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 
 namespace bsp {
 
     using namespace drivers;
-    using namespace magic_enum;
 
     static std::shared_ptr<drivers::DriverI2C> i2c;
     static drivers::I2CAddress i2cAddr = {.deviceAddress=TCA8418_I2C_ADDRESS, .subAddressSize=TCA8418_I2C_ADDRESS_SIZE};
@@ -59,25 +57,25 @@ namespace bsp {
         gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON)});
 
         gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN)});
 
         gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntFallingEdge,
                 .defLogic = 0,
-                .pin = enum_integer(BoardDefinitions::KEYBOARD_IRQ_PIN)});
+                .pin = static_cast<uint32_t >(BoardDefinitions::KEYBOARD_IRQ_PIN)});
 
 
 
 
         // Reset keyboard controller
-        gpio->WritePin(enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN),0);
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),0);
         vTaskDelay(100);
-        gpio->WritePin(enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN),1);
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),1);
         vTaskDelay(100);
 
         uint32_t reg = 0;
@@ -150,8 +148,8 @@ namespace bsp {
         }
 
         /* Enable GPIO pin interrupt */
-        gpio->EnableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
-        gpio->EnableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_IRQ_PIN));
+        gpio->EnableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->EnableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_IRQ_PIN));
 
         return kStatus_Success;
     }
@@ -160,8 +158,8 @@ namespace bsp {
     status_t keyboard_Deinit(void) {
 
         /* Disable GPIO pin interrupt */
-        gpio->DisableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
-        gpio->DisableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_IRQ_PIN));
+        gpio->DisableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->DisableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_IRQ_PIN));
 
         //Clear all interrupts, even IRQs we didn't check (GPI, CAD, LCK)
         uint8_t reg = 0xff;
@@ -169,7 +167,7 @@ namespace bsp {
         i2c->Write(i2cAddr, (uint8_t *) &reg, 1);
 
         // Keep keyboard controller in reset state
-        gpio->WritePin(enum_integer(BoardDefinitions::KEYBOARD_RESET_PIN),0);
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),0);
 
         //Clear IRQ queue handle
         qHandleIrq = NULL;
@@ -233,12 +231,12 @@ namespace bsp {
 
     BaseType_t keyboard_right_functional_IRQHandler(void) {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        gpio->ClearPortInterrupts(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->ClearPortInterrupts(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
 
         if (s_right_functional_check_timer != NULL) {
-            gpio->DisableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
+            gpio->DisableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
 
-            if (gpio->ReadPin(enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON)) == 0) {
+            if (gpio->ReadPin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON)) == 0) {
                 s_rigth_functional_last_state = 0;
             } else {
                 s_rigth_functional_last_state = 1;
@@ -283,6 +281,6 @@ namespace bsp {
             }
         }
 
-        gpio->EnableInterrupt(1U << enum_integer(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->EnableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
     }
 }
