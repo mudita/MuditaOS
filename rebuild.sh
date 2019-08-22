@@ -9,25 +9,6 @@ if [ ! -d "$BUILD_DIR" ]; then
 	mkdir "$BUILD_DIR"
 fi
 
-#enter build directory, erase content and make /sys/assets directory
-cd "$BUILD_DIR"
-rm -rf *
-mkdir -p "sys/$ASSETS_DIR"
-mkdir -p "sys/$DB_DIR"
-
-#if module-gui directory is present try to copy assets to build directory
-MODULE_GUI_DIR="../module-gui"
-if [ -d "$MODULE_GUI_DIR" ]; then
-	
-	echo "Found module-gui, copying assets."
-#	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
-	cp -R ../image/* sys
-#	cp -R "../image/Luts.bin" "sys"
-	cp "../module-apps/application-viewer/viewerStates.txt" "sys"
-	#language profiles
-#	cp -R "../image/assets" "sys"
-fi
-
 #first parameter specifies platform, by default it is Linux
 TARGET="Target_Linux.cmake"
 TARGET_SET="false"
@@ -39,6 +20,18 @@ if [ "$1" != "" ]; then
 		echo "Building for Linux."
 		TARGET="Target_Linux.cmake"
 		TARGET_SET="true"
+	fi
+	if [ "$1" = "assets" ]; then
+		echo "Copying assets folder"
+		cd "$BUILD_DIR"
+		#if there is no assets directory create one
+		if [ ! -d "$ASSETS_DIR" ]; then
+			mkdir "$ASSETS_DIR"
+		fi	
+		cd "$ASSETS_DIR"
+		rm -rf *
+		cd ..
+		cp -R ../image/* sys
 	fi
 	if [ "$1" = "rt1051" ]; then
 		echo "Building for RT1051."
@@ -63,6 +56,26 @@ if [ "$TARGET_SET" = "true" ]; then
 	else
 		echo "Building without tests."
 	fi
+fi
+
+
+#enter build directory, erase content and make /sys/assets directory
+cd "$BUILD_DIR"
+rm -rf *
+mkdir -p "sys/$ASSETS_DIR"
+mkdir -p "sys/$DB_DIR"
+
+#if module-gui directory is present try to copy assets to build directory
+MODULE_GUI_DIR="../module-gui"
+if [ -d "$MODULE_GUI_DIR" ]; then
+	
+	echo "Found module-gui, copying assets."
+#	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
+	cp -R ../image/* sys
+#	cp -R "../image/Luts.bin" "sys"
+	cp "../module-apps/application-viewer/viewerStates.txt" "sys"
+	#language profiles
+#	cp -R "../image/assets" "sys"
 fi
 
 if [ "$BUILD_TESTS" = "true" ]; then
