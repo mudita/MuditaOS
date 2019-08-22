@@ -23,14 +23,14 @@
 
 namespace drivers {
 
-    std::weak_ptr<DriverDMA> DriverDMA::singleton[magic_enum::enum_count<DMAInstances>()];
+    std::weak_ptr<DriverDMA> DriverDMA::singleton[static_cast<uint32_t >(DMAInstances ::COUNT)];
 
     std::shared_ptr<DriverDMA> DriverDMA::Create(const drivers::DMAInstances instance,
                                                        const drivers::DriverDMAParams &params) {
         {
 
             cpp_freertos::CriticalSection::Enter();
-            std::shared_ptr<DriverDMA> inst = singleton[magic_enum::enum_integer(instance)].lock();
+            std::shared_ptr<DriverDMA> inst = singleton[static_cast<uint32_t >(instance)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
@@ -40,7 +40,7 @@ namespace drivers {
 #error "Unsupported target"
 #endif
 
-                singleton[magic_enum::enum_integer(instance)] = inst;
+                singleton[static_cast<uint32_t >(instance)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();

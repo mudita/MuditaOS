@@ -13,14 +13,14 @@
 #define PUREPHONE_DRIVERI2C_HPP
 
 #include <memory>
-#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
 
     enum class I2CInstances {
         I2C1,
-        I2C2
+        I2C2,
+        COUNT
     };
 
     struct DriverI2CParams {
@@ -55,7 +55,7 @@ namespace drivers {
         const DriverI2CParams parameters;
 
     private:
-        static std::weak_ptr<DriverI2C> singleton[magic_enum::enum_count<I2CInstances>()];
+        static std::weak_ptr<DriverI2C> singleton[static_cast<uint32_t >(I2CInstances ::COUNT)];
 
     };
 
