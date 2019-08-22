@@ -340,7 +340,7 @@ void BOARD_BootClockRUN(void)
 	/* Set GPT2 High frequency reference clock source. */
 	IOMUXC_GPR->GPR5 &= ~IOMUXC_GPR_GPR5_VREF_1M_CLK_GPT2_MASK;
 	/* Init ARM PLL. */
-	clkPLL1setup(CLK_ENABLE);
+	clkPLL1setup(CLK_DISABLE);
 
 	/* Init System pfd0. */
 	clkPLL2_PFD0setup(CLK_ENABLE);
@@ -398,7 +398,7 @@ void BOARD_BootClockRUN(void)
 
 	/* Set preperiph clock source. */
 	/* PLL1/2 = 432MHz */
-	CLOCK_SetMux(kCLOCK_PrePeriphMux, 3);		//CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
+	CLOCK_SetMux(kCLOCK_PrePeriphMux, 0);		//CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
 	/* Set periph clock source. */
 	/* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
 	CLOCK_SetMux(kCLOCK_PeriphMux, 0);			//CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided

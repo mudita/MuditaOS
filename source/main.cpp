@@ -59,7 +59,7 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl) override {
 
-#if 1 // M.P: left here on purpose
+#if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
         auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         //vTaskDelay(3000);
@@ -140,7 +140,7 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
 
         //vector with launchers to applications
