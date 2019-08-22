@@ -409,7 +409,7 @@ void BOARD_BootClockRUN(void)
 	/* PLL3_SW_CLK = 480MHz */
 	CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 0);		//CBCMR  (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
 	/* Set SystemCoreClock variable. */
-	SystemCoreClock = BOARD_BOOTCLOCKRUN_CORE_CLOCK;
+    SystemCoreClockUpdate();
 
 	/* DeInit Audio PLL */
 	clkPLL4setup(CLK_DISABLE);
