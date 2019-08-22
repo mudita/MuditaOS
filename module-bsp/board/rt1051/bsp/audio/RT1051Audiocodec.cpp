@@ -173,7 +173,7 @@ namespace bsp {
         dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE
         dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE
 
-        mclkSourceClockHz = BOARD_AUDIOCODEC_SAIx_CLK_FREQ;
+        mclkSourceClockHz = GetPerphSourceClock(PerphClock_SAI2); // TODO:M.P fix PerphClock_SAI2
 
         // Initialize SAI Tx module
         SAI_TxGetDefaultConfig(&config);

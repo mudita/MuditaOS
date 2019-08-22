@@ -148,7 +148,7 @@ namespace bsp {
         dmamux->Enable(static_cast<uint32_t >(BoardDefinitions::CELLULAR_AUDIO_RX_DMA_CHANNEL),
                        BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_CELLULAR_AUDIO_SAIx_DMA_RX_SOURCE
 
-        mclkSourceClockHz = BOARD_CELLULAR_AUDIO_SAIx_CLK_FREQ;
+        mclkSourceClockHz = GetPerphSourceClock(PerphClock_SAI1); // TODO:M.P fix PerphClock_SAI1
 
         // Initialize SAI Tx module
         SAI_TxGetDefaultConfig(&config);

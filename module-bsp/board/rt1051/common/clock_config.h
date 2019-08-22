@@ -148,6 +148,18 @@ void clkPLL6setup( uint8_t enabled );
 
 void clkPLL7setup( uint8_t enabled );
 
+typedef enum{
+    PerphClock_I2C,
+    PerphClock_LPSPI,
+    PerphClock_LPUART,
+    PerphClock_SAI1,
+    PerphClock_SAI2,
+    PerphClock_USDHC2,
+
+}PerphClock_t;
+
+uint32_t GetPerphSourceClock(PerphClock_t clock);
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus*/

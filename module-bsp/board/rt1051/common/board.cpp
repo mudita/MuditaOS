@@ -155,20 +155,6 @@ namespace bsp {
         SCB_EnableICache();
     }
 
-
-    static void BOARD_ConfigAudioCodec(void) {
-        CLOCK_SetMux(BOARD_AUDIOCODEC_SAIx_MUX, BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_SELECT);    //sai2, 2-PLL4
-        CLOCK_SetDiv(BOARD_AUDIOCODEC_SAIx_PREDIV, BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_PRE_DIVIDER);    // /1
-        CLOCK_SetDiv(BOARD_AUDIOCODEC_SAIx_DIV, BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_DIVIDER);    // /63
-    }
-
-    static void BOARD_ConfigCellular(void) {
-        CLOCK_SetMux(BOARD_CELLULAR_AUDIO_SAIx_MUX,
-                     BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_SELECT);        //sai1, 2-PLL4
-        CLOCK_SetDiv(BOARD_CELLULAR_AUDIO_SAIx_PREDIV, BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_PRE_DIVIDER);    // /1
-        CLOCK_SetDiv(BOARD_CELLULAR_AUDIO_SAIx_DIV, BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_DIVIDER); // /63
-    }
-
     void BOARD_PrintClocks( void ) {
         const char *_PLLNames[22] = {
                 "kCLOCK_CpuClk",  /*!< CPU clock */
@@ -229,8 +215,6 @@ namespace bsp {
         BOARD_ConfigMPU();
 
         BOARD_InitDebugConsole();
-        BOARD_ConfigAudioCodec();
-        BOARD_ConfigCellular();
 
         irq_gpio_Init();
 
