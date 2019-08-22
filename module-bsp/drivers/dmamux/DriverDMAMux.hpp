@@ -13,13 +13,13 @@
 #define PUREPHONE_DRIVERDMAMUX_HPP
 
 #include <memory>
-#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
 
     enum class DMAMuxInstances {
-        DMAMUX0
+        DMAMUX0,
+        COUNT
     };
 
     struct DriverDMAMuxParams {
@@ -42,7 +42,7 @@ namespace drivers {
         const DriverDMAMuxParams parameters;
 
     private:
-        static std::weak_ptr<DriverDMAMux> singleton[magic_enum::enum_count<DMAMuxInstances>()];
+        static std::weak_ptr<DriverDMAMux> singleton[static_cast<uint32_t >(DMAMuxInstances ::COUNT)];
 
     };
 

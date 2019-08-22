@@ -10,7 +10,6 @@
 
 
 #include "RT1051DriverGPIO.hpp"
-#include "menums/magic_enum.hpp"
 #include "log/log.hpp"
 
 
@@ -20,35 +19,41 @@ RT1051DriverGPIO::RT1051DriverGPIO(const GPIOInstances &inst, const DriverGPIOPa
     switch (instance) {
         case GPIOInstances::GPIO_1: {
             base = GPIO1;
+            name = "GPIO_1";
         }
             break;
 
         case GPIOInstances::GPIO_2: {
             base = GPIO2;
+            name = "GPIO_2";
         }
             break;
 
         case GPIOInstances::GPIO_3: {
             base = GPIO3;
+            name = "GPIO_3";
         }
             break;
 
         case GPIOInstances::GPIO_4: {
             base = GPIO4;
+            name = "GPIO_4";
         }
             break;
 
         case GPIOInstances::GPIO_5: {
             base = GPIO5;
+            name = "GPIO_5";
         }
             break;
     }
-    LOG_DEBUG("Init: %s",std::string(magic_enum::enum_name(instance)).c_str());
+
+    LOG_DEBUG("Init: %s", name.c_str());
 }
 
 
 RT1051DriverGPIO::~RT1051DriverGPIO() {
-    LOG_DEBUG("Deinit: %s", std::string(magic_enum::enum_name(instance)).c_str());
+    LOG_DEBUG("Deinit: %s", name.c_str());
     //Disable all interrupts
     GPIO_DisableInterrupts(base,UINT32_MAX);
     // Clear all interrupt flags
@@ -62,6 +67,7 @@ int32_t RT1051DriverGPIO::ConfPin(const drivers::DriverGPIOPinParams &params) {
     conf.outputLogic = static_cast<uint8_t >(params.defLogic);
     conf.interruptMode = static_cast<gpio_interrupt_mode_t>(params.irqMode);
     GPIO_PinInit(base,params.pin,&conf);
+    return 0;
 }
 
 void RT1051DriverGPIO::SetPort(const uint32_t mask) {
