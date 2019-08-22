@@ -7,6 +7,8 @@
  * @details
  */
 #include <iterator>
+
+#include "vfs.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "../core/Font.hpp"
@@ -105,7 +107,54 @@ void Text::clear(){
 }
 
 UTF8 Text::getText() {
-	return "";
+
+	UTF8 output;
+
+	//iterate over all lines and add content from each line to output string.
+	auto it = textLines.begin();
+	while( it != textLines.end()) {
+
+		output += (*it)->text;
+		if( (*it)->endType == LineEndType::BREAK ) {
+			output.insert("\n");
+		}
+
+		if( (*it)->endType == LineEndType::CONTINUE_SPACE ) {
+			output.insert(" ");
+		}
+
+		++it;
+	}
+	return output;
+}
+
+bool Text::saveText( UTF8 path ) {
+
+	auto file = vfs.fopen( path.c_str(), "wb" );
+
+	if( file == nullptr )
+		return false;
+
+	auto it = textLines.begin();
+
+	//iterate over all lines in text edit
+	while( it != textLines.end()) {
+
+		vfs.fwrite( (*it)->text.c_str(), (*it)->text.used()-1, 1, file );
+		if( (*it)->endType == LineEndType::BREAK ) {
+			vfs.fwrite( "\n", 1, 1, file );
+		}
+
+		if( (*it)->endType == LineEndType::CONTINUE_SPACE ) {
+			vfs.fwrite( " ", 1, 1, file );
+		}
+
+		++it;
+	}
+	//close file
+	vfs.fclose( file );
+
+	return true;
 }
 
 void Text::setFont( const UTF8& fontName) {
