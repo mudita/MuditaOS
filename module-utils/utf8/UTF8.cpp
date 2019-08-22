@@ -536,7 +536,7 @@ bool UTF8::removeChar(const uint32_t& pos, const uint32_t& count)
 	uint32_t copyOffset = beginPtr - this->data;
 	memset(tempString, 0, tempStringBufferSize);
 	memcpy(tempString, this->data, beginPtr - this->data);
-	memcpy(tempString + copyOffset, endPtr, this->sizeUsed - bytesToRemove);
+	memcpy(tempString + copyOffset, endPtr, this->sizeUsed - bytesToRemove - copyOffset);
 
 	this->sizeAllocated = tempStringBufferSize;
 	this->strLength -= count;
