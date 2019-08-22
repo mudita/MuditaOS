@@ -56,6 +56,13 @@ void NotesEditWindow::buildInterface() {
 	text->setFont("gt_pressura_bold_24");
 	text->setRadius(5);
 	text->setMargins( gui::Margins(10, 10, 10, 10));
+	text->activatedCallback = [=] (gui::Item& item){
+		LOG_INFO("Comparing text" );
+		LOG_INFO("SOURCE:[%s]", textString.c_str());
+		UTF8 getstr = text->getText();
+		LOG_INFO("GETSTR:[%s]", getstr.c_str());
+		LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
+		return true; };
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
@@ -85,13 +92,7 @@ bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
 		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) {
 			application->render( RefreshModes::GUI_REFRESH_FAST );
 		}
-		//if enter was pressed
-		else {
-			LOG_INFO("SOURCE:[%s]", textString.c_str());
-			UTF8 getstr = text->getText();
-			LOG_INFO("GETSTR:[%s]", getstr.c_str());
-			LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
-		}
+
 		return true;
 	}
 
