@@ -49,7 +49,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(5000, true);
+        timer_id = CreateTimer(500, true);
         ReloadTimer(timer_id);
     }
 
@@ -96,6 +96,7 @@ public:
 
         auto ret = sys::Bus::SendUnicast(msg,GetName(),this);
 #endif
+
     }
 
 
@@ -140,7 +141,7 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
-        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
 
         //vector with launchers to applications

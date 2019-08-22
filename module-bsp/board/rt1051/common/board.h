@@ -261,55 +261,9 @@
                                 IOMUXC_SW_PAD_CTL_PAD_DSE(strength));                             \
     }
 
-/*! @brief The WIFI-QCA shield pin. */
-#define BOARD_INITGT202SHIELD_PWRON_GPIO GPIO1                    /*!< GPIO device name: GPIO */
-#define BOARD_INITGT202SHIELD_PWRON_PORT 1U                       /*!< PORT device index: 1 */
-#define BOARD_INITGT202SHIELD_PWRON_GPIO_PIN 3U                   /*!< PIO4 pin index: 3 */
-#define BOARD_INITGT202SHIELD_PWRON_PIN_NAME GPIO1_3              /*!< Pin name */
-#define BOARD_INITGT202SHIELD_PWRON_LABEL "PWRON"                 /*!< Label */
-#define BOARD_INITGT202SHIELD_PWRON_NAME "PWRON"                  /*!< Identifier name */
-#define BOARD_INITGT202SHIELD_PWRON_DIRECTION kGPIO_DigitalOutput /*!< Direction */
-
-#define BOARD_INITGT202SHIELD_IRQ_GPIO GPIO1                   /*!< GPIO device name: GPIO */
-#define BOARD_INITGT202SHIELD_IRQ_PORT 1U                      /*!< PORT device index: 1 */
-#define BOARD_INITGT202SHIELD_IRQ_GPIO_PIN 19U                 /*!< PIO1 pin index: 19 */
-#define BOARD_INITGT202SHIELD_IRQ_PIN_NAME GPIO1_19            /*!< Pin name */
-#define BOARD_INITGT202SHIELD_IRQ_LABEL "IRQ"                  /*!< Label */
-#define BOARD_INITGT202SHIELD_IRQ_NAME "IRQ"                   /*!< Identifier name */
-#define BOARD_INITGT202SHIELD_IRQ_DIRECTION kGPIO_DigitalInput /*!< Direction */
-
-
-/* @Brief Board accelerator sensor configuration */ 
-#define BOARD_ACCEL_I2C_BASEADDR LPI2C1
-/* Select USB1 PLL (480 MHz) as LPI2C's clock source */
-#define BOARD_ACCEL_I2C_CLOCK_SOURCE_SELECT (0U)
-/* Clock divider for LPI2C clock source */
-#define BOARD_ACCEL_I2C_CLOCK_SOURCE_DIVIDER (5U)
-#define BOARD_ACCEL_I2C_CLOCK_FREQ (CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8 / (BOARD_ACCEL_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-
-#define BOARD_CODEC_I2C_BASEADDR LPI2C1
-#define BOARD_CODEC_I2C_CLOCK_SOURCE_SELECT (0U)
-#define BOARD_CODEC_I2C_CLOCK_SOURCE_DIVIDER (5U)
-#define BOARD_CODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_CODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-
-/* @Brief Board CAMERA configuration */
-#define BOARD_CAMERA_I2C_BASEADDR LPI2C1
-#define BOARD_CAMERA_I2C_CLOCK_SOURCE_DIVIDER (5U)
-#define BOARD_CAMERA_I2C_CLOCK_SOURCE_SELECT (0U) /* Select USB1 PLL (480 MHz) as LPI2C's clock source */
-#define BOARD_CAMERA_I2C_CLOCK_FREQ \
-    (CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8 / (BOARD_CAMERA_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-
-
 /**
  * BOARD EINK DEFINITIONS
  */
-
-/* Select USB1 PLL PFD0 (720 MHz) as lpspi clock source */
-#define BOARD_EINK_LPSPI_CLOCK_SOURCE_SELECT (1U)
-/* Clock divider for master lpspi clock source */
-#define BOARD_EINK_LPSPI_CLOCK_SOURCE_DIVIDER (7U)
-#define BOARD_EINK_LPSPI_CLOCK_FREQ \
-    (CLOCK_GetFreq(kCLOCK_Usb1PllPfd0Clk) / (BOARD_EINK_LPSPI_CLOCK_SOURCE_DIVIDER + 1U))
 
 
 #define BOARD_EINK_LPSPI_BASE		LPSPI1
@@ -396,16 +350,6 @@
 #define BOARD_CELLULAR_AUDIO_SAIx_RX_IRQ                    SAI1_IRQn
 
 
-/* Select Audio/Video PLL (786.48 MHz) as BOARD_AUDIOCODEC_SAIx clock source */
-#define BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_SELECT (2U)
-/* Clock pre divider for BOARD_AUDIOCODEC_SAIx clock source */
-#define BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_PRE_DIVIDER (0U)
-/* Divide to get 12.288MHz MCLK */
-#define BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_DIVIDER (63U)
-#define BOARD_CELLULAR_AUDIO_SAIx_CLK_FREQ                                                        \
-    (CLOCK_GetFreq(kCLOCK_AudioPllClk) / (BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_DIVIDER + 1U) / \
-     (BOARD_CELLULAR_AUDIO_SAIx_CLOCK_SOURCE_PRE_DIVIDER + 1U))
-
 #define BSP_CELLULAR_SIMSEL_PORT                             GPIO2
 #define BSP_CELLULAR_SIMSEL_PIN                              20
 #define BSP_CELLULAR_SIMSEL_PAD                              GPIO_B1_04
@@ -437,11 +381,6 @@
 /**
  * BOARD KEYBOARD DEFINITIONS
  */
-#define BOARD_KEYBOARD_I2C_BASEADDR LPI2C2
-#define BOARD_KEYBOARD_I2C_CLOCK_SOURCE_SELECT (0U)
-#define BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER (5U)
-//#define BOARD_KEYBOARD_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-#define BOARD_KEYBOARD_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U))
 
 #define BOARD_KEYBOARD_RESET_GPIO_PIN 	(29U)
 #define BOARD_KEYBOARD_RESET_GPIO		GPIO2
@@ -465,36 +404,6 @@
 /* IRQ */
 #define BOARD_AUDIOCODEC_SAIx_TX_IRQ SAI2_IRQn
 #define BOARD_AUDIOCODEC_SAIx_RX_IRQ SAI2_IRQn
-
-/* Select Audio/Video PLL (786.48 MHz) as BOARD_AUDIOCODEC_SAIx clock source */
-#define BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_SELECT (2U)
-/* Clock pre divider for BOARD_AUDIOCODEC_SAIx clock source */
-#define BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_PRE_DIVIDER (0U)
-/* Divide to get 12.288MHz MCLK */
-#define BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_DIVIDER (63U)
-#define BOARD_AUDIOCODEC_SAIx_CLK_FREQ                                                        \
-    (CLOCK_GetFreq(kCLOCK_AudioPllClk) / (BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_DIVIDER + 1U) / \
-     (BOARD_AUDIOCODEC_SAIx_CLOCK_SOURCE_PRE_DIVIDER + 1U))
-
-/* I2C */
-
-#define BOARD_AUDIOCODEC_I2C_BASEADDR LPI2C2
-#define BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_SELECT (0U)
-#define BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER (5U)
-//#define BOARD_AUDIOCODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-#define BOARD_AUDIOCODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-
-
-/**
- * BOARD EMMC DEFINITIONS
- */
-
-
-#define BOARD_EMMC_USDHCx USDHC2
-#define BOARD_EMMC_USDHCx_CLK_FREQ (CLOCK_GetSysPfdFreq(kCLOCK_Pfd0) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U))
-#define BOARD_EMMC_USDHCx_IRQ USDHC2_IRQn
-
-
 
 /**
  * BOARD USB TYPE-C CONTROLLER DEFINITIONS

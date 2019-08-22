@@ -341,6 +341,7 @@ void BOARD_BootClockRUN(void)
 	IOMUXC_GPR->GPR5 &= ~IOMUXC_GPR_GPR5_VREF_1M_CLK_GPT2_MASK;
 	/* Init ARM PLL. */
 	clkPLL1setup(CLK_DISABLE);
+    CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllArm, 1);
 
 	/* Init System pfd0. */
 	clkPLL2_PFD0setup(CLK_ENABLE);
@@ -878,4 +879,25 @@ void clkPLL7setup( uint8_t enabled ) {
 		/* DeInit Usb2 PLL. */
 		CLOCK_DeinitUsb2Pll();
 	}
+}
+
+uint32_t GetPerphSourceClock(PerphClock_t clock){
+    switch (clock){
+
+        case PerphClock_I2C:
+            return CLOCK_GetFreq(kCLOCK_OscClk) / 2;
+        case PerphClock_LPSPI:
+            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / 8;
+        case PerphClock_LPUART:
+            return CLOCK_GetFreq(kCLOCK_OscClk);
+        case PerphClock_SAI1:
+        case PerphClock_SAI2:
+            return CLOCK_GetFreq(kCLOCK_AudioPllClk)/64;
+        case PerphClock_USDHC2:
+            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+
+
+
+
+    }
 }
