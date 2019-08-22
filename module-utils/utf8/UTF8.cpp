@@ -311,7 +311,8 @@ UTF8& UTF8::operator+=( const UTF8& utf ) {
 		data = newData;
 		sizeAllocated = newSizeAllocated;
 		strLength += utf.strLength;
-		sizeUsed += utf.sizeUsed;
+		//-1 is to ignore double null terminator as it is counted in sizeUsed
+		sizeUsed += utf.sizeUsed-1;
 		lastIndex = 0;
 		lastIndexData = data;
 	}

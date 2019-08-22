@@ -114,6 +114,7 @@ UTF8 Text::getText() {
 	auto it = textLines.begin();
 	while( it != textLines.end()) {
 
+		auto textLine = (*it);
 		output += (*it)->text;
 		if( (*it)->endType == LineEndType::BREAK ) {
 			output.insert("\n");
@@ -392,6 +393,11 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 		return false;
 	}
 
+	//if key has enter code than return
+	if( inputEvent.keyCode == KeyCode::KEY_ENTER )
+		return false;
+
+
 	//check if this is navigation event
 	bool res;
 	if( editMode == EditMode::BROWSE )
@@ -430,6 +436,7 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 }
 
 bool Text::onActivated( void* data ) {
+	Rect::onActivated( data );
 	return false;
 }
 
