@@ -22,6 +22,8 @@
 #include "Text.hpp"
 #include "NotesEditWindow.hpp"
 
+UTF8 textString = "Very long test line ABCDEFGHIJKLMNOPQRST123456789\nabcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345";
+
 namespace gui {
 
 NotesEditWindow::NotesEditWindow( app::Application* app ) :
@@ -72,7 +74,7 @@ void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData*
 	application->setKeyboardProfile( "lang_eng_lower" );
 	setFocusItem( text );
 	LOG_INFO("SETTING TEXT");
-	text->setText("Very long test line ABCDEFGHIJKLMNOPQRST123456789\nabcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345");
+	text->setText( textString );
 }
 
 bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
@@ -80,8 +82,16 @@ bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
 	bool ret = AppWindow::onInput( inputEvent );
 	if( ret ) {
 		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
+		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) {
 			application->render( RefreshModes::GUI_REFRESH_FAST );
+		}
+		//if enter was pressed
+		else {
+			LOG_INFO("SOURCE:[%s]", textString.c_str());
+			UTF8 getstr = text->getText();
+			LOG_INFO("GETSTR:[%s]", getstr.c_str());
+			LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
+		}
 		return true;
 	}
 
