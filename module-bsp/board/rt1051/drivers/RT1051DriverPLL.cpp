@@ -11,12 +11,9 @@
 
 #include "RT1051DriverPLL.hpp"
 #include "log/log.hpp"
-#include "menums/magic_enum.hpp"
 #include "../common/clock_config.h"
 
 namespace drivers {
-
-    using namespace magic_enum;
 
     RT1051DriverPLL::RT1051DriverPLL(const drivers::PLLInstances &inst, const drivers::DriverPLLParams &params)
             : DriverPLL(params), instance(inst) {
@@ -24,29 +21,36 @@ namespace drivers {
         switch (instance) {
             case PLLInstances::PLL4_Audio: {
                 clkPLL4setup(CLK_ENABLE);
+                name = "PLL4_Audio";
             }
                 break;
             case PLLInstances::PLL3: {
                 clkPLL3setup(CLK_ENABLE);
+                name = "PLL3";
             }
                 break;
             case PLLInstances::PLL3_PFD0: {
                 clkPLL3_PFD0setup(CLK_ENABLE);
+                name = "PLL3_PFD0";
             }
                 break;
             case PLLInstances::PLL3_PFD1: {
                 clkPLL3_PFD1setup(CLK_ENABLE);
+                name = "PLL3_PFD1";
             }
                 break;
             case PLLInstances::PLL3_PFD2: {
                 clkPLL3_PFD2setup(CLK_ENABLE);
+                name = "PLL3_PFD2";
             }
                 break;
             case PLLInstances::PLL2_PFD2:
                 clkPLL2_PFD2setup(CLK_ENABLE);
+                name = "PLL2_PFD2";
                 break;
             case PLLInstances::PLL1_ARM: {
                 clkPLL1setup(CLK_ENABLE);
+                name = "PLL1_ARM";
             }
                 break;
             case PLLInstances::OSC_24M: {
@@ -54,7 +58,7 @@ namespace drivers {
             }
                 break;
         }
-        LOG_DEBUG("Init %s",std::string(magic_enum::enum_name(instance)).c_str());
+        LOG_DEBUG("Init: %s",name.c_str());
 
     }
 
@@ -94,7 +98,7 @@ namespace drivers {
                 break;
         }
 
-        LOG_DEBUG("Deinit %s",std::string(magic_enum::enum_name(instance)).c_str());
+        LOG_DEBUG("Deinit: %s",name.c_str());
     }
 
 }

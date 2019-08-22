@@ -13,7 +13,6 @@
 #define PUREPHONE_DRIVERPLL_HPP
 
 #include <memory>
-#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
@@ -27,6 +26,7 @@ namespace drivers {
         PLL3_PFD1,
         PLL3_PFD2,
         PLL4_Audio,
+        COUNT
     };
 
     struct DriverPLLParams {
@@ -45,7 +45,7 @@ namespace drivers {
     protected:
         const DriverPLLParams parameters;
     private:
-        static std::weak_ptr<DriverPLL> singleton[magic_enum::enum_count<PLLInstances>()];
+        static std::weak_ptr<DriverPLL> singleton[static_cast<uint32_t >(PLLInstances ::COUNT)];
 
     };
 

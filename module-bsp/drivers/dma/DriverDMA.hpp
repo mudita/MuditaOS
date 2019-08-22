@@ -15,13 +15,13 @@
 
 #include <functional>
 #include <memory>
-#include "menums/magic_enum.hpp"
 
 namespace drivers {
 
 
     enum class DMAInstances {
-        DMA_0
+        DMA_0,
+        COUNT
     };
 
     struct DriverDMAParams {
@@ -47,7 +47,7 @@ namespace drivers {
     protected:
         const DriverDMAParams parameters;
     private:
-        static std::weak_ptr<DriverDMA> singleton[magic_enum::enum_count<DMAInstances>()];
+        static std::weak_ptr<DriverDMA> singleton[static_cast<uint32_t >(DMAInstances ::COUNT)];
 
     };
 

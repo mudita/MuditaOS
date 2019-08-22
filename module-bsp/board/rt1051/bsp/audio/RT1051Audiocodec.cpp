@@ -12,7 +12,6 @@
 #include "RT1051Audiocodec.hpp"
 #include "board.h"
 #include "dma_config.h"
-#include "menums/magic_enum.hpp"
 #include "log/log.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
@@ -21,7 +20,6 @@
 namespace bsp {
 
     using namespace drivers;
-    using namespace magic_enum;
 
     sai_edma_handle_t RT1051Audiocodec::txHandle = {};
     sai_edma_handle_t RT1051Audiocodec::rxHandle = {};
@@ -170,10 +168,10 @@ namespace bsp {
         // Enable MCLK clock
         IOMUXC_GPR->GPR1 |= BOARD_AUDIOCODEC_SAIx_MCLK_MASK;
 
-        txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
-        rxDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
-        dmamux->Enable(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE
-        dmamux->Enable(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE
+        txDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
+        rxDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
+        dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE
+        dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE
 
         mclkSourceClockHz = BOARD_AUDIOCODEC_SAIx_CLK_FREQ;
 
@@ -192,8 +190,8 @@ namespace bsp {
     void RT1051Audiocodec::Deinit() {
         memset(&config, 0, sizeof config);
         SAI_Deinit(BOARD_AUDIOCODEC_SAIx);
-        dmamux->Disable(enum_integer(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
-        dmamux->Disable(enum_integer(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
+        dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL));
+        dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL));
     }
 
     void RT1051Audiocodec::InStart() {

@@ -36,7 +36,7 @@ namespace drivers {
 
                 EDMA_GetDefaultConfig(&dmaConfig);
                 EDMA_Init(base, &dmaConfig);
-                LOG_DEBUG("Init: DMA0");
+                LOG_DEBUG("Init: DMA_0");
             }
                 break;
         }
@@ -44,7 +44,7 @@ namespace drivers {
 
     RT1051DriverDMA::~RT1051DriverDMA() {
         EDMA_Deinit(base);
-        LOG_DEBUG("Deinit: DMA0");
+        LOG_DEBUG("Deinit: DMA_0");
     }
 
     std::unique_ptr<DriverDMAHandle> RT1051DriverDMA::CreateHandle(const uint32_t channel,std::function<void()> callback) {

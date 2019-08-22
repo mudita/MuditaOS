@@ -24,14 +24,14 @@
 
 namespace drivers {
 
-    std::weak_ptr<DriverI2C> DriverI2C::singleton[magic_enum::enum_count<I2CInstances>()];
+    std::weak_ptr<DriverI2C> DriverI2C::singleton[static_cast<uint32_t >(I2CInstances ::COUNT)];
 
     std::shared_ptr<DriverI2C> DriverI2C::Create(const drivers::I2CInstances instance,
                                                  const drivers::DriverI2CParams &params) {
         {
 
             cpp_freertos::CriticalSection::Enter();
-            std::shared_ptr<DriverI2C> inst = singleton[magic_enum::enum_integer(instance)].lock();
+            std::shared_ptr<DriverI2C> inst = singleton[static_cast<uint32_t >(instance)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
@@ -41,7 +41,7 @@ namespace drivers {
 #error "Unsupported target"
 #endif
 
-                singleton[magic_enum::enum_integer(instance)] = inst;
+                singleton[static_cast<uint32_t >(instance)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();

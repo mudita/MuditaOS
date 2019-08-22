@@ -389,12 +389,11 @@ void BOARD_BootClockRUN(void)
 
 	/* USB2 PLL */
 	/* DeInit Usb2 PLL. */
-	CLOCK_DeinitUsb2Pll();
 	clkPLL7setup(CLK_DISABLE);
 	/* Bypass Usb2 PLL. */
 	CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllUsb2, 1);
-	/* Enable Usb2 PLL output. */
-	CCM_ANALOG->PLL_USB2 |= CCM_ANALOG_PLL_USB2_ENABLE_MASK;
+	/* Disable Usb2 PLL output. */
+	CCM_ANALOG->PLL_USB2 &= ~CCM_ANALOG_PLL_USB2_ENABLE_MASK;
 
 	/* Set preperiph clock source. */
 	/* PLL1/2 = 432MHz */
