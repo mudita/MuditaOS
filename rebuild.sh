@@ -2,6 +2,7 @@
 
 BUILD_DIR="build"
 ASSETS_DIR="assets"
+SYS_DIR="sys"
 DB_DIR="db"
 
 #if there is no build directory create one
@@ -24,14 +25,20 @@ if [ "$1" != "" ]; then
 	if [ "$1" = "assets" ]; then
 		echo "Copying assets folder"
 		cd "$BUILD_DIR"
+		#if there is no sys directory create one
+		if [ ! -d "$SYS_DIR" ]; then
+			mkdir "$SYS_DIR"
+		fi
+		cd "$SYS_DIR"
 		#if there is no assets directory create one
 		if [ ! -d "$ASSETS_DIR" ]; then
 			mkdir "$ASSETS_DIR"
 		fi	
 		cd "$ASSETS_DIR"
 		rm -rf *
-		cd ..
-		cp -R ../image/* sys
+		cd ../..
+		cp -R ../image/assets/* sys/assets
+		exit 1
 	fi
 	if [ "$1" = "rt1051" ]; then
 		echo "Building for RT1051."
