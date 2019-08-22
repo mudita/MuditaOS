@@ -40,7 +40,7 @@ enum class EinkWorkerCommands {
 };
 
 ServiceEink::ServiceEink(const std::string& name)
-	: sys::Service(name),
+	: sys::Service(name,4096+1024),
 	  timerID { 0 },
 	  selfRefereshTriggerCount{ 0 },
 	  temperatureMeasurementTriggerCount{ 0 },
