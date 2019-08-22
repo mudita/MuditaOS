@@ -24,14 +24,14 @@
 
 namespace drivers {
 
-    std::weak_ptr<DriverGPIO> DriverGPIO::singleton[magic_enum::enum_count<GPIOInstances>()];
+    std::weak_ptr<DriverGPIO> DriverGPIO::singleton[static_cast<uint32_t >(GPIOInstances ::COUNT)];
 
     std::shared_ptr<DriverGPIO> DriverGPIO::Create(const drivers::GPIOInstances instance,
                                                  const drivers::DriverGPIOParams &params) {
         {
 
             cpp_freertos::CriticalSection::Enter();
-            std::shared_ptr<DriverGPIO> inst = singleton[magic_enum::enum_integer(instance)].lock();
+            std::shared_ptr<DriverGPIO> inst = singleton[static_cast<uint32_t >(instance)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
@@ -41,7 +41,7 @@ namespace drivers {
 #error "Unsupported target"
 #endif
 
-                singleton[magic_enum::enum_integer(instance)] = inst;
+                singleton[static_cast<uint32_t >(instance)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();

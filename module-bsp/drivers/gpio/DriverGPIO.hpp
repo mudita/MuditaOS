@@ -24,7 +24,8 @@ namespace drivers {
         GPIO_2,
         GPIO_3,
         GPIO_4,
-        GPIO_5
+        GPIO_5,
+        COUNT
     };
 
     struct DriverGPIOParams {
@@ -88,7 +89,7 @@ namespace drivers {
         const DriverGPIOParams parameters;
 
     private:
-        static std::weak_ptr<DriverGPIO> singleton[magic_enum::enum_count<GPIOInstances>()];
+        static std::weak_ptr<DriverGPIO> singleton[static_cast<uint32_t >(GPIOInstances ::COUNT)];
 
     };
 
