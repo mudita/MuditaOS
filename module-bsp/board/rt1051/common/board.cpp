@@ -12,7 +12,6 @@
 #include "board.h"
 #include "fsl_clock.h"
 #include "pin_mux.h"
-#include "dma_config.h"
 
 #include "irq/irq_gpio.hpp"
 
@@ -219,6 +218,7 @@ namespace bsp {
         irq_gpio_Init();
 
         BOARD_PrintClocks();
+        PrintPerphSourceClocks();
 
 
 

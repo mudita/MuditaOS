@@ -31,7 +31,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/board.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/clock_config.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/clock_config.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/pin_mux.c"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/startup_mimxrt1052.cpp"
