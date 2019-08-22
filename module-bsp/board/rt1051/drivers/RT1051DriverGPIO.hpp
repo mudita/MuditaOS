@@ -50,6 +50,7 @@ namespace drivers {
     private:
         GPIOInstances instance;
         GPIO_Type *base;
+        std::string name;
     };
 
 }

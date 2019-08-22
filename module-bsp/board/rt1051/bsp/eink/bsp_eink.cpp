@@ -18,7 +18,6 @@
 #include "semphr.h"
 #include "queue.h"
 
-#include "menums/magic_enum.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/dma/DriverDMA.hpp"
@@ -85,7 +84,6 @@ typedef struct _bsp_eink_driver
 } bsp_eink_driver_t;
 
 using namespace drivers;
-using namespace magic_enum;
 static lpspi_master_config_t s_eink_lpspi_master_config;
 static std::shared_ptr<drivers::DriverGPIO> gpio;
 static std::shared_ptr<drivers::DriverPLL> pll;
@@ -192,20 +190,20 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
             .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
             .defLogic = 1,
-            .pin = enum_integer(BoardDefinitions::EINK_CS_PIN)});
+            .pin = static_cast<uint32_t >(BoardDefinitions::EINK_CS_PIN)});
 
     gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
             .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
             .defLogic = 0,
-            .pin = enum_integer(BoardDefinitions::EINK_RESET_PIN)});
+            .pin = static_cast<uint32_t >(BoardDefinitions::EINK_RESET_PIN)});
 
     gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
             .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingEdge,
             .defLogic = 0,
-            .pin = enum_integer(BoardDefinitions::EINK_BUSY_PIN)});
+            .pin = static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN)});
 
-    gpio->ClearPortInterrupts(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
-    gpio->DisableInterrupt(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->ClearPortInterrupts(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
 
     s_eink_lpspi_master_config.baudRate                        = BSP_EINK_TRANSFER_WRITE_CLOCK;
     s_eink_lpspi_master_config.bitsPerFrame                    = 8;
@@ -234,10 +232,10 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
 
 
-    txDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
-    rxDMAHandle = dma->CreateHandle(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
-    dmamux->Enable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_TX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_TX_PERI_SEL
-    dmamux->Enable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_RX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_RX_PERI_SEL
+    txDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
+    rxDMAHandle = dma->CreateHandle(static_cast<uint32_t >(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+    dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::EINK_TX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_TX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_TX_PERI_SEL
+    dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::EINK_RX_DMA_CHANNEL),BSP_EINK_LPSPI_DMA_RX_PERI_SEL); // TODO: M.P fix BSP_EINK_LPSPI_DMA_RX_PERI_SEL
 
     BSP_EINK_LPSPI_EdmaDriverState.edmaTxDataToTxRegHandle = reinterpret_cast<edma_handle_t*>(txDMAHandle->GetHandle());
     BSP_EINK_LPSPI_EdmaDriverState.edmaRxRegToRxDataHandle = reinterpret_cast<edma_handle_t*>(rxDMAHandle->GetHandle());
@@ -285,14 +283,14 @@ void BSP_EinkDeinit(void)
         bsp_eink_TransferComplete = NULL;
     }
 
-    dmamux->Disable(enum_integer(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
-    dmamux->Disable(enum_integer(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
+    dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
+    dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::EINK_RX_DMA_CHANNEL));
 
     dma.reset();
     dmamux.reset();
 
-    gpio->DisableInterrupt(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
-    gpio->ClearPortInterrupts(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->ClearPortInterrupts(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
     gpio.reset();
 
     //pll.reset(); TODO:M.P
@@ -323,9 +321,9 @@ status_t BSP_EinkWriteData(void* txBuffer, uint32_t len, eink_spi_cs_config_e cs
     // Clean the TX complete queue
     xQueueReset(bsp_eink_TransferComplete);
     // Clear the BUSY Pin IRQ Flag
-    gpio->ClearPortInterrupts(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->ClearPortInterrupts(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
     // Enable the BUSY Pin IRQ
-    gpio->EnableInterrupt(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->EnableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
     // Take the BUSY semaphore without timeout just in case the transmission makes the BUSY pin state change. It enables the
     // driver to block then on the bsp_eink_busySemaphore until the BUSY pin is deasserted
     xSemaphoreTake(bsp_eink_busySemaphore, 0);
@@ -421,9 +419,9 @@ status_t BSP_EinkReadData(void* rxBuffer, uint32_t len, eink_spi_cs_config_e cs)
     // Clean the TX complete queue
     xQueueReset(bsp_eink_TransferComplete);
     // Clear the BUSY Pin IRQ Flag
-    gpio->ClearPortInterrupts(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->ClearPortInterrupts(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
     // Enable the BUSY Pin IRQ
-    gpio->EnableInterrupt(1 << enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+    gpio->EnableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
     // Take the BUSY semaphore without timeout just in case the transmission makes the BUSY pin state change. It enables the
     // driver to block then on the bsp_eink_busySemaphore until the BUSY pin is deasserted
     xSemaphoreTake(bsp_eink_busySemaphore, 0);
@@ -486,9 +484,9 @@ void BSP_EinkResetDisplayController(void)
 {
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
 
-    gpio->WritePin(enum_integer(BoardDefinitions::EINK_RESET_PIN),0);
+    gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::EINK_RESET_PIN),0);
 	vTaskDelay(10);
-    gpio->WritePin(enum_integer(BoardDefinitions::EINK_RESET_PIN),1);
+    gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::EINK_RESET_PIN),1);
 	vTaskDelay(10);
 }
 
@@ -496,12 +494,12 @@ void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl)
 {
 	if(ctrl == BSP_Eink_CS_Clr)
 	{
-        gpio->WritePin(enum_integer(BoardDefinitions::EINK_CS_PIN),0);
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::EINK_CS_PIN),0);
 	}
 	else
     if(ctrl == BSP_Eink_CS_Set)
     {
-        gpio->WritePin(enum_integer(BoardDefinitions::EINK_CS_PIN),1);
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::EINK_CS_PIN),1);
 	}
     else
     {
@@ -517,7 +515,7 @@ BaseType_t BSP_EinkBusyPinStateChangeHandler(void)
     /* Give semaphore only if something is waiting on it */
     if(BSP_EINK_LPSPI_EdmaDriverState.eventRegister == EventWaitRegistered)
     {
-        gpio->DisableInterrupt(1<< enum_integer(BoardDefinitions::EINK_BUSY_PIN));
+        gpio->DisableInterrupt(1<< static_cast<uint32_t >(BoardDefinitions::EINK_BUSY_PIN));
 
         if(xSemaphoreGiveFromISR(bsp_eink_busySemaphore,&xHigherPriorityTaskWoken) != pdPASS)
         {
