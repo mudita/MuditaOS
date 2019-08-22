@@ -49,6 +49,7 @@
 #include "clock_config.h"
 #include "board.h"
 #include "fsl_iomuxc.h"
+#include "log/log.hpp"
 
 /*******************************************************************************
  * Definitions
@@ -897,9 +898,15 @@ uint32_t GetPerphSourceClock(PerphClock_t clock){
             return CLOCK_GetFreq(kCLOCK_AudioPllClk)/64;
         case PerphClock_USDHC2:
             return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
-
-
-
-
     }
+}
+
+void PrintPerphSourceClocks(){
+    LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n",GetPerphSourceClock(PerphClock_I2C));
+    LOG_PRINTF("PerphSourceClock_LPSPI: %lu\r\n",GetPerphSourceClock(PerphClock_LPSPI));
+    LOG_PRINTF("PerphSourceClock_LPUART: %lu\r\n",GetPerphSourceClock(PerphClock_LPUART));
+    LOG_PRINTF("PerphSourceClock_SAI1: %lu\r\n",GetPerphSourceClock(PerphClock_SAI1));
+    LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n",GetPerphSourceClock(PerphClock_SAI2));
+    LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n",GetPerphSourceClock(PerphClock_USDHC2));
+
 }

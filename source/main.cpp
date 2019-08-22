@@ -124,7 +124,7 @@ public:
 
 int main() {
 
-    LOG_PRINTF("Launching PurePhone..\n ");
+    LOG_PRINTF("Launching PurePhone..\n");
 
     bsp::BoardInit();
 
