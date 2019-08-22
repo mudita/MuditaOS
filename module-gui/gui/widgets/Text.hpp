@@ -182,6 +182,12 @@ public:
 	virtual void setText( const UTF8& text );
 	virtual void clear();
 	virtual UTF8 getText();
+	/**
+	 * @brief Saves text from widget to file at specified path
+	 * @param path Path to output file where widgets content will be saved.
+	 * @return True if operation was successful, false otherwise.
+	 */
+	virtual bool saveText( UTF8 path );
 	void setFont( const UTF8& fontName );
 	virtual void setMargins( const Margins& margins );
 
