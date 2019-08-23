@@ -16,6 +16,7 @@
 
 #include "../fsl_drivers/fsl_common.h"
 #include "../fsl_drivers/fsl_lpi2c.h"
+#include "clock_config.h"
 
 #include "mutex.hpp"
 
