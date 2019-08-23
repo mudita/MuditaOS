@@ -199,6 +199,12 @@ SECTIONS
     } >BOARD_SDRAM_NOCACHE
     */
 
+    .intramnoncacheable (NOLOAD) : ALIGN(4)
+    {
+        *(.intramnoncacheable)
+        *(.intramnoncacheable.*)
+    } >SRAM_OC
+
     /* Reserve and place Heap within memory map */
     _HeapSize = 0x1000;
     .heap :  ALIGN(4)
