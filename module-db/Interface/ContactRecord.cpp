@@ -156,25 +156,11 @@ bool ContactRecordInterface::RemoveByID(uint32_t id) {
         return false;
     }
 
-    if(contactDB->name.RemoveByID(contact.nameID) == false){
-        return false;
-    }
-
-    if(contactDB->address.RemoveByID(std::stoul(contact.addressIDs)) == false){
-        return false;
-    }
-
-    if(contactDB->number.RemoveByID(std::stoul(contact.numbersID)) == false){
-        return false;
-    }
-
-    if(contactDB->ringtones.RemoveByID(contact.ringID) == false){
-        return false;
-    }
-
-    if(contactDB->contacts.RemoveByID(id) == false){
-        return false;
-    }
+    contactDB->name.RemoveByID(contact.nameID);
+    contactDB->address.RemoveByID(std::stoul(contact.addressIDs));
+    contactDB->number.RemoveByID(std::stoul(contact.numbersID));
+    contactDB->ringtones.RemoveByID(contact.ringID);
+    contactDB->contacts.RemoveByID(id);
 
     return true;
 }
