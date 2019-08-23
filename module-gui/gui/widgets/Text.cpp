@@ -38,6 +38,7 @@ Text::Text() :
 
 	cursor = new Rect( this, 0,0,1,1);
 	cursor->setFilled( true );
+	cursor->setVisible( false );
 
 	//insert first empty text line
 	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
@@ -45,6 +46,7 @@ Text::Text() :
 	lastLine = textLines.begin();
 	setBorderColor( gui::ColorFullBlack );
 	setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+	updateCursor();
 }
 
 Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h,
@@ -67,6 +69,7 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 	lastLine = textLines.begin();
 	setBorderColor( gui::ColorFullBlack );
 	setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+	updateCursor();
 }
 
 Text::~Text() {
@@ -90,6 +93,8 @@ void Text::setCursorWidth( uint32_t w ) {
 
 void Text::setText( const UTF8& text ) {
 	clear();
+	cursorRow = 0;
+	cursorColumn = 0;
 	//erase default empty line
 	delete textLines.front();
 	textLines.pop_front();
@@ -97,6 +102,7 @@ void Text::setText( const UTF8& text ) {
 	//split and add new lines
 	splitTextToLines(text);
 	recalculateDrawParams();
+	updateCursor();
 }
 void Text::clear(){
 	//if there are text lines erase them.
@@ -384,26 +390,21 @@ std::list<DrawCommand*> Text::buildDrawList() {
 void Text::setPosition( const short& x, const short& y ) {
 	Rect::setPosition(x, y);
 	recalculateDrawParams();
+	updateCursor();
 }
 
 void Text::setSize( const short& w, const short& h ) {
 	Rect::setSize( w, h );
 	recalculateDrawParams();
+	updateCursor();
 }
 
 bool Text::onInput( const InputEvent& inputEvent ) {
 
-
-//	LOG_INFO("%d %s", inputEvent.keyCode, (inputEvent.cycle?"TRUE":"FALSE"));
 	//process only short release events
 	if( inputEvent.state != InputEvent::State::keyReleasedShort ) {
 		return false;
 	}
-
-	//if key has enter code than return
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER )
-		return false;
-
 
 	//check if this is navigation event
 	bool res = false;
@@ -420,6 +421,11 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 			updateCursor();
 		return res;
 	}
+
+	//it there is no key char it means that translator didn't handled the key and this key
+	//press is not for text input.
+	if( inputEvent.keyChar == 0 )
+		return false;
 
 	if( inputEvent.cycle ) {
 		handleBackspace();
@@ -451,7 +457,19 @@ bool Text::onActivated( void* data ) {
 	return false;
 }
 
+bool Text::onFocus( bool state ) {
+	bool ret = Rect::onFocus( state );
+	if( state ) {
+		cursor->setVisible(true);
+	}
+	else
+		cursor->setVisible(false);
+
+	return ret;}
+
 bool Text::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
+	Rect::onDimensionChanged(oldDim, newDim);
+	updateCursor();
 	return false;
 }
 
@@ -645,7 +663,8 @@ bool Text::handleEnter() {
 bool Text::handleBackspace() {
 
 	//if cursor is in column 0 and there is no previous line return
-	if( (cursorColumn == 0) && (firstLine == textLines.begin()) )
+	if( (cursorRow == 0 ) && (cursorColumn == 0) &&
+		(firstLine == textLines.begin()) )
 		return true;
 
 	//if cursor is in position other than 0 remove previous character and run lines rework
@@ -658,35 +677,40 @@ bool Text::handleBackspace() {
 	}
 	//this is when cursor is located at the beginning of the line and there are previous lines
 	else {
-		auto itNext = it;
-		//go to previous line
-		it--;
 
-		TextLine* currentTextLine = (*it);
+		if( it == textLines.begin() ) {
+			return true;
+		}
+
+		auto itPrev = std::prev(it,1);
 
 		//if ending is equal to LineEndType::CONTINUE delete last char from current string
-		if( currentTextLine->endType == LineEndType::CONTINUE ) {
-			currentTextLine->text.removeChar(currentTextLine->text.length()-1);
+		if( (*itPrev)->endType == LineEndType::CONTINUE ) {
+			(*itPrev)->text.removeChar( (*itPrev)->text.length()-1);
 		}
-		if( currentTextLine->endType == LineEndType::CONTINUE_SPACE ) {
-			currentTextLine->endType = LineEndType::CONTINUE;
+		if( (*itPrev)->endType == LineEndType::CONTINUE_SPACE ) {
+			(*itPrev)->endType = LineEndType::CONTINUE;
 		}
-		else if( currentTextLine->endType == LineEndType::BREAK ) {
-			currentTextLine->endType = LineEndType::CONTINUE;
+		else if( (*itPrev)->endType == LineEndType::BREAK ) {
+			(*itPrev)->endType = LineEndType::CONTINUE;
 
 		}
 
-		cursorColumn = currentTextLine->text.length();
+		cursorColumn = (*itPrev)->text.length();
 
-		currentTextLine->text += (*itNext)->text;
+		if( cursorRow == 0 ) {
+			firstLine = itPrev;
+		}
+		else {
+			--cursorRow;
+		}
 
-		(*it)->endType = (*itNext)->endType;
+		(*itPrev)->text += (*it)->text;
+		(*itPrev)->endType = (*it)->endType;
 
-		//delete next line
-		textLines.erase(itNext);
-
-		//set new first visible line
-		firstLine = it;
+		//delete current line
+		textLines.erase(it);
+		it = itPrev;
 	}
 
 	reworkLines( it );

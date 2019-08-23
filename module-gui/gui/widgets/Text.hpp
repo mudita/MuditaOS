@@ -210,6 +210,7 @@ public:
 	void setSize( const short& w, const short& h ) override;
 	bool onInput( const InputEvent& inputEvent ) override;
 	bool onActivated( void* data ) override ;
+	bool onFocus( bool state ) override;
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 	Item* getNavigationItem( NavigationDirection direction ) override;
 };
