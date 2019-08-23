@@ -42,6 +42,10 @@ namespace bsp {
 
         ssize_t Write(void *buf, size_t nbytes) override final;
 
+        void InformModemHostAsleep() override final;
+
+		void InformModemHostWakeup() override final;
+
     private:
 
         static constexpr speed_t baud_bits[] = {
