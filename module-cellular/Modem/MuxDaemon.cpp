@@ -140,11 +140,12 @@ MuxDaemon::ConfState MuxDaemon::PowerUpProcedure() {
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
+        //cellular->InformHostReady();
         // GSM module needs some time to close multiplexer
         vTaskDelay(1000);
-
         // Try sending AT command once again
         ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
+
         if (ret.size() == 1 || ret.size() == 2) {
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
             return ConfState ::Success;

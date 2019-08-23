@@ -254,6 +254,10 @@ namespace bsp {
         return ret;
     }
 
+    void RT1051Cellular::InformHostReady(void)
+    {
+    	InformModemHostWakeup();
+    }
 
     void RT1051Cellular::MSPInit() {
 

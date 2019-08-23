@@ -50,6 +50,7 @@ namespace bsp {
 
         ssize_t Write(void *buf, size_t nbytes) override final;
 
+        virtual void InformHostReady(void) override final;
 
         static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;
