@@ -254,6 +254,13 @@ namespace bsp {
         return ret;
     }
 
+    void RT1051Cellular::InformModemHostAsleep() {
+		gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),!CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
+	}
+
+	void RT1051Cellular::InformModemHostWakeup() {
+		gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
+	}
 
     void RT1051Cellular::MSPInit() {
 
