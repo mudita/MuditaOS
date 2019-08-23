@@ -24,6 +24,7 @@ namespace drivers {
 
     private:
         PLLInstances instance;
+        std::string name;
 
     };
 

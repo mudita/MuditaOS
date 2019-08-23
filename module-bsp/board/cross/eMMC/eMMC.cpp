@@ -11,6 +11,8 @@
 
 #include "eMMC.hpp"
 
+#include "bsp/BoardDefinitions.hpp"
+
 #if defined(TARGET_RT1051)
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #elif defined(TARGET_Linux)
@@ -23,15 +25,19 @@
 namespace bsp
 {
 
+    using namespace drivers;
+
     RetCode eMMC::Init()
     {
     #if defined(TARGET_RT1051)
 
+        //pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EMMC_PLL),DriverPLLParams{});
+
         mmcCard.busWidth = kMMC_DataBusWidth8bit;
         mmcCard.busTiming = kMMC_HighSpeedTiming;
         mmcCard.enablePreDefinedBlockCount = true;
-        mmcCard.host.base = BOARD_EMMC_USDHCx;
-        mmcCard.host.sourceClock_Hz = BOARD_EMMC_USDHCx_CLK_FREQ;
+        mmcCard.host.base = USDHC2; // TODO:M.P move it to BoardDefinitions.hpp
+        mmcCard.host.sourceClock_Hz = GetPerphSourceClock(PerphClock_USDHC2);
         
         auto ret = MMC_Init(&mmcCard);
         if(ret != kStatus_Success){       

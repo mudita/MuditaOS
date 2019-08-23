@@ -160,7 +160,7 @@ namespace bsp {
 
     void RT1051Audiocodec::Init() {
 
-        pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
+        pllAudio = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
         dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::AUDIOCODEC_DMAMUX),DriverDMAMuxParams{});
         dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions ::AUDIOCODEC_DMA),DriverDMAParams{});
 
@@ -173,7 +173,7 @@ namespace bsp {
         dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_TX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE
         dmamux->Enable(static_cast<uint32_t >(BoardDefinitions ::AUDIOCODEC_RX_DMA_CHANNEL),BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE); // TODO: M.P fix BSP_AUDIOCODEC_SAIx_DMA_RX_SOURCE
 
-        mclkSourceClockHz = BOARD_AUDIOCODEC_SAIx_CLK_FREQ;
+        mclkSourceClockHz = GetPerphSourceClock(PerphClock_SAI2); // TODO:M.P fix PerphClock_SAI2
 
         // Initialize SAI Tx module
         SAI_TxGetDefaultConfig(&config);

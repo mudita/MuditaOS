@@ -66,8 +66,6 @@ namespace bsp {
 
         void DMADeinit();
 
-        uint32_t UartGetPeripheralClock();
-
         inline void EnableRx() {
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
             LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
