@@ -77,6 +77,13 @@ void Text::setEditMode( EditMode mode ) {
 	editMode = mode;
 }
 
+void Text::setNavigationBarrier( const NavigationBarrier& barrier, bool value ) {
+	if( value )
+		barriers |= static_cast<uint32_t>(barrier);
+	else
+		barriers &= ~(static_cast<uint32_t>(barrier));
+}
+
 void Text::setCursorWidth( uint32_t w ) {
 	cursorWidth = w;
 }
@@ -211,7 +218,7 @@ void Text::splitTextToLines( const UTF8& text) {
 				startIndex = index;
 				endIndex = totalLength;
 				textLines.push_back( new TextLine( tmpText, startIndex, endIndex, lineEndType, spaceConsumed ) );
-				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
+//				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 				index += charCount;
 			}
 		}
@@ -399,17 +406,21 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 
 
 	//check if this is navigation event
-	bool res;
-	if( editMode == EditMode::BROWSE )
-		res = handleBrowsing( inputEvent );
-	else
-		res = handleNavigation( inputEvent );
+	bool res = false;
+	if(( inputEvent.keyCode == KeyCode::KEY_LEFT ) ||
+		( inputEvent.keyCode == KeyCode::KEY_RIGHT ) ||
+		( inputEvent.keyCode == KeyCode::KEY_UP ) ||
+		( inputEvent.keyCode == KeyCode::KEY_DOWN ))  {
+		if( editMode == EditMode::BROWSE )
+			res = handleBrowsing( inputEvent );
+		else
+			res = handleNavigation( inputEvent );
 
-	//if navigation/browsing was detected and handled return
-	if( res )
-		return true;
+		if( res )
+			updateCursor();
+		return res;
+	}
 
-	res = false;
 	if( inputEvent.cycle ) {
 		handleBackspace();
 		res = handleChar( inputEvent );
@@ -444,27 +455,107 @@ bool Text::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& new
 	return false;
 }
 
-bool Text::moveCursor( const MoveDirection& direction ) {
+bool Text::moveCursor( const NavigationDirection& direction ) {
 
-	//if cursor is standing on the first line return false to allow focus change to previous widget
-	if( firstLine == textLines.begin()) {
+	auto it = getCursorTextLine();
 
-		//TODO add check for bariers preventing navigation to other widgets.
+	if( direction == NavigationDirection::LEFT ) {
+		//if we are standing on the beginning for the line move to previous line
+		if( cursorColumn == 0 ) {
 
-		return false;
+			//if there is no previous line return false so window can switch focus to the item on the left.
+			if( it == textLines.begin()) {
+				return false;
+			}
+
+			//there is a previous line, check if cursor's row is greater than 0;
+			cursorColumn = (*std::prev(it,1))->text.length();
+			if( cursorRow > 0 ) {
+				--cursorRow;
+			}
+			else {
+				--firstLine;
+				recalculateDrawParams();
+			}
+			return true;
+		}
+		//cursor's column is greater than 0
+		else {
+			--cursorColumn;
+			return true;
+		}
 	}
+	else if( direction == NavigationDirection::RIGHT ) {
+		//if cursor is not at the end of current line simply move curosr
+		if( cursorColumn < (*it)->text.length()) {
+			++cursorColumn;
+			return true;
+		}
+		else {
+			auto itNext = std::next( it, 1 );
+			//if this is not the last line increment row and set column to 0
+			if( itNext != textLines.end() ) {
+				++cursorRow;
+				cursorColumn = 0;
 
-	if( direction == MoveDirection::MOVE_LEFT ) {
-
+				//if increased row is out of visible are increment first line
+				if( cursorRow >= visibleRows ) {
+					firstLine++;
+					recalculateDrawParams();
+					cursorRow = visibleRows-1;
+				}
+				return true;
+			}
+		}
 	}
-	else if( direction == MoveDirection::MOVE_RIGHT ) {
+	else if( direction == NavigationDirection::DOWN ) {
+		auto itNext = std::next( it, 1 );
 
-	}
-	else if( direction == MoveDirection::MOVE_DOWN ) {
+		//this is the last line, check for barrier
+		if( itNext == textLines.end( )) {
+			if( barriers & static_cast<uint32_t>(NavigationBarrier::BARRIER_DOWN))
+				return true;
+			return false;
+		}
 
+		//increment line
+		++cursorRow;
+
+		//check if column position is still valid
+		if( cursorColumn > (*itNext)->text.length())
+			cursorColumn = (*itNext)->text.length();
+
+		if( cursorRow >= visibleRows ) {
+			firstLine++;
+			recalculateDrawParams();
+			cursorRow = visibleRows-1;
+		}
+		return true;
 	}
-	else if( direction == MoveDirection::MOVE_UP ) {
-		--firstLine;
+	else if( direction == NavigationDirection::UP ) {
+
+		//if cursor is standing on the first line return false to allow focus change to previous widget
+		if( it == textLines.begin()) {
+			return false;
+		}
+
+		auto itPrev = std::prev( it, 1 );
+		if( cursorRow == 0 ) {
+			--firstLine;
+
+			recalculateDrawParams();
+			return true;
+		}
+		else {
+			--cursorRow;
+		}
+
+		//check if previous line is shorter than last one if so move cursor to the end of previous line
+		if( cursorColumn > (*itPrev)->text.length()) {
+			cursorColumn = (*itPrev)->text.length();
+		}
+
+		return true;
 	}
 
 
@@ -476,11 +567,13 @@ bool Text::handleBrowsing( const InputEvent& inputEvent ) {
 	{
 		case (KeyCode::KEY_UP):
 		{
-			return moveCursor( MoveDirection::MOVE_UP );
+			LOG_INFO("KEY_UP");
+			return moveCursor( NavigationDirection::UP );
 		} break;
 		case KeyCode::KEY_DOWN:
 		{
-			return moveCursor( MoveDirection::MOVE_DOWN );
+			LOG_INFO("KEY_DOWN");
+			return moveCursor( NavigationDirection::DOWN );
 		} break;
 		default:
 		{
@@ -491,23 +584,28 @@ bool Text::handleBrowsing( const InputEvent& inputEvent ) {
 }
 
 bool Text::handleNavigation( const InputEvent& inputEvent ) {
+
 	switch( inputEvent.keyCode )
 	{
 		case (KeyCode::KEY_UP):
 		{
-			return moveCursor( MoveDirection::MOVE_UP );
+			LOG_INFO("KEY_UP");
+			return moveCursor( NavigationDirection::UP );
 		} break;
 		case KeyCode::KEY_DOWN:
 		{
-			return moveCursor( MoveDirection::MOVE_DOWN );
+			LOG_INFO("KEY_DOWN");
+			return moveCursor( NavigationDirection::DOWN );
 		} break;
 		case KeyCode::KEY_LEFT:
 		{
-			return moveCursor( MoveDirection::MOVE_LEFT );
+			LOG_INFO("KEY_LEFT");
+			return moveCursor( NavigationDirection::LEFT );
 		} break;
 		case KeyCode::KEY_RIGHT:
 		{
-			return moveCursor( MoveDirection::MOVE_RIGHT );
+			LOG_INFO("KEY_RIGHT");
+			return moveCursor( NavigationDirection::RIGHT );
 		} break;
 		default:
 		{
@@ -556,6 +654,7 @@ bool Text::handleBackspace() {
 		TextLine* currentTextLine = (*it);
 		currentTextLine->text.removeChar( cursorColumn - 1 );
 		currentTextLine = (*it);
+		cursorColumn--;
 	}
 	//this is when cursor is located at the beginning of the line and there are previous lines
 	else {
@@ -569,6 +668,15 @@ bool Text::handleBackspace() {
 		if( currentTextLine->endType == LineEndType::CONTINUE ) {
 			currentTextLine->text.removeChar(currentTextLine->text.length()-1);
 		}
+		if( currentTextLine->endType == LineEndType::CONTINUE_SPACE ) {
+			currentTextLine->endType = LineEndType::CONTINUE;
+		}
+		else if( currentTextLine->endType == LineEndType::BREAK ) {
+			currentTextLine->endType = LineEndType::CONTINUE;
+
+		}
+
+		cursorColumn = currentTextLine->text.length();
 
 		currentTextLine->text += (*itNext)->text;
 
@@ -580,8 +688,6 @@ bool Text::handleBackspace() {
 		//set new first visible line
 		firstLine = it;
 	}
-
-	cursorColumn--;
 
 	reworkLines( it );
 	recalculateDrawParams();
@@ -607,10 +713,20 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 	uint32_t availableSpace = getAvailableHPixelSpace();
 	uint32_t currentWidth = currentTextLine->pixelLength;
 	if( currentWidth + charWidth > availableSpace ) {
+
 		++cursorColumn;
 		reworkLines( it );
 
-		//change cursor position to the end of current line
+		//if cursor position is greater than number of characters in current line move cursor to next line.
+		if( cursorColumn > (*it)->text.length()) {
+			cursorColumn = 0;
+			++cursorRow;
+		}
+
+		if( cursorRow >= visibleRows ) {
+			firstRow++;
+		}
+
 	}
 	//no line splitting, update pixel width and proceed
 	else {
@@ -619,9 +735,9 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 	}
 
 	//if number of text lines have increased, text widget is multi-line and expandable change widgets space
-	if( linesCount != textLines.size()) {
-
-	}
+//	if( linesCount != textLines.size()) {
+//
+//	}
 
 	recalculateDrawParams();
 	//calculate new position of the cursor
@@ -638,7 +754,7 @@ std::list<Text::TextLine*>::iterator Text::getCursorTextLine() {
 
 void Text::updateCursor() {
 	cursor->setSize( 2, font->info.line_height );
-	auto it = firstLine;
+	auto it = std::next( firstLine, cursorRow );
 
 	uint32_t posX = margins.left + font->getPixelWidth( (*it)->text, 0, cursorColumn );
 	uint32_t posY = margins.top + cursorRow*font->info.line_height;
@@ -681,6 +797,7 @@ void Text::recalculateDrawParams() {
 		labelLines.push_back( label );
 		startY += font->info.line_height;
 	}
+	visibleRows = rowCount;
 
 	//assign text to all lines
 	auto textIterator = firstLine;
@@ -697,6 +814,15 @@ void Text::recalculateDrawParams() {
 void Text::setMargins( const Margins& margins ) {
 	this->margins = margins;
 	recalculateDrawParams();
+}
+
+Item* Text::getNavigationItem( NavigationDirection direction ) {
+	//if provided direction is forbidden than return nullptr
+	if( barriers & static_cast<uint32_t>(direction))
+		return nullptr;
+
+	//otherwise run default navigation method (Item)
+	return Rect::getNavigationItem( direction );
 }
 
 } /* namespace gui */
