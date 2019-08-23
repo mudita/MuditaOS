@@ -60,23 +60,6 @@ void BOARD_InitBootClocks(void);
 #endif /* __cplusplus*/
 
 /*******************************************************************************
- ********************** Configuration BOARD_BootClockRUN ***********************
- ******************************************************************************/
-/*******************************************************************************
- * Definitions for BOARD_BootClockRUN configuration
- ******************************************************************************/
-
-/*! @brief Arm PLL set for BOARD_BootClockRUN configuration.
- */
-extern const clock_arm_pll_config_t g_armPllConfig_BOARD_BootClockRUN;
-/*! @brief Usb1 PLL set for BOARD_BootClockRUN configuration.
- */
-extern const clock_usb_pll_config_t g_usb1PllConfig_BOARD_BootClockRUN;
-/*! @brief Sys PLL for BOARD_BootClockRUN configuration.
- */
-extern const clock_sys_pll_config_t g_sysPllConfig_BOARD_BootClockRUN;
-
-/*******************************************************************************
  * API for BOARD_BootClockRUN configuration
  ******************************************************************************/
 #if defined(__cplusplus)

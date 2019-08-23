@@ -59,7 +59,7 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl) override {
 
-#if 1 // M.P: left here on purpose
+#if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
         auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         AudioServiceAPI::Stop(this);
@@ -90,7 +90,7 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override {
-#if 1 // M.P: left here on purpose
+#if 0 // M.P: left here on purpose
         LOG_DEBUG("Blinky service tick!");
 
         stopTimer(timer_id);
