@@ -959,16 +959,25 @@ uint32_t GetPerphSourceClock(PerphClock_t clock) {
     switch (clock) {
 
         case PerphClock_I2C:
-            return CLOCK_GetFreq(kCLOCK_OscClk) / 2;
+            return CLOCK_GetFreq(kCLOCK_OscClk) /
+                   (CLOCK_GetDiv(kCLOCK_Lpi2cDiv) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_Lpi2cDiv));
         case PerphClock_LPSPI:
-            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / 8;
+            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) /
+                   (CLOCK_GetDiv(kCLOCK_LpspiDiv) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_LpspiDiv));
         case PerphClock_LPUART:
-            return CLOCK_GetFreq(kCLOCK_OscClk);
+            return CLOCK_GetFreq(kCLOCK_OscClk) /
+                   (CLOCK_GetDiv(kCLOCK_UartDiv) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_UartDiv));
         case PerphClock_SAI1:
+            return CLOCK_GetFreq(kCLOCK_AudioPllClk) /
+                   (CLOCK_GetDiv(kCLOCK_Sai1Div) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_Sai1Div)) /
+                   (CLOCK_GetDiv(kCLOCK_Sai1PreDiv) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_Sai1PreDiv));
         case PerphClock_SAI2:
-            return CLOCK_GetFreq(kCLOCK_AudioPllClk) / 64;
+            return CLOCK_GetFreq(kCLOCK_AudioPllClk) /
+                   (CLOCK_GetDiv(kCLOCK_Sai2Div) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_Sai2Div)) /
+                   (CLOCK_GetDiv(kCLOCK_Sai2PreDiv) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_Sai2PreDiv));
         case PerphClock_USDHC2:
-            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) /
+                   (CLOCK_GetDiv(kCLOCK_Usdhc2Div) == 0 ? 1 : CLOCK_GetDiv(kCLOCK_Usdhc2Div));
         default:
             return 0;
 
