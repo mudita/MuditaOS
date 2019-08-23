@@ -96,8 +96,8 @@ public:
 	virtual void setRadius( int value );
 
 	//functinos to handle navigation
-	Item* getNavigationItem( NavigationDirection direction );
-	void setNavigationItem( NavigationDirection direction, Item* item );
+	virtual Item* getNavigationItem( NavigationDirection direction );
+	virtual void setNavigationItem( NavigationDirection direction, Item* item );
 
 	Item();
 	virtual ~Item();

@@ -56,12 +56,21 @@ public:
 		SINGLE_LINE = 1,
 		MULTI_LINE
 	};
+//
+//	enum class MoveDirection {
+//		MOVE_UP,
+//		MOVE_DOWN,
+//		MOVE_LEFT,
+//		MOVE_RIGHT
+//	};
 
-	enum class MoveDirection {
-		MOVE_UP,
-		MOVE_DOWN,
-		MOVE_LEFT,
-		MOVE_RIGHT
+	enum class NavigationBarrier {
+		BARRIER_NONE  = 0x00,
+		BARRIER_UP    = 0x01,
+		BARRIER_DOWN  = 0x02,
+		BARRIER_LEFT  = 0x04,
+		BARRIER_RIGHT = 0x08,
+		BARRIER_ALL   = 0x0F,
 	};
 
 protected:
@@ -99,9 +108,9 @@ protected:
 	//pointer to the last visible line.
 	std::list<TextLine*>::iterator lastLine = textLines.end();
 	//row where cursor is located ( 0 - first row from top )
-	uint32_t cursorRow = 0;
+	int32_t cursorRow = 0;
 	// column where cursor is located( 0 - position before first character in the line )
-	uint32_t cursorColumn = 0;
+	int32_t cursorColumn = 0;
 
 	Rect* cursor = nullptr;
 
@@ -117,9 +126,12 @@ protected:
 	//index of the first visible row of the text
 	uint32_t firstRow = 0;
 	//number of visible rows
+	uint32_t visibleRows = 0;
 
 	//margins for text
 	Margins margins;
+	//barrier for navigation
+	uint32_t barriers = static_cast<uint32_t>(NavigationBarrier::BARRIER_NONE);
 
 	void splitTextToLines( const UTF8& text);
 	/**
@@ -135,7 +147,7 @@ protected:
 	/**
 	 * Moves cursor in specified direction
 	 */
-	bool moveCursor( const MoveDirection& direction );
+	bool moveCursor( const NavigationDirection& direction );
 	/**
 	 * Function is used to move text up and down in the browsing mode
 	 */
@@ -178,6 +190,7 @@ public:
 	virtual ~Text();
 
 	void setEditMode( EditMode mode );
+	void setNavigationBarrier( const NavigationBarrier& barrier, bool value );
 	void setCursorWidth( uint32_t w );
 	virtual void setText( const UTF8& text );
 	virtual void clear();
@@ -198,6 +211,7 @@ public:
 	bool onInput( const InputEvent& inputEvent ) override;
 	bool onActivated( void* data ) override ;
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
+	Item* getNavigationItem( NavigationDirection direction ) override;
 };
 
 } /* namespace gui */
