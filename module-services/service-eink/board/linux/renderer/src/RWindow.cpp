@@ -140,7 +140,7 @@ RWindow::RWindow( char* shmMemory, int fifoKbd, int fifoBatt, int w, int h ) :
 
 	add(drawArea);
 	show_all_children();
-	g_timeout_add( 1000, viewUpdate, this );
+	g_timeout_add( 50, viewUpdate, this );
 
 	this->signal_key_press_event().connect( sigc::mem_fun(*this, &RWindow::onKeyPress), false);
 	this->signal_key_release_event().connect( sigc::mem_fun(*this, &RWindow::onKeyRelease), false);
