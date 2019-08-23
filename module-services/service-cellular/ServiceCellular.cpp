@@ -162,6 +162,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl) {
                    }
                    else if(powerRet == MuxDaemon::ConfState::PowerUp){
                        state = State::PowerUpInProgress;
+
                    }
                    else{
                        LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
