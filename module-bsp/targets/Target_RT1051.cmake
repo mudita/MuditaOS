@@ -31,7 +31,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/irq/irq_gpio.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/board.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/clock_config.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/clock_config.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/pin_mux.c"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/startup_mimxrt1052.cpp"
@@ -57,7 +57,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/rtc/rtc.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/battery-charger/battery_charger.cpp"
 		
-		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pwr/lpm.c"
+		#"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/pwr/lpm.c"
 
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051Audiocodec.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/RT1051CellularAudio.cpp"

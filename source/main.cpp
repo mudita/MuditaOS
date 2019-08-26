@@ -49,8 +49,8 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(5000, true);
-        //ReloadTimer(timer_id);
+        timer_id = CreateTimer(500, true);
+        ReloadTimer(timer_id);
     }
 
     ~BlinkyService() {
@@ -62,7 +62,9 @@ public:
 #if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
         auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
-        vTaskDelay(3000);
+        AudioServiceAPI::Stop(this);
+        AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        //vTaskDelay(3000);
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
         //vTaskDelay(3000);
@@ -96,6 +98,7 @@ public:
 
         auto ret = sys::Bus::SendUnicast(msg,GetName(),this);
 #endif
+
     }
 
 
@@ -123,7 +126,7 @@ public:
 
 int main() {
 
-    LOG_PRINTF("Launching PurePhone..\n ");
+    LOG_PRINTF("Launching PurePhone..\n");
 
     bsp::BoardInit();
 

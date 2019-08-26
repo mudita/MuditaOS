@@ -40,6 +40,10 @@ namespace bsp {
 
         virtual ssize_t Write(void *buf, size_t nbytes) = 0;
 
+        virtual void InformModemHostAsleep() = 0;
+
+		virtual void InformModemHostWakeup() = 0;
+
     protected:
         bool isInitialized = false;
 
