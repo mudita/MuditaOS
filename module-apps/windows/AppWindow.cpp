@@ -83,8 +83,20 @@ bool AppWindow::updateSignalStrength( uint32_t strength ) {
 	return true;
 }
 
+bool AppWindow::updateTime( const UTF8& timeStr ) {
+	topBar->setTime(timeStr);
+	return true;
+}
+
+bool AppWindow::updateTime( const uint32_t& timestamp, bool mode24H ) {
+	topBar->setTime( timestamp, mode24H );
+	return true;
+}
+
 std::list<DrawCommand*> AppWindow::buildDrawList() {
 	return Window::buildDrawList();
 }
+
+bool AppWindow::onDatabaseMessage( sys::Message* msg ){ return false; }
 
 } /* namespace gui */

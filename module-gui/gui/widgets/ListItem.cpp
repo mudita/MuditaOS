@@ -10,12 +10,9 @@
 namespace gui {
 
 ListItem::ListItem() {
-	// TODO Auto-generated constructor stub
-
 }
 
 ListItem::~ListItem() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace gui */

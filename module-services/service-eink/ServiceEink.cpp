@@ -40,7 +40,7 @@ enum class EinkWorkerCommands {
 };
 
 ServiceEink::ServiceEink(const std::string& name)
-	: sys::Service(name),
+	: sys::Service(name,4096+1024),
 	  timerID { 0 },
 	  selfRefereshTriggerCount{ 0 },
 	  temperatureMeasurementTriggerCount{ 0 },
@@ -65,14 +65,10 @@ ServiceEink::~ServiceEink(){
 }
 
 // Invoked upon receiving data message
-sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 	seink::EinkMessage* msg = static_cast<seink::EinkMessage*>(msgl);
 
 	switch( msg->messageType ) {
-
-		case static_cast<uint32_t>(MessageType::MessageTypeUninitialized): {
-			LOG_ERROR("[ServiceEink] Received uninitialized message type");
-		} break;
 
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
@@ -138,6 +134,9 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl) {
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;
+
+		default:
+		    break;
 
 	};
 

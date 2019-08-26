@@ -12,6 +12,8 @@
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Window.hpp"
+#include "Service/Service.hpp"
+#include "Service/Message.hpp"
 
 namespace app {
 	class Application;
@@ -46,11 +48,14 @@ public:
 
 	app::Application* getApplication() { return application; };
 	void setApplication( app::Application* app ) { application = app; };
+	virtual bool onDatabaseMessage( sys::Message* msg );
 
 	//updates battery level in the window
 	bool updateBatteryLevel( uint32_t percentage );
 	//updates battery level in the window
 	bool updateSignalStrength( uint32_t strength );
+	bool updateTime( const UTF8& timeStr );
+	bool updateTime( const uint32_t& timestamp, bool mode24H );
 
 	void rebuild() override;
 	void buildInterface() override;

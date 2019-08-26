@@ -29,6 +29,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SmsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/SettingsDB.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Databases/AlarmsDB.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases/NotesDB.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/Table.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTable.cpp
@@ -40,6 +41,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/ContactsAddressTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SettingsTable.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/Tables/AlarmsTable.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/Tables/NotesTable.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
@@ -47,6 +49,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/ThreadRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SettingsRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/AlarmsRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/NotesRecord.cpp
 
         )
 
@@ -86,7 +89,14 @@ target_include_directories(${PROJECT_NAME}
 
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface
-
+        
+        PRIVATE
+        
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables
+        ${CMAKE_CURRENT_SOURCE_DIR}/Databases
+        ${CMAKE_CURRENT_SOURCE_DIR}/Database
 )
 
 target_link_libraries(${PROJECT_NAME} module-utils module-vfs )

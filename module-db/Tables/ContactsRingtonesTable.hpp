@@ -33,7 +33,7 @@ public:
 
     ContactsRingtonesTable(Database* db);
 
-    ~ContactsRingtonesTable();
+    virtual ~ContactsRingtonesTable();
 
     bool Create() override final;
 

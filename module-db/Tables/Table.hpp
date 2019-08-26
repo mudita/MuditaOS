@@ -23,7 +23,7 @@ protected:
 
     Table(Database* db):db(db){}
 
-    ~Table(){}
+    virtual ~Table(){}
 
     virtual bool Create() = 0;
     virtual bool Add(T entry) = 0;

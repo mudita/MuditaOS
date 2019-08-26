@@ -25,7 +25,7 @@ public:
 	ApplicationViewer(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationViewer();
 
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 	sys::ReturnCodes WakeUpHandler() override;
