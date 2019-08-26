@@ -62,6 +62,7 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 
 	cursor = new Rect( this, 0,0,1,1);
 	cursor->setFilled( true );
+	cursor->setVisible( false );
 
 	//insert first empty text line
 	textLines.push_back( new TextLine( UTF8(""), 0, 0, LineEndType::EOT, 0 ) );
@@ -78,6 +79,16 @@ Text::~Text() {
 
 void Text::setEditMode( EditMode mode ) {
 	editMode = mode;
+	if( mode == EditMode::BROWSE )
+		cursor->setVisible(false);
+	else {
+		if( focus )
+			cursor->setVisible(true);
+	}
+}
+
+void Text::setTextType( TextType type ) {
+
 }
 
 void Text::setNavigationBarrier( const NavigationBarrier& barrier, bool value ) {
@@ -459,13 +470,24 @@ bool Text::onActivated( void* data ) {
 
 bool Text::onFocus( bool state ) {
 	bool ret = Rect::onFocus( state );
-	if( state ) {
+	if( focus && editMode == EditMode::EDIT ) {
 		cursor->setVisible(true);
 	}
 	else
 		cursor->setVisible(false);
 
-	return ret;}
+	return ret;
+}
+
+void Text::setRadius( int value ) {
+	Rect::setRadius( value );
+	//if margins are smaller than radius update the margins
+	if( margins.left < value )
+		margins.left = value;
+	if( margins.right < value )
+		margins.right = value;
+	updateCursor();
+}
 
 bool Text::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
 	Rect::onDimensionChanged(oldDim, newDim);
@@ -585,12 +607,20 @@ bool Text::handleBrowsing( const InputEvent& inputEvent ) {
 	{
 		case (KeyCode::KEY_UP):
 		{
-			LOG_INFO("KEY_UP");
+			//move cursor to first visible element
+			cursorRow = 0;
 			return moveCursor( NavigationDirection::UP );
 		} break;
 		case KeyCode::KEY_DOWN:
 		{
-			LOG_INFO("KEY_DOWN");
+			//move cursor to the last visible element
+			auto it = firstLine;
+			cursorRow = 0;
+			while( it != textLines.end() && cursorRow < visibleRows ) {
+				it++;
+				cursorRow++;
+			}
+
 			return moveCursor( NavigationDirection::DOWN );
 		} break;
 		default:
@@ -607,22 +637,18 @@ bool Text::handleNavigation( const InputEvent& inputEvent ) {
 	{
 		case (KeyCode::KEY_UP):
 		{
-			LOG_INFO("KEY_UP");
 			return moveCursor( NavigationDirection::UP );
 		} break;
 		case KeyCode::KEY_DOWN:
 		{
-			LOG_INFO("KEY_DOWN");
 			return moveCursor( NavigationDirection::DOWN );
 		} break;
 		case KeyCode::KEY_LEFT:
 		{
-			LOG_INFO("KEY_LEFT");
 			return moveCursor( NavigationDirection::LEFT );
 		} break;
 		case KeyCode::KEY_RIGHT:
 		{
-			LOG_INFO("KEY_RIGHT");
 			return moveCursor( NavigationDirection::RIGHT );
 		} break;
 		default:
@@ -651,6 +677,12 @@ bool Text::handleEnter() {
 	++itNext;
 	textLines.insert( itNext, new TextLine( remainingText, 0, remainingText.length(), endType, font->getPixelWidth( remainingText) ) );
 	cursorRow++;
+
+	if( cursorRow >= visibleRows ) {
+		cursorRow = visibleRows - 1;
+		firstLine++;
+	}
+
 	cursorColumn = 0;
 
 	reworkLines( it );
@@ -672,7 +704,6 @@ bool Text::handleBackspace() {
 	if( cursorColumn > 0 ) {
 		TextLine* currentTextLine = (*it);
 		currentTextLine->text.removeChar( cursorColumn - 1 );
-		currentTextLine = (*it);
 		cursorColumn--;
 	}
 	//this is when cursor is located at the beginning of the line and there are previous lines
@@ -838,6 +869,7 @@ void Text::recalculateDrawParams() {
 void Text::setMargins( const Margins& margins ) {
 	this->margins = margins;
 	recalculateDrawParams();
+	updateCursor();
 }
 
 Item* Text::getNavigationItem( NavigationDirection direction ) {

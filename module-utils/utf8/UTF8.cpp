@@ -508,7 +508,7 @@ UTF8 UTF8::getLine(void)
 bool UTF8::removeChar(const uint32_t& pos, const uint32_t& count)
 {
 
-	if( ( pos + count >= this->length() ) || ( count == 0 ) )
+	if( ( pos + count > this->length() ) || ( count == 0 ) )
 		return false;
 
 	//get pointer to begin of string to remove

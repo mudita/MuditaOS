@@ -56,13 +56,6 @@ public:
 		SINGLE_LINE = 1,
 		MULTI_LINE
 	};
-//
-//	enum class MoveDirection {
-//		MOVE_UP,
-//		MOVE_DOWN,
-//		MOVE_LEFT,
-//		MOVE_RIGHT
-//	};
 
 	enum class NavigationBarrier {
 		BARRIER_NONE  = 0x00,
@@ -190,6 +183,7 @@ public:
 	virtual ~Text();
 
 	void setEditMode( EditMode mode );
+	void setTextType( TextType type );
 	void setNavigationBarrier( const NavigationBarrier& barrier, bool value );
 	void setCursorWidth( uint32_t w );
 	virtual void setText( const UTF8& text );
@@ -213,6 +207,7 @@ public:
 	bool onFocus( bool state ) override;
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 	Item* getNavigationItem( NavigationDirection direction ) override;
+	void setRadius( int value ) override;
 };
 
 } /* namespace gui */
