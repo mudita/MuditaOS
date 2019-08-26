@@ -16,7 +16,7 @@
 namespace app {
 
 ApplicationNotes::ApplicationNotes(std::string name, bool startBackgound) :
-	Application( name, startBackgound, 2048 ) {
+	Application( name, startBackgound, 4096 ) {
 }
 
 ApplicationNotes::~ApplicationNotes() {
