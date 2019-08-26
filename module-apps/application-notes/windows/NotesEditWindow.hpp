@@ -24,7 +24,7 @@
 namespace gui {
 
 class NotesEditWindow: public AppWindow {
-	Text* textMulti;
+	Text* textMulti[3];
 	Text* textSingle;
 public:
 	NotesEditWindow( app::Application* app );

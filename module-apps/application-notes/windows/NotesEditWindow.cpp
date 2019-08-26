@@ -53,24 +53,35 @@ void NotesEditWindow::buildInterface() {
 	title->setText("New Note");
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	textMulti = new gui::Text( this, 11, 150, 480-22, 200 );
-	textMulti->setFont("gt_pressura_bold_24");
-	textMulti->setRadius(5);
-	textMulti->setMargins( gui::Margins(10, 10, 10, 10));
-	textMulti->activatedCallback = [=] (gui::Item& item){
-		LOG_INFO("Comparing text" );
-		LOG_INFO("SOURCE:[%s]", textString.c_str());
-		UTF8 getstr = textMulti->getText();
-		LOG_INFO("GETSTR:[%s]", getstr.c_str());
-		LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
-		return true; };
-	textMulti->setTextType( gui::Text::TextType::MULTI_LINE );
-	textMulti->setEditMode(gui::Text::EditMode::BROWSE );
+	for( uint32_t i=0; i<3; i++ ) {
+		if( i == 0 )
+			textMulti[i] = new gui::Text( this, 11, 100, 480-22, 120 );
+		else if( i == 1)
+			textMulti[i] = new gui::Text( this, 11, 100+124, 480-22, 100 );
+		else if( i == 2)
+			textMulti[i] = new gui::Text( this, 11, 100+124+104+54, 480-22, 120 );
 
-	textSingle = new gui::Text( this, 11, 354, 480-22, 200 );
+		textMulti[i]->setFont("gt_pressura_bold_24");
+		textMulti[i]->setRadius(5);
+		textMulti[i]->setMargins( gui::Margins(10, 5, 10, 5));
+		textMulti[i]->activatedCallback = [=] (gui::Item& item){
+			LOG_INFO("Comparing text" );
+			LOG_INFO("SOURCE:[%s]", textString.c_str());
+			UTF8 getstr = textMulti[i]->getText();
+			LOG_INFO("GETSTR:[%s]", getstr.c_str());
+			LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
+			return true; };
+		textMulti[i]->setTextType( gui::Text::TextType::MULTI_LINE );
+
+
+		if( i == 1)
+			textMulti[i]->setEditMode(gui::Text::EditMode::BROWSE );
+	}
+
+	textSingle = new gui::Text( this, 11, 100+124+104, 480-22, 50 );
 	textSingle->setFont("gt_pressura_bold_24");
 	textSingle->setRadius(5);
-	textSingle->setMargins( gui::Margins(10, 10, 10, 10));
+	textSingle->setMargins( gui::Margins(10, 5, 10, 5));
 	textSingle->activatedCallback = [=] (gui::Item& item){
 		LOG_INFO("Comparing text" );
 		LOG_INFO("SOURCE:[%s]", textString.c_str());
@@ -80,8 +91,15 @@ void NotesEditWindow::buildInterface() {
 		return true; };
 	textSingle->setTextType( gui::Text::TextType::SINGLE_LINE );
 
-	textMulti->setNavigationItem( NavigationDirection::DOWN, textSingle );
-	textSingle->setNavigationItem( NavigationDirection::UP, textMulti );
+	textMulti[0]->setNavigationItem( NavigationDirection::DOWN, textMulti[1] );
+
+	textMulti[1]->setNavigationItem( NavigationDirection::UP, textMulti[0] );
+	textMulti[1]->setNavigationItem( NavigationDirection::DOWN, textSingle );
+
+	textSingle->setNavigationItem( NavigationDirection::UP, textMulti[1] );
+	textSingle->setNavigationItem( NavigationDirection::DOWN, textMulti[2] );
+
+	textMulti[2]->setNavigationItem( NavigationDirection::UP, textSingle );
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
@@ -98,9 +116,12 @@ NotesEditWindow::~NotesEditWindow() {
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 	application->setKeyboardProfile( "lang_eng_lower" );
-	setFocusItem( textMulti );
-	LOG_INFO("SETTING TEXT");
-	textMulti->setText( textString );
+	setFocusItem( textMulti[0] );
+	LOG_INFO("SETTING MULTI TEXT WIDGET 0");
+	textMulti[0]->setText( textString );
+	LOG_INFO("SETTING MULTI  TEXT WIDGET 1");
+	textMulti[1]->setText( textString );
+	LOG_INFO("SETTING SINGLE TEXT");
 	textSingle->setText( textString );
 }
 

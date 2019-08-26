@@ -88,7 +88,7 @@ void Text::setEditMode( EditMode mode ) {
 }
 
 void Text::setTextType( TextType type ) {
-
+	textType = type;
 }
 
 void Text::setNavigationBarrier( const NavigationBarrier& barrier, bool value ) {
@@ -228,7 +228,8 @@ void Text::splitTextToLines( const UTF8& text) {
 				endIndex = index+enterIndex;
 				index += enterIndex + 1;
 				lineEndType = LineEndType::BREAK;
-				textLines.push_back( new TextLine( tmpText.substr(0,enterIndex), startIndex, endIndex, lineEndType, spaceConsumed ) );
+				textLines.push_back( new TextLine( tmpText.substr(0,enterIndex), startIndex, endIndex, lineEndType,
+					font->getPixelWidth(tmpText.substr(0,enterIndex))) );
 //				LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 			} //no enter found last line can be copied as a whole.
 			else {
@@ -281,12 +282,23 @@ void Text::splitTextToLines( const UTF8& text) {
 						endIndex = index+spaceIndex;
 						index += spaceIndex+1;
 						textLines.push_back( new TextLine( tmpText.substr(0,spaceIndex),
-							startIndex, endIndex, lineEndType, spaceConsumed - spaceWidth) );
+							startIndex, endIndex, lineEndType, font->getPixelWidth(tmpText.substr(0,spaceIndex))) );
 //						LOG_INFO("Text Input Line: [%s]", textLines.back()->text.c_str());
 					}
 				}
 			}
 		}
+
+		if( textType == TextType::SINGLE_LINE ) {
+			LOG_INFO("NUMBER OF LINES: %d", textLines.size());
+			auto textLine = textLines.front();
+			textLine->endType = LineEndType::EOT;
+			break;
+		}
+	}
+
+	for( auto it : textLines ) {
+		LOG_INFO("text: [%s] ending: %d", it->text.c_str(), static_cast<uint32_t>(it->endType));
 	}
 
 	firstLine = textLines.begin();
@@ -549,6 +561,11 @@ bool Text::moveCursor( const NavigationDirection& direction ) {
 		}
 	}
 	else if( direction == NavigationDirection::DOWN ) {
+
+		//if this is a single line text widget there is no navigation down allowed
+		if( textType == TextType::SINGLE_LINE )
+			return false;
+
 		auto itNext = std::next( it, 1 );
 
 		//this is the last line, check for barrier
@@ -573,6 +590,10 @@ bool Text::moveCursor( const NavigationDirection& direction ) {
 		return true;
 	}
 	else if( direction == NavigationDirection::UP ) {
+
+		//if this is a single line text widget there is no navigation up allowed
+		if( textType == TextType::SINGLE_LINE )
+			return false;
 
 		//if cursor is standing on the first line return false to allow focus change to previous widget
 		if( it == textLines.begin()) {
@@ -603,6 +624,10 @@ bool Text::moveCursor( const NavigationDirection& direction ) {
 }
 
 bool Text::handleBrowsing( const InputEvent& inputEvent ) {
+	//if this is a single line text widget there is no browsing allowed
+	if( textType == TextType::SINGLE_LINE )
+		return false;
+
 	switch( inputEvent.keyCode )
 	{
 		case (KeyCode::KEY_UP):
@@ -616,7 +641,7 @@ bool Text::handleBrowsing( const InputEvent& inputEvent ) {
 			//move cursor to the last visible element
 			auto it = firstLine;
 			cursorRow = 0;
-			while( it != textLines.end() && cursorRow < visibleRows ) {
+			while( (it != textLines.end()) && (cursorRow < visibleRows-1) ) {
 				it++;
 				cursorRow++;
 			}
@@ -661,6 +686,9 @@ bool Text::handleNavigation( const InputEvent& inputEvent ) {
 
 bool Text::handleEnter() {
 
+	if( editMode == EditMode::BROWSE )
+		return false;
+
 	//get textline where cursor is located
 	auto it = firstLine;
 	std::advance(it, cursorRow );
@@ -693,6 +721,9 @@ bool Text::handleEnter() {
 }
 
 bool Text::handleBackspace() {
+
+	if( editMode == EditMode::BROWSE )
+		return false;
 
 	//if cursor is in column 0 and there is no previous line return
 	if( (cursorRow == 0 ) && (cursorColumn == 0) &&
@@ -752,6 +783,9 @@ bool Text::handleBackspace() {
 
 bool Text::handleChar( const InputEvent& inputEvent ) {
 
+	if( editMode == EditMode::BROWSE )
+		return false;
+
 	//get text line where cursor is standing
 	auto it = getCursorTextLine();
 	TextLine* currentTextLine = (*it);
@@ -768,6 +802,14 @@ bool Text::handleChar( const InputEvent& inputEvent ) {
 	uint32_t availableSpace = getAvailableHPixelSpace();
 	uint32_t currentWidth = currentTextLine->pixelLength;
 	if( currentWidth + charWidth > availableSpace ) {
+
+		//this is the case when new character inserted into single line text
+		//is creating the line that doesn't fit available space.
+		if( textType == TextType::SINGLE_LINE ) {
+
+			currentTextLine->text.removeChar( cursorColumn, 1 );
+			return true;
+		}
 
 		++cursorColumn;
 		reworkLines( it );
@@ -819,7 +861,7 @@ void Text::updateCursor() {
 void Text::recalculateDrawParams() {
 
 	//calculate number of lines for displaying text
-	int32_t h = widgetArea.h - margins.top - margins.bottom - 2*radius;
+	int32_t h = widgetArea.h - margins.top - margins.bottom;
 	if( h < 0 )
 		h = 0;
 
