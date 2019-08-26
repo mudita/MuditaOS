@@ -105,7 +105,7 @@ void ServiceGUI::sendToRender() {
 
 
 // Invoked upon receiving data message
-sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
 	sgui::GUIMessage* msg = static_cast<sgui::GUIMessage*>(msgl);
 

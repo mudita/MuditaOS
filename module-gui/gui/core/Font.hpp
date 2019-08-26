@@ -116,9 +116,10 @@ public:
 	 * @param str UTF8 string that will be used to calculate how many chars can fit provided space.
 	 * @param space Number of pixels in width availabale to calculate how many chars will fit.
 	 * @param spaceConsumed Space actually consumed by characters.
+	 * @param delimiter Optional character that stops operation. This character will be the last included character
 	 * @return number of chars that can fit provided space;
 	 */
-	uint32_t getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed );
+	uint32_t getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const uint32_t& delimiter = 0);
 	/**
 	 * @brief Calculates how many pixels will occupy selected part of the string.
 	 * @param str String used as a source of text.
@@ -127,6 +128,17 @@ public:
 	 * @return Number of pixels in width occupied by selected part of the text.
 	 */
 	uint32_t getPixelWidth( const UTF8& str, const uint32_t start, const uint32_t count );
+	/**
+	 * @brief Calculates how many pixels will occupy string.
+	 * @param str String used as a source of text.
+	 * @return Number of pixels in width occupied by string.
+	 */
+	uint32_t getPixelWidth( const UTF8& str );
+	uint32_t getCharPixelWidth( uint32_t charCode );
+
+	const std::string getName() {
+		return info.face;
+	}
 };
 
 class FontManager {

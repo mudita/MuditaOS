@@ -58,7 +58,7 @@ public:
     }
 
     // Invoked upon receiving data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl) override {
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override {
 
 #if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");

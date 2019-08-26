@@ -76,7 +76,8 @@ public:
 
 	bool setFocus( bool state ) {
 		if( state != focus ) {
-			focus = state;
+			//focus = state;
+			onFocus( state );
 			focusChangedCallback( *this );
 		};
 		return state;
@@ -96,8 +97,8 @@ public:
 	virtual void setRadius( int value );
 
 	//functinos to handle navigation
-	Item* getNavigationItem( NavigationDirection direction );
-	void setNavigationItem( NavigationDirection direction, Item* item );
+	virtual Item* getNavigationItem( NavigationDirection direction );
+	virtual void setNavigationItem( NavigationDirection direction, Item* item );
 
 	Item();
 	virtual ~Item();

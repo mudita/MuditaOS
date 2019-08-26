@@ -20,7 +20,7 @@ void SchedulerKiller::TickHandler(uint32_t id) {
     sys::SystemManager::CloseSystem(this);
 }
 
-sys::Message_t SchedulerKiller::DataReceivedHandler(sys::DataMessage* msgl)
+sys::Message_t SchedulerKiller::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp)
 {
     return std::make_shared<sys::ResponseMessage>();
 }

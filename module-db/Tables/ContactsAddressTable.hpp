@@ -43,7 +43,7 @@ public:
 
     ContactsAddressTable(Database* db);
 
-    ~ContactsAddressTable();
+    virtual ~ContactsAddressTable();
 
     bool Create() override final;
 

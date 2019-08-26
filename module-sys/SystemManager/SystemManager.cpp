@@ -175,7 +175,7 @@ namespace sys
 
     }
 
-    Message_t SystemManager::DataReceivedHandler(DataMessage* msg)
+    Message_t SystemManager::DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)
     {
         if(msg->channel == BusChannels::SystemManagerRequests){
             SystemManagerMsg* data = static_cast<SystemManagerMsg*>(msg);
