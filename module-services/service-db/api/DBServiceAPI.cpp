@@ -169,6 +169,7 @@ std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sy
 
 bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd,rec);
+    msg->record.contactType = ContactType::USER;
 
     auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
     DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());

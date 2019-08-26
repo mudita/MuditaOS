@@ -56,9 +56,9 @@ TEST_CASE("Contact Record tests")
 
     recordIN.primaryName=primaryNameTest;
     recordIN.alternativeName= alternativeNameTest;
-    recordIN.numberUser=numberUserTest;
-    recordIN.numberE164=numberE164Test;
-    recordIN.numberType = contactNumberTypeTest;
+    recordIN.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
+            });
     recordIN.contactType=contactTypeTest;
     recordIN.country=countryTest;
     recordIN.city=cityTest;
@@ -85,9 +85,10 @@ TEST_CASE("Contact Record tests")
 
         REQUIRE(recordOUT.primaryName == primaryNameTest);
         REQUIRE(recordOUT.alternativeName == alternativeNameTest);
-        REQUIRE(recordOUT.numberUser == numberUserTest);
-        REQUIRE(recordOUT.numberE164 == numberE164Test);
-        REQUIRE(recordOUT.numberType == contactNumberTypeTest);
+        REQUIRE(recordOUT.numbers.size() == 1);
+        REQUIRE(recordOUT.numbers[0].numberUser == numberUserTest);
+        REQUIRE(recordOUT.numbers[0].numberE164 == numberE164Test);
+        REQUIRE(recordOUT.numbers[0].numberType == contactNumberTypeTest);
         REQUIRE(recordOUT.contactType == contactTypeTest);
         REQUIRE(recordOUT.country == countryTest);
         REQUIRE(recordOUT.city == cityTest);
@@ -115,9 +116,9 @@ TEST_CASE("Contact Record tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numberUser == numberUserTest);
-            REQUIRE(w.numberE164 == numberE164Test);
-            REQUIRE(w.numberType == contactNumberTypeTest);
+            REQUIRE(w.numbers[0].numberUser == numberUserTest);
+            REQUIRE(w.numbers[0].numberE164 == numberE164Test);
+            REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.country == countryTest);
             REQUIRE(w.city == cityTest);
@@ -145,9 +146,9 @@ TEST_CASE("Contact Record tests")
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
-            REQUIRE(w.numberUser == numberUserTest);
-            REQUIRE(w.numberE164 == numberE164Test);
-            REQUIRE(w.numberType == contactNumberTypeTest);
+            REQUIRE(w.numbers[0].numberUser == numberUserTest);
+            REQUIRE(w.numbers[0].numberE164 == numberE164Test);
+            REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
             REQUIRE(w.country == countryTest);
             REQUIRE(w.city == cityTest);
@@ -175,9 +176,9 @@ TEST_CASE("Contact Record tests")
 
         REQUIRE(w.primaryName == primaryNameTest);
         REQUIRE(w.alternativeName == alternativeNameTest);
-        REQUIRE(w.numberUser == numberUserTest);
-        REQUIRE(w.numberE164 == numberE164Test);
-        REQUIRE(w.numberType == contactNumberTypeTest);
+        REQUIRE(w.numbers[0].numberUser == numberUserTest);
+        REQUIRE(w.numbers[0].numberE164 == numberE164Test);
+        REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
         REQUIRE(w.contactType == contactTypeTest);
         REQUIRE(w.country == countryTest);
         REQUIRE(w.city == cityTest);

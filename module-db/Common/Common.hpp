@@ -29,8 +29,7 @@ enum class SMSType {
  */
 enum class ContactType {
     USER = 1,
-    MESSAGE,
-    PHONE
+    TEMPORARY,
 };
 
 enum class ContactNumberType
