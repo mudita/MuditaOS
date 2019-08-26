@@ -206,7 +206,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		uint32_t min = (timestamp % 3600) / 60;
 
 		std::ostringstream stringStream;
-		stringStream << std::setfill('0') << std::setw(2) << hour << ":" << min;
+		stringStream << std::setfill('0') << std::setw(2) << hour << ":" << std::setfill('0') << std::setw(2) <<min;
 
 		std::string timeStr = stringStream.str();
 

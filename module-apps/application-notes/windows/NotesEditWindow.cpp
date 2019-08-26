@@ -22,7 +22,8 @@
 #include "Text.hpp"
 #include "NotesEditWindow.hpp"
 
-UTF8 textString = "Very long test line ABCDEFGHIJKLMNOPQRST123456789\nabcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345";
+UTF8 textString = "Very long test line ABCDEFGHIJKLMNOPQRST123456789\n"
+		"abcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345";
 
 namespace gui {
 
@@ -52,17 +53,35 @@ void NotesEditWindow::buildInterface() {
 	title->setText("New Note");
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	text = new gui::Text( this, 11, 150, 480-22, 400 );
-	text->setFont("gt_pressura_bold_24");
-	text->setRadius(5);
-	text->setMargins( gui::Margins(10, 10, 10, 10));
-	text->activatedCallback = [=] (gui::Item& item){
+	textMulti = new gui::Text( this, 11, 150, 480-22, 200 );
+	textMulti->setFont("gt_pressura_bold_24");
+	textMulti->setRadius(5);
+	textMulti->setMargins( gui::Margins(10, 10, 10, 10));
+	textMulti->activatedCallback = [=] (gui::Item& item){
 		LOG_INFO("Comparing text" );
 		LOG_INFO("SOURCE:[%s]", textString.c_str());
-		UTF8 getstr = text->getText();
+		UTF8 getstr = textMulti->getText();
 		LOG_INFO("GETSTR:[%s]", getstr.c_str());
 		LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
 		return true; };
+	textMulti->setTextType( gui::Text::TextType::MULTI_LINE );
+	textMulti->setEditMode(gui::Text::EditMode::BROWSE );
+
+	textSingle = new gui::Text( this, 11, 354, 480-22, 200 );
+	textSingle->setFont("gt_pressura_bold_24");
+	textSingle->setRadius(5);
+	textSingle->setMargins( gui::Margins(10, 10, 10, 10));
+	textSingle->activatedCallback = [=] (gui::Item& item){
+		LOG_INFO("Comparing text" );
+		LOG_INFO("SOURCE:[%s]", textString.c_str());
+		UTF8 getstr = textSingle->getText();
+		LOG_INFO("GETSTR:[%s]", getstr.c_str());
+		LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
+		return true; };
+	textSingle->setTextType( gui::Text::TextType::SINGLE_LINE );
+
+	textMulti->setNavigationItem( NavigationDirection::DOWN, textSingle );
+	textSingle->setNavigationItem( NavigationDirection::UP, textMulti );
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
@@ -79,9 +98,10 @@ NotesEditWindow::~NotesEditWindow() {
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 	application->setKeyboardProfile( "lang_eng_lower" );
-	setFocusItem( text );
+	setFocusItem( textMulti );
 	LOG_INFO("SETTING TEXT");
-	text->setText( textString );
+	textMulti->setText( textString );
+	textSingle->setText( textString );
 }
 
 bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
