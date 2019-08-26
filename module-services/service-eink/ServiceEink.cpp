@@ -219,6 +219,7 @@ bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperatur
 	const uint32_t LUTS_TOTAL_SIZE = LUTD_SIZE + LUTC_SIZE + LUTR_SIZE;
 
 	waveformSettings.temperature = temperature;
+	waveformSettings.mode = mode;
 
 	unsigned int segment = 0;
 
