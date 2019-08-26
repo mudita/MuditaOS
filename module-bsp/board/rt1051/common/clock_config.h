@@ -143,6 +143,10 @@ typedef enum{
 
 uint32_t GetPerphSourceClock(PerphClock_t clock);
 void PrintPerphSourceClocks();
+
+void LPM_EnterLowPowerRun();
+void LPM_EnterLowPowerIdle(void);
+
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus*/
