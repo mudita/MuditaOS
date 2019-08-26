@@ -17,24 +17,30 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
+#include <vector>
+
 struct ContactRecord{
 
     uint32_t dbID;
     UTF8 primaryName;
     UTF8 alternativeName;
-    UTF8 numberUser;
-    UTF8 numberE164;
     ContactType contactType;
 
-    ContactNumberType numberType;
+    struct Number {
+        UTF8 numberUser;
+        UTF8 numberE164;
+        ContactNumberType numberType;
+        Number(UTF8 n_user="", UTF8 n_e164="", ContactNumberType n_type=ContactNumberType::CELL) :numberUser(n_user), numberE164(n_e164), numberType(n_type) {}
+    };
+    std::vector<Number> numbers;
 
-    UTF8 country;
-    UTF8 city;
-    UTF8 street;
-    UTF8 number;
-    UTF8 note;
-    UTF8 mail;
-    ContactAddressType addressType;
+        UTF8 country;
+        UTF8 city;
+        UTF8 street;
+        UTF8 number;
+        UTF8 note;
+        UTF8 mail;
+        ContactAddressType addressType;
 
     UTF8 assetPath;
 
@@ -73,6 +79,9 @@ public:
 
 private:
     ContactsDB* contactDB;
+
+    /// get multiple numbers by split numbers_id
+    std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
 };
 
 

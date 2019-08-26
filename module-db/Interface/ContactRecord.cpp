@@ -11,6 +11,24 @@
 
 #include "ContactRecord.hpp"
 
+// TODO copied from Profile -> move to some utils.hpp
+#include <sstream>
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) { *(result++) = item;
+    }
+}
+
+static std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+/// <- copy end
+
+
 ContactRecordInterface::ContactRecordInterface(ContactsDB* db) : contactDB(db) {
 }
 
@@ -45,13 +63,12 @@ bool ContactRecordInterface::Add(const ContactRecord& rec) {
 
     auto contactNameID = contactDB->GetLastInsertRowID();
 
-
-    // TODO: add missing feature: multiple numbers per contact
-    ret = contactDB->number.Add(ContactsNumberTableRow{
-            .contactID = contactID,
-            .numberUser = rec.numberUser.c_str(),
-            .numbere164 = rec.numberE164.c_str(),
-            .type = rec.numberType});
+    for (auto a : rec.numbers) {
+        ret = contactDB->number.Add(ContactsNumberTableRow{.contactID = contactID,
+                                                           .numberUser = a.numberUser.c_str(),
+                                                           .numbere164 = a.numberE164.c_str(),
+                                                           .type = a.numberType});
+    }
 
     if (!ret) {
         return ret;
@@ -141,18 +158,17 @@ bool ContactRecordInterface::Update(const ContactRecord &rec) {
 
 ContactRecord ContactRecordInterface::GetByID(uint32_t id) {
 
-    ContactRecord rec;
+    ContactRecord rec = ContactRecord();
 
     auto contact = contactDB->contacts.GetByID(id);
     if(contact.ID == 0){
         return rec;
     }
 
-    auto nr = contactDB->number.GetByID(std::stoul(contact.numbersID));
-    if(nr.ID == 0){
+    std::vector<ContactRecord::Number> nrs = getNumbers(contact.numbersID);
+    if( nrs.size() == 0) {
         return rec;
     }
-
     auto ring = contactDB->ringtones.GetByID(contact.ringID);
     if(ring.ID == 0){
         return rec;
@@ -171,10 +187,8 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id) {
     rec.dbID = contact.ID;
     rec.primaryName = name.namePrimary;
     rec.alternativeName=name.nameAlternative;
-    rec.numberUser=nr.numberUser;
-    rec.numberE164=nr.numbere164;
+    rec.numbers = nrs;
     rec.contactType=contact.type;
-    rec.numberType=nr.type;
     rec.country=address.country;
     rec.city=address.city;
     rec.street=address.street;
@@ -205,8 +219,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
     for(const auto &w : ret){
 
-        auto nr = contactDB->number.GetByID(std::stoul(w.numbersID));
-        if(nr.ID == 0){
+        auto nrs = getNumbers(w.numbersID);
+        if(nrs.size() == 0){
             return records;
         }
 
@@ -229,10 +243,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             .dbID = w.ID,
             .primaryName = name.namePrimary,
             .alternativeName=name.nameAlternative,
-            .numberUser=nr.numberUser,
-            .numberE164=nr.numbere164,
             .contactType=w.type,
-            .numberType=nr.type,
+            .numbers = nrs,
             .country=address.country,
             .city=address.city,
             .street=address.street,
@@ -245,8 +257,6 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             .isOnBlacklist=w.isOnBlacklist,
             .isOnFavourites=w.isOnFavourites,
             .speeddial=static_cast<uint8_t >(w.speedDial)
-
-
         });
     }
     return records;
@@ -270,8 +280,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                     return records;
                 }
 
-                auto nr = contactDB->number.GetByID(std::stoul(contact.numbersID));
-                if(nr.ID == 0){
+                auto nrs = getNumbers(contact.numbersID);
+                if(nrs.size() == 0){
                     return records;
                 }
 
@@ -290,10 +300,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                         .dbID = w.ID,
                         .primaryName = w.namePrimary,
                         .alternativeName=w.nameAlternative,
-                        .numberUser=nr.numberUser,
-                        .numberE164=nr.numbere164,
                         .contactType=contact.type,
-                        .numberType=nr.type,
+                        .numbers = nrs,
                         .country=address.country,
                         .city=address.city,
                         .street=address.street,
@@ -306,8 +314,6 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                         .isOnBlacklist=contact.isOnBlacklist,
                         .isOnFavourites=contact.isOnFavourites,
                         .speeddial=static_cast<uint8_t >(contact.speedDial)
-
-
                 });
             }
 
@@ -324,6 +330,11 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
                 auto contact = contactDB->contacts.GetByID(w.contactID);
                 if(contact.ID == 0){
+                    return records;
+                }
+
+                auto nrs = getNumbers(contact.numbersID);
+                if(nrs.size() == 0){
                     return records;
                 }
 
@@ -347,10 +358,8 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                         .dbID = w.ID,
                         .primaryName = name.namePrimary,
                         .alternativeName=name.nameAlternative,
-                        .numberUser=w.numberUser,
-                        .numberE164=w.numbere164,
                         .contactType=contact.type,
-                        .numberType=w.type,
+                        .numbers = nrs,
                         .country=address.country,
                         .city=address.city,
                         .street=address.street,
@@ -372,4 +381,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     }
 
     return records;
+}
+
+std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)
+{
+    std::vector<ContactRecord::Number> nrs;
+    for (auto nr_str : split(numbers_id, ' ')) {
+        auto nr = contactDB->number.GetByID(std::stol(nr_str));
+        if(nr.ID == 0) {
+            return nrs;
+        }
+        nrs.push_back(ContactRecord::Number(nr.numberUser, nr.numbere164, nr.type));
+    }
+    return nrs;
 }

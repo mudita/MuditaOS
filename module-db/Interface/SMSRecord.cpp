@@ -31,10 +31,12 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
     // Contact not found, create one
     if (contactRec->size() == 0) {
         contactInterface.Add(ContactRecord{
-                .numberUser=rec.number,
-                .numberE164=rec.number,
-                .contactType=ContactType::MESSAGE,
-        });
+                .contactType=ContactType::TEMPORARY,
+                .numbers=std::vector<ContactRecord::Number>{ContactRecord::Number(
+                    rec.number.c_str(),
+                    rec.number.c_str())
+                },
+                });
 
         contactRec = contactInterface.GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164,
                                                                  rec.number.c_str());
@@ -127,7 +129,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
                                    .date=w.date,
                                    .dateSent=w.dateSent,
                                    .errorCode=w.errorCode,
-                                   .number=contactRec.numberE164,// TODO: or numberUser?
+                                   .number=contactRec.numbers[0].numberE164,// TODO: or numberUser? or other number?
                                    .body=w.body,
                                    .isRead=w.isRead,
                                    .type=w.type,
@@ -156,7 +158,7 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
            .date=w.date,
            .dateSent=w.dateSent,
            .errorCode=w.errorCode,
-           .number=contactRec.numberE164,// TODO: or numberUser?
+           .number=contactRec.numbers[0].numberE164,// TODO: or numberUser? or other number
            .body=w.body,
            .isRead=w.isRead,
            .type=w.type,
@@ -268,7 +270,7 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id) {
         .date=sms.date,
         .dateSent=sms.dateSent,
         .errorCode=sms.errorCode,
-        .number=contactRec.numberE164,// TODO: or numberUser?
+        .number=contactRec.numbers[0].numberE164,// TODO: or numberUser?
         .body=sms.body,
         .isRead=sms.isRead,
         .type=sms.type,
