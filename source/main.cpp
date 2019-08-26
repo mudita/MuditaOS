@@ -130,12 +130,14 @@ int main() {
     LOG_PRINTF("Launching PurePhone..\n");
 
     bsp::BoardInit();
+    LPM_EnterLowPowerIdle();
 
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
 
+#if 0
         vfs.Init();
 
         bool ret = false;
@@ -144,7 +146,7 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
 
         //vector with launchers to applications
@@ -174,6 +176,8 @@ int main() {
         if (ret) {
             return 0;
         }
+
+#endif
 
         return 0;
 
