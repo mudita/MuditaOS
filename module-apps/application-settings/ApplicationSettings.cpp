@@ -10,7 +10,6 @@
 
 #include "MessageType.hpp"
 #include "windows/SettingsMainWindow.hpp"
-#include "windows/LanguageWindow.hpp"
 
 #include "ApplicationSettings.hpp"
 
@@ -74,9 +73,6 @@ void ApplicationSettings::createUserInterface() {
 	gui::AppWindow* window = nullptr;
 
 	window = new gui::SettingsMainWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
-	window = new gui::LanguageWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
