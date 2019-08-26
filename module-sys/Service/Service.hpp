@@ -39,7 +39,7 @@ private:
 class Service : public cpp_freertos::Thread,public std::enable_shared_from_this<Service>
 {
 public:
-	Service(std::string name,uint32_t stackDepth=4096,ServicePriority priority=ServicePriority::Idle);
+	Service(std::string name,uint32_t stackDepth=4096,ServicePriority priority=ServicePriority::Idle,std::string parent="");
 
 	virtual ~Service();
 
@@ -77,6 +77,8 @@ public:
 	virtual ReturnCodes SleepHandler() = 0;
 
 	void CloseHandler();
+
+	std::string parent;
 
 	std::vector<BusChannels> busChannels;
 
