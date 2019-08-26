@@ -116,6 +116,14 @@ namespace bsp {
         return ret;
     }
 
+    void LinuxCellular::InformModemHostAsleep(void){
+
+    }
+
+    void LinuxCellular::InformModemHostWakeup(void){
+
+    }
+
     uint32_t LinuxCellular::Wait(uint32_t timeout) {
 
         uint32_t currentTime = cpp_freertos::Ticks::GetTicks();

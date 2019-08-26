@@ -60,24 +60,6 @@ void BOARD_InitBootClocks(void);
 #endif /* __cplusplus*/
 
 /*******************************************************************************
- ********************** Configuration BOARD_BootClockRUN ***********************
- ******************************************************************************/
-/*******************************************************************************
- * Definitions for BOARD_BootClockRUN configuration
- ******************************************************************************/
-#define BOARD_BOOTCLOCKRUN_CORE_CLOCK             516000000U  /*!< Core clock frequency: 516000000Hz */
-
-/*! @brief Arm PLL set for BOARD_BootClockRUN configuration.
- */
-extern const clock_arm_pll_config_t g_armPllConfig_BOARD_BootClockRUN;
-/*! @brief Usb1 PLL set for BOARD_BootClockRUN configuration.
- */
-extern const clock_usb_pll_config_t g_usb1PllConfig_BOARD_BootClockRUN;
-/*! @brief Sys PLL for BOARD_BootClockRUN configuration.
- */
-extern const clock_sys_pll_config_t g_sysPllConfig_BOARD_BootClockRUN;
-
-/*******************************************************************************
  * API for BOARD_BootClockRUN configuration
  ******************************************************************************/
 #if defined(__cplusplus)
@@ -149,6 +131,18 @@ void clkPLL6setup( uint8_t enabled );
 
 void clkPLL7setup( uint8_t enabled );
 
+typedef enum{
+    PerphClock_I2C,
+    PerphClock_LPSPI,
+    PerphClock_LPUART,
+    PerphClock_SAI1,
+    PerphClock_SAI2,
+    PerphClock_USDHC2,
+
+}PerphClock_t;
+
+uint32_t GetPerphSourceClock(PerphClock_t clock);
+void PrintPerphSourceClocks();
 #if defined(__cplusplus)
 }
 #endif /* __cplusplus*/

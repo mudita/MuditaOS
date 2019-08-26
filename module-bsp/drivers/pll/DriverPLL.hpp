@@ -18,12 +18,14 @@ namespace drivers {
 
 
     enum class PLLInstances {
-        //TODO: M.P add the rest of plls
-        Audio,
-        Video,
-        Ethernet,
-        USB_1,
-        USB_2,
+        OSC_24M,
+        PLL1_ARM,
+        PLL2_PFD2,
+        PLL3,
+        PLL3_PFD0,
+        PLL3_PFD1,
+        PLL3_PFD2,
+        PLL4_Audio,
         COUNT
     };
 

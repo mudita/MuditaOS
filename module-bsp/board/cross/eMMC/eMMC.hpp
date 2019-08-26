@@ -13,9 +13,11 @@
 #define MODULE_BSP_EMMC_HPP
 
 #include <stdint.h>
+#include <memory>
 
 #if defined(TARGET_RT1051)
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
+#include "drivers/pll/DriverPLL.hpp"
 #else
 #error "Unsupported target"
 #endif
@@ -57,6 +59,7 @@ namespace bsp
     private:
 
     #if defined(TARGET_RT1051)
+        std::shared_ptr<drivers::DriverPLL> pll;
         mmc_card_t mmcCard;
     #else
     #error "Unsupported target"

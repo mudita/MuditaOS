@@ -31,7 +31,7 @@ namespace drivers {
                 break;
         }
         LPI2C_MasterGetDefaultConfig(&lpi2cConfig);
-        LPI2C_MasterInit(base, &lpi2cConfig, ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U)));
+        LPI2C_MasterInit(base, &lpi2cConfig, GetPerphSourceClock(PerphClock_I2C));
     }
 
     RT1051DriverI2C::~RT1051DriverI2C() {

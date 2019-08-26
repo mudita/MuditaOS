@@ -140,11 +140,12 @@ MuxDaemon::ConfState MuxDaemon::PowerUpProcedure() {
         inOutSerialDataWorker->SendFrame(0, closeChannelCmd, sizeof(closeChannelCmd),
                                          static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
 
+        cellular->InformModemHostWakeup();
         // GSM module needs some time to close multiplexer
         vTaskDelay(1000);
-
         // Try sending AT command once again
         ret = inOutSerialDataWorker->SendATCommand("AT\r", 2);
+
         if (ret.size() == 1 || ret.size() == 2) {
             // Modem can send echo response or not, in either case it means that modem is operating in AT mode
             return ConfState ::Success;
@@ -195,6 +196,8 @@ MuxDaemon::ConfState MuxDaemon::ConfProcedure() {
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 1));
     // Route URCs to UART1
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 1));
+    // Configure AP_Ready pin logic ( enable, logic level 1, 200ms )
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QCFG=\"apready\",1,1,200\r", 1));
     // Turn on signal strength change URC
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QINDCFG=\"csq\",1\r", 1));
     // Change incoming call notification from "RING" to "+CRING:type"

@@ -94,7 +94,7 @@ static std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
 
 static uint32_t BSP_EINK_LPSPI_GetFreq(void)
 {
-	return BOARD_EINK_LPSPI_CLOCK_FREQ;
+	return GetPerphSourceClock(PerphClock_LPSPI);
 }
 
 
@@ -182,6 +182,8 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     	return kStatus_Fail;
     }
 
+    //pll = DriverPLL::Create(static_cast<PLLInstances >(BoardDefinitions ::EINK_PLL),DriverPLLParams{});
+
     lpspi->eventRegister = EventWaitNotRegistered;
 
     gpio = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::EINK_GPIO),
@@ -221,13 +223,11 @@ status_t BSP_EinkInit(bsp_eink_BusyEvent event)
     s_eink_lpspi_master_config.pinCfg                          = kLPSPI_SdiInSdoOut;
     s_eink_lpspi_master_config.dataOutConfig                   = kLpspiDataOutRetained;
 
-    LPSPI_MasterInit(BSP_EINK_LPSPI_BASE, &s_eink_lpspi_master_config, BOARD_EINK_LPSPI_CLOCK_FREQ);
+    LPSPI_MasterInit(BSP_EINK_LPSPI_BASE, &s_eink_lpspi_master_config, GetPerphSourceClock(PerphClock_LPSPI));
 
     // fsl_lpspi doesn't support configuring autopcs feature
     BSP_EINK_LPSPI_BASE->CFGR1 |= LPSPI_CFGR1_AUTOPCS(0);
 
-    //TODO:M.P add PLL support
-    //pll = DriverInterface<DriverPLL>::Create(static_cast<PLLInstances >(BoardDefinitions ::AUDIO_PLL),DriverPLLParams{});
     dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances >(BoardDefinitions ::EINK_DMAMUX),DriverDMAMuxParams{});
     dma = DriverDMA::Create(static_cast<DMAInstances >(BoardDefinitions ::EINK_DMA),DriverDMAParams{});
 
@@ -256,7 +256,7 @@ status_t BSP_EinkChangeSpiFrequency(uint32_t frequencyHz)
     uint32_t tcrPrescalerValue = 0;
 
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
-    LPSPI_MasterSetBaudRate(BSP_EINK_LPSPI_BASE, frequencyHz, BOARD_EINK_LPSPI_CLOCK_FREQ, &tcrPrescalerValue);
+    LPSPI_MasterSetBaudRate(BSP_EINK_LPSPI_BASE, frequencyHz, GetPerphSourceClock(PerphClock_LPSPI), &tcrPrescalerValue);
 
     s_eink_lpspi_master_config.baudRate = frequencyHz;
     BSP_EINK_LPSPI_BASE->TCR =  LPSPI_TCR_CPOL(s_eink_lpspi_master_config.cpol) | LPSPI_TCR_CPHA(s_eink_lpspi_master_config.cpha) |
@@ -282,6 +282,8 @@ void BSP_EinkDeinit(void)
         vQueueDelete(bsp_eink_TransferComplete);
         bsp_eink_TransferComplete = NULL;
     }
+
+    pll.reset();
 
     dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::EINK_TX_DMA_CHANNEL));
     dmamux->Disable(static_cast<uint32_t >(BoardDefinitions ::EINK_RX_DMA_CHANNEL));

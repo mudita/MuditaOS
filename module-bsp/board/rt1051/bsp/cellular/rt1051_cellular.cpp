@@ -112,7 +112,7 @@ namespace bsp {
         s_cellularConfig.enableTx = false;
         s_cellularConfig.enableRx = false;
 
-        if (LPUART_Init(CELLULAR_UART_BASE, &s_cellularConfig, UartGetPeripheralClock()) != kStatus_Success) {
+        if (LPUART_Init(CELLULAR_UART_BASE, &s_cellularConfig, GetPerphSourceClock(PerphClock_LPUART)) != kStatus_Success) {
             LOG_ERROR("Could not initialize the uart!");
             return;
         }
@@ -254,6 +254,13 @@ namespace bsp {
         return ret;
     }
 
+    void RT1051Cellular::InformModemHostAsleep() {
+		gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),!CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
+	}
+
+	void RT1051Cellular::InformModemHostWakeup() {
+		gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
+	}
 
     void RT1051Cellular::MSPInit() {
 
@@ -377,23 +384,6 @@ namespace bsp {
     void RT1051Cellular::DMADeinit() {
         dmamux->Disable(static_cast<uint32_t >(BoardDefinitions::CELLULAR_TX_DMA_CHANNEL));
     }
-
-    uint32_t RT1051Cellular::UartGetPeripheralClock() {
-        const int UART_PERIPHERAL_PLL_DIVIDER = 6;
-        uint32_t freq = 0;
-        /* To make it simple, we assume default PLL and divider settings, and the only variable
-           from application is use PLL3 source or OSC source */
-        if (CLOCK_GetMux(kCLOCK_UartMux) == 0) /* PLL3 div6 80M */
-        {
-            freq = (CLOCK_GetPllFreq(kCLOCK_PllUsb1) / UART_PERIPHERAL_PLL_DIVIDER) /
-                   (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-        } else {
-            freq = CLOCK_GetOscFreq() / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-        }
-
-        return freq;
-    }
-
 
     void RT1051Cellular::DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status,
                                           void *userData) {
