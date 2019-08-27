@@ -17,6 +17,7 @@ AppWindow::AppWindow( app::Application* app, std::string name, uint32_t id ) :
 }
 
 AppWindow::~AppWindow() {
+	LOG_INFO("deleting window: %s", name.c_str());
 }
 
 
