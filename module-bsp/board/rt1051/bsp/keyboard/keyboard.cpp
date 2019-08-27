@@ -69,17 +69,13 @@ namespace bsp {
                 .defLogic = 0,
                 .pin = static_cast<uint32_t >(BoardDefinitions::KEYBOARD_IRQ_PIN)});
 
-
-
-
-        // Reset keyboard controller
-        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),0);
-        vTaskDelay(100);
-        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),1);
-        vTaskDelay(100);
-
         uint32_t reg = 0;
         status_t error = 0;
+
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),0);
+        vTaskDelay(1);
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),1);
+
 
         /* Assemble a mask for row and column registers */
         reg = ~(~0 << TCA8418_ROWS_COUNT);
@@ -129,6 +125,12 @@ namespace bsp {
             i2c->Read(i2cAddr, (uint8_t *) &val, 1);
         }
 
+        //Clear all interrupts
+        uint8_t dummy = 0xff;
+
+        i2cAddr.subAddress = REG_INT_STAT;
+        i2c->Read(i2cAddr, (uint8_t *) &dummy, 1);
+
         //Clear all interrupts, even IRQs we didn't check (GPI, CAD, LCK)
         reg = 0xff;
         i2cAddr.subAddress = REG_INT_STAT;
@@ -161,19 +163,21 @@ namespace bsp {
         gpio->DisableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
         gpio->DisableInterrupt(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_IRQ_PIN));
 
+        gpio->ClearPortInterrupts(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RF_BUTTON));
+        gpio->ClearPortInterrupts(1U << static_cast<uint32_t >(BoardDefinitions::KEYBOARD_IRQ_PIN));
+
         //Clear all interrupts, even IRQs we didn't check (GPI, CAD, LCK)
         uint8_t reg = 0xff;
         i2cAddr.subAddress = REG_INT_STAT;
         i2c->Write(i2cAddr, (uint8_t *) &reg, 1);
 
-        // Keep keyboard controller in reset state
-        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),0);
+        xTimerDelete(s_right_functional_check_timer,50);
+        s_right_functional_check_timer = nullptr;
 
         //Clear IRQ queue handle
         qHandleIrq = NULL;
 
         i2c.reset();
-        i2cAddr = {};
         gpio.reset();
 
         return kStatus_Success;
