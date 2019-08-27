@@ -32,7 +32,6 @@ EventManager::~EventManager(){
 	LOG_INFO("[EventManager] Cleaning resources");
 	if( EventWorker != nullptr) {
 		EventWorker->deinit();
-		delete EventWorker;
 	}
 }
 
@@ -110,7 +109,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 sys::ReturnCodes EventManager::InitHandler() {
 
 	//initialize keyboard worker
-	EventWorker = new WorkerEvent( this );
+	EventWorker = std::make_unique<WorkerEvent>(this);
 
 	//create queues for worker
 	//keyboard irq queue
@@ -137,7 +136,7 @@ sys::ReturnCodes EventManager::InitHandler() {
 sys::ReturnCodes EventManager::DeinitHandler() {
 
 	EventWorker->deinit();
-	EventWorker = nullptr;
+	EventWorker.reset();
 	return sys::ReturnCodes::Success;
 }
 
