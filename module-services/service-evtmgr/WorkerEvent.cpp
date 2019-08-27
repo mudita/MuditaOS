@@ -122,7 +122,6 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 
 bool WorkerEvent::deinit(void)
 {
-	Worker::stop();
 	Worker::deinit();
 	bsp::keyboard_Deinit();
 	bsp::battery_Deinit();
