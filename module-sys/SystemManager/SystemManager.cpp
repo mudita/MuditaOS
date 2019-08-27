@@ -104,7 +104,7 @@ namespace sys
 
         if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
 
-            CriticalSection::Enter();
+            cpp_freertos::LockGuard lck(destroyMutex);
 
             auto serv = std::find_if(servicesList.begin(),servicesList.end(),[&](std::shared_ptr<Service>const &s) { return s->GetName() == name; });
             if(serv == servicesList.end()){
@@ -112,7 +112,6 @@ namespace sys
             }
 
             servicesList.erase(serv);
-            CriticalSection::Exit();
 
             return true;
         }
@@ -234,5 +233,6 @@ namespace sys
 
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
+    cpp_freertos::MutexStandard SystemManager::destroyMutex;
 
 }
