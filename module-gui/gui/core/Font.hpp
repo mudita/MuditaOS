@@ -156,6 +156,7 @@ public:
 	void operator= (const FontManager& ) = delete;
 
 	bool init( std::string baseDirectory );
+	void clear();
 	static FontManager& getInstance();
 
 	virtual ~FontManager();
