@@ -78,8 +78,15 @@ class ApplicationManager: public sys::Service {
 	bool handleSwitchPrevApplication( APMSwitchPrevApp* msg );
 	bool handleRegisterApplication( APMRegister* msg );
 	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
+	/**
+	 * @brief Closes all running applications.
+	 */
 	bool startApplication( const std::string& appName );
+	/**
+	 * @brief Closes eink and gui services.
+	 */
 	bool closeApplications();
+	bool closeServices();
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();
