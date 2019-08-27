@@ -137,6 +137,7 @@ sys::ReturnCodes EventManager::InitHandler() {
 sys::ReturnCodes EventManager::DeinitHandler() {
 
 	EventWorker->deinit();
+	EventWorker = nullptr;
 	return sys::ReturnCodes::Success;
 }
 

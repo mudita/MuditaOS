@@ -60,7 +60,7 @@ public:
 	 * This method is called from thread when new message arrives in queue.
 	 * @param queueID Index of the queue in the queues vector.
 	*/
-	bool handleMessage( uint32_t queueID );
+	bool handleMessage( uint32_t queueID ) override final;
 
 };
 
