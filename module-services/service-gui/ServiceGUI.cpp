@@ -75,12 +75,17 @@ ServiceGUI::~ServiceGUI(){
 		delete renderContext;
 	if( transferContext )
 		delete transferContext;
+
+	worker->deinit();
+
+	gui::ImageManager::getInstance().clear();
+	gui::FontManager::getInstance().clear();
+
 }
 
 void ServiceGUI::sendBuffer() {
 	//copy data from render context to transfer context
 	transferContext->insert( 0, 0, renderContext );
-	//memcpy( transferContext->getData(), renderContext->getData(), renderContext->getW()*renderContext->getH());
 
 	auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
 			transferContext->getW(),

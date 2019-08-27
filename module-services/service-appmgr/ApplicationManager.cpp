@@ -51,9 +51,26 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 }
 ApplicationManager::~ApplicationManager() {
 	closeApplications();
+	closeServices();
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
+}
+
+bool ApplicationManager::closeServices() {
+	bool ret = sys::SystemManager::DestroyService( "ServiceGUI", this );
+	if( ret ) {
+		LOG_INFO("Service: %s closed", "ServiceGUI");
+	}else {
+		LOG_FATAL("Service: %s is still running", "ServiceGUI");
+	}
+	ret = sys::SystemManager::DestroyService( "ServiceEink", this );
+	if( ret ) {
+		LOG_INFO("Service: %s closed", "ServiceEink");
+	}else {
+		LOG_FATAL("Service: %s is still running", "ServiceEink");
+	}
+	return true;
 }
 
 bool ApplicationManager::closeApplications() {
@@ -130,6 +147,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 		} break;
 		case static_cast<uint32_t>(MessageType::APMClose): {
 			closeApplications();
+			closeServices();
 		} break;
 		default : {
 		} break;
