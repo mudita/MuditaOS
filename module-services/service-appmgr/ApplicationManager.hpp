@@ -126,6 +126,10 @@ public:
     * @brief Sends message to application manager to inform it about change of the phone's language performed by the user.
     */
    static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
+   /**
+    * @brief Sends message to application manager that it should close itself and as a resulrt
+    */
+   static bool messageCloseApplicationManager( sys::Service* sender );
 };
 
 } /* namespace sapm */
