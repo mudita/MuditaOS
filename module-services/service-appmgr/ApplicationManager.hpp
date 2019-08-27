@@ -79,6 +79,7 @@ class ApplicationManager: public sys::Service {
 	bool handleRegisterApplication( APMRegister* msg );
 	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
 	bool startApplication( const std::string& appName );
+	bool closeApplications();
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();

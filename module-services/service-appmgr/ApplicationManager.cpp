@@ -50,10 +50,31 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 	}
 }
 ApplicationManager::~ApplicationManager() {
+	closeApplications();
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
+}
 
+bool ApplicationManager::closeApplications() {
+
+	//if application is started, its in first plane or it's working in background
+	//it will be closed using SystemManager's API.
+	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
+		if( ( it->second->state == app::Application::State::ACTIVE_FORGROUND ) ||
+			( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) ||
+			( it->second->state == app::Application::State::ACTIVATING )) {
+			LOG_INFO("Closing application: %s", it->second->name.c_str());
+			bool ret = sys::SystemManager::DestroyService( it->second->name, this );
+			if( ret ) {
+				LOG_INFO("Application: %s closed", it->second->name.c_str());
+			}else {
+				LOG_FATAL("Application: %s is still running", it->second->name.c_str());
+			}
+			it->second->state = app::Application::State::DEACTIVATED;
+		}
+	}
+	return true;
 }
 
 sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
@@ -107,6 +128,9 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
 			handleLanguageChange( msg );
 		} break;
+		case static_cast<uint32_t>(MessageType::APMClose): {
+			closeApplications();
+		} break;
 		default : {
 		} break;
 	};
@@ -116,7 +140,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 }
 // Invoked when timer ticked
 void ApplicationManager::TickHandler(uint32_t id) {
-
 }
 
 // Invoked during initialization
