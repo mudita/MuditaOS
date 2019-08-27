@@ -20,6 +20,7 @@ ApplicationNotes::ApplicationNotes(std::string name, bool startBackgound) :
 }
 
 ApplicationNotes::~ApplicationNotes() {
+	LOG_INFO("delelting");
 }
 
 // Invoked upon receiving data message
