@@ -18,6 +18,7 @@
 #include "Interface/ThreadRecord.hpp"
 #include "Interface/ContactRecord.hpp"
 #include "Interface/AlarmsRecord.hpp"
+#include "Interface/NotesRecord.hpp"
 
 class DBServiceAPI {
 
@@ -47,6 +48,12 @@ public:
     static uint32_t AlarmGetCount(sys::Service* serv);
     static std::unique_ptr<std::vector<AlarmsRecord>> AlarmGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
     static AlarmsRecord AlarmGetNext(sys::Service *serv, time_t time);
+
+    static bool NotesAdd(sys::Service* serv,const NotesRecord& rec);
+	static bool NotesRemove(sys::Service* serv,uint32_t id);
+	static bool NotesUpdate(sys::Service* serv,const NotesRecord& rec);
+	static uint32_t NotesGetCount(sys::Service* serv);
+	static bool NotesGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
 
 };
 

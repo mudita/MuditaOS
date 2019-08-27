@@ -51,7 +51,6 @@ public:
 
     AlarmsRecord GetNext(time_t time);
 private:
-    const uint32_t snippetLength = 45;
     AlarmsDB* alarmsDB;
 };
 

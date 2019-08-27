@@ -32,9 +32,12 @@ void CommandsService::TickHandler(uint32_t id) {
 
 }
 
-sys::Message_t CommandsService::DataReceivedHandler(sys::DataMessage* msgl){
+sys::Message_t CommandsService::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp){
     uint32_t servCount = 10;
 
+    if(resp != nullptr){
+        return std::make_shared<sys::ResponseMessage>();
+    }
 
     /*
      * Spawn 10 services and kill all of them

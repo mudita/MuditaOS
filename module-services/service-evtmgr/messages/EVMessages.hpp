@@ -40,7 +40,7 @@ public:
 	{
 		// Ignore incoming data message if this service is not yet initialized
 		if(service->isReady){
-			return service->DataReceivedHandler(this);
+			return service->DataReceivedHandler(this,nullptr);
 		}
 		else{
 			return std::make_shared<sys::ResponseMessage>();
@@ -67,7 +67,7 @@ public:
 	{
 		// Ignore incoming data message if this service is not yet initialized
 		if(service->isReady){
-			return service->DataReceivedHandler(this);
+			return service->DataReceivedHandler(this,nullptr);
 		}
 		else{
 			return std::make_shared<sys::ResponseMessage>();
@@ -91,7 +91,7 @@ public:
 	{
 		// Ignore incoming data message if this service is not yet initialized
 		if(service->isReady){
-			return service->DataReceivedHandler(this);
+			return service->DataReceivedHandler(this,nullptr);
 		}
 		else{
 			return std::make_shared<sys::ResponseMessage>();
@@ -113,7 +113,7 @@ public:
 	{
 		// Ignore incoming data message if this service is not yet initialized
 		if(service->isReady){
-			return service->DataReceivedHandler(this);
+			return service->DataReceivedHandler(this,nullptr);
 		}
 		else{
 			return std::make_shared<sys::ResponseMessage>();

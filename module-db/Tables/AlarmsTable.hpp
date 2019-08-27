@@ -33,7 +33,7 @@ class AlarmsTable : public Table<AlarmsTableRow,AlarmsTableFields> {
 public:
 
 	AlarmsTable(Database* db);
-    ~AlarmsTable();
+    virtual ~AlarmsTable();
 
     bool Create() override final;
     bool Add(AlarmsTableRow entry) override final;

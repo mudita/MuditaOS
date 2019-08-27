@@ -8,7 +8,7 @@ class ApplicationPhonebook: public app::Application {
 public:
 	ApplicationPhonebook( std::string name="ApplicationPhonebook", bool startBackgound = false);
 	virtual ~ApplicationPhonebook();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 	sys::ReturnCodes WakeUpHandler() override;

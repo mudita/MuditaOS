@@ -66,7 +66,7 @@ void ServiceAudio::TickHandler(uint32_t id) {
 
 }
 
-sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl) {
+sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp) {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
     switch (static_cast<MessageType >(msgl->messageType)) {

@@ -320,3 +320,65 @@ AlarmsRecord DBServiceAPI::AlarmGetNext(sys::Service *serv, time_t time) {
     }
 }
 
+bool DBServiceAPI::NotesAdd(sys::Service *serv, const NotesRecord &rec) {
+    std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesAdd,rec);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBNotesResponseMessage* notesResponse = reinterpret_cast<DBNotesResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::NotesRemove(sys::Service *serv, uint32_t id) {
+    std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesRemove);
+    msg->id = id;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBNotesResponseMessage* notesResponse = reinterpret_cast<DBNotesResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::NotesUpdate(sys::Service *serv, const NotesRecord &rec) {
+    std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesUpdate,rec);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBNotesResponseMessage* notesResponse = reinterpret_cast<DBNotesResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+uint32_t DBServiceAPI::NotesGetCount(sys::Service *serv) {
+    std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesGetCount);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBNotesResponseMessage* notesResponse = reinterpret_cast<DBNotesResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (notesResponse->retCode == true)){
+        return notesResponse->count;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) {
+    std::shared_ptr<DBNotesMessage> msg = std::make_shared<DBNotesMessage>(MessageType::DBNotesGetLimitOffset);
+    msg->offset = offset;
+    msg->limit = limit;
+
+    sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv);
+    return true;
+}
+

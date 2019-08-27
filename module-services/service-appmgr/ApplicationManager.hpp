@@ -83,7 +83,7 @@ public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override;
 
@@ -126,6 +126,10 @@ public:
     * @brief Sends message to application manager to inform it about change of the phone's language performed by the user.
     */
    static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
+   /**
+    * @brief Sends message to application manager that it should close itself and as a resulrt
+    */
+   static bool messageCloseApplicationManager( sys::Service* sender );
 };
 
 } /* namespace sapm */

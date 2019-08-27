@@ -180,68 +180,68 @@ void ListView::updatePageItems() {
 
 bool ListView::onInput( const InputEvent& inputEvent ) {
 
-//	if( (key.keyState == KeyState::KEY_RELEASED_SHORT) && (key.keyCode == KeyCode::KEY_ENTER) ) {
-//		return onActivated(nullptr);
-//	}
-//
-//	if( (key.keyState == KeyState::KEY_RELEASED_SHORT) && (key.keyCode == KeyCode::KEY_UP) ){
-//		if( orientation == ORIENTATION_TOP_DOWN ) {
-//			if( listMode == MODE_PAGE ){
-//				if( selectedIndex > firstIndex ) {
-//					selectedIndex--;
-//					return true;
-//				}
-//				if( selectedIndex == firstIndex ) {
-//					if( firstIndex > 0 ) {
-//						firstIndex -= pageSize;
-//						if( firstIndex < 0 )
-//							firstIndex = 0;
-//						lastIndex = firstIndex + pageSize -1;
-//						if( lastIndex > elementsCount - 1 )
-//							lastIndex = elementsCount - 1;
-//						selectedIndex = lastIndex;
-//						updateScrollDimenstions();
-//						return true;
-//					}
-//				}
-//			}
-//			else {
-//				//TODO implement continuous mode
-//			}
-//		}
-//		else if( orientation == ORIENTATION_BOTTOM_UP ) {
-//			//TODO implement BOTTOM_UP orientation
-//		}
-//	}
-//	else if( (key.keyState == KeyState::KEY_RELEASED_SHORT) && (key.keyCode == KeyCode::KEY_DOWN) ){
-//		if( orientation == ORIENTATION_TOP_DOWN ) {
-//			if( listMode == MODE_PAGE ) {
-//				if( selectedIndex < lastIndex ) {
-//					selectedIndex++;
-//					return true;
-//				}
-//				if( selectedIndex == lastIndex ) {
-//					if( lastIndex < elementsCount - 1 ) {
-//						firstIndex += pageSize;
-//						if( firstIndex > elementsCount - 1 )
-//							firstIndex = elementsCount - 1;
-//						lastIndex = firstIndex + pageSize -1;
-//						if( lastIndex > elementsCount - 1 )
-//							lastIndex = elementsCount - 1;
-//						selectedIndex = firstIndex;
-//						updateScrollDimenstions();
-//						return true;
-//					}
-//				}
-//			}
-//			else { //continuous mode
-//
-//			}
-//		}
-//		else { // BOTTOM_UP
-//
-//		}
-//	}
+	if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_ENTER) ) {
+		return onActivated(nullptr);
+	}
+
+	if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_UP) ){
+		if( orientation == ORIENTATION_TOP_DOWN ) {
+			if( listMode == MODE_PAGE ){
+				if( selectedIndex > firstIndex ) {
+					selectedIndex--;
+					return true;
+				}
+				if( selectedIndex == firstIndex ) {
+					if( firstIndex > 0 ) {
+						firstIndex -= pageSize;
+						if( firstIndex < 0 )
+							firstIndex = 0;
+						lastIndex = firstIndex + pageSize -1;
+						if( lastIndex > elementsCount - 1 )
+							lastIndex = elementsCount - 1;
+						selectedIndex = lastIndex;
+						updateScrollDimenstions();
+						return true;
+					}
+				}
+			}
+			else {
+				//TODO implement continuous mode
+			}
+		}
+		else if( orientation == ORIENTATION_BOTTOM_UP ) {
+			//TODO implement BOTTOM_UP orientation
+		}
+	}
+	else if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_DOWN) ){
+		if( orientation == ORIENTATION_TOP_DOWN ) {
+			if( listMode == MODE_PAGE ) {
+				if( selectedIndex < lastIndex ) {
+					selectedIndex++;
+					return true;
+				}
+				if( selectedIndex == lastIndex ) {
+					if( lastIndex < elementsCount - 1 ) {
+						firstIndex += pageSize;
+						if( firstIndex > elementsCount - 1 )
+							firstIndex = elementsCount - 1;
+						lastIndex = firstIndex + pageSize -1;
+						if( lastIndex > elementsCount - 1 )
+							lastIndex = elementsCount - 1;
+						selectedIndex = firstIndex;
+						updateScrollDimenstions();
+						return true;
+					}
+				}
+			}
+			else { //continuous mode
+
+			}
+		}
+		else { // BOTTOM_UP
+
+		}
+	}
 	return false;
 }
 
