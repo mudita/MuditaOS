@@ -26,6 +26,7 @@ ApplicationDesktop::ApplicationDesktop(std::string name) :
 }
 
 ApplicationDesktop::~ApplicationDesktop() {
+	LOG_INFO("Desktop destruktor");
 }
 
 uint32_t ApplicationDesktop::getMisseedCalls() {return missedCalls; }
@@ -71,6 +72,7 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationDesktop::DeinitHandler() {
+	LOG_INFO("DeinitHandler");
 	return sys::ReturnCodes::Success;
 }
 

@@ -31,6 +31,8 @@ enum class State {
 	gui::Label* infoLabel = nullptr;
 
 	std::vector<gui::Label*> selectionLabels;
+	//TODO remove this label after power manager is finished.
+	gui::Label* eventMgrLabel = nullptr;
 	gui::Image* powerImage = nullptr;
 	State state = State::Return;
 
