@@ -40,6 +40,7 @@ public:
 
 	ImageMap* getImageMap( uint32_t id );
 	uint32_t getImageMapID( const std::string& name );
+	void clear();
 };
 
 } /* namespace gui */
