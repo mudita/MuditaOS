@@ -69,6 +69,9 @@ class ApplicationManager: public sys::Service {
 	std::string launchApplicationName = "";
 	//state of the application manager
 	State state = State::IDLE;
+	//time to wait
+	//timer that will trigger when application manager will receive close applications
+	uint32_t closeTimer = 0;
 
 	//tries to switch the application
 	bool handleSwitchApplication( APMSwitch* msg);
@@ -79,6 +82,7 @@ class ApplicationManager: public sys::Service {
 	bool handleRegisterApplication( APMRegister* msg );
 	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
 	bool startApplication( const std::string& appName );
+	bool closeApplications();
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();
