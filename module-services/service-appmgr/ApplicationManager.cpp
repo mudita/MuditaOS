@@ -48,15 +48,12 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 
 		applications.insert(std::pair<std::string, ApplicationDescription*>(name, desc)	);
 	}
-	closeTimer = CreateTimer(500, false );
-
 }
 ApplicationManager::~ApplicationManager() {
 	closeApplications();
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
-
 }
 
 bool ApplicationManager::closeApplications() {
@@ -132,7 +129,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 			handleLanguageChange( msg );
 		} break;
 		case static_cast<uint32_t>(MessageType::APMClose): {
-			ReloadTimer(closeTimer);
+			closeApplications();
 		} break;
 		default : {
 		} break;
@@ -143,8 +140,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 }
 // Invoked when timer ticked
 void ApplicationManager::TickHandler(uint32_t id) {
-	if( id == closeTimer )
-		closeApplications();
 }
 
 // Invoked during initialization

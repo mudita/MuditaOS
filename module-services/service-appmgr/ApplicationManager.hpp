@@ -69,9 +69,6 @@ class ApplicationManager: public sys::Service {
 	std::string launchApplicationName = "";
 	//state of the application manager
 	State state = State::IDLE;
-	//time to wait
-	//timer that will trigger when application manager will receive close applications
-	uint32_t closeTimer = 0;
 
 	//tries to switch the application
 	bool handleSwitchApplication( APMSwitch* msg);
