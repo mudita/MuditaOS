@@ -61,7 +61,12 @@ namespace sys
         msg->sender = s->GetName();
         msg->uniID = receivedMsg->uniID;
         msg->transType = Message::TransmissionType ::Unicast;
-        servicesRegistered[receivedMsg->sender]->mailbox.push(msg);
+        if(servicesRegistered.find(receivedMsg->sender) != servicesRegistered.end()){
+            servicesRegistered[receivedMsg->sender]->mailbox.push(msg);
+        }
+        else{
+            // silently drop it
+        }
     }
 
     bool Bus::SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s)
