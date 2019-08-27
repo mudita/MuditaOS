@@ -58,10 +58,15 @@ namespace sys
 
     void Bus::SendResponse(std::shared_ptr<Message> msg,std::shared_ptr<Message> receivedMsg,Service* s)
     {
-        msg->sender = s->GetName();
-        msg->uniID = receivedMsg->uniID;
-        msg->transType = Message::TransmissionType ::Unicast;
-        servicesRegistered[receivedMsg->sender]->mailbox.push(msg);
+    	msg->sender = s->GetName();
+    	msg->uniID = receivedMsg->uniID;
+    	msg->transType = Message::TransmissionType ::Unicast;
+    	if(servicesRegistered.find(receivedMsg->sender) != servicesRegistered.end()){
+    		servicesRegistered[receivedMsg->sender]->mailbox.push(msg);
+    	}
+    	else{
+    		// silently drop it
+    	}
     }
 
     bool Bus::SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s)
