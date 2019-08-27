@@ -18,10 +18,15 @@
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
+#include "gui/widgets/ListView.hpp"
+
+#include "../NotesModel.hpp"
 
 namespace gui {
 
 class NotesMainWindow: public AppWindow {
+	NotesModel* notesModel;
+	gui::ListView* list;
 public:
 	NotesMainWindow( app::Application* app );
 	virtual ~NotesMainWindow();
@@ -30,9 +35,11 @@ public:
 	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
 
+
 	void rebuild() override;
 	void buildInterface() override;
 	void destroyInterface() override;
+	bool onDatabaseMessage( sys::Message* msg ) override;
 };
 
 } /* namespace gui */

@@ -19,6 +19,11 @@
 #include <utility>
 #include <memory>
 
+//services
+#include "service-gui/ServiceGUI.hpp"
+#include "service-eink/ServiceEink.hpp"
+
+
 //module-utils
 #include "log/log.hpp"
 #include "i18/i18.hpp"
@@ -51,7 +56,7 @@ ApplicationManager::~ApplicationManager() {
 
 }
 
-sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
 	uint32_t msgType = msgl->messageType;
 
@@ -103,7 +108,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl) {
 			handleLanguageChange( msg );
 		} break;
 		default : {
-			LOG_FATAL("Received unknown massage %d", msgType );
 		} break;
 	};
 
@@ -134,6 +138,15 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 		utils::localize.Switch( utils::Lang::Sp );
 	}
 
+	bool ret;
+	ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), this );
+	if( !ret ) {
+		LOG_ERROR("Failed to initialize GUI service");
+	}
+	ret = sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink"), this );
+	if( !ret ) {
+		LOG_ERROR("Failed to initialize EINK service");
+	}
 
 	//search for application with specified name and run it
 #if 1 //change to 0 if you want to run only viewer application for kickstarter
@@ -466,6 +479,12 @@ bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const
 
 bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lang language ) {
 	auto msg = std::make_shared<sapm::APMChangeLanguage>( sender->GetName(), language );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+
+bool ApplicationManager::messageCloseApplicationManager( sys::Service* sender ) {
+	auto msg = std::make_shared<sapm::APMClose>( sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }

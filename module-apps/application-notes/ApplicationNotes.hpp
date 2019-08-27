@@ -9,15 +9,18 @@
 #ifndef MODULE_APPS_APPLICATION_NOTES_APPLICATIONNOTES_HPP_
 #define MODULE_APPS_APPLICATION_NOTES_APPLICATIONNOTES_HPP_
 
+#include "NotesModel.hpp"
 #include "Application.hpp"
 
 namespace app {
 
 class ApplicationNotes: public Application {
+protected:
+
 public:
 	ApplicationNotes( std::string name="ApplicationNotes", bool startBackgound = false);
 	virtual ~ApplicationNotes();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 	sys::ReturnCodes WakeUpHandler() override;

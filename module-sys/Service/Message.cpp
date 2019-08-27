@@ -23,7 +23,7 @@ namespace sys {
 
         // Ignore incoming data message if this service is not yet initialized
         if(service->isReady){
-            return service->DataReceivedHandler(this);
+            return service->DataReceivedHandler(this,nullptr);
         }
         else{
             return std::make_shared<ResponseMessage>();
@@ -72,7 +72,14 @@ namespace sys {
     }
 
     Message_t ResponseMessage::Execute(Service *service) {
-        return std::make_shared<ResponseMessage>();
+        // Ignore incoming data message if this service is not yet initialized
+        if(service->isReady){
+            DataMessage dummy(0);
+            return service->DataReceivedHandler(&dummy,this);
+        }
+        else{
+            return std::make_shared<ResponseMessage>();
+        }
     }
 
 #ifdef UNIT_TESTS

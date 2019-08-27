@@ -93,8 +93,9 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 						cycle = true;
 						cyclePosition = (cyclePosition+1)%prevKeyProfile->chars.size();
 					}
-					else
+					else {
 						cyclePosition = 0;
+					}
 				}
 				else {
 					cyclePosition = 0;
@@ -135,7 +136,7 @@ InputEvent Translator::translate( bool pressed, uint32_t keyCode,
 			if( longPress )
 				eventState = gui::InputEvent::State::keyReleasedLong;
 
-			lastEvent = InputEvent( eventState, keyCode, prevKeyProfile->chars[cyclePosition], lastEvent.keyPressTime, releaseTime, false, prevKeyProfile->timeouts[cyclePosition] );
+			lastEvent = InputEvent( eventState, keyCode, prevKeyProfile->chars[cyclePosition], lastEvent.keyPressTime, releaseTime, lastEvent.cycle, prevKeyProfile->timeouts[cyclePosition] );
 			return lastEvent;
 		}
 		else {

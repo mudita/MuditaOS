@@ -40,7 +40,7 @@ class SMSTable : public Table<SMSTableRow,SMSTableFields> {
 public:
 
     SMSTable(Database* db);
-    ~SMSTable();
+    virtual ~SMSTable();
 
     bool Create() override final;
     bool Add(SMSTableRow entry) override final;

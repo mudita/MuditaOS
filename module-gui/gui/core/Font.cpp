@@ -195,7 +195,7 @@ int32_t Font::getKerning( uint32_t id1, uint32_t id2 ) {
 	return kern->amount;
 }
 
-uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed )
+uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const uint32_t& delimiter )
 {
 	spaceConsumed = 0;
 
@@ -241,6 +241,11 @@ uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint3
 		}
 		idLast = idCurrent;
 		++stringChars;
+
+		//check for delimiter
+		if( idCurrent == delimiter ) {
+			break;
+		}
 	}
 	spaceConsumed = space - availableSpace;
 	return stringChars;
@@ -292,6 +297,19 @@ uint32_t Font::getPixelWidth( const UTF8& str, const uint32_t start, const uint3
 	}
 
 	return stringPixelWidth;
+}
+
+uint32_t Font::getPixelWidth( const UTF8& str ) {
+	return getPixelWidth( str, 0, str.length() );
+}
+
+uint32_t Font::getCharPixelWidth( uint32_t charCode ) {
+	FontGlyph* glyph = glyphs.find(charCode)->second;
+
+	if( glyph != NULL)
+		return  glyph->xadvance ;
+
+	return 0;
 }
 
 FontManager::FontManager() {

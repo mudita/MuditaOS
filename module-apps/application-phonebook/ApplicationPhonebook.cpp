@@ -9,13 +9,13 @@
 namespace app {
 
 ApplicationPhonebook::ApplicationPhonebook(std::string name, bool startBackgound) :
-    Application( name, startBackgound, 2048 ) {
+    Application( name, startBackgound, 4096 ) {
 }
 
 ApplicationPhonebook::~ApplicationPhonebook() {}
 
 // Invoked upon receiving data message
-sys::Message_t ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl) {
+sys::Message_t ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage* resp) {
 
     auto retMsg = Application::DataReceivedHandler(msgl);
     // if message was handled by application's template there is no need to process further.

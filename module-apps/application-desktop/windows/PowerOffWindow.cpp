@@ -15,6 +15,9 @@
 #include "PowerOffWindow.hpp"
 #include "../ApplicationDesktop.hpp"
 
+//services
+#include "service-appmgr/ApplicationManager.hpp"
+
 namespace gui {
 
 PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerOffWindow"){
@@ -96,6 +99,11 @@ void PowerOffWindow::buildInterface() {
 		if( item.focus )
 			this->state = State::PowerDown;
 		return true; };
+
+	selectionLabels[1]->activatedCallback = [=] (gui::Item& item) {
+		LOG_INFO("Closing system");
+		sapm::ApplicationManager::messageCloseApplicationManager( application );
+		return false; };
 }
 void PowerOffWindow::destroyInterface() {
 	AppWindow::destroyInterface();

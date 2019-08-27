@@ -173,7 +173,23 @@ UTF8::~UTF8() {
 }
 
 bool UTF8::expand( uint32_t size ) {
-	return true;
+
+	uint32_t newSizeAllocated = getDataBufferSize( sizeAllocated + size );
+	uint8_t* newData = new uint8_t[newSizeAllocated];
+
+	if( newData != nullptr ) {
+
+		memcpy( newData, data, sizeUsed );
+		memset( newData + sizeUsed, 0, newSizeAllocated - sizeUsed );
+
+		delete [] data;
+		data = newData;
+		sizeAllocated = newSizeAllocated;
+		lastIndex = 0;
+		lastIndexData = data;
+		return true;
+	}
+	return false;
 }
 
 uint32_t UTF8::getDataBufferSize( uint32_t dataBytes ){
@@ -272,12 +288,6 @@ uint32_t UTF8::operator[]( const uint32_t& idx ) const{
 	uint32_t dummy;
 	uint32_t retValue = decode( reinterpret_cast<const char*>(dataPtr), dummy );
 	return retValue;
-
-//	uint32_t returnValue = 0;
-//	uint32_t tmp = charLength(reinterpret_cast<const char*>(dataPtr));
-//	memcpy(static_cast<uint32_t*>(&returnValue), dataPtr, tmp);
-//
-//	return returnValue;
 }
 
 UTF8 UTF8::operator+( const UTF8& utf ) {
@@ -301,7 +311,8 @@ UTF8& UTF8::operator+=( const UTF8& utf ) {
 		data = newData;
 		sizeAllocated = newSizeAllocated;
 		strLength += utf.strLength;
-		sizeUsed += utf.sizeUsed;
+		//-1 is to ignore double null terminator as it is counted in sizeUsed
+		sizeUsed += utf.sizeUsed-1;
 		lastIndex = 0;
 		lastIndexData = data;
 	}
@@ -320,6 +331,20 @@ bool UTF8::operator==( const UTF8& utf ) const {
 const char* UTF8::c_str() const {
 	return reinterpret_cast<const char*>(data);
 }
+
+void UTF8::clear() {
+
+	if( data )
+		delete data;
+
+	data = new uint8_t[stringExpansion];
+	sizeAllocated = stringExpansion;
+	sizeUsed = 1;
+	strLength = 0;
+	lastIndex = 0;
+	lastIndexData = data;
+}
+
 UTF8 UTF8::substr( const uint32_t begin, const uint32_t length) const {
 
 	if( ( begin + length > this->length() ) ||
@@ -483,7 +508,7 @@ UTF8 UTF8::getLine(void)
 bool UTF8::removeChar(const uint32_t& pos, const uint32_t& count)
 {
 
-	if( ( pos + count >= this->length() ) || ( count == 0 ) )
+	if( ( pos + count > this->length() ) || ( count == 0 ) )
 		return false;
 
 	//get pointer to begin of string to remove
@@ -512,7 +537,7 @@ bool UTF8::removeChar(const uint32_t& pos, const uint32_t& count)
 	uint32_t copyOffset = beginPtr - this->data;
 	memset(tempString, 0, tempStringBufferSize);
 	memcpy(tempString, this->data, beginPtr - this->data);
-	memcpy(tempString + copyOffset, endPtr, this->sizeUsed - bytesToRemove);
+	memcpy(tempString + copyOffset, endPtr, this->sizeUsed - bytesToRemove - copyOffset);
 
 	this->sizeAllocated = tempStringBufferSize;
 	this->strLength -= count;
@@ -526,6 +551,128 @@ bool UTF8::removeChar(const uint32_t& pos, const uint32_t& count)
 	this->data = tempString;
 
 	return true;
+}
+
+//Char. number range  |        UTF-8 octet sequence
+//   (hexadecimal)    |              (binary)
+//--------------------+---------------------------------------------
+//0000 0000-0000 007F | 0xxxxxxx
+//0000 0080-0000 07FF | 110xxxxx 10xxxxxx
+//0000 0800-0000 FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+//0001 0000-0010 FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+bool UTF8::encode( const uint16_t& code, uint32_t& dest, uint32_t& length ) {
+
+	dest = 0;
+	length = 0;
+	if( ( (code >= 0xD800) && (code <= 0xDFFF )) || (code > 0x10FFFF))
+		return false;
+
+	if( code < 0x00080 ) {
+		length = 1;
+		dest = code;
+	}
+	else if( code < 0x0800 ) {
+		length = 2;
+		dest = 0x0000C080;
+		//low byte
+		dest |= (code & 0x003F );
+		//high byte
+		dest |= ( (code>>6) & 0x001F ) << 8;
+	}
+	else if( code < 0x010000 ) {
+		length = 3;
+		dest = 0x00E08080;
+		//low byte
+		dest |= (code & 0x003F );
+		//middle byte
+		dest |= ( (code>>6) & 0x003F ) << 8;
+		//high byte
+		dest |= ( (code>>12) & 0x000F ) << 16;
+	}
+	else {
+		length = 4;
+		dest = 0xF0808080;
+		//low byte
+		dest |= (code & 0x003F );
+		//byte after low
+		dest |= ( (code>>6) & 0x003F ) << 8;
+		//byte before low
+		dest |= ( (code>>12) & 0x003F ) << 16;
+		//high byte
+		dest |= ( (code>>18) & 0x0007 ) << 24;
+	}
+	return true;
+}
+
+bool UTF8::insert( const char* charPtr, const uint32_t& index ) {
+
+	//if index is different than UTF8::npos check if its valid
+	uint32_t insertIndex = index;
+	if( insertIndex != UTF8::npos ) {
+		if( insertIndex > strLength )
+			return false;
+	}
+	else
+		insertIndex = strLength;
+
+
+	//get length of the char in bytes
+	uint32_t charLen = charLength( charPtr );
+
+	//if there is not enough space in string buffer try t expand it by default expansion size.
+	if( charLen + sizeUsed >= sizeAllocated ) {
+		if( expand() == false )
+			return false;
+	}
+
+	//find pointer where new character should be copied
+	uint8_t* beginPtr = this->data;
+	for(uint32_t i = 0; i < insertIndex; i++) {
+		beginPtr += charLength(reinterpret_cast<const char*>(beginPtr));
+	}
+
+	memmove( beginPtr + charLen, beginPtr, sizeUsed - (beginPtr - data));
+	memcpy( beginPtr, charPtr, charLen );
+
+	sizeUsed += charLen;
+	++strLength;
+
+	return true;
+}
+
+bool UTF8::insertCode( const uint32_t& charCode, const uint32_t& index ) {
+
+	uint32_t encodedValue;
+	uint32_t encodedLength;
+	encode( charCode, encodedValue, encodedLength );
+
+	return insert( reinterpret_cast<char*>( &encodedValue), index );
+}
+
+bool UTF8::insertString( const UTF8& str, const uint32_t& index ) {
+
+	//if index is different than UTF8::npos check if its valid
+	uint32_t insertIndex = index;
+	if( insertIndex != UTF8::npos ) {
+		if( insertIndex > strLength )
+			return false;
+	}
+	else
+		insertIndex = strLength;
+
+	uint32_t totalSize = sizeUsed + str.sizeUsed-1; //-1 because there are 2 end terminators
+	expand( getDataBufferSize( totalSize ));
+
+	uint8_t* beginPtr = this->data;
+	for(uint32_t i = 0; i < insertIndex; i++) {
+		beginPtr += charLength(reinterpret_cast<const char*>(beginPtr));
+	}
+
+	//-1 to ignore end terminator from str
+	memmove( beginPtr + str.sizeUsed-1, beginPtr, sizeUsed - (beginPtr - data));
+	memcpy( beginPtr, str.data, str.sizeUsed-1 );
+
+	return false;
 }
 
 
@@ -582,7 +729,7 @@ uint32_t UTF8::decode( const char* utf8_char, uint32_t& length  ) const
 {
     uint32_t ret = 0;
     uint32_t len = 0;
-    //check if provided char is standars US-ASCII character. 0xxxxxxx
+    //check if provided char is standards US-ASCII character. 0xxxxxxx
     if( ( (*utf8_char) & UTF8_HEADER_1_MASK ) == 0 )
     {
         ret = *utf8_char;

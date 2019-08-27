@@ -37,7 +37,7 @@ EventManager::~EventManager(){
 }
 
 // Invoked upon receiving data message
-sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl) {
+sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
 	bool handled = false;
 

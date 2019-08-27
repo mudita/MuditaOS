@@ -35,7 +35,7 @@ public:
 
     ContactsNameTable(Database* db);
 
-    ~ContactsNameTable();
+    virtual ~ContactsNameTable();
 
     bool Create() override final;
 
