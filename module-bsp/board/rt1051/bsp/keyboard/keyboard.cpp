@@ -75,7 +75,7 @@ namespace bsp {
         gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),0);
         vTaskDelay(1);
         gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::KEYBOARD_RESET_PIN),1);
-
+        vTaskDelay(10);
 
         /* Assemble a mask for row and column registers */
         reg = ~(~0 << TCA8418_ROWS_COUNT);
