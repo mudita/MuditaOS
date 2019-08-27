@@ -46,7 +46,9 @@ Application::Application(std::string name, bool startBackground, uint32_t stackD
 }
 
 Application::~Application() {
-	// TODO Auto-generated destructor stub
+	for( auto it = windows.begin(); it!= windows.end(); it++)
+		delete it->second;
+	windows.clear();
 }
 
 void Application::TickHandler(uint32_t id) {
