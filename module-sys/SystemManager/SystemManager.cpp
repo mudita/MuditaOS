@@ -198,33 +198,27 @@ namespace sys
 
         DeleteTimer(pingPongTimerID);
 
-        for(auto const &w: servicesList){
-
-            // Sysmgr stores list of all active services but some of them are under control of parent services.
-            // Parent services ought to manage lifetime of child services hence we are sending close messages only to parent services.
-            if(w->parent != ""){
-                continue;
-            }
-
-            auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::Exit),w->GetName(),this,5000);
-
-            if(ret.first != ReturnCodes::Success){
-                //no response to exit message,
-                LogOutput::Output(w->GetName() + " failed to response to exit message");
-                exit(1);
-            }
-
-            auto serv = std::find_if(servicesList.begin(),servicesList.end(),[&](std::shared_ptr<Service>const &s) { return s->GetName() == w->GetName(); });
-            if(serv == servicesList.end()){
-                exit(1);
-            }
-
-        }
-
+        // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
-        servicesList.clear();
+        std::reverse(servicesList.begin(),servicesList.end());
         CriticalSection::Exit();
 
+        servicesList.erase( std::remove_if(servicesList.begin(), servicesList.end(), [&](auto& obj){
+            // Sysmgr stores list of all active services but some of them are under control of parent services.
+            // Parent services ought to manage lifetime of child services hence we are sending close messages only to parent services.
+            if(obj->parent == ""){
+                auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::Exit),obj->GetName(),this,5000);
+
+                if(ret.first != ReturnCodes::Success){
+                    //no response to exit message,
+                    LogOutput::Output(obj->GetName() + " failed to response to exit message");
+                    exit(1);
+                }
+            }
+            return true;
+        }
+        ), servicesList.end() );
+        
         if(servicesList.size() == 0){
                 enableRunLoop = false;
         }
