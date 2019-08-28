@@ -24,6 +24,12 @@ bool ContactsNameTable::Create() {
     return db->Execute(createTableQuery);
 }
 
+bool ContactsNameTable::DuplicateVerify(const UTF8 &primary_name)
+{
+    auto query = db->Query("SELECT * FROM contact_name WHERE name_primary = '%s';", primary_name.c_str());
+    return query->GetRowCount() == 0;
+}
+
 bool ContactsNameTable::Add(ContactsNameTableRow entry) {
     return db->Execute(
             "insert or ignore into contact_name (contact_id, name_primary, name_alternative) VALUES (%lu, '%s', '%s');",

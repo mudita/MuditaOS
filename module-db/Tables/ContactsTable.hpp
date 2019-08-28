@@ -47,6 +47,8 @@ public:
 
     bool Add(ContactsTableRow entry) override final;
 
+    bool DuplicateVerify(const uint8_t speeddial);
+
     bool RemoveByID(uint32_t id) override final;
 
     bool Update(ContactsTableRow entry) override final;

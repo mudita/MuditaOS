@@ -10,6 +10,7 @@
 
 
 #include "ContactsNumberTable.hpp"
+#include <log/log.hpp>
 
 ContactsNumberTable::ContactsNumberTable(Database *db): Table(db) {
 
@@ -31,6 +32,19 @@ bool ContactsNumberTable::Add(ContactsNumberTableRow entry) {
             entry.numbere164.c_str(),
             entry.type
     );
+}
+
+bool ContactsNumberTable::DuplicateVerify(ContactsNumberTableRow entry) {
+    bool retval = true;
+    if( entry.numberUser.length() == 0 && entry.numbere164.length() == 0) {
+        return retval;
+    }
+    std::unique_ptr<QueryResult> query;
+    query = db->Query("SELECT * FROM contact_number WHERE number_user = '%s' OR number_e164 = '%s';",
+                entry.numberUser.c_str(),
+                entry.numbere164.c_str()
+            );
+    return retval && query->GetRowCount() == 0;
 }
 
 bool ContactsNumberTable::RemoveByID(uint32_t id) {

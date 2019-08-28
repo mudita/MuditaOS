@@ -62,6 +62,17 @@ public:
     ContactRecordInterface(ContactsDB* db);
     ~ContactRecordInterface();
 
+    enum class VerifyResult : uint32_t {
+        VerifySuccess =0,
+        VerifyDB_Error,
+        VerifyNumer,
+        VerifyName,
+        VerifySpeedDial,
+    };
+
+    /// verifies if contact is ok and returns what's wrong if not
+    VerifyResult Verify(const ContactRecord & rec);
+
     bool Add(const ContactRecord &rec) override final;
 
     bool RemoveByID(uint32_t id) override final;

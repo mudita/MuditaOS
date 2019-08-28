@@ -167,18 +167,21 @@ std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sy
     }
 }
 
-bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) {
+ContactRecordInterface::VerifyResult DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) {
+    ContactRecordInterface::VerifyResult result = ContactRecordInterface::VerifyResult::VerifySuccess;
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd,rec);
     msg->record.contactType = ContactType::USER;
 
     auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
     DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
-    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
-        return true;
+    if( ret.first != sys::ReturnCodes::Success) {
+        result = ContactRecordInterface::VerifyResult::VerifyDB_Error;
+    } else if( contactResponse->retCode != 0) {
+        result = *reinterpret_cast<ContactRecordInterface::VerifyResult*>(&contactResponse->retCode);
+    } else{
+        result = ContactRecordInterface::VerifyResult::VerifySuccess;
     }
-    else{
-        return false;
-    }
+    return result;
 }
 
 bool DBServiceAPI::ContactRemove(sys::Service *serv, uint32_t id) {

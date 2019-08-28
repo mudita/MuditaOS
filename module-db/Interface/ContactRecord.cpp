@@ -36,6 +36,28 @@ ContactRecordInterface::~ContactRecordInterface() {
 
 }
 
+ContactRecordInterface::VerifyResult ContactRecordInterface::Verify(const ContactRecord & rec)
+{
+    VerifyResult retval = VerifyResult::VerifySuccess;
+    for ( auto element : rec.numbers) {
+        ContactsNumberTableRow entry = {
+            .contactID = 0,
+            .numberUser = element.numberUser.c_str(),
+            .numbere164 = element.numberE164.c_str(),
+            .type = element.numberType
+        };
+        if(!contactDB->number.DuplicateVerify(entry)) {
+            return VerifyResult::VerifyNumer;
+        }
+    }
+    if(false == contactDB->name.DuplicateVerify(rec.primaryName)) {
+        return VerifyResult::VerifyName;
+    }
+    if(false == contactDB->contacts.DuplicateVerify(rec.speeddial)) {
+        return VerifyResult::VerifySpeedDial;
+    }
+    return retval;
+}
 
 bool ContactRecordInterface::Add(const ContactRecord& rec) {
 
@@ -64,10 +86,16 @@ bool ContactRecordInterface::Add(const ContactRecord& rec) {
     auto contactNameID = contactDB->GetLastInsertRowID();
 
     for (auto a : rec.numbers) {
-        ret = contactDB->number.Add(ContactsNumberTableRow{.contactID = contactID,
-                                                           .numberUser = a.numberUser.c_str(),
-                                                           .numbere164 = a.numberE164.c_str(),
-                                                           .type = a.numberType});
+        ContactsNumberTableRow entry = {
+            .contactID = contactID,
+            .numberUser = a.numberUser.c_str(),
+            .numbere164 = a.numberE164.c_str(),
+            .type = a.numberType
+        };
+        ret = contactDB->number.Add(entry);
+        if (ret != 0) {
+            break;
+        }
     }
 
     if (!ret) {

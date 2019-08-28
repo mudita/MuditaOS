@@ -39,6 +39,9 @@ public:
 
     bool Create() override final;
 
+    /// return true on no duplicate
+    bool DuplicateVerify(const UTF8 &primary_name);
+
     bool Add(ContactsNameTableRow entry) override final;
 
     bool RemoveByID(uint32_t id) override final;
