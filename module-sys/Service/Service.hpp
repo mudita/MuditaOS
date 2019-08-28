@@ -39,7 +39,7 @@ private:
 class Service : public cpp_freertos::Thread,public std::enable_shared_from_this<Service>
 {
 public:
-	Service(std::string name,uint32_t stackDepth=4096,ServicePriority priority=ServicePriority::Idle,std::string parent="");
+	Service(std::string name,std::string parent="",uint32_t stackDepth=4096,ServicePriority priority=ServicePriority::Idle);
 
 	virtual ~Service();
 
