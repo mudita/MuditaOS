@@ -50,11 +50,10 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 	}
 }
 ApplicationManager::~ApplicationManager() {
-	closeApplications();
-	closeServices();
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
+	systemManager = nullptr;
 }
 
 bool ApplicationManager::closeServices() {
@@ -180,11 +179,11 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 	}
 
 	bool ret;
-	ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), this );
+	ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", GetName(), 480, 600), this );
 	if( !ret ) {
 		LOG_ERROR("Failed to initialize GUI service");
 	}
-	ret = sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink"), this );
+	ret = sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink", GetName() ), this );
 	if( !ret ) {
 		LOG_ERROR("Failed to initialize EINK service");
 	}
@@ -196,7 +195,7 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	auto it = applications.find(runCallAppName);
 	if( it!= applications.end()){
-		it->second->lanucher->runBackground(reinterpret_cast<sys::SystemManager*>(this));
+		it->second->lanucher->runBackground(this);
 	}
 
 	it = applications.find(runDesktopName);
@@ -217,6 +216,8 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationManager::DeinitHandler() {
+	closeApplications();
+	closeServices();
 	return sys::ReturnCodes::Success;
 }
 
@@ -246,7 +247,7 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 	else {
 		state = State::WAITING_NEW_APP_REGISTRATION;
 		LOG_INFO( "starting application: %s", appName.c_str());
-		it->second->lanucher->run(reinterpret_cast<sys::SystemManager*>(this));
+		it->second->lanucher->run(this);
 	}
 
 	return true;

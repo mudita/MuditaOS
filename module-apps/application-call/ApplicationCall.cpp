@@ -24,8 +24,8 @@
 #include "ApplicationCall.hpp"
 namespace app {
 
-ApplicationCall::ApplicationCall(std::string name, bool startBackgound ) :
-	Application( name, startBackgound, 4096 ) {
+ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound ) :
+	Application( name, parent, startBackgound, 4096 ) {
 
 	timerCall = CreateTimer(1000,true);
 }

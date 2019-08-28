@@ -39,8 +39,8 @@ enum class EinkWorkerCommands {
 	CopyComplete
 };
 
-ServiceEink::ServiceEink(const std::string& name)
-	: sys::Service(name,4096+1024),
+ServiceEink::ServiceEink(const std::string& name, std::string parent)
+	: sys::Service(name,parent,4096+1024),
 	  timerID { 0 },
 	  selfRefereshTriggerCount{ 0 },
 	  temperatureMeasurementTriggerCount{ 0 },
@@ -196,7 +196,7 @@ sys::ReturnCodes ServiceEink::InitHandler() {
 }
 
 sys::ReturnCodes ServiceEink::DeinitHandler() {
-	EinkPowerOff();
+	EinkPowerDown();
 	return sys::ReturnCodes::Success;
 }
 

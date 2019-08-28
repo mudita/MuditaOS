@@ -30,7 +30,7 @@ const char *ServiceDB::serviceName = "ServiceDB";
 
 
 ServiceDB::ServiceDB()
-        : sys::Service(serviceName, 1024 * 24, sys::ServicePriority::Idle) {
+        : sys::Service(serviceName, "", 1024 * 24, sys::ServicePriority::Idle) {
     LOG_INFO("[ServiceDB] Initializing");
 
 }

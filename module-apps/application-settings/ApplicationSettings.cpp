@@ -16,8 +16,8 @@
 
 namespace app {
 
-ApplicationSettings::ApplicationSettings(std::string name, bool startBackgound) :
-	Application( name, startBackgound ) {
+ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound) :
+	Application( name, parent, startBackgound ) {
 }
 
 ApplicationSettings::~ApplicationSettings() {
