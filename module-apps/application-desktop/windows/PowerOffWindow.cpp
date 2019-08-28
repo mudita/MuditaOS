@@ -155,6 +155,7 @@ void PowerOffWindow::destroyInterface() {
 	selectionLabels.clear();
 	delete powerImage;
 	focusItem = nullptr;
+	delete eventMgrLabel;
 	children.clear();
 }
 
