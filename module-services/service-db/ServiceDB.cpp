@@ -208,11 +208,16 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 #if SHOW_DB_ACCESS_PERF == 1
             timestamp = cpp_freertos::Ticks::GetTicks();
 #endif
-            auto ret = contactRecordInterface->Add(msg->record);
+            ContactRecordInterface::VerifyResult ret = contactRecordInterface->Verify((msg->record));
+            if(ret == ContactRecordInterface::VerifyResult::VerifySuccess) {
+                if(contactRecordInterface->Add(msg->record)) {
+                    ret = ContactRecordInterface::VerifyResult::VerifySuccess;
+                }
+            }
 #if SHOW_DB_ACCESS_PERF == 1
             LOG_ERROR("DBContactAdd time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
-            responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+            responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, *reinterpret_cast<uint32_t*>(&ret));
         }
             break;
 

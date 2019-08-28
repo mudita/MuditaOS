@@ -23,6 +23,13 @@ bool ContactsTable::Create() {
     return db->Execute(createTableQuery);
 }
 
+bool ContactsTable::DuplicateVerify(const uint8_t speeddial) {
+    static const int speed_dial_max = 10; static const int speed_dial_min = 2; // dont know proper place for these
+    if(speeddial > speed_dial_max || speeddial < speed_dial_min) { return true; }
+    auto retQuery = db->Query("SELECT * FROM contacts WHERE speeddial= %d;", speeddial);
+    return retQuery->GetRowCount() == 0;
+}
+
 bool ContactsTable::Add(ContactsTableRow entry) {
     return db->Execute(
             "insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, blacklist, favourites, speeddial ) VALUES (%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, %lu);",

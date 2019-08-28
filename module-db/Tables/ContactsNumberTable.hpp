@@ -43,6 +43,9 @@ public:
 
     bool Add(ContactsNumberTableRow entry) override final;
 
+    /// returns true if no duplicate found and no error occured
+    bool DuplicateVerify(ContactsNumberTableRow entry);
+
     bool RemoveByID(uint32_t id) override final;
 
     bool Update(ContactsNumberTableRow entry) override final;
