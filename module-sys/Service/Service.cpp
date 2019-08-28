@@ -13,7 +13,7 @@ namespace sys
 using namespace cpp_freertos;
 using namespace std;
 
-Service::Service(std::string name,uint32_t stackDepth,ServicePriority priority,std::string parent)
+Service::Service(std::string name,std::string parent,uint32_t stackDepth,ServicePriority priority)
 		:	cpp_freertos::Thread(name, stackDepth/4 /* Stack depth in bytes */, static_cast<UBaseType_t >(priority)),
 		     parent(parent),
              mailbox(this),
