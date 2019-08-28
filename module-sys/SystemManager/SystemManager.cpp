@@ -203,23 +203,23 @@ namespace sys
         std::reverse(servicesList.begin(),servicesList.end());
         CriticalSection::Exit();
 
-        servicesList.erase( std::remove_if(servicesList.begin(), servicesList.end(), [&](auto& obj){
-            // Sysmgr stores list of all active services but some of them are under control of parent services.
-            // Parent services ought to manage lifetime of child services hence we are sending close messages only to parent services.
-            if(obj->parent == ""){
-                auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::Exit),obj->GetName(),this,5000);
 
-                if(ret.first != ReturnCodes::Success){
+        retry:
+        for(auto &w : servicesList){
+
+            // Sysmgr stores list of all active services but some of them are under control of parent services.
+            // Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to parents.
+            if(w->parent == ""){
+                auto ret = DestroyService(w->GetName(),this);
+                if(!ret){
                     //no response to exit message,
-                    LogOutput::Output(obj->GetName() + " failed to response to exit message");
+                    LogOutput::Output(w->GetName() + " failed to response to exit message");
                     exit(1);
                 }
-                return true;
+                goto retry;
             }
-            return false;
         }
-        ), servicesList.end() );
-        
+
         if(servicesList.size() == 0){
                 enableRunLoop = false;
         }

@@ -21,7 +21,7 @@ Translator::Translator() {
 }
 
 Translator::~Translator() {
-	// TODO Auto-generated destructor stub
+
 }
 
 std::vector<std::string> Translator::getProfilesList(std::string ext) {
