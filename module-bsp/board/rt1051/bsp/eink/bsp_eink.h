@@ -36,6 +36,7 @@ typedef void (*bsp_eink_BusyEvent)(void);
 #define BSP_EINK_TRANSFER_TIMEOUT_MS        1000
 
 status_t BSP_EinkInit(bsp_eink_BusyEvent event);
+void BSP_EinkDeinit(void);
 void BSP_EinkWriteCS(bsp_eink_cs_ctrl_t ctrl);
 uint8_t BSP_EinkWaitUntilDisplayBusy(uint32_t timeout);
 void BSP_EinkResetDisplayController(void);

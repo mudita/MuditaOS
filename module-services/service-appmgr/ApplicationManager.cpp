@@ -55,6 +55,7 @@ ApplicationManager::~ApplicationManager() {
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
+	systemManager = nullptr;
 }
 
 bool ApplicationManager::closeServices() {
@@ -217,6 +218,9 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationManager::DeinitHandler() {
+	closeApplications();
+	closeServices();
+	delete systemManager;
 	return sys::ReturnCodes::Success;
 }
 
