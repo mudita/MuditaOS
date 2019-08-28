@@ -125,7 +125,8 @@ void PowerOffWindow::buildInterface() {
 
 	selectionLabels[1]->activatedCallback = [=] (gui::Item& item) {
 		LOG_INFO("Closing system");
-		sapm::ApplicationManager::messageCloseApplicationManager( application );
+		sys::SystemManager::CloseSystem(application);
+//		sapm::ApplicationManager::messageCloseApplicationManager( application );
 		return false; };
 
 	//TODO Mati pisze tutaj.
