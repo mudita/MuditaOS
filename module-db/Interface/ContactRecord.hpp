@@ -88,6 +88,7 @@ public:
 
     std::unique_ptr<std::vector<ContactRecord>>
     GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str) override final;
+    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetLike(uint32_t offset, uint32_t limit, UTF8 text);
 
 private:
     ContactsDB* contactDB;
@@ -98,6 +99,8 @@ private:
     std::unique_ptr<std::vector<ContactRecord>> getFavourites(uint32_t offset, uint32_t limit, const char* str);
     /// helper function to avoid needles code copies
     void contact_from_contacts_records(std::vector<ContactRecord> *record, std::vector<ContactsTableRow> &contacts);
+    /// helper function
+    void build_contact_records_by_name(std::vector<ContactsNameTableRow> &ret, std::vector<ContactRecord> *records);
 };
 
 
