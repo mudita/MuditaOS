@@ -86,6 +86,7 @@ MuxDaemon::MuxDaemon(NotificationMuxChannel::NotificationCallback_t callback) :
 
 MuxDaemon::~MuxDaemon() {
     CloseMultiplexer();
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QPOWD\r", 1));
 }
 
 std::unique_ptr<MuxDaemon> MuxDaemon::Create(NotificationMuxChannel::NotificationCallback_t callback) {
