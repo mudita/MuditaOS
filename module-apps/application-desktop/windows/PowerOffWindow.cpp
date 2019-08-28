@@ -133,7 +133,8 @@ void PowerOffWindow::buildInterface() {
 	eventMgrLabel->activatedCallback = [=] (gui::Item& item) {
         static bool state = false;
         if(state == false){
-            sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
+            //sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
+            sys::SystemManager::CloseSystem(application);
             LOG_INFO("Closing Cellular Service");
             state = true;
         }
