@@ -18,7 +18,7 @@ class ApplicationNotes: public Application {
 protected:
 
 public:
-	ApplicationNotes( std::string name="ApplicationNotes", bool startBackgound = false);
+	ApplicationNotes( std::string name="ApplicationNotes", std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationNotes();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -32,13 +32,14 @@ public:
 
 class ApplicationNotesLauncher : public ApplicationLauncher {
 public:
-	ApplicationNotesLauncher() : ApplicationLauncher("ApplicationNotes", true) {
+	ApplicationNotesLauncher() : ApplicationLauncher("ApplicationNotes", true ) {};
+	bool run(sys::Service* caller = nullptr ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationNotes>(name, parent), caller );
 	};
-	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationNotes>(name),sysmgr);
-	};
-	bool runBackground(sys::SystemManager* sysmgr) {
-		return sysmgr->CreateService(std::make_shared<ApplicationNotes>(name, true), sysmgr);
+	bool runBackground(sys::Service* caller ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationNotes>(name, parent ),caller);
 	};
 };
 

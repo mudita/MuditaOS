@@ -70,6 +70,10 @@ void EinkPowerOff()
     s_einkIsPoweredOn = false;
 }
 
+void EinkPowerDown(void) {
+	EinkPowerOff();
+}
+
 int16_t EinkGetTemperatureInternal() {
 	return 25;
 }

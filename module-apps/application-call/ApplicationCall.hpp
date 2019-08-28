@@ -25,7 +25,7 @@ protected:
 	uint32_t callDuration = 0;
 	uint32_t callEndTime = -1;
 public:
-	ApplicationCall( std::string name="ApplicationCall", bool startBackgound = false );
+	ApplicationCall( std::string name="ApplicationCall", std::string parent = "", bool startBackgound = false );
 	virtual ~ApplicationCall();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -49,12 +49,14 @@ public:
 
 class ApplicationCallLauncher : public ApplicationLauncher {
 public:
-	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false) {};
-	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name),sysmgr);
+	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false ) {};
+	bool run(sys::Service* caller = nullptr ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationCall>(name, parent), caller );
 	};
-	bool runBackground(sys::SystemManager* sysmgr) {
-		return sysmgr->CreateService(std::make_shared<ApplicationCall>(name, true), sysmgr);
+	bool runBackground(sys::Service* caller ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationCall>(name, parent ),caller);
 	};
 };
 

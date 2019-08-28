@@ -15,12 +15,12 @@
 
 namespace app {
 
-ApplicationNotes::ApplicationNotes(std::string name, bool startBackgound) :
-	Application( name, startBackgound, 4096 ) {
+ApplicationNotes::ApplicationNotes(std::string name, std::string parent, bool startBackgound) :
+	Application( name, parent, startBackgound, 4096 ) {
 }
 
 ApplicationNotes::~ApplicationNotes() {
-	LOG_INFO("delelting");
+	LOG_INFO("deleting");
 }
 
 // Invoked upon receiving data message
