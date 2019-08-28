@@ -151,7 +151,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 // Invoked when timer ticked
 void ServiceEink::TickHandler(uint32_t id) {
 
-	LOG_INFO("[ServiceEink] Powre down eink after 3 seconds");
+	LOG_INFO("[ServiceEink] Power down eink after 3 seconds");
 	EinkPowerOff();
 }
 
