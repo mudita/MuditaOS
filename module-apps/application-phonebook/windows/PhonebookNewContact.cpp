@@ -105,7 +105,6 @@ PhonebookNewContact::~PhonebookNewContact()
         delete p;
     }
     destroyInterface();
-    delete box;
 }
 
 void PhonebookNewContact::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
