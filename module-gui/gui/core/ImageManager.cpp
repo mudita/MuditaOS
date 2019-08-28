@@ -25,8 +25,7 @@ ImageManager::ImageManager() {
 }
 
 ImageManager::~ImageManager() {
-	for( ImageMap* imageMap: imageMaps )
-		delete imageMap;
+	clear();
 }
 
 void ImageManager::loadImageMaps( std::string baseDirectory ) {
@@ -41,6 +40,15 @@ void ImageManager::loadImageMaps( std::string baseDirectory ) {
 		loadVecMap( mapName );
 	}
 }
+
+void ImageManager::clear() {
+	for( ImageMap* imageMap: imageMaps ) {
+		LOG_INFO("deleting image: %s", imageMap->getName().c_str());
+		delete imageMap;
+	}
+	imageMaps.clear();
+}
+
 
 std::vector<std::string> splitpath(
   const std::string& str
