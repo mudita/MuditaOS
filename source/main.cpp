@@ -15,6 +15,7 @@
 #include "application-settings/ApplicationSettings.hpp"
 #include "application-notes/ApplicationNotes.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-test-ui/ApplicationTest.hpp"
 
 //module-services
 #include "service-gui/ServiceGUI.hpp"
@@ -166,6 +167,8 @@ int main() {
 
         // create launcher for phonebook, all launchers could be created like that
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
+
+		applications.push_back(app::CreateLauncher<app::ApplicationTest>("ApplicationTest"));
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),

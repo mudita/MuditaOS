@@ -137,7 +137,9 @@ void MenuWindow::buildInterface() {
 		TileDescription{"menu_calendar",    "app_desktop_menu_calendar",[=] (gui::Item& item){ return true; }},
 		TileDescription{"menu_alarm",       "app_desktop_menu_alarm",[=] (gui::Item& item){ return true; }},
 		TileDescription{"menu_meditation",  "app_desktop_menu_meditation",[=] (gui::Item& item){ return true; }},
-		TileDescription{"menu_music_player","app_desktop_menu_music",[=] (gui::Item& item){ return true; }},
+		TileDescription{"menu_music_player","app_desktop_menu_music",[=] (gui::Item& item){
+            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationTest", "MainWindow", nullptr);
+            return true; }},
 		TileDescription{"menu_tools",       "app_desktop_menu_tools",[=] (gui::Item& item){ {
 			LOG_INFO("page 1 tools" );
 			switchPage(1);
