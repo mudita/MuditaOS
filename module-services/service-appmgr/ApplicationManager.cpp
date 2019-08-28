@@ -50,8 +50,6 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 	}
 }
 ApplicationManager::~ApplicationManager() {
-	closeApplications();
-	closeServices();
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
@@ -220,7 +218,6 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 sys::ReturnCodes ApplicationManager::DeinitHandler() {
 	closeApplications();
 	closeServices();
-	delete systemManager;
 	return sys::ReturnCodes::Success;
 }
 
