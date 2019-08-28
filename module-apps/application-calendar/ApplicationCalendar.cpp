@@ -13,8 +13,8 @@
 
 namespace app {
 
-ApplicationCalendar::ApplicationCalendar(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, false, stackDepth, priority ) {
+ApplicationCalendar::ApplicationCalendar(std::string name,std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
+	Application( name, parent, false, stackDepth, priority ) {
 }
 
 ApplicationCalendar::~ApplicationCalendar() {

@@ -22,7 +22,7 @@ namespace app {
 class ApplicationCalendar: public Application {
 public:
 
-	ApplicationCalendar(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	ApplicationCalendar(std::string name, std::string parent, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationCalendar();
 
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
@@ -38,13 +38,14 @@ public:
 
 class ApplicationCalendarLauncher : public ApplicationLauncher {
 public:
-	ApplicationCalendarLauncher() : ApplicationLauncher("ApplicationCalendar", true) {};
-	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr,1000);
+	ApplicationCalendarLauncher() : ApplicationLauncher("ApplicationCalendar", false) {};
+	bool run(sys::Service* caller = nullptr ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationCalendar>(name, parent), caller );
 	};
-	bool runBackground(sys::SystemManager* sysmgr) {
-		startBackground = true;
-		return sysmgr->CreateService(std::make_shared<app::ApplicationCalendar>(name),sysmgr,1000);
+	bool runBackground(sys::Service* caller ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationCalendar>(name, parent ),caller);
 	};
 };
 
