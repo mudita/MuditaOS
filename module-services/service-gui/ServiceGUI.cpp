@@ -40,8 +40,8 @@ static uint32_t getTimeFunction() {
 	return xTaskGetTickCount();
 }
 
-ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
-		: sys::Service(name, 4096, sys::ServicePriority::Idle),
+ServiceGUI::ServiceGUI(const std::string& name, std::string parent, uint32_t screenWidth, uint32_t screenHeight)
+		: sys::Service(name, parent, 4096, sys::ServicePriority::Idle),
 		renderContext{ nullptr },
 		transferContext { nullptr },
 		renderFrameCounter{ 1 },

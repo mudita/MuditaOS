@@ -21,8 +21,8 @@
 
 namespace app {
 
-ApplicationDesktop::ApplicationDesktop(std::string name) :
-	Application( name ) {
+ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent) :
+	Application( name, parent ) {
 }
 
 ApplicationDesktop::~ApplicationDesktop() {
