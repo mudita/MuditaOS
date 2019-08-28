@@ -316,8 +316,15 @@ FontManager::FontManager() {
 }
 
 FontManager::~FontManager() {
-	for( Font* font : fonts )
+	clear();
+}
+
+void FontManager::clear() {
+	for( Font* font: fonts ) {
+		LOG_INFO("deleting font: %s", font->getName().c_str());
 		delete font;
+	}
+	fonts.clear();
 }
 
 void FontManager::loadFonts( std::string baseDirectory ) {
