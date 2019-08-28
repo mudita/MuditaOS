@@ -19,6 +19,8 @@
 //services
 #include "service-appmgr/ApplicationManager.hpp"
 
+#include "service-cellular/ServiceCellular.hpp"
+
 namespace gui {
 
 PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerOffWindow"){
@@ -128,8 +130,18 @@ void PowerOffWindow::buildInterface() {
 
 	//TODO Mati pisze tutaj.
 	eventMgrLabel->activatedCallback = [=] (gui::Item& item) {
-		LOG_INFO("Closing Event Manager");
-		return true; };
+        static bool state = false;
+        if(state == false){
+            sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
+            LOG_INFO("Closing Cellular Service");
+            state = true;
+        }
+        else{
+            sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), application);
+            state = false;
+        }
+		return true;
+	};
 }
 void PowerOffWindow::destroyInterface() {
 	AppWindow::destroyInterface();
