@@ -214,8 +214,9 @@ namespace sys
                     LogOutput::Output(obj->GetName() + " failed to response to exit message");
                     exit(1);
                 }
+                return true;
             }
-            return true;
+            return false;
         }
         ), servicesList.end() );
         
