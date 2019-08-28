@@ -196,7 +196,7 @@ sys::ReturnCodes ServiceEink::InitHandler() {
 }
 
 sys::ReturnCodes ServiceEink::DeinitHandler() {
-	EinkPowerOff();
+	EinkPowerDown();
 	return sys::ReturnCodes::Success;
 }
 

@@ -592,6 +592,11 @@ void EinkPowerOff()
     }
 }
 
+void EinkPowerDown(void) {
+	EinkPowerOff();
+	BSP_EinkDeinit();
+}
+
 int16_t EinkGetTemperatureInternal()
 {
     uint8_t cmd[1];
@@ -972,23 +977,6 @@ EinkUpdateFrame ( uint16_t X,
 
     return(EinkOK);
 }
-
-//EinkStatus_e
-//EinkClearScreenDeep (int8_t temperature)
-//{
-//    EinkWaveforms_e wv = s_einkConfiguredWaveform;
-//
-//    EinkUpdateWaveform(EinkWaveformA2, temperature);
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
-//    EinkFillScreenWithColor(EinkDisplayColorBlack);
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
-//    EinkFillScreenWithColor(EinkDisplayColorBlack);
-//    EinkFillScreenWithColor(EinkDisplayColorWhite);
-//
-//    EinkUpdateWaveform(wv, temperature);
-//
-//    return EinkOK;
-//}
 
 EinkStatus_e
 EinkFillScreenWithColor (EinkDisplayColorFilling_e colorFill)
