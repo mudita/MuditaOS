@@ -21,7 +21,6 @@ Translator::Translator() {
 }
 
 Translator::~Translator() {
-
 }
 
 std::vector<std::string> Translator::getProfilesList(std::string ext) {
