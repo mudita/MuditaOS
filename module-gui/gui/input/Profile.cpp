@@ -26,6 +26,7 @@ Profile::Profile() {
 Profile::~Profile() {
 	for ( auto it = keys.begin(); it != keys.end(); it++ )
 		delete it->second;
+	keys.clear();
 }
 
 static inline std::string trim(const std::string &s)
@@ -62,10 +63,13 @@ bool Profile::load( std::string filename ) {
 	LineType lineType = LineType::KEY_CODE;
 	bool name = false;
 
-	KeyProfile* pk;
+
+	KeyProfile* pk = nullptr;
+	KeyProfile tmp;
 	while( vfs.eof(file) != true ) {
+
 		std::string line = trim(vfs.getline(file));
-		if( line[0] == '#') {
+		if( (line[0] == '#') || (line.empty())) {
 			continue;
 		}
 		else {
@@ -79,8 +83,10 @@ bool Profile::load( std::string filename ) {
 			else {
 				//new structure, create profile key and read the keyboard's key code
 				if( lineType == LineType::KEY_CODE ) {
+					uint32_t keyCode;
+					std::stringstream( line ) >> keyCode;
 					pk = new KeyProfile();
-					std::stringstream( line ) >> pk->keyCode;
+					pk->keyCode = keyCode;
 					lineType = LineType::CYCLIC;
 				}
 				else if( lineType == LineType::CYCLIC ) {
@@ -93,13 +99,20 @@ bool Profile::load( std::string filename ) {
 				}
 				else if( lineType == LineType::TIMEOUTS ) {
 					addTimeouts( pk, line );
-					if( pk->chars.size() == pk->timeouts.size() ) {
+					if( (pk->chars.size() == pk->timeouts.size()) &&
+						(keys.find(pk->keyCode) == keys.end())) {
 						addKeyProfile( pk );
 					}
 					else {
+						LOG_FATAL("Incorrect number of chars or key code duplicate key code: [%d]", pk->keyCode);
 						delete pk;
+						pk = nullptr;
 					}
+
 					lineType = LineType::KEY_CODE;
+				}
+				else {
+					LOG_FATAL("invalid line: [%s]", line.c_str());
 				}
 			}
 		}
