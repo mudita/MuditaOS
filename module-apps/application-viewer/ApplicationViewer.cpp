@@ -33,8 +33,8 @@
 
 namespace app {
 
-ApplicationViewer::ApplicationViewer(std::string name,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, false, stackDepth, priority ) {
+ApplicationViewer::ApplicationViewer(std::string name, std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
+	Application( name, parent, false, stackDepth, priority ) {
 }
 
 ApplicationViewer::~ApplicationViewer() {
