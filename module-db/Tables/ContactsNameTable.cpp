@@ -89,6 +89,21 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t off
     return ret;
 }
 
+auto buildResponseFromQuery(std::unique_ptr<QueryResult> retQuery) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+        return std::vector<ContactsNameTableRow>();
+    }
+    std::vector<ContactsNameTableRow> ret;
+    do {
+        ret.push_back(ContactsNameTableRow{(*retQuery)[0].GetUInt32(),  // ID
+                                           (*retQuery)[1].GetUInt32(),    // contactID
+                                           (*retQuery)[2].GetString(),    // namePrimary
+                                           (*retQuery)[3].GetString(),    // nameAlternative
+        });
+    } while (retQuery->NextRow());
+    return ret;
+}
+
 std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit,ContactNameTableFields field,
                                                                              const char *str) {
 
@@ -111,21 +126,24 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint3
                               limit,
                               offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
-        return std::vector<ContactsNameTableRow>();
-    }
 
+    return buildResponseFromQuery(std::move(retQuery));
+}
+
+#include <log/log.hpp>
+
+std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetLikeName(uint32_t offset, uint32_t limit, UTF8 &text)
+{
     std::vector<ContactsNameTableRow> ret;
-
-    do {
-        ret.push_back(ContactsNameTableRow{(*retQuery)[0].GetUInt32(),  // ID
-                                           (*retQuery)[1].GetUInt32(),    // contactID
-                                           (*retQuery)[2].GetString(),    // namePrimary
-                                           (*retQuery)[3].GetString(),    // nameAlternative
-        });
-    } while (retQuery->NextRow());
-
-    return ret;
+    LOG_INFO("SELECT * from contact_name WHERE name_primary LIKE '%s' ORDER BY name_primary LIMIT %lu OFFSET %lu;",
+                              text.c_str(),
+                              limit,
+                              offset);
+    auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary LIKE '%%%s%%' ORDER BY name_primary LIMIT %lu OFFSET %lu;",
+                              text.c_str(),
+                              limit,
+                              offset);
+    return buildResponseFromQuery(std::move(retQuery));
 }
 
 uint32_t ContactsNameTable::GetCount() {

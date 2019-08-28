@@ -44,6 +44,7 @@ enum class MessageType {
 	DBContactUpdate,    // Update contact remove
 	DBContactGetLimitOffset,   // Get contact records by limit,offset
     DBContactGetLimitOffsetByFavourites, // Get contact records by limit offset by field
+    DBContactGetLimitOffsetLike, // Get contact records like these in text
 	DBContactGetCount,         // Get contacts count
 
 

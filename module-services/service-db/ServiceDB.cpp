@@ -280,6 +280,14 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
         }
         break;
 
+        case MessageType::DBContactGetLimitOffsetLike:
+        {
+            DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
+            auto ret = contactRecordInterface->GetLimitOffsetLike(msg->offset, msg->limit, msg->text);
+            responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true);
+        }
+        break;
+
         case MessageType::DBAlarmAdd: {
             DBAlarmMessage *msg = reinterpret_cast<DBAlarmMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1

@@ -255,6 +255,22 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetLimitOffsetB
     }
 }
 
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetLimitOffsetLike(sys::Service *serv, uint32_t offset, uint32_t limit, const UTF8& text) {
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetLimitOffsetLike);
+    msg->offset = offset;
+    msg->limit = limit;
+    msg->text = text;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+        return std::move(contactResponse->records);
+    }
+    else{
+        return std::make_unique<std::vector<ContactRecord>>();
+    }
+}
+
 
 bool DBServiceAPI::AlarmAdd(sys::Service *serv, const AlarmsRecord &rec) {
     std::shared_ptr<DBAlarmMessage> msg = std::make_shared<DBAlarmMessage>(MessageType::DBAlarmAdd,rec);

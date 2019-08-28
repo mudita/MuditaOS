@@ -291,37 +291,28 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     return records;
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
-                                                                                          uint32_t limit,
-                                                                                          ContactRecordField field,
-                                                                                          const char *str) {
-    auto records =  std::make_unique<std::vector<ContactRecord>>();
-
-    switch(field){
-        case ContactRecordField ::PrimaryName:
-        {
-            auto ret = contactDB->name.GetLimitOffsetByField(offset,limit,ContactNameTableFields::NamePrimary,str);
-
+void ContactRecordInterface::build_contact_records_by_name(std::vector<ContactsNameTableRow> &ret, std::vector<ContactRecord> *records)
+{
             for(const auto &w : ret){
 
                 auto contact = contactDB->contacts.GetByID(w.contactID);
                 if(contact.ID == 0){
-                    return records;
+                    return;
                 }
 
                 auto nrs = getNumbers(contact.numbersID);
                 if(nrs.size() == 0){
-                    return records;
+                    return;
                 }
 
                 auto ring = contactDB->ringtones.GetByID(contact.ringID);
                 if(ring.ID == 0){
-                    return records;
+                    return;
                 }
 
                 auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
                 if(address.ID == 0){
-                    return records;
+                    return;
                 }
 
 
@@ -345,8 +336,19 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                         .speeddial=static_cast<uint8_t >(contact.speedDial)
                 });
             }
+}
 
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
+                                                                                          uint32_t limit,
+                                                                                          ContactRecordField field,
+                                                                                          const char *str) {
+    auto records =  std::make_unique<std::vector<ContactRecord>>();
 
+    switch(field){
+        case ContactRecordField ::PrimaryName:
+        {
+            auto ret = contactDB->name.GetLimitOffsetByField(offset,limit,ContactNameTableFields::NamePrimary,str);
+            build_contact_records_by_name(ret, records.get());
         }
 
             break;
@@ -414,6 +416,15 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         }
     }
 
+    return records;
+}
+
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffsetLike(uint32_t offset, uint32_t limit, UTF8 text)
+{
+    auto records =  std::make_unique<std::vector<ContactRecord>>();
+    auto ret = contactDB->name.GetLimitOffsetLikeName(offset,limit,text);
+    build_contact_records_by_name(ret, records.get());
     return records;
 }
 

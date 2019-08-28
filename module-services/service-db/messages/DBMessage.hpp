@@ -106,6 +106,7 @@ public:
     virtual ~DBContactMessage() {}
 
     ContactRecord record;
+    UTF8 text;
 };
 
 class DBContactResponseMessage: public DBResponseMessage {
