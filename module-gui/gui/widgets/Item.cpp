@@ -44,7 +44,7 @@ Item::~Item() {
 }
 
 bool Item::addWidget( Item* item ) {
-
+    if( item == nullptr ) return false;
 	if( item->parent ) {
 		item->parent->removeWidget(item);
 	}
