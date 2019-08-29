@@ -21,11 +21,12 @@
 
 namespace app {
 
-ApplicationDesktop::ApplicationDesktop(std::string name) :
-	Application( name ) {
+ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent) :
+	Application( name, parent ) {
 }
 
 ApplicationDesktop::~ApplicationDesktop() {
+	LOG_INFO("Desktop destruktor");
 }
 
 uint32_t ApplicationDesktop::getMisseedCalls() {return missedCalls; }
@@ -71,6 +72,7 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationDesktop::DeinitHandler() {
+	LOG_INFO("DeinitHandler");
 	return sys::ReturnCodes::Success;
 }
 

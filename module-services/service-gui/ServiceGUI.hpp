@@ -61,7 +61,7 @@ protected:
 	void sendToRender();
 
 public:
-    ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight );
+    ServiceGUI(const std::string& name, std::string parent = "", uint32_t screenWidth = 480, uint32_t screenHeight = 600 );
     ~ServiceGUI();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;

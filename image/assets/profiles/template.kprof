@@ -34,7 +34,7 @@ true
 43
 true
 'm','n','o'
-0
+0,0,0
 #NumericKey7 = 51,
 51
 true
@@ -56,12 +56,12 @@ false
 ' '
 0
 #NumericKeyAst = 61,
-31
+61
 false
 0x08
 0
 #NumericKeyPnd = 63,
-31
+63
 false
 0x0A
 0
@@ -70,8 +70,8 @@ false
 #JoystickUp = 2,
 #JoystickDown = 22,
 #JoystickEnter = 12,
-#FnLeft = 21,//1,
-#FnRight = 23,//3,
+#FnLeft = 21,
+#FnRight = 23
 23
 false
 ''

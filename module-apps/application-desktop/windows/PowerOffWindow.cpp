@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "log/log.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 
@@ -14,6 +15,11 @@
 
 #include "PowerOffWindow.hpp"
 #include "../ApplicationDesktop.hpp"
+
+//services
+#include "service-appmgr/ApplicationManager.hpp"
+
+#include "service-cellular/ServiceCellular.hpp"
 
 namespace gui {
 
@@ -63,8 +69,10 @@ void PowerOffWindow::buildInterface() {
 	infoLabel->setText( utils::localize.get("app_desktop_poweroff_question") );
 
 	uint32_t pinLabelX = 46;
+	//TODO change this to 397 after power manager is finished
+	uint32_t pinLabelY = 350;
 	for( uint32_t i=0; i<4; i++ ){
-		gui::Label* label = new gui::Label(this, pinLabelX, 397, 193, 75);
+		gui::Label* label = new gui::Label(this, pinLabelX, pinLabelY, 193, 75);
 		label->setFilled( false );
 		label->setBorderColor( gui::ColorFullBlack );
 		label->setPenWidth(0);
@@ -76,15 +84,33 @@ void PowerOffWindow::buildInterface() {
 		selectionLabels.push_back( label );
 		pinLabelX += 193;
 	}
+
 	selectionLabels[0]->setText( utils::localize.get("common_no") );
 	selectionLabels[1]->setText( utils::localize.get("common_yes") );
+
+	pinLabelX = 46;
+	pinLabelY += 75;
+	eventMgrLabel = new gui::Label(this, pinLabelX, pinLabelY, 193*2, 75);
+	eventMgrLabel->setFilled( false );
+	eventMgrLabel->setBorderColor( gui::ColorFullBlack );
+	eventMgrLabel->setPenWidth(0);
+	eventMgrLabel->setPenFocusWidth(2);
+	eventMgrLabel->setRadius(5);
+	eventMgrLabel->setFont("gt_pressura_bold_24");
+	eventMgrLabel->setText( "TURN PWR MGR OFF" );
+	eventMgrLabel->setEdges( RectangleEdgeFlags::GUI_RECT_ALL_EDGES );
+	eventMgrLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	//define navigation between labels
 	selectionLabels[0]->setNavigationItem( NavigationDirection::LEFT, selectionLabels[1] );
 	selectionLabels[0]->setNavigationItem( NavigationDirection::RIGHT, selectionLabels[1] );
+	selectionLabels[0]->setNavigationItem( NavigationDirection::DOWN, eventMgrLabel );
 
 	selectionLabels[1]->setNavigationItem( NavigationDirection::LEFT, selectionLabels[0] );
 	selectionLabels[1]->setNavigationItem( NavigationDirection::RIGHT, selectionLabels[0] );
+	selectionLabels[1]->setNavigationItem( NavigationDirection::DOWN, eventMgrLabel );
+
+	eventMgrLabel->setNavigationItem( NavigationDirection::UP, selectionLabels[0]);
 
 	//callbacks for getting focus
 	selectionLabels[0]->focusChangedCallback = [=] (gui::Item& item) {
@@ -96,6 +122,28 @@ void PowerOffWindow::buildInterface() {
 		if( item.focus )
 			this->state = State::PowerDown;
 		return true; };
+
+	selectionLabels[1]->activatedCallback = [=] (gui::Item& item) {
+		LOG_INFO("Closing system");
+		sys::SystemManager::CloseSystem(application);
+//		sapm::ApplicationManager::messageCloseApplicationManager( application );
+		return false; };
+
+	//TODO Mati pisze tutaj.
+	eventMgrLabel->activatedCallback = [=] (gui::Item& item) {
+        static bool state = false;
+        if(state == false){
+            //sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
+            sys::SystemManager::CloseSystem(application);
+            LOG_INFO("Closing Cellular Service");
+            state = true;
+        }
+        else{
+            sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), application);
+            state = false;
+        }
+		return true;
+	};
 }
 void PowerOffWindow::destroyInterface() {
 	AppWindow::destroyInterface();
@@ -107,6 +155,7 @@ void PowerOffWindow::destroyInterface() {
 	selectionLabels.clear();
 	delete powerImage;
 	focusItem = nullptr;
+	delete eventMgrLabel;
 	children.clear();
 }
 

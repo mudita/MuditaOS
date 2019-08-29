@@ -42,8 +42,9 @@ protected:
 
 	uint8_t einkRenderBuffer[600 * 480];
 	bool	deepRefresh = false;
+	uint32_t timerPowerOff = 0;
 public:
-	ServiceEink(const std::string& name);
+	ServiceEink(const std::string& name,std::string parent = "");
     ~ServiceEink();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;

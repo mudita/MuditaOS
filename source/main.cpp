@@ -17,9 +17,6 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 
 //module-services
-#include "service-gui/ServiceGUI.hpp"
-#include "service-gui/messages/DrawMessage.hpp"
-#include "ServiceEink.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "service-db/ServiceDB.hpp"
@@ -139,9 +136,8 @@ int main() {
         vfs.Init();
 
         bool ret = false;
-        ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", 480, 600), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+
+        ret = sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());

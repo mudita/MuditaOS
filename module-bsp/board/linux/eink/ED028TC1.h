@@ -322,6 +322,11 @@ void EinkPowerOn();
 void EinkPowerOff();
 
 /**
+ * @brief This function is responsible for turning eink of and releasing all resources.
+ */
+void EinkPowerDown(void);
+
+/**
  * This function measures the ambient temperature using the ED028TC1 display internal temperature sensor.
  * @note The display needs to be powered on
  *

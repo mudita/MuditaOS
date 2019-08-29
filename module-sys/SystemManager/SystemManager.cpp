@@ -25,7 +25,7 @@ namespace sys
     const char* systemManagerServiceName = "SysMgrService";
 
     SystemManager::SystemManager(TickType_t pingInterval)
-            : Service(systemManagerServiceName,4096,ServicePriority::Idle),
+            : Service(systemManagerServiceName),
               pingInterval(pingInterval)
     {
         // Specify list of channels which System Manager is registered to
@@ -104,7 +104,7 @@ namespace sys
 
         if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
 
-            CriticalSection::Enter();
+            cpp_freertos::LockGuard lck(destroyMutex);
 
             auto serv = std::find_if(servicesList.begin(),servicesList.end(),[&](std::shared_ptr<Service>const &s) { return s->GetName() == name; });
             if(serv == servicesList.end()){
@@ -112,7 +112,6 @@ namespace sys
             }
 
             servicesList.erase(serv);
-            CriticalSection::Exit();
 
             return true;
         }
@@ -199,32 +198,27 @@ namespace sys
 
         DeleteTimer(pingPongTimerID);
 
-        for(auto const &w: servicesList){
+        // We are going to remove services in reversed order of creation
+        CriticalSection::Enter();
+        std::reverse(servicesList.begin(),servicesList.end());
+        CriticalSection::Exit();
+
+
+        retry:
+        for(auto &w : servicesList){
 
             // Sysmgr stores list of all active services but some of them are under control of parent services.
-            // Parent services ought to manage lifetime of child services hence we are sending close messages only to parent services.
-            if(w->parent != ""){
-                continue;
+            // Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to parents.
+            if(w->parent == ""){
+                auto ret = DestroyService(w->GetName(),this);
+                if(!ret){
+                    //no response to exit message,
+                    LogOutput::Output(w->GetName() + " failed to response to exit message");
+                    exit(1);
+                }
+                goto retry;
             }
-
-            auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::Exit),w->GetName(),this,5000);
-
-            if(ret.first != ReturnCodes::Success){
-                //no response to exit message,
-                LogOutput::Output(w->GetName() + " failed to response to exit message");
-                exit(1);
-            }
-
-            auto serv = std::find_if(servicesList.begin(),servicesList.end(),[&](std::shared_ptr<Service>const &s) { return s->GetName() == w->GetName(); });
-            if(serv == servicesList.end()){
-                exit(1);
-            }
-
         }
-
-        CriticalSection::Enter();
-        servicesList.clear();
-        CriticalSection::Exit();
 
         if(servicesList.size() == 0){
                 enableRunLoop = false;
@@ -234,5 +228,6 @@ namespace sys
 
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
+    cpp_freertos::MutexStandard SystemManager::destroyMutex;
 
 }

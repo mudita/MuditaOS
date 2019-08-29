@@ -10,13 +10,14 @@
 
 #include "MessageType.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/LanguageWindow.hpp"
 
 #include "ApplicationSettings.hpp"
 
 namespace app {
 
-ApplicationSettings::ApplicationSettings(std::string name, bool startBackgound) :
-	Application( name, startBackgound ) {
+ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound) :
+	Application( name, parent, startBackgound ) {
 }
 
 ApplicationSettings::~ApplicationSettings() {
@@ -73,6 +74,9 @@ void ApplicationSettings::createUserInterface() {
 	gui::AppWindow* window = nullptr;
 
 	window = new gui::SettingsMainWindow(this);
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+	window = new gui::LanguageWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 

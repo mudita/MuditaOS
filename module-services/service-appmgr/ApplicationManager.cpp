@@ -19,6 +19,11 @@
 #include <utility>
 #include <memory>
 
+//services
+#include "service-gui/ServiceGUI.hpp"
+#include "service-eink/ServiceEink.hpp"
+
+
 //module-utils
 #include "log/log.hpp"
 #include "i18/i18.hpp"
@@ -48,7 +53,44 @@ ApplicationManager::~ApplicationManager() {
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
 		delete it->second;
 	}
+	systemManager = nullptr;
+}
 
+bool ApplicationManager::closeServices() {
+	bool ret = sys::SystemManager::DestroyService( "ServiceGUI", this );
+	if( ret ) {
+		LOG_INFO("Service: %s closed", "ServiceGUI");
+	}else {
+		LOG_FATAL("Service: %s is still running", "ServiceGUI");
+	}
+	ret = sys::SystemManager::DestroyService( "ServiceEink", this );
+	if( ret ) {
+		LOG_INFO("Service: %s closed", "ServiceEink");
+	}else {
+		LOG_FATAL("Service: %s is still running", "ServiceEink");
+	}
+	return true;
+}
+
+bool ApplicationManager::closeApplications() {
+
+	//if application is started, its in first plane or it's working in background
+	//it will be closed using SystemManager's API.
+	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
+		if( ( it->second->state == app::Application::State::ACTIVE_FORGROUND ) ||
+			( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) ||
+			( it->second->state == app::Application::State::ACTIVATING )) {
+			LOG_INFO("Closing application: %s", it->second->name.c_str());
+			bool ret = sys::SystemManager::DestroyService( it->second->name, this );
+			if( ret ) {
+				LOG_INFO("Application: %s closed", it->second->name.c_str());
+			}else {
+				LOG_FATAL("Application: %s is still running", it->second->name.c_str());
+			}
+			it->second->state = app::Application::State::DEACTIVATED;
+		}
+	}
+	return true;
 }
 
 sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
@@ -102,6 +144,10 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
 			handleLanguageChange( msg );
 		} break;
+		case static_cast<uint32_t>(MessageType::APMClose): {
+			closeApplications();
+			closeServices();
+		} break;
 		default : {
 		} break;
 	};
@@ -111,7 +157,6 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 }
 // Invoked when timer ticked
 void ApplicationManager::TickHandler(uint32_t id) {
-
 }
 
 // Invoked during initialization
@@ -133,6 +178,15 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 		utils::localize.Switch( utils::Lang::Sp );
 	}
 
+	bool ret;
+	ret = sys::SystemManager::CreateService(std::make_shared<sgui::ServiceGUI>("ServiceGUI", GetName(), 480, 600), this );
+	if( !ret ) {
+		LOG_ERROR("Failed to initialize GUI service");
+	}
+	ret = sys::SystemManager::CreateService(std::make_shared<ServiceEink>("ServiceEink", GetName() ), this );
+	if( !ret ) {
+		LOG_ERROR("Failed to initialize EINK service");
+	}
 
 	//search for application with specified name and run it
 #if 1 //change to 0 if you want to run only viewer application for kickstarter
@@ -141,7 +195,7 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	auto it = applications.find(runCallAppName);
 	if( it!= applications.end()){
-		it->second->lanucher->runBackground(reinterpret_cast<sys::SystemManager*>(this));
+		it->second->lanucher->runBackground(this);
 	}
 
 	it = applications.find(runDesktopName);
@@ -162,6 +216,8 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationManager::DeinitHandler() {
+	closeApplications();
+	closeServices();
 	return sys::ReturnCodes::Success;
 }
 
@@ -191,7 +247,7 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 	else {
 		state = State::WAITING_NEW_APP_REGISTRATION;
 		LOG_INFO( "starting application: %s", appName.c_str());
-		it->second->lanucher->run(reinterpret_cast<sys::SystemManager*>(this));
+		it->second->lanucher->run(this);
 	}
 
 	return true;
@@ -465,6 +521,12 @@ bool ApplicationManager::messageRegisterApplication( sys::Service* sender, const
 
 bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lang language ) {
 	auto msg = std::make_shared<sapm::APMChangeLanguage>( sender->GetName(), language );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+
+bool ApplicationManager::messageCloseApplicationManager( sys::Service* sender ) {
+	auto msg = std::make_shared<sapm::APMClose>( sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }

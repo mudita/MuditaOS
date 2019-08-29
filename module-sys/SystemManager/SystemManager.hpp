@@ -89,6 +89,7 @@ private:
     std::function<int()> userInit;
 
 	static std::vector<std::shared_ptr<Service>> servicesList;
+    static cpp_freertos::MutexStandard destroyMutex;
 
 
 };
