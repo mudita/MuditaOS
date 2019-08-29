@@ -32,6 +32,19 @@ Image::Image( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, cons
 	updateDrawArea();
 }
 
+
+Image::Image(const UTF8& imageName )
+	:imageMap { nullptr }
+{
+	type = ItemType::IMAGE;
+
+	if( imageName.length() ) {
+		uint32_t id = ImageManager::getInstance().getImageMapID( imageName.c_str() );
+		setImageWithID( id );
+	}
+	updateDrawArea();
+}
+
 Image::~Image() {
 }
 
