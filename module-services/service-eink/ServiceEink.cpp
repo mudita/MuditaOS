@@ -39,8 +39,8 @@ enum class EinkWorkerCommands {
 	CopyComplete
 };
 
-ServiceEink::ServiceEink(const std::string& name)
-	: sys::Service(name,4096+1024),
+ServiceEink::ServiceEink(const std::string& name, std::string parent)
+	: sys::Service(name,parent,4096+1024),
 	  timerID { 0 },
 	  selfRefereshTriggerCount{ 0 },
 	  temperatureMeasurementTriggerCount{ 0 },
@@ -50,6 +50,8 @@ ServiceEink::ServiceEink(const std::string& name)
 	memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
 	waveformSettings.mode = EinkWaveformGC16;
 	waveformSettings.temperature = -1000;
+	timerPowerOff = CreateTimer(3000, false);
+
 }
 
 ServiceEink::~ServiceEink(){
@@ -71,6 +73,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 	switch( msg->messageType ) {
 
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
+			stopTimer( timerPowerOff );
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
 //			LOG_INFO("[ServiceEink] Received framebuffer");
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
@@ -122,6 +125,8 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 
 //			LOG_INFO("[ServiceEink] RefreshTime: %d", end_tick - start_tick);
 
+			ReloadTimer( timerPowerOff );
+
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;
@@ -146,7 +151,8 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 // Invoked when timer ticked
 void ServiceEink::TickHandler(uint32_t id) {
 
-//	LOG_INFO("[ServiceEink] Timer");
+	LOG_INFO("[ServiceEink] Power down eink after 3 seconds");
+	EinkPowerOff();
 }
 
 // Invoked during initialization
@@ -190,6 +196,7 @@ sys::ReturnCodes ServiceEink::InitHandler() {
 }
 
 sys::ReturnCodes ServiceEink::DeinitHandler() {
+	EinkPowerDown();
 	return sys::ReturnCodes::Success;
 }
 

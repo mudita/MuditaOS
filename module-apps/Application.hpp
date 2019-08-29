@@ -62,7 +62,7 @@ public:
 		DEACTIVATING
 	};
 public:
-	Application(std::string name, bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
 	/**
@@ -164,7 +164,9 @@ protected:
 class ApplicationLauncher {
 protected:
 	//name of the application to run
-	std::string name;
+	std::string name = "";
+	//name of the application's owner
+	std::string parent = "";
 	//defines whether application can be closed when it looses focus
 	bool closeable = true;
 	//defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
@@ -175,8 +177,8 @@ public:
 	std::string getName() { return name;};
 	bool isCloseable() { return closeable; };
 	//virtual method to run the application
-	virtual bool run(sys::SystemManager* sysmgr) {return true;};
-	virtual bool runBackground(sys::SystemManager* sysmgr) {return true;};
+	virtual bool run(sys::Service* caller = nullptr ) {return true;};
+	virtual bool runBackground(sys::Service* caller = nullptr ) {return true;};
 };
 
 template <class T>
@@ -184,11 +186,11 @@ class ApplicationLauncherT : public ApplicationLauncher
 {
     public:
     ApplicationLauncherT(std::string name, bool isCloseable=true) : ApplicationLauncher(name, isCloseable) {}
-    virtual bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<T>(name),sysmgr);
+    virtual bool run(sys::Service* caller) override {
+    	return sys::SystemManager::CreateService( std::make_shared<T>(name), caller );
 	};
-    bool runBackground(sys::SystemManager *sysmgr) override {
-        return sysmgr->CreateService(std::make_shared<T>(name, true), sysmgr);
+    bool runBackground(sys::Service *caller) override {
+    	return sys::SystemManager::CreateService( std::make_shared<T>(name,"", true), caller );
     };
 };
 

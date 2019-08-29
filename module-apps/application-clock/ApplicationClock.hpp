@@ -25,7 +25,7 @@ class ApplicationClock: public Application {
 	uint32_t timer_id= 0;
 
 public:
-	ApplicationClock(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	ApplicationClock(std::string name, std::string parent = "", uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
 
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
@@ -41,9 +41,14 @@ public:
 
 class ApplicationClockLauncher : public ApplicationLauncher {
 public:
-	ApplicationClockLauncher() : ApplicationLauncher("ApplicationClock", true) {};
-	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationClock>(name),sysmgr,1000);
+	ApplicationClockLauncher() : ApplicationLauncher("ApplicationClock", true ) {};
+	bool run(sys::Service* caller = nullptr ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationClock>(name, parent), caller );
+	};
+	bool runBackground(sys::Service* caller ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationClock>(name, parent ),caller);
 	};
 };
 

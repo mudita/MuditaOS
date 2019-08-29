@@ -21,7 +21,7 @@ Translator::Translator() {
 }
 
 Translator::~Translator() {
-	// TODO Auto-generated destructor stub
+	LOG_INFO("Removing translator");
 }
 
 std::vector<std::string> Translator::getProfilesList(std::string ext) {
@@ -54,7 +54,7 @@ bool Translator::setProfile( std::string profileName ) {
 void Translator::loadProfile( std::string filepath ) {
 	Profile* p = new Profile();
 	p->load(filepath);
-	profiles.insert( std::pair<std::string, Profile*>(p->getName(), p));
+	profiles.insert( std::pair<std::string, std::shared_ptr<Profile>>(p->getName(), p));
 }
 
 InputEvent Translator::translate( bool pressed, uint32_t keyCode,

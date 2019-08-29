@@ -16,12 +16,14 @@
 
 #include "bsp/common.hpp"
 
+class WorkerEvent;
+
 class EventManager: public sys::Service {
 private:
 	void HandleAlarmTrigger(sys::DataMessage* msgl);
 	void GetNextAlarmTimestamp(time_t timestamp);
 protected:
-	sys::Worker* EventWorker = nullptr;
+	std::unique_ptr<WorkerEvent> EventWorker;
 	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
 	std::string targetApplication;
 	//alarm timestamp in seconds from midnight

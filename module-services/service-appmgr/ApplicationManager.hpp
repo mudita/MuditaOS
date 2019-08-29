@@ -78,7 +78,15 @@ class ApplicationManager: public sys::Service {
 	bool handleSwitchPrevApplication( APMSwitchPrevApp* msg );
 	bool handleRegisterApplication( APMRegister* msg );
 	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
+	/**
+	 * @brief Closes all running applications.
+	 */
 	bool startApplication( const std::string& appName );
+	/**
+	 * @brief Closes eink and gui services.
+	 */
+	bool closeApplications();
+	bool closeServices();
 public:
 	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
     ~ApplicationManager();
@@ -126,6 +134,10 @@ public:
     * @brief Sends message to application manager to inform it about change of the phone's language performed by the user.
     */
    static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
+   /**
+    * @brief Sends message to application manager that it should close itself and as a resulrt
+    */
+   static bool messageCloseApplicationManager( sys::Service* sender );
 };
 
 } /* namespace sapm */

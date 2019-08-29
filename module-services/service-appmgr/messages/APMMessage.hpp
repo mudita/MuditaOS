@@ -113,6 +113,12 @@ public:
 	const utils::Lang& getLanguage() { return language; };
 };
 
+class APMClose: public APMMessage {
+public:
+	APMClose( const std::string& senderName) :
+	APMMessage( MessageType::APMClose, senderName )
+	{}
+};
 
 } /* namespace sapm */
 

@@ -40,8 +40,8 @@ static uint32_t getTimeFunction() {
 	return xTaskGetTickCount();
 }
 
-ServiceGUI::ServiceGUI(const std::string& name, uint32_t screenWidth, uint32_t screenHeight)
-		: sys::Service(name, 4096, sys::ServicePriority::Idle),
+ServiceGUI::ServiceGUI(const std::string& name, std::string parent, uint32_t screenWidth, uint32_t screenHeight)
+		: sys::Service(name, parent, 4096, sys::ServicePriority::Idle),
 		renderContext{ nullptr },
 		transferContext { nullptr },
 		renderFrameCounter{ 1 },
@@ -75,12 +75,17 @@ ServiceGUI::~ServiceGUI(){
 		delete renderContext;
 	if( transferContext )
 		delete transferContext;
+
+	worker->deinit();
+
+	gui::ImageManager::getInstance().clear();
+	gui::FontManager::getInstance().clear();
+
 }
 
 void ServiceGUI::sendBuffer() {
 	//copy data from render context to transfer context
 	transferContext->insert( 0, 0, renderContext );
-	//memcpy( transferContext->getData(), renderContext->getData(), renderContext->getW()*renderContext->getH());
 
 	auto msg = std::make_shared<seink::ImageMessage>( 0, 0,
 			transferContext->getW(),

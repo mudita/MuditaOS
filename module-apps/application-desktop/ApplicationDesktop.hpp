@@ -25,7 +25,7 @@ protected:
 	uint32_t unreadMessages = 0;
 	uint32_t missedCalls = 0;
 public:
-	ApplicationDesktop( std::string name="ApplicationDesktop" );
+	ApplicationDesktop( std::string name="ApplicationDesktop", std::string parent = "" );
 	virtual ~ApplicationDesktop();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -51,12 +51,14 @@ public:
 class ApplicationDesktopLauncher : public ApplicationLauncher {
 public:
 	ApplicationDesktopLauncher() : ApplicationLauncher("ApplicationDesktop", false) {};
-	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr);
+	bool run(sys::Service* caller = nullptr ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationDesktop>(name, parent), caller );
 	};
-	bool runBackground(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<ApplicationDesktop>(name),sysmgr);
-};
+	bool runBackground(sys::Service* caller ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationDesktop>(name, parent ),caller);
+	};
 };
 
 

@@ -31,8 +31,8 @@
 
 namespace app {
 
-Application::Application(std::string name, bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
-	Service( name, stackDepth, priority ),
+Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
+	Service( name, parent, stackDepth, priority ),
 	startBackground{ startBackground } {
 
 	longpressTimerID = CreateTimer( 1000 ,false);

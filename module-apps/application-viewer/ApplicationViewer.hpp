@@ -22,7 +22,7 @@ namespace app {
 class ApplicationViewer: public Application {
 
 public:
-	ApplicationViewer(std::string name,uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	ApplicationViewer(std::string name, std::string parent = "", uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationViewer();
 
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
@@ -37,9 +37,14 @@ public:
 
 class ApplicationViewerLauncher : public ApplicationLauncher {
 public:
-	ApplicationViewerLauncher() : ApplicationLauncher("ApplicationViewer", true) {};
-	bool run(sys::SystemManager* sysmgr) override {
-		return sysmgr->CreateService(std::make_shared<app::ApplicationViewer>(name),sysmgr,1000);
+	ApplicationViewerLauncher() : ApplicationLauncher("ApplicationViewer", true ) {};
+	bool run(sys::Service* caller = nullptr ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationViewer>(name, parent), caller );
+	};
+	bool runBackground(sys::Service* caller ) override {
+		parent = (caller==nullptr?"":caller->GetName());
+		return sys::SystemManager::CreateService( std::make_shared<ApplicationViewer>(name, parent ),caller);
 	};
 };
 

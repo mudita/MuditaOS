@@ -34,7 +34,6 @@ static void workerTaskFunction( void* ptr ) {
 			}
 		}
 	}
-	vTaskDelete( NULL );
 }
 
 
@@ -43,7 +42,6 @@ Worker::Worker( sys::Service* service ) : service {service }, serviceQueue{ NULL
 }
 
 Worker::~Worker() {
-	deinit();
 }
 
 bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
@@ -95,8 +93,9 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 }
 bool Worker::deinit() {
 
+    vTaskDelete(taskHandle);
+
 	//for all queues - remove from set and delete queue
-	std::vector<xQueueHandle> queues;
 	for( auto q : queues ) {
 		//remove queues from set
 		xQueueRemoveFromSet( q, queueSet );
@@ -108,8 +107,8 @@ bool Worker::deinit() {
 	//delete queues set
 	vQueueDelete((QueueHandle_t) queueSet );
 	queueSet = NULL;
-
 	taskHandle = NULL;
+
 	return true;
 };
 /**
