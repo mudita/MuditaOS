@@ -140,13 +140,6 @@ sys::ReturnCodes EventManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes EventManager::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-sys::ReturnCodes EventManager::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
 
 bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 

@@ -53,14 +53,6 @@ sys::ReturnCodes ServiceAudio::DeinitHandler() {
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceAudio::WakeUpHandler() {
-    return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceAudio::SleepHandler() {
-    return sys::ReturnCodes::Success;
-}
 
 void ServiceAudio::TickHandler(uint32_t id) {
 

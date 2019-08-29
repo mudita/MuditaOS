@@ -70,15 +70,6 @@ sys::ReturnCodes ApplicationNotes::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationNotes::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationNotes::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 void ApplicationNotes::createUserInterface() {
 
 	gui::AppWindow* window = nullptr;

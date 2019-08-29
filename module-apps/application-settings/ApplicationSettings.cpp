@@ -60,15 +60,6 @@ sys::ReturnCodes ApplicationSettings::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationSettings::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationSettings::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 void ApplicationSettings::createUserInterface() {
 
 	gui::AppWindow* window = nullptr;

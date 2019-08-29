@@ -43,14 +43,6 @@ sys::ReturnCodes ApplicationCalendar::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationCalendar::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationCalendar::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
 
 void ApplicationCalendar::createUserInterface() {
 

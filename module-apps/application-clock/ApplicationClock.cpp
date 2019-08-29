@@ -110,15 +110,6 @@ sys::ReturnCodes ApplicationClock::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationClock::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationClock::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 void ApplicationClock::createUserInterface() {
 
 	gui::ClockMainWindow* mainWindow = new gui::ClockMainWindow(this);

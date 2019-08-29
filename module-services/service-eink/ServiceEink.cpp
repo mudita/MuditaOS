@@ -200,15 +200,6 @@ sys::ReturnCodes ServiceEink::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceEink::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceEink::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperature ) {
 
     // If neither the temperature nor the waveform has changed - do nothing

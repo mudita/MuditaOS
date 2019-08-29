@@ -78,15 +78,6 @@ sys::ReturnCodes ApplicationViewer::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationViewer::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationViewer::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 void ApplicationViewer::createUserInterface() {
 
 	gui::AppWindow* window = nullptr;
