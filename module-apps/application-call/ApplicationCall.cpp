@@ -126,15 +126,6 @@ sys::ReturnCodes ApplicationCall::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationCall::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationCall::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 // Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
 void ApplicationCall::TickHandler(uint32_t id) {
 	++callDuration;

@@ -454,12 +454,3 @@ sys::ReturnCodes ServiceDB::DeinitHandler() {
 
     return sys::ReturnCodes::Success;
 }
-
-sys::ReturnCodes ServiceDB::WakeUpHandler() {
-    return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceDB::SleepHandler() {
-    return sys::ReturnCodes::Success;
-}

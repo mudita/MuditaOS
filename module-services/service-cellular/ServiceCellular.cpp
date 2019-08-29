@@ -127,15 +127,6 @@ sys::ReturnCodes ServiceCellular::DeinitHandler() {
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceCellular::WakeUpHandler() {
-    return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceCellular::SleepHandler() {
-    return sys::ReturnCodes::Success;
-}
-
 sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp) {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
