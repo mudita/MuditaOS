@@ -70,11 +70,7 @@ public:
     // Invoked upon receiving close request
     virtual ReturnCodes DeinitHandler()= 0;
 
-    // Invoked upon receiving wake up request
-	virtual ReturnCodes WakeUpHandler() = 0;
-
-	// Invoked upon receiving go sleep request
-	virtual ReturnCodes SleepHandler() = 0;
+	virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 
 	void CloseHandler();
 

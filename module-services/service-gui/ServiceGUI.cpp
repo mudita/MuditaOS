@@ -232,14 +232,6 @@ sys::ReturnCodes ServiceGUI::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceGUI::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceGUI::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
 
 } /* namespace sgui */
 

@@ -76,15 +76,6 @@ sys::ReturnCodes ApplicationDesktop::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationDesktop::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationDesktop::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 void ApplicationDesktop::createUserInterface() {
 
 	gui::AppWindow* window = nullptr;

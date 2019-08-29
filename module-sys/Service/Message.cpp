@@ -43,14 +43,8 @@ namespace sys {
                 service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
                 break;
 
-            case SystemMessageType ::GoSleep:
-                if(service->isReady)
-                    ret = service->SleepHandler();
-                break;
-
-            case SystemMessageType ::Wakeup:
-                if(service->isReady)
-                   ret =  service->WakeUpHandler();
+            case SystemMessageType ::SwitchPowerMode:
+                service->SwitchPowerModeHandler(ServicePowerMode::Active);
                 break;
 
             case SystemMessageType ::Exit:
