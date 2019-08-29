@@ -221,14 +221,6 @@ sys::ReturnCodes ApplicationManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationManager::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-sys::ReturnCodes ApplicationManager::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	state = State::STARTING_NEW_APP;

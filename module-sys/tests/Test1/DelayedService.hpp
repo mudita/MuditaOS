@@ -49,15 +49,7 @@ public:
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes WakeUpHandler() override{
-        return sys::ReturnCodes::Success;
-    }
-
-
-    sys::ReturnCodes SleepHandler() override{
-        return sys::ReturnCodes::Success;
-    }
-
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
     static uint32_t DelayerServiceInstanceCount;
     static uint32_t DelayerServiceDataMessageReceivedCount;
