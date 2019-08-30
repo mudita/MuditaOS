@@ -38,7 +38,8 @@ ApplicationDescription::ApplicationDescription( std::string name, std::unique_pt
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
 	std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
 
-//	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+	blockingTimerID = CreateTimer(0xFFFFFFFF, false );
+
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
 
@@ -98,6 +99,10 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 	uint32_t msgType = msgl->messageType;
 
 	switch( msgType ) {
+		case static_cast<uint32_t>( MessageType::APMPreventBlocking ): {
+			LOG_INFO("Restarting screen locking timer");
+			ReloadTimer(blockingTimerID);
+		} break;
 		case static_cast<uint32_t>(MessageType::APMSwitch): {
 			sapm::APMSwitch* msg = reinterpret_cast<sapm::APMSwitch*>( msgl );
 			handleSwitchApplication( msg );
@@ -157,6 +162,10 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 }
 // Invoked when timer ticked
 void ApplicationManager::TickHandler(uint32_t id) {
+	if( id == blockingTimerID ) {
+		LOG_INFO("screen Locking Timer Triggered");
+		stopTimer(blockingTimerID);
+	}
 }
 
 // Invoked during initialization
@@ -164,6 +173,12 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//get settings to initialize language in applications
 	settings = DBServiceAPI::SettingsGet(this);
+
+	//reset blocking timer to the value specified in settings
+	uint32_t lockTime = settings.lockTime;
+	if( lockTime == 0 )
+		lockTime = 30000;
+	setTimerPeriod( blockingTimerID, lockTime );
 
 	if( settings.language == SettingsLanguage::ENGLISH ) {
 		utils::localize.Switch( utils::Lang::En );
@@ -527,6 +542,12 @@ bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lan
 
 bool ApplicationManager::messageCloseApplicationManager( sys::Service* sender ) {
 	auto msg = std::make_shared<sapm::APMClose>( sender->GetName() );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+
+bool ApplicationManager::messagePreventBlocking( sys::Service* sender ) {
+	auto msg = std::make_shared<sapm::APMPreventBlocking>( sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }

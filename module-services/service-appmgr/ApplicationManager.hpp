@@ -69,6 +69,9 @@ class ApplicationManager: public sys::Service {
 	std::string launchApplicationName = "";
 	//state of the application manager
 	State state = State::IDLE;
+	//timer to count time from last user's activity. If it reaches time defined in settings database application manager is sending signal
+	//to power manager and changing window to the desktop window in the blocked state.
+	uint32_t blockingTimerID = 0;
 
 	//tries to switch the application
 	bool handleSwitchApplication( APMSwitch* msg);
@@ -135,9 +138,13 @@ public:
     */
    static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
    /**
-    * @brief Sends message to application manager that it should close itself and as a resulrt
+    * @brief Sends message to application manager that it should close itself and as a result.
     */
    static bool messageCloseApplicationManager( sys::Service* sender );
+   /**
+    * @brief Sends message to inform Application Manager to reset timer responsible for blocking phone
+    */
+   static bool messagePreventBlocking( sys::Service* sender );
 };
 
 } /* namespace sapm */

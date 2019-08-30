@@ -140,11 +140,11 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
 				//if interval between enter and pnd keys is less than time defined for unlocking
 				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
-//					app->setScreenLocked(false);
 					//display pin lock screen or simply refresh current window to update labels
 					if( app->getPinLocked())
 						application->switchWindow( "PinLockWindow", 0, nullptr );
 					else {
+						app->setScreenLocked(false);
 						setVisibleState();
 						application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 					}

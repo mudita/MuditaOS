@@ -171,11 +171,18 @@ protected:
 	bool closeable = true;
 	//defines whether application should be run without gaining focus, it will remian in the BACKGROUND state
 	bool startBackground = false;
+	//flag defines whether this application can prevent power manager from changing
+	bool preventBlocking = false;
 public:
-	ApplicationLauncher( std::string name, bool isCloseable ) : name{name}, closeable{isCloseable} {};
+	ApplicationLauncher( std::string name, bool isCloseable, bool preventBlocking = false ) :
+		name{name},
+		closeable{isCloseable},
+		preventBlocking{preventBlocking} {};
 	virtual ~ApplicationLauncher() {};
 	std::string getName() { return name;};
 	bool isCloseable() { return closeable; };
+	bool isBlocking() { return preventBlocking; };
+
 	//virtual method to run the application
 	virtual bool run(sys::Service* caller = nullptr ) {return true;};
 	virtual bool runBackground(sys::Service* caller = nullptr ) {return true;};
