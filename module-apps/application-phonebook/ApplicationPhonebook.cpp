@@ -48,10 +48,6 @@ sys::ReturnCodes ApplicationPhonebook::InitHandler() {
 
 sys::ReturnCodes ApplicationPhonebook::DeinitHandler() { return sys::ReturnCodes::Success; }
 
-sys::ReturnCodes ApplicationPhonebook::WakeUpHandler() { return sys::ReturnCodes::Success; }
-
-sys::ReturnCodes ApplicationPhonebook::SleepHandler() { return sys::ReturnCodes::Success; }
-
 void ApplicationPhonebook::createUserInterface() {
 
     gui::AppWindow *window = nullptr;

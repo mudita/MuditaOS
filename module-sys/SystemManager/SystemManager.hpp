@@ -55,12 +55,6 @@ public:
 	// Destroy existing service
 	static bool DestroyService(const std::string& name,Service* caller,TickType_t timeout=5000);
 
-	// Suspend specified serivice
-	static bool SuspendService(const std::string& name,Service* caller,TickType_t timeout=5000);
-
-	// Resume specified service
-	static bool ResumeService(const std::string& name,Service* caller,TickType_t timeout=5000);
-
 private:
 
 	void TickHandler(uint32_t id) override;
@@ -69,11 +63,9 @@ private:
 
     ReturnCodes InitHandler() override;
 
-    ReturnCodes WakeUpHandler() override{return ReturnCodes::Success;}
-
-    ReturnCodes SleepHandler() override{return ReturnCodes::Success;}
-
     ReturnCodes DeinitHandler() override{return ReturnCodes::Success;}
+
+    ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final{return ReturnCodes::Success;}
 
 
 

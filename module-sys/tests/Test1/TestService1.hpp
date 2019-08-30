@@ -133,16 +133,7 @@ public:
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes WakeUpHandler() override{
-        TestServiceInstanceSuspendedCount--;
-        return sys::ReturnCodes::Success;
-    }
-
-
-    sys::ReturnCodes SleepHandler() override{
-        TestServiceInstanceSuspendedCount++;
-        return sys::ReturnCodes::Success;
-    }
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
 
     static uint32_t TestServiceInstanceCount;

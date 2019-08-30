@@ -75,18 +75,6 @@ sys::Message_t CommandsService::DataReceivedHandler(sys::DataMessage* msgl,sys::
         REQUIRE( TestService1::TestServiceInstanceCount == i+1);
     }
 
-    for(uint32_t i =0;i<servCount;i++){
-        auto ret = sys::SystemManager::SuspendService("Test Service " + std::to_string(i),this);
-        REQUIRE( ret );
-    }
-
-    REQUIRE( TestService1::TestServiceInstanceSuspendedCount == servCount);
-
-    for(uint32_t i =0;i<servCount;i++){
-        auto ret = sys::SystemManager::ResumeService("Test Service " + std::to_string(i),this);
-        REQUIRE( ret );
-    }
-
     REQUIRE( TestService1::TestServiceInstanceSuspendedCount == 0);
 
 
