@@ -74,6 +74,13 @@ public:
 	std::function<bool(Item&)> activatedCallback;
 	std::function<bool(Item&, InputEvent& inputEvent)> inputCallback;
 
+    int16_t w() { return widgetArea.w; }
+    int16_t h() { return widgetArea.h; }
+    /// helper function to show where widget ends in x axis
+    int32_t offset_w() { return w() + widgetArea.x; }
+    /// helper function to show where widget ends in y axis
+    int32_t offset_h() { return h() + widgetArea.y; }
+
 	bool setFocus( bool state ) {
 		if( state != focus ) {
 			//focus = state;
