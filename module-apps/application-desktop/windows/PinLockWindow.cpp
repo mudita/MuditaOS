@@ -201,7 +201,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 			else if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 				if( (state == State::EnteringPin) && (charCount == 4)) {
 
-					//TODO make pin chacking here, currentyly it always fails
+					//TODO make pin checking here, currently it always fails
 					if( application->getSettings().lockPassHash == (1000*charValue[0]+100*charValue[1]+10*charValue[2]+charValue[3] ) ) {
 						remainingAttempts = maxPasswordAttempts;
 						app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );

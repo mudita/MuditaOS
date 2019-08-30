@@ -213,6 +213,7 @@ Name: settings
 | active_sim | (m) | INTEGER | Indx of the SIM card selected by the user. By default it is first SIM card is selected: value 0 |
 | network_operator | (m) | TEXT	 | Raw string with selected network operator. |
 | lock_pass_hash | (m) | INTEGER | Hash of the pasword required for unlocking phone. |
+| lock_time| (m) | INTEGER | time of inactivity of the user after which phone will be automatically blocked. Expressed in milliseconds. Default value is 30 000ms |
 | language | (m) | INTEGER | Language selected by user. English by default. |
 
 Table describes possible values of **pin_mode** field.

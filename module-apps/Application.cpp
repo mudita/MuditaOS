@@ -227,11 +227,11 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
 		if( ( state == State::INITIALIZING ) ||	( state == State::ACTIVE_BACKGROUND )){
 
-			if( msg->getApplicationName() == this->GetName()) {
+			if( msg->getTargetApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_FORGROUND;
 
-					switchWindow( msg->getWindowName(), 0, std::move( msg->getData()));
+					switchWindow( msg->getTargetWindowName(), 0, std::move( msg->getData()));
 					handled = true;
 				}
 				else {
@@ -244,7 +244,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			}
 		}
 		else if( state == State::ACTIVE_FORGROUND ) {
-			if( msg->getApplicationName() == this->GetName()) {
+			if( msg->getTargetApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_BACKGROUND;
 					handled = true;

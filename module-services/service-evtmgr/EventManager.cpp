@@ -16,6 +16,7 @@
 #include "vfs.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -56,9 +57,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		message->keyPressTime = msg->keyPressTime;
 		message->keyRelaseTime = msg->keyRelaseTime;
 
+		//send key to focused application
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
+		//notify application manager to prevent screen locking
+		sapm::ApplicationManager::messagePreventBlocking(this);
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {
@@ -151,8 +155,6 @@ sys::ReturnCodes EventManager::SleepHandler() {
 bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 
 	auto msg = std::make_shared<sevm::EVMFocusApplication>( applicationName );
-//	auto ret =  sys::Bus::SendUnicast(msg, "EventManager", sender, 200 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 	sys::Bus::SendUnicast(msg, "EventManager", sender );
 	return true;
 }

@@ -28,23 +28,35 @@ public:
 
 //this message is used to notify application about switching event. Application will gain or lose focus upon receiving this message.
 //Application gains focus when it was in init or active background state. Application lose focus when it was in active foreground state.
+//if no window is specified it is assumed that MainWindow is the target
 class AppSwitchMessage : public AppMessage {
 protected:
-	std::string window;
-	std::unique_ptr<gui::SwitchData> data;
 	//name of the application to which switch is performed.
-	std::string application;
+	std::string targetApplication;
+	//name of the window to which switch should be performed.
+	std::string targetWindow;
+	//optional data for the target window.
+	std::unique_ptr<gui::SwitchData> data;
+	//name of the application to which switch should be performed after finishing tasks in target application and window.
+	std::string returnApplication;
+	//name of the window to which switch should be performed after finishing tasks in target application and window.
+	std::string returnWindow;
 public:
-	AppSwitchMessage( const std::string& application, const std::string& window, std::unique_ptr<gui::SwitchData> data ) :
+	AppSwitchMessage( const std::string& targetApplication, const std::string& targetWindow, std::unique_ptr<gui::SwitchData> data,
+			const std::string& returnApplication = "", const std::string& returnWindow = "") :
 		AppMessage( MessageType::AppSwitch ),
-		window{window},
+		targetApplication{ targetApplication },
+		targetWindow{ targetWindow },
 		data {std::move(data)},
-		application{ application} {};
+		returnApplication{ returnApplication },
+		returnWindow{ returnWindow } {};
 	virtual ~AppSwitchMessage() {};
 
-	std::string getWindowName() { return window; };
+	std::string getTargetWindowName() { return targetWindow; };
+	std::string getReturnWindowName() { return returnWindow; };
 	std::unique_ptr<gui::SwitchData>& getData() { return data; };
-	std::string getApplicationName() { return application;};
+	std::string getTargetApplicationName() { return targetApplication;};
+	std::string getReturnApplicationName() { return returnApplication;};
 };
 
 class AppRefreshMessage : public AppMessage {
