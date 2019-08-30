@@ -96,6 +96,10 @@ void PhonebookNewContact::buildInterface() {
 void PhonebookNewContact::destroyInterface()
 {
     AppWindow::destroyInterface();
+
+    delete title;
+	delete box;
+
     children.clear();
 }
 
