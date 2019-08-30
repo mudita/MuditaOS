@@ -45,9 +45,8 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes WakeUpHandler() override;
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-    sys::ReturnCodes SleepHandler() override;
 
     /**
 	* @brief Sends request to application manager to switch from current application to specific window in application with specified name .

@@ -120,33 +120,6 @@ namespace sys
         }
     }
 
-    bool SystemManager::SuspendService(const std::string& name,Service* caller,TickType_t timeout){
-
-        auto msg = std::make_shared<SystemMessage>(SystemMessageType::GoSleep);
-        auto ret = Bus::SendUnicast(msg,name,caller,timeout);
-        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
-
-        if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    bool SystemManager::ResumeService(const std::string& name,Service* caller,TickType_t timeout){
-
-        auto msg = std::make_shared<SystemMessage>(SystemMessageType::Wakeup);
-        auto ret = Bus::SendUnicast(msg,name,caller,timeout);
-        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
-
-        if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
 
     ReturnCodes SystemManager::InitHandler(){
         isReady = true;

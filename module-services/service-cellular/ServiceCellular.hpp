@@ -44,9 +44,8 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes WakeUpHandler() override;
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-    sys::ReturnCodes SleepHandler() override;
 
     static const char *serviceName;
 
