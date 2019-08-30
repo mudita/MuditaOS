@@ -49,6 +49,10 @@ public:
 	// Invoke system close procedure
 	static bool CloseSystem(Service* s);
 
+	static bool SuspendSystem(Service* caller);
+
+	static bool ResumeSystem(Service* caller);
+
 	// Create new service
 	static bool CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout=5000);
 

@@ -44,7 +44,7 @@ namespace sys {
                 break;
 
             case SystemMessageType ::SwitchPowerMode:
-                service->SwitchPowerModeHandler(ServicePowerMode::Active);
+                service->SwitchPowerModeHandler(powerMode);
                 break;
 
             case SystemMessageType ::Exit:
