@@ -32,8 +32,8 @@ void DesktopMainWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::LOCK, true );
 	topBar->setActive(TopBar::Elements::BATTERY, true );
 
-	callsImage = new gui::Image( this, 28,266,0,0, "phone" );
-	messagesImage = new gui::Image( this, 28, 341,0,0, "mail" );
+	callsImage = new gui::Image( this, 28,258,0,0, "phone" );
+	messagesImage = new gui::Image( this, 28, 333,0,0, "mail" );
 
 	time = new gui::Label(this, 34, 90, 250, 116 );
 	time->setFilled( false );
@@ -56,21 +56,21 @@ void DesktopMainWindow::buildInterface() {
 	dayMonth->setText("01 Jan");
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
-	notificationCalls = new gui::Label(this, 86, 255, 390, 42 );
+	notificationCalls = new gui::Text(this, 86, 255, 350, 70 );
 	notificationCalls->setFilled( false );
 	notificationCalls->setBorderColor( gui::ColorNoColor );
 	notificationCalls->setFont("gt_pressura_light_24");
 	UTF8 calls = "2 " + utils::localize.get("app_desktop_missed_calls");
 	notificationCalls->setText(calls);
-	notificationCalls->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	notificationMessages = new gui::Label(this, 86, 330, 390, 42 );
+
+	notificationMessages = new gui::Text(this, 86, 330, 350, 70 );
 	notificationMessages->setFilled( false );
 	notificationMessages->setBorderColor( gui::ColorNoColor );
 	notificationMessages->setFont("gt_pressura_light_24");
 	UTF8 mess = "2 " + utils::localize.get("app_desktop_unread_messages");
+
 	notificationMessages->setText(mess);
-	notificationMessages->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 }
 
 void DesktopMainWindow::destroyInterface() {

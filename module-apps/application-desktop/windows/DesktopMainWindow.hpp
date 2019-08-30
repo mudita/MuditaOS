@@ -10,6 +10,7 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 
 #include "AppWindow.hpp"
+#include "gui/widgets/Text.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
@@ -27,8 +28,8 @@ protected:
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;
 	gui::Label* dayMonth = nullptr;
-	gui::Label* notificationCalls = nullptr;
-	gui::Label* notificationMessages = nullptr;
+	gui::Text* notificationCalls = nullptr;
+	gui::Text* notificationMessages = nullptr;
 	gui::Image* callsImage = nullptr;
 	gui::Image* messagesImage = nullptr;
 	/**
