@@ -134,7 +134,14 @@ public:
 	 * @return Number of pixels in width occupied by string.
 	 */
 	uint32_t getPixelWidth( const UTF8& str );
+	/**
+	 * @brief returns number of pixels occupied by character horizontally.
+	 */
 	uint32_t getCharPixelWidth( uint32_t charCode );
+	/**
+	 * @brief Returns number of pixels occupied by the character vertically.
+	 */
+	uint32_t getCharPixelHeight( uint32_t charCode );
 
 	const std::string getName() {
 		return info.face;

@@ -31,6 +31,7 @@ MenuPage::MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_
 	title->setFont("gt_pressura_regular_24");
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 	title->setText( titleName );
+	title->setLineMode(true);
 
 	uint32_t rowCount = tilesDescription.size()/3;
 

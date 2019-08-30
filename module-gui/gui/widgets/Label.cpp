@@ -115,21 +115,13 @@ void Label::calculateDisplayText() {
 		textArea.y =
 			(widgetArea.h - font->info.line_height )/2 +
 			font->info.base;
-//		textArea.y =
-//			(drawArea.h - font->info.line_height )/2 +
-//			font->info.base;
 	}
 	else if( alignment.isAligned(Alignment::ALIGN_VERTICAL_TOP ))
 	{
-//		textArea.y = font->info.base + margins.top;
 		textArea.y = font->info.base + margins.top;
 	}
 	else if( alignment.isAligned(Alignment::ALIGN_VERTICAL_BOTTOM ))
 	{
-//		textArea.y =
-//			drawArea.h -
-//			font->info.line_height + font->info.base -
-//			margins.bottom;
 		textArea.y =
 			widgetArea.h -
 			font->info.line_height + font->info.base -
@@ -139,7 +131,6 @@ void Label::calculateDisplayText() {
 	//calculate horizontal position o text
 	if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_CENTER ))
 	{
-//		textArea.x =( drawArea.w - textArea.w )/2;
 		textArea.x =( widgetArea.w - textArea.w )/2;
 	}
 	else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_LEFT ))
@@ -148,8 +139,35 @@ void Label::calculateDisplayText() {
 	}
 	else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT ))
 	{
-//		textArea.x = drawArea.w - textArea.w - margins.right;
 		textArea.x = widgetArea.w - textArea.w - margins.right;
+	}
+
+	//if dots mode is disabled and line mode is enabled calculate positiona and width of the line
+	if( (!dotsMode) && (lineMode) && (lineFront!=nullptr) ) {
+		uint32_t spaceWidth = font->getCharPixelWidth(' ');
+		int32_t lineW = availableSpace - stringPixelWidth ;
+		uint32_t lineY = textArea.y - font->getCharPixelHeight('a')/2;
+		if( lineW < 0 ) lineW = 0;
+
+		lineFront->setVisible(true);
+		lineBack->setVisible(true);
+		//both lines are visible
+		if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_CENTER )) {
+			lineFront->setPosition( 0, lineY );
+			lineFront->setSize( lineW/2 - spaceWidth, 2 );
+			lineBack->setPosition( lineW/2 + stringPixelWidth +spaceWidth, lineY);
+			lineBack->setSize( lineW/2 -spaceWidth, 2 );
+		}
+		else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT)) {
+			lineFront->setPosition( 0, lineY );
+			lineFront->setSize( lineW-spaceWidth, 2 );
+			lineBack->setVisible(false);
+		}
+		else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_LEFT )) {
+			lineBack->setPosition( stringPixelWidth +spaceWidth, lineY);
+			lineBack->setSize( lineW-spaceWidth, 2 );
+			lineFront->setVisible(false);
+		}
 	}
 }
 
@@ -178,6 +196,27 @@ void Label::setMargins( const Margins& margins ) {
 
 void Label::setDotsMode( const bool val ) {
 	dotsMode = val;
+	calculateDisplayText();
+}
+
+void Label::setLineMode( const bool& val ) {
+	//if line mode is disable remove the line if it was previously created
+	if( val == false ) {
+		if( lineFront != nullptr ) {
+			this->removeWidget( lineFront );
+			this->removeWidget( lineBack );
+			delete lineFront;
+			delete lineBack;
+			lineFront = nullptr;
+			lineBack = nullptr;
+		}
+	}
+	else {
+		if( lineFront == nullptr ) {
+			lineFront = new Rect( this, 0,0,0,0 );
+			lineBack = new Rect( this, 0,0,0,0 );
+		}
+	}
 	calculateDisplayText();
 }
 
