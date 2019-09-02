@@ -100,7 +100,9 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{
+        LOG_FATAL("[ServiceAudio] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+        return sys::ReturnCodes::Success;}
 
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application with specified name .

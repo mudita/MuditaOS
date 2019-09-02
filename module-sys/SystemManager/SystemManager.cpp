@@ -75,30 +75,54 @@ namespace sys {
 
     bool SystemManager::SuspendSystem(Service *caller) {
 
-        for(const auto &w : servicesList){
-            if(w->GetName() != caller->GetName()){
+        for (auto w = servicesList.rbegin(); w != servicesList.rend(); ++w)
+        {
+            if((*w)->parent == "" && (*w)->GetName() != caller->GetName()){
                 auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::SuspendToRAM),
-                                            w->GetName(), caller);
-                if(!ret){
-                    LOG_FATAL("Service %s failed to enter low-power mode",w->GetName().c_str());
+                                            (*w)->GetName(), caller,1000);
+
+                auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+                if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+                    LOG_FATAL("Service %s failed to enter low-power mode",(*w)->GetName().c_str());
                 }
             }
-
         }
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
         for(const auto &w : servicesList){
 
-            if(w->GetName() != caller->GetName()){
+            if(w->parent == "" && w->GetName() != caller->GetName()){
                 auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::Active),
-                                            w->GetName(), caller);
-                if(!ret){
+                                            w->GetName(), caller,1000);
+                auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+
+                if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
                     LOG_FATAL("Service %s failed to exit low-power mode",w->GetName().c_str());
                 }
             }
 
 
+        }
+    }
+
+    bool SystemManager::SuspendService(const std::string &name, sys::Service *caller) {
+        auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::SuspendToRAM),
+                                    name, caller,1000);
+        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+
+        if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+            LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
+        }
+    }
+
+    bool SystemManager::ResumeService(const std::string &name, sys::Service *caller){
+        auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::Active),
+                                    name, caller,1000);
+        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+
+        if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+            LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
     }
 
