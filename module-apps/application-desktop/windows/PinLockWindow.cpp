@@ -6,7 +6,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-//modulr-gui
+//application manager
+#include "service-appmgr/ApplicationManager.hpp"
+
+//module-gui
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 
@@ -16,6 +19,7 @@
 #include "PinLockWindow.hpp"
 
 #include "../ApplicationDesktop.hpp"
+#include "../data/LockPhoneData.hpp"
 
 namespace gui {
 
@@ -167,6 +171,12 @@ void PinLockWindow::setVisibleState( const State& state ) {
 
 void PinLockWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
+	//check if there was a signal to lock the phone due to inactivity.
+	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
+		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
+		lockTimeoutApplilcation = lockData->getPreviousApplication();
+	}
+
 	//change kbd profile to home_screen
 	application->setKeyboardProfile("home_screen");
 	//set state
@@ -206,7 +216,15 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 						remainingAttempts = maxPasswordAttempts;
 						app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 						app->setScreenLocked(false);
-						application->switchWindow("MainWindow", 0, nullptr );
+
+						//if there is no application to return to simply return to main window
+						if( lockTimeoutApplilcation.empty()) {
+							application->switchWindow("MainWindow", 0, nullptr );
+						}
+						else {
+							lockTimeoutApplilcation = "";
+							sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+						}
 						return true;
 					}
 

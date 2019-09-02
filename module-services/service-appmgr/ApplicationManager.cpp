@@ -177,8 +177,15 @@ void ApplicationManager::TickHandler(uint32_t id) {
 			app::Application::messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::make_unique<gui::LockPhoneData>() );
 		}
 		else {
-			//get the application description
-//			ApplicationDescription* appDescription = applications.find( focusApplicationName );
+			//get the application description for application that is on top and set blocking flag for it
+			ApplicationDescription* appDescription = applications.find( focusApplicationName )->second;
+			appDescription->blockClosing = true;
+
+			std::unique_ptr<gui::LockPhoneData> data = std::make_unique<gui::LockPhoneData>();
+			data->setPrevApplication( focusApplicationName );
+
+			//run normal flow of applications change
+			messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::move(data) );
 		}
 	}
 }
@@ -310,14 +317,14 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 		auto it = applications.find( previousApplicationName );
 
 		//if application's launcher defines that it can be closed send message with close signal
-		if( it->second->closeable ){
-			LOG_INFO("APMSwitch waiting for close confirmation from: %s", msg->getSenderName().c_str());
+		if( (it->second->closeable) && (it->second->blockClosing == false) ){
+			LOG_INFO("APMSwitch waiting for close confirmation from: %s", previousApplicationName.c_str());
 			state = State::WAITING_CLOSE_CONFIRMATION;
 			app::Application::messageCloseApplication( this, previousApplicationName );
 		}
 		//if application is not closeable send lost focus message
 		else {
-			LOG_INFO("APMSwitch Waiting for lost focus from: %s", msg->getSenderName().c_str());
+			LOG_INFO("APMSwitch Waiting for lost focus from: %s", previousApplicationName.c_str());
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
 			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
@@ -376,7 +383,7 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		//if application is not closeable send lost focus message
 		else {
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
-			app::Application::messageSwitchApplication(this, previousApplicationName, "LastWindow", nullptr);
+			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
 	}
 	//if there was no application to close or application can't be closed change internal state to

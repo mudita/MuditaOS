@@ -16,9 +16,13 @@ namespace gui {
 
 //class template that stores information that was sent along with switch message
 class LockPhoneData : public gui::SwitchData{
+	std::string previousApplication;
 public:
 	LockPhoneData() : SwitchData() { description = "LockPhoneData"; };
 	virtual ~LockPhoneData() {};
+
+	void setPrevApplication( const std::string& prevApp ) { previousApplication = prevApp; };
+	const std::string& getPreviousApplication() { return previousApplication; };
 };
 
 

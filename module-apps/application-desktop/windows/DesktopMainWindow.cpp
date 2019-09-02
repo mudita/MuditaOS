@@ -10,13 +10,13 @@
 #include <functional>
 
 #include "../ApplicationDesktop.hpp"
+#include "../data/LockPhoneData.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
 
 //application-call
 #include "application-call/data/CallSwitchData.hpp"
-
 
 #include "i18/i18.hpp"
 
@@ -117,6 +117,9 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchDat
 	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
 		app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 		app->setScreenLocked(true);
+
+		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
+		lockTimeoutApplilcation = lockData->getPreviousApplication();
 	}
 
 	setVisibleState();
@@ -144,11 +147,30 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
 					//display pin lock screen or simply refresh current window to update labels
 					if( app->getPinLocked())
-						application->switchWindow( "PinLockWindow", 0, nullptr );
+						//if there was no application on to before closing proceed normally to pin protection window.
+						if( lockTimeoutApplilcation.empty()) {
+							application->switchWindow( "PinLockWindow", 0, nullptr );
+						}
+						else {
+							std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>();
+							data->setPrevApplication( lockTimeoutApplilcation );
+							lockTimeoutApplilcation = "";
+							application->switchWindow( "PinLockWindow", 0, std::move(data) );
+						}
+
 					else {
-						app->setScreenLocked(false);
-						setVisibleState();
-						application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+						//if phone was locked by user show unlocked main window
+						if( lockTimeoutApplilcation.empty() ) {
+							app->setScreenLocked(false);
+							setVisibleState();
+							application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+						}
+						//if there was application on top when timeout occurred
+						else {
+							lockTimeoutApplilcation = "";
+							sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+						}
 					}
 				}
 				enterPressed = false;
@@ -168,6 +190,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 
 				char key[] = { char(inputEvent.keyChar) ,0};
 				std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
+
 				sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
 
 				return true;

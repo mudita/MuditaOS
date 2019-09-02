@@ -70,6 +70,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		if( msg->sender == "ApplicationManager" ) {
 			targetApplication = msg->getApplication();
 			handled = true;
+			LOG_INFO("Switching focus to %s", targetApplication.c_str());
 		}
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
