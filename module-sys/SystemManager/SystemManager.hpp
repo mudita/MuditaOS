@@ -53,6 +53,10 @@ public:
 
 	static bool ResumeSystem(Service* caller);
 
+	static bool SuspendService(const std::string& name,Service* caller);
+
+    static bool ResumeService(const std::string& name,Service* caller);
+
 	// Create new service
 	static bool CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout=5000);
 

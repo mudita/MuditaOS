@@ -47,7 +47,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(500, true);
+        timer_id = CreateTimer(5000, true);
         ReloadTimer(timer_id);
     }
 
@@ -57,11 +57,11 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override {
 
-#if 0 // M.P: left here on purpose
+#if 1 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
-        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+/*        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         AudioServiceAPI::Stop(this);
-        AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");*/
         //vTaskDelay(3000);
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
@@ -82,13 +82,16 @@ public:
 #endif
         //sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
 
+        sys::SystemManager::SuspendSystem(this);
+        sys::SystemManager::ResumeSystem(this);
+
         return std::make_shared<sys::ResponseMessage>();
 
     }
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override {
-#if 0 // M.P: left here on purpose
+#if 1 // M.P: left here on purpose
         LOG_DEBUG("Blinky service tick!");
 
         stopTimer(timer_id);
