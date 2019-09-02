@@ -245,13 +245,23 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		}
 		else if( state == State::ACTIVE_FORGROUND ) {
 			if( msg->getTargetApplicationName() == this->GetName()) {
-				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
-					state = State::ACTIVE_BACKGROUND;
-					handled = true;
+				//if window name and data are null pointers this is a message informing
+				//that application should go to background mode
+				if( (msg->getTargetWindowName() == "") && (msg->getData() == nullptr ) ) {
+					if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
+						state = State::ACTIVE_BACKGROUND;
+						handled = true;
+					}
+					else {
+						//TODO send to itself message to close
+						LOG_ERROR("Failed to communicate ");
+					}
 				}
+				//if application is in front and receives message with defined window it should
+				//change to that window.
 				else {
-					//TODO send to itself message to close
-					LOG_ERROR("Failed to communicate ");
+					switchWindow( msg->getTargetWindowName(), 0, std::move( msg->getData()));
+					handled = true;
 				}
 			}
 			else {

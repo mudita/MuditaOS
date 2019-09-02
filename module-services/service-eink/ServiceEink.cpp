@@ -93,6 +93,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 			EinkStatus_e ret;
 			if( deepRefresh ) {
 				changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+				EinkDitherDisplay();
 			}
 			else{
 				changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
