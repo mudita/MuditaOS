@@ -27,7 +27,7 @@ public:
 };
 
 //this message is used to notify application about switching event. Application will gain or lose focus upon receiving this message.
-//Application gains focus when it was in init or active background state. Application lose focus when it was in active foreground state.
+//Application gains focus when it was in init or active background state. Application loose focus when it was in active foreground state.
 //if no window is specified it is assumed that MainWindow is the target
 class AppSwitchMessage : public AppMessage {
 protected:

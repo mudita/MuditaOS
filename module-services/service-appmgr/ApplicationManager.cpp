@@ -6,6 +6,8 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <memory>
+
 #include "SystemManager/SystemManager.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
@@ -23,6 +25,8 @@
 #include "service-gui/ServiceGUI.hpp"
 #include "service-eink/ServiceEink.hpp"
 
+//desktop application
+#include "application-desktop/data/LockPhoneData.hpp"
 
 //module-utils
 #include "log/log.hpp"
@@ -100,7 +104,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 
 	switch( msgType ) {
 		case static_cast<uint32_t>( MessageType::APMPreventBlocking ): {
-			LOG_INFO("Restarting screen locking timer");
+//			LOG_INFO("Restarting screen locking timer");
 			ReloadTimer(blockingTimerID);
 		} break;
 		case static_cast<uint32_t>(MessageType::APMSwitch): {
@@ -165,6 +169,17 @@ void ApplicationManager::TickHandler(uint32_t id) {
 	if( id == blockingTimerID ) {
 		LOG_INFO("screen Locking Timer Triggered");
 		stopTimer(blockingTimerID);
+
+		//if desktop has focus switch to main window and set it locked.
+		if( focusApplicationName == "ApplicationDesktop") {
+			//switch data must contain target window and information about blocking
+
+			app::Application::messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::make_unique<gui::LockPhoneData>() );
+		}
+		else {
+			//get the application description
+//			ApplicationDescription* appDescription = applications.find( focusApplicationName );
+		}
 	}
 }
 
@@ -272,7 +287,8 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	}
 
 	//check if specified application is not the application that is currently running
-	if( focusApplicationName == msg->getName()) {
+	//this is applicable to all applications except desktop
+	if( (focusApplicationName == msg->getName()) ) {
 		LOG_WARN("Trying to rerun currently active application");
 		return false;
 	}
@@ -494,7 +510,8 @@ bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 
 //Static methods
 
-bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
+bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
+		const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
 
 	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);

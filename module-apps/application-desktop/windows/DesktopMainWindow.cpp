@@ -113,9 +113,11 @@ void DesktopMainWindow::setVisibleState() {
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
-//	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-//	pinLockScreen = ( app->getPinLocked() != 0 );
-//	screenLocked = app->getScreenLocked();
+	//check if there was a signal to lock the pone due to inactivity.
+	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
+		app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+		app->setScreenLocked(true);
+	}
 
 	setVisibleState();
 }
