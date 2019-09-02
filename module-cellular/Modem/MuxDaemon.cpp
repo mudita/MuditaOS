@@ -127,6 +127,14 @@ bool MuxDaemon::Start() {
     return true;
 }
 
+void MuxDaemon::EnterSleepMode() {
+    cellular->EnterSleep();
+}
+
+void MuxDaemon::ExitSleepMode() {
+    cellular->ExitSleep();
+}
+
 MuxDaemon::ConfState MuxDaemon::PowerUpProcedure() {
 
     // At first send AT command to check if modem is turned on
@@ -204,6 +212,8 @@ MuxDaemon::ConfState MuxDaemon::ConfProcedure() {
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
     CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+CLIP=1\r", 1));
+    // Enable sleep mode
+    CheckATCommandResponse(inOutSerialDataWorker->SendATCommand("AT+QSCLK=1\r", 1));
 
     /*    // Set Message format to Text
     SendAT("AT+CMGF=1\r", 500);

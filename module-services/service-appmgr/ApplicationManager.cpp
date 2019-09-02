@@ -221,6 +221,20 @@ sys::ReturnCodes ApplicationManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceAppMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
+
 bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	state = State::STARTING_NEW_APP;

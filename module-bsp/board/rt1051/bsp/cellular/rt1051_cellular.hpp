@@ -54,6 +54,10 @@ namespace bsp {
 
 		void InformModemHostWakeup() override final;
 
+		void EnterSleep() override final;
+
+		void ExitSleep() override final;
+
         static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;
 
@@ -84,18 +88,6 @@ namespace bsp {
 
         inline void DisableTx() {
             LPUART_EnableTx(CELLULAR_UART_BASE, false);
-        }
-
-        inline void WakeupModem() {
-            gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN),0);
-            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN),0);
-
-            vTaskDelay(pdMS_TO_TICKS(15));
-        }
-
-        inline void EnableModemEnterSleepMode() {
-            gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN),1);
-            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN),1);
         }
 
         // M.P: It is important to destroy these drivers in specific order
