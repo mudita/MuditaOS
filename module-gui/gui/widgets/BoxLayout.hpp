@@ -39,18 +39,16 @@ public:
 };
 
 class HBox : public BoxLayout {
-protected:
-	void resizeItems() override;
 public:
+	void resizeItems() override;
 	HBox();
 	HBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
 	virtual ~HBox() {};
 };
 
 class VBox : public BoxLayout {
-protected:
-	void resizeItems() override;
 public:
+	void resizeItems() override;
 	VBox();
 	VBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
 	virtual ~VBox() {};
