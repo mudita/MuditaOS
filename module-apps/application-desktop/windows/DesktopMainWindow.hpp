@@ -45,13 +45,10 @@ protected:
 	 */
 	bool enterPressed = false;
 	/**
-	 * Flag informs whether window has been unlocked
+	 * Name of the appliction that was on top when lock timeout occured
 	 */
-//	bool screenLocked = true;
-	/**
-	 * Flag that defines if pin window should be displayed
-	 */
-//	bool pinLockScreen = false;
+	std::string lockTimeoutApplilcation = "";
+
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState();
 public:
