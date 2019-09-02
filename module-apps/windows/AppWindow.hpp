@@ -42,6 +42,9 @@ protected:
 	uint32_t calculateBatteryLavel( uint32_t percentage );
 public:
 
+    static const uint32_t default_width;
+    static const uint32_t default_height;
+
 	AppWindow( app::Application* app, std::string name, uint32_t id=GUIWindowID++ );
 	AppWindow( AppWindow* win );
 	virtual ~AppWindow();

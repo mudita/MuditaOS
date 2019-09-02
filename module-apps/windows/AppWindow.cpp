@@ -16,6 +16,9 @@ AppWindow::AppWindow( app::Application* app, std::string name, uint32_t id ) :
 	Window ( name, id), application{ app } {
 }
 
+const uint32_t AppWindow::default_width = 480;
+const uint32_t AppWindow::default_height = 600;
+
 AppWindow::~AppWindow() {
 	LOG_INFO("deleting window: %s", name.c_str());
 }
