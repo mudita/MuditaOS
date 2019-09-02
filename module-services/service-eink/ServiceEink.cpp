@@ -200,6 +200,22 @@ sys::ReturnCodes ServiceEink::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceEink] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            EinkPowerOn();
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            EinkPowerOff();
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
+
 bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperature ) {
 
     // If neither the temperature nor the waveform has changed - do nothing

@@ -124,6 +124,14 @@ namespace bsp {
 
     }
 
+    void LinuxCellular::EnterSleep() {
+
+    }
+
+    void LinuxCellular::ExitSleep() {
+
+    }
+
     uint32_t LinuxCellular::Wait(uint32_t timeout) {
 
         uint32_t currentTime = cpp_freertos::Ticks::GetTicks();

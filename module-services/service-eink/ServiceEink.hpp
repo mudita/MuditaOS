@@ -56,9 +56,7 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{
-        LOG_FATAL("[ServiceAudio] PowerModeHandler: %d", static_cast<uint32_t>(mode));
-        return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 };
 
 #endif /* MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_ */

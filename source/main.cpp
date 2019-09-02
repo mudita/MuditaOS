@@ -47,7 +47,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(5000, true);
+        timer_id = CreateTimer(20000, true);
         ReloadTimer(timer_id);
     }
 
