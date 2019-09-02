@@ -9,18 +9,20 @@
 
 #include "../ContactBuilder.hpp"
 #include "PhonebookData.hpp"
+#include <widgets/BoxLayout.hpp>
 
 namespace gui {
 
-class PhonebookNewContact : public AppWindow {
+class PhonebookInfo : public AppWindow {
   protected:
-    static const int side_margin;
-    gui::ContactInputBox *box1, *box2;
-    std::unique_ptr<PhonebookContactData> data;
+    std::unique_ptr<PhonebookInfoData> data;
+    Label *text_label;
+    Image *image;
+    HBox *box;
 
   public:
-    PhonebookNewContact(app::Application *app);
-    virtual ~PhonebookNewContact();
+    PhonebookInfo(app::Application *app);
+    virtual ~PhonebookInfo();
 
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
@@ -32,10 +34,7 @@ class PhonebookNewContact : public AppWindow {
     void destroyInterface() override;
 
   private:
-    void addContact(ContactBuilder &&contact);
-    void removeContact();
-    void obligatoryData();
-    void dataTaken(UTF8 &&text);
+    void addContact(ContactBuilder &contact);
 };
 
 } /* namespace gui */

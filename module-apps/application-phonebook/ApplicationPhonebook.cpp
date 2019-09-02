@@ -3,13 +3,15 @@
 #include "MessageType.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
+#include "windows/PhonebookOptions.hpp"
+#include "windows/PhonebookInfoWindow.hpp"
 
 #include "ApplicationPhonebook.hpp"
 
 namespace app {
 
 ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound) :
-    Application( name, parent, startBackgound, 4096 ) {
+    Application( name, parent, startBackgound, 32768 ) {
 }
 
 ApplicationPhonebook::~ApplicationPhonebook() {}
@@ -60,6 +62,12 @@ void ApplicationPhonebook::createUserInterface() {
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
     window = new gui::PhonebookNewContact(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new gui::PhonebookOptions(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new gui::PhonebookInfo(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 }
 
