@@ -19,41 +19,14 @@
 
 namespace gui {
 
-
-static const uint32_t max_favourites_shown = 3;
-
-
 PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
-    : AppWindow(app, "MainWindow"), max_contacts_possible_to_show(0), max_normals(0), normals_position(0),
-      window_margin(20), topbox(nullptr), left(nullptr), right(nullptr), favourites(nullptr),
-      contact_size_h_px(style::default_label_h), contacts(nullptr)
+    : AppWindow(app, "MainWindow"), contact_size_h_px(style::default_label_h),window_margin(20),topbox(nullptr), left(nullptr), right(nullptr)
 {
     setSize(default_width, default_height);
-    contact_click_cb = [=](ContactRecord record) {
-                        application->switchWindow("PhonebookOptions",0,
-                                std::unique_ptr<PhonebookContactData>(new PhonebookContactData(record)));
-                        return true;
-                        };
 
-    notifier_next = std::make_unique<Notifier>(
-                [=] (Item& it) {
-                    if(it.focus) {
-                        changeContactsPage(NavigationDirection::DOWN);
-                    }
-                    notifier_next->focus = false;
-                    return true;
-                }
-                );
+    model = new ContactListModel(app, 7);
+    controller = new ContactListController(app, model, this);
 
-    notifier_previous = std::make_unique<Notifier>(
-                [=] (Item& it) {
-                    if(it.focus) {
-                        changeContactsPage(NavigationDirection::UP);
-                    }
-                    notifier_previous->focus = false;
-                    return true;
-                }
-                );
     buildInterface();
 }
 
@@ -92,13 +65,13 @@ void PhonebookMainWindow::buildInterface() {
         topbox->resizeItems();
     }
 
-    showContacts(max_favourites_shown, normals_position);
+    controller->setViewArea(BoundingBox(0,topbox->offset_h(), this->w(), usable_h()));
+    controller->initialize();
+    setFocusItem(controller);
 }
 
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
-    this->removeWidget(searchbox.get());
-    normals_position=0;
     topbox = nullptr;
     this->focusItem = nullptr;
     children.clear();
@@ -107,8 +80,6 @@ void PhonebookMainWindow::destroyInterface() {
 PhonebookMainWindow::~PhonebookMainWindow() { destroyInterface(); }
 
 void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
-    // TODO maybe do it more optimal way
-    showContacts(max_favourites_shown, normals_position);
 }
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
@@ -163,143 +134,7 @@ UTF8 utf_deserialize_to_utf(uint32_t val) {
     return UTF8(letter_store.el);
 }
 
-void PhonebookMainWindow::destroyContactBox(ContactsVBox *&box)
-{
-    if (box != nullptr) {
-        this->removeWidget(box);
-        delete box;
-    }
-    box = nullptr;
-}
-
-void PhonebookMainWindow::buildContactBox(std::vector<ContactRecord> *contacts, ContactsVBox *&box, PhonebookMainWindow::Type type)
-{
-    if(contacts == nullptr) {
-        destroyContactBox(box);
-        return;
-    }
-    if(contacts->size() > 0) {
-        if(box) {
-            // TODO check if proper use
-            this->removeWidget(box);
-            delete box;
-        }
-        int contact_offset=0;
-        if( type==Normals && favourites != nullptr) {
-            contact_offset = contact_size_h_px * favourites->children.size();
-        }
-        box = new ContactsVBox(this, 0,topbox->offset_h() + contact_offset, this->w(), usable_h() - contact_offset, (usable_h() - contact_offset)/contact_size_h_px );
-    } else {
-        return;
-    }
-    if( type == PhonebookMainWindow::Favourites) {
-        auto label = new ContactLabel();
-        label->create("Favourites");
-        label->setMaxSize(box->w(), contact_size_h_px);
-        box->addWidget(label);
-    }
-    uint32_t letter=0, new_letter=0;
-    for (auto element : *contacts ) {
-        if( type == Normals) {
-            if((new_letter = element.primaryName[0]) != letter) {
-                auto label = new ContactLabel();
-                label->create(utf_deserialize_to_utf(new_letter));
-                label->setMaxSize(box->w(), contact_size_h_px);
-                label->setSize(box->w(), contact_size_h_px);
-                box->addWidget(label);
-                letter = new_letter;
-            }
-        }
-        auto next_contact = new ContactBox();
-        next_contact->Item::setSize(box->w(),contact_size_h_px);
-        next_contact->setMaxSize(box->w(), contact_size_h_px);
-        next_contact->create(element.primaryName, std::vector { new Image("left_label_arrow")});
-        if(!box->addWidget(next_contact , [this, element](Item&) { return this->contact_click_cb(element); ;})) {
-            LOG_ERROR("Couldn't add widget!");
-        }
-    }
-    box->resizeItems();
-}
-
-void PhonebookMainWindow::changeContactsPage(NavigationDirection dir)
-{
-    if(!contacts) {
-        LOG_ERROR("Trying to switch page with no contacts");
-        return;
-    }
-    if( dir == NavigationDirection::DOWN) {
-        // check if there is anything else to load
-        if(max_normals > normals_position + contacts->size()) {
-            normals_position+= contacts->size();
-        } else {
-            LOG_WARN("Reached end of contact list");
-            // get back our last navigation item
-            setFocusItem(contacts->navigation_end());
-            return;
-        }
-    } else if ( dir == NavigationDirection::UP) {
-        if(contacts->size() != 0 && normals_position != 0) {
-            if(normals_position > contacts->size())
-                normals_position-= contacts->size();
-            else normals_position = 0;
-        } else {
-            LOG_WARN("Reached begining of the list");
-        }
-    }
-    showContacts(max_favourites_shown, normals_position, dir==NavigationDirection::DOWN);
-}
-
-// shows N of favourite contacts & contacts from start_contacts position ( 0 <=start_contacts < contacts_in_db_size )
-void PhonebookMainWindow::showContacts(uint32_t max_favourites, uint32_t start_contacts, bool focus_first)
-{
-    int fav_contacts_size = 0;
-    this->focusItem = nullptr;
-    max_contacts_possible_to_show = usable_h()/contact_size_h_px;
-    max_normals = DBServiceAPI::ContactGetCount(this->application);
-    /// fav contacts only on first page
-    if(start_contacts == 0) {
-        fav_contacts = DBServiceAPI::ContactGetLimitOffsetByFavourites(this->application, 0, max_favourites);
-        fav_contacts_size = fav_contacts->size();
-    } else {
-        fav_contacts = nullptr;
-    }
-    buildContactBox(fav_contacts.get(), favourites, Favourites);
-    if(start_contacts >= max_normals) {
-        LOG_ERROR("Starting contact out of range");
-    } else  {
-        norm_contacts = DBServiceAPI::ContactGetLimitOffset(this->application, start_contacts, max_contacts_possible_to_show - fav_contacts_size);
-        buildContactBox(norm_contacts.get(), contacts, Normals);
-    }
-
-    if(favourites) favourites->setNavigation(nullptr, contacts?contacts->navigation_begin():nullptr);
-    if(contacts) {
-        contacts->setNavigation(favourites?favourites->navigation_end():notifier_previous.get(), notifier_next.get());
-    }
-
-    if(focus_first && favourites && favourites->size()) {
-        setFocusItem(favourites->navigation_begin());
-    } else if( contacts && contacts->size()) {
-        setFocusItem(focus_first?contacts->navigation_begin():contacts->navigation_end());
-    } else {
-        setFocusItem(nullptr);
-    }
-}
-
 void PhonebookMainWindow::addSearch()
 {
-    this->setFocusItem(nullptr);
-    searchbox = std::make_unique<Label>(this, 0,topbox->offset_h(), this->w(), style::default_label_h, "John");
-    style::round(searchbox.get());
-    setFocusItem(searchbox.get());
-    destroyContactBox(contacts);
-    destroyContactBox(favourites);
-
-    application->render(gui::RefreshModes::GUI_REFRESH_FAST);
-    searchbox->activatedCallback = [=](Item&) {
-        LOG_INFO("Search contacts");
-        auto search_contacts = DBServiceAPI::ContactGetLimitOffsetLike(this->application, 0, max_contacts_possible_to_show, searchbox->getText());
-        LOG_INFO("FOUND: %d",search_contacts->size());
-        return true;
-    };
 }
 } /* namespace gui */

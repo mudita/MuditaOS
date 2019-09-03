@@ -9,27 +9,46 @@ namespace gui {
 
 class ContactsVBox : public VBox {
     private:
-        int maxsize, count, visible_cnt;
+        int maxsize, count, visible_cnt, active_item_number=0;
         // just to store items which are interactive
         std::list<Item*> action_items;
+        std::list<Item*>::iterator active_item;
     public:
         void setMaxsize(const int val) { maxsize = val; }
         ContactsVBox() : maxsize(0) {};
         ContactsVBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, int maxsize=0);
         virtual ~ContactsVBox() = default;
         virtual bool addWidget(Item *item) override;
-        virtual bool addWidget(Item *item, std::function<bool(Item&)>cb);
-        // set navigation through list on valid elements, if prev / next != null -> sets previous/next element
-        void setNavigation(Item *prev, Item *next);
-        // return if box should be visible or not
-        bool isVisible() { return visible_cnt > 0; }
-        // get all items used for navigation
-        std::list<Item*> &getNavigationItems();
-        /// size of action_items stored
-        uint32_t size() { return action_items.size(); };
-        /// return first navigation item
-        Item* navigation_begin() { if(size()) { return *action_items.begin(); } else { return nullptr;}}
-        Item* navigation_end() { if(size()==0) { return nullptr; } else if (size() == 1) return *action_items.begin(); else return *std::prev(action_items.end()); };
+
+        uint32_t size() {
+            return action_items.size();
+        }
+
+        uint32_t getCount() {
+            return count;
+        }
+
+        bool onInput(const InputEvent &inputEvent) override
+        {
+            return inputCallback(inputEvent);
+        };
+
+        bool onLastItem() {
+            return *active_item == action_items.back();
+        }
+
+        uint32_t height() {
+            uint32_t h =0;
+            for( auto a:children) {
+                if(a!=nullptr)
+                    h += a->h();
+            }
+            return h;
+        }
+
+        uint32_t activeItemNumber() {
+            return active_item_number-1;
+        }
 };
 
 // this: |[ Name     o]|

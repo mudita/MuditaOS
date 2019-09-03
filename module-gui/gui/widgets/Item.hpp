@@ -72,7 +72,7 @@ public:
 	std::function<bool(Item&)> focusChangedCallback;
 	std::function<void(Item&,  void* data)> dimensionChangedCallback;
 	std::function<bool(Item&)> activatedCallback;
-	std::function<bool(Item&, InputEvent& inputEvent)> inputCallback;
+	std::function<bool(const InputEvent& inputEvent)> inputCallback;
 
     int16_t w() { return widgetArea.w; }
     int16_t h() { return widgetArea.h; }

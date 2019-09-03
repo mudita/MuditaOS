@@ -15,6 +15,8 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/ContactBuilder.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/ContactListController.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/ContactListModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/ContactInputBox.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"

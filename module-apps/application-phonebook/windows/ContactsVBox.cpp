@@ -1,66 +1,62 @@
 #include "ContactsVBox.hpp"
 #include "DefaultStyle.hpp"
+#include <log/log.hpp>
 
 using namespace gui;
 
 ContactsVBox::ContactsVBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, const int maxsize):
     VBox(parent,x,y,w,h), maxsize(maxsize), count(0)
 {
+    active_item = action_items.begin();
     this->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    focusChangedCallback = [=](Item& it) {
+        if(!*active_item) return false;
+        return (*active_item)->setFocus(it.focus);
+    };
+
+    // controller first try to bother box , then do it's stuff
+    inputCallback = [=](const InputEvent &evt)
+    {
+        // LOG_INFO("Box inputCallback %d %s", action_items.size(), evt.keyCode == KeyCode::KEY_UP?"KeyUp":evt.keyCode == KeyCode::KEY_DOWN?"KeyDown":"Unknown");
+        if (action_items.size()) {
+            if (evt.keyCode == KeyCode::KEY_UP) {
+                if (active_item == action_items.begin()) {
+                    active_item_number = 0;
+                    return false;
+                } else {
+                    // get previous element from the list
+                    active_item = std::prev(active_item);
+                    active_item_number--;
+                }
+            } else if (evt.keyCode == KeyCode::KEY_DOWN) {
+                if (action_items.end() == std::next(active_item)) {
+                    active_item_number = action_items.size()-1;
+                    return false;
+                } else {
+                    active_item = std::next(active_item);
+                    active_item_number++;
+                }
+            } else {
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
+    };
 }
 
 bool ContactsVBox::addWidget( Item* item )
 {
     if(count < maxsize) {
         VBox::addWidget(item);
-        ++count;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool ContactsVBox::addWidget( Item* item, std::function<bool(Item&)>cb)
-{
-    if(count<maxsize) {
-        VBox::addWidget(item);
+        ///// TEMP TEMP TEMp
         action_items.push_back(item);
-        item->activatedCallback = cb;
-        item->focusChangedCallback = [=] (Item&item) {
-            if(item.focus) {
-                ++visible_cnt;
-            } else {
-                --visible_cnt;
-            }
-            return true;
-        };
         ++count;
         return true;
     } else {
         return false;
     }
-}
-
-void ContactsVBox::setNavigation(Item *prev, Item *next)
-{
-    for (auto iter=action_items.begin(); iter != action_items.end();++iter) {
-        if(iter != action_items.begin()) {
-            (*iter)->setNavigationItem(NavigationDirection::UP, *std::prev(iter));
-        } else if(prev) {
-            (*iter)->setNavigationItem(NavigationDirection::UP, prev);
-        }
-        if(std::next(iter) != action_items.end()) {
-            (*iter)->setNavigationItem(NavigationDirection::DOWN, *std::next(iter));
-        } else if(next) {
-            (*iter)->setNavigationItem(NavigationDirection::DOWN, next);
-        }
-    }
-}
-
-
-std::list<gui::Item*> &ContactsVBox::getNavigationItems()
-{
-    return action_items;
 }
 
 ContactBox::ContactBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h):

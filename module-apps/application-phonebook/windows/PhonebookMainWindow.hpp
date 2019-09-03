@@ -13,6 +13,9 @@
 #include "ContactsVBox.hpp"
 #include <ContactRecord.hpp>
 
+#include "../ContactListController.hpp"
+#include "../ContactListModel.hpp"
+
 namespace gui {
 
 /// no show item -> just used for callbacks triggering
@@ -31,29 +34,17 @@ class PhonebookMainWindow : public AppWindow {
         Favourites,
         Normals
     };
-    private:
-        std::unique_ptr<Notifier> notifier_next, notifier_previous;
-        uint32_t max_contacts_possible_to_show;
-        uint32_t max_normals, normals_position;
-        uint32_t usable_h();
-        std::function<bool(ContactRecord record)> contact_click_cb;
-        void buildContactBox(std::vector<ContactRecord> *contacts, ContactsVBox *&box, Type type);
-        void destroyContactBox(ContactsVBox *&box);
-        void showContacts(uint32_t max_favourites, uint32_t start_contacts, bool focus_first=true);
-        void changeContactsPage(NavigationDirection dir);
-        void addSearch();
     public:
         const int contact_size_h_px;
   protected:
     const unsigned int window_margin;
     HBox *topbox;
     Image *left,*right;
-    ContactsVBox *favourites, *contacts;
-    std::unique_ptr<std::vector<ContactRecord>> fav_contacts, norm_contacts;
-    std::unique_ptr<Label> searchbox;
+    ContactListController *controller = nullptr;
+    ContactListModel *model = nullptr;
 
-    gui::Item *addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback);
-
+    void addSearch();
+    uint32_t usable_h();
   public:
     PhonebookMainWindow(app::Application *app);
     virtual ~PhonebookMainWindow();
