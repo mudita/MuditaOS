@@ -251,9 +251,10 @@ void CallWindow::updateDuration( uint32_t duration ) {
 
 bool CallWindow::handleSwitchData( SwitchData* data ) {
 
-	if( data == nullptr )
+	if( data == nullptr ) {
 		LOG_ERROR("Received null pointer");
 		return false;
+	}
 
 	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
 	if( callData->getType() == app::CallSwitchData::Type::INCOMMING_CALL ) {
