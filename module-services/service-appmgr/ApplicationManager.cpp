@@ -471,6 +471,7 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 			launchApplicationName = "";
 
 			auto it = applications.find(focusApplicationName);
+			it->second->blockClosing = false;
 			it->second->state = app::Application::State::ACTIVE_FORGROUND;
 			state = State::IDLE;
 			return true;
