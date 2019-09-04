@@ -216,7 +216,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		currentWindow->updateTime( timeStr );
 		if( state == State::ACTIVE_FORGROUND )
-			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 
 		handled = true;
 	}

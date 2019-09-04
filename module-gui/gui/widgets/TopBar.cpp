@@ -6,6 +6,9 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+
+#include <ctime>
+#include <iomanip>
 #include "Label.hpp"
 #include "Image.hpp"
 #include "TopBar.hpp"
@@ -126,6 +129,17 @@ void TopBar::setTime( const UTF8& time ) {
 
 void TopBar::setTime( const uint32_t& time, bool mode24H ) {
 
+//	std::time_t t= time;
+//	std::stringstream ss;
+//	if( mode24H )
+//		ss<<std::put_time( std::gmtime(&t), "%H:%M");
+//	else
+//		ss<<std::put_time( std::gmtime(&t), "%OH:%M");
+//	setTime(ss.str());
+}
+
+UTF8 TopBar::getTimeString() {
+	return timeLabel->getText();
 }
 
 } /* namespace gui */

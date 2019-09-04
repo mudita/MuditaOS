@@ -35,7 +35,7 @@ void DesktopMainWindow::buildInterface() {
 	callsImage = new gui::Image( this, 28,258,0,0, "phone" );
 	messagesImage = new gui::Image( this, 28, 333,0,0, "mail" );
 
-	time = new gui::Label(this, 34, 90, 250, 116 );
+	time = new gui::Label(this, 20, 90, 280, 116 );
 	time->setFilled( false );
 	time->setBorderColor( gui::ColorNoColor );
 	time->setFont("gt_pressura_light_84");
@@ -75,7 +75,6 @@ void DesktopMainWindow::buildInterface() {
 
 void DesktopMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete description;
 	delete time;
 	delete dayText;
 	delete dayMonth;
@@ -112,6 +111,9 @@ void DesktopMainWindow::setVisibleState() {
 }
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+
+	//update time
+	time->setText( topBar->getTimeString() );
 
 	//check if there was a signal to lock the pone due to inactivity.
 	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
@@ -216,6 +218,17 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 void DesktopMainWindow::rebuild() {
 	destroyInterface();
 	buildInterface();
+}
+
+bool DesktopMainWindow::updateTime( const UTF8& timeStr ) {
+	auto ret = AppWindow::updateTime( timeStr );
+	time->setText( topBar->getTimeString());
+	return ret;
+}
+bool DesktopMainWindow::updateTime( const uint32_t& timestamp, bool mode24H ) {
+	auto ret = AppWindow::updateTime( timestamp, mode24H );
+//	time->setText( topBar->getTimeString());
+	return ret;
 }
 
 } /* namespace gui */

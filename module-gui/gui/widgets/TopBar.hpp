@@ -71,6 +71,7 @@ public:
 
 	void setTime( const UTF8& time );
 	void setTime( const uint32_t& time, bool mode24H );
+	UTF8 getTimeString();
 };
 
 } /* namespace gui */
