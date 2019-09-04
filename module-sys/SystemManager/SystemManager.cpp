@@ -57,6 +57,8 @@ namespace sys {
 
         userInit = init;
 
+        lowPowerMode = bsp::LowPowerMode::Create().value_or(nullptr);
+
         // Start System manager
         StartService();
 
@@ -87,9 +89,15 @@ namespace sys {
                 }
             }
         }
+
+        lowPowerMode->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
+
+        lowPowerMode->Switch(bsp::LowPowerMode::Mode::FullSpeed);
+
         for(const auto &w : servicesList){
 
             if(w->parent == "" && w->GetName() != caller->GetName()){
@@ -101,8 +109,6 @@ namespace sys {
                     LOG_FATAL("Service %s failed to exit low-power mode",w->GetName().c_str());
                 }
             }
-
-
         }
     }
 
@@ -249,5 +255,6 @@ namespace sys {
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
+    std::unique_ptr<bsp::LowPowerMode> SystemManager::lowPowerMode;
 
 }

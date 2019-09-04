@@ -142,8 +142,9 @@ typedef enum{
 }PerphClock_t;
 
 uint32_t GetPerphSourceClock(PerphClock_t clock);
-void PrintPerphSourceClocks();
+void PrintSystemClocks();
 
+void LPM_EnterFullSpeed(void);
 void LPM_EnterLowPowerRun();
 void LPM_EnterLowPowerIdle(void);
 

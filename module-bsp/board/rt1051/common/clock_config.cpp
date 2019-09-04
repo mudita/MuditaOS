@@ -962,7 +962,46 @@ uint32_t GetPerphSourceClock(PerphClock_t clock) {
     }
 }
 
-void PrintPerphSourceClocks() {
+void PrintSystemClocks() {
+
+
+    const char *_PLLNames[22] = {
+            "kCLOCK_CpuClk",  /*!< CPU clock */
+            "kCLOCK_AhbClk",  /*!< AHB clock */
+            "kCLOCK_SemcClk", /*!< SEMC clock */
+            "kCLOCK_IpgClk",  /*!< IPG clock */
+
+            "kCLOCK_OscClk", /*!< OSC clock selected by PMU_LOWPWR_CTRL[OSC_SEL]. */
+            "kCLOCK_RtcClk", /*!< RTC clock. (RTCCLK) */
+
+            "kCLOCK_ArmPllClk", /*!< ARMPLLCLK. */
+
+            "kCLOCK_Usb1PllClk",     /*!< USB1PLLCLK. */
+            "kCLOCK_Usb1PllPfd0Clk", /*!< USB1PLLPDF0CLK. */
+            "kCLOCK_Usb1PllPfd1Clk", /*!< USB1PLLPFD1CLK. */
+            "kCLOCK_Usb1PllPfd2Clk", /*!< USB1PLLPFD2CLK. */
+            "kCLOCK_Usb1PllPfd3Clk", /*!< USB1PLLPFD3CLK. */
+
+            "kCLOCK_Usb2PllClk", /*!< USB2PLLCLK. */
+
+            "kCLOCK_SysPllClk",      /*!< SYSPLLCLK. */
+            "kCLOCK_SysPllPfd0Clk",  /*!< SYSPLLPDF0CLK. */
+            "kCLOCK_SysPllPfd1Clk",  /*!< SYSPLLPFD1CLK. */
+            "kCLOCK_SysPllPfd2Clk", /*!< SYSPLLPFD2CLK. */
+            "kCLOCK_SysPllPfd3Clk", /*!< SYSPLLPFD3CLK. */
+
+            "kCLOCK_EnetPll0Clk", /*!< Enet PLLCLK ref_enetpll0. */
+            "kCLOCK_EnetPll1Clk", /*!< Enet PLLCLK ref_enetpll1. */
+
+            "kCLOCK_AudioPllClk", /*!< Audio PLLCLK. */
+            "kCLOCK_VideoPllClk", /*!< Video PLLCLK. */
+    };
+    int i;
+
+    for (i=0; i<22; i++) {
+        LOG_PRINTF("%s: %i Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
+    }
+
     LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n", GetPerphSourceClock(PerphClock_I2C));
     LOG_PRINTF("PerphSourceClock_LPSPI: %lu\r\n", GetPerphSourceClock(PerphClock_LPSPI));
     LOG_PRINTF("PerphSourceClock_LPUART: %lu\r\n", GetPerphSourceClock(PerphClock_LPUART));
@@ -1006,6 +1045,20 @@ void EnableWeakLDO(void)
     LPM_DELAY(40);
 }
 
+void DisableWeakLDO(void)
+{
+    /* Disable Weak LDO 2P5 and 1P1 */
+    PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
+    PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
+}
+
+void EnableRegularLDO(void)
+{
+    /* Enable Regular LDO 2P5 and 1P1 */
+    PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
+    PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
+}
+
 void DisableRegularLDO(void)
 {
     /* Disable Regular LDO 2P5 and 1P1 */
@@ -1017,6 +1070,17 @@ void BandgapOff(void)
 {
     XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
     PMU->MISC0_SET              = PMU_MISC0_REFTOP_PWD_MASK;
+}
+
+void BandgapOn(void)
+{
+    /* Turn on regular bandgap and wait for stable */
+    PMU->MISC0_CLR = PMU_MISC0_REFTOP_PWD_MASK;
+    while ((PMU->MISC0 & PMU_MISC0_REFTOP_VBGUP_MASK) == 0)
+    {
+    }
+    /* Low power band gap disable */
+    XTALOSC24M->LOWPWR_CTRL_CLR = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
 }
 
 void LPM_SetWaitModeConfig(void)
@@ -1138,6 +1202,70 @@ void LPM_EnterLowPowerRun(){
 
 }
 
+void LPM_EnterFullSpeed(void)
+{
+    /* CCM Mode */
+    DCDC_BootIntoCCM(DCDC);
+
+    /* Connect internal the load resistor */
+    DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
+    /* Adjust SOC voltage to 1.275V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x13, 0x1);
+
+    /* Enable FET ODRIVE */
+    PMU->REG_CORE_SET = PMU_REG_CORE_FET_ODRIVE_MASK;
+    /* Connect vdd_high_in and connect vdd_snvs_in */
+    PMU->MISC0_CLR = PMU_MISC0_DISCON_HIGH_SNVS_MASK;
+
+    BandgapOn();
+    EnableRegularLDO();
+    DisableWeakLDO();
+
+    /* Switch clock source to external OSC. */
+    CLOCK_SwitchOsc(kCLOCK_XtalOsc);
+    /* Set Oscillator ready counter value. */
+    CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(127);
+    /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
+    /* OSC_CLK (24M) */
+    CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
+                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+    /* PERIPH_CLK2_SEL */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+
+    /* Set AHB_PODF. */
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 0);    //CBCDR
+
+    /* Set IPG_PODF. */
+    /* AHB_CLK/4 */
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 3);    //CBCDR
+
+    /* Set ARM_PODF. */
+    /* PLL1/2 (864MHz / 2 = 432 MHz) */
+    CLOCK_SetDiv(kCLOCK_ArmDiv, 1);    //CACRR
+
+    /* Set PERCLK_PODF. */
+    /* IPG_CLK_ROOT/2 */
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1);    //CSCMR1
+    /* Set per clock source. */
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0);    //CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
+
+
+    /* Set preperiph clock source. */
+    /* PLL1/2 = 432MHz */
+    CLOCK_SetMux(kCLOCK_PrePeriphMux, 0);        //CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
+    /* Set periph clock source. */
+    /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 0);            //CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+
+    /* Set SystemCoreClock variable. */
+    SystemCoreClockUpdate();
+
+    /* Adjust SOC voltage to 1.15V */
+    DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
+
+    PrintSystemClocks();
+}
+
 void LPM_EnterLowPowerIdle(void)
 {
     LPM_SetWaitModeConfig();
@@ -1182,7 +1310,7 @@ void LPM_EnterLowPowerIdle(void)
 
     PeripheralEnterDozeMode();
 
-    clkPLL2setup(CLK_DISABLE);
+    //clkPLL2setup(CLK_DISABLE);
 
-    __WFI();
+    //__WFI();
 }
