@@ -62,6 +62,8 @@ public:
 	void rebuild() override;
 	void buildInterface() override;
 	void destroyInterface() override;
+	bool updateTime( const UTF8& timeStr ) override;
+	bool updateTime( const uint32_t& timestamp, bool mode24H ) override;
 };
 
 } /* namespace gui */
