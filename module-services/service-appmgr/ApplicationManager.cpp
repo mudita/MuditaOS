@@ -226,9 +226,13 @@ sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePo
 
     switch (mode){
         case sys::ServicePowerMode ::Active:
+            sys::SystemManager::ResumeService("ServiceEink",this);
+            sys::SystemManager::ResumeService("ServiceGUI",this);
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
+            sys::SystemManager::SuspendService("ServiceGUI",this);
+            sys::SystemManager::SuspendService("ServiceEink",this);
             break;
     }
 

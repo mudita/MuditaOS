@@ -13,6 +13,7 @@
 #include "timer.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
+#include "bsp/lpm/bsp_lpm.hpp"
 #include "Service/Mailbox.hpp"
 #include "Service/Bus.hpp"
 #include "Service/Service.hpp"
@@ -90,6 +91,8 @@ private:
 
 	static std::vector<std::shared_ptr<Service>> servicesList;
     static cpp_freertos::MutexStandard destroyMutex;
+
+    static std::unique_ptr<bsp::LowPowerMode> lowPowerMode;
 
 
 };
