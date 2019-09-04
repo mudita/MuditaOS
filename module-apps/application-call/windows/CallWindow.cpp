@@ -187,12 +187,12 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, true );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, true );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-//			bottomBar->setText( gui::BottomBar::Side::LEFT, utils::localize.get("app_call_answer") );
-//			bottomBar->setText( gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message") );
-//			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_reject") );
-			bottomBar->setText( gui::BottomBar::Side::LEFT, "app_call_answer" );
-			bottomBar->setText( gui::BottomBar::Side::CENTER, "app_call_message" );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "app_call_reject" );
+			bottomBar->setText( gui::BottomBar::Side::LEFT, utils::localize.get("app_call_answer") );
+			bottomBar->setText( gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message") );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_reject") );
+//			bottomBar->setText( gui::BottomBar::Side::LEFT, "app_call_answer" );
+//			bottomBar->setText( gui::BottomBar::Side::CENTER, "app_call_message" );
+//			bottomBar->setText( gui::BottomBar::Side::RIGHT, "app_call_reject" );
 
 //			imageMessage->setVisible(true);
 		}break;
@@ -202,7 +202,7 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "app_call_return" );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_return") );
 		}break;
 		case State::CALL_IN_PROGRESS: {
 //			titleLabel->setText("CALL_IN_PROGRESS");
@@ -211,7 +211,7 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "app_call_end_call" );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
 
 			rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(true);
 			rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(true);
@@ -230,7 +230,7 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "app_call_end_call" );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
 		}break;
 	};
 }
