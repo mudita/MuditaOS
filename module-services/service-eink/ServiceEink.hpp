@@ -56,7 +56,7 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 };
 
 #endif /* MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_ */

@@ -232,6 +232,19 @@ sys::ReturnCodes ServiceGUI::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceGUI] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
 
 } /* namespace sgui */
 

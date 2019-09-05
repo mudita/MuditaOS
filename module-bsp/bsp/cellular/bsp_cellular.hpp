@@ -44,6 +44,10 @@ namespace bsp {
 
 		virtual void InformModemHostWakeup() = 0;
 
+        virtual void EnterSleep() = 0;
+
+        virtual void ExitSleep() = 0;
+
     protected:
         bool isInitialized = false;
 
