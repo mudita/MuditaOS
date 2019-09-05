@@ -1138,11 +1138,15 @@ void PINMUX_InitPowerButton(void) {
     //Output
     IOMUXC_SetPinConfig(
             PINMUX_KEYBOARD_POWER_ENABLE_PAD,
-            PAD_CONFIG_DRIVER_STRENGTH_LVL_1);
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_DOWN_100kOhm);
 
     //Input
     IOMUXC_SetPinConfig(
-            PINMUX_KEYBOARD_RF_BUTTON_PAD, 0);
+            PINMUX_KEYBOARD_RF_BUTTON_PAD,
+            PAD_CONFIG_PULL_UP_100kOhm |
+            PAD_CONFIG_SELECT_PULL);
 
 
     gpio_pin_config_t power_enable;
@@ -1189,114 +1193,60 @@ void PINMUX_InitKeyboard(void) {
             PINMUX_KEYBOARD_RESET,
             PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
             PAD_CONFIG_PULL_KEEPER_ENABLED |
-            PAD_CONFIG_OPEN_DRAIN_ENABLED);
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm);
 
     //Input
     IOMUXC_SetPinConfig(
             PINMUX_KEYBOARD_IRQ,
-            0);  /* External pull is used */
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm);
 }
 
 void PINMUX_InitAudioCodec(void) {
-    IOMUXC_SetPinMux(
-            PINMUX_AUDIOCODEC_SCL,        /* GPIO_AD_B1_00 is configured as LPI2C1_SCL */
-            1U);                                    /* Software Input On Field: Force input path of pad PINMUX_KEYPINMUX_SCL */
-
-    IOMUXC_SetPinMux(
-            PINMUX_AUDIOCODEC_SDA,        /* GPIO_AD_B1_01 is configured as LPI2C1_SDA */
-            1U);                                    /* Software Input On Field: Force input path of pad PINMUX_KEYPINMUX_SDA */
-
 
     IOMUXC_SetPinMux(
             PINMUX_AUDIOCODEC_SAIx_MCLK,         /* GPIO_AD_B1_09 is configured as SAI1_MCLK */
-            1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_09 */
+            0U);
     IOMUXC_SetPinMux(
             PINMUX_AUDIOCODEC_SAIx_RX_DATA00,    /* GPIO_AD_B1_12 is configured as SAI1_RX_DATA00 */
-            1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_12 */
+            0U);
     IOMUXC_SetPinMux(
             PINMUX_AUDIOCODEC_SAIx_TX_DATA00,    /* GPIO_AD_B1_13 is configured as SAI1_TX_DATA00 */
-            1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_13 */
+            0U);
     IOMUXC_SetPinMux(
             PINMUX_AUDIOCODEC_SAIx_BCLK,      /* GPIO_AD_B1_14 is configured as SAI1_TX_BCLK */
-            1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_14 */
+            0U);
     IOMUXC_SetPinMux(
             PINMUX_AUDIOCODEC_SAIx_TX_SYNC,      /* GPIO_AD_B1_15 is configured as SAI1_TX_SYNC */
-            1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_15 */
-
-#if 0
-    IOMUXC_SetPinConfig(
-            PINMUX_AUDIOCODEC_SCL,        /* GPIO_AD_B1_00 PAD functional properties : */
-        0xD8B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 Speed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Enabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 22K Ohm Pull Up
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
-    IOMUXC_SetPinConfig(
-            PINMUX_AUDIOCODEC_SDA,        /* GPIO_AD_B1_01 PAD functional properties : */
-        0xD8B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 Speed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Enabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 22K Ohm Pull Up
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
-#endif
+            0U);
 
     IOMUXC_SetPinConfig(
             PINMUX_AUDIOCODEC_SAIx_MCLK,         /* GPIO_AD_B1_09 PAD functional properties : */
-            0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 Speed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Disabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm);
     IOMUXC_SetPinConfig(
             PINMUX_AUDIOCODEC_SAIx_RX_DATA00,    /* GPIO_AD_B1_12 PAD functional properties : */
-            0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 Speed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Disabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm
+    );
     IOMUXC_SetPinConfig(
             PINMUX_AUDIOCODEC_SAIx_TX_DATA00,    /* GPIO_AD_B1_13 PAD functional properties : */
-            0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 Speed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Disabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm);
     IOMUXC_SetPinConfig(
             PINMUX_AUDIOCODEC_SAIx_BCLK,      /* GPIO_AD_B1_14 PAD functional properties : */
-            0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 ll / Keep Select Field: Keeper
-                                                 PuSpeed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Disabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm);
     IOMUXC_SetPinConfig(
             PINMUX_AUDIOCODEC_SAIx_TX_SYNC,      /* GPIO_AD_B1_15 PAD functional properties : */
-            0x10B0u);                               /* Slew Rate Field: Slow Slew Rate
-	                                                 Drive Strength Field: R0/6
-	                                                 Speed Field: medium(100MHz)
-	                                                 Open Drain Enable Field: Open Drain Disabled
-	                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-	                                                 Pull / Keep Select Field: Keeper
-	                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-	                                                 Hyst. Enable Field: Hysteresis Disabled */
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm);
 }
 
 void PINMUX_InitEINK(void) {

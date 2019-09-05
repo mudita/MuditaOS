@@ -47,7 +47,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(20000, true);
+        timer_id = CreateTimer(5000, true);
         ReloadTimer(timer_id);
     }
 
@@ -80,10 +80,10 @@ public:
          AudioServiceAPI::Stop(this);*/
 
 #endif
-        //sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
+        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
-        sys::SystemManager::SuspendSystem(this);
-        sys::SystemManager::ResumeSystem(this);
+        //sys::SystemManager::SuspendSystem(this);
+        //sys::SystemManager::ResumeSystem(this);
         return std::make_shared<sys::ResponseMessage>();
 
     }
