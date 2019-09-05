@@ -162,7 +162,7 @@ namespace bsp {
 
         DisableRx();
 
-        WakeupModem();
+        ExitSleep();
         InformModemHostWakeup();
 
         TickType_t tick = xTaskGetTickCount();
@@ -177,7 +177,7 @@ namespace bsp {
     void RT1051Cellular::PowerDown() {
         const uint16_t POWER_DOWN_DELAY_MS = 700;
 
-        WakeupModem();
+        ExitSleep();
         InformModemHostWakeup();
 
         TickType_t tick = xTaskGetTickCount();
@@ -199,7 +199,7 @@ namespace bsp {
         const uint16_t RESET_DELAY_MS = 460;
 
         InformModemHostWakeup();
-        WakeupModem();
+        ExitSleep();
 
         gpio_2->WritePin(static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RESET_PIN), 1);
         vTaskDelay(pdMS_TO_TICKS(RESET_DELAY_MS));
@@ -261,6 +261,17 @@ namespace bsp {
 	void RT1051Cellular::InformModemHostWakeup() {
 		gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_APRDY_PIN),CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE);
 	}
+
+	void RT1051Cellular::EnterSleep() {
+        gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN),1);
+        gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN),1);
+    }
+
+    void RT1051Cellular::ExitSleep() {
+        gpio_3->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN),0);
+        gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN),0);
+        vTaskDelay(pdMS_TO_TICKS(15));
+    }
 
     void RT1051Cellular::MSPInit() {
 
