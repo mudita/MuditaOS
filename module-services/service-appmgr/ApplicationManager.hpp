@@ -31,6 +31,12 @@ public:
 	std::unique_ptr<app::ApplicationLauncher> lanucher;
 	//informs if it is possible to close application when it looses focus.
 	bool closeable;
+	//informs application manager that this application temporary musn't be closed.
+	//This flag is used to prevent application closing when application is closeable and there is incoming call.
+	//This flag is also used when closeable application is on front and there is a timeout to block the applicatioin.
+	bool blockClosing = false;
+	//prevents from blocking the system
+	bool preventLocking = false;
 	//current state of the application
 	app::Application::State state = app::Application::State::DEACTIVATED;
 	//switching data stored when application manager had to run init function
@@ -69,6 +75,9 @@ class ApplicationManager: public sys::Service {
 	std::string launchApplicationName = "";
 	//state of the application manager
 	State state = State::IDLE;
+	//timer to count time from last user's activity. If it reaches time defined in settings database application manager is sending signal
+	//to power manager and changing window to the desktop window in the blocked state.
+	uint32_t blockingTimerID = 0;
 
 	//tries to switch the application
 	bool handleSwitchApplication( APMSwitch* msg);
@@ -100,14 +109,13 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes WakeUpHandler() override;
-
-    sys::ReturnCodes SleepHandler() override;
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
      */
-    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<gui::SwitchData> data );
+    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
+    		const std::string& windowName, std::unique_ptr<gui::SwitchData> data );
     /**
 	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
 	 * Allows sending data to destination application.
@@ -135,9 +143,13 @@ public:
     */
    static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
    /**
-    * @brief Sends message to application manager that it should close itself and as a resulrt
+    * @brief Sends message to application manager that it should close itself and as a result.
     */
    static bool messageCloseApplicationManager( sys::Service* sender );
+   /**
+    * @brief Sends message to inform Application Manager to reset timer responsible for blocking phone
+    */
+   static bool messagePreventBlocking( sys::Service* sender );
 };
 
 } /* namespace sapm */

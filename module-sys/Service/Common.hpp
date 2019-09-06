@@ -32,6 +32,12 @@ enum class ServicePriority {
 	Realtime     	= 4,          ///< priority: realtime (highest)
 };
 
+enum class ServicePowerMode{
+    Active,
+    SuspendToRAM,
+    SuspendToNVM
+};
+
 enum class ReturnCodes{
     Success,
 	Failure,

@@ -25,7 +25,7 @@
 namespace app {
 
 ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound ) :
-	Application( name, parent, startBackgound, 4096 ) {
+	Application( name, parent, startBackgound, 4096+2048 ) {
 
 	timerCall = CreateTimer(1000,true);
 }
@@ -65,35 +65,44 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 		    refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
-		   LOG_INFO("---------------------------------CallActive");
-		   callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
-		   refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+			callDuration = 0;
+
+			LOG_INFO("---------------------------------CallActive");
+			callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
 		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
 			//reset call duration
-		    callDuration = 0;
+//		    callDuration = 0;
 			LOG_INFO("---------------------------------IncomingCall");
 			if( callWindow->getState() == gui::CallWindow::State::INCOMING_CALL ) {
 				LOG_INFO("ignoring call incoming");
 			}
-			AudioServiceAPI::RoutingStart(this);
-			runCallTimer();
-			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
-			//send to itself message to switch (run) call application
-			if( state == State::ACTIVE_FORGROUND ) {
-				switchWindow( "CallWindow",0, std::move(data) );
-			}
 			else {
+
+				AudioServiceAPI::RoutingStart(this);
+				runCallTimer();
+				std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
+				//send to itself message to switch (run) call application
 				callWindow->setState( gui::CallWindow::State::INCOMING_CALL );
-				sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
+				if( state == State::ACTIVE_FORGROUND ) {
+					LOG_INFO("++++++++++++WINDOW SWITCH");
+					switchWindow( "CallWindow",0, std::move(data) );
+				}
+				else {
+					LOG_INFO("++++++++++++APP SWITCH");
+
+					sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
+				}
 			}
 		}
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
 			//reset call duration
-		    callDuration = 0;
+		    //callDuration = 0;
+			runCallTimer();
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
-			runCallTimer();
+
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
 				switchWindow( "CallWindow",0, nullptr );
@@ -123,15 +132,6 @@ sys::ReturnCodes ApplicationCall::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationCall::DeinitHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-sys::ReturnCodes ApplicationCall::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ApplicationCall::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 

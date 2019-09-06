@@ -74,7 +74,14 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 }
 
 Text::~Text() {
-	clear();
+	//if there are text lines erase them.
+	if( !textLines.empty() ) {
+		while( !textLines.empty() ) {
+			delete textLines.front();
+			textLines.pop_front();
+		}
+	}
+	textLines.clear();
 }
 
 void Text::setEditMode( EditMode mode ) {

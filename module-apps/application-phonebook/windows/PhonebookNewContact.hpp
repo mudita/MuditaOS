@@ -11,7 +11,6 @@ namespace gui {
 class PhonebookNewContact : public AppWindow
 {
   protected:
-    std::vector<gui::Item> options;
     gui::Label *title;
     // TODO -> make this new class inheriting on vbox...
     struct Input {

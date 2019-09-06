@@ -6,6 +6,8 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <memory>
+
 #include "SystemManager/SystemManager.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-evtmgr/EventManager.hpp"
@@ -23,6 +25,8 @@
 #include "service-gui/ServiceGUI.hpp"
 #include "service-eink/ServiceEink.hpp"
 
+//desktop application
+#include "application-desktop/data/LockPhoneData.hpp"
 
 //module-utils
 #include "log/log.hpp"
@@ -38,13 +42,16 @@ ApplicationDescription::ApplicationDescription( std::string name, std::unique_pt
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
 	std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers ) : Service(name), systemManager{sysmgr} {
 
-//	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+	blockingTimerID = CreateTimer(0xFFFFFFFF, false );
+
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
 
 		std::string name = launchers[i]->getName();
 		bool isCloseable = launchers[i]->isCloseable();
+		bool preventsLocking = launchers[i]->isBlocking();
 		ApplicationDescription* desc = new ApplicationDescription(name, std::move(launchers[i]), isCloseable );
+		desc->preventLocking = preventsLocking;
 
 		applications.insert(std::pair<std::string, ApplicationDescription*>(name, desc)	);
 	}
@@ -98,6 +105,10 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 	uint32_t msgType = msgl->messageType;
 
 	switch( msgType ) {
+		case static_cast<uint32_t>( MessageType::APMPreventBlocking ): {
+//			LOG_INFO("Restarting screen locking timer");
+			ReloadTimer(blockingTimerID);
+		} break;
 		case static_cast<uint32_t>(MessageType::APMSwitch): {
 			sapm::APMSwitch* msg = reinterpret_cast<sapm::APMSwitch*>( msgl );
 			handleSwitchApplication( msg );
@@ -157,6 +168,35 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 }
 // Invoked when timer ticked
 void ApplicationManager::TickHandler(uint32_t id) {
+	if( id == blockingTimerID ) {
+		LOG_INFO("screen Locking Timer Triggered");
+		stopTimer(blockingTimerID);
+
+		//check if application that has focus doesn't have a flag that prevents system from blocking and going to low power mode
+		ApplicationDescription* appDescription = applications.find( focusApplicationName )->second;
+		if( appDescription->preventLocking ) {
+			//restart timer
+			ReloadTimer(blockingTimerID);
+			return;
+		}
+
+		//if desktop has focus switch to main window and set it locked.
+		if( focusApplicationName == "ApplicationDesktop") {
+			//switch data must contain target window and information about blocking
+
+			app::Application::messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::make_unique<gui::LockPhoneData>() );
+		}
+		else {
+			//get the application description for application that is on top and set blocking flag for it
+			appDescription->blockClosing = true;
+
+			std::unique_ptr<gui::LockPhoneData> data = std::make_unique<gui::LockPhoneData>();
+			data->setPrevApplication( focusApplicationName );
+
+			//run normal flow of applications change
+			messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::move(data) );
+		}
+	}
 }
 
 // Invoked during initialization
@@ -164,6 +204,12 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//get settings to initialize language in applications
 	settings = DBServiceAPI::SettingsGet(this);
+
+	//reset blocking timer to the value specified in settings
+	uint32_t lockTime = settings.lockTime;
+	if( lockTime == 0 )
+		lockTime = 30000;
+	setTimerPeriod( blockingTimerID, lockTime );
 
 	if( settings.language == SettingsLanguage::ENGLISH ) {
 		utils::localize.Switch( utils::Lang::En );
@@ -221,14 +267,6 @@ sys::ReturnCodes ApplicationManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ApplicationManager::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-sys::ReturnCodes ApplicationManager::SleepHandler() {
-	return sys::ReturnCodes::Success;
-}
-
 bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	state = State::STARTING_NEW_APP;
@@ -265,7 +303,8 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	}
 
 	//check if specified application is not the application that is currently running
-	if( focusApplicationName == msg->getName()) {
+	//this is applicable to all applications except desktop
+	if( (focusApplicationName == msg->getName()) ) {
 		LOG_WARN("Trying to rerun currently active application");
 		return false;
 	}
@@ -287,14 +326,14 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 		auto it = applications.find( previousApplicationName );
 
 		//if application's launcher defines that it can be closed send message with close signal
-		if( it->second->closeable ){
-			LOG_INFO("APMSwitch waiting for close confirmation from: %s", msg->getSenderName().c_str());
+		if( (it->second->closeable) && (it->second->blockClosing == false) ){
+			LOG_INFO("APMSwitch waiting for close confirmation from: %s", previousApplicationName.c_str());
 			state = State::WAITING_CLOSE_CONFIRMATION;
 			app::Application::messageCloseApplication( this, previousApplicationName );
 		}
 		//if application is not closeable send lost focus message
 		else {
-			LOG_INFO("APMSwitch Waiting for lost focus from: %s", msg->getSenderName().c_str());
+			LOG_INFO("APMSwitch Waiting for lost focus from: %s", previousApplicationName.c_str());
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
 			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
@@ -353,7 +392,7 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		//if application is not closeable send lost focus message
 		else {
 			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
-			app::Application::messageSwitchApplication(this, previousApplicationName, "LastWindow", nullptr);
+			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
 	}
 	//if there was no application to close or application can't be closed change internal state to
@@ -441,6 +480,7 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 			launchApplicationName = "";
 
 			auto it = applications.find(focusApplicationName);
+			it->second->blockClosing = false;
 			it->second->state = app::Application::State::ACTIVE_FORGROUND;
 			state = State::IDLE;
 			return true;
@@ -487,7 +527,8 @@ bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 
 //Static methods
 
-bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
+bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
+		const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
 
 	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
@@ -527,6 +568,12 @@ bool ApplicationManager::messageChangeLanguage( sys::Service* sender, utils::Lan
 
 bool ApplicationManager::messageCloseApplicationManager( sys::Service* sender ) {
 	auto msg = std::make_shared<sapm::APMClose>( sender->GetName() );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+
+bool ApplicationManager::messagePreventBlocking( sys::Service* sender ) {
+	auto msg = std::make_shared<sapm::APMPreventBlocking>( sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }

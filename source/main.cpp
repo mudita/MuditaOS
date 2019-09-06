@@ -110,14 +110,7 @@ public:
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes WakeUpHandler() override {
-        return sys::ReturnCodes::Success;
-    }
-
-
-    sys::ReturnCodes SleepHandler() override {
-        return sys::ReturnCodes::Success;
-    }
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
     uint32_t timer_id = 0;
 };
@@ -145,23 +138,12 @@ int main() {
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
-        //launcher for viewer
 		applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
-
-		//launcher for desktop application
 		applications.push_back(std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher()));
-
-		//launcher for call application
 		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
-
-		//launcher for settings application
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
-
-		//launcher for notes application
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-
-        // create launcher for phonebook, all launchers could be created like that
-		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
+		//applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),

@@ -41,8 +41,8 @@ MenuPage::MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_
 		uint32_t pageColumn = (i%pageSize) % 3;
 		gui::Rect* tile = new gui::Rect( this, 31 + pageColumn*(128 + 17 ), 60+pageRow*(128+17), 128, 128 );
 		tile->setRadius(11);
-		tile->setPenFocusWidth(3);
-		tile->setPenWidth(1);
+		tile->setPenFocusWidth(2);
+		tile->setPenWidth(0);
 
 		gui::Image* tileImg = new gui::Image( tile, 0, 0, 0,0, tileString.iconName );
 		tileImg->setPosition( (tile->widgetArea.w - tileImg->widgetArea.w)/2, (tile->widgetArea.h - tileImg->widgetArea.h)/3 );

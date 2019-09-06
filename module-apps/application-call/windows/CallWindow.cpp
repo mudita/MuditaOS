@@ -38,32 +38,20 @@ void CallWindow::rebuild() {
 }
 void CallWindow::buildInterface() {
 	AppWindow::buildInterface();
+
+	topBar->setActive(gui::TopBar::Elements::BATTERY, true );
+	topBar->setActive(gui::TopBar::Elements::SIGNAL, true );
+	topBar->setActive(gui::TopBar::Elements::TIME, true );
+
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
+
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_select"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 	bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
 
-	titleLabel = new gui::Label(this, 0, 50, 480, 50 );
-	titleLabel->setFilled( false );
-	titleLabel->setBorderColor( gui::ColorNoColor );
-	titleLabel->setFont("gt_pressura_bold_24");
-	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-
-	durationLabel = new gui::Label(this, 0, 240, 480, 80 );
-	durationLabel->setFilled( false );
-	durationLabel->setBorderColor( gui::ColorNoColor );
-	durationLabel->setFont("gt_pressura_regular_44");
-	durationLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
-	numberLabel = new gui::Label(this, 0, 120, 480, 80 );
-	numberLabel->setFilled( false );
-	numberLabel->setBorderColor( gui::ColorNoColor );
-	numberLabel->setFont("gt_pressura_bold_44");
-	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-
 	//create circles to hold images inside
-	for( uint32_t i=0; i<3; ++i ) {
+	for( uint32_t i=0; i<2; ++i ) {
 		rects[i] = new gui::Rect( this, 0,0, 80, 80 );
 		rects[i]->setFilled( false );
 		rects[i]->setRadius(40);
@@ -71,22 +59,36 @@ void CallWindow::buildInterface() {
 		rects[i]->setPenWidth(1);
 	}
 
-	rects[static_cast<uint32_t>(FocusRects::Messages)]->setPosition( 200, 400 );
 	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setPosition( 150, 400 );
 	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setPosition( 250, 400 );
-	rects[static_cast<uint32_t>(FocusRects::Messages)]->setPenWidth(3);
 
 	imageSpeaker[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Speaker)], 20, 20, 0,0, "speaker_on" );
 	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Speaker)], 20, 20, 0,0, "speaker_off" );
 	imageSpeaker[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
 	imageSpeaker[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
 
-	imageMessage = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Messages)], 15, 15, 0,0, "menu_messages" );
+//	imageMessage = new gui::Image( this, 200, 60-177, 0,0, "call_message" );
 
 	imageMicrophone[static_cast<uint32_t>(AudioState::ON)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0,0, "microphone_on" );
 	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)] = new gui::Image( rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0,0, "microphone_off" );
 	imageMicrophone[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
 	imageMicrophone[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
+
+	//top circle image
+	imageCircleTop = new gui::Image( this, 116, 82, 0,0, "circle_top" );
+	imageCircleBottom = new gui::Image( this, 106, 266, 0,0, "circle_bottom" );
+
+	durationLabel = new gui::Label(this, 0, 220, 480, 80 );
+	durationLabel->setFilled( false );
+	durationLabel->setBorderColor( gui::ColorNoColor );
+	durationLabel->setFont("gt_pressura_regular_24");
+	durationLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
+	numberLabel = new gui::Label(this, 11, 150, 480-22, 80 );
+	numberLabel->setFilled( false );
+	numberLabel->setBorderColor( gui::ColorNoColor );
+	numberLabel->setFont("gt_pressura_regular_44");
+	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	//define navigation between labels
 	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setNavigationItem( NavigationDirection::LEFT,
@@ -146,10 +148,17 @@ void CallWindow::buildInterface() {
 
 void CallWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete titleLabel;
-	delete numberLabel;
-	children.remove( titleLabel );
-	children.remove( numberLabel );
+
+	//	delete titleLabel;
+//	delete numberLabel;
+//	delete durationLabel;
+//	delete imageCircleBottom;
+//	delete imageCircleTop;
+//	delete imageMessage;
+//	delete rects[0];
+//	delete rects[1];
+
+	children.clear();
 }
 
 CallWindow::~CallWindow() {
@@ -166,40 +175,38 @@ const CallWindow::State& CallWindow::getState() {
 
 void CallWindow::setVisibleState() {
 
+//	imageMessage->setVisible(false);
 	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(false);
-	rects[static_cast<uint32_t>(FocusRects::Messages)]->setVisible(false);
 	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(false);
 	durationLabel->setVisible(false);
 
 	//show state of the window
 	switch( state ) {
 		case State::INCOMING_CALL: {
-			titleLabel->setText("INCOMMING_CALL");
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, true );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, true );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::LEFT, "Accept" );
-			bottomBar->setText( gui::BottomBar::Side::CENTER, "Message" );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "Reject" );
-
-			rects[static_cast<uint32_t>(FocusRects::Messages)]->setVisible(true);
+			bottomBar->setText( gui::BottomBar::Side::LEFT, utils::localize.get("app_call_answer") );
+			bottomBar->setText( gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message") );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_reject") );
+			durationLabel->setText(utils::localize.get("app_call_is_calling"));
+//			imageMessage->setVisible(true);
 		}break;
 		case State::CALL_ENDED: {
-			titleLabel->setText("CALL_ENDED");
-
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
-			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "Return" );
+			bottomBar->setActive(gui::BottomBar::Side::RIGHT, false );
+//			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_return") );
+//			durationLabel->setText(utils::localize.get("app_call_call_ended"));
 		}break;
 		case State::CALL_IN_PROGRESS: {
-			titleLabel->setText("CALL_IN_PROGRESS");
+//			titleLabel->setText("CALL_IN_PROGRESS");
 			durationLabel->setVisible(true);
 
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
 
 			rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(true);
 			rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(true);
@@ -210,15 +217,15 @@ void CallWindow::setVisibleState() {
 			setFocusItem( rects[static_cast<uint32_t>(FocusRects::Speaker)] );
 		}break;
 		case State::IDLE: {
-			titleLabel->setText("IDLE");
+//			titleLabel->setText("IDLE");
 		}break;
 		case State::OUTGOING_CALL: {
-			titleLabel->setText("OUTGOING_CALL");
+//			titleLabel->setText("OUTGOING_CALL");
 
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, "End Call" );
+			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
 		}break;
 	};
 }
@@ -251,9 +258,10 @@ void CallWindow::updateDuration( uint32_t duration ) {
 
 bool CallWindow::handleSwitchData( SwitchData* data ) {
 
-	if( data == nullptr )
+	if( data == nullptr ) {
 		LOG_ERROR("Received null pointer");
 		return false;
+	}
 
 	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
 	if( callData->getType() == app::CallSwitchData::Type::INCOMMING_CALL ) {
@@ -268,15 +276,11 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 }
 
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-//	AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
-//	AudioServiceAPI::RoutingMute(this->application,false);
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_speaker"));
 }
 
 bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
-//		AudioServiceAPI::RoutingStart(application);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
 		return true;
@@ -321,11 +325,11 @@ bool CallWindow::handleRightButton() {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 	}
-	else if( state == State::CALL_ENDED ) {
-		//return to previous application
-		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
-		return true;
-	}
+//	else if( state == State::CALL_ENDED ) {
+//		//return to previous application
+//		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+//		return true;
+//	}
 	else if( state == State::CALL_IN_PROGRESS ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
@@ -336,6 +340,8 @@ bool CallWindow::handleRightButton() {
 }
 
 bool CallWindow::onInput( const InputEvent& inputEvent ) {
+
+	LOG_INFO("key code: %d", static_cast<uint32_t>(inputEvent.keyCode));
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
 	if( ret ) {
