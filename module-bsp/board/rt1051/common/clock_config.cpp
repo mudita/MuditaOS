@@ -775,6 +775,7 @@ void clkPLL1setup(uint8_t enabled) {
     }
 }
 
+__attribute__((section( ".intfoo" )))
 void clkPLL2setup(uint8_t enabled) {
     const clock_sys_pll_config_t sysPllConfig_BOARD_BootClockRUN =
             {
@@ -941,6 +942,7 @@ void clkPLL7setup(uint8_t enabled) {
     }
 }
 
+__attribute__((section( ".intfoo" )))
 uint32_t GetPerphSourceClock(PerphClock_t clock) {
     switch (clock) {
 
@@ -962,6 +964,7 @@ uint32_t GetPerphSourceClock(PerphClock_t clock) {
     }
 }
 
+__attribute__((section( ".intfoo" )))
 void PrintSystemClocks() {
 
 
@@ -1000,6 +1003,7 @@ void PrintSystemClocks() {
 
     for (i=0; i<22; i++) {
         LOG_PRINTF("%s: %i Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
+        //volatile uint32_t val = CLOCK_GetFreq(static_cast<clock_name_t>(i));
     }
 
     LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n", GetPerphSourceClock(PerphClock_I2C));
@@ -1009,6 +1013,12 @@ void PrintSystemClocks() {
     LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n", GetPerphSourceClock(PerphClock_SAI2));
     LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n", GetPerphSourceClock(PerphClock_USDHC2));
 
+/*    volatile auto  val1 = GetPerphSourceClock(PerphClock_I2C);
+    volatile auto  val2 = GetPerphSourceClock(PerphClock_LPSPI);
+    volatile auto  val3 = GetPerphSourceClock(PerphClock_LPUART);
+    volatile auto  val4 = GetPerphSourceClock(PerphClock_SAI1);
+    volatile auto  val5 = GetPerphSourceClock(PerphClock_SAI2);
+    volatile auto  val6 = GetPerphSourceClock(PerphClock_USDHC2);*/
 }
 
 
@@ -1152,6 +1162,55 @@ void PeripheralEnterDozeMode(void)
     IOMUXC_GPR->GPR12 = GPR12_DOZE_BITS;
 }
 
+
+#define GPR4_STOP_REQ_BITS                                                                                          \
+    (IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR4_SAI3_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_REQ_MASK | IOMUXC_GPR_GPR4_PIT_STOP_REQ_MASK |  \
+     IOMUXC_GPR_GPR4_FLEXIO1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_FLEXIO2_STOP_REQ_MASK)
+
+#define GPR4_STOP_ACK_BITS                                                                                          \
+    (IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR4_SAI3_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_ACK_MASK | IOMUXC_GPR_GPR4_PIT_STOP_ACK_MASK |  \
+     IOMUXC_GPR_GPR4_FLEXIO1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_FLEXIO2_STOP_ACK_MASK)
+
+#define GPR7_STOP_REQ_BITS                                                           \
+    (IOMUXC_GPR_GPR7_LPI2C1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPI2C3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPUART1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR7_LPUART3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR7_LPUART5_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR7_LPUART7_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART8_STOP_REQ_MASK)
+
+#define GPR7_STOP_ACK_BITS                                                           \
+    (IOMUXC_GPR_GPR7_LPI2C1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPI2C3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPUART1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR7_LPUART3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR7_LPUART5_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR7_LPUART7_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART8_STOP_ACK_MASK)
+
+void PeripheralEnterStopMode(void)
+{
+    IOMUXC_GPR->GPR4 = IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK;
+    while ((IOMUXC_GPR->GPR4 & IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK) != IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK)
+    {
+    }
+    IOMUXC_GPR->GPR4  = GPR4_STOP_REQ_BITS;
+    IOMUXC_GPR->GPR7  = GPR7_STOP_REQ_BITS;
+    IOMUXC_GPR->GPR8  = GPR8_DOZE_BITS | GPR8_STOP_MODE_BITS;
+    IOMUXC_GPR->GPR12 = GPR12_DOZE_BITS | GPR12_STOP_MODE_BITS;
+    while ((IOMUXC_GPR->GPR4 & GPR4_STOP_ACK_BITS) != GPR4_STOP_ACK_BITS)
+    {
+    }
+    while ((IOMUXC_GPR->GPR7 & GPR7_STOP_ACK_BITS) != GPR7_STOP_ACK_BITS)
+    {
+    }
+}
+
 void PowerDownUSBPHY(void)
 {
     USBPHY1->CTRL = 0xFFFFFFFF;
@@ -1202,6 +1261,7 @@ void LPM_EnterLowPowerRun(){
 
 }
 
+__attribute__((section( ".intfoo" )))
 void LPM_EnterFullSpeed(void)
 {
     /* CCM Mode */
@@ -1221,8 +1281,13 @@ void LPM_EnterFullSpeed(void)
     EnableRegularLDO();
     DisableWeakLDO();
 
-    /* Switch clock source to external OSC. */
-    CLOCK_SwitchOsc(kCLOCK_XtalOsc);
+    CLOCK_InitExternalClk(0);
+
+    /* Switch DCDC to use DCDC external OSC */
+    DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
+
+        /* Switch clock source to external OSC. */
+        CLOCK_SwitchOsc(kCLOCK_XtalOsc);
     /* Set Oscillator ready counter value. */
     CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(127);
     /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
@@ -1266,6 +1331,7 @@ void LPM_EnterFullSpeed(void)
     PrintSystemClocks();
 }
 
+__attribute__((section( ".intfoo" )))
 void LPM_EnterLowPowerIdle(void)
 {
     LPM_SetWaitModeConfig();
@@ -1287,11 +1353,22 @@ void LPM_EnterLowPowerIdle(void)
     CLOCK_SetMux(kCLOCK_PerclkMux, 0x0);
     CLOCK_SetDiv(kCLOCK_PerclkDiv, 0x0);
 
+    /* Switch clock source to internal RC */
+    CLOCK_SwitchOsc(kCLOCK_RcOsc);
+
+    CLOCK_DeinitExternalClk();
+
+    CCM_ANALOG->MISC0_SET = CCM_ANALOG_MISC0_OSC_I_MASK;
+
+
     /* Power down USBPHY */
     PowerDownUSBPHY();
 
-    /* Adjust SOC voltage to 0.95V */
+    /* Adjust LP voltage to 0.95V */
     DCDC_AdjustTargetVoltage(DCDC, 0x6, 0x1);
+    /* Switch DCDC to use DCDC internal OSC */
+    DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
+
     /* DCM Mode */
     DCDC_BootIntoDCM(DCDC);
     /* Disconnect internal the load resistor */
@@ -1309,8 +1386,18 @@ void LPM_EnterLowPowerIdle(void)
     BandgapOff();
 
     PeripheralEnterDozeMode();
+    //PeripheralEnterStopMode();
 
-    clkPLL2setup(CLK_DISABLE);
+    PrintSystemClocks();
 
-    __WFI();
+    /* Turn on FlexRAM0 */
+    GPC->CNTR &= ~GPC_CNTR_PDRAM0_PGE_MASK;
+    /* Turn on FlexRAM1 */
+    PGC->MEGA_CTRL &= ~PGC_MEGA_CTRL_PCR_MASK;
+
+    clkPLL2_PFD2setup(CLK_DISABLE);
+    clkPLL2_PFD2setup(CLK_ENABLE);
+   // PrintSystemClocks();
+
+    //__WFI();
 }
