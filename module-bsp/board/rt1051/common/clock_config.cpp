@@ -1310,7 +1310,7 @@ void LPM_EnterLowPowerIdle(void)
 
     PeripheralEnterDozeMode();
 
-    clkPLL2setup(CLK_DISABLE);
+    //clkPLL2setup(CLK_DISABLE);
 
-    __WFI();
+    //__WFI();
 }
