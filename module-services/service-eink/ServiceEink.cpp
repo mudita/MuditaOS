@@ -201,6 +201,44 @@ sys::ReturnCodes ServiceEink::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceEink] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+        {
+            EinkStatus_e einkStatus = EinkResetAndInitialize();
+
+            if (einkStatus != EinkOK)
+            {
+                LOG_FATAL("Error: Could not initialize Eink display!\n");
+            }
+
+            //TODO remove screen clearing code below.
+            EinkPowerOn();
+
+            uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
+            // Make the saturation to the lower limit
+            if (s_einkAmbientTemperature < 0)
+                s_einkAmbientTemperature = 0;
+
+            // Make the saturation to the higher limit
+            if (s_einkAmbientTemperature > 49)
+                s_einkAmbientTemperature = 49;
+
+            // Clear the temperature timer count
+            deepClearScreen( s_einkAmbientTemperature );
+        }
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            EinkPowerDown();
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
+
 bool ServiceEink::changeWaveform( EinkWaveforms_e mode, const int32_t temperature ) {
 
     // If neither the temperature nor the waveform has changed - do nothing

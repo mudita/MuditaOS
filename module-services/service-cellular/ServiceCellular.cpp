@@ -127,6 +127,22 @@ sys::ReturnCodes ServiceCellular::DeinitHandler() {
     return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceCellular] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            muxdaemon->ExitSleepMode();
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            muxdaemon->EnterSleepMode();
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
+
 sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp) {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 

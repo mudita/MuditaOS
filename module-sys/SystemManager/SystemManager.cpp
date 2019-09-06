@@ -14,34 +14,31 @@
 #include <algorithm>
 
 
-namespace sys
-{
+namespace sys {
 
     using namespace cpp_freertos;
     using namespace std;
     using namespace sys;
 
 
-    const char* systemManagerServiceName = "SysMgrService";
+    const char *systemManagerServiceName = "SysMgrService";
 
     SystemManager::SystemManager(TickType_t pingInterval)
             : Service(systemManagerServiceName),
-              pingInterval(pingInterval)
-    {
+              pingInterval(pingInterval) {
         // Specify list of channels which System Manager is registered to
-        busChannels = {BusChannels ::SystemManagerRequests};
+        busChannels = {BusChannels::SystemManagerRequests};
     }
 
-    SystemManager::~SystemManager()
-    {
+    SystemManager::~SystemManager() {
         LogOutput::Output(GetName() + ":destructor");
     }
 
-    void SystemManager::Run(){
+    void SystemManager::Run() {
 
         InitHandler();
 
-        if(userInit){
+        if (userInit) {
             userInit();
         }
 
@@ -55,27 +52,87 @@ namespace sys
         EndScheduler();
     }
 
-    void SystemManager::StartSystem(std::function<int()> init)
-    {
+    void SystemManager::StartSystem(std::function<int()> init) {
         LogOutput::Output("Initializing system...");
 
         userInit = init;
 
+        lowPowerMode = bsp::LowPowerMode::Create().value_or(nullptr);
+
         // Start System manager
         StartService();
 
-        pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval),true);
-        ReloadTimer(pingPongTimerID);
+        //M.P: Ping/pong mechanism is turned off. It doesn't bring any value to the system.
+        //pingPongTimerID = CreateTimer(Ticks::MsToTicks(pingInterval), true);
+        //ReloadTimer(pingPongTimerID);
 
     }
 
-    bool SystemManager::CloseSystem(Service* s){
+    bool SystemManager::CloseSystem(Service *s) {
 
-        Bus::SendUnicast(std::make_shared<SystemManagerMsg>(SystemManagerMsgType::CloseSystem),systemManagerServiceName,s);
+        Bus::SendUnicast(std::make_shared<SystemManagerMsg>(SystemManagerMsgType::CloseSystem),
+                         systemManagerServiceName, s);
         return true;
     }
 
-    bool SystemManager::CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout){
+    bool SystemManager::SuspendSystem(Service *caller) {
+
+        for (auto w = servicesList.rbegin(); w != servicesList.rend(); ++w)
+        {
+            if((*w)->parent == "" && (*w)->GetName() != caller->GetName()){
+                auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::SuspendToRAM),
+                                            (*w)->GetName(), caller,1000);
+
+                auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+                if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+                    LOG_FATAL("Service %s failed to enter low-power mode",(*w)->GetName().c_str());
+                }
+            }
+        }
+
+        lowPowerMode->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+
+    }
+
+    bool SystemManager::ResumeSystem(Service *caller) {
+
+        lowPowerMode->Switch(bsp::LowPowerMode::Mode::FullSpeed);
+
+        for(const auto &w : servicesList){
+
+            if(w->parent == "" && w->GetName() != caller->GetName()){
+                auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::Active),
+                                            w->GetName(), caller,1000);
+                auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+
+                if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+                    LOG_FATAL("Service %s failed to exit low-power mode",w->GetName().c_str());
+                }
+            }
+        }
+    }
+
+    bool SystemManager::SuspendService(const std::string &name, sys::Service *caller) {
+        auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::SuspendToRAM),
+                                    name, caller,1000);
+        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+
+        if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+            LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
+        }
+    }
+
+    bool SystemManager::ResumeService(const std::string &name, sys::Service *caller){
+        auto ret = Bus::SendUnicast(std::make_shared<SystemMessage>(SystemMessageType::SwitchPowerMode,ServicePowerMode::Active),
+                                    name, caller,1000);
+        auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
+
+        if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
+            LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
+        }
+    }
+
+    bool SystemManager::CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout) {
 
 
         CriticalSection::Enter();
@@ -85,74 +142,70 @@ namespace sys
         service->StartService();
 
         auto msg = std::make_shared<SystemMessage>(SystemMessageType::Start);
-        auto ret = Bus::SendUnicast(msg,service->GetName(),caller,timeout);
+        auto ret = Bus::SendUnicast(msg, service->GetName(), caller, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
-        if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
+        if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    bool SystemManager::DestroyService(const std::string& name,Service* caller,TickType_t timeout){
+    bool SystemManager::DestroyService(const std::string &name, Service *caller, TickType_t timeout) {
 
         auto msg = std::make_shared<SystemMessage>(SystemMessageType::Exit);
-        auto ret = Bus::SendUnicast(msg,name,caller,timeout);
+        auto ret = Bus::SendUnicast(msg, name, caller, timeout);
         auto resp = std::static_pointer_cast<ResponseMessage>(ret.second);
 
-        if(ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)){
+        if (ret.first == ReturnCodes::Success && (resp->retCode == ReturnCodes::Success)) {
 
             cpp_freertos::LockGuard lck(destroyMutex);
 
-            auto serv = std::find_if(servicesList.begin(),servicesList.end(),[&](std::shared_ptr<Service>const &s) { return s->GetName() == name; });
-            if(serv == servicesList.end()){
+            auto serv = std::find_if(servicesList.begin(), servicesList.end(),
+                                     [&](std::shared_ptr<Service> const &s) { return s->GetName() == name; });
+            if (serv == servicesList.end()) {
                 return false;
             }
 
             servicesList.erase(serv);
 
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
 
-    ReturnCodes SystemManager::InitHandler(){
+    ReturnCodes SystemManager::InitHandler() {
         isReady = true;
-        return ReturnCodes ::Success;
+        return ReturnCodes::Success;
     }
 
 
-    void SystemManager::TickHandler(uint32_t id)
-    {
-        if(id == pingPongTimerID){
+    void SystemManager::TickHandler(uint32_t id) {
+        if (id == pingPongTimerID) {
 
-            for(auto &w : servicesList){
-                if(w->pingTimestamp==0){
+            for (auto &w : servicesList) {
+                if (w->pingTimestamp == 0) {
                     //no reponse for ping messages, restart system
                     LogOutput::Output(w->GetName() + " failed to response to ping message");
                     exit(1);
-                }
-                else{
+                } else {
                     w->pingTimestamp = 0;
                 }
             }
 
-            Bus::SendBroadcast(std::make_shared<SystemMessage>(SystemMessageType::Ping),this);
+            Bus::SendBroadcast(std::make_shared<SystemMessage>(SystemMessageType::Ping), this);
         }
 
     }
 
-    Message_t SystemManager::DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)
-    {
-        if(msg->channel == BusChannels::SystemManagerRequests){
-            SystemManagerMsg* data = static_cast<SystemManagerMsg*>(msg);
+    Message_t SystemManager::DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) {
+        if (msg->channel == BusChannels::SystemManagerRequests) {
+            SystemManagerMsg *data = static_cast<SystemManagerMsg *>(msg);
 
-            switch(data->type){
+            switch (data->type) {
 
                 case SystemManagerMsgType::CloseSystem:
                     CloseSystemHandler();
@@ -166,25 +219,25 @@ namespace sys
 
     }
 
-    void SystemManager:: CloseSystemHandler(){
+    void SystemManager::CloseSystemHandler() {
         LogOutput::Output("Invoking closing procedure...");
 
         DeleteTimer(pingPongTimerID);
 
         // We are going to remove services in reversed order of creation
         CriticalSection::Enter();
-        std::reverse(servicesList.begin(),servicesList.end());
+        std::reverse(servicesList.begin(), servicesList.end());
         CriticalSection::Exit();
 
 
         retry:
-        for(auto &w : servicesList){
+        for (auto &w : servicesList) {
 
             // Sysmgr stores list of all active services but some of them are under control of parent services.
             // Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to parents.
-            if(w->parent == ""){
-                auto ret = DestroyService(w->GetName(),this);
-                if(!ret){
+            if (w->parent == "") {
+                auto ret = DestroyService(w->GetName(), this);
+                if (!ret) {
                     //no response to exit message,
                     LogOutput::Output(w->GetName() + " failed to response to exit message");
                     exit(1);
@@ -193,8 +246,8 @@ namespace sys
             }
         }
 
-        if(servicesList.size() == 0){
-                enableRunLoop = false;
+        if (servicesList.size() == 0) {
+            enableRunLoop = false;
         }
 
     }
@@ -202,5 +255,6 @@ namespace sys
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
+    std::unique_ptr<bsp::LowPowerMode> SystemManager::lowPowerMode;
 
 }
