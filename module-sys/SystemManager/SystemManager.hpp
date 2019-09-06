@@ -13,6 +13,7 @@
 #include "timer.hpp"
 #include "condition_variable.hpp"
 #include "mutex.hpp"
+#include "bsp/lpm/bsp_lpm.hpp"
 #include "Service/Mailbox.hpp"
 #include "Service/Bus.hpp"
 #include "Service/Service.hpp"
@@ -49,6 +50,14 @@ public:
 	// Invoke system close procedure
 	static bool CloseSystem(Service* s);
 
+	static bool SuspendSystem(Service* caller);
+
+	static bool ResumeSystem(Service* caller);
+
+	static bool SuspendService(const std::string& name,Service* caller);
+
+    static bool ResumeService(const std::string& name,Service* caller);
+
 	// Create new service
 	static bool CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout=5000);
 
@@ -82,6 +91,8 @@ private:
 
 	static std::vector<std::shared_ptr<Service>> servicesList;
     static cpp_freertos::MutexStandard destroyMutex;
+
+    static std::unique_ptr<bsp::LowPowerMode> lowPowerMode;
 
 
 };

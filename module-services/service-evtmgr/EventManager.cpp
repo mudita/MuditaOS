@@ -145,6 +145,19 @@ sys::ReturnCodes EventManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
 
 bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 
