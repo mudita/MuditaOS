@@ -142,7 +142,7 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-		//applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
+		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),

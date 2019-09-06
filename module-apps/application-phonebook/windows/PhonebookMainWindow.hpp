@@ -4,20 +4,17 @@
 #include <string>
 
 #include "AppWindow.hpp"
-#include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
-#include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
+#include "ListView.hpp"
 
 namespace gui {
 
 class PhonebookMainWindow : public AppWindow {
   protected:
-    gui::Label *title;
-    std::vector<gui::Item *> options;
-
-    gui::Item *addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback);
+    gui::Label *title = nullptr;
+    ListView* list;
 
   public:
     PhonebookMainWindow(app::Application *app);

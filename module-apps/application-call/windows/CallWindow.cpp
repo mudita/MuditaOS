@@ -149,14 +149,14 @@ void CallWindow::buildInterface() {
 void CallWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 
-	//	delete titleLabel;
-//	delete numberLabel;
-//	delete durationLabel;
-//	delete imageCircleBottom;
-//	delete imageCircleTop;
-//	delete imageMessage;
-//	delete rects[0];
-//	delete rects[1];
+	if( numberLabel ){ removeWidget(numberLabel); delete numberLabel; numberLabel = nullptr; }
+	if( durationLabel ){ removeWidget(durationLabel); delete durationLabel; durationLabel = nullptr; }
+	if( rects[0] ){ removeWidget(rects[0]); delete rects[0]; rects[0]= nullptr; }
+	if( rects[1] ){ removeWidget(rects[1]); delete rects[1]; rects[1]= nullptr; }
+
+	if( imageMessage ){ removeWidget(imageMessage); delete imageMessage; imageMessage = nullptr; }
+	if( imageCircleTop ){ removeWidget(imageCircleTop); delete imageCircleTop; imageCircleTop = nullptr; }
+	if( imageCircleBottom ){ removeWidget(imageCircleBottom); delete imageCircleBottom; imageCircleBottom = nullptr; }
 
 	children.clear();
 }
