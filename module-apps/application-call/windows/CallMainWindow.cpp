@@ -31,6 +31,7 @@ void CallMainWindow::buildInterface() {
 }
 void CallMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
+	if( title ) { removeWidget(title); delete title; title = nullptr; }
 }
 
 

@@ -10,6 +10,7 @@
 #include "i18/i18.hpp"
 
 #include "Label.hpp"
+#include "ListView.hpp"
 #include "Margins.hpp"
 #include "PhonebookMainWindow.hpp"
 
@@ -25,83 +26,48 @@ PhonebookMainWindow::PhonebookMainWindow(app::Application *app) : AppWindow(app,
 }
 
 void PhonebookMainWindow::rebuild() {
-    // find which widget has focus
-    uint32_t index = 0;
-    for (uint32_t i = 0; i < options.size(); i++)
-        if (options[i] == getFocusItem()) {
-            index = i;
-            break;
-        }
-
     destroyInterface();
     buildInterface();
-    setFocusItem(options[index]);
 }
 void PhonebookMainWindow::buildInterface() {
-    AppWindow::buildInterface();
+
+	AppWindow::buildInterface();
+
+	bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+    bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_phonebook_call"));
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_open"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    topBar->setActive(TopBar::Elements::SIGNAL, true);
-    topBar->setActive(TopBar::Elements::BATTERY, true);
+    topBar->setActive(TopBar::Elements::TIME, true);
 
-    title = new gui::Label(this, 0, 50, 480, 50);
+    title = new gui::Label(this, 0, 50, 480, 54);
     title->setFilled(false);
-    title->setBorderColor(gui::ColorNoColor);
+    title->setBorderColor( gui::ColorFullBlack );
+    title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+    title->setMargins( Margins(0,0,0,18));
     title->setFont("gt_pressura_bold_24");
     title->setText(utils::localize.get("app_phonebook_title_main"));
-    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-    std::unique_ptr<std::vector<ContactRecord>> tmp = DBServiceAPI::ContactGetLimitOffset(this->application, 0,7);
-    LOG_INFO("CONTACTS: %d", tmp->size());
-    if(tmp != nullptr && tmp->size() != 0) {
-        for(auto a:*tmp) {
-            options.push_back(addOptionLabel(a.primaryName, [=](gui::Item &) { return true; }));
-        }
-    }
+    list = new gui::ListView(this, 11, 105, 480-22, 600-105-50 );
 
-    if( options.size() == 0) {
-            options.push_back(addOptionLabel(utils::localize.get("app_phonebook_empty"), [=](gui::Item &) { return true; }));
-    }
-
-    // set position and navigation for labels
-    for (uint32_t i = 0, size = options.size(), posY = 100; i < options.size(); i++) {
-        options[i]->setPosition(17, posY);
-        posY += 60;
-        options[i]->setNavigationItem(NavigationDirection::DOWN, options[(i + 1) % size]);
-        options[i]->setNavigationItem(NavigationDirection::UP, options[(size + i - 1) % size]);
-    }
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
-    delete title;
-    for (uint32_t i = 0; i < options.size(); i++)
-        delete options[i];
-    options.clear();
-    this->focusItem = nullptr;
-    LOG_INFO("options size: %d", options.size());
+    if( title ) { removeWidget(title);    delete title; title = nullptr; }
+    if( list ) { removeWidget(list);    delete list; list = nullptr; }
     children.clear();
 }
 
-PhonebookMainWindow::~PhonebookMainWindow() { destroyInterface(); }
-
-gui::Item *PhonebookMainWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback) {
-    gui::Label *label = new gui::Label(this, 17, 0, 480 - 34, 60, text);
-    label->setMargins(gui::Margins(16, 0, 0, 0));
-    label->setFilled(false);
-    label->setPenFocusWidth(3);
-    label->setPenWidth(0);
-    label->setFont("gt_pressura_regular_24");
-    label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
-    label->setRadius(11);
-    label->activatedCallback = activatedCallback;
-
-    return label;
+PhonebookMainWindow::~PhonebookMainWindow() {
+	destroyInterface();
 }
 
-void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) { setFocusItem(options[0]); }
+
+void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+}
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
 	//check if any of the lower inheritance onInput methods catch the event
@@ -118,12 +84,13 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
 	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
 		return false;
 
-    if( inputEvent.keyCode == KeyCode::KEY_1) {
-        LOG_INFO("Pressed 1");
+    if( inputEvent.keyCode == KeyCode::KEY_LEFT) {
+        LOG_INFO("Adding new contact");
         application->switchWindow("NewContact",0,nullptr);
     }
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
+    else if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
+		LOG_INFO("Searching contact");
+		application->switchWindow("SearchWindow",0, nullptr );
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
 		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MenuWindow", nullptr );

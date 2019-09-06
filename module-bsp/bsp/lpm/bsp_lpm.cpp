@@ -20,20 +20,19 @@
 #error "Unsupported target"
 #endif
 
-
 namespace bsp{
 
     std::optional<std::unique_ptr<LowPowerMode>> LowPowerMode::Create() {
 
         std::unique_ptr<LowPowerMode> inst;
 
-#if defined(TARGET_RT1051)
-        inst = std::make_unique<bsp::RT1051LPM>();
-#elif defined(TARGET_Linux)
-        inst = std::make_unique<bsp::LinuxCellular>(term);
-#else
-#error "Unsupported target"
-#endif
+//#if defined(TARGET_RT1051)
+//        inst = std::make_unique<bsp::RT1051LPM>();
+//#elif defined(TARGET_Linux)
+//        inst = std::make_unique<bsp::LinuxCellular>("0");
+//#else
+//#error "Unsupported target"
+//#endif
 
         return inst;
     }

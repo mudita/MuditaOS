@@ -11,18 +11,7 @@ namespace gui {
 class PhonebookNewContact : public AppWindow
 {
   protected:
-    gui::Label *title;
-    // TODO -> make this new class inheriting on vbox...
-    struct Input {
-        gui::Label name, input;
-        Input(Input &&) = default;
-        Input(gui::VBox* box, const UTF8 &text);
-        virtual ~Input();
-    };
-    std::vector<Input *> el;
-    gui::VBox *box;
-    unsigned int pos;
-
+    gui::Label *title = nullptr;
   public:
     PhonebookNewContact(app::Application *app);
     virtual ~PhonebookNewContact();
