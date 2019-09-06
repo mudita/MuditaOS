@@ -227,8 +227,13 @@ bool DesktopMainWindow::updateTime( const UTF8& timeStr ) {
 }
 bool DesktopMainWindow::updateTime( const uint32_t& timestamp, bool mode24H ) {
 	auto ret = AppWindow::updateTime( timestamp, mode24H );
-//	time->setText( topBar->getTimeString());
+	time->setText( topBar->getTimeString());
 	return ret;
+}
+
+std::list<DrawCommand*> DesktopMainWindow::buildDrawList() {
+	time->setText( topBar->getTimeString());
+	return Window::buildDrawList();
 }
 
 } /* namespace gui */

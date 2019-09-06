@@ -201,20 +201,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		sevm::RtcMinuteAlarmMessage* msg = static_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
 		LOG_INFO("Application time updated");
 
-		time_t timestamp = msg->timestamp;
-		struct tm time;
-		time =*localtime(&timestamp);
-		uint32_t hour = (timestamp % 86400) / 3600;
-		uint32_t min = (timestamp % 3600) / 60;
+		currentWindow->updateTime( msg->timestamp, !settings.timeFormat12 );
 
-		std::ostringstream stringStream;
-		stringStream << std::setfill('0') << std::setw(2) << hour << ":" << std::setfill('0') << std::setw(2) <<min;
-
-		std::string timeStr = stringStream.str();
-
-//		LOG_INFO("%s", timeStr.c_str() );
-
-		currentWindow->updateTime( timeStr );
 		if( state == State::ACTIVE_FORGROUND )
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 
