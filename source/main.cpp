@@ -123,6 +123,10 @@ int main() {
 
     bsp::BoardInit();
 
+    LPM_EnterLowPowerIdle();
+
+#if 0
+
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
@@ -172,5 +176,7 @@ int main() {
     });
 
     cpp_freertos::Thread::StartScheduler();
-    return 0;
+
+#endif
+    return 1;
 }
