@@ -70,17 +70,18 @@ void Load_Dcdc_Trim()
  
 void Clock_Init() 
 {
-  // Enable all clocks
+    //
   MEM_WriteU32(0x400FC068,0xffffffff);
   MEM_WriteU32(0x400FC06C,0xffffffff);
+
   MEM_WriteU32(0x400FC070,0xffffffff);
   MEM_WriteU32(0x400FC074,0xffffffff);
   MEM_WriteU32(0x400FC078,0xffffffff);
   MEM_WriteU32(0x400FC07C,0xffffffff);
   MEM_WriteU32(0x400FC080,0xffffffff);
-  MEM_WriteU32(0x400D8030,0x00002001);   
-  MEM_WriteU32(0x400D8100,0x001d0000);  
-  MEM_WriteU32(0x400FC014,0x00010D40);    
+  MEM_WriteU32(0x400D8030,0x00002001); // CCM_ANALOG_PLL_SYS
+  MEM_WriteU32(0x400D8100,0x001d0000);  // CCM_ANALOG_PFD_528
+  MEM_WriteU32(0x400FC014,0x00010D40); // CCM_CBCDR
   Report("Clock Init Done");
 }
 void SDRAM_WaitIpCmdDone(void) 
@@ -183,6 +184,8 @@ void SDRAM_Init() {
   MEM_WriteU32(0x401F82A0,0x000110F9); // EMC_39
   MEM_WriteU32(0x401F82A4,0x000110F9); // EMC_40
   MEM_WriteU32(0x401F82A8,0x000110F9); // EMC_41
+
+
   // Config SDR Controller Registers/
   MEM_WriteU32(0x402F0000,0x10000004); // MCR
   MEM_WriteU32(0x402F0008,0x00030524); // BMCR0
@@ -205,7 +208,7 @@ void SDRAM_Init() {
   MEM_WriteU32(0x402F009C,0xA55A000A); // SD_CC_IMS
   SDRAM_WaitIpCmdDone();
   MEM_WriteU32(0x402F004C,0x08080A01 ); // enable sdram self refresh again after initialization done.
- 
+
   Report("SDRAM Init Done");
 }
 void INTRAM_Init() {
@@ -251,8 +254,8 @@ void INTRAM_Init() {
 /* SetupTarget */
 void AfterResetTarget(void) {
   Report("Enabling i.MXRT SDRAM");
-  Load_Dcdc_Trim();
-  Clock_Init();
-  SDRAM_Init();
+  /*Load_Dcdc_Trim();*/
+  //Clock_Init();
+  //SDRAM_Init();
   INTRAM_Init();
 }
