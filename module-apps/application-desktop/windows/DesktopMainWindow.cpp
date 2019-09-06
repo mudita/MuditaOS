@@ -10,13 +10,13 @@
 #include <functional>
 
 #include "../ApplicationDesktop.hpp"
+#include "../data/LockPhoneData.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
 
 //application-call
 #include "application-call/data/CallSwitchData.hpp"
-
 
 #include "i18/i18.hpp"
 
@@ -32,10 +32,10 @@ void DesktopMainWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::LOCK, true );
 	topBar->setActive(TopBar::Elements::BATTERY, true );
 
-	callsImage = new gui::Image( this, 28,266,0,0, "phone" );
-	messagesImage = new gui::Image( this, 28, 341,0,0, "mail" );
+	callsImage = new gui::Image( this, 28,258,0,0, "phone" );
+	messagesImage = new gui::Image( this, 28, 333,0,0, "mail" );
 
-	time = new gui::Label(this, 34, 90, 250, 116 );
+	time = new gui::Label(this, 20, 90, 280, 116 );
 	time->setFilled( false );
 	time->setBorderColor( gui::ColorNoColor );
 	time->setFont("gt_pressura_light_84");
@@ -56,26 +56,25 @@ void DesktopMainWindow::buildInterface() {
 	dayMonth->setText("01 Jan");
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
-	notificationCalls = new gui::Label(this, 86, 255, 390, 42 );
+	notificationCalls = new gui::Text(this, 86, 255, 350, 70 );
 	notificationCalls->setFilled( false );
 	notificationCalls->setBorderColor( gui::ColorNoColor );
 	notificationCalls->setFont("gt_pressura_light_24");
 	UTF8 calls = "2 " + utils::localize.get("app_desktop_missed_calls");
 	notificationCalls->setText(calls);
-	notificationCalls->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	notificationMessages = new gui::Label(this, 86, 330, 390, 42 );
+
+	notificationMessages = new gui::Text(this, 86, 330, 350, 70 );
 	notificationMessages->setFilled( false );
 	notificationMessages->setBorderColor( gui::ColorNoColor );
 	notificationMessages->setFont("gt_pressura_light_24");
 	UTF8 mess = "2 " + utils::localize.get("app_desktop_unread_messages");
+
 	notificationMessages->setText(mess);
-	notificationMessages->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 }
 
 void DesktopMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete description;
 	delete time;
 	delete dayText;
 	delete dayMonth;
@@ -113,9 +112,17 @@ void DesktopMainWindow::setVisibleState() {
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 
-//	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-//	pinLockScreen = ( app->getPinLocked() != 0 );
-//	screenLocked = app->getScreenLocked();
+	//update time
+	time->setText( topBar->getTimeString() );
+
+	//check if there was a signal to lock the pone due to inactivity.
+	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
+		app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+		app->setScreenLocked(true);
+
+		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
+		lockTimeoutApplilcation = lockData->getPreviousApplication();
+	}
 
 	setVisibleState();
 }
@@ -140,13 +147,32 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			else if(( inputEvent.keyCode == KeyCode::KEY_PND ) && enterPressed ) {
 				//if interval between enter and pnd keys is less than time defined for unlocking
 				if( xTaskGetTickCount() - unlockStartTime  < unclockTime) {
-//					app->setScreenLocked(false);
 					//display pin lock screen or simply refresh current window to update labels
 					if( app->getPinLocked())
-						application->switchWindow( "PinLockWindow", 0, nullptr );
+						//if there was no application on to before closing proceed normally to pin protection window.
+						if( lockTimeoutApplilcation.empty()) {
+							application->switchWindow( "PinLockWindow", 0, nullptr );
+						}
+						else {
+							std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>();
+							data->setPrevApplication( lockTimeoutApplilcation );
+							lockTimeoutApplilcation = "";
+							application->switchWindow( "PinLockWindow", 0, std::move(data) );
+						}
+
 					else {
-						setVisibleState();
-						application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+						//if phone was locked by user show unlocked main window
+						if( lockTimeoutApplilcation.empty() ) {
+							app->setScreenLocked(false);
+							setVisibleState();
+							application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+						}
+						//if there was application on top when timeout occurred
+						else {
+							lockTimeoutApplilcation = "";
+							sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+						}
 					}
 				}
 				enterPressed = false;
@@ -166,6 +192,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 
 				char key[] = { char(inputEvent.keyChar) ,0};
 				std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
+
 				sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
 
 				return true;
@@ -191,6 +218,22 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 void DesktopMainWindow::rebuild() {
 	destroyInterface();
 	buildInterface();
+}
+
+bool DesktopMainWindow::updateTime( const UTF8& timeStr ) {
+	auto ret = AppWindow::updateTime( timeStr );
+	time->setText( topBar->getTimeString());
+	return ret;
+}
+bool DesktopMainWindow::updateTime( const uint32_t& timestamp, bool mode24H ) {
+	auto ret = AppWindow::updateTime( timestamp, mode24H );
+	time->setText( topBar->getTimeString());
+	return ret;
+}
+
+std::list<DrawCommand*> DesktopMainWindow::buildDrawList() {
+	time->setText( topBar->getTimeString());
+	return Window::buildDrawList();
 }
 
 } /* namespace gui */

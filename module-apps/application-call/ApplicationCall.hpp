@@ -30,9 +30,9 @@ public:
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
-	sys::ReturnCodes WakeUpHandler() override;
-	sys::ReturnCodes SleepHandler() override;
 	void TickHandler(uint32_t id) override;
+
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
 	void createUserInterface() ;
 	void destroyUserInterface();
@@ -49,7 +49,7 @@ public:
 
 class ApplicationCallLauncher : public ApplicationLauncher {
 public:
-	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false ) {};
+	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false, true ) {};
 	bool run(sys::Service* caller = nullptr ) override {
 		parent = (caller==nullptr?"":caller->GetName());
 		return sys::SystemManager::CreateService( std::make_shared<ApplicationCall>(name, parent), caller );

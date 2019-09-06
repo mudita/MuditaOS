@@ -51,7 +51,12 @@
     "app_call_clear": "CLEAR",
     "app_call_reject": "REJECT",
     "app_call_answer": "ANSWER",
+    "app_call_message": "MESSAGE",
+    "app_call_return": "RETURN",
+    "app_call_end_call": "END CALL",
     "app_call_emergency": "Emergency call",
+    "app_call_is_calling": "is calling",
+    "app_call_call_ended": "call ended",
     
     "app_settings_title_main": "Settings",
     "app_settings_connectivity": "Connectivity",

@@ -55,14 +55,15 @@ SettingsTableRow SettingsTable::GetByID(uint32_t id) {
                             (*retQuery)[11].GetUInt32(),    // activeSIM
                             (*retQuery)[12].GetString(),    // networkOperator
                             (*retQuery)[13].GetUInt32(),    // lockPassHash
-                            static_cast<SettingsLanguage >((*retQuery)[14].GetUInt32()),    // language
+							(*retQuery)[14].GetUInt32(),    // lockTime
+                            static_cast<SettingsLanguage >((*retQuery)[15].GetUInt32()),    // language
 
     };
 }
 
 bool SettingsTable::Update(SettingsTableRow entry) {
     return db->Execute(
-            "UPDATE settings SET time_format_12 = %lu, time_auto = %lu ,brightness_auto = %lu, brightness_level = %lu, bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%s', pin2_string = '%s', active_sim = %lu, network_operator = '%s', lock_pass_hash = %lu, language = %lu WHERE _id=1;",
+            "UPDATE settings SET time_format_12 = %lu, time_auto = %lu ,brightness_auto = %lu, brightness_level = %lu, bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%s', pin2_string = '%s', active_sim = %lu, network_operator = '%s', lock_pass_hash = %lu, lock_time = %lu, language = %lu WHERE _id=1;",
             entry.timeFormat12,
             entry.timeAuto,
             entry.brightnessAuto,
@@ -76,6 +77,7 @@ bool SettingsTable::Update(SettingsTableRow entry) {
             entry.activeSIM,
             entry.networkOperator.c_str(),
             entry.lockPassHash,
+			entry.lockTime,
             entry.language
     );
 }

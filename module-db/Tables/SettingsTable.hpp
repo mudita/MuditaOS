@@ -32,6 +32,8 @@ struct SettingsTableRow{
     uint32_t    activeSIM;
     std::string     networkOperator;
     uint32_t lockPassHash;
+    //time of inactivity of the user after which phone will be automatically blocked.
+    uint32_t lockTime;
     SettingsLanguage language;
 };
 
@@ -78,11 +80,12 @@ private:
             "active_sim INTEGER DEFAULT 1, "
             "network_operator TEXT DEFAULT '', "
             "lock_pass_hash INTEGER DEFAULT 0, "
+    		"lock_time INTEGER DEFAULT 30000, "
             "language INTEGER DEFAULT 1 "
             ");";
 
     const char* settingsInitialization =
-    		"INSERT OR IGNORE INTO settings (_id, time_format_12, time_auto, brightness_auto, brightness_level, bigger_font, pin_mode, pin_days, pin_days_left, pin1_string,pin2_string, active_sim,network_operator,lock_pass_hash,language) VALUES(1,0,1,1,0,0,1,0,0,'','',1,'',0,1)";
+    		"INSERT OR IGNORE INTO settings (_id, time_format_12, time_auto, brightness_auto, brightness_level, bigger_font, pin_mode, pin_days, pin_days_left, pin1_string,pin2_string, active_sim,network_operator,lock_pass_hash,lock_time, language) VALUES(1,0,1,1,0,0,1,0,0,'','',1,'',0,30000,1)";
 
 };
 

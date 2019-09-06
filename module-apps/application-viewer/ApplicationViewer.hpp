@@ -28,8 +28,8 @@ public:
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
-	sys::ReturnCodes WakeUpHandler() override;
-	sys::ReturnCodes SleepHandler() override;
+
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
 	void createUserInterface() ;
 	void destroyUserInterface();

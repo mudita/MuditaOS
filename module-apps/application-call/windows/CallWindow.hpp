@@ -30,7 +30,6 @@ public:
 protected:
 
 	enum class FocusRects {
-		Messages,
 		Speaker,
 		Micrphone,
 	};
@@ -39,14 +38,18 @@ protected:
 		ON,
 		OFF
 	};
-	gui::Label* titleLabel = nullptr;
+//	gui::Label* titleLabel = nullptr;
+	//used to display both nnumber and name of contact
 	gui::Label* numberLabel = nullptr;
+	//used to inform user about call state of call and display duration of call
 	gui::Label* durationLabel = nullptr;
 
 	gui::Image* imageSpeaker[2] = {nullptr,nullptr};
 	gui::Image* imageMicrophone[2] = {nullptr,nullptr};
-	gui::Rect* rects[3] = {nullptr};
+	gui::Rect* rects[2] = {nullptr};
 	gui::Image* imageMessage = nullptr;
+	gui::Image* imageCircleTop = nullptr;
+	gui::Image* imageCircleBottom = nullptr;
 
 	AudioState microphoneState = AudioState::ON;
 	AudioState speakerState = AudioState::OFF;

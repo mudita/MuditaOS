@@ -38,6 +38,8 @@ class PinLockWindow: public AppWindow {
 	//state of the window
 	State state = State::EnteringPin;
 
+	std::string lockTimeoutApplilcation = "";
+
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState( const State& state );
 public:

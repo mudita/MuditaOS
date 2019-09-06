@@ -93,6 +93,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 			EinkStatus_e ret;
 			if( deepRefresh ) {
 				changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+				EinkDitherDisplay();
 			}
 			else{
 				changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
@@ -197,15 +198,6 @@ sys::ReturnCodes ServiceEink::InitHandler() {
 
 sys::ReturnCodes ServiceEink::DeinitHandler() {
 	EinkPowerDown();
-	return sys::ReturnCodes::Success;
-}
-
-sys::ReturnCodes ServiceEink::WakeUpHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceEink::SleepHandler() {
 	return sys::ReturnCodes::Success;
 }
 

@@ -63,7 +63,12 @@
     "app_call_clear": "WYCZYŚĆ",
     "app_call_reject": "ODRZUĆ",
     "app_call_answer": "ODBIERZ",
+    "app_call_message": "WIADOMOŚĆ",
+    "app_call_return": "POWRÓT",
+    "app_call_end_call": "ZAKOŃCZ",
     "app_call_emergency": "Numer alarmowy",
+    "app_call_is_calling": "dzwoni",
+    "app_call_call_ended": "zakończono",
     
     "app_settings_title_main": "Ustawienia",
     "app_settings_connectivity": "Łączność",

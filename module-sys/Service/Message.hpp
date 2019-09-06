@@ -18,8 +18,7 @@ namespace sys
 
     enum class SystemMessageType{
         Ping,
-        Wakeup,
-        GoSleep,
+        SwitchPowerMode,
         Start,
         Exit
     };
