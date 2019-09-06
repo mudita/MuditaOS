@@ -49,7 +49,9 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 
 		std::string name = launchers[i]->getName();
 		bool isCloseable = launchers[i]->isCloseable();
+		bool preventsLocking = launchers[i]->isBlocking();
 		ApplicationDescription* desc = new ApplicationDescription(name, std::move(launchers[i]), isCloseable );
+		desc->preventLocking = preventsLocking;
 
 		applications.insert(std::pair<std::string, ApplicationDescription*>(name, desc)	);
 	}
@@ -170,6 +172,14 @@ void ApplicationManager::TickHandler(uint32_t id) {
 		LOG_INFO("screen Locking Timer Triggered");
 		stopTimer(blockingTimerID);
 
+		//check if application that has focus doesn't have a flag that prevents system from blocking and going to low power mode
+		ApplicationDescription* appDescription = applications.find( focusApplicationName )->second;
+		if( appDescription->preventLocking ) {
+			//restart timer
+			ReloadTimer(blockingTimerID);
+			return;
+		}
+
 		//if desktop has focus switch to main window and set it locked.
 		if( focusApplicationName == "ApplicationDesktop") {
 			//switch data must contain target window and information about blocking
@@ -178,7 +188,6 @@ void ApplicationManager::TickHandler(uint32_t id) {
 		}
 		else {
 			//get the application description for application that is on top and set blocking flag for it
-			ApplicationDescription* appDescription = applications.find( focusApplicationName )->second;
 			appDescription->blockClosing = true;
 
 			std::unique_ptr<gui::LockPhoneData> data = std::make_unique<gui::LockPhoneData>();

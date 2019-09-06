@@ -64,6 +64,7 @@ public:
 	void destroyInterface() override;
 	bool updateTime( const UTF8& timeStr ) override;
 	bool updateTime( const uint32_t& timestamp, bool mode24H ) override;
+	std::list<DrawCommand*> buildDrawList() override;
 };
 
 } /* namespace gui */

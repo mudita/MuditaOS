@@ -183,26 +183,21 @@ void CallWindow::setVisibleState() {
 	//show state of the window
 	switch( state ) {
 		case State::INCOMING_CALL: {
-//			titleLabel->setText("INCOMMING_CALL");
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, true );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, true );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
 			bottomBar->setText( gui::BottomBar::Side::LEFT, utils::localize.get("app_call_answer") );
 			bottomBar->setText( gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message") );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_reject") );
-//			bottomBar->setText( gui::BottomBar::Side::LEFT, "app_call_answer" );
-//			bottomBar->setText( gui::BottomBar::Side::CENTER, "app_call_message" );
-//			bottomBar->setText( gui::BottomBar::Side::RIGHT, "app_call_reject" );
-
+			durationLabel->setText(utils::localize.get("app_call_is_calling"));
 //			imageMessage->setVisible(true);
 		}break;
 		case State::CALL_ENDED: {
-//			titleLabel->setText("CALL_ENDED");
-
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
-			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
-			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_return") );
+			bottomBar->setActive(gui::BottomBar::Side::RIGHT, false );
+//			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_return") );
+//			durationLabel->setText(utils::localize.get("app_call_call_ended"));
 		}break;
 		case State::CALL_IN_PROGRESS: {
 //			titleLabel->setText("CALL_IN_PROGRESS");
@@ -281,15 +276,11 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 }
 
 void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
-//	AudioServiceAPI::RoutingSpeakerPhone(this->application,false);
-//	AudioServiceAPI::RoutingMute(this->application,false);
-//	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_call_message"));
 }
 
 bool CallWindow::handleLeftButton() {
 	if( state == State::INCOMING_CALL ) {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
-//		AudioServiceAPI::RoutingStart(application);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
 		return true;
@@ -334,11 +325,11 @@ bool CallWindow::handleRightButton() {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
 	}
-	else if( state == State::CALL_ENDED ) {
-		//return to previous application
-		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
-		return true;
-	}
+//	else if( state == State::CALL_ENDED ) {
+//		//return to previous application
+//		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
+//		return true;
+//	}
 	else if( state == State::CALL_IN_PROGRESS ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
@@ -349,6 +340,8 @@ bool CallWindow::handleRightButton() {
 }
 
 bool CallWindow::onInput( const InputEvent& inputEvent ) {
+
+	LOG_INFO("key code: %d", static_cast<uint32_t>(inputEvent.keyCode));
 	//check if any of the lower inheritance onInput methods catch the event
 	bool ret = AppWindow::onInput( inputEvent );
 	if( ret ) {

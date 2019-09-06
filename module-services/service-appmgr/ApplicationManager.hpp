@@ -35,6 +35,8 @@ public:
 	//This flag is used to prevent application closing when application is closeable and there is incoming call.
 	//This flag is also used when closeable application is on front and there is a timeout to block the applicatioin.
 	bool blockClosing = false;
+	//prevents from blocking the system
+	bool preventLocking = false;
 	//current state of the application
 	app::Application::State state = app::Application::State::DEACTIVATED;
 	//switching data stored when application manager had to run init function
