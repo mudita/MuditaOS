@@ -82,8 +82,6 @@ public:
 #endif
         //sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
 
-        sys::SystemManager::SuspendSystem(this);
-        sys::SystemManager::ResumeSystem(this);
         return std::make_shared<sys::ResponseMessage>();
 
     }
