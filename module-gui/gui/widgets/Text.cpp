@@ -460,22 +460,28 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 	if( inputEvent.cycle ) {
 		handleBackspace();
 		res = handleChar( inputEvent );
-		if( res )
+		if( res ) {
 			updateCursor();
+			contentCallback(*this);
+		}
 		return res;
 	}
 
 	//if char is a new line char then create new line and move caret and return
 	if( inputEvent.keyChar == 0x0A) {
-		if( textType == TextType::MULTI_LINE )
+		if( textType == TextType::MULTI_LINE ){
 			res = handleEnter();
+			contentCallback(*this);
+		}
 	}
 	//backspace handling
 	else if( inputEvent.keyChar  == 0x08 ) {
 		res = handleBackspace();
+		contentCallback(*this);
 	}
 	else { //normal char -> add and check pixel width
 		res = handleChar( inputEvent );
+		contentCallback(*this);
 	}
 	if( res )
 		updateCursor();

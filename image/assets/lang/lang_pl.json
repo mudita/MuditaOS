@@ -1,4 +1,8 @@
 {
+	"common_kbd_lower": "lang_pl_lower",
+	"common_kbd_upper": "lang_pl_upper",
+	"common_kbd_numeric": "numeric",
+	
     "common_open": "OTWÓRZ",
     "common_confirm": "POTWIERDŹ",
     "common_select": "WYBIERZ",
@@ -18,6 +22,12 @@
     "common_friday": "Piątek",
     "common_saturday": "Sobota",
     "common_sunday": "Niedziela",
+    
+    "app_notes_title_main": "Notatki",
+    "app_notes_new_note": "Nowa Notatka",
+    "app_notes_save": "ZAPISZ",
+    "app_notes_edit": "EDYTUJ",
+    "app_notes_back": "WROĆ",
 
     "app_desktop_unlock": "ODBLOKUJ",
     "app_desktop_lock": "ZABLOKUJ",
@@ -107,6 +117,11 @@
     "app_phonebook_options_delete": "Usuń",
     "app_phonebook_options_send_bt": "Wyślij przez Bluetooth",
     "app_phonebook_options_send_sms": "Wyślij przez SMS",
+    "app_phonebook_new_contact_first_name": "Imię",
+    "app_phonebook_new_contact_second_name": "Nazwisko",
+    "app_phonebook_new_contact_number_1": "Numer",
+    "app_phonebook_new_contact_number_2": "Numer alternatywny",
+    "app_phonebook_new_contact_email": "Email",
     
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
