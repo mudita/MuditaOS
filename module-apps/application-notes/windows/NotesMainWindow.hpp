@@ -25,8 +25,9 @@
 namespace gui {
 
 class NotesMainWindow: public AppWindow {
-	NotesModel* notesModel;
-	gui::ListView* list;
+	NotesModel* notesModel = nullptr;
+	gui::ListView* list = nullptr;
+	Label* title = nullptr;
 public:
 	NotesMainWindow( app::Application* app );
 	virtual ~NotesMainWindow();

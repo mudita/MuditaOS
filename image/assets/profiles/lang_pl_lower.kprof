@@ -1,0 +1,99 @@
+#name of the profile
+lang_pl_lower
+#NumericKey1 = 31,
+31
+false
+''
+0
+#NumericKey2 = 32,
+32
+true
+'a','b','c'
+0,0,0
+#NumericKey3 = 33,
+33
+true
+'d','e','f'
+0,0,0
+#NumericKey4 = 41,
+41
+true
+'g','h','i'
+0,0,0
+#NumericKey5 = 42,
+42
+true
+'j','k','l'
+0,0,0
+#NumericKey6 = 43,
+43
+true
+'m','n','o'
+0,0,0
+#NumericKey7 = 51,
+51
+true
+'p','q','r','s'
+0,0,0,0
+#NumericKey8 = 52,
+52
+true
+'t','u','v'
+0,0,0
+#NumericKey9 = 53,
+53
+true
+'w','x','y','z'
+0,0,0,0
+#NumericKey0 = 62,
+62
+false
+' '
+0
+#NumericKeyAst = 61,
+61
+false
+0x08
+0
+#NumericKeyPnd = 63,
+63
+false
+0x0A
+0
+#JoystickLeft = 11,
+11
+false
+''
+0
+#JoystickRight = 13,
+13
+false
+''
+0
+#JoystickUp = 2,
+2
+false
+''
+0
+#JoystickDown = 22,
+22
+false
+''
+0
+#JoystickEnter = 12,
+12
+false
+0x0D
+0
+#FnLeft = 21,//1,
+#FnRight = 23,//3,
+23
+false
+''
+2000
+#VolUp = 4,
+#VolDown = 14,
+#Torch = 24,
+#SSwitchUp = 34,
+#SSwitchDown = 54,
+#SSwitchMid = 44
