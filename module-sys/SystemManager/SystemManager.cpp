@@ -91,6 +91,7 @@ namespace sys {
         }
 
         lowPowerMode->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+        return true; // TODO:M.P return real ret code
 
     }
 
@@ -110,6 +111,7 @@ namespace sys {
                 }
             }
         }
+        return true; // TODO:M.P return real ret code
     }
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller) {
@@ -120,6 +122,7 @@ namespace sys {
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
             LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
+        return true; // TODO:M.P return real ret code
     }
 
     bool SystemManager::ResumeService(const std::string &name, sys::Service *caller){
@@ -130,6 +133,7 @@ namespace sys {
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
             LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
+        return true; // TODO:M.P return real ret code
     }
 
     bool SystemManager::CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout) {
