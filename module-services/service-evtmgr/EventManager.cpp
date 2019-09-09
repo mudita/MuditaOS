@@ -41,6 +41,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 	bool handled = false;
 
+	LOG_INFO("SUSPENDED: %d", suspended );
+
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
 	{
 

@@ -124,7 +124,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 			EinkPowerOff();
 //			uint32_t end_tick = xTaskGetTickCount();
 
-//			LOG_INFO("[ServiceEink] RefreshTime: %d", end_tick - start_tick);
+			LOG_INFO("[ServiceEink] Reloading timer");
 
 			ReloadTimer( timerPowerOff );
 
@@ -204,8 +204,6 @@ sys::ReturnCodes ServiceEink::DeinitHandler() {
 sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
     LOG_FATAL("[ServiceEink] PowerModeHandler: %d", static_cast<uint32_t>(mode));
 
-    stopTimer( timerPowerOff );
-
     switch (mode){
         case sys::ServicePowerMode ::Active:
         {
@@ -234,6 +232,7 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
+        	stopTimer( timerPowerOff );
             EinkPowerDown();
             break;
     }
