@@ -36,6 +36,9 @@ protected:
 
 	//structure with recently loaded waveformdata
 	EinkWaveFormSettings_t waveformSettings;
+
+	bool suspended = false;
+
 	bool changeWaveform( EinkWaveforms_e Mode, const int32_t temperature );
 
 	bool deepClearScreen(int8_t temperature);
