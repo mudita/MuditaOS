@@ -98,6 +98,23 @@ void Text::setTextType( TextType type ) {
 	textType = type;
 }
 
+void Text::setUnderline( bool underline ) {
+	//do nothing, value of the flag doesn;t change
+	if( this->underline == underline )
+		return;
+
+	this->underline = underline;
+	LOG_INFO("lines count: %d", labelLines.size());
+	for( auto it = labelLines.begin(); it!=labelLines.end(); it++ ) {
+
+		gui::Label* label = *it;
+		if( this->underline )
+			label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+		else
+			label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+	}
+}
+
 void Text::setNavigationBarrier( const NavigationBarrier& barrier, bool value ) {
 	if( value )
 		barriers |= static_cast<uint32_t>(barrier);
@@ -903,7 +920,10 @@ void Text::recalculateDrawParams() {
 		label->setFilled( false );
 		label->setFont( font-> getName() );
 		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-		label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+		if( underline )
+			label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+		else
+			label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 		labelLines.push_back( label );
 		startY += font->info.line_height;
 	}

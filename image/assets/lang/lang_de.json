@@ -110,6 +110,8 @@
     "app_phonebook_new_contact_number_1": "Number",
     "app_phonebook_new_contact_number_2": "Alternative number",
     "app_phonebook_new_contact_email": "Email",
+    "app_phonebook_new_contact_address": "Address",
+    "app_phonebook_new_contact_note": "Note",
 	
 
     "settings_lang_PL": "PL",
