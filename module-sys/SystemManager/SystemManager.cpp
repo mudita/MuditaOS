@@ -77,6 +77,10 @@ namespace sys {
 
     bool SystemManager::SuspendSystem(Service *caller) {
 
+        if(lowPowerMode->GetCurrentMode() != bsp::LowPowerMode::Mode::FullSpeed){
+            return false;
+        }
+
         for (auto w = servicesList.rbegin(); w != servicesList.rend(); ++w)
         {
             if((*w)->parent == "" && (*w)->GetName() != caller->GetName()){
@@ -96,6 +100,10 @@ namespace sys {
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
+
+        if(lowPowerMode->GetCurrentMode() == bsp::LowPowerMode::Mode::FullSpeed){
+            return false;
+        }
 
         lowPowerMode->Switch(bsp::LowPowerMode::Mode::FullSpeed);
 
