@@ -514,9 +514,14 @@ bool Text::onFocus( bool state ) {
 	bool ret = Rect::onFocus( state );
 	if( focus && editMode == EditMode::EDIT ) {
 		cursor->setVisible(true);
+		for( auto it = labelLines.begin(); it != labelLines.end(); it++ )
+			(*it)->setPenWidth(3);
 	}
-	else
+	else {
 		cursor->setVisible(false);
+		for( auto it = labelLines.begin(); it != labelLines.end(); it++ )
+			(*it)->setPenWidth(1);
+	}
 
 	return ret;
 }
@@ -918,12 +923,16 @@ void Text::recalculateDrawParams() {
 	for( uint32_t i=0; i<rowCount; i++ ) {
 		gui::Label* label = new gui::Label( this, margins.left, startY, widgetArea.w - margins.left - margins.right, font->info.line_height );
 		label->setFilled( false );
+		label->setPenWidth( 1 );
+		label->setPenFocusWidth( 3 );
 		label->setFont( font-> getName() );
 		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 		if( underline )
 			label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 		else
 			label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+		if( focus )
+			label->setPenWidth( 3 );
 		labelLines.push_back( label );
 		startY += font->info.line_height;
 	}

@@ -56,7 +56,7 @@ void PhonebookNewContact::buildInterface() {
 		page1.labels[i]->setFont("gt_pressura_regular_16");
 		page1.labels[i]->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-		page1.text[i]= new gui::Text(this, 30, 157+87*i, 420, 40);
+		page1.text[i]= new gui::Text(this, 30, 157+87*i, 420, 42);
 		page1.text[i]->setFilled(false);
 		page1.text[i]->setPenFocusWidth(2);
 		page1.text[i]->setPenWidth(1);
@@ -64,7 +64,7 @@ void PhonebookNewContact::buildInterface() {
 		page1.text[i]->setUnderline(true);
 		page1.text[i]->setTextType( Text::TextType::SINGLE_LINE );
 		page1.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-		page1.text[i]->setMargins( Margins(0,0,0,0));
+//		page1.text[i]->setMargins( Margins(0,0,0,0));
 		page1.text[i]->setFont("gt_pressura_regular_18");
 
 		//for text widgets focus callback should hangle changing keyboard profile
@@ -123,7 +123,7 @@ void PhonebookNewContact::buildInterface() {
 
 	//set navigation for page 1
 	for( uint32_t i=0; i<4; i++ ) {
-		page1.text[i]->setNavigationItem( NavigationDirection::DOWN, page1.text[i+1] );
+		page1.text[i]->setNavigationItem(   NavigationDirection::DOWN, page1.text[i+1] );
 		page1.text[i+1]->setNavigationItem( NavigationDirection::UP, page1.text[i] );
 	}
 	page1.text[4]->setNavigationItem( NavigationDirection::UP, page1.text[3] );
