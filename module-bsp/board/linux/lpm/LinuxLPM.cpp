@@ -9,6 +9,7 @@ namespace bsp{
 
 
     int32_t LinuxLPM::Switch(const bsp::LowPowerMode::Mode mode) {
+        currentMode = mode;
         return 0;
     }
 

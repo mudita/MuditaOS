@@ -24,8 +24,6 @@ namespace bsp {
         int32_t EnterFullSpeed();
         int32_t EnterLowPowerIdle();
         int32_t EnterSuspend();
-
-        Mode currentMode = Mode::FullSpeed;
     };
 
 }
