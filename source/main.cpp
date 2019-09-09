@@ -94,7 +94,7 @@ public:
         stopTimer(timer_id);
         std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(static_cast<uint32_t >(MessageType::AudioSetInputGain));
 
-        auto ret = sys::Bus::SendUnicast(msg,GetName(),this);
+        sys::Bus::SendUnicast(msg,GetName(),this);
 #endif
 
     }
