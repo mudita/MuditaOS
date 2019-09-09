@@ -208,6 +208,8 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			app->setScreenLocked(true);
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+			sapm::ApplicationManager::messageInitPowerSaveMode(application);
 		}
 		//long press of right function button muve user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
