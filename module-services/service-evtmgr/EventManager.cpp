@@ -49,6 +49,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
+
+		sys::SystemManager::ResumeSystem(this);
+
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
@@ -77,6 +80,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
 
+		sys::SystemManager::ResumeSystem(this);
+
 		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 		message->levelPercents = msg->levelPercents;
 		message->fullyCharged = msg->fullyCharged;
@@ -84,11 +89,14 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
+
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
+
+		sys::SystemManager::ResumeSystem(this);
 
 		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
 		message->plugged = msg->plugged;
@@ -101,7 +109,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
 			msgl->sender == this->GetName() ){
 
+		//resume system first
+		sys::SystemManager::ResumeSystem(this);
+
 		HandleAlarmTrigger(msgl);
+
+		handled = true;
 	}
 
 	if( handled )
