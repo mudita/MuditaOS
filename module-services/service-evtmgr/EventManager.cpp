@@ -50,7 +50,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 
-		sys::SystemManager::ResumeSystem(this);
+		if( suspended )
+			sys::SystemManager::ResumeSystem(this);
 
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
@@ -80,7 +81,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
 
-		sys::SystemManager::ResumeSystem(this);
+		if( suspended )
+			sys::SystemManager::ResumeSystem(this);
 
 		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 		message->levelPercents = msg->levelPercents;
@@ -96,7 +98,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		msgl->sender == this->GetName()) {
 		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
 
-		sys::SystemManager::ResumeSystem(this);
+		if( suspended )
+			sys::SystemManager::ResumeSystem(this);
 
 		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
 		message->plugged = msg->plugged;
@@ -110,7 +113,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 			msgl->sender == this->GetName() ){
 
 		//resume system first
-		sys::SystemManager::ResumeSystem(this);
+		if( suspended )
+			sys::SystemManager::ResumeSystem(this);
 
 		HandleAlarmTrigger(msgl);
 
@@ -161,8 +165,11 @@ sys::ReturnCodes EventManager::DeinitHandler() {
 sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
 
+    suspended = true;
+
     switch (mode){
         case sys::ServicePowerMode ::Active:
+        	suspended = false;
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
