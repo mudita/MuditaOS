@@ -41,8 +41,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 	bool handled = false;
 
-	LOG_INFO("SUSPENDED: %d", suspended );
-
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
 	{
 
@@ -52,8 +50,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 
-		if( suspended )
+		if( suspended ) {
+			suspended = false;
 			sys::SystemManager::ResumeSystem(this);
+		}
 
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
@@ -83,8 +83,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
 
-		if( suspended )
+		if( suspended ) {
+			suspended = false;
 			sys::SystemManager::ResumeSystem(this);
+		}
 
 		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 		message->levelPercents = msg->levelPercents;
@@ -100,8 +102,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		msgl->sender == this->GetName()) {
 		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
 
-		if( suspended )
+		if( suspended ) {
+			suspended = false;
 			sys::SystemManager::ResumeSystem(this);
+		}
 
 		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
 		message->plugged = msg->plugged;
@@ -115,8 +119,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 			msgl->sender == this->GetName() ){
 
 		//resume system first
-		if( suspended )
+		if( suspended ) {
+			suspended = false;
 			sys::SystemManager::ResumeSystem(this);
+		}
 
 		HandleAlarmTrigger(msgl);
 
