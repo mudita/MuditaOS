@@ -315,6 +315,10 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 bool ApplicationManager::handlePowerSavingModeInit() {
 
 	LOG_INFO("Going to suspend mode");
+
+	sys::SystemManager::SuspendService("ServiceGUI",this);
+	sys::SystemManager::SuspendService("ServiceEink",this);
+
 	sys::SystemManager::SuspendSystem(this);
 
 	return true;
