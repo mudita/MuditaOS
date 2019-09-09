@@ -124,6 +124,8 @@
     "app_phonebook_new_contact_email": "Email",
     "app_phonebook_new_contact_address": "Adres",
     "app_phonebook_new_contact_note": "Notatka",
+    "app_phonebook_new_speed_dial_key": "Szybkie wybieranie",
+    "app_phonebook_new_addto_fav": "dodaj do ulubionych",
     
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"

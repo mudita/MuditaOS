@@ -24,12 +24,22 @@ public:
 protected:
     gui::Label *title = nullptr;
 
-    struct Page1 {
-		gui::Label* labels[5] = {nullptr};
-		gui::Text* text[5] = {nullptr};
+    struct Page {
+    	virtual void setVisibile( bool visible ) = 0;
     };
 
-    struct Page2 {
+    struct Page1 : public Page {
+		gui::Label* labels[5] = {nullptr};
+		gui::Text* text[5] = {nullptr};
+		void setVisibile( bool visible ) {
+			for( uint32_t i=0; i<5; i++) {
+				labels[i]->setVisible(visible);
+				text[i]->setVisible(visible);
+			}
+		}
+    };
+
+    struct Page2 : public Page {
     	gui::Label* speedValue = nullptr;
     	gui::Label* speedDescription = nullptr;
     	gui::Image* imageSpeed = nullptr;
@@ -41,6 +51,20 @@ protected:
 		gui::Label* noteLabel = nullptr;
 
 		gui::Text* text[2] = {nullptr};
+
+		void setVisibile( bool visible ) {
+			speedValue->setVisible(visible);
+			speedDescription->setVisible(visible);
+//			imageSpeed->setVisible(visible);
+			favValue->setVisible(visible);
+			favDescription->setVisible(visible);
+//			imageFav->setVisible(visible);
+
+			addressLabel->setVisible(visible);
+			noteLabel->setVisible(visible);
+			text[0]->setVisible(visible);
+			text[1]->setVisible(visible);
+		}
     };
 
     Page1 page1;
