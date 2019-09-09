@@ -204,6 +204,8 @@ sys::ReturnCodes ServiceEink::DeinitHandler() {
 sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
     LOG_FATAL("[ServiceEink] PowerModeHandler: %d", static_cast<uint32_t>(mode));
 
+    stopTimer( timerPowerOff );
+
     switch (mode){
         case sys::ServicePowerMode ::Active:
         {
