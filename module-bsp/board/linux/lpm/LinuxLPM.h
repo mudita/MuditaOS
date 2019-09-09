@@ -12,8 +12,6 @@ namespace bsp{
     class LinuxLPM : public LowPowerMode {
     public:
         int32_t Switch(const Mode mode) override final;
-    private:
-        Mode currentMode = Mode::FullSpeed;
     };
 
 }
