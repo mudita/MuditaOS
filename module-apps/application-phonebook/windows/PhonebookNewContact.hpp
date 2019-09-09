@@ -29,11 +29,27 @@ protected:
 		gui::Text* text[5] = {nullptr};
     };
 
+    struct Page2 {
+    	gui::Label* speedValue = nullptr;
+    	gui::Label* speedDescription = nullptr;
+    	gui::Image* imageSpeed = nullptr;
+    	gui::Label* favValue = nullptr;
+		gui::Label* favDescription = nullptr;
+		gui::Image* imageFav = nullptr;
+
+		gui::Label* addressLabel = nullptr;
+		gui::Label* noteLabel = nullptr;
+
+		gui::Text* text[2] = {nullptr};
+    };
+
     Page1 page1;
+    Page2 page2;
     uint32_t page = 0;
 public:
     PhonebookNewContact(app::Application *app);
     virtual ~PhonebookNewContact();
+    void switchPage( uint32_t page );
 
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
