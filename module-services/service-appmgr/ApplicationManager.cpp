@@ -105,6 +105,9 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 	uint32_t msgType = msgl->messageType;
 
 	switch( msgType ) {
+		case static_cast<uint32_t>( MessageType::APMInitPowerSaveMode ): {
+			handlePowerSavingModeInit();
+		} break;
 		case static_cast<uint32_t>( MessageType::APMPreventBlocking ): {
 //			LOG_INFO("Restarting screen locking timer");
 			ReloadTimer(blockingTimerID);
@@ -305,6 +308,14 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 		LOG_INFO( "starting application: %s", appName.c_str());
 		it->second->lanucher->run(this);
 	}
+
+	return true;
+}
+
+bool ApplicationManager::handlePowerSavingModeInit() {
+
+	LOG_INFO("Going to suspend mode");
+	sys::SystemManager::SuspendSystem(this);
 
 	return true;
 }
@@ -592,6 +603,12 @@ bool ApplicationManager::messageCloseApplicationManager( sys::Service* sender ) 
 
 bool ApplicationManager::messagePreventBlocking( sys::Service* sender ) {
 	auto msg = std::make_shared<sapm::APMPreventBlocking>( sender->GetName() );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+
+bool ApplicationManager::messageInitPowerSaveMode( sys::Service* sender ) {
+	auto msg = std::make_shared<sapm::APMInitPowerSaveMode>( sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }

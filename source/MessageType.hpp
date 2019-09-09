@@ -99,6 +99,7 @@ enum class MessageType {
 					//applications in background and currently active application.
 	APMClose,       //this message will trigger application manager to close itself, all running applications gui and eink services.
 	APMPreventBlocking, //Prevents application manager from initializing device blocking.
+	APMInitPowerSaveMode, //This message is sent to application manager from desktop when locking timeout has triggered or user explicitly locked the phone.
 
 	//keyboard messages
 	KBDKeyEvent,

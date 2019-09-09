@@ -87,6 +87,7 @@ class ApplicationManager: public sys::Service {
 	bool handleSwitchPrevApplication( APMSwitchPrevApp* msg );
 	bool handleRegisterApplication( APMRegister* msg );
 	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
+	bool handlePowerSavingModeInit();
 	/**
 	 * @brief Closes all running applications.
 	 */
@@ -150,6 +151,10 @@ public:
     * @brief Sends message to inform Application Manager to reset timer responsible for blocking phone
     */
    static bool messagePreventBlocking( sys::Service* sender );
+   /**
+    * @brief Sends message to Application Manager. This will initialize procedure of switching to power saving mode.
+    */
+   static bool messageInitPowerSaveMode( sys::Service* sender );
 };
 
 } /* namespace sapm */
