@@ -31,6 +31,11 @@ namespace bsp {
         static std::optional<std::unique_ptr<LowPowerMode>> Create();
 
         virtual int32_t Switch(const Mode mode) = 0;
+        Mode GetCurrentMode(){return currentMode;}
+
+
+    protected:
+        Mode currentMode = Mode::FullSpeed;
 
     };
 
