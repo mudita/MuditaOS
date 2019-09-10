@@ -166,7 +166,6 @@ void CLOCK_DeinitRcOsc24M(void)
     XTALOSC24M->LOWPWR_CTRL &= ~XTALOSC24M_LOWPWR_CTRL_RC_OSC_EN_MASK;
 }
 
-__attribute__((section( ".intfoo" )))
 uint32_t CLOCK_GetFreq(clock_name_t name)
 {
     uint32_t freq;

@@ -538,12 +538,6 @@ void PINMUX_InitSDRAM(void) {
     IOMUXC_SetPinMux(
             IOMUXC_GPIO_EMC_39_SEMC_DQS,            /* GPIO_EMC_39 is configured as SEMC_DQS */
             1U);                                    /* Software Input On Field: Force input path of pad GPIO_EMC_39 */
-    IOMUXC_SetPinMux(
-            IOMUXC_GPIO_EMC_40_SEMC_RDY,            /* GPIO_EMC_40 is configured as SEMC_RDY */
-            0U);                                    /* Software Input On Field: Input Path is determined by functionality */
-    IOMUXC_SetPinMux(
-            IOMUXC_GPIO_EMC_41_SEMC_CSX00,          /* GPIO_EMC_41 is configured as SEMC_CSX00 */
-            0U);                                    /* Software Input On Field: Input Path is determined by functionality */
 
     IOMUXC_SetPinConfig(
             IOMUXC_GPIO_EMC_00_SEMC_DATA00,         /* GPIO_EMC_00 PAD functional properties : */
@@ -945,26 +939,6 @@ void PINMUX_InitSDRAM(void) {
                                                  Pull / Keep Select Field: Keeper
                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                  Hyst. Enable Field: Hysteresis Enabled */
-    IOMUXC_SetPinConfig(
-            IOMUXC_GPIO_EMC_40_SEMC_RDY,            /* GPIO_EMC_40 PAD functional properties : */
-            0x0110F9u);                             /* Slew Rate Field: Fast Slew Rate
-                                                 Drive Strength Field: R0/7
-                                                 Speed Field: max(200MHz)
-                                                 Open Drain Enable Field: Open Drain Disabled
-                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-                                                 Pull / Keep Select Field: Keeper
-                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-                                                 Hyst. Enable Field: Hysteresis Enabled */
-    IOMUXC_SetPinConfig(
-            IOMUXC_GPIO_EMC_41_SEMC_CSX00,          /* GPIO_EMC_41 PAD functional properties : */
-            0x0110F9u);                             /* Slew Rate Field: Fast Slew Rate
-                                                 Drive Strength Field: R0/7
-                                                 Speed Field: max(200MHz)
-                                                 Open Drain Enable Field: Open Drain Disabled
-                                                 Pull / Keep Enable Field: Pull/Keeper Enabled
-                                                 Pull / Keep Select Field: Keeper
-                                                 Pull Up / Down Config. Field: 100K Ohm Pull Down
-                                                 Hyst. Enable Field: Hysteresis Enabled */
 }
 
 /*
@@ -1331,7 +1305,7 @@ void PINMUX_InitEINK(void) {
             PAD_CONFIG_SPEED_SLOW_50MHz |
             PAD_CONFIG_PULL_KEEPER_ENABLED |
             PAD_CONFIG_SELECT_PULL |
-            PAD_CONFIG_PULL_UP_100kOhm |
+            PAD_CONFIG_PULL_DOWN_100kOhm |
             PAD_CONFIG_HYSTERESIS_DISABLED);
 }
 

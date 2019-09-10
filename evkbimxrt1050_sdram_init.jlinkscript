@@ -255,7 +255,7 @@ void INTRAM_Init() {
 void AfterResetTarget(void) {
   Report("Enabling i.MXRT SDRAM");
   /*Load_Dcdc_Trim();*/
-  //Clock_Init();
+  Clock_Init();
   //SDRAM_Init();
   INTRAM_Init();
 }
