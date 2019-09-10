@@ -123,7 +123,9 @@ int main() {
 
     bsp::BoardInit();
 
+    LPM_EnterFullSpeed();
     LPM_EnterLowPowerIdle();
+    //LPM_EnterFullSpeed();
 
 #if 0
 

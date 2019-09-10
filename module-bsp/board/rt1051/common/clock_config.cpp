@@ -355,15 +355,13 @@ void BOARD_BootClockRUN(void) {
      * PLL2 - System PLL
      * ------------------------------------------------------------------
      */
-
-    clkPLL2setup(CLK_ENABLE);
     /* Deinit System pfd0. */
     clkPLL2_PFD0setup(CLK_DISABLE);
     clkPLL2_PFD1setup(CLK_DISABLE);
     clkPLL2_PFD3setup(CLK_DISABLE);
 
     /* Disable pfd offset. */
-    CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
+    //CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
 
 
     /*
@@ -1261,6 +1259,50 @@ void LPM_EnterLowPowerRun(){
 
 }
 
+__attribute__((section( ".sdram" ))) uint8_t sdramtable[1024];
+
+#include "fsl_semc.h"
+#include "pin_mux.h"
+status_t BOARD_InitSEMC(void)
+{
+    semc_config_t config;
+    semc_sdram_config_t sdramconfig;
+    uint32_t clockFrq = CLOCK_GetFreq(kCLOCK_SemcClk);
+
+    /* Initializes the MAC configure structure to zero. */
+    memset(&config, 0, sizeof(semc_config_t));
+    memset(&sdramconfig, 0, sizeof(semc_sdram_config_t));
+
+    /* Initialize SEMC. */
+    SEMC_GetDefaultConfig(&config);
+    config.dqsMode = kSEMC_Loopbackdqspad; /* For more accurate timing. */
+    SEMC_Init(SEMC, &config);
+
+    /* Configure SDRAM. */
+    sdramconfig.csxPinMux           = kSEMC_MUXCSX0;
+    sdramconfig.address             = 0x80000000;
+    sdramconfig.memsize_kbytes      = 16 * 1024; /* 16MB = 32*1024*1KBytes*/
+    sdramconfig.portSize            = kSEMC_PortSize16Bit;
+    sdramconfig.burstLen            = kSEMC_Sdram_BurstLen8;
+    sdramconfig.columnAddrBitNum    = kSEMC_SdramColunm_9bit;
+    sdramconfig.casLatency          = kSEMC_LatencyThree;
+    sdramconfig.tPrecharge2Act_Ns   = 18; /* Trp 18ns */
+    sdramconfig.tAct2ReadWrite_Ns   = 18; /* Trcd 18ns */
+    sdramconfig.tRefreshRecovery_Ns = 67; /* Use the maximum of the (Trfc , Txsr). */
+    sdramconfig.tWriteRecovery_Ns   = 12; /* 12ns */
+    sdramconfig.tCkeOff_Ns =
+            42; /* The minimum cycle of SDRAM CLK off state. CKE is off in self refresh at a minimum period tRAS.*/
+    sdramconfig.tAct2Prechage_Ns       = 42; /* Tras 42ns */
+    sdramconfig.tSelfRefRecovery_Ns    = 67;
+    sdramconfig.tRefresh2Refresh_Ns    = 60;
+    sdramconfig.tAct2Act_Ns            = 60;
+    sdramconfig.tPrescalePeriod_Ns     = 160 * (1000000000 / clockFrq);
+    sdramconfig.refreshPeriod_nsPerRow = 64 * 1000000 / 8192; /* 64ms/8192 */
+    sdramconfig.refreshUrgThreshold    = sdramconfig.refreshPeriod_nsPerRow;
+    sdramconfig.refreshBurstLen        = 1;
+    return SEMC_ConfigureSDRAM(SEMC, kSEMC_SDRAM_CS0, &sdramconfig, clockFrq);
+}
+
 __attribute__((section( ".intfoo" )))
 void LPM_EnterFullSpeed(void)
 {
@@ -1315,6 +1357,8 @@ void LPM_EnterFullSpeed(void)
     CLOCK_SetMux(kCLOCK_PerclkMux, 0);    //CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
 
 
+    clkPLL2setup(CLK_ENABLE);
+
     /* Set preperiph clock source. */
     /* PLL1/2 = 432MHz */
     CLOCK_SetMux(kCLOCK_PrePeriphMux, 0);        //CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
@@ -1329,55 +1373,22 @@ void LPM_EnterFullSpeed(void)
     DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
 
     PrintSystemClocks();
+
+    PINMUX_InitSDRAM();
+    BOARD_InitSEMC();
+
+    strcpy((char*)sdramtable,"Moj testowy string w SDRAMIE");
 }
 
-__attribute__((section( ".sdram" ))) uint8_t sdramtable[1024*1024];
-
-#include "fsl_semc.h"
-#include "pin_mux.h"
-status_t BOARD_InitSEMC(void)
-{
-    semc_config_t config;
-    semc_sdram_config_t sdramconfig;
-    uint32_t clockFrq = CLOCK_GetFreq(kCLOCK_SemcClk);
-
-    /* Initializes the MAC configure structure to zero. */
-    memset(&config, 0, sizeof(semc_config_t));
-    memset(&sdramconfig, 0, sizeof(semc_sdram_config_t));
-
-    /* Initialize SEMC. */
-    SEMC_GetDefaultConfig(&config);
-    config.dqsMode = kSEMC_Loopbackdqspad; /* For more accurate timing. */
-    SEMC_Init(SEMC, &config);
-
-    /* Configure SDRAM. */
-    sdramconfig.csxPinMux           = kSEMC_MUXCSX0;
-    sdramconfig.address             = 0x80000000;
-    sdramconfig.memsize_kbytes      = 16 * 1024; /* 16MB = 32*1024*1KBytes*/
-    sdramconfig.portSize            = kSEMC_PortSize16Bit;
-    sdramconfig.burstLen            = kSEMC_Sdram_BurstLen8;
-    sdramconfig.columnAddrBitNum    = kSEMC_SdramColunm_9bit;
-    sdramconfig.casLatency          = kSEMC_LatencyThree;
-    sdramconfig.tPrecharge2Act_Ns   = 18; /* Trp 18ns */
-    sdramconfig.tAct2ReadWrite_Ns   = 18; /* Trcd 18ns */
-    sdramconfig.tRefreshRecovery_Ns = 67; /* Use the maximum of the (Trfc , Txsr). */
-    sdramconfig.tWriteRecovery_Ns   = 12; /* 12ns */
-    sdramconfig.tCkeOff_Ns =
-            42; /* The minimum cycle of SDRAM CLK off state. CKE is off in self refresh at a minimum period tRAS.*/
-    sdramconfig.tAct2Prechage_Ns       = 42; /* Tras 42ns */
-    sdramconfig.tSelfRefRecovery_Ns    = 67;
-    sdramconfig.tRefresh2Refresh_Ns    = 60;
-    sdramconfig.tAct2Act_Ns            = 60;
-    sdramconfig.tPrescalePeriod_Ns     = 160 * (1000000000 / clockFrq);
-    sdramconfig.refreshPeriod_nsPerRow = 64 * 1000000 / 8192; /* 64ms/8192 */
-    sdramconfig.refreshUrgThreshold    = sdramconfig.refreshPeriod_nsPerRow;
-    sdramconfig.refreshBurstLen        = 1;
-    return SEMC_ConfigureSDRAM(SEMC, kSEMC_SDRAM_CS0, &sdramconfig, clockFrq);
-}
 
 __attribute__((section( ".intfoo" )))
 void LPM_EnterLowPowerIdle(void)
 {
+    /* Turn on FlexRAM0 */
+    GPC->CNTR &= ~GPC_CNTR_PDRAM0_PGE_MASK;
+    /* Turn on FlexRAM1 */
+    PGC->MEGA_CTRL &= ~PGC_MEGA_CTRL_PCR_MASK;
+
     LPM_SetWaitModeConfig();
     //SetLowPowerClockGate();
 
@@ -1434,32 +1445,12 @@ void LPM_EnterLowPowerIdle(void)
 
     PrintSystemClocks();
 
-    /* Turn on FlexRAM0 */
-    GPC->CNTR &= ~GPC_CNTR_PDRAM0_PGE_MASK;
-    /* Turn on FlexRAM1 */
-    PGC->MEGA_CTRL &= ~PGC_MEGA_CTRL_PCR_MASK;
-
-    CLOCK_SetMux(kCLOCK_SemcMux,1);
-
-    PINMUX_InitSDRAM();
-    BOARD_InitSEMC();
-
-    memset(sdramtable,4,sizeof sdramtable);
-
     clkPLL2setup(CLK_DISABLE);
-    clkPLL2setup(CLK_ENABLE);
-
-    BOARD_InitSEMC();
-
-    memset(sdramtable,5,sizeof sdramtable);
-
-
-
     PrintSystemClocks();
 
-    __WFI();
+/*    __WFI();
 
     while(1){
 
-    }
+    }*/
 }
