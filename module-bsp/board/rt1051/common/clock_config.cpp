@@ -1311,13 +1311,17 @@ void LPM_EnterFullSpeed(void)
 
     /* Connect internal the load resistor */
     DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
+
     /* Adjust SOC voltage to 1.275V */
     DCDC_AdjustTargetVoltage(DCDC, 0x13, 0x1);
 
+    dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=false};
+    DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
+
     /* Enable FET ODRIVE */
-    PMU->REG_CORE_SET = PMU_REG_CORE_FET_ODRIVE_MASK;
+    PMU->REG_CORE_SET &= ~PMU_REG_CORE_FET_ODRIVE_MASK;
     /* Connect vdd_high_in and connect vdd_snvs_in */
-    PMU->MISC0_CLR = PMU_MISC0_DISCON_HIGH_SNVS_MASK;
+    PMU->MISC0_CLR &= ~PMU_MISC0_DISCON_HIGH_SNVS_MASK;
 
     BandgapOn();
     EnableRegularLDO();
@@ -1377,7 +1381,7 @@ void LPM_EnterFullSpeed(void)
     PINMUX_InitSDRAM();
     BOARD_InitSEMC();
 
-    strcpy((char*)sdramtable,"Moj testowy string w SDRAMIE");
+    strcpy((char*)sdramtable,"Moj testowy string w sdramie");
 }
 
 
@@ -1419,8 +1423,8 @@ void LPM_EnterLowPowerIdle(void)
     /* Power down USBPHY */
     PowerDownUSBPHY();
 
-    /* Adjust LP voltage to 0.95V */
-    DCDC_AdjustTargetVoltage(DCDC, 0x6, 0x1);
+    /* Adjust LP + FR voltage to 0.8V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x0, 0x0);
     /* Switch DCDC to use DCDC internal OSC */
     DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
 
@@ -1431,26 +1435,22 @@ void LPM_EnterLowPowerIdle(void)
     /* Power Down output range comparator */
     DCDC->REG0 |= DCDC_REG0_PWD_CMP_OFFSET_MASK;
 
+    dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=true};
+    DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
+
     /* Enable FET ODRIVE */
     PMU->REG_CORE_SET = PMU_REG_CORE_FET_ODRIVE_MASK;
     /* Connect vdd_high_in and connect vdd_snvs_in */
     PMU->MISC0_CLR = PMU_MISC0_DISCON_HIGH_SNVS_MASK;
 
+
     EnableWeakLDO();
     DisableRegularLDO();
     BandgapOff();
-
-    //PeripheralEnterDozeMode();
-    //PeripheralEnterStopMode();
 
     PrintSystemClocks();
 
     clkPLL2setup(CLK_DISABLE);
     PrintSystemClocks();
 
-/*    __WFI();
-
-    while(1){
-
-    }*/
 }
