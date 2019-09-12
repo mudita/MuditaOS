@@ -1077,16 +1077,16 @@ void DisableRegularLDO(void)
 void BandgapOff(void)
 {
     XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
-    PMU->MISC0_SET              = PMU_MISC0_REFTOP_PWD_MASK;
+    //PMU->MISC0_SET              |= PMU_MISC0_REFTOP_PWD_MASK;
 }
 
 void BandgapOn(void)
 {
     /* Turn on regular bandgap and wait for stable */
-    PMU->MISC0_CLR = PMU_MISC0_REFTOP_PWD_MASK;
+/*    PMU->MISC0_CLR |= PMU_MISC0_REFTOP_PWD_MASK;
     while ((PMU->MISC0 & PMU_MISC0_REFTOP_VBGUP_MASK) == 0)
     {
-    }
+    }*/
     /* Low power band gap disable */
     XTALOSC24M->LOWPWR_CTRL_CLR = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
 }
@@ -1361,6 +1361,7 @@ void LPM_EnterFullSpeed(void)
 
 
     clkPLL2setup(CLK_ENABLE);
+    CLOCK_SetMux(kCLOCK_SemcMux,1);
 
     /* Set preperiph clock source. */
     /* PLL1/2 = 432MHz */
@@ -1373,15 +1374,8 @@ void LPM_EnterFullSpeed(void)
     SystemCoreClockUpdate();
 
     PrintSystemClocks();
-
-    PINMUX_InitSDRAM();
-    BOARD_InitSEMC();
-
-    strcpy((char*)sdramtable,"Moj testowy string w sdramie");
 }
 
-
-__attribute__((section( ".intfoo" )))
 void LPM_EnterLowPowerIdle(void)
 {
     /* Turn on FlexRAM0 */
@@ -1446,6 +1440,7 @@ void LPM_EnterLowPowerIdle(void)
 
     PrintSystemClocks();
 
+    CLOCK_SetMux(kCLOCK_SemcMux,0);
     clkPLL2setup(CLK_DISABLE);
     PrintSystemClocks();
 

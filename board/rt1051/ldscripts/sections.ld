@@ -41,7 +41,7 @@ SECTIONS
         KEEP(*(.boot_hdr.dcd_data))
         __boot_hdr_end__ = ABSOLUTE(.) ;
         . = 0x2000 ;
-    } > SRAM_DTC
+    } > BOARD_SDRAM_TEXT
 
     /* MAIN TEXT SECTION */
     .text : ALIGN(4)
@@ -66,7 +66,7 @@ SECTIONS
 
         *(.after_vectors*)
 
-    } > SRAM_DTC
+    } > BOARD_SDRAM_TEXT
 
     /* Put FreeRTOS code into internal DTC RAM */
     /*
@@ -111,7 +111,7 @@ SECTIONS
             KEEP (*crtend.o(.dtors))
             . = ALIGN(4);
             /* End C++ */
-    } > SRAM_DTC
+    } > BOARD_SDRAM_TEXT
 
     .intfoo : ALIGN(4)
     {
@@ -128,14 +128,14 @@ SECTIONS
     .ARM.extab : ALIGN(4) 
     {
         *(.ARM.extab* .gnu.linkonce.armextab.*)
-    } > SRAM_DTC
+    } > BOARD_SDRAM_TEXT
 
     __exidx_start = .;
 
     .ARM.exidx : ALIGN(4)
     {
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > SRAM_DTC
+    } > BOARD_SDRAM_TEXT
     __exidx_end = .;
 
     _etext = .;
@@ -146,7 +146,7 @@ SECTIONS
         KEEP(*(.bss.$RESERVED*))
         . = ALIGN(4) ;
         _end_uninit_RESERVED = .;
-    } > SRAM_DTC AT>SRAM_DTC
+    } > SRAM_DTC AT>BOARD_SDRAM_TEXT
 
     /* Main DATA section (SRAM_OC) */
     .data : ALIGN(4)
@@ -159,7 +159,7 @@ SECTIONS
        *(.data*)
        . = ALIGN(4) ;
        _edata = . ;
-    } > SRAM_DTC AT>SRAM_DTC
+    } > SRAM_DTC AT>BOARD_SDRAM_TEXT
 
     /* MAIN BSS SECTION */
     .bss : ALIGN(4)
