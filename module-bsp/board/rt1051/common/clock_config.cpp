@@ -1312,15 +1312,14 @@ void LPM_EnterFullSpeed(void)
     /* Connect internal the load resistor */
     DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
 
-    /* Adjust SOC voltage to 1.275V */
-    DCDC_AdjustTargetVoltage(DCDC, 0x13, 0x1);
+    /* Adjust SOC voltage to 1.15V */
+    DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
 
     dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=false};
     DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
 
-    /* Enable FET ODRIVE */
+    /* Disable FET ODRIVE */
     PMU->REG_CORE_SET &= ~PMU_REG_CORE_FET_ODRIVE_MASK;
-    /* Connect vdd_high_in and connect vdd_snvs_in */
     PMU->MISC0_CLR &= ~PMU_MISC0_DISCON_HIGH_SNVS_MASK;
 
     BandgapOn();
@@ -1372,9 +1371,6 @@ void LPM_EnterFullSpeed(void)
 
     /* Set SystemCoreClock variable. */
     SystemCoreClockUpdate();
-
-    /* Adjust SOC voltage to 1.15V */
-    DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
 
     PrintSystemClocks();
 
