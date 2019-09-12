@@ -125,7 +125,7 @@ int main() {
 
     LPM_EnterFullSpeed();
     LPM_EnterLowPowerIdle();
-    //LPM_EnterFullSpeed();
+    LPM_EnterFullSpeed();
 
 #if 0
 
