@@ -135,7 +135,7 @@ void SDRAM_Init() {
   MEM_WriteU32(0x401F80A4,0x00000000); // EMC_36
   MEM_WriteU32(0x401F80A8,0x00000000); // EMC_37
   MEM_WriteU32(0x401F80AC,0x00000000); // EMC_38
-  MEM_WriteU32(0x401F80AC,0x00000000); // EMC_39
+  MEM_WriteU32(0x401F80B0,0x00000010); // EMC_39
   
   // PAD ctrl
   // drive strength = 0x7 to increase drive strength
@@ -179,7 +179,7 @@ void SDRAM_Init() {
   MEM_WriteU32(0x401F8294,0x000110F9); // EMC_36
   MEM_WriteU32(0x401F8298,0x000110F9); // EMC_37
   MEM_WriteU32(0x401F829C,0x000110F9); // EMC_38
-  MEM_WriteU32(0x401F829C,0x000110F9); // EMC_39
+  MEM_WriteU32(0x401F82A0,0x000110F9); // EMC_39
 
   // Config SDR Controller Registers/
   MEM_WriteU32(0x402F0000,0x10000004); // MCR
