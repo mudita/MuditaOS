@@ -929,8 +929,9 @@ void PINMUX_InitSDRAM(void) {
                                                  Pull / Keep Select Field: Keeper
                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
                                                  Hyst. Enable Field: Hysteresis Enabled */
+
     IOMUXC_SetPinConfig(
-            IOMUXC_GPIO_EMC_39_SEMC_DQS,            /* GPIO_EMC_39 PAD functional properties : */
+            IOMUXC_GPIO_EMC_39_SEMC_DQS,           /* GPIO_EMC_39 PAD functional properties : */
             0x0110F9u);                             /* Slew Rate Field: Fast Slew Rate
                                                  Drive Strength Field: R0/7
                                                  Speed Field: max(200MHz)
