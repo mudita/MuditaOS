@@ -6,7 +6,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../ApplicationPhonebook.hpp"
-
+#include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
 
 #include "Label.hpp"
@@ -18,11 +18,26 @@
 
 #include <log/log.hpp>
 
+
+std::vector<std::string> names =  { "Alek", "Janusz", "Zofia", "Roland", "Cezary",
+									"Ignacy", "Brian", "Ejdiran", "Grażyna", "Sebastian",
+									"Karyna", "Mariola", "Ola", "Mateusz", "Ernest",
+									"Robert", "Jakub", "Adam", "Łukasz", "Tomek"};
+
+std::vector<std::string> surnames = {"Wyczesany", "Pacha", "Małolepszy", "Boligłowa", "Żur",
+									 "Kiełbasa", "Skwara", "Ściera", "Słaby", "Cnotliwy",
+									 "Bubel", "Fundament", "Rura", "Bucior", "Kusibab",
+									 "Kwasigroch", "Siekierka"};
+
+
 namespace gui {
 
-PhonebookMainWindow::PhonebookMainWindow(app::Application *app) : AppWindow(app, "MainWindow") {
+PhonebookMainWindow::PhonebookMainWindow(app::Application *app) :
+	AppWindow(app, "MainWindow"),
+	phonebookModel{ new PhonebookModel(app)}{
     setSize(480, 600);
     buildInterface();
+
 }
 
 void PhonebookMainWindow::rebuild() {
@@ -32,6 +47,15 @@ void PhonebookMainWindow::rebuild() {
 void PhonebookMainWindow::buildInterface() {
 
 	AppWindow::buildInterface();
+
+	list = new gui::PhonebookListView(this, 11, 105, 480-22, 600-105-50 );
+//	list = new gui::PhonebookListView(this, 16, 105, 480-32, 440 );
+	list->setMaxElements(7);
+	list->setPageSize(7);
+	list->setPenFocusWidth(0);
+	list->setPenWidth(0);
+	list->setProvider( phonebookModel );
+
 
 	bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -50,15 +74,13 @@ void PhonebookMainWindow::buildInterface() {
     title->setFont("gt_pressura_bold_24");
     title->setText(utils::localize.get("app_phonebook_title_main"));
     title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
-    list = new gui::ListView(this, 11, 105, 480-22, 600-105-50 );
-
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
     if( title ) { removeWidget(title);    delete title; title = nullptr; }
     if( list ) { removeWidget(list);    delete list; list = nullptr; }
     children.clear();
+    delete phonebookModel;
 }
 
 PhonebookMainWindow::~PhonebookMainWindow() {
@@ -67,6 +89,52 @@ PhonebookMainWindow::~PhonebookMainWindow() {
 
 
 void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+
+
+#if 0
+	for( uint32_t i=0; i<surnames.size(); i++ ) {
+
+		uint32_t nameCount = rand() % 10;
+		uint32_t count = 0;
+
+		for( uint32_t j=0; j<nameCount; j++ ) {
+			ContactRecord contact;
+
+//			LOG_INFO("%d of %d", count, nameCount );
+
+			contact.addressType = ContactAddressType::HOME;
+			contact.alternativeName = surnames[i];
+			contact.city = "Warsaw";
+			contact.contactType = ContactType::USER;
+			contact.country = "Polandia";
+			contact.note = "This is interesting note. More information is needed in this note.";
+			contact.street = "Jana Czeczota";
+			contact.primaryName = names[count];
+			contact.mail = contact.primaryName+"."+contact.alternativeName+"@mudita.com";
+			contact.isOnFavourites = rand() % 2;
+			std::string s = "+";
+			for( uint32_t k=0; k<9; k++)
+				s+=std::to_string(rand()%10);
+			contact.number = s;
+			contact.numbers.push_back( ContactRecord::Number(s, s, ContactNumberType::CELL));
+
+			count += rand() % names.size()/(nameCount+1)+1;
+
+			DBServiceAPI::ContactAdd( application, contact );
+
+			LOG_INFO("%s %s", contact.primaryName.c_str(), contact.alternativeName.c_str());
+		}
+	}
+#endif
+
+
+	setFocusItem(list);
+
+	phonebookModel->clear();
+	phonebookModel->requestRecordsCount();
+
+	list->clear();
+	list->setElementsCount( phonebookModel->getItemCount() );
 }
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
@@ -99,6 +167,15 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
 
 	return false;
 
+}
+
+bool PhonebookMainWindow::onDatabaseMessage( sys::Message* msgl ) {
+	LOG_INFO("received contacts");
+	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
+	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
+		return true;
+
+	return false;
 }
 
 } /* namespace gui */

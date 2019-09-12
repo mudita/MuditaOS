@@ -100,20 +100,29 @@ public:
 
 class DBContactMessage : public DBMessage{
 public:
-    DBContactMessage(MessageType messageType,const ContactRecord& rec = ContactRecord{}): DBMessage(messageType),record(rec){
+    DBContactMessage(MessageType messageType,const ContactRecord& rec = ContactRecord{}, bool favourite = false ):
+    	DBMessage(messageType),record(rec), favourite{favourite}{
 
     }
     virtual ~DBContactMessage() {}
 
     ContactRecord record;
+    bool favourite = false;
 };
 
 class DBContactResponseMessage: public DBResponseMessage {
 public:
-    DBContactResponseMessage(std::unique_ptr<std::vector<ContactRecord>> rec,uint32_t retCode=0,uint32_t  count=0,uint32_t respTo=0) : DBResponseMessage(retCode,count,respTo),records(std::move(rec)){};
+    DBContactResponseMessage(std::unique_ptr<std::vector<ContactRecord>> rec, uint32_t retCode=0,
+		uint32_t limit=0,uint32_t offset=0, bool favourite = false,
+		uint32_t  count=0,uint32_t respTo=0 ) :
+    	DBResponseMessage(retCode,count,respTo),
+		records(std::move(rec)), favourite{favourite}, limit{limit}, offset{offset}{};
     virtual ~DBContactResponseMessage() {};
 
     std::unique_ptr<std::vector<ContactRecord>> records;
+    bool favourite = false;
+    uint32_t limit = 0;
+	uint32_t offset = 0;
 };
 
 class DBAlarmMessage : public DBMessage{

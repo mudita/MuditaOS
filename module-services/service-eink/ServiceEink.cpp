@@ -130,8 +130,6 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 				EinkPowerOff();
 	//			uint32_t end_tick = xTaskGetTickCount();
 
-				LOG_INFO("[ServiceEink] Reloading timer");
-
 				ReloadTimer( timerPowerOff );
 
 				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );

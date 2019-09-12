@@ -207,10 +207,13 @@ void PhonebookNewContact::buildInterface() {
 	}
 
 	page2.speedValue->setNavigationItem( NavigationDirection::DOWN, page2.favValue );
+
 	page2.favValue->setNavigationItem( NavigationDirection::DOWN, page2.text[0] );
 	page2.favValue->setNavigationItem( NavigationDirection::UP, page2.speedValue );
+
 	page2.text[0]->setNavigationItem( NavigationDirection::DOWN, page2.text[1] );
 	page2.text[0]->setNavigationItem( NavigationDirection::UP, page2.favValue );
+
 	page2.text[1]->setNavigationItem( NavigationDirection::UP, page2.text[0] );
 
 }
