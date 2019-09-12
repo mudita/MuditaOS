@@ -1376,12 +1376,8 @@ void LPM_EnterFullSpeed(void)
 
     PINMUX_InitSDRAM();
     BOARD_InitSEMC();
-
-    strcpy((char*)sdramtable,"Moj testowy string w sdramie");
 }
 
-
-__attribute__((section( ".intfoo" )))
 void LPM_EnterLowPowerIdle(void)
 {
     /* Turn on FlexRAM0 */
@@ -1446,7 +1442,7 @@ void LPM_EnterLowPowerIdle(void)
 
     PrintSystemClocks();
 
-    clkPLL2setup(CLK_DISABLE);
+    //clkPLL2setup(CLK_DISABLE);
     PrintSystemClocks();
 
 }

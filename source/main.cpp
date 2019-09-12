@@ -123,12 +123,9 @@ int main() {
 
     bsp::BoardInit();
 
-    LPM_EnterFullSpeed();
     LPM_EnterLowPowerIdle();
-    LPM_EnterFullSpeed();
 
 #if 0
-
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
@@ -137,9 +134,11 @@ int main() {
 
         bool ret = false;
 
-        ret = sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
+        //ret = sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
+
+
         //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
 
@@ -172,13 +171,14 @@ int main() {
         }
 
 
+
+
         return 0;
 
 
     });
 
     cpp_freertos::Thread::StartScheduler();
-
 #endif
     return 1;
 }
