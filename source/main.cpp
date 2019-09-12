@@ -124,8 +124,9 @@ int main() {
     bsp::BoardInit();
 
     LPM_EnterLowPowerIdle();
+    LPM_EnterFullSpeed();
 
-#if 0
+#if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
