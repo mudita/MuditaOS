@@ -45,7 +45,7 @@ protected:
 	int listMode;
 	int pageSize;
 
-	void updatePageItems();
+	virtual void updatePageItems();
 	void updateContinousItems();
 	void clearItems();
 	void updateScrollDimenstions();

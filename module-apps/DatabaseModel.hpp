@@ -55,7 +55,7 @@ public:
 		if( (page >= currentPage - 1) && ( page <= currentPage + 1)){
 			//remove old records
 			for( int i=(pageSize*(page-currentPage) + pageSize); i<(pageSize*(page-currentPage+1) + pageSize); i++ ) {
-				LOG_INFO("value i: %d", i);
+//				LOG_INFO("value i: %d", i);
 				this->records[i] = nullptr;
 			}
 
@@ -102,7 +102,7 @@ public:
 		application->blockEvents(true);
 
 		//request records for next window
-		uint32_t prevPage = currentPage - 2;
+		int prevPage = currentPage - 2;
 		if( prevPage >= 0) {
 			requestRecords(pageSize*prevPage, pageSize );
 		}

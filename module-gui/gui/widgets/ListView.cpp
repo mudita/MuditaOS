@@ -127,12 +127,16 @@ void ListView::clear() {
 
 void ListView::updatePageItems() {
 
+	int prevIndex = firstIndex-1;
 	for( int i=0; i<pageSize; i++ ) {
-		ListItem* item = provider->getItem(firstIndex + i );
+
+		ListItem* item = provider->getItem(firstIndex + i, firstIndex,prevIndex,  pageSize );
 		if( item != nullptr ) {
 			addWidget(item);
 			items.push_back(item);
+			prevIndex++;
 		}
+
 	}
 
 	//calculate height of the item using list's height and pageSize

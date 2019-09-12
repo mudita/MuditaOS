@@ -50,7 +50,7 @@ bool NotesModel::updateRecords( std::unique_ptr<std::vector<NotesRecord>> record
 	return true;
 }
 
-gui::ListItem* NotesModel::getItem( int index ) {
+gui::ListItem* NotesModel::getItem( int index, int firstElement, int prevElement, uint32_t count ) {
 	std::shared_ptr<NotesRecord> note = getRecord( index );
 
 	SettingsRecord& settings = application->getSettings();
@@ -58,9 +58,12 @@ gui::ListItem* NotesModel::getItem( int index ) {
 	if( note == nullptr )
 		return nullptr;
 
+	LOG_INFO("Note item: %d", index);
+
 	gui::NotesItem* item = new gui::NotesItem(this, !settings.timeFormat12 );
 	if( item != nullptr ) {
 		item->setNote(note);
+		item->setID( index );
 		return item;
 	}
 
