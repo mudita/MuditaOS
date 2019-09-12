@@ -35,7 +35,7 @@ namespace sys{
 
     __attribute__((section( ".intfoo" )))
     ReturnCodes PowerManager::InitHandler() {
-        lowPower->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+        lowPower->Switch(bsp::LowPowerMode::Mode::FullSpeed);
     }
     __attribute__((section( ".intfoo" )))
     ReturnCodes PowerManager::DeinitHandler() {
