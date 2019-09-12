@@ -57,8 +57,6 @@ namespace sys {
 
         userInit = init;
 
-        lowPowerMode = bsp::LowPowerMode::Create().value_or(nullptr);
-
         // Start System manager
         StartService();
 
@@ -89,14 +87,10 @@ namespace sys {
                 }
             }
         }
-
-        lowPowerMode->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
-
+        return true;
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
-
-        lowPowerMode->Switch(bsp::LowPowerMode::Mode::FullSpeed);
 
         for(const auto &w : servicesList){
 
@@ -110,6 +104,7 @@ namespace sys {
                 }
             }
         }
+        return true;
     }
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller) {
@@ -120,6 +115,7 @@ namespace sys {
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
             LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
+        return true;
     }
 
     bool SystemManager::ResumeService(const std::string &name, sys::Service *caller){
@@ -130,6 +126,7 @@ namespace sys {
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
             LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
+        return true;
     }
 
     bool SystemManager::CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout) {
@@ -178,6 +175,7 @@ namespace sys {
 
 
     ReturnCodes SystemManager::InitHandler() {
+        CreateService(std::make_shared<PowerManager>(), this);
         isReady = true;
         return ReturnCodes::Success;
     }
@@ -255,6 +253,5 @@ namespace sys {
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
-    std::unique_ptr<bsp::LowPowerMode> SystemManager::lowPowerMode;
 
 }
