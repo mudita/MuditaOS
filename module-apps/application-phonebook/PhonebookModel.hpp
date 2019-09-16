@@ -20,18 +20,9 @@
  *
  */
 class PhonebookModel: public gui::ListItemProvider, public app::DatabaseModel<ContactRecord> {
-
-//	/**
-//	 * Total number of favorite records in database
-//	 */
-//	int favoriteRecordsCount;
-//	/**
-//	 * Index of first element in current page
-//	 */
-//	int firstIndex;
-//	//vector that holds records received from database - first last records, than previous records and finally next records
-//	std::vector<std::shared_ptr<T>> records;
-//
+	/**
+	 * Number of favourite records in the database.
+	 */
 	uint32_t favouriteCount = 0;
 public:
 	PhonebookModel( app::Application* app );
@@ -43,7 +34,7 @@ public:
 	void requestRecords( const uint32_t offset, const uint32_t limit ) override;
 
 	//virtual methods for ListViewProvider
-	gui::ListItem* getItem( int index, int firstElement, int prevIndex, uint32_t count ) override;
+	gui::ListItem* getItem( int index, int firstElement, int prevIndex, uint32_t count, bool topDown ) override;
 	int getItemCount();
 };
 
