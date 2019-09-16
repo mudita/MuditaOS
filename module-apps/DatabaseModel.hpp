@@ -50,18 +50,19 @@ public:
 	virtual bool updateRecords( std::unique_ptr<std::vector<T>> records, const uint32_t offset, const uint32_t limit, uint32_t count ) {
 		//calculate for which page is received data using offset value
 		int page = getPage(offset);
+//		LOG_INFO("page = %d", page);
 		int currentPage = firstIndex / pageSize;
 
 		if( (page >= currentPage - 1) && ( page <= currentPage + 1)){
 			//remove old records
-			for( int i=(pageSize*(page-currentPage) + pageSize); i<(pageSize*(page-currentPage+1) + pageSize); i++ ) {
-//				LOG_INFO("value i: %d", i);
-				this->records[i] = nullptr;
-			}
+//			for( int i=(pageSize*(page-currentPage) + pageSize); i<(pageSize*(page-currentPage+1) + pageSize); i++ ) {
+////				LOG_INFO("value i: %d", i);
+//				this->records[i] = nullptr;
+//			}
 
 			//store new records
 			for( unsigned int i=0; i<count; i++ ) {
-					this->records[i+(pageSize*(page-currentPage) + pageSize)] = std::shared_ptr<T>( new T(records.get()->operator [](i)) );
+				this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% limit] = std::shared_ptr<T>( new T(records.get()->operator [](i)) );
 			}
 
 			//return true (for refreshing window) only if current page was modified.
@@ -201,10 +202,16 @@ public:
 	}
 
 	int getPage( uint32_t index ) {
-		return  (index % pageSize == 0) ? index/pageSize : (index/pageSize)  + 1;
+		return  (index % pageSize == 0) ? index/pageSize : (index/pageSize);
 	}
 
-	std::shared_ptr<T> getRecord( int index ) {
+	/**
+	 * @brief Returns database object under specified index. Performs forward and backward buffering.
+	 * @index Index of the database element. Starts from 0 ( database objects have lowest ID equal to 1. )
+	 * @download Flag that controls whether model should download objects from database when requested object is
+	 * outside visible window.
+	 */
+	std::shared_ptr<T> getRecord( int index, bool download = true ) {
 
 		//if index is greater than number of records or smaller than 0
 		if( (index<0) || (index>recordsCount-1)){
@@ -214,14 +221,18 @@ public:
 		if( (index >= firstIndex) && ( index < firstIndex + pageSize)) {
 			return records[pageSize + index-firstIndex];
 		}
+		//if download is false check if requested element is in any of the windows
+		if( (download == false ) && (index >= firstIndex - pageSize ) && ( index < firstIndex + 2*pageSize)) {
+			return records[pageSize + index-firstIndex];
+		}
 		//if index is in next window
-		if( (index >= firstIndex + pageSize) && ( index < firstIndex+2*pageSize) ) {
+		if( download && (index >= firstIndex + pageSize) && ( index < firstIndex+2*pageSize) ) {
 			std::shared_ptr<T> record = records[pageSize + index - firstIndex];
 			moveNextWindow();
 			return record;
 		}
 		//if index is in previous window
-		if( (index >= firstIndex - pageSize) && ( index < firstIndex) ) {
+		if( download && (index >= firstIndex - pageSize) && ( index < firstIndex) ) {
 			std::shared_ptr<T> record = records[index+ pageSize-firstIndex];
 			movePrevWindow();
 			return record;

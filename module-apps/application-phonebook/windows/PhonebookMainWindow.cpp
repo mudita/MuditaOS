@@ -170,7 +170,6 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
 }
 
 bool PhonebookMainWindow::onDatabaseMessage( sys::Message* msgl ) {
-	LOG_INFO("received contacts");
 	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
 	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
 		return true;

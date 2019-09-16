@@ -36,7 +36,7 @@ protected:
 	//index of the currently selected element
 	int selectedIndex;
 	//vector that holds currently visible list of items
-	std::vector<ListItem*> items;
+	std::list<ListItem*> items;
 	//pointer to the item provider object
 	ListItemProvider* provider = nullptr;
 	//rounded rectangle used to draw scroll bar
