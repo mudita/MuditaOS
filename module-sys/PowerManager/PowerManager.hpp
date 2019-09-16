@@ -12,6 +12,7 @@
 #ifndef PUREPHONE_POWERMANAGER_HPP
 #define PUREPHONE_POWERMANAGER_HPP
 
+#include <functional>
 #include "Service/Mailbox.hpp"
 #include "Service/Bus.hpp"
 #include "Service/Service.hpp"
@@ -27,6 +28,9 @@ namespace sys {
         PowerManager();
         ~PowerManager();
 
+        void RegisterInterruptHandler(std::function<void()> handler);
+
+
 
     private:
 
@@ -40,7 +44,9 @@ namespace sys {
 
         ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final{return ReturnCodes::Success;}
 
-        std::unique_ptr<bsp::LowPowerMode> lowPower;
+        std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
+
+        bsp::LowPowerMode::Mode currentPowerMode = bsp::LowPowerMode::Mode ::FullSpeed;
 
 
     };

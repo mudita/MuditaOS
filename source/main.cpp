@@ -123,9 +123,6 @@ int main() {
 
     bsp::BoardInit();
 
-    LPM_EnterLowPowerIdle();
-    LPM_EnterFullSpeed();
-
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
@@ -135,8 +132,9 @@ int main() {
 
         bool ret = false;
 
-        //ret = sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
-        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<sys::PowerManager>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
 
 

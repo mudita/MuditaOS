@@ -966,7 +966,7 @@ static inline void CLOCK_SetDiv(clock_div_t divider, uint32_t value)
  *
  * @param divider Which div node to get, see \ref clock_div_t.
  */
-__attribute__((section( ".intfoo" )))
+
 static inline uint32_t CLOCK_GetDiv(clock_div_t divider)
 {
     return ((CCM_TUPLE_REG(CCM, divider) & CCM_TUPLE_MASK(divider)) >> CCM_TUPLE_SHIFT(divider));
