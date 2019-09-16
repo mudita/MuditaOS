@@ -41,7 +41,7 @@ namespace sys {
         if (userInit) {
             userInit();
         }
-
+        
         while (enableRunLoop) {
 
             auto msg = mailbox.pop();
@@ -175,7 +175,6 @@ namespace sys {
 
 
     ReturnCodes SystemManager::InitHandler() {
-        CreateService(std::make_shared<PowerManager>(), this);
         isReady = true;
         return ReturnCodes::Success;
     }
