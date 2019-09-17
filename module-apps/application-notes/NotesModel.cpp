@@ -16,7 +16,6 @@ NotesModel::NotesModel(  app::Application* app) : DatabaseModel(app, 3){
 }
 
 NotesModel::~NotesModel() {
-	// TODO Auto-generated destructor stub
 }
 
 void NotesModel::requestRecordsCount() {
@@ -40,10 +39,10 @@ void NotesModel::requestRecords( const uint32_t offset, const uint32_t limit ) {
 
 bool NotesModel::updateRecords( std::unique_ptr<std::vector<NotesRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count ) {
 
-	LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-	for( uint32_t i=0; i<records.get()->size(); ++i ) {
-		LOG_INFO("id: %d, filename: %s", records.get()->operator [](i).ID, records.get()->operator [](i).path.c_str());
-	}
+//	LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+//	for( uint32_t i=0; i<records.get()->size(); ++i ) {
+//		LOG_INFO("id: %d, filename: %s", records.get()->operator [](i).ID, records.get()->operator [](i).path.c_str());
+//	}
 
 	DatabaseModel::updateRecords( std::move(records), offset, limit, count );
 
@@ -51,14 +50,13 @@ bool NotesModel::updateRecords( std::unique_ptr<std::vector<NotesRecord>> record
 }
 
 gui::ListItem* NotesModel::getItem( int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown ) {
+
 	std::shared_ptr<NotesRecord> note = getRecord( index );
 
 	SettingsRecord& settings = application->getSettings();
 
 	if( note == nullptr )
 		return nullptr;
-
-	LOG_INFO("Note item: %d", index);
 
 	gui::NotesItem* item = new gui::NotesItem(this, !settings.timeFormat12 );
 	if( item != nullptr ) {

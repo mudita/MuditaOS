@@ -6,6 +6,7 @@
  */
 
 #include "ListItem.hpp"
+#include "log/log.hpp"
 
 namespace gui {
 

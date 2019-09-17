@@ -49,7 +49,6 @@ void PhonebookMainWindow::buildInterface() {
 	AppWindow::buildInterface();
 
 	list = new gui::PhonebookListView(this, 11, 105, 480-22, 600-105-50 );
-//	list = new gui::PhonebookListView(this, 16, 105, 480-32, 440 );
 	list->setMaxElements(7);
 	list->setPageSize(7);
 	list->setPenFocusWidth(0);

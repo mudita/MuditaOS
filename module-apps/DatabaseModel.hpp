@@ -49,20 +49,18 @@ public:
 
 	virtual bool updateRecords( std::unique_ptr<std::vector<T>> records, const uint32_t offset, const uint32_t limit, uint32_t count ) {
 		//calculate for which page is received data using offset value
+
 		int page = getPage(offset);
-//		LOG_INFO("page = %d", page);
 		int currentPage = firstIndex / pageSize;
 
 		if( (page >= currentPage - 1) && ( page <= currentPage + 1)){
-			//remove old records
-//			for( int i=(pageSize*(page-currentPage) + pageSize); i<(pageSize*(page-currentPage+1) + pageSize); i++ ) {
-////				LOG_INFO("value i: %d", i);
-//				this->records[i] = nullptr;
-//			}
 
 			//store new records
 			for( unsigned int i=0; i<count; i++ ) {
-				this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% limit] = std::shared_ptr<T>( new T(records.get()->operator [](i)) );
+				auto ii = i+(pageSize*(page-currentPage) + pageSize)+offset% limit;
+				this->records[ii] = nullptr;
+				this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% limit] = std::make_shared<T>( records.get()->operator [](i) );
+				//this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% limit] = std::shared_ptr<T>( new T(records.get()->operator [](i)) );
 			}
 
 			//return true (for refreshing window) only if current page was modified.
@@ -184,15 +182,14 @@ public:
 	}
 
 	virtual ~DatabaseModel() {
-		LOG_INFO("~DatabaseModel");
-		records.clear();
+		clear();
 	}
 
 	virtual void clear() {
 
+		for( int i=0; i< pageSize*3; i++ )
+			records[i] = nullptr;
 		records.clear();
-
-		std::fill( records.begin(), records.end(), nullptr );
 		firstIndex = 0;
 		recordsCount = -1;
 	}
