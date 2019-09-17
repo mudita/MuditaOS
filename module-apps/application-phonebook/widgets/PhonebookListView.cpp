@@ -36,7 +36,7 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == firstIndex ) {
-//					orientation = ORIENTATION_BOTTOM_UP;
+					orientation = ORIENTATION_BOTTOM_UP;
 					if( firstIndex > 0 ) {
 						selectedIndex = firstIndex - 1;
 						lastIndex = selectedIndex;
@@ -56,7 +56,6 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == firstIndex ) {
-//					orientation = ORIENTATION_TOP_DOWN;
 					if( firstIndex > 0 ) {
 						selectedIndex = firstIndex - 1;
 						lastIndex = selectedIndex;
@@ -78,7 +77,6 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == lastIndex ) {
-//					orientation = ORIENTATION_TOP_DOWN;
 					if( lastIndex < elementsCount - 1 ) {
 						firstIndex = lastIndex + 1;
 						selectedIndex = firstIndex;
@@ -98,6 +96,7 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == lastIndex ) {
+					orientation = ORIENTATION_TOP_DOWN;
 					if( lastIndex < elementsCount - 1 ) {
 						firstIndex = lastIndex + 1;
 						selectedIndex = firstIndex;
