@@ -72,12 +72,11 @@ bool PhonebookModel::updateRecords( std::unique_ptr<std::vector<ContactRecord>> 
 
 gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIndex, uint32_t count, int remaining, bool topDown ) {
 
-//	LOG_INFO("requested item: %d", index);
 	bool download = false;
 	if( index > firstIndex + pageSize / 2 )
 		download = true;
 	if( index < firstIndex - pageSize / 2 )
-			download = true;
+		download = true;
 	std::shared_ptr<ContactRecord> contact = getRecord( index, download );
 
 	if( contact == nullptr )
@@ -158,6 +157,7 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 	}
 	return nullptr;
 }
+
 int PhonebookModel::getItemCount() {
 	return recordsCount;
 }
