@@ -36,11 +36,13 @@ namespace sys {
 
         int32_t Switch(const Mode mode);
 
+        Mode GetCurrentMode(){return currentPowerMode;}
+
     private:
 
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
 
-        bsp::LowPowerMode::Mode currentPowerMode = bsp::LowPowerMode::Mode ::FullSpeed;
+        Mode currentPowerMode = Mode ::FullSpeed;
 
 
     };

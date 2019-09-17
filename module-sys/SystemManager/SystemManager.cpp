@@ -77,7 +77,8 @@ namespace sys {
 
     bool SystemManager::SuspendSystem(Service *caller) {
 
-        if(lowPowerMode->GetCurrentMode() != bsp::LowPowerMode::Mode::FullSpeed){
+        if(powerManager.GetCurrentMode() != PowerManager::Mode::FullSpeed){
+            LOG_WARN("System is already suspended.");
             return false;
         }
 
@@ -100,6 +101,11 @@ namespace sys {
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
+
+        if(powerManager.GetCurrentMode() == PowerManager::Mode::FullSpeed){
+            LOG_WARN("System is already resumed.");
+            return false;
+        }
 
         powerManager.Switch(PowerManager::Mode::FullSpeed);
 
