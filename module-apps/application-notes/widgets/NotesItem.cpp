@@ -42,6 +42,7 @@ NotesItem::NotesItem(NotesModel* model, bool mode24H) : model{model}, mode24H{mo
 }
 
 NotesItem::~NotesItem() {
+	note = nullptr;
 }
 
 bool NotesItem::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
@@ -57,7 +58,7 @@ bool NotesItem::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox
 }
 
 //sets copy of alarm's
-void NotesItem::setNote( std::shared_ptr<NotesRecord> note ) {
+void NotesItem::setNote( std::shared_ptr<NotesRecord>& note ) {
 	this->note = note;
 	//set values of the labels
 	title->setText( std::to_string( note->ID));
