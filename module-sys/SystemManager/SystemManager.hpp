@@ -17,7 +17,7 @@
 #include "Service/Bus.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
-#include "PowerManager/PowerManager.hpp"
+#include "PowerManager.hpp"
 
 namespace sys
 {
@@ -91,6 +91,7 @@ private:
 
 	static std::vector<std::shared_ptr<Service>> servicesList;
     static cpp_freertos::MutexStandard destroyMutex;
+    static PowerManager powerManager;
 
 };
 
