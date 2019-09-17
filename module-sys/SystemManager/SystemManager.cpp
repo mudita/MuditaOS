@@ -55,6 +55,8 @@ namespace sys {
     void SystemManager::StartSystem(std::function<int()> init) {
         LogOutput::Output("Initializing system...");
 
+        // Switch system to full functionality(clocks and power domains configured to max values)
+        powerManager.Switch(PowerManager::Mode::FullSpeed);
         userInit = init;
 
         // Start System manager
@@ -87,10 +89,15 @@ namespace sys {
                 }
             }
         }
+
+        powerManager.Switch(PowerManager::Mode::LowPowerIdle);
+
         return true;
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
+
+        powerManager.Switch(PowerManager::Mode::FullSpeed);
 
         for(const auto &w : servicesList){
 
@@ -252,5 +259,6 @@ namespace sys {
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
+    PowerManager SystemManager::powerManager;
 
 }

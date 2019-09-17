@@ -70,6 +70,10 @@ ServiceEink::~ServiceEink(){
 sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 	seink::EinkMessage* msg = static_cast<seink::EinkMessage*>(msgl);
 
+	if(isPoweredDown){
+        return std::make_shared<sys::ResponseMessage>();
+	}
+
 	switch( msg->messageType ) {
 
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
@@ -227,11 +231,15 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
 
             // Clear the temperature timer count
             deepClearScreen( s_einkAmbientTemperature );
+
+            isPoweredDown = false;
         }
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
             EinkPowerDown();
+            stopTimer( timerPowerOff );
+            isPoweredDown = true;
             break;
     }
 
