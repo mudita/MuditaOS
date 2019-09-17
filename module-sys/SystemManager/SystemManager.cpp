@@ -41,7 +41,7 @@ namespace sys {
         if (userInit) {
             userInit();
         }
-
+        
         while (enableRunLoop) {
 
             auto msg = mailbox.pop();
@@ -55,9 +55,9 @@ namespace sys {
     void SystemManager::StartSystem(std::function<int()> init) {
         LogOutput::Output("Initializing system...");
 
+        // Switch system to full functionality(clocks and power domains configured to max values)
+        powerManager.Switch(PowerManager::Mode::FullSpeed);
         userInit = init;
-
-        lowPowerMode = bsp::LowPowerMode::Create().value_or(nullptr);
 
         // Start System manager
         StartService();
@@ -77,7 +77,8 @@ namespace sys {
 
     bool SystemManager::SuspendSystem(Service *caller) {
 
-        if(lowPowerMode->GetCurrentMode() != bsp::LowPowerMode::Mode::FullSpeed){
+        if(powerManager.GetCurrentMode() != PowerManager::Mode::FullSpeed){
+            LOG_WARN("System is already suspended.");
             return false;
         }
 
@@ -94,18 +95,19 @@ namespace sys {
             }
         }
 
-        lowPowerMode->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
-        return true; // TODO:M.P return real ret code
+        powerManager.Switch(PowerManager::Mode::LowPowerIdle);
 
+        return true;
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
 
-        if(lowPowerMode->GetCurrentMode() == bsp::LowPowerMode::Mode::FullSpeed){
+        if(powerManager.GetCurrentMode() == PowerManager::Mode::FullSpeed){
+            LOG_WARN("System is already resumed.");
             return false;
         }
 
-        lowPowerMode->Switch(bsp::LowPowerMode::Mode::FullSpeed);
+        powerManager.Switch(PowerManager::Mode::FullSpeed);
 
         for(const auto &w : servicesList){
 
@@ -119,7 +121,7 @@ namespace sys {
                 }
             }
         }
-        return true; // TODO:M.P return real ret code
+        return true;
     }
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller) {
@@ -130,7 +132,7 @@ namespace sys {
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
             LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
-        return true; // TODO:M.P return real ret code
+        return true;
     }
 
     bool SystemManager::ResumeService(const std::string &name, sys::Service *caller){
@@ -141,7 +143,7 @@ namespace sys {
         if (ret.first != ReturnCodes::Success && (resp->retCode != ReturnCodes::Success)){
             LOG_FATAL("Service %s failed to exit low-power mode",name.c_str());
         }
-        return true; // TODO:M.P return real ret code
+        return true;
     }
 
     bool SystemManager::CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout) {
@@ -267,6 +269,6 @@ namespace sys {
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
-    std::unique_ptr<bsp::LowPowerMode> SystemManager::lowPowerMode;
+    PowerManager SystemManager::powerManager;
 
 }

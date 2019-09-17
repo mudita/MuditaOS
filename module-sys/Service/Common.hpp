@@ -15,7 +15,8 @@ namespace sys
 
 enum class BusChannels {
 	System,
-    SystemManagerRequests
+    SystemManagerRequests,
+    PowerManagerRequests
 #ifndef MODULE_CORE_CUSTOM_BUS
 
 #else
