@@ -23,16 +23,23 @@ namespace sys{
     }
 
     int32_t PowerManager::Switch(const sys::PowerManager::Mode mode) {
+
+        int32_t ret = 0;
         switch(mode){
             case Mode::FullSpeed:
-                return lowPowerControl->Switch(bsp::LowPowerMode::Mode::FullSpeed);
+                ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::FullSpeed);
+                break;
             case Mode::LowPowerIdle:
             case Mode::LowPowerRun:
             case Mode::Suspend:
-                return lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
-            default:
-                return 0;
+                ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+                break;
         }
+
+        if(ret == 0){
+            currentPowerMode = mode;
+        }
+        return ret;
     }
 
 }

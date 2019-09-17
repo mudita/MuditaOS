@@ -46,7 +46,6 @@ protected:
 	uint8_t einkRenderBuffer[600 * 480];
 	bool	deepRefresh = false;
 	uint32_t timerPowerOff = 0;
-	bool isPoweredDown = false;
 public:
 	ServiceEink(const std::string& name,std::string parent = "");
     ~ServiceEink();
