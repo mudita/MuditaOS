@@ -350,6 +350,7 @@ void CLOCK_DeinitArmPll(void)
     CCM_ANALOG->PLL_ARM = CCM_ANALOG_PLL_ARM_POWERDOWN_MASK;
 }
 
+
 void CLOCK_InitSysPll(const clock_sys_pll_config_t *config)
 {
     /* Bypass PLL first */
@@ -367,6 +368,7 @@ void CLOCK_InitSysPll(const clock_sys_pll_config_t *config)
     /* Disable Bypass */
     CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_BYPASS_MASK;
 }
+
 
 void CLOCK_DeinitSysPll(void)
 {
