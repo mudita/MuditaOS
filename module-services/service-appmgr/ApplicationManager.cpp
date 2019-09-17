@@ -338,7 +338,7 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	//check if specified application is not the application that is currently running
 	//this is applicable to all applications except desktop
 	if( (focusApplicationName == msg->getName()) ) {
-		LOG_WARN("Trying to rerun currently active application");
+		LOG_WARN("Trying to return currently active application");
 		return false;
 	}
 
@@ -406,6 +406,7 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	launchApplicationName = previousApplicationName;
 	//store window and data if there is any
 	it->second->switchData = std::move(msg->getData());
+	it->second->switchWindow = "LastWindow";
 	state = State::CLOSING_PREV_APP;
 
 	//notify event manager which application should receive keyboard messages
