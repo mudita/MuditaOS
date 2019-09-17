@@ -49,7 +49,7 @@ public:
 
 class ApplicationCallLauncher : public ApplicationLauncher {
 public:
-	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false ) {};
+	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false, true ) {};
 	bool run(sys::Service* caller = nullptr ) override {
 		parent = (caller==nullptr?"":caller->GetName());
 		return sys::SystemManager::CreateService( std::make_shared<ApplicationCall>(name, parent), caller );

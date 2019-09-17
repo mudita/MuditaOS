@@ -33,6 +33,7 @@ Item::Item() :
 	activatedCallback = [](Item&){ return false;};
 	inputCallback = [](Item&, InputEvent& inputEvent){ return false;};
 	dimensionChangedCallback = [](Item&,  void* data){ return false;};
+	contentCallback = [](Item&){ return false;};
 }
 
 Item::~Item() {
@@ -44,7 +45,7 @@ Item::~Item() {
 }
 
 bool Item::addWidget( Item* item ) {
-
+    if( item == nullptr ) return false;
 	if( item->parent ) {
 		item->parent->removeWidget(item);
 	}

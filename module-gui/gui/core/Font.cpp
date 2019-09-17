@@ -312,6 +312,15 @@ uint32_t Font::getCharPixelWidth( uint32_t charCode ) {
 	return 0;
 }
 
+uint32_t Font::getCharPixelHeight( uint32_t charCode ) {
+	FontGlyph* glyph = glyphs.find(charCode)->second;
+
+	if( glyph != NULL)
+		return  glyph->height ;
+
+	return 0;
+}
+
 FontManager::FontManager() {
 }
 

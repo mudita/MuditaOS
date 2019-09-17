@@ -10,6 +10,7 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 
 #include "AppWindow.hpp"
+#include "gui/widgets/Text.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Window.hpp"
@@ -27,8 +28,8 @@ protected:
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;
 	gui::Label* dayMonth = nullptr;
-	gui::Label* notificationCalls = nullptr;
-	gui::Label* notificationMessages = nullptr;
+	gui::Text* notificationCalls = nullptr;
+	gui::Text* notificationMessages = nullptr;
 	gui::Image* callsImage = nullptr;
 	gui::Image* messagesImage = nullptr;
 	/**
@@ -44,13 +45,10 @@ protected:
 	 */
 	bool enterPressed = false;
 	/**
-	 * Flag informs whether window has been unlocked
+	 * Name of the appliction that was on top when lock timeout occured
 	 */
-//	bool screenLocked = true;
-	/**
-	 * Flag that defines if pin window should be displayed
-	 */
-//	bool pinLockScreen = false;
+	std::string lockTimeoutApplilcation = "";
+
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState();
 public:
@@ -64,6 +62,9 @@ public:
 	void rebuild() override;
 	void buildInterface() override;
 	void destroyInterface() override;
+	bool updateTime( const UTF8& timeStr ) override;
+	bool updateTime( const uint32_t& timestamp, bool mode24H ) override;
+	std::list<DrawCommand*> buildDrawList() override;
 };
 
 } /* namespace gui */

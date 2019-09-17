@@ -125,6 +125,8 @@ protected:
 	Margins margins;
 	//barrier for navigation
 	uint32_t barriers = static_cast<uint32_t>(NavigationBarrier::BARRIER_NONE);
+	//defines whether internal labels have underline
+	bool underline = false;
 
 	void splitTextToLines( const UTF8& text);
 	/**
@@ -182,8 +184,16 @@ public:
 			const UTF8& text = "", ExpandMode expandMode = ExpandMode::EXPAND_NONE, TextType textType = TextType::MULTI_LINE );
 	virtual ~Text();
 
+	/**
+	 * @brief allows changing behavior of the text widget between edit and browse mode.
+	 */
 	void setEditMode( EditMode mode );
 	void setTextType( TextType type );
+	/**
+	 * @brief Sets mode where all text lines have underline.
+	 * @param underline - if true text lines will have underline, if false no underline will be drawn.
+	 */
+	void setUnderline( bool underline );
 	void setNavigationBarrier( const NavigationBarrier& barrier, bool value );
 	void setCursorWidth( uint32_t w );
 	virtual void setText( const UTF8& text );

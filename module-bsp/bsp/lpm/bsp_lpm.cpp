@@ -15,11 +15,10 @@
 #if defined(TARGET_RT1051)
 #include "board/rt1051/bsp/lpm/RT1051LPM.hpp"
 #elif defined(TARGET_Linux)
-#include "cellular/linux_cellular.hpp"
+#include "board/linux/lpm/LinuxLPM.h"
 #else
 #error "Unsupported target"
 #endif
-
 
 namespace bsp{
 
@@ -30,7 +29,7 @@ namespace bsp{
 #if defined(TARGET_RT1051)
         inst = std::make_unique<bsp::RT1051LPM>();
 #elif defined(TARGET_Linux)
-        inst = std::make_unique<bsp::LinuxCellular>(term);
+        inst = std::make_unique<bsp::LinuxLPM>();
 #else
 #error "Unsupported target"
 #endif

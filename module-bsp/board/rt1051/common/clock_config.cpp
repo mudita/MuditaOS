@@ -1467,4 +1467,5 @@ void LPM_EnterLowPowerIdle(void)
     clkPLL2setup(CLK_DISABLE);
     PrintSystemClocks();
 
+
 }

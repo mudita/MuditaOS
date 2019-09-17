@@ -201,22 +201,10 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		sevm::RtcMinuteAlarmMessage* msg = static_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
 		LOG_INFO("Application time updated");
 
-		time_t timestamp = msg->timestamp;
-		struct tm time;
-		time =*localtime(&timestamp);
-		uint32_t hour = (timestamp % 86400) / 3600;
-		uint32_t min = (timestamp % 3600) / 60;
+		currentWindow->updateTime( msg->timestamp, !settings.timeFormat12 );
 
-		std::ostringstream stringStream;
-		stringStream << std::setfill('0') << std::setw(2) << hour << ":" << std::setfill('0') << std::setw(2) <<min;
-
-		std::string timeStr = stringStream.str();
-
-//		LOG_INFO("%s", timeStr.c_str() );
-
-		currentWindow->updateTime( timeStr );
 		if( state == State::ACTIVE_FORGROUND )
-			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 
 		handled = true;
 	}
@@ -227,11 +215,11 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
 		if( ( state == State::INITIALIZING ) ||	( state == State::ACTIVE_BACKGROUND )){
 
-			if( msg->getApplicationName() == this->GetName()) {
+			if( msg->getTargetApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_FORGROUND;
 
-					switchWindow( msg->getWindowName(), 0, std::move( msg->getData()));
+					switchWindow( msg->getTargetWindowName(), 0, std::move( msg->getData()));
 					handled = true;
 				}
 				else {
@@ -244,14 +232,24 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			}
 		}
 		else if( state == State::ACTIVE_FORGROUND ) {
-			if( msg->getApplicationName() == this->GetName()) {
-				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
-					state = State::ACTIVE_BACKGROUND;
-					handled = true;
+			if( msg->getTargetApplicationName() == this->GetName()) {
+				//if window name and data are null pointers this is a message informing
+				//that application should go to background mode
+				if( (msg->getTargetWindowName() == "") && (msg->getData() == nullptr ) ) {
+					if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
+						state = State::ACTIVE_BACKGROUND;
+						handled = true;
+					}
+					else {
+						//TODO send to itself message to close
+						LOG_ERROR("Failed to communicate ");
+					}
 				}
+				//if application is in front and receives message with defined window it should
+				//change to that window.
 				else {
-					//TODO send to itself message to close
-					LOG_ERROR("Failed to communicate ");
+					switchWindow( msg->getTargetWindowName(), 0, std::move( msg->getData()));
+					handled = true;
 				}
 			}
 			else {

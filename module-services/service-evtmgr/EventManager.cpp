@@ -16,6 +16,7 @@
 #include "vfs.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -48,6 +49,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
+
+		if( suspended ) {
+			suspended = false;
+			sys::SystemManager::ResumeSystem(this);
+		}
+
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
@@ -56,9 +63,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		message->keyPressTime = msg->keyPressTime;
 		message->keyRelaseTime = msg->keyRelaseTime;
 
+		//send key to focused application
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
+		//notify application manager to prevent screen locking
+		sapm::ApplicationManager::messagePreventBlocking(this);
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {
@@ -66,11 +76,17 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		if( msg->sender == "ApplicationManager" ) {
 			targetApplication = msg->getApplication();
 			handled = true;
+			LOG_INFO("Switching focus to %s", targetApplication.c_str());
 		}
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
+
+		if( suspended ) {
+			suspended = false;
+			sys::SystemManager::ResumeSystem(this);
+		}
 
 		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 		message->levelPercents = msg->levelPercents;
@@ -79,11 +95,17 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
+
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
+
+		if( suspended ) {
+			suspended = false;
+			sys::SystemManager::ResumeSystem(this);
+		}
 
 		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
 		message->plugged = msg->plugged;
@@ -96,7 +118,15 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
 			msgl->sender == this->GetName() ){
 
+		//resume system first
+		if( suspended ) {
+			suspended = false;
+			sys::SystemManager::ResumeSystem(this);
+		}
+
 		HandleAlarmTrigger(msgl);
+
+		handled = true;
 	}
 
 	if( handled )
@@ -143,8 +173,11 @@ sys::ReturnCodes EventManager::DeinitHandler() {
 sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
     LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
 
+    suspended = true;
+
     switch (mode){
         case sys::ServicePowerMode ::Active:
+        	suspended = false;
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
@@ -157,8 +190,6 @@ sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMod
 bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 
 	auto msg = std::make_shared<sevm::EVMFocusApplication>( applicationName );
-//	auto ret =  sys::Bus::SendUnicast(msg, "EventManager", sender, 200 );
-//	return (ret.first == sys::ReturnCodes::Success )?true:false;
 	sys::Bus::SendUnicast(msg, "EventManager", sender );
 	return true;
 }

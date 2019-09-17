@@ -49,7 +49,7 @@ void EnterNumberWindow::buildInterface() {
 }
 void EnterNumberWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete numberLabel;
+	if( numberLabel ) { removeWidget(numberLabel); delete numberLabel; numberLabel= nullptr; }
 	children.clear();
 }
 

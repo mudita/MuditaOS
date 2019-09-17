@@ -74,7 +74,14 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 }
 
 Text::~Text() {
-	clear();
+	//if there are text lines erase them.
+	if( !textLines.empty() ) {
+		while( !textLines.empty() ) {
+			delete textLines.front();
+			textLines.pop_front();
+		}
+	}
+	textLines.clear();
 }
 
 void Text::setEditMode( EditMode mode ) {
@@ -89,6 +96,23 @@ void Text::setEditMode( EditMode mode ) {
 
 void Text::setTextType( TextType type ) {
 	textType = type;
+}
+
+void Text::setUnderline( bool underline ) {
+	//do nothing, value of the flag doesn;t change
+	if( this->underline == underline )
+		return;
+
+	this->underline = underline;
+	LOG_INFO("lines count: %d", labelLines.size());
+	for( auto it = labelLines.begin(); it!=labelLines.end(); it++ ) {
+
+		gui::Label* label = *it;
+		if( this->underline )
+			label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+		else
+			label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+	}
 }
 
 void Text::setNavigationBarrier( const NavigationBarrier& barrier, bool value ) {
@@ -453,22 +477,28 @@ bool Text::onInput( const InputEvent& inputEvent ) {
 	if( inputEvent.cycle ) {
 		handleBackspace();
 		res = handleChar( inputEvent );
-		if( res )
+		if( res ) {
 			updateCursor();
+			contentCallback(*this);
+		}
 		return res;
 	}
 
 	//if char is a new line char then create new line and move caret and return
 	if( inputEvent.keyChar == 0x0A) {
-		if( textType == TextType::MULTI_LINE )
+		if( textType == TextType::MULTI_LINE ){
 			res = handleEnter();
+			contentCallback(*this);
+		}
 	}
 	//backspace handling
 	else if( inputEvent.keyChar  == 0x08 ) {
 		res = handleBackspace();
+		contentCallback(*this);
 	}
 	else { //normal char -> add and check pixel width
 		res = handleChar( inputEvent );
+		contentCallback(*this);
 	}
 	if( res )
 		updateCursor();
@@ -484,9 +514,14 @@ bool Text::onFocus( bool state ) {
 	bool ret = Rect::onFocus( state );
 	if( focus && editMode == EditMode::EDIT ) {
 		cursor->setVisible(true);
+		for( auto it = labelLines.begin(); it != labelLines.end(); it++ )
+			(*it)->setPenWidth(3);
 	}
-	else
+	else {
 		cursor->setVisible(false);
+		for( auto it = labelLines.begin(); it != labelLines.end(); it++ )
+			(*it)->setPenWidth(1);
+	}
 
 	return ret;
 }
@@ -888,9 +923,16 @@ void Text::recalculateDrawParams() {
 	for( uint32_t i=0; i<rowCount; i++ ) {
 		gui::Label* label = new gui::Label( this, margins.left, startY, widgetArea.w - margins.left - margins.right, font->info.line_height );
 		label->setFilled( false );
+		label->setPenWidth( 1 );
+		label->setPenFocusWidth( 3 );
 		label->setFont( font-> getName() );
 		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-		label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+		if( underline )
+			label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+		else
+			label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
+		if( focus )
+			label->setPenWidth( 3 );
 		labelLines.push_back( label );
 		startY += font->info.line_height;
 	}

@@ -82,8 +82,6 @@ public:
 #endif
         //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
-        //sys::SystemManager::SuspendSystem(this);
-        //sys::SystemManager::ResumeSystem(this);
         return std::make_shared<sys::ResponseMessage>();
 
     }
@@ -96,7 +94,7 @@ public:
         stopTimer(timer_id);
         std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(static_cast<uint32_t >(MessageType::AudioSetInputGain));
 
-        auto ret = sys::Bus::SendUnicast(msg,GetName(),this);
+        sys::Bus::SendUnicast(msg,GetName(),this);
 #endif
 
     }
@@ -135,29 +133,16 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
-
-
-        //ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+//        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
-        //launcher for viewer
 		applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
-
-		//launcher for desktop application
 		applications.push_back(std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher()));
-
-		//launcher for call application
 		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
-
-		//launcher for settings application
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
-
-		//launcher for notes application
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-
-        // create launcher for phonebook, all launchers could be created like that
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 
 		//start application manager
