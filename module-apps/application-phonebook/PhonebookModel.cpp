@@ -70,7 +70,7 @@ bool PhonebookModel::updateRecords( std::unique_ptr<std::vector<ContactRecord>> 
 	return true;
 }
 
-gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIndex, uint32_t count, bool topDown ) {
+gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIndex, uint32_t count, int remaining, bool topDown ) {
 
 //	LOG_INFO("requested item: %d", index);
 	bool download = false;
@@ -83,30 +83,28 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 	if( contact == nullptr )
 		return nullptr;
 
-//	LOG_INFO(" index: %d first: %d prev: %d count: %d", index, firstElement, prevIndex, count);
-
-	//return item from favorite part of contacts
-	if( static_cast<uint32_t>(index) < favouriteCount ) {
-		gui::PhonebookItem* item = new gui::PhonebookItem(this);
-		if( (index == firstElement) && (index != prevIndex) ) {
-			item->setValue("Favourite");
+	if( topDown ) {
+		//return item from favorite part of contacts
+		if( static_cast<uint32_t>(index) < favouriteCount ) {
+			gui::PhonebookItem* item = new gui::PhonebookItem(this);
+			if( (index == firstElement) && (index != prevIndex) ) {
+				item->setValue("Favourite");
+			}
+			else {
+				item->setContact(contact);
+				item->setID( index );
+			}
+			return item;
 		}
 		else {
-			item->setContact(contact);
-			item->setID( index );
-		}
-		return item;
-	}
-	else {
-		gui::PhonebookItem* item = new gui::PhonebookItem(this);
-		//on top the page or if element next after last favourite contact is requested
-		if( ((index == firstElement) ||	(static_cast<uint32_t>(index) == favouriteCount)) &&
-				(index!=prevIndex) ) {
+			gui::PhonebookItem* item = new gui::PhonebookItem(this);
+			//on top the page or if element next after last favourite contact is requested
+			if( ((index == firstElement) ||	(static_cast<uint32_t>(index) == favouriteCount)) &&
+					(index!=prevIndex) ) {
 
-			item->setValue( contact->alternativeName.substr(0,1));
-		}
-		else {
-			if( static_cast<uint32_t>(index) > favouriteCount ) {
+				item->setValue( contact->alternativeName.substr(0,1));
+			}
+			else {
 				std::shared_ptr<ContactRecord> prevContact = getRecord( prevIndex, false  );
 				if( contact->alternativeName.substr(0,1) == prevContact->alternativeName.substr(0,1)) {
 					item->setContact(contact);
@@ -116,12 +114,47 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 					item->setValue( contact->alternativeName.substr(0,1));
 				}
 			}
+			return item;
+		}
+	}
+	else{
+		LOG_INFO("BOT-UP index: %d first: %d prev: %d count: %d rem: %d", index, firstElement, prevIndex, count, remaining );
+
+		if( static_cast<uint32_t>(index) < favouriteCount ) {
+			gui::PhonebookItem* item = new gui::PhonebookItem(this);
+			if( (static_cast<uint32_t>(index) == static_cast<uint32_t>(firstElement) - count ) ) {
+				item->setValue("Favourite");
+			}
 			else {
 				item->setContact(contact);
 				item->setID( index );
 			}
+			return item;
 		}
-		return item;
+		else {
+			gui::PhonebookItem* item = new gui::PhonebookItem(this);
+			//on top the page or if element next after last favourite contact is requested
+			if( (static_cast<uint32_t>(index) == favouriteCount) && (index != prevIndex)) {
+				item->setValue( contact->alternativeName.substr(0,1));
+			}
+			else {
+				std::shared_ptr<ContactRecord> prevContact = getRecord( prevIndex, false  );
+				if( remaining == 0 ) {
+					item->setValue( prevContact->alternativeName.substr(0,1));
+				}
+				else if(
+					( ( index == firstElement ) ||
+					( index == prevIndex ) ||
+							( contact->alternativeName.substr(0,1) == prevContact->alternativeName.substr(0,1)) )){
+					item->setContact(contact);
+					item->setID( index );
+				}
+				else {
+					item->setValue( prevContact->alternativeName.substr(0,1));
+				}
+			}
+			return item;
+		}
 	}
 	return nullptr;
 }

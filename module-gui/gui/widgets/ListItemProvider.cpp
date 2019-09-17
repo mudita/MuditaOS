@@ -15,7 +15,7 @@ ListItemProvider::ListItemProvider() {
 ListItemProvider::~ListItemProvider() {
 }
 
-ListItem* ListItemProvider::getItem( int index, int firstElement, int prevElement, uint32_t count, bool topDown ) {
+ListItem* ListItemProvider::getItem( int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown ) {
 	return nullptr;
 }
 
