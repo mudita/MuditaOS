@@ -47,7 +47,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(20000, true);
+        timer_id = CreateTimer(5000, true);
         ReloadTimer(timer_id);
     }
 
@@ -80,7 +80,7 @@ public:
          AudioServiceAPI::Stop(this);*/
 
 #endif
-        //sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
+        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
         return std::make_shared<sys::ResponseMessage>();
 
@@ -121,6 +121,7 @@ int main() {
 
     bsp::BoardInit();
 
+#if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
@@ -129,7 +130,7 @@ int main() {
 
         bool ret = false;
 
-        ret = sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
@@ -153,11 +154,14 @@ int main() {
         }
 
 
+
+
         return 0;
 
 
     });
 
     cpp_freertos::Thread::StartScheduler();
-    return 0;
+#endif
+    return 1;
 }
