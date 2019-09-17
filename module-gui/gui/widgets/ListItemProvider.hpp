@@ -31,7 +31,7 @@ public:
 	 * @param count Number of the elements visible in the list view widget.
 	 * @param topDown defines if elements are to be filled starting from the top of list
 	 */
-	virtual ListItem* getItem( int index, int firstElement, int prevElement, uint32_t count, bool topDown = true );
+	virtual ListItem* getItem( int index, int firstElement, int prevElement, uint32_t count, int remaining = 0, bool topDown = true );
 };
 
 } /* namespace gui */

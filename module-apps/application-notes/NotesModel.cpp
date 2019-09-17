@@ -50,7 +50,7 @@ bool NotesModel::updateRecords( std::unique_ptr<std::vector<NotesRecord>> record
 	return true;
 }
 
-gui::ListItem* NotesModel::getItem( int index, int firstElement, int prevElement, uint32_t count, bool topDown ) {
+gui::ListItem* NotesModel::getItem( int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown ) {
 	std::shared_ptr<NotesRecord> note = getRecord( index );
 
 	SettingsRecord& settings = application->getSettings();

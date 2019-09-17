@@ -36,18 +36,10 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == firstIndex ) {
-					orientation = ORIENTATION_BOTTOM_UP;
+//					orientation = ORIENTATION_BOTTOM_UP;
 					if( firstIndex > 0 ) {
-						firstIndex -= pageSize;
-						if( firstIndex < 0 ) {
-							orientation = ORIENTATION_TOP_DOWN;
-							firstIndex = 0;
-						}
-						selectedIndex = lastIndex;
-//						lastIndex = firstIndex + pageSize -1;
-//						if( lastIndex > elementsCount - 1 )
-//							lastIndex = elementsCount - 1;
-//
+						selectedIndex = firstIndex - 1;
+						lastIndex = selectedIndex;
 						updateScrollDimenstions();
 						return true;
 					}
@@ -58,7 +50,24 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 			}
 		}
 		else if( orientation == ORIENTATION_BOTTOM_UP ) {
-			//TODO implement BOTTOM_UP orientation
+			if( listMode == MODE_PAGE ){
+				if( selectedIndex > firstIndex ) {
+					selectedIndex--;
+					return true;
+				}
+				if( selectedIndex == firstIndex ) {
+//					orientation = ORIENTATION_TOP_DOWN;
+					if( firstIndex > 0 ) {
+						selectedIndex = firstIndex - 1;
+						lastIndex = selectedIndex;
+						updateScrollDimenstions();
+						return true;
+					}
+				}
+			}
+			else {
+				//TODO implement continuous mode
+			}
 		}
 	}
 	else if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_DOWN) ){
@@ -69,17 +78,10 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == lastIndex ) {
-					orientation = ORIENTATION_TOP_DOWN;
+//					orientation = ORIENTATION_TOP_DOWN;
 					if( lastIndex < elementsCount - 1 ) {
 						firstIndex = lastIndex + 1;
-						if( firstIndex > elementsCount - 1 ) {
-							firstIndex = elementsCount - 1;
-						}
 						selectedIndex = firstIndex;
-						//lastIndex = firstIndex + pageSize -1;
-//						if( lastIndex > elementsCount - 1 )
-//							lastIndex = elementsCount - 1;
-//
 						updateScrollDimenstions();
 						return true;
 					}
@@ -89,8 +91,24 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 
 			}
 		}
-		else { // BOTTOM_UP
+		else if( orientation == ORIENTATION_BOTTOM_UP ) {
+			if( listMode == MODE_PAGE ) {
+				if( selectedIndex < lastIndex ) {
+					selectedIndex++;
+					return true;
+				}
+				if( selectedIndex == lastIndex ) {
+					if( lastIndex < elementsCount - 1 ) {
+						firstIndex = lastIndex + 1;
+						selectedIndex = firstIndex;
+						updateScrollDimenstions();
+						return true;
+					}
+				}
+			}
+			else { //continuous mode
 
+			}
 		}
 	}
 	return false;
@@ -98,31 +116,129 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 
 void PhonebookListView::updatePageItems() {
 
+	//defines how many slots in the list has been occupied
+	int visibleElements = 0;
+
 	// for top down orientation
 	if( orientation == ORIENTATION_TOP_DOWN ) {
 		//index of requested item is incremented only if payload of returned item is not null
 		//if it's null it means that this is favourite label of label connected with showing Capital latters for surnames
-		int index = firstIndex, lastIndex = -1;
-		this->lastIndex = firstIndex;
+		int index = firstIndex, prevIndex = -1;
+		lastIndex = firstIndex;
 		for( int i=0; i<pageSize; i++ ) {
-			ListItem* item = provider->getItem(index, firstIndex, lastIndex, pageSize );
+			ListItem* item = provider->getItem(index, firstIndex, prevIndex, pageSize );
 
 			if( item != nullptr ) {
 				addWidget(item);
 				items.push_back(item);
 
-				lastIndex = index;
+				prevIndex = index;
 				if( item->getID() >= 0 ) {
 					index++;
 					this->lastIndex++;
 				}
+				visibleElements++;
 			}
 		}
 		//after the loop lastIndex is the number of elements not the index of last element that's why -- is used.
-		this->lastIndex--;
+		lastIndex--;
+
+		LOG_INFO("Last index: %d", lastIndex );
+
+		//if last element has been displayed but there is still space for elements
+		if( (lastIndex == elementsCount - 1) && (visibleElements != pageSize ) && ( firstIndex != 0 )) {
+
+			orientation = ORIENTATION_BOTTOM_UP;
+
+			//clear all elements in the list.
+			auto it = items.begin();
+			for( uint32_t i=0; i<items.size(); i++ ) {
+				ListItem* item = *it;
+				removeWidget( item );
+				delete item;
+				std::advance(it,1);
+			}
+			items.clear();
+
+			lastIndex = elementsCount - 1;
+			firstIndex = lastIndex;
+			index = lastIndex;
+			prevIndex = -1;
+			for( int i=0; i<pageSize; i++ ) {
+				ListItem* item = provider->getItem(index, lastIndex, prevIndex, pageSize, pageSize - 1 -i, false );
+
+				if( item != nullptr ) {
+					addWidget(item);
+					items.push_back(item);
+
+					prevIndex = index;
+					if( item->getID() >= 0 ) {
+						index--;
+						firstIndex--;
+					}
+				}
+			}
+			LOG_INFO("BOT-UP first index %d Last index: %d", firstIndex, lastIndex );
+		}
 	}
 	else if( orientation == ORIENTATION_BOTTOM_UP ) {
+		//index of requested item is incremented only if payload of returned item is not null
+		//if it's null it means that this is favourite label of label connected with showing Capital latters for surnames
+		int index = lastIndex, prevIndex = -1;
+		firstIndex = lastIndex;
+		for( int i=0; i<pageSize; i++ ) {
+			ListItem* item = provider->getItem(index, lastIndex, prevIndex, pageSize, pageSize - 1 -i, false );
 
+			if( item != nullptr ) {
+				addWidget(item);
+				items.push_back(item);
+
+				prevIndex = index;
+				if( item->getID() >= 0 ) {
+					index--;
+					firstIndex--;
+				}
+				visibleElements++;
+			}
+		}
+
+		firstIndex++;
+
+		LOG_INFO("first index: %d", firstIndex );
+
+		//if last element has been displayed but there is still space for elements
+		if( (lastIndex != elementsCount - 1) && (visibleElements != pageSize ) && ( firstIndex == 0 )) {
+
+			orientation = ORIENTATION_TOP_DOWN;
+
+			//clear all elements in the list.
+			auto it = items.begin();
+			for( uint32_t i=0; i<items.size(); i++ ) {
+				ListItem* item = *it;
+				removeWidget( item );
+				delete item;
+				std::advance(it,1);
+			}
+			items.clear();
+
+			int index = firstIndex, prevIndex = -1;
+			this->lastIndex = firstIndex;
+			for( int i=0; i<pageSize; i++ ) {
+				ListItem* item = provider->getItem(index, firstIndex, prevIndex, pageSize );
+
+				if( item != nullptr ) {
+					addWidget(item);
+					items.push_back(item);
+
+					prevIndex = index;
+					if( item->getID() >= 0 ) {
+						index++;
+						this->lastIndex++;
+					}
+				}
+			}
+			LOG_INFO("TOP-BOT first index %d Last index: %d", firstIndex, lastIndex );
+		}
 	}
 
 	//calculate height of the item using list's height and pageSize
@@ -139,7 +255,7 @@ void PhonebookListView::updatePageItems() {
 	if( orientation == ORIENTATION_TOP_DOWN )
 		verticalPosition = 0;
 	else
-		verticalPosition = widgetArea.h;
+		verticalPosition = widgetArea.h - itemHeight ;
 
 	auto it = items.begin();
 	for(unsigned int i=0; i<items.size(); i++ ) {
