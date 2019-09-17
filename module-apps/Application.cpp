@@ -53,7 +53,6 @@ Application::~Application() {
 
 void Application::TickHandler(uint32_t id) {
 	if( id == longpressTimerID ) {
-//		LOG_INFO( "longpressTimerID triggered");
 		gui::InputEvent iev = translator->translate(
 			false,
 			static_cast<int>(translator->getLastEvent().keyCode),
@@ -91,17 +90,19 @@ void Application::blockEvents(bool isBlocked ) {
 int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 
 	std::string window;
+	LOG_INFO("switching to window: %s", windowName.c_str());
 
 	//case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
 		window = currentWindow->getName();
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::make_unique<gui::SwitchData>("LastWindow"));
+		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 	else {
 		window = windowName.empty()?"MainWindow":windowName;
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
+		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
-
-	auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
-	sys::Bus::SendUnicast(msg, this->GetName(), this );
 
 	return 0;
 }
@@ -266,15 +267,25 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		auto it = windows.find( msg->getWindowName() );
 		if( it != windows.end() ) {
 
-			setActiveWindow( msg->getWindowName());
+			setActiveWindow( msg->getWindowName() );
 
 			//determine show mode
 			gui::ShowMode mode = gui::ShowMode::GUI_SHOW_INIT;
 			if( previousWindow == currentWindow )
 				mode = gui::ShowMode::GUI_SHOW_RETURN;
 			currentWindow->handleSwitchData( msg->getData().get() );
-			currentWindow->onBeforeShow( mode, 0, msg->getData().get() );
-			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+
+			//check if this is case where application is returning to the last visible window.
+			if( (msg->getData() != nullptr) && (msg->getData()->getDescription() == "LastWindow") ) {
+				refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+			}
+			else {
+				currentWindow->onBeforeShow( mode, 0, msg->getData().get() );
+				refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+			}
+
+
+
 		}
 		handled = true;
 	}

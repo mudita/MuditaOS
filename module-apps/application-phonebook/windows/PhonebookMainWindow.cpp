@@ -127,7 +127,6 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchDa
 	}
 #endif
 
-
 	setFocusItem(list);
 
 	phonebookModel->clear();
