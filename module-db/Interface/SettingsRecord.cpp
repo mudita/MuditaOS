@@ -38,6 +38,7 @@ SettingsRecord SettingsRecordInterface::GetByID(uint32_t id) {
             .activeSIM = rec.activeSIM,
             .networkOperator = rec.networkOperator,
             .lockPassHash = rec.lockPassHash,
+			.lockTime = rec.lockTime,
             .language = rec.language
     };
 }
@@ -59,6 +60,7 @@ bool SettingsRecordInterface::Update(const SettingsRecord &rec) {
         .activeSIM = rec.activeSIM,
         .networkOperator = rec.networkOperator,
         .lockPassHash = rec.lockPassHash,
+		.lockTime = rec.lockTime,
         .language = rec.language
     });
 }

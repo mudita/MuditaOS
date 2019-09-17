@@ -25,5 +25,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PinLockWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MenuWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PowerOffWindow.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/data/LockPhoneData.hpp"
 )
 

@@ -42,9 +42,14 @@ protected:
 	Alignment alignment;
 	//flag that defines if 3 dots are to be displayed at the end of label's text.
 	bool dotsMode;
+	bool lineMode;
 	//area specified in pixels occupied by text inside label space.
 	//This defines also position of the text considering alignment and margins.
 	BoundingBox textArea;
+
+	//widgets to add line
+	Rect* lineFront = nullptr;
+	Rect* lineBack = nullptr;
 
 	void calculateDisplayText();
 public:
@@ -60,6 +65,10 @@ public:
 	virtual void setAlignement( const Alignment& alignment );
 	virtual void setMargins( const Margins& margins );
 	void setDotsMode( const bool val );
+	/**
+	 * @brief Defines if remaining area of the label has a horizontal line.
+	 */
+	void setLineMode( const bool& val );
 	void setTextColor( Color color );
 	void setFont( const UTF8& fontName );
 

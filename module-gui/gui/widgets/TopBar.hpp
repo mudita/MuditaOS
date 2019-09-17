@@ -40,6 +40,7 @@ protected:
 	Image* lock;
 	Image* battery[6];
 	void prepareWidget();
+	static TimeMode timeMode;
 public:
 
 
@@ -71,6 +72,11 @@ public:
 
 	void setTime( const UTF8& time );
 	void setTime( const uint32_t& time, bool mode24H );
+	UTF8 getTimeString();
+	uint32_t getTime() { return time; };
+
+	//virtual methods from Item
+	std::list<DrawCommand*> buildDrawList() override;
 };
 
 } /* namespace gui */

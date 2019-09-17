@@ -21,6 +21,7 @@
 namespace bsp{
 
     int32_t RT1051LPM::Switch(const bsp::LowPowerMode::Mode mode) {
+        currentMode = mode;
         switch (mode){
             case Mode ::FullSpeed:
                 return EnterFullSpeed();

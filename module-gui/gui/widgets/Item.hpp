@@ -73,6 +73,14 @@ public:
 	std::function<void(Item&,  void* data)> dimensionChangedCallback;
 	std::function<bool(Item&)> activatedCallback;
 	std::function<bool(Item&, InputEvent& inputEvent)> inputCallback;
+	std::function<bool(Item&)> contentCallback;
+
+    int16_t w() { return widgetArea.w; }
+    int16_t h() { return widgetArea.h; }
+    /// helper function to show where widget ends in x axis
+    int32_t offset_w() { return w() + widgetArea.x; }
+    /// helper function to show where widget ends in y axis
+    int32_t offset_h() { return h() + widgetArea.y; }
 
 	bool setFocus( bool state ) {
 		if( state != focus ) {
@@ -87,6 +95,7 @@ public:
 	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
 	virtual bool onInput( const InputEvent& inputEvent ) { return false; };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
+	virtual bool onContent() { return false; };
 
 	virtual bool addWidget( Item* item );
 	virtual bool removeWidget( Item* item );

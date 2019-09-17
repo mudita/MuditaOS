@@ -24,8 +24,8 @@
 namespace gui {
 
 class NotesEditWindow: public AppWindow {
-	Text* textMulti[3];
-	Text* textSingle;
+	Text* text = nullptr;
+	Label* title = nullptr;
 public:
 	NotesEditWindow( app::Application* app );
 	virtual ~NotesEditWindow();

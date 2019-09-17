@@ -14,10 +14,16 @@ target_sources( ${PROJECT_NAME}
 
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/PhonebookModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
 	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/PhonebookModel.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
 )
 

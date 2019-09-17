@@ -127,11 +127,14 @@ void ListView::clear() {
 
 void ListView::updatePageItems() {
 
+	int prevIndex = firstIndex-1;
 	for( int i=0; i<pageSize; i++ ) {
-		ListItem* item = provider->getItem(firstIndex + i );
+
+		ListItem* item = provider->getItem(firstIndex + i, firstIndex,prevIndex,  pageSize );
 		if( item != nullptr ) {
 			addWidget(item);
 			items.push_back(item);
+			prevIndex++;
 		}
 	}
 
@@ -151,30 +154,32 @@ void ListView::updatePageItems() {
 	else
 		verticalPosition = widgetArea.h;
 
+	auto it = items.begin();
 	for(unsigned int i=0; i<items.size(); i++ ) {
 		if( availableHeight > 0 ) {
 
-			itemHeight = items[i]->minHeight;
+			itemHeight = (*it)->minHeight;
 
 			if( orientation == ORIENTATION_TOP_DOWN ) {
-				items[i]->setPosition(0, verticalPosition );
+				(*it)->setPosition(0, verticalPosition );
 				verticalPosition += itemHeight + 1; //1 for separator
 			}
 			else {
 				verticalPosition -= itemHeight - 1; //1 for separator
-				items[i]->setPosition(0, verticalPosition );
+				(*it)->setPosition(0, verticalPosition );
 			}
 
-			items[i]->setSize(itemWidth, itemHeight );
+			(*it)->setSize(itemWidth, itemHeight );
 
 			//if list has focus and it is visible mark selected element
 			if( visible ) {
 				if( (int)(i+firstIndex) == selectedIndex )
-					items[i]->setFocus(true);
+					(*it)->setFocus(true);
 			}
 
 			availableHeight -=itemHeight;
 		}
+		std::advance(it, 1);
 	}
 }
 
@@ -273,7 +278,9 @@ void ListView::updateItems() {
 ListItem* ListView::getSelectedItem() {
 	//return object only if there are any items in the list
 	if( elementsCount ) {
-		return items[selectedIndex-firstIndex];
+		auto it = items.begin();
+		std::advance(it, selectedIndex-firstIndex );
+		return *it;
 	}
 	return nullptr;
 }
@@ -309,7 +316,9 @@ bool ListView::onActivated( void* data ) {
 	//if there are any elements in the list
 	if( elementsCount > 0 ) {
 		//select item that has focus
-		return items[ selectedIndex-firstIndex ]->onActivated( data );
+		auto it = items.begin();
+		std::advance(it, selectedIndex-firstIndex );
+		return (*it)->onActivated( data );
 	}
 
 	return false;

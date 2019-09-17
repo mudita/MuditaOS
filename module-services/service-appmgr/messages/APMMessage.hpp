@@ -120,6 +120,20 @@ public:
 	{}
 };
 
+class APMPreventBlocking: public APMMessage {
+public:
+	APMPreventBlocking( const std::string& senderName) :
+	APMMessage( MessageType::APMPreventBlocking, senderName )
+	{}
+};
+
+class APMInitPowerSaveMode: public APMMessage {
+public:
+	APMInitPowerSaveMode( const std::string& senderName) :
+	APMMessage( MessageType::APMInitPowerSaveMode, senderName )
+	{}
+};
+
 } /* namespace sapm */
 
 

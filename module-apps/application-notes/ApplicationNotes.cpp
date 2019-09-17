@@ -28,15 +28,16 @@ sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl,sys:
 
 	auto retMsg = Application::DataReceivedHandler(msgl);
 	//if message was handled by application's template there is no need to process further.
-	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
-		sys::ReturnCodes::Success ) ){
+	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode == sys::ReturnCodes::Success ) ){
 		return retMsg;
 	}
+
 
 	bool handled = false;
 
 	//handle database response
 	if( resp != nullptr ) {
+		handled = true;
 		uint32_t msgType = resp->responseTo;
 		switch( msgType ) {
 			case static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset): {
