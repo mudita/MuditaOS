@@ -50,11 +50,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 
-		if( suspended ) {
-			suspended = false;
-			sys::SystemManager::ResumeSystem(this);
-		}
-
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
@@ -62,6 +57,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		message->keyState = msg->keyState;
 		message->keyPressTime = msg->keyPressTime;
 		message->keyRelaseTime = msg->keyRelaseTime;
+
+        if( suspended && (message->keyState == sevm::KeyboardEvents::keyPressed) ) {
+            suspended = false;
+            sys::SystemManager::ResumeSystem(this);
+        }
 
 		//send key to focused application
 		if( targetApplication.empty() == false ) {
@@ -120,11 +120,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 		//resume system first
 		if( suspended ) {
-			suspended = false;
-			sys::SystemManager::ResumeSystem(this);
+			//suspended = false;
+			//sys::SystemManager::ResumeSystem(this);
 		}
 
-		HandleAlarmTrigger(msgl);
+		//HandleAlarmTrigger(msgl);
 
 		handled = true;
 	}
