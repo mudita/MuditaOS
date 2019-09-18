@@ -209,7 +209,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
-			sapm::ApplicationManager::messageInitPowerSaveMode(application);
+			reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
 		}
 		//long press of right function button muve user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
