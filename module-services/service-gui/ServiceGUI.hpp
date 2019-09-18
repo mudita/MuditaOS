@@ -57,6 +57,11 @@ protected:
 
 	WorkerGUI* worker;
 
+	/**
+	 * Flag controls process of redrawing screen when suspend is in progress.
+	 */
+	bool suspendInProgress = false;
+
 	void sendBuffer();
 	void sendToRender();
 

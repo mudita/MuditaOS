@@ -28,10 +28,13 @@ protected:
 public:
 	gui::RefreshModes mode;
 	std::list< std::unique_ptr< gui::DrawCommand > > commands;
+
 	/**
-	 * @brief This constructor converts list of draw command pointers to list of unique pointers
+	 * flag that informs that this is last rendering before suspending system.
 	 */
-	DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode );
+	bool suspend = false;
+
+	DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode, bool suspend = false );
 	virtual ~DrawMessage();
 };
 

@@ -123,7 +123,7 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchDat
 		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
 		lockTimeoutApplilcation = lockData->getPreviousApplication();
 
-		sapm::ApplicationManager::messageInitPowerSaveMode(application);
+		reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
 	}
 
 	setVisibleState();

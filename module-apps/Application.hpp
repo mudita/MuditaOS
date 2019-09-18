@@ -105,6 +105,8 @@ public:
 		return settings;
 	}
 
+	virtual void setSuspendFlag( bool val ) { suspendInProgress = val; };
+
 	//static methods
 	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data );
 	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data=nullptr );
@@ -153,6 +155,12 @@ protected:
 	 * Flag defines how application will behave after registration. It can go forground or background
 	 */
 	bool startBackground = false;
+	/**
+	 * Flag defines whether application initialized suspend mode, this will influence how render message will sent to gui service.
+	 * If suspend is true, application manager will receive information from both eink and gui services if last rendering mesage will
+	 * be processed.
+	 */
+	bool suspendInProgress = false;
 
 	//protected static methods
 	/**

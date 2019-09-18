@@ -39,6 +39,8 @@ protected:
 
 	bool suspended = false;
 
+	bool suspendInProgress = false;
+
 	bool changeWaveform( EinkWaveforms_e Mode, const int32_t temperature );
 
 	bool deepClearScreen(int8_t temperature);
