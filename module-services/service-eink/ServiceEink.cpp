@@ -78,6 +78,9 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 //			LOG_INFO("[ServiceEink] Received framebuffer");
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
 			deepRefresh = dmsg->getDeepRefresh();
+			suspendInProgress = dmsg->getSuspend();
+			if(suspendInProgress)
+				LOG_DEBUG("suspend In Progress");
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer );
 			sys::Bus::SendUnicast(msg, this->GetName(), this);
 		} break;
@@ -87,6 +90,11 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 //			uint32_t start_tick = xTaskGetTickCount();
 
 			if( suspended ) {
+				if( suspendInProgress ) {
+					LOG_ERROR("drawing before suspend failed");
+					suspendInProgress = false;
+				}
+
 				LOG_INFO("[ServiceEink] Received image while suspended, ignoring");
 			}
 
@@ -132,7 +140,8 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 
 				ReloadTimer( timerPowerOff );
 
-				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
+				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress );
+				suspendInProgress = false;
 				sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 			}
 

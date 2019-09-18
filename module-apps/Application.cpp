@@ -80,9 +80,12 @@ void Application::render( gui::RefreshModes mode ) {
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
-		auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode);
+		auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, suspendInProgress);
 		sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 	}
+
+	if( suspendInProgress )
+		suspendInProgress = false;
 }
 void Application::blockEvents(bool isBlocked ) {
 	acceptInput = isBlocked;

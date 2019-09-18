@@ -19,9 +19,12 @@ namespace sgui {
  * @brief Template for all messages that go to gui service
  */
 class GUIMessage: public sys::DataMessage {
+	bool suspend = false;
 public:
-	GUIMessage( MessageType messageType ) : sys::DataMessage(static_cast<uint32_t>(messageType)) {};
+	GUIMessage( MessageType messageType, bool suspend = false  ) : sys::DataMessage(static_cast<uint32_t>(messageType)),
+	suspend{ suspend } {};
 	virtual ~GUIMessage() {};
+	bool getSuspend() { return suspend; };
 };
 
 } /* namespace sgui */
