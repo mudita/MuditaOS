@@ -1397,8 +1397,6 @@ void LPM_EnterFullSpeed(void)
 
     /* Set SystemCoreClock variable. */
     SystemCoreClockUpdate();
-
-    PrintSystemClocks();
 }
 
 void LPM_EnterLowPowerIdle(void)
@@ -1438,8 +1436,8 @@ void LPM_EnterLowPowerIdle(void)
     /* Power down USBPHY */
     PowerDownUSBPHY();
 
-    /* Adjust LP + FR voltage to 0.8V */
-    DCDC_AdjustTargetVoltage(DCDC, 0x0, 0x0);
+    /* Adjust LP + FR voltage to 0.9V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x4, 0x0);
     /* Switch DCDC to use DCDC internal OSC */
     DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
 
@@ -1465,7 +1463,4 @@ void LPM_EnterLowPowerIdle(void)
 
     CLOCK_SetMux(kCLOCK_SemcMux,0);
     clkPLL2setup(CLK_DISABLE);
-    PrintSystemClocks();
-
-
 }
