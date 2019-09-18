@@ -53,6 +53,10 @@ void PhonebookItem::setValue( UTF8 text ) {
 	setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 }
 
+UTF8 PhonebookItem::getValue() {
+	return value->getText();
+}
+
 bool PhonebookItem::onActivated( void* data ) {
 	LOG_INFO("ITEM WAS PRESSED");
 	return true;

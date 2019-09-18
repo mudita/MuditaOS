@@ -54,6 +54,7 @@ void PhonebookMainWindow::buildInterface() {
 	list->setPenFocusWidth(0);
 	list->setPenWidth(0);
 	list->setProvider( phonebookModel );
+	list->setApplication( application );
 
 
 	bottomBar->setActive(BottomBar::Side::LEFT, true);
