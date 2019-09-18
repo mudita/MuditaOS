@@ -269,6 +269,7 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 		state = State::INCOMING_CALL;
 		numberLabel->setText( incData->getPhoneNumber());
 	}
+
 	setVisibleState();
 	application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
 

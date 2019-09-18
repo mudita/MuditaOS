@@ -32,12 +32,14 @@ public:
 	//sets copy of contact
 	void setContact( std::shared_ptr<ContactRecord> note );
 	void setValue( UTF8 text );
+	UTF8 getValue();
 
 	//returns contact's structure
-	std::shared_ptr<ContactRecord> getContact();
+	std::shared_ptr<ContactRecord> getContact() { return contact; };
 	//virtual methods from Item
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 	bool onActivated( void* data ) override;
+
 };
 
 } /* namespace gui */

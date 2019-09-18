@@ -7,7 +7,10 @@
  * @details
  */
 #include "log/log.hpp"
+#include "PhonebookItem.hpp"
 #include "PhonebookListView.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
+#include "application-call/ApplicationCall.hpp"
 
 namespace gui {
 
@@ -23,9 +26,39 @@ PhonebookListView::PhonebookListView( Item* parent, uint32_t x, uint32_t y, uint
 PhonebookListView::~PhonebookListView() {
 }
 
+void PhonebookListView::setApplication( app::Application* app ) {
+	application = app;
+}
+
 bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 	if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_ENTER) ) {
-		return onActivated(nullptr);
+
+		LOG_INFO("Pressed index: %d", selectedIndex - firstIndex);
+		return true;
+
+//		return onActivated(nullptr);
+	}
+
+	if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_LF) ) {
+
+		//find which item has been pressed
+		int index = selectedIndex - firstIndex;
+		auto it = items.begin();
+		int count = -1;
+		for( int i=0; i<pageSize; i++ ) {
+			if( (*it)->getID() >= 0 )
+				count++;
+			if( count == index )
+				break;
+			std::advance( it, 1 );
+		}
+
+		PhonebookItem* item = reinterpret_cast<PhonebookItem*>(*it);
+		LOG_INFO("calling index: %d %s", index, item->getValue().c_str());
+
+		app::ApplicationCall::messageSwitchToCall( application, item->getContact()->numbers[0].numberE164.c_str(), true );
+
+		return true;
 	}
 
 	if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_UP) ){

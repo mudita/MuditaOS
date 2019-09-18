@@ -42,9 +42,10 @@ public:
 	void runCallTimer();
 	void stopCallTimer();
 	/**
-	 * @brief Performs switch to call application providing first character in number.
+	 * @brief Performs switch to call application with the number needed to perform the call
+	 *
 	 */
-	void messageSwitchToEnterPhone( sys::Service* sender );
+	static bool messageSwitchToCall( sys::Service* sender, const UTF8& e164number, bool call = false );
 };
 
 class ApplicationCallLauncher : public ApplicationLauncher {
