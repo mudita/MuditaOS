@@ -231,7 +231,7 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
             }
 
             //TODO remove screen clearing code below.
-//            EinkPowerOn();
+            EinkPowerOn();
 //
 //            uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
 //            // Make the saturation to the lower limit

@@ -58,8 +58,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		message->keyPressTime = msg->keyPressTime;
 		message->keyRelaseTime = msg->keyRelaseTime;
 
-//        if( suspended && (message->keyState == sevm::KeyboardEvents::keyPressed) ) {
-		if( suspended ) {
+        if( suspended && (message->keyState == sevm::KeyboardEvents::keyPressed) ) {
+//		if( suspended ) {
             suspended = false;
             sys::SystemManager::ResumeSystem(this);
         }
