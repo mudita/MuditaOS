@@ -211,7 +211,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 
 			reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
 		}
-		//long press of right function button muve user to power off window
+		//long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
 			application->switchWindow( "PowerOffWindow", 0, nullptr );
 		}

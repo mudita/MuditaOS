@@ -472,6 +472,6 @@ sys::ReturnCodes ServiceDB::DeinitHandler() {
 }
 
 sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
-    LOG_FATAL("[ServiceCellular] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+    LOG_FATAL("[%s] PowerModeHandler: %d", this->GetName().c_str(), static_cast<uint32_t>(mode));
     return sys::ReturnCodes::Success;
 }

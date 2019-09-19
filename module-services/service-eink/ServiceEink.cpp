@@ -231,19 +231,19 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
             }
 
             //TODO remove screen clearing code below.
-            EinkPowerOn();
-
-            uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
-            // Make the saturation to the lower limit
-            if (s_einkAmbientTemperature < 0)
-                s_einkAmbientTemperature = 0;
-
-            // Make the saturation to the higher limit
-            if (s_einkAmbientTemperature > 49)
-                s_einkAmbientTemperature = 49;
-
-            // Clear the temperature timer count
-            deepClearScreen( s_einkAmbientTemperature );
+//            EinkPowerOn();
+//
+//            uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
+//            // Make the saturation to the lower limit
+//            if (s_einkAmbientTemperature < 0)
+//                s_einkAmbientTemperature = 0;
+//
+//            // Make the saturation to the higher limit
+//            if (s_einkAmbientTemperature > 49)
+//                s_einkAmbientTemperature = 49;
+//
+//            // Clear the temperature timer count
+//            deepClearScreen( s_einkAmbientTemperature );
         }
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
