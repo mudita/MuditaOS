@@ -55,7 +55,7 @@ ServiceEink::ServiceEink(const std::string& name, std::string parent)
 }
 
 ServiceEink::~ServiceEink(){
-	LOG_INFO("[ServiceEink] Cleaning resources");
+//	LOG_INFO("[ServiceEink] Cleaning resources");
 	//release data from settings
 	if( waveformSettings.LUTCData != nullptr )
 		delete [] waveformSettings.LUTCData;
@@ -75,11 +75,9 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
 			stopTimer( timerPowerOff );
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
-			LOG_INFO("[%s] EinkImageData", GetName().c_str());
+//			LOG_INFO("[%s] EinkImageData", GetName().c_str());
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
 			deepRefresh = dmsg->getDeepRefresh();
-
-			LOG_INFO("RENDERING: %s", deepRefresh?"DEEP":"FAST");
 
 			suspendInProgress = dmsg->getSuspend();
 			if(suspendInProgress)
@@ -89,7 +87,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 		} break;
 		case static_cast<uint32_t>(MessageType::EinkDMATransfer): {
 
-			LOG_INFO("[%s] EinkDMATransfer", GetName().c_str());
+//			LOG_INFO("[%s] EinkDMATransfer", GetName().c_str());
 //			uint32_t start_tick = xTaskGetTickCount();
 
 			if( suspended ) {
@@ -151,11 +149,11 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 		} break;
 
 		case static_cast<uint32_t>(MessageType::EinkTemperatureUpdate): {
-			LOG_INFO("[%s] EinkTemperatureUpdate", GetName().c_str());
+//			LOG_INFO("[%s] EinkTemperatureUpdate", GetName().c_str());
 		} break;
 
 		case static_cast<uint32_t>(MessageType::EinkStateRequest ): {
-			LOG_INFO("[%s] EinkStateRequest", GetName().c_str());
+//			LOG_INFO("[%s] EinkStateRequest", GetName().c_str());
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;

@@ -57,9 +57,9 @@ public:
 
 			//store new records
 			for( unsigned int i=0; i<count; i++ ) {
-				auto ii = i+(pageSize*(page-currentPage) + pageSize)+offset% limit;
+				auto ii = i+(pageSize*(page-currentPage) + pageSize)+offset% pageSize;
 				this->records[ii] = nullptr;
-				this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% limit] = std::make_shared<T>( records.get()->operator [](i) );
+				this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% pageSize] = std::make_shared<T>( records.get()->operator [](i) );
 				//this->records[i+(pageSize*(page-currentPage) + pageSize)+offset% limit] = std::shared_ptr<T>( new T(records.get()->operator [](i)) );
 			}
 

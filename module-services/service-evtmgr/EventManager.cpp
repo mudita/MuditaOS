@@ -52,6 +52,15 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
+//		std::string keyState = "PRESS";
+//				if( msg->keyState == sevm::KeyboardEvents::keyReleasedShort )
+//					keyState = "RELEASE SHORT";
+//				if( msg->keyState == sevm::KeyboardEvents::keyReleasedLong )
+//						keyState = "RELEASE SHORT";
+//
+//				LOG_WARN("Key: %d %s", msg->keyCode, keyState.c_str());
+
+
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = msg->keyCode;
 		message->keyState = msg->keyState;
