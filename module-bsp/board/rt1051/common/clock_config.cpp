@@ -1077,16 +1077,16 @@ void DisableRegularLDO(void)
 void BandgapOff(void)
 {
     XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
-    //PMU->MISC0_SET              |= PMU_MISC0_REFTOP_PWD_MASK;
+    PMU->MISC0_SET              |= PMU_MISC0_REFTOP_PWD_MASK;
 }
 
 void BandgapOn(void)
 {
     /* Turn on regular bandgap and wait for stable */
-/*    PMU->MISC0_CLR |= PMU_MISC0_REFTOP_PWD_MASK;
+    PMU->MISC0_CLR |= PMU_MISC0_REFTOP_PWD_MASK;
     while ((PMU->MISC0 & PMU_MISC0_REFTOP_VBGUP_MASK) == 0)
     {
-    }*/
+    }
     /* Low power band gap disable */
     XTALOSC24M->LOWPWR_CTRL_CLR = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
 }
@@ -1337,8 +1337,8 @@ void LPM_EnterFullSpeed(void)
     /* Connect internal the load resistor */
     DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
 
-    /* Adjust SOC voltage to 1.15V */
-    DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
+    /* Adjust SOC voltage to 1.275V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x13, 0x1);
 
     dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=false};
     DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
@@ -1395,6 +1395,9 @@ void LPM_EnterFullSpeed(void)
     /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
     CLOCK_SetMux(kCLOCK_PeriphMux, 0);            //CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
+    /* Adjust SOC voltage to 1.15V */
+    DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
+
     /* Set SystemCoreClock variable. */
     SystemCoreClockUpdate();
 }
@@ -1436,8 +1439,8 @@ void LPM_EnterLowPowerIdle(void)
     /* Power down USBPHY */
     PowerDownUSBPHY();
 
-    /* Adjust LP + FR voltage to 0.9V */
-    DCDC_AdjustTargetVoltage(DCDC, 0x4, 0x0);
+    /* Adjust SOC voltage to 0.95V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x6, 0x1);
     /* Switch DCDC to use DCDC internal OSC */
     DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
 
