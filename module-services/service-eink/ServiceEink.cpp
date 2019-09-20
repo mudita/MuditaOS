@@ -235,13 +235,13 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
             //TODO remove screen clearing code below.
             EinkPowerOn();
 
-            int32_t temperature = EinkGetTemperatureInternal();
-            	//			LOG_INFO("temperature: %d", temperature );
-
-			changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
-			EinkDitherDisplay();
-
-            EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
+//            int32_t temperature = EinkGetTemperatureInternal();
+//            	//			LOG_INFO("temperature: %d", temperature );
+//
+//			changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+//			EinkDitherDisplay();
+//
+//            EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
 
             EinkPowerOff();
 //
