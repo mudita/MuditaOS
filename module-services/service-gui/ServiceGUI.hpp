@@ -57,6 +57,11 @@ protected:
 
 	WorkerGUI* worker;
 
+	/**
+	 * Flag controls process of redrawing screen when suspend is in progress.
+	 */
+	bool suspendInProgress = false;
+
 	void sendBuffer();
 	void sendToRender();
 
@@ -73,7 +78,7 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 };
 
 } /* namespace sgui */

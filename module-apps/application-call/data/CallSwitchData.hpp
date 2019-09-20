@@ -22,7 +22,8 @@ public:
 	enum class Type {
 		UNDEFINED,
 		ENTER_NUMBER,
-		INCOMMING_CALL
+		INCOMMING_CALL,
+		CALL_NUMBER
 	};
 protected:
 	Type type = Type::UNDEFINED;
@@ -49,6 +50,16 @@ protected:
 public:
 	IncommingCallData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::INCOMMING_CALL ), phoneNumber{ number }{};
 	virtual ~IncommingCallData(){};
+
+	const std::string& getPhoneNumber() const { return phoneNumber; };
+};
+
+class ExecuteCallData: public CallSwitchData {
+protected:
+	std::string phoneNumber;
+public:
+	ExecuteCallData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::CALL_NUMBER ), phoneNumber{ number }{};
+	virtual ~ExecuteCallData(){};
 
 	const std::string& getPhoneNumber() const { return phoneNumber; };
 };

@@ -156,9 +156,24 @@ void ApplicationCall::TickHandler(uint32_t id) {
 }
 
 void ApplicationCall::stopCallTimer() {
-	LOG_INFO("switching to precv calldur: %d endTime: %d", callDuration, callEndTime );
+	LOG_INFO("switching to prev calldur: %d endTime: %d", callDuration, callEndTime );
 	stopTimer(timerCall);
 	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
+}
+
+bool ApplicationCall::messageSwitchToCall( sys::Service* sender, const UTF8& e164number, bool call ) {
+	std::string application = "ApplicationCall";
+	std::string window = "CallWindow";
+
+	std::unique_ptr<ExecuteCallData> data = std::make_unique<ExecuteCallData>(e164number.c_str());
+
+	//it is possible to prepare call window and wait for user's acceptance
+	if( call )
+		data->setDescription("call"); //execute call
+	else
+		data->setDescription("prepare"); //TODO prepare call and wait for user's action
+
+	return sapm::ApplicationManager::messageSwitchApplication( sender, application, window, std::move(data));
 }
 
 void ApplicationCall::createUserInterface() {

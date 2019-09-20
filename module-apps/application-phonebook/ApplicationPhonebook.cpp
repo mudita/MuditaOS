@@ -24,7 +24,19 @@ sys::Message_t ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl,
     }
 
     // this variable defines whether message was processed.
-    bool handled = true;
+    bool handled = false;
+
+    //handle database response
+	if( resp != nullptr ) {
+		handled = true;
+		uint32_t msgType = resp->responseTo;
+		switch( msgType ) {
+			case static_cast<uint32_t>(MessageType::DBContactGetLimitOffset): {
+				if( currentWindow->onDatabaseMessage( resp ) )
+					refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
+			}break;
+		}
+	}
 
     if (handled)
         return std::make_shared<sys::ResponseMessage>();

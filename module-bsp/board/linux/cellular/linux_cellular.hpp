@@ -46,6 +46,10 @@ namespace bsp {
 
 		void InformModemHostWakeup() override final;
 
+        void EnterSleep() override final;
+
+        void ExitSleep() override final;
+
     private:
 
         static constexpr speed_t baud_bits[] = {

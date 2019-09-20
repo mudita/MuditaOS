@@ -105,6 +105,9 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 	uint32_t msgType = msgl->messageType;
 
 	switch( msgType ) {
+		case static_cast<uint32_t>( MessageType::APMInitPowerSaveMode ): {
+			handlePowerSavingModeInit();
+		} break;
 		case static_cast<uint32_t>( MessageType::APMPreventBlocking ): {
 //			LOG_INFO("Restarting screen locking timer");
 			ReloadTimer(blockingTimerID);
@@ -267,6 +270,24 @@ sys::ReturnCodes ApplicationManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceAppMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            sys::SystemManager::ResumeService("ServiceEink",this);
+            sys::SystemManager::ResumeService("ServiceGUI",this);
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            sys::SystemManager::SuspendService("ServiceGUI",this);
+            sys::SystemManager::SuspendService("ServiceEink",this);
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
+
 bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	state = State::STARTING_NEW_APP;
@@ -291,6 +312,18 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 	return true;
 }
 
+bool ApplicationManager::handlePowerSavingModeInit() {
+
+	LOG_INFO("Going to suspend mode");
+
+	sys::SystemManager::SuspendService("ServiceGUI",this);
+	sys::SystemManager::SuspendService("ServiceEink",this);
+
+	sys::SystemManager::SuspendSystem(this);
+
+	return true;
+}
+
 //tries to switch the application
 bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 
@@ -305,7 +338,7 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	//check if specified application is not the application that is currently running
 	//this is applicable to all applications except desktop
 	if( (focusApplicationName == msg->getName()) ) {
-		LOG_WARN("Trying to rerun currently active application");
+		LOG_WARN("Trying to return currently active application");
 		return false;
 	}
 
@@ -373,6 +406,7 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	launchApplicationName = previousApplicationName;
 	//store window and data if there is any
 	it->second->switchData = std::move(msg->getData());
+	it->second->switchWindow = "LastWindow";
 	state = State::CLOSING_PREV_APP;
 
 	//notify event manager which application should receive keyboard messages
@@ -574,6 +608,12 @@ bool ApplicationManager::messageCloseApplicationManager( sys::Service* sender ) 
 
 bool ApplicationManager::messagePreventBlocking( sys::Service* sender ) {
 	auto msg = std::make_shared<sapm::APMPreventBlocking>( sender->GetName() );
+	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+	return true;
+}
+
+bool ApplicationManager::messageInitPowerSaveMode( sys::Service* sender ) {
+	auto msg = std::make_shared<sapm::APMInitPowerSaveMode>( sender->GetName() );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }

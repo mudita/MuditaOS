@@ -154,46 +154,6 @@ namespace bsp {
         SCB_EnableICache();
     }
 
-    void BOARD_PrintClocks( void ) {
-        const char *_PLLNames[22] = {
-                "kCLOCK_CpuClk",  /*!< CPU clock */
-                "kCLOCK_AhbClk",  /*!< AHB clock */
-                "kCLOCK_SemcClk", /*!< SEMC clock */
-                "kCLOCK_IpgClk",  /*!< IPG clock */
-
-                "kCLOCK_OscClk", /*!< OSC clock selected by PMU_LOWPWR_CTRL[OSC_SEL]. */
-                "kCLOCK_RtcClk", /*!< RTC clock. (RTCCLK) */
-
-                "kCLOCK_ArmPllClk", /*!< ARMPLLCLK. */
-
-                "kCLOCK_Usb1PllClk",     /*!< USB1PLLCLK. */
-                "kCLOCK_Usb1PllPfd0Clk", /*!< USB1PLLPDF0CLK. */
-                "kCLOCK_Usb1PllPfd1Clk", /*!< USB1PLLPFD1CLK. */
-                "kCLOCK_Usb1PllPfd2Clk", /*!< USB1PLLPFD2CLK. */
-                "kCLOCK_Usb1PllPfd3Clk", /*!< USB1PLLPFD3CLK. */
-
-                "kCLOCK_Usb2PllClk", /*!< USB2PLLCLK. */
-
-                "kCLOCK_SysPllClk",      /*!< SYSPLLCLK. */
-                "kCLOCK_SysPllPfd0Clk",  /*!< SYSPLLPDF0CLK. */
-                "kCLOCK_SysPllPfd1Clk",  /*!< SYSPLLPFD1CLK. */
-                "kCLOCK_SysPllPfd2Clk", /*!< SYSPLLPFD2CLK. */
-                "kCLOCK_SysPllPfd3Clk", /*!< SYSPLLPFD3CLK. */
-
-                "kCLOCK_EnetPll0Clk", /*!< Enet PLLCLK ref_enetpll0. */
-                "kCLOCK_EnetPll1Clk", /*!< Enet PLLCLK ref_enetpll1. */
-
-                "kCLOCK_AudioPllClk", /*!< Audio PLLCLK. */
-                "kCLOCK_VideoPllClk", /*!< Video PLLCLK. */
-        };
-        int i;
-
-        for (i=0; i<22; i++) {
-            LOG_PRINTF("%s: %i Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
-        }
-
-    }
-
     void Power_SW_Init( void ) {
         gpio_pin_config_t gpio_config = {kGPIO_DigitalInput, 0, kGPIO_NoIntmode};
 
@@ -217,12 +177,7 @@ namespace bsp {
 
         irq_gpio_Init();
 
-        BOARD_PrintClocks();
-        PrintPerphSourceClocks();
-
-
-
-
+        PrintSystemClocks();
     }
 
 

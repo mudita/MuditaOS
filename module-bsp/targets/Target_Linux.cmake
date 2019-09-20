@@ -9,7 +9,7 @@ set(BOARD_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/cellular/linux_cellular.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/rtc/rtc.cpp"
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/pwr/lpm.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/lpm/LinuxLPM.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/linux_audiocodec.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio/LinuxCellularAudio.cpp"
@@ -21,7 +21,6 @@ set(BOARD_DIR_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/eink
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/pwr
         ${CMAKE_CURRENT_SOURCE_DIR}/board/linux/audio
-
 
         CACHE INTERNAL "")
 

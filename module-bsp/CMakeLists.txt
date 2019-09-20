@@ -20,6 +20,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
@@ -27,7 +28,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
-        )
+        board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h)
 
 if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)
@@ -63,10 +64,10 @@ target_compile_definitions(${PROJECT_NAME}
         )
 
 target_include_directories(${PROJECT_NAME}
-        PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}"
+		PUBLIC
 
-        )
+		${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 set_source_files_properties(${BOARD_SOURCE_FILES_PROPERTIES})
 

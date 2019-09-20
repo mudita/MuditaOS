@@ -49,7 +49,7 @@ void EnterNumberWindow::buildInterface() {
 }
 void EnterNumberWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete numberLabel;
+	if( numberLabel ) { removeWidget(numberLabel); delete numberLabel; numberLabel= nullptr; }
 	children.clear();
 }
 
@@ -74,7 +74,6 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			std::string num = app->getDisplayedNumber();
 			LOG_INFO("number: [%s]", num.c_str());
 			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
-//			auto ret = CellularServiceAPI::DialNumber(application,"694135409");
 			LOG_INFO("CALL RESULT: %s", (ret?"OK":"FAIL"));
 		}
 		else if(inputEvent.keyCode == KeyCode::KEY_RF) {
@@ -158,6 +157,10 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
 			return true;
 		}break;
 		case app::CallSwitchData::Type::INCOMMING_CALL: {
+			return false;
+		}break;
+		case app::CallSwitchData::Type::CALL_NUMBER: {
+			LOG_INFO("app::CallSwitchData::Type::CALL_NUMBER");
 			return false;
 		}break;
 	};

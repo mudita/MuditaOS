@@ -39,6 +39,8 @@ enum class MessageType {
 	DBThreadRemove,     // Remove thread by ID
 	DBThreadGetLimitOffset, // Get Thread record by limit,offset
 
+	DBContactVerify,    //checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
+						//speed dial key
 	DBContactAdd,       // Add contact record
 	DBContactRemove,    // Remove contact remove
 	DBContactUpdate,    // Update contact remove
@@ -99,6 +101,7 @@ enum class MessageType {
 					//applications in background and currently active application.
 	APMClose,       //this message will trigger application manager to close itself, all running applications gui and eink services.
 	APMPreventBlocking, //Prevents application manager from initializing device blocking.
+	APMInitPowerSaveMode, //This message is sent to application manager from desktop when locking timeout has triggered or user explicitly locked the phone.
 
 	//keyboard messages
 	KBDKeyEvent,

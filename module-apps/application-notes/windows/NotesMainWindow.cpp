@@ -37,12 +37,23 @@ void NotesMainWindow::rebuild() {
 void NotesMainWindow::buildInterface() {
 	AppWindow::buildInterface();
 
-	list = new gui::ListView(this, 16, 104, 480-32, 440 );
+	list = new gui::ListView(this, 16, 105, 480-32, 440 );
 	list->setMaxElements(3);
 	list->setPageSize(3);
+	list->setPenFocusWidth(0);
+	list->setPenWidth(0);
 	list->setProvider( notesModel );
 
 	setFocusItem(list);
+
+	title = new gui::Label(this, 0, 50, 480, 54);
+	title->setFilled(false);
+	title->setBorderColor( gui::ColorFullBlack );
+	title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+	title->setMargins( Margins(0,0,0,18));
+	title->setFont("gt_pressura_bold_24");
+	title->setText(utils::localize.get("app_notes_title_main"));
+	title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
@@ -54,6 +65,10 @@ void NotesMainWindow::buildInterface() {
 }
 void NotesMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
+
+	if( title ) { removeWidget(title); delete title; title = nullptr; };
+	if( list ) { removeWidget(list); delete list; list= nullptr; };
+
 	children.clear();
 	delete notesModel;
 }

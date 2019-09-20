@@ -49,13 +49,29 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
+
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
+
+		std::string keyState = "PRESS";
+		if( msg->keyState == sevm::KeyboardEvents::keyReleasedShort )
+			keyState = "RELEASE SHORT";
+		if( msg->keyState == sevm::KeyboardEvents::keyReleasedLong )
+				keyState = "RELEASE SHORT";
+
+//		LOG_WARN("Key: %d %s", msg->keyCode, keyState.c_str());
+
 
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
 		message->keyCode = msg->keyCode;
 		message->keyState = msg->keyState;
 		message->keyPressTime = msg->keyPressTime;
 		message->keyRelaseTime = msg->keyRelaseTime;
+
+        if( suspended && (message->keyState == sevm::KeyboardEvents::keyPressed) ) {
+//		if( suspended ) {
+            suspended = false;
+            sys::SystemManager::ResumeSystem(this);
+        }
 
 		//send key to focused application
 		if( targetApplication.empty() == false ) {
@@ -77,6 +93,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
 
+		if( suspended ) {
+			suspended = false;
+			sys::SystemManager::ResumeSystem(this);
+		}
+
 		auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
 		message->levelPercents = msg->levelPercents;
 		message->fullyCharged = msg->fullyCharged;
@@ -84,11 +105,17 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
+
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
+
+		if( suspended ) {
+			suspended = false;
+			sys::SystemManager::ResumeSystem(this);
+		}
 
 		auto message = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
 		message->plugged = msg->plugged;
@@ -101,7 +128,15 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
 			msgl->sender == this->GetName() ){
 
-		HandleAlarmTrigger(msgl);
+		//resume system first
+		if( suspended ) {
+			//suspended = false;
+			//sys::SystemManager::ResumeSystem(this);
+		}
+
+		//HandleAlarmTrigger(msgl);
+
+		handled = true;
 	}
 
 	if( handled )
@@ -145,6 +180,22 @@ sys::ReturnCodes EventManager::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    suspended = true;
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+        	suspended = false;
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
 
 bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
 

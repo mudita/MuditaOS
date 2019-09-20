@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.14)
 project(module-sys VERSION 1.0
         DESCRIPTION "Core module library")
 
-set(CMAKE_CXX_STANDARD 14)
-
 if(NOT DEFINED PROJECT_LIB_DIRECTORY )
     set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
     message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
@@ -26,6 +24,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Message.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Service/Service.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/SystemManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SystemManager/PowerManager.cpp
 
         )
 

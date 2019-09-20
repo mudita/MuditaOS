@@ -36,6 +36,11 @@ protected:
 
 	//structure with recently loaded waveformdata
 	EinkWaveFormSettings_t waveformSettings;
+
+	bool suspended = false;
+
+	bool suspendInProgress = false;
+
 	bool changeWaveform( EinkWaveforms_e Mode, const int32_t temperature );
 
 	bool deepClearScreen(int8_t temperature);
@@ -56,7 +61,7 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 };
 
 #endif /* MODULE_SERVICES_SERVICE_EINK_SERVICEEINK_HPP_ */

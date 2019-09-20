@@ -31,7 +31,7 @@ public:
 	void requestRecords( const uint32_t offset, const uint32_t limit ) override;
 
 	//virtual methods for ListViewProvider
-	gui::ListItem* getItem( int index );
+	gui::ListItem* getItem( int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown ) override;
 	int getItemCount();
 };
 

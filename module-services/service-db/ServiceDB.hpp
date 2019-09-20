@@ -53,8 +53,7 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
-
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
     static const char* serviceName;
 
 };

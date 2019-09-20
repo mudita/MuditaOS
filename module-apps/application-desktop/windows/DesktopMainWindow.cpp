@@ -122,6 +122,8 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchDat
 
 		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
 		lockTimeoutApplilcation = lockData->getPreviousApplication();
+
+		reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
 	}
 
 	setVisibleState();
@@ -206,8 +208,10 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			app->setScreenLocked(true);
 			setVisibleState();
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+			reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
 		}
-		//long press of right function button muve user to power off window
+		//long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
 			application->switchWindow( "PowerOffWindow", 0, nullptr );
 		}

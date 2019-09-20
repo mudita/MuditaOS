@@ -35,7 +35,7 @@ class NotesItem: public ListItem {
 		NotesItem( NotesModel* model, bool mode24H );
 		virtual ~NotesItem();
 		//sets copy of alarm's
-		void setNote( std::shared_ptr<NotesRecord> note );
+		void setNote( std::shared_ptr<NotesRecord>& note );
 
 		//returns alarm structure
 		std::shared_ptr<NotesRecord> getAlarm();
