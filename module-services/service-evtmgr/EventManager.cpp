@@ -58,7 +58,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		if( msg->keyState == sevm::KeyboardEvents::keyReleasedLong )
 				keyState = "RELEASE SHORT";
 
-		LOG_WARN("Key: %d %s", msg->keyCode, keyState.c_str());
+//		LOG_WARN("Key: %d %s", msg->keyCode, keyState.c_str());
 
 
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
