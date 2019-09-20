@@ -36,11 +36,25 @@ public:
     static bool ThreadRemove(sys::Service* serv,uint32_t id);
     static std::unique_ptr<std::vector<ThreadRecord>> ThreadGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
 
+    /**
+	 * @brief Function is checking if new contact can be added to database. Function is blocking.
+	 * @param serv Pointer to Service based object that is sending request.
+	 * @param rec Reference to the contact to be added to database.
+	 * @param errName in case of existing contact with same name this record will be filled with data.
+	 * @param errName in case of existing contact with same primary phone number this record will be filled with data.
+	 * @param errName in case of existing contact with same alternative phone number this record will be filled with data.
+	 * @param errName in case of existing contact with same speed dial assigned this record will be filled with data.
+	 *
+	 * @note This function is blocking. It's checking until first error.
+	 */
+	static bool verifyContact( sys::Service* serv,const NotesRecord& rec,
+		NotesRecord& errName, const NotesRecord& errPhone1, NotesRecord& errPhone2, NotesRecord& speedDial );
     static bool ContactAdd(sys::Service* serv,const ContactRecord& rec);
     static bool ContactRemove(sys::Service* serv,uint32_t id);
     static bool ContactUpdate(sys::Service* serv,const ContactRecord& rec);
-    static uint32_t ContactGetCount(sys::Service* serv);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+    static uint32_t ContactGetCount(sys::Service* serv, bool favourites = false );
+//    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit, bool favourites = false );
+    static bool ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit, bool favourites = false );
 
     static bool AlarmAdd(sys::Service* serv,const AlarmsRecord& rec);
     static bool AlarmRemove(sys::Service* serv,uint32_t id);
@@ -54,7 +68,6 @@ public:
 	static bool NotesUpdate(sys::Service* serv,const NotesRecord& rec);
 	static uint32_t NotesGetCount(sys::Service* serv);
 	static bool NotesGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
-
 };
 
 

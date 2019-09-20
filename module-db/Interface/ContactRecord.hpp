@@ -34,13 +34,13 @@ struct ContactRecord{
     };
     std::vector<Number> numbers;
 
-        UTF8 country;
-        UTF8 city;
-        UTF8 street;
-        UTF8 number;
-        UTF8 note;
-        UTF8 mail;
-        ContactAddressType addressType;
+	UTF8 country;
+	UTF8 city;
+	UTF8 street;
+	UTF8 number;
+	UTF8 note;
+	UTF8 mail;
+	ContactAddressType addressType;
 
     UTF8 assetPath;
 
@@ -53,6 +53,7 @@ struct ContactRecord{
 enum class ContactRecordField {
     PrimaryName,
     NumberE164,
+	Favourite,
 };
 
 class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField> {
@@ -71,6 +72,8 @@ public:
     ContactRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
+
+    uint32_t GetCountFavourites();
 
     std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 

@@ -12,6 +12,8 @@
 
 #include "service-appmgr/ApplicationManager.hpp"
 
+#include "bsp/rtc/rtc.hpp"
+
 #include "../ApplicationNotes.hpp"
 
 #include "service-db/messages/DBMessage.hpp"
@@ -43,70 +45,45 @@ void NotesEditWindow::buildInterface() {
 
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
-	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_notes_save"));
+	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("app_notes_back"));
 
-	gui::Label* title = new gui::Label(this, 0, 50, 480, 42 );
-	title->setFilled( false );
-	title->setBorderColor( gui::ColorNoColor );
+	title = new gui::Label(this, 0, 50, 480, 54);
+	title->setFilled(false);
+	title->setBorderColor( gui::ColorFullBlack );
+	title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+	title->setMargins( Margins(0,0,0,18));
 	title->setFont("gt_pressura_bold_24");
-	title->setText("New Note");
-	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+	title->setText(utils::localize.get("app_notes_new_note"));
+	title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	for( uint32_t i=0; i<3; i++ ) {
-		if( i == 0 )
-			textMulti[i] = new gui::Text( this, 11, 100, 480-22, 120 );
-		else if( i == 1)
-			textMulti[i] = new gui::Text( this, 11, 100+124, 480-22, 100 );
-		else if( i == 2)
-			textMulti[i] = new gui::Text( this, 11, 100+124+104+54, 480-22, 120 );
+	text = new gui::Text( this, 11, 105, 480-22, 600-105-50 );
+	text->setFont("gt_pressura_bold_24");
+	text->setRadius(5);
+	text->setMargins( gui::Margins(10, 5, 10, 5));
+	text->activatedCallback = [=] (gui::Item& item){
+		UTF8 getstr = text->getText();
+		time_t timestamp;
+		bsp::rtc_GetCurrentTimestamp(&timestamp);
 
-		textMulti[i]->setFont("gt_pressura_bold_24");
-		textMulti[i]->setRadius(5);
-		textMulti[i]->setMargins( gui::Margins(10, 5, 10, 5));
-		textMulti[i]->activatedCallback = [=] (gui::Item& item){
-			LOG_INFO("Comparing text" );
-			LOG_INFO("SOURCE:[%s]", textString.c_str());
-			UTF8 getstr = textMulti[i]->getText();
-			LOG_INFO("GETSTR:[%s]", getstr.c_str());
-			LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
-			return true; };
-		textMulti[i]->setTextType( gui::Text::TextType::MULTI_LINE );
+		UTF8 filename = "sys/data/applications/notes/" + std::to_string(timestamp) + ".txt";
 
-
-		if( i == 1)
-			textMulti[i]->setEditMode(gui::Text::EditMode::BROWSE );
-	}
-
-	textSingle = new gui::Text( this, 11, 100+124+104, 480-22, 50 );
-	textSingle->setFont("gt_pressura_bold_24");
-	textSingle->setRadius(5);
-	textSingle->setMargins( gui::Margins(10, 5, 10, 5));
-	textSingle->activatedCallback = [=] (gui::Item& item){
-		LOG_INFO("Comparing text" );
-		LOG_INFO("SOURCE:[%s]", textString.c_str());
-		UTF8 getstr = textSingle->getText();
-		LOG_INFO("GETSTR:[%s]", getstr.c_str());
-		LOG_INFO("COMPARE: %s",(textString==getstr?"TRUE":"FALSE"));
+		auto file = vfs.fopen( filename.c_str(), "wb" );
+		vfs.fwrite( getstr.c_str(), getstr.used()-1, 1, file );
+		vfs.fclose( file );
 		return true; };
-	textSingle->setTextType( gui::Text::TextType::SINGLE_LINE );
-
-	textMulti[0]->setNavigationItem( NavigationDirection::DOWN, textMulti[1] );
-
-	textMulti[1]->setNavigationItem( NavigationDirection::UP, textMulti[0] );
-	textMulti[1]->setNavigationItem( NavigationDirection::DOWN, textSingle );
-
-	textSingle->setNavigationItem( NavigationDirection::UP, textMulti[1] );
-	textSingle->setNavigationItem( NavigationDirection::DOWN, textMulti[2] );
-
-	textMulti[2]->setNavigationItem( NavigationDirection::UP, textSingle );
+	text->setTextType( gui::Text::TextType::MULTI_LINE );
+	text->setEditMode(gui::Text::EditMode::BROWSE );
 
 	topBar->setActive(TopBar::Elements::TIME, true );
-
 }
 
 void NotesEditWindow::destroyInterface() {
 	AppWindow::destroyInterface();
+
+	if( text ) { removeWidget(text); delete text; text = nullptr; }
+	if( title ) { removeWidget(title); delete title; title = nullptr;}
+
 	children.clear();
 }
 
@@ -116,13 +93,8 @@ NotesEditWindow::~NotesEditWindow() {
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
 	application->setKeyboardProfile( "lang_eng_lower" );
-	setFocusItem( textMulti[0] );
-	LOG_INFO("SETTING MULTI TEXT WIDGET 0");
-	textMulti[0]->setText( textString );
-	LOG_INFO("SETTING MULTI  TEXT WIDGET 1");
-	textMulti[1]->setText( textString );
-	LOG_INFO("SETTING SINGLE TEXT");
-	textSingle->setText( textString );
+	text->setText( textString );
+	setFocusItem( text );
 }
 
 bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {

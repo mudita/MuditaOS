@@ -24,6 +24,7 @@
 #include "service-eink/messages/ImageMessage.hpp"
 
 #include "ServiceGUI.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 
 #include "../gui/core/ImageManager.hpp"
 #include "log/log.hpp"
@@ -91,7 +92,8 @@ void ServiceGUI::sendBuffer() {
 			transferContext->getW(),
 			transferContext->getH(),
 			(mode==gui::RefreshModes::GUI_REFRESH_DEEP?true:false),
-			transferContext->getData()
+			transferContext->getData(),
+			suspendInProgress
 	);
 	einkReady = false;
 	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this,2000);
@@ -116,39 +118,51 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 
 	switch( msg->messageType ) {
 		case static_cast<uint32_t>(MessageType::MessageTypeUninitialized): {
-			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
+//			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
 		} break;
 		case static_cast<uint32_t>( MessageType::GUICommands ): {
+//			LOG_INFO("[%s] GUICommands", GetName().c_str());
 			auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
 			if( !dmsg->commands.empty() ) {
 
-				//update mode
-				if( dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP ) {
-					mode = dmsg->mode;
+				//if suspend flag is set ignore any new message
+				if( !suspendInProgress ) {
+
+					//if message carries suspend flag set flag in service and proceed
+					if( dmsg->suspend ) {
+						LOG_WARN( "Suspended - received suspend draw commands" );
+						suspendInProgress = true;
+					}
+
+					//update mode
+					if( dmsg->mode == gui::RefreshModes::GUI_REFRESH_DEEP ) {
+						mode = dmsg->mode;
+					}
+
+	//				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
+
+					//lock access to commands vector, clear it and then copy commands from message to vector
+					if( xSemaphoreTake( semCommands, pdMS_TO_TICKS(1000) ) == pdTRUE ) {
+						commands.clear();
+						for (auto it = dmsg->commands.begin(); it != dmsg->commands.end(); it++)
+							commands.push_back(std::move(*it));
+						xSemaphoreGive( semCommands );
+					}
+
+					//if worker is not rendering send him new set of commands
+					if( !rendering ) {
+						sendToRender();
+					}
+	//				uint32_t mem = usermemGetFreeHeapSize();
+	//				LOG_WARN( "Heap Memory: %d", mem );
 				}
-
-//				LOG_INFO("[ServiceGUI] Received %d draw commands", dmsg->commands.size());
-
-				//lock access to commands vector, clear it and then copy commands from message to vector
-				if( xSemaphoreTake( semCommands, pdMS_TO_TICKS(1000) ) == pdTRUE ) {
-					commands.clear();
-					for (auto it = dmsg->commands.begin(); it != dmsg->commands.end(); it++)
-						commands.push_back(std::move(*it));
-					xSemaphoreGive( semCommands );
+				else {
+					LOG_WARN( "Suspended - ignoring draw commands" );
 				}
-
-				//if worker is not rendering send him new set of commands
-				if( !rendering ) {
-					sendToRender();
-				}
-
-//				uint32_t mem = usermemGetFreeHeapSize();
-//				LOG_WARN( "Heap Memory: %d", mem );
 			}
-
 		} break;
 		case static_cast<uint32_t>(MessageType::GUIRenderingFinished): {
-//			LOG_INFO("Rendering finished");
+//			LOG_INFO("[%s] GUIRenderingFinished", GetName().c_str());
 			//increment counter holding number of drawn frames
 			rendering = false;
 			renderFrameCounter++;
@@ -166,14 +180,20 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 			}
 		}break;
 		case static_cast<uint32_t>( MessageType::GUIFocusInfo ): {
-
-//			LOG_INFO("[ServiceGUI] Received focus info");
+//			LOG_INFO("[%s] GUIFocusInfo", GetName().c_str());
 		} break;
 		case static_cast<uint32_t>( MessageType::GUIDisplayReady ): {
-
-//			LOG_INFO("[ServiceGUI]Display ready");
+//			LOG_INFO("[%s] GUIDisplayReady", GetName().c_str());
 			einkReady = true;
 			requestSent = false;
+
+			if( msg->getSuspend()){
+				einkReady = false;
+				suspendInProgress = false;
+				LOG_DEBUG("last rendering before suspend is finished.");
+
+				sapm::ApplicationManager::messageInitPowerSaveMode(this);
+			}
 			//mode = gui::RefreshModes::GUI_REFRESH_FAST;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
@@ -184,7 +204,6 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 			else {
 //				LOG_INFO(" NO new buffer to send");
 			}
-
 		} break;
 	};
 
@@ -232,6 +251,19 @@ sys::ReturnCodes ServiceGUI::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
+sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[ServiceGUI] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+
+    switch (mode){
+        case sys::ServicePowerMode ::Active:
+            break;
+        case sys::ServicePowerMode ::SuspendToRAM:
+        case sys::ServicePowerMode ::SuspendToNVM:
+            break;
+    }
+
+    return sys::ReturnCodes::Success;
+}
 
 } /* namespace sgui */
 

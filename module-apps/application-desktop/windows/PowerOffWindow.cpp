@@ -134,12 +134,13 @@ void PowerOffWindow::buildInterface() {
         static bool state = false;
         if(state == false){
             //sys::SystemManager::DestroyService(ServiceCellular::serviceName,application);
-            sys::SystemManager::CloseSystem(application);
-            LOG_INFO("Closing Cellular Service");
+            sys::SystemManager::SuspendSystem(application);
+            LOG_INFO("SUSPEND SYSTEM");
             state = true;
         }
         else{
-            sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), application);
+            sys::SystemManager::ResumeSystem(application);
+            LOG_INFO("RESUME SYSTEM");
             state = false;
         }
 		return true;

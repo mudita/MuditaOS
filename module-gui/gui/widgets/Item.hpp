@@ -73,6 +73,7 @@ public:
 	std::function<void(Item&,  void* data)> dimensionChangedCallback;
 	std::function<bool(Item&)> activatedCallback;
 	std::function<bool(Item&, InputEvent& inputEvent)> inputCallback;
+	std::function<bool(Item&)> contentCallback;
 
     int16_t w() { return widgetArea.w; }
     int16_t h() { return widgetArea.h; }
@@ -94,6 +95,7 @@ public:
 	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
 	virtual bool onInput( const InputEvent& inputEvent ) { return false; };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
+	virtual bool onContent() { return false; };
 
 	virtual bool addWidget( Item* item );
 	virtual bool removeWidget( Item* item );

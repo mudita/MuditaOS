@@ -49,6 +49,8 @@
 #include "clock_config.h"
 #include "board.h"
 #include "fsl_iomuxc.h"
+#include "fsl_dcdc.h"
+#include "fsl_gpc.h"
 #include "log/log.hpp"
 
 /*******************************************************************************
@@ -117,10 +119,7 @@ void BOARD_InitBootClocks(void) {
 void BOARD_BootClockRUN(void) {
     /* Init RTC OSC clock frequency. */
     CLOCK_SetRtcXtalFreq(32768U);
-    /* Enable 1MHz clock output. */
-    XTALOSC24M->OSC_CONFIG2 |= XTALOSC24M_OSC_CONFIG2_ENABLE_1M_MASK;
-    /* Use free 1MHz clock output. */
-    XTALOSC24M->OSC_CONFIG2 &= ~XTALOSC24M_OSC_CONFIG2_MUX_1M_MASK;
+
     /* Set XTAL 24MHz clock frequency. */
     CLOCK_SetXtalFreq(24000000U);
     /* Enable XTAL 24MHz clock source. */
@@ -137,11 +136,6 @@ void BOARD_BootClockRUN(void) {
                  1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
     /* PERIPH_CLK2_SEL */
     CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
-    /* Setting the VDD_SOC to 1.275V. It is necessary to config AHB to 600Mhz. */
-    DCDC->REG3 = (DCDC->REG3 & (~DCDC_REG3_TRG_MASK)) | DCDC_REG3_TRG(0x13);
-    /* Waiting for DCDC_STS_DC_OK bit is asserted */
-    while (DCDC_REG0_STS_DC_OK_MASK != (DCDC_REG0_STS_DC_OK_MASK & DCDC->REG0)) {
-    }
 
     /* Set AHB_PODF. */
     CLOCK_SetDiv(kCLOCK_AhbDiv, 0);    //CBCDR
@@ -361,15 +355,13 @@ void BOARD_BootClockRUN(void) {
      * PLL2 - System PLL
      * ------------------------------------------------------------------
      */
-
-    clkPLL2setup(CLK_ENABLE);
     /* Deinit System pfd0. */
     clkPLL2_PFD0setup(CLK_DISABLE);
     clkPLL2_PFD1setup(CLK_DISABLE);
     clkPLL2_PFD3setup(CLK_DISABLE);
 
     /* Disable pfd offset. */
-    CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
+    //CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
 
 
     /*
@@ -459,14 +451,6 @@ void BOARD_BootClockRUN(void) {
     /* Set periph clock source. */
     /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
     CLOCK_SetMux(kCLOCK_PeriphMux, 0);            //CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
-    /* Set PERIPH_CLK2_PODF. */
-    /* PLL3_SW_CLK/1 = 480MHz */
-    CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);        //CBCDR
-    /* Set periph clock2 clock source. */
-    /* PLL3_SW_CLK = 480MHz */
-    CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
-                 0);        //CBCMR  (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
-
 
     /* Set SystemCoreClock variable. */
     SystemCoreClockUpdate();
@@ -789,6 +773,7 @@ void clkPLL1setup(uint8_t enabled) {
     }
 }
 
+
 void clkPLL2setup(uint8_t enabled) {
     const clock_sys_pll_config_t sysPllConfig_BOARD_BootClockRUN =
             {
@@ -955,6 +940,7 @@ void clkPLL7setup(uint8_t enabled) {
     }
 }
 
+
 uint32_t GetPerphSourceClock(PerphClock_t clock) {
     switch (clock) {
 
@@ -976,7 +962,48 @@ uint32_t GetPerphSourceClock(PerphClock_t clock) {
     }
 }
 
-void PrintPerphSourceClocks() {
+
+void PrintSystemClocks() {
+
+
+    const char *_PLLNames[22] = {
+            "kCLOCK_CpuClk",  /*!< CPU clock */
+            "kCLOCK_AhbClk",  /*!< AHB clock */
+            "kCLOCK_SemcClk", /*!< SEMC clock */
+            "kCLOCK_IpgClk",  /*!< IPG clock */
+
+            "kCLOCK_OscClk", /*!< OSC clock selected by PMU_LOWPWR_CTRL[OSC_SEL]. */
+            "kCLOCK_RtcClk", /*!< RTC clock. (RTCCLK) */
+
+            "kCLOCK_ArmPllClk", /*!< ARMPLLCLK. */
+
+            "kCLOCK_Usb1PllClk",     /*!< USB1PLLCLK. */
+            "kCLOCK_Usb1PllPfd0Clk", /*!< USB1PLLPDF0CLK. */
+            "kCLOCK_Usb1PllPfd1Clk", /*!< USB1PLLPFD1CLK. */
+            "kCLOCK_Usb1PllPfd2Clk", /*!< USB1PLLPFD2CLK. */
+            "kCLOCK_Usb1PllPfd3Clk", /*!< USB1PLLPFD3CLK. */
+
+            "kCLOCK_Usb2PllClk", /*!< USB2PLLCLK. */
+
+            "kCLOCK_SysPllClk",      /*!< SYSPLLCLK. */
+            "kCLOCK_SysPllPfd0Clk",  /*!< SYSPLLPDF0CLK. */
+            "kCLOCK_SysPllPfd1Clk",  /*!< SYSPLLPFD1CLK. */
+            "kCLOCK_SysPllPfd2Clk", /*!< SYSPLLPFD2CLK. */
+            "kCLOCK_SysPllPfd3Clk", /*!< SYSPLLPFD3CLK. */
+
+            "kCLOCK_EnetPll0Clk", /*!< Enet PLLCLK ref_enetpll0. */
+            "kCLOCK_EnetPll1Clk", /*!< Enet PLLCLK ref_enetpll1. */
+
+            "kCLOCK_AudioPllClk", /*!< Audio PLLCLK. */
+            "kCLOCK_VideoPllClk", /*!< Video PLLCLK. */
+    };
+    int i;
+
+    for (i=0; i<22; i++) {
+        LOG_PRINTF("%s: %i Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
+        //volatile uint32_t val = CLOCK_GetFreq(static_cast<clock_name_t>(i));
+    }
+
     LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n", GetPerphSourceClock(PerphClock_I2C));
     LOG_PRINTF("PerphSourceClock_LPSPI: %lu\r\n", GetPerphSourceClock(PerphClock_LPSPI));
     LOG_PRINTF("PerphSourceClock_LPUART: %lu\r\n", GetPerphSourceClock(PerphClock_LPUART));
@@ -984,4 +1011,458 @@ void PrintPerphSourceClocks() {
     LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n", GetPerphSourceClock(PerphClock_SAI2));
     LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n", GetPerphSourceClock(PerphClock_USDHC2));
 
+/*    volatile auto  val1 = GetPerphSourceClock(PerphClock_I2C);
+    volatile auto  val2 = GetPerphSourceClock(PerphClock_LPSPI);
+    volatile auto  val3 = GetPerphSourceClock(PerphClock_LPUART);
+    volatile auto  val4 = GetPerphSourceClock(PerphClock_SAI1);
+    volatile auto  val5 = GetPerphSourceClock(PerphClock_SAI2);
+    volatile auto  val6 = GetPerphSourceClock(PerphClock_USDHC2);*/
+}
+
+
+#define CLOCK_CCM_HANDSHAKE_WAIT() \
+    \
+do                          \
+    {                              \
+        while (CCM->CDHIPR != 0)   \
+        {                          \
+        }                          \
+    \
+}                           \
+    while (0)
+
+#define LPM_DELAY(value)                         \
+    \
+do                                        \
+    {                                            \
+        for (uint32_t i = 0; i < 5 * value; i++) \
+        {                                        \
+            __NOP();                             \
+        }                                        \
+    \
+}                                         \
+    while (0)
+
+
+void EnableWeakLDO(void)
+{
+    /* Enable Weak LDO 2P5 and 1P1 */
+    PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
+    PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
+
+    LPM_DELAY(40);
+}
+
+void DisableWeakLDO(void)
+{
+    /* Disable Weak LDO 2P5 and 1P1 */
+    PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
+    PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
+}
+
+void EnableRegularLDO(void)
+{
+    /* Enable Regular LDO 2P5 and 1P1 */
+    PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
+    PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
+}
+
+void DisableRegularLDO(void)
+{
+    /* Disable Regular LDO 2P5 and 1P1 */
+    PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_LINREG_MASK;
+    PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_LINREG_MASK;
+}
+
+void BandgapOff(void)
+{
+    XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
+    PMU->MISC0_SET              |= PMU_MISC0_REFTOP_PWD_MASK;
+}
+
+void BandgapOn(void)
+{
+    /* Turn on regular bandgap and wait for stable */
+    PMU->MISC0_CLR |= PMU_MISC0_REFTOP_PWD_MASK;
+    while ((PMU->MISC0 & PMU_MISC0_REFTOP_VBGUP_MASK) == 0)
+    {
+    }
+    /* Low power band gap disable */
+    XTALOSC24M->LOWPWR_CTRL_CLR = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
+}
+
+void LPM_SetWaitModeConfig(void)
+{
+    uint32_t clpcr;
+
+    /*
+     * ERR007265: CCM: When improper low-power sequence is used,
+     * the SoC enters low power mode before the ARM core executes WFI.
+     *
+     * Software workaround:
+     * 1) Software should trigger IRQ #41 (GPR_IRQ) to be always pending
+     *      by setting IOMUXC_GPR_GPR1_GINT.
+     * 2) Software should then unmask IRQ #41 in GPC before setting CCM
+     *      Low-Power mode.
+     * 3) Software should mask IRQ #41 right after CCM Low-Power mode
+     *      is set (set bits 0-1 of CCM_CLPCR).
+     */
+    GPC_EnableIRQ(GPC, GPR_IRQ_IRQn);
+    clpcr      = CCM->CLPCR & (~(CCM_CLPCR_LPM_MASK | CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK));
+    CCM->CLPCR = clpcr | CCM_CLPCR_LPM(kCLOCK_ModeWait) | CCM_CLPCR_MASK_SCU_IDLE_MASK | CCM_CLPCR_MASK_L2CC_IDLE_MASK |
+                 CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK | CCM_CLPCR_STBY_COUNT_MASK | CCM_CLPCR_BYPASS_LPM_HS0_MASK |
+                 CCM_CLPCR_BYPASS_LPM_HS1_MASK;
+    GPC_DisableIRQ(GPC, GPR_IRQ_IRQn);
+}
+
+void SetLowPowerClockGate(void)
+{
+    CCM->CCGR0 = CCM_CCGR0_CG0(1) | CCM_CCGR0_CG1(1) | CCM_CCGR0_CG3(3) | CCM_CCGR0_CG11(1) | CCM_CCGR0_CG12(1);
+    CCM->CCGR1 = CCM_CCGR1_CG9(3) | CCM_CCGR1_CG10(1) | CCM_CCGR1_CG13(1) | CCM_CCGR1_CG14(1) /*| CCM_CCGR1_CG15(1)*/;
+    CCM->CCGR2 = CCM_CCGR2_CG2(1) | CCM_CCGR2_CG8(1) | CCM_CCGR2_CG9(1) | CCM_CCGR2_CG10(1);
+    CCM->CCGR3 = /*CCM_CCGR3_CG2(1) |*/ CCM_CCGR3_CG4(1) /*| CCM_CCGR3_CG9(1) */ /*| CCM_CCGR3_CG14(1) | CCM_CCGR3_CG15(1)*/;
+    CCM->CCGR4 =
+            CCM_CCGR4_CG1(1) | CCM_CCGR4_CG2(1) | CCM_CCGR4_CG4(1) | CCM_CCGR4_CG5(1) | CCM_CCGR4_CG6(1) | CCM_CCGR4_CG7(1);
+    CCM->CCGR5 = CCM_CCGR5_CG0(1) | CCM_CCGR5_CG1(1) | CCM_CCGR5_CG4(1) | CCM_CCGR5_CG6(1) | CCM_CCGR5_CG12(1) |
+                 CCM_CCGR5_CG14(1) /*| CCM_CCGR5_CG15(1)*/;
+    /* We can enable DCDC when need to config it and close it after configuration */
+    CCM->CCGR6 = CCM_CCGR6_CG3(1) | CCM_CCGR6_CG4(1) | CCM_CCGR6_CG5(1) | CCM_CCGR6_CG9(1) | CCM_CCGR6_CG10(1) |
+                 CCM_CCGR6_CG11(1);
+}
+
+#define GPR8_DOZE_BITS                                                               \
+    (IOMUXC_GPR_GPR8_LPI2C1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPI2C2_IPG_DOZE_MASK |   \
+     IOMUXC_GPR_GPR8_LPI2C3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPI2C4_IPG_DOZE_MASK |   \
+     IOMUXC_GPR_GPR8_LPSPI1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPSPI2_IPG_DOZE_MASK |   \
+     IOMUXC_GPR_GPR8_LPSPI3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPSPI4_IPG_DOZE_MASK |   \
+     IOMUXC_GPR_GPR8_LPUART1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART2_IPG_DOZE_MASK | \
+     IOMUXC_GPR_GPR8_LPUART3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART4_IPG_DOZE_MASK | \
+     IOMUXC_GPR_GPR8_LPUART5_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART6_IPG_DOZE_MASK | \
+     IOMUXC_GPR_GPR8_LPUART7_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART8_IPG_DOZE_MASK)
+
+#define GPR8_STOP_MODE_BITS                                                                    \
+    (IOMUXC_GPR_GPR8_LPI2C1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPI2C2_IPG_STOP_MODE_MASK |   \
+     IOMUXC_GPR_GPR8_LPI2C3_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPI2C4_IPG_STOP_MODE_MASK |   \
+     IOMUXC_GPR_GPR8_LPSPI1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPSPI2_IPG_STOP_MODE_MASK |   \
+     IOMUXC_GPR_GPR8_LPSPI3_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPSPI4_IPG_STOP_MODE_MASK |   \
+     IOMUXC_GPR_GPR8_LPUART2_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART3_IPG_STOP_MODE_MASK | \
+     IOMUXC_GPR_GPR8_LPUART4_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART5_IPG_STOP_MODE_MASK | \
+     IOMUXC_GPR_GPR8_LPUART6_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART7_IPG_STOP_MODE_MASK | \
+     IOMUXC_GPR_GPR8_LPUART8_IPG_STOP_MODE_MASK)
+
+#define GPR12_DOZE_BITS (IOMUXC_GPR_GPR12_FLEXIO1_IPG_DOZE_MASK | IOMUXC_GPR_GPR12_FLEXIO2_IPG_DOZE_MASK)
+
+#define GPR12_STOP_MODE_BITS (IOMUXC_GPR_GPR12_FLEXIO1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR12_FLEXIO2_IPG_STOP_MODE_MASK)
+
+void PeripheralEnterDozeMode(void)
+{
+    IOMUXC_GPR->GPR8  = GPR8_DOZE_BITS;
+    IOMUXC_GPR->GPR12 = GPR12_DOZE_BITS;
+}
+
+
+#define GPR4_STOP_REQ_BITS                                                                                          \
+    (IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR4_SAI3_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_REQ_MASK | IOMUXC_GPR_GPR4_PIT_STOP_REQ_MASK |  \
+     IOMUXC_GPR_GPR4_FLEXIO1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_FLEXIO2_STOP_REQ_MASK)
+
+#define GPR4_STOP_ACK_BITS                                                                                          \
+    (IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR4_SAI3_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_ACK_MASK | IOMUXC_GPR_GPR4_PIT_STOP_ACK_MASK |  \
+     IOMUXC_GPR_GPR4_FLEXIO1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_FLEXIO2_STOP_ACK_MASK)
+
+#define GPR7_STOP_REQ_BITS                                                           \
+    (IOMUXC_GPR_GPR7_LPI2C1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPI2C3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_REQ_MASK |   \
+     IOMUXC_GPR_GPR7_LPUART1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR7_LPUART3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR7_LPUART5_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_REQ_MASK | \
+     IOMUXC_GPR_GPR7_LPUART7_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART8_STOP_REQ_MASK)
+
+#define GPR7_STOP_ACK_BITS                                                           \
+    (IOMUXC_GPR_GPR7_LPI2C1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPI2C3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPSPI3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_ACK_MASK |   \
+     IOMUXC_GPR_GPR7_LPUART1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR7_LPUART3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR7_LPUART5_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_ACK_MASK | \
+     IOMUXC_GPR_GPR7_LPUART7_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART8_STOP_ACK_MASK)
+
+void PeripheralEnterStopMode(void)
+{
+    IOMUXC_GPR->GPR4 = IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK;
+    while ((IOMUXC_GPR->GPR4 & IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK) != IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK)
+    {
+    }
+    IOMUXC_GPR->GPR4  = GPR4_STOP_REQ_BITS;
+    IOMUXC_GPR->GPR7  = GPR7_STOP_REQ_BITS;
+    IOMUXC_GPR->GPR8  = GPR8_DOZE_BITS | GPR8_STOP_MODE_BITS;
+    IOMUXC_GPR->GPR12 = GPR12_DOZE_BITS | GPR12_STOP_MODE_BITS;
+    while ((IOMUXC_GPR->GPR4 & GPR4_STOP_ACK_BITS) != GPR4_STOP_ACK_BITS)
+    {
+    }
+    while ((IOMUXC_GPR->GPR7 & GPR7_STOP_ACK_BITS) != GPR7_STOP_ACK_BITS)
+    {
+    }
+}
+
+void PowerDownUSBPHY(void)
+{
+    USBPHY1->CTRL = 0xFFFFFFFF;
+    USBPHY2->CTRL = 0xFFFFFFFF;
+}
+
+void LPM_EnterLowPowerRun(){
+    /* Switch DCDC to use DCDC internal OSC */
+   // DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
+
+    CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
+
+    /* OSC_CLK (24M) */
+    CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
+                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+    /* PERIPH_CLK2_SEL */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+
+    /* SET AHB, IPG to 12MHz */
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 0);
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 1);
+
+    /*Set PERCLK to 12Mhz*/
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0x0);
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 0x0);
+
+    /* Power down USBPHY */
+    USBPHY1->CTRL = 0xFFFFFFFF;
+    USBPHY2->CTRL = 0xFFFFFFFF;
+
+    /* Adjust SOC voltage to 0.95V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x6, 0x1);
+    /* DCM Mode */
+    DCDC_BootIntoDCM(DCDC);
+    /* Disconnect internal the load resistor */
+    DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
+    /* Power Down output range comparator */
+    DCDC->REG0 |= DCDC_REG0_PWD_CMP_OFFSET_MASK;
+
+    /* Enable FET ODRIVE */
+    PMU->REG_CORE_SET = PMU_REG_CORE_FET_ODRIVE_MASK;
+    /* Connect vdd_high_in and connect vdd_snvs_in */
+    PMU->MISC0_CLR = PMU_MISC0_DISCON_HIGH_SNVS_MASK;
+
+    EnableWeakLDO();
+    DisableRegularLDO();
+    BandgapOff();
+
+}
+
+/*
+
+#include "fsl_semc.h"
+#include "pin_mux.h"
+status_t BOARD_InitSEMC(void)
+{
+    semc_config_t config;
+    semc_sdram_config_t sdramconfig;
+    uint32_t clockFrq = CLOCK_GetFreq(kCLOCK_SemcClk);
+
+    */
+/* Initializes the MAC configure structure to zero. *//*
+
+    memset(&config, 0, sizeof(semc_config_t));
+    memset(&sdramconfig, 0, sizeof(semc_sdram_config_t));
+
+    */
+/* Initialize SEMC. *//*
+
+    SEMC_GetDefaultConfig(&config);
+    config.dqsMode = kSEMC_Loopbackdqspad; */
+/* For more accurate timing. *//*
+
+    SEMC_Init(SEMC, &config);
+
+    */
+/* Configure SDRAM. *//*
+
+    sdramconfig.csxPinMux           = kSEMC_MUXCSX0;
+    sdramconfig.address             = 0x80000000;
+    sdramconfig.memsize_kbytes      = 16 * 1024; */
+/* 16MB = 32*1024*1KBytes*//*
+
+    sdramconfig.portSize            = kSEMC_PortSize16Bit;
+    sdramconfig.burstLen            = kSEMC_Sdram_BurstLen8;
+    sdramconfig.columnAddrBitNum    = kSEMC_SdramColunm_9bit;
+    sdramconfig.casLatency          = kSEMC_LatencyThree;
+    sdramconfig.tPrecharge2Act_Ns   = 18; */
+/* Trp 18ns *//*
+
+    sdramconfig.tAct2ReadWrite_Ns   = 18; */
+/* Trcd 18ns *//*
+
+    sdramconfig.tRefreshRecovery_Ns = 67; */
+/* Use the maximum of the (Trfc , Txsr). *//*
+
+    sdramconfig.tWriteRecovery_Ns   = 12; */
+/* 12ns *//*
+
+    sdramconfig.tCkeOff_Ns =
+            42; */
+/* The minimum cycle of SDRAM CLK off state. CKE is off in self refresh at a minimum period tRAS.*//*
+
+    sdramconfig.tAct2Prechage_Ns       = 42; */
+/* Tras 42ns *//*
+
+    sdramconfig.tSelfRefRecovery_Ns    = 67;
+    sdramconfig.tRefresh2Refresh_Ns    = 60;
+    sdramconfig.tAct2Act_Ns            = 60;
+    sdramconfig.tPrescalePeriod_Ns     = 160 * (1000000000 / clockFrq);
+    sdramconfig.refreshPeriod_nsPerRow = 64 * 1000000 / 8192; */
+/* 64ms/8192 *//*
+
+    sdramconfig.refreshUrgThreshold    = sdramconfig.refreshPeriod_nsPerRow;
+    sdramconfig.refreshBurstLen        = 1;
+    return SEMC_ConfigureSDRAM(SEMC, kSEMC_SDRAM_CS0, &sdramconfig, clockFrq);
+}
+*/
+
+
+void LPM_EnterFullSpeed(void)
+{
+    CLOCK_InitExternalClk(0);
+
+    /* Switch DCDC to use DCDC external OSC */
+    DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
+
+    /* CCM Mode */
+    //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
+    //DCDC_BootIntoCCM(DCDC);
+
+    /* Connect internal the load resistor */
+    DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
+
+    /* Adjust SOC voltage to 1.275V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x13, 0x1);
+
+    dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=false};
+    DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
+
+    /* Disable FET ODRIVE */
+    PMU->REG_CORE_SET &= ~PMU_REG_CORE_FET_ODRIVE_MASK;
+    PMU->MISC0_CLR &= ~PMU_MISC0_DISCON_HIGH_SNVS_MASK;
+
+    BandgapOn();
+    EnableRegularLDO();
+    DisableWeakLDO();
+
+    /* Switch clock source to external OSC. */
+    CLOCK_SwitchOsc(kCLOCK_XtalOsc);
+    /* Set Oscillator ready counter value. */
+    CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(127);
+    /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
+    /* OSC_CLK (24M) */
+    CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
+                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+    /* PERIPH_CLK2_SEL */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+
+    /* Set AHB_PODF. */
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 0);    //CBCDR
+
+    /* Set IPG_PODF. */
+    /* AHB_CLK/4 */
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 3);    //CBCDR
+
+    /* Set ARM_PODF. */
+    /* PLL1/2 (864MHz / 2 = 432 MHz) */
+    CLOCK_SetDiv(kCLOCK_ArmDiv, 1);    //CACRR
+
+    /* Set PERCLK_PODF. */
+    /* IPG_CLK_ROOT/2 */
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1);    //CSCMR1
+    /* Set per clock source. */
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0);    //CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
+
+
+    clkPLL2setup(CLK_ENABLE);
+    CLOCK_SetMux(kCLOCK_SemcMux,1);
+
+    /* Set preperiph clock source. */
+    /* PLL1/2 = 432MHz */
+    CLOCK_SetMux(kCLOCK_PrePeriphMux, 0);        //CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
+    /* Set periph clock source. */
+    /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 0);            //CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+
+    /* Adjust SOC voltage to 1.15V */
+    DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
+
+    /* Set SystemCoreClock variable. */
+    SystemCoreClockUpdate();
+}
+
+void LPM_EnterLowPowerIdle(void)
+{
+    /* Turn on FlexRAM0 */
+    GPC->CNTR &= ~GPC_CNTR_PDRAM0_PGE_MASK;
+    /* Turn on FlexRAM1 */
+    PGC->MEGA_CTRL &= ~PGC_MEGA_CTRL_PCR_MASK;
+
+    LPM_SetWaitModeConfig();
+    //SetLowPowerClockGate();
+
+    CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
+
+    /* OSC_CLK (24M) */
+    CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
+                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+    /* PERIPH_CLK2_SEL */
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+
+    /* SET AHB, IPG to 12MHz */
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 0);
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 1);
+
+    /*Set PERCLK to 12Mhz*/
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0x0);
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 0x0);
+
+    /* Switch clock source to internal RC */
+    CLOCK_SwitchOsc(kCLOCK_RcOsc);
+
+    CLOCK_DeinitExternalClk();
+
+    /* Power down USBPHY */
+    PowerDownUSBPHY();
+
+    /* Adjust SOC voltage to 0.95V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x6, 0x1);
+    /* Switch DCDC to use DCDC internal OSC */
+    DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
+
+    /* DCM Mode */
+    //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
+    //DCDC_BootIntoDCM(DCDC);
+    /* Disconnect internal the load resistor */
+    DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
+    /* Power Down output range comparator */
+    DCDC->REG0 |= DCDC_REG0_PWD_CMP_OFFSET_MASK;
+
+    dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=true};
+    DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
+
+    /* Enable FET ODRIVE */
+    PMU->REG_CORE_SET = PMU_REG_CORE_FET_ODRIVE_MASK;
+    /* Connect vdd_high_in and connect vdd_snvs_in */
+    PMU->MISC0_CLR = PMU_MISC0_DISCON_HIGH_SNVS_MASK;
+
+
+    EnableWeakLDO();
+    DisableRegularLDO();
+    BandgapOff();
+
+    CLOCK_SetMux(kCLOCK_SemcMux,0);
+    clkPLL2setup(CLK_DISABLE);
 }

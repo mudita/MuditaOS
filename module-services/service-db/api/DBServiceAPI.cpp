@@ -167,6 +167,23 @@ std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sy
     }
 }
 
+bool DBServiceAPI::verifyContact( sys::Service* serv,const NotesRecord& rec,
+    		NotesRecord& errName, const NotesRecord& errPhone1, NotesRecord& errPhone2, NotesRecord& speedDial ) {
+
+//	std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactVerify,rec);
+//	    msg->record.contactType = ContactType::USER;
+//
+//	    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+//	    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+//	    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+//	        return true;
+//	    }
+//	    else{
+//	        return false;
+//	    }
+	return true;
+}
+
 bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactAdd,rec);
     msg->record.contactType = ContactType::USER;
@@ -208,8 +225,8 @@ bool DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec) {
     }
 }
 
-uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv) {
-    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetCount);
+uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv, bool favourites ) {
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetCount, ContactRecord{}, favourites);
 
     auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
     DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
@@ -221,20 +238,28 @@ uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv) {
     }
 }
 
-std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset,
-                                                                                uint32_t limit) {
-    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetLimitOffset);
+//std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset,
+bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset,
+		uint32_t limit, bool favourites ) {
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetLimitOffset, ContactRecord{}, favourites);
     msg->offset = offset;
     msg->limit = limit;
 
-    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
-    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
-    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
-        return std::move(contactResponse->records);
-    }
-    else{
-        return std::make_unique<std::vector<ContactRecord>>();
-    }
+//    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+//    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+//    contactResponse->offset = msg->offset;
+//    contactResponse->limit = msg->limit;
+//    contactResponse->favourite = favourites;
+//
+//    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+//        return std::move(contactResponse->records);
+//    }
+//    else{
+//        return std::make_unique<std::vector<ContactRecord>>();
+//    }
+
+    sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv);
+        return true;
 }
 
 bool DBServiceAPI::AlarmAdd(sys::Service *serv, const AlarmsRecord &rec) {

@@ -22,7 +22,8 @@ class ServiceGUI;
 
 enum class WorkerGUICommands {
 	Finish,
-	Render
+	Render,
+//	RenderSuspend
 };
 
 /*

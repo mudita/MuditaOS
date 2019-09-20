@@ -243,14 +243,22 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
             break;
 
         case MessageType::DBContactGetCount: {
+        	DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1
             timestamp = cpp_freertos::Ticks::GetTicks();
 #endif
-            auto ret = contactRecordInterface->GetCount();
+
+            uint32_t ret = 0;
+            if( msg->favourite )
+            	ret = contactRecordInterface->GetCountFavourites();
+            else
+            	ret = contactRecordInterface->GetCount();
 #if SHOW_DB_ACCESS_PERF == 1
-            LOG_ERROR("DBContactGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+            LOG_ERROR("DBContactGetCount time: %lu favourites: %s",(cpp_freertos::Ticks::GetTicks()-timestamp),
+				(msg->favourite==true?"TRUE":"FALSE") );
 #endif
-            responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, true,ret);
+            //std::unique_ptr<std::vector<ContactRecord>> rec,uint32_t retCode=0,uint32_t  count=0,uint32_t respTo=0, bool favourite = false
+            responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, true, 0, 0, msg->favourite,ret );
         }
             break;
 
@@ -259,11 +267,19 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 #if SHOW_DB_ACCESS_PERF == 1
             timestamp = cpp_freertos::Ticks::GetTicks();
 #endif
-            auto ret = contactRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+            std::unique_ptr<std::vector<ContactRecord>> ret;
+            if( msg->favourite )
+            	ret = std::move( contactRecordInterface->GetLimitOffsetByField(msg->offset, msg->limit, ContactRecordField::Favourite, "1") );
+            else
+            	ret = std::move( contactRecordInterface->GetLimitOffset(msg->offset, msg->limit) );
 #if SHOW_DB_ACCESS_PERF == 1
-            LOG_ERROR("DBContactGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+            LOG_ERROR("DBContactGetLimitOffset offset: %d, limit: %d size: %d, time: %lu favourites: %s",
+            		msg->offset, msg->limit, ret->size(), cpp_freertos::Ticks::GetTicks()-timestamp,
+				(msg->favourite==true?"TRUE":"FALSE"));
 #endif
-            responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true);
+
+            responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(),
+            		static_cast<uint32_t>(MessageType::DBContactGetLimitOffset));
         }
             break;
 
@@ -452,5 +468,10 @@ sys::ReturnCodes ServiceDB::InitHandler() {
 
 sys::ReturnCodes ServiceDB::DeinitHandler() {
 
+    return sys::ReturnCodes::Success;
+}
+
+sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode mode) {
+    LOG_FATAL("[%s] PowerModeHandler: %d", this->GetName().c_str(), static_cast<uint32_t>(mode));
     return sys::ReturnCodes::Success;
 }

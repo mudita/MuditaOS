@@ -86,9 +86,10 @@ namespace sys
     {
     public:
 
-        SystemMessage(SystemMessageType sysMsgType):
+        SystemMessage(SystemMessageType sysMsgType,ServicePowerMode pwrMode = ServicePowerMode::Active):
             Message(BusChannels ::System),
-            sysMsgType(sysMsgType)
+            sysMsgType(sysMsgType),
+            powerMode(pwrMode)
         {
             type = Type::System;
         }
@@ -96,6 +97,7 @@ namespace sys
         Message_t Execute(Service* service) override;
 
         SystemMessageType sysMsgType;
+        ServicePowerMode powerMode;
     };
 
     class DataMessage : public Message

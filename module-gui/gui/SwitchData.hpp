@@ -18,8 +18,10 @@ protected:
 public:
 
 	SwitchData() {};
+	SwitchData( std::string description ) : description{description} {};
 	virtual ~SwitchData() {};
 	virtual const std::string& getDescription() { return description; };
+	virtual void setDescription( const std::string desc ) { description = desc; };
 };
 
 } /* namespace gui */

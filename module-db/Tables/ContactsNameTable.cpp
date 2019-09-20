@@ -26,10 +26,11 @@ bool ContactsNameTable::Create() {
 
 bool ContactsNameTable::Add(ContactsNameTableRow entry) {
     return db->Execute(
-            "insert or ignore into contact_name (contact_id, name_primary, name_alternative) VALUES (%lu, '%s', '%s');",
+            "insert or ignore into contact_name (contact_id, name_primary, name_alternative, favourite) VALUES (%lu, '%s', '%s', '%lu');",
             entry.contactID,
             entry.namePrimary.c_str(),
-            entry.nameAlternative.c_str()
+            entry.nameAlternative.c_str(),
+			entry.favourite
     );
 }
 
@@ -39,10 +40,11 @@ bool ContactsNameTable::RemoveByID(uint32_t id) {
 
 bool ContactsNameTable::Update(ContactsNameTableRow entry) {
     return db->Execute(
-            "UPDATE contact_name SET contact_id = %lu, name_primary = '%s' ,name_alternative = '%s' WHERE _id=%lu;",
+            "UPDATE contact_name SET contact_id = %lu, name_primary = '%s' ,name_alternative = '%s' favourite = '%d' WHERE _id=%lu;",
             entry.contactID,
             entry.namePrimary.c_str(),
             entry.nameAlternative.c_str(),
+			entry.favourite,
             entry.ID
     );
 }
@@ -58,11 +60,12 @@ ContactsNameTableRow ContactsNameTable::GetByID(uint32_t id) {
                             (*retQuery)[1].GetUInt32(),    // contactID
                             (*retQuery)[2].GetString(),    // namePrimary
                             (*retQuery)[3].GetString(),    // nameAlternative
+							(*retQuery)[4].GetUInt32(),    // favourite
     };
 }
 
 std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto retQuery = db->Query("SELECT * from contact_name ORDER BY name_primary LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from contact_name ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
                               limit,
                               offset);
 
@@ -77,6 +80,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffset(uint32_t off
                                            (*retQuery)[1].GetUInt32(),    // contactID
                                            (*retQuery)[2].GetString(),    // namePrimary
                                            (*retQuery)[3].GetString(),    // nameAlternative
+										   (*retQuery)[4].GetUInt32(),    // favourite
         });
     } while (retQuery->NextRow());
 
@@ -95,11 +99,14 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint3
         case ContactNameTableFields ::NameAlternative:
             fieldName = "name_alternative";
             break;
+        case ContactNameTableFields ::Favourite:
+			fieldName = "favourite";
+			break;
         default:
             return std::vector<ContactsNameTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contact_name WHERE %s='%s' ORDER BY name_primary LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from contact_name WHERE %s='%s' ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -116,6 +123,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint3
                                            (*retQuery)[1].GetUInt32(),    // contactID
                                            (*retQuery)[2].GetString(),    // namePrimary
                                            (*retQuery)[3].GetString(),    // nameAlternative
+										   (*retQuery)[4].GetUInt32(),    // favourite
         });
     } while (retQuery->NextRow());
 

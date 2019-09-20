@@ -129,7 +129,7 @@ namespace sys
 
                 // Push messages collected during waiting for response to processing queue
                 for(const auto &w : tempMsg){
-                    s->mailbox.push_front(w);
+                    s->mailbox.push(w);
                 }
 
                 // Register that we didn't receive response. Even if it arrives it will be dropped
@@ -147,7 +147,7 @@ namespace sys
 
                 // Push messages collected during waiting for response to processing queue
                 for(const auto &w : tempMsg){
-                    s->mailbox.push_front(w);
+                    s->mailbox.push(w);
                 }
 
                 // Register that we didn't receive response. Even if it arrives it will be dropped
@@ -160,7 +160,7 @@ namespace sys
 
                 // Push messages collected during waiting for response to processing queue
                 for(const auto &w : tempMsg){
-                    s->mailbox.push_front(w);
+                    s->mailbox.push(w);
                 }
 
                 return CreateMessageRet(ReturnCodes::Success,rxmsg);

@@ -34,6 +34,8 @@ protected:
 	bool alarmDBEmpty = false;
 	//flag set when there is alarm to handle
 	bool alarmIsValid = false;
+	//flag informs about suspend/resume status
+	bool suspended = false;
 public:
 	EventManager(const std::string& name);
     ~EventManager();
@@ -45,7 +47,7 @@ public:
 
     sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
 
     /**

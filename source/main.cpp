@@ -47,7 +47,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(500, true);
+        timer_id = CreateTimer(5000, true);
         ReloadTimer(timer_id);
     }
 
@@ -57,11 +57,11 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override {
 
-#if 0 // M.P: left here on purpose
+#if 1 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
-        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+/*        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         AudioServiceAPI::Stop(this);
-        AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+        AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");*/
         //vTaskDelay(3000);
         //AudioServiceAPI::SetOutputVolume(this,0.6);
         //auto ret = AudioServiceAPI::RecordingStart(this,"sys/audio/rec1mono.wav");
@@ -80,7 +80,7 @@ public:
          AudioServiceAPI::Stop(this);*/
 
 #endif
-        //sys::SystemManager::DestroyService(ServiceAudio::serviceName,this);
+        //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
 
         return std::make_shared<sys::ResponseMessage>();
 
@@ -88,13 +88,13 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override {
-#if 0 // M.P: left here on purpose
+#if 1 // M.P: left here on purpose
         LOG_DEBUG("Blinky service tick!");
 
         stopTimer(timer_id);
         std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(static_cast<uint32_t >(MessageType::AudioSetInputGain));
 
-        auto ret = sys::Bus::SendUnicast(msg,GetName(),this);
+        sys::Bus::SendUnicast(msg,GetName(),this);
 #endif
 
     }
@@ -130,7 +130,7 @@ int main() {
 
         bool ret = false;
 
-        ret = sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
@@ -143,7 +143,7 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-		//applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
+		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
@@ -153,6 +153,9 @@ int main() {
             return 0;
         }
 
+
+
+
         return 0;
 
 
@@ -160,5 +163,5 @@ int main() {
 
     cpp_freertos::Thread::StartScheduler();
 #endif
-    return 0;
+    return 1;
 }

@@ -73,6 +73,9 @@ public:
     std::optional<MuxChannel*> GetMuxChannel(MuxChannel::MuxChannelType chan);
     void RemoveMuxChannel(MuxChannel::MuxChannelType chan);
 
+    void EnterSleepMode();
+    void ExitSleepMode();
+
     ConfState PowerUpProcedure();
     ConfState ConfProcedure();
     ConfState AudioConfProcedure();
