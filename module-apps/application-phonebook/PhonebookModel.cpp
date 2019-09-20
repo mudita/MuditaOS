@@ -22,15 +22,15 @@ PhonebookModel::~PhonebookModel() {
 
 void PhonebookModel::requestRecordsCount() {
 
-	uint32_t start = xTaskGetTickCount();
+//	uint32_t start = xTaskGetTickCount();
 	favouriteCount = DBServiceAPI::ContactGetCount(application, true );
-	uint32_t stop = xTaskGetTickCount();
-	LOG_INFO("DBServiceAPI::PhonebookGetCount %d records %d ms", favouriteCount, stop-start);
+//	uint32_t stop = xTaskGetTickCount();
+//	LOG_INFO("DBServiceAPI::PhonebookGetCount %d records %d ms", favouriteCount, stop-start);
 
-	start = xTaskGetTickCount();
+//	start = xTaskGetTickCount();
 	recordsCount = DBServiceAPI::ContactGetCount(application)  +favouriteCount;
-	stop = xTaskGetTickCount();
-	LOG_INFO("DBServiceAPI::PhonebookGetCount %d records %d ms", recordsCount, stop-start);
+//	stop = xTaskGetTickCount();
+//	LOG_INFO("DBServiceAPI::PhonebookGetCount %d records %d ms", recordsCount, stop-start);
 
 	//if there are favorite records request as much as possible
 	uint32_t pageSize = this->pageSize;
@@ -86,10 +86,12 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 		//return item from favorite part of contacts
 		if( static_cast<uint32_t>(index) < favouriteCount ) {
 			gui::PhonebookItem* item = new gui::PhonebookItem(this);
+
 			if( (index == firstElement) && (index != prevIndex) ) {
 				item->setValue("Favourite");
 			}
 			else {
+				item->markFavourite(true);
 				item->setContact(contact);
 				item->setID( index );
 			}
@@ -119,12 +121,13 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 	else{
 		LOG_INFO("BOT-UP index: %d first: %d prev: %d count: %d rem: %d", index, firstElement, prevIndex, count, remaining );
 
-		if( static_cast<uint32_t>(index) < favouriteCount ) {
+		if( static_cast<uint32_t>(index) < favouriteCount -1 ) {
 			gui::PhonebookItem* item = new gui::PhonebookItem(this);
 			if( remaining == 0 ) {
 				item->setValue("Favourite");
 			}
 			else {
+				item->markFavourite(true);
 				item->setContact(contact);
 				item->setID( index );
 			}
@@ -132,8 +135,15 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 		}
 		else {
 			gui::PhonebookItem* item = new gui::PhonebookItem(this);
-			//on top the page or if element next after last favourite contact is requested
-			if( (static_cast<uint32_t>(index) == favouriteCount) && (index != prevIndex)) {
+
+			//leaving normal contacts list and entering favourite area but charatcer is already placed
+			if( (static_cast<uint32_t>(index) == favouriteCount -1 ) && (index == prevIndex)) {
+				item->markFavourite(true);
+				item->setContact(contact);
+				item->setID( index );
+			}
+			//leaving normal contacts list and entering favourite area - return character
+			if( (static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex)) {
 				item->setValue( contact->alternativeName.substr(0,1));
 			}
 			else {
