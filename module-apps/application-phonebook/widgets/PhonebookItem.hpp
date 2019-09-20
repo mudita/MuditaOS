@@ -25,7 +25,9 @@ class PhonebookItem: public ListItem {
 	std::shared_ptr<ContactRecord> contact = nullptr;
 	//this is contact's name and surname or "favourites" or "first letter of surname
 	gui::Label* value = nullptr;
-
+	static const std::string boldFont;
+	static const std::string normalFont;
+	bool favourite = false;
 public:
 	PhonebookItem( PhonebookModel* model );
 	virtual ~PhonebookItem();
@@ -33,6 +35,10 @@ public:
 	void setContact( std::shared_ptr<ContactRecord> note );
 	void setValue( UTF8 text );
 	UTF8 getValue();
+	/**
+	 * Marks item as a favourite. This will cause to use bold font instead of normal font.
+	 */
+	void markFavourite( bool val );
 
 	//returns contact's structure
 	std::shared_ptr<ContactRecord> getContact() { return contact; };

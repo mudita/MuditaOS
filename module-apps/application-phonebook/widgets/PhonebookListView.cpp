@@ -175,8 +175,6 @@ void PhonebookListView::updatePageItems() {
 		//after the loop lastIndex is the number of elements not the index of last element that's why -- is used.
 		lastIndex--;
 
-//		LOG_INFO("Last index: %d", lastIndex );
-
 		//if last element has been displayed but there is still space for elements
 		if( (lastIndex == elementsCount - 1) && (visibleElements != pageSize ) && ( firstIndex != 0 )) {
 
@@ -210,7 +208,7 @@ void PhonebookListView::updatePageItems() {
 					}
 				}
 			}
-			LOG_INFO("BOT-UP first index %d Last index: %d", firstIndex, lastIndex );
+//			LOG_INFO("BOT-UP first index %d Last index: %d", firstIndex, lastIndex );
 		}
 	}
 	else if( orientation == ORIENTATION_BOTTOM_UP ) {
@@ -235,8 +233,6 @@ void PhonebookListView::updatePageItems() {
 		}
 
 		firstIndex++;
-
-		LOG_INFO("first index: %d", firstIndex );
 
 		//if last element has been displayed but there is still space for elements
 		if( (lastIndex != elementsCount - 1) && (visibleElements != pageSize ) && ( firstIndex == 0 )) {
@@ -269,7 +265,7 @@ void PhonebookListView::updatePageItems() {
 					}
 				}
 			}
-			LOG_INFO("TOP-BOT first index %d Last index: %d", firstIndex, lastIndex );
+//			LOG_INFO("TOP-BOT first index %d Last index: %d", firstIndex, lastIndex );
 		}
 	}
 
@@ -278,31 +274,26 @@ void PhonebookListView::updatePageItems() {
 	if( drawVerticalScroll )
 		itemWidth -= 10;
 
+	//substract pageSize for 1 pixel separators
 	int availableHeight  = widgetArea.h - pageSize;
 	if( availableHeight < 0 )
 		availableHeight = 0;
 	int itemHeight = availableHeight / pageSize;
 
-	int verticalPosition;
-	if( orientation == ORIENTATION_TOP_DOWN )
-		verticalPosition = 0;
-	else
-		verticalPosition = widgetArea.h - itemHeight ;
+	int verticalPosition = 0;
+
+	if( orientation == ORIENTATION_BOTTOM_UP )
+		items.reverse();
 
 	auto it = items.begin();
+
 	for(unsigned int i=0; i<items.size(); i++ ) {
 		if( availableHeight > 0 ) {
 
 			itemHeight = (*it)->minHeight;
 
-			if( orientation == ORIENTATION_TOP_DOWN ) {
-				(*it)->setPosition(0, verticalPosition );
-				verticalPosition += itemHeight + 1; //1 for separator
-			}
-			else {
-				verticalPosition -= itemHeight - 1; //1 for separator
-				(*it)->setPosition(0, verticalPosition );
-			}
+			(*it)->setPosition(0, verticalPosition );
+			verticalPosition += itemHeight + 1; //1 for separator
 
 			(*it)->setSize(itemWidth, itemHeight );
 

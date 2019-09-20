@@ -10,6 +10,9 @@
 
 namespace gui {
 
+const std::string PhonebookItem::boldFont = "gt_pressura_bold_24";
+const std::string PhonebookItem::normalFont = "gt_pressura_regular_24";
+
 PhonebookItem::PhonebookItem(PhonebookModel* model) : model{model}{
 	minWidth = 436;
 	minHeight = 55;
@@ -25,7 +28,7 @@ PhonebookItem::PhonebookItem(PhonebookModel* model) : model{model}{
 	value = new gui::Label( this, 0,0,0,0);
 	value->setPenFocusWidth(0);
 	value->setPenWidth(0);
-	value->setFont("gt_pressura_regular_24");
+	value->setFont(normalFont);
 	value->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER } );
 }
 
@@ -60,6 +63,14 @@ UTF8 PhonebookItem::getValue() {
 bool PhonebookItem::onActivated( void* data ) {
 	LOG_INFO("ITEM WAS PRESSED");
 	return true;
+}
+
+void PhonebookItem::markFavourite( bool val ) {
+	favourite = val;
+	if( val )
+		value->setFont(boldFont);
+	else
+		value->setFont(normalFont);
 }
 
 } /* namespace gui */
