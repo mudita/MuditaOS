@@ -1337,7 +1337,8 @@ void LPM_EnterFullSpeed(void)
     DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
 
     /* CCM Mode */
-    DCDC_BootIntoCCM(DCDC);
+    //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
+    //DCDC_BootIntoCCM(DCDC);
 
     /* Connect internal the load resistor */
     DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
@@ -1442,7 +1443,8 @@ void LPM_EnterLowPowerIdle(void)
     DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
 
     /* DCM Mode */
-    DCDC_BootIntoDCM(DCDC);
+    //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
+    //DCDC_BootIntoDCM(DCDC);
     /* Disconnect internal the load resistor */
     DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
     /* Power Down output range comparator */
