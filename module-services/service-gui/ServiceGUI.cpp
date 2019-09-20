@@ -118,9 +118,10 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 
 	switch( msg->messageType ) {
 		case static_cast<uint32_t>(MessageType::MessageTypeUninitialized): {
-			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
+//			LOG_ERROR("[ServiceGUI] Received uninitialized message type");
 		} break;
 		case static_cast<uint32_t>( MessageType::GUICommands ): {
+//			LOG_INFO("[%s] GUICommands", GetName().c_str());
 			auto dmsg = static_cast<sgui::DrawMessage*>( msgl );
 			if( !dmsg->commands.empty() ) {
 
@@ -161,7 +162,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 			}
 		} break;
 		case static_cast<uint32_t>(MessageType::GUIRenderingFinished): {
-//			LOG_INFO("Rendering finished");
+//			LOG_INFO("[%s] GUIRenderingFinished", GetName().c_str());
 			//increment counter holding number of drawn frames
 			rendering = false;
 			renderFrameCounter++;
@@ -179,14 +180,20 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 			}
 		}break;
 		case static_cast<uint32_t>( MessageType::GUIFocusInfo ): {
-
-//			LOG_INFO("[ServiceGUI] Received focus info");
+//			LOG_INFO("[%s] GUIFocusInfo", GetName().c_str());
 		} break;
 		case static_cast<uint32_t>( MessageType::GUIDisplayReady ): {
-
-//			LOG_INFO("[ServiceGUI]Display ready");
+//			LOG_INFO("[%s] GUIDisplayReady", GetName().c_str());
 			einkReady = true;
 			requestSent = false;
+
+			if( msg->getSuspend()){
+				einkReady = false;
+				suspendInProgress = false;
+				LOG_DEBUG("last rendering before suspend is finished.");
+
+				sapm::ApplicationManager::messageInitPowerSaveMode(this);
+			}
 			//mode = gui::RefreshModes::GUI_REFRESH_FAST;
 			//check if something new was rendered. If so render counter has greater value than
 			//transfer counter.
@@ -197,13 +204,6 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 			else {
 //				LOG_INFO(" NO new buffer to send");
 			}
-			if( msg->getSuspend()){
-				suspendInProgress = false;
-				LOG_DEBUG("last rendering before suspend is finished.");
-
-				sapm::ApplicationManager::messageInitPowerSaveMode(this);
-			}
-
 		} break;
 	};
 

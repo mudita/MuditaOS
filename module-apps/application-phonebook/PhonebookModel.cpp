@@ -121,7 +121,7 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 
 		if( static_cast<uint32_t>(index) < favouriteCount ) {
 			gui::PhonebookItem* item = new gui::PhonebookItem(this);
-			if( (static_cast<uint32_t>(index) == static_cast<uint32_t>(firstElement) - count ) ) {
+			if( remaining == 0 ) {
 				item->setValue("Favourite");
 			}
 			else {
@@ -139,9 +139,17 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 			else {
 				std::shared_ptr<ContactRecord> prevContact = getRecord( prevIndex, false  );
 				if( remaining == 0 ) {
-					item->setValue( prevContact->alternativeName.substr(0,1));
+					//previous element has the same first character of alternative name so display first character
+					if( index == prevIndex ){
+						item->setContact(contact);
+						item->setID( index );
+					}
+					else {
+						item->setValue( prevContact->alternativeName.substr(0,1));
+					}
 				}
-				else if(
+				else
+					if(
 					( ( index == firstElement ) ||
 					( index == prevIndex ) ||
 							( contact->alternativeName.substr(0,1) == prevContact->alternativeName.substr(0,1)) )){

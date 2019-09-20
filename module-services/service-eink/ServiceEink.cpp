@@ -55,7 +55,7 @@ ServiceEink::ServiceEink(const std::string& name, std::string parent)
 }
 
 ServiceEink::~ServiceEink(){
-	LOG_INFO("[ServiceEink] Cleaning resources");
+//	LOG_INFO("[ServiceEink] Cleaning resources");
 	//release data from settings
 	if( waveformSettings.LUTCData != nullptr )
 		delete [] waveformSettings.LUTCData;
@@ -75,9 +75,10 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
 			stopTimer( timerPowerOff );
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
-//			LOG_INFO("[ServiceEink] Received framebuffer");
+//			LOG_INFO("[%s] EinkImageData", GetName().c_str());
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
 			deepRefresh = dmsg->getDeepRefresh();
+
 			suspendInProgress = dmsg->getSuspend();
 			if(suspendInProgress)
 				LOG_DEBUG("suspend In Progress");
@@ -86,7 +87,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 		} break;
 		case static_cast<uint32_t>(MessageType::EinkDMATransfer): {
 
-//			LOG_INFO("[ServiceEink] Received framebuffer");
+//			LOG_INFO("[%s] EinkDMATransfer", GetName().c_str());
 //			uint32_t start_tick = xTaskGetTickCount();
 
 			if( suspended ) {
@@ -148,10 +149,11 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 		} break;
 
 		case static_cast<uint32_t>(MessageType::EinkTemperatureUpdate): {
-
+//			LOG_INFO("[%s] EinkTemperatureUpdate", GetName().c_str());
 		} break;
 
 		case static_cast<uint32_t>(MessageType::EinkStateRequest ): {
+//			LOG_INFO("[%s] EinkStateRequest", GetName().c_str());
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		} break;
@@ -232,6 +234,16 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
 
             //TODO remove screen clearing code below.
             EinkPowerOn();
+
+            int32_t temperature = EinkGetTemperatureInternal();
+            	//			LOG_INFO("temperature: %d", temperature );
+
+			changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+			EinkDitherDisplay();
+
+            EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
+
+            EinkPowerOff();
 //
 //            uint8_t s_einkAmbientTemperature = EinkGetTemperatureInternal();
 //            // Make the saturation to the lower limit
