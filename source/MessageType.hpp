@@ -39,6 +39,8 @@ enum class MessageType {
 	DBThreadRemove,     // Remove thread by ID
 	DBThreadGetLimitOffset, // Get Thread record by limit,offset
 
+	DBContactVerify,    //checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
+						//speed dial key
 	DBContactAdd,       // Add contact record
 	DBContactRemove,    // Remove contact remove
 	DBContactUpdate,    // Update contact remove

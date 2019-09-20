@@ -19,6 +19,11 @@ class PhonebookMainWindow : public AppWindow {
     PhonebookListView* list;
     PhonebookModel* phonebookModel = nullptr;
 
+    Image* leftArrowImage = nullptr;
+    Image* rightArrowImage = nullptr;
+    Image* newContactImage = nullptr;
+    Image* searchImage = nullptr;
+
   public:
     PhonebookMainWindow(app::Application *app);
     virtual ~PhonebookMainWindow();

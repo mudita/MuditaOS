@@ -208,7 +208,6 @@ void PhonebookListView::updatePageItems() {
 					}
 				}
 			}
-//			LOG_INFO("BOT-UP first index %d Last index: %d", firstIndex, lastIndex );
 		}
 	}
 	else if( orientation == ORIENTATION_BOTTOM_UP ) {
@@ -265,7 +264,6 @@ void PhonebookListView::updatePageItems() {
 					}
 				}
 			}
-//			LOG_INFO("TOP-BOT first index %d Last index: %d", firstIndex, lastIndex );
 		}
 	}
 

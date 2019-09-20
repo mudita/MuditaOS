@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "i18/i18.hpp"
 #include "PhonebookModel.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
@@ -17,20 +18,13 @@ PhonebookModel::PhonebookModel(  app::Application* app) : DatabaseModel(app, 14)
 }
 
 PhonebookModel::~PhonebookModel() {
-	// TODO Auto-generated destructor stub
 }
 
 void PhonebookModel::requestRecordsCount() {
 
-//	uint32_t start = xTaskGetTickCount();
 	favouriteCount = DBServiceAPI::ContactGetCount(application, true );
-//	uint32_t stop = xTaskGetTickCount();
-//	LOG_INFO("DBServiceAPI::PhonebookGetCount %d records %d ms", favouriteCount, stop-start);
 
-//	start = xTaskGetTickCount();
 	recordsCount = DBServiceAPI::ContactGetCount(application)  +favouriteCount;
-//	stop = xTaskGetTickCount();
-//	LOG_INFO("DBServiceAPI::PhonebookGetCount %d records %d ms", recordsCount, stop-start);
 
 	//if there are favorite records request as much as possible
 	uint32_t pageSize = this->pageSize;
@@ -60,8 +54,6 @@ void PhonebookModel::requestRecords( const uint32_t offset, const uint32_t limit
 
 bool PhonebookModel::updateRecords( std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count, bool favourite  ) {
 
-	LOG_INFO("Offset: %d, Limit: %d Count:%d", favourite?offset:offset+favouriteCount, limit, count);
-
 	if( favourite )
 		DatabaseModel::updateRecords( std::move(records), offset, limit, count );
 	else
@@ -88,7 +80,7 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 			gui::PhonebookItem* item = new gui::PhonebookItem(this);
 
 			if( (index == firstElement) && (index != prevIndex) ) {
-				item->setValue("Favourite");
+				item->setValue(utils::localize.get("app_phonebook_list_favourites"));
 			}
 			else {
 				item->markFavourite(true);
@@ -119,12 +111,10 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 		}
 	}
 	else{
-		LOG_INFO("BOT-UP index: %d first: %d prev: %d count: %d rem: %d", index, firstElement, prevIndex, count, remaining );
-
 		if( static_cast<uint32_t>(index) < favouriteCount -1 ) {
 			gui::PhonebookItem* item = new gui::PhonebookItem(this);
 			if( remaining == 0 ) {
-				item->setValue("Favourite");
+				item->setValue(utils::localize.get("app_phonebook_list_favourites"));
 			}
 			else {
 				item->markFavourite(true);
