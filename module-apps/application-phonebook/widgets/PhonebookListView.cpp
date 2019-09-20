@@ -175,7 +175,7 @@ void PhonebookListView::updatePageItems() {
 		//after the loop lastIndex is the number of elements not the index of last element that's why -- is used.
 		lastIndex--;
 
-		LOG_INFO("Last index: %d", lastIndex );
+//		LOG_INFO("Last index: %d", lastIndex );
 
 		//if last element has been displayed but there is still space for elements
 		if( (lastIndex == elementsCount - 1) && (visibleElements != pageSize ) && ( firstIndex != 0 )) {

@@ -280,14 +280,13 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			//check if this is case where application is returning to the last visible window.
 			if( (msg->getData() != nullptr) && (msg->getData()->getDescription() == "LastWindow") ) {
-				refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+				//do nothing here
 			}
 			else {
 				currentWindow->onBeforeShow( mode, 0, msg->getData().get() );
-				refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 			}
 
-
+			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 
 		}
 		handled = true;
