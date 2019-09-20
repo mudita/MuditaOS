@@ -74,11 +74,21 @@ void PhonebookMainWindow::buildInterface() {
     title->setFont("gt_pressura_bold_24");
     title->setText(utils::localize.get("app_phonebook_title_main"));
     title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
+    leftArrowImage  = new gui::Image( this, 30,62,0,0, "phonebook_arrow_left" );
+	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "phonebook_arrow_right" );
+	newContactImage = new gui::Image( this, 48,55,0,0, "phonebook_cross" );
+	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "phonebook_search" );
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
     if( title ) { removeWidget(title);    delete title; title = nullptr; }
     if( list ) { removeWidget(list);    delete list; list = nullptr; }
+    if( leftArrowImage ) { removeWidget(leftArrowImage);    delete leftArrowImage; leftArrowImage = nullptr; }
+    if( rightArrowImage ) { removeWidget(rightArrowImage);    delete rightArrowImage; rightArrowImage = nullptr; }
+    if( newContactImage ) { removeWidget(newContactImage);    delete newContactImage; newContactImage = nullptr; }
+    if( searchImage ) { removeWidget(searchImage);    delete searchImage; searchImage = nullptr; }
+
     children.clear();
     delete phonebookModel;
 }
