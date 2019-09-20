@@ -1331,6 +1331,11 @@ status_t BOARD_InitSEMC(void)
 
 void LPM_EnterFullSpeed(void)
 {
+    CLOCK_InitExternalClk(0);
+
+    /* Switch DCDC to use DCDC external OSC */
+    DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
+
     /* CCM Mode */
     DCDC_BootIntoCCM(DCDC);
 
@@ -1351,13 +1356,8 @@ void LPM_EnterFullSpeed(void)
     EnableRegularLDO();
     DisableWeakLDO();
 
-    CLOCK_InitExternalClk(0);
-
-    /* Switch DCDC to use DCDC external OSC */
-    DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
-
-        /* Switch clock source to external OSC. */
-        CLOCK_SwitchOsc(kCLOCK_XtalOsc);
+    /* Switch clock source to external OSC. */
+    CLOCK_SwitchOsc(kCLOCK_XtalOsc);
     /* Set Oscillator ready counter value. */
     CCM->CCR = (CCM->CCR & (~CCM_CCR_OSCNT_MASK)) | CCM_CCR_OSCNT(127);
     /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
@@ -1432,9 +1432,6 @@ void LPM_EnterLowPowerIdle(void)
     CLOCK_SwitchOsc(kCLOCK_RcOsc);
 
     CLOCK_DeinitExternalClk();
-
-    CCM_ANALOG->MISC0_SET = CCM_ANALOG_MISC0_OSC_I_MASK;
-
 
     /* Power down USBPHY */
     PowerDownUSBPHY();
