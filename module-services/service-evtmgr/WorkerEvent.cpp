@@ -51,6 +51,8 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		uint8_t state, code;
 		bsp::keyboard_get_data(notification, state, code);
 
+		LOG_WARN("X-RAY Key: noti: %d state: %d code: %d", notification, state, code);
+
 		processKeyEvent(static_cast<bsp::KeyEvents>(state), static_cast<bsp::KeyCodes>(code));
 
 	}
