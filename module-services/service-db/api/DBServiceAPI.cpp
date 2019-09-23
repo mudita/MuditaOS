@@ -167,21 +167,123 @@ std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sy
     }
 }
 
-bool DBServiceAPI::verifyContact( sys::Service* serv,const NotesRecord& rec,
-    		NotesRecord& errName, const NotesRecord& errPhone1, NotesRecord& errPhone2, NotesRecord& speedDial ) {
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName ) {
 
-//	std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactVerify,rec);
-//	    msg->record.contactType = ContactType::USER;
-//
-//	    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
-//	    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
-//	    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
-//	        return true;
-//	    }
-//	    else{
-//	        return false;
-//	    }
-	return true;
+	ContactRecord rec;
+	rec.primaryName = primaryName;
+	rec.alternativeName = alternativeName;
+
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByName,rec );
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+		return std::move(contactResponse->records);
+	}
+	else{
+		return std::make_unique<std::vector<ContactRecord>>();
+	}
+}
+
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial ) {
+	ContactRecord rec;
+	rec.speeddial = speeddial;
+
+	std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetBySpeedDial,rec );
+
+	auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+	DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+	if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+		return std::move(contactResponse->records);
+	}
+	else{
+		return std::make_unique<std::vector<ContactRecord>>();
+	}
+}
+
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber) {
+	ContactRecord rec;
+	rec.number = phoneNumber;
+
+	std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber,rec );
+
+	auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+	DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+	if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+		return std::move(contactResponse->records);
+	}
+	else{
+		return std::make_unique<std::vector<ContactRecord>>();
+	}
+}
+
+bool DBServiceAPI::verifyContact( sys::Service* serv,const ContactRecord& rec,
+		ContactRecord& errName, ContactRecord& errPhone1, ContactRecord& errPhone2, ContactRecord& speedDial ) {
+
+	//if true it means that contact passed verification
+	bool verified = true;
+
+	//request contact with specified primary and alternative name.
+	auto retName = ContactGetByName( serv, rec.primaryName, rec.alternativeName );
+	if( retName->size() != 0 ) {
+		verified = false;
+		errName = retName->operator [](0);
+		LOG_WARN("Name verification failed for [%s %s] owner ID: %d [%s %s]",
+			rec.primaryName.c_str(), rec.alternativeName.c_str());
+	}
+	else {
+		LOG_INFO("Name verification passed for [%s %s]", rec.primaryName.c_str(), rec.alternativeName.c_str());
+	}
+
+	//request contact by speed dial
+	auto retSpeedDial = ContactGetBySpeeddial( serv, rec.speeddial );
+	if( retSpeedDial->size() != 0 ) {
+		verified = false;
+		LOG_WARN("Speed dial verification failed for number: [%d] owner ID: %d [%s %s]",
+			rec.speeddial,
+			retSpeedDial->operator [](0).dbID,
+			retSpeedDial->operator [](0).primaryName.c_str(),
+			retSpeedDial->operator [](0).alternativeName.c_str());
+		speedDial = retSpeedDial->operator [](0);
+	}
+	else {
+		LOG_INFO("Speed dial verification passed for number: [%d]", rec.speeddial);
+	}
+
+	//request contact by speed dial
+	if( rec.numbers.size() > 0 ) {
+		auto retPhone1 = ContactGetByPhoneNumber( serv, rec.numbers[0].numberE164 );
+		if( retPhone1->size() != 0 ) {
+			verified = false;
+			LOG_WARN("Phone number 1 verification failed for number: [%s] owner: ID: %d [%s %s]",
+				rec.numbers[0].numberE164.c_str(),
+				retPhone1->operator [](0).dbID,
+				retPhone1->operator [](0).primaryName.c_str(),
+				retPhone1->operator [](0).alternativeName.c_str());
+			errPhone1 = retPhone1->operator [](0);
+		}
+		else {
+			LOG_INFO("Phone number 1 verification passed for number: [%s]", rec.numbers[0].numberE164.c_str());
+		}
+	}
+
+	if( rec.numbers.size() > 1 ) {
+		auto retPhone2 = ContactGetByPhoneNumber( serv, rec.numbers[0].numberE164 );
+		if( retPhone2->size() != 0 ) {
+			verified = false;
+			LOG_WARN("Phone number 1 verification failed for number: [%s] owner: ID: %d [%s %s]",
+				rec.numbers[0].numberE164.c_str(),
+				retPhone2->operator [](0).dbID,
+				retPhone2->operator [](0).primaryName.c_str(),
+				retPhone2->operator [](0).alternativeName.c_str());
+			errPhone2 = retPhone2->operator [](0);
+		}
+		else {
+			LOG_INFO("Phone number 2 verification passed for number: [%s]", rec.numbers[1].numberE164.c_str());
+		}
+	}
+
+	return verified;
 }
 
 bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec) {

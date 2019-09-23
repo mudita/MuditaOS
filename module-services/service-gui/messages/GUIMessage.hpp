@@ -20,11 +20,13 @@ namespace sgui {
  */
 class GUIMessage: public sys::DataMessage {
 	bool suspend = false;
+	bool shutdown = false;
 public:
-	GUIMessage( MessageType messageType, bool suspend = false  ) : sys::DataMessage(static_cast<uint32_t>(messageType)),
-	suspend{ suspend } {};
+	GUIMessage( MessageType messageType, bool suspend = false, bool shutdown = false ) : sys::DataMessage(static_cast<uint32_t>(messageType)),
+	suspend{ suspend },shutdown{ shutdown } {};
 	virtual ~GUIMessage() {};
 	bool getSuspend() { return suspend; };
+	bool getShutdown() { return shutdown; };
 };
 
 } /* namespace sgui */

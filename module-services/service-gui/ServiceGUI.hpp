@@ -61,6 +61,10 @@ protected:
 	 * Flag controls process of redrawing screen when suspend is in progress.
 	 */
 	bool suspendInProgress = false;
+	/**
+	 * Flag controls process of redrawing screen when phone is shutting down.
+	 */
+	bool shutdownInProgress = false;
 
 	void sendBuffer();
 	void sendToRender();

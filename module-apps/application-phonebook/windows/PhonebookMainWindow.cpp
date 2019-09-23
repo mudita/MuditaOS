@@ -144,6 +144,20 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchDa
 
 	list->clear();
 	list->setElementsCount( phonebookModel->getItemCount() );
+
+	ContactRecord rec;
+	ContactRecord errName;
+	ContactRecord errPhone1;
+	ContactRecord errPhone2;
+	ContactRecord speedDial;
+
+	rec.speeddial = 1;
+	rec.numbers.push_back( ContactRecord::Number("+487172722", "+487172722"));
+	bool res = DBServiceAPI::verifyContact( application,rec, errName, errPhone1, errPhone2, speedDial );
+
+	if( res == false )
+		LOG_ERROR("Verification failed");
+
 }
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {

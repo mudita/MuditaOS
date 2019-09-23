@@ -47,8 +47,12 @@ public:
 	 *
 	 * @note This function is blocking. It's checking until first error.
 	 */
-	static bool verifyContact( sys::Service* serv,const NotesRecord& rec,
-		NotesRecord& errName, const NotesRecord& errPhone1, NotesRecord& errPhone2, NotesRecord& speedDial );
+	static bool verifyContact( sys::Service* serv,const ContactRecord& rec,
+			ContactRecord& errName, ContactRecord& errPhone1, ContactRecord& errPhone2, ContactRecord& speedDial );
+
+	static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName );
+	static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial );
+	static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
     static bool ContactAdd(sys::Service* serv,const ContactRecord& rec);
     static bool ContactRemove(sys::Service* serv,uint32_t id);
     static bool ContactUpdate(sys::Service* serv,const ContactRecord& rec);
