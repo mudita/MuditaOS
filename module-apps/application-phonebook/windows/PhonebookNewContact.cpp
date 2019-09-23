@@ -7,6 +7,7 @@
 #include "Margins.hpp"
 #include "PhonebookNewContact.hpp"
 #include <log/log.hpp>
+#include "InputEvent.hpp"
 
 #include "Text.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
@@ -142,7 +143,23 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedValue->setPenWidth(1);
 	page2.speedValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
 	page2.speedValue->setFont("gt_pressura_regular_16");
-	page2.speedValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+	page2.speedValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
+	page2.speedValue->focusChangedCallback = [=] (gui::Item& item){
+		if( item.focus ) {
+			LOG_INFO("Changed profile to common_kbd_numeric");
+			application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
+		}
+		return true;
+	};
+
+	page2.speedValue->inputCallback  = [=] (gui::Item& item, const InputEvent& inputEvent ){
+		if( (inputEvent.keyChar > '0') && (inputEvent.keyChar < '9') ) {
+			page2.speedValue->setText(std::to_string(inputEvent.keyChar-'0'));
+			return true;
+		}
+		return false;
+	};
 
 	page2.speedDescription = new gui::Label(this, 100, 105, 330, 47);
 	page2.speedDescription->setFilled(false);
@@ -153,7 +170,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedDescription->setFont("gt_pressura_regular_16");
 	page2.speedDescription->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	page2.imageSpeed = nullptr;
+	page2.imageSpeed = new gui::Image( this, 416, 122,0,0, "small_circle" );;
 
 	page2.favValue = new gui::Label(this, 30, 161, 56, 47);
 	page2.favValue->setFilled(false);
@@ -173,7 +190,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.favDescription->setFont("gt_pressura_regular_16");
 	page2.favDescription->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	page2.imageFav = nullptr;
+	page2.imageFav = new gui::Image( this, 416, 177,0,0, "small_heart" );;
 
 	page2.speedDescription->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
 	page2.favDescription->setText(utils::localize.get("app_phonebook_new_addto_fav"));

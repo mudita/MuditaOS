@@ -55,10 +55,10 @@ protected:
 		void setVisibile( bool visible ) {
 			speedValue->setVisible(visible);
 			speedDescription->setVisible(visible);
-//			imageSpeed->setVisible(visible);
+			imageSpeed->setVisible(visible);
 			favValue->setVisible(visible);
 			favDescription->setVisible(visible);
-//			imageFav->setVisible(visible);
+			imageFav->setVisible(visible);
 
 			addressLabel->setVisible(visible);
 			noteLabel->setVisible(visible);
