@@ -23,14 +23,16 @@ protected:
 	bool deepRefresh;
 	uint8_t* data;
 	bool suspend = false;
+	bool shutdown = false;
 public:
-	ImageMessage( uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool deepRefresh, uint8_t* data, bool suspend );
+	ImageMessage( uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool deepRefresh, uint8_t* data, bool suspend, bool shutdown );
 	virtual ~ImageMessage();
 
 	uint8_t* const getData() { return data; } ;
 	uint32_t getSize() { return w*h; };
 	bool getDeepRefresh() { return deepRefresh; };
 	bool getSuspend() { return suspend; };
+	bool getShutdown() { return shutdown; };
 };
 
 } /* namespace seink */

@@ -128,6 +128,10 @@
     "app_phonebook_new_addto_fav": "dodaj do ulubionych",
     
     "settings_lang_PL": "PL",
-    "settings_lang_ENG": "ENG"
+    "settings_lang_ENG": "ENG",
+    "settings_lang_DE": "DE",
+    "settings_lang_SP": "SP",
+    "desktop_powerdown_info1": "Teraz jest...",
+    "desktop_powerdown_info2": "Wyłączone!!!"
 
 }

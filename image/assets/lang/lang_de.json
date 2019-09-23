@@ -117,6 +117,10 @@
 	
 
     "settings_lang_PL": "PL",
-    "settings_lang_ENG": "ENG"
+    "settings_lang_ENG": "ENG",
+    "settings_lang_DE": "DE",
+    "settings_lang_SP": "SP",
+    "desktop_powerdown_info1": "Now It is truly...",
+    "desktop_powerdown_info2": "Disabled!!!"
 
 }

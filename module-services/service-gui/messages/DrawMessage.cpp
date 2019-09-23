@@ -12,9 +12,9 @@
 
 namespace sgui {
 
-DrawMessage::DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode, bool suspend ) :
+DrawMessage::DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode, DrawCommand cmd ) :
 	GUIMessage(MessageType::GUICommands),
-	suspend{ suspend } {
+	command{ cmd } {
 
 	this->mode = mode;
 	for( auto cmd : commandsList ) {

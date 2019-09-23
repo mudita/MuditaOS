@@ -79,9 +79,13 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
 			deepRefresh = dmsg->getDeepRefresh();
 
+			shutdownInProgress = dmsg->getShutdown();
+			if(shutdownInProgress)
+				LOG_DEBUG("Shutdown In Progress");
+
 			suspendInProgress = dmsg->getSuspend();
 			if(suspendInProgress)
-				LOG_DEBUG("suspend In Progress");
+				LOG_DEBUG("Suspend In Progress");
 			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer );
 			sys::Bus::SendUnicast(msg, this->GetName(), this);
 		} break;
@@ -141,8 +145,9 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 
 				ReloadTimer( timerPowerOff );
 
-				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress );
+				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress, shutdownInProgress );
 				suspendInProgress = false;
+				shutdownInProgress = false;
 				sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 			}
 

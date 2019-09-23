@@ -149,3 +149,29 @@ uint32_t ContactsNameTable::GetCountByFieldID(const char *field, uint32_t id) {
 
     return uint32_t{(*queryRet)[0].GetUInt32()};
 }
+
+std::vector<ContactsNameTableRow>
+	ContactsNameTable::GetByName( const char* primaryName, const char* alternativeName ) {
+
+	auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary='%s' AND name_alternative='%s' ORDER BY name_alternative LIMIT 1;",
+	                              primaryName,
+	                              alternativeName );
+
+	if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+		return std::vector<ContactsNameTableRow>();
+	}
+
+	std::vector<ContactsNameTableRow> ret;
+
+	do {
+		ret.push_back(ContactsNameTableRow{(*retQuery)[0].GetUInt32(),  // ID
+										   (*retQuery)[1].GetUInt32(),    // contactID
+										   (*retQuery)[2].GetString(),    // namePrimary
+										   (*retQuery)[3].GetString(),    // nameAlternative
+										   (*retQuery)[4].GetUInt32(),    // favourite
+		});
+	} while (retQuery->NextRow());
+
+	return ret;
+
+}
