@@ -207,11 +207,7 @@ void Thread::TaskFunctionAdapter(void *pvParameters)
     thread->Run();
 
 #if (INCLUDE_vTaskDelete == 1)
-
-    thread->Cleanup();
-
     vTaskDelete(NULL);
-
 #else
     configASSERT( ! "Cannot return from a thread.run function "
                     "if INCLUDE_vTaskDelete is not defined.");

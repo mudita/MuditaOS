@@ -132,7 +132,7 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 
     switch (mode){
         case sys::ServicePowerMode ::Active:
-            muxdaemon->ExitSleepMode();
+            //muxdaemon->ExitSleepMode();
             break;
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
