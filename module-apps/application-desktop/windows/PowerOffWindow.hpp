@@ -34,6 +34,7 @@ enum class State {
 	//TODO remove this label after power manager is finished.
 	gui::Label* eventMgrLabel = nullptr;
 	gui::Image* powerImage = nullptr;
+	gui::Image* powerDownImage = nullptr;
 	State state = State::Return;
 
 public:

@@ -12,9 +12,9 @@
 
 namespace seink {
 
-ImageMessage::ImageMessage( uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool deepRefresh, uint8_t* data, bool suspend) :
+ImageMessage::ImageMessage( uint32_t x, uint32_t y, uint32_t w, uint32_t h, bool deepRefresh, uint8_t* data, bool suspend, bool shutdown) :
 	EinkMessage( MessageType::EinkImageData ), x{x}, y{y}, w{w}, h{h}, deepRefresh{deepRefresh}, data{ data },
-	suspend{ suspend}{
+	suspend{ suspend}, shutdown{ shutdown }{
 }
 
 ImageMessage::~ImageMessage() {

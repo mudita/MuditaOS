@@ -58,6 +58,9 @@ public:
 
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
 
+    std::vector<ContactsNameTableRow>
+    GetByName( const char* primaryName, const char* alternativeName );
+
 private:
 
     const char *createTableQuery =

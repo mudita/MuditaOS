@@ -93,7 +93,8 @@ void ServiceGUI::sendBuffer() {
 			transferContext->getH(),
 			(mode==gui::RefreshModes::GUI_REFRESH_DEEP?true:false),
 			transferContext->getData(),
-			suspendInProgress
+			suspendInProgress,
+			shutdownInProgress
 	);
 	einkReady = false;
 	auto ret = sys::Bus::SendUnicast(msg, "ServiceEink", this,2000);
@@ -128,8 +129,14 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 				//if suspend flag is set ignore any new message
 				if( !suspendInProgress ) {
 
+
+					if( dmsg->command == sgui::DrawMessage::DrawCommand::SHUTDOWN ) {
+						LOG_WARN( "Shutdown - received shutdown draw commands" );
+						shutdownInProgress = true;
+					}
+
 					//if message carries suspend flag set flag in service and proceed
-					if( dmsg->suspend ) {
+					if( dmsg->command == sgui::DrawMessage::DrawCommand::SUSPEND ) {
 						LOG_WARN( "Suspended - received suspend draw commands" );
 						suspendInProgress = true;
 					}
@@ -186,6 +193,14 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 //			LOG_INFO("[%s] GUIDisplayReady", GetName().c_str());
 			einkReady = true;
 			requestSent = false;
+
+			if( msg->getShutdown()){
+				einkReady = false;
+				suspendInProgress = false;
+				LOG_DEBUG("last rendering before shutdown finished.");
+
+				sys::SystemManager::CloseSystem(this);
+			}
 
 			if( msg->getSuspend()){
 				einkReady = false;

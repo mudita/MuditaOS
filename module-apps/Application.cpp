@@ -80,8 +80,19 @@ void Application::render( gui::RefreshModes mode ) {
 	//send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
 		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
-		auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, suspendInProgress);
-		sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+
+		if( shutdownInProgress ) {
+			auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::SHUTDOWN );
+			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+		}
+		else if( suspendInProgress ) {
+			auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::SUSPEND );
+			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+		}
+		else {
+			auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::NORMAL );
+			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+		}
 	}
 
 	if( suspendInProgress )
