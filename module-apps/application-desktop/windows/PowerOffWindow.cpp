@@ -50,6 +50,8 @@ void PowerOffWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
 	powerImage = new gui::Image( this, 177,132,0,0, "pin_lock_info" );
+	powerDownImage = new gui::Image( this, 0,0 ,0,0, "logo" );
+	powerDownImage->setVisible(false);
 
 	//title label
 	titleLabel = new gui::Label(this, 0, 60, 480, 40);
@@ -125,9 +127,21 @@ void PowerOffWindow::buildInterface() {
 
 	selectionLabels[1]->activatedCallback = [=] (gui::Item& item) {
 		LOG_INFO("Closing system");
-		sys::SystemManager::CloseSystem(application);
-//		sapm::ApplicationManager::messageCloseApplicationManager( application );
-		return false; };
+		application->setShutdownFlag();
+
+		bottomBar->setVisible(false);
+		topBar->setVisible(false);
+		selectionLabels[0]->setVisible(false);
+		selectionLabels[1]->setVisible(false);
+		eventMgrLabel->setVisible(false);
+		powerImage->setVisible(false);
+		powerDownImage->setVisible(true);
+		titleLabel->setVisible(false);
+		infoLabel->setVisible(false);
+
+		application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP );
+
+		return true; };
 
 	//TODO Mati pisze tutaj.
 	eventMgrLabel->activatedCallback = [=] (gui::Item& item) {
@@ -148,13 +162,17 @@ void PowerOffWindow::buildInterface() {
 }
 void PowerOffWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete titleLabel;
-	delete infoLabel;
+	if( titleLabel ) { removeWidget(titleLabel); delete titleLabel; titleLabel = nullptr; };
+	if( infoLabel ) { removeWidget(infoLabel); delete infoLabel; infoLabel = nullptr; };
 
-	for( uint32_t i=0; i<selectionLabels.size(); i++ )
-		delete selectionLabels[i];
+	for( uint32_t i=0; i<selectionLabels.size(); i++ ) {
+		if( selectionLabels[i] ) { removeWidget(selectionLabels[i]); delete selectionLabels[i]; selectionLabels[i] = nullptr; };
+	}
 	selectionLabels.clear();
-	delete powerImage;
+
+	if( powerImage ) { removeWidget(powerImage); delete powerImage; powerImage = nullptr; };
+	if( powerDownImage ) { removeWidget(powerDownImage); delete powerDownImage; powerDownImage = nullptr; };
+
 	focusItem = nullptr;
 	delete eventMgrLabel;
 	children.clear();
@@ -179,7 +197,7 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 	}
 
-	//proccess only short press, consume rest
+	//process only short press, consume rest
 	if( inputEvent.state != gui::InputEvent::State::keyReleasedShort )
 		return true;
 

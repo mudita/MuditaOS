@@ -388,7 +388,61 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 });
             }
         } break;
-        case ContactRecordField ::Favourite: {
+        case ContactRecordField::SpeedDial: {
+        	auto ret = contactDB->contacts.GetLimitOffsetByField(0, 1, ContactTableFields::SpeedDial, str );
+
+        	for(const auto &w : ret){
+
+				auto contact = contactDB->contacts.GetByID(w.ID);
+				if(contact.ID == 0){
+					return records;
+				}
+
+				auto name = contactDB->name.GetByID(contact.nameID);
+					if(name.ID == 0){
+						return records;
+				}
+
+				auto nrs = getNumbers(contact.numbersID);
+					if(nrs.size() == 0){
+						return records;
+				}
+
+				auto ring = contactDB->ringtones.GetByID(contact.ringID);
+				if(ring.ID == 0){
+					return records;
+				}
+
+				auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
+				if(address.ID == 0){
+					return records;
+				}
+
+
+				records->push_back(ContactRecord{
+						.dbID = contact.ID,
+						.primaryName = name.namePrimary,
+						.alternativeName= name.nameAlternative,
+						.contactType=contact.type,
+						.numbers = nrs,
+						.country=address.country,
+						.city=address.city,
+						.street=address.street,
+						.number=address.number,
+						.note=address.note,
+						.mail=address.mail,
+						.addressType=address.type,
+						.assetPath=ring.assetPath,
+						.isOnWhitelist=contact.isOnWhitelist,
+						.isOnBlacklist=contact.isOnBlacklist,
+						.isOnFavourites=contact.isOnFavourites,
+						.speeddial=static_cast<uint8_t >(contact.speedDial)
+				});
+			}
+
+        } break;
+
+        case ContactRecordField::Favourite: {
         	auto ret = contactDB->name.GetLimitOffsetByField(offset,limit,ContactNameTableFields::Favourite,str);
 
         	for(const auto &w : ret){
@@ -443,6 +497,68 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     }
 
     return records;
+}
+
+std::unique_ptr<std::vector<ContactRecord>>
+	ContactRecordInterface::GetByName( UTF8 primaryName, UTF8 alternativeName ) {
+
+	auto records =  std::make_unique<std::vector<ContactRecord>>();
+
+	auto ret = contactDB->name.GetByName(primaryName.c_str(), alternativeName.c_str());
+
+	for(const auto &w : ret){
+
+		auto contact = contactDB->contacts.GetByID(w.contactID);
+		if(contact.ID == 0){
+			return records;
+		}
+
+		auto nrs = getNumbers(contact.numbersID);
+		if(nrs.size() == 0){
+			return records;
+		}
+
+		auto ring = contactDB->ringtones.GetByID(contact.ringID);
+		if(ring.ID == 0){
+			return records;
+		}
+
+		auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
+		if(address.ID == 0){
+			return records;
+		}
+
+
+		records->push_back(ContactRecord{
+				.dbID = w.ID,
+				.primaryName = w.namePrimary,
+				.alternativeName=w.nameAlternative,
+				.contactType=contact.type,
+				.numbers = nrs,
+				.country=address.country,
+				.city=address.city,
+				.street=address.street,
+				.number=address.number,
+				.note=address.note,
+				.mail=address.mail,
+				.addressType=address.type,
+				.assetPath=ring.assetPath,
+				.isOnWhitelist=contact.isOnWhitelist,
+				.isOnBlacklist=contact.isOnBlacklist,
+				.isOnFavourites=contact.isOnFavourites,
+				.speeddial=static_cast<uint8_t >(contact.speedDial)
+		});
+	}
+
+	return records;
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber( UTF8 number ) {
+	return GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, number.c_str());
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial( uint8_t speedDial ) {
+	return GetLimitOffsetByField(0, 1, ContactRecordField::SpeedDial, std::to_string(speedDial).c_str());
 }
 
 std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)

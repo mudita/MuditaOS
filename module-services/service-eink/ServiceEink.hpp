@@ -40,6 +40,7 @@ protected:
 	bool suspended = false;
 
 	bool suspendInProgress = false;
+	bool shutdownInProgress = false;
 
 	bool changeWaveform( EinkWaveforms_e Mode, const int32_t temperature );
 

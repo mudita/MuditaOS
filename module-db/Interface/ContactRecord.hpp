@@ -53,6 +53,7 @@ struct ContactRecord{
 enum class ContactRecordField {
     PrimaryName,
     NumberE164,
+	SpeedDial,
 	Favourite,
 };
 
@@ -79,6 +80,15 @@ public:
 
     std::unique_ptr<std::vector<ContactRecord>>
     GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str) override final;
+
+    std::unique_ptr<std::vector<ContactRecord>>
+	GetByName( UTF8 primaryName, UTF8 alternativeName );
+
+    std::unique_ptr<std::vector<ContactRecord>>
+	GetByNumber( UTF8 number );
+
+    std::unique_ptr<std::vector<ContactRecord>>
+	GetBySpeedDial( uint8_t speedDial );
 
 private:
     ContactsDB* contactDB;

@@ -106,6 +106,7 @@ public:
 	}
 
 	virtual void setSuspendFlag( bool val ) { suspendInProgress = val; };
+	virtual void setShutdownFlag() { shutdownInProgress = true; };
 
 	//static methods
 	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data );
@@ -161,6 +162,11 @@ protected:
 	 * be processed.
 	 */
 	bool suspendInProgress = false;
+	/**
+	 * Flag defines case when display needs to be refreshed before closing the system. If flag is set to true next set of rendering commands will
+	 * carry information to GUI service that system needs to be closed. After displaying the screen GUI will notify application manager to request system shutdown.
+	 */
+	bool shutdownInProgress = false;
 
 	//protected static methods
 	/**
