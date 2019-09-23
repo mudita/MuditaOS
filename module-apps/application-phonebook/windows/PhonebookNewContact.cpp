@@ -170,7 +170,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedDescription->setFont("gt_pressura_regular_16");
 	page2.speedDescription->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	page2.imageSpeed = new gui::Image( this, 416, 122,0,0, "small_circle" );;
+	page2.imageSpeed = new gui::Image( this, 416, 122,0,0, "small_circle" );
 
 	page2.favValue = new gui::Label(this, 30, 161, 56, 47);
 	page2.favValue->setFilled(false);
@@ -181,6 +181,36 @@ void PhonebookNewContact::buildInterface() {
 	page2.favValue->setFont("gt_pressura_regular_16");
 	page2.favValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
+	page2.favValue->focusChangedCallback = [=] (gui::Item& item){
+		if( item.focus ) {
+			bottomBar->setText(BottomBar::Side::CENTER, "SELECT");
+		}
+		else {
+			bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_save"));
+		}
+		return true;
+	};
+
+	page2.favValue->inputCallback  = [=] (gui::Item& item, const InputEvent& inputEvent ){
+		if( (inputEvent.keyCode == KeyCode::KEY_ENTER) &&
+			((inputEvent.state == InputEvent::State::keyReleasedShort ) ||
+			(inputEvent.state == InputEvent::State::keyReleasedLong ) )) {
+			if( page2.favSelected ) {
+				page2.imageTick->setVisible(false);
+				page2.favSelected = false;
+				LOG_INFO("Removed from favourites");
+			}
+			else {
+				page2.imageTick->setVisible(true);
+				page2.favSelected = true;
+				LOG_INFO("Added to favourites");
+			}
+			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+			return true;
+		}
+		return false;
+	};
+
 	page2.favDescription = new gui::Label(this, 100, 161, 330, 47);
 	page2.favDescription->setFilled(false);
 	page2.favDescription->setBorderColor( gui::ColorFullBlack );
@@ -190,7 +220,10 @@ void PhonebookNewContact::buildInterface() {
 	page2.favDescription->setFont("gt_pressura_regular_16");
 	page2.favDescription->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-	page2.imageFav = new gui::Image( this, 416, 177,0,0, "small_heart" );;
+	page2.imageTick= new gui::Image( this, 43, 174,0,0, "small_tick" );
+	page2.imageTick->setVisible(false);
+
+	page2.imageFav = new gui::Image( this, 416, 177,0,0, "small_heart" );
 
 	page2.speedDescription->setText(utils::localize.get("app_phonebook_new_speed_dial_key"));
 	page2.favDescription->setText(utils::localize.get("app_phonebook_new_addto_fav"));
@@ -221,6 +254,20 @@ void PhonebookNewContact::buildInterface() {
 		page2.text[i]->setBorderColor( gui::ColorFullBlack );
 		page2.text[i]->setMargins( Margins(0,0,0,0));
 		page2.text[i]->setFont("gt_pressura_regular_18");
+
+		page2.text[i]->contentCallback = [=] (gui::Item& item){
+			gui::Text* text = reinterpret_cast<Text*>(&item);
+			uint32_t length = text->getText().length();
+			if( length == 0 ){
+				LOG_INFO("Switching to uppercase");
+				application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
+			}
+			else if( length == 1 ){
+				LOG_INFO("Switching to lowercase");
+				application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
+			}
+			return true;
+		};
 	}
 
 	page2.speedValue->setNavigationItem( NavigationDirection::DOWN, page2.favValue );
@@ -281,6 +328,8 @@ void PhonebookNewContact::switchPage( uint32_t page ) {
 void PhonebookNewContact::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
 	switchPage(0);
 	setFocusItem(page1.text[0]);
+	page2.favSelected = false;
+	page2.imageFav->setVisible(false);
 	application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 }
 
