@@ -46,11 +46,14 @@ protected:
     	gui::Label* favValue = nullptr;
 		gui::Label* favDescription = nullptr;
 		gui::Image* imageFav = nullptr;
+		gui::Image* imageTick = nullptr;
 
 		gui::Label* addressLabel = nullptr;
 		gui::Label* noteLabel = nullptr;
 
 		gui::Text* text[2] = {nullptr};
+
+		bool favSelected = false;
 
 		void setVisibile( bool visible ) {
 			speedValue->setVisible(visible);
