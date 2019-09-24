@@ -333,25 +333,51 @@ void PhonebookNewContact::onBeforeShow(ShowMode mode, uint32_t command, SwitchDa
 	application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 }
 
+ContactRecord PhonebookNewContact::readContact(){
+	ContactRecord ret;
+
+	ret.primaryName = page1.text[0]->getText();
+	ret.alternativeName = page1.text[1]->getText();
+	ContactRecord::Number phoneNumber1, phoneNumber2;
+//	phoneNumber1.numberUser = page1.text[2];
+//	phoneNumber2.numberUser = page1.text[3];
+	ret.number = phoneNumber1.numberUser;
+
+	UTF8 text = page2.speedValue->getText();
+	if( text.length() ) {
+
+	}
+
+
+	return ret;
+}
+
 bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-			//refresh window only when key is other than enter
-			if( inputEvent.keyCode != KeyCode::KEY_ENTER ) {
-				application->render( RefreshModes::GUI_REFRESH_FAST );
-			}
-
-			return true;
-		}
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
 	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
 		return false;
 
+
+	//check if any of the lower inheritance onInput methods catch the event
+	bool ret = AppWindow::onInput( inputEvent );
+	if( ret ) {
+		//refresh window only when key is other than enter
+		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) {
+			application->render( RefreshModes::GUI_REFRESH_FAST );
+		}
+
+		return true;
+	}
+
 	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
+		//if focus is on the favourite selection field do nothing
+		if( focusItem == page2.favValue )
+			return true;
+
+		//read information and fill contact object
+
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_DOWN) {
 		LOG_INFO("switching to second page");
