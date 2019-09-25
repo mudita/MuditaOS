@@ -93,6 +93,9 @@
 	"app_settings_language_polish": "Polski",
 	"app_settings_language_german": "Niemiecki",
 	"app_settings_language_spanish": "Hiszpański",
+	
+	"app_messages_title_main": "Wiadomości",
+	"app_messages_new_message": "Nowa Wiadomość",
     	
  	"app_phonebook_title_main": "Kontakty",
 	"app_phonebook_call": "DZWOŃ",

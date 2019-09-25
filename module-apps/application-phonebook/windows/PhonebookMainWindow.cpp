@@ -75,10 +75,10 @@ void PhonebookMainWindow::buildInterface() {
     title->setText(utils::localize.get("app_phonebook_title_main"));
     title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-    leftArrowImage  = new gui::Image( this, 30,62,0,0, "phonebook_arrow_left" );
-	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "phonebook_arrow_right" );
-	newContactImage = new gui::Image( this, 48,55,0,0, "phonebook_cross" );
-	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "phonebook_search" );
+    leftArrowImage  = new gui::Image( this, 30,62,0,0, "arrow_left" );
+	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "arrow_right" );
+	newContactImage = new gui::Image( this, 48,55,0,0, "cross" );
+	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "search" );
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
