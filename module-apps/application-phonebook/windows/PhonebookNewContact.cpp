@@ -300,6 +300,7 @@ void PhonebookNewContact::destroyInterface()
     if( page2.favValue ) { removeWidget(page2.favValue); delete page2.favValue; page2.favValue = nullptr;}
     if( page2.favDescription ) { removeWidget(page2.favDescription); delete page2.favDescription; page2.favDescription = nullptr;}
     if( page2.imageFav ) { removeWidget(page2.imageFav); delete page2.imageFav; page2.imageFav = nullptr;}
+    if( page2.imageTick ) { removeWidget(page2.imageTick); delete page2.imageTick; page2.imageTick = nullptr;}
     if( page2.addressLabel ) { removeWidget(page2.addressLabel); delete page2.addressLabel; page2.addressLabel = nullptr;}
     if( page2.noteLabel ) { removeWidget(page2.noteLabel); delete page2.noteLabel; page2.noteLabel = nullptr;}
     for( uint32_t i=0; i<2; i++ ) {
