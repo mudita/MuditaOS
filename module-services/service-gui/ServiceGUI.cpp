@@ -155,11 +155,18 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 							commands.push_back(std::move(*it));
 						xSemaphoreGive( semCommands );
 					}
+					else {
+						LOG_ERROR("Failed to acquire semaphore");
+					}
+
 
 					//if worker is not rendering send him new set of commands
 					if( !rendering ) {
 						sendToRender();
+					} else {
+//						LOG_ERROR("Already rendering");
 					}
+
 	//				uint32_t mem = usermemGetFreeHeapSize();
 	//				LOG_WARN( "Heap Memory: %d", mem );
 				}
@@ -219,6 +226,13 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 			else {
 //				LOG_INFO(" NO new buffer to send");
 			}
+
+			//check if there are pending commands to render.
+			if( commands.empty() == false ) {
+				LOG_ERROR("Rendering pending %d commands", commands.size());
+				sendToRender();
+			}
+
 		} break;
 	};
 
