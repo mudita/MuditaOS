@@ -102,12 +102,12 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchDa
 
 
 #if 0
-	for( uint32_t i=0; i<surnames.size(); i++ ) {
+	for( uint32_t i=0; i<2/*surnames.size()*/; i++ ) {
 
 		uint32_t nameCount = rand() % 10;
 		uint32_t count = 0;
 
-		for( uint32_t j=0; j<nameCount; j++ ) {
+		for( uint32_t j=0; j</*nameCount*/ 2; j++ ) {
 			ContactRecord contact;
 
 //			LOG_INFO("%d of %d", count, nameCount );

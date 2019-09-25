@@ -30,7 +30,8 @@ void PhonebookModel::requestRecordsCount() {
 	uint32_t pageSize = this->pageSize;
 
 	requestRecords( 0, pageSize );
-	requestRecords( pageSize, pageSize );
+	if( recordsCount > pageSize )
+		requestRecords( pageSize, pageSize );
 }
 
 void PhonebookModel::requestRecords( const uint32_t offset, const uint32_t limit ) {
@@ -64,6 +65,7 @@ bool PhonebookModel::updateRecords( std::unique_ptr<std::vector<ContactRecord>> 
 
 gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIndex, uint32_t count, int remaining, bool topDown ) {
 
+	LOG_INFO("index: %d, first:%d prev: %d, count: %d, rem: %d, topDown: %d", index, firstElement, prevIndex, count, remaining, topDown );
 	bool download = false;
 	if( index > firstIndex + pageSize / 2 )
 		download = true;
