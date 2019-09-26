@@ -32,7 +32,9 @@ enum class ItemType {
 	LIST_ITEM,
 	TEXT,
 	IMAGE,
-	LAYOUT
+	LAYOUT,
+	VBOX,
+	HBOX
 };
 
 class Item {
@@ -72,7 +74,7 @@ public:
 	std::function<bool(Item&)> focusChangedCallback;
 	std::function<void(Item&,  void* data)> dimensionChangedCallback;
 	std::function<bool(Item&)> activatedCallback;
-	std::function<bool(Item&, InputEvent& inputEvent)> inputCallback;
+	std::function<bool(Item&, const InputEvent& inputEvent)> inputCallback;
 	std::function<bool(Item&)> contentCallback;
 
     int16_t w() { return widgetArea.w; }
@@ -93,7 +95,7 @@ public:
 
 	virtual bool onFocus( bool state ) { focus = state; return true; };
 	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
-	virtual bool onInput( const InputEvent& inputEvent ) { return false; };
+	virtual bool onInput( const InputEvent& inputEvent ) { return inputCallback( *this, inputEvent ); };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
 	virtual bool onContent() { return false; };
 

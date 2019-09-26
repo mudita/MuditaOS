@@ -35,8 +35,6 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 
 		LOG_INFO("Pressed index: %d", selectedIndex - firstIndex);
 		return true;
-
-//		return onActivated(nullptr);
 	}
 
 	if( (inputEvent.state == InputEvent::State::keyReleasedShort ) && (inputEvent.keyCode == KeyCode::KEY_LF) ) {
@@ -69,6 +67,9 @@ bool PhonebookListView::onInput( const InputEvent& inputEvent ) {
 					return true;
 				}
 				if( selectedIndex == firstIndex ) {
+					//ignore when someone wants to go above first element
+					if( selectedIndex == 0 )
+						return false;
 					orientation = ORIENTATION_BOTTOM_UP;
 					if( firstIndex > 0 ) {
 						selectedIndex = firstIndex - 1;
@@ -266,6 +267,9 @@ void PhonebookListView::updatePageItems() {
 			}
 		}
 	}
+
+	if( firstIndex < 0 )
+		firstIndex = 0;
 
 	//calculate height of the item using list's height and pageSize
 	uint32_t itemWidth = widgetArea.w;

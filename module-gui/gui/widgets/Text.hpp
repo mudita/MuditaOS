@@ -218,6 +218,7 @@ public:
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 	Item* getNavigationItem( NavigationDirection direction ) override;
 	void setRadius( int value ) override;
+	bool onContent() override;
 };
 
 } /* namespace gui */

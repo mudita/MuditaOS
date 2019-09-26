@@ -38,6 +38,7 @@ add_subdirectory( application-settings )
 add_subdirectory( application-call )
 add_subdirectory( application-notes )
 add_subdirectory( application-phonebook )
+add_subdirectory( application-messages )
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )
