@@ -18,7 +18,7 @@ target_sources( ${PROJECT_NAME}
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesItem.cpp"
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesMainWindow.cpp"
-        #"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesNewContact.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/ThreadViewWindow.cpp"
 	PUBLIC
 		#"${CMAKE_CURRENT_LIST_DIR}/MessagesModel.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationMessages.hpp"
