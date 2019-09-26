@@ -50,10 +50,11 @@ std::list<DrawCommand*> BoxLayout::buildDrawList() {
 
 
 HBox::HBox() : BoxLayout() {
-
+	type = ItemType::HBOX;
 }
 HBox::HBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h) :
 	BoxLayout( parent, x, y, w, h ) {
+	type = ItemType::HBOX;
 }
 
 void HBox::resizeItems() {
@@ -142,10 +143,11 @@ void HBox::resizeItems() {
 
 
 VBox::VBox() : BoxLayout() {
-
+	type = ItemType::VBOX;
 }
 VBox::VBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h) :
 	BoxLayout( parent, x, y, w, h ) {
+	type = ItemType::VBOX;
 }
 
 void VBox::resizeItems() {

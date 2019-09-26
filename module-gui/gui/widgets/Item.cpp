@@ -31,9 +31,9 @@ Item::Item() :
 
 	focusChangedCallback = [](Item&){ return false;};
 	activatedCallback = [](Item&){ return false;};
-	inputCallback = [](Item&, InputEvent& inputEvent){ return false;};
+	inputCallback = [](Item&, const InputEvent& inputEvent){ return false;};
 	dimensionChangedCallback = [](Item&,  void* data){ return false;};
-	contentCallback = [](Item&){ return false;};
+	contentCallback = [=](Item&){ if( parent != nullptr ) return parent->onContent(); return false;};
 }
 
 Item::~Item() {

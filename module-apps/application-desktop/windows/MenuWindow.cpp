@@ -129,11 +129,15 @@ void MenuWindow::buildInterface() {
 			LOG_INFO("page 1 tile 1" );
 			return true; }},
 		TileDescription{"menu_contacts",    "app_desktop_menu_contacts",[=] (gui::Item& item){
-            LOG_INFO("Contacts");
+            LOG_INFO("Phonebook");
             sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationPhonebook", "MainWindow",nullptr);
             return true;
         }},
-		TileDescription{"menu_messages",    "app_desktop_menu_messages",[=] (gui::Item& item){ return true; }},
+		TileDescription{"menu_messages",    "app_desktop_menu_messages",[=] (gui::Item& item){
+            LOG_INFO("Messages");
+            sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationMessages", "MainWindow",nullptr);
+            return true;
+        }},
 		TileDescription{"menu_calendar",    "app_desktop_menu_calendar",[=] (gui::Item& item){ return true; }},
 		TileDescription{"menu_alarm",       "app_desktop_menu_alarm",[=] (gui::Item& item){ return true; }},
 		TileDescription{"menu_meditation",  "app_desktop_menu_meditation",[=] (gui::Item& item){ return true; }},

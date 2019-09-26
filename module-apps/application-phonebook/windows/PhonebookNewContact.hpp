@@ -3,10 +3,12 @@
 #include <memory>
 #include <string>
 
+#include "ContactRecord.hpp"
 #include "AppWindow.hpp"
 #include "Label.hpp"
 #include "Text.hpp"
 #include <widgets/BoxLayout.hpp>
+
 
 namespace gui {
 
@@ -46,19 +48,23 @@ protected:
     	gui::Label* favValue = nullptr;
 		gui::Label* favDescription = nullptr;
 		gui::Image* imageFav = nullptr;
+		gui::Image* imageTick = nullptr;
 
 		gui::Label* addressLabel = nullptr;
 		gui::Label* noteLabel = nullptr;
 
 		gui::Text* text[2] = {nullptr};
 
+		bool favSelected = false;
+
 		void setVisibile( bool visible ) {
 			speedValue->setVisible(visible);
 			speedDescription->setVisible(visible);
-//			imageSpeed->setVisible(visible);
+			imageSpeed->setVisible(visible);
 			favValue->setVisible(visible);
 			favDescription->setVisible(visible);
-//			imageFav->setVisible(visible);
+			imageFav->setVisible(visible);
+			imageTick->setVisible(visible);
 
 			addressLabel->setVisible(visible);
 			noteLabel->setVisible(visible);
@@ -70,6 +76,10 @@ protected:
     Page1 page1;
     Page2 page2;
     uint32_t page = 0;
+
+    //reads data from fields in page1 and page2 and place it in Contact object.
+    ContactRecord readContact();
+
 public:
     PhonebookNewContact(app::Application *app);
     virtual ~PhonebookNewContact();

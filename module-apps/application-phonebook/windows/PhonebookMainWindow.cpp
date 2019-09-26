@@ -75,10 +75,10 @@ void PhonebookMainWindow::buildInterface() {
     title->setText(utils::localize.get("app_phonebook_title_main"));
     title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-    leftArrowImage  = new gui::Image( this, 30,62,0,0, "phonebook_arrow_left" );
-	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "phonebook_arrow_right" );
-	newContactImage = new gui::Image( this, 48,55,0,0, "phonebook_cross" );
-	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "phonebook_search" );
+    leftArrowImage  = new gui::Image( this, 30,62,0,0, "arrow_left" );
+	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "arrow_right" );
+	newContactImage = new gui::Image( this, 48,55,0,0, "cross" );
+	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "search" );
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
@@ -102,12 +102,12 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchDa
 
 
 #if 0
-	for( uint32_t i=0; i<surnames.size(); i++ ) {
+	for( uint32_t i=0; i<2/*surnames.size()*/; i++ ) {
 
 		uint32_t nameCount = rand() % 10;
 		uint32_t count = 0;
 
-		for( uint32_t j=0; j<nameCount; j++ ) {
+		for( uint32_t j=0; j</*nameCount*/ 2; j++ ) {
 			ContactRecord contact;
 
 //			LOG_INFO("%d of %d", count, nameCount );

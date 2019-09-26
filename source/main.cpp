@@ -15,6 +15,7 @@
 #include "application-settings/ApplicationSettings.hpp"
 #include "application-notes/ApplicationNotes.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
+#include "application-messages/ApplicationMessages.hpp"
 
 //module-services
 #include "service-appmgr/ApplicationManager.hpp"
@@ -144,6 +145,7 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
+		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
 
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
