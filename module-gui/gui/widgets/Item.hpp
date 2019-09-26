@@ -32,7 +32,9 @@ enum class ItemType {
 	LIST_ITEM,
 	TEXT,
 	IMAGE,
-	LAYOUT
+	LAYOUT,
+	VBOX,
+	HBOX
 };
 
 class Item {

@@ -30,7 +30,7 @@ void PhonebookModel::requestRecordsCount() {
 	uint32_t pageSize = this->pageSize;
 
 	requestRecords( 0, pageSize );
-	if( recordsCount > pageSize )
+	if( static_cast<uint32_t>(recordsCount) > pageSize )
 		requestRecords( pageSize, pageSize );
 }
 

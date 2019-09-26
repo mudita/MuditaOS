@@ -965,4 +965,15 @@ Item* Text::getNavigationItem( NavigationDirection direction ) {
 	return Rect::getNavigationItem( direction );
 }
 
+bool Text::onContent() {
+	if(( expandMode == Text::ExpandMode::EXPAND_DOWN) ||
+		( expandMode == Text::ExpandMode::EXPAND_UP)) {
+		if( (parent->type == ItemType::VBOX ) || ( parent->type == ItemType::HBOX )) {
+			parent->onContent();
+		}
+	}
+
+	return true;
+}
+
 } /* namespace gui */
