@@ -10,6 +10,7 @@
 
 #include <string>
 #include <cstdint>
+#include <iostream>
 
 
 
@@ -62,6 +63,11 @@ public:
 	UTF8 operator+( const UTF8& utf );
 	UTF8& operator+=( const UTF8& utf );
 	bool operator==( const UTF8& utf ) const;
+    operator std::string() { return c_str(); }
+    friend std::ostream& operator<< (std::ostream& os, const UTF8 &el) {
+        os << el.c_str();
+        return os;
+    }
 
 	/**
 	 * UTILITY FUNCTIONS
