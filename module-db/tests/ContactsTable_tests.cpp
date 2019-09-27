@@ -38,7 +38,6 @@ TEST_CASE("Contacts Table tests")
             .numbersID="0 1 2 3 4",
             .ringID=0,
             .addressIDs="5 6 7 8",
-            .type=ContactType ::PHONE,
             .isOnWhitelist=true,
             .isOnBlacklist=true,
             .isOnFavourites=false,
