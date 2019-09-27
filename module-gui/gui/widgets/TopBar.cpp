@@ -12,6 +12,7 @@
 #include "Label.hpp"
 #include "Image.hpp"
 #include "TopBar.hpp"
+#include <time/time_conversion.hpp>
 
 namespace gui {
 
@@ -132,12 +133,7 @@ void TopBar::setTime( const UTF8& time ) {
 void TopBar::setTime( const uint32_t& time, bool mode24H ) {
 
 	std::time_t t= time;
-	std::stringstream ss;
-	if( mode24H )
-		ss<<std::put_time( std::gmtime(&t), "%H:%M");
-	else
-		ss<<std::put_time( std::gmtime(&t), "%OH:%M");
-	setTime(ss.str());
+	setTime(utils::time::SysTime());
 
 	timeMode = (mode24H?TimeMode::TIME_24H:TimeMode::TIME_12H);
 	this->time = time;
