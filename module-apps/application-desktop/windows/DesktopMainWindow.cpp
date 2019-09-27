@@ -19,6 +19,7 @@
 #include "application-call/data/CallSwitchData.hpp"
 
 #include "i18/i18.hpp"
+#include <time/time_conversion.hpp>
 
 
 namespace gui {
@@ -46,14 +47,15 @@ void DesktopMainWindow::buildInterface() {
 	dayText->setFilled( false );
 	dayText->setBorderColor( gui::ColorNoColor );
 	dayText->setFont("gt_pressura_light_24");
-	dayText->setText(utils::localize.get("common_wendesday"));
+    auto time = utils::time::SysTime();
+	dayText->setText(time.day());
 	dayText->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	dayMonth = new gui::Label(this, 264, 150, 190, 42 );
 	dayMonth->setFilled( false );
 	dayMonth->setBorderColor( gui::ColorNoColor );
 	dayMonth->setFont("gt_pressura_light_24");
-	dayMonth->setText("01 Jan");
+	dayMonth->setText(time.str("%d %B"));
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
 	notificationCalls = new gui::Text(this, 86, 255, 350, 70 );
