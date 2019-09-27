@@ -50,3 +50,14 @@ else()
 	message( "${Red} No GTest ${ColourReset} - skipping build of ${CMAKE_PROJECT_GTEST_UTF8} ")
 endif()
 
+#Log unit tests projeet
+project(unittest_module-utils_time VERSION 1.0
+       DESCRIPTION "Module-utils time unit tests")
+
+add_executable( ${PROJECT_NAME}
+"${CMAKE_CURRENT_LIST_DIR}/unittest_time_conversion.cpp"
+
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
+target_link_libraries(${PROJECT_NAME} PRIVATE module-utils module-vfs)

@@ -51,6 +51,7 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/i18/i18.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/json/json11.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/utf8/UTF8.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/time/time_conversion.cpp
         )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
