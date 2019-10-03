@@ -22,17 +22,17 @@ class BluetopiaHW : public Bluetopia
         // without them it doesnt see inherited functs o_o
         virtual void open() override;
         virtual void close() override;
-        virtual void sleep_ms(ssize_t ms) override;
+        virtual void sleep_ms(ssize_t ms);
         virtual ssize_t read(void *buf, size_t nbytes) override;
-        virtual ssize_t write(char *buf, size_t nbytes) override;
-        virtual Error flush() override;
-        virtual Error set_baudrate(uint32_t bd) override;
-        virtual Error set_rts(bool on) override;
-        virtual Error set_reset(bool on) override;
-        virtual int read_cts() override;
-        ssize_t write_blocking(char *buf, ssize_t len) override;
-        virtual void set_irq(bool enable) override;
-        virtual void wait_data() override;
-        virtual void set_data() override;
+        virtual ssize_t write(char *buf, size_t nbytes);
+        virtual Error flush();
+        virtual Error set_baudrate(uint32_t bd);
+        virtual Error set_rts(bool on);
+        virtual Error set_reset(bool on);
+        virtual int read_cts();
+        ssize_t write_blocking(char *buf, ssize_t len);
+        virtual void set_irq(bool enable);
+        virtual void wait_data();
+        virtual void set_data();
 };
 };
