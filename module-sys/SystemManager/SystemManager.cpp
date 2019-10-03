@@ -50,6 +50,8 @@ namespace sys {
         }
         Bus::Remove(shared_from_this());
         EndScheduler();
+        // Power off system
+        powerManager.PowerOff();
     }
 
     void SystemManager::StartSystem(std::function<int()> init) {
