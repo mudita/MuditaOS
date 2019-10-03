@@ -154,8 +154,7 @@ static void local_version_information_handler(uint8_t * packet){
 
 void run_btstack(void*)
 {
-    LOG_INFO("run BtStack loop\n");
-    // TODO synch
+    LOG_INFO("-----> run BtStack loop\n");
     btstack_run_loop_execute();
 }
 
@@ -172,7 +171,7 @@ BluetoothWorker::Error WorkerImpl::initialize_stack()
 #ifdef TARGET_RT1051
     const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance();
 #else
-    config.device_name = "/dev/ttyUSB0";
+    config.device_name = "/dev/telit";
     LOG_INFO("H4 device: %s", config.device_name);
     const btstack_uart_block_t *uart_driver = btstack_uart_block_posix_instance();
 #endif
@@ -183,10 +182,15 @@ BluetoothWorker::Error WorkerImpl::initialize_stack()
 
     hci_event_callback_registration.callback = &hci_packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
+    hci_power_control(HCI_POWER_ON);
 
     // signal(SIGINT, sigint_handler);
 
-    xTaskCreate(run_btstack, std::string("BtStack").c_str(), 8192, NULL, tskIDLE_PRIORITY, &handle);
+    BaseType_t taskerr = 0;
+    if((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(), 1024, NULL, tskIDLE_PRIORITY, &handle))!=pdPASS) {
+        LOG_ERROR("BT Service failure! %d", taskerr);
+        err = Error::ErrorBtGeneric;
+    }
     return err;
 }
 

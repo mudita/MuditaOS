@@ -24,6 +24,10 @@ int BTPSAPI HCITR_COMOpen(  HCI_COMMDriverInformation_t *COMMDriverInformation,
     bt->com_cb = COMDataCallback;
     bt->com_cb_param = CallbackParameter;
     bt->rx_thread = xTaskCreate(RxThread, "RxThread", 4096, NULL, 3, &bt->thandle);
+    if(bt->rx_thread != pdPASS) {
+        ret = ErrorBtGeneric;
+        LOG_ERROR("COM OPEN failure: %d", bt->rx_thread);
+    }
     LOG_INFO("COM OPEN! done");
     return ret;
 }
