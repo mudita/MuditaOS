@@ -321,15 +321,6 @@
 #define BOARD_ALS_GB2_PIN							27
 #define BOARD_ALS_GB2_PAD							GPIO_AD_B1_11
 
-/**
- * Power switch
- */
-#define BOARD_POWER_SW_GPIO     					GPIO2
-#define BOARD_POWER_SW_GPIO_PIN 					6U
-#define BOARD_POWER_SW_PAD                    		GPIO_B0_06
-#define BOARD_POWER_HOLD_GPIO     					GPIO2
-#define BOARD_POWER_HOLD_GPIO_PIN 					7U
-
 #if defined(__cplusplus)
 extern "C" {
 #endif /* __cplusplus */

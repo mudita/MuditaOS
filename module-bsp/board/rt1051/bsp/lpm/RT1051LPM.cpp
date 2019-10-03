@@ -12,13 +12,24 @@
 #include "RT1051LPM.hpp"
 
 #include "board.h"
-#include "fsl_iomuxc.h"
-#include "fsl_dcdc.h"
-#include "fsl_gpc.h"
 #include "log/log.hpp"
+#include "bsp/BoardDefinitions.hpp"
 
 
 namespace bsp{
+
+    using namespace drivers;
+
+    RT1051LPM::RT1051LPM(){
+        gpio = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
+                                  DriverGPIOParams{});
+
+        gpio->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
+                .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
+                .defLogic = 1,
+                .pin = static_cast<uint32_t >(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON)});
+
+    }
 
     int32_t RT1051LPM::Switch(const bsp::LowPowerMode::Mode mode) {
         currentMode = mode;
@@ -32,6 +43,11 @@ namespace bsp{
             case Mode ::Suspend:
                 return EnterSuspend();
         }
+    }
+
+    int32_t RT1051LPM::PowerOff() {
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON),0);
+        return 0;
     }
 
 
