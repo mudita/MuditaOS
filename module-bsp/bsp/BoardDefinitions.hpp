@@ -19,6 +19,10 @@
 #include "drivers/gpio/DriverGPIO.hpp"
 
 enum class BoardDefinitions{
+
+    POWER_SWITCH_HOLD_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
+    POWER_SWITCH_HOLD_BUTTON = 7,
+
     AUDIOCODEC_I2C_BAUDRATE = 100000,
     AUDIOCODEC_I2C = static_cast<int >(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),

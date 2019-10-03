@@ -33,6 +33,8 @@ namespace bsp {
         virtual int32_t Switch(const Mode mode) = 0;
         Mode GetCurrentMode(){return currentMode;}
 
+        virtual int32_t PowerOff() = 0;
+
 
     protected:
         Mode currentMode = Mode::FullSpeed;

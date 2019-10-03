@@ -1123,13 +1123,6 @@ void PINMUX_InitPowerButton(void) {
             PINMUX_KEYBOARD_RF_BUTTON_PAD,
             PAD_CONFIG_PULL_UP_100kOhm |
             PAD_CONFIG_SELECT_PULL);
-
-
-    gpio_pin_config_t power_enable;
-    power_enable.direction = kGPIO_DigitalOutput;
-    power_enable.interruptMode = 0;
-    power_enable.outputLogic = 1;
-    GPIO_PinInit(BOARD_POWER_SW_GPIO, BOARD_POWER_SW_GPIO_PIN, &power_enable);
 }
 
 void PINMUX_InitKeyboard(void) {
