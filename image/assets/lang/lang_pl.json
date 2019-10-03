@@ -15,7 +15,6 @@
     "common_mute": "WYCISZ",
     "common_switch": "ZMIEŃ",
     "common_options": "OPCJE",
-
     "common_monday": "poniedziałek",
     "common_tuesday": "wtorek",
     "common_wendesday": "środa",
@@ -23,6 +22,7 @@
     "common_friday": "piątek",
     "common_saturday": "sobota",
     "common_sunday": "niedziela",
+
     "common_january": "stycznia",
     "common_february": "lutego",
     "common_march": "marca",

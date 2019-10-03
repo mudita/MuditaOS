@@ -22,13 +22,31 @@
     "common_friday": "Friday",
     "common_saturday": "Saturday",
     "common_sunday": "Sunday",
-    
+
+    "common_january": "January",
+    "common_february": "February",
+    "common_march": "March",
+    "common_april": "April",
+    "common_may": "May",
+    "common_june": "June",
+    "common_july": "July",
+    "common_august": "August",
+    "common_september": "September",
+    "common_october": "October",
+    "common_november": "November",
+    "common_december": "December",
+    "common_yesterday" : "Yesterday",
+    "locale_12hour_min" : "%I:%M %p",
+    "locale_24hour_min" : "%H:%M",
+    "locale_date_full" : "%m/%d/%y",
+    "locale_date_short" : "%m/%y",
+
     "app_notes_title_main": "Notes",
     "app_notes_new_note": "New Note",
     "app_notes_save": "SAVE",
     "app_notes_edit": "EDIT",
     "app_notes_back": "BACK",
-    
+
     "app_desktop_unlock": "UNLOCK",
     "app_desktop_lock": "LOCK",
     "app_desktop_menu": "MENU",
@@ -56,7 +74,7 @@
     "app_desktop_tools_recorder": "RECORDER",
     "app_desktop_poweroff_title": "Turn Off",
     "app_desktop_poweroff_question": "Select Yes to power down",
-    
+
     "app_call_call": "CALL",
     "app_call_clear": "CLEAR",
     "app_call_reject": "REJECT",
@@ -67,7 +85,7 @@
     "app_call_emergency": "Emergency call",
     "app_call_is_calling": "is calling",
     "app_call_call_ended": "call ended",
-    
+
     "app_settings_title_main": "Settings",
     "app_settings_connectivity": "Connectivity",
     "app_settings_date_and_time": "Date and Time",
@@ -114,7 +132,6 @@
     "app_phonebook_new_contact_note": "Note",
     "app_phonebook_new_speed_dial_key": "Speed dial key",
     "app_phonebook_new_addto_fav": "add to favourites",
-	
 
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG"
