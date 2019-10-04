@@ -50,13 +50,16 @@ namespace sys {
         }
         Bus::Remove(shared_from_this());
         EndScheduler();
+        // Power off system
+        powerManager->PowerOff();
     }
 
     void SystemManager::StartSystem(std::function<int()> init) {
         LogOutput::Output("Initializing system...");
 
+        powerManager = std::make_unique<PowerManager>();
         // Switch system to full functionality(clocks and power domains configured to max values)
-        powerManager.Switch(PowerManager::Mode::FullSpeed);
+        powerManager->Switch(PowerManager::Mode::FullSpeed);
         userInit = init;
 
         // Start System manager
@@ -77,7 +80,7 @@ namespace sys {
 
     bool SystemManager::SuspendSystem(Service *caller) {
 
-        if(powerManager.GetCurrentMode() != PowerManager::Mode::FullSpeed){
+        if(powerManager->GetCurrentMode() != PowerManager::Mode::FullSpeed){
             LOG_WARN("System is already suspended.");
             return false;
         }
@@ -95,19 +98,19 @@ namespace sys {
             }
         }
 
-        powerManager.Switch(PowerManager::Mode::LowPowerIdle);
+        powerManager->Switch(PowerManager::Mode::LowPowerIdle);
 
         return true;
     }
 
     bool SystemManager::ResumeSystem(Service *caller) {
 
-        if(powerManager.GetCurrentMode() == PowerManager::Mode::FullSpeed){
+        if(powerManager->GetCurrentMode() == PowerManager::Mode::FullSpeed){
             LOG_WARN("System is already resumed.");
             return false;
         }
 
-        powerManager.Switch(PowerManager::Mode::FullSpeed);
+        powerManager->Switch(PowerManager::Mode::FullSpeed);
 
         for(const auto &w : servicesList){
 
@@ -269,6 +272,6 @@ namespace sys {
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
     cpp_freertos::MutexStandard SystemManager::destroyMutex;
-    PowerManager SystemManager::powerManager;
+    std::unique_ptr<PowerManager> SystemManager::powerManager;
 
 }

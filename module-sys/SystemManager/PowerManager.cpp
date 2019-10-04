@@ -42,4 +42,8 @@ namespace sys{
         return ret;
     }
 
+    int32_t PowerManager::PowerOff() {
+        return lowPowerControl->PowerOff();
+    }
+
 }

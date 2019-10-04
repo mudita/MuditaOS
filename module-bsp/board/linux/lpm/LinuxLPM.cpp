@@ -13,4 +13,8 @@ namespace bsp{
         return 0;
     }
 
+    int32_t LinuxLPM::PowerOff() {
+        return 0;
+    }
+
 }

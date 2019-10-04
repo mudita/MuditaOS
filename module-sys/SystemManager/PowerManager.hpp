@@ -35,6 +35,7 @@ namespace sys {
         ~PowerManager();
 
         int32_t Switch(const Mode mode);
+        int32_t PowerOff();
 
         Mode GetCurrentMode(){return currentPowerMode;}
 
