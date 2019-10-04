@@ -91,7 +91,7 @@ private:
 
 	static std::vector<std::shared_ptr<Service>> servicesList;
     static cpp_freertos::MutexStandard destroyMutex;
-    static PowerManager powerManager;
+    static std::unique_ptr<PowerManager> powerManager;
 
 };
 
