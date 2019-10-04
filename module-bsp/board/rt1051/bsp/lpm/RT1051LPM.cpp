@@ -29,6 +29,8 @@ namespace bsp{
                 .defLogic = 1,
                 .pin = static_cast<uint32_t >(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON)});
 
+        gpio->WritePin(static_cast<uint32_t >(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON),1);
+
     }
 
     int32_t RT1051LPM::Switch(const bsp::LowPowerMode::Mode mode) {

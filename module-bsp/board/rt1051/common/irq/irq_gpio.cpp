@@ -39,15 +39,12 @@ namespace bsp {
             DisableIRQ(GPIO2_Combined_16_31_IRQn);
             DisableIRQ(GPIO3_Combined_16_31_IRQn);
 
-            GPIO_PortEnableInterrupts(GPIO2, 0xFFFFFFFF);
-            GPIO_PortEnableInterrupts(GPIO3, 0xFFFFFFFF);
+            GPIO_PortDisableInterrupts(GPIO2, UINT32_MAX);
+            GPIO_PortDisableInterrupts(GPIO3, UINT32_MAX);
 
             // Clear all IRQs
-            GPIO_PortClearInterruptFlags(GPIO2, 0xFFFFFFFF);
-            GPIO_PortClearInterruptFlags(GPIO3, 0xFFFFFFFF);
-
-            GPIO_PortDisableInterrupts(GPIO2, 0xFFFFFFFF);
-            GPIO_PortDisableInterrupts(GPIO3, 0xFFFFFFFF);
+            GPIO_PortClearInterruptFlags(GPIO2, UINT32_MAX);
+            GPIO_PortClearInterruptFlags(GPIO3, UINT32_MAX);
 
             EnableIRQ(GPIO2_Combined_0_15_IRQn);
             NVIC_SetPriority(GPIO2_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
