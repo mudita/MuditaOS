@@ -228,6 +228,7 @@ GAP *GAP::create()
 BtProfile::ErrorBtProfile GAPi::scan()
 {
     // We dont use results now, we dont store/return them
+    LOG_INFO("Start scan if active: %d", state == ACTIVE);
     if(state == ACTIVE) {
         start_scan();
     }

@@ -11,15 +11,12 @@ extern "C"
 #include <btstack_run_loop.h>
 #include <btstack_uart_block.h>
 #include <stddef.h> // for null
+#include <btstack_run_loop_freertos.h>
 
 namespace {  // interfacing
 // static hci_transport_config_uart_t *uart_config;
 // data source for integration with BTstack Runloop
 static btstack_data_source_t transport_data_source;
-struct {
-    int len;
-    uint8_t *data;
-} static g_write;
 // callbacks
 static void (*block_sent)(void);
 static void (*block_received)(void);
@@ -48,6 +45,7 @@ static int uart_rt1051_close()
 }
 
 static void uart_rt1051_set_block_received(void (*handler)(void)) {
+    /// TODO read_ready_cb call from my thread
     BlueKitchen::getInstance()->read_ready_cb = handler;
 }
 
@@ -77,15 +75,15 @@ static int uart_rt1051_set_flowcontroll(int flowcontroll)
 
 static void uart_rt1051_receive_block(uint8_t *buffer, uint16_t len)
 {
-    LOG_INFO("BlueKitchen read: %d", len);
+    LOG_INFO("<-- read: %d", len);
     BlueKitchen::getInstance()->read(buffer, len);
 }
 
-
 static void uart_rt1051_send_block(const uint8_t *buffer, uint16_t length)
 {
-    LOG_INFO("BlueKitchen write: %d", length);
+    LOG_INFO("--> write: %d", length);
     BlueKitchen::getInstance()->write_blocking((char*)buffer, length);
+    /// TODO check me
 }
 
 static const btstack_uart_block_t btstack_uart_posix = {
@@ -104,7 +102,8 @@ static const btstack_uart_block_t btstack_uart_posix = {
     /* void (*set_wakeup_handler)(void (*handler)(void)); */          NULL,
 };
 
-const btstack_uart_block_t *btstack_uart_block_rt1051_instance()
+//// TODO handle me
+const btstack_uart_block_t *btstack_uart_block_rt1051_instance(xQueueHandle qHandle)
 {
     LOG_INFO("btstack_uart_block_rt1051_instance");
     return &btstack_uart_posix;

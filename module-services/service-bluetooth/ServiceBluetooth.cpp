@@ -12,13 +12,12 @@ ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
     ReloadTimer(testTimerID);
     //// TODO TESTING - creating dangling pointer right now
     LOG_INFO("create!\n");
-    worker=BluetoothWorker::create();
-    LOG_INFO("scan!\n");
-    worker->scan();
+    worker=std::make_unique<BluetoothWorker>(this);
+    // LOG_INFO("BluetoothWorker -> scan!\n");
+    // worker->scan();
 }
 
 ServiceBluetooth::~ServiceBluetooth() {
-    free(worker);
     LOG_INFO("[ServiceBluetooth] Cleaning resources");
 }
 

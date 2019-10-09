@@ -26,6 +26,7 @@ BluetoothCommon::~BluetoothCommon()
 void BluetoothCommon::open()
 {
     LOG_INFO("Bluetooth HW open!");
+    set_reset(true);
     vSemaphoreCreateBinary(sem_data);
     set_irq(true);
     is_open = true;
@@ -39,6 +40,7 @@ void BluetoothCommon::close()
     set_rts(false);
     set_irq(false);
     is_open = false;
+    set_reset(false);
 }
 
 void BluetoothCommon::sleep_ms(ssize_t ms)
@@ -185,7 +187,7 @@ void BluetoothCommon::configure_lpuart()
 
     LPUART_ClearStatusFlags(BSP_BLUETOOTH_UART_BASE, 0xFFFFFFFF);
     NVIC_ClearPendingIRQ(LPUART2_IRQn);
-    NVIC_SetPriority(LPUART2_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
+    NVIC_SetPriority(LPUART2_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
     NVIC_EnableIRQ(LPUART2_IRQn);
 }
 
