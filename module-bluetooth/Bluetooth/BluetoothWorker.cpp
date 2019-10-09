@@ -8,16 +8,23 @@
 using namespace bsp;
 
 BluetoothWorker::BluetoothWorker(sys::Service* service) : Worker(service) {
-  init({{"qBluetooth", sizeof(Bt::Message), 10}});
-  run();
-  // TODO what - that's just wrong -_-
-  auto el = getQueues()[queueIO_handle];
-  BlueKitchen::getInstance()->qHandle = el;
-  initialize_stack(getQueues()[queueIO_handle]);
+    init({{"qBtIO", sizeof(Bt::Message), 10},
+          {"qBtWork", sizeof(Bt::EvtWorker), 10},
+         });
+    run();
+    // TODO what - that's just wrong -_-
+    auto el = getQueues()[queueIO_handle];
+    BlueKitchen::getInstance()->qHandle = el;
+    initialize_stack();
+    pan_bnep_setup();
+    run_stack(&this->bt_worker_task);
 };
 
 BluetoothWorker::~BluetoothWorker()
 {
+    if(this->bt_worker_task!= nullptr) {
+        // TODO kill task
+    }
     LOG_INFO("Worker removed");
 }
 
