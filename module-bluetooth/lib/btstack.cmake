@@ -115,9 +115,16 @@ set(TARGET_LIBRARIES_INCLUDES
 #&& include from posix too
 #}
 
-list(APPEND TARGET_LIBRARIES_INCLUDES
-    ${BT_STACK_ROOT}/platform/posix/
-    )
+if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+message("-----------------------")
+message("Linux specyfic includes")
+message("-----------------------")
+    list(APPEND TARGET_LIBRARIES_INCLUDES
+        ${BT_STACK_ROOT}/platform/posix/
+        )
+else ()
+message("proc")
+endif()
 
 set(BOARD_DIR_SOURCES
             ${BT_INT}/WorkerImpl.cpp
@@ -136,7 +143,14 @@ set(BOARD_DIR_SOURCES
             ${BT_CLASSIC}
     )
 
+if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+message("----------------------")
+message("Linux specyfic sources")
+message("----------------------")
 list(APPEND BOARD_DIR_SOURCES
     ${BT_STACK_ROOT}/platform/posix/btstack_stdin_posix.c
     ${BT_STACK_ROOT}/platform/posix/btstack_uart_block_posix.c
     )
+else()
+message("proc")
+endif()

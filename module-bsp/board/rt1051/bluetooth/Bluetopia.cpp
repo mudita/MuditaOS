@@ -30,21 +30,6 @@ ssize_t Bluetopia::read(void*, size_t nbytes)
     return 0;
 }
 
-void Bluetopia::wait_data()
-{
-    while(in.len == 0) {
-        // TODO checkme
-        xSemaphoreTake(sem_data, -1);
-    }
-}
-
-void Bluetopia::set_data()
-{
-    long tmp;
-    xSemaphoreGiveFromISR(sem_data, &tmp);
-}
-
-};
 
 extern "C" {
     void LPUART2_IRQHandler(void)

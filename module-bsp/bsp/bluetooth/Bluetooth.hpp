@@ -100,8 +100,8 @@ namespace bsp {
             // uart specyfic Common part
             virtual void open() override;
             virtual void close() override;
-            ssize_t write(char *buf, size_t nbytes);
-            ssize_t write_blocking(char *buf, ssize_t len);
+            virtual ssize_t write(char *buf, size_t nbytes);
+            virtual ssize_t write_blocking(char *buf, ssize_t len);
             Error flush();
             Error set_baudrate(uint32_t bd);
             Error set_rts(bool on);
@@ -143,10 +143,14 @@ namespace bsp {
             static BlueKitchen *getInstance();
 
             virtual ssize_t read(void *buf, size_t nbytes) override;
+            virtual ssize_t write_blocking(char *buf, ssize_t len) override;
+            uint32_t to_read_debug = 0;
             volatile uint32_t to_read;
-            char* read_buff;
+            volatile char* read_buff;
 
             void (*read_ready_cb)(void);
             void (*write_done_cb)(void);
+            /// to be able to trigger events on thread
+            xQueueHandle qHandle = nullptr;
     };
 };
