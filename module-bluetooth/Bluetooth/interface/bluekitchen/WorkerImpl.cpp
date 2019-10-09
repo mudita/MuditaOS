@@ -120,32 +120,31 @@ static void local_version_information_handler(uint8_t * packet){
     uint16_t lmp_version    = packet[9];
     uint16_t manufacturer   = little_endian_read_16(packet, 10);
     uint16_t lmp_subversion = little_endian_read_16(packet, 12);
-    LOG_INFO("- HCI Version    0x%04x\n", hci_version);
-    LOG_INFO("- HCI Revision   0x%04x\n", hci_revision);
-    LOG_INFO("- LMP Version    0x%04x\n", lmp_version);
-    LOG_INFO("- LMP Subversion 0x%04x\n", lmp_subversion);
-    LOG_INFO("- Manufacturer 0x%04x\n", manufacturer);
+    LOG_INFO("- HCI Version    0x%04x", hci_version);
+    LOG_INFO("- HCI Revision   0x%04x", hci_revision);
+    LOG_INFO("- LMP Version    0x%04x", lmp_version);
+    LOG_INFO("- LMP Subversion 0x%04x", lmp_subversion);
+    LOG_INFO("- Manufacturer 0x%04x", manufacturer);
     switch (manufacturer){
         case BLUETOOTH_COMPANY_ID_TEXAS_INSTRUMENTS_INC:
-            LOG_INFO("Texas Instruments - CC256x compatible chipset.\n");
+            LOG_INFO("Texas Instruments - CC256x compatible chipset.");
             if (lmp_subversion != btstack_chipset_cc256x_lmp_subversion()){
                 LOG_INFO("Error: LMP Subversion does not match initscript! ");
-                LOG_INFO("Your initscripts is for %s chipset\n", btstack_chipset_cc256x_lmp_subversion() < lmp_subversion ? "an older" : "a newer");
-                LOG_INFO("Please update Makefile to include the appropriate bluetooth_init_cc256???.c file\n");
+                LOG_INFO("Your initscripts is for %s chipset", btstack_chipset_cc256x_lmp_subversion() < lmp_subversion ? "an older" : "a newer");
+                LOG_INFO("Please update Makefile to include the appropriate bluetooth_init_cc256???.c file");
                 exit(10);
             }
-            LOG_INFO("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             use_fast_uart();
             hci_set_chipset(btstack_chipset_cc256x_instance());
 #ifdef ENABLE_EHCILL
-            LOG_INFO("eHCILL enabled.\n");
+            LOG_INFO("eHCILL enabled.");
 #else
-            LOG_INFO("eHCILL disable.\n");
+            LOG_INFO("eHCILL disable.");
 #endif
 
             break;
         case BLUETOOTH_COMPANY_ID_NORDIC_SEMICONDUCTOR_ASA:
-            LOG_INFO("Nordic Semiconductor nRF5 chipset.\n");
+            LOG_INFO("Nordic Semiconductor nRF5 chipset.");
             break;
         default:
             LOG_INFO("Unknown manufacturer / manufacturer not supported yet.\n");
@@ -191,6 +190,7 @@ BluetoothWorker::Error initialize_stack(xQueueHandle qHandle)
 
     BaseType_t taskerr = 0;
     /// TODO give it to papa to handle handle on kill
+    LOG_DEBUG("BT worker run success");
     hci_power_control(HCI_POWER_ON);
     TaskHandle_t handle;
     if ((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(),

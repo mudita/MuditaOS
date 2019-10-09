@@ -23,6 +23,7 @@ BluetoothWorker::~BluetoothWorker()
 
 std::vector<Device> BluetoothWorker::scan()
 {
+    /// TODO -> create worker for GAP
     std::vector<Device> empty;
     GAP *prof = GAP::create();
     prof->scan();
@@ -65,18 +66,30 @@ bool BluetoothWorker::handleMessage( uint32_t queueID ) {
     auto bt = BlueKitchen::getInstance();
     switch (notification) {
         case Bt::Message::EvtSent:
+#ifdef DO_DEBUG_HCI_COMS
             LOG_INFO("[evt] sent");
+#endif
             if(bt->write_done_cb) {
                 bt->write_done_cb();
             }
             break;
-        case Bt::Message::EvtReceived :
+        case Bt::Message::EvtReceived:
             {
-                std::stringstream ss;
-                for (int i =0; i<bt->to_read_debug; ++i) {
-                    ss << " 0x" << std::hex << (int)*(bt->read_buff-i);
+
+                for( int i=0; i < bt->to_read_req; ++i) {
+                    // error in pop should never happen
+                    if(int ret = bt->in.pop((char*)bt->read_buff+i)) {
+                        LOG_ERROR("This shall never happen: %d", ret);
+                    }
                 }
-                LOG_DEBUG("[evt] recieved <-- [%d]>%s<", bt->to_read_debug, ss.str().c_str());
+#ifdef DO_DEBUG_HCI_COMS
+                std::stringstream ss;
+                for (int i =0; i<bt->to_read_req; ++i) {
+                    ss << " 0x" << std::hex << (int)*(bt->read_buff+i);
+                }
+                LOG_DEBUG("[evt] recieved <-- [%d]>%s<", bt->to_read_req, ss.str().c_str());
+#endif
+                bt->to_read_req = 0;
 
                 if(bt->read_ready_cb) {
                     bt->read_ready_cb();
