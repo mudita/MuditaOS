@@ -13,6 +13,9 @@
 
 struct HCI;
 
+/// debug option for HCI (uart) commands debugging
+// #define DO_DEBUG_HCI_COMS
+
 namespace Bt {
     enum Message : uint8_t {
         /// asynchronous messages to use on event from irq

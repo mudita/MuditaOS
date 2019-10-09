@@ -13,6 +13,8 @@ extern "C"
 #include <stddef.h> // for null
 #include <btstack_run_loop_freertos.h>
 
+// #define DEBUG_UART
+
 namespace {  // interfacing
 // static hci_transport_config_uart_t *uart_config;
 // data source for integration with BTstack Runloop
@@ -75,13 +77,17 @@ static int uart_rt1051_set_flowcontroll(int flowcontroll)
 
 static void uart_rt1051_receive_block(uint8_t *buffer, uint16_t len)
 {
+#ifdef DEBUG_UART
     LOG_INFO("<-- read: %d", len);
+#endif
     BlueKitchen::getInstance()->read(buffer, len);
 }
 
 static void uart_rt1051_send_block(const uint8_t *buffer, uint16_t length)
 {
+#ifdef DEBUG_UART
     LOG_INFO("--> write: %d", length);
+#endif
     BlueKitchen::getInstance()->write_blocking((char*)buffer, length);
     /// TODO check me
 }
