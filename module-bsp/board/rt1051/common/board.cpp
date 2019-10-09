@@ -15,11 +15,15 @@
 
 #include "irq/irq_gpio.hpp"
 
-#include "bsp/rtc/rtc.hpp"
+#if LOG_REDIRECT_TO_SERIAL == 1
+#include "fsl_lpuart.h"
+#endif
 
 namespace bsp {
 
-
+#if LOG_REDIRECT_TO_SERIAL == 1
+    static lpuart_handle_t g_lpuartHandle;
+#endif
 
 
 /* Get debug console frequency. */
@@ -39,11 +43,35 @@ namespace bsp {
         return freq;
     }
 
+
+
 /* Initialize debug console. */
     static void BOARD_InitDebugConsole(void) {
-        //uint32_t uartClkSrcFreq = BOARD_DebugConsoleSrcFreq();
-        //DbgConsole_Init((uint32_t)BOARD_DEBUG_UART_BASEADDR, BOARD_DEBUG_UART_BAUDRATE, BOARD_DEBUG_UART_TYPE, uartClkSrcFreq);
-        //bsp_serterm_Init(BOARD_DEBUG_UART_BASEADDR,BOARD_DEBUG_UART_BAUDRATE,uartClkSrcFreq);
+#if LOG_REDIRECT_TO_SERIAL == 1
+        /* The user initialization should be placed here */
+        lpuart_config_t lpuartConfig;
+
+        /* Initialize the LPUART. */
+        /*
+         * lpuartConfig.baudRate_Bps = 115200U;
+         * lpuartConfig.parityMode = kLPUART_ParityDisabled;
+         * lpuartConfig.stopBitCount = kLPUART_OneStopBit;
+         * lpuartConfig.txFifoWatermark = 0;
+         * lpuartConfig.rxFifoWatermark = 0;
+         * lpuartConfig.enableTx = false;
+         * lpuartConfig.enableRx = false;
+         */
+        LPUART_GetDefaultConfig(&lpuartConfig);
+        lpuartConfig.baudRate_Bps = 115200;
+        lpuartConfig.enableTx = true;
+        lpuartConfig.enableRx = true;
+
+        LPUART_TransferCreateHandle(LPUART3, &g_lpuartHandle, NULL, NULL);
+
+        LPUART_Init(LPUART3, &lpuartConfig, BOARD_DebugConsoleSrcFreq());
+        LPUART_EnableTx(LPUART3, true);
+        LPUART_EnableRx(LPUART3, true);
+#endif
     }
 
 
