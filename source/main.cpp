@@ -118,9 +118,9 @@ public:
 
 int main() {
 
-    LOG_PRINTF("Launching PurePhone..\n");
-
     bsp::BoardInit();
+
+    LOG_PRINTF("Launching PurePhone..\n");
 
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);

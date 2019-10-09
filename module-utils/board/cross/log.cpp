@@ -8,6 +8,15 @@
 #include "semphr.h"
 #include <assert.h>
 
+/*
+ * TODO: M.P
+ * Redictering log output to serial console in this form need be considered as quick&dirty solution.
+ * It should be refactored i.e serial terminal BSP created and used here instead of using RT1051's low-level routines directly.
+ */
+#if LOG_REDIRECT_TO_SERIAL == 1
+#include "fsl_lpuart.h"
+#endif
+
 
 #define LOGGER_BUFFER_SIZE  4096
 
@@ -81,7 +90,11 @@ void log_Printf(const char *fmt, ...)
     ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, fmt, args);
     va_end(args);
 
+#if LOG_REDIRECT_TO_SERIAL == 1
+    LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
+#else
     SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+#endif
 
     /* Release lock */
     xSemaphoreGive(logger.lock);
@@ -108,7 +121,11 @@ void log_Log(logger_level level, const char *file, int line,const char *function
     va_end(args);
     ptr += sprintf(ptr,"\r\n");
 
-    SEGGER_RTT_Write(0,loggerBuffer,ptr-loggerBuffer);
+#if LOG_REDIRECT_TO_SERIAL == 1
+    LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
+#else
+    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+#endif
 
     /* Release lock */
     xSemaphoreGive(logger.lock);
