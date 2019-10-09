@@ -109,7 +109,7 @@ static const btstack_uart_block_t btstack_uart_posix = {
 };
 
 //// TODO handle me
-const btstack_uart_block_t *btstack_uart_block_rt1051_instance(xQueueHandle qHandle)
+const btstack_uart_block_t *btstack_uart_block_rt1051_instance()
 {
     LOG_INFO("btstack_uart_block_rt1051_instance");
     return &btstack_uart_posix;

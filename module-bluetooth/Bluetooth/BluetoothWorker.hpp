@@ -45,15 +45,23 @@ namespace Bt {
                 return "";
         }
     }
+
+    struct EvtWorker {
+        enum Evt : uint8_t {
+        };
+    };
 };
 
 
 class BluetoothWorker : private sys::Worker {
   enum WorkerEventQueues {
-    queueService = 0,
-    queueIO_handle,
+      queueService = 0,
+      queueIO_handle,             /// bsp support queue
+      queue_profiles,             /// queue for communication between profile workers,
+                                  /// main bt_worker_task should dispatch these in events
   };
 
+  TaskHandle_t bt_worker_task = nullptr;
 public:
   enum Error {
     SuccessBt,
@@ -62,18 +70,12 @@ public:
   };
 
   BluetoothWorker(sys::Service* service);
-  ///    /// This function is responsible for creating all queues provided in
-  ///    the constructor.
-  ///    /// When all queues are created this method creates set of queues.
-  ///    virtual bool init( std::list<sys::WorkerQueueInfo> queues );
-  ///    virtual bool deinit();
-  ///    /// This method is called from thread when new message arrives in
-  ///    queue.
-  ///    /// @param queueID Index of the queue in the queues vector.
+  virtual ~BluetoothWorker();
+
   virtual bool handleMessage(uint32_t queueID);
 
-  virtual ~BluetoothWorker();
   std::vector<Device> scan();
+
   Error aud_init();
   /// bluetooth stack id in use
   unsigned long active_features;

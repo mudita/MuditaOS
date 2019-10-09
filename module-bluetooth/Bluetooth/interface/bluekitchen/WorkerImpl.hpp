@@ -5,4 +5,6 @@
 #include "../../BluetoothWorker.hpp"
 
 
-BluetoothWorker::Error initialize_stack(xQueueHandle qHandle);
+BluetoothWorker::Error initialize_stack();
+BluetoothWorker::Error run_stack(TaskHandle_t *handle);
+BluetoothWorker::Error pan_bnep_setup();
