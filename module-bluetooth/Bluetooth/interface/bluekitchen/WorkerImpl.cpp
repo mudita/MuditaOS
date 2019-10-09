@@ -108,7 +108,7 @@ static void use_fast_uart(void){
     LOG_INFO("Using 2000000 baud.");
     config.baudrate_main = 2000000;
 #else
-    LOG_INFO("Using 921600 baud.\n");
+    LOG_INFO("Using 921600 baud");
     config.baudrate_main = 921600;
 #endif
 }
@@ -134,6 +134,7 @@ static void local_version_information_handler(uint8_t * packet){
                 LOG_INFO("Please update Makefile to include the appropriate bluetooth_init_cc256???.c file\n");
                 exit(10);
             }
+            LOG_INFO("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
             use_fast_uart();
             hci_set_chipset(btstack_chipset_cc256x_instance());
 #ifdef ENABLE_EHCILL
@@ -154,13 +155,13 @@ static void local_version_information_handler(uint8_t * packet){
 
 void run_btstack(void*)
 {
-    LOG_INFO("-----> run BtStack loop\n");
+    LOG_INFO("- run BtStack loop\n");
     btstack_run_loop_execute();
 }
 
-BluetoothWorker::Error WorkerImpl::initialize_stack()
+BluetoothWorker::Error initialize_stack(xQueueHandle qHandle)
 {
-    Error err= SuccessBt;
+    BluetoothWorker::Error err= BluetoothWorker::SuccessBt;
     btstack_memory_init();
     btstack_run_loop_init(btstack_run_loop_freertos_get_instance());
 
@@ -169,41 +170,34 @@ BluetoothWorker::Error WorkerImpl::initialize_stack()
 //    LOG_INFO("Packet Log: %s\n", pklg_path);
 
 #ifdef TARGET_RT1051
-    const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance();
+    const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance(qHandle);
+    /// TODO
+    //// here -> notify QHandle
 #else
     config.device_name = "/dev/telit";
     LOG_INFO("H4 device: %s", config.device_name);
     const btstack_uart_block_t *uart_driver = btstack_uart_block_posix_instance();
 #endif
     const hci_transport_t *transport = hci_transport_h4_instance(uart_driver);
-    // const btstack_link_key_db_t *link_key_db = btstack_link_key_db_fs_instance();
     hci_init(transport, (void *)&config);
+    // hci_set_chipset(btstack_chipset_cc256x_instance());
+    // const btstack_link_key_db_t *link_key_db = btstack_link_key_db_fs_instance();
     // hci_set_link_key_db(link_key_db);
 
     hci_event_callback_registration.callback = &hci_packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
-    hci_power_control(HCI_POWER_ON);
 
     // signal(SIGINT, sigint_handler);
 
     BaseType_t taskerr = 0;
-    if((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(), 1024, NULL, tskIDLE_PRIORITY, &handle))!=pdPASS) {
-        LOG_ERROR("BT Service failure! %d", taskerr);
-        err = Error::ErrorBtGeneric;
+    /// TODO give it to papa to handle handle on kill
+    hci_power_control(HCI_POWER_ON);
+    TaskHandle_t handle;
+    if ((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(),
+                               1024, NULL, tskIDLE_PRIORITY, &handle)) !=
+        pdPASS) {
+      LOG_ERROR("BT Service failure! %d", taskerr);
+      err = BluetoothWorker::ErrorBtGeneric;
     }
     return err;
-}
-
-WorkerImpl::WorkerImpl() : handle(NULL)
-{
-    initialize_stack();
-}
-
-WorkerImpl::~WorkerImpl() {
-    // TODO destroy task in handle
-}
-
-WorkerImpl *WorkerImpl::create()
-{
-    return new WorkerImpl();
 }

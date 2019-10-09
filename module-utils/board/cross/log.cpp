@@ -4,7 +4,9 @@
 
 #include "../../log/log.hpp"
 #include "../../log/segger/SEGGER_RTT.h"
+extern "C" {
 #include "FreeRTOS.h"
+}
 #include "semphr.h"
 #include <assert.h>
 
@@ -100,19 +102,27 @@ void log_Printf(const char *fmt, ...)
     xSemaphoreGive(logger.lock);
 }
 
+#include <board.h>
+
 void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...)
 {
     /* Acquire lock */
-    if(xSemaphoreTake(logger.lock,100) != pdPASS){
-        return;
+    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
+        if(xSemaphoreTake(logger.lock,100) != pdPASS){
+            return;
+        }
     }
 
     char* ptr = loggerBuffer;
 
     va_list args;
 #if LOG_USE_COLOR == 1
-    ptr += sprintf(ptr,"%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
-        level_colors[level], level_names[level], file, line);
+
+    ptr += sprintf(ptr,"%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
+        level_colors[level],
+        level_names[level],
+        xPortIsInsideInterrupt()?"IRQ": pcTaskGetName(xTaskGetCurrentTaskHandle()),
+        file, line);
 #else
     ptr += sprintf(ptr,"%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
@@ -128,7 +138,9 @@ void log_Log(logger_level level, const char *file, int line,const char *function
 #endif
 
     /* Release lock */
+    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
     xSemaphoreGive(logger.lock);
+    }
 }
 
 /**
@@ -138,3 +150,39 @@ void log_Log(logger_level level, const char *file, int line,const char *function
 void log_SetLevel(logger_level level) {
     logger.level = level;
 }
+
+extern "C" {
+    int printf (__const char *__restrict __format, ...)
+    {
+    /* Acquire lock */
+    if(xSemaphoreTake(logger.lock,100) != pdPASS){
+        return 0;
+    }
+    char* ptr = loggerBuffer;
+    va_list args;
+
+    va_start(args, __format);
+    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, args);
+    va_end(args);
+
+    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+
+    /* Release lock */
+    xSemaphoreGive(logger.lock);
+    return 0;
+}
+
+int vprintf (const char *__restrict __format, va_list __arg) {
+    /* Acquire lock */
+    if(xSemaphoreTake(logger.lock,100) != pdPASS){
+        return 0;
+    }
+    char* ptr = loggerBuffer;
+    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, __arg);
+
+    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+
+    /* Release lock */
+    xSemaphoreGive(logger.lock);
+}
+};

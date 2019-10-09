@@ -2,6 +2,7 @@
 
 #include "Service/Service.hpp"
 #include "module-bluetooth/Bluetooth/BluetoothWorker.hpp"
+#include <memory>
 
 class ServiceBluetooth: public sys::Service  {
 
@@ -19,5 +20,5 @@ public:
 private:
     static const char* serviceName;
     uint32_t testTimerID;
-    BluetoothWorker *worker;
+    std::unique_ptr<BluetoothWorker> worker;
 };
