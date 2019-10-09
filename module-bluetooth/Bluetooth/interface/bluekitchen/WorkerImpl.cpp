@@ -158,18 +158,14 @@ void run_btstack(void*)
     btstack_run_loop_execute();
 }
 
-BluetoothWorker::Error initialize_stack(xQueueHandle qHandle)
+BluetoothWorker::Error initialize_stack()
 {
     BluetoothWorker::Error err= BluetoothWorker::SuccessBt;
     btstack_memory_init();
     btstack_run_loop_init(btstack_run_loop_freertos_get_instance());
 
-//    const char *pklg_path = "/tmp/hci_dump.pklg";
-//    hci_dump_open(pklg_path, HCI_DUMP_PACKETLOGGER);
-//    LOG_INFO("Packet Log: %s\n", pklg_path);
-
 #ifdef TARGET_RT1051
-    const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance(qHandle);
+    const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance();
     /// TODO
     //// here -> notify QHandle
 #else
@@ -179,23 +175,24 @@ BluetoothWorker::Error initialize_stack(xQueueHandle qHandle)
 #endif
     const hci_transport_t *transport = hci_transport_h4_instance(uart_driver);
     hci_init(transport, (void *)&config);
-    // hci_set_chipset(btstack_chipset_cc256x_instance());
-    // const btstack_link_key_db_t *link_key_db = btstack_link_key_db_fs_instance();
-    // hci_set_link_key_db(link_key_db);
 
     hci_event_callback_registration.callback = &hci_packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
-
-    // signal(SIGINT, sigint_handler);
-
-    BaseType_t taskerr = 0;
-    /// TODO give it to papa to handle handle on kill
     LOG_DEBUG("BT worker run success");
     hci_power_control(HCI_POWER_ON);
-    TaskHandle_t handle;
+    return err;
+}
+
+BluetoothWorker::Error run_stack(TaskHandle_t *handle)
+{
+    BluetoothWorker::Error err= BluetoothWorker::SuccessBt;
+    BaseType_t taskerr = 0;
+    // TODO message here - to all workers that they have to do their all needed prerun crap
     if ((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(),
-                               1024, NULL, tskIDLE_PRIORITY, &handle)) !=
-        pdPASS) {
+                               1024,
+                               NULL,
+                               tskIDLE_PRIORITY,
+                               handle)) != pdPASS) {
       LOG_ERROR("BT Service failure! %d", taskerr);
       err = BluetoothWorker::ErrorBtGeneric;
     }

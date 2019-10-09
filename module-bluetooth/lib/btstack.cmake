@@ -32,6 +32,7 @@ set(BT_CLASSIC
     ${BT_STACK_ROOT}/src/classic/spp_server.c
     ${BT_STACK_ROOT}/src/classic/rfcomm.c
     ${BT_STACK_ROOT}/src/classic/bnep.c
+    ${BT_STACK_ROOT}/src/classic/pan.c
     ${BT_STACK_ROOT}/src/classic/sdp_server.c
     ${BT_STACK_ROOT}/src/classic/device_id_server.c
     )
@@ -128,6 +129,7 @@ endif()
 
 set(BOARD_DIR_SOURCES
             ${BT_INT}/WorkerImpl.cpp
+            ${BT_INT}/PAN_Impl.cpp
             ${BT_INT}/GAP.cpp
             ${BT_INT}/GAVD.cpp
 
