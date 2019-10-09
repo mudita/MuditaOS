@@ -35,7 +35,7 @@ namespace bsp {
             static const unsigned int default_baudrate = 115200;
             struct _circ {
                 char* buff;
-                unsigned int head, tail, threshold;
+                volatile unsigned int head, tail, threshold;
                 const unsigned int size;
                 volatile unsigned int len;
                 _circ(unsigned int size, int threshold=0) : head(0), tail(0), threshold(threshold), size(size), len(0) { buff = new char[size];};
@@ -55,8 +55,8 @@ namespace bsp {
                     int ret=0;
                     if(val!=nullptr) {
                         if(len) {
-                            *val = buff[head];
-                            if(head == 0) head=size; else head--;
+                            *val = buff[head++];
+                            if(head == size) head=0;
                             --len;
                         } else {
                             ret =-1;
@@ -144,8 +144,8 @@ namespace bsp {
 
             virtual ssize_t read(void *buf, size_t nbytes) override;
             virtual ssize_t write_blocking(char *buf, ssize_t len) override;
-            uint32_t to_read_debug = 0;
-            volatile uint32_t to_read;
+            uint32_t to_read_req = 0;
+            volatile uint32_t to_read =0;
             volatile char* read_buff;
 
             void (*read_ready_cb)(void);

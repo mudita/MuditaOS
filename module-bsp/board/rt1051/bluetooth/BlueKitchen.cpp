@@ -32,11 +32,21 @@ BlueKitchen *BlueKitchen::getInstance()
 // request... from circ buffer
 ssize_t BlueKitchen::read(void *buf, size_t nbytes)
 {
+    set_rts(false);
     to_read = nbytes;
+    to_read_req = nbytes;
     read_buff = reinterpret_cast<char*>(buf);
-    to_read_debug = to_read;
     // set bt ptr to 0, len to 0, to read to nbytes
     // bt->to_read
+    BaseType_t taskwoken = 0;
+    uint8_t val = Bt::Message::EvtReceived;
+    if(to_read!=0 && in.len >= to_read && in.len != 0) {
+        to_read = 0;
+        if(qHandle) {
+            xQueueSendFromISR(qHandle, &val, &taskwoken);
+        }
+    }
+    set_rts(true);
     return 0;
 }
 
@@ -46,11 +56,14 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size) {
     ssize_t i = 0;
     BaseType_t taskwoken = 0;
     uint8_t val = Bt::Message::EvtSent;
+
+#ifdef DO_DEBUG_HCI_COMS
     std::stringstream ss;
     for (int i = 0; i < size; ++i) {
         ss << " 0x" << std::hex << (int)buf[i];
     }
     LOG_DEBUG("--> [%d]>%s<", size, ss.str().c_str());
+#endif
     if (BluetoothCommon::write_blocking(buf, size) == size) {
         xQueueSendFromISR(qHandle, &val, &taskwoken);
     } else {
@@ -74,25 +87,15 @@ extern "C" {
         if(isrReg & kLPUART_RxDataRegFullFlag)
         {
             characterReceived = LPUART_ReadByte(BSP_BLUETOOTH_UART_BASE);
-            if( bt->to_read != 0 ) {
-                    *(bt->read_buff)=characterReceived;
-                    ++bt->read_buff;
-                if(--bt->to_read == 0) {
-                    BaseType_t taskwoken = 0;
-                    uint8_t val = Bt::Message::EvtReceived;
-                    if(bt->qHandle) {
-                        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-                        /// tell me about it
-                    } else {
-                        val = Bt::Message::EvtRecError;
-                        xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-                    }
-                }
-            } else {
-                if(bt->qHandle) {
-                    val = Bt::Message::EvtRecUnwanted;
-                    xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
-                }
+            if(bt->in.push(characterReceived)) {
+                val = Bt::Message::EvtRecUnwanted;
+                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+            }
+            if(bt->to_read !=0 && bt->in.len >= bt->to_read) {
+                bt->to_read = 0;
+                assert(bt->qHandle);
+                val = Bt::Message::EvtReceived;
+                xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
             }
         }
         if(isrReg & kLPUART_RxOverrunFlag) {
