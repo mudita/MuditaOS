@@ -1,0 +1,7 @@
+target remote localhost:2331
+monitor reset 0
+monitor halt
+load
+monitor halt
+eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
+b main
