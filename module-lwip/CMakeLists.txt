@@ -1,29 +1,35 @@
-project(module-bluetooth VERSION 1.0 DESCRIPTION "Bluetooth module library")
+project(module-lwip VERSION 1.0 DESCRIPTION "LwIP port layer")
 
 include(${CMAKE_SOURCE_DIR}/config/ModuleConfig.cmake)
 
-set(SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Bluetooth/BluetoothWorker.cpp
+# TODO check me
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
+set(LWIP_COMPILER_FLAGS ${TARGET_COMPILE_OPTIONS})
+
+# module-lwip/lib/lwip/src/include/lwip/err.h
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/lwip-includes.cmake)
+
+set (SOURCES
+    "${LWIP_DIR}/contrib/ports/freertos/sys_arch.c"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/interfaces/{}
 )
 
-if(${BT_STACK} STREQUAL "Bluetopia")
-    if(NOT ${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-        message("Build with bluetopia")
-        include(lib/Bluetopia.cmake)
-    else()
-        message("Nor bluetopia not bluekitchen - wont compile")
-    endif()
-else()
-    message("Build with BlueKitchen")
-    include(lib/btstack.cmake)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+set (LWIP_DEFINITIONS LWIP_DEBUG=1)
 endif()
 
+include(${LWIP_DIR}/src/Filelists.cmake)
+include(${LWIP_DIR}/contrib/Filelists.cmake)
 
-message("Sources: " ${SOURCES})
+# for any target dependent on lwip
+# target_include_directories(<app> PRIVATE ${LWIP_INCLUDE_DIRS})
+
+# add to target
+set(LWIP_LIBRARIES lwipcontribapps lwipallapps lwipcore)
+
+### TODO maybe make it a bit shared
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_DIR_SOURCES})
-
-
-# # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC   ${PROJECT_CONFIG_DEFINITIONS}
                                                     ${PROJECT_TARGET}
                                                     ${TARGET_COMPILE_DEFINITIONS}
@@ -40,6 +46,7 @@ target_include_directories(
     ${BOARD_DIR_INCLUDES}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${TARGET_LIBRARIES_INCLUDES}
+    ${LWIP_INCLUDE_DIRS}
 )
 
 target_link_libraries(
