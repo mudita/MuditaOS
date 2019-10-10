@@ -37,6 +37,10 @@ set(BT_CLASSIC
     ${BT_STACK_ROOT}/src/classic/device_id_server.c
     )
 
+set(BNEP_LWIP
+    ${BT_STACK_ROOT}/platform/lwip/bnep_lwip.c
+    )
+
 # ATT
 # 	${BT_STACK_ROOT}/att_dispatch.c
 #
@@ -101,13 +105,12 @@ set(TARGET_LIBRARIES_INCLUDES
     ${BT_STACK_ROOT}/3rd-party/bluedroid/decoder/include
     ${BT_STACK_ROOT}/3rd-party/bluedroid/encoder/include
     ${BT_STACK_ROOT}/3rd-party/hxcmod-player
-    ${BT_STACK_ROOT}/3rd-party/lwip/core/src/include/
+    # ${BT_STACK_ROOT}/3rd-party/lwip/core/src/include/
     ${BT_STACK_ROOT}/3rd-party/lwip/dhcp-server
     ${BT_STACK_ROOT}/3rd-party/md5
     ${BT_STACK_ROOT}/3rd-party/micro-ecc
     ${BT_STACK_ROOT}/3rd-party/yxml
-    ${BT_STACK_ROOT}/platform/lwip
-    ${BT_STACK_ROOT}/platform/lwip/port
+    # ${BT_STACK_ROOT}/platform/lwip
     )
 
 # pseudocode
@@ -117,15 +120,19 @@ set(TARGET_LIBRARIES_INCLUDES
 #}
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-message("-----------------------")
 message("Linux specyfic includes")
 message("-----------------------")
     list(APPEND TARGET_LIBRARIES_INCLUDES
         ${BT_STACK_ROOT}/platform/posix/
         )
 else ()
-message("proc")
 endif()
+
+include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
+list(APPEND TARGET_LIBRARIES_INCLUDES ${LWIP_INCLUDE_DIRS})
+list(APPEND TARGET_LIBRARIES_INCLUDES
+    ${BT_STACK_ROOT}/platform/lwip
+    )
 
 set(BOARD_DIR_SOURCES
             ${BT_INT}/WorkerImpl.cpp
@@ -143,10 +150,10 @@ set(BOARD_DIR_SOURCES
             ${BT_CORE}
             ${BT_COMMON}
             ${BT_CLASSIC}
+            ${BNEP_LWIP}
     )
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-message("----------------------")
 message("Linux specyfic sources")
 message("----------------------")
 list(APPEND BOARD_DIR_SOURCES
@@ -154,5 +161,4 @@ list(APPEND BOARD_DIR_SOURCES
     ${BT_STACK_ROOT}/platform/posix/btstack_uart_block_posix.c
     )
 else()
-message("proc")
 endif()

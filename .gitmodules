@@ -1,3 +1,9 @@
 [submodule "module-bluetooth/lib/btstack"]
 	path = module-bluetooth/lib/btstack
 	url = https://github.com/bluekitchen/btstack.git
+[submodule "module-lwip/lib/lwip"]
+	path = module-lwip/lib/lwip
+	url = https://git.savannah.nongnu.org/git/lwip.git
+[submodule "module-lwip/lib/lwip-contrib"]
+	path = module-lwip/lib/lwip-contrib
+	url = https://git.savannah.nongnu.org/git/lwip/lwip-contrib.git

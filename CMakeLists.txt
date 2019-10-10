@@ -7,6 +7,7 @@ include(env.cmake)
 project(PurePhone)
 
 include(config/ProjectConfig.cmake)
+include(module-lwip/lwip-includes.cmake)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")
@@ -148,6 +149,9 @@ add_subdirectory(module-apps)
 message("${PROJECT_NAME}: add_subdirectory module-bluetooth")
 add_subdirectory(module-bluetooth)
 
+message("${PROJECT_NAME}: add_subdirectory module-lwip")
+add_subdirectory(module-lwip)
+
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
@@ -171,25 +175,12 @@ target_link_libraries(${PROJECT_NAME}
         module-gui
         module-services
         module-apps
+        module-bluetooth
+        ${LWIP_LIBRARIES}
+        module-lwip
         ${TARGET_LIBRARIES}
         )
 
-# bluekitchen comes as library, right now it has circ dependency, which is why start/end grous are used
-if(${BT_STACK} STREQUAL "Bluetopia")
-target_link_libraries(${PROJECT_NAME}
-        -Wl,--start-group
-        module-bluetooth
-        ${Bluetopia_32_M7}
-        ${SS1BTAUD_32_M7}
-        ${SS1BTAVC_32_M7}
-        ${SS1BTAVR_32_M7}
-        ${SS1BTGAV_32_M7}
-        -Wl,--end-group)
-else()
-target_link_libraries(${PROJECT_NAME}
-    module-bluetooth
-    )
-endif()
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
