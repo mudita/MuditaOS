@@ -121,7 +121,7 @@ void log_Log(logger_level level, const char *file, int line,const char *function
     ptr += sprintf(ptr,"%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
         level_colors[level],
         level_names[level],
-        xPortIsInsideInterrupt()?"IRQ": pcTaskGetName(xTaskGetCurrentTaskHandle()),
+        xTaskGetCurrentTaskHandle()==NULL?"CRIT":xPortIsInsideInterrupt()?"IRQ": pcTaskGetName(xTaskGetCurrentTaskHandle()),
         file, line);
 #else
     ptr += sprintf(ptr,"%-5s %s:%s:%d: ", level_names[level], file, function, line);

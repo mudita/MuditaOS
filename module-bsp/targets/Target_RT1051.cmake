@@ -76,7 +76,6 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMAMux.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverDMA.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverGPIO.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bluetooth/bsp_bt.cpp"
 
 
         CACHE INTERNAL ""
@@ -87,6 +86,8 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
 			${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/fsl_drivers
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/cmsis
+            ${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
+            ${CMAKE_SOURCE_DIR}/module-sys/
 
 
         CACHE INTERNAL "")

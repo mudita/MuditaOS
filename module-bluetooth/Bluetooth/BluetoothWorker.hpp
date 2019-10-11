@@ -9,7 +9,7 @@
 #include "profiles/BtProfile.hpp"
 #include "profiles/GAP.hpp"
 #include "Device.hpp"
-#include "module-sys/Service/Worker.hpp"
+#include "Service/Worker.hpp"
 
 struct HCI;
 
