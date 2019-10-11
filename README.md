@@ -1,6 +1,12 @@
 # PurePhone repository
 
-Documentation:
+## First time repo checkout with submodules
+`git submodule update --init --recursive`
+
+## Repo update with submodules
+`git pull --recurse-submodules`
+
+## Documentation:
 
 * [doc/config](./doc/config.linux.md)
 * [doc/bluetooth](./doc/bluetooth.md)
