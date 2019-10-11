@@ -1,5 +1,5 @@
-#include "bluetooth/Bluetooth.hpp"
-#include "module-bluetooth/Bluetooth/BluetoothWorker.hpp"
+#include "bsp/bluetooth/Bluetooth.hpp"
+#include "BluetoothWorker.hpp"
 #include "log/log.hpp"
 #include "FreeRTOS.h"
 #include "fsl_lpuart.h"

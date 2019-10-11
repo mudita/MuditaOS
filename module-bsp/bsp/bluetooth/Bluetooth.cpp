@@ -1,13 +1,6 @@
 #include "Bluetooth.hpp"
 #include <cstdarg>
 
-#if defined(TARGET_RT1051)
-#include "bluetooth/Bluetooth.hpp"
-#elif defined(TARGET_Linux)
-#include "bluetooth/test/bsp_bt.hpp"
-#else
-#error "Unsupported target"
-#endif
 
 namespace bsp {
     BTdev::BTdev(unsigned int in_size, unsigned int out_size, int threshold) : flog(nullptr), in(in_size, threshold), out(out_size, threshold)

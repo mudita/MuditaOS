@@ -28,7 +28,7 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/i2c/DriverI2C.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/drivers/sai/DriverSAI.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/gpio/DriverGPIO.cpp"
-        board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h)
+        board/linux/lpm/LinuxLPM.cpp board/linux/lpm/LinuxLPM.h
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/bluetooth/Bluetooth.cpp"
         )
 

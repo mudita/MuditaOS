@@ -11,7 +11,7 @@ ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
     //// TODO TESTING - creating dangling pointer right now
-    LOG_INFO("create!\n");
+    LOG_INFO("create!");
     worker=std::make_unique<BluetoothWorker>(this);
     // LOG_INFO("BluetoothWorker -> scan!\n");
     // worker->scan();
@@ -36,20 +36,13 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler() {
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceBluetooth::WakeUpHandler() {
-    return sys::ReturnCodes::Success;
-}
-
-
-sys::ReturnCodes ServiceBluetooth::SleepHandler() {
-    return sys::ReturnCodes::Success;
-}
-
-sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msgl) {
+sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage* msg,sys::ResponseMessage* resp) {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
-    switch (static_cast<MessageType >(msgl->messageType)) {
-        default:
-            break;
-    }
     return responseMsg;
+}
+
+sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
+{
+    LOG_ERROR("TODO");
+    return sys::ReturnCodes::Success;
 }
