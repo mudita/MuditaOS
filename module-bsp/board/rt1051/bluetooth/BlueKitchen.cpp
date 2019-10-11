@@ -44,6 +44,7 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
         to_read = 0;
         if(qHandle) {
             xQueueSendFromISR(qHandle, &val, &taskwoken);
+            portEND_SWITCHING_ISR(taskwoken);
         }
     }
     set_rts(true);
