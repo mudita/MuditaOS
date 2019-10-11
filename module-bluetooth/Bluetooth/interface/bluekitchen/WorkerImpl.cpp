@@ -114,7 +114,7 @@ static void use_fast_uart(void){
 }
 
 static void local_version_information_handler(uint8_t * packet){
-    LOG_INFO("Local version information:\n");
+    LOG_INFO("Local version information:");
     uint16_t hci_version    = packet[6];
     uint16_t hci_revision   = little_endian_read_16(packet, 7);
     uint16_t lmp_version    = packet[9];
