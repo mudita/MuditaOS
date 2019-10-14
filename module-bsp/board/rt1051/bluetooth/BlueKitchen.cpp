@@ -40,7 +40,7 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
     // bt->to_read
     BaseType_t taskwoken = 0;
     uint8_t val = Bt::Message::EvtReceived;
-    if(to_read!=0 && in.len >= to_read && in.len != 0) {
+    if((to_read!=0) && (in.len >= to_read) && (in.len != 0)) {
         to_read = 0;
         if(qHandle) {
             xQueueSendFromISR(qHandle, &val, &taskwoken);
