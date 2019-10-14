@@ -106,11 +106,12 @@ void log_Printf(const char *fmt, ...)
 
 static void _log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, va_list args)
 {
-    /* Acquire lock */
-    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
-        if(xSemaphoreTake(logger.lock,100) != pdPASS){
-            return;
-        }
+    /// right now there is no way to call logging from ISR -> check if we are in isr and assert
+    if(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) {
+        assert(0);
+    }
+    if(xSemaphoreTake(logger.lock,100) != pdPASS){
+        return;
     }
 
     char* ptr = loggerBuffer;
@@ -135,9 +136,7 @@ static void _log_Log(logger_level level, const char *file, int line,const char *
 #endif
 
     /* Release lock */
-    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
     xSemaphoreGive(logger.lock);
-    }
 }
 
 void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...)

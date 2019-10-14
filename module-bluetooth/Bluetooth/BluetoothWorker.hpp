@@ -74,9 +74,6 @@ public:
 
   virtual bool handleMessage(uint32_t queueID);
 
-  /// temporary starter - to split
-  void start_bluetooth();
-
   std::vector<Device> scan();
 
   Error aud_init();
