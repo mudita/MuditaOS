@@ -72,7 +72,7 @@ int createFIFO( void )
 	}
 
 	int error = errno;
-	perror("mkfifo");
+    std::cerr << "mkfifo " << strerror(errno) << " " << myfifo << std::endl;
 //	ENOENT
 
 	return fd;
@@ -91,7 +91,7 @@ int createBattFifo( void )
 	}
 
 	int error = errno;
-	perror("mkfifo");
+    std::cerr << "mkfifo " << strerror(errno) << " " << myfifo << std::endl;
 //	ENOENT
 
 	return fd;

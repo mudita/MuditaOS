@@ -10,11 +10,6 @@ ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
     LOG_INFO("[ServiceBluetooth] Initializing");
     testTimerID = CreateTimer(3000,true);
     ReloadTimer(testTimerID);
-    //// TODO TESTING - creating dangling pointer right now
-    LOG_INFO("create!");
-    worker=std::make_unique<BluetoothWorker>(this);
-    // LOG_INFO("BluetoothWorker -> scan!\n");
-    // worker->scan();
 }
 
 ServiceBluetooth::~ServiceBluetooth() {
@@ -25,8 +20,13 @@ ServiceBluetooth::~ServiceBluetooth() {
 void ServiceBluetooth::TickHandler(uint32_t id) {
 }
 
-// Invoked during initialization
+// This code is experimental:
+// this means it is an init point of bluetooth feature handling
 sys::ReturnCodes ServiceBluetooth::InitHandler() {
+    LOG_ERROR("Bluetooth experimental!");
+    worker=std::make_unique<BluetoothWorker>(this);
+    // LOG_INFO("BluetoothWorker -> scan!\n");
+    // worker->scan();
 
     return sys::ReturnCodes::Success;
 }

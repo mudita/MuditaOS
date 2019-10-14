@@ -100,3 +100,4 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 if(DEFINED BUILD_UNIT_TESTS)
 
 endif()
+

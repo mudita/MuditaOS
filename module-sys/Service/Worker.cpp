@@ -115,21 +115,21 @@ bool Worker::deinit() {
  * This method starts RTOS thread that waits for incomming queue events.
  */
 bool Worker::run() {
-	static int workerCount = 0;
-	std::string workerName = service->GetName()+"_w" + std::to_string(workerCount);
-	BaseType_t task_error = xTaskCreate(
-		workerTaskFunction,
-		workerName.c_str(),
-		512,
-		this,
-		service->GetPriority(),
-		&taskHandle);
-	if ( task_error != pdPASS)
-	{
-//		LOG_ERROR("Failed to start the task");
-		return false;
-	}
-	return true;
+    static int workerCount = 0;
+    std::string workerName = service->GetName()+"_w" + std::to_string(workerCount);
+    BaseType_t task_error = xTaskCreate(
+            workerTaskFunction,
+            workerName.c_str(),
+            512,
+            this,
+            service->GetPriority(),
+            &taskHandle);
+    if ( task_error != pdPASS)
+    {
+        LOG_ERROR("Failed to start the task");
+        return false;
+    }
+    return true;
 }
 
 bool Worker::stop() {

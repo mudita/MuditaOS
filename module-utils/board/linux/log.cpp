@@ -67,7 +67,7 @@ void log_Printf(const char *fmt, ...)
     std::cout<<loggerBuffer;
 }
 
-void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...)
+static void _log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, va_list args)
 {
     if (level < logger.level) {
         return;
@@ -77,19 +77,24 @@ void log_Log(logger_level level, const char *file, int line,const char *function
 
     char* ptr = loggerBuffer;
 
-    va_list args;
 #if LOG_USE_COLOR == 1
     ptr += sprintf(ptr,"%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
         level_colors[level], level_names[level], file, line);
 #else
     ptr += sprintf(ptr,"%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
-    va_start(args, fmt);
     ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, fmt, args);
-    va_end(args);
     ptr += sprintf(ptr,"\r\n");
 
     std::cout<<loggerBuffer;
+}
+
+void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    _log_Log(level, file, line,function, fmt, args);
+    va_end(args);
 }
 
 /**
@@ -99,3 +104,14 @@ void log_Log(logger_level level, const char *file, int line,const char *function
 void log_SetLevel(logger_level level) {
     logger.level = level;
 }
+
+extern "C" {
+
+    void bt_log_custom(const char* file , int line, const char* foo, const char *fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        _log_Log( LOGTRACE, file, line, foo, fmt, args);
+        va_end(args);
+      }
+
+};
