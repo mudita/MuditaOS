@@ -11,14 +11,21 @@ BluetoothWorker::BluetoothWorker(sys::Service* service) : Worker(service) {
     init({{"qBtIO", sizeof(Bt::Message), 10},
           {"qBtWork", sizeof(Bt::EvtWorker), 10},
          });
-    run();
-    // TODO what - that's just wrong -_-
-    auto el = getQueues()[queueIO_handle];
-    BlueKitchen::getInstance()->qHandle = el;
-    initialize_stack();
-    pan_bnep_setup();
-    run_stack(&this->bt_worker_task);
+    /// well this crashes on malloc? O_O
+    if(run()) {
+        // TODO what - that's just wrong -_-
+        auto el = getQueues()[queueIO_handle];
+        BlueKitchen::getInstance()->qHandle = el;
+        initialize_stack();
+        pan_bnep_setup();
+        run_stack(&this->bt_worker_task);
+    }
 };
+
+
+void BluetoothWorker::start_bluetooth()
+{
+}
 
 BluetoothWorker::~BluetoothWorker()
 {
