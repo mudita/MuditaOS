@@ -22,11 +22,6 @@ BluetoothWorker::BluetoothWorker(sys::Service* service) : Worker(service) {
     }
 };
 
-
-void BluetoothWorker::start_bluetooth()
-{
-}
-
 BluetoothWorker::~BluetoothWorker()
 {
     if(this->bt_worker_task!= nullptr) {
