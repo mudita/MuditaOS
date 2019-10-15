@@ -92,7 +92,7 @@ MessagesMainWindow::~MessagesMainWindow() {
 }
 
 
-void MessagesMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 //	setFocusItem(list);
 
 //	phonebookModel->clear();

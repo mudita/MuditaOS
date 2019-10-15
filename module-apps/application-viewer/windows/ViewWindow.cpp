@@ -121,7 +121,7 @@ ViewWindow::~ViewWindow() {
 	destroyInterface();
 }
 
-void ViewWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void ViewWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	currentState = 0;
 	if( states.size() )

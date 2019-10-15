@@ -81,7 +81,7 @@ ThreadViewWindow::~ThreadViewWindow() {
 }
 
 
-void ThreadViewWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+void ThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 }
 
 bool ThreadViewWindow::onInput(const InputEvent &inputEvent) {
@@ -103,7 +103,7 @@ bool ThreadViewWindow::onInput(const InputEvent &inputEvent) {
 		LOG_INFO("Enter pressed");
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
+		application->switchWindow( "MainWindow" );
 		return true;
 	}
 

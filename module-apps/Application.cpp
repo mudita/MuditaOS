@@ -101,7 +101,7 @@ void Application::render( gui::RefreshModes mode ) {
 void Application::blockEvents(bool isBlocked ) {
 	acceptInput = isBlocked;
 }
-int Application::switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
+int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd, std::unique_ptr<gui::SwitchData> data ) {
 
 	std::string window;
 	LOG_INFO("switching to window: %s", windowName.c_str());
@@ -109,17 +109,19 @@ int Application::switchWindow( const std::string& windowName, uint32_t cmd, std:
 	//case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
 		window = currentWindow->getName();
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::make_unique<gui::SwitchData>("LastWindow"));
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, std::make_unique<gui::SwitchData>("LastWindow"), cmd);
 		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 	else {
-		window = windowName.empty()?"MainWindow":windowName;
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, cmd, std::move(data) );
+		window = windowName.empty() ? "MainWindow" : windowName;
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, std::move(data), cmd );
 		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 
 	return 0;
 }
+
+// TODO: this one seems to be unused
 int Application::switchBackWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data ) {
 	auto msg = std::make_shared<AppMessage>( MessageType::AppSwitchWindowBack );
 	sys::Bus::SendUnicast(msg, this->GetName(), this );
@@ -234,7 +236,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
 					state = State::ACTIVE_FORGROUND;
 
-					switchWindow( msg->getTargetWindowName(), 0, std::move( msg->getData()));
+					switchWindow( msg->getTargetWindowName(), std::move( msg->getData()));
 					handled = true;
 				}
 				else {
@@ -263,7 +265,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				//if application is in front and receives message with defined window it should
 				//change to that window.
 				else {
-					switchWindow( msg->getTargetWindowName(), 0, std::move( msg->getData()));
+					switchWindow( msg->getTargetWindowName(), std::move( msg->getData()));
 					handled = true;
 				}
 			}
@@ -283,10 +285,6 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			setActiveWindow( msg->getWindowName() );
 
-			//determine show mode
-			gui::ShowMode mode = gui::ShowMode::GUI_SHOW_INIT;
-			if( previousWindow == currentWindow )
-				mode = gui::ShowMode::GUI_SHOW_RETURN;
 			currentWindow->handleSwitchData( msg->getData().get() );
 
 			//check if this is case where application is returning to the last visible window.
@@ -294,7 +292,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				//do nothing here
 			}
 			else {
-				currentWindow->onBeforeShow( mode, 0, msg->getData().get() );
+				currentWindow->onBeforeShow( msg->getCommand(), msg->getData().get() );
 			}
 
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );

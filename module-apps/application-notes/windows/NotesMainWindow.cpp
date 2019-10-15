@@ -77,7 +77,7 @@ NotesMainWindow::~NotesMainWindow() {
 	destroyInterface();
 }
 
-void NotesMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void NotesMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	notesModel->clear();
 	notesModel->requestRecordsCount();
 	list->clear();
@@ -107,7 +107,7 @@ bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_LEFT ) {
-		application->switchWindow( "EditWindow", 0, nullptr );
+		application->switchWindow( "EditWindow" );
 		return true;
 	}
 
