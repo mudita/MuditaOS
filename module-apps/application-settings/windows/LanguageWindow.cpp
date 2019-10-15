@@ -119,7 +119,7 @@ gui::Item* LanguageWindow::addOptionLabel( const std::string& text, std::functio
 }
 
 
-void LanguageWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void LanguageWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setFocusItem( options[0] );
 }
 
@@ -142,7 +142,7 @@ bool LanguageWindow::onInput( const InputEvent& inputEvent ) {
 		LOG_INFO("Enter pressed");
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
+		application->switchWindow( "MainWindow", gui::ShowMode::GUI_SHOW_RETURN );
 		return true;
 	}
 

@@ -182,7 +182,7 @@ MenuWindow::~MenuWindow() {
 	destroyInterface();
 }
 
-void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void MenuWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//select middle row and middle column to assign focus to the element.
 	Item* item = pages[currentPage]->tiles[0];
@@ -211,7 +211,7 @@ bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 			switchPage(0);
 		}
 		else {
-			application->switchWindow( "MainWindow", 0, nullptr );
+			application->switchWindow( "MainWindow" );
 		}
 		return true;
 	}

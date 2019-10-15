@@ -91,7 +91,7 @@ NotesEditWindow::~NotesEditWindow() {
 	destroyInterface();
 }
 
-void NotesEditWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void NotesEditWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	application->setKeyboardProfile( "lang_eng_lower" );
 	text->setText( textString );
 	setFocusItem( text );
@@ -118,7 +118,7 @@ bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
 		LOG_INFO("Enter pressed");
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
+		application->switchWindow( "MainWindow", gui::ShowMode::GUI_SHOW_RETURN );
 		return true;
 	}
 

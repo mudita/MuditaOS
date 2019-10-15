@@ -182,7 +182,7 @@ PowerOffWindow::~PowerOffWindow() {
 	destroyInterface();
 }
 
-void PowerOffWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void PowerOffWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	//on entering screen always set default result as returning to home screen and set focus to "No" label
 	state = State::Return;
 	setFocusItem( selectionLabels[0] );
@@ -202,7 +202,7 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 
 	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
+		application->switchWindow( "MainWindow" );
 	}
 	//if enter was pressed check state and power down or return to main desktop's window
 	else if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
@@ -210,7 +210,7 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 			//TODO start powering down procedure
 		}
 		else {
-			application->switchWindow( "MainWindow", 0, nullptr );
+			application->switchWindow( "MainWindow" );
 		}
 	}
 

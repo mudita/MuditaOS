@@ -169,7 +169,7 @@ void PinLockWindow::setVisibleState( const State& state ) {
 	}
 }
 
-void PinLockWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void PinLockWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//check if there was a signal to lock the phone due to inactivity.
 	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
@@ -196,7 +196,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				return true;
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-				application->switchWindow( "MainWindow", 0, nullptr );
+				application->switchWindow( "MainWindow" );
 				return true;
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_PND ) {
@@ -219,7 +219,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 
 						//if there is no application to return to simply return to main window
 						if( lockTimeoutApplilcation.empty()) {
-							application->switchWindow("MainWindow", 0, nullptr );
+							application->switchWindow( "MainWindow" );
 						}
 						else {
 							lockTimeoutApplilcation = "";
@@ -269,12 +269,12 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
 				state = State::EnteringPin;
-				application->switchWindow( "MainWindow", 0, nullptr );
+				application->switchWindow( "MainWindow" );
 			}
 		}
 		else if( state == State::PhoneBlocked) {
 			if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-				application->switchWindow( "MainWindow", 0, nullptr );
+				application->switchWindow( "MainWindow" );
 				return true;
 			}
 		}

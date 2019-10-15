@@ -76,7 +76,7 @@ void SettingsMainWindow::buildInterface() {
 	//add option language option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_language"), [=](gui::Item&){
 		LOG_INFO("switching to language page" );
-		application->switchWindow("Languages", 0, nullptr );
+		application->switchWindow( "Languages" );
 		return true;} ));
 
 	//add option security option
@@ -124,7 +124,7 @@ gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::fun
 }
 
 
-void SettingsMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void SettingsMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setFocusItem( options[0] );
 }
 

@@ -98,7 +98,7 @@ PhonebookMainWindow::~PhonebookMainWindow() {
 }
 
 
-void PhonebookMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
 
 #if 0
@@ -177,11 +177,11 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
 
     if( inputEvent.keyCode == KeyCode::KEY_LEFT) {
         LOG_INFO("Adding new contact");
-        application->switchWindow("NewContact",0,nullptr);
+        application->switchWindow( "NewContact" );
     }
     else if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 		LOG_INFO("Searching contact");
-		application->switchWindow("SearchWindow",0, nullptr );
+		application->switchWindow( "SearchWindow" );
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
 		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MenuWindow", nullptr );

@@ -276,7 +276,7 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 	return true;
 }
 
-void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void CallWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
 bool CallWindow::handleLeftButton() {
