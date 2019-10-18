@@ -1,9 +1,25 @@
-#!/bin/sh
+#!/bin/bash -e
 
 BUILD_DIR="build"
 ASSETS_DIR="assets"
 SYS_DIR="sys"
 DB_DIR="db"
+
+function check_submodules() {
+    local gitlist=$(cat .gitmodules | grep path | cut -d ' ' -f 3)
+    for el in $gitlist; do
+        if [[ ! -f "./${el}/.git" ]]; then
+            echo "Please init (all) submodules"
+            echo "not found: ./${el}/.git break!"
+            echo "please run:"
+            echo "git submodule update --init --recursive"
+            exit 1
+        fi
+    done
+}
+
+# check for submodules
+check_submodules
 
 #if there is no build directory create one
 if [ ! -d "$BUILD_DIR" ]; then
