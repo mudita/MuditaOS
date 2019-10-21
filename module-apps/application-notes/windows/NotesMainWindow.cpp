@@ -86,8 +86,7 @@ void NotesMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
+	if( AppWindow::onInput( inputEvent ) ) {
 		//refresh window only when key is other than enter
 		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
 			application->render( RefreshModes::GUI_REFRESH_FAST );
@@ -101,10 +100,6 @@ bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
 
 	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 		LOG_INFO("Enter pressed");
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-		return true;
 	}
 	else if( inputEvent.keyCode == KeyCode::KEY_LEFT ) {
 		application->switchWindow( "EditWindow" );

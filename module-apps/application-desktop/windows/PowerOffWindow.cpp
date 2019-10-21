@@ -191,8 +191,7 @@ void PowerOffWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
+	if( AppWindow::onInput( inputEvent ) ) {
 		application->render(RefreshModes::GUI_REFRESH_FAST);
 		return true;
 	}
@@ -201,11 +200,9 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	if( inputEvent.state != gui::InputEvent::State::keyReleasedShort )
 		return true;
 
-	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow" );
-	}
+
 	//if enter was pressed check state and power down or return to main desktop's window
-	else if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
+	if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
 		if( state == State::PowerDown ){
 			//TODO start powering down procedure
 		}

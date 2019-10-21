@@ -75,20 +75,23 @@ public:
 class AppSwitchWindowMessage : public AppMessage {
 protected:
 	std::string window;
+	std::string senderWindow;
 	gui::ShowMode command;
 	std::unique_ptr<gui::SwitchData> data;
 public:
 	AppSwitchWindowMessage() = delete;
 
-	AppSwitchWindowMessage( const std::string& window, std::unique_ptr<gui::SwitchData> data, gui::ShowMode command = gui::ShowMode::GUI_SHOW_INIT) :
+	AppSwitchWindowMessage( const std::string& window, const std::string senderWindow, std::unique_ptr<gui::SwitchData> data, const gui::ShowMode command = gui::ShowMode::GUI_SHOW_INIT) :
 		AppMessage( MessageType::AppSwitchWindow ),
 		window{window},
+		senderWindow{ senderWindow },
 		command{ command },
 		data{std::move(data)} {};
 	virtual ~AppSwitchWindowMessage() = default;
 
-	std::string getWindowName() const { return window; };
-	gui::ShowMode getCommand() const { return command; };
+	const std::string& getWindowName() const { return window; };
+	const std::string& getSenderWindowName() const { return senderWindow; };
+	const gui::ShowMode& getCommand() const { return command; };
 	std::unique_ptr<gui::SwitchData>& getData() { return data; };
 };
 
