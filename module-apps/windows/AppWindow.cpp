@@ -104,7 +104,10 @@ bool AppWindow::onDatabaseMessage( sys::Message* msg ){ return false; }
 bool AppWindow::onInput( const InputEvent& inputEvent) {
 
 	//check if any of the lower inheritance onInput methods catch the event
-	if( Window::onInput( inputEvent ) ) return true;
+	if( Window::onInput( inputEvent ) ) {
+		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) application->render( RefreshModes::GUI_REFRESH_FAST );
+		return true;
+	}
 
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;

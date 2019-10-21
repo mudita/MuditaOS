@@ -191,8 +191,7 @@ void PowerOffWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
-	if( AppWindow::onInput( inputEvent ) ) {
-		application->render(RefreshModes::GUI_REFRESH_FAST);
+	if( AppWindow::onInput( inputEvent ) ) { // TODO: alek: test it
 		return true;
 	}
 

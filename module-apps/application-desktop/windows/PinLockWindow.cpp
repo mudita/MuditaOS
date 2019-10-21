@@ -276,9 +276,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 	}
 
 	//check if any of the lower inheritance onInput methods catch the event
-	if( AppWindow::onInput( inputEvent ) ) return true;
-
-	return false;
+	return AppWindow::onInput( inputEvent );
 }
 
 } /* namespace gui */

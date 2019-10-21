@@ -212,12 +212,7 @@ bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 	} 
 	
 	//check if any of the lower inheritance onInput methods catch the event
-	if( AppWindow::onInput( inputEvent ) ) {
-		application->render( RefreshModes::GUI_REFRESH_FAST );
-		return true;
-	}
-
-	return false;
+	return AppWindow::onInput( inputEvent );
 }
 
 void MenuWindow::switchPage( uint32_t index ) {

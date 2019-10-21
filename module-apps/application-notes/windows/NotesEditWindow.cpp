@@ -97,19 +97,6 @@ void NotesEditWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setFocusItem( text );
 }
 
-bool NotesEditWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	if( AppWindow::onInput( inputEvent ) ) {
-		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) {
-			application->render( RefreshModes::GUI_REFRESH_FAST );
-		}
-		return true;
-	}
-
-	return false;
-}
-
 } /* namespace gui */
 
 
