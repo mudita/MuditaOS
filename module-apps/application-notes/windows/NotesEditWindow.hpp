@@ -31,7 +31,6 @@ public:
 	virtual ~NotesEditWindow();
 
 	//virtual methods
-	bool onInput( const InputEvent& inputEvent ) override;
 	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
 
 	void rebuild() override;
