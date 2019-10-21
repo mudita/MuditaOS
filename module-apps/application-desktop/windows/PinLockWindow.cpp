@@ -184,11 +184,6 @@ void PinLockWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
 bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
 	if( inputEvent.state == gui::InputEvent::State::keyReleasedShort ) {
 		//accept only LF, enter, RF, #, and numeric values
 		if( state == State::EnteringPin ) {
@@ -279,6 +274,9 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 			}
 		}
 	}
+
+	//check if any of the lower inheritance onInput methods catch the event
+	if( AppWindow::onInput( inputEvent ) ) return true;
 
 	return false;
 }

@@ -109,12 +109,12 @@ int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd,
 	//case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
 		window = currentWindow->getName();
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, std::make_unique<gui::SwitchData>("LastWindow"), cmd);
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, currentWindow->getName(), std::make_unique<gui::SwitchData>("LastWindow"), cmd);
 		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 	else {
 		window = windowName.empty() ? "MainWindow" : windowName;
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, std::move(data), cmd );
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, currentWindow->getName(), std::move(data), cmd );
 		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 
@@ -286,6 +286,10 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			setActiveWindow( msg->getWindowName() );
 
 			currentWindow->handleSwitchData( msg->getData().get() );
+
+			if( currentWindow->getPrevWindow().empty() ) {
+				currentWindow->setPrevWindow( msg->getSenderWindowName() );
+			}
 
 			//check if this is case where application is returning to the last visible window.
 			if( (msg->getData() != nullptr) && (msg->getData()->getDescription() == "LastWindow") ) {

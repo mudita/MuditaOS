@@ -396,10 +396,6 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 			application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
 		}
 	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", gui::ShowMode::GUI_SHOW_RETURN );
-		return true;
-	}
 
 	return false;
 }

@@ -132,11 +132,10 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
 bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
+	
+	// do nothing
+	if( inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_RF ) return false;
+	
 	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 
 	//process shortpress
@@ -218,6 +217,10 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			application->switchWindow( "PowerOffWindow" );
 		}
 	}
+
+	//check if any of the lower inheritance onInput methods catch the event
+	if( AppWindow::onInput( inputEvent ) ) return true;
+
 	return false;
 }
 
