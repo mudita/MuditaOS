@@ -8,29 +8,33 @@ module-sys is made of four main parts which are thoroughly described below:
 ## Services
 In order to crate new custom service you have to inherit from base Service class. Then you have to implement
 several virtual methods which are listed below:
-* `ReturnCodes InitHandler()`  
+#### `ReturnCodes InitHandler()`
 This handler is invoked upon creation of the service. It is very important to return proper return code specified in:
->enum class ReturnCodes{
->     Success,
-> 	Failure,
->     Timeout,
->     ServiceDoesntExist,
-> 	Unresolved
-> };
-* `ReturnCodes DeinitHandler()`  
+````
+enum class ReturnCodes{
+    Success,
+    Failure,
+    Timeout,
+    ServiceDoesntExist,
+    Unresolved
+};
+````
+#### `ReturnCodes DeinitHandler()`  
 This handler is invoked upon destruction of the service. The same rules about return codes apply here.
-* `ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode)`  
+#### `ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode)`  
 This handler is invoked when there is request for switching specified service's power mode. Available power modes which
 service should support are specified below:
-> enum class ServicePowerMode{
->    Active,
->    SuspendToRAM,
->    SuspendToNVM
-> }; 
+````
+enum class ServicePowerMode{
+    Active,
+    SuspendToRAM,
+    SuspendToNVM
+}; 
+````
 
-#### Important: Currently there is no distinction between `SuspendToRAM` and `SuspendsToNVM`. These two cases should be handled the same.  Additionally only `SuspendToNVM` can be received by service.
+Important: Currently there is no distinction between `SuspendToRAM` and `SuspendsToNVM`. These two cases should be handled the same.  Additionally only `SuspendToNVM` can be received by service.
 
-* `Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)`  
+#### `Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)`  
 This is the main handler which should handle incoming messages.  
 If `DataMessage* msg` is not nullptr then it contains valid message which was sent by using blocking Bus API.  
 If `ResponseMessage* resp` is not nullptr then it contains valid message which was sent by using non-blocking Bus API.
@@ -40,7 +44,7 @@ by inheriting from base `sys::ResponseMessage` class.
 
 Please check existing services for more examples of use    
 Please check "Caveats & good practices" chapter for more info   
-* `void TickHandler(uint32_t id)`  
+#### `void TickHandler(uint32_t id)`  
 This is optional timer handler. Only define it if you plan to use service timers functionality. It will be invoked upon specified timer expiration.
 `uint32_t id` is the unique number of timer which invoked this handler.
 
@@ -63,17 +67,17 @@ Please check "Caveats & good practices" chapter for more info
 
 ## Bus
 Bus subsystem was developed in order for services to be able to communicate with each other. Bus consists of four main methods:
-* `bool SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s)`  
+#### `bool SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s)`  
 Non-blocking variant of sending messages to specified service.  
 `Service* s` is pointer to API caller.
-* `MessageRet_t SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s,uint32_t timeout)`  
+#### `MessageRet_t SendUnicast(std::shared_ptr<Message> msg,const std::string& service,Service* s,uint32_t timeout)`  
 Blocking variant of sending messages to specified service. `timeout` is in ms. `MessageRet_t` is std::pair which consist return code and message hence
-it is required to first check for return code before using message field. In case of timeout return code will be set to `Timeout`.  
+it is required to first check for return code before using message field. In case of timeout return code will be set to `Timeout`    
 `Service* s` is pointer to API caller.
-* `void SendMulticast(std::shared_ptr<Message> msg,BusChannels channel,Service* s)`  
-Send message to specified channel. Every channel which is registered to this channel will receive this message.  
+#### `void SendMulticast(std::shared_ptr<Message> msg,BusChannels channel,Service* s)`  
+Send message to specified channel. Every service which is registered to this channel will receive this message.  
 `Service* s` is pointer to API caller.
-* `void SendBroadcast(std::shared_ptr<Message> msg,Service* s)`
+#### `void SendBroadcast(std::shared_ptr<Message> msg,Service* s)`
 Send message to all active service except the caller.  
 `Service* s` is pointer to API caller.
 
@@ -90,22 +94,22 @@ For examples of using them please check application code as it seems that's wher
 
 # Caveats & good practices #
 
-* It is not possible to use Bus blocking API within `TickHandler`. Only non-blocking variant of Bus API is available to use.
+#### It is not possible to use Bus blocking API within `TickHandler`. Only non-blocking variant of Bus API is available to use.
 This is due to `TickHandler` body being invoked from different context, specifically tick handlers are invoked in 
 FreeRTOS timer context. It is to be considered if current mechanism fulfills system requirements. If not, `TickHandler`
 should be invoked from service context and triggered by special sys message (mechanism similar to Ping/Pong system messages).
 
-* Due to the point above `TickHandler` implementation should fast and efficient. In general it ought to be treated similar to
+#### Due to the point above `TickHandler` implementation should fast and efficient. In general it ought to be treated similar to
 interrupt routine except that in `TickHandler` body it is allowed to use dynamic memory allocations, stdlib functions, file system and so on.
 This requirement is due to specific implementation of FreeRTOS software timers which is the basis of tick handlers. For more detailed info please
 refer to [Software Timers](https://www.freertos.org/FreeRTOS-Software-Timer-API-Functions.html)
  
 
-* DataReceivedHandler should not block for long period of time.  
+#### DataReceivedHandler should not block for long period of time.  
 It is okay to do some minor blocking tasks but blocking for longer periods will make whole system unpredictable or behave
 in very uncontrolled manner. It is perfectly fine to use `Bus::SendUnicast` blocking API in the handler.
 
-* Watch out for async incoming messages  
+#### Watch out for async incoming messages  
 Some time ago second parameter was added to DataReceivedHandler 
 `DataReceivedHandler(DataMessage* msg,ResponseMessage* resp)`
 This addition was dictated by need of using non-blocking variant of `Bus::SendUnicast` which then can trigger receiving async
