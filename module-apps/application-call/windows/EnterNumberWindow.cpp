@@ -84,6 +84,8 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			app->setDisplayedNumber(num);
 
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+			return true;
 		}
 		//if numeric key was pressed record that key and send it to call application with a switch command
 		else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
