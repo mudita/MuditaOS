@@ -81,7 +81,14 @@ public:
 	/**
 	 * Generic function for sending switch command. This will switch window within active application.
 	 */
-	int switchWindow( const std::string& windowName, uint32_t cmd, std::unique_ptr<gui::SwitchData> data );
+	int switchWindow( const std::string& windowName, gui::ShowMode cmd = gui::ShowMode::GUI_SHOW_INIT, std::unique_ptr<gui::SwitchData> data = nullptr );
+	/**
+	 * Generic method for sending switch command. This will switch window within active application.
+	 * It set the ShowMode to gui::ShowMode::GUI_SHOW_INIT
+	 */
+	inline auto switchWindow( const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
+		return switchWindow( windowName, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+	};
 	/**
 	 * Generic function for returning to switch window in active application without performing initialization of the window.
 	 */

@@ -25,7 +25,7 @@ Window::Window( std::string name, uint32_t id ) :
 Window::~Window() {
 }
 
-void Window::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void Window::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
 void Window::getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h ) {
@@ -79,14 +79,13 @@ std::list<DrawCommand*> Window::buildDrawList() {
 
 
 bool Window::onInput( const InputEvent& inputEvent) {
-	bool res = false;
-	if( focusItem != nullptr )
-		res =  focusItem->onInput(inputEvent);
+	auto res = false;
+	if( focusItem != nullptr ) res =  focusItem->onInput(inputEvent);
 
-	if( res )
-		return true;
-	//if focused item didn't handle the key event and it was navigation key
-	//check if moving focus is possible
+	if( res ) return true;
+	
+	// if focused item didn't handle the key event and it was navigation key
+	// check if moving focus is possible
 	gui::Item* newFocusItem = nullptr;
 	if( (!res) && (focusItem != nullptr ) && (inputEvent.state == InputEvent::State::keyReleasedShort) ) {
 		switch( inputEvent.keyCode ) {
@@ -103,7 +102,7 @@ bool Window::onInput( const InputEvent& inputEvent) {
 			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::DOWN);
 			break;
 		case KeyCode::KEY_ENTER:
-			if( focusItem )
+			if( focusItem != nullptr)
 				return focusItem->onActivated(nullptr);
 			break;
 		default:
