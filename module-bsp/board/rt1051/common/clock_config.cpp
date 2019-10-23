@@ -1444,7 +1444,7 @@ void LPM_EnterLowPowerIdle(void)
 
     /* DCM Mode */
     //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
-    //DCDC_BootIntoDCM(DCDC);
+    DCDC_BootIntoDCM(DCDC);
     /* Disconnect internal the load resistor */
     DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
     /* Power Down output range comparator */
