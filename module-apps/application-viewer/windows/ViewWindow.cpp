@@ -121,7 +121,7 @@ ViewWindow::~ViewWindow() {
 	destroyInterface();
 }
 
-void ViewWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void ViewWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	currentState = 0;
 	if( states.size() )
@@ -129,11 +129,6 @@ void ViewWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data
 }
 
 bool ViewWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
 	//process only if key is released
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
@@ -158,7 +153,8 @@ bool ViewWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 	}
 
-	return false;
+	//check if any of the lower inheritance onInput methods catch the event
+	return AppWindow::onInput( inputEvent );
 }
 
 } /* namespace gui */
