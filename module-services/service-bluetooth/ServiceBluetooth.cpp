@@ -2,6 +2,7 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
+#include "messages/BluetoothMessage.hpp"
 #include <log/log.hpp>
 
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
@@ -25,8 +26,6 @@ void ServiceBluetooth::TickHandler(uint32_t id) {
 sys::ReturnCodes ServiceBluetooth::InitHandler() {
     LOG_ERROR("Bluetooth experimental!");
     worker=std::make_unique<BluetoothWorker>(this);
-    // LOG_INFO("BluetoothWorker -> scan!\n");
-    // worker->scan();
 
     return sys::ReturnCodes::Success;
 }
@@ -37,8 +36,44 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler() {
 }
 
 sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage* msg,sys::ResponseMessage* resp) {
-    std::shared_ptr<sys::ResponseMessage> responseMsg;
-    return responseMsg;
+    try {
+        switch (static_cast<MessageType>(msg->messageType)) {
+        case MessageType::BluetoothRequest: {
+            BluetoothMessage *lmsg = dynamic_cast<BluetoothMessage *>(msg);
+            LOG_INFO("Bluetooth request!");
+            switch (lmsg->req) {
+                case BluetoothMessage::Start:
+                    worker->run();
+                    break;
+                case BluetoothMessage::Scan:
+                    if(worker->scan()) {
+                        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Success);
+                    } else {
+                        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
+                    }
+                    break;
+
+                case BluetoothMessage::PAN:
+                    worker->start_pan();
+                    break;
+
+                case BluetoothMessage::Visible:
+                    worker->set_visible();
+                    break;
+
+                default:
+                    break;
+            }
+            break;
+        }
+        default:
+            LOG_INFO("BT not handled!");
+            break;
+        }
+    } catch (std::exception &ex) {
+        LOG_ERROR("Exception on BtService!: %s", ex.what());
+    }
+    return std::make_shared<sys::ResponseMessage>();
 }
 
 sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowerMode mode)

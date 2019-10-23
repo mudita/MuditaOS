@@ -55,7 +55,11 @@ void SettingsMainWindow::buildInterface() {
     setTitle(utils::localize.get("app_settings_title_main"));
 
 	//add option connectivity option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_connectivity"), [=] (gui::Item& item){ return true; }) );
+	options.push_back( addOptionLabel( utils::localize.get("app_settings_bt"), [=] (gui::Item& item){
+                LOG_INFO("switching to bluetooth page" );
+                application->switchWindow("Bluetooth", nullptr );
+                return true;
+            }) );
 
 	//add option date and time option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_date_and_time"), [=](gui::Item&){ return true;}) );
@@ -103,22 +107,14 @@ SettingsMainWindow::~SettingsMainWindow() {
 	destroyInterface();
 }
 
-gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
-	gui::Label* label = new gui::Label( this, 20,0, 480-2*20, 55, text );
-	label->setMargins( gui::Margins(10,0,20,0) );
-	label->setFilled( false );
-	label->setPenFocusWidth( 3 );
-	label->setPenWidth( 0 );
-	label->setFont(style::window::font::big);
-	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
-    label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
-	label->activatedCallback = activatedCallback;
-
-	new gui::Image( label, 425-17, 24, 0, 0, "right_label_arrow" );
-
-	return label;
+gui::Item *SettingsMainWindow::addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback)
+{
+    gui::Label *label = new gui::Label(this, 20, 0, 480 - 2 * 20, 55, text);
+    style::window::decorateOption(label);
+    label->activatedCallback = activatedCallback;
+    new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
+    return label;
 }
-
 
 void SettingsMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setFocusItem( options[0] );

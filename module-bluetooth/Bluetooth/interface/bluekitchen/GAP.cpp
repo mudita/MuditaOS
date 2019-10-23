@@ -1,24 +1,13 @@
-#include <Bluetooth/profiles/GAP.hpp>
 #include <Bluetooth/Device.hpp>
 #include <log/log.hpp>
+#include <vector>
+#include <Bluetooth/Error.hpp>
 
 extern "C" {
 #include "btstack.h"
 };
 
-// Tiny bit modified gap_inquiry example
-
-class GAPi :public GAP {
-    public:
-        GAPi();
-        virtual ~GAPi();
-        virtual ErrorBtProfile init(Stack *stack) override;
-
-        virtual ErrorBtProfile scan() override;
-    private:
-        btstack_packet_callback_registration_t cb_handler;
-};
-
+btstack_packet_callback_registration_t cb_handler;
 enum DEVICE_STATE { REMOTE_NAME_REQUEST, REMOTE_NAME_INQUIRED, REMOTE_NAME_FETCHED };
 
 struct Devicei :public Device {
@@ -54,9 +43,9 @@ enum STATE {INIT, ACTIVE, DONE} ;
 enum STATE state = INIT;
 
 #define INQUIRY_INTERVAL 5
-static void start_scan(void){
+static int start_scan(void){
     LOG_INFO("Starting inquiry scan..");
-    gap_inquiry_start(INQUIRY_INTERVAL);
+    return gap_inquiry_start(INQUIRY_INTERVAL);
 }
 
 static int has_more_remote_name_requests(void){
@@ -170,7 +159,7 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
                     continue_remote_names();
                     break;
 
-                case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
+                case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE: {
                     reverse_bd_addr(&packet[3], addr);
                     index = getDeviceIndexForAddress(devices,addr);
                     if (index >= 0) {
@@ -187,7 +176,8 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
                         state = DONE;
                     }
                     continue_remote_names();
-                    break;
+                 }
+                 break;
 
                 default:
                     break;
@@ -199,38 +189,32 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
     }
 }
 
-GAPi::GAPi()
+namespace Bt {
+namespace GAP {
+
+Error register_scan()
 {
-    LOG_INFO("GAP create");
+    LOG_INFO("GAP register scan!");
+    /// -> this have to be called prior to power on!
     hci_set_inquiry_mode(INQUIRY_MODE_RSSI_AND_EIR);
-    // TODO this should somehow get context, and store devices to GAT response devices, not global
     cb_handler.callback = &packet_handler;
     hci_add_event_handler(&cb_handler);
+    return Error();
 }
 
-GAPi::~GAPi()
+Error scan()
 {
-}
-
-BtProfile::ErrorBtProfile GAPi::init(Stack *stack)
-{
-    ErrorBtProfile err = SuccessBtProfile;
-    return err;
-}
-
-
-GAP *GAP::create()
-{
-    return new GAPi();
-}
-
-
-BtProfile::ErrorBtProfile GAPi::scan()
-{
-    // We dont use results now, we dont store/return them
-    LOG_INFO("Start scan if active: %d", state == ACTIVE);
-    if(state == ACTIVE) {
-        start_scan();
+    // TODO We dont use results now, we dont store/return them
+    LOG_INFO("Start scan if active: %d: %d", hci_get_state(), state);
+    if(hci_get_state() == HCI_STATE_WORKING) {
+        if( int ret = start_scan() != 0 ) {
+            LOG_ERROR("Start scan error!: 0x%X", ret);
+            return Error(Error::LibraryError, ret);
+        }
+    } else {
+        return Error(Error::NotReady);
     }
-    return BtProfile::SuccessBtProfile;
+    return Error();
+}
+}
 }
