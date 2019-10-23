@@ -5,6 +5,7 @@
 #include "Service.hpp"
 #include "Message.hpp"
 #include <algorithm>
+#include <cassert>
 
 namespace sys
 {
@@ -58,6 +59,9 @@ namespace sys
 
     void Bus::SendResponse(std::shared_ptr<Message> msg,std::shared_ptr<Message> receivedMsg,Service* s)
     {
+        assert(msg != nullptr);
+        assert(receivedMsg != nullptr);
+        assert(s != nullptr);
         msg->sender = s->GetName();
         msg->uniID = receivedMsg->uniID;
         msg->transType = Message::TransmissionType ::Unicast;
