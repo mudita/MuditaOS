@@ -1,9 +1,6 @@
 #include "BluetoothWorker.hpp"
-#include "profiles/GAVD.hpp"
-#include "profiles/GAP.hpp"
 #include "log/log.hpp"
-
-#include <WorkerImpl.hpp>
+#include "BtCommand.hpp"
 
 using namespace bsp;
 
@@ -11,15 +8,6 @@ BluetoothWorker::BluetoothWorker(sys::Service* service) : Worker(service) {
     init({{"qBtIO", sizeof(Bt::Message), 10},
           {"qBtWork", sizeof(Bt::EvtWorker), 10},
          });
-    /// well this crashes on malloc? O_O
-    if(run()) {
-        // TODO what - that's just wrong -_-
-        auto el = getQueues()[queueIO_handle];
-        BlueKitchen::getInstance()->qHandle = el;
-        initialize_stack();
-        pan_bnep_setup();
-        run_stack(&this->bt_worker_task);
-    }
 };
 
 BluetoothWorker::~BluetoothWorker()
@@ -30,26 +18,67 @@ BluetoothWorker::~BluetoothWorker()
     LOG_INFO("Worker removed");
 }
 
-std::vector<Device> BluetoothWorker::scan()
+bool BluetoothWorker::run() {
+    if(is_running) {
+        return true;
+    }
+    if(Worker::run()) {
+        // TODO what - that's just wrong -_-
+        auto el = getQueues()[queueIO_handle];
+        BlueKitchen::getInstance()->qHandle = el;
+        Bt::initialize_stack();
+        Bt::GAP::register_scan();
+        std::string name = "PurePhone";
+        Bt::set_name(name);
+        // set local namne
+        // set discoverable (on)
+        // Bt::GAP::
+        Bt::run_stack(&this->bt_worker_task);
+        is_running = true;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool BluetoothWorker::scan()
 {
-    /// TODO -> create worker for GAP
     std::vector<Device> empty;
-    GAP *prof = GAP::create();
-    prof->scan();
-    return empty;
+    /// TODO -> create worker for GAP - this is async... handle from WorkerImpl? (message for each/all elements found)
+    // if state inactive -> return not ready or queue?
+    // state active - change what? (BT [ON] on display? )
+    auto ret = Bt::GAP::scan();
+    if(ret.err != Bt::Error::Succes) {
+        LOG_ERROR("Cant start scan!: %d %d", ret.err, ret.lib_code);
+        return false;
+    } else {
+        LOG_INFO("Scan started!");
+        return true;
+    }
+}
+
+bool BluetoothWorker::set_visible()
+{
+    LOG_ERROR("TODO");
+    return false;
+}
+
+bool BluetoothWorker::start_pan()
+{
+    auto err = Bt::PAN::bnep_setup();
+    if(err.err != Bt::Error::Succes) {
+        LOG_ERROR("PAN setup error: %d %d", err.err, err.lib_code);
+    }
+    return false;
 }
 
 BluetoothWorker::Error BluetoothWorker::aud_init()
 {
     LOG_INFO("%s", __PRETTY_FUNCTION__);
     Error err = SuccessBt;
-    LOG_INFO("Initialize AUD profile");
-    BtProfile *prof = GAVD::create();
-    if (prof->init(&stack) != BtProfile::SuccessBtProfile) {
-        LOG_ERROR("AUD init failure!");
-    } else {
-        // ASSIGN_CLASS_OF_DEVICE(ClassOfDevice, 0x28, 0x04, 0x10);
-    }
+    LOG_INFO("AUDIO - TODO");
+    // start GAVD
+    // && ASSIGN_CLASS_OF_DEVICE(ClassOfDevice, 0x28, 0x04, 0x10);
     return err;
 }
 

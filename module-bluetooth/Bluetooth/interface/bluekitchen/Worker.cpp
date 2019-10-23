@@ -1,4 +1,3 @@
-#include "WorkerImpl.hpp"
 #include <log/log.hpp>
 
 // #define __BTSTACK_FILE__ ".c"
@@ -16,21 +15,26 @@ extern "C" {
 // #include <btstack_link_key_db_fs.h>
 #include <btstack_memory.h>
 #include <btstack_run_loop.h>
-#include <btstack_run_loop_freertos.h>
 #include <bluetooth_company_id.h>
 #include <hci.h>
 #include <hci_dump.h>
 #include <btstack_stdin.h>
-// #include <btstack_tlv_posix.h>
 
 #include <btstack_chipset_cc256x.h>
 
 };
 
-#include "Bluetooth/profiles/GAP.hpp"
 #ifdef TARGET_RT1051
 #include <Bluetooth/glucode/btstack_uart_block_rt1051.h>
+#include <btstack_run_loop_freertos.h>
+#else
+extern "C" {
+#include <btstack_run_loop_posix.h>
+#include <btstack_tlv_posix.h>
+}
 #endif
+
+#include <Error.hpp>
 
 // #define TLV_DB_PATH_PREFIX "/tmp/btstack_"
 // #define TLV_DB_PATH_POSTFIX ".tlv"
@@ -152,23 +156,28 @@ static void local_version_information_handler(uint8_t * packet){
     }
 }
 
+extern "C" {
+#include <FreeRTOS.h>
+#include <task.h>
+};
+
+namespace Bt {
 void run_btstack(void*)
 {
     LOG_INFO("- run BtStack loop\n");
     btstack_run_loop_execute();
 }
 
-BluetoothWorker::Error initialize_stack()
+Error initialize_stack()
 {
-    BluetoothWorker::Error err= BluetoothWorker::SuccessBt;
     btstack_memory_init();
-    btstack_run_loop_init(btstack_run_loop_freertos_get_instance());
-
 #ifdef TARGET_RT1051
+    btstack_run_loop_init(btstack_run_loop_freertos_get_instance());
     const btstack_uart_block_t *uart_driver = btstack_uart_block_rt1051_instance();
     /// TODO
     //// here -> notify QHandle
 #else
+    btstack_run_loop_init(btstack_run_loop_posix_get_instance());
     config.device_name = "/dev/telit";
     LOG_INFO("H4 device: %s", config.device_name);
     const btstack_uart_block_t *uart_driver = btstack_uart_block_posix_instance();
@@ -180,21 +189,21 @@ BluetoothWorker::Error initialize_stack()
     hci_add_event_handler(&hci_event_callback_registration);
     LOG_DEBUG("BT worker run success");
     hci_power_control(HCI_POWER_ON);
-    return err;
+    return Error();
 }
 
-BluetoothWorker::Error run_stack(TaskHandle_t *handle)
+Error run_stack(TaskHandle_t *handle)
 {
-    BluetoothWorker::Error err= BluetoothWorker::SuccessBt;
     BaseType_t taskerr = 0;
-    // TODO message here - to all workers that they have to do their all needed prerun crap
+    LOG_INFO("Last moment for Bt registration prior to RUN state");
     if ((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(),
                                1024,
                                NULL,
                                tskIDLE_PRIORITY,
                                handle)) != pdPASS) {
       LOG_ERROR("BT Service failure! %d", taskerr);
-      err = BluetoothWorker::ErrorBtGeneric;
+      return Error(Error::SystemError, taskerr);
     }
-    return err;
+    return Error();
+}
 }

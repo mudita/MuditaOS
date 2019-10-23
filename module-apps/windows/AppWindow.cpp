@@ -18,6 +18,7 @@ namespace gui {
 
 AppWindow::AppWindow( app::Application* app, std::string name, uint32_t id ) :
 	Window ( name, id), application{ app } {
+    setSize(style::window_width, style::window_height);
 }
 
 AppWindow::~AppWindow() {

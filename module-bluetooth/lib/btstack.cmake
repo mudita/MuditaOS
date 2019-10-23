@@ -135,10 +135,9 @@ list(APPEND TARGET_LIBRARIES_INCLUDES
     )
 
 set(BOARD_DIR_SOURCES
-            ${BT_INT}/WorkerImpl.cpp
-            ${BT_INT}/PAN_Impl.cpp
+            ${BT_INT}/Worker.cpp
             ${BT_INT}/GAP.cpp
-            ${BT_INT}/GAVD.cpp
+            ${BT_INT}/PAN.cpp
 
             ${BT_GLU}/bluetooth_init_cc2564C_1.0.c
             ${BT_GLU}/btstack_uart_block_rt1051.cpp
@@ -156,9 +155,12 @@ set(BOARD_DIR_SOURCES
 if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 message("Linux specyfic sources")
 message("----------------------")
+# include(${CMAKE_CURRENT_SOURCE_DIR}/targets/Target_Linux.cmake)
 list(APPEND BOARD_DIR_SOURCES
+    # ${BOARD_SOURCES}
     ${BT_STACK_ROOT}/platform/posix/btstack_stdin_posix.c
     ${BT_STACK_ROOT}/platform/posix/btstack_uart_block_posix.c
+    ${BT_STACK_ROOT}/platform/posix/btstack_run_loop_posix.c
     )
 else()
 endif()
