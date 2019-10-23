@@ -117,13 +117,27 @@ public:
     uint32_t timer_id = 0;
 };
 
+#include "board/rt1051/common/clock_config.h"
+
 int main() {
 
     bsp::BoardInit();
 
     LOG_PRINTF("Launching PurePhone..\n");
 
-#if 1
+/*
+    while(1){
+        LPM_EnterFullSpeed();
+        LPM_EnterLowPowerIdle();
+    }
+*/
+
+    LPM_EnterFullSpeed();
+    LPM_EnterLowPowerIdle();
+
+    while(1);
+
+#if 0
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
