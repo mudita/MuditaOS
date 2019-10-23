@@ -131,6 +131,8 @@ enum class MessageType {
 	//rtc messages
 	EVMMinuteUpdated,//This message is send to current focused application on every minute time change.
 
+    BluetoothRequest,
+
 };
 
 

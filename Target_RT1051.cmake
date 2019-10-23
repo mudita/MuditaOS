@@ -53,10 +53,7 @@ set(TARGET_COMPILE_OPTIONS
         -Wno-psabi
 
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> # "register" keyword was marked as deprecated in C++17
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> # "register" 
 
 
@@ -65,8 +62,6 @@ set(TARGET_COMPILE_OPTIONS
         )
 
 set(TARGET_COMPILE_FEATURES
-
-        cxx_noexcept
 
         CACHE INTERNAL "" )
 

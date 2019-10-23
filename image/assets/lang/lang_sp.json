@@ -90,7 +90,7 @@
     "app_messages_new_message": "New Message",
     
     "app_settings_title_main": "Settings",
-    "app_settings_connectivity": "Connectivity",
+    "app_settings_bt" : "Bluetooth",
     "app_settings_date_and_time": "Date and Time",
     "app_settings_display": "Display",
     "app_settings_phone_modes": "Phone Modes",

@@ -1,4 +1,3 @@
-#include "WorkerImpl.hpp"
 #include <log/log.hpp>
 
 extern "C" {
@@ -29,7 +28,8 @@ extern "C" {
 
 };
 
-#include "Bluetooth/profiles/GAP.hpp"
+#include <BtCommand.hpp>
+#include <Error.hpp>
 #ifdef TARGET_RT1051
 #include <Bluetooth/glucode/btstack_uart_block_rt1051.h>
 #endif
@@ -97,14 +97,32 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
     }
 }
 
-BluetoothWorker::Error pan_bnep_setup()
+namespace Bt {
+
+Error set_name(std::string &name) {
+    // name has to have storage
+    constexpr uint32_t size = 64;
+    static char *lname;
+    if(lname == nullptr) {
+        lname = new(char[size]);
+        memset(lname, 0, size);
+    }
+    snprintf(lname, size,"%s %s", name.c_str(), "00:00:00:00:00:00");
+    LOG_INFO("Setting local name: %s", lname);
+    gap_set_local_name(lname);
+    return Error();
+}
+namespace PAN {
+
+Error bnep_setup()
 {
     BluetoothWorker::Error  err = BluetoothWorker::Error::SuccessBt;
     // Discoverable
     // Set local name with a template Bluetooth address, that will be automatically
     // replaced with a actual address once it is available, i.e. when BTstack boots
     // up and starts talking to a Bluetooth module.
-    gap_set_local_name("PAN HTTP 00:00:00:00:00:00");
+    // TODO - in config...
+    // TODO - set it settable...
     gap_discoverable_control(1);
 
     // register for HCI events
@@ -127,13 +145,15 @@ BluetoothWorker::Error pan_bnep_setup()
     sdp_register_service(pan_sdp_record);
     LOG_INFO("SDP service record size: %u", de_get_len((uint8_t*) pan_sdp_record));
 
-    // TODO
     bnep_lwip_init();
 
-    // // Setup NAP Service via BENP lwIP adapter
+    // Setup NAP Service via BENP lwIP adapter
     bnep_lwip_register_service(BLUETOOTH_SERVICE_CLASS_NAP, 1691);
 
-    // // register callback - to print state
+    // register callback - to print state
     bnep_lwip_register_packet_handler(packet_handler);
-    return err;
+    return Error();
+}
+
+}
 }

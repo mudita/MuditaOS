@@ -17,10 +17,10 @@ endif()
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
+set(CMAKE_CXX_STANDARD 17)
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
-	set(CMAKE_CXX_STANDARD 17)
     include(targets/Target_Linux.cmake)
 else()
     message(FATAL_ERROR "Invalid target!")
@@ -84,7 +84,6 @@ target_compile_options(${PROJECT_NAME}
         $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
         $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
 
-        $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
         $<$<COMPILE_LANGUAGE:CXX>:-fno-non-call-exceptions>
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
 
