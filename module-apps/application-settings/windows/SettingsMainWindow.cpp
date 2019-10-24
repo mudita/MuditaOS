@@ -19,6 +19,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "SettingsMainWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -51,12 +52,7 @@ void SettingsMainWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::SIGNAL, true );
 	topBar->setActive(TopBar::Elements::BATTERY, true );
 
-	title = new gui::Label(this, 0, 50, 480, 50 );
-	title->setFilled( false );
-	title->setBorderColor( gui::ColorNoColor );
-	title->setFont("gt_pressura_bold_24");
-	title->setText(utils::localize.get("app_settings_title_main"));
-	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    setTitle(utils::localize.get("app_settings_title_main"));
 
 	//add option connectivity option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_connectivity"), [=] (gui::Item& item){ return true; }) );
@@ -83,10 +79,11 @@ void SettingsMainWindow::buildInterface() {
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
 
 	//set position and navigation for labels
-	uint32_t posY = 100;
+	uint32_t posY = 113;
 	uint32_t size = options.size();
+    const unsigned int labeloffset = 4;
 	for( uint32_t i=0; i<options.size(); i++ ){
-		options[i]->setPosition(17,posY);
+		options[i]->setPosition(20,(posY+labeloffset*i));
 		posY += 60;
 		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
 		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
@@ -94,7 +91,6 @@ void SettingsMainWindow::buildInterface() {
 }
 void SettingsMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete title;
 	for( uint32_t i=0; i<options.size(); i++ )
 		delete options[i];
 	options.clear();
@@ -108,14 +104,14 @@ SettingsMainWindow::~SettingsMainWindow() {
 }
 
 gui::Item* SettingsMainWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
-	gui::Label* label = new gui::Label( this, 17,0, 480-34, 60, text );
-	label->setMargins( gui::Margins(16,0,0,0) );
+	gui::Label* label = new gui::Label( this, 20,0, 480-2*20, 55, text );
+	label->setMargins( gui::Margins(10,0,20,0) );
 	label->setFilled( false );
 	label->setPenFocusWidth( 3 );
 	label->setPenWidth( 0 );
-	label->setFont("gt_pressura_regular_24");
+	label->setFont(style::window::font::big);
 	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	label->setRadius(11);
+    label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
 	label->activatedCallback = activatedCallback;
 
 	new gui::Image( label, 425-17, 24, 0, 0, "right_label_arrow" );

@@ -20,6 +20,7 @@
 
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -59,7 +60,7 @@ void PinLockWindow::buildInterface() {
 	titleLabel->setFilled( false );
 	titleLabel->setVisible(false);
 	titleLabel->setBorderColor( gui::ColorFullBlack );
-	titleLabel->setFont("gt_pressura_regular_24");
+	titleLabel->setFont(style::header::font::title);
 	titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
 	titleLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
@@ -71,7 +72,7 @@ void PinLockWindow::buildInterface() {
 		label->setFilled( false );
 		label->setBorderColor( gui::ColorFullBlack );
 		label->setPenWidth(2);
-		label->setFont("gt_pressura_regular_65");
+		label->setFont(style::window::font::verybig);
 		label->setText("*");
 		label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
 		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
@@ -85,7 +86,7 @@ void PinLockWindow::buildInterface() {
 		gui::Label* label = new gui::Label(this, 0, infoLabelY, 480, 30);
 		label->setFilled( false );
 		label->setBorderColor( gui::ColorNoColor );
-		label->setFont("gt_pressura_regular_24");
+		label->setFont(style::window::font::medium);
 		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 		infoLabels.push_back( label );
 		infoLabelY += 40;

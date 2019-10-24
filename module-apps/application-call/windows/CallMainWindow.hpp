@@ -20,7 +20,6 @@ namespace gui {
  */
 class CallMainWindow: public AppWindow {
 protected:
-	gui::Label* title;
 public:
 	CallMainWindow( app::Application* app );
 	virtual ~CallMainWindow();
