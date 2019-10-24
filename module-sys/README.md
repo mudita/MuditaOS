@@ -92,6 +92,63 @@ that workers don't share memory/resources with parent service. They are also sep
 From my understanding they are mostly used as a mean of unloading services from doing cpu-intensive work which could block service's `DataReceivedHandler` for too long.
 For examples of using them please check application code as it seems that's where they are used the most.
 
+# Power management
+PureOS power management was designed and developed based on Linux Power Management subsystem.  
+There are three main assumptions:
+* It is responsibility of each service to properly support power mode switching
+* Each bsp package from module-bsp should use smart drivers when interfacing with hardware
+* Each service should manage its software & hardware resources 
+
+Most information about design and implementation can be found in [AND_0011_PowerManager](https://docs.google.com/document/d/1G1HUFEPGblu3_VDrDdwF1nVqKwMz6sz1nGOgMEmhJgs/edit#heading=h.gm0is2hpfho6).
+
+Additionally current implementation of PowerManager(it should be considered as first iteration of development and absolutely it cannot be treated as final solution) is very simple but it proved to be working and it fulfilled current requirements.
+For the time being PowerManager exposes two methods which are internally used by SystemManager:
+#### `int32_t Switch(const Mode mode)`
+This method allows for switching CPU to different modes which are listed below:
+````
+enum class Mode{
+    FullSpeed,
+    LowPowerRun,
+    LowPowerIdle,
+    Suspend
+
+};
+````
+In current implementation only `FullSpeed` and `LowPowerIdle` modes are used. It is worth to note that `LowPowerIdle` is heavy customized
+and it absolutely doesn't correspond to low power idle mode from RT1051's data sheet. Main differences are:
+* All internal RAM controller banks are preserved
+* External SDRAM controller is on but reconfigured to 12MHz clock in order to limit current consumption
+* TODO: For now internal uC DCDC is NOT switched to low power mode. This should be fixed as it limits current consumption by over 2mA
+* Core is switched to internal 24MHz oscillator, all available peripherals are turned off or switched to 24/12Mhz clock and external oscillator is turned off.
+
+Actual code is implemented in `module-bsp/board/rt1051/bsp/lpm/RT1051LPM.cpp` and `module-bsp/board/rt1051/common/clock_config.cpp`.
+
+Research was done about using `Suspend` state and it resulted in several conclusions:
+* It is not possible to use it in PureOS  
+This is mostly due to software design which is run from external SDRAM. It is almost impossible in current state of the system to
+switch to suspend state and gracefully exit from it when code is invoked from SDRAM.
+* It is not necessary to use `Suspend` state in order to fulfill business requirements (5mA in aeroplane mode)  
+By clever use of SDRAM clock scaling and custom LowPowerIdle mode we were able to achieve even lower current consumption(3,9mA) which is more than
+enough.
+
+Based on above use of `Suspend` mode is not necessary and was dropped.
+
+`LowPowerRun` mode is only listed for convenience as it is not even programmed.
+
+#### `int32_t PowerOff()`
+This method is used to turn off power supply to system. It is invoked by SystemManager after successful system close. 
+
+### Features missing or to be considered:
+#### Dynamic clock frequency scaling during normal operation 
+This is optional feature but by implementing it we would be able to limit current consumption during normal operation. 
+
+#### More sophisticated mechanism of entering and exiting from low power mode
+Currently whole mechanism of putting services into low power mode is very simple. There are no additional checks being made and there is no
+possibility to disable auto-lock feature and so on. Another thing is that most of the low-power logic is placed into ApplicationManager which unfortunately is
+bad design choice. It is to be considered if current solution will be sufficient or not. It is very possible that more advanced mechanism of communication between
+PowerManager and system logic will have to be designed and developed.
+
+
 # Caveats & good practices #
 
 #### It is not possible to use Bus blocking API within `TickHandler`. Only non-blocking variant of Bus API is available to use.
