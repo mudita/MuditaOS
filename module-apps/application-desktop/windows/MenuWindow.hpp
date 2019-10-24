@@ -40,7 +40,7 @@ public:
 	std::vector<gui::Item*> tiles;
 
 	MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_t h,
-		const std::vector<TileDescription>& tilesDescription, const UTF8& title, MenuPage::PageID id );
+	const std::vector<TileDescription>& tilesDescription, MenuPage::PageID id );
 	virtual ~MenuPage();
 
 	const PageID& getID(){ return id; };
@@ -54,6 +54,7 @@ protected:
 	//page that is currently selected by the user.
 	uint32_t currentPage =  0;
 	std::vector<gui::MenuPage*> pages;
+    std::vector<UTF8> page_name;
 
 public:
 	MenuWindow( app::Application* app );

@@ -7,11 +7,9 @@
  * @details
  */
 #include "PhonebookItem.hpp"
+#include <Style.hpp>
 
 namespace gui {
-
-const std::string PhonebookItem::boldFont = "gt_pressura_bold_24";
-const std::string PhonebookItem::normalFont = "gt_pressura_regular_24";
 
 PhonebookItem::PhonebookItem(PhonebookModel* model) : model{model}{
 	minWidth = 436;
@@ -28,7 +26,7 @@ PhonebookItem::PhonebookItem(PhonebookModel* model) : model{model}{
 	value = new gui::Label( this, 0,0,0,0);
 	value->setPenFocusWidth(0);
 	value->setPenWidth(0);
-	value->setFont(normalFont);
+	value->setFont(style::window::font::medium);
 	value->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER } );
 }
 
@@ -68,9 +66,9 @@ bool PhonebookItem::onActivated( void* data ) {
 void PhonebookItem::markFavourite( bool val ) {
 	favourite = val;
 	if( val )
-		value->setFont(boldFont);
+		value->setFont(style::window::font::bigbold);
 	else
-		value->setFont(normalFont);
+		value->setFont(style::window::font::medium);
 }
 
 } /* namespace gui */
