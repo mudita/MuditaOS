@@ -20,14 +20,11 @@
 #include <unistd.h>
 #include <time.h>
 #include <ticks.hpp>
-
-
-#include "log/log.hpp"
-
+#include "mutex.hpp"
 
 namespace bsp {
 
-    LinuxCellular::LinuxCellular(const char *term) {
+    LinuxCellular::LinuxCellular(const char *term, speed_t portSpeed) {
 
         if (strcmp(term, "0") == 0) {
             fd = 0;
@@ -35,7 +32,7 @@ namespace bsp {
             // open serial port
             fd = open(term, O_RDWR | O_NOCTTY | O_NONBLOCK);
             if (fd == -1) {
-                LOG_FATAL("Failed to open serial port");
+                printf("Failed to open serial port\n");
                 return;
             }
 
@@ -48,7 +45,7 @@ namespace bsp {
             //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
             //else
             t.c_cflag &= ~(CRTSCTS);//disable the flow control on dev board
-            speed_t speed = B115200;
+            speed_t speed = portSpeed;//B115200;
             cfsetispeed(&t, speed);
             cfsetospeed(&t, speed);
             tcsetattr(fd, TCSANOW, &t);
@@ -59,7 +56,7 @@ namespace bsp {
         epoll_fd = epoll_create1(0);
 
         if (epoll_fd == -1) {
-            LOG_FATAL("Failed to create epoll file descriptor");
+            printf("Failed to create epoll file descriptor\n");
         }
 
         struct epoll_event event;
@@ -67,7 +64,7 @@ namespace bsp {
         event.events = EPOLLIN;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event)) {
-            LOG_FATAL("Failed to add file descriptor to epoll\n");
+            printf("Failed to add file descriptor to epoll\n");
         }
 
         isInitialized = true;
@@ -99,15 +96,29 @@ namespace bsp {
 
     ssize_t LinuxCellular::Read(void *buf, size_t nbytes) {
 
+        cpp_freertos::LockGuard lock(serOutMutex);
         retry:
         auto ret = read(fd, buf, nbytes);
         if ((ret == -1) && (errno == EINTR)) {
             goto retry;
         }
+        if (ret > 0) {
+            printf("[RX] ");
+            uint8_t *ptr = (uint8_t*)buf;
+            for (size_t i = 0; i < ret; i++)
+                printf("%02X ", (uint8_t)*ptr++);
+            printf("\n");
+        }
         return ret;
     }
 
     ssize_t LinuxCellular::Write(void *buf, size_t nbytes) {
+        cpp_freertos::LockGuard lock(serOutMutex);
+        printf("[TX] ");
+        uint8_t *ptr = (uint8_t*)buf;
+        for (size_t i = 0; i < nbytes; i++)
+            printf("%02X ", (uint8_t)*ptr++);
+        printf("\n");
         retry:
         auto ret = write(fd, buf, nbytes);
         if((ret == -1) && (errno == EINTR)){
@@ -156,6 +167,24 @@ namespace bsp {
         }
 
 
+    }
+
+    void LinuxCellular::SetSpeed(speed_t portSpeed) {
+        struct termios t;
+        memset(&t, 0, sizeof(t));
+        tcgetattr(fd, &t);
+        cfmakeraw(&t);
+        t.c_cflag |= CLOCAL;
+        //if(ctsrts == 1)
+        //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
+        //else
+        t.c_cflag &= ~(CRTSCTS);   //disable the flow control on dev board
+        speed_t speed = portSpeed; //B115200;
+        cfsetispeed(&t, speed);
+        cfsetospeed(&t, speed);
+        tcsetattr(fd, TCSANOW, &t);
+        int status = TIOCM_DTR | TIOCM_RTS;
+        ioctl(fd, TIOCMBIS, &status);
     }
 
 }

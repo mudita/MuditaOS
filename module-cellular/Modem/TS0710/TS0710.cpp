@@ -1,0 +1,255 @@
+/**
+ * Project Untitled
+ */
+
+
+#include "TS0710.h"
+#include "bsp/cellular/bsp_cellular.hpp"
+#include "Modem/ATParser.hpp"
+
+std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = { {TypeOfFrame_e::SABM, "SABM"}, {TypeOfFrame_e::UA, "UA"}, {TypeOfFrame_e::DM, "DM"}, {TypeOfFrame_e::DISC, "DISC"}, {TypeOfFrame_e::UIH, "UIH"}, {TypeOfFrame_e::UI, "UI"}, {TypeOfFrame_e::I, "I"} };
+
+/**
+ * TS0710 implementation
+ */
+
+TS0710::TS0710(TS0710_START::PortSpeed_e portSpeed) {
+    pv_portSpeed = portSpeed;
+    pv_cellular = bsp::Cellular::Create(SERIAL_PORT, B115200).value_or(nullptr);
+
+    BaseType_t task_error = xTaskCreate(
+        workerTaskFunction,
+        "TS0710Worker",
+        512, // in words
+        this,
+        taskPriority,
+        &taskHandle);
+    if (task_error != pdPASS)
+    {
+        LOG_ERROR("Failed to start inputSerialWorker task");
+        return;
+    }
+}
+
+TS0710::~TS0710() {
+    for (auto it : channels)
+        delete it;
+    channels.clear();
+    TS0710_CLOSE pv_TS0710_Close = TS0710_CLOSE();
+    mode = Mode::AT;
+    if (taskHandle) {
+        vTaskDelete(taskHandle);
+    }
+}
+
+TS0710::ConfState TS0710::PowerUpProcedure() {
+    char buf[256];
+    // At first send AT command to check if modem is turned on
+    ATParser parser(pv_cellular.get());
+    auto ret = parser.SendCommand("AT\r", 2);
+
+    if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")) {
+        return ConfState ::Success;
+    } else {
+
+        LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
+        TS0710_Frame::frame_t frame;
+        frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
+        frame.Control = TypeOfFrame_e::UIH;
+        frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) | static_cast<uint8_t>(MuxDefines::GSM0710_EA) | static_cast<uint8_t>(MuxDefines::GSM0710_CR));
+        pv_cellular->Write((void*)frame.serialize().data(), frame.serialize().size());
+
+        pv_cellular->InformModemHostWakeup();
+        // GSM module needs some time to close multiplexer
+        vTaskDelay(1000);
+        // Try sending AT command once again
+        ret = parser.SendCommand("AT\r", 2);
+
+        if (ret.size() == 1 || ret.size() == 2) {
+            // Modem can send echo response or not, in either case it means that modem is operating in AT mode
+            return ConfState ::Success;
+        } else {
+            LOG_INFO("Starting power up procedure...");
+            // If no response, power up modem and try again
+            pv_cellular->PowerUp();
+            return ConfState::PowerUp;
+        }
+    }
+}
+
+//TODO:M.P Fetch configuration from JSON/XML file
+TS0710::ConfState TS0710::ConfProcedure() {
+    ATParser parser(pv_cellular.get());
+    LOG_DEBUG("Configuring modem...");
+
+    // Factory reset
+    parser.SendCommand("AT&F\r", 2);
+
+    // Turn off local echo
+    parser.SendCommand("ATE0\r", 2);
+
+    // Print current firmware version
+    LOG_INFO("GSM modem info:");
+    auto retVersion = parser.SendCommand("ATI\r", 4);
+    for(uint32_t i = 0; i< retVersion.size()-1;++i){ // skip final "OK"
+        LOG_INFO(retVersion[i].c_str());
+    }
+
+    // Set up modem configuration
+    if (hardwareControlFlowEnable) {
+        parser.SendCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
+    } else {
+        CheckATCommandResponse(
+                parser.SendCommand("AT+IFC=0,0\r", 1)); // disable flow control function for module
+    }
+
+    // Set fixed baudrate
+    // CheckATCommandResponse(
+    //         parser.SendCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1));   //done with TS0710_Start
+
+    // Route URCs to first MUX channel
+    CheckATCommandResponse(parser.SendCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));
+    // Turn off RI pin for incoming calls
+    CheckATCommandResponse(parser.SendCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 1));
+    // Turn off RI pin for incoming sms
+    CheckATCommandResponse(parser.SendCommand("AT+QCFG=\"urc/ri/smsincoming\",\"off\"\r", 1));
+    // Route URCs to UART1
+    CheckATCommandResponse(parser.SendCommand("AT+QURCCFG=\"urcport\",\"uart1\"\r", 1));
+    // Configure AP_Ready pin logic ( enable, logic level 1, 200ms )
+    CheckATCommandResponse(parser.SendCommand("AT+QCFG=\"apready\",1,1,200\r", 1));
+    // Turn on signal strength change URC
+    CheckATCommandResponse(parser.SendCommand("AT+QINDCFG=\"csq\",1\r", 1));
+    // Change incoming call notification from "RING" to "+CRING:type"
+    CheckATCommandResponse(parser.SendCommand("AT+CRC=1\r", 1));
+    // Turn on caller's number presentation
+    CheckATCommandResponse(parser.SendCommand("AT+CLIP=1\r", 1));
+
+    // Enable sleep mode
+    while(!CheckATCommandResponse(parser.SendCommand("AT+QSCLK=1\r", 1))){
+        vTaskDelay(1000);
+    }
+
+    /*    // Set Message format to Text
+    SendAT("AT+CMGF=1\r", 500);
+    // Set SMS received report format
+    SendAT("AT+CNMI=1,2,0,1,0\r", 500);*/
+
+    return ConfState ::Success;
+}
+
+TS0710::ConfState TS0710::AudioConfProcedure() {
+    ATParser parser(pv_cellular.get());
+    auto audioConfRet = parser.SendCommand("AT+QDAI?\r", 1);
+
+    // There is possibility for SendATCommand to capture invalid response (it can be ERROR or async URC)
+    // Hence we are checking here for beginning of valid response for "AT+QDAI?" command. AudioConfProcedure
+    // procedure will be invoked from AudioService's context as many times as needed.
+    if(audioConfRet[0].compare(0,strlen("+QDAI:"),"+QDAI:",strlen("+QDAI:")) != 0){
+        return ConfState ::Failure;
+    }
+    else if(audioConfRet[0].compare("+QDAI: 1,0,0,5,0,1,1,1") == 0){
+        return ConfState ::Success;
+    }
+    else {
+        // Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
+        // Quectel confirmed that during init phase modem sends "ready notification" way before
+        // audio subsystem is initialized. The only recommended solution for this is to send configuration
+        // command repetitively until modem responds with OK. Due to our system characteristic we can't use here simple
+        // while loop with vTaskDelay as this function will be invoked from AudioService context. By design service's
+        // routines should be as fast as they can and non blocking. Therefore there is possibility for audioservice to block
+        // for too long waiting in while loop which will trigger SystemManager ping/pong failure procedure.
+        if(!CheckATCommandResponse(parser.SendCommand("AT+QDAI=1,0,0,5,0,1\r", 1)) ){
+            vTaskDelay(1000);
+            return ConfState ::Failure;
+        }else{
+            pv_cellular->Restart();
+            LOG_DEBUG("GSM module first run, performing reset...");
+            return ConfState::ModemNeedsReset;
+        }
+
+    }
+}
+
+TS0710::ConfState TS0710::StartMultiplexer() {
+
+    LOG_DEBUG("Configuring multiplexer...");
+
+    // start connection
+    startParams.PortSpeed = pv_portSpeed;
+    startParams.MaxFrameSize = 127; //maximum for Basic mode
+    startParams.AckTimer = 10;     //100ms default
+    startParams.MaxNumOfRetransmissions = 3;    //default
+    startParams.MaxCtrlRespTime = 30;          //300ms default
+    startParams.WakeUpRespTime = 10;            //10s default
+    startParams.ErrRecovWindowSize = 2;         //2 default
+
+    TS0710_START *pv_TS0710_Start = new TS0710_START(TS0710_START::Mode_e::Basic, startParams, pv_cellular.get());
+    //wait for confirmation
+    if (pv_TS0710_Start->ConnectionStatus()) {
+        channels.push_back(pv_TS0710_Start->getCtrlChannel());  //store control channel
+    }
+    delete pv_TS0710_Start;
+
+    mode = Mode::CMUX;
+
+    //TODO: Open remaining channels
+    OpenChannel(1, "Notifications");
+    OpenChannel(2, "Commands");
+    OpenChannel(3, "Data");
+
+    return ConfState::Success;
+}
+
+void workerTaskFunction(void *ptr) {
+    TS0710 *inst = reinterpret_cast<TS0710 *>(ptr);
+
+    while (1) {
+        auto ret = inst->pv_cellular->Wait(UINT32_MAX);
+        if (ret == 0) {
+            continue;
+        }
+
+        // AT mode is used only during initialization phase
+        if (inst->mode == TS0710::Mode::AT) {
+            //inst->atParser->ProcessNewData();
+            //TODO: add AT command processing
+        }
+            // CMUX mode is default operation mode
+        else {
+            std::vector<uint8_t> data;
+            ssize_t len = inst->ReceiveData(data, static_cast<uint32_t>(inst->startParams.MaxCtrlRespTime));
+            if (len > 0) {
+                for (auto *chan : inst->channels) {
+                    if (TS0710_Frame::isMyChannel(data, chan->getDLCI()))
+                        chan->ParseInputData(data);
+                }
+            }
+        }
+    }
+}
+
+ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
+    ssize_t ret = -1;
+    static uint8_t *buf = nullptr;
+    buf = reinterpret_cast<uint8_t*>(malloc(startParams.MaxFrameSize));
+    bool complete = false;
+
+    while((!complete) && (timeout--)) {  //TODO: add timeout control
+        ret = pv_cellular->Read(reinterpret_cast<void *>(buf), startParams.MaxFrameSize);
+        if (ret > 0) {
+            LOG_DEBUG("Received %i bytes", ret);
+            for (int i = 0; i < ret; i++)
+                data.push_back(buf[i]);
+            complete = TS0710_Frame::isComplete(data);
+        }
+        vTaskDelay(1);
+    }
+    if (!complete)
+        LOG_ERROR("Incomplete frame received");
+    if (timeout == 0)
+        LOG_ERROR("Timeout occured");
+    
+    free(buf);
+
+    return ret;
+}

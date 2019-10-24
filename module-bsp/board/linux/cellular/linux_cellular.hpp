@@ -19,7 +19,7 @@
 #include <sys/epoll.h>
 #include "termios.h"
 #include <sys/ioctl.h>
-
+#include "mutex.hpp"
 
 namespace bsp {
 
@@ -27,7 +27,7 @@ namespace bsp {
 
     public:
 
-        LinuxCellular(const char* term);
+        LinuxCellular(const char* term, speed_t portSpeed);
         ~LinuxCellular();
 
         void PowerUp() override final;
@@ -50,6 +50,8 @@ namespace bsp {
 
         void ExitSleep() override final;
 
+        void SetSpeed(speed_t portSpeed);
+
     private:
 
         static constexpr speed_t baud_bits[] = {
@@ -66,7 +68,7 @@ namespace bsp {
 
         struct epoll_event event, events[MAX_EVENTS];
 
-
+        cpp_freertos::MutexStandard serOutMutex;
     };
 
 }

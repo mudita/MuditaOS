@@ -23,12 +23,6 @@ namespace bsp{
     class Cellular;
 }
 
-
-
-class MuxDaemon;
-class InOutSerialWorker;
-
-
 class ATParser {
 public:
 
@@ -41,9 +35,7 @@ public:
 
     };
 
-    static std::optional<std::unique_ptr<ATParser>> Create(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
-
-    ATParser(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
+    ATParser(bsp::Cellular* cellular);
 
     int ProcessNewData();
 
@@ -55,8 +47,6 @@ private:
 
     std::vector<Urc> ParseURC();
 
-    MuxDaemon* mux = nullptr;
-    InOutSerialWorker* inOutSerialWorker = nullptr;
     bsp::Cellular* cellular = nullptr;
 
     std::string responseBuffer;

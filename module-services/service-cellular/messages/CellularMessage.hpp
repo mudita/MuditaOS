@@ -44,6 +44,7 @@ public:
         SignalStrengthUpdate,	//update of the strength of the network's signal.
         ServiceReady,			//Idle state of the service. This is a start state before any call is initialized by user or by network.
 								//service returns to this state when call is finished.
+        PowerUpProcedureComplete
     };
 
 

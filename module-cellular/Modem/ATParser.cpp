@@ -12,24 +12,8 @@
 #include "ATParser.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "ticks.hpp"
-#include "InOutSerialWorker.hpp"
-#include "MuxDaemon.hpp"
 
-std::optional<std::unique_ptr<ATParser>>
-ATParser::Create(MuxDaemon *mux, InOutSerialWorker *inOutSerial, bsp::Cellular *cellular) {
-    auto inst = std::make_unique<ATParser>(mux, inOutSerial, cellular);
-
-    if (inst->isInitialized) {
-        return inst;
-    } else {
-        return {};
-    }
-}
-
-ATParser::ATParser(MuxDaemon *mux, InOutSerialWorker *inOutSerial, bsp::Cellular *cellular) : mux(mux),
-                                                                                              inOutSerialWorker(
-                                                                                                      inOutSerial),
-                                                                                              cellular(cellular) {
+ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
     isInitialized = true;
 }
 
@@ -110,7 +94,7 @@ int ATParser::ProcessNewData() {
         // 5) +QIND: PB DONE
         if (urcs.size() == 5) {
             cpp_freertos::LockGuard lock(mutex);
-            mux->callback(NotificationType ::PowerUpProcedureComplete,"");
+            //mux->callback(NotificationType ::PowerUpProcedureComplete,"");
             responseBuffer.erase();
             urcs.clear();
         }
@@ -128,8 +112,9 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     }
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
-    auto cmdSigned = const_cast<char *>(cmd);
-    inOutSerialWorker->WriteData(reinterpret_cast<unsigned char *>(cmdSigned), strlen(cmd));
+    //auto cmdSigned = const_cast<char *>(cmd);
+    //inOutSerialWorker->WriteData(reinterpret_cast<unsigned char *>(cmdSigned), strlen(cmd));
+    cellular->Write((void*)cmd, strlen(cmd));
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
