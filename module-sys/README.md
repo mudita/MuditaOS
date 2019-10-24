@@ -102,7 +102,7 @@ There are three main assumptions:
 Most information about design and implementation can be found in [AND_0011_PowerManager](https://docs.google.com/document/d/1G1HUFEPGblu3_VDrDdwF1nVqKwMz6sz1nGOgMEmhJgs/edit#heading=h.gm0is2hpfho6).
 
 Additionally current implementation of PowerManager(it should be considered as first iteration of development and absolutely it cannot be treated as final solution) is very simple but it proved to be working and it fulfilled current requirements.
-For the time being PowerManager exposes two methods which are internally used by SystemManager:
+For the time being PowerManager class exposes two methods which are internally used by SystemManager:
 #### `int32_t Switch(const Mode mode)`
 This method allows for switching CPU to different modes which are listed below:
 ````
@@ -125,25 +125,25 @@ Actual code is implemented in `module-bsp/board/rt1051/bsp/lpm/RT1051LPM.cpp` an
 
 Research was done about using `Suspend` state and it resulted in several conclusions:
 * It is not possible to use it in PureOS  
-This is mostly due to software design which is run from external SDRAM. It is almost impossible in current state of the system to
-switch to suspend state and gracefully exit from it when code is invoked from SDRAM.
+This is mostly due to software design where app code is executed from external SDRAM. It is almost impossible in current state of the system to
+switch to suspend state and gracefully return to normal state when code is placed into SDRAM.
 * It is not necessary to use `Suspend` state in order to fulfill business requirements (5mA in aeroplane mode)  
-By clever use of SDRAM clock scaling and custom LowPowerIdle mode we were able to achieve even lower current consumption(3,9mA) which is more than
+By clever use of SDRAM clock scaling and custom LowPowerIdle mode we were able to achieve even lower current consumption(1,98mA) which is more than
 enough.
 
 Based on above use of `Suspend` mode is not necessary and was dropped.
 
-`LowPowerRun` mode is only listed for convenience as it is not even programmed.
+`LowPowerRun` mode is only listed for convenience as it is not even implemented.
 
 #### `int32_t PowerOff()`
 This method is used to turn off power supply to system. It is invoked by SystemManager after successful system close. 
 
 ### Features missing or to be considered:
 #### Dynamic clock frequency scaling during normal operation 
-This is optional feature but by implementing it we would be able to limit current consumption during normal operation. 
+This is optional feature but by implementing it we will be able to limit current consumption during normal operation. 
 
 #### More sophisticated mechanism of entering and exiting from low power mode
-Currently whole mechanism of putting services into low power mode is very simple. There are no additional checks being made and there is no
+Currently whole mechanism of switching services into low power mode is very simple. There are no additional checks being made and there is no
 possibility to disable auto-lock feature and so on. Another thing is that most of the low-power logic is placed into ApplicationManager which unfortunately is
 bad design choice. It is to be considered if current solution will be sufficient or not. It is very possible that more advanced mechanism of communication between
 PowerManager and system logic will have to be designed and developed.
