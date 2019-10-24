@@ -8,6 +8,7 @@
 #include "BottomBar.hpp"
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -62,15 +63,15 @@ gui::Label* BottomBar::prepareLabel( BottomBar::Side side ) {
 	switch( side ) {
 		case Side::LEFT:
 			label->setAlignement( gui::Alignment(	gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER ));
-			label->setFont("gt_pressura_regular_18");
+			label->setFont(style::footer::font::medium);
 			break;
 		case Side::CENTER:
 			label->setAlignement( gui::Alignment(	gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER ));
-			label->setFont("gt_pressura_bold_18");
+			label->setFont(style::footer::font::bold);
 			break;
 		case Side::RIGHT:
 			label->setAlignement( gui::Alignment(	gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER ));
-			label->setFont("gt_pressura_regular_18");
+			label->setFont(style::footer::font::medium);
 			break;
 	};
 

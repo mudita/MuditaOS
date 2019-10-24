@@ -14,7 +14,6 @@ namespace gui {
 
 class PhonebookMainWindow : public AppWindow {
   protected:
-    gui::Label *title = nullptr;
     PhonebookListView* list;
     PhonebookModel* phonebookModel = nullptr;
 
@@ -30,8 +29,7 @@ class PhonebookMainWindow : public AppWindow {
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
     void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
-    bool onDatabaseMessage( sys::Message* msgl );
+    bool onDatabaseMessage( sys::Message* msgl ) override;
 
     void rebuild() override;
     void buildInterface() override;

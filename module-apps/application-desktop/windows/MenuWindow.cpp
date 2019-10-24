@@ -13,24 +13,19 @@
 #include "Item.hpp"
 
 #include "i18/i18.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
 
 MenuPage::MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_t h,
 		const std::vector<TileDescription>& tilesDescription,
-		const UTF8& titleName, MenuPage::PageID id ) :
+		MenuPage::PageID id ) :
 	Rect( parent, x, y, w, h ),
 	id{ id }{
 
 	setBorderColor( ColorNoColor );
 	setFilled( false );
-
-	title = new gui::Label( this, 0, 0, 480, 50 );
-	title->setBorderColor( gui::ColorNoColor );
-	title->setFont("gt_pressura_regular_24");
-	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	title->setText( titleName );
 
 	uint32_t rowCount = tilesDescription.size()/3;
 
@@ -49,7 +44,7 @@ MenuPage::MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_
 
 		gui::Label* titleDesc = new gui::Label( tile, 0, 0, tile->widgetArea.w, 103);
 		titleDesc->setBorderColor( gui::ColorNoColor );
-		titleDesc->setFont("gt_pressura_regular_16");
+		titleDesc->setFont(style::window::font::small);
 		titleDesc->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 		titleDesc->setText( utils::localize.get(tileString.i18Desctiption) );
 
@@ -152,9 +147,9 @@ void MenuWindow::buildInterface() {
 			return true; }},
 	};
 
-	MenuPage* page1 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page1Definitions,
-		utils::localize.get("app_desktop_menu_title"), MenuPage::PageID::MainPage);
-	pages.push_back( page1 );
+	MenuPage* page1 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page1Definitions, MenuPage::PageID::MainPage);
+	pages.push_back(page1);
+    page_name.push_back(utils::localize.get("app_desktop_menu_title"));
 
 	//PAGE 2
 	std::vector<TileDescription> page2Definitions {
@@ -165,9 +160,11 @@ void MenuWindow::buildInterface() {
 		TileDescription{"menu_tools_recorder",  "app_desktop_tools_recorder",[=] (gui::Item& item){ return true; }},
 	};
 
-	MenuPage* page2 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page2Definitions,
-		utils::localize.get("app_desktop_tools_title"), MenuPage::PageID::ToolsPage );
+	MenuPage* page2 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page2Definitions, MenuPage::PageID::ToolsPage );
 	pages.push_back( page2 );
+    page_name.push_back(utils::localize.get("app_desktop_tools_title"));
+
+    setTitle(page_name[currentPage]);
 }
 void MenuWindow::destroyInterface() {
 	AppWindow::destroyInterface();
@@ -193,6 +190,14 @@ void MenuWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 	
 	if(( inputEvent.state == InputEvent::State::keyReleasedShort ) || ( inputEvent.state == InputEvent::State::keyReleasedLong )) {
+		// putsh enter on tile number on key press (press 9 to enter 9th tile)
+		int num = gui::toNumeric(inputEvent.keyCode) - 1;
+		/// size is unsigned, creating int() to avoid warning
+		if((num > 0) && int(num < (pages[currentPage]->tiles.size()))) {
+			LOG_ERROR("RUN tile with enter -> %d %d", num,pages[currentPage]->tiles.size());
+			auto el = Item();
+			return pages[currentPage]->tiles[num]->activatedCallback(el);
+		}
 		switch( inputEvent.keyCode ) {
 			case KeyCode::KEY_ENTER:
 				LOG_INFO("Enter pressed");
@@ -226,6 +231,7 @@ void MenuWindow::switchPage( uint32_t index ) {
 	//give focus to element
 	Item* item = pages[currentPage]->tiles[0];
 	setFocusItem(item);
+    setTitle(page_name[currentPage]);
 	application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP );
 }
 

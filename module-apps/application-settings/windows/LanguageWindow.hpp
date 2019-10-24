@@ -27,7 +27,6 @@ namespace gui {
 class LanguageWindow: public AppWindow {
 protected:
 	std::vector<gui::Item*> options;
-	gui::Label* title = nullptr;
 
 	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
 public:

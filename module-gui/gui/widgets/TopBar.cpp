@@ -13,6 +13,7 @@
 #include "Image.hpp"
 #include "TopBar.hpp"
 #include <time/time_conversion.hpp>
+#include "Style.hpp"
 
 namespace gui {
 
@@ -76,7 +77,7 @@ void TopBar::prepareWidget() {
 	timeLabel = new Label(this, 0, 0, 480, this->drawArea.h );
 	timeLabel->setFilled( false );
 	timeLabel->setBorderColor( gui::ColorNoColor );
-	timeLabel->setFont("gt_pressura_bold_24");
+	timeLabel->setFont(style::header::font::time);
 	timeLabel->setText("00:00");
 	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 }

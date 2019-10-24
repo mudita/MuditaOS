@@ -20,6 +20,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "service-cellular/ServiceCellular.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -57,7 +58,7 @@ void PowerOffWindow::buildInterface() {
 	titleLabel = new gui::Label(this, 0, 60, 480, 40);
 	titleLabel->setFilled( false );
 	titleLabel->setBorderColor( gui::ColorFullBlack );
-	titleLabel->setFont("gt_pressura_regular_24");
+	titleLabel->setFont(style::header::font::title);
 	titleLabel->setText(utils::localize.get("app_desktop_poweroff_title"));
 	titleLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 	titleLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
@@ -66,7 +67,7 @@ void PowerOffWindow::buildInterface() {
 	infoLabel = new gui::Label(this, 0, 294, 480, 30);
 	infoLabel->setFilled( false );
 	infoLabel->setBorderColor( gui::ColorNoColor );
-	infoLabel->setFont("gt_pressura_regular_24");
+	infoLabel->setFont(style::window::font::medium);
 	infoLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 	infoLabel->setText( utils::localize.get("app_desktop_poweroff_question") );
 
@@ -80,7 +81,7 @@ void PowerOffWindow::buildInterface() {
 		label->setPenWidth(0);
 		label->setPenFocusWidth(2);
 		label->setRadius(5);
-		label->setFont("gt_pressura_regular_24");
+		label->setFont(style::window::font::medium);
 		label->setEdges( RectangleEdgeFlags::GUI_RECT_ALL_EDGES );
 		label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 		selectionLabels.push_back( label );
@@ -98,7 +99,7 @@ void PowerOffWindow::buildInterface() {
 	eventMgrLabel->setPenWidth(0);
 	eventMgrLabel->setPenFocusWidth(2);
 	eventMgrLabel->setRadius(5);
-	eventMgrLabel->setFont("gt_pressura_bold_24");
+	eventMgrLabel->setFont(style::window::font::bigbold);
 	eventMgrLabel->setText( "TURN PWR MGR OFF" );
 	eventMgrLabel->setEdges( RectangleEdgeFlags::GUI_RECT_ALL_EDGES );
 	eventMgrLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));

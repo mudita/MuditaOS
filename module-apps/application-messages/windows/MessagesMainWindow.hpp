@@ -24,7 +24,6 @@ namespace gui {
 
 class MessagesMainWindow: public AppWindow {
   protected:
-    gui::Label *title = nullptr;
 //    PhonebookListView* list;
 //    PhonebookModel* phonebookModel = nullptr;
 

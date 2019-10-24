@@ -17,6 +17,7 @@
 #include "gui/widgets/BoxLayout.hpp"
 #include "gui/core/ImageManager.hpp"
 #include "../ClockData.hpp"
+#include <Style.hpp>
 
 
 namespace gui {
@@ -31,14 +32,14 @@ ClockMainWindow::ClockMainWindow( app::Application* app ) : gui::AppWindow( app,
 	hourLabel = new gui::Label(this, 100+xOffset,300-160+yOffset,280,150);
 	hourLabel->setFilled( false );
 	hourLabel->setBorderColor( gui::ColorNoColor );
-	hourLabel->setFont("gt_pressura_regular_140");
+	hourLabel->setFont(style::window::font::verybig);
 	hourLabel->setText("00");
 	hourLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
 	minuteLabel = new gui::Label(this, 100+xOffset,310+yOffset,280,150);
 	minuteLabel->setFilled( false );
 	minuteLabel->setBorderColor( gui::ColorFullBlack );
-	minuteLabel->setFont("gt_pressura_regular_140");
+	minuteLabel->setFont(style::window::font::verybig);
 	minuteLabel->setText("00");
 	minuteLabel->setRadius( 20 );
 	minuteLabel->setPenWidth(1);
