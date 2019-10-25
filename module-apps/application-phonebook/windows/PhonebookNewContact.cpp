@@ -326,7 +326,7 @@ void PhonebookNewContact::switchPage( uint32_t page ) {
 	}
 }
 
-void PhonebookNewContact::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data) {
 	switchPage(0);
 	setFocusItem(page1.text[0]);
 	page2.favSelected = false;
@@ -395,10 +395,6 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 			setFocusItem(page1.text[4]);
 			application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
 		}
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
-		return true;
 	}
 
 	return false;

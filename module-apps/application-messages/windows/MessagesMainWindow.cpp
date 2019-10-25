@@ -92,7 +92,7 @@ MessagesMainWindow::~MessagesMainWindow() {
 }
 
 
-void MessagesMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) {
+void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 //	setFocusItem(list);
 
 //	phonebookModel->clear();
@@ -104,35 +104,7 @@ void MessagesMainWindow::onBeforeShow(ShowMode mode, uint32_t command, SwitchDat
 
 bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
 	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
-			application->render( RefreshModes::GUI_REFRESH_FAST );
-		return true;
-	}
-
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return false;
-
-//    if( inputEvent.keyCode == KeyCode::KEY_LEFT) {
-//        LOG_INFO("Adding new contact");
-//        application->switchWindow("NewContact",0,nullptr);
-//    }
-//    else
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Entering thread");
-//		application->switchWindow("SearchWindow",0, nullptr );
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationDesktop", "MenuWindow", nullptr );
-		return true;
-	}
-
-	return false;
-
+	return AppWindow::onInput( inputEvent );
 }
 
 bool MessagesMainWindow::onDatabaseMessage( sys::Message* msgl ) {

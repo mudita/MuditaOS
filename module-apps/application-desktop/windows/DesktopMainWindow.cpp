@@ -112,7 +112,7 @@ void DesktopMainWindow::setVisibleState() {
 	}
 }
 
-void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//update time
 	time->setText( topBar->getTimeString() );
@@ -132,11 +132,10 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchDat
 }
 
 bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
+	
+	// do nothing
+	if( inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_RF ) return false;
+	
 	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 
 	//process shortpress
@@ -155,13 +154,13 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 					if( app->getPinLocked())
 						//if there was no application on to before closing proceed normally to pin protection window.
 						if( lockTimeoutApplilcation.empty()) {
-							application->switchWindow( "PinLockWindow", 0, nullptr );
+							application->switchWindow( "PinLockWindow" );
 						}
 						else {
 							std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>();
 							data->setPrevApplication( lockTimeoutApplilcation );
 							lockTimeoutApplilcation = "";
-							application->switchWindow( "PinLockWindow", 0, std::move(data) );
+							application->switchWindow( "PinLockWindow", std::move(data) );
 						}
 
 					else {
@@ -189,7 +188,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		else {
 			//pressing enter moves user to menu screen
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-				application->switchWindow( "MenuWindow", 0, nullptr );
+				application->switchWindow( "MenuWindow" );
 			}
 			//if numeric key was pressed record that key and send it to call application with a switch command
 			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
@@ -215,10 +214,12 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 		//long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
-			application->switchWindow( "PowerOffWindow", 0, nullptr );
+			application->switchWindow( "PowerOffWindow" );
 		}
 	}
-	return false;
+
+	//check if any of the lower inheritance onInput methods catch the event
+	return AppWindow::onInput( inputEvent );
 }
 
 void DesktopMainWindow::rebuild() {

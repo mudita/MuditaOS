@@ -169,7 +169,7 @@ void PinLockWindow::setVisibleState( const State& state ) {
 	}
 }
 
-void PinLockWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void PinLockWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//check if there was a signal to lock the phone due to inactivity.
 	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
@@ -184,11 +184,6 @@ void PinLockWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* d
 }
 
 bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
 	if( inputEvent.state == gui::InputEvent::State::keyReleasedShort ) {
 		//accept only LF, enter, RF, #, and numeric values
 		if( state == State::EnteringPin ) {
@@ -196,7 +191,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				return true;
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-				application->switchWindow( "MainWindow", 0, nullptr );
+				application->switchWindow( "MainWindow" );
 				return true;
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_PND ) {
@@ -219,7 +214,7 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 
 						//if there is no application to return to simply return to main window
 						if( lockTimeoutApplilcation.empty()) {
-							application->switchWindow("MainWindow", 0, nullptr );
+							application->switchWindow( "MainWindow" );
 						}
 						else {
 							lockTimeoutApplilcation = "";
@@ -269,18 +264,19 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
 				state = State::EnteringPin;
-				application->switchWindow( "MainWindow", 0, nullptr );
+				application->switchWindow( "MainWindow" );
 			}
 		}
 		else if( state == State::PhoneBlocked) {
 			if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-				application->switchWindow( "MainWindow", 0, nullptr );
+				application->switchWindow( "MainWindow" );
 				return true;
 			}
 		}
 	}
 
-	return false;
+	//check if any of the lower inheritance onInput methods catch the event
+	return AppWindow::onInput( inputEvent );
 }
 
 } /* namespace gui */
