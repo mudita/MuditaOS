@@ -182,7 +182,7 @@ MenuWindow::~MenuWindow() {
 	destroyInterface();
 }
 
-void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void MenuWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//select middle row and middle column to assign focus to the element.
 	Item* item = pages[currentPage]->tiles[0];
@@ -191,38 +191,33 @@ void MenuWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data
 }
 
 bool MenuWindow::onInput( const InputEvent& inputEvent ) {
+	
+	if(( inputEvent.state == InputEvent::State::keyReleasedShort ) || ( inputEvent.state == InputEvent::State::keyReleasedLong )) {
+		switch( inputEvent.keyCode ) {
+			case KeyCode::KEY_ENTER:
+				LOG_INFO("Enter pressed");
+				break;
+			case KeyCode::KEY_RF: {
+				if( pages[currentPage]->getID() == MenuPage::PageID::ToolsPage ) {
+					switchPage(0);
+				}
+				else {
+					application->switchWindow( "MainWindow" );
+				}
+				return true;
+			}
+			default:
+				break; 
+		}	
+	} 
+	
 	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		application->render( RefreshModes::GUI_REFRESH_FAST );
-		return true;
-	}
-
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return true;
-
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		if( pages[currentPage]->getID() == MenuPage::PageID::ToolsPage ) {
-			switchPage(0);
-		}
-		else {
-			application->switchWindow( "MainWindow", 0, nullptr );
-		}
-		return true;
-	}
-
-	return false;
+	return AppWindow::onInput( inputEvent );
 }
 
 void MenuWindow::switchPage( uint32_t index ) {
 	//check if index hase valid value
-	if( index >= pages.size())
-		return;
+	if( index >= pages.size()) return;
 
 	//set visibility of all pages to false
 	pages[currentPage]->setVisible(false);
@@ -231,7 +226,7 @@ void MenuWindow::switchPage( uint32_t index ) {
 	//give focus to element
 	Item* item = pages[currentPage]->tiles[0];
 	setFocusItem(item);
-	application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP 	 );
+	application->refreshWindow( RefreshModes::GUI_REFRESH_DEEP );
 }
 
 } /* namespace gui */

@@ -182,7 +182,7 @@ PowerOffWindow::~PowerOffWindow() {
 	destroyInterface();
 }
 
-void PowerOffWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void PowerOffWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	//on entering screen always set default result as returning to home screen and set focus to "No" label
 	state = State::Return;
 	setFocusItem( selectionLabels[0] );
@@ -191,9 +191,7 @@ void PowerOffWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* 
 
 bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		application->render(RefreshModes::GUI_REFRESH_FAST);
+	if( AppWindow::onInput( inputEvent ) ) { // TODO: alek: test it
 		return true;
 	}
 
@@ -201,16 +199,14 @@ bool PowerOffWindow::onInput( const InputEvent& inputEvent ) {
 	if( inputEvent.state != gui::InputEvent::State::keyReleasedShort )
 		return true;
 
-	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
-	}
+
 	//if enter was pressed check state and power down or return to main desktop's window
-	else if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
+	if (inputEvent.keyCode == KeyCode::KEY_ENTER) {
 		if( state == State::PowerDown ){
 			//TODO start powering down procedure
 		}
 		else {
-			application->switchWindow( "MainWindow", 0, nullptr );
+			application->switchWindow( "MainWindow" );
 		}
 	}
 
