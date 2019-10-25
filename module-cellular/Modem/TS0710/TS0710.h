@@ -209,6 +209,7 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include "TS0710_types.h"
 #include "DLC_channel.h"
 #include "TS0710_Frame.h"
+#include "Modem/ATParser.hpp"
 
 #if defined (__cplusplus)
     extern "C"{
@@ -233,7 +234,8 @@ private:
     xTaskHandle taskHandle=nullptr;
     const uint32_t taskPriority = 0;
     std::unique_ptr<bsp::Cellular> pv_cellular;
-    TS0710_START::PortSpeed_e pv_portSpeed;
+    PortSpeed_e pv_portSpeed;
+    ATParser *parser;
 
     enum class Mode{
         AT,
@@ -248,7 +250,10 @@ private:
         if (response.size() == 1 && response[0] == "OK") {
             return true;
         } else {
-            LOG_ERROR("Invalid response");
+            std::string resp;
+            for (std::string s : response)
+                resp.append(s);
+            LOG_ERROR("Invalid response: %s", resp.c_str());
             return false;
         }
     }
@@ -302,7 +307,7 @@ public:
     ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
 
 
-TS0710(TS0710_START::PortSpeed_e portSpeed);
+TS0710(PortSpeed_e portSpeed);
 ~TS0710();
 
 //Add error handling - only for Advanced mode. Leave for now

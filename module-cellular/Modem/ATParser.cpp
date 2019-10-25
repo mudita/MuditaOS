@@ -74,10 +74,12 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
 int ATParser::ProcessNewData() {
     char rawBuffer[256] = {0};
 
+    LOG_DEBUG("Receiving data from ProcessNewData");
     auto length = cellular->Read(rawBuffer, sizeof(rawBuffer));
 
     {
         cpp_freertos::LockGuard lock(mutex);
+        LOG_DEBUG("Appending %i bytes to responseBuffer", length);
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
     }
 
@@ -95,6 +97,7 @@ int ATParser::ProcessNewData() {
         if (urcs.size() == 5) {
             cpp_freertos::LockGuard lock(mutex);
             //mux->callback(NotificationType ::PowerUpProcedureComplete,"");
+            LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();
             urcs.clear();
         }
@@ -111,6 +114,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
         responseBuffer.erase();
     }
 
+    LOG_DEBUG("[AT]: %s", cmd);
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     //auto cmdSigned = const_cast<char *>(cmd);
     //inOutSerialWorker->WriteData(reinterpret_cast<unsigned char *>(cmdSigned), strlen(cmd));
@@ -146,6 +150,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
     blockedTaskHandle = nullptr;
     responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
+    LOG_DEBUG("AT command returning %i tokens", tokens.size());
     return tokens;
 }
 

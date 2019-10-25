@@ -59,6 +59,7 @@ ServiceCellular::ServiceCellular()
             case CellularNotificationMessage::Type::CallBusy:
             case CellularNotificationMessage::Type::CallActive:
             case CellularNotificationMessage::Type::CallAborted:
+            case CellularNotificationMessage::Type::None:
                 // no data field is used
                 break;
 
@@ -107,7 +108,7 @@ void ServiceCellular::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
-    cmux = new TS0710(TS0710_START::PortSpeed_e::PS460800);
+    cmux = new TS0710(PortSpeed_e::PS460800);
 
     DLC_channel *notificationsChannel = cmux->GetChannel("Notifications");  //open channel - notifications
     
@@ -212,8 +213,14 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                    auto audioRet = cmux->AudioConfProcedure();
                    if(audioRet == TS0710::ConfState::Success){
 
-                       cmux->StartMultiplexer();
-                       LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+                        if (cmux->StartMultiplexer() == TS0710::ConfState::Success) {
+                            LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+                            state = State::Ready;
+                        }
+                        else {
+                            LOG_DEBUG("[ServiceCellular] Modem FAILED");
+                            state = State::Failed;
+                        }
 
                        state = State::Ready;
                        // Propagate "ServiceReady" notification into system
@@ -363,5 +370,7 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
 
         return CellularNotificationMessage::Type::SignalStrengthUpdate;
     }
+
+    return CellularNotificationMessage::Type::None;
 
 }

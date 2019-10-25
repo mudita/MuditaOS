@@ -14,7 +14,7 @@ class TS0710_START {
 public: 
 
 enum class Mode_e { Basic, HDLC_UIH_frames, HDLC_UI_frames, HDLC_frames }; 
-enum class PortSpeed_e { PS2400, PS4800, PS7200, PS9600, PS19200, PS38400, PS57600, PS115200, PS230400, PS460800 };
+//enum class PortSpeed_e { PS2400, PS4800, PS7200, PS9600, PS19200, PS38400, PS57600, PS115200, PS230400, PS460800 };
  
 struct START_SystemParameters_t {
     PortSpeed_e PortSpeed;          //!< Port speed
@@ -25,9 +25,9 @@ struct START_SystemParameters_t {
     int WakeUpRespTime;             //!< Wake up response timer [1s-255s, default: 10s]
     int ErrRecovWindowSize;         //!< Window size for error recovery mode [1-7, default: 2]
 };
-std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text = { {PortSpeed_e::PS9600, 1}, {PortSpeed_e::PS19200, 2}, {PortSpeed_e::PS38400, 3}, {PortSpeed_e::PS57600, 4}, {PortSpeed_e::PS115200, 5}, {PortSpeed_e::PS230400, 6}, {PortSpeed_e::PS460800, 7} };
-std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {PortSpeed_e::PS19200, 19200}, {PortSpeed_e::PS38400, 38400}, {PortSpeed_e::PS57600, 57600}, {PortSpeed_e::PS115200, 115200}, {PortSpeed_e::PS230400, 230400}, {PortSpeed_e::PS460800, 460800} };
-std::map<PortSpeed_e, speed_t> LinuxTermPortSpeeds_text = { {PortSpeed_e::PS9600, B9600}, {PortSpeed_e::PS19200, B19200}, {PortSpeed_e::PS38400, B38400}, {PortSpeed_e::PS57600, B57600}, {PortSpeed_e::PS115200, B115200}, {PortSpeed_e::PS230400, B230400}, {PortSpeed_e::PS460800, B460800} };
+// std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text = { {PortSpeed_e::PS9600, 1}, {PortSpeed_e::PS19200, 2}, {PortSpeed_e::PS38400, 3}, {PortSpeed_e::PS57600, 4}, {PortSpeed_e::PS115200, 5}, {PortSpeed_e::PS230400, 6}, {PortSpeed_e::PS460800, 7} };
+// std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {PortSpeed_e::PS19200, 19200}, {PortSpeed_e::PS38400, 38400}, {PortSpeed_e::PS57600, 57600}, {PortSpeed_e::PS115200, 115200}, {PortSpeed_e::PS230400, 230400}, {PortSpeed_e::PS460800, 460800} };
+// std::map<PortSpeed_e, speed_t> LinuxTermPortSpeeds_text = { {PortSpeed_e::PS9600, B9600}, {PortSpeed_e::PS19200, B19200}, {PortSpeed_e::PS38400, B38400}, {PortSpeed_e::PS57600, B57600}, {PortSpeed_e::PS115200, B115200}, {PortSpeed_e::PS230400, B230400}, {PortSpeed_e::PS460800, B460800} };
 
 private:
     Mode_e pv_mode;
