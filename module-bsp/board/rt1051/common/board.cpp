@@ -11,6 +11,7 @@
 #include "fsl_common.h"
 #include "board.h"
 #include "fsl_clock.h"
+#include "fsl_dcdc.h"
 #include "pin_mux.h"
 
 #include "irq/irq_gpio.hpp"
@@ -192,6 +193,9 @@ namespace bsp {
         BOARD_InitDebugConsole();
 
         irq_gpio_Init();
+
+        // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
+        DCDC_BootIntoDCM(DCDC);
 
         PrintSystemClocks();
     }

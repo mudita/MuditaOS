@@ -1336,18 +1336,11 @@ void LPM_EnterFullSpeed(void)
     /* Switch DCDC to use DCDC external OSC */
     DCDC_SetClockSource(DCDC, kDCDC_ClockExternalOsc);
 
-    /* CCM Mode */
-    //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
-    //DCDC_BootIntoCCM(DCDC);
-
     /* Connect internal the load resistor */
     DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
 
     /* Adjust SOC voltage to 1.275V */
     DCDC_AdjustTargetVoltage(DCDC, 0x13, 0x1);
-
-    dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=false};
-    DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
 
     /* Disable FET ODRIVE */
     PMU->REG_CORE_SET &= ~PMU_REG_CORE_FET_ODRIVE_MASK;
@@ -1437,21 +1430,15 @@ void LPM_EnterLowPowerIdle(void)
     /* Power down USBPHY */
     PowerDownUSBPHY();
 
-    /* Adjust SOC voltage to 0.95V */
-    DCDC_AdjustTargetVoltage(DCDC, 0x6, 0x1);
+    /* Adjust SOC voltage to 0.90V */
+    DCDC_AdjustTargetVoltage(DCDC, 0x4, 0x0);
     /* Switch DCDC to use DCDC internal OSC */
     DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
 
-    /* DCM Mode */
-    //TODO:M.P: temporarily disabled, it causes current consumption to increase by ~2mA,
-    //DCDC_BootIntoDCM(DCDC);
     /* Disconnect internal the load resistor */
     DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
     /* Power Down output range comparator */
     DCDC->REG0 |= DCDC_REG0_PWD_CMP_OFFSET_MASK;
-
-    dcdc_min_power_config_t dcdcconf = {.enableUseHalfFreqForContinuous=true};
-    DCDC_SetMinPowerConfig(DCDC,&dcdcconf);
 
     /* Enable FET ODRIVE */
     PMU->REG_CORE_SET = PMU_REG_CORE_FET_ODRIVE_MASK;
