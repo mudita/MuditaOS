@@ -40,6 +40,8 @@ protected:
 	 */
 	app::Application* application = nullptr;
 	uint32_t calculateBatteryLavel( uint32_t percentage );
+
+	std::string prevWindow = "";
 public:
 
 	AppWindow( app::Application* app, std::string name, uint32_t id=GUIWindowID++ );
@@ -60,7 +62,11 @@ public:
 	void rebuild() override;
 	void buildInterface() override;
 	void destroyInterface() override;
+	bool onInput( const InputEvent& inputEvent ) override;
 	std::list<DrawCommand*> buildDrawList() override;
+
+	void setPrevWindow( const std::string& prevWindow ) { this->prevWindow = prevWindow; };
+	const std::string& getPrevWindow() const { return prevWindow; };
 };
 
 } /* namespace gui */

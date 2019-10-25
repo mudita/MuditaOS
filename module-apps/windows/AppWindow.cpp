@@ -7,8 +7,9 @@
  * @details
  */
 #include "i18/i18.hpp"
-#include "AppWindow.hpp"
 #include "Application.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
+#include "AppWindow.hpp"
 
 namespace gui {
 
@@ -99,5 +100,28 @@ std::list<DrawCommand*> AppWindow::buildDrawList() {
 }
 
 bool AppWindow::onDatabaseMessage( sys::Message* msg ){ return false; }
+
+bool AppWindow::onInput( const InputEvent& inputEvent) {
+
+	//check if any of the lower inheritance onInput methods catch the event
+	if( Window::onInput( inputEvent ) ) {
+		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) application->render( RefreshModes::GUI_REFRESH_FAST );
+		return true;
+	}
+
+	//process only if key is released
+	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
+
+	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+		if( prevWindow == getName() ) { 
+			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+		} else {
+			application->switchWindow( prevWindow, gui::ShowMode::GUI_SHOW_RETURN );
+		}
+		return true;
+	}
+
+	return false;
+}
 
 } /* namespace gui */
