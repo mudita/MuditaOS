@@ -7,6 +7,7 @@
  * @details
  */
 #include "NotesItem.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -24,19 +25,19 @@ NotesItem::NotesItem(NotesModel* model, bool mode24H) : model{model}, mode24H{mo
 	hour = new gui::Label( this, 0,0,0,0);
 	hour->setPenFocusWidth(0);
 	hour->setPenWidth(0);
-	hour->setFont("gt_pressura_regular_24");
+	hour->setFont(style::window::font::medium);
 	hour->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP } );
 
 	title = new gui::Label( this, 0,0,0,0);
 	title->setPenFocusWidth(0);
 	title->setPenWidth(0);
-	title->setFont("gt_pressura_bold_24");
+	title->setFont(style::window::font::bigbold);
 	title->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_TOP } );
 
 	snippet = new gui::Label( this, 0,0,0,0);
 	snippet->setPenFocusWidth(0);
 	snippet->setPenWidth(0);
-	snippet->setFont("gt_pressura_regular_16");
+	snippet->setFont(style::window::font::small);
 	snippet->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER} );
 
 }

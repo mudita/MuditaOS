@@ -25,8 +25,6 @@ class PhonebookItem: public ListItem {
 	std::shared_ptr<ContactRecord> contact = nullptr;
 	//this is contact's name and surname or "favourites" or "first letter of surname
 	gui::Label* value = nullptr;
-	static const std::string boldFont;
-	static const std::string normalFont;
 	bool favourite = false;
 public:
 	PhonebookItem( PhonebookModel* model );

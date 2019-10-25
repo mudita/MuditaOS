@@ -13,7 +13,7 @@
 #include "utf8/UTF8.hpp"
 #include "../core/Font.hpp"
 #include "Text.hpp"
-
+#include <Style.hpp>
 
 namespace gui {
 
@@ -26,14 +26,10 @@ Text::TextLine::TextLine( const UTF8& text, uint32_t startIndex, uint32_t endInd
 
 }
 
-Text::Text() :
-	Rect(),
-	expandMode{ expandMode},
-	textType{ textType} {
-
+Text::Text() {
 	setPenWidth( 1 );
 	setPenFocusWidth( 3 );
-	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
+	uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
 	font = FontManager::getInstance().getFont(fontID);
 
 	cursor = new Rect( this, 0,0,1,1);
@@ -57,7 +53,7 @@ Text::Text( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 
 	setPenWidth( 1 );
 	setPenFocusWidth( 3 );
-	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
+	uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
 	font = FontManager::getInstance().getFont(fontID);
 
 	cursor = new Rect( this, 0,0,1,1);

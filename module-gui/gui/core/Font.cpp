@@ -15,6 +15,7 @@
 #include "log/log.hpp"
 //for loading files
 #include "vfs.hpp"
+#include <cassert>
 
 
 namespace gui {
@@ -430,16 +431,27 @@ FontManager& FontManager::getInstance(){
 }
 
 Font* FontManager::getFont( uint32_t id ) {
-	if( id >= fonts.size())
+	if( id >= fonts.size()) {
+        LOG_ERROR("Font not found! id: %d", id);
 		return nullptr;
+    }
 	return fonts[id];
 }
 uint32_t FontManager::getFontID( const std::string& name ) {
-	for( uint32_t i=0; i<fonts.size(); i++ ) {
-		if( name.compare( fonts[i]->info.face ) == 0 )
-			return i;
+    bool found = false;
+    uint32_t i;
+	for( i=0; i<fonts.size(); i++ ) {
+		if( name.compare( fonts[i]->info.face ) == 0 ) {
+            found = true;
+			break;
+        }
 	}
-	return 0;
+    if(!found) {
+        LOG_ERROR("=> font not found: %s", name.c_str());
+        LOG_ERROR("Using default!");
+        return 0;
+    }
+	return i;
 }
 
 } /* namespace gui */

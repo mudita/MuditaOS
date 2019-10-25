@@ -20,7 +20,7 @@
 
 #include "i18/i18.hpp"
 #include <time/time_conversion.hpp>
-
+#include <Style.hpp>
 
 namespace gui {
 
@@ -39,14 +39,14 @@ void DesktopMainWindow::buildInterface() {
 	time = new gui::Label(this, 20, 90, 280, 116 );
 	time->setFilled( false );
 	time->setBorderColor( gui::ColorNoColor );
-	time->setFont("gt_pressura_light_84");
+	time->setFont(style::window::font::verybig);
 	time->setText("12:07");
 	time->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	dayText = new gui::Label(this, 264, 108, 190, 42 );
 	dayText->setFilled( false );
 	dayText->setBorderColor( gui::ColorNoColor );
-	dayText->setFont("gt_pressura_light_24");
+	dayText->setFont(style::window::font::medium);
     auto time = utils::time::SysTime();
 	dayText->setText(time.day());
 	dayText->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
@@ -54,14 +54,14 @@ void DesktopMainWindow::buildInterface() {
 	dayMonth = new gui::Label(this, 264, 150, 190, 42 );
 	dayMonth->setFilled( false );
 	dayMonth->setBorderColor( gui::ColorNoColor );
-	dayMonth->setFont("gt_pressura_light_24");
+	dayMonth->setFont(style::window::font::medium);
 	dayMonth->setText(time.str("%d %B"));
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
 	notificationCalls = new gui::Text(this, 86, 255, 350, 70 );
 	notificationCalls->setFilled( false );
 	notificationCalls->setBorderColor( gui::ColorNoColor );
-	notificationCalls->setFont("gt_pressura_light_24");
+	notificationCalls->setFont(style::window::font::medium);
 	UTF8 calls = "2 " + utils::localize.get("app_desktop_missed_calls");
 	notificationCalls->setText(calls);
 
@@ -69,7 +69,7 @@ void DesktopMainWindow::buildInterface() {
 	notificationMessages = new gui::Text(this, 86, 330, 350, 70 );
 	notificationMessages->setFilled( false );
 	notificationMessages->setBorderColor( gui::ColorNoColor );
-	notificationMessages->setFont("gt_pressura_light_24");
+	notificationMessages->setFont(style::window::font::medium);
 	UTF8 mess = "2 " + utils::localize.get("app_desktop_unread_messages");
 
 	notificationMessages->setText(mess);

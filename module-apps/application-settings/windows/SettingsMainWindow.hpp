@@ -26,7 +26,6 @@ namespace gui {
  */
 class SettingsMainWindow: public AppWindow {
 protected:
-	gui::Label* title;
 	std::vector<gui::Item*> options;
 
 	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
