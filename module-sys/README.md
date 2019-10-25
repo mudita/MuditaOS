@@ -149,11 +149,11 @@ bad design choice. It is to be considered if current solution will be sufficient
 PowerManager and system logic will have to be designed and developed.
 
 #### Core voltage in low power mode
-Currently core voltage during operating in low power mode is set to 0.9V. This results in 2,08mA current consumption. This can be lowered even further by lowering it to 0.8V (around 1.86mA).
+Currently core voltage during operating in low power mode is set to 0.9V. This results in 2,08mA current consumption. This can be lowered even further by lowering it to 0.8V ( resulting in current consumed at around 1.86mA).
 As far as I know setting core voltage to 0.8V is considered to be unstable but it is worth trying/testing.  
 
-In order to switch core voltage to 0.8V you have to modify `DCDC_AdjustTargetVoltage` second parameter from 0x4 to 0x0. `VDDRun` is set in 25mA steps starting from 0.8V.  
-For more info please check `RT1051 Reference Manual, Chapter 18 "DCDC Converter"` and `DCDC Register 3 `.
+Core voltage is set in LPM_EnterLowPowerIdle function which can be found in module-bsp/board/rt1051/common/clock_config.cpp.
+For more info please check RT1051 Reference Manual, Chapter 18 "DCDC Converter" and DCDC Register 3 .
 
 
 # Caveats & good practices #
