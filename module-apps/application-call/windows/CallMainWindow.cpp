@@ -7,8 +7,9 @@
  * @details
  */
 
-#include "Label.hpp"
+#include <Label.hpp>
 #include "CallMainWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -22,16 +23,10 @@ void CallMainWindow::rebuild() {
 }
 void CallMainWindow::buildInterface() {
 	AppWindow::buildInterface();
-	title = new gui::Label(this, 0, 100, 480, 116 );
-	title->setFilled( false );
-	title->setBorderColor( gui::ColorNoColor );
-	title->setFont("gt_pressura_light_24");
-	title->setText(getName());
-	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    setTitle(getName());
 }
 void CallMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	if( title ) { removeWidget(title); delete title; title = nullptr; }
 }
 
 

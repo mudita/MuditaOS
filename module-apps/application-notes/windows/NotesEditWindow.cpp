@@ -23,6 +23,7 @@
 #include "Margins.hpp"
 #include "Text.hpp"
 #include "NotesEditWindow.hpp"
+#include <Style.hpp>
 
 UTF8 textString = "Very long test line ABCDEFGHIJKLMNOPQRST123456789\n"
 		"abcdefghijklmnopqrs 123456789 ABCDEFGHIJKLMONPQRSTUW 12345\n    test\nnew line\n\n\n12345";
@@ -48,17 +49,10 @@ void NotesEditWindow::buildInterface() {
 	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_notes_save"));
 	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("app_notes_back"));
 
-	title = new gui::Label(this, 0, 50, 480, 54);
-	title->setFilled(false);
-	title->setBorderColor( gui::ColorFullBlack );
-	title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-	title->setMargins( Margins(0,0,0,18));
-	title->setFont("gt_pressura_bold_24");
-	title->setText(utils::localize.get("app_notes_new_note"));
-	title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    setTitle(utils::localize.get("app_notes_new_note"));
 
 	text = new gui::Text( this, 11, 105, 480-22, 600-105-50 );
-	text->setFont("gt_pressura_bold_24");
+	text->setFont(style::window::font::medium);
 	text->setRadius(5);
 	text->setMargins( gui::Margins(10, 5, 10, 5));
 	text->activatedCallback = [=] (gui::Item& item){
@@ -82,7 +76,6 @@ void NotesEditWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 
 	if( text ) { removeWidget(text); delete text; text = nullptr; }
-	if( title ) { removeWidget(title); delete title; title = nullptr;}
 
 	children.clear();
 }

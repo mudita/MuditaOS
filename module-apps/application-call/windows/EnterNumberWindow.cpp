@@ -13,6 +13,7 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "i18/i18.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -41,7 +42,7 @@ void EnterNumberWindow::buildInterface() {
 	numberLabel->setFilled( false );
 	numberLabel->setBorderColor( gui::ColorFullBlack );
 	numberLabel->setPenWidth(2);
-	numberLabel->setFont("gt_pressura_light_44");
+	numberLabel->setFont(style::header::font::title);
 	numberLabel->setText("");
 	numberLabel->setMargins( Margins(0,0,0,16));
 	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );

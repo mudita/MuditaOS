@@ -24,17 +24,6 @@ void CalendarMainWindow::rebuild() {
 }
 void CalendarMainWindow::buildInterface() {
 	AppWindow::buildInterface();
-	//	gui::VBox* vBox = new gui::VBox( this, 0, 0, 480, 600 );
-	//
-	//	gui::Label title = new gui::Label(vBox, 0,0,480,600);
-	//	timeLabel->setFont("gt_pressura_bold_65");
-	//	timeLabel->setText("12:35");
-	//	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	//	timeLabel->setMaxSize( 480, 180 );
-	//
-	//	vBox->addWidget(maxH1);
-	//	vBox->addWidget(timeLabel);
-	//	vBox->addWidget(maxH2);
 }
 void CalendarMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();

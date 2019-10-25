@@ -11,6 +11,7 @@
 
 #include "Text.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -29,6 +30,7 @@ void PhonebookNewContact::rebuild()
 
 void PhonebookNewContact::buildInterface() {
     AppWindow::buildInterface();
+    setTitle(utils::localize.get("app_phonebook_contact_title"));
 
     bottomBar->setActive(BottomBar::Side::LEFT, false);
 	bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -38,15 +40,6 @@ void PhonebookNewContact::buildInterface() {
 
 	topBar->setActive(TopBar::Elements::TIME, true);
 
-	title = new gui::Label(this, 0, 50, 480, 54);
-	title->setFilled(false);
-	title->setBorderColor( gui::ColorFullBlack );
-	title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-	title->setMargins( Margins(0,0,0,18));
-	title->setFont("gt_pressura_bold_24");
-	title->setText(utils::localize.get("app_phonebook_contact_title"));
-	title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
 	//page 1 labels and text
 	for( uint32_t i=0; i<5; i++ ) {
 
@@ -54,7 +47,7 @@ void PhonebookNewContact::buildInterface() {
 		page1.labels[i]->setFilled(false);
 		page1.labels[i]->setBorderColor( gui::ColorFullBlack );
 		page1.labels[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-		page1.labels[i]->setFont("gt_pressura_regular_16");
+		page1.labels[i]->setFont(style::window::font::small);
 		page1.labels[i]->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 		page1.text[i]= new gui::Text(this, 30, 157+87*i, 420, 42);
@@ -66,17 +59,17 @@ void PhonebookNewContact::buildInterface() {
 		page1.text[i]->setTextType( Text::TextType::SINGLE_LINE );
 		page1.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 //		page1.text[i]->setMargins( Margins(0,0,0,0));
-		page1.text[i]->setFont("gt_pressura_regular_18");
+		page1.text[i]->setFont(style::window::font::medium);
 
 		//for text widgets focus callback should hangle changing keyboard profile
 		if( (i == 2) || (i == 3 ) ) {
 			page1.text[i]->focusChangedCallback = [=] (gui::Item& item){
 				if( item.focus ) {
-					page1.text[i]->setFont("gt_pressura_bold_18");
+					page1.text[i]->setFont(style::window::font::bigbold);
 					application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
 				}
 				else {
-					page1.text[i]->setFont("gt_pressura_regular_18");
+					page1.text[i]->setFont(style::window::font::medium);
 				}
 				return true;
 			};
@@ -86,7 +79,7 @@ void PhonebookNewContact::buildInterface() {
 				if( item.focus ) {
 					gui::Text* text = reinterpret_cast<Text*>(&item);
 					uint32_t length = text->getText().length();
-					page1.text[i]->setFont("gt_pressura_bold_18");
+					page1.text[i]->setFont(style::window::font::bigbold);
 					if( length == 0 ){
 						LOG_INFO("Switching to uppercase");
 						application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
@@ -97,7 +90,7 @@ void PhonebookNewContact::buildInterface() {
 					}
 				}
 				else {
-					page1.text[i]->setFont("gt_pressura_regular_18");
+					page1.text[i]->setFont(style::window::font::medium);
 				}
 				return true;
 			};
@@ -142,7 +135,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedValue->setPenFocusWidth(3);
 	page2.speedValue->setPenWidth(1);
 	page2.speedValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-	page2.speedValue->setFont("gt_pressura_regular_16");
+	page2.speedValue->setFont(style::window::font::small);
 	page2.speedValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	page2.speedValue->focusChangedCallback = [=] (gui::Item& item){
@@ -167,7 +160,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedDescription->setPenFocusWidth(0);
 	page2.speedDescription->setPenWidth(0);
 	page2.speedDescription->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	page2.speedDescription->setFont("gt_pressura_regular_16");
+	page2.speedDescription->setFont(style::window::font::small);
 	page2.speedDescription->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	page2.imageSpeed = new gui::Image( this, 416, 122,0,0, "small_circle" );
@@ -178,7 +171,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.favValue->setPenFocusWidth(3);
 	page2.favValue->setPenWidth(1);
 	page2.favValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-	page2.favValue->setFont("gt_pressura_regular_16");
+	page2.favValue->setFont(style::window::font::small);
 	page2.favValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	page2.favValue->focusChangedCallback = [=] (gui::Item& item){
@@ -217,7 +210,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.favDescription->setPenFocusWidth(0);
 	page2.favDescription->setPenWidth(0);
 	page2.favDescription->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	page2.favDescription->setFont("gt_pressura_regular_16");
+	page2.favDescription->setFont(style::window::font::small);
 	page2.favDescription->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	page2.imageTick= new gui::Image( this, 43, 174,0,0, "small_tick" );
@@ -232,7 +225,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.addressLabel->setFilled(false);
 	page2.addressLabel->setBorderColor( gui::ColorFullBlack );
 	page2.addressLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	page2.addressLabel->setFont("gt_pressura_regular_16");
+	page2.addressLabel->setFont(style::window::font::small);
 	page2.addressLabel->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 	page2.addressLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
 
@@ -240,7 +233,7 @@ void PhonebookNewContact::buildInterface() {
 	page2.noteLabel->setFilled(false);
 	page2.noteLabel->setBorderColor( gui::ColorFullBlack );
 	page2.noteLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	page2.noteLabel->setFont("gt_pressura_regular_16");
+	page2.noteLabel->setFont(style::window::font::small);
 	page2.noteLabel->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 	page2.noteLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
 
@@ -253,7 +246,7 @@ void PhonebookNewContact::buildInterface() {
 		page2.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 		page2.text[i]->setBorderColor( gui::ColorFullBlack );
 		page2.text[i]->setMargins( Margins(0,0,0,0));
-		page2.text[i]->setFont("gt_pressura_regular_18");
+		page2.text[i]->setFont(style::window::font::medium);
 
 		page2.text[i]->contentCallback = [=] (gui::Item& item){
 			gui::Text* text = reinterpret_cast<Text*>(&item);
@@ -285,8 +278,6 @@ void PhonebookNewContact::buildInterface() {
 void PhonebookNewContact::destroyInterface()
 {
     AppWindow::destroyInterface();
-
-    if( title ) { removeWidget(title); delete title; title = nullptr; }
 
     //page 1
     for( uint32_t i=0; i<5; i++ ) {

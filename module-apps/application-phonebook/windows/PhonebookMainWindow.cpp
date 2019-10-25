@@ -17,6 +17,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 
 #include <log/log.hpp>
+#include <Style.hpp>
 
 
 std::vector<std::string> names =  { "Alek", "Janusz", "Zofia", "Roland", "Cezary",
@@ -66,14 +67,7 @@ void PhonebookMainWindow::buildInterface() {
 
     topBar->setActive(TopBar::Elements::TIME, true);
 
-    title = new gui::Label(this, 0, 50, 480, 54);
-    title->setFilled(false);
-    title->setBorderColor( gui::ColorFullBlack );
-    title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-    title->setMargins( Margins(0,0,0,18));
-    title->setFont("gt_pressura_bold_24");
-    title->setText(utils::localize.get("app_phonebook_title_main"));
-    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    setTitle(utils::localize.get("app_phonebook_title_main"));
 
     leftArrowImage  = new gui::Image( this, 30,62,0,0, "arrow_left" );
 	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "arrow_right" );
@@ -82,7 +76,6 @@ void PhonebookMainWindow::buildInterface() {
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
-    if( title ) { removeWidget(title);    delete title; title = nullptr; }
     if( list ) { removeWidget(list);    delete list; list = nullptr; }
     if( leftArrowImage ) { removeWidget(leftArrowImage);    delete leftArrowImage; leftArrowImage = nullptr; }
     if( rightArrowImage ) { removeWidget(rightArrowImage);    delete rightArrowImage; rightArrowImage = nullptr; }

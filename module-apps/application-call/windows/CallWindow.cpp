@@ -24,6 +24,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "CallWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -81,13 +82,13 @@ void CallWindow::buildInterface() {
 	durationLabel = new gui::Label(this, 0, 220, 480, 80 );
 	durationLabel->setFilled( false );
 	durationLabel->setBorderColor( gui::ColorNoColor );
-	durationLabel->setFont("gt_pressura_regular_24");
+	durationLabel->setFont(style::window::font::verybig);
 	durationLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	numberLabel = new gui::Label(this, 11, 150, 480-22, 80 );
 	numberLabel->setFilled( false );
 	numberLabel->setBorderColor( gui::ColorNoColor );
-	numberLabel->setFont("gt_pressura_regular_44");
+	numberLabel->setFont(style::window::font::bigbold);
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	//define navigation between labels

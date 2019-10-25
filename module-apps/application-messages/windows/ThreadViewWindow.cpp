@@ -23,6 +23,7 @@
 #include <log/log.hpp>
 
 #include "ThreadViewWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -60,19 +61,10 @@ void ThreadViewWindow::buildInterface() {
 
     topBar->setActive(TopBar::Elements::TIME, true);
 
-    title = new gui::Label(this, 0, 50, 480, 54);
-    title->setFilled(false);
-    title->setBorderColor( gui::ColorFullBlack );
-    title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-    title->setMargins( Margins(0,0,0,18));
-    title->setFont("gt_pressura_bold_24");
-    title->setText(utils::localize.get("app_messages_title_main"));
-    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    setTitle(utils::localize.get("app_messages_title_main"));
 }
 void ThreadViewWindow::destroyInterface() {
     AppWindow::destroyInterface();
-    if( title ) { removeWidget(title);    delete title; title = nullptr; }
-
     children.clear();
 }
 
