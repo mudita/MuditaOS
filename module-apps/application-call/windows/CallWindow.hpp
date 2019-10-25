@@ -76,7 +76,7 @@ public:
 
 	//virtual methods
 	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
 	bool handleSwitchData( SwitchData* data ) override;
 
 	void rebuild() override;
