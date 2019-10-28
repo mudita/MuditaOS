@@ -28,6 +28,7 @@
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
 #include "service-bluetooth/ServiceBluetooth.hpp"
+#include "service-lwip/ServiceLwIP.hpp"
 
 //module-bsp
 #include "bsp/bsp.hpp"
@@ -146,6 +147,7 @@ int main() {
 #endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(),sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(),sysmgr.get());
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
