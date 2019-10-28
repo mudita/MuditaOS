@@ -39,9 +39,10 @@ ServiceCellular::ServiceCellular()
     callStateTimer = CreateTimer(1000, true);
 
     notificationCallback = [this](std::vector<uint8_t> &data) {
-
+        LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
+        TS0710_Frame frame(data);
         std::string message;
-        CellularNotificationMessage::Type type = identifyNotification(data, message);
+        CellularNotificationMessage::Type type = identifyNotification(frame.getFrame().data, message);
         auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(type));
         
         switch (type) {
@@ -72,6 +73,7 @@ ServiceCellular::ServiceCellular()
                 break;
 
             case CellularNotificationMessage::Type::SignalStrengthUpdate:
+                LOG_DEBUG("Setting new signal strength");
                 msg->signalStrength = std::stoll(message);
                 if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0]))) {
                     LOG_ERROR("Signal strength value out of range.");
@@ -110,13 +112,7 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
 
     cmux = new TS0710(PortSpeed_e::PS460800);
 
-    DLC_channel *notificationsChannel = cmux->GetChannel("Notifications");  //open channel - notifications
-    
-    if (notificationsChannel) {
-        notificationsChannel->setCallback(notificationCallback);
-
-
-        // Start procedure is as follow:
+    // Start procedure is as follow:
         /*
          * 1) Power-up
          * 2) Init configuration of GSM modem
@@ -125,15 +121,12 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
          * 5) Modem fully-operational
          */
 
-        // Start power-up procedure
-        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
-                              GetName(), this);
-        state = State::PowerUpInProgress;
+    // Start power-up procedure
+    sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
+                          GetName(), this);
+    state = State::PowerUpInProgress;
 
-        return sys::ReturnCodes::Success;
-    } else {
-        return sys::ReturnCodes::Failure;
-    }
+    return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceCellular::DeinitHandler() {
@@ -215,6 +208,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 
                         if (cmux->StartMultiplexer() == TS0710::ConfState::Success) {
                             LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+                            DLC_channel *notificationsChannel = cmux->GetChannel("Notifications");  //open channel - notifications
+                            if (notificationsChannel){
+                                LOG_DEBUG("Setting up notifications callback");
+                                notificationsChannel->setCallback(notificationCallback);
+                            }
+
                             state = State::Ready;
                         }
                         else {

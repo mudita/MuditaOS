@@ -239,6 +239,7 @@ private:
 
     enum class Mode{
         AT,
+        CMUX_SETUP,
         CMUX
     };
     Mode mode = Mode::AT;
@@ -246,8 +247,17 @@ private:
     int CloseMultiplexer();
     const static bool hardwareControlFlowEnable = false;
 
+    bool searchForOK(const std::vector<std::string> &response) {
+        for (std::string s : response) {
+            if (s == "OK")
+                return true;
+        }
+        return false;
+    }
+
     bool CheckATCommandResponse(const std::vector<std::string> &response) {
-        if (response.size() == 1 && response[0] == "OK") {
+        //if (response.size() == 1 && response[0] == "OK") {
+        if (searchForOK(response)) {
             return true;
         } else {
             std::string resp;
@@ -274,7 +284,7 @@ public:
         for (auto it : channels) { 
             if (it->getName() == name) return it; 
         } 
-        return new DLC_channel(); 
+        return nullptr; 
     } //return channel or empty if such name dosen't exist
 
     DLC_channel *OpenChannel(DLCI_t DLCI, std::string name) { 

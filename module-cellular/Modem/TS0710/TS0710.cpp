@@ -19,6 +19,15 @@ TS0710::TS0710(PortSpeed_e portSpeed) {
     pv_cellular = bsp::Cellular::Create(SERIAL_PORT, B115200).value_or(nullptr);
     parser = new ATParser(pv_cellular.get());
 
+    // start connection
+    startParams.PortSpeed = pv_portSpeed;
+    startParams.MaxFrameSize = 127; //maximum for Basic mode
+    startParams.AckTimer = 10;     //100ms default
+    startParams.MaxNumOfRetransmissions = 3;    //default
+    startParams.MaxCtrlRespTime = 30;          //300ms default
+    startParams.WakeUpRespTime = 10;            //10s default
+    startParams.ErrRecovWindowSize = 2;         //2 default
+
     BaseType_t task_error = xTaskCreate(
         workerTaskFunction,
         "TS0710Worker",
@@ -86,7 +95,8 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
 
 //TODO:M.P Fetch configuration from JSON/XML file
 TS0710::ConfState TS0710::ConfProcedure() {
-    
+    static char buf[256];
+
     LOG_DEBUG("Configuring modem...");
 
     // Factory reset
@@ -113,9 +123,18 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Set fixed baudrate
     // CheckATCommandResponse(
     //         parser->SendCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1));   //done with TS0710_Start
+    LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[startParams.PortSpeed]);
+    sprintf(buf,"AT+IPR=%i\r", ATPortSpeeds_text[startParams.PortSpeed]);
+    if (!CheckATCommandResponse(parser->SendCommand(buf, 1))) {
+        LOG_ERROR("Baudrate setup error");
+        return ConfState::Failure;
+    }
 
-    // Route URCs to first MUX channel
+    pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[startParams.PortSpeed]);
+
+    // Route URCs to second (Notifications) MUX channel
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));
+
     // Turn off RI pin for incoming calls
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 1));
     // Turn off RI pin for incoming sms
@@ -125,7 +144,7 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Configure AP_Ready pin logic ( enable, logic level 1, 200ms )
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"apready\",1,1,200\r", 1));
     // Turn on signal strength change URC
-    //CheckATCommandResponse(parser->SendCommand("AT+QINDCFG=\"csq\",1\r", 1));
+    CheckATCommandResponse(parser->SendCommand("AT+QINDCFG=\"csq\",1\r", 1));
     // Change incoming call notification from "RING" to "+CRING:type"
     CheckATCommandResponse(parser->SendCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
@@ -179,14 +198,6 @@ TS0710::ConfState TS0710::AudioConfProcedure() {
 
 TS0710::ConfState TS0710::StartMultiplexer() {
     static char buf[256];
-    // start connection
-    startParams.PortSpeed = pv_portSpeed;
-    startParams.MaxFrameSize = 127; //maximum for Basic mode
-    startParams.AckTimer = 10;     //100ms default
-    startParams.MaxNumOfRetransmissions = 3;    //default
-    startParams.MaxCtrlRespTime = 30;          //300ms default
-    startParams.WakeUpRespTime = 10;            //10s default
-    startParams.ErrRecovWindowSize = 2;         //2 default
 
     LOG_DEBUG("Configuring multiplexer...");
 
@@ -224,14 +235,7 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     int WakeUpRespTime;             //!< Wake up response timer [1s-255s, default: 10s]
     int ErrRecovWindowSize;         //!< Window size for error recovery mode [1-7, default: 2]
     */
-    LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[startParams.PortSpeed]);
-    sprintf(buf,"AT+IPR=%i\r", ATPortSpeeds_text[startParams.PortSpeed]);
-    if (!CheckATCommandResponse(parser->SendCommand(buf, 1))) {
-        LOG_ERROR("CMUX setup error");
-        return ConfState::Failure;
-    }
-
-    pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[startParams.PortSpeed]);
+    
     //enable cmux
     LOG_DEBUG("Enabling CMUX");
     sprintf(buf, "AT+CMUX=0,0,%i,%i,%i,%i,%i,%i,%i\r", QuectelCMUXPortSpeeds_text[startParams.PortSpeed], startParams.MaxFrameSize, startParams.AckTimer, \
@@ -242,19 +246,33 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         return ConfState::Failure;
     }
 
+    mode = Mode::CMUX_SETUP;
     TS0710_START *pv_TS0710_Start = new TS0710_START(TS0710_START::Mode_e::Basic, startParams, pv_cellular.get());
     //wait for confirmation
     if (pv_TS0710_Start->ConnectionStatus()) {
         channels.push_back(pv_TS0710_Start->getCtrlChannel());  //store control channel
+        
     }
     delete pv_TS0710_Start;
 
+    //TODO: Open remaining channels
+    OpenChannel(1, "Commands");
+    OpenChannel(2, "Notifications");
+    OpenChannel(3, "Data");
+
     mode = Mode::CMUX;
 
-    //TODO: Open remaining channels
-    OpenChannel(1, "Notifications");
-    OpenChannel(2, "Commands");
-    OpenChannel(3, "Data");
+    // Route URCs to second (Notifications) MUX channel
+    DLC_channel *c = GetChannel("Commands");
+    CheckATCommandResponse(c->SendCommandReponse("AT+QCFG=\"cmux/urcport\",2\r", 1));
+
+    /* Let's test if this actually works */
+    if (c != nullptr) {
+        LOG_DEBUG("Sending test ATI");
+        std::vector<std::string> v = c->SendCommandReponse("ATI\r", 5);
+        for (std::string s : v)
+            LOG_DEBUG("[]%s", s.c_str());
+    }
 
     return ConfState::Success;
 }
@@ -272,16 +290,32 @@ void workerTaskFunction(void *ptr) {
         if (inst->mode == TS0710::Mode::AT) {
             //inst->atParser->ProcessNewData();
             //TODO: add AT command processing
+            LOG_DEBUG("[Worker] Processing AT response");
             inst->parser->ProcessNewData();
         }
             // CMUX mode is default operation mode
-        else {
+        else if (inst->mode == TS0710::Mode::CMUX) {
+            LOG_DEBUG("[Worker] Processing CMUX response");
             std::vector<uint8_t> data;
             ssize_t len = inst->ReceiveData(data, static_cast<uint32_t>(inst->startParams.MaxCtrlRespTime));
+            //divide message to different frames as Quectel may send them one after another
+            std::vector<std::vector<uint8_t>> multipleFrames;
+            std::vector<uint8_t> _d;
+            for (uint8_t c : data) {
+                _d.push_back(c);
+                if ((c == 0xF9) && (_d.size() > 1)) {
+                    multipleFrames.push_back(_d);
+                    _d.clear();
+                }
+                
+            }
+            LOG_DEBUG("Received %i frames", multipleFrames.size());
             if (len > 0) {
                 for (auto *chan : inst->channels) {
-                    if (TS0710_Frame::isMyChannel(data, chan->getDLCI()))
-                        chan->ParseInputData(data);
+                    for (std::vector<uint8_t> v : multipleFrames) {
+                        if (TS0710_Frame::isMyChannel(v, chan->getDLCI()))
+                            chan->ParseInputData(v);
+                    }
                 }
             }
         }
@@ -293,9 +327,9 @@ ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
     static uint8_t *buf = nullptr;
     buf = reinterpret_cast<uint8_t*>(malloc(startParams.MaxFrameSize));
     bool complete = false;
+    uint32_t _timeout = timeout;
 
-    while((!complete) && (timeout--)) {  //TODO: add timeout control
-        LOG_DEBUG("Receiving data from worker");
+    while((!complete) && (--_timeout)) {
         ret = pv_cellular->Read(reinterpret_cast<void *>(buf), startParams.MaxFrameSize);
         if (ret > 0) {
             LOG_DEBUG("Received %i bytes", ret);
@@ -303,12 +337,10 @@ ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
                 data.push_back(buf[i]);
             complete = TS0710_Frame::isComplete(data);
         }
-        vTaskDelay(1);
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
-    if (!complete)
+    if ((!complete) && (_timeout))
         LOG_ERROR("Incomplete frame received");
-    if (timeout == 0)
-        LOG_ERROR("Timeout occured");
     
     free(buf);
 

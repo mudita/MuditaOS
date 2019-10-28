@@ -189,6 +189,12 @@ public:
             return true;
         return false;
     }
+
+    static DLCI_t getFrameDLCI(std::vector<uint8_t> serData) {
+        if (serData.size() > 1)
+            return (serData.at(1) >> 2);
+        return -1;
+    }
 };
 
 #endif /*_TS0710_FRAME_H*/

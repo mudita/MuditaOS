@@ -16,7 +16,7 @@
 class TS0710_DATA {
 public: 
 
-TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t> User_data);
+TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t> User_data, bsp::Cellular *cellular);
 ~TS0710_DATA() {}
 
 private:
@@ -33,7 +33,7 @@ void request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<u
  */
 void indication(DLCI_t DLCI, std::vector<uint8_t> User_data);
 
-std::unique_ptr<bsp::Cellular> pv_cellular;
+bsp::Cellular *pv_cellular;
 };
 
 #endif //_TS0710_DATA_H

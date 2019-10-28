@@ -49,7 +49,7 @@ DLC_channel::~DLC_channel(){
 }
 
 void DLC_channel::SendData(std::vector<uint8_t> data){
-    TS0710_DATA _data = TS0710_DATA(pv_DLCI, pv_chanParams, data);
+    TS0710_DATA _data = TS0710_DATA(pv_DLCI, pv_chanParams, data, pv_cellular);
 }
 
 #if 0
@@ -90,7 +90,8 @@ std::vector<std::string> DLC_channel::SendCommandReponse(const char *cmd, size_t
 
     std::vector<std::string> tokens;
     std::vector<uint8_t> data;
-    for (int i; i = 0; i < strlen(cmd))
+
+    for (int i = 0; i < strlen(cmd); i++)
         data.push_back(static_cast<uint8_t>(cmd[i]));
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
@@ -135,22 +136,27 @@ std::vector<std::string> DLC_channel::SendCommandReponse(const char *cmd, size_t
 }
 
 int DLC_channel::ParseInputData(std::vector<uint8_t> data) {
+    LOG_DEBUG("Parsing data for channel %i [%s]", pv_DLCI, pv_name.c_str());
 
+    cpp_freertos::LockGuard lock(mutex);
+    responseBuffer.append(reinterpret_cast<char *>(data.data()), data.size());
     if(blockedTaskHandle){
-        cpp_freertos::LockGuard lock(mutex);
-        responseBuffer.append(reinterpret_cast<char*>(data.data()), data.size());
+        xTaskNotifyGive(blockedTaskHandle);
+    }
+    //Received response data without active request, drop it
+    else{
         if (pv_callback != nullptr) {
+            LOG_DEBUG("Passing URC to callback");
             std::vector<uint8_t> v;
             for (auto c : responseBuffer)
                 v.push_back(static_cast<uint8_t>(c));
             pv_callback(v);
         }
-        xTaskNotifyGive(blockedTaskHandle);
+        else {
+            responseBuffer.erase();
+            LOG_DEBUG("Dropping unneeded URC");
+        }
     }
-    // Received response data without active request, drop it
-    else{
-        responseBuffer.erase();
-        LOG_INFO("Received unneeded data");
-    }
+
     return 1;
 }

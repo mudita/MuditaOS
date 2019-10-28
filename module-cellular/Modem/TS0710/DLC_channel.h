@@ -47,7 +47,7 @@ public:
     bool getActive() { return active; }
 
     //ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
-    void setCallback(Callback_t callback) { pv_callback = callback; }
+    void setCallback(Callback_t callback) { LOG_DEBUG("[%s] Setting up callback for channel", pv_name.c_str()); pv_callback = callback; }
 
     std::vector<std::string> SendCommandReponse(const char *cmd, size_t rxCount,
                                                                          uint32_t timeout = 100);

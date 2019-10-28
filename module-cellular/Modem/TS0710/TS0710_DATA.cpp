@@ -17,7 +17,9 @@
 /**
  * TS0710_DATA implementation
  */
-TS0710_DATA::TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t> User_data) {
+TS0710_DATA::TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t> User_data, bsp::Cellular *cellular) {
+    pv_cellular = cellular;
+
     request(DLCI, sysParams, User_data);
 }
 
