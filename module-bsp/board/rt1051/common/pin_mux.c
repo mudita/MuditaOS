@@ -1446,7 +1446,11 @@ void PINMUX_InitCellular(void) {
             PINMUX_CELLULAR_UART_TX,
 
             PAD_CONFIG_SLEW_RATE_SLOW |
-            PAD_CONFIG_OPEN_DRAIN_ENABLED |
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SPEED_SLOW_50MHz |
+            PAD_CONFIG_PULL_KEEPER_ENABLED |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm |
             PAD_CONFIG_HYSTERESIS_DISABLED
     );
 
@@ -1454,7 +1458,11 @@ void PINMUX_InitCellular(void) {
             PINMUX_CELLULAR_UART_RX,
 
             PAD_CONFIG_SLEW_RATE_SLOW |
-            PAD_CONFIG_OPEN_DRAIN_ENABLED |
+            PAD_CONFIG_DRIVER_STRENGTH_LVL_1 |
+            PAD_CONFIG_SPEED_SLOW_50MHz |
+            PAD_CONFIG_PULL_KEEPER_ENABLED |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm |
             PAD_CONFIG_HYSTERESIS_DISABLED
     );
 
@@ -1540,7 +1548,11 @@ void PINMUX_InitCellular(void) {
             PINMUX_CELLULAR_RI,
 
             PAD_CONFIG_SLEW_RATE_SLOW |
-            PAD_CONFIG_OPEN_DRAIN_ENABLED |
+            PAD_CONFIG_DRIVER_DISABLED |
+            PAD_CONFIG_SPEED_SLOW_50MHz |
+            PAD_CONFIG_PULL_KEEPER_ENABLED |
+            PAD_CONFIG_SELECT_PULL |
+            PAD_CONFIG_PULL_UP_100kOhm |
             PAD_CONFIG_HYSTERESIS_DISABLED);
 
     IOMUXC_SetPinConfig(
