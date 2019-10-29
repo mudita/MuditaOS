@@ -64,6 +64,10 @@ void BtWindow::buildInterface()
     add_box_label(box, box_items, "Bluetooth on off", [=](Item&){
         LOG_DEBUG("Callback Bluetooth on");
         message_bt(application, BluetoothMessage::Request::Start);
+        for (auto &el : box->children) {
+            el->visible = true;
+        }
+        application->render(gui::RefreshModes::GUI_REFRESH_FAST);
         return true;
         });
 
@@ -84,6 +88,10 @@ void BtWindow::buildInterface()
         message_bt(application, BluetoothMessage::Request::Visible);
         return true;
     });
+
+    for (int i =1; i < box_items.size(); ++i) {
+        (*std::next(box_items.begin(),i))->visible = false;
+    }
 
     box->resizeItems();
 

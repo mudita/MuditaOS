@@ -99,14 +99,14 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
 
 namespace Bt {
 
+// TODO - in config...
+// TODO - set it settable...
+// Set local name with a template Bluetooth address, that will be automatically
+// replaced with a actual address once it is available, i.e. when BTstack boots
 Error set_name(std::string &name) {
     // name has to have storage
     constexpr uint32_t size = 64;
-    static char *lname;
-    if(lname == nullptr) {
-        lname = new(char[size]);
-        memset(lname, 0, size);
-    }
+    static char lname[size] = {0};
     snprintf(lname, size,"%s %s", name.c_str(), "00:00:00:00:00:00");
     LOG_INFO("Setting local name: %s", lname);
     gap_set_local_name(lname);
@@ -118,11 +118,7 @@ Error bnep_setup()
 {
     BluetoothWorker::Error  err = BluetoothWorker::Error::SuccessBt;
     // Discoverable
-    // Set local name with a template Bluetooth address, that will be automatically
-    // replaced with a actual address once it is available, i.e. when BTstack boots
     // up and starts talking to a Bluetooth module.
-    // TODO - in config...
-    // TODO - set it settable...
     gap_discoverable_control(1);
 
     // register for HCI events
@@ -144,7 +140,10 @@ Error bnep_setup()
     pan_create_nap_sdp_record(pan_sdp_record, sdp_create_service_record_handle(), network_packet_types, NULL, NULL, BNEP_SECURITY_NONE, PAN_NET_ACCESS_TYPE_OTHER, 1000000, NULL, NULL);
     sdp_register_service(pan_sdp_record);
     LOG_INFO("SDP service record size: %u", de_get_len((uint8_t*) pan_sdp_record));
+    return Error();
+}
 
+Error bnep_start() {
     bnep_lwip_init();
 
     // Setup NAP Service via BENP lwIP adapter
