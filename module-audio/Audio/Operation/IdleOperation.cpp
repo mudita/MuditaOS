@@ -14,12 +14,10 @@
 namespace audio {
 
     IdleOperation::IdleOperation([[maybe_unused]] const char *file) {
-        //TODO: M.P switch off audio PLL here
         isInitialized = true;
     }
 
     IdleOperation::~IdleOperation() {
-        //TODO: M.P switch on audio PLL here
     }
 
     int32_t IdleOperation::SetOutputVolume(float vol) {
