@@ -76,6 +76,12 @@ enum class MessageType {
 	DBNotesGetLimitOffset,   // Get notes records by limit,offset
 	DBNotesGetCount,         // Get notes reocrds count
 
+	DBCalllogAdd,       // Add new note's record
+	DBCalllogRemove,    // Remove selected note's record
+	DBCalllogUpdate,    // Update selected note's record
+	DBCalllogGetLimitOffset,   // Get Calllog records by limit,offset
+	DBCalllogGetCount,         // Get Calllog reocrds count
+
     //Audio service messages
     AudioNotification,
     AudioPlaybackStart,

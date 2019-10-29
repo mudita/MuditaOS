@@ -33,7 +33,7 @@ public:
 	virtual ~BottomBar();
 
 	void setActive( BottomBar::Side side, bool active );
-	void setText( BottomBar::Side side, const UTF8& str );
+	void setText( BottomBar::Side side, const UTF8& str, bool active = true );
 
 	//virtual methods from Item
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim);

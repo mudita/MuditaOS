@@ -4,6 +4,8 @@
 	"common_kbd_numeric": "numeric",
 	
     "common_open": "ABIERTA",
+    "common_call": "CALL",
+    "common_send": "SEND",
     "common_confirm": "CONFIRMAR",
     "common_select": "SELECT",
     "common_ok": "OK",
@@ -23,6 +25,8 @@
     "common_saturday": "Sábado",
     "common_sunday": "Domingo",
     
+    "common_information": "Information",
+
     "common_january": "January",
     "common_february": "February",
     "common_march": "March",
@@ -39,13 +43,29 @@
     "locale_12hour_min" : "%I:%M %p",
     "locale_24hour_min" : "%H:%M",
     "locale_date_full" : "%m/%d/%y",
-    "locale_date_short" : "%m/%y",
+    "locale_date_short" : "%d/%m",
 
     "app_notes_title_main": "Notes",
     "app_notes_new_note": "New Note",
     "app_notes_save": "SAVE",
     "app_notes_edit": "EDIT",
     "app_notes_back": "BACK",
+
+    "app_calllog_title_main": "Calls",
+    "app_calllog_new_note": "New Note",
+    "app_calllog_save": "SAVE",
+    "app_calllog_edit": "EDIT",
+    "app_calllog_back": "BACK",
+    "app_calllog_type": "Type",
+    "app_calllog_duration": "Duration",
+    "app_calllog_incoming_call": "incoming call",
+    "app_calllog_outgoing_call": "outgoing call",
+    "app_calllog_missed_call": "missed call",
+    "app_calllog_date": "Date",
+    "app_calllog_options_title": "Options",
+    "app_calllog_options_contact_details": "Contact details",
+    "app_calllog_options_delete_call": "Delete call",
+    "app_calllog_delete_call_confirmation": "Do you really want to delete this call from the list?",
 
     "app_desktop_unlock": "DESBLOQUEAR",
     "app_desktop_lock": "BLOQUEAR",

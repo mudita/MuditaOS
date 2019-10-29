@@ -35,7 +35,7 @@ public:
 
 	//virtual methods for ListViewProvider
 	gui::ListItem* getItem( int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown ) override;
-	int getItemCount();
+	int getItemCount() const override { return recordsCount; };
 };
 
 #endif /* MODULE_APPS_APPLICATION_PHONEBOOK_PHONEBOOKMODEL_HPP_ */

@@ -167,8 +167,3 @@ gui::ListItem* PhonebookModel::getItem( int index, int firstElement,  int prevIn
 	}
 	return nullptr;
 }
-
-int PhonebookModel::getItemCount() {
-	return recordsCount;
-}
-
