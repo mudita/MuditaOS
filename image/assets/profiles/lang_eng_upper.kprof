@@ -86,6 +86,10 @@ false
 0x0D
 0
 #FnLeft = 21,//1,
+21
+false
+''
+2000
 #FnRight = 23,//3,
 23
 false
