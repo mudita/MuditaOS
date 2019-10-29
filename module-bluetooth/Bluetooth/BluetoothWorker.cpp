@@ -19,22 +19,26 @@ BluetoothWorker::~BluetoothWorker()
 }
 
 bool BluetoothWorker::run() {
+    LOG_INFO("-> BluetoothWorker run request");
     if(is_running) {
         return true;
     }
     if(Worker::run()) {
+        // TODO mutex - there can be multiple requests for run at once possibly...
+        is_running = true;
         // TODO what - that's just wrong -_-
         auto el = getQueues()[queueIO_handle];
         BlueKitchen::getInstance()->qHandle = el;
         Bt::initialize_stack();
-        Bt::GAP::register_scan();
+        Bt::register_hw_error();
+        // TODO maybe it's this ( REMOVE FOR BT PAN)
+        // Bt::GAP::register_scan();
         std::string name = "PurePhone";
         Bt::set_name(name);
         // set local namne
         // set discoverable (on)
         // Bt::GAP::
         Bt::run_stack(&this->bt_worker_task);
-        is_running = true;
         return true;
     } else {
         return false;
@@ -65,7 +69,8 @@ bool BluetoothWorker::set_visible()
 
 bool BluetoothWorker::start_pan()
 {
-    auto err = Bt::PAN::bnep_setup();
+        Bt::PAN::bnep_setup();
+    auto err = Bt::PAN::bnep_start();
     if(err.err != Bt::Error::Succes) {
         LOG_ERROR("PAN setup error: %d %d", err.err, err.lib_code);
     }
@@ -78,7 +83,7 @@ BluetoothWorker::Error BluetoothWorker::aud_init()
     Error err = SuccessBt;
     LOG_INFO("AUDIO - TODO");
     // start GAVD
-    // && ASSIGN_CLASS_OF_DEVICE(ClassOfDevice, 0x28, 0x04, 0x10);
+    // &&  ASSIGN_CLASS_OF_DEVICE(ClassOfDevice, 0x28, 0x04, 0x10);
     return err;
 }
 
@@ -96,7 +101,7 @@ bool BluetoothWorker::handleMessage( uint32_t queueID ) {
         return false;
     }
 
-    Bt::Message notification;
+    Bt::Message notification = Bt::Message::EvtErrorRec;
     if( xQueueReceive(queue, &notification, 0 ) != pdTRUE ) {
         LOG_ERROR("Receive failure!");
         return false;
@@ -113,13 +118,21 @@ bool BluetoothWorker::handleMessage( uint32_t queueID ) {
             break;
         case Bt::Message::EvtReceived:
             {
-
+                /// TODO THERE IS SOME TIMING ISSUE >_>
+                /// need to find out if it's cause there is next read while we are pending last one
+                /// TODO check if Bt timer works properly (i.e. request on reneval doesn't come too quick...)
+                /// TODO maybe blocking on write is bad? ( stack don't have time to process other stuff and looses it)
+                if( bt->to_read_req > bt->in.len) {
+                     // LOG_ERROR("%d vs %d", bt->to_read_req, bt->in.len);
+                     break;
+                }
                 for( int i=0; i < bt->to_read_req; ++i) {
                     // error in pop should never happen
                     if(int ret = bt->in.pop((char*)bt->read_buff+i)) {
                         LOG_ERROR("This shall never happen: %d", ret);
                     }
                 }
+                // LOG_DEBUG(">> %d",bt->in.len);
 #ifdef DO_DEBUG_HCI_COMS
                 std::stringstream ss;
                 for (int i =0; i<bt->to_read_req; ++i) {
