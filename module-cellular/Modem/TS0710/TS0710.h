@@ -210,6 +210,7 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include "DLC_channel.h"
 #include "TS0710_Frame.h"
 #include "Modem/ATParser.hpp"
+#include "Service/Service.hpp"
 
 #if defined (__cplusplus)
     extern "C"{
@@ -268,6 +269,7 @@ private:
         }
     }
     TS0710_START::START_SystemParameters_t startParams;
+    sys::Service *pv_parent;
 
 public: 
     enum class ConfState{
@@ -317,7 +319,7 @@ public:
     ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
 
 
-TS0710(PortSpeed_e portSpeed);
+TS0710(PortSpeed_e portSpeed, sys::Service *parent);
 ~TS0710();
 
 //Add error handling - only for Advanced mode. Leave for now

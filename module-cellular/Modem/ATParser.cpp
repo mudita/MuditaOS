@@ -12,6 +12,8 @@
 #include "ATParser.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "ticks.hpp"
+#include "../../module-services/service-cellular/messages/CellularMessage.hpp"
+#include "Service/Bus.hpp"
 
 ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
     isInitialized = true;
@@ -71,7 +73,7 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     return resp;
 }
 
-int ATParser::ProcessNewData() {
+int ATParser::ProcessNewData(sys::Service *service) {
     char rawBuffer[256] = {0};
 
     LOG_DEBUG("Receiving data from ProcessNewData");
@@ -97,6 +99,8 @@ int ATParser::ProcessNewData() {
         if (urcs.size() == 5) {
             cpp_freertos::LockGuard lock(mutex);
             //mux->callback(NotificationType ::PowerUpProcedureComplete,"");
+            auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);
+            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
             LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();
             urcs.clear();

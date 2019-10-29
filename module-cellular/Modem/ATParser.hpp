@@ -18,6 +18,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "mutex.hpp"
+#include "Service/Service.hpp"
 
 namespace bsp{
     class Cellular;
@@ -37,7 +38,7 @@ public:
 
     ATParser(bsp::Cellular* cellular);
 
-    int ProcessNewData();
+    int ProcessNewData(sys::Service *service);
 
     std::vector<std::string> SendCommand(const char* cmd,size_t rxCount,uint32_t timeout = 500);
 
@@ -57,7 +58,6 @@ private:
     std::vector<ATParser::Urc> urcs;
 
     bool isInitialized = false;
-
 
 };
 

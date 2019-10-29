@@ -110,7 +110,7 @@ void ServiceCellular::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
-    cmux = new TS0710(PortSpeed_e::PS460800);
+    cmux = new TS0710(PortSpeed_e::PS460800, this);
 
     // Start procedure is as follow:
         /*
@@ -163,6 +163,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
                 (msg->type == CellularNotificationMessage::Type::CallBusy)) {
                 stopTimer(callStateTimer);
+            } else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete) {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+                                      GetName(), this);
+                state = State ::ModemConfigurationInProgress;
             } else {
                 //ignore rest of notifications
             }
@@ -318,43 +322,38 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 }
 
 CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vector<uint8_t> data, std::string &message) {
-    std::ostringstream oss;
-
-    if (!data.empty()) {
-        // Convert all but the last element to avoid a trailing ","
-        std::copy(data.begin(), data.end() - 1,
-                  std::ostream_iterator<int>(oss, ","));
-
-        // Now add the last element with no delimiter
-        oss << data.back();
-    }
+    
+    /* let's convert uint8_t vector to std::string*/
+    std::string str;
+    for (uint8_t i : data)
+        str += (static_cast<char>(i));
 
     // Incoming call
-    if (auto ret = oss.str().find("+CLIP: ") != std::string::npos) {
+    if (auto ret = str.find("+CLIP: ") != std::string::npos) {
         LOG_TRACE("incoming call...");
 
-        auto beg = oss.str().find("\"",ret);
-        auto end = oss.str().find("\"",ret + beg+1);
-        message = oss.str().substr(beg+1,end-beg-1);
+        auto beg = str.find("\"",ret);
+        auto end = str.find("\"",ret + beg+1);
+        message = str.substr(beg+1,end-beg-1);
 
         return CellularNotificationMessage::Type::IncomingCall;
     }
 
 
     // Call aborted/failed
-    if (oss.str().find("NO CARRIER") != std::string::npos) {
+    if (str.find("NO CARRIER") != std::string::npos) {
         LOG_TRACE(": call failed/aborted");
         return CellularNotificationMessage::Type::CallAborted;
     }
 
     // Call busy
-    if (oss.str().find("BUSY") != std::string::npos) {
+    if (str.find("BUSY") != std::string::npos) {
         LOG_TRACE(": call busy");
         return CellularNotificationMessage::Type::CallBusy;
     }
 
     // Received new SMS
-    if (oss.str().find("+CMTI: ") != std::string::npos) {
+    if (str.find("+CMTI: ") != std::string::npos) {
         LOG_TRACE(": received new SMS notification");
         message = "888777333"; // TODO:M.P add SMS nr parsing
 
@@ -362,11 +361,11 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
     }
 
     // Received signal strength change
-    if (auto ret = oss.str().find("+QIND: \"csq\"") != std::string::npos) {
+    if (auto ret = str.find("+QIND: \"csq\"") != std::string::npos) {
         LOG_TRACE(": received signal strength change notification");
-        auto beg = oss.str().find(",",ret);
-        auto end = oss.str().find(",",ret + beg+1);
-        message = oss.str().substr(beg+1,end-beg-1);
+        auto beg = str.find(",",ret);
+        auto end = str.find(",",ret + beg+1);
+        message = str.substr(beg+1,end-beg-1);
 
         return CellularNotificationMessage::Type::SignalStrengthUpdate;
     }

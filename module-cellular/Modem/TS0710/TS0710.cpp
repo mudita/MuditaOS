@@ -14,10 +14,11 @@ std::map<PortSpeed_e, speed_t> LinuxTermPortSpeeds_text = { {PortSpeed_e::PS9600
  * TS0710 implementation
  */
 
-TS0710::TS0710(PortSpeed_e portSpeed) {
+TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
     pv_cellular = bsp::Cellular::Create(SERIAL_PORT, B115200).value_or(nullptr);
     parser = new ATParser(pv_cellular.get());
+    pv_parent = parent;
 
     // start connection
     startParams.PortSpeed = pv_portSpeed;
@@ -55,42 +56,92 @@ TS0710::~TS0710() {
 }
 
 TS0710::ConfState TS0710::PowerUpProcedure() {
-    char buf[256];
-    // At first send AT command to check if modem is turned on
-    
-    LOG_DEBUG("Sending AT 1 ...");
-    auto ret = parser->SendCommand("AT\r", 2);
+    bool result = false;
+    int step = 1;
+    std::vector<std::string> ret;
+    while(!result) {
+        switch(step) {
+            case 1:
+                //1. Send AT - check for answer
+                //2. OK ? -> ret success
+                LOG_DEBUG("1. Sending AT...");
+                ret = parser->SendCommand("AT\r", 2);
+                if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
+                    result = true;
+                step++;
+                break;
+            case 2:
+                //3. set baudrate 460800 baud
+                //4. Send AT - check for answer
+                //5. OK ? -> ret success
+                LOG_DEBUG("2. Setting baudrate to %i...", ATPortSpeeds_text[startParams.PortSpeed]);
+                pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[startParams.PortSpeed]);
+                LOG_DEBUG("Sending AT...");
+                ret = parser->SendCommand("AT\r", 2);
+                if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
+                    result = true;
+                step++;
+                break;
+            case 3: {
+                //6. Close CMUX -> Send AT
+                LOG_INFO("3. Closing mux mode");
+                TS0710_Frame::frame_t frame;
+                frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
+                frame.Control = TypeOfFrame_e::UIH;
+                frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) | static_cast<uint8_t>(MuxDefines::GSM0710_EA) | static_cast<uint8_t>(MuxDefines::GSM0710_CR));
+                frame.data.push_back(0x01);
+                pv_cellular->Write((void *)frame.serialize().data(), frame.serialize().size());
 
-    LOG_DEBUG("Ret size: %i", ret.size());
+                pv_cellular->InformModemHostWakeup();
+                // GSM module needs some time to close multiplexer
+                vTaskDelay(1000);
+                LOG_DEBUG("Sending AT...");
+                ret = parser->SendCommand("AT\r", 2);
+                if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
+                    result = true;
+                step++;
+            }
+                break;
+            case 4:
+                //7. set baudrate 115200 baud
+                //8. Send AT
+                LOG_DEBUG("Setting baudrate to 115200...");
+                pv_cellular->SetSpeed(B115200);
+                LOG_DEBUG("Sending AT...");
+                ret = parser->SendCommand("AT\r", 2);
+                if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
+                    result = true;
+                step++;
+                break;
+            case 5: {
+                //9. Close CMUX -> Send AT
+                LOG_INFO("5. Closing mux mode");
+                TS0710_Frame::frame_t frame;
+                frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
+                frame.Control = TypeOfFrame_e::UIH;
+                frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) | static_cast<uint8_t>(MuxDefines::GSM0710_EA) | static_cast<uint8_t>(MuxDefines::GSM0710_CR));
+                frame.data.push_back(0x01);
+                pv_cellular->Write((void *)frame.serialize().data(), frame.serialize().size());
 
-    if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK")) {
-        return ConfState ::Success;
-    } else {
-
-        LOG_INFO("Modem does not respond to AT commands, trying close mux mode");
-        TS0710_Frame::frame_t frame;
-        frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
-        frame.Control = TypeOfFrame_e::UIH;
-        frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) | static_cast<uint8_t>(MuxDefines::GSM0710_EA) | static_cast<uint8_t>(MuxDefines::GSM0710_CR));
-        pv_cellular->Write((void*)frame.serialize().data(), frame.serialize().size());
-
-        pv_cellular->InformModemHostWakeup();
-        // GSM module needs some time to close multiplexer
-        vTaskDelay(1000);
-        // Try sending AT command once again
-        LOG_DEBUG("Sending AT 2 ...");
-        ret = parser->SendCommand("AT\r", 2);
-
-        if (ret.size() == 1 || ret.size() == 2) {
-            // Modem can send echo response or not, in either case it means that modem is operating in AT mode
-            return ConfState ::Success;
-        } else {
-            LOG_INFO("Starting power up procedure...");
-            // If no response, power up modem and try again
-            pv_cellular->PowerUp();
-            return ConfState::PowerUp;
+                pv_cellular->InformModemHostWakeup();
+                // GSM module needs some time to close multiplexer
+                vTaskDelay(1000);
+                LOG_DEBUG("Sending AT...");
+                ret = parser->SendCommand("AT\r", 2);
+                if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
+                    result = true;
+            }
+                step++;
+                break;
+            case 6:
+                //10. power UP
+                LOG_INFO("Starting power up procedure...");
+                pv_cellular->PowerUp();
+                return ConfState::PowerUp;
+                break;
         }
     }
+    return ConfState ::Success;
 }
 
 //TODO:M.P Fetch configuration from JSON/XML file
@@ -129,7 +180,6 @@ TS0710::ConfState TS0710::ConfProcedure() {
         LOG_ERROR("Baudrate setup error");
         return ConfState::Failure;
     }
-
     pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[startParams.PortSpeed]);
 
     // Route URCs to second (Notifications) MUX channel
@@ -291,7 +341,7 @@ void workerTaskFunction(void *ptr) {
             //inst->atParser->ProcessNewData();
             //TODO: add AT command processing
             LOG_DEBUG("[Worker] Processing AT response");
-            inst->parser->ProcessNewData();
+            inst->parser->ProcessNewData(inst->pv_parent);
         }
             // CMUX mode is default operation mode
         else if (inst->mode == TS0710::Mode::CMUX) {
