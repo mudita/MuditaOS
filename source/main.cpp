@@ -16,6 +16,7 @@
 #include "application-notes/ApplicationNotes.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-messages/ApplicationMessages.hpp"
+#include "application-calllog/ApplicationCallLog.hpp"
 
 //module-services
 #include "service-appmgr/ApplicationManager.hpp"
@@ -153,6 +154,7 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
+        applications.push_back(app::CreateLauncher<app::ApplicationCallLog>("ApplicationCallLog"));
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
 

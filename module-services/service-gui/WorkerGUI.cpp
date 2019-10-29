@@ -53,6 +53,9 @@ bool WorkerGUI::handleMessage( uint32_t queueID ) {
 			serviceGUI->commands.clear();
 			xSemaphoreGive( serviceGUI->semCommands );
 		}
+		else {
+			LOG_ERROR("Failed to acquire semaphore");
+		}
 
 		//create temporary vector of pointers to draw commands to avoid polluting renderer with smart pointers.
 		std::vector<gui::DrawCommand*> commands;

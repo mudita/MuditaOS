@@ -42,6 +42,7 @@ protected:
 	Alignment alignment;
 	//flag that defines if 3 dots are to be displayed at the end of label's text.
 	bool dotsMode;
+	//flag that defines if a remaining area of the label has a horizontal line.
 	bool lineMode;
 	//area specified in pixels occupied by text inside label space.
 	//This defines also position of the text considering alignment and margins.

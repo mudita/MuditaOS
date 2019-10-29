@@ -40,7 +40,7 @@ if [ "$1" != "" ]; then
 		TARGET_SET="true"
 		BT="DBT_STACK_SEL=\"BlueKitchen\""
 	fi
-	if [ "$1" = "assets" ]; then
+	if [ "$1" = "assets" ] ; then
 		echo "Copying assets folder"
 		cd "$BUILD_DIR"
 		#if there is no sys directory create one
@@ -56,6 +56,16 @@ if [ "$1" != "" ]; then
 		rm -rf *
 		cd ../..
 		cp -R ../image/assets/* sys/assets
+		exit 1
+	fi
+	if [ "$1" = "sys" ] ; then
+		echo "Copying whole image to sys folder"
+		#enter build directory, erase content and make /sys/assets directory
+		cd "$BUILD_DIR"
+		mkdir -p "$SYS_DIR" 
+		rm -rf "$SYS_DIR"/*
+		cp -R ../image/* "$SYS_DIR"
+		cp "../module-apps/application-viewer/viewerStates.txt" "sys"
 		exit 1
 	fi
 	if [ "$1" = "rt1051" ]; then
@@ -98,7 +108,7 @@ if [ -d "$MODULE_GUI_DIR" ]; then
 	
 	echo "Found module-gui, copying assets."
 #	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
-	cp -R ../image/* sys
+	cp -R ../image/* "$SYS_DIR"
 #	cp -R "../image/Luts.bin" "sys"
 	cp "../module-apps/application-viewer/viewerStates.txt" "sys"
 	#language profiles
