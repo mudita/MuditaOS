@@ -509,3 +509,64 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
     return true;
 }
 
+bool DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec) {
+    std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd,rec);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBCalllogResponseMessage* calllogResponse = reinterpret_cast<DBCalllogResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id) {
+    std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogRemove);
+    msg->id = id;
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBCalllogResponseMessage* calllogResponse = reinterpret_cast<DBCalllogResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec) {
+    std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate,rec);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBCalllogResponseMessage* calllogResponse = reinterpret_cast<DBCalllogResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv) {
+    std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogGetCount);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBCalllogResponseMessage* calllogResponse = reinterpret_cast<DBCalllogResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true)){
+        return calllogResponse->count;
+    }
+    else{
+        return false;
+    }
+}
+
+bool DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) {
+    std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogGetLimitOffset);
+    msg->offset = offset;
+    msg->limit = limit;
+
+    sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv);
+    return true;
+}

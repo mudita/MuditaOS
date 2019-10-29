@@ -93,16 +93,19 @@ void BottomBar::setActive( BottomBar::Side side, bool active ) {
 			break;
 	};
 }
-void BottomBar::setText( BottomBar::Side side, const UTF8& str ) {
+void BottomBar::setText( BottomBar::Side side, const UTF8& str, bool active ) {
 	switch( side ) {
 		case Side::LEFT:
 			left->setText(str);
+			left->setVisible(active);
 			break;
 		case Side::CENTER:
 			center->setText(str);
+			center->setVisible(active);
 			break;
 		case Side::RIGHT:
 			right->setText(str);
+			right->setVisible(active);
 			break;
 	};
 }

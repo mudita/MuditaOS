@@ -69,10 +69,10 @@ void PhonebookMainWindow::buildInterface() {
 
     setTitle(utils::localize.get("app_phonebook_title_main"));
 
-    leftArrowImage  = new gui::Image( this, 30,62,0,0, "arrow_left" );
-	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "arrow_right" );
-	newContactImage = new gui::Image( this, 48,55,0,0, "cross" );
-	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "search" );
+    leftArrowImage  = new gui::Image( this, 30,62,0,0, "phonebook_arrow_left" );
+	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "phonebook_arrow_right" );
+	newContactImage = new gui::Image( this, 48,55,0,0, "phonebook_cross" );
+	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "phonebook_search" );
 }
 void PhonebookMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
@@ -95,12 +95,12 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
 
 #if 0
-	for( uint32_t i=0; i<2/*surnames.size()*/; i++ ) {
+	for( uint32_t i=0; i<surnames.size(); i++ ) {
 
 		uint32_t nameCount = rand() % 10;
 		uint32_t count = 0;
 
-		for( uint32_t j=0; j</*nameCount*/ 2; j++ ) {
+		for( uint32_t j=0; j<nameCount; j++ ) {
 			ContactRecord contact;
 
 //			LOG_INFO("%d of %d", count, nameCount );
@@ -137,20 +137,6 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
 	list->clear();
 	list->setElementsCount( phonebookModel->getItemCount() );
-
-	ContactRecord rec;
-	ContactRecord errName;
-	ContactRecord errPhone1;
-	ContactRecord errPhone2;
-	ContactRecord speedDial;
-
-	rec.speeddial = 1;
-	rec.numbers.push_back( ContactRecord::Number("+487172722", "+487172722"));
-	bool res = DBServiceAPI::verifyContact( application,rec, errName, errPhone1, errPhone2, speedDial );
-
-	if( res == false )
-		LOG_ERROR("Verification failed");
-
 }
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {

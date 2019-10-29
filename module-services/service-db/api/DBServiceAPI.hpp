@@ -19,6 +19,7 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/NotesRecord.hpp"
+#include "Interface/CalllogRecord.hpp"
 
 class DBServiceAPI {
 
@@ -72,6 +73,12 @@ public:
 	static bool NotesUpdate(sys::Service* serv,const NotesRecord& rec);
 	static uint32_t NotesGetCount(sys::Service* serv);
 	static bool NotesGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+
+    static bool CalllogAdd(sys::Service* serv,const CalllogRecord& rec);
+	static bool CalllogRemove(sys::Service* serv,uint32_t id);
+	static bool CalllogUpdate(sys::Service* serv,const CalllogRecord& rec);
+	static uint32_t CalllogGetCount(sys::Service* serv);
+	static bool CalllogGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
 };
 
 

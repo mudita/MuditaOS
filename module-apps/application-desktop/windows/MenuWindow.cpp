@@ -122,6 +122,7 @@ void MenuWindow::buildInterface() {
 		//page1
 		TileDescription{"menu_phone","app_desktop_menu_phone",[=] (gui::Item& item) {
 			LOG_INFO("page 1 tile 1" );
+			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCallLog", "MainWindow", nullptr );
 			return true; }},
 		TileDescription{"menu_contacts",    "app_desktop_menu_contacts",[=] (gui::Item& item){
             LOG_INFO("Phonebook");

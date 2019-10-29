@@ -18,6 +18,8 @@ const inline std::string title = "gt_pressura_bold_32";
 };  // namespace font
 };  // namespace header
 namespace window {
+const inline uint32_t default_left_margin = 20;
+const inline uint32_t default_right_margin = 20;
 namespace font {
 const inline std::string verybig = "gt_pressura_light_46";
 const inline std::string bigbold = "gt_pressura_bold_30";
