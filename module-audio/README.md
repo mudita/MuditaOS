@@ -8,7 +8,7 @@ Implementation of module-audio was developed after going through [Linux Sound Su
 documents describing audio Linux audio. These documents were mainly used as inspiration as requested PureOS audio functionality is much less sophisticated. Also due to 
 hardware limitations (mainly processor speed and hardware audio codec features) some additional assumptions were made.
 #### [PortAudio library](http://www.portaudio.com/)
-Whole audio device layer which can be found in `module-bsp/bsp/audio` and concept of audio devices were based on this library.
+Whole audio device layer which can be found in [bsp-audio](../module-bsp/bsp/audio) and concept of audio devices were based on this library.
 Even API is quite similar to PortAudio's one. 
 
 # Features
@@ -39,9 +39,9 @@ hardware audio codec and & BT configuration need to be switched according to spe
 currently being played.
 #### There is no possibility to mix audio channels
 Due to not having re-sampling ability, mixing channels which have different audio formats is considered to be impossible.There is not even a audio channels or
-mixer implemented! This has even further implications as it won't possible for instance to play notification during voice call or song. 
+mixer implemented! This has even further implications as it won't be possible for instance to play notification during voice call or song. 
 #### 16bit stereo/mono PCM samples are used as internal audio samples format
-This format was picked as it is used the most common. Additionally moving raw PCM samples from one point to another is the easiest method and the most error prone.
+This format was picked as it is commonly used. Additionally moving raw PCM samples from one point to another is the easiest method and the most error resilient.
 #### 16 bit audio files are only supported
 Currently due to some limitations in hardware audio codec only 16-bit PCM samples are supported. It is possible to add support for 8/24 or even 32 bit samples. This should be done
 in audio device layer inside `module-bsp/bsp/audio`
