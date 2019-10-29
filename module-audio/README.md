@@ -43,7 +43,7 @@ mixer implemented! This has even further implications as it won't possible for i
 #### 16bit stereo/mono PCM samples are used as internal audio samples format
 This format was picked as it is used the most common. Additionally moving raw PCM samples from one point to another is the easiest method and the most error prone.
 #### 16 bit audio files are only supported
-Currently due to some limitations in hardware audio codec only 16-bit PCM samples are supported. It is possible to add support for 8/24 or even 32 bit samples. This is should be done
+Currently due to some limitations in hardware audio codec only 16-bit PCM samples are supported. It is possible to add support for 8/24 or even 32 bit samples. This should be done
 in audio device layer inside `module-bsp/bsp/audio`
 #### There is no possibility to record and playback at the same time
 This is self-explanatory. Whole switching logic is implemented inside `module-audio` 
@@ -52,7 +52,7 @@ IPhone headphones have very specific format of handling vol up/down buttons whic
 
 # How it works
 ### Audio devices
-Audio devices that can be found in `module-bsp/bsp/audio` are generic abstraction over different kinds of output/input audio devices.
+Audio devices that can be found in [bsp_audio](../module-bsp/bsp/audio) are generic abstraction over different kinds of output/input audio devices.
 For instance: audio codecs, GSM audio and so on.The main purpose of using this abstraction is to have one unified interface (API) by which we
 can control and manage audio devices. This way we can also very easily support different compile target (currently Linux & RT1051). It is only a matter of
 implementing a new audio device.
@@ -63,7 +63,7 @@ Currently we have four implementations of audio devices
 * Linux audio (via PortAudio library)
 * Linux audio cellular (also via PortAudio library)
 
-Each audio device must conform to API interface which is specified in `AudioDevice` class in `module-bsp/bsp/audio/bsp_audio.hpp`
+Each audio device must conform to API interface which is specified in `AudioDevice` class in [bsp_audio](../module-bsp/bsp/audio/bsp_audio.hpp)
 
 ### Decoders
 Decoders layer was developed in order to have unified API over vast range of audio decoders. Another very important part of decoders
@@ -221,17 +221,98 @@ ProfilePlaybackHeadphones(std::function<int32_t()> callback, float volume) : Pro
         bsp::AudioDevice::Type::Audiocodec,
         callback) {}
 ````
+Profile configuration can be found here: [Profiles](./Audio/Profiles)
+
 Not every parameter is used, for example setting `inputGain` for playback does not have any sense so does `inputPath` hence they are omitted.
 `callback` parameter was designed to be invoked asynchronously when audio subsystem updates profile's data. This way those changes can be also updated in database.  
 **IMPORTANT:** For the time being profiles are not loaded and stored into database. This should be fixed.  
 **IMPORTANT:** Callbacks mechanism is only experimental and should be considered as incomplete.
 
+# Audio class
+Audio class is main interface to audio subsystem: [Audio class](./Audio/Audio.hpp)  which is exclusively used by [audio-service](../module-services/service-audio)
+Audio class stores internally current `Operation` and bunch of other things like its state and async callback.  
+Async callback which is described below:
+````
+enum class AudioEvents {
+    EndOfFile,
+    FileSystemNoSpace
+};
+````
+is mainly used for signaling various events to the audio subsystem user. For now list of events is not very long but mechanism is here and it can be extended if needed.  
+
+API is quite straightforward, methods are self-explanatory hence I will not describe them thoroughly. What is worth noticing is:
+````
+enum class State {
+    Idle,
+    Playback,
+    Recording,
+    Routing,
+};
+````
+This structure describes all possible states in which audio subsystem can be. This states are directly related to this four methods:
+```` 
+int32_t Start(Operation::Type op, const char *fileName="");
+
+int32_t Stop();
+
+int32_t Pause();
+
+int32_t Resume();
+````
+
+By invoking them user internally changes audio subsystem state therefore there are some assumptions and constraints:
+* It is possible to invoke `Start` from any state
+* It is possible to invoke `Stop` from any state
+* `Pause` can be invoked only when **not** in `Idle` state
+* `Resume` can be invoked only **after** successful `Pause` request.
+If user messes switching logic appropriate error code will be returned.  
+
+
+##### std::optional<Tags> GetFileTags(const char *filename);
+
+is used for fetching metadata of specified audio file. There are no constraints on using it, it can be invoked in any time.
+If file exists and its extension is supported Tags structure will be returned containing all necessary data about audio file.
 
 # Missing features
 #### Bluetooth audio device support
+Currently support for BT audio devices is marginal. There are some code parts related to BT but they absolutely cannot be treated as target implementation.
+Adding BT support in my opinion should be split into several steps:
+* Adding BT A2DP audio device into `module-bsp/bsp/audio`
+* Adding necessary profiles configuration (`PlaybackBTA2DP` and `SystemSoundBTA2DP`)
+* There should be no further problems with BT audio device if it fully implements necessary API and its behaviour under different actions is correct
+* For examples of audio device implementation please check existing ones
+
 #### Jack insert/remove events handling
+Templates for all necessary profiles are already implemented. There should be verified and double-checked, though. 
+Jack insert/remove events are also correctly propagated into audio subsystem. What is missing is actual handling of jack detection circuit on the low-level. There is also no
+communication between audio subsystem and event system.
+
 #### Storing & loading profiles
-#### Control profiles parameters
+As described earlier dedicated async callback were added into each profile. It is to be considered if this mechanism is sufficient enough or should be reimplemented.
+Currently profiles configuration is not sustained and loaded upon start. It should be stored in DB.
 
+#### Control profile's parameters
+Currently there are four methods used for controlling profile's parameters, [Audio Class](./Audio/Audio.hpp)
+````
+int32_t SetOutputVolume(Volume vol);
 
-More missing features are listed in `module-audio/TODO` file.
+int32_t SetInputGain(Gain gain);
+
+Volume GetOutputVolume();
+
+Gain GetInputGain();
+````
+These methods are designed to operate on current Operation/Profile pair. What it means is that invoking them will only change parameters of currently used profile.  
+Another variant of this set should be developed which would allow for changing any profile's parameters.  
+For instance:
+````
+int32_t SetOutputVolume(Profile::Type profile, Volume vol);
+
+int32_t SetInputGain(Profile::Type profile,Gain gain);
+
+Volume GetOutputVolume(Profile::Type profile);
+
+Gain GetInputGain(Profile::Type profile);
+````
+
+Some missing features are also described in [TODO](./TODO)
