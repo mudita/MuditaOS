@@ -13,6 +13,7 @@ BlueKitchen::BlueKitchen(unsigned int in_size, unsigned int out_size) :Bluetooth
     read_buff = NULL;
     read_ready_cb=NULL;
     write_done_cb=NULL;
+    in.threshold = 128;
 }
 
 BlueKitchen::~BlueKitchen()
@@ -23,7 +24,7 @@ BlueKitchen *BlueKitchen::getInstance()
 {
     static BlueKitchen *k=NULL;
     if(k==NULL) {
-        k=new BlueKitchen();
+        k=new BlueKitchen(2048, 8000);
     }
     return k;
 }
@@ -40,7 +41,7 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
     // bt->to_read
     BaseType_t taskwoken = 0;
     uint8_t val = Bt::Message::EvtReceived;
-    if((to_read!=0) && (in.len >= to_read) && (in.len != 0)) {
+    if((to_read!=0) && (in.len >= to_read)) {
         to_read = 0;
         if(qHandle) {
             xQueueSendFromISR(qHandle, &val, &taskwoken);
@@ -49,6 +50,10 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
     }
     set_rts(true);
     return 0;
+}
+
+void BlueKitchen::set_flowcontroll(int on) {
+    // TODO
 }
 
 #include <sstream>
@@ -67,6 +72,7 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size) {
 #endif
     if (BluetoothCommon::write_blocking(buf, size) == size) {
         xQueueSendFromISR(qHandle, &val, &taskwoken);
+        portEND_SWITCHING_ISR(taskwoken);
     } else {
         val = Bt::Message::EvtSentError;
         xQueueSendFromISR(qHandle, &val, &taskwoken);
@@ -76,7 +82,6 @@ ssize_t BlueKitchen::write_blocking(char *buf, ssize_t size) {
 }
 
 extern "C" {
-    // TODO chyba wiem... powinienem zebrac sam dane a potem je przekazac juz zbuforowane xdddd
     void LPUART2_IRQHandler(void)
     {
         uint32_t isrReg = LPUART_GetStatusFlags(BSP_BLUETOOTH_UART_BASE);
@@ -92,11 +97,15 @@ extern "C" {
                 val = Bt::Message::EvtRecUnwanted;
                 xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
             }
-            if(bt->to_read !=0 && bt->in.len >= bt->to_read) {
+            if(bt->to_read !=0 && (bt->in.len >= bt->to_read)) {
                 bt->to_read = 0;
                 assert(bt->qHandle);
                 val = Bt::Message::EvtReceived;
                 xQueueSendFromISR(bt->qHandle, &val, &taskwoken);
+                portEND_SWITCHING_ISR(taskwoken);
+            }
+            if(bt->in.threshold_guard()) {
+                bt->set_rts(false);
             }
         }
         if(isrReg & kLPUART_RxOverrunFlag) {

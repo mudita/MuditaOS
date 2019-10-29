@@ -4,6 +4,7 @@
 #include "MessageType.hpp"
 #include "messages/BluetoothMessage.hpp"
 #include <log/log.hpp>
+#include <service-lwip/ServiceLwIP.hpp>
 
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
 
@@ -53,10 +54,20 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage* msg,sys::
                     }
                     break;
 
-                case BluetoothMessage::PAN:
-                    worker->start_pan();
-                    break;
-
+                case BluetoothMessage::PAN: {
+                    /// request lwip first...
+                    LOG_INFO("Request LwIP running!");
+// TODO blocking message - wrecks system
+//                    auto ret = message_lwip(this, LwIP_message::Request::Start);
+//                    if (ret != sys::ReturnCodes::Success) {
+//                        LOG_ERROR("Request for LwIP start failed");
+//                    }
+//                    else {
+                        /// TODO request PPP
+                        LOG_INFO("Start PAN");
+                        worker->start_pan();
+//                    }
+                } break;
                 case BluetoothMessage::Visible:
                     worker->set_visible();
                     break;

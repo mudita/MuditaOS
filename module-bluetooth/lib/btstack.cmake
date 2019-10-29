@@ -32,6 +32,7 @@ set(BT_CLASSIC
     ${BT_STACK_ROOT}/src/classic/spp_server.c
     ${BT_STACK_ROOT}/src/classic/rfcomm.c
     ${BT_STACK_ROOT}/src/classic/bnep.c
+    ${BT_STACK_ROOT}/src/classic/btstack_link_key_db_memory.c
     ${BT_STACK_ROOT}/src/classic/pan.c
     ${BT_STACK_ROOT}/src/classic/sdp_server.c
     ${BT_STACK_ROOT}/src/classic/device_id_server.c
@@ -161,6 +162,7 @@ list(APPEND BOARD_DIR_SOURCES
     ${BT_STACK_ROOT}/platform/posix/btstack_stdin_posix.c
     ${BT_STACK_ROOT}/platform/posix/btstack_uart_block_posix.c
     ${BT_STACK_ROOT}/platform/posix/btstack_run_loop_posix.c
+    ${BT_STACK_ROOT}/platform/posix/btstack_tlv_posix.c
     )
 else()
 endif()

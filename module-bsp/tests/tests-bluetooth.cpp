@@ -14,12 +14,6 @@ TEST_CASE("TC1") {
         auto bt = Bluetopia::getInstance();
         REQUIRE(bt!=nullptr);
 
-        bt->log(BTdev::LogError,"Test! Shouldnt print");
-        bt->register_log(vprintf);
-        bt->log(BTdev::LogError,"Test prints\n");
-        bt->log(BTdev::LogDebug, "Now logs everything\n");
-        bt->log(BTdev::LogWarning, "LOG: %u\n",10);
-
         // cast to char* to aviod warning
         REQUIRE(bt->write_blocking((char*)"LOL", strlen("LOL"))>0);
         std::array<char,120> test_array;

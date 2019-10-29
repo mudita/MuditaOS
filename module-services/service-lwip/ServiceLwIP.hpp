@@ -17,6 +17,8 @@ class LwIP_message : public sys::DataMessage {
     virtual ~LwIP_message() = default;
 };
 
+sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req);
+
 class ServiceLwIP : public sys::Service {
    public:
     ServiceLwIP();

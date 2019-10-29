@@ -6,7 +6,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <signal.h>
 
 #include "btstack_config.h"
@@ -21,6 +20,7 @@ extern "C" {
 #include <btstack_stdin.h>
 
 #include <btstack_chipset_cc256x.h>
+#include <btstack_link_key_db_memory.h>
 
 };
 
@@ -35,6 +35,7 @@ extern "C" {
 #endif
 
 #include <Error.hpp>
+#include <functional>
 
 // #define TLV_DB_PATH_PREFIX "/tmp/btstack_"
 // #define TLV_DB_PATH_POSTFIX ".tlv"
@@ -183,20 +184,34 @@ Error initialize_stack()
     const btstack_uart_block_t *uart_driver = btstack_uart_block_posix_instance();
 #endif
     const hci_transport_t *transport = hci_transport_h4_instance(uart_driver);
+    const btstack_link_key_db_t * link_key_db = btstack_link_key_db_memory_instance();
     hci_init(transport, (void *)&config);
+    hci_set_link_key_db(link_key_db);
 
     hci_event_callback_registration.callback = &hci_packet_handler;
     hci_add_event_handler(&hci_event_callback_registration);
     LOG_DEBUG("BT worker run success");
-    hci_power_control(HCI_POWER_ON);
+    return Error();
+}
+
+Error register_hw_error(std::function<void(uint8_t)> foo) {
+    static std::function<void(uint8_t)> bar = nullptr;
+    bar = foo;
+    hci_set_hardware_error_callback([](uint8_t val) -> void {
+            LOG_ERROR("Bluetooth HW ERROR! %d", val);
+            if(bar) {
+                bar(val);
+            }
+            });
     return Error();
 }
 
 Error run_stack(TaskHandle_t *handle)
 {
     BaseType_t taskerr = 0;
-    LOG_INFO("Last moment for Bt registration prior to RUN state");
-    if ((taskerr = xTaskCreate(run_btstack, std::string("BtStack").c_str(),
+    LOG_INFO("Past last moment for Bt registration prior to RUN state");
+    hci_power_control(HCI_POWER_ON);
+    if ((taskerr = xTaskCreate(run_btstack, "BtStack",
                                1024,
                                NULL,
                                tskIDLE_PRIORITY,
