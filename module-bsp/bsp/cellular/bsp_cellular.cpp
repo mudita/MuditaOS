@@ -22,7 +22,7 @@
 namespace bsp{
 
     std::optional<std::unique_ptr<Cellular>> Cellular::Create(
-            [[maybe_unused]] const char* term, speed_t portSpeed) {
+            [[maybe_unused]] const char* term, uint32_t portSpeed) {
 
         std::unique_ptr<Cellular> inst;
 

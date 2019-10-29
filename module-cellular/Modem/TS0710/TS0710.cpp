@@ -9,14 +9,14 @@
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = { {TypeOfFrame_e::SABM, "SABM"}, {TypeOfFrame_e::UA, "UA"}, {TypeOfFrame_e::DM, "DM"}, {TypeOfFrame_e::DISC, "DISC"}, {TypeOfFrame_e::UIH, "UIH"}, {TypeOfFrame_e::UI, "UI"}, {TypeOfFrame_e::I, "I"} };
 std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text = { {PortSpeed_e::PS9600, 1}, {PortSpeed_e::PS19200, 2}, {PortSpeed_e::PS38400, 3}, {PortSpeed_e::PS57600, 4}, {PortSpeed_e::PS115200, 5}, {PortSpeed_e::PS230400, 6}, {PortSpeed_e::PS460800, 7} };
 std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {PortSpeed_e::PS19200, 19200}, {PortSpeed_e::PS38400, 38400}, {PortSpeed_e::PS57600, 57600}, {PortSpeed_e::PS115200, 115200}, {PortSpeed_e::PS230400, 230400}, {PortSpeed_e::PS460800, 460800} };
-std::map<PortSpeed_e, speed_t> LinuxTermPortSpeeds_text = { {PortSpeed_e::PS9600, B9600}, {PortSpeed_e::PS19200, B19200}, {PortSpeed_e::PS38400, B38400}, {PortSpeed_e::PS57600, B57600}, {PortSpeed_e::PS115200, B115200}, {PortSpeed_e::PS230400, B230400}, {PortSpeed_e::PS460800, B460800} };
+
 /**
  * TS0710 implementation
  */
 
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
-    pv_cellular = bsp::Cellular::Create(SERIAL_PORT, B115200).value_or(nullptr);
+    pv_cellular = bsp::Cellular::Create(SERIAL_PORT, 115200).value_or(nullptr);
     parser = new ATParser(pv_cellular.get());
     pv_parent = parent;
 
@@ -75,7 +75,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //4. Send AT - check for answer
                 //5. OK ? -> ret success
                 LOG_DEBUG("2. Setting baudrate to %i...", ATPortSpeeds_text[startParams.PortSpeed]);
-                pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[startParams.PortSpeed]);
+                pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
                 LOG_DEBUG("Sending AT...");
                 ret = parser->SendCommand("AT\r", 2);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
@@ -106,7 +106,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //7. set baudrate 115200 baud
                 //8. Send AT
                 LOG_DEBUG("Setting baudrate to 115200...");
-                pv_cellular->SetSpeed(B115200);
+                pv_cellular->SetSpeed(115200);
                 LOG_DEBUG("Sending AT...");
                 ret = parser->SendCommand("AT\r", 2);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
@@ -180,7 +180,7 @@ TS0710::ConfState TS0710::ConfProcedure() {
         LOG_ERROR("Baudrate setup error");
         return ConfState::Failure;
     }
-    pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[startParams.PortSpeed]);
+    pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
 
     // Route URCs to second (Notifications) MUX channel
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));

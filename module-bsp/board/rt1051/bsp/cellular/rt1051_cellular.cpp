@@ -16,7 +16,7 @@
 
 #include "dma_config.h"
 #include "fsl_cache.h"
-
+#include <map>
 
 extern "C" {
 
@@ -62,7 +62,6 @@ namespace bsp {
     lpuart_edma_handle_t            RT1051Cellular::uartDmaHandle = {};
     TaskHandle_t                    RT1051Cellular::blockedTaskHandle = nullptr;
     StreamBufferHandle_t            RT1051Cellular::uartRxStreamBuffer = nullptr;
-
 
     RT1051Cellular::RT1051Cellular() {
 
@@ -125,6 +124,31 @@ namespace bsp {
         EnableRx();
 
         isInitialized = true;
+    }
+
+    void RT1051Cellular::SetSpeed(uint32_t portSpeed) {
+        NVIC_DisableIRQ(LPUART1_IRQn);
+        lpuart_config_t s_cellularConfig;
+
+        LPUART_GetDefaultConfig(&s_cellularConfig);
+
+        s_cellularConfig.baudRate_Bps = portSpeed;
+        s_cellularConfig.dataBitsCount = kLPUART_EightDataBits;
+        s_cellularConfig.parityMode = kLPUART_ParityDisabled;
+        s_cellularConfig.isMsb = false;
+        s_cellularConfig.rxIdleType = kLPUART_IdleTypeStartBit;
+        s_cellularConfig.rxIdleConfig = kLPUART_IdleCharacter1;
+        s_cellularConfig.enableTx = false;
+        s_cellularConfig.enableRx = false;
+
+        LPUART_Deinit(CELLULAR_UART_BASE);
+
+        if (LPUART_Init(CELLULAR_UART_BASE, &s_cellularConfig, GetPerphSourceClock(PerphClock_LPUART)) != kStatus_Success) {
+            LOG_ERROR("Could not initialize the uart!");
+            return;
+        }
+
+        NVIC_EnableIRQ(LPUART1_IRQn);
     }
 
 
@@ -209,6 +233,13 @@ namespace bsp {
 
     ssize_t RT1051Cellular::Write(void *buf, size_t nbytes) {
         lpuart_transfer_t sendXfer;
+
+        printf("[TX] ");
+        uint8_t *ptr = (uint8_t*)buf;
+        for (size_t i = 0; i < nbytes; i++)
+            printf("%02X ", (uint8_t)*ptr++);
+        printf("\n");
+
         sendXfer.data = static_cast<uint8_t *>(buf);
         sendXfer.dataSize = nbytes;
 
@@ -235,7 +266,16 @@ namespace bsp {
     }
 
     ssize_t RT1051Cellular::Read(void *buf, size_t nbytes) {
-        return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
+        ssize_t ret = xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
+        if (ret > 0) {
+            printf("[RX] ");
+            uint8_t *ptr = (uint8_t*)buf;
+            for (size_t i = 0; i < ret; i++)
+                printf("%02X ", (uint8_t)*ptr++);
+            printf("\n");
+        }
+        return ret;
+        //return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
     }
 
     uint32_t RT1051Cellular::Wait(uint32_t timeout) {

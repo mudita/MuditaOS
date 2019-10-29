@@ -24,7 +24,6 @@ struct DLC_ESTABL_SystemParameters_t {
 enum PortSpeed_e { PS2400, PS4800, PS7200, PS9600, PS19200, PS38400, PS57600, PS115200, PS230400, PS460800 };
 extern std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text;
 extern std::map<PortSpeed_e, int> ATPortSpeeds_text;
-extern std::map<PortSpeed_e, speed_t> LinuxTermPortSpeeds_text;
 
 /*MUX defines */
 enum class MuxDefines {

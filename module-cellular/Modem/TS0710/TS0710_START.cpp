@@ -64,34 +64,7 @@ void TS0710_START::request(Mode_e mode, START_SystemParameters_t system_paramete
     int WakeUpRespTime;             //!< Wake up response timer [1s-255s, default: 10s]
     int ErrRecovWindowSize;         //!< Window size for error recovery mode [1-7, default: 2]
     */
-#if 0
-    LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[system_parameters.PortSpeed]);
-    sprintf(buf,"AT+IPR=%i\r", ATPortSpeeds_text[system_parameters.PortSpeed]);
-    pv_cellular->Write((void*)buf, strlen(buf));
-    vTaskDelay(1000);
-    ssize_t len = pv_cellular->Read((void*)buf, 256);
-    LOG_DEBUG("[!!!] len: %i", len);
-    buf[len] = 0;
-    if (strcmp(buf, "\r\nOK\r\n") != 0) {
-        LOG_ERROR("CMUX setup error: %s", buf);
-        return;
-    }
-    pv_cellular->SetSpeed(LinuxTermPortSpeeds_text[system_parameters.PortSpeed]);
-    //enable cmux
-    LOG_DEBUG("Enabling CMUX");
-    sprintf(buf, "AT+CMUX=0,0,%i,%i,%i,%i,%i,%i,%i\r", QuectelCMUXPortSpeeds_text[system_parameters.PortSpeed], system_parameters.MaxFrameSize, system_parameters.AckTimer, \
-                                                        system_parameters.MaxNumOfRetransmissions, system_parameters.MaxCtrlRespTime, system_parameters.WakeUpRespTime, \
-                                                        system_parameters.ErrRecovWindowSize);
-    LOG_DEBUG("%s", buf);
-    pv_cellular->Write((void *)buf, strlen(buf));
-    vTaskDelay(100);
-    len = pv_cellular->Read((void *)buf, 256);
-    buf[len] = 0;
-    if (strcmp(buf, "\r\nOK\r\n") != 0) {
-        LOG_ERROR("CMUX setup error: %s", buf);
-        return;
-    }
-#endif
+
     //2. Create channel DLCI0 - control
     ctrlChannel = new DLC_channel(0, std::string("Control"), pv_cellular);
 

@@ -58,6 +58,8 @@ namespace bsp {
 
 		void ExitSleep() override final;
 
+        void SetSpeed(uint32_t portSpeed);
+
         static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;
 

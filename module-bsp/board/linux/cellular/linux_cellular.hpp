@@ -50,7 +50,7 @@ namespace bsp {
 
         void ExitSleep() override final;
 
-        void SetSpeed(speed_t portSpeed);
+        void SetSpeed(uint32_t portSpeed);
 
     private:
 

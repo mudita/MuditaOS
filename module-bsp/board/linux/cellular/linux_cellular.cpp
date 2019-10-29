@@ -21,8 +21,11 @@
 #include <time.h>
 #include <ticks.hpp>
 #include "mutex.hpp"
+#include <map>
 
 namespace bsp {
+
+    std::map<uint32_t, speed_t> PortSpeeds_text = { {9600U, B9600}, {19200U, B19200}, {38400U, B38400}, {57600U, B57600}, {115200U, B115200}, {230400U, B230400}, {460800U, B460800} };
 
     LinuxCellular::LinuxCellular(const char *term, speed_t portSpeed) {
 
@@ -169,7 +172,7 @@ namespace bsp {
 
     }
 
-    void LinuxCellular::SetSpeed(speed_t portSpeed) {
+    void LinuxCellular::SetSpeed(uint32_t portSpeed) {
         struct termios t;
         memset(&t, 0, sizeof(t));
         tcgetattr(fd, &t);
@@ -179,7 +182,7 @@ namespace bsp {
         //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
         //else
         t.c_cflag &= ~(CRTSCTS);   //disable the flow control on dev board
-        speed_t speed = portSpeed; //B115200;
+        speed_t speed = PortSpeeds_text[portSpeed]; //B115200;
         cfsetispeed(&t, speed);
         cfsetospeed(&t, speed);
         tcsetattr(fd, TCSANOW, &t);
