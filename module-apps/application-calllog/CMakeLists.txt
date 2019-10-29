@@ -29,8 +29,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogDetailsWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogOptionsWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogCallDeleteWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CallLogCallType.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CallLogSwitchData.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/data/CallLogGuiSettings.hpp"
 )
 
