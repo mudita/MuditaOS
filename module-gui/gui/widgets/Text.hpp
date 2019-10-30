@@ -177,6 +177,7 @@ protected:
 	}
 
 	void recalculateDrawParams();
+	Alignment alignementType;
 
 public:
 	Text();
@@ -189,6 +190,7 @@ public:
 	 */
 	void setEditMode( EditMode mode );
 	void setTextType( TextType type );
+	void setAlignement ( const Alignment& alignment );
 	/**
 	 * @brief Sets mode where all text lines have underline.
 	 * @param underline - if true text lines will have underline, if false no underline will be drawn.
