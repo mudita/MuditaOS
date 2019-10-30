@@ -27,7 +27,7 @@ namespace bsp {
 
     public:
 
-        LinuxCellular(const char* term, speed_t portSpeed);
+        LinuxCellular(const char* term, uint32_t portSpeed);
         ~LinuxCellular();
 
         void PowerUp() override final;

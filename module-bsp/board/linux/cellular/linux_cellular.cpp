@@ -28,7 +28,7 @@
 
 namespace bsp {
 
-    std::map<uint32_t, speed_t> PortSpeeds_text = { {9600U, B9600}, {19200U, B19200}, {38400U, B38400}, {57600U, B57600}, {115200U, B115200}, {230400U, B230400}, {460800U, B460800} };
+    const std::map<uint32_t, speed_t> PortSpeeds_text = { {9600U, B9600}, {19200U, B19200}, {38400U, B38400}, {57600U, B57600}, {115200U, B115200}, {230400U, B230400}, {460800U, B460800} };
 
     LinuxCellular::LinuxCellular(const char *term, uint32_t portSpeed) {
 
@@ -38,7 +38,7 @@ namespace bsp {
             // open serial port
             fd = open(term, O_RDWR | O_NOCTTY | O_NONBLOCK);
             if (fd == -1) {
-                LOG_FATAL("Failed to open serial port\n");
+                LOG_FATAL("Failed to open serial port");
                 return;
             }
 
@@ -62,7 +62,7 @@ namespace bsp {
         epoll_fd = epoll_create1(0);
 
         if (epoll_fd == -1) {
-            LOG_FATAL("Failed to create epoll file descriptor\n");
+            LOG_FATAL("Failed to create epoll file descriptor");
         }
 
         struct epoll_event event;
@@ -70,7 +70,7 @@ namespace bsp {
         event.events = EPOLLIN;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event)) {
-            LOG_FATAL("Failed to add file descriptor to epoll\n");
+            LOG_FATAL("Failed to add file descriptor to epoll");
         }
 
         isInitialized = true;

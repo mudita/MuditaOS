@@ -52,7 +52,7 @@ void DLC_channel::SendData(std::vector<uint8_t> data){
     TS0710_DATA _data = TS0710_DATA(pv_DLCI, pv_chanParams, data, pv_cellular);
 }
 
-#if 0
+#if 0  //left here for reference
 ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
     ssize_t ret = -1;
     static uint8_t *buf = nullptr;

@@ -78,8 +78,8 @@ public:
             return ret;
         }
 
-        void deserialize(std::vector<uint8_t> serData) {
-            if (serData.size() == 0) {
+        void deserialize(const std::vector<uint8_t> &serData) {
+            if (serData.size() < 4) {
                 LOG_ERROR("Trying to deserialize empty frame");
                 Address = 0;
                 Control = 0;
@@ -161,7 +161,7 @@ public:
     std::vector<uint8_t> getSerData() { return pv_serData; }
 
     /* F9 03 3F 01 1C F9 */
-    static bool isComplete(std::vector<uint8_t> serData) {
+    static bool isComplete(const std::vector<uint8_t> &serData) {
         if (serData.size() < 4)
             return false;   //check if buffer has enough data to get length
 
@@ -184,13 +184,13 @@ public:
         return false;
     }
 
-    static bool isMyChannel(std::vector<uint8_t> serData, DLCI_t DLCI) {
+    static bool isMyChannel(const std::vector<uint8_t> &serData, DLCI_t DLCI) {
         if ((serData.size() > 1) && ((serData.at(1) >> 2) == DLCI))
             return true;
         return false;
     }
 
-    static DLCI_t getFrameDLCI(std::vector<uint8_t> serData) {
+    static DLCI_t getFrameDLCI(const std::vector<uint8_t> &serData) {
         if (serData.size() > 1)
             return (serData.at(1) >> 2);
         return -1;

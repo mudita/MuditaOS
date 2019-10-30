@@ -55,7 +55,7 @@ public:
 private:
 
     //std::unique_ptr<MuxDaemon> muxdaemon;
-    TS0710 *cmux = nullptr;
+    TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     uint32_t callStateTimer = 0;
     DLC_channel::Callback_t notificationCallback=nullptr;
 

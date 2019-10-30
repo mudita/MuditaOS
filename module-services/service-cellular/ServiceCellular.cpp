@@ -110,7 +110,7 @@ void ServiceCellular::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
-    cmux = new TS0710(PortSpeed_e::PS460800, this);
+    //cmux = new TS0710(PortSpeed_e::PS460800, this);
 
     // Start procedure is as follow:
         /*

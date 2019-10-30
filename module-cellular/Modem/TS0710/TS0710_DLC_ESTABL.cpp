@@ -106,26 +106,29 @@ void TS0710_DLC_ESTABL::indication(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sy
  */
 bool TS0710_DLC_ESTABL::response(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t system_parameters) {
     #define _SIZE   256
-    static uint8_t data[_SIZE];
+    static uint8_t *data;
+
+    data = static_cast<uint8_t*>(malloc(_SIZE));    //disconnected from declaration due to the fact that static is needed here and if
+                                                    //allocated in declaration, compiler will not alloc this second time called
     
     //uint32_t len = UartReceive(data);
     ssize_t len = pv_cellular->Read(reinterpret_cast<void*>(data), _SIZE);
     LOG_DEBUG("RX length = %li", len);
     
     if (len > 0) {
-        std::vector<uint8_t> v;
-        for (uint32_t i = 0; i < len; i++)
-            v.push_back(data[i]);
+        std::vector<uint8_t> v(data, data + len);
         TS0710_Frame frame_c(v);
         TS0710_Frame::frame_t frame = frame_c.getFrame();
 
         if ( ((frame.Address & 0xFC) == (DLCI << 2)) && (frame.Control == static_cast<uint8_t>(TypeOfFrame_e::UA)) ) {
             LOG_DEBUG("Frame correct");
+            free(data);
             return true;
         }
     }
 
     LOG_DEBUG("ERROR - discarding frame !");
+    free(data);
     return false;
 }
 
