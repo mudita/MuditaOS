@@ -19,6 +19,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "LanguageWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -51,12 +52,7 @@ void LanguageWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::SIGNAL, true  );
 	topBar->setActive(TopBar::Elements::BATTERY, true  );
 
-	title = new gui::Label(this, 0, 50, 480, 50 );
-	title->setFilled( false );
-	title->setBorderColor( gui::ColorNoColor );
-	title->setFont("gt_pressura_bold_24");
-	title->setText(utils::localize.get("app_settings_title_languages"));
-	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    setTitle(utils::localize.get("app_settings_title_languages"));
 
 	//add option connectivity option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_language_english"), [=] (gui::Item& item){
@@ -93,7 +89,6 @@ void LanguageWindow::buildInterface() {
 }
 void LanguageWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete title;
 	for( uint32_t i=0; i<options.size(); i++ )
 		delete options[i];
 	this->focusItem = nullptr;
@@ -110,7 +105,7 @@ gui::Item* LanguageWindow::addOptionLabel( const std::string& text, std::functio
 	label->setFilled( false );
 	label->setPenFocusWidth( 3 );
 	label->setPenWidth( 0 );
-	label->setFont("gt_pressura_regular_24");
+	label->setFont(style::window::font::medium);
 	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
 	label->setRadius(11);
 	label->activatedCallback = activatedCallback;
@@ -119,34 +114,8 @@ gui::Item* LanguageWindow::addOptionLabel( const std::string& text, std::functio
 }
 
 
-void LanguageWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void LanguageWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setFocusItem( options[0] );
-}
-
-bool LanguageWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
-			application->render( RefreshModes::GUI_REFRESH_FAST );
-		return true;
-	}
-
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return false;
-
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		application->switchWindow( "MainWindow", 0, nullptr );
-		return true;
-	}
-
-	return false;
 }
 
 } /* namespace gui */

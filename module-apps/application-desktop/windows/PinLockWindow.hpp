@@ -45,7 +45,7 @@ class PinLockWindow: public AppWindow {
 public:
 	PinLockWindow( app::Application* app );
 	virtual ~PinLockWindow();
-	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
 	bool onInput( const InputEvent& inputEvent ) override;
 
 	void rebuild() override;

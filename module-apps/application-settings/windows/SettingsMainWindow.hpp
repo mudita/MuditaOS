@@ -26,7 +26,6 @@ namespace gui {
  */
 class SettingsMainWindow: public AppWindow {
 protected:
-	gui::Label* title;
 	std::vector<gui::Item*> options;
 
 	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
@@ -35,8 +34,7 @@ public:
 	virtual ~SettingsMainWindow();
 
 	//virtual methods
-	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
 
 	void rebuild() override;
 	void buildInterface() override;

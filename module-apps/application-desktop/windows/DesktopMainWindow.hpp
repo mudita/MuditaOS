@@ -57,7 +57,7 @@ public:
 
 	//virtual methods gui::Window
 	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) override;
+	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
 	//virtual methods gui::AppWindow
 	void rebuild() override;
 	void buildInterface() override;

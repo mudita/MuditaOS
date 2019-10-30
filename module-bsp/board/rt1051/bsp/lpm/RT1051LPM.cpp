@@ -44,6 +44,8 @@ namespace bsp{
                 return EnterLowPowerIdle();
             case Mode ::Suspend:
                 return EnterSuspend();
+            default:
+                return 0;
         }
     }
 

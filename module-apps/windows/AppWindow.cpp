@@ -7,25 +7,36 @@
  * @details
  */
 #include "i18/i18.hpp"
-#include "AppWindow.hpp"
 #include "Application.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
+#include "AppWindow.hpp"
+#include <Style.hpp>
+
+using namespace style::header;
 
 namespace gui {
 
 AppWindow::AppWindow( app::Application* app, std::string name, uint32_t id ) :
 	Window ( name, id), application{ app } {
+    setSize(style::window_width, style::window_height);
 }
 
 AppWindow::~AppWindow() {
 	LOG_INFO("deleting window: %s", name.c_str());
+    destroyInterface();
 }
 
 
 void AppWindow::destroyInterface() {
 	children.remove(bottomBar);
 	children.remove(topBar);
+	children.remove(title);
+    delete title;
 	delete bottomBar;
 	delete topBar;
+    title = nullptr;
+    bottomBar = nullptr;
+    topBar = nullptr;
 }
 
 void AppWindow::rebuild() {
@@ -36,6 +47,14 @@ void AppWindow::buildInterface() {
 	bottomBar->setActive( BottomBar::Side::LEFT, false );
 	bottomBar->setActive( BottomBar::Side::CENTER, false );
 	bottomBar->setActive( BottomBar::Side::RIGHT, false );
+
+	title = new gui::Label(this, 0, 52, 480, 52 );
+	title->setFilled( false );
+	title->setFont(font::title);
+	title->setText("");
+	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
+    title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+    title->visible = false;
 
 	topBar = new gui::TopBar( this, 0,0, 480, 50 );
 	topBar->setActive(TopBar::Elements::LOCK, false );
@@ -94,10 +113,42 @@ bool AppWindow::updateTime( const uint32_t& timestamp, bool mode24H ) {
 	return true;
 }
 
+void AppWindow::setTitle(const UTF8 &text) {
+    if(title != nullptr) {
+        title->setVisible(true);
+        title->setText(text);
+    } else {
+        LOG_ERROR("cant set title - it doesn't exist!");
+    }
+}
+
 std::list<DrawCommand*> AppWindow::buildDrawList() {
 	return Window::buildDrawList();
 }
 
 bool AppWindow::onDatabaseMessage( sys::Message* msg ){ return false; }
+
+bool AppWindow::onInput( const InputEvent& inputEvent) {
+
+	//check if any of the lower inheritance onInput methods catch the event
+	if( Window::onInput( inputEvent ) ) {
+		if( inputEvent.keyCode != KeyCode::KEY_ENTER ) application->render( RefreshModes::GUI_REFRESH_FAST );
+		return true;
+	}
+
+	//process only if key is released
+	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
+
+	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+		if( prevWindow == getName() ) { 
+			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+		} else {
+			application->switchWindow( prevWindow, gui::ShowMode::GUI_SHOW_RETURN );
+		}
+		return true;
+	}
+
+	return false;
+}
 
 } /* namespace gui */

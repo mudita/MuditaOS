@@ -18,6 +18,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Layout.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/TopBar.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Text.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/Style.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/BottomBar.hpp"

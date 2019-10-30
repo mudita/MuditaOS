@@ -24,6 +24,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "CallWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -81,13 +82,13 @@ void CallWindow::buildInterface() {
 	durationLabel = new gui::Label(this, 0, 220, 480, 80 );
 	durationLabel->setFilled( false );
 	durationLabel->setBorderColor( gui::ColorNoColor );
-	durationLabel->setFont("gt_pressura_regular_24");
+	durationLabel->setFont(style::window::font::verybig);
 	durationLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	numberLabel = new gui::Label(this, 11, 150, 480-22, 80 );
 	numberLabel->setFilled( false );
 	numberLabel->setBorderColor( gui::ColorNoColor );
-	numberLabel->setFont("gt_pressura_regular_44");
+	numberLabel->setFont(style::window::font::bigbold);
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	//define navigation between labels
@@ -276,7 +277,7 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 	return true;
 }
 
-void CallWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void CallWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
 bool CallWindow::handleLeftButton() {
@@ -343,34 +344,33 @@ bool CallWindow::handleRightButton() {
 bool CallWindow::onInput( const InputEvent& inputEvent ) {
 
 	LOG_INFO("key code: %d", static_cast<uint32_t>(inputEvent.keyCode));
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
-			application->render( RefreshModes::GUI_REFRESH_FAST );
+	 
+	bool handled = false;
+	
+	//process only if key is released
+	if( inputEvent.state != InputEvent::State::keyReleasedShort ) { // TODO: alek: seems wrong
+		switch( inputEvent.keyCode ) {
+			case KeyCode::KEY_ENTER:
+				handled = handleCenterButton();
+				break;
+			case KeyCode::KEY_LF:
+				handled = handleLeftButton();
+				break;
+			case KeyCode::KEY_RF :
+				handled = handleRightButton();
+				break;
+			default:
+				break;	
+		}
+	}
+
+	if( handled ) {
+		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
 		return true;
 	}
 
-	bool handled = false;
-
-	//process only if key is released
-	if( inputEvent.state != InputEvent::State::keyReleasedShort ) {
-		if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-			handled = handleCenterButton();
-		}
-		else if( inputEvent.keyCode == KeyCode::KEY_LF ) {
-			handled = handleLeftButton();
-		}
-		else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-			handled = handleRightButton();
-		}
-	}
-
-	if( handled )
-		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
-
-	return false;
+	//check if any of the lower inheritance onInput methods catch the event
+	return AppWindow::onInput( inputEvent );
 }
 
 } /* namespace gui */

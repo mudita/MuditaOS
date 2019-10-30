@@ -20,7 +20,7 @@
 
 #include "i18/i18.hpp"
 #include <time/time_conversion.hpp>
-
+#include <Style.hpp>
 
 namespace gui {
 
@@ -39,14 +39,14 @@ void DesktopMainWindow::buildInterface() {
 	time = new gui::Label(this, 20, 90, 280, 116 );
 	time->setFilled( false );
 	time->setBorderColor( gui::ColorNoColor );
-	time->setFont("gt_pressura_light_84");
+	time->setFont(style::window::font::verybig);
 	time->setText("12:07");
 	time->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
 	dayText = new gui::Label(this, 264, 108, 190, 42 );
 	dayText->setFilled( false );
 	dayText->setBorderColor( gui::ColorNoColor );
-	dayText->setFont("gt_pressura_light_24");
+	dayText->setFont(style::window::font::medium);
     auto time = utils::time::SysTime();
 	dayText->setText(time.day());
 	dayText->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
@@ -54,14 +54,14 @@ void DesktopMainWindow::buildInterface() {
 	dayMonth = new gui::Label(this, 264, 150, 190, 42 );
 	dayMonth->setFilled( false );
 	dayMonth->setBorderColor( gui::ColorNoColor );
-	dayMonth->setFont("gt_pressura_light_24");
+	dayMonth->setFont(style::window::font::medium);
 	dayMonth->setText(time.str("%d %B"));
 	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
 
 	notificationCalls = new gui::Text(this, 86, 255, 350, 70 );
 	notificationCalls->setFilled( false );
 	notificationCalls->setBorderColor( gui::ColorNoColor );
-	notificationCalls->setFont("gt_pressura_light_24");
+	notificationCalls->setFont(style::window::font::medium);
 	UTF8 calls = "2 " + utils::localize.get("app_desktop_missed_calls");
 	notificationCalls->setText(calls);
 
@@ -69,7 +69,7 @@ void DesktopMainWindow::buildInterface() {
 	notificationMessages = new gui::Text(this, 86, 330, 350, 70 );
 	notificationMessages->setFilled( false );
 	notificationMessages->setBorderColor( gui::ColorNoColor );
-	notificationMessages->setFont("gt_pressura_light_24");
+	notificationMessages->setFont(style::window::font::medium);
 	UTF8 mess = "2 " + utils::localize.get("app_desktop_unread_messages");
 
 	notificationMessages->setText(mess);
@@ -112,7 +112,7 @@ void DesktopMainWindow::setVisibleState() {
 	}
 }
 
-void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//update time
 	time->setText( topBar->getTimeString() );
@@ -132,11 +132,10 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchDat
 }
 
 bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
+	
+	// do nothing
+	if( inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_RF ) return false;
+	
 	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 
 	//process shortpress
@@ -155,13 +154,13 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 					if( app->getPinLocked())
 						//if there was no application on to before closing proceed normally to pin protection window.
 						if( lockTimeoutApplilcation.empty()) {
-							application->switchWindow( "PinLockWindow", 0, nullptr );
+							application->switchWindow( "PinLockWindow" );
 						}
 						else {
 							std::unique_ptr<LockPhoneData> data = std::make_unique<LockPhoneData>();
 							data->setPrevApplication( lockTimeoutApplilcation );
 							lockTimeoutApplilcation = "";
-							application->switchWindow( "PinLockWindow", 0, std::move(data) );
+							application->switchWindow( "PinLockWindow", std::move(data) );
 						}
 
 					else {
@@ -189,7 +188,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		else {
 			//pressing enter moves user to menu screen
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-				application->switchWindow( "MenuWindow", 0, nullptr );
+				application->switchWindow( "MenuWindow" );
 			}
 			//if numeric key was pressed record that key and send it to call application with a switch command
 			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
@@ -215,10 +214,12 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 		//long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
-			application->switchWindow( "PowerOffWindow", 0, nullptr );
+			application->switchWindow( "PowerOffWindow" );
 		}
 	}
-	return false;
+
+	//check if any of the lower inheritance onInput methods catch the event
+	return AppWindow::onInput( inputEvent );
 }
 
 void DesktopMainWindow::rebuild() {

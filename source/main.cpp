@@ -50,7 +50,7 @@ public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
         timer_id = CreateTimer(5000, true);
-        ReloadTimer(timer_id);
+        //ReloadTimer(timer_id);
     }
 
     ~BlinkyService() {
@@ -59,7 +59,7 @@ public:
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override {
 
-#if 1 // M.P: left here on purpose
+#if 0 // M.P: left here on purpose
         //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
 /*        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         AudioServiceAPI::Stop(this);
@@ -81,8 +81,9 @@ public:
          vTaskDelay(2000);
          AudioServiceAPI::Stop(this);*/
 
-#endif
         //auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
+
+#endif
 
         return std::make_shared<sys::ResponseMessage>();
 
@@ -90,7 +91,8 @@ public:
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override {
-#if 1 // M.P: left here on purpose
+
+#if 0 // M.P: left here on purpose
         LOG_DEBUG("Blinky service tick!");
 
         stopTimer(timer_id);
@@ -116,6 +118,7 @@ public:
 
     uint32_t timer_id = 0;
 };
+
 
 int main() {
 

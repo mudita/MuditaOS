@@ -19,6 +19,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "NotesMainWindow.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -46,14 +47,7 @@ void NotesMainWindow::buildInterface() {
 
 	setFocusItem(list);
 
-	title = new gui::Label(this, 0, 50, 480, 54);
-	title->setFilled(false);
-	title->setBorderColor( gui::ColorFullBlack );
-	title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
-	title->setMargins( Margins(0,0,0,18));
-	title->setFont("gt_pressura_bold_24");
-	title->setText(utils::localize.get("app_notes_title_main"));
-	title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    setTitle(utils::localize.get("app_notes_title_main"));
 
 	bottomBar->setActive( BottomBar::Side::CENTER, true );
 	bottomBar->setActive( BottomBar::Side::RIGHT, true );
@@ -66,7 +60,6 @@ void NotesMainWindow::buildInterface() {
 void NotesMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 
-	if( title ) { removeWidget(title); delete title; title = nullptr; };
 	if( list ) { removeWidget(list); delete list; list= nullptr; };
 
 	children.clear();
@@ -77,7 +70,7 @@ NotesMainWindow::~NotesMainWindow() {
 	destroyInterface();
 }
 
-void NotesMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData* data ) {
+void NotesMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	notesModel->clear();
 	notesModel->requestRecordsCount();
 	list->clear();
@@ -85,33 +78,16 @@ void NotesMainWindow::onBeforeShow( ShowMode mode, uint32_t command, SwitchData*
 }
 
 bool NotesMainWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret ) {
-		//refresh window only when key is other than enter
-		if( inputEvent.keyCode != KeyCode::KEY_ENTER )
-			application->render( RefreshModes::GUI_REFRESH_FAST );
-		return true;
-	}
 
 	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return false;
-
-	if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-		LOG_INFO("Enter pressed");
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-		return true;
-	}
-	else if( inputEvent.keyCode == KeyCode::KEY_LEFT ) {
-		application->switchWindow( "EditWindow", 0, nullptr );
-		return true;
+	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) || ( inputEvent.state != InputEvent::State::keyReleasedLong )) {
+		if( inputEvent.keyCode == KeyCode::KEY_LEFT ) {
+			application->switchWindow( "EditWindow" );
+			return true;
+		}
 	}
 
-	return false;
+	return AppWindow::onInput( inputEvent );
 }
 
 bool NotesMainWindow::onDatabaseMessage( sys::Message* msgl ) {

@@ -11,6 +11,7 @@
 #include "../core/Font.hpp"
 
 #include "Label.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -24,8 +25,7 @@ Label::Label() :
 	font{ nullptr },
 	dotsMode{false}
 {
-	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
-	font = FontManager::getInstance().getFont(fontID);
+    setFont(style::window::font::medium);
 }
 
 Label::Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, const UTF8& newText ) :
@@ -37,9 +37,7 @@ Label::Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t
 	textColor{ 0,0 },
 	dotsMode{false}
 {
-	uint32_t fontID = FontManager::getInstance().getFontID("gt_pressura_regular_16");
-	font = FontManager::getInstance().getFont(fontID);
-	calculateDisplayText();
+    setFont(style::window::font::medium);
 }
 
 Label::~Label() {
@@ -285,7 +283,7 @@ void Label::setFont( const UTF8& fontName) {
 		font = newFont;
 		calculateDisplayText();
 	} else {
-		LOG_ERROR("Font not found");
+		LOG_ERROR("Font not found!");
 	}
 }
 

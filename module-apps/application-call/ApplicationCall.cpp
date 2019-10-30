@@ -87,7 +87,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 				callWindow->setState( gui::CallWindow::State::INCOMING_CALL );
 				if( state == State::ACTIVE_FORGROUND ) {
 					LOG_INFO("++++++++++++WINDOW SWITCH");
-					switchWindow( "CallWindow",0, std::move(data) );
+					switchWindow( "CallWindow", std::move(data) );
 				}
 				else {
 					LOG_INFO("++++++++++++APP SWITCH");
@@ -105,7 +105,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
-				switchWindow( "CallWindow",0, nullptr );
+				switchWindow( "CallWindow" );
 			}
 		}
 		handled = true;

@@ -13,6 +13,7 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "i18/i18.hpp"
+#include <Style.hpp>
 
 namespace gui {
 
@@ -41,7 +42,7 @@ void EnterNumberWindow::buildInterface() {
 	numberLabel->setFilled( false );
 	numberLabel->setBorderColor( gui::ColorFullBlack );
 	numberLabel->setPenWidth(2);
-	numberLabel->setFont("gt_pressura_light_44");
+	numberLabel->setFont(style::header::font::title);
 	numberLabel->setText("");
 	numberLabel->setMargins( Margins(0,0,0,16));
 	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
@@ -58,16 +59,6 @@ EnterNumberWindow::~EnterNumberWindow() {
 }
 
 bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
-	//check if any of the lower inheritance onInput methods catch the event
-	bool ret = AppWindow::onInput( inputEvent );
-	if( ret )
-		return true;
-
-	//process only if key is short released
-//	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-//	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-//		return true;
-
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 		if(inputEvent.keyCode == KeyCode::KEY_ENTER) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
@@ -94,6 +85,8 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			app->setDisplayedNumber(num);
 
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+			return true;
 		}
 		//if numeric key was pressed record that key and send it to call application with a switch command
 		else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
@@ -133,7 +126,9 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 		}
 	}
-	return false;
+
+	//check if any of the lower inheritance onInput methods catch the event
+	return AppWindow::onInput( inputEvent );
 }
 
 bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {

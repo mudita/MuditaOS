@@ -27,6 +27,9 @@ namespace gui {
  */
 class AppWindow: public Window {
 protected:
+
+    /// actual built window title
+	gui::Label* title = nullptr;
 	/**
 	 * Information bar for the buttons on the bottom of the page.
 	 */
@@ -40,6 +43,8 @@ protected:
 	 */
 	app::Application* application = nullptr;
 	uint32_t calculateBatteryLavel( uint32_t percentage );
+
+	std::string prevWindow = "";
 public:
 
 	AppWindow( app::Application* app, std::string name, uint32_t id=GUIWindowID++ );
@@ -56,11 +61,16 @@ public:
 	bool updateSignalStrength( uint32_t strength );
 	virtual bool updateTime( const UTF8& timeStr );
 	virtual bool updateTime( const uint32_t& timestamp, bool mode24H );
+    void setTitle(const UTF8 &text);
 
 	void rebuild() override;
 	void buildInterface() override;
 	void destroyInterface() override;
+	bool onInput( const InputEvent& inputEvent ) override;
 	std::list<DrawCommand*> buildDrawList() override;
+
+	void setPrevWindow( const std::string& prevWindow ) { this->prevWindow = prevWindow; };
+	const std::string& getPrevWindow() const { return prevWindow; };
 };
 
 } /* namespace gui */

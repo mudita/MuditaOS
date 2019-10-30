@@ -24,7 +24,6 @@ namespace gui {
 
 class MessagesMainWindow: public AppWindow {
   protected:
-    gui::Label *title = nullptr;
 //    PhonebookListView* list;
 //    PhonebookModel* phonebookModel = nullptr;
 
@@ -39,7 +38,7 @@ class MessagesMainWindow: public AppWindow {
 
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, uint32_t command, SwitchData *data) override;
+    void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
     bool onDatabaseMessage( sys::Message* msgl );
 

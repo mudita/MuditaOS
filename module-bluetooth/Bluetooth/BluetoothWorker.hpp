@@ -6,8 +6,6 @@
 #include <memory>
 #include <vector>
 
-#include "profiles/BtProfile.hpp"
-#include "profiles/GAP.hpp"
 #include "Device.hpp"
 #include "Service/Worker.hpp"
 
@@ -62,6 +60,7 @@ class BluetoothWorker : private sys::Worker {
   };
 
   TaskHandle_t bt_worker_task = nullptr;
+  int is_running = false;
 public:
   enum Error {
     SuccessBt,
@@ -74,11 +73,15 @@ public:
 
   virtual bool handleMessage(uint32_t queueID);
 
-  std::vector<Device> scan();
+  bool run();
+
+  bool scan();
+
+  bool set_visible();
+
+  bool start_pan();
 
   Error aud_init();
   /// bluetooth stack id in use
   unsigned long active_features;
-  // TODO store profiles, now dangling
-  Stack stack;
 };
