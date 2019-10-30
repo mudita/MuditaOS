@@ -20,14 +20,17 @@
 #include <unistd.h>
 #include <time.h>
 #include <ticks.hpp>
+#include "log/log.hpp"
 #include "mutex.hpp"
 #include <map>
+
+#define _LINUX_UART_DEBUG   0
 
 namespace bsp {
 
     std::map<uint32_t, speed_t> PortSpeeds_text = { {9600U, B9600}, {19200U, B19200}, {38400U, B38400}, {57600U, B57600}, {115200U, B115200}, {230400U, B230400}, {460800U, B460800} };
 
-    LinuxCellular::LinuxCellular(const char *term, speed_t portSpeed) {
+    LinuxCellular::LinuxCellular(const char *term, uint32_t portSpeed) {
 
         if (strcmp(term, "0") == 0) {
             fd = 0;
@@ -35,7 +38,7 @@ namespace bsp {
             // open serial port
             fd = open(term, O_RDWR | O_NOCTTY | O_NONBLOCK);
             if (fd == -1) {
-                printf("Failed to open serial port\n");
+                LOG_FATAL("Failed to open serial port\n");
                 return;
             }
 
@@ -48,7 +51,7 @@ namespace bsp {
             //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
             //else
             t.c_cflag &= ~(CRTSCTS);//disable the flow control on dev board
-            speed_t speed = portSpeed;//B115200;
+            speed_t speed = PortSpeeds_text[portSpeed];//B115200;
             cfsetispeed(&t, speed);
             cfsetospeed(&t, speed);
             tcsetattr(fd, TCSANOW, &t);
@@ -59,7 +62,7 @@ namespace bsp {
         epoll_fd = epoll_create1(0);
 
         if (epoll_fd == -1) {
-            printf("Failed to create epoll file descriptor\n");
+            LOG_FATAL("Failed to create epoll file descriptor\n");
         }
 
         struct epoll_event event;
@@ -67,7 +70,7 @@ namespace bsp {
         event.events = EPOLLIN;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event)) {
-            printf("Failed to add file descriptor to epoll\n");
+            LOG_FATAL("Failed to add file descriptor to epoll\n");
         }
 
         isInitialized = true;
@@ -105,6 +108,7 @@ namespace bsp {
         if ((ret == -1) && (errno == EINTR)) {
             goto retry;
         }
+        #if _LINUX_UART_DEBUG
         if (ret > 0) {
             printf("[RX] ");
             uint8_t *ptr = (uint8_t*)buf;
@@ -112,16 +116,19 @@ namespace bsp {
                 printf("%02X ", (uint8_t)*ptr++);
             printf("\n");
         }
+        #endif
         return ret;
     }
 
     ssize_t LinuxCellular::Write(void *buf, size_t nbytes) {
         cpp_freertos::LockGuard lock(serOutMutex);
+        #if _LINUX_UART_DEBUG
         printf("[TX] ");
         uint8_t *ptr = (uint8_t*)buf;
         for (size_t i = 0; i < nbytes; i++)
             printf("%02X ", (uint8_t)*ptr++);
         printf("\n");
+        #endif
         retry:
         auto ret = write(fd, buf, nbytes);
         if((ret == -1) && (errno == EINTR)){
