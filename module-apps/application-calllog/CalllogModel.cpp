@@ -14,14 +14,20 @@
 
 using namespace calllog;
 
+#define DEBUG_CALLLOG_DB_ACCESS 0
+
 CalllogModel::CalllogModel( app::Application* app) : DatabaseModel( app, calllog::settings::pageSize ){
 
 }
 
 void CalllogModel::requestRecordsCount() {
-	//auto tstamp = xTaskGetTickCount();
+  #if(DEBUG_CALLLOG_DB_ACCESS)
+	auto tstamp = xTaskGetTickCount();
+  #endif
 	recordsCount = DBServiceAPI::CalllogGetCount(application);
-	//LOG_INFO("DBServiceAPI::CalllogGetCount %d records %d ms", recordsCount, xTaskGetTickCount()-tstamp);
+  #if(DEBUG_CALLLOG_DB_ACCESS)
+	LOG_INFO("DBServiceAPI::CalllogGetCount %d records %d ms", recordsCount, xTaskGetTickCount() - tstamp);
+  #endif
 
 	//request first and second page if possible
 	if( recordsCount > 0 ){
