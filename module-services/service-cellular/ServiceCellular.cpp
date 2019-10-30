@@ -210,16 +210,30 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                    auto audioRet = cmux->AudioConfProcedure();
                    if(audioRet == TS0710::ConfState::Success){
 
-                        if (cmux->StartMultiplexer() == TS0710::ConfState::Success) {
-                            LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+                       char buf[32];
+                       LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+                       sprintf(buf, "AT+IPR=%i\r", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+                       if (!cmux->CheckATCommandResponse(cmux->getParser()->SendCommand(buf, 1))) {
+                           LOG_ERROR("Baudrate setup error");
+                           state = State::Failed;
+                           break;
+                       }
+                       cmux->getCellular()->SetSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
 
-                            DLC_channel *notificationsChannel = cmux->GetChannel("Notifications");  //open channel - notifications
-                            if (notificationsChannel){
-                                LOG_DEBUG("Setting up notifications callback");
-                                notificationsChannel->setCallback(notificationCallback);
-                            }
+                       vTaskDelay(1000);
 
-                            state = State::Ready;
+                       if (cmux->StartMultiplexer() == TS0710::ConfState::Success)
+                       {
+                           LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+                           DLC_channel *notificationsChannel = cmux->GetChannel("Notifications"); //open channel - notifications
+                           if (notificationsChannel)
+                           {
+                               LOG_DEBUG("Setting up notifications callback");
+                               notificationsChannel->setCallback(notificationCallback);
+                           }
+
+                           state = State::Ready;
                         }
                         else {
                             LOG_DEBUG("[ServiceCellular] Modem FAILED");

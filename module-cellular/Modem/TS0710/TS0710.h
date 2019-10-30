@@ -256,18 +256,6 @@ private:
         return false;
     }
 
-    bool CheckATCommandResponse(const std::vector<std::string> &response) {
-        //if (response.size() == 1 && response[0] == "OK") {
-        if (searchForOK(response)) {
-            return true;
-        } else {
-            std::string resp;
-            for (std::string s : response)
-                resp.append(s);
-            LOG_ERROR("Invalid response: %s", resp.c_str());
-            return false;
-        }
-    }
     TS0710_START::START_SystemParameters_t startParams;
     sys::Service *pv_parent;
 
@@ -318,6 +306,22 @@ public:
 
     ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
 
+    bsp::Cellular* getCellular() { return pv_cellular.get(); }
+    TS0710_START::START_SystemParameters_t getStartParams() { return startParams; }
+    ATParser* getParser() { return parser; }
+
+    bool CheckATCommandResponse(const std::vector<std::string> &response) {
+        //if (response.size() == 1 && response[0] == "OK") {
+        if (searchForOK(response)) {
+            return true;
+        } else {
+            std::string resp;
+            for (std::string s : response)
+                resp.append(s);
+            LOG_ERROR("Invalid response: %s", resp.c_str());
+            return false;
+        }
+    }
 
 TS0710(PortSpeed_e portSpeed, sys::Service *parent);
 ~TS0710();

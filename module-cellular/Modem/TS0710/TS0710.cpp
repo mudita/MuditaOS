@@ -174,13 +174,13 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Set fixed baudrate
     // CheckATCommandResponse(
     //         parser->SendCommand(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str(), 1));   //done with TS0710_Start
-    LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[startParams.PortSpeed]);
-    sprintf(buf,"AT+IPR=%i\r", ATPortSpeeds_text[startParams.PortSpeed]);
-    if (!CheckATCommandResponse(parser->SendCommand(buf, 1))) {
-        LOG_ERROR("Baudrate setup error");
-        return ConfState::Failure;
-    }
-    pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
+    // LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[startParams.PortSpeed]);
+    // sprintf(buf,"AT+IPR=%i\r", ATPortSpeeds_text[startParams.PortSpeed]);
+    // if (!CheckATCommandResponse(parser->SendCommand(buf, 1))) {
+    //     LOG_ERROR("Baudrate setup error");
+    //     return ConfState::Failure;
+    // }
+    // pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
 
     // Route URCs to second (Notifications) MUX channel
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));

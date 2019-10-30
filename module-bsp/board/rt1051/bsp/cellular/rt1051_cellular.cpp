@@ -127,28 +127,9 @@ namespace bsp {
     }
 
     void RT1051Cellular::SetSpeed(uint32_t portSpeed) {
-        NVIC_DisableIRQ(LPUART1_IRQn);
-        lpuart_config_t s_cellularConfig;
+        LOG_DEBUG("[RT1051] Setting %i baudrate", portSpeed);
 
-        LPUART_GetDefaultConfig(&s_cellularConfig);
-
-        s_cellularConfig.baudRate_Bps = portSpeed;
-        s_cellularConfig.dataBitsCount = kLPUART_EightDataBits;
-        s_cellularConfig.parityMode = kLPUART_ParityDisabled;
-        s_cellularConfig.isMsb = false;
-        s_cellularConfig.rxIdleType = kLPUART_IdleTypeStartBit;
-        s_cellularConfig.rxIdleConfig = kLPUART_IdleCharacter1;
-        s_cellularConfig.enableTx = false;
-        s_cellularConfig.enableRx = false;
-
-        LPUART_Deinit(CELLULAR_UART_BASE);
-
-        if (LPUART_Init(CELLULAR_UART_BASE, &s_cellularConfig, GetPerphSourceClock(PerphClock_LPUART)) != kStatus_Success) {
-            LOG_ERROR("Could not initialize the uart!");
-            return;
-        }
-
-        NVIC_EnableIRQ(LPUART1_IRQn);
+        LPUART_SetBaudRate(CELLULAR_UART_BASE, portSpeed, GetPerphSourceClock(PerphClock_LPUART));
     }
 
 
