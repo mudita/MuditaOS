@@ -93,7 +93,7 @@ public:
             }
 
             Address = serData.at(1);
-            Control = serData.at(2);
+            Control = serData.at(2) & ~(1 << 4);
             int Length;
             if (serData.at(3) & 0x01) {  //short length
                 Length = static_cast<uint16_t>(serData.at(3) >> 1);
@@ -103,6 +103,10 @@ public:
             }
             if (serData.at(3) == 0xFF)   //ugly hack for Quectel misimplementation of the standard
                 Length = serData.size() - 6;
+            LOG_PRINTF("[FrRX] ");
+            for (uint8_t d : serData)
+                LOG_PRINTF("%02X ", d);
+            LOG_PRINTF("\n");
             LOG_DEBUG("[Frame] %s Addr: 0x%02X, Ctrl: 0x%02X, Len: %i", TypeOfFrame_text[static_cast<TypeOfFrame_e>(Control)].c_str(), Address, Control, Length);
             data.insert(data.begin(), serData.begin() + 4, serData.begin() + 4 + Length);   //get data - amount of data determined by Length value
 
@@ -123,7 +127,7 @@ public:
             if (Control == static_cast<uint8_t>(TypeOfFrame_e::UIH))
                 FCS=crctable[FCS^serData.at(serData.size() - 2)];
 
-            if ((FCS != 0xCF) && (serData.at(3) != 0xFF)) {  //error - but fuck FCS check if it's faulty Quectel UIH frame
+            if ((FCS != 0xCF) && (serData.at(3) != 0xFF) && (Control != static_cast<uint8_t>(TypeOfFrame_e::UA))) {  //error - but fuck FCS check if it's faulty Quectel UIH frame or UA frame
                 Address = 0;
                 Control = 0;
                 data.clear();
@@ -143,7 +147,7 @@ public:
         pv_serData = frame.serialize();
         pv_frame = frame;
     }
-    TS0710_Frame(std::vector<uint8_t> serData) {
+    TS0710_Frame(std::vector<uint8_t> &serData) {
         LOG_DEBUG("Deserializing serData");
         pv_frame.deserialize(serData);
         pv_serData = serData;

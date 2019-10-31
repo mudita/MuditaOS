@@ -259,6 +259,8 @@ private:
     TS0710_START::START_SystemParameters_t startParams;
     sys::Service *pv_parent;
 
+    DLC_channel::Callback_t controlCallback = nullptr;
+
 public: 
     enum class ConfState{
         Success,

@@ -90,49 +90,51 @@ std::vector<std::string> DLC_channel::SendCommandReponse(const char *cmd, size_t
 
     std::vector<std::string> tokens;
     std::vector<uint8_t> data;
+    bool wait_for_data = true;
 
     for (int i = 0; i < strlen(cmd); i++)
         data.push_back(static_cast<uint8_t>(cmd[i]));
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
-    //auto cmdSigned = const_cast<char*>(cmd);
-    //inout->SendFrame(GetChannelNumber(), reinterpret_cast<unsigned char*>(cmdSigned),strlen(cmd),static_cast<unsigned char>(MuxDefines::GSM0710_TYPE_UIH));
     SendData(data);
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
 
-    wait_for_data:
+     wait_for_data:
 
-    if(timeElapsed >= timeoutNeeded) {
-        blockedTaskHandle = nullptr;
-        return tokens;
-    }
+         if (timeElapsed >= timeoutNeeded)
+         {
+             blockedTaskHandle = nullptr;
+             return tokens;
+         }
 
-    auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded-timeElapsed);
-    timeElapsed = cpp_freertos::Ticks::GetTicks();
-    if(ret){
+         auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
+         timeElapsed = cpp_freertos::Ticks::GetTicks();
+         if (ret)
+         {
 
-        std::vector<std::string> strings;
+             std::vector<std::string> strings;
 
-        cpp_freertos::LockGuard lock(mutex);
-        //tokenize responseBuffer
-        auto ret = ATParser::Tokenizer(responseBuffer, rxCount, "\r\n");
-        tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
+             cpp_freertos::LockGuard lock(mutex);
+             //tokenize responseBuffer
+             auto ret = ATParser::Tokenizer(responseBuffer, rxCount, "\r\n");
+             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
 
-        if(tokens.size() < rxCount){
-            goto wait_for_data;
-        }
-        blockedTaskHandle = nullptr;
-        return tokens;
-    }
-    else{
-        //timeout
-        blockedTaskHandle = nullptr;
-        return tokens;
-    }
-
+             if (tokens.size() < rxCount)
+             {
+                 goto wait_for_data;
+             }
+             blockedTaskHandle = nullptr;
+             return tokens;
+         }
+         else
+         {
+             //timeout
+             blockedTaskHandle = nullptr;
+             return tokens;
+         }
 }
 
 int DLC_channel::ParseInputData(std::vector<uint8_t> data) {
@@ -140,6 +142,7 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> data) {
 
     cpp_freertos::LockGuard lock(mutex);
     responseBuffer.append(reinterpret_cast<char *>(data.data()), data.size());
+
     if(blockedTaskHandle){
         xTaskNotifyGive(blockedTaskHandle);
     }
@@ -150,6 +153,7 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> data) {
             std::vector<uint8_t> v;
             for (auto c : responseBuffer)
                 v.push_back(static_cast<uint8_t>(c));
+            responseBuffer.clear();
             pv_callback(v);
         }
         else {

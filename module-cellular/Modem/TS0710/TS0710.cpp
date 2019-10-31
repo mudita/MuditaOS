@@ -305,6 +305,46 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     }
     delete pv_TS0710_Start;
 
+    controlCallback = [this](std::vector<uint8_t> &data) {
+        char *buf = static_cast<char*>(malloc(256));
+        memset(buf, 0, 256);
+        LOG_DEBUG("Processing Control message");
+
+        if (buf) {
+            TS0710_Frame *frame = new TS0710_Frame(data);
+            for (uint8_t d : frame->getFrame().data) {
+                char _b[4];
+                sprintf(_b, "%02X ", d);
+                strcat(buf, _b);
+            }
+            LOG_DEBUG("Mesage: %s", buf);
+            switch(frame->getFrame().data.at(0)) {
+                case 0xE3: {  //MSC
+                    LOG_PRINTF("[MSC ch #%i] ", frame->getFrame().data.at(2) >> 2);
+                    if (frame->getFrame().data.at(2) & 0x80)
+                        LOG_PRINTF("DV ");
+                    if (frame->getFrame().data.at(2) & 0x40)
+                        LOG_PRINTF("IC ");
+                    if (frame->getFrame().data.at(2) & 0x08)
+                        LOG_PRINTF("RTR ");
+                    if (frame->getFrame().data.at(2) & 0x04)
+                        LOG_PRINTF("RTC ");
+                    if (frame->getFrame().data.at(2) & 0x02)
+                        LOG_PRINTF("FC ");
+                    LOG_PRINTF("\n");
+                }
+                break;
+            }
+
+            free(buf);
+            delete frame;
+        }
+        else
+            LOG_ERROR("Can't allocate buffer !");
+    };
+
+    channels[0]->setCallback(controlCallback);
+
     //TODO: Open remaining channels
     OpenChannel(1, "Commands");
     OpenChannel(2, "Notifications");

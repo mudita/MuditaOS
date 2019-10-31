@@ -76,6 +76,8 @@ bool TS0710_DLC_ESTABL::request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t syste
     frame.Address = static_cast<uint8_t>(DLCI << 2) | (1 << 1);  //set C/R = 1 - command
     frame.Control = static_cast<uint8_t>(system_parameters.TypeOfFrame);
     TS0710_Frame frame_c(frame);
+    pv_cellular->Write(static_cast<void*>(frame_c.getSerData().data()), frame_c.getSerData().size());
+    //return true;
     int retries = system_parameters.MaxNumOfRetransmissions;
     while (retries--) {
         //UartSend(frame_c.getSerData().data(), frame_c.getSerData().size());
@@ -114,9 +116,21 @@ bool TS0710_DLC_ESTABL::response(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t syst
     //uint32_t len = UartReceive(data);
     ssize_t len = pv_cellular->Read(reinterpret_cast<void*>(data), _SIZE);
     LOG_DEBUG("RX length = %li", len);
-    
+
     if (len > 0) {
         std::vector<uint8_t> v(data, data + len);
+        //divide message to different frames as Quectel may send them one after another
+        std::vector<std::vector<uint8_t>> multipleFrames;
+        std::vector<uint8_t> _d;
+        for (uint8_t c : v) {
+            _d.push_back(c);
+            if ((c == 0xF9) && (_d.size() > 1)) {
+                multipleFrames.push_back(_d);
+                _d.clear();
+            }
+        }
+
+        
         TS0710_Frame frame_c(v);
         TS0710_Frame::frame_t frame = frame_c.getFrame();
 

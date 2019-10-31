@@ -54,7 +54,7 @@ void LPUART1_IRQHandler(void) {
 
 }
 
-#define _RT1051_UART_DEBUG   0
+#define _RT1051_UART_DEBUG   1
 
 namespace bsp {
 
