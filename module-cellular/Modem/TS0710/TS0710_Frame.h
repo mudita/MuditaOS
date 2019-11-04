@@ -85,7 +85,21 @@ public:
                 Control = 0;
                 return;
             }
-            if ((serData.at(0) != TS0710_FLAG) || (serData.at(serData.size()-1) != TS0710_FLAG)) {
+            //iterate through frame to get correct trailing flag. In case multiple-frame stream provided
+            bool myFrame = false;
+            ssize_t myLen = 0;
+            for (uint8_t c : serData) {
+                myLen++;
+                if ((!myFrame) && (c == TS0710_FLAG)) {
+                    myFrame = true;
+                    continue;
+                }
+                if ((myFrame) && (c == TS0710_FLAG)) {
+                    break;
+                }
+            }
+
+            if ((serData.at(0) != TS0710_FLAG) || (serData.at(myLen-1) != TS0710_FLAG)) {
                 Address = 0;
                 Control = 0;
                 LOG_ERROR("Received frame has incorrect leading/trailing flags. Dropping.");
@@ -102,7 +116,7 @@ public:
                 Length = static_cast<uint16_t>(serData.at(3) >> 1) + (static_cast<uint16_t>(serData.at(4)) << 7);
             }
             if (serData.at(3) == 0xFF)   //ugly hack for Quectel misimplementation of the standard
-                Length = serData.size() - 6;
+                Length = myLen - 6;
             LOG_PRINTF("[FrRX] ");
             for (uint8_t d : serData)
                 LOG_PRINTF("%02X ", d);
@@ -113,7 +127,7 @@ public:
             //check FCS
             /*Calculate FCS*/
             unsigned char FCS=0xFF;
-            unsigned char len = serData.size() - 2;
+            unsigned char len = myLen - 2;
             unsigned char i = 1;
             if (Control == static_cast<uint8_t>(TypeOfFrame_e::UIH)) {
                 len = 3;  //par. 5.3.6 of GSM0710 document states that for UIH frames, the FCS shall be calculated over only the address, control and length fields: include 2-byte address

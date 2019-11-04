@@ -119,22 +119,10 @@ bool TS0710_DLC_ESTABL::response(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t syst
 
     if (len > 0) {
         std::vector<uint8_t> v(data, data + len);
-        //divide message to different frames as Quectel may send them one after another
-        std::vector<std::vector<uint8_t>> multipleFrames;
-        std::vector<uint8_t> _d;
-        for (uint8_t c : v) {
-            _d.push_back(c);
-            if ((c == 0xF9) && (_d.size() > 1)) {
-                multipleFrames.push_back(_d);
-                _d.clear();
-            }
-        }
-
-        
         TS0710_Frame frame_c(v);
         TS0710_Frame::frame_t frame = frame_c.getFrame();
 
-        if ( ((frame.Address & 0xFC) == (DLCI << 2)) && (frame.Control == static_cast<uint8_t>(TypeOfFrame_e::UA)) ) {
+        if ( ((frame.Address & 0xFC) == (DLCI << 2)) && (frame.Control == (static_cast<uint8_t>(TypeOfFrame_e::UA) & ~(1 << 4))) ) {
             LOG_DEBUG("Frame correct");
             free(data);
             return true;
