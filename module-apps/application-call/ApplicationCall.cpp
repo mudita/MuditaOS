@@ -50,28 +50,28 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>( windows.find( "CallWindow")->second);
 
-		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
+		if (msg->type == NotificationType::CallAborted) {
 		   LOG_INFO("---------------------------------CallAborted");
 		   AudioServiceAPI::Stop(this);
 		   callEndTime = callDuration + 3;
 		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		   refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
-		else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
+		else if( msg->type == NotificationType::CallBusy) {
 			callEndTime = callDuration + 3;
 		    LOG_INFO("---------------------------------CallBusy");
 		    AudioServiceAPI::Stop(this);
 		    callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		    refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
-		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
+		else if( msg->type == NotificationType::CallActive ) {
 			callDuration = 0;
 
 			LOG_INFO("---------------------------------CallActive");
 			callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
-		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
+		else if( msg->type == NotificationType::IncomingCall ) {
 			//reset call duration
 //		    callDuration = 0;
 			LOG_INFO("---------------------------------IncomingCall");
@@ -96,7 +96,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 				}
 			}
 		}
-		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
+		else if( msg->type == NotificationType::Ringing ) {
 			//reset call duration
 		    //callDuration = 0;
 			runCallTimer();
