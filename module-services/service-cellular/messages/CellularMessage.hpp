@@ -20,10 +20,11 @@
 
 class CellularMessage : public sys::DataMessage {
 public:
+    CellularMessage() = delete;
     CellularMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)),
                                                type(messageType) {};
 
-    virtual ~CellularMessage() {};
+    virtual ~CellularMessage() = default;
 
     MessageType type;
 
@@ -46,11 +47,11 @@ public:
 								//service returns to this state when call is finished.
     };
 
+    CellularNotificationMessage() = delete;
+    CellularNotificationMessage(Type type, const std::string & data = "") : CellularMessage(
+            MessageType::CellularNotification), type(type), data(data) {}
 
-    CellularNotificationMessage(Type type) : CellularMessage(
-            MessageType::CellularNotification), type(type){}
-
-    ~CellularNotificationMessage() {}
+    virtual ~CellularNotificationMessage() = default;
 
     Type type;
     std::string data;
@@ -62,8 +63,9 @@ public:
 class CellularRequestMessage : public CellularMessage{
 public:
 
+    CellularRequestMessage() = delete;
     CellularRequestMessage(MessageType messageType):CellularMessage(messageType){}
-    ~CellularRequestMessage() {}
+    virtual ~CellularRequestMessage() = default;
 
     std::string data;
 
@@ -71,10 +73,10 @@ public:
 
 class CellularResponseMessage: public sys::ResponseMessage {
 public:
-    CellularResponseMessage(uint32_t retCode) : sys::ResponseMessage(),retCode(retCode) {};
-    virtual ~CellularResponseMessage() {};
+    CellularResponseMessage(bool retCode = true) : sys::ResponseMessage(),retCode(retCode) {};
+    virtual ~CellularResponseMessage() = default;
 
-    uint32_t retCode;
+    bool retCode;
 };
 
 

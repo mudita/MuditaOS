@@ -191,6 +191,7 @@ void CallWindow::setVisibleState() {
 			bottomBar->setText( gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message") );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_reject") );
 			durationLabel->setText(utils::localize.get("app_call_is_calling"));
+			durationLabel->setVisible(true);
 //			imageMessage->setVisible(true);
 		}break;
 		case State::CALL_ENDED: {
@@ -227,6 +228,7 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
+			// durationLabel->setText(utils::localize.get("app_call_is_calling")); // TODO: alek: should be printed sthg?
 		}break;
 	};
 }
@@ -265,11 +267,27 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 	}
 
 	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
-	if( callData->getType() == app::CallSwitchData::Type::INCOMMING_CALL ) {
-		app::IncommingCallData* incData = reinterpret_cast<app::IncommingCallData*>( data );
-		state = State::INCOMING_CALL;
-		numberLabel->setText( incData->getPhoneNumber());
+	std::string phoneNumber;
+	switch(callData->getType()) {
+		case app::CallSwitchData::Type::INCOMMING_CALL : {
+			app::IncommingCallData* incData = reinterpret_cast<app::IncommingCallData*>( data );
+			state = State::INCOMING_CALL;
+			phoneNumber = incData->getPhoneNumber();
+		} break;
+
+		case app::CallSwitchData::Type::ENTER_NUMBER : {
+			app::CallNumberData* incData = reinterpret_cast<app::CallNumberData*>( data );
+			state = State::OUTGOING_CALL;
+			numberLabel->setText( incData->getPhoneNumber());
+			phoneNumber = incData->getPhoneNumber();
+		} break;
+
+		default:
+			LOG_ERROR("Unhandled type");
+			phoneNumber = "unknown";
 	}
+
+	numberLabel->setText( phoneNumber );
 
 	setVisibleState();
 	application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );

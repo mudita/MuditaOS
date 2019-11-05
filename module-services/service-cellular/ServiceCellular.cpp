@@ -48,13 +48,12 @@ ServiceCellular::ServiceCellular()
                 return;
             }
             case NotificationType::Ringing:
-            	//TODO R.B added to clear build warning.
-            	break;
             case NotificationType::ServiceReady:
             case NotificationType::CallBusy:
             case NotificationType::CallActive:
             case NotificationType::CallAborted:
                 // no data field is used
+                LOG_ERROR("unexpected notification");
                 break;
 
             case NotificationType::IncomingCall:
@@ -278,7 +277,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                 ReloadTimer(callStateTimer);
                 // Propagate "Ringing" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                        static_cast<CellularNotificationMessage::Type >(NotificationType::Ringing)),
+                        static_cast<CellularNotificationMessage::Type >(NotificationType::Ringing), msg->data),
                                         sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);

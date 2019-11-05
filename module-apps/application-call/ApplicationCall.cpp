@@ -46,8 +46,8 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 	//this variable defines whether message was processed.
 	bool handled = false;
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
-			CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-
+			
+		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>( windows.find( "CallWindow")->second);
 
 		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
@@ -103,9 +103,10 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
 
+			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::CallNumberData>(msg->data);
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
-				switchWindow( "CallWindow" );
+				switchWindow( "CallWindow", std::move(data) );
 			}
 		}
 		handled = true;

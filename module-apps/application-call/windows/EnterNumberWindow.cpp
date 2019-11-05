@@ -124,6 +124,8 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			app->setDisplayedNumber("");
 
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+			
+			return true;
 		}
 	}
 
