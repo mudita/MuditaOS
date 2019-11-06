@@ -266,25 +266,27 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 		return false;
 	}
 
-	app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
 	std::string phoneNumber;
-	switch(callData->getType()) {
-		case app::CallSwitchData::Type::INCOMMING_CALL : {
-			app::IncommingCallData* incData = reinterpret_cast<app::IncommingCallData*>( data );
-			state = State::INCOMING_CALL;
-			phoneNumber = incData->getPhoneNumber();
-		} break;
+	if(data->getDescription() == app::CallSwitchData::descriptionStr) {
+		app::CallSwitchData* callData = reinterpret_cast<app::CallSwitchData*>(data);
+		phoneNumber = callData->getPhoneNumber();
+		switch(callData->getType()) {
+			case app::CallSwitchData::Type::INCOMMING_CALL : {
+				state = State::INCOMING_CALL;
+			} break;
 
-		case app::CallSwitchData::Type::ENTER_NUMBER : {
-			app::CallNumberData* incData = reinterpret_cast<app::CallNumberData*>( data );
-			state = State::OUTGOING_CALL;
-			numberLabel->setText( incData->getPhoneNumber());
-			phoneNumber = incData->getPhoneNumber();
-		} break;
+			case app::CallSwitchData::Type::EXECUTE_CALL : {
+				state = State::OUTGOING_CALL;
+			} break;
 
-		default:
-			LOG_ERROR("Unhandled type");
-			phoneNumber = "unknown";
+			default:
+				LOG_ERROR("Unhandled type");
+				phoneNumber = "";
+		}
+	}
+	else {
+		LOG_ERROR("Unrecognized SwitchData");
+		return false;
 	}
 
 	numberLabel->setText( phoneNumber );

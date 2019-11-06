@@ -103,7 +103,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 			LOG_INFO("---------------------------------Ringing");
 			AudioServiceAPI::RoutingStart(this);
 
-			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::CallNumberData>(msg->data);
+			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->data);
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
 			if( state == State::ACTIVE_FORGROUND ) {
 				switchWindow( "CallWindow", std::move(data) );
