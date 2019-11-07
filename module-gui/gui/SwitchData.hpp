@@ -18,9 +18,9 @@ protected:
 public:
 
 	SwitchData() {};
-	SwitchData( std::string description ) : description{description} {};
+	SwitchData( const std::string& description ) : description{description} {};
 	virtual ~SwitchData() {};
-	virtual const std::string& getDescription() { return description; };
+	virtual const std::string& getDescription() const { return description; };
 	virtual void setDescription( const std::string desc ) { description = desc; };
 };
 

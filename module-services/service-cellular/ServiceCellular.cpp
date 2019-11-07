@@ -37,10 +37,9 @@ ServiceCellular::ServiceCellular()
 
     notificationCallback = [this](NotificationType type, std::string resp) {
 
-        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(type));
+        auto msg = std::make_shared<CellularNotificationMessage>(type);
 
         switch (type) {
-
             case NotificationType::PowerUpProcedureComplete: {
                 sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
                                       GetName(), this);
@@ -48,13 +47,12 @@ ServiceCellular::ServiceCellular()
                 return;
             }
             case NotificationType::Ringing:
-            	//TODO R.B added to clear build warning.
-            	break;
             case NotificationType::ServiceReady:
             case NotificationType::CallBusy:
             case NotificationType::CallActive:
             case NotificationType::CallAborted:
                 // no data field is used
+                LOG_ERROR("unexpected notification");
                 break;
 
             case NotificationType::IncomingCall:
@@ -77,9 +75,7 @@ ServiceCellular::ServiceCellular()
                 break;
         }
 
-
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
-
     };
 }
 
@@ -153,8 +149,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
         case MessageType::CellularNotification: {
             CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 
-            if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
-                (msg->type == CellularNotificationMessage::Type::CallBusy)) {
+            if ((msg->type == NotificationType::CallAborted) ||
+                (msg->type == NotificationType::CallBusy)) {
                 stopTimer(callStateTimer);
             } else {
                 //ignore rest of notifications
@@ -205,8 +201,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                        state = State::Ready;
                        // Propagate "ServiceReady" notification into system
                        sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                               static_cast<CellularNotificationMessage::Type >(NotificationType::ServiceReady)),
-                                               sys::BusChannels::ServiceCellularNotifications, this);
+                               NotificationType::ServiceReady), sys::BusChannels::ServiceCellularNotifications, this);
                    }
                    else if(audioRet == MuxDaemon::ConfState::Failure){
                        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
@@ -249,8 +244,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 
             // Propagate "CallAborted" notification into system
             sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-            	static_cast<CellularNotificationMessage::Type >(NotificationType::CallAborted)),
-                sys::BusChannels::ServiceCellularNotifications, this);
+            	NotificationType::CallAborted), sys::BusChannels::ServiceCellularNotifications, this);
         }
             break;
 
@@ -260,8 +254,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // Propagate "CallActive" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                        static_cast<CellularNotificationMessage::Type >(NotificationType::CallActive)),
-                                        sys::BusChannels::ServiceCellularNotifications, this);
+                        NotificationType::CallActive), sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
@@ -278,8 +271,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                 ReloadTimer(callStateTimer);
                 // Propagate "Ringing" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                        static_cast<CellularNotificationMessage::Type >(NotificationType::Ringing)),
-                                        sys::BusChannels::ServiceCellularNotifications, this);
+                    NotificationType::Ringing, msg->data), sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }

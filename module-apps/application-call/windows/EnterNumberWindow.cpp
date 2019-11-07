@@ -124,6 +124,8 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			app->setDisplayedNumber("");
 
 			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+			
+			return true;
 		}
 	}
 
@@ -145,7 +147,7 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
 			return false;
 		}break;
 		case app::CallSwitchData::Type::ENTER_NUMBER: {
-			app::CallNumberData* numberData = reinterpret_cast<app::CallNumberData*>(data);
+			app::EnterNumberData* numberData = reinterpret_cast<app::EnterNumberData*>(data);
 			numberLabel->setText(numberData->getPhoneNumber());
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
 			app->setDisplayedNumber(numberData->getPhoneNumber());
@@ -154,8 +156,8 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
 		case app::CallSwitchData::Type::INCOMMING_CALL: {
 			return false;
 		}break;
-		case app::CallSwitchData::Type::CALL_NUMBER: {
-			LOG_INFO("app::CallSwitchData::Type::CALL_NUMBER");
+		case app::CallSwitchData::Type::EXECUTE_CALL: {
+			LOG_INFO("app::CallSwitchData::Type::EXECUTE_CALL");
 			return false;
 		}break;
 	};
