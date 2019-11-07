@@ -43,6 +43,28 @@ sys::ReturnCodes message_bt(app::Application* app, BluetoothMessage::Request req
     return ret.first;
 }
 
+void BtWindow::set_navigation() {
+    if(!box) return;
+    if (box->children.size() > 1) {
+        auto nav_set = [=](auto el, auto end, auto dir) {
+            for (; el != std::prev(end); ++el) {
+                if ((*el)->visible == false) {  /// ignore if not visible
+                    continue;
+                }
+                for (auto next = std::next(el); next != end; ++next) {    /// get next visible item
+                    if ((*next)->visible) {
+                        (*el)->setNavigationItem(dir, *next);  /// set navigation
+                        break;
+                    }
+                }
+            }
+        };
+
+        nav_set(box->children.begin(), box->children.end(), NavigationDirection::DOWN);
+        nav_set(box->children.rbegin(), box->children.rend(), NavigationDirection::UP);
+    }
+}
+
 void BtWindow::buildInterface()
 {
     AppWindow::buildInterface();
@@ -67,6 +89,7 @@ void BtWindow::buildInterface()
         for (auto &el : box->children) {
             el->visible = true;
         }
+        set_navigation();
         application->render(gui::RefreshModes::GUI_REFRESH_FAST);
         return true;
         });
@@ -95,18 +118,12 @@ void BtWindow::buildInterface()
 
     box->resizeItems();
 
-    if (box->children.size() > 1) {
-        for (auto el = box->children.begin(); el != std::prev(box->children.end()); ++el) {
-            (*el)->setNavigationItem(NavigationDirection::DOWN, *std::next(el));
-        }
-        for (auto el = box->children.rbegin(); el != std::prev(box->children.rend()); ++el) {
-            (*el)->setNavigationItem(NavigationDirection::UP, *std::next(el));
-        }
-    }
+    set_navigation();
 
     this->focusItem = box_items.front();
     this->focusItem->setFocus(true);
 }
+
 void BtWindow::destroyInterface()
 {
     this->focusItem = nullptr;
