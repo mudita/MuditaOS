@@ -194,7 +194,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
 
 				char key[] = { char(inputEvent.keyChar) ,0};
-				std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::CallNumberData>(std::string(key));
+				std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(std::string(key));
 
 				sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
 

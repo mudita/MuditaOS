@@ -14,54 +14,45 @@
 
 namespace app {
 
-/*
- *
- */
 class CallSwitchData: public gui::SwitchData {
 public:
 	enum class Type {
 		UNDEFINED,
 		ENTER_NUMBER,
 		INCOMMING_CALL,
-		CALL_NUMBER
+		EXECUTE_CALL 
 	};
+	static const inline std::string descriptionStr = "CallSwitchData";
+	static const inline std::string defaultPhoneNumber = "undefined";
 protected:
 	Type type = Type::UNDEFINED;
+	std::string phoneNumber;
 public:
-	CallSwitchData( app::CallSwitchData::Type type ) : type{ type } {};
+	CallSwitchData( const std::string& number = defaultPhoneNumber, Type type = Type::UNDEFINED ) : SwitchData(descriptionStr), type{ type }, phoneNumber{ number } {};
 	virtual ~CallSwitchData(){};
 
 	const Type& getType() const { return type; };
+	const std::string& getPhoneNumber() const { return phoneNumber; };
 };
 
-class CallNumberData: public CallSwitchData {
-protected:
-	std::string phoneNumber;
+class EnterNumberData: public CallSwitchData {
 public:
-	CallNumberData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::ENTER_NUMBER ), phoneNumber{ number }{};
-	virtual ~CallNumberData(){};
-
-	const std::string& getPhoneNumber() const { return phoneNumber; };
+	EnterNumberData( const std::string& number = "") : CallSwitchData( number, CallSwitchData::Type::ENTER_NUMBER ) {};
+	virtual ~EnterNumberData(){};
 };
 
 class IncommingCallData: public CallSwitchData {
-protected:
-	std::string phoneNumber;
 public:
-	IncommingCallData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::INCOMMING_CALL ), phoneNumber{ number }{};
+	IncommingCallData( const std::string& number = "") : CallSwitchData( number, CallSwitchData::Type::INCOMMING_CALL ) {};
 	virtual ~IncommingCallData(){};
-
-	const std::string& getPhoneNumber() const { return phoneNumber; };
 };
 
 class ExecuteCallData: public CallSwitchData {
 protected:
 	std::string phoneNumber;
 public:
-	ExecuteCallData( std::string number ) : CallSwitchData( app::CallSwitchData::Type::CALL_NUMBER ), phoneNumber{ number }{};
+	ExecuteCallData( const std::string& number = "") : CallSwitchData( number, app::CallSwitchData::Type::EXECUTE_CALL ) {};
 	virtual ~ExecuteCallData(){};
-
-	const std::string& getPhoneNumber() const { return phoneNumber; };
 };
 
 } /* namespace app */
