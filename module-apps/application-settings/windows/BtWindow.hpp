@@ -31,5 +31,6 @@ class BtWindow : public AppWindow
     void rebuild() override;
     void buildInterface() override;
     void destroyInterface() override;
+    void set_navigation();
 };
 } // namespace gui

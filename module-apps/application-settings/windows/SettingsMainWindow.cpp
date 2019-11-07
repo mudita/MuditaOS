@@ -55,7 +55,7 @@ void SettingsMainWindow::buildInterface() {
     setTitle(utils::localize.get("app_settings_title_main"));
 
 	//add option connectivity option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_bt"), [=] (gui::Item& item){
+	options.push_back( addOptionLabel( "Bluetooth settings", [=] (gui::Item& item){
                 LOG_INFO("switching to bluetooth page" );
                 application->switchWindow("Bluetooth", nullptr );
                 return true;
