@@ -13,7 +13,7 @@
 
 namespace calllog {
 
-    enum class CallLogCallType {
+    enum CallLogCallType {
 		IN = 0,
 		OUT = 1,
 		MISSED = 2,
