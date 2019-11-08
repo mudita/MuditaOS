@@ -51,7 +51,8 @@ void CallLogDetailsWindow::decorateLabel(Label* label){
 	label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 	label->setFont(style::window::font::small);
 	label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-	label->setLineMode(true);
+	label->setLineMode(true); 
+	// TODO: alek: try to use decorate() from Style.hpp
 }
 void CallLogDetailsWindow::decorateData(Label* label){
 	if(label == nullptr){
@@ -61,6 +62,7 @@ void CallLogDetailsWindow::decorateData(Label* label){
 	label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 	label->setFont(style::window::font::big);
 	label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+	// TODO: alek: try to use decorate() from Style.hpp
 }
 
 void CallLogDetailsWindow::buildInterface() {
@@ -119,18 +121,19 @@ void CallLogDetailsWindow::buildInterface() {
 	typeLabel = new gui::Label(this, leftMargin, 200, w()/2-leftMargin, 54, utils::localize.get("app_calllog_type"));
 	decorateLabel(typeLabel);
 
-	auto callTypeImgX = leftMargin +10;
-	callTypeImg_[static_cast<uint32_t>(calllog::CallLogCallType::IN)] = new gui::Image( this, 
-		callTypeImgX, 275+13, 0, 0, "calllog_arrow_in" );
-	callTypeImg_[static_cast<uint32_t>(calllog::CallLogCallType::OUT)] = new gui::Image( this, 
-		callTypeImgX, 275+13, 0, 0, "calllog_arrow_out" );
-	callTypeImg_[static_cast<uint32_t>(calllog::CallLogCallType::MISSED)] = new gui::Image( this, 
-		callTypeImgX, 275+13, 0, 0, "calllog_arrow_den" );
-	for (auto& img : callTypeImg_) {
-		img->setVisible(false);
-	}
+	const auto callTypeImgX = leftMargin +10;
+	const auto callTypeImgY = 275+13;
+	// TODO: alek: it is used in the code at least twice, possibly create one common function for this
+	auto newImg = [=](const UTF8 imageName)->gui::Image* { 
+		auto img = new gui::Image(this, callTypeImgX, callTypeImgY, 0, 0, imageName); 
+		img->setVisible(false); 
+		return img;  
+	};
+	callTypeImg[calllog::CallLogCallType::IN] = newImg("calllog_arrow_in");
+	callTypeImg[calllog::CallLogCallType::OUT] = newImg("calllog_arrow_out");
+	callTypeImg[calllog::CallLogCallType::MISSED] = newImg("calllog_arrow_den");
 
-	auto typeDataX = callTypeImgX+ callTypeImg_[0]->w() + 10;
+	auto typeDataX = callTypeImgX+ callTypeImg[0]->w() + 10;
 	typeData = new gui::Label(this, typeDataX, 250, w()/2-typeDataX, 54);
 	decorateData(typeData);
 
@@ -166,7 +169,7 @@ void CallLogDetailsWindow::destroyInterface() {
 	if( smsImg ) { removeWidget(smsImg); delete smsImg; smsImg = nullptr; }
 	if( typeLabel ) { removeWidget(typeLabel); delete typeLabel; typeLabel = nullptr; }
 	if( durationLabel ) { removeWidget(durationLabel); delete durationLabel; durationLabel = nullptr; }
-	for( auto& img : callTypeImg_ ) {
+	for( auto& img : callTypeImg ) {
 		if( img ) { removeWidget(img); delete img; img = nullptr; }
 	}
 	if( typeData ) { removeWidget(typeData); delete typeData; typeData = nullptr; }
@@ -192,10 +195,10 @@ void CallLogDetailsWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 		number->setText(record.number.c_str());
 
 		auto callType = toCallLogCallType( record.type );
-		for (auto& img : callTypeImg_) {
+		for (auto& img : callTypeImg) {
 			img->setVisible(false);
 		}
-		callTypeImg_[static_cast<uint32_t>(callType)]->setVisible(true);
+		callTypeImg[callType]->setVisible(true);
 		
 		UTF8 callTypeStr;
 		switch(callType) {

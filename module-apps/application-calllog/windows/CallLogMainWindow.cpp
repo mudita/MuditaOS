@@ -51,7 +51,7 @@ void CallLogMainWindow::buildInterface() {
 							 w()- window::default_left_margin- window::default_right_margin, h() - 105 - 50);
 	list->setMaxElements(calllog::settings::pageSize);
 	list->setPageSize(calllog::settings::pageSize);
-	list->setPenFocusWidth(0);
+	list->setPenFocusWidth(0); // TODO: add: decorator or setting in constructor 
 	list->setPenWidth(0);
 	list->setProvider(calllogModel);
 
@@ -84,6 +84,7 @@ bool CallLogMainWindow::onInput( const InputEvent& inputEvent ) {
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) || ( inputEvent.state != InputEvent::State::keyReleasedLong )) {
 		if( inputEvent.keyCode == KeyCode::KEY_LF ) {
 			// TODO: alek: add calling
+			LOG_DEBUG("Call"); // TODO: alek:: add number to the log
 			return true;
 		}
 	}

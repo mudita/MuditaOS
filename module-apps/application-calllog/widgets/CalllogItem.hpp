@@ -25,7 +25,7 @@ class CalllogItem: public ListItem {
 	std::shared_ptr<CalllogRecord> call = nullptr;
 	//this is timestamp in the mode defined in settings
 	gui::Label* timestamp = nullptr;
-	gui::Image* imageCallType[static_cast<uint32_t>(calllog::CallLogCallType::NUM_OF_CALL_TYPES)] = {nullptr,nullptr,nullptr};
+	gui::Image* imageCallType[calllog::CallLogCallType::NUM_OF_CALL_TYPES] = {nullptr,nullptr,nullptr};
 	gui::Label* text = nullptr;
 	//flag that defines if time should be displayed in 24h mode
 	bool mode24H = false;
