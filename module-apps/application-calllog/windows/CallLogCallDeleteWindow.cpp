@@ -111,15 +111,8 @@ CallLogCallDeleteWindow::~CallLogCallDeleteWindow() {
 
 gui::Item* CallLogCallDeleteWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
 	gui::Label* label = new gui::Label( this, 0,0, 150, 75, text ); // TODO: alek: remove magic numbers
-	label->setFilled( false );
-	label->setPenFocusWidth( 3 );
-	label->setPenWidth( 0 );
-	label->setRadius( 0 );
-	label->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
-	label->setFont(style::window::font::big);
-	label->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-	label->activatedCallback = activatedCallback;
-
+    style::window::decorateOption(label);
+    label->activatedCallback = activatedCallback;
 	return label;
 }
 

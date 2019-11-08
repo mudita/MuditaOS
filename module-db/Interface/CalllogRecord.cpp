@@ -26,7 +26,6 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec) {
             .name=rec.name,
             .contactId=rec.contactId
     });
-    //TODO: error check
 }
 
 

@@ -36,12 +36,14 @@ CalllogItem::CalllogItem(CalllogModel* model, bool mode24H) : model{model}, mode
 	timestamp->setFont(style::window::font::small);
 	timestamp->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER } );
 
-	imageCallType[static_cast<uint32_t>(calllog::CallLogCallType::IN)] = new gui::Image( this, 11, 22, 0, 0, "calllog_arrow_in" );
-	imageCallType[static_cast<uint32_t>(calllog::CallLogCallType::OUT)] = new gui::Image( this, 11, 22, 0, 0, "calllog_arrow_out" );
-	imageCallType[static_cast<uint32_t>(calllog::CallLogCallType::MISSED)] = new gui::Image( this, 11, 22, 0, 0, "calllog_arrow_den" );
-	for( auto& img : imageCallType ) {
-		img->setVisible(false);
-	}
+	auto newImg = [=](const UTF8 imageName)->gui::Image* { 
+		auto img = new gui::Image(this, 11, 22, 0, 0, imageName); 
+		img->setVisible(false); 
+		return img;  
+	};
+	imageCallType[calllog::CallLogCallType::IN] = newImg("calllog_arrow_in");
+	imageCallType[calllog::CallLogCallType::OUT] = newImg("calllog_arrow_out");
+	imageCallType[calllog::CallLogCallType::MISSED] = newImg("calllog_arrow_den");
 
 	text = new gui::Label( this, 0,0,0,0);
 	text->setPenFocusWidth(0);
