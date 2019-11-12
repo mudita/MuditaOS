@@ -1,31 +1,18 @@
 #include "PhonebookMainWindow.hpp"
 
 #include <functional>
+#include <log/log.hpp>
 #include <memory>
 
-#include "service-appmgr/ApplicationManager.hpp"
-
 #include "../ApplicationPhonebook.hpp"
-#include "i18/i18.hpp"
-#include "service-db/messages/DBMessage.hpp"
-
 #include "Label.hpp"
 #include "ListView.hpp"
 #include "Margins.hpp"
 #include "PhonebookMainWindow.hpp"
-
+#include "i18/i18.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-
-#include <Style.hpp>
-#include <log/log.hpp>
-
-std::vector<std::string> names = {"Alek",    "Janusz",  "Zofia",     "Roland", "Cezary",  "Ignacy", "Brian",
-                                  "Ejdiran", "Grażyna", "Sebastian", "Karyna", "Mariola", "Ola",    "Mateusz",
-                                  "Ernest",  "Robert",  "Jakub",     "Adam",   "Łukasz",  "Tomek"};
-
-std::vector<std::string> surnames = {"Wyczesany", "Pacha",  "Małolepszy", "Boligłowa",  "Żur",      "Kiełbasa",
-                                     "Skwara",    "Ściera", "Słaby",      "Cnotliwy",   "Bubel",    "Fundament",
-                                     "Rura",      "Bucior", "Kusibab",    "Kwasigroch", "Siekierka"};
+#include "service-db/messages/DBMessage.hpp"
 
 namespace gui
 {
@@ -42,9 +29,9 @@ void PhonebookMainWindow::rebuild()
     destroyInterface();
     buildInterface();
 }
+
 void PhonebookMainWindow::buildInterface()
 {
-
     AppWindow::buildInterface();
 
     list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
@@ -64,16 +51,31 @@ void PhonebookMainWindow::buildInterface()
 
     topBar->setActive(TopBar::Elements::TIME, true);
 
-    setTitle(utils::localize.get("app_phonebook_title_main"));
+    title = new gui::Label(this, 0, 50, 480, 54);
+    title->setFilled(false);
+    title->setBorderColor(gui::ColorFullBlack);
+    title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    title->setMargins(Margins(0, 0, 0, 18));
+    title->setFont("gt_pressura_bold_24");
+    title->setText(utils::localize.get("app_phonebook_title_main"));
+    title->setAlignement(
+        gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
     leftArrowImage = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
     rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
     newContactImage = new gui::Image(this, 48, 55, 0, 0, "cross");
     searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 }
+
 void PhonebookMainWindow::destroyInterface()
 {
     AppWindow::destroyInterface();
+    if (title)
+    {
+        removeWidget(title);
+        delete title;
+        title = nullptr;
+    }
     if (list)
     {
         removeWidget(list);
@@ -116,7 +118,6 @@ PhonebookMainWindow::~PhonebookMainWindow()
 
 void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-
     setFocusItem(list);
 
     phonebookModel->clear();
@@ -124,44 +125,42 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
     list->clear();
     list->setElementsCount(phonebookModel->getItemCount());
-
-    ContactRecord rec;
-    ContactRecord errName;
-    ContactRecord errPhone1;
-    ContactRecord errPhone2;
-    ContactRecord speedDial;
-
-    rec.speeddial = 1;
-    rec.numbers.push_back(ContactRecord::Number("+487172722", "+487172722"));
-    bool res = DBServiceAPI::verifyContact(application, rec, errName, errPhone1, errPhone2, speedDial);
-
-    if (res == false)
-        LOG_ERROR("Verification failed");
 }
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
 {
-
-    // process only if key is released
-    if (inputEvent.state == InputEvent::State::keyReleasedShort)
+    // check if any of the lower inheritance onInput methods catch the event
+    bool ret = AppWindow::onInput(inputEvent);
+    if (ret)
     {
-        switch (inputEvent.keyCode)
-        {
-        case KeyCode::KEY_LEFT:
-            LOG_INFO("Adding new contact");
-            application->switchWindow("NewContact");
-            return true;
-        case KeyCode::KEY_ENTER:
-            LOG_INFO("Searching contact");
-            application->switchWindow("SearchWindow");
-            return true;
-        default:
-            break;
-        }
+        // refresh window only when key is other than enter
+        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
+            application->render(RefreshModes::GUI_REFRESH_FAST);
+        return true;
     }
 
-    // check if any of the lower inheritance onInput methods catch the event
-    return AppWindow::onInput(inputEvent);
+    // process only if key is released
+    if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
+        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+        return false;
+
+    if (inputEvent.keyCode == KeyCode::KEY_LEFT)
+    {
+        LOG_INFO("Adding new contact");
+        application->switchWindow("New", gui::ShowMode::GUI_SHOW_INIT, nullptr);
+    }
+    else if (inputEvent.keyCode == KeyCode::KEY_RIGHT)
+    {
+        LOG_INFO("Switch to search view");
+        application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, nullptr);
+    }
+    else if (inputEvent.keyCode == KeyCode::KEY_RF)
+    {
+        sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationDesktop", "MenuWindow", nullptr);
+        return (true);
+    }
+
+    return false;
 }
 
 bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)

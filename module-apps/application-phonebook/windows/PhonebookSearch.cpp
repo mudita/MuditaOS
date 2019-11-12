@@ -162,13 +162,6 @@ bool PhonebookSearch::onInput(const InputEvent &inputEvent)
         }
         return (true);
     }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
     else
     {
         LOG_INFO("onInput unhandled event code=%d", inputEvent.keyCode);

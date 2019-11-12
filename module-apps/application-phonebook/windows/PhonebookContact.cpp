@@ -248,7 +248,14 @@ ContactRecord PhonebookContact::readContact()
 
 void PhonebookContact::setContactData()
 {
-    titleLabel->setText(contact->primaryName + " " + contact->alternativeName);
+    if (contact == nullptr)
+        return;
+
+    if (contact && contact->primaryName.length() > 0)
+        titleLabel->setText(contact->primaryName);
+
+    if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
+        titleLabel->setText(contact->primaryName + " " + contact->alternativeName);
 
     if (contact->speeddial >= 0)
     {
@@ -383,7 +390,6 @@ bool PhonebookContact::onInput(const InputEvent &inputEvent)
     if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
         ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
-        LOG_INFO("not handling this event");
         return (false);
     }
 
@@ -393,17 +399,9 @@ bool PhonebookContact::onInput(const InputEvent &inputEvent)
     }
     else if (inputEvent.keyCode == KeyCode::KEY_LF)
     {
-        LOG_INFO("Options");
+        LOG_INFO("switch to options");
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
         return (true);
     }
     else

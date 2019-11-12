@@ -120,7 +120,6 @@ void PhonebookDeleteContact::buildInterface()
 void PhonebookDeleteContact::destroyInterface()
 {
     AppWindow::destroyInterface();
-    children.clear();
 }
 
 void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
