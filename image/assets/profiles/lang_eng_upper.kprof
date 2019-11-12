@@ -85,12 +85,16 @@ false
 false
 0x0D
 0
-#FnLeft = 21,//1,
-#FnRight = 23,//3,
-23
+#FnLeft = 21,
+21
 false
 ''
 2000
+#FnRight = 23,
+23
+false
+''
+3000
 #VolUp = 4,
 #VolDown = 14,
 #Torch = 24,
