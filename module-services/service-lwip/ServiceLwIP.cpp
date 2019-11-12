@@ -5,7 +5,7 @@
 #include "Service/Service.hpp"
 
 extern "C" {
-#include "dhserver.h"
+#include "dhcp-server/dhserver.h"
 #include "lwip/apps/httpd.h"
 #include "lwip/init.h"
 #include "lwip/opt.h"
@@ -35,20 +35,39 @@ sys::ReturnCodes ServiceLwIP::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
+#define NUM_DHCP_ENTRY 3
+
+static dhcp_entry_t entries[NUM_DHCP_ENTRY] =
+{
+    /* mac    ip address        subnet mask        lease time */
+    { {0}, {192, 168, 7, 2}, {255, 255, 255, 0}, 24 * 60 * 60 },
+    { {0}, {192, 168, 7, 3}, {255, 255, 255, 0}, 24 * 60 * 60 },
+    { {0}, {192, 168, 7, 4}, {255, 255, 255, 0}, 24 * 60 * 60 }
+};
+
+static dhcp_config_t dhcp_config =
+{
+    {192, 168, 7, 1}, 67, /* server address, port */
+    {0, 0, 0, 0},         /* dns server */
+    NULL,                /* dns suffix */
+    NUM_DHCP_ENTRY,       /* num entry */
+    entries               /* entries */
+};
+
 sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     try {
         switch (static_cast<MessageType>(msg->messageType)) {
         case MessageType::LwIP_request: {
             LwIP_message *lmsg = dynamic_cast<LwIP_message *>(msg);
-            switch (msg->req) {
+            switch (lmsg->req) {
             case LwIP_message::Request::Start:
                 lwip_init();
                 dhserv_init(&dhcp_config);
                 httpd_init();
                 break;
             default:
-                LOG_ERROR("Not implemented: %d", msg->req);
+                LOG_ERROR("Not implemented: %d", lmsg->req);
             }
         }
         default:
