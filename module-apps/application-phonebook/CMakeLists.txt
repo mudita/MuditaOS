@@ -18,12 +18,20 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookDeleteContact.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearch.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptions.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptionsNamecard.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookErrors.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/PhonebookModel.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.hpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.hpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptions.hpp"
 )
 

@@ -10,7 +10,7 @@
 
 
 #include "ContactsNameTable.hpp"
-
+#include <log/log.hpp>
 
 ContactsNameTable::ContactsNameTable(Database *db): Table(db) {
 
@@ -156,6 +156,31 @@ std::vector<ContactsNameTableRow>
 	auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary='%s' AND name_alternative='%s' ORDER BY name_alternative LIMIT 1;",
 	                              primaryName,
 	                              alternativeName );
+
+	if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+		return std::vector<ContactsNameTableRow>();
+	}
+
+	std::vector<ContactsNameTableRow> ret;
+
+	do {
+		ret.push_back(ContactsNameTableRow{(*retQuery)[0].GetUInt32(),  // ID
+										   (*retQuery)[1].GetUInt32(),    // contactID
+										   (*retQuery)[2].GetString(),    // namePrimary
+										   (*retQuery)[3].GetString(),    // nameAlternative
+										   (*retQuery)[4].GetUInt32(),    // favourite
+		});
+	} while (retQuery->NextRow());
+
+	return ret;
+
+}
+
+std::vector<ContactsNameTableRow>
+	ContactsNameTable::SearchByName( const char *primaryName, const char *alternativeName ) {
+	LOG_INFO("ContactsNameTable::SearchByName primaryName=\"%s\" alternativeName=\"%s\"", primaryName, alternativeName);
+	auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary LIKE '%s%%' or name_alternative LIKE '%s%%'",
+	                              primaryName, alternativeName);
 
 	if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
 		return std::vector<ContactsNameTableRow>();

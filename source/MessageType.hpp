@@ -42,6 +42,7 @@ enum class MessageType {
 	DBContactVerify,    //checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
 						//speed dial key
 	DBContactGetByName, //used to ask for a contact with specified primary and alternative name.
+	DBContactSearchByName, // used to search the database by name
 	DBContactGetBySpeedDial, //used to ask for a contact with specified speed dial key assigned
 	DBContactGetByNumber, //used to ask for a contact with specified primary or secondary phone number
 	DBContactAdd,       // Add contact record

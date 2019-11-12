@@ -90,6 +90,8 @@ public:
     std::unique_ptr<std::vector<ContactRecord>>
 	GetBySpeedDial( uint8_t speedDial );
 
+    std::unique_ptr<std::vector<ContactRecord>>
+	SearchByName(UTF8 primaryName, UTF8 alternativeName);
 private:
     ContactsDB* contactDB;
 

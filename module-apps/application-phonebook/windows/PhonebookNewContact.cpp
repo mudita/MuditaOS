@@ -40,6 +40,15 @@ void PhonebookNewContact::buildInterface() {
 
 	topBar->setActive(TopBar::Elements::TIME, true);
 
+	title = new gui::Label(this, 0, 50, 480, 54);
+	title->setFilled(false);
+	title->setBorderColor( gui::ColorFullBlack );
+	title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+	title->setMargins( Margins(0,0,0,18));
+	title->setFont("gt_pressura_bold_24");
+	title->setText(utils::localize.get("app_phonebook_contact_title"));
+	title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+
 	//page 1 labels and text
 	for( uint32_t i=0; i<5; i++ ) {
 
@@ -278,6 +287,8 @@ void PhonebookNewContact::buildInterface() {
 void PhonebookNewContact::destroyInterface()
 {
     AppWindow::destroyInterface();
+
+    if( title ) { removeWidget(title); delete title; title = nullptr; }
 
     //page 1
     for( uint32_t i=0; i<5; i++ ) {

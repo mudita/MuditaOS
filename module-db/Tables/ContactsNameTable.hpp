@@ -61,6 +61,9 @@ public:
     std::vector<ContactsNameTableRow>
     GetByName( const char* primaryName, const char* alternativeName );
 
+    std::vector<ContactsNameTableRow>
+    SearchByName( const char *primaryName, const char *alternativeName );
+
 private:
 
     const char *createTableQuery =

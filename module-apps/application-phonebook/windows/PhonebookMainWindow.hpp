@@ -14,6 +14,7 @@ namespace gui {
 
 class PhonebookMainWindow : public AppWindow {
   protected:
+    gui::Label *title = nullptr;
     PhonebookListView* list;
     PhonebookModel* phonebookModel = nullptr;
 
