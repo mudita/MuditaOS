@@ -3,9 +3,11 @@
 #include <memory>
 #include <string>
 
+#include "../data/PhonebookItemData.hpp"
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"
 #include "Label.hpp"
+#include "Style.hpp"
 #include "Text.hpp"
 #include <widgets/BoxLayout.hpp>
 
@@ -84,8 +86,7 @@ class PhonebookNewContact : public AppWindow
     Page2 page2;
     uint32_t page = 0;
 
-    // reads data from fields in page1 and page2 and place it in Contact object.
-    ContactRecord readContact();
+    std::shared_ptr<ContactRecord> contact = nullptr;
 
   public:
     PhonebookNewContact(app::Application *app);
@@ -95,14 +96,11 @@ class PhonebookNewContact : public AppWindow
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
     void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
+    bool handleSwitchData(SwitchData *data) override;
     void rebuild() override;
     void buildInterface() override;
     void destroyInterface() override;
     void setContactData();
-
-  private:
-    void verifyAndSave();
 };
 
 } /* namespace gui */

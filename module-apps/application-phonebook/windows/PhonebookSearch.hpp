@@ -6,6 +6,7 @@
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"
 #include "Label.hpp"
+#include "Style.hpp"
 #include "Text.hpp"
 #include <memory>
 #include <string>

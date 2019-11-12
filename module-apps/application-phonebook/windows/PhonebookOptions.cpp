@@ -36,7 +36,7 @@ gui::Item *PhonebookOptions::addOptionLabel(const std::string &text, bool hasSub
     label->setFilled(false);
     label->setPenFocusWidth(3);
     label->setPenWidth(0);
-    label->setFont("gt_pressura_regular_24");
+    label->setFont(style::window::font::small);
     label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->activatedCallback = activatedCallback;
     label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
@@ -62,7 +62,7 @@ void PhonebookOptions::buildInterface()
     title = new Label(this, 0, 50, 480, 50);
     title->setFilled(false);
     title->setBorderColor(gui::ColorNoColor);
-    title->setFont("gt_pressura_bold_24");
+    title->setFont(style::header::font::title);
     title->setText(utils::localize.get("app_phonebook_options_title"));
     title->setAlignement(
         gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));

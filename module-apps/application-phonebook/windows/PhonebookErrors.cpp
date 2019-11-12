@@ -53,7 +53,7 @@ void PhonebookNoResults::buildInterface()
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
     titleLabel = addLabel(nullptr, 0, 52, 480, 35, utils::localize.get("app_phonebook_search_win_contacts"),
-                          "gt_pressura_bold_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                          style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                           Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
 
     topSeparatorLabel = addLabel(nullptr, 0, 104, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -64,7 +64,7 @@ void PhonebookNoResults::buildInterface()
     informationLabel->setTextType(Text::TextType::MULTI_LINE);
     informationLabel->setEditMode(Text::EditMode::BROWSE);
     informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    informationLabel->setFont("gt_pressura_regular_24");
+    informationLabel->setFont(style::window::font::small);
 
     searchCenter = new Image(this, 224, 265, 32, 32, "search");
 }

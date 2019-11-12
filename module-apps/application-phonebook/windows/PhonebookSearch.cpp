@@ -22,7 +22,7 @@ PhonebookSearch::~PhonebookSearch()
 }
 
 Label *PhonebookSearch::addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text = "",
-                                 const std::string fontName = "gt_pressura_bold_24",
+                                 const std::string fontName = style::window::font::small,
                                  const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                  const Alignment alignment = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT,
                                                                        Alignment::ALIGN_VERTICAL_BOTTOM),
@@ -57,7 +57,7 @@ void PhonebookSearch::buildInterface()
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
     titleLabel = addLabel(nullptr, 0, 52, 480, 35, utils::localize.get("app_phonebook_search_win_contacts"),
-                          "gt_pressura_bold_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                          style::header::font::title, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                           Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
 
     topSeparatorLabel = addLabel(nullptr, 0, 104, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -71,7 +71,7 @@ void PhonebookSearch::buildInterface()
     informationLabel->setEditMode(Text::EditMode::BROWSE);
     informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     // informationLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
-    informationLabel->setFont("gt_pressura_regular_24");
+    informationLabel->setFont(style::window::font::small);
 
     inputField = new Text(this, 30, 153, 420, 33);
     inputField->setTextType(Text::TextType::SINGLE_LINE);
@@ -79,7 +79,7 @@ void PhonebookSearch::buildInterface()
     inputField->setEditMode(Text::EditMode::EDIT);
     inputField->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
     // inputField->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
-    inputField->setFont("gt_pressura_regular_24");
+    inputField->setFont(style::window::font::small);
 
     searchTop = new Image(this, 420, 153, 32, 32, "search");
     searchCenter = new Image(this, 224, 265, 32, 32, "search");
@@ -160,13 +160,6 @@ bool PhonebookSearch::onInput(const InputEvent &inputEvent)
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(inputField->getText());
             application->switchWindow("NoResults", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
         return (true);
     }
     else

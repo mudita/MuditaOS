@@ -51,7 +51,7 @@ void PhonebookDeleteContact::buildInterface()
     titleLabel->setFilled(false);
     titleLabel->setBorderColor(ColorFullBlack);
     titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-    titleLabel->setFont("gt_pressura_bold_24");
+    titleLabel->setFont(style::window::font::small);
     titleLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     titleLabel->setLineMode(false);
 
@@ -64,7 +64,7 @@ void PhonebookDeleteContact::buildInterface()
     confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     // confirmationLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER,
     // Alignment::ALIGN_VERTICAL_BOTTOM));
-    confirmationLabel->setFont("gt_pressura_regular_24");
+    confirmationLabel->setFont(style::window::font::small);
 
     noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
     noLabel->setPenWidth(0);
@@ -72,7 +72,7 @@ void PhonebookDeleteContact::buildInterface()
     noLabel->setFilled(false);
     noLabel->setBorderColor(ColorFullBlack);
     noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    noLabel->setFont("gt_pressura_regular_24");
+    noLabel->setFont(style::window::font::small);
     noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
@@ -91,7 +91,7 @@ void PhonebookDeleteContact::buildInterface()
     yesLabel->setFilled(false);
     yesLabel->setBorderColor(ColorFullBlack);
     yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yesLabel->setFont("gt_pressura_regular_24");
+    yesLabel->setFont(style::window::font::small);
     yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
@@ -120,7 +120,6 @@ void PhonebookDeleteContact::buildInterface()
 void PhonebookDeleteContact::destroyInterface()
 {
     AppWindow::destroyInterface();
-    children.clear();
 }
 
 void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)

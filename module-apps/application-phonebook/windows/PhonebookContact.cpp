@@ -13,7 +13,7 @@
 
 PhonebookContact::PhonebookContact(app::Application *app) : AppWindow(app, "Contact")
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
@@ -24,7 +24,7 @@ void PhonebookContact::rebuild()
 }
 
 Label *PhonebookContact::addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h,
-                                  const std::string text = "", const std::string fontName = "gt_pressura_bold_24",
+                                  const std::string text = "", const std::string fontName = style::window::font::small,
                                   const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                   const Alignment alignment = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT,
                                                                         Alignment::ALIGN_VERTICAL_BOTTOM),
@@ -57,13 +57,13 @@ void PhonebookContact::buildInterface()
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_call"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    titleLabel = addLabel(nullptr, 119, 52, 241, 35, utils::localize.get("app_phonebook_contact_information"));
+    titleLabel = addLabel(nullptr, 119, 52, 241, 35, utils::localize.get("app_phonebook_contact_information"),
+                          style::header::font::title);
 
     favouritesIcon = new Image(this, 97, 107, 32, 32, "small_heart");
-    blockedIcon = new Image(this, 351, 107, 32, 32, "small_circle");
-
-    favouritesLabel = addLabel(nullptr, 65, 144, 94, 20, utils::localize.get("app_phonebook_contact_favourites_upper"),
-                               "gt_pressura_regular_16");
+    favouritesLabel = addLabel(nullptr, 65, 144, 89, 20, utils::localize.get("app_phonebook_contact_favourites_upper"),
+                               "gt_pressura_regular_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                               Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     speedDial =
         addLabel(nullptr, 225, 107, 32, 32, "", "gt_pressura_bold_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
@@ -73,6 +73,7 @@ void PhonebookContact::buildInterface()
                               "gt_pressura_regular_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                               Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
+    blockedIcon = new Image(this, 351, 107, 32, 32, "small_circle");
     blockedLabel =
         addLabel(nullptr, 329, 144, 75, 20, utils::localize.get("app_phonebook_contact_speed_blocked_uppper"),
                  "gt_pressura_regular_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
@@ -87,7 +88,7 @@ void PhonebookContact::buildInterface()
 
     // first number line
     numberPrimary =
-        addLabel(&page1, 30, 249, 178, 33, "", "gt_pressura_bold_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+        addLabel(&page1, 30, 249, 178, 33, "", style::window::font::bigbold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     numberPrimaryLabel = addLabel(&page1, 328, 237, 32, 53, "", "gt_pressura_regular_16",
@@ -132,7 +133,7 @@ void PhonebookContact::buildInterface()
 
     // second number line
     numberSecondary =
-        addLabel(&page1, 30, 306, 178, 33, "", "gt_pressura_regular_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+        addLabel(&page1, 30, 306, 178, 33, "", style::window::font::big, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     numberSecondaryLabel = addLabel(&page1, 328, 297, 32, 53, "", "gt_pressura_regular_16",
@@ -172,7 +173,7 @@ void PhonebookContact::buildInterface()
 
     numberSecondaryMessage = new Image(this, 401, 306, 32, 32, "mail");
     page1.push_back(numberSecondaryMessage);
-    email = addLabel(&page1, 30, 363, 413, 33, "", "gt_pressura_regular_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+    email = addLabel(&page1, 30, 363, 413, 33, "", style::window::font::big, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                      Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
 
     addressLabel = addLabel(&page1, 30, 429, 413, 20, utils::localize.get("app_phonebook_contact_address"),
@@ -180,11 +181,11 @@ void PhonebookContact::buildInterface()
                             Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM), true);
 
     addressLine1 =
-        addLabel(&page1, 30, 475, 422, 33, "", "gt_pressura_regular_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+        addLabel(&page1, 30, 475, 422, 33, "", style::window::font::big, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
 
     addressLine2 =
-        addLabel(&page1, 30, 508, 422, 33, "", "gt_pressura_regular_24", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+        addLabel(&page1, 30, 508, 422, 33, "", style::window::font::big, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
 
     noteLabel = addLabel(&page2, 30, 203, 413, 20, utils::localize.get("app_phonebook_contact_note"),
@@ -248,7 +249,14 @@ ContactRecord PhonebookContact::readContact()
 
 void PhonebookContact::setContactData()
 {
-    titleLabel->setText(contact->primaryName + " " + contact->alternativeName);
+    if (contact == nullptr)
+        return;
+
+    if (contact && contact->primaryName.length() > 0)
+        titleLabel->setText(contact->primaryName);
+
+    if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
+        titleLabel->setText(contact->primaryName + " " + contact->alternativeName);
 
     if (contact->speeddial >= 0)
     {
@@ -383,7 +391,6 @@ bool PhonebookContact::onInput(const InputEvent &inputEvent)
     if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
         ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
-        LOG_INFO("not handling this event");
         return (false);
     }
 
@@ -393,17 +400,9 @@ bool PhonebookContact::onInput(const InputEvent &inputEvent)
     }
     else if (inputEvent.keyCode == KeyCode::KEY_LF)
     {
-        LOG_INFO("Options");
+        LOG_INFO("switch to options");
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
         return (true);
     }
     else

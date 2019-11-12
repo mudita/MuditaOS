@@ -9,28 +9,34 @@
 #ifndef MODULE_APPS_APPLICATION_PHONEBOOK_WIDGETS_PHONEBOOKLISTVIEW_HPP_
 #define MODULE_APPS_APPLICATION_PHONEBOOK_WIDGETS_PHONEBOOKLISTVIEW_HPP_
 
+#include "../data/PhonebookItemData.hpp"
 #include "Application.hpp"
 #include "ListView.hpp"
 
-namespace gui {
+namespace gui
+{
+
+class PhonebookItem;
 
 /*
  *
  */
-class PhonebookListView: public ListView {
-	/**
-	 * Pointer to application that owns the model
-	 */
-	app::Application* application = nullptr;
-public:
-	PhonebookListView();
-	PhonebookListView( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h );
-	virtual ~PhonebookListView();
-	void setApplication( app::Application* app );
+class PhonebookListView : public ListView
+{
+    /**
+     * Pointer to application that owns the model
+     */
+    app::Application *application = nullptr;
 
+  public:
+    PhonebookListView();
+    PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+    virtual ~PhonebookListView();
+    void setApplication(app::Application *app);
+    PhonebookItem *getSelectedPhonebookItem();
 
-	bool onInput( const InputEvent& inputEvent ) override;
-	void updatePageItems() override;
+    bool onInput(const InputEvent &inputEvent) override;
+    void updatePageItems() override;
 };
 
 } /* namespace gui */
