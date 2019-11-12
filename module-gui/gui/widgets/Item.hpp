@@ -5,8 +5,7 @@
  *      Author: robert
  */
 
-#ifndef MIDDLEWARES_GUI_WIDGETS_ITEM_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_ITEM_HPP_
+#pragma once
 
 #include <vector>
 #include <list>
@@ -39,37 +38,54 @@ enum class ItemType {
 
 class Item {
 public:
+	Item();
+	virtual ~Item();
+	
 	//flag that informs whether item has a focus
 	bool focus;
+	
 	//type of the widget
 	ItemType type;
+	
 	//pointer to the parent Item
 	Item* parent;
+	
 	//list of items that have the same parent.
 	std::list<Item*> children;
+	
 	//bounding box of the item. This is in coordinates of the parent widget.
 	BoundingBox widgetArea;
+	
 	//bounding box used for drawing. This is in coordinates of window
 	BoundingBox drawArea;
+	
 	//radius of corner
 	short radius;
+	
 	//flag that defines whether widget is enabled
 	bool enabled;
+	
 	//flag that defines whether widget is visible
 	bool visible;
+	
 	//policy for changing vertical size if Item is placed inside layout
 	LayoutVerticalPolicy verticalPolicy;
+	
 	//policy for changing horizontal size if Item is placed inside layout
 	LayoutHorizontalPolicy horizontalPolicy;
+	
 	//Minimal height to which Layout base widget can scale current widget
 	uint16_t minHeight;
+	
 	//Minimal width to which Layout base widget can scale current widget
 	uint16_t minWidth;
+	
 	//Maximum height to which Layout base widget can scale current widget
 	uint16_t maxHeight;
+
 	//Maximum width to which Layout base widget can scale current widget
 	uint16_t maxWidth;
-
+	
 	//callbacks
 	std::function<bool(Item&)> focusChangedCallback;
 	std::function<void(Item&,  void* data)> dimensionChangedCallback;
@@ -77,27 +93,14 @@ public:
 	std::function<bool(Item&, const InputEvent& inputEvent)> inputCallback;
 	std::function<bool(Item&)> contentCallback;
 
-    int16_t w() { return widgetArea.w; }
-    int16_t h() { return widgetArea.h; }
-    /// helper function to show where widget ends in x axis
-    int32_t offset_w() { return w() + widgetArea.x; }
-    /// helper function to show where widget ends in y axis
-    int32_t offset_h() { return h() + widgetArea.y; }
-
-	bool setFocus( bool state ) {
-		if( state != focus ) {
-			//focus = state;
-			onFocus( state );
-			focusChangedCallback( *this );
-		};
-		return state;
-	}
-
-	virtual bool onFocus( bool state ) { focus = state; return true; };
-	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
-	virtual bool onInput( const InputEvent& inputEvent ) { return inputCallback( *this, inputEvent ); };
-	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
-	virtual bool onContent() { return false; };
+	bool setFocus (bool state );
+	virtual bool onFocus (bool state ) 							{ focus = state; return true; };
+	virtual bool onActivated (void* data ) 						{ return activatedCallback(*this); };
+	virtual bool onInput (const InputEvent& inputEvent ) 		{ return inputCallback( *this, inputEvent ); };
+	virtual bool onDimensionChanged (const BoundingBox& oldDim, 
+									const BoundingBox& newDim)
+																{ return true; };
+	virtual bool onContent() 									{ return false; };
 
 	virtual bool addWidget( Item* item );
 	virtual bool removeWidget( Item* item );
@@ -107,52 +110,52 @@ public:
 	virtual std::list<DrawCommand*> buildDrawList();
 	virtual void setRadius( int value );
 
-	//functinos to handle navigation
+	/** 
+	 * functinos to handle navigation
+	 */
 	virtual Item* getNavigationItem( NavigationDirection direction );
 	virtual void setNavigationItem( NavigationDirection direction, Item* item );
 
-	Item();
-	virtual ~Item();
+	/**
+	 * children handling
+	 */
+	template<typename T, class ...Args> void addItem(Args... args);	
+	template<typename T> void addItem(T &&el) { ownedItems.push_back(el); }
 
 	/**
-	 * @brief Method returns minimal height for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note This method is used by containers that inherit from the Layout class (HBox, VBox...).
-	 * This value takes into consideration specific elements of widget like font's height, rounded corners and border's width.
+	 * positioning
 	 */
 	uint32_t getMinHeight();
-	/**
-	 * @brief Method returns minimal width for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note This method is used by containers that inherit from the Layout class (HBox, VBox...).
-	 * This value takes into consideration specific elements of widget like rounded corners and border's width.
-	 */
 	uint32_t getMinWidth();
-	/**
-	 * @brief Method returns maximum height for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note Returned value must be equal or greater than value returned by getMinHeight.
-	 */
 	uint32_t getMaxHeight();
-	/**
-	 * @brief Method returns maximum width for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note Returned value must be equal or greater than value returned by getMinWidth.
-	 */
 	uint32_t getMaxWidth();
-
+	uint32_t proportionOfHeight(const double proportion);
+	uint32_t proportionOfWidth(const double proportion);
+	void setX(const uint32_t x);
+	void setY(const uint32_t y);
+	const uint32_t getX() const			{ return (widgetArea.x); }
+	const uint32_t getY() const			{ return (widgetArea.y); }
+	const uint32_t getWidth() const		{ return (widgetArea.w); }
+	const uint32_t getHeight() const	{ return (widgetArea.h); }
+	int32_t getOffsetWidth() 			{ return (getWidth() + widgetArea.x); }
+    int32_t getOffsetHeight() 			{ return (getHeight() + widgetArea.y); }
 	void setMaxSize( const uint16_t& w, const uint16_t& h);
 	void setMinSize( const uint16_t& w, const uint16_t& h);
+
 protected:
-	//On change of position or size this method will recalculate visible part of the widget
-	//considering widgets hierarchy and calculate absolute position of drawing primitives.
+	/**
+	 * On change of position or size this method will recalculate visible part of the widget
+	 * considering widgets hierarchy and calculate absolute position of drawing primitives.
+	 */
+
 	virtual void updateDrawArea();
 	/**
 	 * Pointer to navigation object. It is added when object is set for one of the directions
 	 */
 	gui::Navigation* navigationDirections;
+
+private:
+	std::list<Item*> ownedItems;
 };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_ITEM_HPP_ */

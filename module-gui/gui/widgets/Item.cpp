@@ -42,6 +42,10 @@ Item::~Item() {
 
 	if( navigationDirections )
 		delete navigationDirections;
+
+	for (auto *l : ownedItems) {
+		delete (l);
+	}
 }
 
 bool Item::addWidget( Item* item ) {
@@ -54,7 +58,7 @@ bool Item::addWidget( Item* item ) {
 	children.push_back(item);
 
 	item->updateDrawArea();
-	return true;
+	return (true);
 }
 
 bool Item::removeWidget( Item* item ) {
@@ -63,7 +67,7 @@ bool Item::removeWidget( Item* item ) {
 		children.erase(fi);
 		return true;
 	}
-	return false;
+	return (false);
 }
 
 void Item::setVisible( bool value ) {
@@ -87,6 +91,24 @@ void Item::setPosition( const short& x, const short& y ) {
 
 	BoundingBox oldArea = widgetArea;
 	widgetArea.x = x;
+	widgetArea.y = y;
+	updateDrawArea();
+
+	onDimensionChanged(oldArea, widgetArea);
+}
+
+void Item::setX(const uint32_t x)
+{
+	BoundingBox oldArea = widgetArea;
+	widgetArea.x = x;
+	updateDrawArea();
+
+	onDimensionChanged(oldArea, widgetArea);
+}
+
+void Item::setY(const uint32_t y)
+{
+	BoundingBox oldArea = widgetArea;
 	widgetArea.y = y;
 	updateDrawArea();
 
@@ -153,28 +175,57 @@ void Item::setNavigationItem( gui::NavigationDirection direction, Item* item ) {
 }
 
 uint32_t Item::getMinHeight() {
-	return minHeight;
+	return (minHeight);
 }
 
 uint32_t Item::getMinWidth() {
-	return minWidth;
+	return (minWidth);
 }
 
 uint32_t Item::getMaxHeight() {
-	return maxHeight;
+	return (maxHeight);
 }
 
 uint32_t Item::getMaxWidth() {
-	return maxWidth;
+	return (maxWidth);
+}
+
+uint32_t Item::proportionOfWidth(const double proportion)
+{
+	return (getWidth() * proportion);
+}
+
+uint32_t Item::proportionOfHeight(const double proportion)
+{
+	return (getHeight() * proportion);
 }
 
 void Item::setMaxSize( const uint16_t& w, const uint16_t& h) {
 	maxWidth = w;
 	maxHeight = h;
 }
+
 void Item::setMinSize( const uint16_t& w, const uint16_t& h) {
 	minWidth = w;
 	minHeight = h;
+}
+
+bool Item::setFocus(bool state)
+{
+	if( state != focus ) {
+		//focus = state;
+		onFocus( state );
+		focusChangedCallback( *this );
+	};
+	
+	return (state);
+}
+
+template<typename T, class ...Args> void Item::addItem(Args... args)
+{
+	auto item = new T(args...);
+	ownedItems.push_back(item);
+	return (item);
 }
 
 } /* namespace gui */
