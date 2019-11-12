@@ -30,7 +30,7 @@ const inline std::string small   = "gt_pressura_regular_24";
 
 namespace label {
 const inline uint32_t default_h         = 50;
-const inline uint32_t border_focucs_w   = 3;
+const inline uint32_t border_focucs_w   = 2;
 const inline uint32_t border_no_focus_w = 0;
 };  // namespace label
 
