@@ -335,9 +335,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vector<uint8_t> data, std::string &message) {
 
     /* let's convert uint8_t vector to std::string*/
-    std::string str;
-    for (uint8_t i : data)
-        str += (static_cast<char>(i));
+    std::string str = std::string(reinterpret_cast<char*>(data.data()), reinterpret_cast<char*>(data.data() + data.size()));
 
     // Incoming call
     if (auto ret = str.find("+CLIP: ") != std::string::npos) {
