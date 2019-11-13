@@ -17,13 +17,13 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
+
 class CellularMessage : public sys::DataMessage {
 public:
-    CellularMessage() = delete;
     CellularMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)),
                                                type(messageType) {};
 
-    virtual ~CellularMessage() = default;
+    virtual ~CellularMessage() {};
 
     MessageType type;
 
@@ -57,6 +57,7 @@ public:
     virtual ~CellularNotificationMessage() = default;
 
     Type type=Type::None;
+
     std::string data;
     uint32_t signalStrength=0;
     int32_t dBmSignalStrength=0;
@@ -66,9 +67,8 @@ public:
 class CellularRequestMessage : public CellularMessage{
 public:
 
-    CellularRequestMessage() = delete;
     CellularRequestMessage(MessageType messageType):CellularMessage(messageType){}
-    virtual ~CellularRequestMessage() = default;
+    ~CellularRequestMessage() {}
 
     std::string data;
 
@@ -76,10 +76,10 @@ public:
 
 class CellularResponseMessage: public sys::ResponseMessage {
 public:
-    CellularResponseMessage(bool retCode = true) : sys::ResponseMessage(),retCode(retCode) {};
-    virtual ~CellularResponseMessage() = default;
+    CellularResponseMessage(uint32_t retCode) : sys::ResponseMessage(),retCode(retCode) {};
+    virtual ~CellularResponseMessage() {};
 
-    bool retCode;
+    uint32_t retCode;
 };
 
 

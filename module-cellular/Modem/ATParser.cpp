@@ -128,28 +128,34 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
 
-    wait_for_data:
+    //wait_for_data:
+    while(1) {
 
-    if (timeElapsed >= timeoutNeeded) {
-        blockedTaskHandle = nullptr;
-        return tokens;
-    }
-
-    auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
-    timeElapsed = cpp_freertos::Ticks::GetTicks();
-    if (ret) {
-
-        std::vector<std::string> strings;
-
-        cpp_freertos::LockGuard lock(mutex);
-        //tokenize responseBuffer
-        auto ret = Tokenizer(responseBuffer, rxCount, "\r\n");
-        tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-
-        if (tokens.size() < rxCount) {
-            goto wait_for_data;
+        if (timeElapsed >= timeoutNeeded)
+        {
+            blockedTaskHandle = nullptr;
+            return tokens;
         }
 
+        auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
+        timeElapsed = cpp_freertos::Ticks::GetTicks();
+        if (ret)
+        {
+
+            std::vector<std::string> strings;
+
+            cpp_freertos::LockGuard lock(mutex);
+            //tokenize responseBuffer
+            auto ret = Tokenizer(responseBuffer, rxCount, "\r\n");
+            tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
+
+            if (tokens.size() < rxCount)
+            {
+                //goto wait_for_data;
+                continue;
+            }
+        }
+        break;
     }
 
     blockedTaskHandle = nullptr;

@@ -47,6 +47,7 @@ ServiceCellular::ServiceCellular()
         auto msg = std::make_shared<CellularNotificationMessage>(type);
 
         switch (type) {
+
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
                 sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
                                       GetName(), this);

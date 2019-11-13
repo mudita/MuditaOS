@@ -52,7 +52,6 @@ namespace bsp {
 
         void ExitSleep() override final;
 
-
         void SetSpeed(uint32_t portSpeed);
 
         void SetSendingAllowed(bool state) override final { pv_SendingAllowed = state; }

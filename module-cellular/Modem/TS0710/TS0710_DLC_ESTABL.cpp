@@ -112,6 +112,9 @@ bool TS0710_DLC_ESTABL::response(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t syst
 
     data = static_cast<uint8_t*>(malloc(_SIZE));    //disconnected from declaration due to the fact that static is needed here and if
                                                     //allocated in declaration, compiler will not alloc this second time called
+
+    if (!data)
+        return false;
     
     //uint32_t len = UartReceive(data);
     ssize_t len = pv_cellular->Read(reinterpret_cast<void*>(data), _SIZE);
