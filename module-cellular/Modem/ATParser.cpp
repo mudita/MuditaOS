@@ -12,7 +12,7 @@
 #include "ATParser.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "ticks.hpp"
-#include "../../module-services/service-cellular/messages/CellularMessage.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
 #include "Service/Bus.hpp"
 
 ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
@@ -98,7 +98,6 @@ int ATParser::ProcessNewData(sys::Service *service) {
         // 5) +QIND: PB DONE
         if (urcs.size() == 5) {
             cpp_freertos::LockGuard lock(mutex);
-            //mux->callback(NotificationType ::PowerUpProcedureComplete,"");
             auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
             LOG_DEBUG("[!!!] Fucking away data");
@@ -120,8 +119,6 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
     LOG_DEBUG("[AT]: %s", cmd);
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
-    //auto cmdSigned = const_cast<char *>(cmd);
-    //inOutSerialWorker->WriteData(reinterpret_cast<unsigned char *>(cmdSigned), strlen(cmd));
     cellular->Write((void*)cmd, strlen(cmd));
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
