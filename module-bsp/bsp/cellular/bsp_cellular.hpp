@@ -48,7 +48,6 @@ namespace bsp {
 
         virtual void ExitSleep() = 0;
 
-
         virtual void SetSpeed(uint32_t portSpeed) = 0;
 
         virtual void SetSendingAllowed(bool state) = 0;

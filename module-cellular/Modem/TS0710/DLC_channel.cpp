@@ -103,7 +103,8 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
 
-     wait_for_data:
+     //wait_for_data:
+     while(1) {
 
          if (timeElapsed >= timeoutNeeded)
          {
@@ -121,7 +122,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
 
              cpp_freertos::LockGuard lock(mutex);
              TS0710_Frame::frame_t frame;
-             std::vector<uint8_t> v (responseBuffer.begin(), responseBuffer.end());
+             std::vector<uint8_t> v(responseBuffer.begin(), responseBuffer.end());
              responseBuffer.clear();
              frame.deserialize(v);
              std::string str(frame.data.begin(), frame.data.end());
@@ -131,16 +132,16 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
 
              if (tokens.size() < rxCount)
              {
-                 goto wait_for_data;
+                 continue;
              }
              blockedTaskHandle = nullptr;
-            //  LOG_PRINTF("[2. returning] %i tokens ", tokens.size());
-            //  for(std::string s : tokens) {
-            //     for(int i = 0; i < s.length(); i++) 
-            //         LOG_PRINTF("%02X ", s[i]);
-            //     LOG_PRINTF("; [%s]", s.c_str());
-            //  }
-            //  LOG_PRINTF("\n");
+             //  LOG_PRINTF("[2. returning] %i tokens ", tokens.size());
+             //  for(std::string s : tokens) {
+             //     for(int i = 0; i < s.length(); i++)
+             //         LOG_PRINTF("%02X ", s[i]);
+             //     LOG_PRINTF("; [%s]", s.c_str());
+             //  }
+             //  LOG_PRINTF("\n");
              return tokens;
          }
          else
@@ -148,14 +149,18 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
              //timeout
              blockedTaskHandle = nullptr;
              //LOG_PRINTF("[2. returning] %i tokens ", tokens.size());
-            //  for(std::string s : tokens) {
-            //     for(int i = 0; i < s.length(); i++) 
-            //         LOG_PRINTF("%02X ", s[i]);
-            //     LOG_PRINTF("; [%s]", s.c_str());
-            //  }
-            //  LOG_PRINTF("\n");
+             //  for(std::string s : tokens) {
+             //     for(int i = 0; i < s.length(); i++)
+             //         LOG_PRINTF("%02X ", s[i]);
+             //     LOG_PRINTF("; [%s]", s.c_str());
+             //  }
+             //  LOG_PRINTF("\n");
              return tokens;
          }
+
+         //to avoid endless loop
+         return tokens;
+     }
 }
 
 int DLC_channel::ParseInputData(std::vector<uint8_t> &data) {

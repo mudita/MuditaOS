@@ -247,7 +247,7 @@ TS0710::ConfState TS0710::AudioConfProcedure() {
 }
 
 TS0710::ConfState TS0710::StartMultiplexer() {
-    static char buf[256];
+    static char buf[128];
 
     LOG_DEBUG("Configuring multiplexer...");
 
