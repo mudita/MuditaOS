@@ -3,6 +3,9 @@ PurePhone repository
 
 # Quickstart
 
+Prior to any build setup environment, need to be run once. (See: `## Run provisioning`)
+`cd config && ./bootstrap.sh`
+
 ## Super quick and dirty to run app on linux:
 ```
 cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake     # set env.cmake
@@ -48,6 +51,9 @@ There is provisioning script `./config/bootstrap.sh` run it to install all depen
 * This script will require sudo (for apt)
 * needed cmake and GCC will be installed by default to `${HOME}` - in case of other needs, change it
 * script doesn't install ccache, but if ccache is on system - it's support is added to env.cmake.sample
+* need to be run once (not more on restart or anything)
+
+`cd config && ./bootstrap.sh`
 
 ## Install JLink driver:
 
@@ -75,7 +81,7 @@ after running provisioning you are ready to build project for both linux and rt1
     * [./module-bluetooth/](./module-bluetooth/README.md)
 * [module-lwip](./module-lwip/README.md)
 * [doc/database](./doc/database_v2.md)
-* [emulator keyboard bindings](./doc/host_keyboard_bindings.md)
+* [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
 
 # Linux Bluetooth device
 
