@@ -54,7 +54,7 @@ void LPUART1_IRQHandler(void) {
 
 }
 
-#define _RT1051_UART_DEBUG   1
+#define _RT1051_UART_DEBUG   0
 
 namespace bsp {
 
@@ -217,11 +217,11 @@ namespace bsp {
     ssize_t RT1051Cellular::Write(void *buf, size_t nbytes) {
         lpuart_transfer_t sendXfer;
         #if _RT1051_UART_DEBUG
-        printf("[TX] ");
+        LOG_PRINTF("[TX] ");
         uint8_t *ptr = (uint8_t*)buf;
         for (size_t i = 0; i < nbytes; i++)
-            printf("%02X ", (uint8_t)*ptr++);
-        printf("\n");
+            LOG_PRINTF("%02X ", (uint8_t)*ptr++);
+        LOG_PRINTF("\n");
         #endif
         sendXfer.data = static_cast<uint8_t *>(buf);
         sendXfer.dataSize = nbytes;
@@ -252,11 +252,11 @@ namespace bsp {
         ssize_t ret = xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
         #if _RT1051_UART_DEBUG
         if (ret > 0) {
-            printf("[RX] ");
+            LOG_PRINTF("[RX] ");
             uint8_t *ptr = (uint8_t*)buf;
             for (size_t i = 0; i < ret; i++)
-                printf("%02X ", (uint8_t)*ptr++);
-            printf("\n");
+                LOG_PRINTF("%02X ", (uint8_t)*ptr++);
+            LOG_PRINTF("\n");
         }
         #endif
         return ret;

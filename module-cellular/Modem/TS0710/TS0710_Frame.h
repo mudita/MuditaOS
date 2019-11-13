@@ -99,23 +99,23 @@ public:
                 }
             }
 
-            if ((serData.at(0) != TS0710_FLAG) || (serData.at(myLen-1) != TS0710_FLAG)) {
+            if ((serData[0] != TS0710_FLAG) || (serData.at(myLen-1) != TS0710_FLAG)) {
                 Address = 0;
                 Control = 0;
                 LOG_ERROR("Received frame has incorrect leading/trailing flags. Dropping.");
                 return; //return empty frame. Discard frame witout proper leading & trailing flag
             }
 
-            Address = serData.at(1);
-            Control = serData.at(2) & ~(1 << 4);
+            Address = serData[1];
+            Control = serData[2] & ~(1 << 4);
             int Length;
-            if (serData.at(3) & 0x01) {  //short length
-                Length = static_cast<uint16_t>(serData.at(3) >> 1);
+            if (serData[3] & 0x01) {  //short length
+                Length = static_cast<uint16_t>(serData[3] >> 1);
             }
             else {  //long length
-                Length = static_cast<uint16_t>(serData.at(3) >> 1) + (static_cast<uint16_t>(serData.at(4)) << 7);
+                Length = static_cast<uint16_t>(serData[3] >> 1) + (static_cast<uint16_t>(serData[3]) << 7);
             }
-            if (serData.at(3) == 0xFF)   //ugly hack for Quectel misimplementation of the standard
+            if (serData[3] == 0xFF)   //ugly hack for Quectel misimplementation of the standard
                 Length = myLen - 6;
             //LOG_DEBUG("[Frame] %s Addr: 0x%02X, Ctrl: 0x%02X, Len: %i", TypeOfFrame_text[static_cast<TypeOfFrame_e>(Control)].c_str(), Address, Control, Length);
             data.insert(data.begin(), serData.begin() + 4, serData.begin() + 4 + Length);   //get data - amount of data determined by Length value
@@ -132,12 +132,12 @@ public:
             }
             /*len is the number of bytes in the message, p points to message*/
             while (len--) {
-                FCS=crctable[FCS^serData.at(i++)];
+                FCS=crctable[FCS^serData[i++]];
             }
             if (Control == static_cast<uint8_t>(TypeOfFrame_e::UIH))
-                FCS=crctable[FCS^serData.at(myLen - 2)];
+                FCS=crctable[FCS^serData[myLen - 2]];
 
-            if ((FCS != 0xCF) && (serData.at(3) != 0xFF) && (Control != static_cast<uint8_t>(TypeOfFrame_e::UA))) {  //error - but fuck FCS check if it's faulty Quectel UIH frame or UA frame
+            if ((FCS != 0xCF) && (serData[3] != 0xFF) && (Control != static_cast<uint8_t>(TypeOfFrame_e::UA))) {  //error - but fuck FCS check if it's faulty Quectel UIH frame or UA frame
                 Address = 0;
                 Control = 0;
                 data.clear();
@@ -179,34 +179,34 @@ public:
         if (serData.size() < 4)
             return false;   //check if buffer has enough data to get length
 
-        if ((serData.at(0) != TS0710_FLAG) || (serData.at(serData.size()-1) != TS0710_FLAG))
+        if ((serData[0] != TS0710_FLAG) || (serData[serData.size()-1] != TS0710_FLAG))
             return false;
 
         int Length = 0;
-        if (serData.at(3) & 0x01){ //short length
-            Length = static_cast<uint16_t>(serData.at(3) >> 1);
+        if (serData[3] & 0x01){ //short length
+            Length = static_cast<uint16_t>(serData[3] >> 1);
         }
         else if (serData.size() > 4){ //long length - another check if enough bytes in buffer
-            Length = static_cast<uint16_t>(serData.at(3) >> 1) + (static_cast<uint16_t>(serData.at(4)) << 7);
+            Length = static_cast<uint16_t>(serData[3] >> 1) + (static_cast<uint16_t>(serData[4]) << 7);
         }
         else
             return false;
 
-        if (serData.size() >= static_cast<size_t>(TS0710_FRAME_HDR_LEN + Length + (serData.at(3) & 0x01 ? 0 : 1)))   //include extended address byte if present
+        if (serData.size() >= static_cast<size_t>(TS0710_FRAME_HDR_LEN + Length + (serData[3] & 0x01 ? 0 : 1)))   //include extended address byte if present
             return true;
 
         return false;
     }
 
     static bool isMyChannel(const std::vector<uint8_t> &serData, DLCI_t DLCI) {
-        if ((serData.size() > 1) && ((serData.at(1) >> 2) == DLCI))
+        if ((serData.size() > 1) && ((serData[1] >> 2) == DLCI))
             return true;
         return false;
     }
 
     static DLCI_t getFrameDLCI(const std::vector<uint8_t> &serData) {
         if (serData.size() > 1)
-            return (serData.at(1) >> 2);
+            return (serData[1] >> 2);
         return -1;
     }
 };
