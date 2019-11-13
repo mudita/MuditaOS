@@ -54,9 +54,9 @@ PhonebookItem *PhonebookListView::getSelectedPhonebookItem()
 
 bool PhonebookListView::onInput(const InputEvent &inputEvent)
 {
+    LOG_INFO("code:%d state:%d", inputEvent.keyCode, inputEvent.state);
     if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_ENTER))
     {
-
         PhonebookItem *item = getSelectedPhonebookItem();
         if (item)
         {

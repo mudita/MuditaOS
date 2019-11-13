@@ -129,7 +129,6 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
 {
-
     // process only if key is released
     if (inputEvent.state == InputEvent::State::keyReleasedShort)
     {
@@ -137,11 +136,11 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
         {
         case KeyCode::KEY_LEFT:
             LOG_INFO("Adding new contact");
-            application->switchWindow("NewContact");
+            application->switchWindow("New");
             return true;
-        case KeyCode::KEY_ENTER:
+        case KeyCode::KEY_RIGHT:
             LOG_INFO("Searching contact");
-            application->switchWindow("SearchWindow");
+            application->switchWindow("Search");
             return true;
         default:
             break;

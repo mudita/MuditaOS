@@ -144,16 +144,34 @@ bool PhonebookSearch::onInput(const InputEvent &inputEvent)
     if (inputEvent.keyCode == KeyCode::KEY_ENTER)
     {
         LOG_INFO("Enter pressed");
-        std::string contents = inputField->getText();
-        if (contents.size() > 122)
+        std::string contents = utils::trim(inputField->getText());
+        std::unique_ptr<std::vector<ContactRecord>> searchResults;
+        std::string primaryName = "";
+        std::string alternativeName = "";
+        std::string number = "";
+
+        if (contents.size() > 0)
         {
-            std::vector<std::string> result = utils::split(contents, ' ');
-            std::unique_ptr<std::vector<ContactRecord>> contacts = DBServiceAPI::ContactSearchByName(
-                application, result.size() >= 1 ? result[0] : "", result.size() == 2 ? result[1] : "");
-            if (contacts)
+            if (utils::is_number(contents) || contents.find('+') != std::string::npos)
             {
-                LOG_INFO("search query returned %d records", contacts->size());
+                number = contents;
             }
+            else if (contents.find(' '))
+            {
+                std::vector<std::string> result = utils::split(contents, ' ');
+                primaryName = result[0];
+                alternativeName = result[1];
+            }
+            else
+            {
+                primaryName = contents;
+            }
+
+            LOG_INFO("searching for pri:%s alt:%s num:%s", primaryName.c_str(), alternativeName.c_str(),
+                     number.c_str());
+            searchResults = DBServiceAPI::ContactSearch(application, primaryName, alternativeName, number);
+
+            LOG_INFO("found %d entries", searchResults->size());
         }
         else
         {

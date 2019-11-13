@@ -62,28 +62,28 @@ void PhonebookContact::buildInterface()
 
     favouritesIcon = new Image(this, 97, 107, 32, 32, "small_heart");
     favouritesLabel = addLabel(nullptr, 65, 144, 89, 20, utils::localize.get("app_phonebook_contact_favourites_upper"),
-                               "gt_pressura_regular_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                               style::phonebook::font::tinybold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     speedDial =
-        addLabel(nullptr, 225, 107, 32, 32, "", "gt_pressura_bold_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+        addLabel(nullptr, 225, 107, 32, 32, "", style::footer::font::bold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     speedDialLabel = addLabel(nullptr, 196, 144, 89, 20, utils::localize.get("app_phonebook_contact_speed_dial_upper"),
-                              "gt_pressura_regular_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                              style::phonebook::font::tinybold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                               Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     blockedIcon = new Image(this, 351, 107, 32, 32, "small_circle");
     blockedLabel =
         addLabel(nullptr, 329, 144, 75, 20, utils::localize.get("app_phonebook_contact_speed_blocked_uppper"),
-                 "gt_pressura_regular_16", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                 style::phonebook::font::tinybold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     topSeparatorLabel = addLabel(nullptr, 0, 179, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
     // page1 contents
     informationLabel = addLabel(&page1, 30, 203, 413, 20, utils::localize.get("app_phonebook_contact_information"),
-                                "gt_pressura_regular_18", RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                                style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                 Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM), true);
 
     // first number line
@@ -91,7 +91,7 @@ void PhonebookContact::buildInterface()
         addLabel(&page1, 30, 249, 178, 33, "", style::window::font::bigbold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    numberPrimaryLabel = addLabel(&page1, 328, 237, 32, 53, "", "gt_pressura_regular_16",
+    numberPrimaryLabel = addLabel(&page1, 328, 237, 32, 53, "", style::window::font::small,
                                   RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
                                   Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     numberPrimaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
@@ -113,7 +113,7 @@ void PhonebookContact::buildInterface()
     page1.push_back(numberPrimaryIcon);
 
     numberPrimaryMessageLabel =
-        addLabel(&page1, 401, 237, 32, 53, "", "gt_pressura_regular_16",
+        addLabel(&page1, 401, 237, 32, 53, "", style::window::font::small,
                  RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
@@ -136,7 +136,7 @@ void PhonebookContact::buildInterface()
         addLabel(&page1, 30, 306, 178, 33, "", style::window::font::big, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    numberSecondaryLabel = addLabel(&page1, 328, 297, 32, 53, "", "gt_pressura_regular_16",
+    numberSecondaryLabel = addLabel(&page1, 328, 297, 32, 53, "", style::window::font::small,
                                     RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
                                     Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     numberSecondaryLabel->setPenFocusWidth(3);
@@ -157,7 +157,7 @@ void PhonebookContact::buildInterface()
     page1.push_back(numberSecondaryIcon);
 
     numberSecondaryMessageLabel =
-        addLabel(&page1, 401, 297, 32, 53, "", "gt_pressura_regular_16",
+        addLabel(&page1, 401, 297, 32, 53, "", style::window::font::small,
                  RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     numberSecondaryMessageLabel->setPenFocusWidth(3);
@@ -194,7 +194,7 @@ void PhonebookContact::buildInterface()
 
     noteText = new Text(this, 30, 249, 422, 600 - 249 - bottomBar->getHeight());
     noteText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    noteText->setFont("gt_pressura_regular_24");
+    noteText->setFont(style::window::font::small);
     page2.push_back(noteText);
     noteText->focusChangedCallback = [=](gui::Item &item) {
         setVisible(&page2, item.focus);
