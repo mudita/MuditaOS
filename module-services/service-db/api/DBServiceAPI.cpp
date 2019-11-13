@@ -422,14 +422,12 @@ bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, ui
     return true;
 }
 /** */
-std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactSearchByName(sys::Service *serv, UTF8 primaryName,
-                                                                              UTF8 alternativeName)
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactSearch(sys::Service *serv, UTF8 primaryName,
+                                                                        UTF8 alternativeName, UTF8 number)
 {
-    ContactRecord rec;
-    rec.primaryName = primaryName;
-    rec.alternativeName = alternativeName;
-
-    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactSearchByName, rec);
+    std::shared_ptr<DBContactSearchMessage> msg = std::make_shared<DBContactSearchMessage>(
+        MessageType::DBContactSearch, (primaryName.length() > 0) ? primaryName.c_str() : "",
+        (alternativeName.length() > 0) ? alternativeName.c_str() : "", (number.length() > 0) ? number.c_str() : "");
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());

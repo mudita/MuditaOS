@@ -75,8 +75,8 @@ class DBServiceAPI
     //    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t
     //    offset,uint32_t limit, bool favourites = false );
     static bool ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit, bool favourites = false);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactSearchByName(sys::Service *serv, UTF8 primaryName,
-                                                                           UTF8 alternativeName);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactSearch(sys::Service *serv, UTF8 primaryName,
+                                                                     UTF8 alternativeName, UTF8 number);
     static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
     static bool AlarmRemove(sys::Service *serv, uint32_t id);
     static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);
