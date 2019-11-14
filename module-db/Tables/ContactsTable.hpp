@@ -55,6 +55,8 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
 
     ContactsTableRow GetByID(uint32_t id) override final;
 
+    bool BlockByID(uint32_t id, bool shouldBeBlocked);
+
     std::vector<ContactsTableRow> Search(const std::string primaryName, const std::string alternativeName,
                                          const std::string number);
 

@@ -75,6 +75,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     bool Update(const ContactRecord &rec) override final;
 
+    bool BlockByID(uint32_t id, const bool shouldBeBlocked = true);
+
     ContactRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;

@@ -133,6 +133,21 @@ class DBContactMessage : public DBMessage
     bool favourite = false;
 };
 
+class DBContactBlock : public DBMessage
+{
+  public:
+    DBContactBlock(MessageType messageType, const uint32_t _id, bool _shouldBeBlocked)
+        : DBMessage(messageType), id(_id), shouldBeBlocked(_shouldBeBlocked)
+    {
+    }
+    virtual ~DBContactBlock()
+    {
+    }
+
+    uint32_t id;
+    bool shouldBeBlocked;
+};
+
 class DBContactSearchMessage : public DBMessage
 {
   public:

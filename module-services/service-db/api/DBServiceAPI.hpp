@@ -71,6 +71,7 @@ class DBServiceAPI
     static bool ContactAdd(sys::Service *serv, const ContactRecord &rec);
     static bool ContactRemove(sys::Service *serv, uint32_t id);
     static bool ContactUpdate(sys::Service *serv, const ContactRecord &rec);
+    static bool ContactBlock(sys::Service *serv, uint32_t id, const bool shouldBeBlocked = true);
     static uint32_t ContactGetCount(sys::Service *serv, bool favourites = false);
     //    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t
     //    offset,uint32_t limit, bool favourites = false );

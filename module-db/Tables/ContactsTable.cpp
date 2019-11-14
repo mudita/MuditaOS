@@ -36,6 +36,11 @@ bool ContactsTable::RemoveByID(uint32_t id)
     return db->Execute("DELETE FROM contacts where _id = %u;", id);
 }
 
+bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
+{
+    return db->Execute("UPDATE contacts SET blacklist=%lu WHERE _id=%lu", shouldBeBlocked ? 1 : 0, id);
+}
+
 bool ContactsTable::Update(ContactsTableRow entry)
 {
     return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%s' ,ring_id = %lu, address_ids = '%s', type "

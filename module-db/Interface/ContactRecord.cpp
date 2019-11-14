@@ -103,6 +103,11 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     return ret;
 }
 
+bool ContactRecordInterface::BlockByID(uint32_t id, const bool shouldBeBlocked)
+{
+    return contactDB->contacts.BlockByID(id, shouldBeBlocked);
+}
+
 bool ContactRecordInterface::RemoveByID(uint32_t id)
 {
 

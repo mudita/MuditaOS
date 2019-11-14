@@ -380,6 +380,23 @@ bool DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec)
     }
 }
 
+bool DBServiceAPI::ContactBlock(sys::Service *serv, uint32_t id, const bool shouldBeBlocked)
+{
+    std::shared_ptr<DBContactBlock> msg =
+        std::make_shared<DBContactBlock>(MessageType::DBContactBlock, id, shouldBeBlocked);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv, bool favourites)
 {
     std::shared_ptr<DBContactMessage> msg =

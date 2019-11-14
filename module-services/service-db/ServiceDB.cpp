@@ -283,6 +283,18 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     }
     break;
 
+    case MessageType::DBContactBlock: {
+        DBContactBlock *msg = reinterpret_cast<DBContactBlock *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+        timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+        auto ret = contactRecordInterface->BlockByID(msg->id, msg->shouldBeBlocked);
+#if SHOW_DB_ACCESS_PERF == 1
+        LOG_DEBUG("DBContactBlock time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+        responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+    }
+    break;
     case MessageType::DBContactUpdate: {
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1

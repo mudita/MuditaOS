@@ -14,10 +14,10 @@ enum class MessageType
 
     MessageTypeUninitialized = 0,
     // eink messages
-    EinkStateRequest, // message is used to pull status of the eink. If eink is ready to display image
-    EinkImageData,    // message with pointer to the image data for displaying
-    EinkDMATransfer,  // this message is internally sent from wink service to eink service. This will trigger DMA
-                     // transfer to Eink's controller. After tranfer gui service wil lbewill be notified
+    EinkStateRequest,      // message is used to pull status of the eink. If eink is ready to display image
+    EinkImageData,         // message with pointer to the image data for displaying
+    EinkDMATransfer,       // this message is internally sent from wink service to eink service. This will trigger DMA
+                           // transfer to Eink's controller. After tranfer gui service wil lbewill be notified
     EinkTemperatureUpdate, // message sent from timer handler. Message forces service to update temperature measured by
                            // the eink.
 
@@ -53,13 +53,13 @@ enum class MessageType
     DBContactUpdate,         // Update contact remove
     DBContactGetLimitOffset, // Get contact records by limit,offset
     DBContactGetCount,       // Get contacts count
-
-    DBAlarmAdd,            // Add alarm record
-    DBAlarmRemove,         // Remove alarm remove
-    DBAlarmUpdate,         // Update alarm remove
-    DBAlarmGetLimitOffset, // Get alarm records by limit,offset
-    DBAlarmGetCount,       // Get alarm count
-    DBAlarmGetNext,        // Get alarm, closest or equal to current timestamp.
+    DBContactBlock,          // block a contact
+    DBAlarmAdd,              // Add alarm record
+    DBAlarmRemove,           // Remove alarm remove
+    DBAlarmUpdate,           // Update alarm remove
+    DBAlarmGetLimitOffset,   // Get alarm records by limit,offset
+    DBAlarmGetCount,         // Get alarm count
+    DBAlarmGetNext,          // Get alarm, closest or equal to current timestamp.
     DBAlarmUpdateNotification,
 
     // Cellular messages
@@ -101,10 +101,10 @@ enum class MessageType
     APMSwitchPrevApp, // Request to switch to previous application.
     APMConfirmSwitch, // Used when application confirms that it is loosing focus and also when application confirms that
                       // is has gained focus
-    APMConfirmClose, // Sent by application to confirm completion of the close procedure
-    APMRegister,     // when application finishes initHandler it is sending this messag to inform whether init was
-                 // successful or not.
-    APMDeleydClose, // this message is sent internally from and to application manager to close specified application.
+    APMConfirmClose,  // Sent by application to confirm completion of the close procedure
+    APMRegister,      // when application finishes initHandler it is sending this messag to inform whether init was
+                      // successful or not.
+    APMDeleydClose,   // this message is sent internally from and to application manager to close specified application.
     APMChangeLanguage, // this message is sent from any application to inform application manager that it should send
                        // gui rebuild command to all applications in background and currently active application.
     APMClose, // this message will trigger application manager to close itself, all running applications gui and eink
@@ -120,7 +120,7 @@ enum class MessageType
     AppSwitchWindowBack, // message to inform
     AppSwitchWindow, // This is internal message transmitted within application to change window. Additional command and
                      // data are transmitted with it.
-    AppInputEvent, // used after key event translation to send input event to application
+    AppInputEvent,   // used after key event translation to send input event to application
     AppRefresh,
     AppRebuild, // message used to notify application that it should recreate it's GUI (i.e. language has beed changed
                 // by the user)
