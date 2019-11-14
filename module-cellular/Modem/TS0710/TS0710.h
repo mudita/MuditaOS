@@ -328,6 +328,7 @@ public:
     }
 
 TS0710(PortSpeed_e portSpeed, sys::Service *parent);
+TS0710() = delete;
 ~TS0710();
 
 //Add error handling - only for Advanced mode. Leave for now

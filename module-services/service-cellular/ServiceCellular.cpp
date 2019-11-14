@@ -320,7 +320,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
 
-
+            
         }
             break;
 
