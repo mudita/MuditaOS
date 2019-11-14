@@ -19,15 +19,17 @@
 #include <sys/epoll.h>
 #include "termios.h"
 #include <sys/ioctl.h>
-
+#include "mutex.hpp"
 
 namespace bsp {
 
     class LinuxCellular: public Cellular  {
+    private:
+        bool pv_SendingAllowed = true;
 
     public:
 
-        LinuxCellular(const char* term);
+        LinuxCellular(const char* term, uint32_t portSpeed);
         ~LinuxCellular();
 
         void PowerUp() override final;
@@ -50,6 +52,12 @@ namespace bsp {
 
         void ExitSleep() override final;
 
+
+        void SetSpeed(uint32_t portSpeed);
+
+        void SetSendingAllowed(bool state) override final { pv_SendingAllowed = state; }
+        bool GetSendingAllowed() override final { return pv_SendingAllowed; }
+
     private:
 
         static constexpr speed_t baud_bits[] = {
@@ -66,7 +74,7 @@ namespace bsp {
 
         struct epoll_event event, events[MAX_EVENTS];
 
-
+        cpp_freertos::MutexStandard serOutMutex;
     };
 
 }

@@ -7,27 +7,31 @@
  *  @details
  */
 
-
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <sstream>
+#include <iterator>
 
 #include "ServiceCellular.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 
-#include "Modem/MuxDaemon.hpp"
-
 #include "MessageType.hpp"
 
 #include "messages/CellularMessage.hpp"
+#include <ticks.hpp>
 
 #include "Common.hpp"
+#include "log/log.hpp"
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 
 ServiceCellular::ServiceCellular()
-        : sys::Service(serviceName),
-          muxdaemon(nullptr) {
+        : sys::Service(serviceName, "", 8192UL, sys::ServicePriority::Idle) {
 
     LOG_INFO("[ServiceCellular] Initializing");
 
@@ -35,36 +39,41 @@ ServiceCellular::ServiceCellular()
 
     callStateTimer = CreateTimer(1000, true);
 
-    notificationCallback = [this](NotificationType type, std::string resp) {
-
+    notificationCallback = [this](std::vector<uint8_t> &data) {
+        LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
+        TS0710_Frame frame(data);
+        std::string message;
+        CellularNotificationMessage::Type type = identifyNotification(frame.getFrame().data, message);
         auto msg = std::make_shared<CellularNotificationMessage>(type);
 
         switch (type) {
-            case NotificationType::PowerUpProcedureComplete: {
+            case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
                 sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
                                       GetName(), this);
                 state = State ::ModemConfigurationInProgress;
                 return;
             }
-            case NotificationType::Ringing:
-            case NotificationType::ServiceReady:
-            case NotificationType::CallBusy:
-            case NotificationType::CallActive:
-            case NotificationType::CallAborted:
+            case CellularNotificationMessage::Type::Ringing:
+            case CellularNotificationMessage::Type::ServiceReady:
+            case CellularNotificationMessage::Type::CallBusy:
+            case CellularNotificationMessage::Type::CallActive:
+            case CellularNotificationMessage::Type::CallAborted:
+            case CellularNotificationMessage::Type::None:
                 // no data field is used
                 LOG_ERROR("unexpected notification");
                 break;
 
-            case NotificationType::IncomingCall:
-                msg->data = resp;
+            case CellularNotificationMessage::Type::IncomingCall:
+                msg->data = message;
                 break;
 
-            case NotificationType::NewIncomingSMS:
+            case CellularNotificationMessage::Type::NewIncomingSMS:
                 //TODO:M.P fill message's fields
                 break;
 
-            case NotificationType::SignalStrengthUpdate:
-                msg->signalStrength = std::stoll(resp);
+            case CellularNotificationMessage::Type::SignalStrengthUpdate:
+                LOG_DEBUG("Setting new signal strength");
+                msg->signalStrength = std::stoll(message);
                 if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0]))) {
                     LOG_ERROR("Signal strength value out of range.");
                     msg->dBmSignalStrength = signalStrengthToDB[0];
@@ -82,6 +91,9 @@ ServiceCellular::ServiceCellular()
 ServiceCellular::~ServiceCellular() {
 
     LOG_INFO("[ServiceCellular] Cleaning resources");
+    if (cmux != nullptr) {
+        delete cmux;
+    }
 }
 
 // Invoked when timer ticked
@@ -95,10 +107,9 @@ void ServiceCellular::TickHandler(uint32_t id) {
 // Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
-    muxdaemon = MuxDaemon::Create(notificationCallback);
-    if (muxdaemon) {
+    //cmux = new TS0710(PortSpeed_e::PS460800, this);
 
-        // Start procedure is as follow:
+    // Start procedure is as follow:
         /*
          * 1) Power-up
          * 2) Init configuration of GSM modem
@@ -107,15 +118,12 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
          * 5) Modem fully-operational
          */
 
-        // Start power-up procedure
-        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
-                              GetName(), this);
-        state = State::PowerUpInProgress;
+    // Start power-up procedure
+    sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
+                          GetName(), this);
+    state = State::PowerUpInProgress;
 
-        return sys::ReturnCodes::Success;
-    } else {
-        return sys::ReturnCodes::Failure;
-    }
+    return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceCellular::DeinitHandler() {
@@ -149,9 +157,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
         case MessageType::CellularNotification: {
             CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 
-            if ((msg->type == NotificationType::CallAborted) ||
-                (msg->type == NotificationType::CallBusy)) {
+            if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
+                (msg->type == CellularNotificationMessage::Type::CallBusy)) {
                 stopTimer(callStateTimer);
+            } else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete) {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+                                      GetName(), this);
+                state = State ::ModemConfigurationInProgress;
             } else {
                 //ignore rest of notifications
             }
@@ -159,12 +171,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             break;
 
         case MessageType::CellularStartPowerUpProcedure: {
-                   auto powerRet = muxdaemon->PowerUpProcedure();
-                   if (powerRet == MuxDaemon::ConfState::Success) {
+                   auto powerRet = cmux->PowerUpProcedure();
+                   if (powerRet == TS0710::ConfState::Success) {
                        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
                                              GetName(), this);
                    }
-                   else if(powerRet == MuxDaemon::ConfState::PowerUp){
+                   else if(powerRet == TS0710::ConfState::PowerUp){
                        state = State::PowerUpInProgress;
 
                    }
@@ -177,8 +189,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 
                case MessageType::CellularStartConfProcedure: {
                    // Start configuration procedure, if it's first run modem will be restarted
-                   auto confRet = muxdaemon->ConfProcedure();
-                   if (confRet == MuxDaemon::ConfState::Success) {
+                   auto confRet = cmux->ConfProcedure();
+                   if (confRet == TS0710::ConfState::Success) {
                        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
                                              GetName(), this);
                        state = State::AudioConfigurationInProgress;
@@ -192,18 +204,46 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 
                case MessageType ::CellularStartAudioConfProcedure:
                {
-                   auto audioRet = muxdaemon->AudioConfProcedure();
-                   if(audioRet == MuxDaemon::ConfState::Success){
+                   auto audioRet = cmux->AudioConfProcedure();
+                   if(audioRet == TS0710::ConfState::Success){
 
-                       muxdaemon->StartMultiplexer();
-                       LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+                       char buf[32];
+                       LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+                       sprintf(buf, "AT+IPR=%i\r", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+                       if (!cmux->CheckATCommandResponse(cmux->getParser()->SendCommand(buf, 1))) {
+                           LOG_ERROR("Baudrate setup error");
+                           state = State::Failed;
+                           break;
+                       }
+                       cmux->getCellular()->SetSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+
+                       vTaskDelay(1000);
+
+                       if (cmux->StartMultiplexer() == TS0710::ConfState::Success)
+                       {
+                           LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+                           DLC_channel *notificationsChannel = cmux->GetChannel("Notifications"); //open channel - notifications
+                           if (notificationsChannel)
+                           {
+                               LOG_DEBUG("Setting up notifications callback");
+                               notificationsChannel->setCallback(notificationCallback);
+                           }
+
+                           state = State::Ready;
+                        }
+                        else {
+                            LOG_DEBUG("[ServiceCellular] Modem FAILED");
+                            state = State::Failed;
+                        }
 
                        state = State::Ready;
                        // Propagate "ServiceReady" notification into system
                        sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                               NotificationType::ServiceReady), sys::BusChannels::ServiceCellularNotifications, this);
+                               CellularNotificationMessage::Type::ServiceReady),
+                               sys::BusChannels::ServiceCellularNotifications, this);
                    }
-                   else if(audioRet == MuxDaemon::ConfState::Failure){
+                   else if(audioRet == TS0710::ConfState::Failure){
                        sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
                                              GetName(), this);
                    }
@@ -215,14 +255,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                break;
 
         case MessageType::CellularListCurrentCalls: {
-            auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "AT+CLCC\r", 3);
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", 3);
             if ((ret.size() == 3) && (ret[2] == "OK")) {
 
                 auto beg = ret[1].find(",", 0);
                 beg = ret[1].find(",", beg + 1);
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
                 if (std::stoul(ret[1].substr(beg + 1, 1)) == static_cast<uint32_t >(CallStates::Active)) {
-                    notificationCallback(NotificationType::CallActive, "");
+                    //notificationCallback(CellularNotificationMessage::Type::CallActive, "");  //TODO: enable this
+
                     stopTimer(callStateTimer);
                 }
 
@@ -234,7 +275,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             break;
 
         case MessageType::CellularHangupCall: {
-            auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "ATH\r", 1);
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATH\r", 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
             } else {
@@ -243,18 +284,20 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             stopTimer(callStateTimer);
 
             // Propagate "CallAborted" notification into system
-            sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-            	NotificationType::CallAborted), sys::BusChannels::ServiceCellularNotifications, this);
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
+                CellularNotificationMessage::Type::CallAborted),
+                sys::BusChannels::ServiceCellularNotifications, this);
         }
             break;
 
         case MessageType::CellularAnswerIncomingCall: {
-            auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication, "ATA\r", 1);
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATA\r", 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // Propagate "CallActive" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                        NotificationType::CallActive), sys::BusChannels::ServiceCellularNotifications, this);
+                        CellularNotificationMessage::Type::CallActive),
+                        sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
@@ -263,15 +306,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 
         case MessageType::CellularDialNumber: {
             CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-            auto ret = muxdaemon->SendCommandResponse(MuxChannel::MuxChannelType::Communication,
-                                                      ("ATD" + msg->data + ";\r").c_str(), 1);
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1);
             if ((ret.size() == 1) && (ret[0] == "OK")) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
                 ReloadTimer(callStateTimer);
                 // Propagate "Ringing" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                    NotificationType::Ringing, msg->data), sys::BusChannels::ServiceCellularNotifications, this);
+                    CellularNotificationMessage::Type::Ringing),
+                    sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
@@ -280,11 +323,63 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
         }
             break;
 
-
         default:
             break;
     }
 
 
     return responseMsg;
+}
+
+CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vector<uint8_t> data, std::string &message) {
+
+    /* let's convert uint8_t vector to std::string*/
+    std::string str;
+    for (uint8_t i : data)
+        str += (static_cast<char>(i));
+
+    // Incoming call
+    if (auto ret = str.find("+CLIP: ") != std::string::npos) {
+        LOG_TRACE("incoming call...");
+
+        auto beg = str.find("\"",ret);
+        auto end = str.find("\"",ret + beg+1);
+        message = str.substr(beg+1,end-beg-1);
+
+        return CellularNotificationMessage::Type::IncomingCall;
+    }
+
+
+    // Call aborted/failed
+    if (str.find("NO CARRIER") != std::string::npos) {
+        LOG_TRACE(": call failed/aborted");
+        return CellularNotificationMessage::Type::CallAborted;
+    }
+
+    // Call busy
+    if (str.find("BUSY") != std::string::npos) {
+        LOG_TRACE(": call busy");
+        return CellularNotificationMessage::Type::CallBusy;
+    }
+
+    // Received new SMS
+    if (str.find("+CMTI: ") != std::string::npos) {
+        LOG_TRACE(": received new SMS notification");
+        message = "888777333"; // TODO:M.P add SMS nr parsing
+
+        return CellularNotificationMessage::Type::NewIncomingSMS;
+    }
+
+    // Received signal strength change
+    if (auto ret = str.find("+QIND: \"csq\"") != std::string::npos) {
+        LOG_TRACE(": received signal strength change notification");
+        auto beg = str.find(",",ret);
+        auto end = str.find(",",ret + beg+1);
+        message = str.substr(beg+1,end-beg-1);
+
+        return CellularNotificationMessage::Type::SignalStrengthUpdate;
+    }
+
+    return CellularNotificationMessage::Type::None;
+
 }

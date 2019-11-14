@@ -18,16 +18,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "mutex.hpp"
+#include "Service/Service.hpp"
 
 namespace bsp{
     class Cellular;
 }
-
-
-
-class MuxDaemon;
-class InOutSerialWorker;
-
 
 class ATParser {
 public:
@@ -41,11 +36,9 @@ public:
 
     };
 
-    static std::optional<std::unique_ptr<ATParser>> Create(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
+    ATParser(bsp::Cellular* cellular);
 
-    ATParser(MuxDaemon* mux,InOutSerialWorker* inOutSerial,bsp::Cellular* cellular);
-
-    int ProcessNewData();
+    int ProcessNewData(sys::Service *service);
 
     std::vector<std::string> SendCommand(const char* cmd,size_t rxCount,uint32_t timeout = 500);
 
@@ -55,8 +48,6 @@ private:
 
     std::vector<Urc> ParseURC();
 
-    MuxDaemon* mux = nullptr;
-    InOutSerialWorker* inOutSerialWorker = nullptr;
     bsp::Cellular* cellular = nullptr;
 
     std::string responseBuffer;
@@ -67,7 +58,6 @@ private:
     std::vector<ATParser::Urc> urcs;
 
     bool isInitialized = false;
-
 
 };
 
