@@ -21,6 +21,7 @@ target_sources( ${PROJECT_NAME}
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookDeleteContact.cpp"
+                "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookBlockContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookSearch.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptions.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookOptionsNamecard.cpp"

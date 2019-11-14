@@ -19,7 +19,7 @@ class PhonebookBlockContact : public AppWindow
     Text *confirmationLabel = nullptr;
     Label *noLabel = nullptr;
     Label *yesLabel = nullptr;
-    Image *trashacnIcon = nullptr;
+    Image *icon = nullptr;
     /** currently displayed contact */
     std::shared_ptr<ContactRecord> contact = nullptr;
 

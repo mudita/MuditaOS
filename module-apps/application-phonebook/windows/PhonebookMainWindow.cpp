@@ -1,31 +1,17 @@
 #include "PhonebookMainWindow.hpp"
-
-#include <functional>
-#include <memory>
-
-#include "service-appmgr/ApplicationManager.hpp"
-
 #include "../ApplicationPhonebook.hpp"
-#include "i18/i18.hpp"
-#include "service-db/messages/DBMessage.hpp"
-
 #include "Label.hpp"
 #include "ListView.hpp"
 #include "Margins.hpp"
 #include "PhonebookMainWindow.hpp"
-
+#include "i18/i18.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-
+#include "service-db/messages/DBMessage.hpp"
 #include <Style.hpp>
+#include <functional>
 #include <log/log.hpp>
-
-std::vector<std::string> names = {"Alek",    "Janusz",  "Zofia",     "Roland", "Cezary",  "Ignacy", "Brian",
-                                  "Ejdiran", "Grażyna", "Sebastian", "Karyna", "Mariola", "Ola",    "Mateusz",
-                                  "Ernest",  "Robert",  "Jakub",     "Adam",   "Łukasz",  "Tomek"};
-
-std::vector<std::string> surnames = {"Wyczesany", "Pacha",  "Małolepszy", "Boligłowa",  "Żur",      "Kiełbasa",
-                                     "Skwara",    "Ściera", "Słaby",      "Cnotliwy",   "Bubel",    "Fundament",
-                                     "Rura",      "Bucior", "Kusibab",    "Kwasigroch", "Siekierka"};
+#include <memory>
 
 namespace gui
 {
@@ -33,7 +19,7 @@ namespace gui
 PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
     : AppWindow(app, "MainWindow"), phonebookModel{new PhonebookModel(app)}
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 

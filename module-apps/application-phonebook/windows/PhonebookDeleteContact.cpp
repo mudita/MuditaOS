@@ -20,7 +20,7 @@
 
 PhonebookDeleteContact::PhonebookDeleteContact(app::Application *app) : AppWindow(app, "Delete")
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
@@ -55,7 +55,7 @@ void PhonebookDeleteContact::buildInterface()
     titleLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     titleLabel->setLineMode(false);
 
-    trashacnIcon = new Image(this, 176, 135, 128, 128, "trashcan_large");
+    trashacnIcon = new Image(this, 176, 135, 128, 128, "phonebook_contact_delete_trashcan");
 
     confirmationLabel = new Text(this, 45, 293, 390, 128);
     confirmationLabel->setText(utils::localize.get("app_phonebook_options_delete_confirm"));

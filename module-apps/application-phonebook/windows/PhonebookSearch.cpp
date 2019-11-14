@@ -13,7 +13,7 @@
 PhonebookSearch::PhonebookSearch(app::Application *app)
     : AppWindow(app, "Search"), phonebookModel{new PhonebookModel(app)}
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
@@ -61,8 +61,7 @@ void PhonebookSearch::buildInterface()
                           Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
 
     topSeparatorLabel = addLabel(nullptr, 0, 104, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-    searchHeader = addLabel(nullptr, 30, 127, 90, 20, utils::localize.get("app_phonebook_search_win_search"),
-                            "gt_pressura_regular_18");
+    searchHeader = addLabel(nullptr, 30, 127, 90, 20, utils::localize.get("app_phonebook_search_win_search"));
 
     informationLabel = new Text(this, 45, 315, 390, 90);
     informationLabel->setText(utils::localize.get("app_phonebook_search_win_info"));
@@ -72,6 +71,7 @@ void PhonebookSearch::buildInterface()
     informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     // informationLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
     informationLabel->setFont(style::window::font::small);
+    informationLabel->setTextColor(style::color::lightgrey);
 
     inputField = new Text(this, 30, 153, 420, 33);
     inputField->setTextType(Text::TextType::SINGLE_LINE);
@@ -82,8 +82,8 @@ void PhonebookSearch::buildInterface()
     inputField->setFont(style::window::font::small);
 
     searchTop = new Image(this, 420, 153, 32, 32, "search");
-    searchCenter = new Image(this, 224, 265, 32, 32, "search");
-    fancyArrowDown = new Image(this, 174, 380, 132, 132, "fancy_arrow_down_big");
+    searchCenter = new Image(this, 224, 265, 32, 32, "phonebook_search_glass_grey");
+    fancyArrowDown = new Image(this, 174, 380, 132, 132, "phonebook_search_arrow_down_grey");
 
     searchResultList = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
     searchResultList->setMaxElements(7);

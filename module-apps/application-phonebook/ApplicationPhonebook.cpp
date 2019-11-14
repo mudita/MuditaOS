@@ -2,6 +2,7 @@
 
 #include "ApplicationPhonebook.hpp"
 #include "MessageType.hpp"
+#include "windows/PhonebookBlockContact.hpp"
 #include "windows/PhonebookContact.hpp"
 #include "windows/PhonebookDeleteContact.hpp"
 #include "windows/PhonebookErrors.hpp"
@@ -92,6 +93,9 @@ void ApplicationPhonebook::createUserInterface()
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
     window = new PhonebookDeleteContact(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookBlockContact(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
     window = new PhonebookSearch(this);

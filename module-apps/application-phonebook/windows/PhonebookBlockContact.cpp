@@ -20,7 +20,7 @@
 
 PhonebookBlockContact::PhonebookBlockContact(app::Application *app) : AppWindow(app, "Block")
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
@@ -55,7 +55,7 @@ void PhonebookBlockContact::buildInterface()
     titleLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     titleLabel->setLineMode(false);
 
-    trashacnIcon = new Image(this, 176, 135, 128, 128, "trashcan_large");
+    icon = new Image(this, 176, 135, 128, 128, "phonebook_empty_grey_circle");
 
     confirmationLabel = new Text(this, 45, 293, 390, 128);
     confirmationLabel->setText(utils::localize.get("app_phonebook_options_block_confirm"));
@@ -77,11 +77,15 @@ void PhonebookBlockContact::buildInterface()
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-            return (true);
-        }
+
+            if (DBServiceAPI::ContactBlock(application, contact->dbID, false))
+            {
+                LOG_INFO("contact %d unblocked, switch to MainWindow", contact->dbID);
+            }
+            else
+            {
+                LOG_ERROR("failed to unblock contact with id %d", contact->dbID);
+            }
         return (false);
     };
 
@@ -97,14 +101,13 @@ void PhonebookBlockContact::buildInterface()
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong)))
         {
-
-            if (DBServiceAPI::ContactRemove(application, contact->dbID))
+            if (DBServiceAPI::ContactBlock(application, contact->dbID, true))
             {
-                LOG_INFO("contact %d removed, switch to MainWindow", contact->dbID);
+                LOG_INFO("contact %d blocked, switch to MainWindow", contact->dbID);
             }
             else
             {
-                LOG_ERROR("failed to delete contact with id %d", contact->dbID);
+                LOG_ERROR("failed to block contact with id %d", contact->dbID);
             }
 
             application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, nullptr);

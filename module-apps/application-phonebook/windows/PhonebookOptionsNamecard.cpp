@@ -20,7 +20,7 @@
 
 PhonebookOptionsNamecard::PhonebookOptionsNamecard(app::Application *app) : AppWindow(app, "OptionsNamecard")
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 

@@ -109,7 +109,7 @@ void PhonebookContact::buildInterface()
     numberPrimaryLabel->setPenFocusWidth(3);
     numberPrimaryLabel->setPenWidth(0);
 
-    numberPrimaryIcon = new Image(this, 328, 249, 32, 32, "phone");
+    numberPrimaryIcon = new Image(this, 328, 249, 32, 32, "phonebook_phone_ringing");
     page1.push_back(numberPrimaryIcon);
 
     numberPrimaryMessageLabel =
@@ -153,7 +153,7 @@ void PhonebookContact::buildInterface()
         return (false);
     };
 
-    numberSecondaryIcon = new Image(this, 328, 308, 32, 32, "phone");
+    numberSecondaryIcon = new Image(this, 328, 308, 32, 32, "phonebook_phone_ringing");
     page1.push_back(numberSecondaryIcon);
 
     numberSecondaryMessageLabel =

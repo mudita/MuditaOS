@@ -11,7 +11,7 @@
 
 PhonebookNoResults::PhonebookNoResults(app::Application *app) : AppWindow(app, "NoResults")
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
