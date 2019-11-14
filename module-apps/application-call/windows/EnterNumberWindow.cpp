@@ -50,6 +50,7 @@ void EnterNumberWindow::buildInterface() {
 
 	topBar->setActive(TopBar::Elements::SIGNAL, true );
 	topBar->setActive(TopBar::Elements::BATTERY, true );
+	topBar->setActive(TopBar::Elements::TIME, true );
 
 	numberLabel = new gui::Label(this, 60, 157, style::window_width-60-60, 66);
 	numberLabel->setPenWidth(1);
@@ -76,7 +77,7 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
             return true;
         }
         else if(inputEvent.keyCode == KeyCode::KEY_LF) {
-			auto app = reinterpret_cast<app::ApplicationCall*>( application );
+			auto app = dynamic_cast<app::ApplicationCall*>( application );
 			std::string num = app->getDisplayedNumber();
 			LOG_INFO("number: [%s]", num.c_str());
 			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
@@ -84,7 +85,7 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
             return true;
         }
         else if(inputEvent.keyCode == KeyCode::KEY_RF) {
-			auto app = reinterpret_cast<app::ApplicationCall*>( application );
+			auto app = dynamic_cast<app::ApplicationCall*>( application );
 			std::string num = app->getDisplayedNumber();
 			//if there isn't any char in phone number field return to previous application
 			if( num.empty() ) {
@@ -146,24 +147,14 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
 		return false;
 	}
 
-	app::CallSwitchData *callData = reinterpret_cast<app::CallSwitchData*>(data);
-	switch( callData->getType()) {
-		case app::CallSwitchData::Type::UNDEFINED: {
-			return false;
-		}break;
-		case app::CallSwitchData::Type::ENTER_NUMBER: {
-			app::EnterNumberData* numberData = reinterpret_cast<app::EnterNumberData*>(data);
-			setNumberLabel(numberData->getPhoneNumber());
-            return true;
-        }break;
-		case app::CallSwitchData::Type::INCOMMING_CALL: {
-			return false;
-		}break;
-		case app::CallSwitchData::Type::EXECUTE_CALL: {
-			LOG_INFO("app::CallSwitchData::Type::EXECUTE_CALL");
-			return false;
-		}break;
-	};
+	app::CallSwitchData *numberData = dynamic_cast<app::EnterNumberData*>(data);
+	if(numberData!=nullptr)
+	{
+		setNumberLabel(numberData->getPhoneNumber());
+		return true;
+	}
+	LOG_ERROR("Unsupported SwitchData");
+
 	return false;
 }
 
