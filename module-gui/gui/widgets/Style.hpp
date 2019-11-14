@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Color.hpp>
 #include <Label.hpp>
 #include <inttypes.h>
 #include <string>
@@ -57,4 +58,8 @@ const inline std::string tinybold = "gt_pressura_bold_16";
 const inline std::string tinylight = "gt_pressura_light_16";
 }; // namespace font
 }; // namespace phonebook
+namespace color
+{
+const inline gui::Color lightgrey = gui::Color(12, 0);
+}; //  namespace color
 }; // namespace style
