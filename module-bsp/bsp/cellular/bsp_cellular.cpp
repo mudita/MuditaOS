@@ -22,14 +22,14 @@
 namespace bsp{
 
     std::optional<std::unique_ptr<Cellular>> Cellular::Create(
-            [[maybe_unused]] const char* term) {
+            [[maybe_unused]] const char* term, uint32_t portSpeed) {
 
         std::unique_ptr<Cellular> inst;
 
 #if defined(TARGET_RT1051)
         inst = std::make_unique<bsp::RT1051Cellular>();
 #elif defined(TARGET_Linux)
-        inst = std::make_unique<bsp::LinuxCellular>(term);
+        inst = std::make_unique<bsp::LinuxCellular>(term, portSpeed);
 #else
 #error "Unsupported target"
 #endif

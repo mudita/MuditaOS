@@ -16,7 +16,7 @@
 
 #include "dma_config.h"
 #include "fsl_cache.h"
-
+#include <map>
 
 extern "C" {
 
@@ -54,6 +54,8 @@ void LPUART1_IRQHandler(void) {
 
 }
 
+#define _RT1051_UART_DEBUG   1
+
 namespace bsp {
 
     using namespace drivers;
@@ -62,7 +64,6 @@ namespace bsp {
     lpuart_edma_handle_t            RT1051Cellular::uartDmaHandle = {};
     TaskHandle_t                    RT1051Cellular::blockedTaskHandle = nullptr;
     StreamBufferHandle_t            RT1051Cellular::uartRxStreamBuffer = nullptr;
-
 
     RT1051Cellular::RT1051Cellular() {
 
@@ -125,6 +126,12 @@ namespace bsp {
         EnableRx();
 
         isInitialized = true;
+    }
+
+    void RT1051Cellular::SetSpeed(uint32_t portSpeed) {
+        LOG_DEBUG("[RT1051] Setting %i baudrate", portSpeed);
+
+        LPUART_SetBaudRate(CELLULAR_UART_BASE, portSpeed, GetPerphSourceClock(PerphClock_LPUART));
     }
 
 
@@ -209,6 +216,13 @@ namespace bsp {
 
     ssize_t RT1051Cellular::Write(void *buf, size_t nbytes) {
         lpuart_transfer_t sendXfer;
+        #if _RT1051_UART_DEBUG
+        printf("[TX] ");
+        uint8_t *ptr = (uint8_t*)buf;
+        for (size_t i = 0; i < nbytes; i++)
+            printf("%02X ", (uint8_t)*ptr++);
+        printf("\n");
+        #endif
         sendXfer.data = static_cast<uint8_t *>(buf);
         sendXfer.dataSize = nbytes;
 
@@ -235,7 +249,18 @@ namespace bsp {
     }
 
     ssize_t RT1051Cellular::Read(void *buf, size_t nbytes) {
-        return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
+        ssize_t ret = xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
+        #if _RT1051_UART_DEBUG
+        if (ret > 0) {
+            printf("[RX] ");
+            uint8_t *ptr = (uint8_t*)buf;
+            for (size_t i = 0; i < ret; i++)
+                printf("%02X ", (uint8_t)*ptr++);
+            printf("\n");
+        }
+        #endif
+        return ret;
+        //return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
     }
 
     uint32_t RT1051Cellular::Wait(uint32_t timeout) {
@@ -411,5 +436,8 @@ namespace bsp {
         }
 
     }
+
+    void RT1051Cellular::SetSendingAllowed(bool state) { pv_SendingAllowed = state; }
+    bool RT1051Cellular::GetSendingAllowed() { return pv_SendingAllowed; }
 
 }

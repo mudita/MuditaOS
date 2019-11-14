@@ -20,14 +20,17 @@
 #include <unistd.h>
 #include <time.h>
 #include <ticks.hpp>
-
-
 #include "log/log.hpp"
+#include "mutex.hpp"
+#include <map>
 
+#define _LINUX_UART_DEBUG   0
 
 namespace bsp {
 
-    LinuxCellular::LinuxCellular(const char *term) {
+    std::map<uint32_t, speed_t> PortSpeeds_text = { {9600U, B9600}, {19200U, B19200}, {38400U, B38400}, {57600U, B57600}, {115200U, B115200}, {230400U, B230400}, {460800U, B460800} };
+
+    LinuxCellular::LinuxCellular(const char *term, uint32_t portSpeed) {
 
         if (strcmp(term, "0") == 0) {
             fd = 0;
@@ -48,7 +51,7 @@ namespace bsp {
             //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
             //else
             t.c_cflag &= ~(CRTSCTS);//disable the flow control on dev board
-            speed_t speed = B115200;
+            speed_t speed = PortSpeeds_text[portSpeed];//B115200;
             cfsetispeed(&t, speed);
             cfsetospeed(&t, speed);
             tcsetattr(fd, TCSANOW, &t);
@@ -67,7 +70,7 @@ namespace bsp {
         event.events = EPOLLIN;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event)) {
-            LOG_FATAL("Failed to add file descriptor to epoll\n");
+            LOG_FATAL("Failed to add file descriptor to epoll");
         }
 
         isInitialized = true;
@@ -99,15 +102,33 @@ namespace bsp {
 
     ssize_t LinuxCellular::Read(void *buf, size_t nbytes) {
 
+        cpp_freertos::LockGuard lock(serOutMutex);
         retry:
         auto ret = read(fd, buf, nbytes);
         if ((ret == -1) && (errno == EINTR)) {
             goto retry;
         }
+        #if _LINUX_UART_DEBUG
+        if (ret > 0) {
+            printf("[RX] ");
+            uint8_t *ptr = (uint8_t*)buf;
+            for (size_t i = 0; i < ret; i++)
+                printf("%02X ", (uint8_t)*ptr++);
+            printf("\n");
+        }
+        #endif
         return ret;
     }
 
     ssize_t LinuxCellular::Write(void *buf, size_t nbytes) {
+        cpp_freertos::LockGuard lock(serOutMutex);
+        #if _LINUX_UART_DEBUG
+        printf("[TX] ");
+        uint8_t *ptr = (uint8_t*)buf;
+        for (size_t i = 0; i < nbytes; i++)
+            printf("%02X ", (uint8_t)*ptr++);
+        printf("\n");
+        #endif
         retry:
         auto ret = write(fd, buf, nbytes);
         if((ret == -1) && (errno == EINTR)){
@@ -156,6 +177,24 @@ namespace bsp {
         }
 
 
+    }
+
+    void LinuxCellular::SetSpeed(uint32_t portSpeed) {
+        struct termios t;
+        memset(&t, 0, sizeof(t));
+        tcgetattr(fd, &t);
+        cfmakeraw(&t);
+        t.c_cflag |= CLOCAL;
+        //if(ctsrts == 1)
+        //  t.c_cflag |= CRTSCTS; //enable the flow control on dev board
+        //else
+        t.c_cflag &= ~(CRTSCTS);   //disable the flow control on dev board
+        speed_t speed = PortSpeeds_text[portSpeed]; //B115200;
+        cfsetispeed(&t, speed);
+        cfsetospeed(&t, speed);
+        tcsetattr(fd, TCSANOW, &t);
+        int status = TIOCM_DTR | TIOCM_RTS;
+        ioctl(fd, TIOCMBIS, &status);
     }
 
 }

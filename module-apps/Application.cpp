@@ -141,7 +141,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
 		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-		if( msg->type == NotificationType::SignalStrengthUpdate ) {
+		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
 			if( ( state == State::ACTIVE_FORGROUND ) && (currentWindow->updateSignalStrength( msg->signalStrength) ) ) {
 				//loop and update all widnows
 				for ( auto it = windows.begin(); it != windows.end(); it++ ) {
