@@ -6,8 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#ifndef MODULE_APPS_APPLICATION_CALL_WINDOWS_ENTERNUMBERWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_CALL_WINDOWS_ENTERNUMBERWINDOW_HPP_
+#pragma once
 
 #include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
@@ -26,7 +25,10 @@ protected:
 	gui::Label* numberLabel = nullptr;
 
 	void updateBottomBar();
-public:
+
+    void setNumberLabel(const std::string num);
+
+  public:
 	EnterNumberWindow( app::Application* app, std::string windowName = "EnterNumberWindow" );
 	virtual ~EnterNumberWindow();
 
@@ -40,4 +42,3 @@ public:
 
 } /* namespace gui */
 
-#endif /* MODULE_APPS_APPLICATION_CALL_WINDOWS_ENTERNUMBERWINDOW_HPP_ */

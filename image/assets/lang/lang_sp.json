@@ -105,6 +105,7 @@
     "app_call_emergency": "Emergency call",
     "app_call_is_calling": "is calling",
     "app_call_call_ended": "call ended",
+    "app_call_add": "ADD",
     
     "app_messages_title_main": "Messages",
     "app_messages_new_message": "New Message",
