@@ -1,0 +1,13 @@
+﻿---
+BasedOnStyle: Microsoft
+AlignAfterOpenBracket: Align
+AlignTrailingComments: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortIfStatementsOnASingleLine: Always
+ColumnLimit: '160'
+IndentCaseLabels: 'false'
+IndentWidth: '4'
+PointerAlignment: Right
+UseTab: Never
+
+...

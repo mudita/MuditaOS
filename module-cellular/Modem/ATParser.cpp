@@ -12,24 +12,10 @@
 #include "ATParser.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "ticks.hpp"
-#include "InOutSerialWorker.hpp"
-#include "MuxDaemon.hpp"
+#include "../../module-services/service-cellular/messages/CellularMessage.hpp"
+#include "Service/Bus.hpp"
 
-std::optional<std::unique_ptr<ATParser>>
-ATParser::Create(MuxDaemon *mux, InOutSerialWorker *inOutSerial, bsp::Cellular *cellular) {
-    auto inst = std::make_unique<ATParser>(mux, inOutSerial, cellular);
-
-    if (inst->isInitialized) {
-        return inst;
-    } else {
-        return {};
-    }
-}
-
-ATParser::ATParser(MuxDaemon *mux, InOutSerialWorker *inOutSerial, bsp::Cellular *cellular) : mux(mux),
-                                                                                              inOutSerialWorker(
-                                                                                                      inOutSerial),
-                                                                                              cellular(cellular) {
+ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
     isInitialized = true;
 }
 
@@ -87,13 +73,15 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     return resp;
 }
 
-int ATParser::ProcessNewData() {
+int ATParser::ProcessNewData(sys::Service *service) {
     char rawBuffer[256] = {0};
 
+    LOG_DEBUG("Receiving data from ProcessNewData");
     auto length = cellular->Read(rawBuffer, sizeof(rawBuffer));
 
     {
         cpp_freertos::LockGuard lock(mutex);
+        LOG_DEBUG("Appending %i bytes to responseBuffer", length);
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
     }
 
@@ -110,7 +98,10 @@ int ATParser::ProcessNewData() {
         // 5) +QIND: PB DONE
         if (urcs.size() == 5) {
             cpp_freertos::LockGuard lock(mutex);
-            mux->callback(NotificationType ::PowerUpProcedureComplete,"");
+            //mux->callback(NotificationType ::PowerUpProcedureComplete,"");
+            auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);
+            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
+            LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();
             urcs.clear();
         }
@@ -127,9 +118,11 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
         responseBuffer.erase();
     }
 
+    LOG_DEBUG("[AT]: %s", cmd);
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
-    auto cmdSigned = const_cast<char *>(cmd);
-    inOutSerialWorker->WriteData(reinterpret_cast<unsigned char *>(cmdSigned), strlen(cmd));
+    //auto cmdSigned = const_cast<char *>(cmd);
+    //inOutSerialWorker->WriteData(reinterpret_cast<unsigned char *>(cmdSigned), strlen(cmd));
+    cellular->Write((void*)cmd, strlen(cmd));
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
@@ -161,6 +154,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
     blockedTaskHandle = nullptr;
     responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
+    LOG_DEBUG("AT command returning %i tokens", tokens.size());
     return tokens;
 }
 
@@ -177,7 +171,6 @@ std::vector<std::string> ATParser::Tokenizer(std::string &input, uint32_t maxTok
             prev = pos + delimiter.size();
             continue;
         }
-
         strings.push_back(input.substr(prev, pos - prev));
         prev = pos + delimiter.size();
         tokenCount++;

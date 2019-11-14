@@ -13,8 +13,11 @@
 #define PUREPHONE_SERVICECELLULAR_HPP
 
 #include "Service/Service.hpp"
-#include "Modem/NotificationMuxChannel.hpp"
+#include "Modem/TS0710/DLC_channel.h"
+#include "Modem/TS0710/TS0710.h"
+#include "messages/CellularMessage.hpp"
 
+//
 class MuxDaemon;
 
 class ServiceCellular : public sys::Service {
@@ -51,9 +54,10 @@ public:
 
 private:
 
-    std::unique_ptr<MuxDaemon> muxdaemon;
+    //std::unique_ptr<MuxDaemon> muxdaemon;
+    TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     uint32_t callStateTimer = 0;
-    NotificationMuxChannel::NotificationCallback_t notificationCallback=nullptr;
+    DLC_channel::Callback_t notificationCallback=nullptr;
 
     State state = State ::Idle;
 
@@ -91,6 +95,19 @@ private:
             -53 //30
     };
 
+    CellularNotificationMessage::Type identifyNotification(std::vector<uint8_t> data, std::string &message);
+
+    bool searchForOK(const std::vector<std::string> &response) {
+        for (std::string s : response) {
+            //LOG_DEBUG("[Processing] %s", s.c_str());
+            if (s == "OK") {
+                //LOG_DEBUG("[TRUE]");
+                return true;
+            }
+        }
+        //LOG_DEBUG("[FALSE]");
+        return false;
+    }
 
 };
 
