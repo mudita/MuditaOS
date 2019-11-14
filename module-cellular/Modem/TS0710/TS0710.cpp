@@ -359,18 +359,6 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     return ConfState::Success;
 }
 
-/*  - Dodać bufor fifo przechowujący bajty przychodzące przez serial 
-    - Podzielić bufor na pakiety i sprawdzić kompletność każdego
-    - Jeśli pakiet niekompletny jest w środku -> wylatuje
-    - Jeśli pakiet niekompletny jest na końcu -> powtarzać odbiór aż do timeoutu. Potem pakiet do śmieci
-    - Kompletne pakiety są zdejmowane z bufora
-    - Każdy pakiet kierowany jest do swojego kanału
-    - Jeśli jest 'blockedTaskHandle' to dane wrzucane są do bufora lokalnego kanału
-    - Jeśli nie ma 'blockedTaskHandle' wywoływany jest (jeśli istnieje) callback dla kanału
-    - Jeśli żadne z powyższych pakiet idzie do śmieci
-    - Bufor lokalny kanału jest interpretowany przez blokujące wywołanie komendy
-*/
-
 void workerTaskFunction(void *ptr) {
     TS0710 *inst = reinterpret_cast<TS0710 *>(ptr);
 

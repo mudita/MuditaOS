@@ -125,7 +125,6 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
 
-    //wait_for_data:
     while(1) {
 
         if (timeElapsed >= timeoutNeeded)
@@ -148,7 +147,6 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
             if (tokens.size() < rxCount)
             {
-                //goto wait_for_data;
                 continue;
             }
         }
