@@ -64,7 +64,7 @@ void TS0710_DATA::request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, 
             //UartSend(frame_c.getSerData().data(), frame_c.getSerData().size());
             //while(!pv_cellular->GetSendingAllowed());
             pv_cellular->Write(static_cast<void*>(frame_c.getSerData().data()), frame_c.getSerData().size());
-            vTaskDelay(1);
+            //vTaskDelay(1);
             dataLeft -= (dataLeft < sysParams.MaxFrameSize ? dataLeft : sysParams.MaxFrameSize);
         }
     }

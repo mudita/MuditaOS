@@ -260,7 +260,6 @@ namespace bsp {
         }
         #endif
         return ret;
-        //return xStreamBufferReceive(uartRxStreamBuffer, buf, nbytes, 0);
     }
 
     uint32_t RT1051Cellular::Wait(uint32_t timeout) {

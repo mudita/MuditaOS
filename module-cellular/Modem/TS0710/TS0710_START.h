@@ -14,7 +14,6 @@ class TS0710_START {
 public: 
 
 enum class Mode_e { Basic, HDLC_UIH_frames, HDLC_UI_frames, HDLC_frames }; 
-//enum class PortSpeed_e { PS2400, PS4800, PS7200, PS9600, PS19200, PS38400, PS57600, PS115200, PS230400, PS460800 };
  
 struct START_SystemParameters_t {
     PortSpeed_e PortSpeed;          //!< Port speed

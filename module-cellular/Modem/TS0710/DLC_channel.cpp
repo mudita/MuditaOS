@@ -135,26 +135,14 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
                  continue;
              }
              blockedTaskHandle = nullptr;
-             //  LOG_PRINTF("[2. returning] %i tokens ", tokens.size());
-             //  for(std::string s : tokens) {
-             //     for(int i = 0; i < s.length(); i++)
-             //         LOG_PRINTF("%02X ", s[i]);
-             //     LOG_PRINTF("; [%s]", s.c_str());
-             //  }
-             //  LOG_PRINTF("\n");
+
              return tokens;
          }
          else
          {
              //timeout
              blockedTaskHandle = nullptr;
-             //LOG_PRINTF("[2. returning] %i tokens ", tokens.size());
-             //  for(std::string s : tokens) {
-             //     for(int i = 0; i < s.length(); i++)
-             //         LOG_PRINTF("%02X ", s[i]);
-             //     LOG_PRINTF("; [%s]", s.c_str());
-             //  }
-             //  LOG_PRINTF("\n");
+
              return tokens;
          }
 
@@ -164,7 +152,6 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
 }
 
 int DLC_channel::ParseInputData(std::vector<uint8_t> &data) {
-    //LOG_DEBUG("Parsing data for channel %i [%s]", pv_DLCI, pv_name.c_str());
 
     cpp_freertos::LockGuard lock(mutex);
 
@@ -173,7 +160,6 @@ int DLC_channel::ParseInputData(std::vector<uint8_t> &data) {
         xTaskNotifyGive(blockedTaskHandle);
     }
     else if (pv_callback != nullptr) {
-            //LOG_DEBUG("Passing URC to callback");
             std::vector<uint8_t> v;
             for (auto c : data)
                 v.push_back(c);
