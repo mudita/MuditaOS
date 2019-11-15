@@ -5,6 +5,8 @@
 
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
+#include "service-cellular/ServiceCellular.hpp"
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = { {TypeOfFrame_e::SABM, "SABM"}, {TypeOfFrame_e::UA, "UA"}, {TypeOfFrame_e::DM, "DM"}, {TypeOfFrame_e::DISC, "DISC"}, {TypeOfFrame_e::UIH, "UIH"}, {TypeOfFrame_e::UI, "UI"}, {TypeOfFrame_e::I, "I"} };
 std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text = { {PortSpeed_e::PS9600, 1}, {PortSpeed_e::PS19200, 2}, {PortSpeed_e::PS38400, 3}, {PortSpeed_e::PS57600, 4}, {PortSpeed_e::PS115200, 5}, {PortSpeed_e::PS230400, 6}, {PortSpeed_e::PS460800, 7} };
@@ -354,6 +356,24 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         std::vector<std::string> v = c->SendCommandResponse("ATI\r", 5);
         for (std::string s : v)
             LOG_DEBUG("[]%s", s.c_str());
+        
+        v.clear();
+        v = c->SendCommandResponse("AT+CSQ\r", 5);
+
+        auto beg = v[0].find(" ");
+        auto end = v[0].find(",", 1);
+        auto message = v[0].substr(beg+1, end-beg-1);
+        LOG_DEBUG("Setting new signal strength");
+        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(CellularNotificationMessage::Type::SignalStrengthUpdate));
+        msg->signalStrength = std::stoll(message);
+        if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
+            LOG_ERROR("Signal strength value out of range.");
+            msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(0);
+        }
+        else {
+            msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(msg->signalStrength);
+        }
+        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
     }
 
     return ConfState::Success;
