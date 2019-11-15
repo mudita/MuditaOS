@@ -75,6 +75,7 @@ after running provisioning you are ready to build project for both linux and rt1
 
 # Documentation:
 
+* [doc/development_workflow](./doc/development_workflow.md)
 * [doc/config](./doc/config.linux.md)
 * [doc/bluetooth](./doc/bluetooth.md)
     * [./module-bsp/bsp/bluetooth](./module-bsp/bsp/bluetooth/)
