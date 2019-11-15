@@ -52,6 +52,9 @@ public:
 
     static const char *serviceName;
 
+    static int32_t getSignalStrengthDB(int32_t strength) { return signalStrengthToDB[strength]; }
+    static int32_t getSignalStrengthDBRange() { return (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])); }
+
 private:
 
     //std::unique_ptr<MuxDaemon> muxdaemon;
