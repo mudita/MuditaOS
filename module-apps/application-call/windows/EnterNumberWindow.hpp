@@ -23,8 +23,9 @@ namespace gui {
 class EnterNumberWindow: public AppWindow {
 protected:
 	gui::Label* numberLabel = nullptr;
+    gui::Rect *newContactImg = nullptr;
 
-	void updateBottomBar();
+    void updateBottomBar();
 
     void setNumberLabel(const std::string num);
 

@@ -105,6 +105,7 @@
     "app_call_is_calling": "is calling",
     "app_call_call_ended": "call ended",
     "app_call_add": "ADD",
+    "app_call_contact": "CONTACT",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
