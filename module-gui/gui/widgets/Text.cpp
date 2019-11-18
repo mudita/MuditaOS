@@ -100,7 +100,7 @@ void Text::setUnderline(bool underline)
     if (this->underline == underline) return;
 
     this->underline = underline;
-    LOG_INFO("lines count: %d", labelLines.size());
+    // LOG_INFO("lines count: %d", labelLines.size());
     for (auto it = labelLines.begin(); it != labelLines.end(); it++)
     {
 
@@ -137,6 +137,16 @@ void Text::setText(const UTF8 &text)
     recalculateDrawParams();
     updateCursor();
 }
+
+void Text::setTextColor(Color color)
+{
+    textColor = color;
+    for (auto line : labelLines)
+    {
+        line->setTextColor(color);
+    }
+}
+
 void Text::clear()
 {
     // if there are text lines erase them.
@@ -326,7 +336,7 @@ void Text::splitTextToLines(const UTF8 &text)
 
         if (textType == TextType::SINGLE_LINE)
         {
-            LOG_INFO("NUMBER OF LINES: %d", textLines.size());
+            // LOG_INFO("NUMBER OF LINES: %d", textLines.size());
             auto textLine = textLines.front();
             textLine->endType = LineEndType::EOT;
             break;
@@ -335,7 +345,7 @@ void Text::splitTextToLines(const UTF8 &text)
 
     for (auto it : textLines)
     {
-        LOG_INFO("text: [%s] ending: %d", it->text.c_str(), static_cast<uint32_t>(it->endType));
+        // LOG_INFO("text: [%s] ending: %d", it->text.c_str(), static_cast<uint32_t>(it->endType));
     }
 
     firstLine = textLines.begin();
@@ -853,7 +863,8 @@ bool Text::handleChar(const InputEvent &inputEvent)
     // insert character into string in currently selected line
     if (currentTextLine->text.insertCode(inputEvent.keyChar, cursorColumn) == false) return false;
 
-    // if sum of the old string and width of the new character are greater than available space run lines rework procedure
+    // if sum of the old string and width of the new character are greater than available space run lines rework
+    // procedure
     uint32_t linesCount = textLines.size();
     uint32_t availableSpace = getAvailableHPixelSpace();
     uint32_t currentWidth = currentTextLine->pixelLength;
@@ -949,8 +960,10 @@ void Text::recalculateDrawParams()
         label->setFilled(false);
         label->setPenWidth(1);
         label->setPenFocusWidth(3);
+        label->setAlignement(alignment);
         label->setFont(font->getName());
-        label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+        label->setTextColor(textColor);
+
         if (underline) label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         else
             label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -995,6 +1008,13 @@ bool Text::onContent()
     }
 
     return true;
+}
+
+void Text::setAlignment(const Alignment _alignment)
+{
+    alignment = _alignment;
+    recalculateDrawParams();
+    updateCursor();
 }
 
 } /* namespace gui */
