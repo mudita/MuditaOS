@@ -17,6 +17,7 @@
 #include "BoxLayout.hpp"
 #include "Label.hpp"
 #include "Rect.hpp"
+#include "Style.hpp"
 
 namespace gui
 {
@@ -129,18 +130,22 @@ class Text : public Rect
     uint32_t firstRow = 0;
     // number of visible rows
     uint32_t visibleRows = 0;
-
+    // text color
+    Color textColor;
     // margins for text
     Margins margins;
     // barrier for navigation
     uint32_t barriers = static_cast<uint32_t>(NavigationBarrier::BARRIER_NONE);
+    // default alignment
+    Alignment alignment = style::text::defaultTextAlignment;
     // defines whether internal labels have underline
     bool underline = false;
 
     void splitTextToLines(const UTF8 &text);
     /**
      * Iterate over lines starting from the one that is provided. Function concatenate lines and performs new split.
-     * Function stops on the last line or it there is a lines break ( enter ) or if last concatenated line doesn;t change after update.
+     * Function stops on the last line or it there is a lines break ( enter ) or if last concatenated line doesn;t
+     * change after update.
      */
     void reworkLines(std::list<TextLine *>::iterator it);
     /**
@@ -229,6 +234,8 @@ class Text : public Rect
     Item *getNavigationItem(NavigationDirection direction) override;
     void setRadius(int value) override;
     bool onContent() override;
+    void setTextColor(Color color);
+    void setAlignment(const Alignment alignment);
 };
 
 } /* namespace gui */
