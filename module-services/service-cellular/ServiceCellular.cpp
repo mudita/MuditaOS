@@ -314,7 +314,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                 ReloadTimer(callStateTimer);
                 // Propagate "Ringing" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                    CellularNotificationMessage::Type::Ringing),
+                    CellularNotificationMessage::Type::Ringing, msg->data),
                     sys::BusChannels::ServiceCellularNotifications, this);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
