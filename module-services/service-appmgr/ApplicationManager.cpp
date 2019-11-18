@@ -28,6 +28,9 @@
 //desktop application
 #include "application-desktop/data/LockPhoneData.hpp"
 
+/// Auto phone lock disabled for now till the times when it's debugged
+/// #define AUTO_PHONE_LOCK_ENABLED
+
 //module-utils
 #include "log/log.hpp"
 #include "i18/i18.hpp"
@@ -171,6 +174,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 }
 // Invoked when timer ticked
 void ApplicationManager::TickHandler(uint32_t id) {
+#ifdef AUTO_PHONE_LOCK_ENABLED
 	if( id == blockingTimerID ) {
 		LOG_INFO("screen Locking Timer Triggered");
 		stopTimer(blockingTimerID);
@@ -200,6 +204,7 @@ void ApplicationManager::TickHandler(uint32_t id) {
 			messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::move(data) );
 		}
 	}
+#endif
 }
 
 // Invoked during initialization
@@ -210,8 +215,9 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//reset blocking timer to the value specified in settings
 	uint32_t lockTime = settings.lockTime;
-	if( lockTime == 0 )
-		lockTime = 30000;
+	if( lockTime == 0 ) {
+		lockTime = default_application_locktime;
+    }
 	setTimerPeriod( blockingTimerID, lockTime );
 
 	if( settings.language == SettingsLanguage::ENGLISH ) {
