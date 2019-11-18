@@ -19,6 +19,8 @@
 #include "messages/APMMessage.hpp"
 #include "i18/i18.hpp"
 
+inline uint32_t default_application_locktime=30000;
+
 namespace sapm {
 
 class ApplicationDescription {
