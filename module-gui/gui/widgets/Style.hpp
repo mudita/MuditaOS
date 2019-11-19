@@ -18,8 +18,8 @@ const inline std::string title = "gt_pressura_bold_32";
 };  // namespace font
 };  // namespace header
 namespace window {
-const inline uint32_t default_left_margin = 20;
-const inline uint32_t default_right_margin = 20;
+const inline uint32_t default_left_margin = 30;
+const inline uint32_t default_right_margin = 30;
 namespace font {
 const inline std::string verybig = "gt_pressura_light_46";
 const inline std::string bigbold = "gt_pressura_bold_30";
@@ -29,12 +29,14 @@ const inline std::string small   = "gt_pressura_regular_24";
 };  // namespace font
 
 namespace label {
+const inline uint32_t small_h           = 33;
 const inline uint32_t default_h         = 50;
+const inline uint32_t big_h             = 55;
 const inline uint32_t border_focucs_w   = 2;
 const inline uint32_t border_no_focus_w = 0;
 };  // namespace label
 
-/// minimal label decoration - edges & focus
+/// minimal label decoration - edges, focus & alignment
 void decorate(gui::Label *el);
 /// minimal label decoration for Option
 void decorateOption(gui::Label *el);
