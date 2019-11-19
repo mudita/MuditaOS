@@ -71,7 +71,7 @@ static int uart_rt1051_set_parity(int pairity)
 static int uart_rt1051_set_flowcontroll(int flowcontroll)
 {
     LOG_INFO("BlueKitchen set flowcontroll: %d", flowcontroll);
-    BlueKitchen::getInstance()->set_flowcontroll(flowcontroll);
+    // BlueKitchen::getInstance()->set_rts(); ??
     return 0;
 }
 
