@@ -44,6 +44,7 @@ void MessagesMainWindow::buildInterface() {
 
 	AppWindow::buildInterface();
 
+
 //	list = new gui::PhonebookListView(this, 11, 105, 480-22, 600-105-50 );
 //	list->setMaxElements(7);
 //	list->setPageSize(7);

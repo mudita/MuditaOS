@@ -38,6 +38,7 @@ enum class MessageType {
 	DBThreadGet,        // Get thread by ID
 	DBThreadRemove,     // Remove thread by ID
 	DBThreadGetLimitOffset, // Get Thread record by limit,offset
+	DBThreadGetCount, 		//get Thread count
 
 	DBContactVerify,    //checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
 						//speed dial key
@@ -75,6 +76,12 @@ enum class MessageType {
 	DBNotesUpdate,    // Update selected note's record
 	DBNotesGetLimitOffset,   // Get notes records by limit,offset
 	DBNotesGetCount,         // Get notes reocrds count
+
+	DBCalllogAdd,       // Add new note's record
+	DBCalllogRemove,    // Remove selected note's record
+	DBCalllogUpdate,    // Update selected note's record
+	DBCalllogGetLimitOffset,   // Get Calllog records by limit,offset
+	DBCalllogGetCount,         // Get Calllog reocrds count
 
     //Audio service messages
     AudioNotification,
