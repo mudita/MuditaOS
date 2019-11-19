@@ -35,6 +35,7 @@ public:
     static ThreadRecord ThreadGet(sys::Service* serv,uint32_t id);
     static bool ThreadRemove(sys::Service* serv,uint32_t id);
     static std::unique_ptr<std::vector<ThreadRecord>> ThreadGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit);
+    static uint32_t ThreadGetCount(sys::Service* serv);
 
     /**
 	 * @brief Function is checking if new contact can be added to database. Function is blocking.

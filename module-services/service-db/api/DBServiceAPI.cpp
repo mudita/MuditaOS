@@ -167,6 +167,20 @@ std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sy
     }
 }
 
+uint32_t DBServiceAPI::ThreadGetCount(sys::Service * serv)
+{
+    std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGetCount);
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
+        return threadResponse->count;
+    }
+    else{
+        return false;
+    }
+}
+
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName ) {
 
 	ContactRecord rec;

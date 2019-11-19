@@ -203,6 +203,20 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
         }
             break;
 
+        case MessageType::DBThreadGetCount:
+        {
+          //  DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
+      #if SHOW_DB_ACCESS_PERF == 1
+                  timestamp = cpp_freertos::Ticks::GetTicks();
+      #endif
+                  auto ret = threadRecordInterface->GetCount();
+      #if SHOW_DB_ACCESS_PERF == 1
+                  LOG_DEBUG("DBThreadGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+      #endif
+                  responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true,ret);
+        }
+	  break;
+
         case MessageType::DBContactAdd: {
             DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1
