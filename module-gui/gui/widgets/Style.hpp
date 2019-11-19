@@ -3,8 +3,12 @@
 #include <inttypes.h>
 #include <Label.hpp>
 #include <string>
+#include <Alignment.hpp>
 
 namespace style {
+namespace text {
+const inline gui::Alignment defaultTextAlignment = gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT,gui::Alignment::ALIGN_VERTICAL_BOTTOM);
+}
 const inline uint32_t window_height = 600;
 const inline uint32_t window_width  = 480;
 namespace header {
