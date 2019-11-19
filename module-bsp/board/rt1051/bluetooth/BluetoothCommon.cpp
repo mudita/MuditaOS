@@ -51,11 +51,6 @@ BTdev::Error BluetoothCommon::flush()
 {
     // LOG_INFO("flush [%d] %s", out.len, out.tail<out.head?"reverse":"normal");
     Error err = Success;
-//     int i=0;
-//     if(i==default_timeout_ms) {
-//         LOG_ERROR("BT CTS error!");
-//         err = ErrorTimeout;
-//     }
     int len = out.len;
     char* from = new char[out.len];
     for (int i =0; i < len; ++i) {
@@ -118,7 +113,6 @@ BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
     return ret;
 }
 
-// TODO WIP
 // set flow on -> true, set flow off -> false
 BTdev::Error BluetoothCommon::set_rts(bool on)
 {

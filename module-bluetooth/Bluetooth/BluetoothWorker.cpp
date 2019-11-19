@@ -24,15 +24,13 @@ bool BluetoothWorker::run() {
         return true;
     }
     if(Worker::run()) {
-        // TODO mutex - there can be multiple requests for run at once possibly...
         is_running = true;
         // TODO what - that's just wrong -_-
         auto el = getQueues()[queueIO_handle];
         BlueKitchen::getInstance()->qHandle = el;
         Bt::initialize_stack();
         Bt::register_hw_error();
-        // TODO maybe it's this ( REMOVE FOR BT PAN)
-        // Bt::GAP::register_scan();
+        Bt::GAP::register_scan();
         std::string name = "PurePhone";
         Bt::set_name(name);
         // set local namne
@@ -69,7 +67,7 @@ bool BluetoothWorker::set_visible()
 
 bool BluetoothWorker::start_pan()
 {
-        Bt::PAN::bnep_setup();
+    Bt::PAN::bnep_setup();
     auto err = Bt::PAN::bnep_start();
     if(err.err != Bt::Error::Succes) {
         LOG_ERROR("PAN setup error: %d %d", err.err, err.lib_code);
