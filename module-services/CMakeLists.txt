@@ -39,8 +39,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${LWIP_INCLUDE_DIRS})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 
-
-
 target_include_directories(${PROJECT_NAME}
 
         PUBLIC
