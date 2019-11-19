@@ -28,8 +28,8 @@
 namespace gui {
 
 MessagesMainWindow::MessagesMainWindow(app::Application *app) :
-	AppWindow(app, "MainWindow")
-//	phonebookModel{ new PhonebookModel(app)}
+	AppWindow(app, "MainWindow"),
+	threadModel{ new ThreadModel(app)}
 {
     setSize(480, 600);
     buildInterface();
@@ -45,13 +45,14 @@ void MessagesMainWindow::buildInterface() {
 	AppWindow::buildInterface();
 
 
-//	list = new gui::PhonebookListView(this, 11, 105, 480-22, 600-105-50 );
-//	list->setMaxElements(7);
-//	list->setPageSize(7);
-//	list->setPenFocusWidth(0);
-//	list->setPenWidth(0);
-//	list->setProvider( phonebookModel );
-//	list->setApplication( application );
+
+	list = new gui::ListView(this, 11, 105, 480-22, 600-105-50 );
+	list->setMaxElements(5);
+	list->setPageSize(5);
+	list->setPenFocusWidth(0);
+	list->setPenWidth(0);
+	list->setProvider( threadModel );
+	//list->setApplication( application );
 
 	bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -87,13 +88,13 @@ MessagesMainWindow::~MessagesMainWindow() {
 
 
 void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
-//	setFocusItem(list);
-
-//	phonebookModel->clear();
-//	phonebookModel->requestRecordsCount();
-
-//	list->clear();
-//	list->setElementsCount( phonebookModel->getItemCount() );
+	if( mode == ShowMode::GUI_SHOW_INIT ){
+			threadModel->clear();
+			threadModel->requestRecordsCount();
+			list->clear();
+			list->setElementsCount( threadModel->getItemCount() );
+//			list->
+		}
 }
 
 bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {

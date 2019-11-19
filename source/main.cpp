@@ -124,7 +124,7 @@ int main() {
 
     bsp::BoardInit();
 
-    LOG_PRINTF("Launching PurePhone..\n");
+    LOG_PRINTF("Launching PurePhone..\scn");
 
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);

@@ -213,7 +213,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
       #if SHOW_DB_ACCESS_PERF == 1
                   LOG_DEBUG("DBThreadGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
       #endif
-                  responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true,ret);
+                  //DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0,uint32_t count=0,uint32_t respTo=0)
+                  responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, ret);
         }
 	  break;
 
