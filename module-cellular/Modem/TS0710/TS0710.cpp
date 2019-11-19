@@ -16,6 +16,10 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {P
  * TS0710 implementation
  */
 
+#ifndef SERIAL_PORT
+#define SERIAL_PORT "/dev/null"
+#endif
+
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
     pv_cellular = bsp::Cellular::Create(SERIAL_PORT, 115200).value_or(nullptr);
