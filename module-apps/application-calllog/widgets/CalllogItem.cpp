@@ -17,27 +17,46 @@ using namespace calllog;
 
 namespace gui {
 
-CalllogItem::CalllogItem(CalllogModel* model, bool mode24H) : model{model}, mode24H{mode24H} {
-	
-	minWidth = 431;
-	minHeight = 55;
-	maxWidth = 431;
-	maxHeight = 55;
+namespace clItemStyle
+{
+constexpr uint32_t w = 431;
+constexpr uint32_t h = style::window::label::big_h;
+namespace img
+{
+constexpr uint32_t x = 11; // TODO: alek:: change to good values
+constexpr uint32_t y = 22;
+} // namespace img
+namespace text
+{
+constexpr uint32_t x = 37;
+constexpr uint32_t w = 280;
+} // namespace text
+namespace timestamp
+{
+constexpr uint32_t w = 115;
+}
+} // namespace clItemStyle
+
+CalllogItem::CalllogItem(CalllogModel *model, bool mode24H) : model{model}, mode24H{mode24H}
+{
+    minWidth = clItemStyle::w;
+	minHeight = clItemStyle::h;
+	maxWidth = clItemStyle::w;
+	maxHeight = clItemStyle::h;
 
 	setRadius( 0 );
 	setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
 
-	setPenFocusWidth(2);
-	setPenWidth(0);
+	setPenFocusWidth(style::window::label::border_focucs_w);
+	setPenWidth(style::window::label::border_no_focus_w);
 
 	timestamp = new gui::Label(this, 0,0,0,0);
-	timestamp->setPenFocusWidth(0);
-	timestamp->setPenWidth(0);
-	timestamp->setFont(style::window::font::small);
+    style::window::decorate(timestamp);
+	timestamp->setFont(style::window::font::big);
 	timestamp->setAlignement(gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER } );
 
 	auto newImg = [=](const UTF8 imageName)->gui::Image* { 
-		auto img = new gui::Image(this, 11, 22, 0, 0, imageName); 
+		auto img = new gui::Image(this, clItemStyle::img::x, clItemStyle::img::y, 0, 0, imageName); 
 		img->setVisible(false); 
 		return img;  
 	};
@@ -46,11 +65,9 @@ CalllogItem::CalllogItem(CalllogModel* model, bool mode24H) : model{model}, mode
 	imageCallType[calllog::CallLogCallType::MISSED] = newImg("calllog_arrow_den");
 
 	text = new gui::Label( this, 0,0,0,0);
-	text->setPenFocusWidth(0);
-	text->setPenWidth(0);
-	text->setFont(style::window::font::big);
-	text->setDotsMode( true );
-	text->setAlignement( gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER} );
+    style::window::decorate(text);
+    text->setFont(style::window::font::big);
+    text->setDotsMode( true );
 }
 
 CalllogItem::~CalllogItem() {
@@ -63,11 +80,11 @@ CalllogItem::~CalllogItem() {
 }
 
 bool CalllogItem::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
-	text->setPosition(33, 0 );
-	text->setSize(newDim.w-33-100, newDim.h);
+	text->setPosition(clItemStyle::text::x, 0 );
+	text->setSize(clItemStyle::text::w, newDim.h);
 
-	timestamp->setPosition(newDim.w-100,0);
-	timestamp->setSize(100, newDim.h);
+	timestamp->setPosition(newDim.w-clItemStyle::timestamp::w,0);
+	timestamp->setSize(clItemStyle::timestamp::w, newDim.h);
 	return true;
 }
 
