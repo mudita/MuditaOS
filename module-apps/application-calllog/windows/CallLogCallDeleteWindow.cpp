@@ -30,6 +30,36 @@
 
 namespace gui {
 
+namespace callLogStyle
+{
+namespace deleteWindow
+{
+namespace question
+{
+constexpr uint32_t x = 88;
+constexpr uint32_t y = 293;
+constexpr uint32_t w = 303;
+constexpr uint32_t h = 66;
+} // namespace question
+namespace options
+{
+constexpr uint32_t y = 415;
+constexpr uint32_t w = 150;
+constexpr uint32_t h = 75;
+namespace yes
+{
+constexpr uint32_t x = 255;
+}
+namespace no
+{
+constexpr uint32_t x = 75;
+}
+} // namespace options
+} // namespace deleteWindow
+} // namespace callLogStyle
+
+using namespace callLogStyle::deleteWindow;
+
 CallLogCallDeleteWindow::CallLogCallDeleteWindow( app::Application* app ) : AppWindow(app,calllog::settings::CallDeleteWindowStr){
 	buildInterface();
 }
@@ -56,13 +86,14 @@ void CallLogCallDeleteWindow::buildInterface() {
 
 	// trashImg =  // TODO: add this
 
-	questionText = new gui::Text(this, 88, 293, 303, 66);
+	questionText = new gui::Text(this, question::x, question::y, question::w, question::h);
 	questionText->setFilled( false );
 	questionText->setBorderColor( gui::ColorNoColor );
 	questionText->setTextType( Text::TextType::MULTI_LINE );
 	questionText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	questionText->setFont(style::window::font::small);
+	questionText->setFont(style::window::font::medium);
 	questionText->setText(utils::localize.get("app_calllog_delete_call_confirmation"));
+	// TODO: alek: set alignment
 
 	//add option connectivity option
 	options.push_back( addOptionLabel( utils::localize.get("common_no"), 
@@ -79,12 +110,12 @@ void CallLogCallDeleteWindow::buildInterface() {
 			return true;}) );
 
 	//set position and navigation for labels
-	uint32_t posY = 415;
+	
 	uint32_t size = options.size();
 	// 'No' Label
-	options[0]->setPosition(75,posY);
+	options[0]->setPosition(options::no::x,options::y);
 	// 'Yes' Label
-	options[1]->setPosition(255,posY);;
+	options[1]->setPosition(options::yes::x,options::y);;
 
 	for( uint32_t i=0; i<options.size(); i++ ){
 		options[i]->setNavigationItem( NavigationDirection::LEFT, options[(i+1)%size]);
@@ -110,8 +141,9 @@ CallLogCallDeleteWindow::~CallLogCallDeleteWindow() {
 }
 
 gui::Item* CallLogCallDeleteWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
-	gui::Label* label = new gui::Label( this, 0,0, 150, 75, text ); // TODO: alek: remove magic numbers
-    style::window::decorateOption(label);
+	gui::Label* label = new gui::Label( this, 0,0, options::w, options::h, text ); 
+    style::window::decorate(label);
+	label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->activatedCallback = activatedCallback;
 	return label;
 }

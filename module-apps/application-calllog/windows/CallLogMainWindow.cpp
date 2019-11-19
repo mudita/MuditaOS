@@ -26,6 +26,16 @@ using namespace style;
 
 namespace gui {
 
+namespace cLListViewStyle
+{
+constexpr uint32_t leftMargin = 19;
+constexpr uint32_t rightMargin = 17;
+constexpr uint32_t x = leftMargin;
+constexpr uint32_t y = 111;
+constexpr uint32_t w = style::window_width-leftMargin-rightMargin;
+constexpr uint32_t h = style::window_height-y;
+}
+
 CallLogMainWindow::CallLogMainWindow( app::Application* app ) :
 	AppWindow( app, calllog::settings::MainWindowStr ), calllogModel{ new CalllogModel( app ) } {
 
@@ -47,12 +57,9 @@ void CallLogMainWindow::buildInterface() {
 
 	topBar->setActive( TopBar::Elements::TIME, true );
 
-	list = new gui::ListView(this, window::default_left_margin, 105,
-							 w()- window::default_left_margin- window::default_right_margin, h() - 105 - 50);
-	list->setMaxElements(calllog::settings::pageSize);
-	list->setPageSize(calllog::settings::pageSize);
-	list->setPenFocusWidth(0); // TODO: add: decorator or setting in constructor 
-	list->setPenWidth(0);
+    list = new gui::ListView(this, cLListViewStyle::x, cLListViewStyle::y, cLListViewStyle::w, cLListViewStyle::h);
+    list->setMaxElements(calllog::settings::pageSize);
+    list->setPageSize(calllog::settings::pageSize);
 	list->setProvider(calllogModel);
 
 	setFocusItem( list );
@@ -84,7 +91,7 @@ bool CallLogMainWindow::onInput( const InputEvent& inputEvent ) {
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) || ( inputEvent.state != InputEvent::State::keyReleasedLong )) {
 		if( inputEvent.keyCode == KeyCode::KEY_LF ) {
 			// TODO: alek: add calling
-			LOG_DEBUG("Call"); // TODO: alek:: add number to the log
+			LOG_DEBUG("TODO:: add calling"); // TODO: alek:: add number to the log
 			return true;
 		}
 	}

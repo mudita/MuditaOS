@@ -31,9 +31,6 @@ class CallLogDetailsWindow: public AppWindow {
 		Sms,
 		NumOfRects
 	};
-
-	const uint32_t leftMargin;
-	const uint32_t rightMargin;
 	
 	Label* informationLabel = nullptr;
 	Label* number = nullptr;
@@ -51,10 +48,10 @@ class CallLogDetailsWindow: public AppWindow {
 
 	CalllogRecord record = {0}; // TODO: consider changing to pointer
 
-	void decorateLabel(Label *);
-	void decorateData(Label *);
+    Label *decorateLabel(Label *);
+    Label *decorateData(Label *);
 
-public:
+  public:
 	CallLogDetailsWindow( app::Application* app );
 	virtual ~CallLogDetailsWindow();
 

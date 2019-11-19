@@ -33,7 +33,7 @@ using namespace calllog;
 namespace gui {
 
 CallLogDetailsWindow::CallLogDetailsWindow( app::Application* app ) :
-	AppWindow(app, calllog::settings::DetailsWindowStr), leftMargin(style::window::default_left_margin), rightMargin(style::window::default_right_margin) {
+	AppWindow(app, calllog::settings::DetailsWindowStr) {
 
 	buildInterface();
 }
@@ -43,27 +43,121 @@ void CallLogDetailsWindow::rebuild() {
 	buildInterface();
 }
 
-void CallLogDetailsWindow::decorateLabel(Label* label){
+Label *CallLogDetailsWindow::decorateLabel(Label *label)
+{
+    if (label == nullptr)
+    {
+        LOG_ERROR("label is nullptr");
+        return label;
+    }
+    style::window::decorate(label);
+    label->setFont(style::window::font::small);
+	label->setSize(label->widgetArea.w, style::window::label::big_h);
+	label->setLineMode(true);
+
+    return label;
+}
+
+Label * CallLogDetailsWindow::decorateData(Label* label){
 	if(label == nullptr){
 		LOG_ERROR("label is nullptr");
-		return;
+		return label;
 	}
-	label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	label->setFont(style::window::font::small);
-	label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-	label->setLineMode(true); 
-	// TODO: alek: try to use decorate() from Style.hpp
+	style::window::decorate(label);
+	label->setFont(style::window::font::medium);
+    label->setSize(label->widgetArea.w, style::window::label::small_h);
+
+	return label;
 }
-void CallLogDetailsWindow::decorateData(Label* label){
-	if(label == nullptr){
-		LOG_ERROR("label is nullptr");
-		return;
-	}
-	label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
-	label->setFont(style::window::font::big);
-	label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-	// TODO: alek: try to use decorate() from Style.hpp
+
+// layout constants
+constexpr uint32_t default_x = style::window::default_left_margin;
+constexpr uint32_t default_w = style::window_width - style::window::default_left_margin - style::window::default_right_margin;
+namespace information
+{
+namespace label
+{
+constexpr uint32_t x = default_x;
+constexpr uint32_t y = 111;
+constexpr uint32_t w = default_w;
+} // namespace label
+namespace number
+{
+constexpr uint32_t x = default_x;
+constexpr uint32_t y = 174;
+constexpr uint32_t w = default_w;
+} // namespace number
+namespace imgs
+{
+constexpr uint32_t y = 162;
+constexpr uint32_t w = 55;
+constexpr uint32_t h = 55;
+namespace call
+{
+constexpr uint32_t x = 317;
 }
+namespace sms
+{
+constexpr uint32_t x = 389;
+}
+} // namespace imgs
+} // namespace information
+namespace type
+{
+namespace label
+{
+constexpr uint32_t x = default_x;
+constexpr uint32_t y = 222;
+constexpr uint32_t w = style::window_width / 2 - x;
+} // namespace label
+namespace img
+{
+const uint32_t x = default_x;
+const uint32_t y = 285;
+} // namespace img
+namespace data
+{
+constexpr uint32_t x = 70;
+constexpr uint32_t y = 285;
+constexpr uint32_t w = style::window_width / 2 - x;
+} // namespace data
+} // namespace type
+namespace duration
+{
+namespace label
+{
+constexpr uint32_t x = 281;
+constexpr uint32_t y = 222;
+constexpr uint32_t w = style::window_width - x - style::window::default_right_margin;
+} // namespace label
+namespace data
+{
+constexpr uint32_t x = 281;
+constexpr uint32_t y = 285;
+constexpr uint32_t w = style::window_width / 2 - style::window::default_right_margin;
+} // namespace data
+} // namespace duration
+namespace date
+{
+namespace label
+{
+constexpr uint32_t x = default_x;
+constexpr uint32_t y = 333;
+constexpr uint32_t w = default_w;
+} // namespace label
+namespace dataDay
+{
+constexpr uint32_t x = default_x;
+constexpr uint32_t y = 396;
+constexpr uint32_t w = default_w;
+} // namespace dataDay
+namespace dataDate
+{
+constexpr uint32_t x = default_x;
+constexpr uint32_t y = dataDay::y + style::window::label::small_h;
+constexpr uint32_t w = default_w;
+} // namespace dataDate
+} // namespace date
 
 void CallLogDetailsWindow::buildInterface() {
 	AppWindow::buildInterface();
@@ -74,28 +168,26 @@ void CallLogDetailsWindow::buildInterface() {
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
-	// Information
-	informationLabel = new gui::Label(this, leftMargin, 100, w()-leftMargin-rightMargin, 54, utils::localize.get("common_information"));
-	decorateLabel(informationLabel);
-
-	number = new gui::Label(this, leftMargin, 150, w()-leftMargin-rightMargin, 54);
-	decorateData(number);
-	number->setFont(style::window::font::bigbold); // overwrite default
+    // NOTE: height of all labels is set using decorators
+	
+    // Information
+    informationLabel =
+        decorateLabel(new gui::Label(this, information::label::x, information::label::y, information::label::w, 0, utils::localize.get("common_information")));
+    number = decorateData(new gui::Label(this, information::number::x, information::number::y, information::number::w, 0));
+    // number->setFont(style::window::font::bigbold); // TODO: alek: must be set to bold 27px 
 
 	for( uint32_t i=0; i<2; ++i ) {
-		rects[i] = new gui::Rect( this, 0,0, 50, 50 );
+		rects[i] = new gui::Rect( this, 0,0, information::imgs::w, information::imgs::h );
 		rects[i]->setFilled( false );
 		rects[i]->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
-		rects[i]->setPenFocusWidth(2);
-		rects[i]->setPenWidth(0);
+		rects[i]->setPenFocusWidth(style::window::label::border_focucs_w);
+		rects[i]->setPenWidth(style::window::label::border_no_focus_w);
 	}
 
-	rects[static_cast<uint32_t>(FocusRects::Call)]->setPosition( 
-		w()/2 + (w()-rightMargin)/2/3*1, 150 );
-	rects[static_cast<uint32_t>(FocusRects::Sms)]->setPosition( 
-		w()/2 + (w()-rightMargin)/2/3*2, 150 );
+    rects[static_cast<uint32_t>(FocusRects::Call)]->setPosition(information::imgs::call::x, information::imgs::y);
+    rects[static_cast<uint32_t>(FocusRects::Sms)]->setPosition(information::imgs::sms::x, information::imgs::y);
 
-	//define navigation between labels
+    //define navigation between labels
 	rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem( NavigationDirection::LEFT,
 		rects[static_cast<uint32_t>(FocusRects::Sms)]);
 	rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem( NavigationDirection::RIGHT,
@@ -118,14 +210,12 @@ void CallLogDetailsWindow::buildInterface() {
 		return true; };
 
 	// Type
-	typeLabel = new gui::Label(this, leftMargin, 200, w()/2-leftMargin, 54, utils::localize.get("app_calllog_type"));
-	decorateLabel(typeLabel);
+	typeLabel = decorateLabel(new gui::Label(this, type::label::x, type::label::y, type::label::w, 0, utils::localize.get("app_calllog_type")));
+	typeData = decorateData(new gui::Label(this, type::data::x, type::data::y, type::data::w, 0));
 
-	const auto callTypeImgX = leftMargin +10;
-	const auto callTypeImgY = 275+13;
 	// TODO: alek: it is used in the code at least twice, possibly create one common function for this
 	auto newImg = [=](const UTF8 imageName)->gui::Image* { 
-		auto img = new gui::Image(this, callTypeImgX, callTypeImgY, 0, 0, imageName); 
+		auto img = new gui::Image(this, type::img::x, type::img::y, 0, 0, imageName); 
 		img->setVisible(false); 
 		return img;  
 	};
@@ -133,28 +223,15 @@ void CallLogDetailsWindow::buildInterface() {
 	callTypeImg[calllog::CallLogCallType::OUT] = newImg("calllog_arrow_out");
 	callTypeImg[calllog::CallLogCallType::MISSED] = newImg("calllog_arrow_den");
 
-	auto typeDataX = callTypeImgX+ callTypeImg[0]->w() + 10;
-	typeData = new gui::Label(this, typeDataX, 250, w()/2-typeDataX, 54);
-	decorateData(typeData);
+    // Duration
+    durationLabel =
+        decorateLabel(new gui::Label(this, duration::label::x, duration::label::y, duration::label::w, 0, utils::localize.get("app_calllog_duration")));
+    durationData = decorateData(new gui::Label(this, duration::data::x, duration::data::y, duration::data::w, 0));
 
-	// Duration
-	const auto durationX = w()/2+leftMargin;
-	const auto durationW = w()/2-leftMargin-rightMargin;
-	durationLabel = new gui::Label(this, durationX, 200, durationW, 54, utils::localize.get("app_calllog_duration"));
-	decorateLabel(durationLabel);
-
-	durationData = new gui::Label(this, durationX, 250, durationW, 54);
-	decorateData(durationData);	
-
-	// Date
-	dateLabel = new gui::Label(this, leftMargin, 300, w()-leftMargin-rightMargin, 54, utils::localize.get("app_calllog_date"));
-	decorateLabel(dateLabel);
-
-	dateDay = new gui::Label(this, leftMargin, 350, w()-leftMargin-rightMargin, 54);
-	decorateData(dateDay);
-
-	dateDate = new gui::Label(this, leftMargin, 400, w()-leftMargin-rightMargin, 54);
-	decorateData(dateDate);
+    // Date
+    dateLabel = decorateLabel(new gui::Label(this, date::label::x, date::label::y, date::label::w, 0, utils::localize.get("app_calllog_date")));
+    dateDay = decorateData(new gui::Label(this, date::dataDay::x, date::dataDay::y, date::dataDay::w, 0));
+    dateDate = decorateData(new gui::Label(this, date::dataDate::x, date::dataDate::y, date::dataDate::w, 0));
 }
 
 void CallLogDetailsWindow::destroyInterface() {
@@ -229,25 +306,16 @@ bool CallLogDetailsWindow::onInput( const InputEvent& inputEvent ) {
 		return true;
 	}
 
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) &&
-	   (( inputEvent.state != InputEvent::State::keyReleasedLong )))
-		return false;
+    // process only if key is released
+    if (((inputEvent.state == InputEvent::State::keyReleasedShort) || ((inputEvent.state == InputEvent::State::keyReleasedLong))) &&
+        (inputEvent.keyCode == KeyCode::KEY_LF))
+    {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
+        application->switchWindow(calllog::settings::OptionsWindowStr, std::move(data));
+        return true;
+    }
 
-	switch( inputEvent.keyCode ) {
-		case KeyCode::KEY_ENTER:
-			LOG_INFO("Enter pressed");
-			break;
-		case KeyCode::KEY_LF: {
-			std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
-			application->switchWindow(calllog::settings::OptionsWindowStr, std::move(data));
-			return true;
-		}
-		default:
-			break;
-	}
-
-	return false;
+    return false;
 }
 
 } /* namespace gui */
