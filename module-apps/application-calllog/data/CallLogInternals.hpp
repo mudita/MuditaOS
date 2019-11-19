@@ -9,6 +9,7 @@
 #pragma once
 
 #include "CalllogRecord.hpp"
+#include "CallLogStyle.hpp"
 #include <string>
 
 namespace calllog {

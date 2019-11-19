@@ -27,7 +27,10 @@
 
 #include <Style.hpp>
 
-namespace gui {
+using namespace callLogStyle::optionsWindow;
+
+namespace gui
+{
 
 CallLogOptionsWindow::CallLogOptionsWindow( app::Application* app ) : AppWindow(app,calllog::settings::OptionsWindowStr){
 	buildInterface();
@@ -70,9 +73,9 @@ void CallLogOptionsWindow::buildInterface() {
 	//set position and navigation for labels
 	auto posY = title->offset_h();
 	auto size = options.size();
-	for (size_t i = 0; i < options.size(); i++){
-		options[i]->setPosition(17,posY);
-		posY += 60;
+	for (size_t i = 0; i < size; i++){
+		options[i]->setPosition(option::x,posY); // TODO: alek:: sthg is wrong here
+		posY += option::offset;
 		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
 		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
 	}
@@ -93,8 +96,8 @@ CallLogOptionsWindow::~CallLogOptionsWindow() {
 }
 
 gui::Item* CallLogOptionsWindow::addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback ) {
-	gui::Label *label = new gui::Label(this, 17, 0, w(), 60, text); // TODO: alek: remove magic numbers
-	style::window::decorateOption(label); // TODO: alek: when focus size should be 2 not 3
+	gui::Label *label = new gui::Label(this, 0, 0, 0, 0, text); 
+	style::window::decorateOption(label);
 	label->activatedCallback = activatedCallback;
 
 	return label;
@@ -111,5 +114,3 @@ void CallLogOptionsWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
 } /* namespace gui */
-
-
