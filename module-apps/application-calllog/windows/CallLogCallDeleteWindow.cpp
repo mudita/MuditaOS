@@ -30,34 +30,6 @@
 
 namespace gui {
 
-namespace callLogStyle
-{
-namespace deleteWindow
-{
-namespace question
-{
-constexpr uint32_t x = 88;
-constexpr uint32_t y = 293;
-constexpr uint32_t w = 303;
-constexpr uint32_t h = 66;
-} // namespace question
-namespace options
-{
-constexpr uint32_t y = 415;
-constexpr uint32_t w = 150;
-constexpr uint32_t h = 75;
-namespace yes
-{
-constexpr uint32_t x = 255;
-}
-namespace no
-{
-constexpr uint32_t x = 75;
-}
-} // namespace options
-} // namespace deleteWindow
-} // namespace callLogStyle
-
 using namespace callLogStyle::deleteWindow;
 
 CallLogCallDeleteWindow::CallLogCallDeleteWindow( app::Application* app ) : AppWindow(app,calllog::settings::CallDeleteWindowStr){

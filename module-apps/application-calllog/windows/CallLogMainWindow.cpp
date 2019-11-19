@@ -23,18 +23,9 @@
 #include <Style.hpp>
 
 using namespace style;
+using namespace callLogStyle;
 
 namespace gui {
-
-namespace cLListViewStyle
-{
-constexpr uint32_t leftMargin = 19;
-constexpr uint32_t rightMargin = 17;
-constexpr uint32_t x = leftMargin;
-constexpr uint32_t y = 111;
-constexpr uint32_t w = style::window_width-leftMargin-rightMargin;
-constexpr uint32_t h = style::window_height-y;
-}
 
 CallLogMainWindow::CallLogMainWindow( app::Application* app ) :
 	AppWindow( app, calllog::settings::MainWindowStr ), calllogModel{ new CalllogModel( app ) } {
@@ -57,7 +48,7 @@ void CallLogMainWindow::buildInterface() {
 
 	topBar->setActive( TopBar::Elements::TIME, true );
 
-    list = new gui::ListView(this, cLListViewStyle::x, cLListViewStyle::y, cLListViewStyle::w, cLListViewStyle::h);
+    list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h);
     list->setMaxElements(calllog::settings::pageSize);
     list->setPageSize(calllog::settings::pageSize);
 	list->setProvider(calllogModel);
