@@ -36,34 +36,14 @@ namespace bsp {
             static const unsigned int default_baudrate = 115200;
             struct _circ {
                 SemaphoreHandle_t sem = 0;
-                void sem_take() {
-                    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
-                        xSemaphoreTake(sem,0);
-                    } else {
-                        BaseType_t *px;
-                        xSemaphoreTakeFromISR(sem,px);
-                    }
-                }
-                void sem_give() {
-                    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
-                        xSemaphoreGive(sem);
-                    } else {
-                        BaseType_t *px;
-                        xSemaphoreGiveFromISR(sem, px);
-                    }
-                }
+                void sem_take();
+                void sem_give();
                 char* buff;
                 volatile unsigned int head, tail, threshold;
                 const unsigned int size;
                 volatile unsigned int len;
-                _circ(unsigned int size, int threshold=0) : head(0), tail(0), threshold(threshold), size(size), len(0) {
-                    buff = new char[size];
-                    sem = xSemaphoreCreateBinary();
-                }
-                ~_circ() {
-                    vSemaphoreDelete(sem);
-                    delete[] buff;
-                }
+                _circ(unsigned int size, int threshold=0);
+                ~_circ();
                 inline int push(char val) {
                     sem_take();
                     int ret=0;
