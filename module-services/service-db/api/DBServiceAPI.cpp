@@ -151,20 +151,20 @@ bool DBServiceAPI::ThreadRemove(sys::Service *serv, uint32_t id) {
     }
 }
 
-std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset,
-                                                                              uint32_t limit) {
+bool DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) {
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGetLimitOffset);
     msg->offset = offset;
     msg->limit = limit;
 
     auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
-    DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
-    if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
-        return std::move(threadResponse->records);
-    }
-    else{
-        return std::make_unique<std::vector<ThreadRecord>>();
-    }
+//    DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
+//    if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
+//        return std::move(threadResponse->records);
+//    }
+//    else{
+//        return std::make_unique<std::vector<ThreadRecord>>();
+//    }
+    return true;
 }
 
 uint32_t DBServiceAPI::ThreadGetCount(sys::Service * serv)

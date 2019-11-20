@@ -216,6 +216,7 @@ public:
 		}
 		//if index is in current window
 		if( (index >= firstIndex) && ( index < firstIndex + pageSize)) {
+			LOG_INFO("Records size %d", records.size());
 			return records[pageSize + index-firstIndex];
 		}
 		//if download is false check if requested element is in any of the windows
