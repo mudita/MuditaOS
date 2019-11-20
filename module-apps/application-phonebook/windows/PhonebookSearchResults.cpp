@@ -1,9 +1,9 @@
-#include "PhonebookMainWindow.hpp"
+#include "PhonebookSearchResults.hpp"
 #include "../ApplicationPhonebook.hpp"
+#include "ContactRecord.hpp"
 #include "Label.hpp"
 #include "ListView.hpp"
 #include "Margins.hpp"
-#include "PhonebookMainWindow.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
@@ -16,20 +16,19 @@
 namespace gui
 {
 
-PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
-    : AppWindow(app, "MainWindow"), phonebookModel{new PhonebookModel(app)}
+PhonebookSearchResults::PhonebookSearchResults(app::Application *app) : AppWindow(app, "SearchResults"), searchResultsModel{new SearchResultsModel(app)}
 {
     setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
-void PhonebookMainWindow::rebuild()
+void PhonebookSearchResults::rebuild()
 {
     destroyInterface();
     buildInterface();
 }
 
-void PhonebookMainWindow::buildInterface()
+void PhonebookSearchResults::buildInterface()
 {
 
     AppWindow::buildInterface();
@@ -39,7 +38,7 @@ void PhonebookMainWindow::buildInterface()
     list->setPageSize(7);
     list->setPenFocusWidth(0);
     list->setPenWidth(0);
-    list->setProvider(phonebookModel);
+    list->setProvider(searchResultsModel);
     list->setApplication(application);
 
     bottomBar->setActive(BottomBar::Side::LEFT, true);
@@ -51,14 +50,13 @@ void PhonebookMainWindow::buildInterface()
 
     topBar->setActive(TopBar::Elements::TIME, true);
 
-    setTitle(utils::localize.get("app_phonebook_title_main"));
+    setTitle(utils::localize.get("app_phonebook_search_results_prefix"));
 
-    leftArrowImage = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
     rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-    newContactImage = new gui::Image(this, 48, 55, 0, 0, "cross");
     searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 }
-void PhonebookMainWindow::destroyInterface()
+
+void PhonebookSearchResults::destroyInterface()
 {
     AppWindow::destroyInterface();
     if (list)
@@ -93,27 +91,20 @@ void PhonebookMainWindow::destroyInterface()
     }
 
     children.clear();
-    delete phonebookModel;
+    delete searchResultsModel;
 }
 
-PhonebookMainWindow::~PhonebookMainWindow()
+PhonebookSearchResults::~PhonebookSearchResults()
 {
     destroyInterface();
 }
 
-void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-
     setFocusItem(list);
-
-    phonebookModel->clear();
-    phonebookModel->requestRecordsCount();
-
-    list->clear();
-    list->setElementsCount(phonebookModel->getItemCount());
 }
 
-bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
+bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)
 {
     // process only if key is released
     if (inputEvent.state == InputEvent::State::keyReleasedShort)
@@ -137,13 +128,27 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
     return AppWindow::onInput(inputEvent);
 }
 
-bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)
+bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
 {
-    DBContactResponseMessage *msg = reinterpret_cast<DBContactResponseMessage *>(msgl);
-    if (phonebookModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite))
-        return true;
+    if (data == nullptr)
+    {
+        LOG_ERROR("Received null pointer");
+        return false;
+    }
 
-    return false;
+    PhonebookSearchResultsData *searchResults = reinterpret_cast<PhonebookSearchResultsData *>(data);
+    if (searchResults)
+    {
+        std::shared_ptr<std::vector<ContactRecord>> results = searchResults->getResults();
+        LOG_INFO("display %d results", results->size());
+        setTitle(utils::localize.get("app_phonebook_search_results_prefix") + "\"" + searchResults->getQuery() + "\"");
+        searchResultsModel->setResults(results);
+        list->clear();
+        list->setElementsCount(searchResultsModel->getItemCount());
+        return (true);
+    }
+
+    return (false);
 }
 
 } /* namespace gui */

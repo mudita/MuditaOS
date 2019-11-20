@@ -2,7 +2,7 @@
 #include <functional>
 #include <string>
 
-#include "../models/PhonebookModel.hpp"
+#include "../models/SearchResultsModel.hpp"
 #include "../widgets/PhonebookListView.hpp"
 #include "AppWindow.hpp"
 #include "ListView.hpp"
@@ -14,11 +14,11 @@
 namespace gui
 {
 
-class PhonebookMainWindow : public AppWindow
+class PhonebookSearchResults : public AppWindow
 {
   protected:
     PhonebookListView *list;
-    PhonebookModel *phonebookModel = nullptr;
+    SearchResultsModel *searchResultsModel = nullptr;
 
     Image *leftArrowImage = nullptr;
     Image *rightArrowImage = nullptr;
@@ -26,14 +26,13 @@ class PhonebookMainWindow : public AppWindow
     Image *searchImage = nullptr;
 
   public:
-    PhonebookMainWindow(app::Application *app);
-    virtual ~PhonebookMainWindow();
+    PhonebookSearchResults(app::Application *app);
+    virtual ~PhonebookSearchResults();
 
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
     void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool onDatabaseMessage(sys::Message *msgl) override;
-
+    bool handleSwitchData(SwitchData *data) override;
     void rebuild() override;
     void buildInterface() override;
     void destroyInterface() override;

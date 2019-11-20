@@ -1,0 +1,168 @@
+/*
+ * PhonebookDeleteContact.cpp
+ *
+ *  Created on: Oct 22, 2019
+ *      Author: atom
+ */
+
+#include "PhonebookBlockContact.hpp"
+#include "../ApplicationPhonebook.hpp"
+#include "InputEvent.hpp"
+#include "Label.hpp"
+#include "Margins.hpp"
+#include "PhonebookContact.hpp"
+#include "Text.hpp"
+#include "application-call/data/CallSwitchData.hpp"
+#include "i18/i18.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
+#include <log/log.hpp>
+
+PhonebookBlockContact::PhonebookBlockContact(app::Application *app) : AppWindow(app, "Block")
+{
+    setSize(style::window_width, style::window_height);
+    buildInterface();
+}
+
+PhonebookBlockContact::~PhonebookBlockContact()
+{
+    destroyInterface();
+}
+
+void PhonebookBlockContact::rebuild()
+{
+    destroyInterface();
+    buildInterface();
+}
+
+void PhonebookBlockContact::buildInterface()
+{
+    AppWindow::buildInterface();
+    topBar->setActive(TopBar::Elements::TIME, true);
+
+    bottomBar->setActive(BottomBar::Side::LEFT, false);
+    bottomBar->setActive(BottomBar::Side::CENTER, true);
+    bottomBar->setActive(BottomBar::Side::RIGHT, true);
+
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
+
+    titleLabel = new Label(this, 0, 52, 480, 55);
+    titleLabel->setFilled(false);
+    titleLabel->setBorderColor(ColorFullBlack);
+    titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    titleLabel->setFont(style::window::font::small);
+    titleLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    titleLabel->setLineMode(false);
+
+    icon = new Image(this, 176, 135, 128, 128, "phonebook_empty_grey_circle");
+
+    confirmationLabel = new Text(this, 45, 293, 390, 128);
+    confirmationLabel->setText(utils::localize.get("app_phonebook_options_block_confirm"));
+    confirmationLabel->setTextType(Text::TextType::MULTI_LINE);
+    confirmationLabel->setEditMode(Text::EditMode::BROWSE);
+    confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    confirmationLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
+    confirmationLabel->setFont(style::window::font::small);
+
+    noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
+    noLabel->setPenWidth(0);
+    noLabel->setPenFocusWidth(3);
+    noLabel->setFilled(false);
+    noLabel->setBorderColor(ColorFullBlack);
+    noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    noLabel->setFont(style::window::font::small);
+    noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
+            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
+        {
+            if (DBServiceAPI::ContactBlock(application, contact->dbID, false)) { LOG_INFO("contact %d unblocked, switch to MainWindow", contact->dbID); }
+            else
+            {
+                LOG_ERROR("failed to unblock contact with id %d", contact->dbID);
+            }
+
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            return (true);
+        }
+        return (false);
+    };
+
+    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
+    yesLabel->setPenWidth(0);
+    yesLabel->setPenFocusWidth(3);
+    yesLabel->setFilled(false);
+    yesLabel->setBorderColor(ColorFullBlack);
+    yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    yesLabel->setFont(style::window::font::small);
+    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
+            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
+        {
+            if (DBServiceAPI::ContactBlock(application, contact->dbID, true)) { LOG_INFO("contact %d blocked, switch to MainWindow", contact->dbID); }
+            else
+            {
+                LOG_ERROR("failed to block contact with id %d", contact->dbID);
+            }
+
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            return (true);
+        }
+        return (false);
+    };
+
+    noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
+    yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
+}
+
+void PhonebookBlockContact::destroyInterface()
+{
+    AppWindow::destroyInterface();
+}
+
+void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
+{
+    setFocusItem(noLabel);
+    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
+}
+
+bool PhonebookBlockContact::handleSwitchData(SwitchData *data)
+{
+    if (data == nullptr) { return (false); }
+
+    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
+    contact = item->getContact();
+
+    setTitle(contact->primaryName + " " + contact->alternativeName);
+
+    return (true);
+}
+
+bool PhonebookBlockContact::onInput(const InputEvent &inputEvent)
+{
+    bool ret = AppWindow::onInput(inputEvent);
+
+    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong))) { return (false); }
+
+    else if (inputEvent.keyCode == KeyCode::KEY_LF)
+    {
+        LOG_INFO("Options");
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+        contact = nullptr;
+        return (true);
+    }
+    else if (inputEvent.keyCode == KeyCode::KEY_RF)
+    {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+        contact = nullptr;
+        return (true);
+    }
+
+    return (ret);
+}
