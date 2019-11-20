@@ -160,7 +160,7 @@ namespace bsp {
             volatile uint32_t to_read =0;
             volatile char* read_buff;
 
-            void set_flowcontroll(int on);
+            void set_flowcontrol(int on);
 
             void (*read_ready_cb)(void);
             void (*write_done_cb)(void);

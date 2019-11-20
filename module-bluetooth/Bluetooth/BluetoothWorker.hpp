@@ -23,7 +23,7 @@ namespace Bt {
         EvtSentError,   /// bsp error on send
         EvtUartError,   /// generic uart error
         EvtReceived,    /// trigger Bt stack received, start processing HCI in BluetoothWorker task
-        EvtErrorRec,
+        EvtErrorRec,    /// there was error o queue receive
     };
 
     inline const char* MessageCstr(Message what) {
