@@ -8,39 +8,43 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_CONTACTRECORD_HPP
 #define PUREPHONE_CONTACTRECORD_HPP
 
-#include "Record.hpp"
-#include "../Databases/ContactsDB.hpp"
-#include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
+#include "../Databases/ContactsDB.hpp"
+#include "Record.hpp"
+#include "utf8/UTF8.hpp"
 
 #include <vector>
 
-struct ContactRecord{
+struct ContactRecord
+{
 
     uint32_t dbID;
     UTF8 primaryName;
     UTF8 alternativeName;
     ContactType contactType;
 
-    struct Number {
+    struct Number
+    {
         UTF8 numberUser;
         UTF8 numberE164;
         ContactNumberType numberType;
-        Number(UTF8 n_user="", UTF8 n_e164="", ContactNumberType n_type=ContactNumberType::CELL) :numberUser(n_user), numberE164(n_e164), numberType(n_type) {}
+        Number(UTF8 n_user = "", UTF8 n_e164 = "", ContactNumberType n_type = ContactNumberType::CELL)
+            : numberUser(n_user), numberE164(n_e164), numberType(n_type)
+        {
+        }
     };
     std::vector<Number> numbers;
 
-	UTF8 country;
-	UTF8 city;
-	UTF8 street;
-	UTF8 number;
-	UTF8 note;
-	UTF8 mail;
-	ContactAddressType addressType;
+    UTF8 country;
+    UTF8 city;
+    UTF8 street;
+    UTF8 number;
+    UTF8 note;
+    UTF8 mail;
+    ContactAddressType addressType;
 
     UTF8 assetPath;
 
@@ -50,18 +54,19 @@ struct ContactRecord{
     uint8_t speeddial;
 };
 
-enum class ContactRecordField {
+enum class ContactRecordField
+{
     PrimaryName,
     NumberE164,
-	SpeedDial,
-	Favourite,
+    SpeedDial,
+    Favourite,
 };
 
-class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField> {
+class ContactRecordInterface : public RecordInterface<ContactRecord, ContactRecordField>
+{
 
-public:
-
-    ContactRecordInterface(ContactsDB* db);
+  public:
+    ContactRecordInterface(ContactsDB *db);
     ~ContactRecordInterface();
 
     bool Add(const ContactRecord &rec) override final;
@@ -69,6 +74,8 @@ public:
     bool RemoveByID(uint32_t id) override final;
 
     bool Update(const ContactRecord &rec) override final;
+
+    bool BlockByID(uint32_t id, const bool shouldBeBlocked = true);
 
     ContactRecord GetByID(uint32_t id) override final;
 
@@ -78,24 +85,24 @@ public:
 
     std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<ContactRecord>>
-    GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field, const char *str) override final;
+    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit,
+                                                                      ContactRecordField field,
+                                                                      const char *str) override final;
 
-    std::unique_ptr<std::vector<ContactRecord>>
-	GetByName( UTF8 primaryName, UTF8 alternativeName );
+    std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
 
-    std::unique_ptr<std::vector<ContactRecord>>
-	GetByNumber( UTF8 number );
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(UTF8 number);
 
-    std::unique_ptr<std::vector<ContactRecord>>
-	GetBySpeedDial( uint8_t speedDial );
+    std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
 
-private:
-    ContactsDB* contactDB;
+    std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName, const char *alternativeName,
+                                                       const char *number);
+
+  private:
+    ContactsDB *contactDB;
 
     /// get multiple numbers by split numbers_id
     std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
 };
 
-
-#endif //PUREPHONE_CONTACTRECORD_HPP
+#endif // PUREPHONE_CONTACTRECORD_HPP

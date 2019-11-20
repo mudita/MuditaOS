@@ -228,6 +228,19 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 					static_cast<uint32_t>(MessageType::DBContactGetByName));
 		} break;
 
+        case MessageType::DBContactSearch: {
+            DBContactSearchMessage *msg = reinterpret_cast<DBContactSearchMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = contactRecordInterface->Search(msg->primaryName, msg->alternativeName, msg->number);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_DEBUG("DBContactSearch time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+            responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true);
+         }
+         break;
+
         case MessageType::DBContactGetBySpeedDial: {
 			DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1
@@ -267,7 +280,21 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
             responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, ret);
         }
             break;
-
+        
+        case MessageType::DBContactBlock: {
+            DBContactBlock *msg = reinterpret_cast<DBContactBlock *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+            timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            auto ret = contactRecordInterface->BlockByID(msg->id, msg->shouldBeBlocked);
+#if SHOW_DB_ACCESS_PERF == 1
+            LOG_DEBUG("DBContactBlock time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+            responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        }
+        
+        break;
+        
         case MessageType::DBContactUpdate: {
             DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1
