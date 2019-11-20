@@ -194,15 +194,15 @@ Error initialize_stack()
     return Error();
 }
 
-Error register_hw_error(std::function<void(uint8_t)> foo) {
-    static std::function<void(uint8_t)> bar = nullptr;
-    bar = foo;
+Error register_hw_error_callback(std::function<void(uint8_t)> new_callback) {
+    static std::function<void(uint8_t)> callback = nullptr;
+    callback=new_callback;
     hci_set_hardware_error_callback([](uint8_t val) -> void {
             LOG_ERROR("Bluetooth HW ERROR! %d", val);
-            if(bar) {
-                bar(val);
+            if(callback) {
+                callback(val);
             }
-            });
+        });
     return Error();
 }
 

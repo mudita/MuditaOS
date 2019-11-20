@@ -112,9 +112,8 @@ void BtWindow::buildInterface()
         return true;
     });
 
-    for (int i =1; i < box_items.size(); ++i) {
-        (*std::next(box_items.begin(),i))->visible = false;
-    }
+    // hide all elements except button for `bluetooth on off`
+    std::for_each(std::next(box_items.begin()), box_items.end(), [](auto &el) { el->visible = false; } );
 
     box->resizeItems();
 

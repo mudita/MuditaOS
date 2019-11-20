@@ -8,7 +8,7 @@
 
 namespace Bt {
 Error initialize_stack();
-Error register_hw_error(std::function<void(uint8_t)> foo=nullptr);
+Error register_hw_error_callback(std::function<void(uint8_t)> new_callback=nullptr);
 Error set_name(std::string &name);
 Error run_stack(TaskHandle_t *handle);
 namespace GAP {

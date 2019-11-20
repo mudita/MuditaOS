@@ -29,7 +29,7 @@ bool BluetoothWorker::run() {
         auto el = getQueues()[queueIO_handle];
         BlueKitchen::getInstance()->qHandle = el;
         Bt::initialize_stack();
-        Bt::register_hw_error();
+        Bt::register_hw_error_callback();
         Bt::GAP::register_scan();
         std::string name = "PurePhone";
         Bt::set_name(name);
