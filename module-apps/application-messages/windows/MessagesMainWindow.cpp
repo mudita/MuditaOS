@@ -69,6 +69,8 @@ void MessagesMainWindow::buildInterface() {
 	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "arrow_right" );
 	newMessageImage = new gui::Image( this, 48,55,0,0, "cross" );
 	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "search" );
+
+//	setFocusItem( list );
 }
 void MessagesMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
@@ -88,13 +90,15 @@ MessagesMainWindow::~MessagesMainWindow() {
 
 
 void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
-	if( mode == ShowMode::GUI_SHOW_INIT ){
-			threadModel->clear();
-			threadModel->requestRecordsCount();
-			list->clear();
-			list->setElementsCount( threadModel->getItemCount() );
-//			list->
-		}
+
+	setFocusItem(list);
+
+	threadModel->clear();
+	threadModel->requestRecordsCount();
+	list->clear();
+	list->setElementsCount( threadModel->getItemCount() );
+
+
 }
 
 bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
@@ -103,9 +107,9 @@ bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
 }
 
 bool MessagesMainWindow::onDatabaseMessage( sys::Message* msgl ) {
-//	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
-//	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
-//		return true;
+	DBThreadResponseMessage* msg = reinterpret_cast<DBThreadResponseMessage*>( msgl );
+	if( threadModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count ) )
+		return true;
 
 	return false;
 }

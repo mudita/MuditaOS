@@ -96,6 +96,8 @@ public:
     virtual ~DBThreadResponseMessage() {};
 
     std::unique_ptr<std::vector<ThreadRecord>> records;
+    uint32_t limit = 0;
+	uint32_t offset = 0;
 };
 
 class DBContactMessage : public DBMessage{

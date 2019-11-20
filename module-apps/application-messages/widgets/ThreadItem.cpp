@@ -19,6 +19,13 @@ ThreadItem::ThreadItem(ThreadModel* model)
 	setPenFocusWidth(2);
 	setPenWidth(0);
 
+	text = new gui::Label( this, 0,0,0,0);
+	text->setPenFocusWidth(0);
+	text->setPenWidth(0);
+	text->setFont(style::window::font::big);
+	text->setDotsMode( true );
+	text->setAlignement( gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER} );
+	text->setText("item");
 }
 
 bool ThreadItem::onDimensionChanged(const BoundingBox& oldDim, const BoundingBox& newDim)

@@ -20,7 +20,7 @@ private:
 	ThreadModel* model = nullptr;
 
 	std::shared_ptr<ThreadRecord> thread = nullptr;
-
+	gui::Label* text = nullptr;
 public:
 	ThreadItem( ThreadModel* model);
 
