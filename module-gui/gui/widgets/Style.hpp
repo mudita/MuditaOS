@@ -6,9 +6,6 @@
 #include <Alignment.hpp>
 
 namespace style {
-namespace text {
-const inline gui::Alignment defaultTextAlignment = gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT,gui::Alignment::ALIGN_VERTICAL_BOTTOM);
-}
 const inline uint32_t window_height = 600;
 const inline uint32_t window_width  = 480;
 namespace header {
@@ -48,4 +45,21 @@ const inline std::string bold   = "gt_pressura_bold_24";
 const inline std::string medium = "gt_pressura_regular_24";
 };  // namespace font
 };  // namespace footer
+namespace phonebook
+{
+namespace font
+{
+const inline std::string tiny = "gt_pressura_regular_16";
+const inline std::string tinybold = "gt_pressura_bold_16";
+const inline std::string tinylight = "gt_pressura_light_16";
+}; // namespace font
+}; // namespace phonebook
+namespace color
+{
+const inline gui::Color lightgrey = gui::Color(3, 0);
+}; //  namespace color
+namespace text
+{
+const inline gui::Alignment defaultTextAlignment = gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM);
+};
 };  // namespace style
