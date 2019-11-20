@@ -3,7 +3,7 @@ BasedOnStyle: Microsoft
 AlignAfterOpenBracket: Align
 AlignTrailingComments: 'true'
 AllowShortBlocksOnASingleLine: 'true'
-AllowShortIfStatementsOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: 'false'
 ColumnLimit: '160'
 IndentCaseLabels: 'false'
 IndentWidth: '4'
