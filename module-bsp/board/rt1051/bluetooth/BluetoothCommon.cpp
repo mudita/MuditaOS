@@ -9,6 +9,33 @@ using namespace bsp;
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
 
+void BTdev::_circ::sem_take() {
+    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
+        xSemaphoreTake(sem,0);
+    } else {
+        BaseType_t *px;
+        xSemaphoreTakeFromISR(sem,px);
+    }
+}
+
+void BTdev::_circ::sem_give() {
+    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
+        xSemaphoreGive(sem);
+    } else {
+        BaseType_t *px;
+        xSemaphoreGiveFromISR(sem, px);
+    }
+}
+
+BTdev::_circ::_circ(unsigned int size, int threshold) : head(0), tail(0), threshold(threshold), size(size), len(0) {
+    buff = new char[size];
+    sem = xSemaphoreCreateBinary();
+}
+
+BTdev::_circ::~_circ() {
+    vSemaphoreDelete(sem);
+    delete[] buff;
+}
 
 BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, int threshold):
     BTdev(in_size,out_size,threshold)
