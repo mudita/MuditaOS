@@ -24,6 +24,8 @@ BlueKitchen *BlueKitchen::getInstance()
 {
     static BlueKitchen *k=NULL;
     if(k==NULL) {
+        /// outcomming & incomming heap allocated buffers sizes
+        /// packet on IP network cna have MTU 1500, so big enough buffers were added to not throttle comms
         k=new BlueKitchen(2048, 8000);
     }
     return k;
@@ -52,7 +54,7 @@ ssize_t BlueKitchen::read(void *buf, size_t nbytes)
     return 0;
 }
 
-void BlueKitchen::set_flowcontroll(int on) {
+void BlueKitchen::set_flowcontrol(int on) {
     // TODO
 }
 
