@@ -973,9 +973,12 @@ void Text::recalculateDrawParams()
     }
     visibleRows = rowCount;
 
-    // assign text to all lines
+
+    //assign text to all lines
     auto textIterator = firstLine;
-    for (uint32_t i = 0; i < labelLines.size(); i++)
+    /// if there is less lines than possible to show, copy only needed lines
+    auto num_lines_visible = labelLines.size() > textLines.size()? textLines.size(): labelLines.size();
+    for( uint32_t i=0; i < num_lines_visible; i++ )
     {
         if (textIterator == textLines.end()) break;
         labelLines[i]->setText((*textIterator)->text);
