@@ -331,28 +331,41 @@ bool ListView::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox&
 	return true;
 }
 
-void ListView::updateScrollDimenstions() {
-	if( (widgetArea.w > 10) && (widgetArea.h > 10) ) {
+void ListView::updateScrollDimenstions()
+{
+    if ((widgetArea.w > 10) && (widgetArea.h > 10))
+    {
+        if (drawVerticalScroll)
+            scroll->visible = true;
 
-		if( drawVerticalScroll )
-			scroll->visible = true;
+        uint32_t pagesCount = 1;
+        if (pageSize)
+        {
+            pagesCount = (elementsCount % pageSize == 0) ? elementsCount / pageSize : elementsCount / pageSize + 1;
+            if (pagesCount == 0)
+            {
+                disableScroll();
+                return;
+            }
+        }
 
-		uint32_t pagesCount = 1;
-		if( pageSize ) {
-			pagesCount = (elementsCount % pageSize == 0 ) ? elementsCount/pageSize : elementsCount/pageSize + 1;
-		}
+        uint32_t currentPage = selectedIndex / pageSize;
+        uint32_t pageHeight = widgetArea.h / pagesCount;
 
-		uint32_t currentPage = selectedIndex/pageSize;
-		uint32_t pageHeight = widgetArea.h / pagesCount;
+        scroll->setPosition(widgetArea.w - 7, pageHeight * currentPage);
+        scroll->setSize(7, pageHeight);
+    }
+    // not enough space - disable scroll
+    else
+    {
+        disableScroll();
+    }
+}
 
-		scroll->setPosition( widgetArea.w - 7, pageHeight*currentPage );
-		scroll->setSize(7, pageHeight );
-	}
-	//not enough space - disable scroll
-	else {
-		scroll->setSize(0, 0);
-		scroll->visible = false;
-	}
+void ListView::disableScroll()
+{
+    scroll->setSize(0, 0);
+    scroll->visible = false;
 }
 
 } /* namespace gui */
