@@ -33,7 +33,8 @@ Icon::Icon(Item *parent, const uint32_t &x, const uint32_t &y, const std::string
 
     img = new gui::Image(this, icon::img::x, icon::img::y, icon::img::w, icon::img::h, imgStr);
     label = new gui::Label(this, icon::label::x, icon::label::y, icon::label::w, icon::label::h, labelStr);
-    style::window::decorate(label);
+    label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->setFont(style::window::font::verysmall);
 }
 
