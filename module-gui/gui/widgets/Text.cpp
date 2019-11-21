@@ -77,6 +77,9 @@ Text::~Text()
         }
     }
     textLines.clear();
+    if(mode) {
+        delete mode;
+    }
 }
 
 void Text::setEditMode(EditMode mode)
@@ -482,6 +485,13 @@ bool Text::onInput(const InputEvent &inputEvent)
 
     // process only short release events
     if (inputEvent.state != InputEvent::State::keyReleasedShort) { return false; }
+
+    /// if we are able to change input modes and there was request for that (#)
+    LOG_INFO("MODE: %d", mode!=nullptr);
+    if(mode != nullptr && inputEvent.keyCode == KeyCode::KEY_PND) {
+        mode->next();
+        return true;
+    }
 
     // check if this is navigation event
     bool res = false;
