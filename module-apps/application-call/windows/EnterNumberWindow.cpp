@@ -58,20 +58,11 @@ void EnterNumberWindow::buildInterface() {
 	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
 
-    newContactImg = new gui::Rect(this, 190, 411, 100, 100); // new gui::Image(this, 190, 411, 100, 100, "speaker_on");
-	newContactImg->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
-	newContactImg->setPenFocusWidth(2);
-	newContactImg->setPenWidth(0);
-    setFocusItem(newContactImg);
-	newContactImg->activatedCallback = [=] (gui::Item& item){
+    newContactIcon = new gui::Icon(this, 190, 411, "cross", utils::localize.get("app_call_contact"));
+	newContactIcon->activatedCallback = [=] (gui::Item& item){
 		LOG_INFO("TODO: add new contact" );
 		return true; };
-
-	auto crossImg = new gui::Image(newContactImg, 34, 15, 32, 32, "cross"); // TODO: alek: add proper image
-    auto newContactLabel = new gui::Label(newContactImg, 9, 58, 82, 20, utils::localize.get("app_call_contact"));
-	newContactLabel->setPenWidth(0);
-	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-	newContactLabel->setFont(style::window::font::small);  // TODO: alek:: change to proper size
+	setFocusItem(newContactIcon);
 }
 
 void EnterNumberWindow::destroyInterface() {

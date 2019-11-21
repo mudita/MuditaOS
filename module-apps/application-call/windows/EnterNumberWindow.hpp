@@ -14,6 +14,7 @@
 #include "gui/widgets/Window.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
+#include "../widgets/Icon.hpp"
 
 namespace gui {
 
@@ -23,7 +24,7 @@ namespace gui {
 class EnterNumberWindow: public AppWindow {
 protected:
 	gui::Label* numberLabel = nullptr;
-    gui::Rect *newContactImg = nullptr;
+    gui::Icon * newContactIcon = nullptr;
 
     void updateBottomBar();
 
