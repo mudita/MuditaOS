@@ -15,7 +15,6 @@ class Icon : public Rect
 
   public:
     Icon() = delete;
-    
     Icon(Item *parent, const uint32_t &x, const uint32_t &y, const std::string &imageName, const std::string &labelStr);
     virtual ~Icon() = default;
 };

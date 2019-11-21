@@ -6,16 +6,18 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "../data/CallSwitchData.hpp"
 #include "EnterNumberWindow.hpp"
+
+#include "../data/CallSwitchData.hpp"
 #include "../ApplicationCall.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
-
 #include "i18/i18.hpp"
-#include <Style.hpp>
+#include "../data/CallAppStyle.hpp"
 
 namespace gui {
+
+using namespace callAppStyle::enterNumberWindow;
 
 EnterNumberWindow::EnterNumberWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName ) {
 	buildInterface();
@@ -52,15 +54,15 @@ void EnterNumberWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::BATTERY, true );
 	topBar->setActive(TopBar::Elements::TIME, true );
 
-	numberLabel = new gui::Label(this, 60, 157, style::window_width-60-60, 66);
-	numberLabel->setPenWidth(1);
-	numberLabel->setFont(style::header::font::title); // TODO: alek: need to be changed to the proper one
+	numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
+	numberLabel->setPenWidth(numberLabel::borderW);
+	numberLabel->setFont(style::window::font::verybig);
 	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
 
-    newContactIcon = new gui::Icon(this, 190, 411, "cross", utils::localize.get("app_call_contact"));
+    newContactIcon = new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
 	newContactIcon->activatedCallback = [=] (gui::Item& item){
-		LOG_INFO("TODO: add new contact" );
+		LOG_ERROR("TODO: add new contact" );
 		return true; };
 	setFocusItem(newContactIcon);
 }
@@ -68,6 +70,7 @@ void EnterNumberWindow::buildInterface() {
 void EnterNumberWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 	if( numberLabel ) { removeWidget(numberLabel); delete numberLabel; numberLabel= nullptr; }
+	if( newContactIcon ) { removeWidget(newContactIcon); delete newContactIcon; newContactIcon= nullptr; }
 	children.clear();
 }
 

@@ -26,13 +26,12 @@ protected:
 	gui::Label* numberLabel = nullptr;
     gui::Icon * newContactIcon = nullptr;
 
-    void updateBottomBar();
-
     void setNumberLabel(const std::string num);
 
   public:
-	EnterNumberWindow( app::Application* app, std::string windowName = "EnterNumberWindow" );
-	virtual ~EnterNumberWindow();
+    EnterNumberWindow() = delete;
+    EnterNumberWindow(app::Application *app, std::string windowName = "EnterNumberWindow");
+    virtual ~EnterNumberWindow();
 
 	bool onInput( const InputEvent& inputEvent ) override;
 	bool handleSwitchData( SwitchData* data ) override;
