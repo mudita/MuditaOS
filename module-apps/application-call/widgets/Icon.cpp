@@ -1,28 +1,10 @@
 #include "Icon.hpp"
-#include <Style.hpp>
+#include "../data/CallAppStyle.hpp"
 #include <log/log.hpp>
 
+using namespace callAppStyle;
 namespace gui
 {
-namespace icon
-{
-constexpr uint32_t w = 100;
-constexpr uint32_t h = 100;     
-namespace label
-{
-constexpr uint32_t x = 9;
-constexpr uint32_t y = 58;
-constexpr uint32_t w = 82;
-constexpr uint32_t h = 20;
-} // namespace label
-namespace img
-{
-constexpr uint32_t x = 34;
-constexpr uint32_t y = 15;
-constexpr uint32_t w = 32;
-constexpr uint32_t h = 32;
-} // namespace img
-} // namespace icon
 
 Icon::Icon(Item *parent, const uint32_t &x, const uint32_t &y, const std::string &imageName, const std::string &labelStr)
     : Rect(parent, x, y, icon::w, icon::h)
