@@ -6,6 +6,7 @@
 namespace gui
 {
 
+// Icon widget with custom image and label
 class Icon : public Rect
 {
   protected:
@@ -14,8 +15,8 @@ class Icon : public Rect
 
   public:
     Icon() = delete;
-    // TODO: add comment
-    Icon(Item *parent, const uint32_t &x, const uint32_t &y, const std::string &imgStr, const std::string &labelStr);
+    
+    Icon(Item *parent, const uint32_t &x, const uint32_t &y, const std::string &imageName, const std::string &labelStr);
     virtual ~Icon() = default;
 };
 } // namespace gui
