@@ -18,6 +18,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SettingsMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LanguageWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/BtWindow.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/UITestWindow.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationSettings.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SettingsMainWindow.hpp"

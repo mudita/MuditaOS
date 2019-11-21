@@ -18,6 +18,7 @@
 #include "Label.hpp"
 #include "Rect.hpp"
 #include "Style.hpp"
+#include "InputMode.hpp"
 
 namespace gui
 {
@@ -25,6 +26,7 @@ namespace gui
 /*
  * @brief Widget that holds multiple lines of text. This widget can expand vertically if needed to hold lines of text.
  */
+
 class Text : public Rect
 {
   public:
@@ -228,6 +230,8 @@ class Text : public Rect
     void setPosition(const short &x, const short &y) override;
     void setSize(const short &w, const short &h) override;
     bool onInput(const InputEvent &inputEvent) override;
+    /// move ownership of mode ptr to Text
+    void setInputMode(InputMode *&&mode) { this->mode = mode; };
     bool onActivated(void *data) override;
     bool onFocus(bool state) override;
     bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
@@ -236,6 +240,8 @@ class Text : public Rect
     bool onContent() override;
     void setTextColor(Color color);
     void setAlignment(const Alignment alignment);
+private:
+    InputMode *mode = nullptr;
 };
 
 } /* namespace gui */
