@@ -81,7 +81,7 @@ void MessagesMainWindow::destroyInterface() {
     if( searchImage ) { removeWidget(searchImage);    delete searchImage; searchImage = nullptr; }
 
     children.clear();
-//    delete phonebookModel;
+    delete threadModel;
 }
 
 MessagesMainWindow::~MessagesMainWindow() {

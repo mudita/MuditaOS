@@ -54,7 +54,7 @@ gui::ListItem* ThreadModel::getItem(int index, int fistElement, int prevElement,
 	auto item = new gui::ThreadItem(this);
 	if( item != nullptr )
 	{
-
+		item->setThreadItem(thread);
 		item->activatedCallback = [=] (gui::Item& item){
 			LOG_INFO("ThreadItem ActivatedCallback");
 			return true;
