@@ -54,6 +54,12 @@ void SettingsMainWindow::buildInterface() {
 
     setTitle(utils::localize.get("app_settings_title_main"));
 
+	options.push_back( addOptionLabel( "TEST UI", [=] (gui::Item& item){
+                LOG_INFO("switching to TEST UI page" );
+                application->switchWindow("TEST_UI", nullptr );
+                return true;
+            }) );
+
 	//add option connectivity option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_bt"), [=] (gui::Item& item){
                 LOG_INFO("switching to bluetooth page" );
