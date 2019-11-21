@@ -91,13 +91,14 @@ MessagesMainWindow::~MessagesMainWindow() {
 
 void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
-	setFocusItem(list);
+
 
 	threadModel->clear();
 	threadModel->requestRecordsCount();
 	list->clear();
 	list->setElementsCount( threadModel->getItemCount() );
 
+	setFocusItem(list);
 
 }
 

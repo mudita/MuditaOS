@@ -200,7 +200,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
             LOG_DEBUG("DBThreadGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
             LOG_INFO("Thread get limit offset");
-            responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(ret), true, 5);
+            responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
         }
             break;
 
@@ -215,7 +215,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
                   LOG_DEBUG("DBThreadGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
       #endif
                   //DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0,uint32_t count=0,uint32_t respTo=0)
-                  responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, ret);
+                  responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true,  0, 0, ret);
         }
 	  break;
 

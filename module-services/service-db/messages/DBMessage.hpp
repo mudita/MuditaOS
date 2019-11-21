@@ -92,7 +92,13 @@ public:
 
 class DBThreadResponseMessage: public DBResponseMessage {
 public:
-    DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0,uint32_t count=0,uint32_t respTo=0) : DBResponseMessage(retCode,count,respTo),records(std::move(rec)){};
+    DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0, uint32_t limit=0,uint32_t offset=0,uint32_t count=0,uint32_t respTo=0) : DBResponseMessage(retCode,count,respTo),
+	records(std::move(rec)),
+	limit( limit ),
+	offset( offset )
+	{
+    	this->count = count;
+	};
     virtual ~DBThreadResponseMessage() {};
 
     std::unique_ptr<std::vector<ThreadRecord>> records;

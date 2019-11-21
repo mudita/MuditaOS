@@ -76,6 +76,8 @@ void ApplicationMessages::createUserInterface() {
 
     window = new gui::MessagesMainWindow(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+
 }
 
 void ApplicationMessages::destroyUserInterface() {}

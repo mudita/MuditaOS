@@ -124,7 +124,7 @@ int main() {
 
     bsp::BoardInit();
 
-    LOG_PRINTF("Launching PurePhone..\scn");
+    LOG_PRINTF("Launching PurePhone..\n");
 
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
@@ -150,8 +150,8 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
-		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
-
+//		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
+		applications.push_back(std::unique_ptr<app::ApplicationMessagesLauncher>(new app::ApplicationMessagesLauncher()));
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
                                      sysmgr.get());
