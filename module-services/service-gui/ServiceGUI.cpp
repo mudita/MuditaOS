@@ -65,9 +65,6 @@ ServiceGUI::ServiceGUI(const std::string& name, std::string parent, uint32_t scr
 	//load images
 	gui::ImageManager& imageManager = gui::ImageManager::getInstance();
 	imageManager.init( "sys/assets" );
-
-	//load keyboard profiles
-	translator.init("sys/assets");
 }
 
 ServiceGUI::~ServiceGUI(){

@@ -155,10 +155,8 @@ protected:
 	 * Timer for checking long press timeouts
 	 */
 	uint32_t longpressTimerID = 0;
-	/**
-	 * Object responsible for translating keyboard events into gui acceptable events
-	 */
-	std::unique_ptr<gui::Translator> translator;
+
+	std::unique_ptr<gui::KeyInputHandler> keyInputHandler;
 	/**
 	 * Flag defines how application will behave after registration. It can go forground or background
 	 */
