@@ -50,7 +50,6 @@ protected:
 	std::vector<std::unique_ptr<gui::DrawCommand>> commands;
 //	uint32_t timer_id= 0;
 	gui::RefreshModes mode = gui::RefreshModes::GUI_REFRESH_DEEP;
-	gui::Translator translator;
 
 	//semaphore used to protect commands vector while commands are taken from service to worker.
 	SemaphoreHandle_t semCommands;

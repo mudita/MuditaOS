@@ -76,12 +76,8 @@ public:
 	};
 
 	State state = State::keyPressed;
-	KeyCode keyCode = KeyCode::KEY_UNDEFINED;
-	uint32_t keyChar = 0;
-	uint32_t keyPressTime = 0;
-	uint32_t keyRelaseTime = 0;
-	bool     cycle = false;
-	uint32_t timeout = 0;
+	KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// default `simple parsed key`
+    // TODO TODO RawKey key;                          /// full key data, for widgets to parse
 
 	InputEvent() {};
 	InputEvent( const State& state, const uint32_t& code, const uint32_t& key,
@@ -99,14 +95,6 @@ public:
 		ss<<" key code: ";
 		ss<< static_cast<int>(keyCode);
 		ss<<" key char: ";
-		ss<<keyChar;
-		ss<<" press time: ";
-		ss<<keyPressTime;
-		ss<<" release time: ";
-		ss<<keyRelaseTime;
-		ss<<" timeout: ";
-		ss<<timeout;
-
 		return ss.str();
 	}
 };

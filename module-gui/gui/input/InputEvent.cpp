@@ -13,12 +13,7 @@ namespace gui {
 InputEvent::InputEvent( const State& state, const uint32_t& keyCode, const uint32_t& keyChar,
 		const uint32_t& pressTime, const uint32_t& releaseTime, bool cycle, uint32_t timeout ) :
 	state{state},
-	keyCode{static_cast<KeyCode>(keyCode)},
-	keyChar{keyChar},
-	keyPressTime{ pressTime },
-	keyRelaseTime{ releaseTime },
-	cycle{ cycle },
-	timeout{timeout} {}
-
-}
+	keyCode{static_cast<KeyCode>(keyCode)}
+    {}
+};
 

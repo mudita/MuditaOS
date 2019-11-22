@@ -482,16 +482,17 @@ void Text::setSize(const short &w, const short &h)
 
 bool Text::onInput(const InputEvent &inputEvent)
 {
-
-    // process only short release events
-    if (inputEvent.state != InputEvent::State::keyReleasedShort) { return false; }
-
+    if(inputEvent.state != InputEvent::State::keyReleasedShort && inputEvent.state != InputEvent::State::keyPressed) {
+        LOG_INFO("---------------->");
+    }
     /// if we are able to change input modes and there was request for that (#)
-    LOG_INFO("MODE: %d", mode!=nullptr);
     if(mode != nullptr && inputEvent.keyCode == KeyCode::KEY_PND) {
         mode->next();
         return true;
     }
+
+    // process only short release events
+    if (inputEvent.state != InputEvent::State::keyReleasedShort) { return false; }
 
     // check if this is navigation event
     bool res = false;
@@ -506,43 +507,45 @@ bool Text::onInput(const InputEvent &inputEvent)
         return res;
     }
 
-    // it there is no key char it means that translator didn't handled the key and this key
-    // press is not for text input.
-    if (inputEvent.keyChar == 0) return false;
+    // TODO add translator here
+    // if (inputEvent.keyChar == 0) return false;
+    /// OLD
+    /// // it there is no key char it means that translator didn't handled the key and this key
+    /// // press is not for text input.
 
-    if (inputEvent.cycle)
-    {
-        handleBackspace();
-        res = handleChar(inputEvent);
-        if (res)
-        {
-            updateCursor();
-            contentCallback(*this);
-        }
-        return res;
-    }
+    // if (inputEvent.cycle)
+    // {
+    //     handleBackspace();
+    //     res = handleChar(inputEvent);
+    //     if (res)
+    //     {
+    //         updateCursor();
+    //         contentCallback(*this);
+    //     }
+    //     return res;
+    // }
 
-    // if char is a new line char then create new line and move caret and return
-    if (inputEvent.keyChar == 0x0A)
-    {
-        if (textType == TextType::MULTI_LINE)
-        {
-            res = handleEnter();
-            contentCallback(*this);
-        }
-    }
-    // backspace handling
-    else if (inputEvent.keyChar == 0x08)
-    {
-        res = handleBackspace();
-        contentCallback(*this);
-    }
-    else
-    { // normal char -> add and check pixel width
-        res = handleChar(inputEvent);
-        contentCallback(*this);
-    }
-    if (res) updateCursor();
+    // // if char is a new line char then create new line and move caret and return
+    // if (inputEvent.keyChar == 0x0A)
+    // {
+    //     if (textType == TextType::MULTI_LINE)
+    //     {
+    //         res = handleEnter();
+    //         contentCallback(*this);
+    //     }
+    // }
+    // // backspace handling
+    // else if (inputEvent.keyChar == 0x08)
+    // {
+    //     res = handleBackspace();
+    //     contentCallback(*this);
+    // }
+    // else
+    // { // normal char -> add and check pixel width
+    //     res = handleChar(inputEvent);
+    //     contentCallback(*this);
+    // }
+    // if (res) updateCursor();
     return res;
 }
 
@@ -867,55 +870,56 @@ bool Text::handleChar(const InputEvent &inputEvent)
     auto it = getCursorTextLine();
     TextLine *currentTextLine = (*it);
 
-    // calculate width of the character that is going to be inserted
-    uint32_t charWidth = font->getCharPixelWidth(inputEvent.keyChar);
-
-    // insert character into string in currently selected line
-    if (currentTextLine->text.insertCode(inputEvent.keyChar, cursorColumn) == false) return false;
+// TODO
+//    // calculate width of the character that is going to be inserted
+//    uint32_t charWidth = font->getCharPixelWidth(inputEvent.keyChar);
+//
+//    // insert character into string in currently selected line
+//    if (currentTextLine->text.insertCode(inputEvent.keyChar, cursorColumn) == false) return false;
 
     // if sum of the old string and width of the new character are greater than available space run lines rework
     // procedure
-    uint32_t linesCount = textLines.size();
-    uint32_t availableSpace = getAvailableHPixelSpace();
-    uint32_t currentWidth = currentTextLine->pixelLength;
-    if (currentWidth + charWidth > availableSpace)
-    {
-
-        // this is the case when new character inserted into single line text
-        // is creating the line that doesn't fit available space.
-        if (textType == TextType::SINGLE_LINE)
-        {
-
-            currentTextLine->text.removeChar(cursorColumn, 1);
-            return true;
-        }
-
-        ++cursorColumn;
-        reworkLines(it);
-
-        // if cursor position is greater than number of characters in current line move cursor to next line.
-        if (cursorColumn > (*it)->text.length())
-        {
-            cursorColumn = 0;
-            ++cursorRow;
-        }
-
-        if (cursorRow >= visibleRows) { firstRow++; }
-    }
-    // no line splitting, update pixel width and proceed
-    else
-    {
-        currentTextLine->pixelLength = font->getPixelWidth(currentTextLine->text);
-        ++cursorColumn;
-    }
-
-    // if number of text lines have increased, text widget is multi-line and expandable change widgets space
-    //	if( linesCount != textLines.size()) {
-    //
-    //	}
-
-    recalculateDrawParams();
-    // calculate new position of the cursor
+//    uint32_t linesCount = textLines.size();
+//    uint32_t availableSpace = getAvailableHPixelSpace();
+//    uint32_t currentWidth = currentTextLine->pixelLength;
+//    if (currentWidth + charWidth > availableSpace)
+//    {
+//
+//        // this is the case when new character inserted into single line text
+//        // is creating the line that doesn't fit available space.
+//        if (textType == TextType::SINGLE_LINE)
+//        {
+//
+//            currentTextLine->text.removeChar(cursorColumn, 1);
+//            return true;
+//        }
+//
+//        ++cursorColumn;
+//        reworkLines(it);
+//
+//        // if cursor position is greater than number of characters in current line move cursor to next line.
+//        if (cursorColumn > (*it)->text.length())
+//        {
+//            cursorColumn = 0;
+//            ++cursorRow;
+//        }
+//
+//        if (cursorRow >= visibleRows) { firstRow++; }
+//    }
+//    // no line splitting, update pixel width and proceed
+//    else
+//    {
+//        currentTextLine->pixelLength = font->getPixelWidth(currentTextLine->text);
+//        ++cursorColumn;
+//    }
+//
+//    // if number of text lines have increased, text widget is multi-line and expandable change widgets space
+//    //	if( linesCount != textLines.size()) {
+//    //
+//    //	}
+//
+//    recalculateDrawParams();
+//    // calculate new position of the cursor
 
     return true;
 }
