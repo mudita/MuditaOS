@@ -241,21 +241,22 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				}
 				return true;
 			}
-			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
-				//fill next field with star and store value in array
-				if( charCount < 4 ) {
-					pinLabels[charCount]->setText("*");
-					charValue[charCount] = inputEvent.keyChar-'0';
-					charCount++;
-
-					//if 4 char has been entered show bottom bar confirm
-					if( charCount == 4 ) {
-						bottomBar->setActive( BottomBar::Side::CENTER, true );
-					}
-					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-				}
-				return true;
-			}
+            // TODO TODO
+//			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
+//				//fill next field with star and store value in array
+//				if( charCount < 4 ) {
+//					pinLabels[charCount]->setText("*");
+//					charValue[charCount] = inputEvent.keyChar-'0';
+//					charCount++;
+//
+//					//if 4 char has been entered show bottom bar confirm
+//					if( charCount == 4 ) {
+//						bottomBar->setActive( BottomBar::Side::CENTER, true );
+//					}
+//					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+//				}
+//				return true;
+//			}
 		}
 		else if( state == State::WrongPinInfo ) {
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {

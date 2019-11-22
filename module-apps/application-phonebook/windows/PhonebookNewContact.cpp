@@ -147,10 +147,11 @@ void PhonebookNewContact::buildInterface() {
 	};
 
 	page2.speedValue->inputCallback  = [=] (gui::Item& item, const InputEvent& inputEvent ){
-		if( (inputEvent.keyChar > '0') && (inputEvent.keyChar < '9') ) {
-			page2.speedValue->setText(std::to_string(inputEvent.keyChar-'0'));
-			return true;
-		}
+// TODO TODO
+//		if( (inputEvent.keyChar > '0') && (inputEvent.keyChar < '9') ) {
+//			page2.speedValue->setText(std::to_string(inputEvent.keyChar-'0'));
+//			return true;
+//		}
 		return false;
 	};
 
