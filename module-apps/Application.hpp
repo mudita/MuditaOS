@@ -151,12 +151,8 @@ protected:
 	 * State of the application
 	 */
 	State state = State::DEACTIVATED;
-	/**
-	 * Timer for checking long press timeouts
-	 */
-	uint32_t longpressTimerID = 0;
 
-	std::unique_ptr<gui::KeyInputHandler> keyInputHandler;
+	std::unique_ptr<gui::KeyInputSimpleTranslation> keyTranslator;
 	/**
 	 * Flag defines how application will behave after registration. It can go forground or background
 	 */

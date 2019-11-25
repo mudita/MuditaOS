@@ -20,16 +20,12 @@ class InputMode
     // list of enabled input modes
     std::list<Mode> input_mode_list;
     uint32_t input_mode_selected = Mode::digit;
-    std::function<void(const std::string&)> switch_cb = nullptr;
 
   public:
-    /// method to set mode switching between: abc, ABC, 123
-    /// need to be done via callback from application because input mode is parent element and we don't want to mix application in widgets
-    InputMode(std::function<void(const std::string&)> switch_cb, Mode starting_mode = Mode::digit, std::list<InputMode::Mode> mode_list = {Mode::digit});
 
-    /// sets selected mode using switch_cb
+    InputMode(InputMode::Mode starting_mode, std::list<InputMode::Mode> mode_list);
     bool next();
-
-    /// set selected Mode
-    bool setMode(Mode m);
+    bool set(Mode m);
+    /// get mode in use
+    const std::string& get();
 };

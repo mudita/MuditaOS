@@ -34,15 +34,8 @@ namespace app {
 Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
 	Service( name, parent, stackDepth, priority ),
 	startBackground{ startBackground } {
-
-	longpressTimerID = CreateTimer( key_time_base_ms ,false);
-
-	//create keyInputHandler and set default profile
-	keyInputHandler = std::make_unique<gui::KeyInputHandler>();
-	// keyInputHandler->setProfile("home_screen");
-
+	keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-
 }
 
 Application::~Application() {
@@ -53,10 +46,6 @@ Application::~Application() {
 
 void Application::TickHandler(uint32_t id)
 {
-    if (id == longpressTimerID)
-    {
-        keyInputHandler->keyTimeUpdate();
-    }
 }
 
 void Application::render( gui::RefreshModes mode ) {
@@ -152,27 +141,11 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
 		sevm::KbdMessage* msg = static_cast<sevm::KbdMessage*>(msgl);
-        LOG_INFO("----------------------------");
-        LOG_INFO("-> %d %d %d %d", msg->keyPressTime, msg->keyRelaseTime, msg->keyState, msg->keyCode);
-        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // From Mon:
-        // TODO it was checked - in out time is always send ( release, press time )
-        //  so we can actually determine everything here - no timer needed...
-        //  time sent is in ms
-        //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // TODO check if it always gets out (and why not)
-        // than -> move it out always and move resp on handling to ui from Application
-        // than -> widget have to have keyInputHandler (except default translation done here)
-//        gui::InputEvent iev = keyInputHandler->handle(msg->keyCode, msg->keyState);
-//            translate((msg->keyState == sevm::KeyboardEvents::keyPressed),
-//                    ,
-//                    msg->keyPressTime,
-//                    msg->keyRelaseTime);
-//
-//for press event check if there is a need for starting timer
-// messageInputEventApplication( this, this->GetName(), iev );
-
-		handled = true;
+        gui::InputEvent iev = keyTranslator->translate(msg->key);
+        if(iev.keyCode != gui::KeyCode::KEY_UNDEFINED ) {
+            messageInputEventApplication( this, this->GetName(), iev );
+        }
+        handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) )
 	{
@@ -348,11 +321,6 @@ void Application::setActiveWindow( const std::string& windowName ) {
 		currentWindow = it->second;
 		acceptInput = true;
 	}
-}
-
-// TODO TODO REMOVE ME
-void Application::setKeyboardProfile( const std::string& profile ) {
-	//keyInputHandler->setProfile( profile );
 }
 
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {

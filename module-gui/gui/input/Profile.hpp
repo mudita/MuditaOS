@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <vector>
 #include <map>
+#include "input/InputEvent.hpp"
 
 namespace gui {
 
@@ -38,19 +39,24 @@ public:
  */
 class Profile {
 	std::string name;
-	std::map<uint32_t, KeyProfile*> keys;
+	std::map<uint32_t, KeyProfile*> keys = {};
 
 	void addCharacters( KeyProfile* pk, const std::string& s );
 	void addTimeouts( KeyProfile* pk, const std::string& s );
 	void addKeyProfile( KeyProfile* pk );
+	void setName( std::string name ) { this->name = name; };
+	const KeyProfile* getKeyProfile( uint32_t keyCode );
 public:
-	Profile();
+    void clear() { this->keys.clear(); };
+	Profile() = default;
+	Profile(const std::string &name);
+    Profile(Profile &&p);
 	virtual ~Profile();
 
-	void setName( std::string name ) { this->name = name; };
 	std::string getName(){ return name; };
 	bool load( std::string filename );
-	const KeyProfile* getKeyProfile( uint32_t keyCode );
+
+    uint32_t get(bsp::KeyCodes code, uint32_t times);
 };
 
 } /* namespace gui */
