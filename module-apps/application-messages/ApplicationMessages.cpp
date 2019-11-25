@@ -23,7 +23,6 @@ ApplicationMessages::~ApplicationMessages() {}
 
 // Invoked upon receiving data message
 sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage* resp) {
-	LOG_INFO("Message type %d", msgl->messageType);
     auto retMsg = Application::DataReceivedHandler(msgl);
     // if message was handled by application's template there is no need to process further.
     if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
@@ -33,13 +32,10 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl, 
     // this variable defines whether message was processed.
     bool handled = false;
 
-
-
     //handle database response
 	if( resp != nullptr ) {
 		handled = true;
 		uint32_t msgType = resp->responseTo;
-		LOG_INFO("response type %d", msgType);
 		switch( msgType ) {
 			case static_cast<uint32_t>(MessageType::DBThreadGetLimitOffset): {
 				if( currentWindow->onDatabaseMessage( resp ) )

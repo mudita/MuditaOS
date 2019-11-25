@@ -11,7 +11,6 @@
 
 #include "service-appmgr/ApplicationManager.hpp"
 
-//#include "../ApplicationPhonebook.hpp"
 #include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
 
@@ -19,6 +18,7 @@
 #include "ListView.hpp"
 #include "Margins.hpp"
 #include "MessagesMainWindow.hpp"
+#include "../MessagesStyle.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
 
@@ -47,12 +47,11 @@ void MessagesMainWindow::buildInterface() {
 
 
 	list = new gui::ListView(this, 11, 105, 480-22, 600-105-50 );
-	list->setMaxElements(5);
-	list->setPageSize(5);
+	list->setMaxElements(29);
+	list->setPageSize(messages::threadsPageSize);
 	list->setPenFocusWidth(0);
 	list->setPenWidth(0);
 	list->setProvider( threadModel );
-	//list->setApplication( application );
 
 	bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -74,7 +73,7 @@ void MessagesMainWindow::buildInterface() {
 }
 void MessagesMainWindow::destroyInterface() {
     AppWindow::destroyInterface();
-//    if( list ) { removeWidget(list);    delete list; list = nullptr; }
+    if( list ) { removeWidget(list);    delete list; list = nullptr; }
     if( leftArrowImage ) { removeWidget(leftArrowImage);    delete leftArrowImage; leftArrowImage = nullptr; }
     if( rightArrowImage ) { removeWidget(rightArrowImage);    delete rightArrowImage; rightArrowImage = nullptr; }
     if( newMessageImage ) { removeWidget(newMessageImage);    delete newMessageImage; newMessageImage = nullptr; }

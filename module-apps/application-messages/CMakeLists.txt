@@ -15,19 +15,26 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationMessages.cpp"
 		#"${CMAKE_CURRENT_LIST_DIR}/MessagesModel.cpp"
+		
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesItem.cpp"
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesListView.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.cpp"
+        
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesMainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/ThreadViewWindow.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.cpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.cpp"
+
 	PUBLIC
 		#"${CMAKE_CURRENT_LIST_DIR}/MessagesModel.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationMessages.hpp"
+		"${CMAKE_CURRENT_LIST_DIR}/MessagesStyle.hpp"
+		
+	 	"${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.hpp"
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesListView.hpp"
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesItem.hpp"
+		
         #"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesNewContact.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.hpp"
-        "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.hpp"
+
 )
 

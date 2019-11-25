@@ -52,6 +52,7 @@ public:
 			ContactRecord& errName, ContactRecord& errPhone1, ContactRecord& errPhone2, ContactRecord& speedDial );
 
 	static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName );
+	static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID );
 	static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial );
 	static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
     static bool ContactAdd(sys::Service* serv,const ContactRecord& rec);

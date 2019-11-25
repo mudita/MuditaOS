@@ -29,5 +29,6 @@ public:
 
 	gui::ListItem* getItem(int index, int firstElement, int prevElement, uint32_t limit, int remaining, bool topDown ) override;
 	int getItemCount() const {return recordsCount; };
+	app::Application* getApplication(void) {return application;};
 };
 

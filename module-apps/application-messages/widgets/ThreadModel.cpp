@@ -10,8 +10,11 @@
 #include "ThreadItem.hpp"
 
 #include "Application.hpp"
+
+#include "../MessagesStyle.hpp"
+
 #include "service-db/api/DBServiceAPI.hpp"
-ThreadModel::ThreadModel( app::Application* app) : DatabaseModel( app, 5)
+ThreadModel::ThreadModel( app::Application* app) : DatabaseModel( app, messages::threadsPageSize)
 {
 
 }
@@ -23,10 +26,10 @@ void ThreadModel::requestRecordsCount( void )
 	if( recordsCount > 0)
 	{
 
-		DBServiceAPI::ThreadGetLimitOffset(application, 0, 5);
-		if( recordsCount >= 5)
+		DBServiceAPI::ThreadGetLimitOffset(application, 0, messages::threadsPageSize);
+		if( recordsCount >= messages::threadsPageSize)
 		{
-			DBServiceAPI::ThreadGetLimitOffset(application, 5, 5);
+			DBServiceAPI::ThreadGetLimitOffset(application, messages::threadsPageSize, messages::threadsPageSize);
 		}
 	}
 }

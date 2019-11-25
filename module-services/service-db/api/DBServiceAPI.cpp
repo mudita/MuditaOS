@@ -199,6 +199,23 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::
 	}
 }
 
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID ) {
+
+	ContactRecord rec;
+	rec.dbID = contactID;
+
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID,rec );
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+		return std::move(contactResponse->records);
+	}
+	else{
+		return std::make_unique<std::vector<ContactRecord>>();
+	}
+}
+
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial ) {
 	ContactRecord rec;
 	rec.speeddial = speeddial;

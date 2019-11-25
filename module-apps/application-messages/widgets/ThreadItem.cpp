@@ -7,11 +7,13 @@
 #include "ThreadItem.hpp"
 #include "time/time_conversion.hpp"
 #include <Style.hpp>
+#include "service-db/api/DBServiceAPI.hpp"
 
 namespace gui{
 
-ThreadItem::ThreadItem(ThreadModel* model)
+ThreadItem::ThreadItem(ThreadModel* threadmodel)
 {
+	model = threadmodel;
 	minWidth = 431;
 	minHeight = 100;
 	maxWidth = 431;
@@ -56,6 +58,8 @@ bool ThreadItem::onDimensionChanged(const BoundingBox& oldDim, const BoundingBox
 
 	preview->setPosition(14, newDim.h/2);
 	preview->setSize(newDim.w-20, newDim.h/2);
+
+
 	return true;
 }
 
@@ -63,12 +67,17 @@ void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord>& thread)
 {
 	this->thread = thread;
 
-
-	contact->setText(std::to_string(thread->contactID));
+	if( model != nullptr )
+	{
+		auto contactRec = DBServiceAPI::ContactGetByID(model->getApplication(), thread->contactID);
+		auto cont = contactRec->front();
+		contact->setText(cont.primaryName + " " + cont.alternativeName);
+	}
 
 	timestamp->setText( utils::time::SysTime(thread->date) );
 
-	preview->setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque placerat eget nunc at consectetur.");
+	preview->setText(thread->snippet);
+
 }
 
 } /*namespace gui*/
