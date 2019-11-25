@@ -19,6 +19,7 @@
 #include "Rect.hpp"
 #include "Style.hpp"
 #include "InputMode.hpp"
+#include "Translator.hpp"
 
 namespace gui
 {
@@ -173,9 +174,9 @@ class Text : public Rect
     bool handleEnter();
     bool handleBackspace();
     /**
-     * Inserts character provided from external source into currently selected line.
+     * Inserts translated set of characters provided from key translation logics
      */
-    bool handleChar(const InputEvent &inputEvent);
+    bool handleChar(uint32_t chars);
     /**
      * Updates cursor position in the text widget
      */
@@ -242,6 +243,7 @@ class Text : public Rect
     void setAlignment(const Alignment alignment);
 private:
     InputMode *mode = nullptr;
+    gui::KeyInputMappedTranslation translator;
 };
 
 } /* namespace gui */

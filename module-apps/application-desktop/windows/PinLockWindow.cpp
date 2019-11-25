@@ -177,9 +177,6 @@ void PinLockWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
 		lockTimeoutApplilcation = lockData->getPreviousApplication();
 	}
-
-	//change kbd profile to home_screen
-	application->setKeyboardProfile("home_screen");
 	//set state
 	setVisibleState( state );
 }
@@ -241,22 +238,21 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				}
 				return true;
 			}
-            // TODO TODO
-//			else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
-//				//fill next field with star and store value in array
-//				if( charCount < 4 ) {
-//					pinLabels[charCount]->setText("*");
-//					charValue[charCount] = inputEvent.keyChar-'0';
-//					charCount++;
-//
-//					//if 4 char has been entered show bottom bar confirm
-//					if( charCount == 4 ) {
-//						bottomBar->setActive( BottomBar::Side::CENTER, true );
-//					}
-//					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-//				}
-//				return true;
-//			}
+			else if( 0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9) {
+				//fill next field with star and store value in array
+				if( charCount < 4 ) {
+					pinLabels[charCount]->setText("*");
+					charValue[charCount] = gui::toNumeric(inputEvent.keyCode);
+					charCount++;
+
+					//if 4 char has been entered show bottom bar confirm
+					if( charCount == 4 ) {
+						bottomBar->setActive( BottomBar::Side::CENTER, true );
+					}
+					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+				}
+				return true;
+			}
 		}
 		else if( state == State::WrongPinInfo ) {
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {

@@ -16,6 +16,7 @@
 namespace bsp {
 
     enum class KeyCodes {
+        Undefined = 0,
         NumericKey1 = 31,
         NumericKey2 = 32,
         NumericKey3 = 33,
