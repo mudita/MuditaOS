@@ -29,7 +29,6 @@
 namespace gui {
 
 CallWindow::CallWindow( app::Application* app, std::string windowName ) : AppWindow(app, windowName){
-	setSize( 480, 600 );
 	buildInterface();
 }
 
@@ -180,8 +179,19 @@ void CallWindow::setVisibleState() {
 	rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(false);
 	rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(false);
 	durationLabel->setVisible(false);
+    setFocusItem(nullptr);
 
-	//show state of the window
+    auto showIconsLambda = [=]() {
+        rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(true);
+        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(true);
+
+        imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
+        imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
+
+        setFocusItem(rects[static_cast<uint32_t>(FocusRects::Speaker)]);
+    };
+
+    //show state of the window
 	switch( state ) {
 		case State::INCOMING_CALL: {
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, true );
@@ -210,14 +220,8 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
 
-			rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(true);
-			rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(true);
-
-			imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
-			imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
-
-			setFocusItem( rects[static_cast<uint32_t>(FocusRects::Speaker)] );
-		}break;
+            showIconsLambda();
+        }break;
 		case State::IDLE: {
 //			titleLabel->setText("IDLE");
 		}break;
@@ -228,6 +232,8 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, true );
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
+
+			showIconsLambda();
 			// durationLabel->setText(utils::localize.get("app_call_is_calling")); // TODO: alek: should be printed sthg?
 		}break;
 	};
@@ -305,8 +311,8 @@ bool CallWindow::handleLeftButton() {
 		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
 
 		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
-		return true;
-	}
+        return true;
+    }
 	else if( state == State::OUTGOING_CALL ) {
 
 	}
