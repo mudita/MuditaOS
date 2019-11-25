@@ -66,8 +66,6 @@ void PhonebookNewContact::buildInterface() {
 			page1.text[i]->focusChangedCallback = [=] (gui::Item& item){
 				if( item.focus ) {
 					page1.text[i]->setFont(style::window::font::bigbold);
-                    // TODO TODO
-					// application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
 				}
 				else {
 					page1.text[i]->setFont(style::window::font::medium);
@@ -79,37 +77,10 @@ void PhonebookNewContact::buildInterface() {
 			page1.text[i]->focusChangedCallback = [=] (gui::Item& item){
 				if( item.focus ) {
 					gui::Text* text = reinterpret_cast<Text*>(&item);
-					uint32_t length = text->getText().length();
 					page1.text[i]->setFont(style::window::font::bigbold);
-					if( length == 0 ){
-						LOG_INFO("Switching to uppercase");
-                        // TODO TODO
-						// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
-					}
-					else {
-						LOG_INFO("Switching to lowercase");
-                        // TODO TODO
-						// application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
-					}
 				}
 				else {
 					page1.text[i]->setFont(style::window::font::medium);
-				}
-				return true;
-			};
-
-			page1.text[i]->contentCallback = [=] (gui::Item& item){
-				gui::Text* text = reinterpret_cast<Text*>(&item);
-				uint32_t length = text->getText().length();
-				if( length == 0 ){
-					LOG_INFO("Switching to uppercase");
-                    // TODO TODO
-					// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
-				}
-				else if( length == 1 ){
-					LOG_INFO("Switching to lowercase");
-                    // TODO TODO
-					// application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
 				}
 				return true;
 			};
@@ -117,7 +88,7 @@ void PhonebookNewContact::buildInterface() {
 
 		page1.text[i]->setTextType( gui::Text::TextType::SINGLE_LINE );
 		page1.text[i]->setEditMode(gui::Text::EditMode::EDIT );
-
+        page1.text[i]->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
 	}
 
 	//set navigation for page 1
@@ -146,18 +117,16 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedValue->focusChangedCallback = [=] (gui::Item& item){
 		if( item.focus ) {
 			LOG_INFO("Changed profile to common_kbd_numeric");
-            // TODO TODO
-			// application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
 		}
 		return true;
 	};
 
 	page2.speedValue->inputCallback  = [=] (gui::Item& item, const InputEvent& inputEvent ){
-// TODO TODO
-//		if( (inputEvent.keyChar > '0') && (inputEvent.keyChar < '9') ) {
-//			page2.speedValue->setText(std::to_string(inputEvent.keyChar-'0'));
-//			return true;
-//		}
+        int val = gui::toNumeric(inputEvent.keyCode);
+		if( 0 <= val && val < 10) {
+			page2.speedValue->setText(std::to_string(val));
+			return true;
+		}
 		return false;
 	};
 
@@ -254,22 +223,6 @@ void PhonebookNewContact::buildInterface() {
 		page2.text[i]->setBorderColor( gui::ColorFullBlack );
 		page2.text[i]->setMargins( Margins(0,0,0,0));
 		page2.text[i]->setFont(style::window::font::medium);
-
-		page2.text[i]->contentCallback = [=] (gui::Item& item){
-			gui::Text* text = reinterpret_cast<Text*>(&item);
-			uint32_t length = text->getText().length();
-			if( length == 0 ){
-				LOG_INFO("Switching to uppercase");
-                // TODO TODO
-				// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
-			}
-			else if( length == 1 ){
-				LOG_INFO("Switching to lowercase");
-                // TODO TODO
-				// application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
-			}
-			return true;
-		};
 	}
 
 	page2.speedValue->setNavigationItem( NavigationDirection::DOWN, page2.favValue );
@@ -331,8 +284,6 @@ void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data) {
 	setFocusItem(page1.text[0]);
 	page2.favSelected = false;
 	page2.imageFav->setVisible(false);
-    // TODO TODO
-	// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 }
 
 ContactRecord PhonebookNewContact::readContact(){
