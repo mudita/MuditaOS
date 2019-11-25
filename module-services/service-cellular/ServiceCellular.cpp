@@ -59,9 +59,7 @@ ServiceCellular::ServiceCellular()
             case CellularNotificationMessage::Type::CallBusy:
             case CellularNotificationMessage::Type::CallActive:
             case CellularNotificationMessage::Type::CallAborted:
-            case CellularNotificationMessage::Type::None:
                 // no data field is used
-                LOG_ERROR("unexpected notification");
                 break;
 
             case CellularNotificationMessage::Type::IncomingCall:
@@ -83,6 +81,10 @@ ServiceCellular::ServiceCellular()
                 }
 
                 break;
+            
+            case CellularNotificationMessage::Type::None:
+                // do not send notification msg
+                return;
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -383,6 +385,7 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
         return CellularNotificationMessage::Type::SignalStrengthUpdate;
     }
 
+    LOG_TRACE(": None");
     return CellularNotificationMessage::Type::None;
 
 }

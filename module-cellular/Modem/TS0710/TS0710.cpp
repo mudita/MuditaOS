@@ -204,8 +204,8 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Change incoming call notification from "RING" to "+CRING:type"
     CheckATCommandResponse(parser->SendCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
-    // TODO: per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 15s
-    CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1, 1000));
+    // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
+    CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1, 15000));
 
     // Enable sleep mode
     while(!CheckATCommandResponse(parser->SendCommand("AT+QSCLK=1\r", 1))){
@@ -358,27 +358,36 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     /* Let's test if this actually works */
     if (c != nullptr) {
         LOG_DEBUG("Sending test ATI");
-        std::vector<std::string> v = c->SendCommandResponse("ATI\r", 5, 300);
+        std::vector<std::string> v = c->SendCommandResponse("ATI\r", 4, 300);
+        CheckATCommandResponse(v);
         for (std::string s : v)
+        {
             LOG_DEBUG("[]%s", s.c_str());
+        }
         
         v.clear();
-        v = c->SendCommandResponse("AT+CSQ\r", 5, 300); 
-
-        auto beg = v[0].find(" ");
-        auto end = v[0].find(",", 1);
-        auto message = v[0].substr(beg+1, end-beg-1);
-        LOG_DEBUG("Setting new signal strength");
-        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(CellularNotificationMessage::Type::SignalStrengthUpdate));
-        msg->signalStrength = std::stoll(message);
-        if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
-            LOG_ERROR("Signal strength value out of range.");
-            msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(0);
+        v = c->SendCommandResponse("AT+CSQ\r", 2, 300); 
+        if(CheckATCommandResponse(v))
+        {
+            auto beg = v[0].find(" ");
+            auto end = v[0].find(",", 1);
+            auto message = v[0].substr(beg+1, end-beg-1);
+            LOG_DEBUG("Setting new signal strength");
+            auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(CellularNotificationMessage::Type::SignalStrengthUpdate));
+            msg->signalStrength = std::stoll(message);
+            if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
+                LOG_ERROR("Signal strength value out of range.");
+                msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(0);
+            }
+            else {
+                msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(msg->signalStrength);
+            }
+            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
         }
-        else {
-            msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(msg->signalStrength);
+        else
+        {
+            LOG_ERROR("signal strength not set");
         }
-        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
     }
 
     return ConfState::Success;

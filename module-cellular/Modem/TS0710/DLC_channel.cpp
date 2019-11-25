@@ -85,8 +85,10 @@ ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 }
 #endif
 
-std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_t rxCount,
-                                                                         uint32_t timeout) {
+// #define DEBUG_OUTPUT_RESPONSE
+
+std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_t rxCount, uint32_t timeout)
+{
     std::vector<std::string> tokens;
     std::vector<char> sdata(cmd, cmd + strlen(cmd));
     // Get a char pointer to the data in the vector
@@ -100,7 +102,6 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
     cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
     cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
 
-    LOG_INFO("[AT]: %s", cmdStr.c_str());
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     SendData(data);
@@ -131,6 +132,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
             frame.deserialize(v);
             std::string str(frame.data.begin(), frame.data.end());
             // tokenize responseBuffer
+            // empty lines are also removed
             auto ret = ATParser::Tokenizer(str, rxCount, "\r\n");
             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
 
@@ -148,6 +150,13 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
     }
 
     LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
+ 
+    #ifdef DEBUG_OUTPUT_RESPONSE
+    for (auto s : tokens)
+    {
+        LOG_DEBUG("[]%s", s.c_str());
+    }
+    #endif
 
     blockedTaskHandle = nullptr;
     return tokens;
