@@ -204,7 +204,8 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Change incoming call notification from "RING" to "+CRING:type"
     CheckATCommandResponse(parser->SendCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
-    CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1));
+    // TODO: per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 15s
+    CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1, 1000));
 
     // Enable sleep mode
     while(!CheckATCommandResponse(parser->SendCommand("AT+QSCLK=1\r", 1))){
@@ -352,17 +353,17 @@ TS0710::ConfState TS0710::StartMultiplexer() {
 
     // Route URCs to second (Notifications) MUX channel
     DLC_channel *c = GetChannel("Commands");
-    CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1));
+    CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1, 300));
 
     /* Let's test if this actually works */
     if (c != nullptr) {
         LOG_DEBUG("Sending test ATI");
-        std::vector<std::string> v = c->SendCommandResponse("ATI\r", 5);
+        std::vector<std::string> v = c->SendCommandResponse("ATI\r", 5, 300);
         for (std::string s : v)
             LOG_DEBUG("[]%s", s.c_str());
         
         v.clear();
-        v = c->SendCommandResponse("AT+CSQ\r", 5);
+        v = c->SendCommandResponse("AT+CSQ\r", 5, 300); 
 
         auto beg = v[0].find(" ");
         auto end = v[0].find(",", 1);

@@ -256,9 +256,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
                break;
 
         case MessageType::CellularListCurrentCalls: {
-            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", 3);
-            if ((ret.size() == 3) && (ret[2] == "OK")) {
-
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", 3, 300);
+            if(cmux->CheckATCommandResponse(ret)) 
+            {
                 auto beg = ret[1].find(",", 0);
                 beg = ret[1].find(",", beg + 1);
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
@@ -277,8 +277,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             break;
 
         case MessageType::CellularHangupCall: {
-            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATH\r", 1);
-            if ((ret.size() == 1) && (ret[0] == "OK")) {
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATH\r", 1, 5000); 
+            if(cmux->CheckATCommandResponse(ret)) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
             } else {
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
@@ -293,8 +293,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             break;
 
         case MessageType::CellularAnswerIncomingCall: {
-            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATA\r", 1);
-            if ((ret.size() == 1) && (ret[0] == "OK")) {
+            // TODO: per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATA\r", 1, 5000); 
+            if(cmux->CheckATCommandResponse(ret))
+            {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // Propagate "CallActive" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
@@ -308,8 +310,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
 
         case MessageType::CellularDialNumber: {
             CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-            auto ret = cmux->GetChannel("Commands")->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1);
-            if ((ret.size() == 1) && (ret[0] == "OK")) {
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1, 5000);
+            if(cmux->CheckATCommandResponse(ret))
+            {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
                 ReloadTimer(callStateTimer);

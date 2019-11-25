@@ -117,7 +117,12 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
         responseBuffer.erase();
     }
 
-    LOG_DEBUG("[AT]: %s", cmd);
+    // Remove \r and \n for logging purposes
+    std::string cmdStr(cmd);
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
+
+    LOG_DEBUG("[AT]: %s", cmdStr.c_str());
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     cellular->Write((void*)cmd, strlen(cmd));
 
@@ -129,15 +134,14 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
         if (timeElapsed >= timeoutNeeded)
         {
-            blockedTaskHandle = nullptr;
-            return tokens;
+            LOG_ERROR("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            break;
         }
 
         auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
         timeElapsed = cpp_freertos::Ticks::GetTicks();
         if (ret)
         {
-
             std::vector<std::string> strings;
 
             cpp_freertos::LockGuard lock(mutex);
@@ -150,12 +154,17 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
                 continue;
             }
         }
+        else
+        {
+            LOG_ERROR("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+        }
+        
         break;
     }
 
     blockedTaskHandle = nullptr;
     responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
-    LOG_DEBUG("AT command returning %i tokens", tokens.size());
+    LOG_DEBUG("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
     return tokens;
 }
 
