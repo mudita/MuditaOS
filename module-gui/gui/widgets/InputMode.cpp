@@ -9,41 +9,26 @@ const std::map<InputMode::Mode, std::string> input_mode = {
     {InputMode::abc, "common_kbd_lower"},
 };
 
-InputMode::InputMode(InputMode::Mode starting_mode, std::list<InputMode::Mode> mode_list)
-    : input_mode_selected(starting_mode), input_mode_list(mode_list)
+InputMode::InputMode(std::list<InputMode::Mode> mode_list)
+    : input_mode_list(mode_list)
 {
     // failsafe
-    if (input_mode_selected < 0 || input_mode_selected > Mode::ABC)
-    {
-        input_mode_selected = Mode::digit;
+    if(input_mode_list.size() == 0) {
+        input_mode_list.push_back(Mode::digit);
     }
-    set(Mode(input_mode_selected));
 }
 
 /// sets next selected mode using Application pointer
-bool InputMode::next()
+void InputMode::next()
 {
-    LOG_INFO("set next mode!");
-    ++input_mode_selected;
-    if (input_mode_selected > Mode::ABC)
+    ++input_mode_list_pos;
+    if (input_mode_list_pos == input_mode_list.size())
     {
-        input_mode_selected = Mode::digit;
+        input_mode_list_pos = input_mode_list.front();
     }
-    return set(Mode(input_mode_selected));
 }
-
 
 const std::string& InputMode::get()
 {
-    return utils::localize.get(input_mode.at(Mode(input_mode_selected)));
-}
-
-bool InputMode::set(InputMode::Mode m)
-{
-    // mode not in mode list
-    if (std::find(input_mode_list.begin(), input_mode_list.end(), m) == input_mode_list.end())
-    {
-        return false;
-    }
-    return true;
+    return utils::localize.get(input_mode.at(*std::next(input_mode_list.begin(),input_mode_list_pos)));
 }
