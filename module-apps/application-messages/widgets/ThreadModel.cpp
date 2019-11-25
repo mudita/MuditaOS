@@ -37,7 +37,7 @@ bool ThreadModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> recor
 {
 	auto ret = DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 
-	return ret;
+	return true;
 }
 
 void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
@@ -58,6 +58,7 @@ gui::ListItem* ThreadModel::getItem(int index, int fistElement, int prevElement,
 	if( item != nullptr )
 	{
 		item->setThreadItem(thread);
+		item->setID(index);
 		item->activatedCallback = [=] (gui::Item& item){
 			LOG_INFO("ThreadItem ActivatedCallback");
 			return true;

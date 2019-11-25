@@ -47,7 +47,7 @@ void MessagesMainWindow::buildInterface() {
 
 
 	list = new gui::ListView(this, 11, 105, 480-22, 600-105-50 );
-	list->setMaxElements(29);
+	list->setMaxElements(messages::threadsPageSize);
 	list->setPageSize(messages::threadsPageSize);
 	list->setPenFocusWidth(0);
 	list->setPenWidth(0);
