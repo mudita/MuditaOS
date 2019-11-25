@@ -226,7 +226,7 @@ sys::Message_t ServiceGUI::DataReceivedHandler(sys::DataMessage* msgl,sys::Respo
 
 			//check if there are pending commands to render.
 			if( commands.empty() == false ) {
-				LOG_ERROR("Rendering pending %d commands", commands.size());
+//				LOG_INFO("Rendering pending %d commands", commands.size());
 				sendToRender();
 			}
 
