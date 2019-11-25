@@ -18,14 +18,12 @@ class InputMode
   private:
     InputMode() = delete;
     // list of enabled input modes
-    std::list<Mode> input_mode_list;
-    uint32_t input_mode_selected = Mode::digit;
+    std::list<Mode> input_mode_list = {};
+    uint32_t input_mode_list_pos=0;
 
   public:
 
-    InputMode(InputMode::Mode starting_mode, std::list<InputMode::Mode> mode_list);
-    bool next();
-    bool set(Mode m);
-    /// get mode in use
+    InputMode(std::list<InputMode::Mode> mode_list);
+    void next();
     const std::string& get();
 };

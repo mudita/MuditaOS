@@ -482,11 +482,7 @@ void Text::setSize(const short &w, const short &h)
 
 bool Text::onInput(const InputEvent &inputEvent)
 {
-    if(inputEvent.state != InputEvent::State::keyReleasedShort && inputEvent.state != InputEvent::State::keyPressed) {
-        LOG_INFO("---------------->");
-    }
-    /// if we are able to change input modes and there was request for that (#)
-    if(mode != nullptr && inputEvent.keyCode == KeyCode::KEY_PND) {
+    if(inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_PND) {
         mode->next();
         return true;
     }
