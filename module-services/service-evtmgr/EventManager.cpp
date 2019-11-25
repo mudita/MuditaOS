@@ -52,28 +52,16 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
 
-		std::string keyState = "PRESS";
-		if( msg->keyState == sevm::KeyboardEvents::keyReleasedShort )
-			keyState = "RELEASE SHORT";
-		if( msg->keyState == sevm::KeyboardEvents::keyReleasedLong )
-				keyState = "RELEASE SHORT";
-
-//		LOG_WARN("Key: %d %s", msg->keyCode, keyState.c_str());
-
-
 		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
-		message->keyCode = msg->keyCode;
-		message->keyState = msg->keyState;
-		message->keyPressTime = msg->keyPressTime;
-		message->keyRelaseTime = msg->keyRelaseTime;
+        message->key = msg->key;
 
-        if( suspended && (message->keyState == sevm::KeyboardEvents::keyPressed) ) {
-//		if( suspended ) {
+        if (suspended && (message->key.state == RawKey::State::Pressed))
+        {
             suspended = false;
             sys::SystemManager::ResumeSystem(this);
         }
 
-		//send key to focused application
+                //send key to focused application
 		if( targetApplication.empty() == false ) {
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}

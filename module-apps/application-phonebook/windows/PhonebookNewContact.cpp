@@ -66,7 +66,8 @@ void PhonebookNewContact::buildInterface() {
 			page1.text[i]->focusChangedCallback = [=] (gui::Item& item){
 				if( item.focus ) {
 					page1.text[i]->setFont(style::window::font::bigbold);
-					application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
+                    // TODO TODO
+					// application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
 				}
 				else {
 					page1.text[i]->setFont(style::window::font::medium);
@@ -82,11 +83,13 @@ void PhonebookNewContact::buildInterface() {
 					page1.text[i]->setFont(style::window::font::bigbold);
 					if( length == 0 ){
 						LOG_INFO("Switching to uppercase");
-						application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
+                        // TODO TODO
+						// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 					}
 					else {
 						LOG_INFO("Switching to lowercase");
-						application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
+                        // TODO TODO
+						// application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
 					}
 				}
 				else {
@@ -100,11 +103,13 @@ void PhonebookNewContact::buildInterface() {
 				uint32_t length = text->getText().length();
 				if( length == 0 ){
 					LOG_INFO("Switching to uppercase");
-					application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
+                    // TODO TODO
+					// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 				}
 				else if( length == 1 ){
 					LOG_INFO("Switching to lowercase");
-					application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
+                    // TODO TODO
+					// application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
 				}
 				return true;
 			};
@@ -141,7 +146,8 @@ void PhonebookNewContact::buildInterface() {
 	page2.speedValue->focusChangedCallback = [=] (gui::Item& item){
 		if( item.focus ) {
 			LOG_INFO("Changed profile to common_kbd_numeric");
-			application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
+            // TODO TODO
+			// application->setKeyboardProfile( utils::localize.get("common_kbd_numeric"));
 		}
 		return true;
 	};
@@ -254,11 +260,13 @@ void PhonebookNewContact::buildInterface() {
 			uint32_t length = text->getText().length();
 			if( length == 0 ){
 				LOG_INFO("Switching to uppercase");
-				application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
+                // TODO TODO
+				// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 			}
 			else if( length == 1 ){
 				LOG_INFO("Switching to lowercase");
-				application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
+                // TODO TODO
+				// application->setKeyboardProfile( utils::localize.get("common_kbd_lower"));
 			}
 			return true;
 		};
@@ -323,7 +331,8 @@ void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data) {
 	setFocusItem(page1.text[0]);
 	page2.favSelected = false;
 	page2.imageFav->setVisible(false);
-	application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
+    // TODO TODO
+	// application->setKeyboardProfile( utils::localize.get("common_kbd_upper"));
 }
 
 ContactRecord PhonebookNewContact::readContact(){

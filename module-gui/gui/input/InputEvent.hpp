@@ -13,6 +13,7 @@
 #include <cstdint>
 //module-bsp
 #include "bsp/keyboard/key_codes.hpp"
+#include "common_data/RawKey.hpp"
 
 namespace gui {
 
@@ -66,37 +67,22 @@ inline int toNumeric(KeyCode key)
     }
 }
 
-class InputEvent {
-public:
-	enum class State{
-		Undefined        = 0x00,
-		keyPressed       = 0x01,
-		keyReleasedShort = 0x02,
-		keyReleasedLong  = 0x04,
-	};
+class InputEvent
+{
+  public:
+    enum class State
+    {
+        Undefined = 0x00,
+        keyPressed = 0x01,
+        keyReleasedShort = 0x02,
+        keyReleasedLong = 0x04,
+    };
 
-	State state = State::keyPressed;
-	KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// default `simple parsed key`
-    // TODO TODO RawKey key;                          /// full key data, for widgets to parse
+    State state = State::keyPressed;          /// initial translated key state
+    KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
+    RawKey key = {};                          /// RawKey data
 
-	InputEvent() {};
-	InputEvent( const State& state, const uint32_t& code, const uint32_t& key,
-			const uint32_t& pressTime, const uint32_t& releaseTime, bool cycle, uint32_t timeout = 0 );
-	virtual ~InputEvent(){};
-
-	std::string to_string() const{
-		std::stringstream ss;
-		ss<<"state: ";
-		if( state == State::Undefined ) ss<<"Undefined";
-		else if( state == State::keyPressed ) ss<<"Key Pressed";
-		else if( state == State::keyReleasedShort ) ss<<"Key Released Short";
-		else if( state == State::keyReleasedLong ) ss<<"Key Released Long";
-
-		ss<<" key code: ";
-		ss<< static_cast<int>(keyCode);
-		ss<<" key char: ";
-		return ss.str();
-	}
+    InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
 };
 
 } //namespace gui

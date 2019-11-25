@@ -20,13 +20,28 @@ namespace gui {
 KeyProfile::KeyProfile() {}
 KeyProfile::~KeyProfile() {}
 
-Profile::Profile() {
+Profile::Profile(const std::string &name)
+{
+    LOG_INFO("Create!");
+    load(name);
 }
 
-Profile::~Profile() {
-	for ( auto it = keys.begin(); it != keys.end(); it++ )
-		delete it->second;
-	keys.clear();
+
+Profile::Profile(Profile &&p)
+{
+    this->name = p.name;
+    this->keys = p.keys;
+    // this is important, we need to assure that moved Profile doesn't clean up our memory again
+    p.clear();
+}
+
+Profile::~Profile()
+{
+    for (auto it = keys.begin(); it != keys.end(); it++)
+    {
+        delete it->second;
+    }
+    keys.clear();
 }
 
 static inline std::string trim(const std::string &s)
@@ -167,6 +182,17 @@ const KeyProfile* Profile::getKeyProfile( uint32_t keyCode ) {
 	if( key != keys.end() )
 		return key->second;
 	return nullptr;
+}
+
+
+uint32_t Profile::get(bsp::KeyCodes code, uint32_t times)
+{
+    const KeyProfile* p = getKeyProfile(uint32_t(code));
+    if ( p == nullptr) {
+        LOG_ERROR("KeyProfile for key: %d not found", code);
+        return 0;
+    }
+    return p->chars[times % p->chars.size()];
 }
 
 } /* namespace gui */

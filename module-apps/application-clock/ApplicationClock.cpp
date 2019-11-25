@@ -49,32 +49,6 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl,sys:
 	//this variable defines whether message was processed.
 	bool handled = false;
 	//if keyboard message received
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
-	{
-		sevm::KbdMessage* msg = static_cast<sevm::KbdMessage*>(msgl);
-		LOG_INFO("Clock key received %d", static_cast<uint32_t>(msg->keyCode));
-
-		if( msg->keyState == sevm::KeyboardEvents::keyReleasedShort ) {
-			if( msg->keyCode == bsp::KeyCodes::JoystickLeft ) {
-				sapm::ApplicationManager::messageSwitchApplication(this, "ApplicationViewer", "", nullptr );
-			}
-
-			if( msg->keyCode == bsp::KeyCodes::NumericKeyAst ) {
-
-				auto it = windows.find("Main");
-				gui::ClockMainWindow* win = reinterpret_cast<gui::ClockMainWindow*>( it->second );
-				win->incrementHour();
-				win->updateLabels();
-			}
-			if( msg->keyCode == bsp::KeyCodes::NumericKeyPnd ) {
-				auto it = windows.find("Main");
-				gui::ClockMainWindow* win = reinterpret_cast<gui::ClockMainWindow*>( it->second );
-				win->incrementMinute();
-				win->updateLabels();
-			}
-		}
-		handled = true;
-	}
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();

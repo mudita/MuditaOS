@@ -16,16 +16,10 @@
 #include "Service/Service.hpp"
 #include "MessageType.hpp"
 #include "bsp/keyboard/key_codes.hpp"
+#include "common_data/RawKey.hpp"
 
 
 namespace sevm {
-
-enum class KeyboardEvents{
-	keyPressed,
-	keyReleasedShort,
-	keyReleasedLong
-};
-
 
 class KbdMessage : public sys::DataMessage
 {
@@ -47,11 +41,7 @@ public:
 		}
 
 	}
-
-	KeyboardEvents keyState = static_cast< KeyboardEvents>(0);
-	bsp::KeyCodes keyCode = static_cast<bsp::KeyCodes>(0);
-	int keyPressTime = 0;
-	int keyRelaseTime = 0;
+    RawKey key = {};
 };
 
 class BatteryLevelMessage : public sys::DataMessage

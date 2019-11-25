@@ -85,7 +85,8 @@ NotesEditWindow::~NotesEditWindow() {
 }
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
-	application->setKeyboardProfile( "lang_eng_lower" );
+    // TODO TODO
+	// application->setKeyboardProfile( "lang_eng_lower" );
 	text->setText( textString );
 	setFocusItem( text );
 }

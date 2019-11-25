@@ -25,12 +25,8 @@ UiTestWindow::UiTestWindow(app::Application *app) : AppWindow(app, "TEST_UI")
                          "LoL ...");
     text->setEditMode(gui::Text::EditMode::EDIT);
     text->setFont(style::window::font::bigbold);
-    // this sets application global keyboard - this is bad
-    // thou this is fast to implement and possible right now out of box :|
-    // this will crap itself after somebody changes keyboard in another text input :lol:
-    text->setInputMode(new InputMode([=](const std::string val){application->setKeyboardProfile(val);}, InputMode::ABC, {InputMode::ABC, InputMode::abc}));
-    ///// nooooo - me don't want to do dat on each call to :ext
-    //#application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
+    text->setInputMode(new InputMode(InputMode::ABC, {InputMode::ABC, InputMode::abc}));
+    // TODO TODO attach(cb - show special characters, && input somehow)
     setFocusItem(text);
 }
 
