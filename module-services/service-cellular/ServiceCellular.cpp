@@ -295,8 +295,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl,sys::
             break;
 
         case MessageType::CellularAnswerIncomingCall: {
-            // TODO: per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
-            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATA\r", 1, 5000); 
+            // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
+            auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATA\r", 1, 90000); 
             if(cmux->CheckATCommandResponse(ret))
             {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
