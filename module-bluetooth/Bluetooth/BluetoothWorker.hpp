@@ -17,12 +17,13 @@ struct HCI;
 namespace Bt {
     enum Message : uint8_t {
         /// asynchronous messages to use on event from irq
-        EvtReceived,    /// trigger Bt stack received, start processing HCI in BluetoothWorker task
         EvtSent,        /// trigger Bt stack wrote, enable writting in HCI in BluetoothWorker task
         EvtRecUnwanted, /// not requested recieve - probably receive came to fast from sent...
         EvtRecError,    /// bsp error on receive
         EvtSentError,   /// bsp error on send
         EvtUartError,   /// generic uart error
+        EvtReceived,    /// trigger Bt stack received, start processing HCI in BluetoothWorker task
+        EvtErrorRec,    /// there was error o queue receive
     };
 
     inline const char* MessageCstr(Message what) {
@@ -39,6 +40,8 @@ namespace Bt {
                 return "EvtSentError";
             case EvtUartError:
                 return "EvtUartError";
+            case EvtErrorRec:
+                return "EvtErrorRec";
             default:
                 return "";
         }

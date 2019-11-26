@@ -32,6 +32,8 @@
 namespace bsp {
 
     class RT1051Cellular : public Cellular {
+    private:
+        bool pv_SendingAllowed = true;
     public:
 
         RT1051Cellular();
@@ -57,6 +59,11 @@ namespace bsp {
 		void EnterSleep() override final;
 
 		void ExitSleep() override final;
+
+        void SetSpeed(uint32_t portSpeed) override final;
+
+        void SetSendingAllowed(bool state) override final;
+        bool GetSendingAllowed() override final;
 
         static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;

@@ -46,32 +46,32 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 	//this variable defines whether message was processed.
 	bool handled = false;
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
-			
+
 		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>( windows.find( "CallWindow")->second);
 
-		if (msg->type == NotificationType::CallAborted) {
+		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
 		   LOG_INFO("---------------------------------CallAborted");
 		   AudioServiceAPI::Stop(this);
 		   callEndTime = callDuration + 3;
 		   callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		   refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
-		else if( msg->type == NotificationType::CallBusy) {
+		else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
 			callEndTime = callDuration + 3;
 		    LOG_INFO("---------------------------------CallBusy");
 		    AudioServiceAPI::Stop(this);
 		    callWindow->setState( gui::CallWindow::State::CALL_ENDED );
 		    refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
-		else if( msg->type == NotificationType::CallActive ) {
+		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
 			callDuration = 0;
 
 			LOG_INFO("---------------------------------CallActive");
 			callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 		}
-		else if( msg->type == NotificationType::IncomingCall ) {
+		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
 			//reset call duration
 //		    callDuration = 0;
 			LOG_INFO("---------------------------------IncomingCall");
@@ -96,7 +96,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 				}
 			}
 		}
-		else if( msg->type == NotificationType::Ringing ) {
+		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
 			//reset call duration
 		    //callDuration = 0;
 			runCallTimer();

@@ -12,7 +12,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/lwip-includes.cmake)
 
 set (SOURCES
     "${LWIP_DIR}/contrib/ports/freertos/sys_arch.c"
-    # ${CMAKE_CURRENT_SOURCE_DIR}/interfaces/{}
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/dhcp-server/dhserver.c"
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

@@ -22,7 +22,7 @@ namespace bsp {
     class Cellular {
     public:
 
-        static std::optional<std::unique_ptr<Cellular>> Create(const char* term = "/dev/ttyUSB0");
+        static std::optional<std::unique_ptr<Cellular>> Create(const char* term = "/dev/ttyUSB0", uint32_t portSpeed = 115200);
 
         Cellular() {}
         virtual ~Cellular() {}
@@ -47,6 +47,11 @@ namespace bsp {
         virtual void EnterSleep() = 0;
 
         virtual void ExitSleep() = 0;
+
+        virtual void SetSpeed(uint32_t portSpeed) = 0;
+
+        virtual void SetSendingAllowed(bool state) = 0;
+        virtual bool GetSendingAllowed() = 0;
 
     protected:
         bool isInitialized = false;

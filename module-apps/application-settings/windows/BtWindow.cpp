@@ -43,6 +43,28 @@ sys::ReturnCodes message_bt(app::Application* app, BluetoothMessage::Request req
     return ret.first;
 }
 
+void BtWindow::set_navigation() {
+    if(!box) return;
+    if (box->children.size() > 1) {
+        auto nav_set = [=](auto el, auto end, auto dir) {
+            for (; el != std::prev(end); ++el) {
+                if ((*el)->visible == false) {  /// ignore if not visible
+                    continue;
+                }
+                for (auto next = std::next(el); next != end; ++next) {    /// get next visible item
+                    if ((*next)->visible) {
+                        (*el)->setNavigationItem(dir, *next);  /// set navigation
+                        break;
+                    }
+                }
+            }
+        };
+
+        nav_set(box->children.begin(), box->children.end(), NavigationDirection::DOWN);
+        nav_set(box->children.rbegin(), box->children.rend(), NavigationDirection::UP);
+    }
+}
+
 void BtWindow::buildInterface()
 {
     AppWindow::buildInterface();
@@ -57,13 +79,18 @@ void BtWindow::buildInterface()
 
     LOG_INFO("Create box layout");
     box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 5*style::window::label::default_h);
-    box->setPenWidth(style::window::label::border_no_focus_w);
+    box->setPenWidth(style::window::default_border_no_focus_w);
 
     // TODO WIP: it's just for usability now
     // TODO scan should return async - handle that... (if in scan -> add to list and refresh if new on window)
     add_box_label(box, box_items, "Bluetooth on off", [=](Item&){
         LOG_DEBUG("Callback Bluetooth on");
         message_bt(application, BluetoothMessage::Request::Start);
+        for (auto &el : box->children) {
+            el->visible = true;
+        }
+        set_navigation();
+        application->render(gui::RefreshModes::GUI_REFRESH_FAST);
         return true;
         });
 
@@ -85,20 +112,17 @@ void BtWindow::buildInterface()
         return true;
     });
 
+    // hide all elements except button for `bluetooth on off`
+    std::for_each(std::next(box_items.begin()), box_items.end(), [](auto &el) { el->visible = false; } );
+
     box->resizeItems();
 
-    if (box->children.size() > 1) {
-        for (auto el = box->children.begin(); el != std::prev(box->children.end()); ++el) {
-            (*el)->setNavigationItem(NavigationDirection::DOWN, *std::next(el));
-        }
-        for (auto el = box->children.rbegin(); el != std::prev(box->children.rend()); ++el) {
-            (*el)->setNavigationItem(NavigationDirection::UP, *std::next(el));
-        }
-    }
+    set_navigation();
 
     this->focusItem = box_items.front();
     this->focusItem->setFocus(true);
 }
+
 void BtWindow::destroyInterface()
 {
     this->focusItem = nullptr;

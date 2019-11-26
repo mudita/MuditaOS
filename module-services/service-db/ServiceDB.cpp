@@ -498,6 +498,65 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 			responseMsg = std::make_shared<DBNotesResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
 		} break;
 
+/****** Calllog */
+		case MessageType::DBCalllogAdd: {
+			DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = calllogRecordInterface->Add(msg->record);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBCalllogAdd time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+				responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+			} break;
+
+		case MessageType::DBCalllogRemove: {
+			DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = calllogRecordInterface->RemoveByID(msg->id);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBCalllogRemove time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+		} break;
+
+		case MessageType::DBCalllogUpdate: {
+			DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = calllogRecordInterface->Update(msg->record);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBCalllogUpdate time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+		} break;
+
+		case MessageType::DBCalllogGetCount: {
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = calllogRecordInterface->GetCount();
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBCalllogGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, true, 0, 0, ret);
+		} break;
+
+		case MessageType::DBCalllogGetLimitOffset: {
+			DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = calllogRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_ERROR("DBCalllogGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
+		} break;
 
         default:
             // ignore this message
@@ -524,6 +583,7 @@ sys::ReturnCodes ServiceDB::InitHandler() {
     smsDB = std::make_unique<SmsDB>();
     alarmsDB = std::make_unique<AlarmsDB>();
     notesDB = std::make_unique<NotesDB>();
+    calllogDB = std::make_unique<CalllogDB>();
 
     // Create record interfaces
     settingsRecordInterface = std::make_unique<SettingsRecordInterface>(settingsDB.get());
@@ -532,6 +592,7 @@ sys::ReturnCodes ServiceDB::InitHandler() {
     threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
     alarmsRecordInterface = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
     notesRecordInterface = std::make_unique<NotesRecordInterface>(notesDB.get());
+    calllogRecordInterface = std::make_unique<CalllogRecordInterface>(calllogDB.get());
 
     return sys::ReturnCodes::Success;
 }

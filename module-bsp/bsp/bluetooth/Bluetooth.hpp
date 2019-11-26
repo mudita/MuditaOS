@@ -5,6 +5,7 @@
 #include <cstdarg>
 #include <FreeRTOS.h>
 #include <thread.hpp>
+#include <board.h>
 
 /// c++ low level driver overlay
 
@@ -34,36 +35,45 @@ namespace bsp {
             static const unsigned int default_buff_size = 1024;
             static const unsigned int default_baudrate = 115200;
             struct _circ {
+                SemaphoreHandle_t sem = 0;
+                void sem_take();
+                void sem_give();
                 char* buff;
                 volatile unsigned int head, tail, threshold;
                 const unsigned int size;
                 volatile unsigned int len;
-                _circ(unsigned int size, int threshold=0) : head(0), tail(0), threshold(threshold), size(size), len(0) { buff = new char[size];};
-                ~_circ() { delete[] buff; }
+                _circ(unsigned int size, int threshold=0);
+                ~_circ();
                 inline int push(char val) {
+                    sem_take();
                     int ret=0;
                     if(len<size) {
-                        buff[tail++]=val;
-                        if(tail==size) tail=0;
+                        buff[tail]=val;
+                        ++tail;
                         ++len;
+                        if(tail==size) tail=0;
                     } else {
                         ret=-1;
                     }
+                    sem_give();
                     return ret;
                 }
                 inline int pop(char* val) {
+                    sem_take();
                     int ret=0;
                     if(val!=nullptr) {
                         if(len) {
-                            *val = buff[head++];
-                            if(head == size) head=0;
+                            *val = buff[head];
                             --len;
+                            ++head;
+                            if(head == size) head=0;
                         } else {
                             ret =-1;
                         }
                     } else {
                         ret=-2;
                     }
+                    sem_give();
                     return ret;
                 }
                 // reached => 1, safe => 0
@@ -71,8 +81,11 @@ namespace bsp {
                     return len+threshold > size;
                 }
                 inline void flush() {
+                    sem_take();
                     len=0;
-                    head=tail=0;
+                    head=0;
+                    tail=0;
+                    sem_give();
                 }
             } in, out;
 
@@ -116,7 +129,6 @@ namespace bsp {
             void configure_uart_io();
             void configure_lpuart();
             void configure_cts_irq();
-            xSemaphoreHandle sem_data;
     };
 
     /// definitions needed by BT stack
@@ -144,9 +156,11 @@ namespace bsp {
 
             virtual ssize_t read(void *buf, size_t nbytes) override;
             virtual ssize_t write_blocking(char *buf, ssize_t len) override;
-            uint32_t to_read_req = 0;
+            volatile uint32_t to_read_req = 0;
             volatile uint32_t to_read =0;
             volatile char* read_buff;
+
+            void set_flowcontrol(int on);
 
             void (*read_ready_cb)(void);
             void (*write_done_cb)(void);

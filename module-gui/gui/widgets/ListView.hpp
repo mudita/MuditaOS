@@ -49,6 +49,7 @@ protected:
 	void updateContinousItems();
 	void clearItems();
 	void updateScrollDimenstions();
+    void disableScroll();
 public:
 	static const int ORIENTATION_TOP_DOWN  = 0x01;
 	static const int ORIENTATION_BOTTOM_UP = 0x02;

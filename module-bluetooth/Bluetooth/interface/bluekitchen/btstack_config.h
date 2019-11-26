@@ -39,5 +39,14 @@
 #define HCI_INCOMING_PRE_BUFFER_SIZE 14 // sizeof benep heade, avoid memcpy
 #define HCI_ACL_PAYLOAD_SIZE (1691 + 4)
 
+// As an option - much slower (according to docs)
+// HCI Controller to Host Flow Control
+// #define ENABLE_HCI_CONTROLLER_TO_HOST_FLOW_CONTROL
+//
+// // Interal ring buffer: 21 kB
+// #define HCI_HOST_ACL_PACKET_NUM 20
+// #define HCI_HOST_ACL_PACKET_LEN 1024
+// #define HCI_HOST_SCO_PACKET_NUM 10
+// #define HCI_HOST_SCO_PACKET_LEN 60
 #endif
 

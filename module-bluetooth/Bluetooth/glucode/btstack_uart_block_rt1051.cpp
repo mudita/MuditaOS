@@ -68,9 +68,9 @@ static int uart_rt1051_set_parity(int pairity)
     return 0;
 }
 
-static int uart_rt1051_set_flowcontroll(int flowcontroll)
+static int uart_rt1051_set_flowcontrol(int flowcontrol)
 {
-    LOG_INFO("BlueKitchen set flowcontroll: %d", flowcontroll);
+    LOG_INFO("BlueKitchen set flowcontrol: %d", flowcontrol);
     // BlueKitchen::getInstance()->set_rts(); ??
     return 0;
 }
@@ -100,7 +100,7 @@ static const btstack_uart_block_t btstack_uart_posix = {
     /* void (*set_block_sent)(void (*handler)(void)); */              uart_rt1051_set_block_sent,
     /* int  (*set_baudrate)(uint32_t baudrate); */                    uart_rt1051_set_baudrate,
     /* int  (*set_parity)(int parity); */                             uart_rt1051_set_parity,
-    /* int  (*set_flowcontrol)(int flowcontrol); */                   uart_rt1051_set_flowcontroll,
+    /* int  (*set_flowcontrol)(int flowcontrol); */                   NULL, // uart_rt1051_set_flowcontrol,
     /* void (*receive_block)(uint8_t *buffer, uint16_t len); */       uart_rt1051_receive_block,
     /* void (*send_block)(const uint8_t *buffer, uint16_t length); */ uart_rt1051_send_block,
     /* int (*get_supported_sleep_modes); */                           NULL,

@@ -16,6 +16,7 @@
 #include "application-notes/ApplicationNotes.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-messages/ApplicationMessages.hpp"
+#include "application-calllog/ApplicationCallLog.hpp"
 
 //module-services
 #include "service-appmgr/ApplicationManager.hpp"
@@ -27,6 +28,7 @@
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
 #include "service-bluetooth/ServiceBluetooth.hpp"
+#include "service-lwip/ServiceLwIP.hpp"
 
 //module-bsp
 #include "bsp/bsp.hpp"
@@ -138,9 +140,14 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
+#if defined(TARGET_Linux) && not defined(SERIAL_PORT_PATH)
+        // For now disable pernamenlty Service cellular when there is no GSM configured
+#else
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+#endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(),sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(),sysmgr.get());
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
@@ -149,6 +156,7 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
+        applications.push_back(app::CreateLauncher<app::ApplicationCallLog>("ApplicationCallLog"));
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
 //		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
 		applications.push_back(std::unique_ptr<app::ApplicationMessagesLauncher>(new app::ApplicationMessagesLauncher()));

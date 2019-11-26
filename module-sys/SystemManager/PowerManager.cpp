@@ -8,6 +8,7 @@
  */
 
 
+#include <log/log.hpp>
 
 #include "PowerManager.hpp"
 
@@ -32,7 +33,9 @@ namespace sys{
             case Mode::LowPowerIdle:
             case Mode::LowPowerRun:
             case Mode::Suspend:
-                ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
+                LOG_FATAL("LowPowerIdle temporary disabled!");
+                // Low power is temporary disabled it was breaking i.e. GSM
+                // ret = lowPowerControl->Switch(bsp::LowPowerMode::Mode::LowPowerIdle);
                 break;
         }
 

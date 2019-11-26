@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.14)
 project(module-services VERSION 1.0
         DESCRIPTION "Library with all services.")
 
+include(${CMAKE_SOURCE_DIR}/module-lwip/lwip-includes.cmake)
+
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
@@ -22,6 +24,7 @@ add_subdirectory( service-db )
 add_subdirectory( service-cellular )
 add_subdirectory( service-audio )
 add_subdirectory( service-bluetooth )
+add_subdirectory( service-lwip )
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db module-cellular module-audio  ${TARGET_LIBRARIES} )
@@ -32,6 +35,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${LWIP_INCLUDE_DIRS})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 

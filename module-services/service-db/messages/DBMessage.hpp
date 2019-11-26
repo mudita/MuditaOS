@@ -21,6 +21,7 @@
 #include "Interface/ContactRecord.hpp"
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/NotesRecord.hpp"
+#include "Interface/CalllogRecord.hpp"
 
 
 class DBMessage: public sys::DataMessage {
@@ -177,5 +178,31 @@ public:
 	uint32_t offset = 0;
 };
 
+
+class DBCalllogMessage : public DBMessage{
+public:
+    DBCalllogMessage(MessageType messageType,const CalllogRecord& rec = CalllogRecord{}): DBMessage(messageType),record(rec){
+
+    }
+    virtual ~DBCalllogMessage() {}
+
+    CalllogRecord record;
+};
+
+class DBCalllogResponseMessage: public DBResponseMessage {
+public:
+    DBCalllogResponseMessage(std::unique_ptr<std::vector<CalllogRecord>> rec,uint32_t retCode=0,uint32_t limit=0,uint32_t offset=0, uint32_t count=0,uint32_t respTo=0) :
+    	DBResponseMessage(retCode,count,respTo),records(std::move(rec)),
+		limit( limit ),
+		offset( offset )
+	{
+    	this->count = count;
+	};
+    virtual ~DBCalllogResponseMessage() {};
+
+    std::unique_ptr<std::vector<CalllogRecord>> records;
+    uint32_t limit = 0;
+	uint32_t offset = 0;
+};
 
 #endif //PUREPHONE_DBMESSAGE_HPP

@@ -16,7 +16,9 @@ namespace gui{
 
 ThreadItem::ThreadItem(ThreadModel* threadmodel)
 {
-	using namespace style::window;
+	using namespace style;
+
+
 
 	model = threadmodel;
 	minWidth = 431;
@@ -27,26 +29,26 @@ ThreadItem::ThreadItem(ThreadModel* threadmodel)
 	setRadius( 0 );
 	setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );
 
-	setPenFocusWidth(label::border_focucs_w);
-	setPenWidth(label::border_no_focus_w);
+	setPenFocusWidth(window::default_border_focucs_w);
+	setPenWidth(window::default_border_no_focus_w);
 
 	contact = new gui::Label( this, 0,0,0,0);
-	contact->setPenFocusWidth(label::border_no_focus_w);
-	contact->setPenWidth(label::border_no_focus_w);
+	contact->setPenFocusWidth(window::default_border_no_focus_w);
+	contact->setPenWidth(window::default_border_no_focus_w);
 	contact->setFont(style::window::font::big);
 	contact->setDotsMode( true );
 	contact->setAlignement( gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER} );
 
 	timestamp = new gui::Label( this, 0,0,0,0);
-	timestamp->setPenFocusWidth(label::border_no_focus_w);
-	timestamp->setPenWidth(label::border_no_focus_w);
+	timestamp->setPenFocusWidth(window::default_border_no_focus_w);
+	timestamp->setPenWidth(window::default_border_no_focus_w);
 	timestamp->setFont(style::window::font::small);
 	timestamp->setDotsMode( true );
 	timestamp->setAlignement( gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER} );
 
 	preview = new gui::Label( this, 0,0,0,0);
-	preview->setPenFocusWidth(label::border_no_focus_w);
-	preview->setPenWidth(label::border_no_focus_w);
+	preview->setPenFocusWidth(window::default_border_no_focus_w);
+	preview->setPenWidth(window::default_border_no_focus_w);
 	preview->setFont(style::window::font::small);
 	preview->setDotsMode( true );
 	preview->setAlignement( gui::Alignment { gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER} );

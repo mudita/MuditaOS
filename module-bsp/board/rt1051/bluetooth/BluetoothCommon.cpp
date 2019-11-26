@@ -9,6 +9,33 @@ using namespace bsp;
 // TODO it's plain copy same as in cellular - this is kind of wrong
 uint32_t UartGetPeripheralClock();
 
+void BTdev::_circ::sem_take() {
+    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
+        xSemaphoreTake(sem,0);
+    } else {
+        BaseType_t *px;
+        xSemaphoreTakeFromISR(sem,px);
+    }
+}
+
+void BTdev::_circ::sem_give() {
+    if(!(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)) {
+        xSemaphoreGive(sem);
+    } else {
+        BaseType_t *px;
+        xSemaphoreGiveFromISR(sem, px);
+    }
+}
+
+BTdev::_circ::_circ(unsigned int size, int threshold) : head(0), tail(0), threshold(threshold), size(size), len(0) {
+    buff = new char[size];
+    sem = xSemaphoreCreateBinary();
+}
+
+BTdev::_circ::~_circ() {
+    vSemaphoreDelete(sem);
+    delete[] buff;
+}
 
 BluetoothCommon::BluetoothCommon(unsigned int in_size, unsigned int out_size, int threshold):
     BTdev(in_size,out_size,threshold)
@@ -27,7 +54,6 @@ void BluetoothCommon::open()
 {
     LOG_INFO("Bluetooth HW open!");
     set_reset(true);
-    vSemaphoreCreateBinary(sem_data);
     set_irq(true);
     is_open = true;
     set_rts(true);
@@ -52,27 +78,26 @@ BTdev::Error BluetoothCommon::flush()
 {
     // LOG_INFO("flush [%d] %s", out.len, out.tail<out.head?"reverse":"normal");
     Error err = Success;
-    int i=0;
-    for(i=0; i<default_timeout_ms; ++i) {
-        if(read_cts() == 0) {
-            break;
-        } else {
-            sleep_ms(1);
+    int len = out.len;
+    char* from = new char[out.len];
+    for (int i =0; i < len; ++i) {
+        out.pop(from+i);
+    }
+    int to_write = len;
+    char* fromp = from;
+    while(to_write) {
+        while(1) {
+            if(read_cts() == 0) {
+                break;
+            } else {
+                sleep_ms(1);
+            }
         }
+        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, reinterpret_cast<uint8_t*>(fromp), 1);
+        --to_write;
+        ++fromp;
     }
-    if(i==default_timeout_ms) {
-        LOG_ERROR("BT CTS error!");
-        err = ErrorTimeout;
-    }
-    char* from = &out.buff[out.head];
-    if(out.tail > out.head) {
-        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, reinterpret_cast<uint8_t*>(from), out.len);
-    } else {
-        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, reinterpret_cast<uint8_t*>(from), out.len - out.tail);
-        from = out.buff;
-        LPUART_WriteBlocking(BSP_BLUETOOTH_UART_BASE, reinterpret_cast<uint8_t*>(from), out.tail);
-    }
-    out.flush();
+    delete[] from;
     return err;
 }
 
@@ -83,6 +108,7 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
     // if CTS set -> ignore return 0, can use threshold_guard here too
     for (i=0; i<nbytes; ++i) {
         if(out.push(*(buf+i)) != 0) {
+            LOG_ERROR("Cant push!");
             break;
         }
     }
@@ -91,13 +117,15 @@ ssize_t BluetoothCommon::write(char *buf, size_t nbytes)
 
 ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
 {
-    int llen = 0;
-    while (llen != len) {
-        llen += write(buf, len);
-        // no error check here! TODO
+    int yet_to_write = len;
+    if(len > out.size) {
+        LOG_WARN("WRITE: %d vs %d", len, out.size);
+    }
+    while (yet_to_write != 0) {
+        yet_to_write -= write(buf+len-yet_to_write, yet_to_write<out.size?yet_to_write:(out.size-1));
         flush();
     }
-    return llen;
+    return len;
 }
 
 BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)

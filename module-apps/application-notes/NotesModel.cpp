@@ -67,6 +67,3 @@ gui::ListItem* NotesModel::getItem( int index, int firstElement, int prevElement
 
 	return nullptr;
 }
-int NotesModel::getItemCount() {
-	return recordsCount;
-}

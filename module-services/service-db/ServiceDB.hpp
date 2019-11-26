@@ -21,6 +21,7 @@
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/NotesRecord.hpp"
+#include "Interface/CalllogRecord.hpp"
 
 class ServiceDB: public sys::Service {
 private:
@@ -30,6 +31,7 @@ private:
     std::unique_ptr<ContactsDB> contactsDB;
     std::unique_ptr<AlarmsDB> alarmsDB;
     std::unique_ptr<NotesDB> notesDB;
+    std::unique_ptr<CalllogDB> calllogDB;
 
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
@@ -37,12 +39,13 @@ private:
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
     std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
     std::unique_ptr<NotesRecordInterface> notesRecordInterface;
-
+    std::unique_ptr<CalllogRecordInterface> calllogRecordInterface;
+    
 protected:
 
 public:
     ServiceDB();
-    ~ServiceDB();
+    virtual ~ServiceDB();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
     // Invoked when timer ticked
