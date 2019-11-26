@@ -15,34 +15,43 @@ namespace app {
 
 class ApplicationMessages: public app::Application {
 public:
-	ApplicationMessages( std::string name="ApplicationMessages", std::string parent="", bool startBackgound = false);
+	ApplicationMessages(std::string name = "ApplicationMessages",
+			std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationMessages();
 
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+	sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,
+			sys::ResponseMessage *resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 
-	sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+	sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode)
+			override final {
+		return sys::ReturnCodes::Success;
+	}
 
 	void createUserInterface() override;
 	void destroyUserInterface() override;
 };
 
-class ApplicationMessagesLauncher : public ApplicationLauncher {
+class ApplicationMessagesLauncher: public ApplicationLauncher {
 public:
-	ApplicationMessagesLauncher() : ApplicationLauncher("ApplicationMessages", true ) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationMessages>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationMessages>(name, parent ),caller);
-	};
+	ApplicationMessagesLauncher() :
+			ApplicationLauncher("ApplicationMessages", true) {
+	}
+	;
+	bool run(sys::Service *caller = nullptr) override {
+		parent = (caller == nullptr ? "" : caller->GetName());
+		return sys::SystemManager::CreateService(
+				std::make_shared<ApplicationMessages>(name, parent), caller);
+	}
+	;
+	bool runBackground(sys::Service *caller) override {
+		parent = (caller == nullptr ? "" : caller->GetName());
+		return sys::SystemManager::CreateService(
+				std::make_shared<ApplicationMessages>(name, parent), caller);
+	}
+	;
 };
 } /* namespace app */
-
-
-
 
 #endif /* MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_ */
