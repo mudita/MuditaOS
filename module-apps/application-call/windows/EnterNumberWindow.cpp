@@ -59,6 +59,7 @@ EnterNumberWindow::~EnterNumberWindow() {
 }
 
 bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
+    int val = gui::toNumeric(inputEvent.keyCode);
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 		if(inputEvent.keyCode == KeyCode::KEY_ENTER) {
 			auto app = reinterpret_cast<app::ApplicationCall*>( application );
@@ -89,23 +90,23 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			return true;
 		}
 		//if numeric key was pressed record that key and send it to call application with a switch command
-//		else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
-//
-//			auto app = reinterpret_cast<app::ApplicationCall*>( application );
-//			char key[] = { char(inputEvent.keyChar) ,0};
-//			std::string num = app->getDisplayedNumber();
-//
-//			if( !num.empty())
-//				bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
-//
-//			num += key;
-//			numberLabel->setText(num);
-//			app->setDisplayedNumber(num);
-//
-//			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-//
-//			return true;
-//		}
+		else if(val >= 0 && val <= 9 ) {
+
+			auto app = reinterpret_cast<app::ApplicationCall*>( application );
+			auto key = std::to_string(val);
+			std::string num = app->getDisplayedNumber();
+
+			if( !num.empty())
+				bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));
+
+			num += key;
+			numberLabel->setText(num);
+			app->setDisplayedNumber(num);
+
+			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+			return true;
+		}
 	}
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong) {
 		//erase all characters from phone number
