@@ -79,7 +79,7 @@ void BtWindow::buildInterface()
 
     LOG_INFO("Create box layout");
     box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 5*style::window::label::default_h);
-    box->setPenWidth(style::window::label::border_no_focus_w);
+    box->setPenWidth(style::window::default_border_no_focus_w);
 
     // TODO WIP: it's just for usability now
     // TODO scan should return async - handle that... (if in scan -> add to list and refresh if new on window)
