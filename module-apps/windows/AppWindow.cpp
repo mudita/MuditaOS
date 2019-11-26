@@ -136,6 +136,11 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 		return true;
 	}
 
+    if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF)
+    {
+        LOG_INFO("exit to main menu");
+        sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationDesktop", "MainWindow", nullptr);
+    }
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
 

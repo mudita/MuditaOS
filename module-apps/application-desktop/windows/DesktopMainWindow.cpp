@@ -216,6 +216,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		//long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
 			application->switchWindow( "PowerOffWindow" );
+            return true;
 		}
 	}
 
