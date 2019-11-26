@@ -68,6 +68,7 @@ void NotesEditWindow::buildInterface() {
 		return true; };
 	text->setTextType( gui::Text::TextType::MULTI_LINE );
 	text->setEditMode(gui::Text::EditMode::BROWSE );
+    text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 }
@@ -85,8 +86,6 @@ NotesEditWindow::~NotesEditWindow() {
 }
 
 void NotesEditWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
-    // TODO TODO
-	// application->setKeyboardProfile( "lang_eng_lower" );
 	text->setText( textString );
 	setFocusItem( text );
 }

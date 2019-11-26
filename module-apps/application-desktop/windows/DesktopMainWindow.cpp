@@ -186,21 +186,19 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 		//screen is unlocked
 		else {
+            int val = gui::toNumeric(inputEvent.keyCode);
 			//pressing enter moves user to menu screen
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 				application->switchWindow( "MenuWindow" );
 			}
-            // TODO TODO
-			// //if numeric key was pressed record that key and send it to call application with a switch command
-			// else if(( inputEvent.keyChar >= '0') && ( inputEvent.keyChar <= '9') ) {
-
-			// 	char key[] = { char(inputEvent.keyChar) ,0};
-			// 	std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(std::string(key));
-
-			// 	sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
-
-			// 	return true;
-			// }
+			//if numeric key was pressed record that key and send it to call application with a switch command
+            else if( 0 <= val && val <= 9)
+            {
+                auto key = std::to_string(val);
+                std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(key);
+                sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
+                return true;
+            }
 		}
 	}
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
