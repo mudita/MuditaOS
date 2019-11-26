@@ -26,6 +26,7 @@ protected:
 	Label* center;
 	Label* right;
 	gui::Label* prepareLabel( BottomBar::Side side );
+    Label* getSide(BottomBar::Side side);
 public:
 
 	BottomBar();
@@ -34,6 +35,7 @@ public:
 
 	void setActive( BottomBar::Side side, bool active );
 	void setText( BottomBar::Side side, const UTF8& str, bool active = true );
+    UTF8 getText( BottomBar::Side side);
 
 	//virtual methods from Item
 	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim);

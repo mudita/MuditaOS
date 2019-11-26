@@ -25,7 +25,11 @@ UiTestWindow::UiTestWindow(app::Application *app) : AppWindow(app, "TEST_UI")
                          "LoL ...");
     text->setEditMode(gui::Text::EditMode::EDIT);
     text->setFont(style::window::font::bigbold);
-    text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
+    text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}, [=](const UTF8 &text) {
+        bottomBar->setText(BottomBar::Side::CENTER, text);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        bottomBar->getText(BottomBar::Side::CENTER);
+    }));
     // TODO TODO attach(cb - show special characters, && input somehow)
     setFocusItem(text);
 }
