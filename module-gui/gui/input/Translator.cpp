@@ -35,43 +35,85 @@ InputEvent KeyBaseTranslation::set(RawKey key)
     {
         prev_key_press = key;
     }
+    if (key.state != RawKey::State::Released)
+    {
+        prev_key_released = false;
+    }
+    else
+    {
+        prev_key_released = true;
+    }
     return evt;
+}
+
+bool KeyBaseTranslation::timeout(uint32_t time)
+{
+    if (!prev_key_released &&
+       (prev_key_press.time_press != 0) &&
+       (time - prev_key_press.time_press >= key_time_longpress_ms))
+    {
+        prev_key_timedout = true;
+        return true;
+    }
+    return false;
+}
+
+gui::KeyCode getKeyCode(bsp::KeyCodes code)
+{
+    switch(code) {
+        case bsp::KeyCodes::NumericKey1: return gui::KeyCode::KEY_1; break;
+        case bsp::KeyCodes::NumericKey2: return gui::KeyCode::KEY_2; break;
+        case bsp::KeyCodes::NumericKey3: return gui::KeyCode::KEY_3; break;
+        case bsp::KeyCodes::NumericKey4: return gui::KeyCode::KEY_4; break;
+        case bsp::KeyCodes::NumericKey5: return gui::KeyCode::KEY_5; break;
+        case bsp::KeyCodes::NumericKey6: return gui::KeyCode::KEY_6; break;
+        case bsp::KeyCodes::NumericKey7: return gui::KeyCode::KEY_7; break;
+        case bsp::KeyCodes::NumericKey8: return gui::KeyCode::KEY_8; break;
+        case bsp::KeyCodes::NumericKey9: return gui::KeyCode::KEY_9; break;
+        case bsp::KeyCodes::NumericKey0: return gui::KeyCode::KEY_0; break;
+        case bsp::KeyCodes::NumericKeyAst: return gui::KeyCode::KEY_AST; break;
+        case bsp::KeyCodes::NumericKeyPnd: return gui::KeyCode::KEY_PND; break;
+        case bsp::KeyCodes::JoystickLeft: return gui::KeyCode::KEY_LEFT; break;
+        case bsp::KeyCodes::JoystickRight: return gui::KeyCode::KEY_RIGHT; break;
+        case bsp::KeyCodes::JoystickUp: return gui::KeyCode::KEY_UP; break;
+        case bsp::KeyCodes::JoystickDown: return gui::KeyCode::KEY_DOWN; break;
+        case bsp::KeyCodes::JoystickEnter: return gui::KeyCode::KEY_ENTER; break;
+        case bsp::KeyCodes::FnLeft: return gui::KeyCode::KEY_LF; break;
+        case bsp::KeyCodes::FnRight: return gui::KeyCode::KEY_RF; break;
+        case bsp::KeyCodes::VolUp: return gui::KeyCode::KEY_VOLUP; break;
+        case bsp::KeyCodes::VolDown: return gui::KeyCode::KEY_VOLDN; break;
+        case bsp::KeyCodes::Torch: return gui::KeyCode::KEY_TORCH; break;
+        case bsp::KeyCodes::SSwitchUp: return gui::KeyCode::SWITCH_UP; break;
+        case bsp::KeyCodes::SSwitchDown: return gui::KeyCode::SWITCH_DN; break;
+        case bsp::KeyCodes::SSwitchMid: return gui::KeyCode::SWITCH_MID; break;
+        default:
+            LOG_ERROR("Unhandled bsp key!");
+            return gui::KeyCode::KEY_UNDEFINED;
+    }
 }
 
 InputEvent KeyInputSimpleTranslation::translate(RawKey key)
 {
     auto evt = KeyBaseTranslation::set(key);
-
-    switch(key.key_code) {
-        case bsp::KeyCodes::NumericKey1: evt.keyCode = gui::KeyCode::KEY_1; break;
-        case bsp::KeyCodes::NumericKey2: evt.keyCode = gui::KeyCode::KEY_2; break;
-        case bsp::KeyCodes::NumericKey3: evt.keyCode = gui::KeyCode::KEY_3; break;
-        case bsp::KeyCodes::NumericKey4: evt.keyCode = gui::KeyCode::KEY_4; break;
-        case bsp::KeyCodes::NumericKey5: evt.keyCode = gui::KeyCode::KEY_5; break;
-        case bsp::KeyCodes::NumericKey6: evt.keyCode = gui::KeyCode::KEY_6; break;
-        case bsp::KeyCodes::NumericKey7: evt.keyCode = gui::KeyCode::KEY_7; break;
-        case bsp::KeyCodes::NumericKey8: evt.keyCode = gui::KeyCode::KEY_8; break;
-        case bsp::KeyCodes::NumericKey9: evt.keyCode = gui::KeyCode::KEY_9; break;
-        case bsp::KeyCodes::NumericKey0: evt.keyCode = gui::KeyCode::KEY_0; break;
-        case bsp::KeyCodes::NumericKeyAst: evt.keyCode = gui::KeyCode::KEY_AST; break;
-        case bsp::KeyCodes::NumericKeyPnd: evt.keyCode = gui::KeyCode::KEY_PND; break;
-        case bsp::KeyCodes::JoystickLeft: evt.keyCode = gui::KeyCode::KEY_LEFT; break;
-        case bsp::KeyCodes::JoystickRight: evt.keyCode = gui::KeyCode::KEY_RIGHT; break;
-        case bsp::KeyCodes::JoystickUp: evt.keyCode = gui::KeyCode::KEY_UP; break;
-        case bsp::KeyCodes::JoystickDown: evt.keyCode = gui::KeyCode::KEY_DOWN; break;
-        case bsp::KeyCodes::JoystickEnter: evt.keyCode = gui::KeyCode::KEY_ENTER; break;
-        case bsp::KeyCodes::FnLeft: evt.keyCode = gui::KeyCode::KEY_LF; break;
-        case bsp::KeyCodes::FnRight: evt.keyCode = gui::KeyCode::KEY_RF; break;
-        case bsp::KeyCodes::VolUp: evt.keyCode = gui::KeyCode::KEY_VOLUP; break;
-        case bsp::KeyCodes::VolDown: evt.keyCode = gui::KeyCode::KEY_VOLDN; break;
-        case bsp::KeyCodes::Torch: evt.keyCode = gui::KeyCode::KEY_TORCH; break;
-        case bsp::KeyCodes::SSwitchUp: evt.keyCode = gui::KeyCode::SWITCH_UP; break;
-        case bsp::KeyCodes::SSwitchDown: evt.keyCode = gui::KeyCode::SWITCH_DN; break;
-        case bsp::KeyCodes::SSwitchMid: evt.keyCode = gui::KeyCode::SWITCH_MID; break;
-        default:
-            LOG_ERROR("Unhandled bsp key!");
+    // when last action timed out we don't want to handle key release
+    if(prev_key_timedout && key.state == RawKey::State::Released) {
+        evt.state = InputEvent::State::Undefined;
+        prev_key_timedout = false;
     }
+    evt.keyCode = getKeyCode(key.key_code);
+    return evt;
+}
 
+InputEvent KeyInputSimpleTranslation::translate(uint32_t timeout)
+{
+    RawKey key;
+    key.state = RawKey::State::Released;
+    key.key_code = prev_key_press.key_code;
+    key.time_press = 0;
+    key.time_release = timeout;
+    InputEvent evt(key);
+    evt.state = InputEvent::State::keyReleasedLong;
+    evt.keyCode = getKeyCode(key.key_code);
     return evt;
 }
 

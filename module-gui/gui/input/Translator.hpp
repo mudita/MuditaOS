@@ -23,8 +23,15 @@ enum class Keymaps {
 class KeyBaseTranslation
 {
   public:
+    // previous pressed key (only for pressed keys), used for shortpress and longpress
     RawKey prev_key_press = {};
+    // was previous key released? used for longpress only
+    bool prev_key_released = true;
+    // did previous key already timed out (and send longpress as a result)
+    bool prev_key_timedout = false;
     InputEvent set(RawKey key);
+    /// timeout keypress (only press) - returns true on timeout'ed keypress
+    bool timeout(uint32_t time);
 };
 
 /// KeyPress translator
@@ -33,7 +40,10 @@ class KeyBaseTranslation
 class KeyInputSimpleTranslation : public KeyBaseTranslation
 {
   public:
+    /// translate incomming key
     InputEvent translate(RawKey key);
+    /// translate timeout - simulate key release
+    InputEvent translate(uint32_t timeout);
 };
 
 /// translator using & switching KeyMaps for use per widget basis ,called for selected widget, per widget basis

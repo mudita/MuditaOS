@@ -35,6 +35,8 @@ Application::Application(std::string name, std::string parent,bool startBackgrou
 	Service( name, parent, stackDepth, priority ),
 	startBackground{ startBackground } {
 	keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
+    longPressTimer = CreateTimer( key_timer_ms, true);
+    Service::ReloadTimer(longPressTimer);
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
@@ -46,6 +48,19 @@ Application::~Application() {
 
 void Application::TickHandler(uint32_t id)
 {
+    if (id == longPressTimer)
+    {
+        // TODO if(check widget type long press trigger)
+        uint32_t time = xTaskGetTickCount();
+        if (keyTranslator->timeout(time))
+        {
+            // previous key press was over standard keypress timeout - send long press
+            gui::InputEvent iev = keyTranslator->translate(time);
+            messageInputEventApplication(this, this->GetName(), iev);
+            // clean previous key
+            keyTranslator->prev_key_press = {};
+        }
+    }
 }
 
 void Application::render( gui::RefreshModes mode ) {
