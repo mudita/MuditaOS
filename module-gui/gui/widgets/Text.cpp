@@ -559,6 +559,18 @@ bool Text::onActivated(void *data)
 
 bool Text::onFocus(bool state)
 {
+    // inform on start what type of input there is
+    if (mode)
+    {
+        if (state)
+        {
+            mode->show_input_type();
+        }
+        else
+        {
+            mode->show_restore();
+        }
+    }
     bool ret = Rect::onFocus(state);
     if (focus && editMode == EditMode::EDIT)
     {
