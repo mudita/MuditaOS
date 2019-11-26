@@ -28,7 +28,7 @@ public:
 	void requestRecords( const uint32_t offset, const uint32_t limit ) override;
 
 	gui::ListItem* getItem(int index, int firstElement, int prevElement, uint32_t limit, int remaining, bool topDown ) override;
-	int getItemCount() const {return recordsCount; };
+	int getItemCount() const override { return recordsCount; };
 	app::Application* getApplication(void) {return application;};
 };
 
