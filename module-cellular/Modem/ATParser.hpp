@@ -40,7 +40,7 @@ public:
 
     int ProcessNewData(sys::Service *service);
 
-    std::vector<std::string> SendCommand(const char* cmd,size_t rxCount,uint32_t timeout = 500);
+    std::vector<std::string> SendCommand(const char *cmd, size_t rxCount, uint32_t timeout = 500);
 
     static std::vector<std::string> Tokenizer(std::string& input,uint32_t maxTokenCount,const std::string& delimiter);
 

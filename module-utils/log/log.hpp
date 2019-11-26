@@ -68,6 +68,7 @@ void log_Printf(const char *fmt, ...);
 #define LOG_WARN(...)   log_Log(LOGWARN,  __FILENAME__, __LINE__,__func__, __VA_ARGS__)
 #define LOG_ERROR(...)  log_Log(LOGERROR, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
 #define LOG_FATAL(...)  log_Log(LOGFATAL, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
+#define LOG_CUSTOM(loggerLevel, ...) log_Log(loggerLevel, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

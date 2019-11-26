@@ -109,7 +109,14 @@ int ATParser::ProcessNewData(sys::Service *service) {
     return 1;
 }
 
-// #define DEBUG_OUTPUT_RESPONSE
+#define DEBUG_OUTPUT_RESPONSE 0
+#define DEBUG_TIMEOUT_AS_ERROR 0
+
+#if DEBUG_TIMEOUT_AS_ERROR
+#define LOG_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
+#else
+#define LOG_TIMEOUT(...) LOG_INFO(__VA_ARGS__)
+#endif
 
 std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, uint32_t timeout) {
     std::vector<std::string> tokens;
@@ -130,12 +137,14 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
+    
+    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
 
     while(1) {
 
         if (timeElapsed >= timeoutNeeded)
         {
-            LOG_ERROR("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LOG_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
             break;
         }
 
@@ -158,7 +167,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
         }
         else
         {
-            LOG_ERROR("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LOG_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
         }
         
         break;
@@ -166,14 +175,14 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
     blockedTaskHandle = nullptr;
     responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
-    LOG_DEBUG("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
-    
-    #ifdef DEBUG_OUTPUT_RESPONSE
+    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
+
+#if DEBUG_OUTPUT_RESPONSE
     for (auto s : tokens)
     {
         LOG_DEBUG("[]%s", s.c_str());
     }
-    #endif
+#endif
 
     return tokens;
 }

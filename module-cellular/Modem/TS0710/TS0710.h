@@ -314,18 +314,25 @@ public:
     TS0710_START::START_SystemParameters_t getStartParams() { return startParams; }
     ATParser* getParser() { return parser; }
 
-    bool CheckATCommandResponse(const std::vector<std::string> &response) {
-        //if (response.size() == 1 && response[0] == "OK") {
+    // @brief It is serching the resposne for "OK" string
+    //
+    // Invalid responses are logged by defult as LOG_ERRORs
+    // 
+    // @param response - tokenized resposne
+    // @parama level - determine how the errors are logged
+    // return true - "OK" string is found, false - otherwise
+    bool CheckATCommandResponse(const std::vector<std::string> &response, logger_level level = LOGERROR) {
         if (searchForOK(response)) {
             return true;
         } else {
             std::string resp;
             for (std::string s : response)
                 resp.append(s);
-            LOG_ERROR("Invalid response: %s", resp.c_str());
+            LOG_CUSTOM(level,"Invalid response: %s", resp.c_str());
             return false;
         }
     }
+
 
 TS0710(PortSpeed_e portSpeed, sys::Service *parent);
 TS0710() = delete;
