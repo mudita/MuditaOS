@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 #include <mutex>
-
+#include <ticks.hpp>
 
 #define LOGGER_BUFFER_SIZE  4096
 
@@ -76,6 +76,8 @@ static void _log_Log(logger_level level, const char *file, int line,const char *
     std::lock_guard<std::mutex> guard(logger.lock);
 
     char* ptr = loggerBuffer;
+
+    ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
     ptr += sprintf(ptr,"%s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ",
