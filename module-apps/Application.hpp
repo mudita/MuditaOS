@@ -34,6 +34,7 @@ namespace app {
  * @brief This is template for creating new applications
  */
 class Application: public sys::Service {
+    uint32_t longPressTimer = 0;
 public:
 	enum class State {
 		//Application: Object has been created and underlying service is waiting to execute init handler method.
