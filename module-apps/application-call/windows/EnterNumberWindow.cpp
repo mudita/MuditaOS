@@ -30,9 +30,14 @@ void EnterNumberWindow::rebuild() {
 void EnterNumberWindow::setNumberLabel(const std::string num)
 {
     auto app = dynamic_cast<app::ApplicationCall *>(application);
+    if (app == nullptr)
+	{
+		LOG_ERROR("app != ApplicationCall");
+        return;
+    }
+    app->setDisplayedNumber(num);
 
-	app->setDisplayedNumber(num);
-    numberLabel->setText(num);
+	numberLabel->setText(num);
 
 	if(numberLabel->getText().length() == 0)
 	{
@@ -83,6 +88,11 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
         if(inputEvent.keyCode == KeyCode::KEY_LF) {
 			auto app = dynamic_cast<app::ApplicationCall*>( application );
+			if (app == nullptr)
+			{
+				LOG_ERROR("app != ApplicationCall");
+                return false;
+            }
 			std::string num = app->getDisplayedNumber();
 			LOG_INFO("number: [%s]", num.c_str());
 			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
@@ -91,6 +101,11 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
         }
         else if(inputEvent.keyCode == KeyCode::KEY_RF) {
 			auto app = dynamic_cast<app::ApplicationCall*>( application );
+			if (app == nullptr)
+			{
+				LOG_ERROR("app != ApplicationCall");
+				return false;
+			}
 			std::string num = app->getDisplayedNumber();
 			//if there isn't any char in phone number field return to previous application
 			if( num.empty() ) {
@@ -109,6 +124,11 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 		else if(val >= 0 && val <= 9 ) {
 
 			auto app = dynamic_cast<app::ApplicationCall*>( application );
+			if (app == nullptr)
+			{
+				LOG_ERROR("app != ApplicationCall");
+				return false;
+			}
 			auto key = std::to_string(val);
 			std::string num = app->getDisplayedNumber();
 
@@ -124,6 +144,11 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 		//erase all characters from phone number
 		if(inputEvent.keyCode == KeyCode::KEY_RF) {
 			auto app = dynamic_cast<app::ApplicationCall*>( application );
+			if (app == nullptr)
+			{
+				LOG_ERROR("app != ApplicationCall");
+                return false;
+            }
 
 			std::string num = app->getDisplayedNumber();
 			//if there isn't any char in phone number field return to previous application
