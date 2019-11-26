@@ -31,7 +31,7 @@ MessagesMainWindow::MessagesMainWindow(app::Application *app) :
 	AppWindow(app, "MainWindow"),
 	threadModel{ new ThreadModel(app)}
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 
 }
@@ -42,13 +42,15 @@ void MessagesMainWindow::rebuild() {
 }
 void MessagesMainWindow::buildInterface() {
 
+	using namespace messages;
+
 	AppWindow::buildInterface();
 
 
 
-	list = new gui::ListView(this, 11, 105, 480-22, 600-105-50 );
-	list->setMaxElements(messages::threadsPageSize);
-	list->setPageSize(messages::threadsPageSize);
+	list = new gui::ListView(this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listWidth );
+	list->setMaxElements(threads::pageSize);
+	list->setPageSize(threads::pageSize);
 	list->setPenFocusWidth(0);
 	list->setPenWidth(0);
 	list->setProvider( threadModel );
@@ -91,13 +93,14 @@ MessagesMainWindow::~MessagesMainWindow() {
 void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
 
-	if( mode == ShowMode::GUI_SHOW_INIT ){
-	threadModel->clear();
-	threadModel->requestRecordsCount();
-	list->clear();
-	list->setElementsCount( threadModel->getItemCount() );
+	if( mode == ShowMode::GUI_SHOW_INIT )
+	{
+		threadModel->clear();
+		threadModel->requestRecordsCount();
+		list->clear();
+		list->setElementsCount( threadModel->getItemCount() );
 
-	setFocusItem(list);
+		setFocusItem(list);
 	}
 
 }

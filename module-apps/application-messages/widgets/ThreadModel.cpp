@@ -14,7 +14,7 @@
 #include "../MessagesStyle.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
-ThreadModel::ThreadModel( app::Application* app) : DatabaseModel( app, messages::threadsPageSize)
+ThreadModel::ThreadModel( app::Application* app) : DatabaseModel( app, messages::threads::pageSize)
 {
 
 }
@@ -26,16 +26,16 @@ void ThreadModel::requestRecordsCount( void )
 	if( recordsCount > 0)
 	{
 
-		DBServiceAPI::ThreadGetLimitOffset(application, 0, messages::threadsPageSize);
-		if( recordsCount >= messages::threadsPageSize)
+		DBServiceAPI::ThreadGetLimitOffset(application, 0, messages::threads::pageSize);
+		if( recordsCount >= messages::threads::pageSize)
 		{
-			DBServiceAPI::ThreadGetLimitOffset(application, messages::threadsPageSize, messages::threadsPageSize);
+			DBServiceAPI::ThreadGetLimitOffset(application, messages::threads::pageSize, messages::threads::pageSize);
 		}
 	}
 }
 bool ThreadModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count )
 {
-	auto ret = DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+	DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 
 	return true;
 }
