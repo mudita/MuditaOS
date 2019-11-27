@@ -8,18 +8,17 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_CONTACTSTABLE_HPP
 #define PUREPHONE_CONTACTSTABLE_HPP
 
-
-#include <string>
-#include "Table.hpp"
-#include "Database/Database.hpp"
-#include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
+#include "Database/Database.hpp"
+#include "Table.hpp"
+#include "utf8/UTF8.hpp"
+#include <string>
 
-struct ContactsTableRow {
+struct ContactsTableRow
+{
     uint32_t ID;
     uint32_t nameID;
     std::string numbersID;
@@ -32,15 +31,16 @@ struct ContactsTableRow {
     uint32_t speedDial;
 };
 
-enum class ContactTableFields{
+enum class ContactTableFields
+{
     SpeedDial,
-	Favourite
+    Favourite
 };
 
-class ContactsTable : public Table<ContactsTableRow,ContactTableFields> {
-public:
-
-    ContactsTable(Database* db);
+class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
+{
+  public:
+    ContactsTable(Database *db);
 
     virtual ~ContactsTable();
 
@@ -56,31 +56,26 @@ public:
 
     std::vector<ContactsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsTableRow>
-    GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactTableFields field,const char* str) override final;
+    std::vector<ContactsTableRow> GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactTableFields field, const char *str) override final;
 
     uint32_t GetCount() override final;
 
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
 
-private:
-
-    const char *createTableQuery =
-            "CREATE TABLE IF NOT EXISTS contacts("
-            "_id INTEGER PRIMARY KEY,"
-            "name_id INTEGER,"
-            "numbers_id TEXT NOT NULL,"
-            "ring_id INTEGER,"
-            "address_ids TEXT NOT NULL,"
-            "type INTEGER,"
-            "whitelist        INTEGER,"
-            "blacklist        INTEGER,"
-            "favourites       INTEGER,"
-            "speeddial        INTEGER,"
-            "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
-            ");";
-
+  private:
+    const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contacts("
+                                   "_id INTEGER PRIMARY KEY,"
+                                   "name_id INTEGER,"
+                                   "numbers_id TEXT NOT NULL,"
+                                   "ring_id INTEGER,"
+                                   "address_ids TEXT NOT NULL,"
+                                   "type INTEGER,"
+                                   "whitelist        INTEGER,"
+                                   "blacklist        INTEGER,"
+                                   "favourites       INTEGER,"
+                                   "speeddial        INTEGER,"
+                                   "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
+                                   ");";
 };
 
-
-#endif //PUREPHONE_CONTACTSTABLE_HPP
+#endif // PUREPHONE_CONTACTSTABLE_HPP
