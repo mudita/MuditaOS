@@ -32,26 +32,6 @@ public:
 	void createUserInterface() override;
 	void destroyUserInterface() override;
 };
-
-class ApplicationMessagesLauncher: public ApplicationLauncher {
-public:
-	ApplicationMessagesLauncher() :
-			ApplicationLauncher("ApplicationMessages", true) {
-	}
-	;
-	bool run(sys::Service *caller = nullptr) override {
-		parent = (caller == nullptr ? "" : caller->GetName());
-		return sys::SystemManager::CreateService(
-				std::make_shared<ApplicationMessages>(name, parent), caller);
-	}
-	;
-	bool runBackground(sys::Service *caller) override {
-		parent = (caller == nullptr ? "" : caller->GetName());
-		return sys::SystemManager::CreateService(
-				std::make_shared<ApplicationMessages>(name, parent), caller);
-	}
-	;
-};
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_ */

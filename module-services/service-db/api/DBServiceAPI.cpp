@@ -157,13 +157,7 @@ bool DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uin
     msg->limit = limit;
 
     sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv);
-//    DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
-//    if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
-//        return std::move(threadResponse->records);
-//    }
-//    else{
-//        return std::make_unique<std::vector<ThreadRecord>>();
-//    }
+
     return true;
 }
 

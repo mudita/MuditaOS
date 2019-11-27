@@ -57,7 +57,13 @@ public:
 
     ~BlinkyService() {
     }
-
+    //    DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
+    //    if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
+    //        return std::move(threadResponse->records);
+    //    }
+    //    else{
+    //        return std::make_unique<std::vector<ThreadRecord>>();
+    //    }
     // Invoked upon receiving data message
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override {
 
@@ -158,8 +164,7 @@ int main() {
 		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
         applications.push_back(app::CreateLauncher<app::ApplicationCallLog>("ApplicationCallLog"));
 		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
-//		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
-		applications.push_back(std::unique_ptr<app::ApplicationMessagesLauncher>(new app::ApplicationMessagesLauncher()));
+		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
 		//start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
                                      sysmgr.get());
