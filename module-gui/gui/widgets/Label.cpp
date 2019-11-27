@@ -192,8 +192,9 @@ void Label::setMargins( const Margins& margins ) {
 	calculateDisplayText();
 }
 
-void Label::setDotsMode( const bool val ) {
+void Label::setDotsMode( const bool val, const gui::Alignment dotsAlignment ) {
 	dotsMode = val;
+	this->dotsAlignment = dotsAlignment;
 	calculateDisplayText();
 }
 
