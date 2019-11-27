@@ -7,6 +7,7 @@ include(env.cmake)
 project(PurePhone)
 
 include(config/ProjectConfig.cmake)
+include(config/Version.cmake)
 include(module-lwip/lwip-includes.cmake)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
