@@ -38,46 +38,48 @@ protected:
 	Font* font;
 	//margins for text
 	Margins margins;
-	//type of alignment
+    //type of alignment
 	Alignment alignment;
-	//flag that defines if 3 dots are to be displayed at the end of label's text.
+    //flag that defines if 3 dots (ellipsis) are to be displayed at the end of label's text.
 	bool dotsMode;
-	//flag that defines if a remaining area of the label has a horizontal line.
+    //a position of the dots (ellipsis) if there are present
+	Alignment dotsAlignment;
+    //flag that defines if a remaining area of the label has a horizontal line.
 	bool lineMode;
+
 	//area specified in pixels occupied by text inside label space.
 	//This defines also position of the text considering alignment and margins.
 	BoundingBox textArea;
-
-	//widgets to add line
+    //widgets to add line
 	Rect* lineFront = nullptr;
+
 	Rect* lineBack = nullptr;
+    void calculateDisplayText();
 
-	void calculateDisplayText();
 public:
+    Label();
+    Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, const UTF8& text = UTF8{} );
 
-	Label();
-	Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h, const UTF8& text = UTF8{} );
 	virtual ~Label();
-
-	//Label's specific methods
+    //Label's specific methods
 	virtual void setText( const UTF8& text );
-	virtual void clear();
-	virtual UTF8 getText();
-	virtual void setAlignement( const Alignment& alignment );
-	virtual void setMargins( const Margins& margins );
-	void setDotsMode( const bool val );
-	/**
+    virtual void clear();
+    virtual UTF8 getText();
+    virtual void setAlignement( const Alignment& alignment );
+    virtual void setMargins( const Margins& margins );
+    void setDotsMode( const bool val , const gui::Alignment dotsAlignment = gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER) );
+    /**
 	 * @brief Defines if remaining area of the label has a horizontal line.
 	 */
 	void setLineMode( const bool& val );
-	void setTextColor( Color color );
+    void setTextColor( Color color );
+
 	void setFont( const UTF8& fontName );
-
-	//virtual methods
+    //virtual methods
 	std::list<DrawCommand*> buildDrawList() override;
-	void setPosition( const short& x, const short& y ) override;
-	void setSize( const short& w, const short& h ) override;
+    void setPosition( const short& x, const short& y ) override;
 
+	void setSize( const short& w, const short& h ) override;
 };
 
 } /* namespace gui */
