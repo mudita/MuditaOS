@@ -195,7 +195,6 @@ TS0710::ConfState TS0710::ConfProcedure() {
 
     // Route URCs to second (Notifications) MUX channel
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"cmux/urcport\",1\r", 1));
-
     // Turn off RI pin for incoming calls
     CheckATCommandResponse(parser->SendCommand("AT+QCFG=\"urc/ri/ring\",\"off\"\r", 1));
     // Turn off RI pin for incoming sms
@@ -209,8 +208,15 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Change incoming call notification from "RING" to "+CRING:type"
     CheckATCommandResponse(parser->SendCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
+
     // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
     CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1, 15000));
+
+    // Set Message format to Text
+    CheckATCommandResponse(parser->SendCommand("AT+CMGF=1\r", 1));
+    //Set ucs2 message format
+    CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"UCS2\"\r", 1));
+
 
     // Enable sleep mode
     LOG_DEBUG("TODO: determine while this retry loop is necessary");
