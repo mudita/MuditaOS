@@ -151,19 +151,27 @@ bool DBServiceAPI::ThreadRemove(sys::Service *serv, uint32_t id) {
     }
 }
 
-std::unique_ptr<std::vector<ThreadRecord>> DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset,
-                                                                              uint32_t limit) {
+bool DBServiceAPI::ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit) {
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGetLimitOffset);
     msg->offset = offset;
     msg->limit = limit;
 
+    sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv);
+
+    return true;
+}
+
+uint32_t DBServiceAPI::ThreadGetCount(sys::Service * serv)
+{
+    std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGetCount);
+
     auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
     DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
     if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
-        return std::move(threadResponse->records);
+        return threadResponse->count;
     }
     else{
-        return std::make_unique<std::vector<ThreadRecord>>();
+        return false;
     }
 }
 
@@ -174,6 +182,23 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::
 	rec.alternativeName = alternativeName;
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByName,rec );
+
+    auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
+    DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());
+    if((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)){
+		return std::move(contactResponse->records);
+	}
+	else{
+		return std::make_unique<std::vector<ContactRecord>>();
+	}
+}
+
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID ) {
+
+	ContactRecord rec;
+	rec.dbID = contactID;
+
+    std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID,rec );
 
     auto ret = sys::Bus::SendUnicast(msg,ServiceDB::serviceName,serv,5000);
     DBContactResponseMessage* contactResponse = reinterpret_cast<DBContactResponseMessage*>(ret.second.get());

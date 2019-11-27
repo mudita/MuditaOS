@@ -199,9 +199,25 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 #if SHOW_DB_ACCESS_PERF == 1
             LOG_DEBUG("DBThreadGetLimitOffset time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
 #endif
-            responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(ret), true);
+            LOG_INFO("Thread get limit offset");
+            responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
         }
             break;
+
+        case MessageType::DBThreadGetCount:
+        {
+          //  DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
+      #if SHOW_DB_ACCESS_PERF == 1
+                  timestamp = cpp_freertos::Ticks::GetTicks();
+      #endif
+                  auto ret = threadRecordInterface->GetCount();
+      #if SHOW_DB_ACCESS_PERF == 1
+                  LOG_DEBUG("DBThreadGetCount time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+      #endif
+                  //DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0,uint32_t count=0,uint32_t respTo=0)
+                  responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true,  0, 0, ret);
+        }
+	  break;
 
         case MessageType::DBContactAdd: {
             DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
@@ -226,6 +242,21 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl,sys::Respon
 #endif
 			responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(),
 					static_cast<uint32_t>(MessageType::DBContactGetByName));
+		} break;
+
+        case MessageType::DBContactGetByID: {
+			DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+			timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+			auto ret = contactRecordInterface->GetByID( msg->record.dbID );
+#if SHOW_DB_ACCESS_PERF == 1
+			LOG_DEBUG("DBContactGetByName time: %lu",cpp_freertos::Ticks::GetTicks()-timestamp);
+#endif
+			auto records =  std::make_unique<std::vector<ContactRecord>>();
+			records->push_back(ret);
+			responseMsg = std::make_shared<DBContactResponseMessage>(std::move(records), true, msg->limit, msg->offset, msg->favourite, 1,
+					static_cast<uint32_t>(MessageType::DBContactGetByID));
 		} break;
 
         case MessageType::DBContactGetBySpeedDial: {

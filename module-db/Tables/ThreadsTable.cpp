@@ -77,7 +77,7 @@ ThreadsTableRow ThreadsTable::GetByID(uint32_t id) {
 
 std::vector<ThreadsTableRow> ThreadsTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
 
-    auto retQuery = db->Query("SELECT * from threads ORDER BY date LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from threads ORDER BY date DESC LIMIT %lu OFFSET %lu;",
                               limit,
                               offset);
 

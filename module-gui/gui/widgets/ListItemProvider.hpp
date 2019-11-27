@@ -22,6 +22,7 @@ public:
 	ListItemProvider();
 	virtual ~ListItemProvider();
 
+
 	virtual int getItemCount() const = 0;
 	/**
 	 * @brief Requests from Provider element that is no index position out of givent count of visible elements

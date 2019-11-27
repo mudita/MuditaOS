@@ -25,6 +25,9 @@
 #include "ThreadViewWindow.hpp"
 #include <Style.hpp>
 
+#include "../widgets/ThreadModel.hpp"
+
+
 namespace gui {
 
 ThreadViewWindow::ThreadViewWindow(app::Application *app) :
