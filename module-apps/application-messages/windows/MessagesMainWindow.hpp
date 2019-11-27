@@ -17,37 +17,38 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Window.hpp"
 #include "ListView.hpp"
-//#include "../PhonebookModel.hpp"
-//#include "../widgets/PhonebookListView.hpp"
+#include "../widgets/ThreadModel.hpp"
 
 namespace gui {
 
 class MessagesMainWindow: public AppWindow {
-  protected:
+protected:
 //    PhonebookListView* list;
 //    PhonebookModel* phonebookModel = nullptr;
 
-    Image* leftArrowImage = nullptr;
-    Image* rightArrowImage = nullptr;
-    Image* newMessageImage = nullptr;
-    Image* searchImage = nullptr;
+	Image *leftArrowImage = nullptr;
+	Image *rightArrowImage = nullptr;
+	Image *newMessageImage = nullptr;
+	Image *searchImage = nullptr;
 
-  public:
-    MessagesMainWindow(app::Application *app);
-    virtual ~MessagesMainWindow();
+	ThreadModel *threadModel = nullptr;
+	gui::ListView *list = nullptr;
 
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
+public:
+	MessagesMainWindow(app::Application *app);
+	virtual ~MessagesMainWindow();
 
-    bool onDatabaseMessage( sys::Message* msgl );
+	// virtual methods
+	bool onInput(const InputEvent &inputEvent) override;
+	void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
+	bool onDatabaseMessage(sys::Message *msgl);
+
+	void rebuild() override;
+	void buildInterface() override;
+	void destroyInterface() override;
 };
 
 } /* namespace gui */
-
 
 #endif /* MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_MESSAGESMAINWINDOW_HPP_ */

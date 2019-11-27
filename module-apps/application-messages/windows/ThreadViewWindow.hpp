@@ -37,6 +37,9 @@ public:
   void rebuild() override;
   void buildInterface() override;
   void destroyInterface() override;
+
+private:
+  ListView* list;
 };
 
 } /* namespace gui */
