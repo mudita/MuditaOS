@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_DATABASE_HPP
 #define PUREPHONE_DATABASE_HPP
 
@@ -17,10 +16,9 @@
 #include "QueryResult.hpp"
 #include <memory>
 
-
-class Database {
-public:
-
+class Database
+{
+  public:
     Database(const char *name);
 
     virtual ~Database();
@@ -34,12 +32,14 @@ public:
     // Must be invoked before closing system in order to properly close OS layer
     static void Deinitialize();
 
-    bool IsInitialized(){return isInitialized;}
+    bool IsInitialized()
+    {
+        return isInitialized;
+    }
 
     uint32_t GetLastInsertRowID();
 
-private:
-
+  private:
     const uint32_t maxQueryLen = (8 * 1024);
 
     /*
@@ -52,11 +52,10 @@ private:
      */
     static int queryCallback(void *usrPtr, int count, char **data, char **columns);
 
-protected:
+  protected:
     sqlite3 *dbConnection;
-    const char* dbName;
+    const char *dbName;
     bool isInitialized;
 };
 
-
-#endif //PUREPHONE_DATABASE_HPP
+#endif // PUREPHONE_DATABASE_HPP
