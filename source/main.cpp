@@ -6,6 +6,7 @@
 #include "log/log.hpp"
 #include "memory/usermem.h"
 #include "ticks.hpp"
+#include "version.hpp"
 
 //module-applications
 #include "application-clock/ApplicationClock.hpp"
@@ -132,7 +133,8 @@ int main() {
 
     bsp::BoardInit();
 
-    LOG_PRINTF("Launching PurePhone..\n");
+    LOG_PRINTF("Launching PurePhone \n");
+    LOG_PRINTF("commit: %s tag: %s branch: %s\n", GIT_REV, GIT_TAG, GIT_BRANCH);
 
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
