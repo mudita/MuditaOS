@@ -86,7 +86,13 @@ void Label::calculateDisplayText() {
 				if( remainingCharDraw )
 				{
 					//get as much chars as possible
-					textDisplayed = text.substr(0, remainingCharDraw) + dotsStr;
+					// @TODO proper getter for gui::Alignment
+					if (this->dotsAlignment.alignment & Alignment::ALIGN_HORIZONTAL_RIGHT) {
+					    textDisplayed = text.substr(0, remainingCharDraw) + dotsStr;
+					}
+					else{
+                        textDisplayed = dotsStr + text.substr(text.length() - remainingCharDraw, remainingCharDraw);
+					}
 					textArea.w = (uint16_t)(dotsSpaceConsumed + spaceConsumed );
 					charDraw = (uint16_t)textDisplayed.length();
 				}
