@@ -15,6 +15,7 @@
 #include "Database/Database.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
+#include <log/log.hpp>
 #include <string>
 
 struct ContactsTableRow
@@ -29,6 +30,8 @@ struct ContactsTableRow
     bool isOnBlacklist;
     bool isOnFavourites;
     uint32_t speedDial;
+    UTF8 namePrimary = "";
+    UTF8 nameAlternative = "";
 };
 
 enum class ContactTableFields
@@ -53,6 +56,10 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
     bool Update(ContactsTableRow entry) override final;
 
     ContactsTableRow GetByID(uint32_t id) override final;
+
+    bool BlockByID(uint32_t id, bool shouldBeBlocked);
+
+    std::vector<ContactsTableRow> Search(const std::string primaryName, const std::string alternativeName, const std::string number);
 
     std::vector<ContactsTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 

@@ -9,26 +9,7 @@
  */
 
 #include "ContactRecord.hpp"
-
-// TODO copied from Profile -> move to some utils.hpp
-#include <sstream>
-template <typename Out> void split(const std::string &s, char delim, Out result)
-{
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim))
-    {
-        *(result++) = item;
-    }
-}
-
-static std::vector<std::string> split(const std::string &s, char delim)
-{
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-/// <- copy end
+#include "Utils.hpp"
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
 {
@@ -116,6 +97,11 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
                                                       .speedDial = rec.speeddial});
 
     return ret;
+}
+
+bool ContactRecordInterface::BlockByID(uint32_t id, const bool shouldBeBlocked)
+{
+    return contactDB->contacts.BlockByID(id, shouldBeBlocked);
 }
 
 bool ContactRecordInterface::RemoveByID(uint32_t id)
@@ -579,6 +565,60 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
     return records;
 }
 
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const char *primaryName, const char *alternativeName, const char *number)
+{
+    auto records = std::make_unique<std::vector<ContactRecord>>();
+
+    auto ret = contactDB->contacts.Search(primaryName, alternativeName, number);
+
+    for (const auto &w : ret)
+    {
+        auto contact = contactDB->contacts.GetByID(w.ID);
+        if (contact.ID == 0)
+        {
+            return records;
+        }
+
+        auto nrs = getNumbers(contact.numbersID);
+        if (nrs.size() == 0)
+        {
+            return records;
+        }
+
+        auto ring = contactDB->ringtones.GetByID(contact.ringID);
+        if (ring.ID == 0)
+        {
+            return records;
+        }
+
+        auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
+        if (address.ID == 0)
+        {
+            return records;
+        }
+
+        records->push_back(ContactRecord{.dbID = w.ID,
+                                         .primaryName = w.namePrimary,
+                                         .alternativeName = w.nameAlternative,
+                                         .contactType = contact.type,
+                                         .numbers = nrs,
+                                         .country = address.country,
+                                         .city = address.city,
+                                         .street = address.street,
+                                         .number = address.number,
+                                         .note = address.note,
+                                         .mail = address.mail,
+                                         .addressType = address.type,
+                                         .assetPath = ring.assetPath,
+                                         .isOnWhitelist = contact.isOnWhitelist,
+                                         .isOnBlacklist = contact.isOnBlacklist,
+                                         .isOnFavourites = contact.isOnFavourites,
+                                         .speeddial = static_cast<uint8_t>(contact.speedDial)});
+    }
+
+    return records;
+}
+
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(UTF8 number)
 {
     return GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, number.c_str());
@@ -592,7 +632,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDi
 std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)
 {
     std::vector<ContactRecord::Number> nrs;
-    for (auto nr_str : split(numbers_id, ' '))
+    for (auto nr_str : utils::split(numbers_id, ' '))
     {
         auto nr = contactDB->number.GetByID(std::stol(nr_str));
         if (nr.ID == 0)

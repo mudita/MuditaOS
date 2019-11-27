@@ -12,7 +12,6 @@
 #define PUREPHONE_DBSERVICEAPI_HPP
 
 #include "Interface/AlarmsRecord.hpp"
-#include "Interface/CalllogRecord.hpp"
 #include "Interface/ContactRecord.hpp"
 #include "Interface/NotesRecord.hpp"
 #include "Interface/SMSRecord.hpp"
@@ -24,6 +23,15 @@ class DBServiceAPI
 {
 
   public:
+    enum ContactVerificationError
+    {
+        nameError,
+        speedDialError,
+        primaryNumberError,
+        secondaryNumberError,
+        noError
+    };
+
     static SettingsRecord SettingsGet(sys::Service *serv);
     static bool SettingsUpdate(sys::Service *serv, const SettingsRecord &rec);
 
@@ -35,8 +43,7 @@ class DBServiceAPI
 
     static ThreadRecord ThreadGet(sys::Service *serv, uint32_t id);
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
-    static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
-    static uint32_t ThreadGetCount(sys::Service *serv);
+    static std::unique_ptr<std::vector<ThreadRecord>> ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
 
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.
@@ -44,25 +51,27 @@ class DBServiceAPI
      * @param rec Reference to the contact to be added to database.
      * @param errName in case of existing contact with same name this record will be filled with data.
      * @param errName in case of existing contact with same primary phone number this record will be filled with data.
-     * @param errName in case of existing contact with same alternative phone number this record will be filled with data.
+     * @param errName in case of existing contact with same alternative phone number this record will be filled with
+     * data.
      * @param errName in case of existing contact with same speed dial assigned this record will be filled with data.
      *
      * @note This function is blocking. It's checking until first error.
      */
-    static bool verifyContact(sys::Service *serv, const ContactRecord &rec, ContactRecord &errName, ContactRecord &errPhone1, ContactRecord &errPhone2,
-                              ContactRecord &speedDial);
-
+    static ContactVerificationError verifyContact(sys::Service *serv, const ContactRecord &rec, ContactRecord &errName, ContactRecord &errPhone1,
+                                                  ContactRecord &errPhone2, ContactRecord &speedDial);
+    static std::string getVerificationErrorString(const ContactVerificationError err);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
     static bool ContactAdd(sys::Service *serv, const ContactRecord &rec);
     static bool ContactRemove(sys::Service *serv, uint32_t id);
     static bool ContactUpdate(sys::Service *serv, const ContactRecord &rec);
+    static bool ContactBlock(sys::Service *serv, uint32_t id, const bool shouldBeBlocked = true);
     static uint32_t ContactGetCount(sys::Service *serv, bool favourites = false);
-    //    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t offset,uint32_t limit, bool favourites = false );
+    //    static std::unique_ptr<std::vector<ContactRecord>> ContactGetLimitOffset(sys::Service *serv,uint32_t
+    //    offset,uint32_t limit, bool favourites = false );
     static bool ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit, bool favourites = false);
-
+    static std::unique_ptr<std::vector<ContactRecord>> ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number);
     static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
     static bool AlarmRemove(sys::Service *serv, uint32_t id);
     static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);
@@ -75,12 +84,6 @@ class DBServiceAPI
     static bool NotesUpdate(sys::Service *serv, const NotesRecord &rec);
     static uint32_t NotesGetCount(sys::Service *serv);
     static bool NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
-
-    static bool CalllogAdd(sys::Service *serv, const CalllogRecord &rec);
-    static bool CalllogRemove(sys::Service *serv, uint32_t id);
-    static bool CalllogUpdate(sys::Service *serv, const CalllogRecord &rec);
-    static uint32_t CalllogGetCount(sys::Service *serv);
-    static bool CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
 };
 
 #endif // PUREPHONE_DBSERVICEAPI_HPP

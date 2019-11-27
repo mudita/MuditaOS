@@ -75,6 +75,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     bool Update(const ContactRecord &rec) override final;
 
+    bool BlockByID(uint32_t id, const bool shouldBeBlocked = true);
+
     ContactRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
@@ -83,7 +85,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field,
+    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit,
+                                                                      ContactRecordField field,
                                                                       const char *str) override final;
 
     std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
@@ -91,6 +94,9 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> GetByNumber(UTF8 number);
 
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
+
+    std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName, const char *alternativeName,
+                                                       const char *number);
 
   private:
     ContactsDB *contactDB;
