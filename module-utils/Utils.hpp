@@ -48,4 +48,34 @@ static inline std::string trim(const std::string &s)
     return rtrim(ltrim(s));
 }
 
+static inline std::string replaceString(std::string subject, const std::string &search, const std::string &replace)
+{
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos)
+    {
+        subject.replace(pos, search.length(), replace);
+        pos += replace.length();
+    }
+    return subject;
+}
+
+static inline std::string formatContactName(std::shared_ptr<ContactRecord> contact)
+{
+    return (contact->primaryName + " " + contact->alternativeName);
+}
+
+static inline std::string fillContactData(const std::string &baseString, std::shared_ptr<ContactRecord> contact)
+{
+    std::string t = replaceString(baseString, "%CONTACT_NAME%", formatContactName(contact));
+    t = replaceString(t, "%CONTACT_NUMBER1%", (contact.get()->numbers.size() >= 1) ? contact.get()->numbers[0].numberE164.c_str() : "");
+    return (t);
+}
+
+template <typename... Args> static inline std::string stringFormatted(const std::string &format, Args... args)
+{
+    size_t size = snprintf(nullptr, 0, format.c_str(), args...) + 1; // Extra space for '\0'
+    std::unique_ptr<char[]> buf(new char[size]);
+    snprintf(buf.get(), size, format.c_str(), args...);
+    return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
 } // namespace utils
