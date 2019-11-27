@@ -64,7 +64,7 @@ void EnterNumberWindow::buildInterface() {
 	numberLabel->setFont(style::window::font::verybig);
 	numberLabel->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
 	numberLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
-    numberLabel->setDotsMode( true );
+    numberLabel->setDotsMode( true, Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
     newContactIcon = new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
 	newContactIcon->activatedCallback = [=] (gui::Item& item){
@@ -161,7 +161,7 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
             setNumberLabel("");
 
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-			
+
 			return true;
 		}
 	}
