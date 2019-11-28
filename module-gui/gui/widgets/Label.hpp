@@ -28,7 +28,7 @@ class Label: public Rect {
 protected:
 	UTF8 text;
 	UTF8 textDisplayed;
-	uint32_t charDraw;
+	uint32_t charDrawableCount;
 	//number of pixels ccupied by displayed text;
 	uint32_t stringPixelWidth;
 
