@@ -370,8 +370,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 	}
 		break;
 
-
-
     default:
         break;
     }
@@ -434,7 +432,7 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
 bool ServiceCellular::sendSMS(std::string number, std::string text) {
 	uint32_t textLen = text.size();
 
-	const uint32_t singleMessageLen = 63;
+	const uint32_t singleMessageLen = 30;
 
 
 	//if text fit in single message send
@@ -442,14 +440,17 @@ bool ServiceCellular::sendSMS(std::string number, std::string text) {
 		LOG_INFO("Sending single message");
 
 		auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
-				("AT+CMGS=\"" + number + "\"\r").c_str(), 1, 1000);
+				("AT+CMGS=\"" + UCS2(UTF8(number)).modemStr() + "\"\r").c_str(), 1, 1000);
 
 		LOG_INFO("Ret size %d", retCommand.size());
 
 		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
 			LOG_INFO("Prompt received send text");
 			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
-					(text + "\032").c_str(), 1);
+					(UCS2(UTF8(text)).modemStr() + "\032").c_str(), 1);
+
+			LOG_INFO("retText size %d", retText.size());
+
 			return true;
 			//todo clean
 			if ((retCommand.size() != 0)) {
@@ -490,7 +491,7 @@ bool ServiceCellular::sendSMS(std::string number, std::string text) {
 			LOG_INFO("Sending concatenated part: %s", messagePart.c_str());
 
 			std::string command(
-					"AT+QCMGS=\"" + std::string(number.c_str()) + "\",120,"
+					"AT+QCMGS=\"" + UCS2(UTF8(number)).modemStr() + "\",120,"
 							+ std::to_string(i + 1) + ","
 							+ std::to_string(messagePartsCount) + "\r");
 
@@ -500,11 +501,18 @@ bool ServiceCellular::sendSMS(std::string number, std::string text) {
 			if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
 				//prompt sign received, send data ended by "Ctrl+Z"
 				auto sended =
-						cmux->GetChannel("Commands")->SendCommandPrompt(
-								(std::string(UCS2(messagePart).modemStr())
+						cmux->GetChannel("Commands")->SendCommandResponse(
+								 (UCS2(UTF8(messagePart)).modemStr()
 										+ "\032").c_str(), 2, 2000);
 				LOG_INFO("sended size %d", sended.size());
 
+				if(sended.size() > 0)
+				{
+					for(uint32_t c = 0; c < sended.size(); c++)
+					{
+						LOG_INFO("%s", sended[c].c_str());
+					}
+				}
 			}
 		}
 

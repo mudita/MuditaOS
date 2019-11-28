@@ -113,6 +113,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
             break;
         }
 
+
         auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
         timeElapsed = cpp_freertos::Ticks::GetTicks();
         if (ret)
