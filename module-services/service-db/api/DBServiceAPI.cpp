@@ -281,38 +281,21 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumbe
     }
 }
 
-bool DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec, ContactRecord &errName, ContactRecord &errPhone1, ContactRecord &errPhone2,
-                                 ContactRecord &speedDial)
+DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec, ContactRecord &errName,
+                                                                   ContactRecord &errPhone1, ContactRecord &errPhone2, ContactRecord &speedDial)
 {
-
-    // if true it means that contact passed verification
-    bool verified = true;
-
-    // request contact with specified primary and alternative name.
     auto retName = ContactGetByName(serv, rec.primaryName, rec.alternativeName);
     if (retName->size() != 0)
     {
-        verified = false;
         errName = retName->operator[](0);
-        LOG_WARN("Name verification failed for [%s %s] owner ID: %d [%s %s]", rec.primaryName.c_str(), rec.alternativeName.c_str());
-    }
-    else
-    {
-        LOG_INFO("Name verification passed for [%s %s]", rec.primaryName.c_str(), rec.alternativeName.c_str());
+        return (nameError);
     }
 
-    // request contact by speed dial
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
     if (retSpeedDial->size() != 0)
     {
-        verified = false;
-        LOG_WARN("Speed dial verification failed for number: [%d] owner ID: %d [%s %s]", rec.speeddial, retSpeedDial->operator[](0).dbID,
-                 retSpeedDial->operator[](0).primaryName.c_str(), retSpeedDial->operator[](0).alternativeName.c_str());
         speedDial = retSpeedDial->operator[](0);
-    }
-    else
-    {
-        LOG_INFO("Speed dial verification passed for number: [%d]", rec.speeddial);
+        return (speedDialError);
     }
 
     // request contact by speed dial
@@ -321,34 +304,41 @@ bool DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec, C
         auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
         if (retPhone1->size() != 0)
         {
-            verified = false;
-            LOG_WARN("Phone number 1 verification failed for number: [%s] owner: ID: %d [%s %s]", rec.numbers[0].numberE164.c_str(),
-                     retPhone1->operator[](0).dbID, retPhone1->operator[](0).primaryName.c_str(), retPhone1->operator[](0).alternativeName.c_str());
             errPhone1 = retPhone1->operator[](0);
-        }
-        else
-        {
-            LOG_INFO("Phone number 1 verification passed for number: [%s]", rec.numbers[0].numberE164.c_str());
+            return (primaryNumberError);
         }
     }
 
     if (rec.numbers.size() > 1)
     {
-        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
+        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberE164);
         if (retPhone2->size() != 0)
         {
-            verified = false;
-            LOG_WARN("Phone number 1 verification failed for number: [%s] owner: ID: %d [%s %s]", rec.numbers[0].numberE164.c_str(),
-                     retPhone2->operator[](0).dbID, retPhone2->operator[](0).primaryName.c_str(), retPhone2->operator[](0).alternativeName.c_str());
             errPhone2 = retPhone2->operator[](0);
-        }
-        else
-        {
-            LOG_INFO("Phone number 2 verification passed for number: [%s]", rec.numbers[1].numberE164.c_str());
+            return (secondaryNumberError);
         }
     }
 
-    return verified;
+    return (noError);
+}
+
+std::string DBServiceAPI::getVerificationErrorString(const ContactVerificationError err)
+{
+    switch (err)
+    {
+    case noError:
+        return ("No error occured");
+    case nameError:
+        return ("Invalid name format");
+    case speedDialError:
+        return ("Invalid or duplicate speed dial number");
+    case primaryNumberError:
+        return ("Invalid or duplicate primary number");
+    case secondaryNumberError:
+        return ("Invalid or duplicate secondary number");
+    default:
+        return "(Unknonw error)";
+    }
 }
 
 bool DBServiceAPI::ContactAdd(sys::Service *serv, const ContactRecord &rec)
@@ -401,6 +391,22 @@ bool DBServiceAPI::ContactUpdate(sys::Service *serv, const ContactRecord &rec)
     }
 }
 
+bool DBServiceAPI::ContactBlock(sys::Service *serv, uint32_t id, const bool shouldBeBlocked)
+{
+    std::shared_ptr<DBContactBlock> msg = std::make_shared<DBContactBlock>(MessageType::DBContactBlock, id, shouldBeBlocked);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 uint32_t DBServiceAPI::ContactGetCount(sys::Service *serv, bool favourites)
 {
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetCount, ContactRecord{}, favourites);
@@ -439,6 +445,24 @@ bool DBServiceAPI::ContactGetLimitOffset(sys::Service *serv, uint32_t offset, ui
 
     sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
     return true;
+}
+
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number)
+{
+    std::shared_ptr<DBContactSearchMessage> msg =
+        std::make_shared<DBContactSearchMessage>(MessageType::DBContactSearch, (primaryName.length() > 0) ? primaryName.c_str() : "",
+                                                 (alternativeName.length() > 0) ? alternativeName.c_str() : "", (number.length() > 0) ? number.c_str() : "");
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true))
+    {
+        return std::move(contactResponse->records);
+    }
+    else
+    {
+        return std::make_unique<std::vector<ContactRecord>>();
+    }
 }
 
 bool DBServiceAPI::AlarmAdd(sys::Service *serv, const AlarmsRecord &rec)

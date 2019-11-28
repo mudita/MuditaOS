@@ -118,6 +118,11 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     return ret;
 }
 
+bool ContactRecordInterface::BlockByID(uint32_t id, const bool shouldBeBlocked)
+{
+    return contactDB->contacts.BlockByID(id, shouldBeBlocked);
+}
+
 bool ContactRecordInterface::RemoveByID(uint32_t id)
 {
 
@@ -534,6 +539,60 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
     {
 
         auto contact = contactDB->contacts.GetByID(w.contactID);
+        if (contact.ID == 0)
+        {
+            return records;
+        }
+
+        auto nrs = getNumbers(contact.numbersID);
+        if (nrs.size() == 0)
+        {
+            return records;
+        }
+
+        auto ring = contactDB->ringtones.GetByID(contact.ringID);
+        if (ring.ID == 0)
+        {
+            return records;
+        }
+
+        auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
+        if (address.ID == 0)
+        {
+            return records;
+        }
+
+        records->push_back(ContactRecord{.dbID = w.ID,
+                                         .primaryName = w.namePrimary,
+                                         .alternativeName = w.nameAlternative,
+                                         .contactType = contact.type,
+                                         .numbers = nrs,
+                                         .country = address.country,
+                                         .city = address.city,
+                                         .street = address.street,
+                                         .number = address.number,
+                                         .note = address.note,
+                                         .mail = address.mail,
+                                         .addressType = address.type,
+                                         .assetPath = ring.assetPath,
+                                         .isOnWhitelist = contact.isOnWhitelist,
+                                         .isOnBlacklist = contact.isOnBlacklist,
+                                         .isOnFavourites = contact.isOnFavourites,
+                                         .speeddial = static_cast<uint8_t>(contact.speedDial)});
+    }
+
+    return records;
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const char *primaryName, const char *alternativeName, const char *number)
+{
+    auto records = std::make_unique<std::vector<ContactRecord>>();
+
+    auto ret = contactDB->contacts.Search(primaryName, alternativeName, number);
+
+    for (const auto &w : ret)
+    {
+        auto contact = contactDB->contacts.GetByID(w.ID);
         if (contact.ID == 0)
         {
             return records;
