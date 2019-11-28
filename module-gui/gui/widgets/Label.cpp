@@ -52,6 +52,7 @@ void Label::calculateDisplayText() {
 
 	//calculate number of chars that can fit available space
 	uint32_t spaceConsumed;
+	// @TODO spaceConsumed returns value irrelevant of current char
     charDrawableCount = font->getCharCountInSpace( text, availableSpace, spaceConsumed );
 	textArea.w = (uint16_t)spaceConsumed;
 
