@@ -37,9 +37,9 @@
 
 namespace sapm {
 
-ApplicationDescription::ApplicationDescription( std::string name, std::unique_ptr<app::ApplicationLauncher> lanucher, bool closeable ) :
-	name{name}, closeable{closeable}, state{app::Application::State::DEACTIVATED}, switchData{nullptr} {
-	this->lanucher = std::move(lanucher);
+ApplicationDescription::ApplicationDescription( std::unique_ptr<app::ApplicationLauncher> launcher) :
+	switchData{nullptr} {
+	this->launcher = std::move(launcher);
 }
 
 ApplicationManager::ApplicationManager( const std::string& name, sys::SystemManager* sysmgr,
@@ -49,19 +49,13 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
-
-		std::string name = launchers[i]->getName();
-		bool isCloseable = launchers[i]->isCloseable();
-		bool preventsLocking = launchers[i]->isBlocking();
-		ApplicationDescription* desc = new ApplicationDescription(name, std::move(launchers[i]), isCloseable );
-		desc->preventLocking = preventsLocking;
-
-		applications.insert(std::pair<std::string, ApplicationDescription*>(name, desc)	);
+		ApplicationDescription* desc = new ApplicationDescription(std::move(launchers[i]));
+		applications.push_back(desc);
 	}
 }
 ApplicationManager::~ApplicationManager() {
 	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
-		delete it->second;
+		delete *it;
 	}
 	systemManager = nullptr;
 }
@@ -86,18 +80,19 @@ bool ApplicationManager::closeApplications() {
 
 	//if application is started, its in first plane or it's working in background
 	//it will be closed using SystemManager's API.
-	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
-		if( ( it->second->state == app::Application::State::ACTIVE_FORGROUND ) ||
-			( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) ||
-			( it->second->state == app::Application::State::ACTIVATING )) {
-			LOG_INFO("Closing application: %s", it->second->name.c_str());
-			bool ret = sys::SystemManager::DestroyService( it->second->name, this );
+    for( auto & app : applications ) {
+		if( app != nullptr && (
+            ( app->getState() == app::Application::State::ACTIVE_FORGROUND ) ||
+			( app->getState() == app::Application::State::ACTIVE_BACKGROUND ) ||
+			( app->getState() == app::Application::State::ACTIVATING ))) {
+			LOG_INFO("Closing application: %s", app->name().c_str());
+			bool ret = sys::SystemManager::DestroyService(app->name(), this );
 			if( ret ) {
-				LOG_INFO("Application: %s closed", it->second->name.c_str());
+				LOG_INFO("Application: %s closed", app->name().c_str());
 			}else {
-				LOG_FATAL("Application: %s is still running", it->second->name.c_str());
+				LOG_FATAL("Application: %s is still running", app->name().c_str());
 			}
-			it->second->state = app::Application::State::DEACTIVATED;
+			app->setState(app::Application::State::DEACTIVATED);
 		}
 	}
 	return true;
@@ -254,18 +249,17 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
     for (auto &el : bg_apps)
     {
-        auto app = applications.find(el);
-        if (app != applications.end())
+        auto app = getApp(el);
+        if (app != nullptr)
         {
-            LOG_INFO("Running in bg: %s", app->first.c_str());
-            app->second->lanucher->runBackground(this);
+            app->launcher->runBackground(this);
         }
     }
 
-    auto app = applications.find(app_desktop);
-    if (app != applications.end())
+    auto app = getApp(app_desktop);
+    if (app != nullptr)
     {
-        messageSwitchApplication(this, app->second->lanucher->getName(), "", nullptr);
+        messageSwitchApplication(this, app->launcher->getName(), "", nullptr);
     }
 
 #else
@@ -308,21 +302,21 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 
 	state = State::STARTING_NEW_APP;
 	//search map for application's description structure with specified name
-	auto it = applications.find(appName);
-	if( it == applications.end() ) {
-		LOG_WARN("Failed to find specified application");
+	auto app = getApp(appName);
+	if( app == nullptr ) {
+		LOG_ERROR("Can't run: %s no such app", appName.c_str());
 		return false;
 	}
 
-	if( it->second->state == app::Application::State::ACTIVE_BACKGROUND ) {
+	if( app->getState() == app::Application::State::ACTIVE_BACKGROUND ) {
 		state = State::WAITING_GET_FOCUS_CONFIRMATION;
-		LOG_INFO( "switching focus to application: [%s] window [%s]", appName.c_str(), it->second->switchWindow.c_str());
-		app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+		LOG_INFO( "switching focus to application: [%s] window [%s]", appName.c_str(), app->switchWindow.c_str());
+		app::Application::messageSwitchApplication( this, launchApplicationName, app->switchWindow, std::move(app->switchData) );
 	}
 	else {
 		state = State::WAITING_NEW_APP_REGISTRATION;
 		LOG_INFO( "starting application: %s", appName.c_str());
-		it->second->lanucher->run(this);
+		app->launcher->run(this);
 	}
 
 	return true;
@@ -344,12 +338,11 @@ bool ApplicationManager::handlePowerSavingModeInit() {
 bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 
 	//first check if there is application specified in the message
-	auto it = applications.find(msg->getName());
-	if( it == applications.end() ) {
-		//specified application was not found, exiting
-		LOG_ERROR("Unable to find specified application");
-		return false;
-	}
+	auto app = getApp(msg->getName());
+    if(!app) {
+        LOG_ERROR("Cant switch to app: %s , doesn't exist", msg->getName().c_str());
+        return false;
+    }
 
 	//check if specified application is not the application that is currently running
 	//this is applicable to all applications except desktop
@@ -362,8 +355,8 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	launchApplicationName = msg->getName();
 
 	//store window and data if there is any
-	it->second->switchData = std::move(msg->getData());
-	it->second->switchWindow = msg->getWindow();
+	app->switchData = std::move(msg->getData());
+	app->switchWindow = msg->getWindow();
 	state = State::CLOSING_PREV_APP;
 
 	//notify event manager which application should receive keyboard messages
@@ -372,10 +365,10 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
 		previousApplicationName = focusApplicationName;
-		auto it = applications.find( previousApplicationName );
+		auto app = getApp( previousApplicationName );
 
 		//if application's launcher defines that it can be closed send message with close signal
-		if( (it->second->closeable) && (it->second->blockClosing == false) ){
+		if( (app->closeable()) && (app->blockClosing == false) ){
 			LOG_INFO("APMSwitch waiting for close confirmation from: %s", previousApplicationName.c_str());
 			state = State::WAITING_CLOSE_CONFIRMATION;
 			app::Application::messageCloseApplication( this, previousApplicationName );
@@ -390,7 +383,7 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	//if there was no application to close or application can't be closed change internal state to
 	//STARTING_NEW_APP and send execute lanuchers for that application
 	else {
-		startApplication( it->second->name);
+		startApplication( app->name());
 	}
 
 	return true;
@@ -405,10 +398,10 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	}
 
 	//check if previous application is stored in the description vector
-	auto it = applications.find( previousApplicationName );
-	if( it == applications.end() ) {
+	auto app = getApp( previousApplicationName );
+	if(!app) {
 		//specified application was not found, exiting
-		LOG_ERROR("Unable to find previous application");
+		LOG_ERROR("Unable to find previous application: %s", previousApplicationName);
 		return false;
 	}
 
@@ -421,8 +414,8 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	//set name of the application to be executed and start closing previous application
 	launchApplicationName = previousApplicationName;
 	//store window and data if there is any
-	it->second->switchData = std::move(msg->getData());
-	it->second->switchWindow = "LastWindow";
+	app->switchData = std::move(msg->getData());
+	app->switchWindow = "LastWindow";
 	state = State::CLOSING_PREV_APP;
 
 	//notify event manager which application should receive keyboard messages
@@ -431,10 +424,10 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
 		previousApplicationName = focusApplicationName;
-		auto it = applications.find( previousApplicationName );
+		auto app = getApp( previousApplicationName );
 
 		//if application's launcher defines that it can be closed send message with close signal
-		if( it->second->closeable ){
+		if( app->closeable()){
 			LOG_INFO( "Closing application: %s", previousApplicationName.c_str() );
 			state = State::WAITING_CLOSE_CONFIRMATION;
 			app::Application::messageCloseApplication( this, previousApplicationName );
@@ -448,35 +441,35 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	//if there was no application to close or application can't be closed change internal state to
 	//STARTING_NEW_APP and send execute lanuchers for that application
 	else {
-		startApplication( it->second->name);
+		startApplication( app->name());
 	}
 
 	return true;
 }
 
 bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
+    auto app = getApp(msg->getSenderName());
+    if (app == nullptr)
+    {
+        LOG_ERROR("can't register: %s no such app in `applicationsk`", msg->getSenderName().c_str());
+        return false;
+    }
 
 	if( msg->getSenderName() == launchApplicationName ) {
-
-		//check if this is register message from recently launched application
-		auto it = applications.find(msg->getSenderName());
-		if( it == applications.end())
-			return false;
 		//application starts in background
 		if( msg->getStartBackground()) {
-			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+			app->setState(app::Application::State::ACTIVE_BACKGROUND);
 			state = State::IDLE;
 		}
 		else {
-			it->second->state = app::Application::State::ACTIVATING;
+			app->setState(app::Application::State::ACTIVATING);
 			state = State::WAITING_GET_FOCUS_CONFIRMATION;
 
-			app::Application::messageSwitchApplication( this, launchApplicationName, it->second->switchWindow, std::move(it->second->switchData) );
+			app::Application::messageSwitchApplication( this, launchApplicationName, app->switchWindow, std::move(app->switchData) );
 		}
 	}
 	else {
-		auto it = applications.find(msg->getSenderName());
-		it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+		app->setState(app::Application::State::ACTIVE_BACKGROUND);
 	}
 	return true;
 }
@@ -507,11 +500,10 @@ bool ApplicationManager::handleLanguageChange( sapm::APMChangeLanguage* msg ) {
 	}
 
 	//iterate over all applications in the background or foreground state and send them rebuild command
-	for( auto it = applications.begin(); it!=applications.end(); it++ ) {
-		if( it->second->state == app::Application::State::ACTIVE_BACKGROUND ||
-			it->second->state == app::Application::State::ACTIVE_FORGROUND ) {
-
-			app::Application::messageRebuildApplication(this, it->second->name);
+	for(auto & app : applications) {
+		if( app->launcher->handle->getState() == app::Application::State::ACTIVE_BACKGROUND ||
+			app->launcher->handle->getState() == app::Application::State::ACTIVE_FORGROUND ) {
+			app::Application::messageRebuildApplication(this, app->name());
 		}
 	}
 
@@ -520,7 +512,14 @@ bool ApplicationManager::handleLanguageChange( sapm::APMChangeLanguage* msg ) {
 	return true;
 }
 
-bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
+bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
+{
+    std::string app_name = state == State::WAITING_GET_FOCUS_CONFIRMATION?msg->getSenderName():focusApplicationName;
+    ApplicationDescription* app = getApp(app_name);
+    if (app == nullptr) {
+        LOG_ERROR("Can't handle switch confirmation to: %s", app_name.c_str());
+        return false;
+    }
 	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
 	if( state == State::WAITING_GET_FOCUS_CONFIRMATION
@@ -531,25 +530,22 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 			focusApplicationName = launchApplicationName;
 			launchApplicationName = "";
 
-			auto it = applications.find(msg->getSenderName());
-			it->second->blockClosing = false;
-			it->second->state = app::Application::State::ACTIVE_FORGROUND;
+			app->blockClosing = false;
+			app->setState(app::Application::State::ACTIVE_FORGROUND);
 			state = State::IDLE;
 			return true;
 		// }
 
 	}
 	//this is the case where application manager is waiting for non-closeable application
-	//to confirm that it has lost focus.
+	//to confirm that app has lost focus.
 	else if( state == State::WAITING_LOST_FOCUS_CONFIRMATION) {
 		if( msg->getSenderName() == focusApplicationName ) {
 			LOG_INFO("APMConfirmSwitch Lost focus confirmed by: %s", msg->getSenderName().c_str());
 			previousApplicationName = focusApplicationName;
 			focusApplicationName = "";
-
-			auto it = applications.find(previousApplicationName);
-			it->second->state = app::Application::State::ACTIVE_BACKGROUND;
-			it->second->switchWindow = "LastWindow";
+			app->setState(app::Application::State::ACTIVE_BACKGROUND);
+			app->switchWindow = "LastWindow";
 			startApplication( launchApplicationName );
 			return true;
 		}
@@ -559,19 +555,23 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 }
 
 bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
-	auto it = applications.find( msg->getSenderName() );
+	auto app = getApp( msg->getSenderName() );
+    if(app == nullptr) {
+        LOG_ERROR("can't handle: %s app: %s doesn't exist", __FUNCTION__, msg->getSenderName());
+        return false;
+    }
 
 	//if application is running and it's not closeable set state to active background
 	//otherwise it means that application is ready to be closed by using DestroyService api
-	if( it->second->closeable ) {
+	if( app->closeable() ) {
 		//internally send close message to allow response message to be sended to application
 		//that has confirmed close request.
-		it->second->state = app::Application::State::DEACTIVATED;
+		app->setState(app::Application::State::DEACTIVATED);
 		auto msg = std::make_shared<sapm::APMDelayedClose>( this->GetName(), previousApplicationName );
 		sys::Bus::SendUnicast(msg, "ApplicationManager", this );
 	}
 	else {
-		it->second->state = app::Application::State::ACTIVE_BACKGROUND;
+		app->setState(app::Application::State::ACTIVE_BACKGROUND);
 	}
 
 	return true;
