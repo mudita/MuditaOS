@@ -25,25 +25,65 @@ namespace sapm {
 
 class ApplicationDescription {
 public:
-	ApplicationDescription( std::string name, std::unique_ptr<app::ApplicationLauncher> lanucher, bool closeable );
+	ApplicationDescription( std::unique_ptr<app::ApplicationLauncher> launcher);
 	virtual ~ApplicationDescription() {}
 	//name of the application. It's used to find proper application during switching
-	std::string name;
+	std::string name()
+    {
+        if(launcher) {
+            return launcher->getName();
+        } else {
+            return "NONE";
+        }
+    }
 	//launcher to application to the application's start function
-	std::unique_ptr<app::ApplicationLauncher> lanucher;
-	//informs if it is possible to close application when it looses focus.
-	bool closeable;
+	std::unique_ptr<app::ApplicationLauncher> launcher = nullptr;
 	//informs application manager that this application temporary musn't be closed.
 	//This flag is used to prevent application closing when application is closeable and there is incoming call.
 	//This flag is also used when closeable application is on front and there is a timeout to block the applicatioin.
 	bool blockClosing = false;
-	//prevents from blocking the system
-	bool preventLocking = false;
-	//current state of the application
-	app::Application::State state = app::Application::State::DEACTIVATED;
 	//switching data stored when application manager had to run init function
 	std::unique_ptr<gui::SwitchData> switchData = nullptr;
 	std::string switchWindow = "";
+
+    // prevents from blocking the system
+    bool preventsLocking()
+    {
+        if (launcher)
+        {
+            return launcher->isBlocking();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // informs if it is possible to close application when it looses focus.
+    bool closeable()
+    {
+        if (launcher)
+        {
+            return launcher->isCloseable();
+        }
+        return false;
+    }
+
+    app::Application::State getState()
+    {
+        if( launcher && launcher->handle ) {
+        return launcher->handle->getState();
+        } else {
+            return app::Application::State::DEACTIVATED;
+        }
+    }
+
+    void setState(app::Application::State st)
+    {
+        if( launcher && launcher->handle ) {
+            launcher->handle->setState(st);
+        }
+    }
 };
 
 /*
@@ -63,8 +103,23 @@ class ApplicationManager: public sys::Service {
 
 	SettingsRecord settings;
 
-	std::map< std::string, ApplicationDescription* > applications;
-	sys::SystemManager* systemManager;
+	std::vector<ApplicationDescription* > applications;
+    ApplicationDescription *getApp(const std::string &name)
+    {
+        auto el = std::find_if(applications.begin(), applications.end(), [=](auto a) {
+            if (a->name() == name)
+                return true;
+            else
+                return false;
+        });
+        if (el == applications.end())
+            return nullptr;
+        else
+        {
+            return *el;
+        }
+    }
+        sys::SystemManager* systemManager;
 
 	//
 	std::unique_ptr<utils::i18> i18;
