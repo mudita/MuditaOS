@@ -55,6 +55,8 @@ public:
     static int32_t getSignalStrengthDB(int32_t strength) { return signalStrengthToDB[strength]; }
     static int32_t getSignalStrengthDBRange() { return (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])); }
 
+    bool sendSMS(std::string destinationNumber, std::string text);
+
 private:
 
     //std::unique_ptr<MuxDaemon> muxdaemon;

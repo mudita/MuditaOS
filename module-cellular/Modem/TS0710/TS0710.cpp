@@ -215,8 +215,8 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Set Message format to Text
     CheckATCommandResponse(parser->SendCommand("AT+CMGF=1\r", 1));
     //Set ucs2 message format
-    CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"UCS2\"\r", 1));
-
+//    CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"UCS2\"\r", 1));
+    CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"GSM\"\r", 1));
 
     // Enable sleep mode
     LOG_DEBUG("TODO: determine while this retry loop is necessary");

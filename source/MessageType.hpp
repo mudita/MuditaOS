@@ -72,12 +72,14 @@ enum class MessageType
     CellularStartPowerUpProcedure,
     CellularStartConfProcedure,
     CellularStartAudioConfProcedure,
+	CellularSendSMS,	// request ot send new sms
 
-    DBNotesAdd,            // Add new note's record
-    DBNotesRemove,         // Remove selected note's record
-    DBNotesUpdate,         // Update selected note's record
-    DBNotesGetLimitOffset, // Get notes records by limit,offset
-    DBNotesGetCount,       // Get notes reocrds count
+	DBNotesAdd,       // Add new note's record
+	DBNotesRemove,    // Remove selected note's record
+	DBNotesUpdate,    // Update selected note's record
+	DBNotesGetLimitOffset,   // Get notes records by limit,offset
+	DBNotesGetCount,         // Get notes reocrds count
+
 
     DBCalllogAdd,            // Add new note's record
     DBCalllogRemove,         // Remove selected note's record

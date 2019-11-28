@@ -26,6 +26,8 @@
 #include "Common.hpp"
 #include "log/log.hpp"
 
+#include "ucs2/UCS2.hpp"
+
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
@@ -331,26 +333,44 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     break;
 
-    case MessageType::CellularDialNumber: {
-        CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-        auto channel = cmux->GetChannel("Commands");
-        if (channel)
-        {
-            auto ret = channel->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1, 5000);
-            if (cmux->CheckATCommandResponse(ret))
-            {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
-                // activate call state timer
-                ReloadTimer(callStateTimer);
-                // Propagate "Ringing" notification into system
-                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::Ringing, msg->data),
-                                        sys::BusChannels::ServiceCellularNotifications, this);
-                break;
-            }
-        }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
-    }
-    break;
+	case MessageType::CellularDialNumber: {
+		CellularRequestMessage *msg =
+				reinterpret_cast<CellularRequestMessage*>(msgl);
+		auto channel = cmux->GetChannel("Commands");
+		if (channel) {
+			auto ret = channel->SendCommandResponse(
+					("ATD" + msg->data + ";\r").c_str(), 1, 5000);
+			if (cmux->CheckATCommandResponse(ret)) {
+				responseMsg = std::make_shared<CellularResponseMessage>(true);
+				// activate call state timer
+				ReloadTimer(callStateTimer);
+				// Propagate "Ringing" notification into system
+				sys::Bus::SendMulticast(
+						std::make_shared<CellularNotificationMessage>(
+								CellularNotificationMessage::Type::Ringing,
+								msg->data),
+						sys::BusChannels::ServiceCellularNotifications, this);
+				break;
+			}
+		}
+	}
+		break;
+	case MessageType::CellularSendSMS: {
+
+		CellularRequestMessage *msg =
+				reinterpret_cast<CellularRequestMessage*>(msgl);
+
+		std::string number = "666600925";
+		std::string text =
+				"ELO tu PurePhone taki dlugi smsm co to bedzie jak to bedzie polskich znakpow ni ma jeszcze cos dopisze na wszelki wypadek";
+//        	std::string text = "ELO tu PurePhone";
+		this->sendSMS(number, text);
+
+		responseMsg = std::make_shared<CellularResponseMessage>(false);
+	}
+		break;
+
+
 
     default:
         break;
@@ -409,4 +429,86 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
     LOG_TRACE(": None");
     return CellularNotificationMessage::Type::None;
 
+}
+
+bool ServiceCellular::sendSMS(std::string number, std::string text) {
+	uint32_t textLen = text.size();
+
+	const uint32_t singleMessageLen = 63;
+
+
+	//if text fit in single message send
+	if (textLen < singleMessageLen) {
+		LOG_INFO("Sending single message");
+
+		auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
+				("AT+CMGS=\"" + number + "\"\r").c_str(), 1, 1000);
+
+		LOG_INFO("Ret size %d", retCommand.size());
+
+		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
+			LOG_INFO("Prompt received send text");
+			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
+					(text + "\032").c_str(), 1);
+			return true;
+			//todo clean
+			if ((retCommand.size() != 0)) {
+//				LOG_INFO("Ret size %d, %s", retText.size(), retText[0].c_str());
+			}
+		}
+	}
+	//split text, and send concatenated message
+	else {
+		const uint32_t maxConcatenatedCount = 7;
+		uint32_t messagePartsCount = textLen / singleMessageLen;
+		if( (textLen % singleMessageLen) != 0 )
+		{
+			messagePartsCount++;
+		}
+
+		if(messagePartsCount > maxConcatenatedCount)
+		{
+			LOG_ERROR("Message to long");
+			return false;
+		}
+
+		LOG_INFO("Concatenated message: message length %d, parts count %d",
+				textLen, messagePartsCount);
+
+		for(uint32_t i = 0; i < messagePartsCount; i++)
+		{
+
+			uint32_t partLength = singleMessageLen;
+			if (i * singleMessageLen + singleMessageLen > text.length()) {
+				partLength = text.length() - i * singleMessageLen;
+			}
+			std::string messagePart = text.substr(i * singleMessageLen,
+					partLength);
+
+			LOG_INFO("Sending concatenated message part %d, total parts %d", i,
+					messagePartsCount);
+			LOG_INFO("Sending concatenated part: %s", messagePart.c_str());
+
+			std::string command(
+					"AT+QCMGS=\"" + std::string(number.c_str()) + "\",120,"
+							+ std::to_string(i + 1) + ","
+							+ std::to_string(messagePartsCount) + "\r");
+
+			auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
+					command.c_str(), 1, 1000);
+
+			if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
+				//prompt sign received, send data ended by "Ctrl+Z"
+				auto sended =
+						cmux->GetChannel("Commands")->SendCommandPrompt(
+								(std::string(UCS2(messagePart).modemStr())
+										+ "\032").c_str(), 2, 2000);
+				LOG_INFO("sended size %d", sended.size());
+
+			}
+		}
+
+//		LOG_INFO("")
+	}
+	return false;
 }

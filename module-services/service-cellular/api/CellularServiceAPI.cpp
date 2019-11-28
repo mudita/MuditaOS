@@ -57,3 +57,16 @@ bool CellularServiceAPI::HangupCall(sys::Service* serv){
         return false;
     }
 }
+
+bool CellularServiceAPI::SendSMS(sys::Service* serv, std::string number, std::string message)
+{
+	std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularSendSMS);
+
+	auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    CellularResponseMessage* response = reinterpret_cast<CellularResponseMessage*>(ret.second.get());
+	if((ret.first == sys::ReturnCodes::Success) && (response->retCode == true))
+	{
+		return true;
+	}
+	return false;
+}
