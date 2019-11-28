@@ -19,7 +19,7 @@ Label::Label() :
 	Rect(),
 	text{ "" },
 	textDisplayed{ "" },
-	charDraw{0},
+	charDrawableCount{0},
 	stringPixelWidth{ 0 },
 	textColor{ 0,0 },
 	font{ nullptr },
@@ -32,7 +32,7 @@ Label::Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t
 	Rect{ parent, x, y, w, h },
 	text( newText ),
 	textDisplayed{ "" },
-	charDraw{0},
+	charDrawableCount{0},
 	stringPixelWidth{ 0 },
 	textColor{ 0,0 },
 	dotsMode{false}
@@ -52,14 +52,14 @@ void Label::calculateDisplayText() {
 
 	//calculate number of chars that can fit available space
 	uint32_t spaceConsumed;
-	charDraw = font->getCharCountInSpace( text, availableSpace, spaceConsumed );
+    charDrawableCount = font->getCharCountInSpace( text, availableSpace, spaceConsumed );
 	textArea.w = (uint16_t)spaceConsumed;
 
 	//if not all characters fit create substring
-	if( charDraw < text.length())
+	if(charDrawableCount < text.length())
 	{
 		//get as much chars as possible
-		textDisplayed = text.substr( 0, charDraw );
+		textDisplayed = text.substr( 0, charDrawableCount);
 
 		// if 3 dots should be placed a the end
 		if( dotsMode )
@@ -76,7 +76,7 @@ void Label::calculateDisplayText() {
 			{
 				textDisplayed = dotsStr.substr( 0, dotsFitting );
 				textArea.w = (uint16_t)dotsSpaceConsumed;
-				charDraw = (uint16_t)dotsFitting;
+                charDrawableCount = (uint16_t)dotsFitting;
 			}
 			else //3 dots fit, calculate how many chars can be placed using smaller space (space for dots substracted )
 			{
@@ -94,12 +94,12 @@ void Label::calculateDisplayText() {
                         textDisplayed = dotsStr + text.substr(text.length() - remainingCharDraw, remainingCharDraw);
 					}
 					textArea.w = (uint16_t)(dotsSpaceConsumed + spaceConsumed );
-					charDraw = (uint16_t)textDisplayed.length();
+                    charDrawableCount = (uint16_t)textDisplayed.length();
 				}
 				else //only 3 dots can fit
 				{
 					textArea.w = (uint16_t)dotsSpaceConsumed;
-					charDraw = (uint16_t)dotsFitting;
+                    charDrawableCount = (uint16_t)dotsFitting;
 					textDisplayed = dotsStr;
 				}
 			}
