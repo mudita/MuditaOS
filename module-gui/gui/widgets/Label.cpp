@@ -79,16 +79,15 @@ void Label::calculateDisplayText() {
 				textArea.w = (uint16_t)dotsSpaceConsumed;
                 charDrawableCount = (uint16_t)dotsFitting;
 			}
-			else //3 dots fit, calculate how many chars can be placed using smaller space (space for dots substracted )
+			else // 3 dots fit, calculate how many chars can be placed using smaller space (space for dots subtracted )
 			{
 				availableSpace -= dotsSpaceConsumed;
-
+                // @TODO: here! count from the end
 				uint32_t remainingCharDraw = font->getCharCountInSpace( text, availableSpace, spaceConsumed );
 				if( remainingCharDraw )
 				{
 					//get as much chars as possible
-					// @TODO proper getter for gui::Alignment
-					if (this->dotsAlignment.alignment & Alignment::ALIGN_HORIZONTAL_RIGHT) {
+					if (this->dotsAlignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT) {
 					    textDisplayed = text.substr(0, remainingCharDraw) + dotsStr;
 					}
 					else{
