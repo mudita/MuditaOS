@@ -35,7 +35,8 @@ Label::Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t
 	charDrawableCount{0},
 	stringPixelWidth{ 0 },
 	textColor{ 0,0 },
-	dotsMode{false}
+	dotsMode{false},
+    dotsShowBeginning{true}
 {
     setFont(style::window::font::medium);
 }
@@ -83,12 +84,11 @@ void Label::calculateDisplayText() {
 			{
 				availableSpace -= dotsSpaceConsumed;
 
-				const bool fromLeft = this->dotsAlignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT);
-				uint32_t remainingCharDraw = font->getCharCountInSpace( text, availableSpace, spaceConsumed , fromLeft);
+				uint32_t remainingCharDraw = font->getCharCountInSpace( text, availableSpace, spaceConsumed , this->dotsShowBeginning);
 				if( remainingCharDraw )
 				{
 					//get as much chars as possible
-					if (this->dotsAlignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT)) {
+					if (this->dotsShowBeginning) {
 					    textDisplayed = text.substr(0, remainingCharDraw) + dotsStr;
 					}
 					else{
@@ -199,9 +199,9 @@ void Label::setMargins( const Margins& margins ) {
 	calculateDisplayText();
 }
 
-void Label::setDotsMode( const bool val, const gui::Alignment dotsAlignment ) {
+void Label::setDotsMode( const bool val, const bool showBeginning ) {
 	dotsMode = val;
-	this->dotsAlignment = dotsAlignment;
+	dotsShowBeginning = showBeginning;
 	calculateDisplayText();
 }
 
