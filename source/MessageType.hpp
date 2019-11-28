@@ -44,6 +44,7 @@ enum class MessageType
     DBContactVerify, // checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
                      // speed dial key
     DBContactGetByName,      // used to ask for a contact with specified primary and alternative name.
+    DBContactSearch,
     DBContactGetByID,        // used to ask for a contact with specified id
     DBContactGetBySpeedDial, // used to ask for a contact with specified speed dial key assigned
     DBContactGetByNumber,    // used to ask for a contact with specified primary or secondary phone number
@@ -52,7 +53,7 @@ enum class MessageType
     DBContactUpdate,         // Update contact remove
     DBContactGetLimitOffset, // Get contact records by limit,offset
     DBContactGetCount,       // Get contacts count
-
+    DBContactBlock,
     DBAlarmAdd,            // Add alarm record
     DBAlarmRemove,         // Remove alarm remove
     DBAlarmUpdate,         // Update alarm remove

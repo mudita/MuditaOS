@@ -36,6 +36,11 @@ bool ContactsTable::RemoveByID(uint32_t id)
     return db->Execute("DELETE FROM contacts where _id = %u;", id);
 }
 
+bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
+{
+    return db->Execute("UPDATE contacts SET blacklist=%lu WHERE _id=%lu", shouldBeBlocked ? 1 : 0, id);
+}
+
 bool ContactsTable::Update(ContactsTableRow entry)
 {
     return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%s' ,ring_id = %lu, address_ids = '%s', type = %lu, whitelist = %lu, blacklist = %lu, "
@@ -65,6 +70,58 @@ ContactsTableRow ContactsTable::GetByID(uint32_t id)
         (*retQuery)[8].GetBool(),                             // is on favourites
         (*retQuery)[9].GetUInt32(),                           // speed dial key
     };
+}
+
+std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryName, const std::string alternativeName, const std::string number)
+{
+    std::vector<ContactsTableRow> ret;
+
+    if (primaryName.empty() && alternativeName.empty() && number.empty())
+    {
+        return (ret);
+    }
+
+    std::string q = "select t1.*,t2.name_primary,t2.name_alternative from contacts t1 inner join contact_name "
+                    "t2 "
+                    "on t1._id=t2.contact_id inner join contact_number t3 on t1._id=t3.contact_id where ";
+
+    if (!primaryName.empty())
+    {
+        q += "t2.name_primary like '%%" + primaryName + "'";
+        if (!alternativeName.empty()) q += " or ";
+    }
+
+    if (!alternativeName.empty())
+    {
+        q += "t2.name_alternative like '%%" + alternativeName + "'";
+        if (!number.empty()) q += " or ";
+    }
+
+    if (!number.empty()) q += "t3.number_e164 like '%%" + number + "%%'";
+
+    auto retQuery = db->Query(q.c_str());
+
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) { return std::vector<ContactsTableRow>(); }
+
+    do
+    {
+        ret.push_back(ContactsTableRow{
+            (*retQuery)[0].GetUInt32(),                           // ID
+            (*retQuery)[1].GetUInt32(),                           // nameID
+            (*retQuery)[2].GetString(),                           // numbersID
+            (*retQuery)[3].GetUInt32(),                           // ringID
+            (*retQuery)[4].GetString(),                           // addressID
+            static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
+            (*retQuery)[6].GetBool(),                             // is on whitelist
+            (*retQuery)[7].GetBool(),                             // is on blacklist
+            (*retQuery)[8].GetBool(),                             // is on favourites
+            (*retQuery)[9].GetUInt32(),                           // speed dial key
+            (*retQuery)[10].GetString(),                          // primaryName
+            (*retQuery)[11].GetString(),                          // alternativeName (WTF!)
+        });
+    } while (retQuery->NextRow());
+
+    return ret;
 }
 
 std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
