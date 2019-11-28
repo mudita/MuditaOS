@@ -119,7 +119,7 @@ public:
 	 * @param delimiter Optional character that stops operation. This character will be the last included character
 	 * @return number of chars that can fit provided space;
 	 */
-	uint32_t getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const uint32_t& delimiter = 0);
+	uint32_t getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const bool fromLeft = true, const uint32_t& delimiter = 0);
 	/**
 	 * @brief Calculates how many pixels will occupy selected part of the string.
 	 * @param str String used as a source of text.
