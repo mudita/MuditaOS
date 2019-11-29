@@ -6,8 +6,8 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../ApplicationPhonebook.hpp"
-#include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
+#include "service-db/messages/DBMessage.hpp"
 
 #include "Label.hpp"
 #include "ListView.hpp"
@@ -16,49 +16,43 @@
 
 #include "service-db/api/DBServiceAPI.hpp"
 
-#include <log/log.hpp>
 #include <Style.hpp>
+#include <log/log.hpp>
 
+std::vector<std::string> names = {"Alek",   "Janusz",  "Zofia", "Roland",  "Cezary", "Ignacy", "Brian", "Ejdiran", "Grażyna", "Sebastian",
+                                  "Karyna", "Mariola", "Ola",   "Mateusz", "Ernest", "Robert", "Jakub", "Adam",    "Łukasz",  "Tomek"};
 
-std::vector<std::string> names =  { "Alek", "Janusz", "Zofia", "Roland", "Cezary",
-									"Ignacy", "Brian", "Ejdiran", "Grażyna", "Sebastian",
-									"Karyna", "Mariola", "Ola", "Mateusz", "Ernest",
-									"Robert", "Jakub", "Adam", "Łukasz", "Tomek"};
+std::vector<std::string> surnames = {"Wyczesany", "Pacha", "Małolepszy", "Boligłowa", "Żur",    "Kiełbasa", "Skwara",     "Ściera",   "Słaby",
+                                     "Cnotliwy",  "Bubel", "Fundament",  "Rura",      "Bucior", "Kusibab",  "Kwasigroch", "Siekierka"};
 
-std::vector<std::string> surnames = {"Wyczesany", "Pacha", "Małolepszy", "Boligłowa", "Żur",
-									 "Kiełbasa", "Skwara", "Ściera", "Słaby", "Cnotliwy",
-									 "Bubel", "Fundament", "Rura", "Bucior", "Kusibab",
-									 "Kwasigroch", "Siekierka"};
+namespace gui
+{
 
-
-namespace gui {
-
-PhonebookMainWindow::PhonebookMainWindow(app::Application *app) :
-	AppWindow(app, "MainWindow"),
-	phonebookModel{ new PhonebookModel(app)}{
+PhonebookMainWindow::PhonebookMainWindow(app::Application *app) : AppWindow(app, "MainWindow"), phonebookModel{new PhonebookModel(app)}
+{
     setSize(480, 600);
     buildInterface();
-
 }
 
-void PhonebookMainWindow::rebuild() {
+void PhonebookMainWindow::rebuild()
+{
     destroyInterface();
     buildInterface();
 }
-void PhonebookMainWindow::buildInterface() {
+void PhonebookMainWindow::buildInterface()
+{
 
-	AppWindow::buildInterface();
+    AppWindow::buildInterface();
 
-	list = new gui::PhonebookListView(this, 11, 105, 480-22, 600-105-50 );
-	list->setMaxElements(7);
-	list->setPageSize(7);
-	list->setPenFocusWidth(0);
-	list->setPenWidth(0);
-	list->setProvider( phonebookModel );
-	list->setApplication( application );
+    list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
+    list->setMaxElements(7);
+    list->setPageSize(7);
+    list->setPenFocusWidth(0);
+    list->setPenWidth(0);
+    list->setProvider(phonebookModel);
+    list->setApplication(application);
 
-
-	bottomBar->setActive(BottomBar::Side::LEFT, true);
+    bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
     bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_phonebook_call"));
@@ -69,30 +63,56 @@ void PhonebookMainWindow::buildInterface() {
 
     setTitle(utils::localize.get("app_phonebook_title_main"));
 
-    leftArrowImage  = new gui::Image( this, 30,62,0,0, "phonebook_arrow_left" );
-	rightArrowImage = new gui::Image( this, 480-30-13,62,0,0, "phonebook_arrow_right" );
-	newContactImage = new gui::Image( this, 48,55,0,0, "phonebook_cross" );
-	searchImage     = new gui::Image( this, 480-48-26,55,0,0, "phonebook_search" );
+    leftArrowImage = new gui::Image(this, 30, 62, 0, 0, "phonebook_arrow_left");
+    rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "phonebook_arrow_right");
+    newContactImage = new gui::Image(this, 48, 55, 0, 0, "phonebook_cross");
+    searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "phonebook_search");
 }
-void PhonebookMainWindow::destroyInterface() {
+void PhonebookMainWindow::destroyInterface()
+{
     AppWindow::destroyInterface();
-    if( list ) { removeWidget(list);    delete list; list = nullptr; }
-    if( leftArrowImage ) { removeWidget(leftArrowImage);    delete leftArrowImage; leftArrowImage = nullptr; }
-    if( rightArrowImage ) { removeWidget(rightArrowImage);    delete rightArrowImage; rightArrowImage = nullptr; }
-    if( newContactImage ) { removeWidget(newContactImage);    delete newContactImage; newContactImage = nullptr; }
-    if( searchImage ) { removeWidget(searchImage);    delete searchImage; searchImage = nullptr; }
+    if (list)
+    {
+        removeWidget(list);
+        delete list;
+        list = nullptr;
+    }
+    if (leftArrowImage)
+    {
+        removeWidget(leftArrowImage);
+        delete leftArrowImage;
+        leftArrowImage = nullptr;
+    }
+    if (rightArrowImage)
+    {
+        removeWidget(rightArrowImage);
+        delete rightArrowImage;
+        rightArrowImage = nullptr;
+    }
+    if (newContactImage)
+    {
+        removeWidget(newContactImage);
+        delete newContactImage;
+        newContactImage = nullptr;
+    }
+    if (searchImage)
+    {
+        removeWidget(searchImage);
+        delete searchImage;
+        searchImage = nullptr;
+    }
 
     children.clear();
     delete phonebookModel;
 }
 
-PhonebookMainWindow::~PhonebookMainWindow() {
-	destroyInterface();
+PhonebookMainWindow::~PhonebookMainWindow()
+{
+    destroyInterface();
 }
 
-
-void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
-
+void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+{
 
 #if 0
 	for( uint32_t i=0; i<2/*surnames.size()*/; i++ ) {
@@ -130,58 +150,60 @@ void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 	}
 #endif
 
-	setFocusItem(list);
+    setFocusItem(list);
 
-	phonebookModel->clear();
-	phonebookModel->requestRecordsCount();
+    phonebookModel->clear();
+    phonebookModel->requestRecordsCount();
 
-	list->clear();
-	list->setElementsCount( phonebookModel->getItemCount() );
+    list->clear();
+    list->setElementsCount(phonebookModel->getItemCount());
 
-	ContactRecord rec;
-	ContactRecord errName;
-	ContactRecord errPhone1;
-	ContactRecord errPhone2;
-	ContactRecord speedDial;
+    ContactRecord rec;
+    ContactRecord errName;
+    ContactRecord errPhone1;
+    ContactRecord errPhone2;
+    ContactRecord speedDial;
 
-	rec.speeddial = 1;
-	rec.numbers.push_back( ContactRecord::Number("+487172722", "+487172722"));
-	bool res = DBServiceAPI::verifyContact( application,rec, errName, errPhone1, errPhone2, speedDial );
+    rec.speeddial = 1;
+    rec.numbers.push_back(ContactRecord::Number("+487172722", "+487172722"));
+    bool res = DBServiceAPI::verifyContact(application, rec, errName, errPhone1, errPhone2, speedDial);
 
-	if( res == false )
-		LOG_ERROR("Verification failed");
-
+    if (res == false)
+        LOG_ERROR("Verification failed");
 }
 
-bool PhonebookMainWindow::onInput(const InputEvent &inputEvent) {
-	
-	//process only if key is released
-	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
-		switch( inputEvent.keyCode ) {
-			case KeyCode::KEY_LEFT:
-				LOG_INFO("Adding new contact");
-        		application->switchWindow( "NewContact" );
-				return true;
-			case KeyCode::KEY_ENTER:
-				LOG_INFO("Searching contact");
-				application->switchWindow( "SearchWindow" );
-				return true;
-			default:
-				break;
-		}
-	}
+bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
+{
 
-	//check if any of the lower inheritance onInput methods catch the event
-	return AppWindow::onInput( inputEvent );
+    // process only if key is released
+    if (inputEvent.state == InputEvent::State::keyReleasedShort)
+    {
+        switch (inputEvent.keyCode)
+        {
+        case KeyCode::KEY_LEFT:
+            LOG_INFO("Adding new contact");
+            application->switchWindow("NewContact");
+            return true;
+        case KeyCode::KEY_ENTER:
+            LOG_INFO("Searching contact");
+            application->switchWindow("SearchWindow");
+            return true;
+        default:
+            break;
+        }
+    }
 
+    // check if any of the lower inheritance onInput methods catch the event
+    return AppWindow::onInput(inputEvent);
 }
 
-bool PhonebookMainWindow::onDatabaseMessage( sys::Message* msgl ) {
-	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
-	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
-		return true;
+bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)
+{
+    DBContactResponseMessage *msg = reinterpret_cast<DBContactResponseMessage *>(msgl);
+    if (phonebookModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite))
+        return true;
 
-	return false;
+    return false;
 }
 
 } /* namespace gui */
