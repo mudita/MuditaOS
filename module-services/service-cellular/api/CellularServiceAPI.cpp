@@ -24,6 +24,7 @@ bool CellularServiceAPI::DialNumber(sys::Service* serv,const std::string& number
         return true;
     }
     else{
+        LOG_ERROR("Failed");
         return false;
     }
 
@@ -38,6 +39,7 @@ bool CellularServiceAPI::AnswerIncomingCall(sys::Service* serv) {
         return true;
     }
     else{
+        LOG_ERROR("Failed");
         return false;
     }
 }
@@ -51,6 +53,7 @@ bool CellularServiceAPI::HangupCall(sys::Service* serv){
         return true;
     }
     else{
+        LOG_ERROR("Failed");
         return false;
     }
 }

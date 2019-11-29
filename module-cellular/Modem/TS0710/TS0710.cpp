@@ -71,7 +71,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //1. Send AT - check for answer
                 //2. OK ? -> ret success
                 LOG_DEBUG("1. Sending AT...");
-                ret = parser->SendCommand("AT\r", 2);
+                ret = parser->SendCommand("AT\r", 2, 100);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
                     result = true;
                 step++;
@@ -83,7 +83,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 LOG_DEBUG("2. Setting baudrate to %i...", ATPortSpeeds_text[startParams.PortSpeed]);
                 pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
                 LOG_DEBUG("Sending AT...");
-                ret = parser->SendCommand("AT\r", 2);
+                ret = parser->SendCommand("AT\r", 2, 100);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
                     result = true;
                 step++;
@@ -102,7 +102,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 // GSM module needs some time to close multiplexer
                 vTaskDelay(1000);
                 LOG_DEBUG("Sending AT...");
-                ret = parser->SendCommand("AT\r", 2);
+                ret = parser->SendCommand("AT\r", 2, 100);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
                     result = true;
                 step++;
@@ -111,10 +111,10 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
             case 4:
                 //7. set baudrate 115200 baud
                 //8. Send AT
-                LOG_DEBUG("Setting baudrate to 115200...");
+                LOG_DEBUG("4. Setting baudrate to 115200...");
                 pv_cellular->SetSpeed(115200);
                 LOG_DEBUG("Sending AT...");
-                ret = parser->SendCommand("AT\r", 2);
+                ret = parser->SendCommand("AT\r", 2, 100);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
                     result = true;
                 step++;
@@ -133,7 +133,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 // GSM module needs some time to close multiplexer
                 vTaskDelay(1000);
                 LOG_DEBUG("Sending AT...");
-                ret = parser->SendCommand("AT\r", 2);
+                ret = parser->SendCommand("AT\r", 2, 100);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
                     result = true;
             }
@@ -141,7 +141,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 break;
             case 6:
                 //10. power UP
-                LOG_INFO("Starting power up procedure...");
+                LOG_INFO("6. Starting power up procedure...");
                 pv_cellular->PowerUp();
                 return ConfState::PowerUp;
                 break;
@@ -157,24 +157,28 @@ TS0710::ConfState TS0710::ConfProcedure() {
     LOG_DEBUG("Configuring modem...");
 
     // Factory reset
-    parser->SendCommand("AT&F\r", 2);
+    CheckATCommandResponse(parser->SendCommand("AT&F\r", 2));
 
     // Turn off local echo
-    parser->SendCommand("ATE0\r", 2);
+    CheckATCommandResponse(parser->SendCommand("ATE0\r", 2));
 
     // Print current firmware version
     LOG_INFO("GSM modem info:");
     auto retVersion = parser->SendCommand("ATI\r", 4);
-    for(uint32_t i = 0; i< retVersion.size()-1;++i){ // skip final "OK"
+    CheckATCommandResponse(retVersion);
+    for (uint32_t i = 0; i < retVersion.size() - 1; ++i) // skip final "OK"
+    { 
         LOG_INFO(retVersion[i].c_str());
     }
 
     // Set up modem configuration
-    if (hardwareControlFlowEnable) {
-        parser->SendCommand("AT+IFC=2,2\r\n", 500); // enable flow control function for module
-    } else {
-        CheckATCommandResponse(
-                parser->SendCommand("AT+IFC=0,0\r", 1)); // disable flow control function for module
+    if (hardwareControlFlowEnable)
+    {
+        CheckATCommandResponse(parser->SendCommand("AT+IFC=2,2\r\n", 500)); // enable flow control function for module
+    }
+    else
+    {
+        CheckATCommandResponse(parser->SendCommand("AT+IFC=0,0\r", 1)); // disable flow control function for module
     }
 
     // Set fixed baudrate
@@ -204,10 +208,13 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Change incoming call notification from "RING" to "+CRING:type"
     CheckATCommandResponse(parser->SendCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
-    CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1));
+    // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
+    CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1, 15000));
 
     // Enable sleep mode
-    while(!CheckATCommandResponse(parser->SendCommand("AT+QSCLK=1\r", 1))){
+    LOG_DEBUG("TODO: determine while this retry loop is necessary");
+    while (!CheckATCommandResponse(parser->SendCommand("AT+QSCLK=1\r", 1), logger_level::LOGINFO))
+    {
         vTaskDelay(1000);
     }
 
@@ -222,6 +229,7 @@ TS0710::ConfState TS0710::ConfProcedure() {
 TS0710::ConfState TS0710::AudioConfProcedure() {
     
     auto audioConfRet = parser->SendCommand("AT+QDAI?\r", 1);
+    // no need to CheckATCommandResponse as it is checked differently below.
 
     // There is possibility for SendATCommand to capture invalid response (it can be ERROR or async URC)
     // Hence we are checking here for beginning of valid response for "AT+QDAI?" command. AudioConfProcedure
@@ -352,32 +360,41 @@ TS0710::ConfState TS0710::StartMultiplexer() {
 
     // Route URCs to second (Notifications) MUX channel
     DLC_channel *c = GetChannel("Commands");
-    CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1));
+    CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1, 300));
 
     /* Let's test if this actually works */
     if (c != nullptr) {
         LOG_DEBUG("Sending test ATI");
-        std::vector<std::string> v = c->SendCommandResponse("ATI\r", 5);
+        std::vector<std::string> v = c->SendCommandResponse("ATI\r", 4, 300);
+        CheckATCommandResponse(v);
         for (std::string s : v)
+        {
             LOG_DEBUG("[]%s", s.c_str());
+        }
         
         v.clear();
-        v = c->SendCommandResponse("AT+CSQ\r", 5);
-
-        auto beg = v[0].find(" ");
-        auto end = v[0].find(",", 1);
-        auto message = v[0].substr(beg+1, end-beg-1);
-        LOG_DEBUG("Setting new signal strength");
-        auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(CellularNotificationMessage::Type::SignalStrengthUpdate));
-        msg->signalStrength = std::stoll(message);
-        if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
-            LOG_ERROR("Signal strength value out of range.");
-            msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(0);
+        v = c->SendCommandResponse("AT+CSQ\r", 2, 300); 
+        if(CheckATCommandResponse(v))
+        {
+            auto beg = v[0].find(" ");
+            auto end = v[0].find(",", 1);
+            auto message = v[0].substr(beg+1, end-beg-1);
+            LOG_DEBUG("Setting new signal strength");
+            auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(CellularNotificationMessage::Type::SignalStrengthUpdate));
+            msg->signalStrength = std::stoll(message);
+            if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
+                LOG_ERROR("Signal strength value out of range.");
+                msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(0);
+            }
+            else {
+                msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(msg->signalStrength);
+            }
+            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
         }
-        else {
-            msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(msg->signalStrength);
+        else
+        {
+            LOG_ERROR("signal strength not set");
         }
-        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
     }
 
     return ConfState::Success;

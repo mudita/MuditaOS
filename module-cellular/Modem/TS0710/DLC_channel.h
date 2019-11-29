@@ -49,8 +49,7 @@ public:
     //ssize_t ReceiveData(std::vector<uint8_t> &data, uint32_t timeout);
     void setCallback(Callback_t callback) { LOG_DEBUG("[%s] Setting up callback for channel", pv_name.c_str()); pv_callback = callback; }
 
-    std::vector<std::string> SendCommandResponse(const char *cmd, size_t rxCount,
-                                                                         uint32_t timeout = 100);
+    std::vector<std::string> SendCommandResponse(const char *cmd, size_t rxCount, uint32_t timeout = 300);
     int ParseInputData(std::vector<uint8_t> &data);
 
     void callback(std::vector<uint8_t> &data) { pv_callback( data ); }
