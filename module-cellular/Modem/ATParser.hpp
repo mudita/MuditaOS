@@ -20,6 +20,15 @@
 #include "mutex.hpp"
 #include "Service/Service.hpp"
 
+#define DEBUG_MODEM_OUTPUT_RESPONSE 0
+#define DEBUG_MODEM_TIMEOUT_AS_ERROR 0
+
+#if DEBUG_MODEM_TIMEOUT_AS_ERROR
+#define LOG_MODEM_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
+#else
+#define LOG_MODEM_TIMEOUT(...) LOG_INFO(__VA_ARGS__)
+#endif
+
 namespace bsp{
     class Cellular;
 }

@@ -85,15 +85,6 @@ ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 }
 #endif
 
-#define DEBUG_OUTPUT_RESPONSE 0
-#define DEBUG_TIMEOUT_AS_ERROR 0
-
-#if DEBUG_TIMEOUT_AS_ERROR
-#define LOG_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
-#else
-#define LOG_TIMEOUT(...) LOG_INFO(__VA_ARGS__)
-#endif
-
 std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_t rxCount, uint32_t timeout)
 {
     std::vector<std::string> tokens;
@@ -123,7 +114,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
     {
         if (timeElapsed >= timeoutNeeded)
         {
-            LOG_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
             break;
         }
 
@@ -151,7 +142,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
         }
         else
         {
-            LOG_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
         }
         
         break;
@@ -159,7 +150,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
 
     LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
 
-#if DEBUG_OUTPUT_RESPONSE
+#if DEBUG_MODEM_OUTPUT_RESPONSE
     for (auto s : tokens)
     {
         LOG_DEBUG("[]%s", s.c_str());

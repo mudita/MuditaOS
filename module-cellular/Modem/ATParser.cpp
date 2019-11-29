@@ -109,15 +109,6 @@ int ATParser::ProcessNewData(sys::Service *service) {
     return 1;
 }
 
-#define DEBUG_OUTPUT_RESPONSE 0
-#define DEBUG_TIMEOUT_AS_ERROR 0
-
-#if DEBUG_TIMEOUT_AS_ERROR
-#define LOG_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
-#else
-#define LOG_TIMEOUT(...) LOG_INFO(__VA_ARGS__)
-#endif
-
 std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, uint32_t timeout) {
     std::vector<std::string> tokens;
 
@@ -144,7 +135,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 
         if (timeElapsed >= timeoutNeeded)
         {
-            LOG_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
             break;
         }
 
@@ -167,7 +158,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
         }
         else
         {
-            LOG_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
         }
         
         break;
@@ -177,7 +168,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
     LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
 
-#if DEBUG_OUTPUT_RESPONSE
+#if DEBUG_MODEM_OUTPUT_RESPONSE
     for (auto s : tokens)
     {
         LOG_DEBUG("[]%s", s.c_str());
