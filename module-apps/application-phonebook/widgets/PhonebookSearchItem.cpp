@@ -6,13 +6,13 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "PhonebookItem.hpp"
+#include "PhonebookSearchItem.hpp"
 #include <Style.hpp>
 
 namespace gui
 {
 
-PhonebookItem::PhonebookItem()
+PhonebookSearchItem::PhonebookSearchItem()
 {
     minWidth = 436;
     minHeight = 55;
@@ -32,7 +32,7 @@ PhonebookItem::PhonebookItem()
     value->setAlignement(gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
 }
 
-PhonebookItem::~PhonebookItem()
+PhonebookSearchItem::~PhonebookSearchItem()
 {
     if (value)
     {
@@ -42,7 +42,7 @@ PhonebookItem::~PhonebookItem()
     }
 }
 
-bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+bool PhonebookSearchItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
 {
     value->setPosition(11, 0);
     value->setSize(newDim.w - 22, newDim.h);
@@ -51,32 +51,32 @@ bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const Bounding
 }
 
 // sets copy of alarm's
-void PhonebookItem::setContact(std::shared_ptr<ContactRecord> contact)
+void PhonebookSearchItem::setContact(std::shared_ptr<ContactRecord> contact)
 {
     this->contact = contact;
     /* alternativeName is used as Surname or Second name */
     value->setText(contact->primaryName + " " + contact->alternativeName);
 }
 
-void PhonebookItem::setValue(UTF8 text)
+void PhonebookSearchItem::setValue(UTF8 text)
 {
     value->setText(text);
     value->setLineMode(true);
     setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 }
 
-UTF8 PhonebookItem::getValue()
+UTF8 PhonebookSearchItem::getValue()
 {
     return value->getText();
 }
 
-bool PhonebookItem::onActivated(void *data)
+bool PhonebookSearchItem::onActivated(void *data)
 {
     LOG_INFO("ITEM WAS PRESSED");
     return true;
 }
 
-void PhonebookItem::markFavourite(bool val)
+void PhonebookSearchItem::markFavourite(bool val)
 {
     favourite = val;
     if (val)
@@ -85,7 +85,7 @@ void PhonebookItem::markFavourite(bool val)
         value->setFont(style::window::font::medium);
 }
 
-std::shared_ptr<ContactRecord> PhonebookItem::getContact()
+std::shared_ptr<ContactRecord> PhonebookSearchItem::getContact()
 {
     return (contact);
 }

@@ -6,9 +6,9 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "PhonebookListView.hpp"
+#include "PhonebookSearchView.hpp"
 #include "../data/PhonebookItemData.hpp"
-#include "PhonebookItem.hpp"
+#include "PhonebookSearchItem.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "log/log.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
@@ -16,26 +16,26 @@
 namespace gui
 {
 
-PhonebookListView::PhonebookListView() : ListView()
+PhonebookSearchView::PhonebookSearchView() : ListView()
 {
     orientation = ORIENTATION_TOP_DOWN;
 }
 
-PhonebookListView::PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : ListView(parent, x, y, w, h)
+PhonebookSearchView::PhonebookSearchView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : ListView(parent, x, y, w, h)
 {
     orientation = ORIENTATION_TOP_DOWN;
 }
 
-PhonebookListView::~PhonebookListView()
+PhonebookSearchView::~PhonebookSearchView()
 {
 }
 
-void PhonebookListView::setApplication(app::Application *app)
+void PhonebookSearchView::setApplication(app::Application *app)
 {
     application = app;
 }
 
-gui::PhonebookItem *PhonebookListView::getSelectedPhonebookItem()
+PhonebookSearchItem *PhonebookSearchView::getSelectedSearchItem()
 {
     int index = selectedIndex - firstIndex;
     auto it = items.begin();
@@ -52,46 +52,40 @@ gui::PhonebookItem *PhonebookListView::getSelectedPhonebookItem()
         std::advance(it, 1);
     }
 
-    return (reinterpret_cast<PhonebookItem *>(*it));
+    return (reinterpret_cast<PhonebookSearchItem *>(*it));
 }
 
-bool PhonebookListView::onInput(const InputEvent &inputEvent)
+bool PhonebookSearchView::onInput(const InputEvent &inputEvent)
 {
-    // LOG_INFO("code:%d state:%d", inputEvent.keyCode, inputEvent.state);
     if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_ENTER))
     {
-        gui::PhonebookItem *item = getSelectedPhonebookItem();
+        PhonebookSearchItem *item = getSelectedSearchItem();
         if (item)
         {
-            // LOG_INFO("show info on index: %d %s", item->getID(), item->getValue().c_str());
-
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(item->getContact());
             application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-
-            return true;
+            return (true);
         }
         else
         {
             LOG_ERROR("failed to get selected item!");
-            return false;
+            return (false);
         }
     }
 
     if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_LF))
     {
 
-        gui::PhonebookItem *item = getSelectedPhonebookItem();
+        PhonebookSearchItem *item = getSelectedSearchItem();
         if (item)
         {
-            // LOG_INFO("calling index: %d %s", item->getID(), item->getValue().c_str());
             app::ApplicationCall::messageSwitchToCall(application, item->getContact()->numbers[0].numberE164.c_str(), true);
-
-            return true;
+            return (true);
         }
         else
         {
             LOG_ERROR("failed to get selected item!");
-            return false;
+            return (false);
         }
     }
 
@@ -207,7 +201,7 @@ bool PhonebookListView::onInput(const InputEvent &inputEvent)
     return false;
 }
 
-void PhonebookListView::updatePageItems()
+void PhonebookSearchView::updatePageItems()
 {
 
     // defines how many slots in the list has been occupied

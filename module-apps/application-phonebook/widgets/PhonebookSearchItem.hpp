@@ -1,13 +1,4 @@
-/*
- * @file PhonebookItem.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 10 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_PHONEBOOK_WIDGETS_PHONEBOOKITEM_HPP_
-#define MODULE_APPS_APPLICATION_PHONEBOOK_WIDGETS_PHONEBOOKITEM_HPP_
+#pragma once
 
 #include "../models/PhonebookModel.hpp"
 #include "Label.hpp"
@@ -19,7 +10,7 @@ namespace gui
 /*
  *
  */
-class PhonebookItem : public ListItem
+class PhonebookSearchItem : public ListItem
 {
     // pointer to the contact record
     std::shared_ptr<ContactRecord> contact = nullptr;
@@ -28,8 +19,8 @@ class PhonebookItem : public ListItem
     bool favourite = false;
 
   public:
-    PhonebookItem();
-    virtual ~PhonebookItem();
+    PhonebookSearchItem();
+    virtual ~PhonebookSearchItem();
     // sets copy of contact
     void setContact(std::shared_ptr<ContactRecord> note);
     void setValue(UTF8 text);
@@ -48,5 +39,3 @@ class PhonebookItem : public ListItem
 };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_PHONEBOOK_WIDGETS_PHONEBOOKITEM_HPP_ */

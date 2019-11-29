@@ -4,21 +4,21 @@
 #include "InputEvent.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
+#include "PhonebookContact.hpp"
 #include "PhonebookNewContact.hpp"
+#include "Text.hpp"
+#include "Utils.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include <log/log.hpp>
-
-#include "Text.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include <Style.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {
 
-PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, "NewContact")
+PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, "New")
 {
-    setSize(480, 600);
+    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
@@ -31,15 +31,30 @@ void PhonebookNewContact::rebuild()
 void PhonebookNewContact::buildInterface()
 {
     AppWindow::buildInterface();
-    setTitle(utils::localize.get("app_phonebook_contact_title"));
 
     bottomBar->setActive(BottomBar::Side::LEFT, false);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
+    bottomBar->setActive(BottomBar::Side::CENTER, false);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_save"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
     topBar->setActive(TopBar::Elements::TIME, true);
+
+    title = new gui::Label(this, 0, 50, 480, 54);
+    title->setFilled(false);
+    title->setBorderColor(gui::ColorFullBlack);
+    title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    title->setMargins(Margins(0, 0, 0, 18));
+    title->setFont(style::window::font::small);
+    if (contact)
+    {
+        title->setText(utils::localize.get("app_phonebook_contact_edit"));
+    }
+    else
+    {
+        title->setText(utils::localize.get("app_phonebook_contact_title"));
+    }
+    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
     // page 1 labels and text
     for (uint32_t i = 0; i < 5; i++)
@@ -50,6 +65,9 @@ void PhonebookNewContact::buildInterface()
         page1.labels[i]->setBorderColor(gui::ColorFullBlack);
         page1.labels[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page1.labels[i]->setFont(style::window::font::small);
+        if (i == 0)
+            page1.labels[i]->setFont(style::footer::font::bold);
+
         page1.labels[i]->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page1.text[i] = new gui::Text(this, 30, 157 + 87 * i, 420, 42);
@@ -60,20 +78,19 @@ void PhonebookNewContact::buildInterface()
         page1.text[i]->setUnderline(true);
         page1.text[i]->setTextType(Text::TextType::SINGLE_LINE);
         page1.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        //		page1.text[i]->setMargins( Margins(0,0,0,0));
-        page1.text[i]->setFont(style::window::font::medium);
+        page1.text[i]->setFont(style::window::font::small);
 
-        // for text widgets focus callback should hangle changing keyboard profile
         if ((i == 2) || (i == 3))
         {
             page1.text[i]->focusChangedCallback = [=](gui::Item &item) {
                 if (item.focus)
                 {
-                    page1.text[i]->setFont(style::window::font::bigbold);
+                    page1.text[i]->setFont(style::window::font::small);
+                    application->setKeyboardProfile(utils::localize.get("common_kbd_numeric"));
                 }
                 else
                 {
-                    page1.text[i]->setFont(style::window::font::medium);
+                    page1.text[i]->setFont(style::window::font::small);
                 }
                 return true;
             };
@@ -84,11 +101,38 @@ void PhonebookNewContact::buildInterface()
                 if (item.focus)
                 {
                     gui::Text *text = reinterpret_cast<Text *>(&item);
-                    page1.text[i]->setFont(style::window::font::bigbold);
+                    uint32_t length = text->getText().length();
+                    page1.text[i]->setFont(style::window::font::small);
+                    if (length == 0)
+                    {
+                        LOG_INFO("Switching to uppercase");
+                        application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
+                    }
+                    else
+                    {
+                        LOG_INFO("Switching to lowercase");
+                        application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
+                    }
                 }
                 else
                 {
-                    page1.text[i]->setFont(style::window::font::medium);
+                    page1.text[i]->setFont(style::window::font::small);
+                }
+                return true;
+            };
+
+            page1.text[i]->contentCallback = [=](gui::Item &item) {
+                gui::Text *text = reinterpret_cast<Text *>(&item);
+                uint32_t length = text->getText().length();
+                if (length == 0)
+                {
+                    LOG_INFO("Switching to uppercase");
+                    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
+                }
+                else if (length == 1)
+                {
+                    LOG_INFO("Switching to lowercase");
+                    application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
                 }
                 return true;
             };
@@ -96,7 +140,6 @@ void PhonebookNewContact::buildInterface()
 
         page1.text[i]->setTextType(gui::Text::TextType::SINGLE_LINE);
         page1.text[i]->setEditMode(gui::Text::EditMode::EDIT);
-        page1.text[i]->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
     }
 
     // set navigation for page 1
@@ -127,15 +170,15 @@ void PhonebookNewContact::buildInterface()
         if (item.focus)
         {
             LOG_INFO("Changed profile to common_kbd_numeric");
+            application->setKeyboardProfile(utils::localize.get("common_kbd_numeric"));
         }
         return true;
     };
 
     page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        int val = gui::toNumeric(inputEvent.keyCode);
-        if (0 <= val && val < 10)
+        if ((inputEvent.keyChar > '0') && (inputEvent.keyChar < '9'))
         {
-            page2.speedValue->setText(std::to_string(val));
+            page2.speedValue->setText(std::to_string(inputEvent.keyChar - '0'));
             return true;
         }
         return false;
@@ -226,7 +269,7 @@ void PhonebookNewContact::buildInterface()
     page2.noteLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     page2.noteLabel->setFont(style::window::font::small);
     page2.noteLabel->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-    page2.noteLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
+    page2.noteLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
 
     for (uint32_t i = 0; i < 2; i++)
     {
@@ -238,7 +281,23 @@ void PhonebookNewContact::buildInterface()
         page2.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.text[i]->setBorderColor(gui::ColorFullBlack);
         page2.text[i]->setMargins(Margins(0, 0, 0, 0));
-        page2.text[i]->setFont(style::window::font::medium);
+        page2.text[i]->setFont(style::window::font::small);
+
+        page2.text[i]->contentCallback = [=](gui::Item &item) {
+            gui::Text *text = reinterpret_cast<Text *>(&item);
+            uint32_t length = text->getText().length();
+            if (length == 0)
+            {
+                LOG_INFO("Switching to uppercase");
+                application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
+            }
+            else if (length == 1)
+            {
+                LOG_INFO("Switching to lowercase");
+                application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
+            }
+            return true;
+        };
     }
 
     page2.speedValue->setNavigationItem(NavigationDirection::DOWN, page2.favValue);
@@ -255,6 +314,13 @@ void PhonebookNewContact::buildInterface()
 void PhonebookNewContact::destroyInterface()
 {
     AppWindow::destroyInterface();
+
+    if (title)
+    {
+        removeWidget(title);
+        delete title;
+        title = nullptr;
+    }
 
     // page 1
     for (uint32_t i = 0; i < 5; i++)
@@ -345,6 +411,54 @@ PhonebookNewContact::~PhonebookNewContact()
     destroyInterface();
 }
 
+void PhonebookNewContact::saveStateChanged()
+{
+    if (isValidName(page1.text[0]->getText()) > 0 && isValidNumber(page1.text[2]->getText()))
+    {
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
+    }
+    else
+    {
+        bottomBar->setActive(BottomBar::Side::CENTER, false);
+    }
+}
+
+void PhonebookNewContact::setContactData()
+{
+    if (contact)
+    {
+        page1.text[0]->setText(contact->primaryName);
+        page1.text[1]->setText(contact->alternativeName);
+        if (contact->numbers.size() > 0)
+        {
+            page1.text[2]->setText(contact->numbers[0].numberE164);
+        }
+        if (contact->numbers.size() > 1)
+        {
+            page1.text[3]->setText(contact->numbers[1].numberE164);
+        }
+        page1.text[4]->setText(contact->mail);
+
+        page2.text[1]->setText(contact->note);
+        if (contact->isOnFavourites)
+        {
+            page2.imageTick->setVisible(true);
+            page2.favSelected = true;
+        }
+        else
+        {
+            page2.imageTick->setVisible(false);
+            page2.favSelected = false;
+        }
+        if (contact->speeddial >= 0 && contact->speeddial < 10)
+            page2.speedValue->setText(std::to_string(contact->speeddial));
+        else
+            page2.speedValue->setText("-");
+
+        saveStateChanged();
+    }
+}
+
 void PhonebookNewContact::switchPage(uint32_t page)
 {
     if (page == 0)
@@ -365,51 +479,44 @@ void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)
     setFocusItem(page1.text[0]);
     page2.favSelected = false;
     page2.imageFav->setVisible(false);
+    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
-ContactRecord PhonebookNewContact::readContact()
+bool PhonebookNewContact::handleSwitchData(SwitchData *data)
 {
-    ContactRecord ret;
+    if (data == nullptr)
+        return false;
 
-    ret.primaryName = page1.text[0]->getText();
-    ret.alternativeName = page1.text[1]->getText();
-    ContactRecord::Number phoneNumber1, phoneNumber2;
-    //	phoneNumber1.numberUser = page1.text[2];
-    //	phoneNumber2.numberUser = page1.text[3];
-    ret.number = phoneNumber1.numberUser;
+    PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
+    if (item)
+    {
+        contact = item->getContact();
+        setContactData();
+    }
 
-    UTF8 text = page2.speedValue->getText();
-    if (text.length()) {}
-
-    return ret;
+    return (true);
 }
 
 bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 {
-    // process only if key is released
+    bool ret = AppWindow::onInput(inputEvent);
+
     if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
         return false;
 
-    // check if any of the lower inheritance onInput methods catch the event
-    bool ret = AppWindow::onInput(inputEvent);
-    if (ret)
-    {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-        {
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        }
+    saveStateChanged();
 
-        return true;
-    }
+    LOG_INFO("onInput keyCode=%d", inputEvent.keyCode);
 
     if (inputEvent.keyCode == KeyCode::KEY_ENTER)
     {
         // if focus is on the favourite selection field do nothing
         if (focusItem == page2.favValue)
+        {
             return true;
+        }
 
-        // read information and fill contact object
+        return (verifyAndSave());
     }
     else if (inputEvent.keyCode == KeyCode::KEY_DOWN)
     {
@@ -431,7 +538,89 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
     }
+    else if (inputEvent.keyCode == KeyCode::KEY_RF)
+    {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        application->switchWindow("MainWindow");
+        contact = nullptr;
+        return true;
+    }
 
-    return false;
+    return (ret);
 }
+
+bool PhonebookNewContact::verifyAndSave()
+{
+    ContactRecord record, errName, errPhone, errSpeed, errFav;
+    record.primaryName = page1.text[0]->getText();
+    record.alternativeName = page1.text[1]->getText();
+    record.numbers.push_back(page1.text[2]->getText());
+    record.numbers.push_back(page1.text[3]->getText());
+    record.mail = page1.text[4]->getText();
+    record.note = page2.text[1]->getText();
+    record.isOnFavourites = page2.favSelected;
+    record.speeddial = atoi(page2.speedValue->getText().c_str());
+
+    /** basic sanity checks */
+    if (!isValidName(record.primaryName))
+    {
+        LOG_ERROR("verifyAndSave name not valid");
+        return (false);
+    }
+
+    if (record.numbers.size() > 0 && isValidNumber(record.numbers[0].numberUser) == false)
+    {
+        LOG_ERROR("verifyAndSave primaryNumber not valid");
+        return (false);
+    }
+
+    if (contact == nullptr) // new contact
+    {
+        /** secondary verification against database data */
+        DBServiceAPI::ContactVerificationError err = DBServiceAPI::verifyContact(application, record, errName, errPhone, errSpeed, errFav);
+        if (err != DBServiceAPI::noError)
+        {
+            if (err == DBServiceAPI::primaryNumberError)
+            {
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+                application->switchWindow("NumberAlreadyExists", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            }
+
+            if (err == DBServiceAPI::speedDialError)
+            {
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+                application->switchWindow("SpeedDialAlreadyAssigned", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            }
+            LOG_ERROR("failed to verify contact data reason: \"%s\"", DBServiceAPI::getVerificationErrorString(err).c_str());
+            return (false);
+        }
+
+        if (DBServiceAPI::ContactAdd(application, record) == false)
+        {
+            LOG_ERROR("verifyAndSave failed to ADD contact");
+            return (false);
+        }
+        else
+        {
+            LOG_INFO("verifyAndSave contact ADDED");
+            return (true);
+        }
+    }
+    else if (contact->dbID > 0)
+    {
+        if (DBServiceAPI::ContactUpdate(application, record) == false)
+        {
+            LOG_ERROR("verifyAndSave failed to UPDATE contact");
+            return (false);
+        }
+        else
+        {
+            LOG_INFO("verifyAndSave new contact UPDATED");
+            return (true);
+        }
+    }
+
+    return (false);
+}
+
 } // namespace gui
