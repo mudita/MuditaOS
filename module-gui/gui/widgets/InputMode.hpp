@@ -4,6 +4,12 @@
 #include <list>
 #include <utf8/UTF8.hpp>
 
+// TODO read from keymap file ...
+namespace gui
+{
+inline const std::vector<char> special_chars = {'.', ',', '_', ':', ';', ')', '(', '?', '!', '/', '*', '+'};
+}
+
 /// this widget has one goal - nicelly change input parsing which is done in application in it's widgets
 class InputMode
 {
