@@ -23,25 +23,22 @@ Rect::Rect() :
 	corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS} {
 }
 
-Rect::Rect( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h) :
-	borderColor(Color(0,0)),
-	fillColor(Color(15,15)),
-	penWidth{1},
-	penFocusWidth{1},
-	filled{false},
-	edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-	flatEdges{ RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT},
-	corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS} {
+Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
+    : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1}, penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
+      flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS}
+{
 
-	widgetArea.x = 0;
-	widgetArea.y = 0;
-	widgetArea.w = 0;
-	widgetArea.h = 0;
-	this->parent = parent;
-	parent->addWidget(this);
-
-	setPosition(x, y);
-	setSize(w, h);
+    widgetArea.x = 0;
+    widgetArea.y = 0;
+    widgetArea.w = 0;
+    widgetArea.h = 0;
+    this->parent = parent;
+    if (parent)
+    {
+        parent->addWidget(this);
+    }
+    setPosition(x, y);
+    setSize(w, h);
 }
 
 Rect::~Rect() {
