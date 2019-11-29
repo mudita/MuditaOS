@@ -42,8 +42,8 @@ protected:
 	Alignment alignment;
     //flag that defines if 3 dots (ellipsis) are to be displayed at the end of label's text.
 	bool dotsMode;
-    //show beggining or show end. dots will be on the oposite side of what to show
-	bool dotsShowBeginning;
+    //truncate a beginning or an end.
+	bool dotsTruncateEnd;
     //flag that defines if a remaining area of the label has a horizontal line.
 	bool lineMode;
 
@@ -67,7 +67,7 @@ public:
     virtual UTF8 getText();
     virtual void setAlignement( const Alignment& alignment );
     virtual void setMargins( const Margins& margins );
-    void setDotsMode( const bool val , const bool showBeginning = true );
+    void setDotsMode( const bool val , const bool truncateEnd = true );
     /**
 	 * @brief Defines if remaining area of the label has a horizontal line.
 	 */
