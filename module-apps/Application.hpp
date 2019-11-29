@@ -118,6 +118,7 @@ public:
 
 	//static methods
 	static bool messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data );
+    static bool messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data );
 	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data=nullptr );
 	static bool messageCloseApplication( sys::Service* sender, std::string application );
 	static bool messageRebuildApplication( sys::Service* sender, std::string application );
