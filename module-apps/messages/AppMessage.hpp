@@ -13,6 +13,8 @@
 #include <string>
 #include "SwitchData.hpp"
 #include "gui/input/InputEvent.hpp"
+#include "Service/Message.hpp"
+#include "MessageType.hpp"
 
 namespace app {
 

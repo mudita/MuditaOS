@@ -119,6 +119,9 @@ public:
      */
     static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
     		const std::string& windowName, std::unique_ptr<gui::SwitchData> data );
+
+
+    static bool messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data );
     /**
 	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
 	 * Allows sending data to destination application.

@@ -250,7 +250,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			}
 		}
 		else {
-			LOG_ERROR("Wrong internal application to switch to active state");
+			LOG_ERROR("Wrong internal application %s to switch to active state", msg->getTargetApplicationName().c_str());
 		}
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
@@ -341,12 +341,6 @@ void Application::setActiveWindow( const std::string& windowName ) {
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {
 	auto msg = std::make_shared<AppSwitchMessage>( application, window, std::move(data) );
 	sys::Bus::SendUnicast(msg, application, sender );
-	return true;
-}
-
-bool Application::messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data ) {
-	auto msg = std::make_shared<AppSwitchMessage>( gui::special_input, gui::char_select, std::move(data) );
-	sys::Bus::SendUnicast(msg, gui::special_input, sender );
 	return true;
 }
 

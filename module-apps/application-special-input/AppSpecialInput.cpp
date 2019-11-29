@@ -4,7 +4,8 @@
 
 using namespace app;
 
-AppSpecialInput::AppSpecialInput(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound)
+AppSpecialInput::AppSpecialInput(std::string name, std::string parent, bool startBackgound) :
+    Application(name, parent, startBackgound)
 {
     auto window = new gui::UiCharSelector(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
@@ -14,11 +15,22 @@ AppSpecialInput::AppSpecialInput(std::string name, std::string parent, bool star
 sys::Message_t AppSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     auto retMsg = Application::DataReceivedHandler(msgl);
-    // if message was handled by application's template there is no need to process further.
     if (reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)
     {
         return retMsg;
     }
 
-    return sys::Message_t();
+    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+}
+
+// THIS IS IMPORTANT THIS SETS APPLICATION STATE... (not for example Application(...) constructor - this wouild be too easy
+sys::ReturnCodes AppSpecialInput::InitHandler()
+{
+    LOG_ERROR("!!!!!");
+    auto ret = Application::InitHandler();
+    if(ret != sys::ReturnCodes::Success) {
+        LOG_ERROR("");
+    }
+    setActiveWindow("MainWindow");
+    return ret;
 }
