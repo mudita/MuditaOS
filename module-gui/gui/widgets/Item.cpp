@@ -95,6 +95,24 @@ void Item::setPosition( const short& x, const short& y ) {
 	onDimensionChanged(oldArea, widgetArea);
 }
 
+void Item::setX(const uint32_t x)
+{
+	BoundingBox oldArea = widgetArea;
+	widgetArea.x = x;
+	updateDrawArea();
+
+	onDimensionChanged(oldArea, widgetArea);
+}
+
+void Item::setY(const uint32_t y)
+{
+	BoundingBox oldArea = widgetArea;
+	widgetArea.y = y;
+	updateDrawArea();
+
+	onDimensionChanged(oldArea, widgetArea);
+}
+
 void Item::setSize( const short& w, const short& h ) {
 
 	BoundingBox oldArea = widgetArea;
