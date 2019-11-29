@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <GridLayout.hpp>
+#include "messages/AppMessage.hpp"
 
 namespace gui
 {
@@ -45,15 +46,9 @@ UiTestWindow::UiTestWindow(app::Application *app) : AppWindow(app, "TEST_UI")
         // on click -> send onInput event with mapped & special keypress (...)
         // better - read special_keys_keymap and handle accordingly ... to be done
     }
-    box->setVisible(true);
-    box->setNavigation(nullptr,nullptr);
-    /// TODO do not resize on each addWidget .. just once :(
-    /// TODO shouldn't be needed here
-    /// TODO add widget -> put widget in it's position
-    box->resizeItems();
-    addWidget(box);
+    ));
     // TODO TODO attach(cb - show special characters, && input somehow)
-    setFocusItem(box->getNavigationItem());
+    setFocusItem(text);
 }
 
 void UiTestWindow::rebuild() { LOG_INFO("Only if I have to!"); }

@@ -40,6 +40,7 @@ add_subdirectory( application-notes )
 add_subdirectory( application-phonebook )
 add_subdirectory( application-messages )
 add_subdirectory( application-calllog )
+add_subdirectory( application-special-input )
 
 include_directories( ../module-sys )
 include_directories( ../module-utils )

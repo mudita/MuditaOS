@@ -344,6 +344,12 @@ bool Application::messageSwitchApplication( sys::Service* sender, std::string ap
 	return true;
 }
 
+bool Application::messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data ) {
+	auto msg = std::make_shared<AppSwitchMessage>( gui::special_input, gui::char_select, std::move(data) );
+	sys::Bus::SendUnicast(msg, gui::special_input, sender );
+	return true;
+}
+
 bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data ) {
 	auto msg = std::make_shared<AppMessage>( MessageType::AppRefresh );
 	sys::Bus::SendUnicast(msg, application, sender  );

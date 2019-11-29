@@ -248,15 +248,24 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 	std::string runDesktopName = "ApplicationDesktop";
 	std::string runCallAppName = "ApplicationCall";
 
-	auto it = applications.find(runCallAppName);
-	if( it!= applications.end()){
-		it->second->lanucher->runBackground(this);
-	}
+    // TODO TODO parameter in launcher?
+    const std::string app_desktop = "ApplicationDesktop";
+    const std::vector<std::string> bg_apps = {"ApplicationCall",gui::special_input };
 
-	it = applications.find(runDesktopName);
-	if( it!= applications.end()){
-		messageSwitchApplication( this, it->second->lanucher->getName(), "", nullptr );
-	}
+    for (auto &el : bg_apps)
+    {
+        auto app = getApp(el);
+        if (app != nullptr)
+        {
+            app->launcher->runBackground(this);
+        }
+    }
+
+    auto app = getApp(app_desktop);
+    if (app != nullptr)
+    {
+        messageSwitchApplication(this, app->launcher->getName(), "", nullptr);
+    }
 
 #else
 	std::string runCallAppName = "ApplicationViewer";

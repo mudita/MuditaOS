@@ -482,9 +482,21 @@ void Text::setSize(const short &w, const short &h)
 
 bool Text::onInput(const InputEvent &inputEvent)
 {
-    if(inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_PND) {
-        mode->next();
-        return true;
+    if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_PND)
+    {
+        if (mode)
+        {
+            mode->next();
+            return true;
+        }
+    }
+
+    if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST)
+    {
+        if(mode) {
+            mode->select_special_char();
+            return true;
+        }
     }
 
     // translate and store keypress
