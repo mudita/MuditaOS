@@ -196,7 +196,7 @@ int32_t Font::getKerning( uint32_t id1, uint32_t id2 ) {
 	return kern->amount;
 }
 
-uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const bool fromLeft, const uint32_t& delimiter )
+uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const bool fromBeginning, const uint32_t& delimiter )
 {
 	spaceConsumed = 0;
 
@@ -208,7 +208,7 @@ uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint3
     for(uint32_t i=0; i<str.length(); ++i )
 	{
         // go in reverse rather than UTF8::reverse. be careful, no NULL at the end.
-        uint32_t iAnyDir = fromLeft ? i : (str.length() -1 - i); // i compensated for direction
+        uint32_t iAnyDir = fromBeginning ? i : (str.length() -1 - i); // i compensated for direction
         idCurrent = str[iAnyDir];
         if( i == 0 )
 		{
