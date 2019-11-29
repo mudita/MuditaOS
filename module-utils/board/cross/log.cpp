@@ -4,6 +4,7 @@
 
 #include "../../log/log.hpp"
 #include "../../log/segger/SEGGER_RTT.h"
+#include <ticks.hpp>
 extern "C" {
 #include "FreeRTOS.h"
 }
@@ -115,6 +116,8 @@ static void _log_Log(logger_level level, const char *file, int line,const char *
     }
 
     char* ptr = loggerBuffer;
+
+    ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
 
