@@ -47,9 +47,6 @@ void NoResults::buildInterface()
 
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    titleLabel = addLabel(this, 0, 52, style::window_width, 35, utils::localize.get("app_phonebook_search_win_contacts"), style::window::font::small,
-                          RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
-
     topSeparatorLabel = addLabel(this, 0, 104, style::window_width, 1, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
     informationLabel = new Text(this, 45, 315, 390, 90);
@@ -72,11 +69,6 @@ void NoResults::destroyInterface()
     AppWindow::destroyInterface();
 }
 
-void NoResults::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
-}
-
 bool NoResults::handleSwitchData(SwitchData *data)
 {
     if (data == nullptr)
@@ -85,7 +77,7 @@ bool NoResults::handleSwitchData(SwitchData *data)
         return false;
     }
 
-    PhonebookSearchQuery *item = reinterpret_cast<PhonebookSearchQuery *>(data);
+    PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
     searchQuery = item->getQuery();
 
     setContactData();
@@ -95,39 +87,20 @@ bool NoResults::handleSwitchData(SwitchData *data)
 
 void NoResults::setContactData()
 {
-    titleLabel->setText(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() + std::string("\""));
+    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() + std::string("\""));
 }
 
 bool NoResults::onInput(const InputEvent &inputEvent)
 {
-    // check if any of the lower inheritance onInput methods catch the event
-    LOG_INFO("onInput %d", inputEvent.keyCode);
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if (ret)
-    {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-        {
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        }
-        return (true);
-    }
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-        return false;
-
-    if (inputEvent.keyCode == KeyCode::KEY_RF)
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchQuery);
         application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return (true);
     }
-    else
-    {
-        LOG_INFO("unhandled event code=%d", inputEvent.keyCode);
-    }
-    return (false);
+
+    return (AppWindow::onInput(inputEvent));
 }
 
 /*
@@ -153,10 +126,6 @@ void ContactBlocked::buildInterface()
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-    titleLabel = addLabel(this, 0, 52, style::window_width, 35, utils::localize.get("app_phonebook_search_win_contacts"), style::window::font::small,
-                          RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
-
     topSeparatorLabel = addLabel(this, 0, 104, style::window_width, 1, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
     informationLabel = new Text(this, 45, 315, 390, 90);
@@ -172,16 +141,13 @@ void ContactBlocked::buildInterface()
 
 void ContactBlocked::rebuild()
 {
+    destroyInterface();
+    buildInterface();
 }
 
 void ContactBlocked::destroyInterface()
 {
     AppWindow::destroyInterface();
-}
-
-void ContactBlocked::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 bool ContactBlocked::handleSwitchData(SwitchData *data)
@@ -192,7 +158,7 @@ bool ContactBlocked::handleSwitchData(SwitchData *data)
         return false;
     }
 
-    PhonebookSearchQuery *item = reinterpret_cast<PhonebookSearchQuery *>(data);
+    PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
     searchQuery = item->getQuery();
 
     setContactData();
@@ -202,37 +168,18 @@ bool ContactBlocked::handleSwitchData(SwitchData *data)
 
 void ContactBlocked::setContactData()
 {
-    titleLabel->setText(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() + std::string("\""));
+    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() + std::string("\""));
 }
 
 bool ContactBlocked::onInput(const InputEvent &inputEvent)
 {
-    // check if any of the lower inheritance onInput methods catch the event
-    LOG_INFO("onInput %d", inputEvent.keyCode);
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if (ret)
-    {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-        {
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        }
-        return (true);
-    }
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-        return false;
-
-    if (inputEvent.keyCode == KeyCode::KEY_RF)
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchQuery);
         application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return (true);
     }
-    else
-    {
-        LOG_INFO("unhandled event code=%d", inputEvent.keyCode);
-    }
-    return (false);
+
+    return (AppWindow::onInput(inputEvent));
 }

@@ -2,28 +2,28 @@
 #include <functional>
 #include <string>
 
+#include "../models/PhonebookModel.hpp"
+#include "../widgets/PhonebookListView.hpp"
 #include "AppWindow.hpp"
 #include "ListView.hpp"
 #include "Style.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Window.hpp"
-#include "ListView.hpp"
-#include "../models/PhonebookModel.hpp"
-#include "../widgets/PhonebookListView.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class PhonebookMainWindow : public AppWindow {
+class PhonebookMainWindow : public AppWindow
+{
   protected:
-    gui::Label *title = nullptr;
-    PhonebookListView* list;
-    PhonebookModel* phonebookModel = nullptr;
+    PhonebookListView *list;
+    PhonebookModel *phonebookModel = nullptr;
 
-    Image* leftArrowImage = nullptr;
-    Image* rightArrowImage = nullptr;
-    Image* newContactImage = nullptr;
-    Image* searchImage = nullptr;
+    Image *leftArrowImage = nullptr;
+    Image *rightArrowImage = nullptr;
+    Image *newContactImage = nullptr;
+    Image *searchImage = nullptr;
 
   public:
     PhonebookMainWindow(app::Application *app);
@@ -32,7 +32,7 @@ class PhonebookMainWindow : public AppWindow {
     // virtual methods
     bool onInput(const InputEvent &inputEvent) override;
     void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool onDatabaseMessage( sys::Message* msgl ) override;
+    bool onDatabaseMessage(sys::Message *msgl) override;
 
     void rebuild() override;
     void buildInterface() override;

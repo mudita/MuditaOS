@@ -11,103 +11,86 @@
 
 using namespace gui;
 
-class PhonebookDeleteContact : public AppWindow
+class PhonebookDialog : public AppWindow
 {
-  protected:
-    /** labels */
-    Label *titleLabel = nullptr;
-    Text *confirmationLabel = nullptr;
-    Label *noLabel = nullptr;
-    Label *yesLabel = nullptr;
-    Image *trashacnIcon = nullptr;
-    /** currently displayed contact */
-    std::shared_ptr<ContactRecord> contact = nullptr;
-
   public:
-    PhonebookDeleteContact(app::Application *app);
-    virtual ~PhonebookDeleteContact();
-    void setContactData();
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
-};
+    PhonebookDialog(app::Application *app, const std::string &dialogName);
+    virtual ~PhonebookDialog()
+    {
+        destroyInterface();
+    }
 
-class PhonebookBlockContact : public AppWindow
-{
+    bool onInput(const InputEvent &inputEvent) override;
+    void onBeforeShow(ShowMode mode, SwitchData *data) override
+    {
+        setFocusItem(noLabel);
+    }
+    bool handleSwitchData(SwitchData *data) override;
+    void rebuild() override
+    {
+        destroyInterface();
+        buildInterface();
+    }
+    void buildInterface() override;
+    void destroyInterface() override
+    {
+        AppWindow::destroyInterface();
+    }
+
+    virtual void setContactData() = 0;
+
   protected:
-    /** labels */
-    Label *titleLabel = nullptr;
     Text *confirmationLabel = nullptr;
     Label *noLabel = nullptr;
     Label *yesLabel = nullptr;
     Image *icon = nullptr;
-    /** currently displayed contact */
     std::shared_ptr<ContactRecord> contact = nullptr;
-
-  public:
-    PhonebookBlockContact(app::Application *app);
-    virtual ~PhonebookBlockContact();
-    void setContactData();
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
 };
 
-class PhonebookDuplicateNumber : public AppWindow
+class PhonebookDeleteContact : public PhonebookDialog
 {
-  protected:
-    /** labels */
-    Label *titleLabel = nullptr;
-    Text *confirmationLabel = nullptr;
-    Label *noLabel = nullptr;
-    Label *yesLabel = nullptr;
-    Image *icon = nullptr;
-    /** currently displayed contact */
-    std::shared_ptr<ContactRecord> contact = nullptr;
-
   public:
-    PhonebookDuplicateNumber(app::Application *app);
-    virtual ~PhonebookDuplicateNumber();
+    PhonebookDeleteContact(app::Application *app) : PhonebookDialog(app, "Delete")
+    {
+        LOG_INFO("PhonebookDeleteContact::ctor");
+    }
+    virtual ~PhonebookDeleteContact() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
     void setContactData();
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
 };
 
-class PhonebookDuplicateSpeedDial : public AppWindow
+class PhonebookBlockContact : public PhonebookDialog
+{
+  public:
+    PhonebookBlockContact(app::Application *app) : PhonebookDialog(app, "Block")
+    {
+    }
+    virtual ~PhonebookBlockContact() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
+    void setContactData();
+};
+
+class PhonebookDuplicateNumber : public PhonebookDialog
+{
+  public:
+    PhonebookDuplicateNumber(app::Application *app) : PhonebookDialog(app, "NumberAlreadyExists")
+    {
+    }
+    virtual ~PhonebookDuplicateNumber() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
+    void setContactData();
+};
+
+class PhonebookDuplicateSpeedDial : public PhonebookDialog
 {
   protected:
-    /** labels */
-    Label *titleLabel = nullptr;
-    Text *confirmationLabel = nullptr;
-    Label *noLabel = nullptr;
-    Label *yesLabel = nullptr;
     Label *dialValue = nullptr;
-    Image *icon = nullptr;
-    /** currently displayed contact */
-    std::shared_ptr<ContactRecord> contact = nullptr;
 
   public:
-    PhonebookDuplicateSpeedDial(app::Application *app);
-    virtual ~PhonebookDuplicateSpeedDial();
+    PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, "SpeedDialAlreadyAssigned")
+    {
+    }
+    virtual ~PhonebookDuplicateSpeedDial() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
     void setContactData();
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
 };

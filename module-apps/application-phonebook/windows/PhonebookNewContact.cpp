@@ -79,14 +79,14 @@ void PhonebookNewContact::buildInterface()
         page1.text[i]->setTextType(Text::TextType::SINGLE_LINE);
         page1.text[i]->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page1.text[i]->setFont(style::window::font::small);
+        page1.text[i]->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
 
         if ((i == 2) || (i == 3))
         {
             page1.text[i]->focusChangedCallback = [=](gui::Item &item) {
                 if (item.focus)
                 {
-                    page1.text[i]->setFont(style::window::font::small);
-                    application->setKeyboardProfile(utils::localize.get("common_kbd_numeric"));
+                    page1.text[i]->setFont(style::window::font::bigbold);
                 }
                 else
                 {
@@ -100,19 +100,7 @@ void PhonebookNewContact::buildInterface()
             page1.text[i]->focusChangedCallback = [=](gui::Item &item) {
                 if (item.focus)
                 {
-                    gui::Text *text = reinterpret_cast<Text *>(&item);
-                    uint32_t length = text->getText().length();
-                    page1.text[i]->setFont(style::window::font::small);
-                    if (length == 0)
-                    {
-                        LOG_INFO("Switching to uppercase");
-                        application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
-                    }
-                    else
-                    {
-                        LOG_INFO("Switching to lowercase");
-                        application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
-                    }
+                    page1.text[i]->setFont(style::window::font::bigbold);
                 }
                 else
                 {
@@ -121,21 +109,7 @@ void PhonebookNewContact::buildInterface()
                 return true;
             };
 
-            page1.text[i]->contentCallback = [=](gui::Item &item) {
-                gui::Text *text = reinterpret_cast<Text *>(&item);
-                uint32_t length = text->getText().length();
-                if (length == 0)
-                {
-                    LOG_INFO("Switching to uppercase");
-                    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
-                }
-                else if (length == 1)
-                {
-                    LOG_INFO("Switching to lowercase");
-                    application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
-                }
-                return true;
-            };
+            page1.text[i]->contentCallback = [=](gui::Item &item) { return true; };
         }
 
         page1.text[i]->setTextType(gui::Text::TextType::SINGLE_LINE);
@@ -166,19 +140,13 @@ void PhonebookNewContact::buildInterface()
     page2.speedValue->setFont(style::window::font::small);
     page2.speedValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-    page2.speedValue->focusChangedCallback = [=](gui::Item &item) {
-        if (item.focus)
-        {
-            LOG_INFO("Changed profile to common_kbd_numeric");
-            application->setKeyboardProfile(utils::localize.get("common_kbd_numeric"));
-        }
-        return true;
-    };
+    page2.speedValue->focusChangedCallback = [=](gui::Item &item) { return true; };
 
     page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyChar > '0') && (inputEvent.keyChar < '9'))
+        int val = gui::toNumeric(inputEvent.keyCode);
+        if ((val >= 0) && (val < 9))
         {
-            page2.speedValue->setText(std::to_string(inputEvent.keyChar - '0'));
+            page2.speedValue->setText(std::to_string(val));
             return true;
         }
         return false;
@@ -282,22 +250,8 @@ void PhonebookNewContact::buildInterface()
         page2.text[i]->setBorderColor(gui::ColorFullBlack);
         page2.text[i]->setMargins(Margins(0, 0, 0, 0));
         page2.text[i]->setFont(style::window::font::small);
-
-        page2.text[i]->contentCallback = [=](gui::Item &item) {
-            gui::Text *text = reinterpret_cast<Text *>(&item);
-            uint32_t length = text->getText().length();
-            if (length == 0)
-            {
-                LOG_INFO("Switching to uppercase");
-                application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
-            }
-            else if (length == 1)
-            {
-                LOG_INFO("Switching to lowercase");
-                application->setKeyboardProfile(utils::localize.get("common_kbd_lower"));
-            }
-            return true;
-        };
+        page2.text[i]->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
+        page2.text[i]->contentCallback = [=](gui::Item &item) { return true; };
     }
 
     page2.speedValue->setNavigationItem(NavigationDirection::DOWN, page2.favValue);
@@ -479,7 +433,6 @@ void PhonebookNewContact::onBeforeShow(ShowMode mode, SwitchData *data)
     setFocusItem(page1.text[0]);
     page2.favSelected = false;
     page2.imageFav->setVisible(false);
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 bool PhonebookNewContact::handleSwitchData(SwitchData *data)
@@ -499,16 +452,10 @@ bool PhonebookNewContact::handleSwitchData(SwitchData *data)
 
 bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 {
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-        return false;
-
     saveStateChanged();
 
-    LOG_INFO("onInput keyCode=%d", inputEvent.keyCode);
-
-    if (inputEvent.keyCode == KeyCode::KEY_ENTER)
+    if (inputEvent.keyCode == KeyCode::KEY_ENTER && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
         // if focus is on the favourite selection field do nothing
         if (focusItem == page2.favValue)
@@ -518,35 +465,28 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 
         return (verifyAndSave());
     }
-    else if (inputEvent.keyCode == KeyCode::KEY_DOWN)
+    else if (inputEvent.keyCode == KeyCode::KEY_DOWN && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+             ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
         LOG_INFO("switching to second page");
         if (getFocusItem() == page1.text[4])
         {
             switchPage(1);
             setFocusItem(page2.speedValue);
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
     }
-    else if (inputEvent.keyCode == KeyCode::KEY_UP)
+    else if (inputEvent.keyCode == KeyCode::KEY_UP && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+             ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
         LOG_INFO("switching to first page");
         if (getFocusItem() == page2.speedValue)
         {
             switchPage(0);
             setFocusItem(page1.text[4]);
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
     }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow");
-        contact = nullptr;
-        return true;
-    }
 
-    return (ret);
+    return (AppWindow::onInput(inputEvent));
 }
 
 bool PhonebookNewContact::verifyAndSave()

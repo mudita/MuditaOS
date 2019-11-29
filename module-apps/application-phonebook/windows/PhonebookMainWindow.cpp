@@ -16,8 +16,7 @@
 namespace gui
 {
 
-PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
-    : AppWindow(app, "MainWindow"), phonebookModel{new PhonebookModel(app)}
+PhonebookMainWindow::PhonebookMainWindow(app::Application *app) : AppWindow(app, "MainWindow"), phonebookModel{new PhonebookModel(app)}
 {
     setSize(style::window_width, style::window_height);
     buildInterface();
@@ -31,7 +30,6 @@ void PhonebookMainWindow::rebuild()
 
 void PhonebookMainWindow::buildInterface()
 {
-
     AppWindow::buildInterface();
 
     list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
@@ -58,39 +56,30 @@ void PhonebookMainWindow::buildInterface()
     newContactImage = new gui::Image(this, 48, 55, 0, 0, "cross");
     searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 }
+
 void PhonebookMainWindow::destroyInterface()
 {
     AppWindow::destroyInterface();
-    if (list)
-    {
-        removeWidget(list);
-        delete list;
-        list = nullptr;
-    }
-    if (leftArrowImage)
-    {
-        removeWidget(leftArrowImage);
-        delete leftArrowImage;
-        leftArrowImage = nullptr;
-    }
-    if (rightArrowImage)
-    {
-        removeWidget(rightArrowImage);
-        delete rightArrowImage;
-        rightArrowImage = nullptr;
-    }
-    if (newContactImage)
-    {
-        removeWidget(newContactImage);
-        delete newContactImage;
-        newContactImage = nullptr;
-    }
-    if (searchImage)
-    {
-        removeWidget(searchImage);
-        delete searchImage;
-        searchImage = nullptr;
-    }
+
+    removeWidget(list);
+    delete list;
+    list = nullptr;
+
+    removeWidget(leftArrowImage);
+    delete leftArrowImage;
+    leftArrowImage = nullptr;
+
+    removeWidget(rightArrowImage);
+    delete rightArrowImage;
+    rightArrowImage = nullptr;
+
+    removeWidget(newContactImage);
+    delete newContactImage;
+    newContactImage = nullptr;
+
+    removeWidget(searchImage);
+    delete searchImage;
+    searchImage = nullptr;
 
     children.clear();
     delete phonebookModel;
@@ -103,7 +92,7 @@ PhonebookMainWindow::~PhonebookMainWindow()
 
 void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-
+    LOG_INFO("onBeforeShow");
     setFocusItem(list);
 
     phonebookModel->clear();
@@ -121,11 +110,9 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
         switch (inputEvent.keyCode)
         {
         case KeyCode::KEY_LEFT:
-            LOG_INFO("Adding new contact");
             application->switchWindow("New");
             return true;
         case KeyCode::KEY_RIGHT:
-            LOG_INFO("Searching contact");
             application->switchWindow("Search");
             return true;
         default:

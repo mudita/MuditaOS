@@ -52,7 +52,7 @@ gui::PhonebookItem *PhonebookListView::getSelectedPhonebookItem()
         std::advance(it, 1);
     }
 
-    return (reinterpret_cast<PhonebookItem *>(*it));
+    return (dynamic_cast<PhonebookItem *>(*it));
 }
 
 bool PhonebookListView::onInput(const InputEvent &inputEvent)

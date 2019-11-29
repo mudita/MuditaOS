@@ -15,7 +15,7 @@ class SearchResultsModel : public gui::ListItemProvider
     virtual ~SearchResultsModel();
 
     gui::ListItem *getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
-    int getItemCount() override;
+    int getItemCount() const override;
     void setResults(std::shared_ptr<std::vector<ContactRecord>> _results);
 
   private:

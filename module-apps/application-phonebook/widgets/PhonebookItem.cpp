@@ -15,7 +15,7 @@ namespace gui
 PhonebookItem::PhonebookItem()
 {
     minWidth = 436;
-    minHeight = 55;
+    minHeight = style::window::label::big_h;
     maxWidth = 436;
     maxHeight = 200;
 

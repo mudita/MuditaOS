@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../models/PhonebookModel.hpp"
 #include "../data/PhonebookItemData.hpp"
+#include "../models/PhonebookModel.hpp"
 #include "../widgets/PhonebookListView.hpp"
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"
@@ -18,7 +18,6 @@ class PhonebookSearch : public AppWindow
 {
   protected:
     /** labels */
-    Label *titleLabel = nullptr;
     Label *topSeparatorLabel = nullptr;
     Label *searchHeader = nullptr;
     Text *informationLabel = nullptr;
@@ -46,7 +45,6 @@ class PhonebookSearch : public AppWindow
     void destroyInterface() override;
 
   private:
-    Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text,
-                    const std::string fontName, const RectangleEdgeFlags edges, const Alignment alignment,
-                    const bool lineMode);
+    Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text, const std::string fontName,
+                    const RectangleEdgeFlags edges, const Alignment alignment, const bool lineMode);
 };

@@ -4,7 +4,7 @@
 
 #include "../data/PhonebookItemData.hpp"
 #include "../models/SearchResultsModel.hpp"
-#include "../widgets/PhonebookSearchView.hpp"
+#include "../widgets/PhonebookListView.hpp"
 #include "AppWindow.hpp"
 #include "ListView.hpp"
 #include "Style.hpp"
@@ -18,7 +18,7 @@ namespace gui
 class PhonebookSearchResults : public AppWindow
 {
   protected:
-    PhonebookSearchView *list;
+    PhonebookListView *list;
     SearchResultsModel *searchResultsModel = nullptr;
 
     Image *leftArrowImage = nullptr;

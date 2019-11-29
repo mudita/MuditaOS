@@ -28,8 +28,7 @@ PhonebookOptionsNamecard::~PhonebookOptionsNamecard()
 {
 }
 
-gui::Item *PhonebookOptionsNamecard::addOptionLabel(const std::string &text, bool hasSubOptions,
-                                                    std::function<bool(gui::Item &)> activatedCallback)
+gui::Item *PhonebookOptionsNamecard::addOptionLabel(const std::string &text, bool hasSubOptions, std::function<bool(gui::Item &)> activatedCallback)
 {
     gui::Label *label = new gui::Label(this, 19, 0, 480 - 21, 55, text);
     label->setMargins(gui::Margins(0, 0, 0, 0));
@@ -64,8 +63,7 @@ void PhonebookOptionsNamecard::buildInterface()
     title->setBorderColor(gui::ColorNoColor);
     title->setFont(style::header::font::title);
     title->setText(utils::localize.get("app_phonebook_options_title"));
-    title->setAlignement(
-        gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
     topSeparatorLabel = new Label(this, 0, 105, 480, 1);
     topSeparatorLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -114,40 +112,22 @@ bool PhonebookOptionsNamecard::handleSwitchData(SwitchData *data)
         return false;
     }
 
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
+    PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
     contact = item->getContact();
     return (true);
 }
 
 bool PhonebookOptionsNamecard::onInput(const InputEvent &inputEvent)
 {
-    // check if any of the lower inheritance onInput methods catch the event
-    bool ret = AppWindow::onInput(inputEvent);
-    if (ret)
-    {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        return true;
-    }
-
-    // process only if key is released
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) &&
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
         ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-        return false;
-
-    if (inputEvent.keyCode == KeyCode::KEY_ENTER)
-    {
-        LOG_INFO("Enter pressed");
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return true;
     }
 
-    return false;
+    return (AppWindow::onInput(inputEvent));
 }
 
 void PhonebookOptionsNamecard::sendViaSms()

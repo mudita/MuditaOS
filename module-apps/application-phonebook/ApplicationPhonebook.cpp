@@ -1,11 +1,16 @@
 #include "Application.hpp"
 
+#include "ApplicationPhonebook.hpp"
 #include "MessageType.hpp"
+#include "windows/PhonebookContact.hpp"
+#include "windows/PhonebookDialogs.hpp"
+#include "windows/PhonebookErrors.hpp"
 #include "windows/PhonebookMainWindow.hpp"
 #include "windows/PhonebookNewContact.hpp"
-
-#include "ApplicationPhonebook.hpp"
-
+#include "windows/PhonebookOptions.hpp"
+#include "windows/PhonebookOptionsNamecard.hpp"
+#include "windows/PhonebookSearch.hpp"
+#include "windows/PhonebookSearchResults.hpp"
 namespace app
 {
 
@@ -77,10 +82,46 @@ void ApplicationPhonebook::createUserInterface()
 
     gui::AppWindow *window = nullptr;
 
-    window = new gui::PhonebookMainWindow(this);
+    window = new PhonebookMainWindow(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
-    window = new gui::PhonebookNewContact(this);
+    window = new PhonebookNewContact(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookContact(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookDeleteContact(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookBlockContact(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookDuplicateSpeedDial(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookDuplicateNumber(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookSearch(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new ErrorWindows::NoResults(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new ErrorWindows::ContactBlocked(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new ErrorWindows::ContactBlocked(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new gui::PhonebookSearchResults(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookOptions(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new PhonebookOptionsNamecard(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 }
 

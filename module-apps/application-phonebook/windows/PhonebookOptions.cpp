@@ -117,37 +117,21 @@ bool PhonebookOptions::handleSwitchData(SwitchData *data)
         return false;
     }
 
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
+    PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
     contact = item->getContact();
     return (true);
 }
 
 bool PhonebookOptions::onInput(const InputEvent &inputEvent)
 {
-    // check if any of the lower inheritance onInput methods catch the event
-    bool ret = AppWindow::onInput(inputEvent);
-    if (ret)
-    {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        return true;
-    }
-
-    // process only if key is released
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-        return false;
-
-    if (inputEvent.keyCode == KeyCode::KEY_ENTER)
-    {
-        LOG_INFO("Enter pressed");
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
+    LOG_INFO("PhonebookOptions::onInput state: %d keyCode: %d", inputEvent.state, inputEvent.keyCode);
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        return true;
+        return (true);
     }
 
-    return false;
+    return (AppWindow::onInput(inputEvent));
 }

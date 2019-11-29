@@ -16,8 +16,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationPhonebook.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookListView.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookSearchView.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/PhonebookSearchItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookMainWindow.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookNewContact.cpp"
                 "${CMAKE_CURRENT_LIST_DIR}/windows/PhonebookContact.cpp"

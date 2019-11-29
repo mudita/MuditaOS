@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../data/PhonebookItemData.hpp"
-#include "../e164.hpp"
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"
 #include "Label.hpp"
@@ -26,24 +25,6 @@ static inline const bool isValidEmail(const UTF8 email)
     return (email.length() > 4);
 }
 
-static inline std::string replaceString(std::string subject, const std::string &search, const std::string &replace)
-{
-    size_t pos = 0;
-    while ((pos = subject.find(search, pos)) != std::string::npos)
-    {
-        subject.replace(pos, search.length(), replace);
-        pos += replace.length();
-    }
-    return subject;
-}
-
-static inline const std::string itoa(const int value)
-{
-    std::stringstream ss;
-    ss << value;
-    return (ss.str());
-}
-
 static inline const std::string formatContactName(std::shared_ptr<ContactRecord> contact)
 {
     return (contact->primaryName + " " + contact->alternativeName);
@@ -51,27 +32,22 @@ static inline const std::string formatContactName(std::shared_ptr<ContactRecord>
 
 static inline void findAndReplaceAll(std::string &data, std::string toSearch, std::string replaceStr)
 {
-    // Get the first occurrence
     size_t pos = data.find(toSearch);
-
-    // Repeat till end is reached
     while (pos != std::string::npos)
     {
-        // Replace this occurrence of Sub String
         data.replace(pos, toSearch.size(), replaceStr);
-        // Get the next occurrence from the current position
         pos = data.find(toSearch, pos + replaceStr.size());
     }
 }
 
 static inline void fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
 {
-    findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName.c_str());
-    findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName.c_str());
+    findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName);
+    findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
     findAndReplaceAll(data, "$CONTACT_NAME$", formatContactName(contact));
-    findAndReplaceAll(data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberE164.c_str() : "");
-    findAndReplaceAll(data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberE164.c_str() : "");
-    findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", itoa(contact->speeddial));
+    findAndReplaceAll(data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberE164 : "");
+    findAndReplaceAll(data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberE164 : "");
+    findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", std::to_string(contact->speeddial));
 }
 
 using namespace gui;
@@ -80,7 +56,6 @@ class PhonebookContact : public AppWindow
 {
   protected:
     /** labels */
-    Label *titleLabel = nullptr;
     Label *informationLabel = nullptr;
     Label *ifnormation = nullptr;
     Label *addressLabel = nullptr;

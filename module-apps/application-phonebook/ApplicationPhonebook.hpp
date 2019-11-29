@@ -6,7 +6,8 @@ namespace app
 class ApplicationPhonebook : public app::Application
 {
   public:
-    ApplicationPhonebook(std::string name = "ApplicationPhonebook", std::string parent = "", bool startBackgound = false);
+    ApplicationPhonebook(std::string name = "ApplicationPhonebook", std::string parent = "",
+                         bool startBackgound = false);
     virtual ~ApplicationPhonebook();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

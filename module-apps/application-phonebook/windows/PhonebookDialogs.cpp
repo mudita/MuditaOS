@@ -20,26 +20,17 @@
 #include <log/log.hpp>
 #include <sstream>
 
-PhonebookDeleteContact::PhonebookDeleteContact(app::Application *app) : AppWindow(app, "Delete")
+PhonebookDialog::PhonebookDialog(app::Application *app, const std::string &dialogName) : AppWindow(app, dialogName)
 {
+    LOG_INFO("PhonebookDialog::ctor %s", dialogName.c_str());
     setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
-PhonebookDeleteContact::~PhonebookDeleteContact()
-{
-    destroyInterface();
-}
-
-void PhonebookDeleteContact::rebuild()
-{
-    destroyInterface();
-    buildInterface();
-}
-
-void PhonebookDeleteContact::buildInterface()
+void PhonebookDialog::buildInterface()
 {
     AppWindow::buildInterface();
+
     topBar->setActive(TopBar::Elements::TIME, true);
 
     bottomBar->setActive(BottomBar::Side::LEFT, false);
@@ -49,7 +40,7 @@ void PhonebookDeleteContact::buildInterface()
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    trashacnIcon = new Image(this, 176, 135, 128, 128, "phonebook_contact_delete_trashcan");
+    icon = new Image(this, 176, 135, 128, 128, "phonebook_contact_delete_trashcan");
 
     confirmationLabel = new Text(this, 45, 293, 390, 128);
     confirmationLabel->setText(utils::localize.get("app_phonebook_options_delete_confirm"));
@@ -66,6 +57,60 @@ void PhonebookDeleteContact::buildInterface()
     noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     noLabel->setFont(style::window::font::small);
     noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+
+    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
+    yesLabel->setPenWidth(0);
+    yesLabel->setPenFocusWidth(3);
+    yesLabel->setFilled(false);
+    yesLabel->setBorderColor(ColorFullBlack);
+    yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    yesLabel->setFont(style::window::font::small);
+    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+
+    noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
+    yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
+}
+
+bool PhonebookDialog::handleSwitchData(SwitchData *data)
+{
+    if (data == nullptr)
+        return false;
+
+    PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
+    contact = item->getContact();
+
+    setContactData();
+
+    return (true);
+}
+
+bool PhonebookDialog::onInput(const InputEvent &inputEvent)
+{
+    if (inputEvent.keyCode == KeyCode::KEY_LF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+        contact = nullptr;
+        return (true);
+    }
+    else if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
+             ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+        contact = nullptr;
+        return (true);
+    }
+
+    return (AppWindow::onInput(inputEvent));
+}
+
+void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
+{
+    LOG_INFO("PhonebookDeleteContact::initialize");
+    icon = new Image(this, 176, 135, 128, 128, "phonebook_contact_delete_trashcan");
+
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -77,14 +122,6 @@ void PhonebookDeleteContact::buildInterface()
         return (false);
     };
 
-    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
-    yesLabel->setPenWidth(0);
-    yesLabel->setPenFocusWidth(3);
-    yesLabel->setFilled(false);
-    yesLabel->setBorderColor(ColorFullBlack);
-    yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yesLabel->setFont(style::window::font::small);
-    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -104,20 +141,6 @@ void PhonebookDeleteContact::buildInterface()
         }
         return (false);
     };
-
-    noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
-    yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
-}
-
-void PhonebookDeleteContact::destroyInterface()
-{
-    AppWindow::destroyInterface();
-}
-
-void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    setFocusItem(noLabel);
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 void PhonebookDeleteContact::setContactData()
@@ -125,95 +148,13 @@ void PhonebookDeleteContact::setContactData()
     setTitle(formatContactName(contact));
 }
 
-bool PhonebookDeleteContact::handleSwitchData(SwitchData *data)
+void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    if (data == nullptr)
-        return false;
+    if (icon == nullptr)
+        icon = new Image(this, 176, 135, 128, 128, "phonebook_blocked_large");
 
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
-
-    setContactData();
-
-    return (true);
-}
-
-bool PhonebookDeleteContact::onInput(const InputEvent &inputEvent)
-{
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-    {
-        return (false);
-    }
-
-    if (inputEvent.keyCode == KeyCode::KEY_LF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-
-    return (ret);
-}
-
-/**
- *
- */
-PhonebookBlockContact::PhonebookBlockContact(app::Application *app) : AppWindow(app, "Block")
-{
-    setSize(style::window_width, style::window_height);
-    buildInterface();
-}
-
-PhonebookBlockContact::~PhonebookBlockContact()
-{
-    destroyInterface();
-}
-
-void PhonebookBlockContact::rebuild()
-{
-    destroyInterface();
-    buildInterface();
-}
-
-void PhonebookBlockContact::buildInterface()
-{
-    AppWindow::buildInterface();
-    topBar->setActive(TopBar::Elements::TIME, true);
-
-    bottomBar->setActive(BottomBar::Side::LEFT, false);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-    icon = new Image(this, 176, 135, 128, 128, "phonebook_blocked_large");
-
-    confirmationLabel = new Text(this, 45, 293, 390, 128);
     confirmationLabel->setText(utils::localize.get("app_phonebook_options_block_confirm"));
-    confirmationLabel->setTextType(Text::TextType::MULTI_LINE);
-    confirmationLabel->setEditMode(Text::EditMode::BROWSE);
-    confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    confirmationLabel->setFont(style::window::font::small);
 
-    noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
-    noLabel->setPenWidth(0);
-    noLabel->setPenFocusWidth(3);
-    noLabel->setFilled(false);
-    noLabel->setBorderColor(ColorFullBlack);
-    noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    noLabel->setFont(style::window::font::small);
-    noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -234,14 +175,6 @@ void PhonebookBlockContact::buildInterface()
         return (false);
     };
 
-    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
-    yesLabel->setPenWidth(0);
-    yesLabel->setPenFocusWidth(3);
-    yesLabel->setFilled(false);
-    yesLabel->setBorderColor(ColorFullBlack);
-    yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yesLabel->setFont(style::window::font::small);
-    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -261,20 +194,6 @@ void PhonebookBlockContact::buildInterface()
         }
         return (false);
     };
-
-    noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
-    yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
-}
-
-void PhonebookBlockContact::destroyInterface()
-{
-    AppWindow::destroyInterface();
-}
-
-void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    setFocusItem(noLabel);
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 void PhonebookBlockContact::setContactData()
@@ -282,94 +201,13 @@ void PhonebookBlockContact::setContactData()
     setTitle(formatContactName(contact));
 }
 
-bool PhonebookBlockContact::handleSwitchData(SwitchData *data)
+void PhonebookDuplicateNumber::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    if (data == nullptr)
-        return false;
+    if (icon == nullptr)
+        icon = new Image(this, 176, 135, 128, 128, "phonebook_info");
 
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
+    confirmationLabel->setText(utils::localize.get("app_phonebook_duplicate_numbers"));
 
-    setContactData();
-
-    return (true);
-}
-
-bool PhonebookBlockContact::onInput(const InputEvent &inputEvent)
-{
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-    {
-        return (false);
-    }
-
-    if (inputEvent.keyCode == KeyCode::KEY_LF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-
-    return (ret);
-}
-
-/**
- *
- */
-PhonebookDuplicateNumber::PhonebookDuplicateNumber(app::Application *app) : AppWindow(app, "NumberAlreadyExists")
-{
-    setSize(style::window_width, style::window_height);
-    buildInterface();
-}
-
-PhonebookDuplicateNumber::~PhonebookDuplicateNumber()
-{
-    destroyInterface();
-}
-
-void PhonebookDuplicateNumber::rebuild()
-{
-    destroyInterface();
-    buildInterface();
-}
-
-void PhonebookDuplicateNumber::buildInterface()
-{
-    AppWindow::buildInterface();
-    topBar->setActive(TopBar::Elements::TIME, true);
-
-    bottomBar->setActive(BottomBar::Side::LEFT, false);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-    icon = new Image(this, 176, 135, 128, 128, "phonebook_info");
-
-    confirmationLabel = new Text(this, 45, 293, 390, 128);
-    confirmationLabel->setTextType(Text::TextType::MULTI_LINE);
-    confirmationLabel->setEditMode(Text::EditMode::BROWSE);
-    confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    confirmationLabel->setFont(style::window::font::small);
-
-    noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
-    noLabel->setPenWidth(0);
-    noLabel->setPenFocusWidth(3);
-    noLabel->setFilled(false);
-    noLabel->setBorderColor(ColorFullBlack);
-    noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    noLabel->setFont(style::window::font::small);
-    noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -380,34 +218,12 @@ void PhonebookDuplicateNumber::buildInterface()
         return (true);
     };
 
-    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
-    yesLabel->setPenWidth(0);
-    yesLabel->setPenFocusWidth(3);
-    yesLabel->setFilled(false);
-    yesLabel->setBorderColor(ColorFullBlack);
-    yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yesLabel->setFont(style::window::font::small);
-    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
         {}
         return (false);
     };
-
-    noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
-    yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
-}
-
-void PhonebookDuplicateNumber::destroyInterface()
-{
-    AppWindow::destroyInterface();
-}
-
-void PhonebookDuplicateNumber::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    setFocusItem(noLabel);
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 void PhonebookDuplicateNumber::setContactData()
@@ -418,85 +234,12 @@ void PhonebookDuplicateNumber::setContactData()
     setTitle(contact.get()->numbers[0].numberE164);
 }
 
-bool PhonebookDuplicateNumber::handleSwitchData(SwitchData *data)
+void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    if (data == nullptr)
-        return false;
+    if (icon == nullptr)
+        icon = new Image(this, 176, 135, 128, 128, "phonebook_empty_grey_circle");
 
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
-
-    setContactData();
-
-    return (true);
-}
-
-bool PhonebookDuplicateNumber::onInput(const InputEvent &inputEvent)
-{
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-    {
-        return (false);
-    }
-
-    if (inputEvent.keyCode == KeyCode::KEY_LF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-
-    return (ret);
-}
-
-/**
- *
- */
-PhonebookDuplicateSpeedDial::PhonebookDuplicateSpeedDial(app::Application *app) : AppWindow(app, "SpeedDialAlreadyAssigned")
-{
-    setSize(style::window_width, style::window_height);
-    buildInterface();
-}
-
-PhonebookDuplicateSpeedDial::~PhonebookDuplicateSpeedDial()
-{
-    destroyInterface();
-}
-
-void PhonebookDuplicateSpeedDial::rebuild()
-{
-    destroyInterface();
-    buildInterface();
-}
-
-void PhonebookDuplicateSpeedDial::buildInterface()
-{
-    AppWindow::buildInterface();
-    topBar->setActive(TopBar::Elements::TIME, true);
-
-    bottomBar->setActive(BottomBar::Side::LEFT, false);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-    icon = new Image(this, 176, 135, 128, 128, "phonebook_empty_grey_circle");
-
-    confirmationLabel = new Text(this, 45, 293, 390, 128);
-    confirmationLabel->setTextType(Text::TextType::MULTI_LINE);
-    confirmationLabel->setEditMode(Text::EditMode::BROWSE);
-    confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    confirmationLabel->setFont(style::window::font::small);
+    confirmationLabel->setText(utils::localize.get("app_phonebook_duplicate_speed_dial"));
 
     dialValue = new Label(this, 176 + 32, 135 + 32, 64, 64);
     dialValue->setPenWidth(0);
@@ -507,14 +250,6 @@ void PhonebookDuplicateSpeedDial::buildInterface()
     dialValue->setFont(style::window::font::verybig);
     dialValue->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
-    noLabel->setPenWidth(0);
-    noLabel->setPenFocusWidth(3);
-    noLabel->setFilled(false);
-    noLabel->setBorderColor(ColorFullBlack);
-    noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    noLabel->setFont(style::window::font::small);
-    noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -525,14 +260,6 @@ void PhonebookDuplicateSpeedDial::buildInterface()
         return (false);
     };
 
-    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
-    yesLabel->setPenWidth(0);
-    yesLabel->setPenFocusWidth(3);
-    yesLabel->setFilled(false);
-    yesLabel->setBorderColor(ColorFullBlack);
-    yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yesLabel->setFont(style::window::font::small);
-    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -551,20 +278,6 @@ void PhonebookDuplicateSpeedDial::buildInterface()
         }
         return (false);
     };
-
-    noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
-    yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
-}
-
-void PhonebookDuplicateSpeedDial::destroyInterface()
-{
-    AppWindow::destroyInterface();
-}
-
-void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
-{
-    setFocusItem(noLabel);
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 void PhonebookDuplicateSpeedDial::setContactData()
@@ -575,47 +288,7 @@ void PhonebookDuplicateSpeedDial::setContactData()
     confirmationLabel->setText(t);
 
     /* speeddial value convert to string */
-    dialValue->setText(itoa(contact->speeddial));
+    dialValue->setText(std::to_string(contact->speeddial));
 
     setTitle(contact.get()->numbers[0].numberE164);
-}
-
-bool PhonebookDuplicateSpeedDial::handleSwitchData(SwitchData *data)
-{
-    if (data == nullptr)
-        return false;
-
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
-
-    setContactData();
-
-    return (true);
-}
-
-bool PhonebookDuplicateSpeedDial::onInput(const InputEvent &inputEvent)
-{
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-    {
-        return (false);
-    }
-
-    if (inputEvent.keyCode == KeyCode::KEY_LF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF)
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-
-    return (ret);
 }

@@ -15,23 +15,6 @@ SearchResultsModel::~SearchResultsModel()
 
 gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-    /*
-    LOG_INFO("requested item: %d first %d prev %d count %d", index, firstElement, prevIndex, count);
-    if (results && index < (int)results->size())
-    {
-        gui::PhonebookItem *item = new gui::PhonebookItem();
-        auto o = *results.get();
-        LOG_INFO("item: %s", o[index].primaryName.c_str());
-        auto contact = std::make_shared<ContactRecord>(o[index]);
-        item->setContact(contact);
-        item->setID(index);
-        return (item);
-    }
-    else
-    {
-        return (nullptr);
-    }
-    */
     auto o = *results.get();
     auto contact = std::make_shared<ContactRecord>(o[index]);
 
@@ -147,7 +130,7 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
     return nullptr;
 }
 
-int SearchResultsModel::getItemCount()
+int SearchResultsModel::getItemCount() const
 {
     if (results)
     {

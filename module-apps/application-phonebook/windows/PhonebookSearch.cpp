@@ -54,9 +54,6 @@ void PhonebookSearch::buildInterface()
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_search"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    titleLabel = addLabel(nullptr, 0, 52, 480, 35, utils::localize.get("app_phonebook_search_win_contacts"), style::header::font::title,
-                          RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
-
     topSeparatorLabel = addLabel(nullptr, 0, 104, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
     searchHeader = addLabel(nullptr, 30, 127, 90, 20, utils::localize.get("app_phonebook_search_win_search"));
 
@@ -105,7 +102,6 @@ void PhonebookSearch::destroyInterface()
 void PhonebookSearch::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     setFocusItem(inputField);
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 bool PhonebookSearch::handleSwitchData(SwitchData *data)
@@ -116,7 +112,7 @@ bool PhonebookSearch::handleSwitchData(SwitchData *data)
         return false;
     }
 
-    PhonebookSearchQuery *item = reinterpret_cast<PhonebookSearchQuery *>(data);
+    PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
     inputField->setText(item->getQuery());
 
     return (true);

@@ -16,10 +16,6 @@ PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel(app, 14)
 {
 }
 
-PhonebookModel::~PhonebookModel()
-{
-}
-
 void PhonebookModel::requestRecordsCount()
 {
 
@@ -73,8 +69,7 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
 
 gui::ListItem *PhonebookModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-
-    LOG_INFO("index: %d, first:%d prev: %d, count: %d, rem: %d, topDown: %d", index, firstElement, prevIndex, count, remaining, topDown);
+    // LOG_INFO("index: %d, first:%d prev: %d, count: %d, rem: %d, topDown: %d", index, firstElement, prevIndex, count, remaining, topDown);
     bool download = false;
     if (index > firstIndex + pageSize / 2)
         download = true;

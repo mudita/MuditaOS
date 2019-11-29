@@ -33,7 +33,7 @@ void PhonebookSearchResults::buildInterface()
 
     AppWindow::buildInterface();
 
-    list = new gui::PhonebookSearchView(this, 11, 105, 480 - 22, 600 - 105 - 50);
+    list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
     list->setMaxElements(7);
     list->setPageSize(7);
     list->setPenFocusWidth(0);
@@ -138,7 +138,7 @@ bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
     if (data == nullptr)
         return false;
 
-    auto searchResults = reinterpret_cast<PhonebookSearchResultsData *>(data);
+    auto searchResults = dynamic_cast<PhonebookSearchResultsData *>(data);
     if (searchResults)
     {
         searchResultsModel->setResults(searchResults->getResults());

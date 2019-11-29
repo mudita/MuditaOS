@@ -20,7 +20,6 @@ class NoResults : public AppWindow
 {
   protected:
     /** labels */
-    Label *titleLabel = nullptr;
     Label *topSeparatorLabel = nullptr;
     Text *informationLabel = nullptr;
     Image *searchCenter;
@@ -30,7 +29,6 @@ class NoResults : public AppWindow
     NoResults(app::Application *app);
     virtual ~NoResults();
     bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
     bool handleSwitchData(SwitchData *data) override;
     void rebuild() override;
     void buildInterface() override;
@@ -44,7 +42,6 @@ class ContactBlocked : public AppWindow
 {
   protected:
     /** labels */
-    Label *titleLabel = nullptr;
     Label *topSeparatorLabel = nullptr;
     Text *informationLabel = nullptr;
     Image *searchCenter;
@@ -54,7 +51,6 @@ class ContactBlocked : public AppWindow
     ContactBlocked(app::Application *app);
     virtual ~ContactBlocked();
     bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
     bool handleSwitchData(SwitchData *data) override;
     void rebuild() override;
     void buildInterface() override;

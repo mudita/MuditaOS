@@ -57,8 +57,6 @@ void PhonebookContact::buildInterface()
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_call"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    titleLabel = addLabel(nullptr, 119, 52, 241, 35, utils::localize.get("app_phonebook_contact_information"), style::header::font::title);
-
     favouritesIcon = new Image(this, 97, 107, 32, 32, "small_heart");
     favouritesLabel = addLabel(nullptr, 65, 144, 89, 20, utils::localize.get("app_phonebook_contact_favourites_upper"), style::phonebook::font::tinybold,
                                RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
@@ -218,7 +216,6 @@ PhonebookContact::~PhonebookContact()
 
 void PhonebookContact::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    application->setKeyboardProfile(utils::localize.get("common_kbd_upper"));
 }
 
 ContactRecord PhonebookContact::readContact()
@@ -233,14 +230,14 @@ void PhonebookContact::setContactData()
         return;
 
     if (contact && contact->primaryName.length() > 0)
-        titleLabel->setText(contact->primaryName);
+        setTitle(contact->primaryName);
 
     if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
-        titleLabel->setText(contact->primaryName + " " + contact->alternativeName);
+        setTitle(contact->primaryName + " " + contact->alternativeName);
 
     if (contact->speeddial >= 0 && contact->speeddial < 10)
     {
-        speedDial->setText(itoa(contact->speeddial));
+        speedDial->setText(std::to_string(contact->speeddial));
     }
     else
     {
@@ -349,7 +346,7 @@ bool PhonebookContact::handleSwitchData(SwitchData *data)
         return false;
     }
 
-    PhonebookItemData *item = reinterpret_cast<PhonebookItemData *>(data);
+    PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
     contact = item->getContact();
 
     setContactData();
@@ -359,39 +356,14 @@ bool PhonebookContact::handleSwitchData(SwitchData *data)
 
 bool PhonebookContact::onInput(const InputEvent &inputEvent)
 {
-    // check if any of the lower inheritance onInput methods catch the event
-    LOG_INFO("PhonebookContact::onInput");
-    bool ret = AppWindow::onInput(inputEvent);
-
-    if (ret)
+    LOG_INFO("PhonebookContact::onInput state: %d keyCode: %d", inputEvent.state, inputEvent.keyCode);
+    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)) &&
+        inputEvent.keyCode == KeyCode::KEY_LF)
     {
-        // refresh window only when key is other than enter
-        if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-        {
-            application->render(RefreshModes::GUI_REFRESH_FAST);
-        }
-        return (true);
-    }
-
-    if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-    {
-        return (false);
-    }
-
-    if (inputEvent.keyCode == KeyCode::KEY_ENTER)
-    {
-        LOG_INFO("Enter pressed");
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_LF)
-    {
-        LOG_INFO("switch to options");
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return (true);
     }
-    else
-    {
-        LOG_INFO("PhonebookContact::onInput unhandled event code=%d", inputEvent.keyCode);
-    }
-    return (false);
+
+    return (AppWindow::onInput(inputEvent));
 }
