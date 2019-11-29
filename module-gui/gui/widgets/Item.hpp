@@ -143,6 +143,12 @@ public:
 
 	void setMaxSize( const uint16_t& w, const uint16_t& h);
 	void setMinSize( const uint16_t& w, const uint16_t& h);
+	void setX(const uint32_t x);
+	void setY(const uint32_t y);
+	const uint32_t getX() const			{ return (widgetArea.x); }
+	const uint32_t getY() const			{ return (widgetArea.y); }
+	const uint32_t getWidth() const		{ return (widgetArea.w); }
+	const uint32_t getHeight() const	{ return (widgetArea.h); }
 protected:
 	//On change of position or size this method will recalculate visible part of the widget
 	//considering widgets hierarchy and calculate absolute position of drawing primitives.
