@@ -117,31 +117,37 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
         responseBuffer.erase();
     }
 
-    LOG_DEBUG("[AT]: %s", cmd);
+    // Remove \r and \n for logging purposes
+    std::string cmdStr(cmd);
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
+
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     cellular->Write((void*)cmd, strlen(cmd));
 
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
+    
+    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
 
     while(1) {
 
         if (timeElapsed >= timeoutNeeded)
         {
-            blockedTaskHandle = nullptr;
-            return tokens;
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            break;
         }
 
         auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
         timeElapsed = cpp_freertos::Ticks::GetTicks();
         if (ret)
         {
-
             std::vector<std::string> strings;
 
             cpp_freertos::LockGuard lock(mutex);
-            //tokenize responseBuffer
+            // tokenize responseBuffer
+            // empty lines are also removed
             auto ret = Tokenizer(responseBuffer, rxCount, "\r\n");
             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
 
@@ -150,12 +156,25 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
                 continue;
             }
         }
+        else
+        {
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+        }
+        
         break;
     }
 
     blockedTaskHandle = nullptr;
     responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
-    LOG_DEBUG("AT command returning %i tokens", tokens.size());
+    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
+
+#if DEBUG_MODEM_OUTPUT_RESPONSE
+    for (auto s : tokens)
+    {
+        LOG_DEBUG("[]%s", s.c_str());
+    }
+#endif
+
     return tokens;
 }
 

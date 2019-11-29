@@ -20,6 +20,15 @@
 #include "mutex.hpp"
 #include "Service/Service.hpp"
 
+#define DEBUG_MODEM_OUTPUT_RESPONSE 0
+#define DEBUG_MODEM_TIMEOUT_AS_ERROR 0
+
+#if DEBUG_MODEM_TIMEOUT_AS_ERROR
+#define LOG_MODEM_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
+#else
+#define LOG_MODEM_TIMEOUT(...) LOG_INFO(__VA_ARGS__)
+#endif
+
 namespace bsp{
     class Cellular;
 }
@@ -40,7 +49,7 @@ public:
 
     int ProcessNewData(sys::Service *service);
 
-    std::vector<std::string> SendCommand(const char* cmd,size_t rxCount,uint32_t timeout = 500);
+    std::vector<std::string> SendCommand(const char *cmd, size_t rxCount, uint32_t timeout = 500);
 
     static std::vector<std::string> Tokenizer(std::string& input,uint32_t maxTokenCount,const std::string& delimiter);
 
