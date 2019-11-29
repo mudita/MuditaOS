@@ -14,7 +14,7 @@
 namespace gui {
 
 inline const std::string special_input = "AppSpecialInput";
-inline const std::string char_select = "CharSelect";
+inline const std::string char_select = "MainWindow";
 
 //class template that stores information that was sent along with switch message
 class SwitchData {
@@ -32,7 +32,12 @@ public:
 class SwitchSpecialChar : public SwitchData
 {
     public:
-        SwitchSpecialChar(const std::string &description) : SwitchData(description) {}
+        std::string requester = "";
+        enum class Type {
+            Request,
+            Response,
+        } type = Type::Request;
+        SwitchSpecialChar(Type type, const std::string requester, const std::string &description="") : SwitchData(description), requester(requester), type(type) {}
         virtual ~SwitchSpecialChar() = default;
 };
 

@@ -31,23 +31,13 @@ UiTestWindow::UiTestWindow(app::Application *app) : AppWindow(app, "TEST_UI")
         bottomBar->setText(BottomBar::Side::CENTER, text);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         bottomBar->getText(BottomBar::Side::CENTER);
-    }));
-    text->setVisible(false);
-    auto box = new GridLayout(0, title->offset_h(), style::window_width, bottomBar->offset_h() - title->offset_h(), {90,90} );
-    for(auto schar : gui::special_chars) {
-        auto el = new gui::Label(box, 0, 0, 80, 80);
-        style::window::decorate(el);
-        el->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-        el->setText(std::string(1,schar));
-        el->setFont(style::window::font::medium);
-        el->activatedCallback = [=](Item& it) {
-            LOG_INFO("handled %s", el->getText().c_str()); return true;
-        };
-        // on click -> send onInput event with mapped & special keypress (...)
-        // better - read special_keys_keymap and handle accordingly ... to be done
+    },
+    [=]() {
+        LOG_INFO("Get special char!");
+        sapm::ApplicationManager::messageSwitchSpecialInput( application,
+                std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request,application->GetName()));
     }
     ));
-    // TODO TODO attach(cb - show special characters, && input somehow)
     setFocusItem(text);
 }
 
