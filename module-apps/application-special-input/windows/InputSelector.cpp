@@ -25,7 +25,11 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
 //            auto msg = std::make_shared<app::msg::AppSpecialInput>(InputEvent(el->getText()[0]));
 //            sys::Bus::SendUnicast(msg, dynamic_cast<app::AppSpecialInput*>(application)->getRequester(), application);
 //            return true;
-//            LOG_INFO("handled %s", el->getText().c_str());
+            auto name = dynamic_cast<app::AppSpecialInput*>(application)->requester;
+            LOG_INFO("handled %s for %s", el->getText().c_str(), name);
+            setFocusItem(nullptr);
+            sapm::ApplicationManager::messageSwitchSpecialInput( application,
+                    std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response,name));
             return true;
         };
         // on click -> send onInput event with mapped & special keypress (...)
@@ -46,11 +50,15 @@ void UiCharSelector::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     auto ret = dynamic_cast<SwitchSpecialChar*>(data);
     if(ret) {
-         LOG_INFO("handle!");
-         // TODO STORE FROM WHOM!
+         LOG_INFO("handle for: %s", ret->requester.c_str());
+        setFocusItem(box->getNavigationItem());
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        dynamic_cast<app::AppSpecialInput*>(application)->requester = ret->requester;
     }
 }
 void UiCharSelector::rebuild() {}
 void UiCharSelector::buildInterface() {}
-void UiCharSelector::destroyInterface() {}
+void UiCharSelector::destroyInterface()
+{
+    setFocusItem(nullptr);
+}

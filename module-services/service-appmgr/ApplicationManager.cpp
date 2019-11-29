@@ -254,17 +254,18 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
     for (auto &el : bg_apps)
     {
-        auto app = getApp(el);
-        if (app != nullptr)
+        auto app = applications.find(el);
+        if (app != applications.end())
         {
-            app->launcher->runBackground(this);
+            LOG_INFO("Running in bg: %s", app->first.c_str());
+            app->second->lanucher->runBackground(this);
         }
     }
 
-    auto app = getApp(app_desktop);
-    if (app != nullptr)
+    auto app = applications.find(app_desktop);
+    if (app != applications.end())
     {
-        messageSwitchApplication(this, app->launcher->getName(), "", nullptr);
+        messageSwitchApplication(this, app->second->lanucher->getName(), "", nullptr);
     }
 
 #else
@@ -522,23 +523,25 @@ bool ApplicationManager::handleLanguageChange( sapm::APMChangeLanguage* msg ) {
 bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
-	if( state == State::WAITING_GET_FOCUS_CONFIRMATION ) {
-		if( msg->getSenderName() == launchApplicationName ) {
+	if( state == State::WAITING_GET_FOCUS_CONFIRMATION
+         || state == State::IDLE
+            ) {
+		//if( msg->getSenderName() == launchApplicationName ) {
 			LOG_INFO("APMConfirmSwitch focus confirmed by: %s", msg->getSenderName().c_str());
 			focusApplicationName = launchApplicationName;
 			launchApplicationName = "";
 
-			auto it = applications.find(focusApplicationName);
+			auto it = applications.find(msg->getSenderName());
 			it->second->blockClosing = false;
 			it->second->state = app::Application::State::ACTIVE_FORGROUND;
 			state = State::IDLE;
 			return true;
-		}
+		// }
 
 	}
 	//this is the case where application manager is waiting for non-closeable application
 	//to confirm that it has lost focus.
-	else if( state == State::WAITING_LOST_FOCUS_CONFIRMATION ) {
+	else if( state == State::WAITING_LOST_FOCUS_CONFIRMATION) {
 		if( msg->getSenderName() == focusApplicationName ) {
 			LOG_INFO("APMConfirmSwitch Lost focus confirmed by: %s", msg->getSenderName().c_str());
 			previousApplicationName = focusApplicationName;
@@ -551,7 +554,7 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg ) {
 			return true;
 		}
 	}
-	LOG_INFO("APMConfirmSwitch error");
+	LOG_ERROR("APMConfirmSwitch %s : %s error %d", msg->getSenderName().c_str(), focusApplicationName.c_str(), state);
 	return false;
 }
 
@@ -582,6 +585,14 @@ bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const s
 	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
+}
+
+bool ApplicationManager::messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data ) {
+    auto val = data->requester;
+    return
+        gui::SwitchSpecialChar::Type::Request == data->type?
+        messageSwitchApplication(sender, gui::special_input, gui::char_select, std::move(data)):
+        messageSwitchApplication(sender, val, "LastWindow", std::move(data));
 }
 
 bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
