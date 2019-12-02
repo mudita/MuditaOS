@@ -21,7 +21,7 @@
 
 namespace app {
 
-ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent) :
+ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground) :
 	Application( name, parent ) {
 }
 

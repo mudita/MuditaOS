@@ -65,7 +65,7 @@ public:
 		DEACTIVATING
 	};
 
-    static inline const char *stateStr(State st);
+    static const char *stateStr(State st);
 
 private:
 
@@ -210,6 +210,8 @@ public:
 	//virtual method to run the application
 	virtual bool run(sys::Service* caller = nullptr ) {return true;};
 	virtual bool runBackground(sys::Service* caller = nullptr ) {return true;};
+    // TODO it would be nice to actually make handle and update it
+    // or comomize constructors with/without delayed run
     std::shared_ptr<Application> handle = nullptr;
 };
 
@@ -219,13 +221,13 @@ class ApplicationLauncherT : public ApplicationLauncher
     public:
     ApplicationLauncherT(std::string name, bool isCloseable=true) : ApplicationLauncher(name, isCloseable) {}
     virtual bool run(sys::Service* caller) override {
-		parent = (caller==nullptr?"":caller->GetName());
-        handle = std::make_shared<T>(name);
-    	return sys::SystemManager::CreateService( handle , caller );
+        parent = (caller==nullptr?"":caller->GetName());
+        handle = std::make_shared<T>(name, parent);
+        return sys::SystemManager::CreateService( handle , caller );
 	};
     bool runBackground(sys::Service *caller) override {
 		parent = (caller==nullptr?"":caller->GetName());
-        handle = std::make_shared<T>(name,"", true);
+        handle = std::make_shared<T>(name,parent, true);
     	return sys::SystemManager::CreateService( handle , caller );
     };
 };

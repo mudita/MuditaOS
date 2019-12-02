@@ -16,9 +16,8 @@
 
 namespace app {
 
-/*
- *
- */
+inline const std::string name_viewer = "ApplicationViewer";
+
 class ApplicationViewer: public Application {
 
 public:
@@ -31,21 +30,8 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() ;
-	void destroyUserInterface();
-};
-
-class ApplicationViewerLauncher : public ApplicationLauncher {
-public:
-	ApplicationViewerLauncher() : ApplicationLauncher("ApplicationViewer", true ) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationViewer>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationViewer>(name, parent ),caller);
-	};
+	void createUserInterface() override;
+	void destroyUserInterface() override;
 };
 
 } /* namespace app */

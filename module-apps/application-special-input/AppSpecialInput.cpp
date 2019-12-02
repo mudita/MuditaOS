@@ -26,7 +26,6 @@ sys::Message_t AppSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys:
 // THIS IS IMPORTANT THIS SETS APPLICATION STATE... (not for example Application(...) constructor - this wouild be too easy
 sys::ReturnCodes AppSpecialInput::InitHandler()
 {
-    LOG_ERROR("!!!!!");
     auto ret = Application::InitHandler();
     if(ret != sys::ReturnCodes::Success) {
         LOG_ERROR("");
