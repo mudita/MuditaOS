@@ -24,6 +24,7 @@ inline uint32_t default_application_locktime=30000;
 namespace sapm {
 
 class ApplicationDescription {
+private:
 public:
 	ApplicationDescription( std::unique_ptr<app::ApplicationLauncher> launcher);
 	virtual ~ApplicationDescription() {}
@@ -49,7 +50,7 @@ public:
     // prevents from blocking the system
     bool preventsLocking()
     {
-        if (launcher)
+        if (launcher != nullptr)
         {
             return launcher->isBlocking();
         }
@@ -62,7 +63,7 @@ public:
     // informs if it is possible to close application when it looses focus.
     bool closeable()
     {
-        if (launcher)
+        if (launcher != nullptr)
         {
             return launcher->isCloseable();
         }
@@ -71,35 +72,73 @@ public:
 
     app::Application::State getState()
     {
-        if( launcher && launcher->handle ) {
-        return launcher->handle->getState();
+        if(( launcher == nullptr) || (launcher->handle == nullptr )) {
+            LOG_ERROR("No %s", launcher?"launcher":"handle");
+            return app::Application::State::NONE;
         } else {
-            return app::Application::State::DEACTIVATED;
+            return launcher->handle->getState();
         }
     }
 
     void setState(app::Application::State st)
     {
-        if( launcher && launcher->handle ) {
+        if((launcher == nullptr) || (launcher->handle == nullptr )) {
+            LOG_ERROR("No %s", launcher==nullptr?"launcher":"handle");
+        } else {
             launcher->handle->setState(st);
         }
     }
 };
 
-/*
- *
- */
-class ApplicationManager: public sys::Service {
+/// this is only to force usage of get/set methods in ApplicatioManager
+class VirtualAppManager
+{
+  public:
+    enum class State
+    {
+        IDLE,
+        CLOSING_PREV_APP,
+        WAITING_CLOSE_CONFIRMATION,
+        STARTING_NEW_APP,
+        WAITING_NEW_APP_REGISTRATION,
+        WAITING_LOST_FOCUS_CONFIRMATION,
+        WAITING_GET_FOCUS_CONFIRMATION
+    };
 
-	enum class State{
-		IDLE,
-		CLOSING_PREV_APP,
-		WAITING_CLOSE_CONFIRMATION,
-		STARTING_NEW_APP,
-		WAITING_NEW_APP_REGISTRATION,
-		WAITING_LOST_FOCUS_CONFIRMATION,
-		WAITING_GET_FOCUS_CONFIRMATION
-	};
+  private:
+    State state = State::IDLE;
+  public:
+    State getState() { return state; }
+    inline const char *stateStr(State st)
+    {
+        switch (st)
+        {
+        case State::IDLE:
+            return "IDLE";
+        case State::CLOSING_PREV_APP:
+            return "CLOSING_PREV_APP";
+        case State::WAITING_CLOSE_CONFIRMATION:
+            return "WAITING_CLOSE_CONFIRMATION";
+        case State::STARTING_NEW_APP:
+            return "STARTING_NEW_APP";
+        case State::WAITING_NEW_APP_REGISTRATION:
+            return "WAITING_NEW_APP_REGISTRATION";
+        case State::WAITING_LOST_FOCUS_CONFIRMATION:
+            return "WAITING_LOST_FOCUS_CONFIRMATION";
+        case State::WAITING_GET_FOCUS_CONFIRMATION:
+            return "WAITING_GET_FOCUS_CONFIRMATION";
+        }
+        // there was enum added - fix it adding it to case
+        return "FIX_ME";
+    }
+    void setState(State st)
+    {
+        LOG_DEBUG("state: (%s) -> (%s)", stateStr(state), stateStr(st));
+        state = st;
+    }
+};
+
+class ApplicationManager: public sys::Service, public VirtualAppManager {
 
 	SettingsRecord settings;
 
@@ -119,7 +158,7 @@ class ApplicationManager: public sys::Service {
             return *el;
         }
     }
-        sys::SystemManager* systemManager;
+    sys::SystemManager* systemManager;
 
 	//
 	std::unique_ptr<utils::i18> i18;
@@ -130,8 +169,6 @@ class ApplicationManager: public sys::Service {
 	std::string previousApplicationName = "";
 	//name of the application scheduled for launching
 	std::string launchApplicationName = "";
-	//state of the application manager
-	State state = State::IDLE;
 	//timer to count time from last user's activity. If it reaches time defined in settings database application manager is sending signal
 	//to power manager and changing window to the desktop window in the blocked state.
 	uint32_t blockingTimerID = 0;

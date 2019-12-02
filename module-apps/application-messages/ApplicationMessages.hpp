@@ -13,9 +13,11 @@
 
 namespace app {
 
+inline const std::string name_messages =  "ApplicationMessages";
+
 class ApplicationMessages: public app::Application {
 public:
-	ApplicationMessages(std::string name = "ApplicationMessages",
+	ApplicationMessages(std::string name = name_messages,
 			std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationMessages();
 

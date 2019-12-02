@@ -160,17 +160,17 @@ int main() {
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
-		applications.push_back(std::unique_ptr<app::ApplicationViewerLauncher>(new app::ApplicationViewerLauncher()));
-		applications.push_back(std::unique_ptr<app::ApplicationDesktopLauncher>(new app::ApplicationDesktopLauncher()));
-		applications.push_back(std::unique_ptr<app::ApplicationCallLauncher>(new app::ApplicationCallLauncher()));
-		applications.push_back(std::unique_ptr<app::ApplicationSettingsLauncher>(new app::ApplicationSettingsLauncher()));
-		applications.push_back(std::unique_ptr<app::ApplicationNotesLauncher>(new app::ApplicationNotesLauncher()));
-        applications.push_back(app::CreateLauncher<app::ApplicationCallLog>("ApplicationCallLog"));
-		applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>("ApplicationPhonebook"));
-		applications.push_back(app::CreateLauncher<app::ApplicationMessages>("ApplicationMessages"));
-		applications.push_back(app::CreateLauncher<app::AppSpecialInput>(gui::special_input, false));
+        applications.push_back(app::CreateLauncher<app::ApplicationViewer>(app::name_viewer));
+        applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
+        applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
+        applications.push_back(app::CreateLauncher<app::ApplicationSettings>(app::name_settings));
+        applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
+        applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
+        applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
+        applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
+        applications.push_back(app::CreateLauncher<app::AppSpecialInput>(gui::special_input, false));
 
-		//start application manager
+        // start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
                                      sysmgr.get());
 
