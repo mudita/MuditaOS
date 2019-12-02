@@ -95,7 +95,7 @@ void GridLayout::setNavigation(Item *previous, Item *next)
             ++row;
         }
     }
-    // TODO
+    // TODO add next item after GridLayout element and previous item after GridLayout element
     // children.front()->setNavigationItem(NavigationDirection::UP | NavigationDirection::LEFT, previous);
     // auto last_element = (*std::next(children.begin(), max_elements < children.size() ? max_elements - 1 : children.size()));
     // last_element->setNavigationItem(NavigationDirection::DOWN | NavigationDirection::RIGHT, next);
