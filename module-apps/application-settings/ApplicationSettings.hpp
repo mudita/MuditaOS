@@ -13,12 +13,11 @@
 
 namespace app {
 
-/*
- *
- */
+inline const std::string name_settings = "ApplicationSettings";
+
 class ApplicationSettings: public app::Application {
 public:
-	ApplicationSettings( std::string name="ApplicationSettings", std::string parent = "", bool startBackgound = false);
+	ApplicationSettings( std::string name=name_settings, std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationSettings();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -26,21 +25,8 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() ;
-	void destroyUserInterface();
-};
-
-class ApplicationSettingsLauncher : public ApplicationLauncher {
-public:
-	ApplicationSettingsLauncher() : ApplicationLauncher("ApplicationSettings", true ) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationSettings>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationSettings>(name, parent ),caller);
-	};
+	void createUserInterface() override;
+	void destroyUserInterface() override;
 };
 
 } /* namespace app */

@@ -49,8 +49,7 @@ ApplicationManager::ApplicationManager( const std::string& name, sys::SystemMana
 
 	//store the pointers in the map where key is the name of the app and value is the launcher
 	for( uint32_t i=0; i<launchers.size(); ++i ) {
-		ApplicationDescription* desc = new ApplicationDescription(std::move(launchers[i]));
-		applications.push_back(desc);
+		applications.push_back(new ApplicationDescription(std::move(launchers[i])));
 	}
 }
 ApplicationManager::~ApplicationManager() {
@@ -116,9 +115,9 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 		}break;
 		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
 			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
-
-			LOG_INFO("APMSwitchPrevApp %s", msg->getSenderName().c_str());
-			handleSwitchPrevApplication( msg );
+			if(!handleSwitchPrevApplication( msg )) {
+                LOG_ERROR("Switch from app: failed",msg->getSenderName().c_str());
+            }
 		}break;
 		case static_cast<uint32_t>(MessageType::APMConfirmSwitch): {
 			sapm::APMConfirmSwitch* msg = reinterpret_cast<sapm::APMConfirmSwitch*>( msgl );
@@ -131,7 +130,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 
 			//if application manager was waiting for close confirmation and name of the application
 			//for launching is defined then start application function is called
-			if( ( state == State::WAITING_CLOSE_CONFIRMATION) &&
+			if( ( getState() == State::WAITING_CLOSE_CONFIRMATION) &&
 				( launchApplicationName.empty() == false ) ) {
 				startApplication( launchApplicationName );
 			}
@@ -143,7 +142,7 @@ sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sy
 		} break;
 		case static_cast<int32_t>(MessageType::APMRegister) : {
 			sapm::APMRegister* msg = reinterpret_cast<sapm::APMRegister*>( msgl );
-			LOG_INFO("APMregister %s %s", msg->getSenderName().c_str(), (msg->getStatus()?"true":"false"));
+			LOG_INFO("APMregister [%s] (%s)", msg->getSenderName().c_str(), (msg->getStatus()?"true":"false"));
 			handleRegisterApplication( msg );
 		} break;
 		case static_cast<int32_t>(MessageType::APMChangeLanguage) : {
@@ -300,7 +299,7 @@ sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePo
 
 bool ApplicationManager::startApplication( const std::string& appName ) {
 
-	state = State::STARTING_NEW_APP;
+	setState(State::STARTING_NEW_APP);
 	//search map for application's description structure with specified name
 	auto app = getApp(appName);
 	if( app == nullptr ) {
@@ -309,12 +308,12 @@ bool ApplicationManager::startApplication( const std::string& appName ) {
 	}
 
 	if( app->getState() == app::Application::State::ACTIVE_BACKGROUND ) {
-		state = State::WAITING_GET_FOCUS_CONFIRMATION;
+		setState(State::WAITING_GET_FOCUS_CONFIRMATION);
 		LOG_INFO( "switching focus to application: [%s] window [%s]", appName.c_str(), app->switchWindow.c_str());
 		app::Application::messageSwitchApplication( this, launchApplicationName, app->switchWindow, std::move(app->switchData) );
 	}
 	else {
-		state = State::WAITING_NEW_APP_REGISTRATION;
+		setState(State::WAITING_NEW_APP_REGISTRATION);
 		LOG_INFO( "starting application: %s", appName.c_str());
 		app->launcher->run(this);
 	}
@@ -357,7 +356,7 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	//store window and data if there is any
 	app->switchData = std::move(msg->getData());
 	app->switchWindow = msg->getWindow();
-	state = State::CLOSING_PREV_APP;
+	setState(State::CLOSING_PREV_APP);
 
 	//notify event manager which application should receive keyboard messages
 	EventManager::messageSetApplication( this, launchApplicationName );
@@ -370,13 +369,13 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 		//if application's launcher defines that it can be closed send message with close signal
 		if( (app->closeable()) && (app->blockClosing == false) ){
 			LOG_INFO("APMSwitch waiting for close confirmation from: %s", previousApplicationName.c_str());
-			state = State::WAITING_CLOSE_CONFIRMATION;
+			setState(State::WAITING_CLOSE_CONFIRMATION);
 			app::Application::messageCloseApplication( this, previousApplicationName );
 		}
 		//if application is not closeable send lost focus message
 		else {
 			LOG_INFO("APMSwitch Waiting for lost focus from: %s", previousApplicationName.c_str());
-			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
+			setState(State::WAITING_LOST_FOCUS_CONFIRMATION);
 			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
 	}
@@ -411,12 +410,17 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		return false;
 	}
 
+    LOG_DEBUG("Switch PrevApp: [%s](%s) -> [%s](%s)",
+            focusApplicationName.c_str(), app::Application::stateStr(getApp(previousApplicationName)->getState()),
+            previousApplicationName.c_str(), app::Application::stateStr(getApp(previousApplicationName)->getState())
+            );
+
 	//set name of the application to be executed and start closing previous application
 	launchApplicationName = previousApplicationName;
 	//store window and data if there is any
 	app->switchData = std::move(msg->getData());
 	app->switchWindow = "LastWindow";
-	state = State::CLOSING_PREV_APP;
+	setState(State::CLOSING_PREV_APP);
 
 	//notify event manager which application should receive keyboard messages
 	EventManager::messageSetApplication( this, launchApplicationName );
@@ -429,12 +433,12 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		//if application's launcher defines that it can be closed send message with close signal
 		if( app->closeable()){
 			LOG_INFO( "Closing application: %s", previousApplicationName.c_str() );
-			state = State::WAITING_CLOSE_CONFIRMATION;
+			setState(State::WAITING_CLOSE_CONFIRMATION);
 			app::Application::messageCloseApplication( this, previousApplicationName );
 		}
 		//if application is not closeable send lost focus message
 		else {
-			state = State::WAITING_LOST_FOCUS_CONFIRMATION;
+			setState(State::WAITING_LOST_FOCUS_CONFIRMATION);
 			app::Application::messageSwitchApplication(this, previousApplicationName, "", nullptr);
 		}
 	}
@@ -459,12 +463,11 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 		//application starts in background
 		if( msg->getStartBackground()) {
 			app->setState(app::Application::State::ACTIVE_BACKGROUND);
-			state = State::IDLE;
+			setState(State::IDLE);
 		}
 		else {
 			app->setState(app::Application::State::ACTIVATING);
-			state = State::WAITING_GET_FOCUS_CONFIRMATION;
-
+			setState(State::WAITING_GET_FOCUS_CONFIRMATION);
 			app::Application::messageSwitchApplication( this, launchApplicationName, app->switchWindow, std::move(app->switchData) );
 		}
 	}
@@ -514,7 +517,7 @@ bool ApplicationManager::handleLanguageChange( sapm::APMChangeLanguage* msg ) {
 
 bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
 {
-    std::string app_name = state == State::WAITING_GET_FOCUS_CONFIRMATION?msg->getSenderName():focusApplicationName;
+    std::string app_name = getState() == State::WAITING_GET_FOCUS_CONFIRMATION?msg->getSenderName():focusApplicationName;
     ApplicationDescription* app = getApp(app_name);
     if (app == nullptr) {
         LOG_ERROR("Can't handle switch confirmation to: %s", app_name.c_str());
@@ -522,24 +525,24 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
     }
 	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
-	if( state == State::WAITING_GET_FOCUS_CONFIRMATION
-         || state == State::IDLE
+	if( getState() == State::WAITING_GET_FOCUS_CONFIRMATION
+         || getState() == State::IDLE
             ) {
 		//if( msg->getSenderName() == launchApplicationName ) {
-			LOG_INFO("APMConfirmSwitch focus confirmed by: %s", msg->getSenderName().c_str());
+			LOG_INFO("APMConfirmSwitch focus confirmed by: [%s]", msg->getSenderName().c_str());
 			focusApplicationName = launchApplicationName;
 			launchApplicationName = "";
 
 			app->blockClosing = false;
 			app->setState(app::Application::State::ACTIVE_FORGROUND);
-			state = State::IDLE;
+			setState(State::IDLE);
 			return true;
 		// }
 
 	}
 	//this is the case where application manager is waiting for non-closeable application
 	//to confirm that app has lost focus.
-	else if( state == State::WAITING_LOST_FOCUS_CONFIRMATION) {
+	else if( getState() == State::WAITING_LOST_FOCUS_CONFIRMATION) {
 		if( msg->getSenderName() == focusApplicationName ) {
 			LOG_INFO("APMConfirmSwitch Lost focus confirmed by: %s", msg->getSenderName().c_str());
 			previousApplicationName = focusApplicationName;
@@ -550,7 +553,7 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
 			return true;
 		}
 	}
-	LOG_ERROR("APMConfirmSwitch %s : %s error %d", msg->getSenderName().c_str(), focusApplicationName.c_str(), state);
+	LOG_ERROR("APMConfirmSwitch %s : %s state %s", msg->getSenderName().c_str(), focusApplicationName.c_str(), stateStr(getState()));
 	return false;
 }
 

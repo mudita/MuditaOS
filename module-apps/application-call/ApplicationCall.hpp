@@ -15,6 +15,7 @@
 
 namespace app {
 
+inline const std::string name_call = "ApplicationCall";
 /*
  *
  */
@@ -25,7 +26,7 @@ protected:
 	uint32_t callDuration = 0;
 	uint32_t callEndTime = -1;
 public:
-	ApplicationCall( std::string name="ApplicationCall", std::string parent = "", bool startBackgound = false );
+	ApplicationCall( std::string name=name_call, std::string parent = "", bool startBackgound = false );
 	virtual ~ApplicationCall();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -34,8 +35,8 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() ;
-	void destroyUserInterface();
+	void createUserInterface() override;
+	void destroyUserInterface() override;
 	void setDisplayedNumber( std::string num );
 	const std::string& getDisplayedNumber();
 	//starts timer that upon triggering, if no user action was performed, will hide application to background and move to previous application
@@ -46,19 +47,6 @@ public:
 	 *
 	 */
 	static bool messageSwitchToCall( sys::Service* sender, const UTF8& e164number, bool call = false );
-};
-
-class ApplicationCallLauncher : public ApplicationLauncher {
-public:
-	ApplicationCallLauncher() : ApplicationLauncher("ApplicationCall", false, true ) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationCall>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationCall>(name, parent ),caller);
-	};
 };
 
 } /* namespace app */

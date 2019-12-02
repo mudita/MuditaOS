@@ -14,11 +14,13 @@
 
 namespace app {
 
+inline const std::string name_notes = "ApplicationNotes";
+
 class ApplicationNotes: public Application {
 protected:
 
 public:
-	ApplicationNotes( std::string name="ApplicationNotes", std::string parent = "", bool startBackgound = false);
+	ApplicationNotes( std::string name=name_notes, std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationNotes();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -26,21 +28,8 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() ;
-	void destroyUserInterface();
-};
-
-class ApplicationNotesLauncher : public ApplicationLauncher {
-public:
-	ApplicationNotesLauncher() : ApplicationLauncher("ApplicationNotes", true ) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationNotes>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationNotes>(name, parent ),caller);
-	};
+	void createUserInterface() override;
+	void destroyUserInterface() override;
 };
 
 } /* namespace app */
