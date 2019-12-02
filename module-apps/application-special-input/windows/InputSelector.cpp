@@ -19,12 +19,6 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
         el->setText(std::string(1, schar));
         el->setFont(style::window::font::medium);
         el->activatedCallback = [=](Item &it) {
-            // message special char -> to actual requester ...
-            // messageSpecialChar();
-// TODO
-//            auto msg = std::make_shared<app::msg::AppSpecialInput>(InputEvent(el->getText()[0]));
-//            sys::Bus::SendUnicast(msg, dynamic_cast<app::AppSpecialInput*>(application)->getRequester(), application);
-//            return true;
             auto name = dynamic_cast<app::AppSpecialInput*>(application)->requester;
             LOG_INFO("handled %s for %s", el->getText().c_str(), name);
             setFocusItem(nullptr);
@@ -32,8 +26,6 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
                     std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response,name));
             return true;
         };
-        // on click -> send onInput event with mapped & special keypress (...)
-        // better - read special_keys_keymap and handle accordingly ... to be done
     }
     box->setVisible(true);
     box->setNavigation(nullptr, nullptr);
@@ -42,7 +34,6 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
     /// TODO add widget -> put widget in it's position
     box->resizeItems();
     addWidget(box);
-    // TODO TODO attach(cb - show special characters, && input somehow)
     setFocusItem(box->getNavigationItem());
 }
 
@@ -50,7 +41,7 @@ void UiCharSelector::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     auto ret = dynamic_cast<SwitchSpecialChar*>(data);
     if(ret) {
-         LOG_INFO("handle for: %s", ret->requester.c_str());
+        LOG_INFO("handle for: %s", ret->requester.c_str());
         setFocusItem(box->getNavigationItem());
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         dynamic_cast<app::AppSpecialInput*>(application)->requester = ret->requester;
