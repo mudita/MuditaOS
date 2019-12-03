@@ -111,6 +111,7 @@ class VirtualAppManager
     State state = State::IDLE;
     std::list<ApplicationDescription* > applications;
   public:
+    std::list<std::string> appStack;
     State getState() { return state; }
     static const char *stateStr(State st);
     ApplicationDescription *appFront();
