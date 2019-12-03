@@ -459,6 +459,11 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
+        if(launchApplicationName == app::name_desktop) {
+            appStack.clear();
+        } else {
+            appStack.push_back(focusApplicationName);
+        }
         /// if we want to disable closing previous app - then forbid killing it - it will be moved to background instead
         bool kill_prev = true;
         if (app->switchData != nullptr && app->switchData->disableAppClose)
@@ -496,6 +501,14 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	if( previousApplicationName.empty() ) {
 		return false;
 	}
+
+    std::string names= "";
+    for(auto &el: appStack) {
+        names += " " + el;
+    }
+
+    previousApplicationName = appStack.back();
+    appStack.pop_back();
 
 	//check if previous application is stored in the description vector
 	auto app = appGet( previousApplicationName );
