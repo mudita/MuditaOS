@@ -562,7 +562,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				std::string token;
 				std::vector<std::string> tokens;
 				while (std::getline(ss, token, ',')) {
-					LOG_INFO("token: %s", token.c_str());
+					//LOG_INFO("token: %s", token.c_str());
 					tokens.push_back(token);
 				}
 				//if its single message process
@@ -582,9 +582,17 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 						messageParts.push_back(ret[i+1]);
 						LOG_INFO("Concatenated");
 
+						std::string messagebody;
+						for (uint32_t j = 0; j <  messageParts.size(); j++)
+						{
+							messagebody += messageParts[j];
+						}
+
+						LOG_INFO("Concatenated message full text: %s", messagebody.c_str());
 					}
 					else
 					{
+						LOG_INFO("Message part %s", ret[i+1].c_str());
 						messageParts.push_back(ret[i+1]);
 					}
 				}

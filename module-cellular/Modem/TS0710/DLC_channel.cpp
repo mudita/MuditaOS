@@ -136,15 +136,35 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 					responseBuffer.end());
 
 			responseBuffer.clear();
-			frame.deserialize(v);
-			std::string str(frame.data.begin(), frame.data.end());
-			LOG_INFO("str: %s", str.c_str());
-			//tokenize responseBuffer
-			auto ret = ATParser::Tokenizer(str, rxCount, "\r\n");
+			std::vector<std::vector<uint8_t>> mFrames;
+			std::vector<uint8_t> _d;
+
+			//get frames from buffer
+			for (int i = 0; i < v.size(); i++) {
+				_d.push_back(v[i]);
+				if (/*TS0710_Frame::isComplete(_d)*/(_d.size() > 1)
+						&& (_d[0] == 0xF9) && (_d[_d.size() - 1] == 0xF9)) {
+					//LOG_DEBUG("Pushing back FRAME");
+					LOG_INFO("mFrame %s", _d);
+					mFrames.push_back(_d);
+					_d.clear();
+				}
+			}
+
+			//deseriaise data from received frames
+			std::string deserialisedData;
+			for (std::vector<uint8_t> vv : mFrames) {
+				frame.deserialize(vv);
+				std::string str(frame.data.begin(), frame.data.end());
+				//append deserialised buffer
+				deserialisedData += str;
+			}
+			mFrames.clear();
+
+			//tokenize data
+			LOG_DEBUG("[Tokenizing] frame");
+			auto ret = ATParser::Tokenizer(deserialisedData, rxCount, "\r\n");
 			tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-
-
-
 			if (tokens.size() < rxCount) {
 				continue;
 			}
@@ -165,75 +185,71 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 
 }
 
-std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t rxCount,
-                                                                         uint32_t timeout) {
-    std::vector<std::string> tokens;
-    std::vector<char> sdata(cmd, cmd + strlen(cmd));
-    // Get a char pointer to the data in the vector
-    char* buf = sdata.data();
-    // cast from char pointer to unsigned char pointer
-    unsigned char* membuf = reinterpret_cast<unsigned char*>(buf);
-    std::vector<uint8_t> data(membuf, membuf + sdata.size());
-    bool wait_for_data = true;
+std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
+		size_t rxCount, uint32_t timeout) {
+	std::vector<std::string> tokens;
+	std::vector<char> sdata(cmd, cmd + strlen(cmd));
+	// Get a char pointer to the data in the vector
+	char *buf = sdata.data();
+	// cast from char pointer to unsigned char pointer
+	unsigned char *membuf = reinterpret_cast<unsigned char*>(buf);
+	std::vector<uint8_t> data(membuf, membuf + sdata.size());
+	bool wait_for_data = true;
 
-    blockedTaskHandle = xTaskGetCurrentTaskHandle();
-    SendData(data);
+	blockedTaskHandle = xTaskGetCurrentTaskHandle();
+	SendData(data);
 
-    uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
-    uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
-    uint32_t timeElapsed = currentTime;
+	uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
+	uint32_t timeoutNeeded =
+			timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
+	uint32_t timeElapsed = currentTime;
 
-     //wait_for_data:
-     while(1) {
+	//wait_for_data:
+	while (1) {
 
-         if (timeElapsed >= timeoutNeeded)
-         {
-             blockedTaskHandle = nullptr;
-             //LOG_DEBUG("[1. returning] %i tokens", tokens.size());
-             return tokens;
-         }
+		if (timeElapsed >= timeoutNeeded) {
+			blockedTaskHandle = nullptr;
+			//LOG_DEBUG("[1. returning] %i tokens", tokens.size());
+			return tokens;
+		}
 
-         auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
-         timeElapsed = cpp_freertos::Ticks::GetTicks();
-         if (ret)
-         {
+		auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
+		timeElapsed = cpp_freertos::Ticks::GetTicks();
+		if (ret) {
 
-             std::vector<std::string> strings;
+			std::vector<std::string> strings;
 
-             cpp_freertos::LockGuard lock(mutex);
-             TS0710_Frame::frame_t frame;
-             std::vector<uint8_t> v(responseBuffer.begin(), responseBuffer.end());
-             responseBuffer.clear();
-             frame.deserialize(v);
-             std::string str(frame.data.begin(), frame.data.end());
-             //tokenize responseBuffer
+			cpp_freertos::LockGuard lock(mutex);
+			TS0710_Frame::frame_t frame;
+			std::vector<uint8_t> v(responseBuffer.begin(),
+					responseBuffer.end());
+			responseBuffer.clear();
+			frame.deserialize(v);
+			std::string str(frame.data.begin(), frame.data.end());
+			//tokenize responseBuffer
 //             auto ret = ATParser::Tokenizer(str, rxCount, "\r\n");
 //             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-             LOG_INFO("str: %s", str.c_str());
-             auto pos = str.find(">");
-			 if(pos != std::string::npos)
-			 {
-				 tokens.push_back(str.substr(pos, strlen(">")));
-			 }
-             if (tokens.size() < rxCount)
-             {
-                 continue;
-             }
-             blockedTaskHandle = nullptr;
+			LOG_INFO("str: %s", str.c_str());
+			auto pos = str.find(">");
+			if (pos != std::string::npos) {
+				tokens.push_back(str.substr(pos, strlen(">")));
+			}
+			if (tokens.size() < rxCount) {
+				continue;
+			}
+			blockedTaskHandle = nullptr;
 
-             return tokens;
-         }
-         else
-         {
-             //timeout
-             blockedTaskHandle = nullptr;
+			return tokens;
+		} else {
+			//timeout
+			blockedTaskHandle = nullptr;
 
-             return tokens;
-         }
+			return tokens;
+		}
 
-         //to avoid endless loop
-         return tokens;
-     }
+		//to avoid endless loop
+		return tokens;
+	}
 }
 
 int DLC_channel::ParseInputData(std::vector<uint8_t> &data) {
