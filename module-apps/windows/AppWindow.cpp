@@ -145,7 +145,7 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
 
 	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		if( prevWindow == getName() ) {
+		if( prevWindow == getName() || getName() == "MainWindow") {
 			LOG_INFO("Back to previous application"); 
 			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
 		} else {

@@ -312,7 +312,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
 
-		}
+		} else {
+            LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
+        }
 		handled = true;
 	}
 
