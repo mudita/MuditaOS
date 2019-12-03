@@ -141,6 +141,15 @@ std::list<ApplicationDescription*> &VirtualAppManager::getApps()
 }
 
 
+void VirtualAppManager::debug_log_app_list()
+{
+    std::string apps = "\n";
+    for ( auto &el : getApps() ) {
+        apps += "-> " + el->name() + " " + app::Application::stateStr(el->getState()) + "\n";
+    }
+    LOG_DEBUG(apps.c_str());
+}
+
 ApplicationManager::ApplicationManager(const std::string &name, sys::SystemManager *sysmgr, std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers)
     : Service(name), VirtualAppManager(launchers), systemManager{sysmgr}
 {
@@ -448,9 +457,6 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 	app->switchWindow = msg->getWindow();
 	setState(State::CLOSING_PREV_APP);
 
-	//notify event manager which application should receive keyboard messages
-	EventManager::messageSetApplication( this, launchApplicationName );
-
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
 		previousApplicationName = focusApplicationName;
@@ -511,9 +517,6 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 	app->switchData = std::move(msg->getData());
 	app->switchWindow = "LastWindow";
 	setState(State::CLOSING_PREV_APP);
-
-	//notify event manager which application should receive keyboard messages
-	EventManager::messageSetApplication( this, launchApplicationName );
 
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
@@ -612,6 +615,18 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
     if (app == nullptr) {
         LOG_ERROR("Can't handle switch confirmation to: %s", app_name.c_str());
         return false;
+    }
+
+    /// move application with focus to front
+    {
+        auto app = appGet(msg->getSenderName());
+        if (app && app->getState() == app::Application::State::ACTIVE_FORGROUND)
+        {
+            appMoveFront(app);
+            debug_log_app_list();
+            //notify event manager which application should receive keyboard messages
+            EventManager::messageSetApplication( this, app->name());
+        }
     }
 	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
