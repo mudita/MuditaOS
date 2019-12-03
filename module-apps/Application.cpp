@@ -28,6 +28,7 @@
 #include "MessageType.hpp"
 #include "messages/AppMessage.hpp"
 #include "windows/AppWindow.hpp"
+#include <Text.hpp>
 
 namespace app {
 
@@ -136,7 +137,8 @@ int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd,
 	//case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
 		window = currentWindow->getName();
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, currentWindow->getName(), std::make_unique<gui::SwitchData>("LastWindow"), cmd);
+        auto ret = dynamic_cast<gui::SwitchSpecialChar*>(data.get());
+		auto msg = std::make_shared<AppSwitchWindowMessage>( window, currentWindow->getName(), ret?std::move(data):std::make_unique<gui::SwitchData>("LastWindow"), cmd);
 		sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 	else {
@@ -301,13 +303,19 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			if( currentWindow->getPrevWindow().empty() ) {
 				currentWindow->setPrevWindow( msg->getSenderWindowName() );
 			}
-
-			//check if this is case where application is returning to the last visible window.
+            //check if this is case where application is returning to the last visible window.
 			if( (msg->getData() != nullptr) && (msg->getData()->getDescription() == "LastWindow") ) {
-				//do nothing here
 			}
 			else {
 				currentWindow->onBeforeShow( msg->getCommand(), msg->getData().get() );
+                auto ret = dynamic_cast<gui::SwitchSpecialChar *>(msg->getData().get());
+                if (msg->getData() != nullptr)
+                {
+                    auto text = dynamic_cast<gui::Text*>(currentWindow->getFocusItem());
+                    if(text) {
+                        text->handleChar(ret->getDescription()[0]);
+                    }
+                }
 			}
 
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
