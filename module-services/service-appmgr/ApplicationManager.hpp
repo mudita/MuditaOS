@@ -24,7 +24,6 @@ inline uint32_t default_application_locktime=30000;
 namespace sapm {
 
 class ApplicationDescription {
-private:
 public:
 	ApplicationDescription( std::unique_ptr<app::ApplicationLauncher> launcher);
 	virtual ~ApplicationDescription() {}
@@ -105,59 +104,29 @@ class VirtualAppManager
         WAITING_GET_FOCUS_CONFIRMATION
     };
 
+    VirtualAppManager(std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers);
+    virtual ~VirtualAppManager();
+
   private:
     State state = State::IDLE;
+    std::list<ApplicationDescription* > applications;
   public:
     State getState() { return state; }
-    inline const char *stateStr(State st)
-    {
-        switch (st)
-        {
-        case State::IDLE:
-            return "IDLE";
-        case State::CLOSING_PREV_APP:
-            return "CLOSING_PREV_APP";
-        case State::WAITING_CLOSE_CONFIRMATION:
-            return "WAITING_CLOSE_CONFIRMATION";
-        case State::STARTING_NEW_APP:
-            return "STARTING_NEW_APP";
-        case State::WAITING_NEW_APP_REGISTRATION:
-            return "WAITING_NEW_APP_REGISTRATION";
-        case State::WAITING_LOST_FOCUS_CONFIRMATION:
-            return "WAITING_LOST_FOCUS_CONFIRMATION";
-        case State::WAITING_GET_FOCUS_CONFIRMATION:
-            return "WAITING_GET_FOCUS_CONFIRMATION";
-        }
-        // there was enum added - fix it adding it to case
-        return "FIX_ME";
-    }
-    void setState(State st)
-    {
-        LOG_DEBUG("state: (%s) -> (%s)", stateStr(state), stateStr(st));
-        state = st;
-    }
+    static const char *stateStr(State st);
+    ApplicationDescription *appFront();
+    ApplicationDescription *appGet(const std::string &name);
+    /// set application as first on the applications vector
+    bool appMoveFront(ApplicationDescription *app);
+    /// get previous visible app - one on FOREGROUND
+    ApplicationDescription *appPrev();
+    void setState(State st);
+    std::list<ApplicationDescription*> &getApps();
 };
 
 class ApplicationManager: public sys::Service, public VirtualAppManager {
 
 	SettingsRecord settings;
 
-	std::vector<ApplicationDescription* > applications;
-    ApplicationDescription *getApp(const std::string &name)
-    {
-        auto el = std::find_if(applications.begin(), applications.end(), [=](auto a) {
-            if (a->name() == name)
-                return true;
-            else
-                return false;
-        });
-        if (el == applications.end())
-            return nullptr;
-        else
-        {
-            return *el;
-        }
-    }
     sys::SystemManager* systemManager;
 
 	//
@@ -192,8 +161,8 @@ class ApplicationManager: public sys::Service, public VirtualAppManager {
 	bool closeApplications();
 	bool closeServices();
 public:
-	ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
-    ~ApplicationManager();
+    ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
+    virtual ~ApplicationManager();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
     // Invoked when timer ticked
