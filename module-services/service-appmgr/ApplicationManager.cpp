@@ -26,7 +26,7 @@
 #include "service-eink/ServiceEink.hpp"
 
 //desktop application
-#include "application-desktop/data/LockPhoneData.hpp"
+#include "application-desktop/ApplicationDesktop.hpp"
 
 /// Auto phone lock disabled for now till the times when it's debugged
 /// #define AUTO_PHONE_LOCK_ENABLED
@@ -510,6 +510,12 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		LOG_WARN("Trying to return currently active application");
 		return false;
 	}
+
+    /// TODO This is hack - we don't have app stack
+    if(previousApplicationName == gui::special_input)
+    {
+        previousApplicationName = app::name_desktop;
+    }
 
     LOG_DEBUG("Switch PrevApp: [%s](%s) -> [%s](%s)",
             focusApplicationName.c_str(), app::Application::stateStr(appGet(previousApplicationName)->getState()),
