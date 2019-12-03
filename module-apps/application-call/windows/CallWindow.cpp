@@ -352,7 +352,9 @@ bool CallWindow::handleRightButton() {
 	else if( state == State::OUTGOING_CALL ) {
 		auto ret = CellularServiceAPI::HangupCall(application);
 		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
-	}
+
+        return true;
+    }
 //	else if( state == State::CALL_ENDED ) {
 //		//return to previous application
 //		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
@@ -369,12 +371,12 @@ bool CallWindow::handleRightButton() {
 
 bool CallWindow::onInput( const InputEvent& inputEvent ) {
 
-	LOG_INFO("key code: %d", static_cast<uint32_t>(inputEvent.keyCode));
+	LOG_INFO("key code: %d, state: %d", static_cast<uint32_t>(inputEvent.keyCode), static_cast<uint32_t>(inputEvent.state));
 	 
 	bool handled = false;
 	
 	//process only if key is released
-	if( inputEvent.state != InputEvent::State::keyReleasedShort ) { // TODO: alek: seems wrong
+	if( inputEvent.state == InputEvent::State::keyReleasedShort ) { // TODO: alek: seems wrong
 		switch( inputEvent.keyCode ) {
 			case KeyCode::KEY_ENTER:
 				handled = handleCenterButton();

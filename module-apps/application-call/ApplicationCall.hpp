@@ -21,7 +21,7 @@ namespace app {
 class ApplicationCall: public Application {
 protected:
 	std::string phoneNumber;
-	uint32_t timerCall = 0;
+	uint32_t timerCallId = 0;
 	uint32_t callDuration = 0;
 	uint32_t callEndTime = -1;
 public:
