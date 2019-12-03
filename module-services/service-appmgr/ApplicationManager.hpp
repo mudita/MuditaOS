@@ -121,6 +121,7 @@ class VirtualAppManager
     ApplicationDescription *appPrev();
     void setState(State st);
     std::list<ApplicationDescription*> &getApps();
+    void debug_log_app_list();
 };
 
 class ApplicationManager: public sys::Service, public VirtualAppManager {
