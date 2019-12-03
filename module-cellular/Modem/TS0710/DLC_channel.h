@@ -50,10 +50,12 @@ public:
     void setCallback(Callback_t callback) { LOG_DEBUG("[%s] Setting up callback for channel", pv_name.c_str()); pv_callback = callback; }
 
 
-    std::vector<std::string> SendCommandResponse(const char *cmd, size_t rxCount,
-                                                                         uint32_t timeout = 100);
-    std::vector<std::string> SendCommandPrompt(const char *cmd, size_t rxCount,
-                                                                             uint32_t timeout = 100);
+
+
+	std::vector<std::string> SendCommandResponse(const char *cmd,
+			size_t rxCount, uint32_t timeout = 100);
+	std::vector<std::string> SendCommandPrompt(const char *cmd, size_t rxCount,
+			uint32_t timeout = 100);
 
     int ParseInputData(std::vector<uint8_t> &data);
 

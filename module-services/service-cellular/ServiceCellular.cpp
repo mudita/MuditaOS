@@ -70,6 +70,14 @@ ServiceCellular::ServiceCellular()
 
             case CellularNotificationMessage::Type::NewIncomingSMS:
                 //TODO:M.P fill message's fields
+            {
+            	std::string notification(data.begin(), data.end() );
+            	auto begin = notification.find(",");
+            	auto end = notification.find("\r");
+            	msg->data  = notification.substr(begin + 1, end);
+            	//todo remove log
+            	LOG_INFO("SMS notification: %s", notification.c_str());
+            }
                 break;
 
             case CellularNotificationMessage::Type::SignalStrengthUpdate:
@@ -164,10 +172,23 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     case MessageType::CellularNotification: {
         CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 
-        if ((msg->type == CellularNotificationMessage::Type::CallAborted) || (msg->type == CellularNotificationMessage::Type::CallBusy))
-        {
-            stopTimer(callStateTimer);
-        }
+
+		if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
+			(msg->type == CellularNotificationMessage::Type::CallBusy))
+		{
+			stopTimer(callStateTimer);
+		}
+		else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
+		{
+			sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+								  GetName(), this);
+			state = State ::ModemConfigurationInProgress;
+		}
+		else if(msg->type == CellularNotificationMessage::Type::NewIncomingSMS)
+		{
+			LOG_INFO("New incoming sms received");
+			receiveSMS(msg->data);
+		}
         else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
         {
             sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure), GetName(), this);
@@ -360,11 +381,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		CellularRequestMessage *msg =
 				reinterpret_cast<CellularRequestMessage*>(msgl);
 
-		std::string number = "666600925";
-		std::string text =
-				"ELO tu PurePhone taki dlugi smsm co to bedzie jak to bedzie polskich znakpow ni ma jeszcze cos dopisze na wszelki wypadek";
-//        	std::string text = "ELO tu PurePhone";
-		this->sendSMS(number, text);
+
+        	std::string number = "666600925";
+//        	std::string number = "696027617";
+        	std::string text = "ELO tu PurePhone taki dlugi sms co ąś to będzie jak to bedzie polskich znakpow ni ma jeszcze cos dopisze na wszelki wypadek, zaraz pisze polskie znaki :)";
+//        	std::string text = "ELO tu PurePhone ąś";
+        	this->receiveSMS(number);
+
 
 		responseMsg = std::make_shared<CellularResponseMessage>(false);
 	}
@@ -519,4 +542,57 @@ bool ServiceCellular::sendSMS(std::string number, std::string text) {
 //		LOG_INFO("")
 	}
 	return false;
+}
+
+bool ServiceCellular::receiveSMS(std::string messageNumber) {
+	std::string command("AT+QCMGR=" + messageNumber + "\r");
+//	std::string command("AT+CMGR=16\r");
+	LOG_INFO("Command: %s", command.c_str());
+	auto ret = cmux->GetChannel("Commands")->SendCommandResponse(
+			command.c_str(), 3, 2000);
+
+//	auto ret = cmux->GetChannel("Commands")->SendCommandResponse( "AT+CMGL=\"ALL\"", 4, 2000);
+
+	if (ret.size() != 0) {
+		for (uint32_t i = 0; i < ret.size(); i++) {
+			if (ret[i].find("QCMGR") != std::string::npos) {
+				LOG_INFO("qcmgr: %s", ret[i].c_str());
+
+				std::istringstream ss(ret[i]);
+				std::string token;
+				std::vector<std::string> tokens;
+				while (std::getline(ss, token, ',')) {
+					LOG_INFO("token: %s", token.c_str());
+					tokens.push_back(token);
+				}
+				//if its single message process
+				LOG_INFO("qcmgr parameters: %d", tokens.size());
+
+				if (tokens.size() == 5) {
+					//todo add message to database
+					LOG_INFO("Single SMS");
+				}
+				//if its concatenated message wait for last message
+				else if (tokens.size() == 8) {
+
+					uint32_t last = std::stoi(tokens[7]);
+					uint32_t current = std::stoi(tokens[6]);
+
+					if (current == last) {
+						messageParts.push_back(ret[i+1]);
+						LOG_INFO("Concatenated");
+
+					}
+					else
+					{
+						messageParts.push_back(ret[i+1]);
+					}
+				}
+			}
+		}
+	}
+	//delete message from modem memory
+	LOG_INFO("Delete message");
+	cmux->GetChannel("Commands")->SendCommandResponse(
+			("AT+CMGD=" + messageNumber).c_str(), 1, 150);
 }
