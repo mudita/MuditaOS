@@ -178,11 +178,11 @@ class Text : public Rect
      * Inserts translated set of characters provided from key translation logics
      */
     bool handleChar(uint32_t chars);
-  private:
     /**
      * Updates cursor position in the text widget
      */
     void updateCursor();
+  private:
     /**
      * Returns text line where cursor is located
      */

@@ -313,7 +313,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
                 {
                     auto text = dynamic_cast<gui::Text*>(currentWindow->getFocusItem());
                     if(text) {
-                        text->handleChar(ret->getDescription()[0]);
+                        if(text->handleChar(ret->getDescription()[0])) {
+                            text->updateCursor();
+                        }
                     }
                 }
 			}
