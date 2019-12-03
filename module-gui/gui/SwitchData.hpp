@@ -27,6 +27,7 @@ public:
 	virtual ~SwitchData() = default;
 	virtual const std::string& getDescription() const { return description; };
 	virtual void setDescription( const std::string desc ) { description = desc; };
+    bool disableAppClose = false;
 };
 
 class SwitchSpecialChar : public SwitchData

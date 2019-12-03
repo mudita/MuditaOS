@@ -459,11 +459,16 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
 
 	//check if there was previous application
 	if( !focusApplicationName.empty() ) {
-		previousApplicationName = focusApplicationName;
+        /// if we want to disable closing previous app - then forbid killing it - it will be moved to background instead
+        bool kill_prev = true;
+        if (app->switchData != nullptr && app->switchData->disableAppClose)
+        {
+            kill_prev = false;
+        }
+        previousApplicationName = focusApplicationName;
 		auto app = appGet( previousApplicationName );
-
 		//if application's launcher defines that it can be closed send message with close signal
-		if( (app->closeable()) && (app->blockClosing == false) ){
+		if( kill_prev && (app->closeable()) && (app->blockClosing == false) ){
 			LOG_INFO("APMSwitch waiting for close confirmation from: %s", previousApplicationName.c_str());
 			setState(State::WAITING_CLOSE_CONFIRMATION);
 			app::Application::messageCloseApplication( this, previousApplicationName );
@@ -688,17 +693,19 @@ bool ApplicationManager::handleCloseConfirmation( APMConfirmClose* msg ) {
 //Static methods
 
 bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
-		const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) {
+		const std::string& windowName, std::unique_ptr<gui::SwitchData> data) {
 
 	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }
 
-bool ApplicationManager::messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data ) {
+bool ApplicationManager::messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data)
+{
     auto val = data->requester;
-    return
-        gui::SwitchSpecialChar::Type::Request == data->type?
+    // TODO do it better - i.e. with state
+    data->disableAppClose = true;
+    return (gui::SwitchSpecialChar::Type::Request == data->type)?
         messageSwitchApplication(sender, gui::special_input, gui::char_select, std::move(data)):
         messageSwitchApplication(sender, val, "LastWindow", std::move(data));
 }
