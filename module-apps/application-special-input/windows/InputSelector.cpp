@@ -23,7 +23,7 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
             LOG_INFO("handled %s for %s", el->getText().c_str(), name);
             setFocusItem(nullptr);
             sapm::ApplicationManager::messageSwitchSpecialInput( application,
-                    std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response,name));
+                    std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response,name,el->getText()));
             return true;
         };
     }
