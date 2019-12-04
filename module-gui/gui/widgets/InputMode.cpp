@@ -4,10 +4,23 @@
 
 /// input mode strings - as these are stored in json (in files...)
 const std::map<InputMode::Mode, std::string> input_mode = {
-    {InputMode::digit, "numeric"},
+    {InputMode::digit, "common_kbd_numeric"},
     {InputMode::ABC, "common_kbd_upper"},
     {InputMode::abc, "common_kbd_lower"},
 };
+
+static std::string getInputName(InputMode::Mode m) {
+    switch(m) {
+        case InputMode::digit:
+            return "123";
+        case InputMode::ABC:
+            return "ABC";
+        case InputMode::abc:
+            return "abc";
+        default:
+            return "";
+    }
+}
 
 InputMode::InputMode(std::list<InputMode::Mode> mode_list
             , std::function<void(const UTF8 &text)> show_type_cb
@@ -49,7 +62,7 @@ void InputMode::show_input_type()
     LOG_INFO("Mode: %d", modeNow());
     if(show_type_cb)
     {
-        show_type_cb(modeNow()==Mode::ABC?"ABC":"abc");
+        show_type_cb(getInputName(modeNow()));
     }
 }
 
