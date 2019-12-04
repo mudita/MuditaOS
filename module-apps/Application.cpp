@@ -78,7 +78,9 @@ Application::~Application() {
 Application::State Application::getState() { return state; }
 void Application::setState(State st)
 {
+#ifdef DEBUG_APPLICATION_MANAGEMENT
     LOG_DEBUG("[%s] (%s) -> (%s)", GetName().c_str(), stateStr(state), stateStr(st));
+#endif
     state = st;
 }
 
@@ -132,7 +134,9 @@ void Application::blockEvents(bool isBlocked ) {
 int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd, std::unique_ptr<gui::SwitchData> data ) {
 
 	std::string window;
+#ifdef DEBUG_APPLICATION_MANAGEMENT
 	LOG_INFO("switching [%s] to window: %s", GetName().c_str(), windowName.length()?windowName.c_str():"MainWindow");
+#endif
 
 	//case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
