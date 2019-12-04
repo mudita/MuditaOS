@@ -275,7 +275,7 @@ public:
     /// @note channel 0 is mandatory - Control
     /// @param index - index
     /// @return pointer to channel or nullptr if such channel doesn't exist
-    DLC_channel *GetChannel(const int index) 
+    DLC_channel *GetChannel(const size_t index) 
     {
         if(index >= channels.size())
         {
@@ -288,11 +288,11 @@ public:
     /// @brief Get Channel by name
     /// @param name - channel name
     /// @return pointer to channel or nullptr if such channel doesn't exist
-    DLC_channel *GetChannel(std::string name) { 
+    DLC_channel *GetChannel(const std::string name) { 
         for (auto it : channels) { 
             if (it->getName() == name) return it; 
         }
-        LOG_ERROR("Channel %s doesn't exist", name);
+        LOG_ERROR("Channel %s doesn't exist", name.c_str());
         return nullptr;
     } 
 
