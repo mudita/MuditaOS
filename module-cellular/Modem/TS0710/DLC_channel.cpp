@@ -48,7 +48,7 @@ DLC_channel::~DLC_channel(){
     TS0710_DLC_RELEASE release = TS0710_DLC_RELEASE(pv_DLCI);
 }
 
-void DLC_channel::SendData(std::vector<uint8_t> data){
+void DLC_channel::SendData(std::vector<uint8_t> & data){
     TS0710_DATA _data = TS0710_DATA(pv_DLCI, pv_chanParams, data, pv_cellular);
 }
 
@@ -88,17 +88,14 @@ ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_t rxCount, uint32_t timeout)
 {
     std::vector<std::string> tokens;
-    std::vector<char> sdata(cmd, cmd + strlen(cmd));
-    // Get a char pointer to the data in the vector
-    char* buf = sdata.data();
-    // cast from char pointer to unsigned char pointer
-    unsigned char* membuf = reinterpret_cast<unsigned char*>(buf);
-    std::vector<uint8_t> data(membuf, membuf + sdata.size());
+    std::vector<uint8_t> data(cmd, cmd + strlen(cmd));
 
     // Remove \r and \n for logging purposes
     std::string cmdStr(cmd);
     cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
     cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
+
+    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
 
     blockedTaskHandle = xTaskGetCurrentTaskHandle();
     SendData(data);
@@ -106,8 +103,6 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd, size_
     uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
     uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
     uint32_t timeElapsed = currentTime;
-
-    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
 
     // wait_for_data:
     while (1)

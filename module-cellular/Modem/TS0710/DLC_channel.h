@@ -40,7 +40,7 @@ public:
     DLC_channel() { pv_DLCI = -1; pv_name = "none"; }   //default constructor creates empty channel
     ~DLC_channel();
     
-    void SendData(std::vector<uint8_t> data);
+    void SendData(std::vector<uint8_t>& data);
 
     DLCI_t getDLCI() { return pv_DLCI; }
     std::string getName() { return pv_name; }
