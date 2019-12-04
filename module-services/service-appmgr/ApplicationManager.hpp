@@ -72,7 +72,6 @@ public:
     app::Application::State getState()
     {
         if(( launcher == nullptr) || (launcher->handle == nullptr )) {
-            LOG_ERROR("No %s", launcher?"launcher":"handle");
             return app::Application::State::NONE;
         } else {
             return launcher->handle->getState();
@@ -201,7 +200,7 @@ public:
     /**
      * @brief Allows requesting Application Manager to run previous application.
      */
-    static bool messageSwitchPreviousApplication( sys::Service* sender );
+    static bool messageSwitchPreviousApplication( sys::Service* sender, std::unique_ptr<APMSwitchPrevApp> msg = nullptr);
     /**
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.

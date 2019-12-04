@@ -20,7 +20,7 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
         el->setFont(style::window::font::medium);
         el->activatedCallback = [=](Item &it) {
             auto name = dynamic_cast<app::AppSpecialInput*>(application)->requester;
-            LOG_INFO("handled %s for %s", el->getText().c_str(), name);
+            LOG_INFO("handled %s for %s", el->getText().c_str(), name.c_str());
             setFocusItem(nullptr);
             sapm::ApplicationManager::messageSwitchSpecialInput( application,
                     std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response,name,el->getText()));

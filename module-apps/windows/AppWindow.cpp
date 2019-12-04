@@ -149,7 +149,7 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 			LOG_INFO("Back to previous application"); 
 			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
 		} else {
-			LOG_INFO("Back to previous window %s", prevWindow); 
+			LOG_INFO("Back to previous window %s", prevWindow.c_str());
 			application->switchWindow( prevWindow, gui::ShowMode::GUI_SHOW_RETURN );
 		}
 		return true;
