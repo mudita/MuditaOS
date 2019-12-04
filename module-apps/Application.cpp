@@ -59,8 +59,13 @@ Application::Application(std::string name, std::string parent,bool startBackgrou
 	Service( name, parent, stackDepth, priority ),
 	startBackground{ startBackground } {
 	keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
-    longPressTimer = CreateTimer( key_timer_ms, true);
-    Service::ReloadTimer(longPressTimer);
+    longPressTimerID = CreateAppTimer(key_timer_ms, true, "longPressTimer");
+Application::Application(std::string name, std::string parent, bool startBackground, uint32_t stackDepth, sys::ServicePriority priority)
+    : Service(name, parent, stackDepth, priority), startBackground{startBackground}
+{
+    keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
+    longPressTimerID = registerTimer(key_timer_ms, true, [&] () {longPressTimerCallback();}, "longPressTimer");
+    Service::ReloadTimer(longPressTimerID);
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     if (startBackground)
     {
@@ -68,10 +73,13 @@ Application::Application(std::string name, std::string parent,bool startBackgrou
     }
 }
 
-Application::~Application() {
-	for( auto it = windows.begin(); it!= windows.end(); it++)
-		delete it->second;
-	windows.clear();
+Application::~Application()
+{
+    for (auto it = windows.begin(); it != windows.end(); it++)
+    {
+        delete it->second;
+    }
+    windows.clear();
 }
 
 Application::State Application::getState()
@@ -89,18 +97,40 @@ void Application::setState(State st)
 
 void Application::TickHandler(uint32_t id)
 {
-    if (id == longPressTimer)
+    if (id == longPressTimerID)
+{
+    auto timerIDtoCall = timers.find(id);
+    if (timerIDtoCall != timers.end())
     {
-        // TODO if(check widget type long press trigger)
-        uint32_t time = xTaskGetTickCount();
-        if (keyTranslator->timeout(time))
-        {
-            // previous key press was over standard keypress timeout - send long press
-            gui::InputEvent iev = keyTranslator->translate(time);
-            messageInputEventApplication(this, this->GetName(), iev);
-            // clean previous key
-            keyTranslator->prev_key_press = {};
-        }
+        timerIDtoCall->second();
+    }
+}
+
+uint32_t Application::CreateAppTimer(TickType_t interval, bool isPeriodic, const std::string & name){
+    auto id = CreateTimer(interval, isPeriodic, name);
+    timerIDs.push_back(id);
+    return id;
+}
+
+uint32_t Application::addTimer(TickType_t interval, bool isPeriodic)
+{
+    auto id = CreateTimer(interval, isPeriodic);
+    timerIDs.push_back(id);
+    return id;
+}
+
+void Application::longPressTimerCallback()
+{
+    // TODO if(check widget type long press trigger)
+    uint32_t time = xTaskGetTickCount();
+    LOG_DEBUG(typeid(*this).name());
+    if (keyTranslator->timeout(time))
+    {
+        // previous key press was over standard keypress timeout - send long press
+        gui::InputEvent iev = keyTranslator->translate(time);
+        messageInputEventApplication(this, this->GetName(), iev);
+        // clean previous key
+        keyTranslator->prev_key_press = {};
     }
 }
 

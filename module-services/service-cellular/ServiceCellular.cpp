@@ -39,7 +39,7 @@ ServiceCellular::ServiceCellular()
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 
-    callStateTimer = CreateTimer(1000, true);
+    callStateTimerID = CreateTimer(1000, true);
 
     notificationCallback = [this](std::vector<uint8_t> &data) {
         LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
@@ -294,8 +294,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
                 sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
 
-                stopTimer(callStateTimer);
-            }
+                    stopTimer(callStateTimerID);
+                }
 
             responseMsg = std::make_shared<CellularResponseMessage>(true);
         }
@@ -319,7 +319,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
             // TODO: this logic seems to be wrong. We should abort the call in app only if proper response from modem
-            stopTimer(callStateTimer);
+            stopTimer(callStateTimerID);
 
             // Propagate "CallAborted" notification into system
             sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted),
@@ -359,7 +359,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 			if (cmux->CheckATCommandResponse(ret)) {
 				responseMsg = std::make_shared<CellularResponseMessage>(true);
 				// activate call state timer
-				ReloadTimer(callStateTimer);
+				ReloadTimer(callStateTimerID);
 				// Propagate "Ringing" notification into system
 				sys::Bus::SendMulticast(
 						std::make_shared<CellularNotificationMessage>(

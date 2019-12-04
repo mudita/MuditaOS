@@ -25,6 +25,9 @@ public:
 	uint32_t GetId(){
 	    return m_id;
 	}
+    static uint32_t GetNextUniqueID(){
+	    return ++m_timers_unique_idx;
+	}
 
 	void Run() override;
 
@@ -34,6 +37,8 @@ private:
     TickType_t m_interval;
 	uint32_t  m_id;
     Service* m_service;
+    static uint32_t  m_timers_unique_idx;
+
 };
 
 class Service : public cpp_freertos::Thread,public std::enable_shared_from_this<Service>
@@ -46,7 +51,8 @@ public:
 	void StartService();
 
 	//Create service timer
-    uint32_t CreateTimer(TickType_t interval,bool isPeriodic,const std::string& name="Default");
+    uint32_t CreateTimer(TickType_t interval,bool isPeriodic,const std::string& name);
+    uint32_t CreateTimer(TickType_t interval,bool isPeriodic);
 	// Reload service timer
 	void ReloadTimer(uint32_t id);
 	// Delete timer
@@ -97,7 +103,6 @@ protected:
 
 	virtual void Run();
 
-    uint32_t  m_timers_unique_idx;
 	std::vector<std::unique_ptr<ServiceTimer>> timersList;
 
 	friend class ServiceTimer;
