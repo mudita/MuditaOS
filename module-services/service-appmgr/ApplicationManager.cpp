@@ -131,7 +131,9 @@ ApplicationDescription *VirtualAppManager::appPrev()
 
 void VirtualAppManager::setState(State st)
 {
+#ifdef DEBUG_APPLICATION_MANAGEMENT
     LOG_DEBUG("app: [%s] prev: [%s], state: (%s) -> (%s)", appFront()->name().c_str(), appPrev()?appPrev()->name().c_str():"", stateStr(state), stateStr(st));
+#endif
     state = st;
 }
 
@@ -143,11 +145,13 @@ std::list<ApplicationDescription*> &VirtualAppManager::getApps()
 
 void VirtualAppManager::debug_log_app_list()
 {
+#ifdef DEBUG_APPLICATION_MANAGEMENT
     std::string apps = "\n";
     for ( auto &el : getApps() ) {
         apps += "-> " + el->name() + " " + app::Application::stateStr(el->getState()) + "\n";
     }
     LOG_DEBUG(apps.c_str());
+#endif
 }
 
 ApplicationManager::ApplicationManager(const std::string &name, sys::SystemManager *sysmgr, std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers)
@@ -463,6 +467,9 @@ bool ApplicationManager::handleSwitchApplication( APMSwitch* msg ) {
             appStack.clear();
         } else {
             appStack.push_back(focusApplicationName);
+#ifdef DEBUG_APPLICATION_MANAGEMENT
+            LOG_DEBUG("LaunchApp: %s", launchApplicationName.c_str());
+#endif
         }
         /// if we want to disable closing previous app - then forbid killing it - it will be moved to background instead
         bool kill_prev = true;
@@ -502,13 +509,16 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		return false;
 	}
 
-    std::string names= "";
-    for(auto &el: appStack) {
-        names += " " + el;
-    }
-
     previousApplicationName = appStack.back();
     appStack.pop_back();
+    if(previousApplicationName == app::name_desktop && appStack.size())
+    {
+        std::string names = "";
+        for(auto &el: appStack) {
+            names += el + "<-";
+        }
+        LOG_ERROR("%s isn't top application! [%s]", app::name_desktop.c_str(), names.c_str());
+    }
 
 	//check if previous application is stored in the description vector
 	auto app = appGet( previousApplicationName );
@@ -524,17 +534,12 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		return false;
 	}
 
-    /// TODO This is hack - we don't have app stack
-    if(previousApplicationName == gui::special_input)
-    {
-        previousApplicationName = app::name_desktop;
-    }
-
+#ifdef DEBUG_APPLICATION_MANAGEMENT
     LOG_DEBUG("Switch PrevApp: [%s](%s) -> [%s](%s)",
             focusApplicationName.c_str(), app::Application::stateStr(appGet(previousApplicationName)->getState()),
             previousApplicationName.c_str(), app::Application::stateStr(appGet(previousApplicationName)->getState())
             );
-
+#endif
 	//set name of the application to be executed and start closing previous application
 	launchApplicationName = previousApplicationName;
 	//store window and data if there is any
@@ -726,7 +731,7 @@ bool ApplicationManager::messageSwitchSpecialInput(sys::Service *sender, std::un
     data->disableAppClose = true;
     return (gui::SwitchSpecialChar::Type::Request == data->type)?
         messageSwitchApplication(sender, gui::special_input, gui::char_select, std::move(data)):
-        messageSwitchApplication(sender, val, "LastWindow", std::move(data));
+        messageSwitchPreviousApplication(sender, std::make_unique<APMSwitchPrevApp>(data->requester, std::move(data)));
 }
 
 bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
@@ -741,10 +746,15 @@ bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 	return true;
 }
-bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender ) {
+bool ApplicationManager::messageSwitchPreviousApplication( sys::Service* sender, std::unique_ptr<APMSwitchPrevApp> msg) {
 
-	auto msg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
-	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+    std::shared_ptr<APMSwitchPrevApp> sendMsg;
+    if(!msg) {
+        sendMsg = std::make_shared<sapm::APMSwitchPrevApp>(sender->GetName() );
+    } else {
+        sendMsg = std::move(msg);
+    }
+	sys::Bus::SendUnicast(sendMsg, "ApplicationManager", sender);
 	return true;
 }
 
