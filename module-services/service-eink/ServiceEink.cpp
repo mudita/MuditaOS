@@ -50,7 +50,7 @@ ServiceEink::ServiceEink(const std::string& name, std::string parent)
 	memset(&waveformSettings, 0, sizeof(EinkWaveFormSettings_t));
 	waveformSettings.mode = EinkWaveformGC16;
 	waveformSettings.temperature = -1000;
-	timerPowerOff = CreateTimer(3000, false);
+    timerPowerOffID = CreateTimer(3000, false);
 
 }
 
@@ -73,7 +73,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 	switch( msg->messageType ) {
 
 		case static_cast<uint32_t>(MessageType::EinkImageData): {
-			stopTimer( timerPowerOff );
+			stopTimer(timerPowerOffID);
 			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
 //			LOG_INFO("[%s] EinkImageData", GetName().c_str());
 			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
@@ -143,7 +143,7 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 				EinkPowerOff();
 	//			uint32_t end_tick = xTaskGetTickCount();
 
-				ReloadTimer( timerPowerOff );
+				ReloadTimer(timerPowerOffID);
 
 				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress, shutdownInProgress );
 				suspendInProgress = false;
@@ -266,7 +266,7 @@ sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode
         case sys::ServicePowerMode ::SuspendToRAM:
         case sys::ServicePowerMode ::SuspendToNVM:
         	suspended = true;
-        	stopTimer( timerPowerOff );
+        	stopTimer(timerPowerOffID);
             EinkPowerDown();
             break;
     }

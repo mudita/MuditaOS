@@ -22,14 +22,13 @@ namespace app {
  *
  */
 class ApplicationClock: public Application {
-	uint32_t timer_id= 0;
+	uint32_t timerClockID = 0;
 
 public:
 	ApplicationClock(std::string name, std::string parent = "", uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
 
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-	void TickHandler(uint32_t id) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 

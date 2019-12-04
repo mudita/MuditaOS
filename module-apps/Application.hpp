@@ -36,7 +36,8 @@ namespace app {
  * @brief This is template for creating new applications
  */
 class Application: public sys::Service {
-    uint32_t longPressTimer = 0;
+    uint32_t longPressTimerID = 0;
+    std::function<void()> longPressTimerCallback;
 public:
 	enum class State {
         /// app doesn't exist
@@ -66,14 +67,16 @@ public:
 		//and request System Manager to close it.
 		DEACTIVATING
 	};
-
+	std::map<uint32_t, std::function <void()>> timers;
     static const char *stateStr(State st);
 
   private:
     State state = State::DEACTIVATED;
 
   public:
-	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	std::list<uint32_t> timerIDs;
+	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,
+	        sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
     Application::State getState();
@@ -83,10 +86,14 @@ public:
 	 * Virtual methods
 	 */
 	void TickHandler(uint32_t id) override;
+    virtual void TickHandlerLocal(uint32_t id) {};
 
-	/**
-	 * Method responsible for rendering currently active window.
-	 */
+    uint32_t CreateAppTimer(TickType_t interval, bool isPeriodic, const std::string & name);
+    uint32_t CreateAppTimer(TickType_t interval, bool isPeriodic);
+
+    /**
+     * Method responsible for rendering currently active window.
+     */
 	void render( gui::RefreshModes mode );
 	/**
 	 * Method responsible for setting application to the state where incoming user input is blocked
@@ -143,6 +150,13 @@ public:
 protected:
 	//application's settings taken from database
 	SettingsRecord settings;
+
+    // protected long key release handler
+    void longPressTimerCallback();
+    /**
+     * @param id - timer IDentificaton number
+     */
+    virtual void TickHandler(uint32_t id) override final;
 	/**
 	 * Placeholder that can be used to create window and widgets.
 	 */

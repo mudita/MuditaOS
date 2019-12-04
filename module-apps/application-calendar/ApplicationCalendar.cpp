@@ -25,10 +25,6 @@ sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage* msgl,s
 	return std::make_shared<sys::ResponseMessage>( );
 }
 
-    // Invoked when timer ticked
-void ApplicationCalendar::TickHandler(uint32_t id) {
-}
-
 // Invoked during initialization
 sys::ReturnCodes ApplicationCalendar::InitHandler() {
 
