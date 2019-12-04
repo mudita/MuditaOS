@@ -212,8 +212,6 @@ public:
 	//virtual method to run the application
 	virtual bool run(sys::Service* caller = nullptr ) {return true;};
 	virtual bool runBackground(sys::Service* caller = nullptr ) {return true;};
-    // TODO it would be nice to actually make handle and update it
-    // or comomize constructors with/without delayed run
     std::shared_ptr<Application> handle = nullptr;
 };
 

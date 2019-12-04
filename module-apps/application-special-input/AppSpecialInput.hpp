@@ -6,13 +6,16 @@
 namespace app
 {
 
+inline const std::string special_input = "AppSpecialInput";
+inline const std::string char_select = "MainWindow";
+
 // app just to provide input selection on UI
 class AppSpecialInput : public app::Application
 {
   public:
     std::string requester = "";
 
-    AppSpecialInput(std::string name = gui::special_input, std::string parent = "", bool startBackgound = true);
+    AppSpecialInput(std::string name = special_input, std::string parent = "", bool startBackgound = true);
     virtual ~AppSpecialInput() = default;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
