@@ -291,56 +291,66 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
 
     case MessageType::CellularHangupCall: {
-        auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATH\r", 1, 5000);
-        if (cmux->CheckATCommandResponse(ret))
+        auto channel = cmux->GetChannel("Commands");
+        if (channel)
         {
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
-        }
-        else
-        {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-        }
-        stopTimer(callStateTimer);
+            if (cmux->CheckATCommandResponse(channel->SendCommandResponse("ATH\r", 1, 5000)))
+            {
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+            }
+            else
+            {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+            // TODO: this logic seems to be wrong. We should abort the call in app only if proper response from modem
+            stopTimer(callStateTimer);
 
-        // Propagate "CallAborted" notification into system
-        sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted),
-                                sys::BusChannels::ServiceCellularNotifications, this);
+            // Propagate "CallAborted" notification into system
+            sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted),
+                                    sys::BusChannels::ServiceCellularNotifications, this);
+            break;
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
     break;
 
     case MessageType::CellularAnswerIncomingCall: {
-        // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
-        auto ret = cmux->GetChannel("Commands")->SendCommandResponse("ATA\r", 1, 90000);
-        if (cmux->CheckATCommandResponse(ret))
+        auto channel = cmux->GetChannel("Commands");
+        if (channel)
         {
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
-            // Propagate "CallActive" notification into system
-            sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive),
-                                    sys::BusChannels::ServiceCellularNotifications, this);
+            // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
+            auto ret = channel->SendCommandResponse("ATA\r", 1, 90000);
+            if (cmux->CheckATCommandResponse(ret))
+            {
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+                // Propagate "CallActive" notification into system
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive),
+                                        sys::BusChannels::ServiceCellularNotifications, this);
+                break;
+            }
         }
-        else
-        {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
     break;
 
     case MessageType::CellularDialNumber: {
         CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-        auto ret = cmux->GetChannel("Commands")->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1, 5000);
-        if (cmux->CheckATCommandResponse(ret))
+        auto channel = cmux->GetChannel("Commands");
+        if (channel)
         {
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
-            // activate call state timer
-            ReloadTimer(callStateTimer);
-            // Propagate "Ringing" notification into system
-            sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::Ringing, msg->data),
-                                    sys::BusChannels::ServiceCellularNotifications, this);
+            auto ret = channel->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1, 5000);
+            if (cmux->CheckATCommandResponse(ret))
+            {
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
+                // activate call state timer
+                ReloadTimer(callStateTimer);
+                // Propagate "Ringing" notification into system
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::Ringing, msg->data),
+                                        sys::BusChannels::ServiceCellularNotifications, this);
+                break;
+            }
         }
-        else
-        {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
     break;
 
