@@ -25,8 +25,9 @@
 #include "service-gui/ServiceGUI.hpp"
 #include "service-eink/ServiceEink.hpp"
 
-//desktop application
 #include "application-desktop/ApplicationDesktop.hpp"
+#include "application-call/ApplicationCall.hpp"
+#include "application-special-input/AppSpecialInput.hpp"
 
 /// Auto phone lock disabled for now till the times when it's debugged
 /// #define AUTO_PHONE_LOCK_ENABLED
@@ -107,7 +108,6 @@ bool VirtualAppManager::appMoveFront(ApplicationDescription *app)
     }
     auto el = std::find_if(applications.begin(), applications.end(), [=](auto a) { return a == app; });
     if( el != applications.end() ) {
-        /// TODO - it could be simpler, just sort on i.e. access date
         applications.push_front(std::move(*el));
         applications.erase(el);
         return true;
@@ -342,12 +342,10 @@ sys::ReturnCodes ApplicationManager::InitHandler() {
 
 	//search for application with specified name and run it
 #if 1 //change to 0 if you want to run only viewer application for kickstarter
-	std::string runDesktopName = "ApplicationDesktop";
-	std::string runCallAppName = "ApplicationCall";
 
-    // TODO TODO parameter in launcher?
-    const std::string app_desktop = "ApplicationDesktop";
-    const std::vector<std::string> bg_apps = {"ApplicationCall",gui::special_input };
+    // TODO this should be checked by parameter in launcher, not started by hand (if bg task -> runBackground())
+    const std::string app_desktop = app::name_desktop;
+    const std::vector<std::string> bg_apps = {app::name_call,app::special_input };
 
     for (auto &el : bg_apps)
     {
@@ -659,10 +657,8 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
     }
 	//this is the case when application manager is waiting for newly started application to confim that it has
 	//successfully gained focus.
-	if( getState() == State::WAITING_GET_FOCUS_CONFIRMATION
-         || getState() == State::IDLE
-            ) {
-		//if( msg->getSenderName() == launchApplicationName ) {
+	if( getState() == State::WAITING_GET_FOCUS_CONFIRMATION || getState() == State::IDLE)
+    {
 			LOG_INFO("APMConfirmSwitch focus confirmed by: [%s]", msg->getSenderName().c_str());
 			focusApplicationName = launchApplicationName;
 			launchApplicationName = "";
@@ -671,8 +667,6 @@ bool ApplicationManager::handleSwitchConfirmation( APMConfirmSwitch* msg )
 			app->setState(app::Application::State::ACTIVE_FORGROUND);
 			setState(State::IDLE);
 			return true;
-		// }
-        //
 	}
 	//this is the case where application manager is waiting for non-closeable application
 	//to confirm that app has lost focus.
@@ -727,10 +721,10 @@ bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const s
 bool ApplicationManager::messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data)
 {
     auto val = data->requester;
-    // TODO do it better - i.e. with state
+    // forbid killing prev app, it could be done better - i.e. with state (not this disableAppClose parameter)
     data->disableAppClose = true;
     return (gui::SwitchSpecialChar::Type::Request == data->type)?
-        messageSwitchApplication(sender, gui::special_input, gui::char_select, std::move(data)):
+        messageSwitchApplication(sender, app::special_input, app::char_select, std::move(data)):
         messageSwitchPreviousApplication(sender, std::make_unique<APMSwitchPrevApp>(data->requester, std::move(data)));
 }
 

@@ -13,9 +13,6 @@
 
 namespace gui {
 
-inline const std::string special_input = "AppSpecialInput";
-inline const std::string char_select = "MainWindow";
-
 //class template that stores information that was sent along with switch message
 class SwitchData {
 protected:

@@ -11,6 +11,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "AppWindow.hpp"
 #include <Style.hpp>
+#include <application-desktop/ApplicationDesktop.hpp>
 
 using namespace style::header;
 
@@ -139,7 +140,7 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
     if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF)
     {
         LOG_INFO("exit to main menu");
-        sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationDesktop", "MainWindow", nullptr);
+        sapm::ApplicationManager::messageSwitchApplication(application, app::name_desktop, "MainWindow", nullptr);
     }
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;

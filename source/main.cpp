@@ -168,7 +168,7 @@ int main() {
         applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
         applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
         applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
-        applications.push_back(app::CreateLauncher<app::AppSpecialInput>(gui::special_input, false));
+        applications.push_back(app::CreateLauncher<app::AppSpecialInput>(app::special_input, false));
 
         // start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),

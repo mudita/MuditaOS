@@ -7,7 +7,7 @@
 
 using namespace gui;
 
-UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char_select )
+UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, app::char_select )
 {
     AppWindow::buildInterface();
     box = new GridLayout(0, title->offset_h(), style::window_width, bottomBar->offset_h() - title->offset_h(), {90, 90});
@@ -30,8 +30,8 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, gui::char
     box->setVisible(true);
     box->setNavigation(nullptr, nullptr);
     /// TODO do not resize on each addWidget .. just once :(
-    /// TODO shouldn't be needed here
-    /// TODO add widget -> put widget in it's position
+    ///      shouldn't be needed here
+    ///      add widget -> put widget in it's position
     box->resizeItems();
     addWidget(box);
     setFocusItem(box->getNavigationItem());
