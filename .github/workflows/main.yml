@@ -14,8 +14,6 @@ jobs:
     - name: Run a multi-line script
       run: |
         echo "Install neccessary packages"
-        sudo apt install -y binutils wget git make pkg-config gtkmm-3.0 gcc-8 g++-8 portaudio19-dev
-        sudo apt install -y --reinstall build-essential
         ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
         CMAKEV='cmake-3.15.5-Linux-x86_64'
         echo "Setup gcc, cmake etc..."
