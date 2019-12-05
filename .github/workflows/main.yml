@@ -9,9 +9,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
+    - name: Run bootstrap
       run: |
         echo "Install neccessary packages"
         ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
@@ -30,5 +28,6 @@ jobs:
         echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
         echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
-        echo "Running bootstrap.sh..."
-        cd config && ./bootstrap.sh
+    - name: Build
+      run: ./rebuild.sh && make -C build -j4
+        
