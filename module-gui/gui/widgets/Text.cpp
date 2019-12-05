@@ -47,8 +47,8 @@ Text::Text(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType}
 {
 
-    setPenWidth(1);
-    setPenFocusWidth(3);
+    setPenWidth(style::window::default_border_no_focus_w);
+    setPenFocusWidth(style::window::default_border_focucs_w);
     uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
     font = FontManager::getInstance().getFont(fontID);
 
@@ -56,12 +56,11 @@ Text::Text(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     cursor->setFilled(true);
     cursor->setVisible(false);
 
-    // insert first empty text line
-    textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-    firstLine = textLines.begin();
-    lastLine = textLines.begin();
+    splitTextToLines(text);
     setBorderColor(gui::ColorFullBlack);
     setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+    // TODO this is bad - cursorColumn is badly handled on newline etc.
+    cursorColumn += text.length();
     updateCursor();
 }
 
@@ -574,14 +573,7 @@ bool Text::onFocus(bool state)
     // inform on start what type of input there is
     if (mode)
     {
-        if (state)
-        {
-            mode->show_input_type();
-        }
-        else
-        {
-            mode->show_restore();
-        }
+        mode->on_focus(state);
     }
     bool ret = Rect::onFocus(state);
     if (focus && editMode == EditMode::EDIT)

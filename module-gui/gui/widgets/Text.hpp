@@ -246,7 +246,6 @@ class Text : public Rect
 private:
     InputMode *mode = nullptr;
     gui::KeyInputMappedTranslation translator;
-    UTF8 previous_text;
 };
 
 } /* namespace gui */
