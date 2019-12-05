@@ -75,7 +75,11 @@ Application::~Application() {
 	windows.clear();
 }
 
-Application::State Application::getState() { return state; }
+Application::State Application::getState()
+{
+    return state;
+}
+
 void Application::setState(State st)
 {
 #ifdef DEBUG_APPLICATION_MANAGEMENT
@@ -342,12 +346,21 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
 		//for all windows call rebuild method
-		for( auto it = windows.begin(); it!= windows.end(); it++)
-			it->second->rebuild();
+		for( auto it = windows.begin(); it!= windows.end(); it++) {
+            LOG_DEBUG("Rebuild: %s", it->first.c_str());
+            if(!it->second) {
+                LOG_ERROR("NO SUCH WINDOW");
+            } else {
+                it->second->rebuild();
+            }
+        }
 		//if application has focus call deep refresh
-		if( state == State::ACTIVE_FORGROUND )
+        LOG_INFO("Refresh app with focus!");
+		if( state == State::ACTIVE_FORGROUND ) {
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+        }
 		handled = true;
+        LOG_INFO("App rebuild done");
 	}
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
