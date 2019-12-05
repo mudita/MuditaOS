@@ -16,7 +16,7 @@
 #include "Modem/TS0710/DLC_channel.h"
 #include "Modem/TS0710/TS0710.h"
 #include "messages/CellularMessage.hpp"
-
+#include "utf8/UTF8.hpp"
 //
 class MuxDaemon;
 
@@ -55,7 +55,7 @@ public:
     static int32_t getSignalStrengthDB(int32_t strength) { return signalStrengthToDB[strength]; }
     static int32_t getSignalStrengthDBRange() { return (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])); }
 
-    bool sendSMS(std::string destinationNumber, std::string text);
+    bool sendSMS(UTF8& number, UTF8& text);
     bool receiveSMS(std::string messageNumber);
 
 private:

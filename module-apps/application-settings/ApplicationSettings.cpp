@@ -12,14 +12,21 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
+
 #include "windows/UITestWindow.hpp"
 
+#include "windows/TestMessageWindow.hpp"
+
+
 #include "ApplicationSettings.hpp"
+
+#include "service-cellular/ServiceCellular.hpp"
 
 namespace app {
 
 ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound) :
 	Application( name, parent, startBackgound ) {
+	busChannels.push_back(sys::BusChannels::ServiceCellularSMSNotification);
 }
 
 ApplicationSettings::~ApplicationSettings() {
@@ -37,6 +44,24 @@ sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage* msgl,s
 
 	//this variable defines whether message was processed.
 	bool handled = true;
+
+	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularSMSMulticast) )
+	{
+		CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
+		LOG_INFO("ODEBRANY MULTICAST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		LOG_INFO("Num: %s, text: %s", msg->number.c_str(), msg->message.c_str());
+
+		auto pos = windows.find("Message");
+		if(pos != windows.end())
+		{
+			if( currentWindow == pos->second)
+			{
+				gui::TestMessageWindow* window = reinterpret_cast<gui::TestMessageWindow*>(pos->second);
+				window->cellularMessageCallback(msg->number, msg->message);
+			}
+		}
+	}
+
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
@@ -76,6 +101,9 @@ void ApplicationSettings::createUserInterface() {
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::UiTestWindow(this);
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+	window = new gui::TestMessageWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
