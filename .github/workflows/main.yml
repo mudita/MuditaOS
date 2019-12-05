@@ -9,6 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+      with:
+        token: ${{ secrets.ACCESS_TOKEN }}
+        submodules: true
     - name: Run bootstrap
       run: |
         echo "Install neccessary packages"
@@ -28,6 +31,7 @@ jobs:
         echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
         echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
+        
     - name: Checkout submodules
       uses: textbook/git-checkout-submodule-action@2.0.0
     - name: Build
