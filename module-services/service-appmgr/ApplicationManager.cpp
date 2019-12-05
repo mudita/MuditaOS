@@ -624,8 +624,9 @@ bool ApplicationManager::handleLanguageChange( sapm::APMChangeLanguage* msg ) {
 
 	//iterate over all applications in the background or foreground state and send them rebuild command
 	for(auto & app : getApps()) {
-		if( app->launcher->handle->getState() == app::Application::State::ACTIVE_BACKGROUND ||
-			app->launcher->handle->getState() == app::Application::State::ACTIVE_FORGROUND ) {
+		if( app && app->launcher && app->launcher->handle && (
+            app->launcher->handle->getState() == app::Application::State::ACTIVE_BACKGROUND ||
+			app->launcher->handle->getState() == app::Application::State::ACTIVE_FORGROUND )) {
 			app::Application::messageRebuildApplication(this, app->name());
 		}
 	}
