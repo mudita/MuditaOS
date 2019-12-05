@@ -1,0 +1,36 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Run a one-line script
+      run: echo Hello, world!
+    - name: Run a multi-line script
+      run: |
+        echo "Install neccessary packages"
+        sudo apt install -y binutils wget git make pkg-config gtkmm-3.0 gcc-8 g++-8 portaudio19-dev
+        sudo apt install -y --reinstall build-essential
+        ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
+        CMAKEV='cmake-3.15.5-Linux-x86_64'
+        echo "Setup gcc, cmake etc..."
+        echo "Download armgcc"
+        [[ ! -f $ARM_GCC ]] && wget --no-verbose -O ${ARM_GCC}.tgz https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2?revision=c34d758a-be0c-476e-a2de-af8c6e16a8a2?product=GNU%20Arm%20Embedded%20Toolchain,64-bit,,Linux,8-2019-q3-update
+        [[ ! -d ${HOME}/${ARM_GCC} ]] &&
+        tar -xf ${ARM_GCC}.tgz -C ${HOME}/
+        echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
+        [[ ! -f ${CMAKEV}.tgz ]] && wget --no-verbose -O ${CMAKEV}.tgz https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
+        [[ ! -d ${HOME}/${CMAKEV} ]] && tar -xf ${CMAKEV}.tgz -C ${HOME}/
+        echo "Set path for cmake"
+        echo 'export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
+        export PATH="${HOME}/${CMAKEV}/bin:$PATH"
+        echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
+        echo "set gcc-8 as default alternative (instead of default gcc-7 in ubuntu)"
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+        echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
+        echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
