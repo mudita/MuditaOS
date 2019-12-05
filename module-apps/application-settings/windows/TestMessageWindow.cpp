@@ -68,6 +68,7 @@ void TestMessageWindow::buildInterface() {
 	receivedLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
 	receiveNumber = new gui::Label(this,110, 190, 480-120, 50);
+	receiveNumber->setFont(style::window::font::small);
 
 	RecNumberLabel = new gui::Label(this,10, 190, 90, 50, "Number");
 	RecNumberLabel->setAlignement(gui::Alignment( gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
@@ -76,6 +77,7 @@ void TestMessageWindow::buildInterface() {
 
 	receiveMessage = new gui::Text(this, 110, 120, 480-120, 50);
     textSetInput(receiveMessage);
+    receiveMessage->setFont(style::window::font::small);
 
 	RecMessageLabel = new gui::Label(this, 10, 120, 90, 50, "Message");
 	RecMessageLabel->setAlignement(gui::Alignment( gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
@@ -90,11 +92,13 @@ void TestMessageWindow::buildInterface() {
 	sendMessage = new gui::Text(this,110, 360, 480-120, 50);
     textSetInput(sendMessage,false);
 	sendMessage->setText("Siema tu PurePhone :)");
+	sendMessage->setFont(style::window::font::small);
 
 	sendNumber = new gui::Text(this,110, 430, 480-120, 50);
     textSetInput(sendNumber);
+    sendNumber->setFont(style::window::font::small);
 
-	SendNumberLabel = new gui::Label(this, 10, 430, 90, 50, "Number");
+    SendNumberLabel = new gui::Label(this, 10, 430, 90, 50, "Number");
 	SendNumberLabel->setAlignement(gui::Alignment( gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
 	SendNumberLabel->setFont(style::window::font::small);
 	SendNumberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
