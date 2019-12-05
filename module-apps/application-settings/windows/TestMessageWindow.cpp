@@ -37,6 +37,20 @@ void TestMessageWindow::rebuild() {
 	buildInterface();
 
 }
+
+void textSetInput(Text * text, bool numeric = true)
+{
+    /// tu ustawiasz że coś jest edytowalne
+    text->setEditMode(gui::Text::EditMode::EDIT);
+    text->setFont(style::window::font::bigbold);
+    /// tu ustawiasz tak naprawdę przez tą listę InputMode::digit etc jakie kolejne tryby wprowadzania są wybierane
+    if(numeric) {
+        text->setInputMode(new InputMode({InputMode::digit}));
+    } else {
+        text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc, InputMode::digit}));
+    }
+}
+
 void TestMessageWindow::buildInterface() {
 	AppWindow::buildInterface();
 	bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -61,6 +75,7 @@ void TestMessageWindow::buildInterface() {
 	RecNumberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
 	receiveMessage = new gui::Text(this, 110, 120, 480-120, 50);
+    textSetInput(receiveMessage);
 
 	RecMessageLabel = new gui::Label(this, 10, 120, 90, 50, "Message");
 	RecMessageLabel->setAlignement(gui::Alignment( gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
@@ -73,9 +88,11 @@ void TestMessageWindow::buildInterface() {
 	sendLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
 	sendMessage = new gui::Text(this,110, 360, 480-120, 50);
+    textSetInput(sendMessage,false);
 	sendMessage->setText("Siema tu PurePhone :)");
 
 	sendNumber = new gui::Text(this,110, 430, 480-120, 50);
+    textSetInput(sendNumber);
 
 	SendNumberLabel = new gui::Label(this, 10, 430, 90, 50, "Number");
 	SendNumberLabel->setAlignement(gui::Alignment( gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
