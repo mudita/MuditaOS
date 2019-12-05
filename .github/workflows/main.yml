@@ -30,3 +30,5 @@ jobs:
         echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
         echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
+        echo "Running bootstrap.sh..."
+        cd config && ./bootstrap.sh
