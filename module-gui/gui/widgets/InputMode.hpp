@@ -33,6 +33,9 @@ class InputMode
     // text to restore when show_input_type was called (and overwritten some other text)
     UTF8 restore_text = "";
 
+    void show_input_type();
+    void show_restore();
+
   public:
 
     InputMode(std::list<InputMode::Mode> mode_list,
@@ -40,9 +43,8 @@ class InputMode
             std::function<void()> show_special_char_selector = nullptr,
             const UTF8 &prev_text = ""
             );
+    void on_focus(bool focus) { if (focus) show_input_type(); else show_restore(); }
     void next();
     const std::string& get();
-    void show_input_type();
-    void show_restore();
     void select_special_char();
 };

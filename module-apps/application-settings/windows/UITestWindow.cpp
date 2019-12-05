@@ -23,21 +23,21 @@ UiTestWindow::UiTestWindow(app::Application *app) : AppWindow(app, "TEST_UI")
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
     setTitle("UI TEST");
-    text = new gui::Text(this, style::window::default_left_margin, title->offset_h(), style::window_width - 2 * style::window::default_left_margin, 100,
-                         "LoL ...");
+    text = new gui::Text(this, style::window::default_left_margin, title->offset_h(), style::window_width - 2 * style::window::default_left_margin, 300,
+                         "Add text, long press * adds special char, long press # changes input (and shows it in bottom bar) arrows walk, 1 in text mode adds special chars too");
     text->setEditMode(gui::Text::EditMode::EDIT);
-    text->setFont(style::window::font::bigbold);
+    text->setFont(style::window::font::medium);
     text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc, InputMode::digit}, [=](const UTF8 &text) {
         bottomBar->setText(BottomBar::Side::CENTER, text);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         bottomBar->getText(BottomBar::Side::CENTER);
     },
     [=]() {
-        LOG_INFO("Get special char!");
         sapm::ApplicationManager::messageSwitchSpecialInput( application,
                 std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request,application->GetName()));
     }
     ));
+    text->setPenFocusWidth(0);
     setFocusItem(text);
 }
 
