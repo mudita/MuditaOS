@@ -4,8 +4,8 @@
  *  Created on: 13 mar 2019
  *      Author: robert
  */
-#include "Label.hpp"
 #include "BottomBar.hpp"
+#include "Label.hpp"
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
@@ -98,7 +98,10 @@ Label *BottomBar::getSide(BottomBar::Side side)
     return nullptr;
 }
 
-void BottomBar::setActive(BottomBar::Side side, bool active) { getSide(side)->setVisible(active); }
+void BottomBar::setActive(BottomBar::Side side, bool active)
+{
+    getSide(side)->setVisible(active);
+}
 
 void BottomBar::setText(BottomBar::Side side, const UTF8 &str, bool active)
 {
@@ -106,7 +109,10 @@ void BottomBar::setText(BottomBar::Side side, const UTF8 &str, bool active)
     setActive(side, active);
 }
 
-UTF8 BottomBar::getText(BottomBar::Side side) { return getSide(side)->getText(); }
+UTF8 BottomBar::getText(BottomBar::Side side)
+{
+    return getSide(side)->getText();
+}
 
 bool BottomBar::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {
 	Rect::onDimensionChanged(oldDim, newDim);

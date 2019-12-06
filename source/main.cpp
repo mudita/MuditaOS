@@ -159,7 +159,7 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(),sysmgr.get());
 
         //vector with launchers to applications
-        std::vector<std::unique_ptr<app::ApplicationLauncher> > applications;
+        std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
         applications.push_back(app::CreateLauncher<app::ApplicationViewer>(app::name_viewer));
         applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
         applications.push_back(app::CreateLauncher<app::ApplicationCall>(app::name_call, false));
@@ -171,8 +171,7 @@ int main() {
         applications.push_back(app::CreateLauncher<app::AppSpecialInput>(app::special_input, false));
 
         // start application manager
-        ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications),
-                                     sysmgr.get());
+        ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications), sysmgr.get());
 
         if (ret) {
             return 0;

@@ -23,106 +23,122 @@ inline uint32_t default_application_locktime=30000;
 
 namespace sapm {
 
-class ApplicationDescription {
-public:
-	ApplicationDescription( std::unique_ptr<app::ApplicationLauncher> launcher);
-	virtual ~ApplicationDescription() {}
-	//name of the application. It's used to find proper application during switching
-	std::string name()
+    class ApplicationDescription
     {
-        if(launcher) {
-            return launcher->getName();
-        } else {
-            return "NONE";
+      public:
+        ApplicationDescription(std::unique_ptr<app::ApplicationLauncher> launcher);
+        virtual ~ApplicationDescription()
+        {
         }
-    }
-	//launcher to application to the application's start function
-	std::unique_ptr<app::ApplicationLauncher> launcher = nullptr;
-	//informs application manager that this application temporary musn't be closed.
-	//This flag is used to prevent application closing when application is closeable and there is incoming call.
-	//This flag is also used when closeable application is on front and there is a timeout to block the applicatioin.
-	bool blockClosing = false;
-	//switching data stored when application manager had to run init function
-	std::unique_ptr<gui::SwitchData> switchData = nullptr;
-	std::string switchWindow = "";
+        // name of the application. It's used to find proper application during switching
+        std::string name()
+        {
+            if (launcher)
+            {
+                return launcher->getName();
+            }
+            else
+            {
+                return "NONE";
+            }
+        }
+        // launcher to application to the application's start function
+        std::unique_ptr<app::ApplicationLauncher> launcher = nullptr;
+        // informs application manager that this application temporary musn't be closed.
+        // This flag is used to prevent application closing when application is closeable and there is incoming call.
+        // This flag is also used when closeable application is on front and there is a timeout to block the applicatioin.
+        bool blockClosing = false;
+        // switching data stored when application manager had to run init function
+        std::unique_ptr<gui::SwitchData> switchData = nullptr;
+        std::string switchWindow = "";
 
-    // prevents from blocking the system
-    bool preventsLocking()
-    {
-        if (launcher != nullptr)
+        // prevents from blocking the system
+        bool preventsLocking()
         {
-            return launcher->isBlocking();
+            if (launcher != nullptr)
+            {
+                return launcher->isBlocking();
+            }
+            else
+            {
+                return false;
+            }
         }
-        else
+
+        // informs if it is possible to close application when it looses focus.
+        bool closeable()
         {
+            if (launcher != nullptr)
+            {
+                return launcher->isCloseable();
+            }
             return false;
         }
-    }
 
-    // informs if it is possible to close application when it looses focus.
-    bool closeable()
-    {
-        if (launcher != nullptr)
+        app::Application::State getState()
         {
-            return launcher->isCloseable();
+            if ((launcher == nullptr) || (launcher->handle == nullptr))
+            {
+                return app::Application::State::NONE;
+            }
+            else
+            {
+                return launcher->handle->getState();
+            }
         }
-        return false;
-    }
 
-    app::Application::State getState()
-    {
-        if(( launcher == nullptr) || (launcher->handle == nullptr )) {
-            return app::Application::State::NONE;
-        } else {
-            return launcher->handle->getState();
+        void setState(app::Application::State st)
+        {
+            if ((launcher == nullptr) || (launcher->handle == nullptr))
+            {
+                LOG_ERROR("No %s", launcher == nullptr ? "launcher" : "handle");
+            }
+            else
+            {
+                launcher->handle->setState(st);
+            }
         }
-    }
-
-    void setState(app::Application::State st)
-    {
-        if((launcher == nullptr) || (launcher->handle == nullptr )) {
-            LOG_ERROR("No %s", launcher==nullptr?"launcher":"handle");
-        } else {
-            launcher->handle->setState(st);
-        }
-    }
-};
-
-/// this is only to force usage of get/set methods in ApplicatioManager
-class VirtualAppManager
-{
-  public:
-    enum class State
-    {
-        IDLE,
-        CLOSING_PREV_APP,
-        WAITING_CLOSE_CONFIRMATION,
-        STARTING_NEW_APP,
-        WAITING_NEW_APP_REGISTRATION,
-        WAITING_LOST_FOCUS_CONFIRMATION,
-        WAITING_GET_FOCUS_CONFIRMATION
     };
 
-    VirtualAppManager(std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers);
-    virtual ~VirtualAppManager();
+/// this is only to force usage of get/set methods in ApplicatioManager
+    class VirtualAppManager
+    {
+      public:
+        enum class State
+        {
+            IDLE,
+            CLOSING_PREV_APP,
+            WAITING_CLOSE_CONFIRMATION,
+            STARTING_NEW_APP,
+            WAITING_NEW_APP_REGISTRATION,
+            WAITING_LOST_FOCUS_CONFIRMATION,
+            WAITING_GET_FOCUS_CONFIRMATION
+        };
 
-  private:
-    State state = State::IDLE;
-    std::list<ApplicationDescription* > applications;
-  public:
-    std::list<std::string> appStack;
-    State getState() { return state; }
-    static const char *stateStr(State st);
-    ApplicationDescription *appFront();
-    ApplicationDescription *appGet(const std::string &name);
-    /// set application as first on the applications vector
-    bool appMoveFront(ApplicationDescription *app);
-    /// get previous visible app - one on FOREGROUND
-    ApplicationDescription *appPrev();
-    void setState(State st);
-    std::list<ApplicationDescription*> &getApps();
-    void debug_log_app_list();
-};
+        VirtualAppManager(std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers);
+        virtual ~VirtualAppManager();
+
+      private:
+        State state = State::IDLE;
+        std::list<ApplicationDescription *> applications;
+
+      public:
+        std::list<std::string> appStack;
+        State getState()
+        {
+            return state;
+        }
+        static const char *stateStr(State st);
+        ApplicationDescription *appFront();
+        ApplicationDescription *appGet(const std::string &name);
+        /// set application as first on the applications vector
+        bool appMoveFront(ApplicationDescription *app);
+        /// get previous visible app - one on FOREGROUND
+        ApplicationDescription *appPrev();
+        void setState(State st);
+        std::list<ApplicationDescription *> &getApps();
+        void debug_log_app_list();
+    };
 
 class ApplicationManager: public sys::Service, public VirtualAppManager {
 
@@ -179,11 +195,10 @@ public:
     /**
      * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
      */
-    static bool messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
-    		const std::string& windowName, std::unique_ptr<gui::SwitchData> data);
+    static bool messageSwitchApplication(sys::Service *sender, const std::string &applicationName, const std::string &windowName,
+                                         std::unique_ptr<gui::SwitchData> data);
 
-
-    static bool messageSwitchSpecialInput( sys::Service* sender, std::unique_ptr<gui::SwitchSpecialChar> data );
+    static bool messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data);
     /**
 	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
 	 * Allows sending data to destination application.
@@ -200,7 +215,7 @@ public:
     /**
      * @brief Allows requesting Application Manager to run previous application.
      */
-    static bool messageSwitchPreviousApplication( sys::Service* sender, std::unique_ptr<APMSwitchPrevApp> msg = nullptr);
+    static bool messageSwitchPreviousApplication(sys::Service *sender, std::unique_ptr<APMSwitchPrevApp> msg = nullptr);
     /**
 	* @brief Sends information from application to manager about result of application's init function.
 	* If successful message will contain name and true value, otherwise false value will be transmitted.

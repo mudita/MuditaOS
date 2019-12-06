@@ -1,6 +1,6 @@
 #include "GridLayout.hpp"
-#include <log/log.hpp>
 #include "Style.hpp"
+#include <log/log.hpp>
 
 using namespace gui;
 
@@ -14,7 +14,8 @@ GridLayout::GridLayout(Item *parent, const uint32_t &x, const uint32_t &y, const
 void GridLayout::resizeItems()
 {
 
-    if( grid.x == 0 || grid.y == 0 ) {
+    if (grid.x == 0 || grid.y == 0)
+    {
         LOG_ERROR("Grid == 0 - abort");
         return;
     }
@@ -28,9 +29,10 @@ void GridLayout::resizeItems()
     {
         LOG_ERROR("More children than possible to show");
     }
-    if (strech) {
-        strech_x = (widgetArea.w - grid.x*el_in_x )/el_in_x;
-        strech_y = (widgetArea.h - grid.y*el_in_y )/el_in_y;
+    if (strech)
+    {
+        strech_x = (widgetArea.w - grid.x * el_in_x) / el_in_x;
+        strech_y = (widgetArea.h - grid.y * el_in_y) / el_in_y;
     }
 
     int i = 0;
@@ -103,7 +105,8 @@ void GridLayout::setNavigation(Item *previous, Item *next)
 
 bool GridLayout::onFocus(bool state)
 {
-    if(children.size()) {
+    if (children.size())
+    {
         children.front()->setFocus(state);
     }
     return true;

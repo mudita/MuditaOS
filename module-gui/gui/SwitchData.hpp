@@ -29,14 +29,17 @@ public:
 
 class SwitchSpecialChar : public SwitchData
 {
-    public:
-        std::string requester = "";
-        enum class Type {
-            Request,
-            Response,
-        } type = Type::Request;
-        SwitchSpecialChar(Type type, const std::string requester, const std::string &description="") : SwitchData(description), requester(requester), type(type) {}
-        virtual ~SwitchSpecialChar() = default;
+  public:
+    std::string requester = "";
+    enum class Type
+    {
+        Request,
+        Response,
+    } type = Type::Request;
+    SwitchSpecialChar(Type type, const std::string requester, const std::string &description = "") : SwitchData(description), requester(requester), type(type)
+    {
+    }
+    virtual ~SwitchSpecialChar() = default;
 };
 
 } /* namespace gui */

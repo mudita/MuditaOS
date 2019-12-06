@@ -173,6 +173,7 @@ class Text : public Rect
      */
     bool handleEnter();
     bool handleBackspace();
+
   public:
     /**
      * Inserts translated set of characters provided from key translation logics
@@ -182,6 +183,7 @@ class Text : public Rect
      * Updates cursor position in the text widget
      */
     void updateCursor();
+
   private:
     /**
      * Returns text line where cursor is located
