@@ -288,7 +288,7 @@ public:
     /// @brief Get Channel by name
     /// @param name - channel name
     /// @return pointer to channel or nullptr if such channel doesn't exist
-    DLC_channel *GetChannel(const std::string name) { 
+    DLC_channel *GetChannel(const std::string & name) { 
         for (auto it : channels) { 
             if (it->getName() == name) return it; 
         }
@@ -296,7 +296,7 @@ public:
         return nullptr;
     } 
 
-    DLC_channel *OpenChannel(DLCI_t DLCI, std::string name) { 
+    DLC_channel *OpenChannel(DLCI_t DLCI, const std::string& name) { 
         DLC_channel *channel = new DLC_channel(DLCI, name, pv_cellular.get()); 
         channels.push_back(channel); 
         return channels.back();
@@ -307,7 +307,7 @@ public:
         channels.erase(channels.begin() + index); 
     }
 
-    void CloseChannel(std::string name) { 
+    void CloseChannel(const std::string & name) { 
         for (size_t i = 0; i < channels.size(); i++) { 
             if (channels.at(i)->getName() == name) {
                 delete channels.at(i); 
