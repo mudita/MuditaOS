@@ -317,7 +317,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			else {
 				currentWindow->onBeforeShow( msg->getCommand(), msg->getData().get() );
                 auto ret = dynamic_cast<gui::SwitchSpecialChar *>(msg->getData().get());
-                if (msg->getData() != nullptr)
+                if (ret != nullptr && msg->getData() != nullptr)
                 {
                     auto text = dynamic_cast<gui::Text*>(currentWindow->getFocusItem());
                     if(text) {
