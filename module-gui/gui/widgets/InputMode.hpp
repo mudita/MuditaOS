@@ -7,7 +7,7 @@
 // TODO read from keymap file ...
 namespace gui
 {
-inline const std::vector<char> special_chars = {'.', ',', '_', ':', ';', ')', '(', '?', '!', '/', '*', '+'};
+    inline const std::vector<char> special_chars = {'.', ',', '_', ':', ';', ')', '(', '?', '!', '/', '*', '+'};
 }
 
 /// this widget has one goal - nicelly change input parsing which is done in application in it's widgets
@@ -26,7 +26,7 @@ class InputMode
     InputMode() = delete;
     // list of enabled input modes
     std::list<Mode> input_mode_list = {};
-    uint32_t input_mode_list_pos=0;
+    uint32_t input_mode_list_pos = 0;
     std::function<void(const UTF8 &text)> show_type_cb = nullptr;
     std::function<void()> show_special_char_selector = nullptr;
     Mode modeNow();
@@ -37,14 +37,16 @@ class InputMode
     void show_restore();
 
   public:
-
-    InputMode(std::list<InputMode::Mode> mode_list,
-            std::function<void(const UTF8 &text)> show_type_cb = nullptr,
-            std::function<void()> show_special_char_selector = nullptr,
-            const UTF8 &prev_text = ""
-            );
-    void on_focus(bool focus) { if (focus) show_input_type(); else show_restore(); }
+    InputMode(std::list<InputMode::Mode> mode_list, std::function<void(const UTF8 &text)> show_type_cb = nullptr,
+              std::function<void()> show_special_char_selector = nullptr, const UTF8 &prev_text = "");
+    void on_focus(bool focus)
+    {
+        if (focus)
+            show_input_type();
+        else
+            show_restore();
+    }
     void next();
-    const std::string& get();
+    const std::string &get();
     void select_special_char();
 };

@@ -492,7 +492,8 @@ bool Text::onInput(const InputEvent &inputEvent)
 
     if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST)
     {
-        if(mode) {
+        if (mode)
+        {
             mode->select_special_char();
             return true;
         }

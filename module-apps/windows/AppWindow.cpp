@@ -6,10 +6,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "i18/i18.hpp"
-#include "Application.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
 #include "AppWindow.hpp"
+#include "Application.hpp"
+#include "i18/i18.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
 
@@ -146,14 +146,17 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
 
 	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		if( prevWindow == getName() || getName() == "MainWindow") {
-			LOG_INFO("Back to previous application"); 
+        if (prevWindow == getName() || getName() == "MainWindow")
+        {
+            LOG_INFO("Back to previous application");
 			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-		} else {
-			LOG_INFO("Back to previous window %s", prevWindow.c_str());
+        }
+        else
+        {
+            LOG_INFO("Back to previous window %s", prevWindow.c_str());
 			application->switchWindow( prevWindow, gui::ShowMode::GUI_SHOW_RETURN );
-		}
-		return true;
+        }
+        return true;
 	}
 
 	return false;

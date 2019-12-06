@@ -28,8 +28,8 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() override;
-	void destroyUserInterface() override;
+    void createUserInterface() override;
+    void destroyUserInterface() override;
 };
 
 } /* namespace app */

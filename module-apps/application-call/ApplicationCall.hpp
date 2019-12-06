@@ -35,9 +35,9 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() override;
-	void destroyUserInterface() override;
-	void setDisplayedNumber( std::string num );
+    void createUserInterface() override;
+    void destroyUserInterface() override;
+    void setDisplayedNumber( std::string num );
 	const std::string& getDisplayedNumber();
 	//starts timer that upon triggering, if no user action was performed, will hide application to background and move to previous application
 	void runCallTimer();
