@@ -5,6 +5,7 @@
 
 #include "TS0710_DATA.h"
 #include "TS0710_Frame.h"
+#include <cassert>
 
 #if defined (__cplusplus)
     extern "C"{
@@ -17,7 +18,9 @@
 /**
  * TS0710_DATA implementation
  */
-TS0710_DATA::TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t> User_data, bsp::Cellular *cellular) {
+TS0710_DATA::TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t>& User_data, bsp::Cellular *cellular) {
+    assert(cellular != nullptr);
+
     pv_cellular = cellular;
 
     request(DLCI, sysParams, User_data);
