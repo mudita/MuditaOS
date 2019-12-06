@@ -216,11 +216,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto audioRet = cmux->AudioConfProcedure();
         if (audioRet == TS0710::ConfState::Success)
         {
-
-            char buf[32];
+            std::string buf = "AT+IPR=" + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
             LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
-            sprintf(buf, "AT+IPR=%i\r", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
-            if (!cmux->CheckATCommandResponse(cmux->getParser()->SendCommand(buf, 1)))
+            if (!cmux->CheckATCommandResponse(cmux->getParser()->SendCommand(buf.c_str(), 1)))
             {
                 LOG_ERROR("Baudrate setup error");
                 state = State::Failed;
