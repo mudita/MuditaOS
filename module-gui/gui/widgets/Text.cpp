@@ -481,14 +481,7 @@ void Text::setSize(const short &w, const short &h)
 
 bool Text::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_PND)
-    {
-        if (mode)
-        {
-            mode->next();
-            return true;
-        }
-    }
+    bool res = false;
 
     if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST)
     {
@@ -500,15 +493,57 @@ bool Text::onInput(const InputEvent &inputEvent)
     }
 
     // translate and store keypress
-    uint32_t code = translator.handle( inputEvent.key, mode?mode->get():"");
+    uint32_t code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+
+    /// handling of key removal
+    if (inputEvent.keyCode == gui::KeyCode::KEY_PND)
+    {
+        // longpress -> remove all characters
+        if (inputEvent.state == InputEvent::State::keyReleasedLong)
+        {
+            // TODO handle longpress remove key
+        }
+        // shortpress remove characters n time for multipress, one time for normal press
+        else if (inputEvent.state == InputEvent::State::keyReleasedShort)
+        {
+            auto char_rm = [=](bool &res) {
+                res = handleBackspace();
+                if (res)
+                {
+                    updateCursor();
+                    contentCallback(*this);
+                }
+            };
+            if (translator.getTimes())
+            {
+                for (int i = 0; i < translator.getTimes(); ++i)
+                {
+                    char_rm(res);
+                }
+            }
+            else
+            {
+                char_rm(res);
+            }
+            return res;
+        }
+    }
 
     // process only short release events
-    if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+    if (inputEvent.state != InputEvent::State::keyReleasedShort)
+    {
         return false;
     }
 
-    // check if this is navigation event
-    bool res = false;
+    if (inputEvent.keyCode == gui::KeyCode::KEY_AST)
+    {
+        if (mode)
+        {
+            mode->next();
+            return true;
+        }
+    }
+
     if ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) || (inputEvent.keyCode == KeyCode::KEY_UP) ||
         (inputEvent.keyCode == KeyCode::KEY_DOWN))
     {
@@ -526,19 +561,6 @@ bool Text::onInput(const InputEvent &inputEvent)
         return false;
     }
 
-    // get how many short presses were handled in this widget
-    if (translator.getTimes())
-    {
-        handleBackspace();
-        res = handleChar(code);
-        if (res)
-        {
-            updateCursor();
-            contentCallback(*this);
-        }
-        return res;
-    }
-
     // if char is a new line char then create new line and move caret and return
     if (code== 0x0A)
     {
@@ -547,12 +569,6 @@ bool Text::onInput(const InputEvent &inputEvent)
             res = handleEnter();
             contentCallback(*this);
         }
-    }
-    // backspace handling
-    else if (code == 0x08)
-    {
-        res = handleBackspace();
-        contentCallback(*this);
     }
     else
     { // normal char -> add and check pixel width
