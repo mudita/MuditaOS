@@ -185,10 +185,9 @@ sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMod
     return sys::ReturnCodes::Success;
 }
 
-bool EventManager::messageSetApplication( sys::Service* sender, const std::string& applicationName ) {
+bool EventManager::messageSetApplication(sys::Service *sender, const std::string &applicationName)
+{
 
-	auto msg = std::make_shared<sevm::EVMFocusApplication>( applicationName );
-	return sys::Bus::SendUnicast(msg, "EventManager", sender );
+    auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
+    return sys::Bus::SendUnicast(msg, "EventManager", sender);
 }
-
-

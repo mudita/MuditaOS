@@ -9,12 +9,12 @@
 #ifndef MODULE_APPS_MESSAGES_APPMESSAGE_HPP_
 #define MODULE_APPS_MESSAGES_APPMESSAGE_HPP_
 
-#include <memory>
-#include <string>
+#include "MessageType.hpp"
+#include "Service/Message.hpp"
 #include "SwitchData.hpp"
 #include "gui/input/InputEvent.hpp"
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
+#include <memory>
+#include <string>
 
 namespace app {
 

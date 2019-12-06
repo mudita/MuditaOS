@@ -69,18 +69,17 @@ public:
 
     static const char *stateStr(State st);
 
-private:
-
+  private:
     State state = State::DEACTIVATED;
 
-public:
+  public:
 	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
     Application::State getState();
     void setState(State st);
 
-	/**
+    /**
 	 * Virtual methods
 	 */
 	void TickHandler(uint32_t id) override;
@@ -221,14 +220,14 @@ class ApplicationLauncherT : public ApplicationLauncher
     public:
     ApplicationLauncherT(std::string name, bool isCloseable=true) : ApplicationLauncher(name, isCloseable) {}
     virtual bool run(sys::Service* caller) override {
-        parent = (caller==nullptr?"":caller->GetName());
+        parent = (caller == nullptr ? "" : caller->GetName());
         handle = std::make_shared<T>(name, parent);
-        return sys::SystemManager::CreateService( handle , caller );
-	};
+        return sys::SystemManager::CreateService(handle, caller);
+    };
     bool runBackground(sys::Service *caller) override {
-		parent = (caller==nullptr?"":caller->GetName());
-        handle = std::make_shared<T>(name,parent, true);
-    	return sys::SystemManager::CreateService( handle , caller );
+        parent = (caller == nullptr ? "" : caller->GetName());
+        handle = std::make_shared<T>(name, parent, true);
+        return sys::SystemManager::CreateService(handle, caller);
     };
 };
 

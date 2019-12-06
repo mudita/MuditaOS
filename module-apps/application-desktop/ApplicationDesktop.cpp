@@ -21,9 +21,9 @@
 
 namespace app {
 
-ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground) :
-	Application( name, parent ) {
-}
+    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground) : Application(name, parent)
+    {
+    }
 
 ApplicationDesktop::~ApplicationDesktop() {
 	LOG_INFO("Desktop destruktor");

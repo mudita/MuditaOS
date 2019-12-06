@@ -7,25 +7,26 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Window.hpp"
-#include <memory>
 #include <GridLayout.hpp>
+#include <memory>
 
 namespace gui
 {
 
-class UiCharSelector : public AppWindow
-{
-  protected:
-    GridLayout *box;
-  public:
-    UiCharSelector(app::Application *app);
-    virtual ~UiCharSelector() = default;
+    class UiCharSelector : public AppWindow
+    {
+      protected:
+        GridLayout *box;
 
-    // virtual methods
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
-};
+      public:
+        UiCharSelector(app::Application *app);
+        virtual ~UiCharSelector() = default;
 
-};
+        // virtual methods
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
+
+}; // namespace gui

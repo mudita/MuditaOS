@@ -32,30 +32,28 @@
 
 namespace app {
 
-
-const char* Application::stateStr(Application::State st)
-{
-    switch (st)
+    const char *Application::stateStr(Application::State st)
     {
-    case State::NONE:
-        return "NONE";
-    case State::DEACTIVATED:
-        return "DEACTIVATED";
-    case State::INITIALIZING:
-        return "INITIALIZING";
-    case State::ACTIVATING:
-        return "ACTIVATING";
-    case State::ACTIVE_FORGROUND:
-        return "ACTIVE_FORGROUND";
-    case State::ACTIVE_BACKGROUND:
-        return "ACTIVE_BACKGROUND";
-    case State::DEACTIVATING:
-        return "DEACTIVATING";
-    default:
-        return "FixIt";
+        switch (st)
+        {
+        case State::NONE:
+            return "NONE";
+        case State::DEACTIVATED:
+            return "DEACTIVATED";
+        case State::INITIALIZING:
+            return "INITIALIZING";
+        case State::ACTIVATING:
+            return "ACTIVATING";
+        case State::ACTIVE_FORGROUND:
+            return "ACTIVE_FORGROUND";
+        case State::ACTIVE_BACKGROUND:
+            return "ACTIVE_BACKGROUND";
+        case State::DEACTIVATING:
+            return "DEACTIVATING";
+        default:
+            return "FixIt";
+        }
     }
-}
-
 
 Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
 	Service( name, parent, stackDepth, priority ),
@@ -64,7 +62,8 @@ Application::Application(std::string name, std::string parent,bool startBackgrou
     longPressTimer = CreateTimer( key_timer_ms, true);
     Service::ReloadTimer(longPressTimer);
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    if(startBackground) {
+    if (startBackground)
+    {
         setState(State::ACTIVE_BACKGROUND);
     }
 }
@@ -139,15 +138,16 @@ int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd,
 
 	std::string window;
 #ifdef DEBUG_APPLICATION_MANAGEMENT
-	LOG_INFO("switching [%s] to window: %s", GetName().c_str(), windowName.length()?windowName.c_str():"MainWindow");
+    LOG_INFO("switching [%s] to window: %s", GetName().c_str(), windowName.length() ? windowName.c_str() : "MainWindow");
 #endif
 
-	//case to handle returning to previous application
+    //case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
 		window = currentWindow->getName();
-        auto ret = dynamic_cast<gui::SwitchSpecialChar*>(data.get());
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, currentWindow->getName(), ret?std::move(data):std::make_unique<gui::SwitchData>("LastWindow"), cmd);
-		sys::Bus::SendUnicast(msg, this->GetName(), this );
+        auto ret = dynamic_cast<gui::SwitchSpecialChar *>(data.get());
+        auto msg = std::make_shared<AppSwitchWindowMessage>(window, currentWindow->getName(),
+                                                            ret ? std::move(data) : std::make_unique<gui::SwitchData>("LastWindow"), cmd);
+        sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 	else {
 		window = windowName.empty() ? "MainWindow" : windowName;
@@ -251,13 +251,14 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
 		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
-		if( (state == State::ACTIVATING) || ( state == State::INITIALIZING ) ||	( state == State::ACTIVE_BACKGROUND )){
+        if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND))
+        {
 
-			if( msg->getTargetApplicationName() == this->GetName()) {
+            if( msg->getTargetApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
-					setState(State::ACTIVE_FORGROUND);
+                    setState(State::ACTIVE_FORGROUND);
 
-					switchWindow( msg->getTargetWindowName(), std::move( msg->getData()));
+                    switchWindow( msg->getTargetWindowName(), std::move( msg->getData()));
 					handled = true;
 				}
 				else {
@@ -268,15 +269,15 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			else {
 				LOG_ERROR("Received switch message outside of activation flow");
 			}
-		}
-		else if( state == State::ACTIVE_FORGROUND ) {
+        }
+        else if( state == State::ACTIVE_FORGROUND ) {
 			if( msg->getTargetApplicationName() == this->GetName()) {
 				//if window name and data are null pointers this is a message informing
 				//that application should go to background mode
 				if( (msg->getTargetWindowName() == "") && (msg->getData() == nullptr ) ) {
 					if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
-						setState(State::ACTIVE_BACKGROUND);
-						handled = true;
+                        setState(State::ACTIVE_BACKGROUND);
+                        handled = true;
 					}
 					else {
 						//TODO send to itself message to close
@@ -295,8 +296,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 			}
 		}
 		else {
-			LOG_ERROR("Wrong internal application %s switch to ACTIVE state form %s", msg->getTargetApplicationName().c_str(), stateStr(state));
-		}
+            LOG_ERROR("Wrong internal application %s switch to ACTIVE state form %s", msg->getTargetApplicationName().c_str(), stateStr(state));
+        }
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
 		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
@@ -319,26 +320,29 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
                 auto ret = dynamic_cast<gui::SwitchSpecialChar *>(msg->getData().get());
                 if (ret != nullptr && msg->getData() != nullptr)
                 {
-                    auto text = dynamic_cast<gui::Text*>(currentWindow->getFocusItem());
-                    if(text) {
-                        if(text->handleChar(ret->getDescription()[0])) {
+                    auto text = dynamic_cast<gui::Text *>(currentWindow->getFocusItem());
+                    if (text)
+                    {
+                        if (text->handleChar(ret->getDescription()[0]))
+                        {
                             text->updateCursor();
                         }
                     }
                 }
-			}
+            }
 
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
-
-		} else {
+        }
+        else
+        {
             LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
         }
-		handled = true;
+        handled = true;
 	}
 
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
-		setState(State::DEACTIVATING);
-		sapm::ApplicationManager::messageConfirmClose(this);
+        setState(State::DEACTIVATING);
+        sapm::ApplicationManager::messageConfirmClose(this);
 		//here should go all the cleaning
 		handled = true;
 	}
@@ -346,22 +350,27 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 		LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
 		//for all windows call rebuild method
-		for( auto it = windows.begin(); it!= windows.end(); it++) {
+        for (auto it = windows.begin(); it != windows.end(); it++)
+        {
             LOG_DEBUG("Rebuild: %s", it->first.c_str());
-            if(!it->second) {
+            if (!it->second)
+            {
                 LOG_ERROR("NO SUCH WINDOW");
-            } else {
+            }
+            else
+            {
                 it->second->rebuild();
             }
         }
-		//if application has focus call deep refresh
+        //if application has focus call deep refresh
         LOG_INFO("Refresh app with focus!");
-		if( state == State::ACTIVE_FORGROUND ) {
-			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
+        if (state == State::ACTIVE_FORGROUND)
+        {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
-		handled = true;
+        handled = true;
         LOG_INFO("App rebuild done");
-	}
+    }
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
 		//currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );

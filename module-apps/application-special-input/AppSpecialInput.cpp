@@ -1,11 +1,10 @@
 #include "AppSpecialInput.hpp"
-#include "windows/InputSelector.hpp"
 #include "messages/AppMessage.hpp"
+#include "windows/InputSelector.hpp"
 
 using namespace app;
 
-AppSpecialInput::AppSpecialInput(std::string name, std::string parent, bool startBackgound) :
-    Application(name, parent, startBackgound)
+AppSpecialInput::AppSpecialInput(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound)
 {
     auto window = new gui::UiCharSelector(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
@@ -27,7 +26,8 @@ sys::Message_t AppSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys:
 sys::ReturnCodes AppSpecialInput::InitHandler()
 {
     auto ret = Application::InitHandler();
-    if(ret != sys::ReturnCodes::Success) {
+    if (ret != sys::ReturnCodes::Success)
+    {
         LOG_ERROR("");
     }
     setActiveWindow("MainWindow");

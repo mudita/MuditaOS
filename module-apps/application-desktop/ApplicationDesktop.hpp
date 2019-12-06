@@ -32,9 +32,9 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() override;
-	void destroyUserInterface() override;
-	bool getScreenLocked();
+    void createUserInterface() override;
+    void destroyUserInterface() override;
+    bool getScreenLocked();
 	void setScreenLocked( bool val );
 	bool getPinLocked();
 
