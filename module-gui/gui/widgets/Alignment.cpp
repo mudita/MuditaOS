@@ -13,8 +13,12 @@ Alignment::Alignment() :
 	alignment{Alignment::ALIGN_HORIZONTAL_LEFT | ALIGN_VERTICAL_TOP } {
 }
 
-Alignment::Alignment( const uint32_t valH, const uint32_t valV ) :
-	alignment {valH | valV} {
+Alignment::Alignment(const uint32_t align) : alignment{align}
+{
+}
+
+Alignment::Alignment(const uint32_t valH, const uint32_t valV) : Alignment(valH | valV)
+{
 }
 
 Alignment::~Alignment() {
