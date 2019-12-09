@@ -1,47 +1,44 @@
-/*
- * @file ThreadViewWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_THREADVIEWWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_THREADVIEWWINDOW_HPP_
+#pragma once
 
 #include <functional>
 #include <string>
 
 #include "AppWindow.hpp"
+#include "ListView.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Window.hpp"
-#include "ListView.hpp"
+#include <gui/widgets/BoxLayout.hpp>
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class ThreadViewWindow: public AppWindow {
-public:
-  ThreadViewWindow(app::Application *app);
-  virtual ~ThreadViewWindow();
+    namespace name
+    {
+        namespace window
+        {
+            inline std::string thread_view = "ThreadViewWindow";
+        };
+    }; // namespace name
 
-  // virtual methods
-  bool onInput(const InputEvent &inputEvent) override;
-  void onBeforeShow(ShowMode mode, SwitchData *data) override;
+    class ThreadViewWindow : public AppWindow
+    {
+      private:
+        gui::VBox *body = nullptr;
 
-  bool onDatabaseMessage( sys::Message* msgl ) override;
+      public:
+        ThreadViewWindow(app::Application *app);
+        virtual ~ThreadViewWindow();
 
-  void rebuild() override;
-  void buildInterface() override;
-  void destroyInterface() override;
+        // virtual methods
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-private:
-  ListView* list;
-};
+        bool onDatabaseMessage(sys::Message *msgl) override;
+
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_THREADVIEWWINDOW_HPP_ */

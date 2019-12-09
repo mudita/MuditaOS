@@ -12,6 +12,7 @@
 #include "windows/MessagesMainWindow.hpp"
 
 #include "ApplicationMessages.hpp"
+#include "windows/ThreadViewWindow.hpp"
 
 namespace app {
 
@@ -79,9 +80,8 @@ void ApplicationMessages::createUserInterface() {
 	gui::AppWindow *window = nullptr;
 
 	window = new gui::MessagesMainWindow(this);
-	windows.insert(
-			std::pair<std::string, gui::AppWindow*>(window->getName(), window));
-
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+    windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
 }
 
 void ApplicationMessages::destroyUserInterface() {

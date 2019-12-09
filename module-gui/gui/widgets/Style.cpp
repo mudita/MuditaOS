@@ -1,4 +1,5 @@
 #include "Style.hpp"
+#include <Label.hpp>
 
 namespace style::window {
 

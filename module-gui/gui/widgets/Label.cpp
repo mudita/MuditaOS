@@ -40,6 +40,17 @@ Label::Label( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t
     setFont(style::window::font::medium);
 }
 
+Label::Label(Item *parent, meta::Label label) : Label(parent, label.x, label.y, label.w, label.h, label.text)
+{
+    setPenFocusWidth(label.focus);
+    setPenWidth(label.no_focus);
+    setFont(label.font);
+    setDotsMode(label.dots);
+    setAlignement(label.align);
+    setRadius(label.radius);
+    setEdges(label.edges);
+}
+
 Label::~Label() {
 }
 
