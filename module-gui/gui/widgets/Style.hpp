@@ -1,9 +1,14 @@
 #pragma once
 
-#include <inttypes.h>
-#include <Label.hpp>
-#include <string>
 #include <Alignment.hpp>
+#include <gui/core/Color.hpp>
+#include <inttypes.h>
+#include <string>
+
+namespace gui
+{
+    class Label;
+};
 
 namespace style {
 const inline uint32_t window_height = 600;

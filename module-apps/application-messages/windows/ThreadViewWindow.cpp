@@ -27,68 +27,175 @@
 
 #include "../widgets/ThreadModel.hpp"
 
+#include <gui/widgets/Text.hpp>
+#include <widgets/ListItem.hpp>
+#include <widgets/ListItemProvider.hpp>
+#include <widgets/ListView.hpp>
 
-namespace gui {
-
-ThreadViewWindow::ThreadViewWindow(app::Application *app) :
-	AppWindow(app, "ThreadViewWindow")
-//	phonebookModel{ new PhonebookModel(app)}
+namespace gui
 {
-    setSize(480, 600);
-    buildInterface();
+    class LolListItem : public gui::ListItem
+    {
+        gui::Label *body = nullptr;
 
-}
+      public:
+        LolListItem(int i = 0)
+        {
+            { // copied from ThreadItem
+                minWidth = 431;
+                minHeight = 100;
+                maxWidth = 431;
+                maxHeight = 100;
+                setRadius(0);
+                setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+                setPenWidth(0);
+                setPenFocusWidth(2);
+            }
 
-void ThreadViewWindow::rebuild() {
-    destroyInterface();
-    buildInterface();
-}
-void ThreadViewWindow::buildInterface() {
+            setID(i);
+            body = new gui::Label(this, gui::meta::Label({0, 0, 0, 0}));
+            body->setText("Text: " + std::to_string(i));
+        }
 
-	AppWindow::buildInterface();
+        // this won't work - copying label and other crap
+        LolListItem(const LolListItem &) = default;
 
-//	list = new gui::PhonebookListView(this, 11, 105, 480-22, 600-105-50 );
-//	list->setMaxElements(7);
-//	list->setPageSize(7);
-//	list->setPenFocusWidth(0);
-//	list->setPenWidth(0);
-//	list->setProvider( phonebookModel );
-//	list->setApplication( application );
+        bool onDimensionChanged(const gui::BoundingBox &oldDim, const gui::BoundingBox &newDim) override
+        {
+            LOG_INFO("Dim changed! %s : %d", body->getText().c_str(), getID());
+            LOG_INFO("%x", body);
+            body->setPosition(newDim.x, newDim.y);
+            body->setSize(newDim.w, newDim.h);
+            return true;
+        }
 
-	bottomBar->setActive(BottomBar::Side::LEFT, true);
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-    bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        virtual bool onFocus(bool state) override
+        {
+            ListItem::onFocus(state);
+            LOG_INFO("Focus changed for! %s", body->getText().c_str());
+            return true;
+        }
+    };
+}; // namespace gui
 
-    topBar->setActive(TopBar::Elements::TIME, true);
+class Provider : public gui::ListItemProvider
+{
+    std::map<int, gui::LolListItem *> items;
 
-    setTitle(utils::localize.get("app_messages_title_main"));
-}
-void ThreadViewWindow::destroyInterface() {
-    AppWindow::destroyInterface();
-    children.clear();
-}
+  public:
+    Provider(app::Application *app)
+    {
+    }
 
-ThreadViewWindow::~ThreadViewWindow() {
-	destroyInterface();
-}
+    virtual ~Provider() = default;
 
+    gui::ListItem *getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override
+    {
+        LOG_INFO("getItem");
+        if (index > getItemCount())
+        {
+            return nullptr;
+        }
+        if (items.find(index) == items.end())
+        {
+            items[index] = new gui::LolListItem(index);
+        }
+        // copy as getItem will push element onto list with parent..
+        return new gui::LolListItem(*items[index]);
+    }
 
-void ThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
-}
+    int getItemCount() const override
+    {
+        return 11;
+    };
+};
 
-bool ThreadViewWindow::onInput(const InputEvent &inputEvent) {
-	return AppWindow::onInput( inputEvent );
-}
+namespace gui
+{
 
-bool ThreadViewWindow::onDatabaseMessage( sys::Message* msgl ) {
-//	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
-//	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
-//		return true;
+    ThreadViewWindow::ThreadViewWindow(app::Application *app) : AppWindow(app, name::window::thread_view)
+    {
+        AppWindow::buildInterface();
+        setTitle(utils::localize.get("app_messages_title_main"));
+        topBar->setActive(TopBar::Elements::TIME, true);
+        bottomBar->setActive(BottomBar::Side::LEFT, true);
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        body = new gui::VBox(this, 0, title->offset_h(), this->getWidth(), bottomBar->getY() - title->offset_h());
+        body->setPenWidth(0);
+        body->setPenFocusWidth(0);
 
-	return false;
-}
+        // dummy new text
+        auto text = new gui::Text(nullptr, 0, 0, 480, 100, "", gui::Text::ExpandMode::EXPAND_UP);
+        text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
+        text->setPenFocusWidth(2);
+        text->setPenWidth(2);
+        text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        body->tryAddWidget(text);
+
+        /// dummy sms thread - TODO TODO load from db
+        /// this is not 'static' do it on window focus (on swtich window)
+        auto labelmeta = gui::meta::Label({0, 0, 480, 100});
+        labelmeta.edges = RectangleEdgeFlags::GUI_RECT_ALL_EDGES;
+        labelmeta.radius = 3;
+        labelmeta.focus = 3;
+        labelmeta.no_focus = 1;
+        auto label = new gui::Label(nullptr, labelmeta);
+        label->setText("Dummy text");
+        body->tryAddWidget(label);
+        label = new gui::Label(nullptr, gui::meta::Label({0, 0, 480, 100}));
+        label->setText("Dummy text2");
+        body->tryAddWidget(label);
+        label = new gui::Label(nullptr, gui::meta::Label({0, 0, 480, 100}));
+        label->setText("Dummy text3");
+        body->tryAddWidget(label);
+
+        /// setup
+        body->setReverseOrder(true);
+        body->setVisible(true);
+        setFocusItem(body);
+    }
+
+    void ThreadViewWindow::rebuild()
+    {
+        destroyInterface();
+        buildInterface();
+    }
+
+    void ThreadViewWindow::buildInterface()
+    {
+    }
+
+    void ThreadViewWindow::destroyInterface()
+    {
+        AppWindow::destroyInterface();
+        children.clear();
+    }
+
+    ThreadViewWindow::~ThreadViewWindow()
+    {
+        destroyInterface();
+    }
+
+    void ThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+    }
+
+    bool ThreadViewWindow::onInput(const InputEvent &inputEvent)
+    {
+        return AppWindow::onInput(inputEvent);
+    }
+
+    bool ThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        //	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
+        //	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
+        //		return true;
+
+        return false;
+    }
 
 } /* namespace gui */
