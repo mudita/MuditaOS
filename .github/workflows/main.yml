@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        token: ${{ secrets.ACCESS_TOKEN }}
+        token: ${{ secrets.GitHub_PAT }}
         submodules: true
     - name: Run bootstrap
       run: |
