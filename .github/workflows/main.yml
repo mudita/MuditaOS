@@ -36,6 +36,4 @@ jobs:
         
     - name: Checkout submodules
       uses: textbook/git-checkout-submodule-action@2.0.0
-      #    - name: Build
-      #run: ./rebuild.sh && make -C build -j4
         
