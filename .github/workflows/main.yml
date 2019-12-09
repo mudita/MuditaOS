@@ -13,7 +13,6 @@ jobs:
         token: ${{ secrets.GitHub_PAT }}
         submodules: true
     - name: Run bootstrap & Build
-      uses: textbook/git-checkout-submodule-action@2.0.0
       run: |
         echo "Install neccessary packages"
         ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
