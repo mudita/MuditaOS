@@ -23,14 +23,13 @@ jobs:
         [[ ! -d ${HOME}/${ARM_GCC} ]] &&
         tar -xf ${ARM_GCC}.tgz -C ${HOME}/
         echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
-        echo "remove preinstalled cmake"
-        sudo apt -q -y remove cmake
-        which cmake
         [[ ! -f ${CMAKEV}.tgz ]] && wget --no-verbose -O ${CMAKEV}.tgz https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
         [[ ! -d ${HOME}/${CMAKEV} ]] && tar -xf ${CMAKEV}.tgz -C ${HOME}/
         echo "Set path for cmake"
         echo 'export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
         export PATH="${HOME}/${CMAKEV}/bin:$PATH"
+        whereis cmake
+        which cmake
         echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
         echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
