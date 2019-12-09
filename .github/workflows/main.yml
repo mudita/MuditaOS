@@ -12,7 +12,8 @@ jobs:
       with:
         token: ${{ secrets.GitHub_PAT }}
         submodules: true
-    - name: Run bootstrap
+    - name: Run bootstrap & Build
+      uses: textbook/git-checkout-submodule-action@2.0.0
       run: |
         echo "Install neccessary packages"
         ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
@@ -31,12 +32,10 @@ jobs:
         echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
         echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
+        ./rebuild.sh && make -C build -j4
         
     - name: Checkout submodules
       uses: textbook/git-checkout-submodule-action@2.0.0
-    - name: Build
-      run: |
-        echo 'export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
-        export PATH="${HOME}/${CMAKEV}/bin:$PATH"
-        ./rebuild.sh && make -C build -j4
+      #    - name: Build
+      #run: ./rebuild.sh && make -C build -j4
         
