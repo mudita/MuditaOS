@@ -48,9 +48,6 @@ sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage* msgl,s
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularSMSMulticast) )
 	{
 		CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
-		LOG_INFO("ODEBRANY MULTICAST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		LOG_INFO("Num: %s, text: %s", msg->number.c_str(), msg->message.c_str());
-
 		auto pos = windows.find("Message");
 		if(pos != windows.end())
 		{

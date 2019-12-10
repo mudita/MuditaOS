@@ -208,17 +208,13 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Change incoming call notification from "RING" to "+CRING:type"
     CheckATCommandResponse(parser->SendCommand("AT+CRC=1\r", 1));
     // Turn on caller's number presentation
-
     // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
     CheckATCommandResponse(parser->SendCommand("AT+CLIP=1\r", 1, 15000));
-
     // Set Message format to Text
     CheckATCommandResponse(parser->SendCommand("AT+CMGF=1\r", 1));
     //Set ucs2 message format
-
     CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"UCS2\"\r", 1));
 //    CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"GSM\"\r", 1));
-
     // Set SMS prefferd storage
     CheckATCommandResponse(parser->SendCommand("AT+CPMS=“ME”,“ME”,“ME”", 2));
 

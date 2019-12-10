@@ -176,7 +176,5 @@ std::string UCS2::modemStr(void)
 		ss << buffer[i];
 	}
 
-	LOG_INFO("%s", ss.str().c_str());
-
 	return ss.str();
 }

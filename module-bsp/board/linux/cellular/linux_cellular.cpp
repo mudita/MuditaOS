@@ -24,7 +24,7 @@
 #include "mutex.hpp"
 #include <map>
 
-#define _LINUX_UART_DEBUG   1
+#define _LINUX_UART_DEBUG   0
 
 namespace bsp {
 

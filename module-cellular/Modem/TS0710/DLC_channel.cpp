@@ -145,7 +145,6 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 				if (/*TS0710_Frame::isComplete(_d)*/(_d.size() > 1)
 						&& (_d[0] == 0xF9) && (_d[_d.size() - 1] == 0xF9)) {
 					//LOG_DEBUG("Pushing back FRAME");
-					LOG_INFO("mFrame %s", _d);
 					mFrames.push_back(_d);
 					_d.clear();
 				}
@@ -229,7 +228,6 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 			//tokenize responseBuffer
 //             auto ret = ATParser::Tokenizer(str, rxCount, "\r\n");
 //             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-			LOG_INFO("str: %s", str.c_str());
 			auto pos = str.find(">");
 			if (pos != std::string::npos) {
 				tokens.push_back(str.substr(pos, strlen(">")));

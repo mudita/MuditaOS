@@ -69,14 +69,11 @@ ServiceCellular::ServiceCellular()
                 break;
 
             case CellularNotificationMessage::Type::NewIncomingSMS:
-                //TODO:M.P fill message's fields
             {
             	std::string notification(data.begin(), data.end() );
             	auto begin = notification.find(",");
             	auto end = notification.find("\r");
             	msg->data  = notification.substr(begin + 1, end);
-            	//todo remove log
-            	LOG_INFO("SMS notification: %s", notification.c_str());
             }
                 break;
 
@@ -253,6 +250,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
             if (cmux->StartMultiplexer() == TS0710::ConfState::Success)
             {
+
                 LOG_DEBUG("[ServiceCellular] Modem is fully operational");
 
                 DLC_channel *notificationsChannel = cmux->GetChannel("Notifications"); // open channel - notifications
@@ -263,6 +261,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 }
 
                 state = State::Ready;
+
             }
             else
             {
@@ -379,11 +378,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 	case MessageType::CellularSendSMS: {
         	CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
 
-
-        	std::string number = "666600925";
-//        	std::string number = "696027617";
-        	std::string text = "ELO tu PurePhone taki dlugi sms co ąś to będzie jak to bedzie polskich znakpow ni ma jeszcze cos dopisze na wszelki wypadek, zaraz pisze polskie znaki :)";
-//        	std::string text = "ELO tu PurePhone ąś";
         	this->sendSMS(msg->number, msg->message);
 
 
@@ -458,25 +452,14 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 
 	//if text fit in single message send
 	if (textLen < singleMessageLen) {
-		LOG_INFO("Sending single message");
 
 		auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
 				("AT+CMGS=\"" + UCS2(number).modemStr() + "\"\r").c_str(), 1, 1000);
 
-		LOG_INFO("Ret size %d", retCommand.size());
-
 		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
-			LOG_INFO("Prompt received send text");
 			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
 					(UCS2(text).modemStr() + "\032").c_str(), 1);
-
-			LOG_INFO("retText size %d", retText.size());
-
 			return true;
-			//todo clean
-			if ((retCommand.size() != 0)) {
-//				LOG_INFO("Ret size %d, %s", retText.size(), retText[0].c_str());
-			}
 		}
 	}
 	//split text, and send concatenated message
@@ -494,9 +477,6 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 			return false;
 		}
 
-		LOG_INFO("Concatenated message: message length %d, parts count %d",
-				textLen, messagePartsCount);
-
 		for(uint32_t i = 0; i < messagePartsCount; i++)
 		{
 
@@ -507,9 +487,6 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 			std::string messagePart = text.substr(i * singleMessageLen,
 					partLength);
 
-			LOG_INFO("Sending concatenated message part %d, total parts %d", i,
-					messagePartsCount);
-			LOG_INFO("Sending concatenated part: %s", messagePart.c_str());
 
 			std::string command(
 					"AT+QCMGS=\"" + UCS2(number).modemStr() + "\",120,"
@@ -525,19 +502,8 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 						cmux->GetChannel("Commands")->SendCommandResponse(
 								 (UCS2(messagePart).modemStr()
 										+ "\032").c_str(), 2, 2000);
-				LOG_INFO("sended size %d", sended.size());
-
-				if(sended.size() > 0)
-				{
-					for(uint32_t c = 0; c < sended.size(); c++)
-					{
-						LOG_INFO("%s", sended[c].c_str());
-					}
-				}
 			}
 		}
-
-//		LOG_INFO("")
 	}
 	return false;
 }
@@ -546,9 +512,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 
 	std::string command("AT+QCMGR=" + messageNumber + "\r");
 
-	LOG_INFO("Command: %s", command.c_str());
 	auto ret = cmux->GetChannel("Commands")->SendCommandResponse(
-			command.c_str(), 3, 2000);
+			command.c_str(), 2, 2000);
 
 	bool messageParsed = false;
 
@@ -564,18 +529,16 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				while (std::getline(ss, token, ',')) {
 					tokens.push_back(token);
 				}
+				tokens[1].erase(
+						std::remove(tokens[1].begin(), tokens[1].end(), '\"'),
+						tokens[1].end());
+				receivedNumber = UCS2(tokens[1]).toUTF8();
+
 				//if its single message process
 				if (tokens.size() == 5) {
 					//todo add message to database
-					LOG_INFO("Single SMS");
-					LOG_INFO("message: %s", ret[i+1].c_str());
-					messageRawBody = ret[i+1];
 
-					tokens[1].erase(
-							std::remove(tokens[1].begin(), tokens[1].end(),
-									'\"'), tokens[1].end());
-					receivedNumber = UCS2(tokens[1]).toUTF8();
-					LOG_INFO("Number: %s", receivedNumber.c_str());
+					messageRawBody = ret[i+1];
 					messageParsed = true;
 				}
 				//if its concatenated message wait for last message
@@ -586,38 +549,35 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 
 					if (current == last) {
 						messageParts.push_back(ret[i + 1]);
-						LOG_INFO("Concatenated");
-
 
 						for (uint32_t j = 0; j < messageParts.size(); j++) {
 							messageRawBody += messageParts[j];
 						}
-
+						messageParts.clear();
 						messageParsed = true;
 					} else {
-						LOG_INFO("Message part %s", ret[i + 1].c_str());
 						messageParts.push_back(ret[i + 1]);
 					}
 				}
 			}
 		}
-		if(messageParsed)
-		{
+		if (messageParsed) {
 			messageParsed = false;
 			UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
-			LOG_INFO("message: %s", decodedMessage.c_str());
 
 			// todo temporary send multicast
-			auto msg = std::make_shared<CellularSMSRequestMessage>(MessageType::CellularSMSMulticast);
+			auto msg = std::make_shared<CellularSMSRequestMessage>(
+					MessageType::CellularSMSMulticast);
 
 			msg->number = receivedNumber;
 			msg->message = decodedMessage;
 
-			sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularSMSNotification, this);
+			sys::Bus::SendMulticast(msg,
+					sys::BusChannels::ServiceCellularSMSNotification, this);
 		}
 	}
 	//delete message from modem memory
-	LOG_INFO("Delete message");
 	cmux->GetChannel("Commands")->SendCommandResponse(
 			("AT+CMGD=" + messageNumber).c_str(), 1, 150);
+	return true;
 }
