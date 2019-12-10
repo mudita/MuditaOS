@@ -561,6 +561,19 @@ bool Text::onInput(const InputEvent &inputEvent)
         return false;
     }
 
+    // get how many short presses were handled in this widget
+    if (translator.getTimes())
+    {
+        handleBackspace();
+        res = handleChar(code);
+        if (res)
+        {
+            updateCursor();
+            contentCallback(*this);
+        }
+        return res;
+    }
+
     // if char is a new line char then create new line and move caret and return
     if (code== 0x0A)
     {
