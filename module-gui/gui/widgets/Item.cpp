@@ -127,6 +127,14 @@ void Item::setSize( const short& w, const short& h ) {
 	onDimensionChanged(oldArea, widgetArea);
 }
 
+void Item::setBoundingBox(const BoundingBox &new_box)
+{
+    BoundingBox oldArea = widgetArea;
+    widgetArea = new_box;
+    updateDrawArea();
+    onDimensionChanged(oldArea, widgetArea);
+}
+
 void Item::setRadius( int value ) {
 	if( value < 0 )
 		value = 0;

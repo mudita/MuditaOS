@@ -104,6 +104,7 @@ public:
 	virtual void setVisible( bool value );
 	virtual void setPosition( const short& x, const short& y );
 	virtual void setSize( const short& w, const short& h );
+    virtual void setBoundingBox(const BoundingBox &new_box);
 	virtual std::list<DrawCommand*> buildDrawList();
 	virtual void setRadius( int value );
 
