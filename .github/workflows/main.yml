@@ -37,8 +37,6 @@ jobs:
     - name: Build
       run: |
         echo 'set(TOOLCHAIN_PATH "/home/runner/gcc-arm-none-eabi-9-2019-q4-major" CACHE INTERNAL "")' > ./env.cmake
+        sudo apt-get -q -y remove cmake
         ./config/bootstrap.sh
-        echo 'export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
-        export PATH="${HOME}/${CMAKEV}/bin:$PATH"
-        echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         ./rebuild.sh && make -C build -j4

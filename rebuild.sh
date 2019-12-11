@@ -5,6 +5,9 @@ ASSETS_DIR="assets"
 SYS_DIR="sys"
 DB_DIR="db"
 
+whereis cmake
+which cmake
+
 function check_submodules() {
     local gitlist=$(cat .gitmodules | grep path | cut -d ' ' -f 3)
     for el in $gitlist; do
