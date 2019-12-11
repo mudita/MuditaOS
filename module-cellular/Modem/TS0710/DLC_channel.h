@@ -53,9 +53,9 @@ public:
 
 
 	std::vector<std::string> SendCommandResponse(const char *cmd,
-			size_t rxCount, uint32_t timeout = 100);
+			size_t rxCount, uint32_t timeout = 300);
 	std::vector<std::string> SendCommandPrompt(const char *cmd, size_t rxCount,
-			uint32_t timeout = 100);
+			uint32_t timeout = 300);
 
     int ParseInputData(std::vector<uint8_t> &data);
 

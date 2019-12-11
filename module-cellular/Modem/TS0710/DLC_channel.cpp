@@ -89,15 +89,16 @@ ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 
 std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 		size_t rxCount, uint32_t timeout) {
-	std::vector<std::string> tokens;
-	std::vector<char> sdata(cmd, cmd + strlen(cmd));
-	// Get a char pointer to the data in the vector
-	char *buf = sdata.data();
-	// cast from char pointer to unsigned char pointer
-	unsigned char *membuf = reinterpret_cast<unsigned char*>(buf);
-	std::vector<uint8_t> data(membuf, membuf + sdata.size());
-	bool wait_for_data = true;
 
+	std::vector<std::string> tokens;
+	std::vector<uint8_t> data(cmd, cmd + strlen(cmd));
+
+    // Remove \r and \n for logging purposes
+    std::string cmdStr(cmd);
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
+
+    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
 
 	blockedTaskHandle = xTaskGetCurrentTaskHandle();
 	SendData(data);
@@ -187,13 +188,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 		size_t rxCount, uint32_t timeout) {
 	std::vector<std::string> tokens;
-	std::vector<char> sdata(cmd, cmd + strlen(cmd));
-	// Get a char pointer to the data in the vector
-	char *buf = sdata.data();
-	// cast from char pointer to unsigned char pointer
-	unsigned char *membuf = reinterpret_cast<unsigned char*>(buf);
-	std::vector<uint8_t> data(membuf, membuf + sdata.size());
-	bool wait_for_data = true;
+	std::vector<uint8_t> data(cmd, cmd + strlen(cmd));
 
 	blockedTaskHandle = xTaskGetCurrentTaskHandle();
 	SendData(data);

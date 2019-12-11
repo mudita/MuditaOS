@@ -214,6 +214,7 @@ TS0710::ConfState TS0710::ConfProcedure() {
     CheckATCommandResponse(parser->SendCommand("AT+CMGF=1\r", 1));
     //Set ucs2 message format
     CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"UCS2\"\r", 1));
+    //todo remove unneeded command
 //    CheckATCommandResponse(parser->SendCommand("AT+CSCS=\"GSM\"\r", 1));
     // Set SMS prefferd storage
     CheckATCommandResponse(parser->SendCommand("AT+CPMS=“ME”,“ME”,“ME”", 2));

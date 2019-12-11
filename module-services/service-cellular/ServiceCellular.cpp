@@ -70,6 +70,7 @@ ServiceCellular::ServiceCellular()
 
             case CellularNotificationMessage::Type::NewIncomingSMS:
             {
+            	//find message number
             	std::string notification(data.begin(), data.end() );
             	auto begin = notification.find(",");
             	auto end = notification.find("\r");
@@ -186,11 +187,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 			LOG_INFO("New incoming sms received");
 			receiveSMS(msg->data);
 		}
-        else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
-        {
-            sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure), GetName(), this);
-            state = State ::ModemConfigurationInProgress;
-        }
         else
         {
             // ignore rest of notifications
@@ -373,15 +369,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 				break;
 			}
 		}
+		responseMsg = std::make_shared<CellularResponseMessage>(false);
 	}
 		break;
 	case MessageType::CellularSendSMS: {
         	CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
 
-        	this->sendSMS(msg->number, msg->message);
+        	auto ret = this->sendSMS(msg->number, msg->message);
 
-
-        	responseMsg = std::make_shared<CellularResponseMessage>(true);
+        	responseMsg = std::make_shared<CellularResponseMessage>(ret);
         }
         	break;
 
@@ -504,6 +500,7 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 										+ "\032").c_str(), 2, 2000);
 			}
 		}
+		return true;
 	}
 	return false;
 }
