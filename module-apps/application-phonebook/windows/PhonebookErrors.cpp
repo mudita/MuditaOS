@@ -92,8 +92,7 @@ void NoResults::setContactData()
 
 bool NoResults::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchQuery);
         application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
@@ -173,8 +172,7 @@ void ContactBlocked::setContactData()
 
 bool ContactBlocked::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchQuery);
         application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, std::move(data));

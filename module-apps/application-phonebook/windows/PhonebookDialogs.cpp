@@ -86,19 +86,10 @@ bool PhonebookDialog::handleSwitchData(SwitchData *data)
 
 bool PhonebookDialog::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_LF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
     {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        contact = nullptr;
-        return (true);
-    }
-    else if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-             ((inputEvent.state != InputEvent::State::keyReleasedLong)))
-    {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         contact = nullptr;
         return (true);
     }
