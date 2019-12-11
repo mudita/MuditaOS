@@ -2,7 +2,10 @@ SET(CMAKE_SYSTEM_NAME Generic)
 SET(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_SYSTEM_VERSION 1)
 
-
+if(${TOOLCHAIN_PATH} EQUAL "")
+	message("No TOOLCHAIN_PATH set. Setting to default")
+	set(TOOLCHAIN_PATH ~/gcc-arm-none-eabi-8-2019-q3-update)
+endif()
 
 set(TOOLCHAIN_PREFIX "arm-none-eabi")
 
