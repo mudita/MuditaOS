@@ -12,15 +12,13 @@
 
 #include <iomanip>
 #include "log/log.hpp"
+#include <iterator>
 
 const uint32_t UCS2::ucs2bufferExt = 16;
 
 UCS2::UCS2(void)
 {
-	sizeUsed = 0;
-	sizeAllocated = ucs2bufferExt;
-	buffer = new uint16_t[sizeAllocated];
-	length = 0;
+	this->clear();
 }
 
 UCS2::~UCS2()
@@ -29,30 +27,25 @@ UCS2::~UCS2()
 		delete[] buffer;
 }
 
-UCS2::UCS2(const uint16_t* text)
-{
-	uint32_t size = sizeof(text) / sizeof(text[0]);
-	LOG_INFO("sizeof text = %d", size);
-
-	if(size >= ucs2bufferExt)
-		sizeAllocated = size + ucs2bufferExt;
-	else
-		sizeAllocated = ucs2bufferExt;
-
-	sizeUsed = size * 2;
-	length = size ;
-	buffer = new uint16_t[sizeAllocated];
-}
+//UCS2::UCS2( uint16_t* text)
+//{
+//	uint32_t size = sizeof(text) / sizeof(text[0]);
+//
+//	LOG_INFO("sizeof text = %d", size);
+//
+//	if(size >= ucs2bufferExt)
+//		sizeAllocated = size + ucs2bufferExt;
+//	else
+//		sizeAllocated = ucs2bufferExt;
+//
+//	sizeUsed = size * 2;
+//	length = size ;
+//	buffer = new uint16_t[sizeAllocated];
+//}
 
 UCS2::UCS2(const UTF8& string)
 {
-	sizeUsed = 0;
-	sizeAllocated = ucs2bufferExt;
-
-	if(buffer == nullptr)
-		delete[] buffer;
-	buffer = new uint16_t[ucs2bufferExt];
-	length = 0;
+	this->clear();
 
 	for (uint32_t i = 0; i < string.length(); i++)
 	{
@@ -74,21 +67,29 @@ UCS2::UCS2(const UTF8& string)
 
 UCS2::UCS2(const std::string& string)
 {
-	sizeUsed = 0;
-	sizeAllocated = ucs2bufferExt;
-	if(buffer == nullptr)
-		delete[] buffer;
-	buffer = new uint16_t[ucs2bufferExt];
-	length = 0;
+	this->clear();
+
 
 	for(unsigned int i = 0; i < string.size()/4; i++)
 	{
-		uint16_t ucs2char = std::stoi(string.substr(i*4, 4), 0, 16);
-
+		uint16_t ucs2char;
+		try
+		{
+			ucs2char = std::stoi(string.substr(i*4, 4), 0, 16);
+		}
+		catch (std::invalid_argument& e)
+		{
+			LOG_ERROR("UCS2::UCS2(const std::string& string) failed.");
+			this->clear();
+		}
+		catch (std::out_of_range& e)
+		{
+			this->clear();
+			LOG_ERROR("UCS2::UCS2(const std::string& string) failed.");
+		}
 		if(0xffff0000 & ucs2char)
 		{
-			sizeUsed = 0;
-			length = 0;
+			this->clear();
 			LOG_ERROR("UCS2::UCS2(const UTF8& string) failed, provided char is out of range");
 			//break;
 		}
@@ -101,6 +102,8 @@ UCS2::UCS2(const std::string& string)
 }
 UCS2::UCS2(UCS2& ucs)
 {
+	this->clear();
+
 	this->sizeUsed = ucs.getSizeUsed();
 	this->	sizeAllocated = ucs.getSizeAlocated();
 	this->length = ucs.getLength();
@@ -177,4 +180,14 @@ std::string UCS2::modemStr(void)
 	}
 
 	return ss.str();
+}
+
+void UCS2::clear(void)
+{
+	sizeUsed = 0;
+	sizeAllocated = ucs2bufferExt;
+	if(buffer != nullptr)
+		delete[] buffer;
+	buffer = new uint16_t[ucs2bufferExt];
+	length = 0;
 }

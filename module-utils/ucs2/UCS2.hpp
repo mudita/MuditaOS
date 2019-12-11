@@ -24,11 +24,12 @@ private:
     uint32_t length;
     //
     static const uint32_t ucs2bufferExt;
+    void clear(void);
 public:
     //default constructor
     UCS2(void);
     //
-    UCS2(const uint16_t* text);
+//    UCS2( uint16_t* text);
     /*
      * @brief Initializes new ucs2 string from utf8 string. It's used to convert text from
      * utf8 to ucs2.

@@ -68,11 +68,7 @@ void SettingsMainWindow::buildInterface() {
             }) );
 
 	//add option date and time option
-//	options.push_back( addOptionLabel( utils::localize.get("app_settings_date_and_time"), [=](gui::Item&){ return true;}) );
-	options.push_back( addOptionLabel( "Test message", [=](gui::Item&){
-	    	LOG_INFO("switching to test message page" );
-	    	application->switchWindow("Message", nullptr );
-		return true;}) );
+	options.push_back( addOptionLabel( utils::localize.get("app_settings_date_and_time"), [=](gui::Item&){ return true;}) );
 
 	//add option display option
 	options.push_back( addOptionLabel( utils::localize.get("app_settings_display"), [=](gui::Item&){ return true;} ));

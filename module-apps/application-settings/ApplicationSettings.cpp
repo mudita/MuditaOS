@@ -45,19 +45,19 @@ sys::Message_t ApplicationSettings::DataReceivedHandler(sys::DataMessage* msgl,s
 	//this variable defines whether message was processed.
 	bool handled = true;
 
-	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularSMSMulticast) )
-	{
-		CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
-		auto pos = windows.find("Message");
-		if(pos != windows.end())
-		{
-			if( currentWindow == pos->second)
-			{
-				gui::TestMessageWindow* window = reinterpret_cast<gui::TestMessageWindow*>(pos->second);
-				window->cellularMessageCallback(msg->number, msg->message);
-			}
-		}
-	}
+//	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularSMSMulticast) )
+//	{
+//		CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
+//		auto pos = windows.find("Message");
+//		if(pos != windows.end())
+//		{
+//			if( currentWindow == pos->second)
+//			{
+//				gui::TestMessageWindow* window = reinterpret_cast<gui::TestMessageWindow*>(pos->second);
+//				window->cellularMessageCallback(msg->number, msg->message);
+//			}
+//		}
+//	}
 
 
 	if( handled )
@@ -100,8 +100,8 @@ void ApplicationSettings::createUserInterface() {
 	window = new gui::UiTestWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
-	window = new gui::TestMessageWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+//	window = new gui::TestMessageWindow(this);
+//	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
 void ApplicationSettings::destroyUserInterface() {
