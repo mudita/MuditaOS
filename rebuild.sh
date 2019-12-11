@@ -5,6 +5,7 @@ ASSETS_DIR="assets"
 SYS_DIR="sys"
 DB_DIR="db"
 
+export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"
 whereis cmake
 which cmake
 
