@@ -25,9 +25,7 @@ class PhonebookOptionsNamecard : public AppWindow
     const std::string formatVCARD();
 
   protected:
-    Label *title = nullptr;
     Text *dbg = nullptr;
-    Label *topSeparatorLabel = nullptr;
     std::vector<gui::Item *> options;
     std::shared_ptr<ContactRecord> contact = nullptr;
     Item *addOptionLabel(const std::string &text, bool hasSubOptions, std::function<bool(Item &)> activatedCallback);

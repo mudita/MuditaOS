@@ -71,8 +71,6 @@ void PhonebookContact::buildInterface()
     blockedLabel = addLabel(nullptr, 329, 144, 75, 20, utils::localize.get("app_phonebook_contact_speed_blocked_uppper"), style::phonebook::font::tinybold,
                             RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    topSeparatorLabel = addLabel(nullptr, 0, 179, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-
     // page1 contents
     informationLabel =
         addLabel(&page1, 30, 203, 413, 20, utils::localize.get("app_phonebook_contact_information"), style::window::font::small,

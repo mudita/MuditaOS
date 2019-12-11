@@ -58,12 +58,7 @@ void PhonebookOptions::buildInterface()
     topBar->setActive(TopBar::Elements::SIGNAL, true);
     topBar->setActive(TopBar::Elements::BATTERY, true);
 
-    title = new Label(this, 0, 50, 480, 50);
-    title->setFilled(false);
-    title->setBorderColor(gui::ColorNoColor);
-    title->setFont(style::header::font::title);
-    title->setText(utils::localize.get("app_phonebook_options_title"));
-    title->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    setTitle(utils::localize.get("app_phonebook_options_title"));
 
     topSeparatorLabel = new Label(this, 0, 105, 480, 1);
     topSeparatorLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);

@@ -69,7 +69,6 @@ class PhonebookContact : public AppWindow
     Label *blockedLabel = nullptr;
     Label *speedDialLabel = nullptr;
     Label *speedDial = nullptr;
-    Label *topSeparatorLabel = nullptr;
     Label *noteLabel = nullptr;
     Text *noteText = nullptr;
 

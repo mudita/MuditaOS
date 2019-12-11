@@ -54,7 +54,6 @@ void PhonebookSearch::buildInterface()
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_search"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    topSeparatorLabel = addLabel(nullptr, 0, 104, 480, 1, "", "", RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
     searchHeader = addLabel(nullptr, 30, 127, 90, 20, utils::localize.get("app_phonebook_search_win_search"));
 
     informationLabel = new Text(this, 45, 315, 390, 90);
@@ -72,7 +71,7 @@ void PhonebookSearch::buildInterface()
     inputField->setPenWidth(3);
     inputField->setEditMode(Text::EditMode::EDIT);
     inputField->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-    // inputField->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+    inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
     inputField->setFont(style::window::font::small);
 
     searchTop = new Image(this, 420, 153, 32, 32, "search");

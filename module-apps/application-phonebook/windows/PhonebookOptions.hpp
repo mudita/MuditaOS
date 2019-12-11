@@ -22,7 +22,6 @@ class PhonebookOptions : public AppWindow
     bool handleSwitchData(SwitchData *data) override;
 
   protected:
-    Label *title = nullptr;
     Label *topSeparatorLabel = nullptr;
     std::vector<gui::Item *> options;
     std::shared_ptr<ContactRecord> contact = nullptr;

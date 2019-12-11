@@ -18,7 +18,6 @@ class PhonebookSearch : public AppWindow
 {
   protected:
     /** labels */
-    Label *topSeparatorLabel = nullptr;
     Label *searchHeader = nullptr;
     Text *informationLabel = nullptr;
     Text *inputField = nullptr;
