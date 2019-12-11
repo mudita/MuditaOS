@@ -32,21 +32,8 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() ;
-	void destroyUserInterface();
-};
-
-class ApplicationCalendarLauncher : public ApplicationLauncher {
-public:
-	ApplicationCalendarLauncher() : ApplicationLauncher("ApplicationCalendar", false) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationCalendar>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationCalendar>(name, parent ),caller);
-	};
+    void createUserInterface() override;
+    void destroyUserInterface() override;
 };
 
 } /* namespace app */

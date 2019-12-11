@@ -1,26 +1,22 @@
 #include "Application.hpp"
 
-namespace app
-{
+namespace app {
 
-class ApplicationPhonebook : public app::Application
-{
-  public:
-    ApplicationPhonebook(std::string name = "ApplicationPhonebook", std::string parent = "",
-                         bool startBackgound = false);
-    virtual ~ApplicationPhonebook();
+inline const std::string name_phonebook = "ApplicationPhonebook";
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-    sys::ReturnCodes InitHandler() override;
-    sys::ReturnCodes DeinitHandler() override;
+class ApplicationPhonebook: public app::Application {
+public:
+	ApplicationPhonebook( std::string name=name_phonebook, std::string parent="", bool startBackgound = false);
+	virtual ~ApplicationPhonebook();
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
-    {
-        return sys::ReturnCodes::Success;
-    }
+	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+	sys::ReturnCodes InitHandler() override;
+	sys::ReturnCodes DeinitHandler() override;
 
-    void createUserInterface() override;
-    void destroyUserInterface() override;
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+
+	void createUserInterface() override;
+	void destroyUserInterface() override;
 };
 
-} // namespace app
+}

@@ -196,7 +196,7 @@ int32_t Font::getKerning( uint32_t id1, uint32_t id2 ) {
 	return kern->amount;
 }
 
-uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const uint32_t& delimiter )
+uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint32_t& spaceConsumed, const bool fromBeginning, const uint32_t& delimiter )
 {
 	spaceConsumed = 0;
 
@@ -205,41 +205,45 @@ uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint3
 	uint32_t stringChars = 0;
 	uint16_t idLast = 0, idCurrent = 0;
 
-	for( uint32_t i=0; i<str.length(); ++i )
+    for(uint32_t i=0; i<str.length(); ++i )
 	{
-		if( i == 0 )
-		{
-			idCurrent = str[i];
-			FontGlyph* glyph = glyphs.find(idCurrent)->second;
-
-			if( glyph != NULL)
-			{
-
-				if( availableSpace - glyph->xadvance < 0 )
-				{
-					if( spaceConsumed )
-						spaceConsumed = space - availableSpace;
-					return stringChars;
-				}
-				availableSpace -= glyph->xadvance;
-			}
-		}
-		else
-		{
-			idCurrent = str[i];
-			FontGlyph* glyph = glyphs.find(idCurrent)->second;
-
-			int32_t kern_value = getKerning( idLast, idCurrent);
-			if( glyph )
-			{
-				if( availableSpace - (glyph->xadvance+kern_value) < 0 )
-				{
-					spaceConsumed = space - availableSpace;
-					return stringChars;
-				}
-				availableSpace -= glyph->xadvance+kern_value;
-			}
-		}
+        // go in reverse rather than UTF8::reverse. be careful, no NULL at the end.
+        uint32_t iAnyDir = fromBeginning ? i : (str.length() -1 - i); // i compensated for direction
+        idCurrent = str[iAnyDir];
+        auto it = glyphs.find(idCurrent);
+        if(it != glyphs.end()) {
+            FontGlyph* glyph = it->second;
+            if( glyph  )
+            {
+                if (i == 0)
+                {
+                    {
+                        if (availableSpace - glyph->xadvance < 0)
+                        {
+                            if (spaceConsumed)
+                            {
+                                spaceConsumed = space - availableSpace;
+                            }
+                            return stringChars;
+                        }
+                        availableSpace -= glyph->xadvance;
+                    }
+                }
+                else
+                {
+                    int32_t kern_value = getKerning(idLast, idCurrent);
+                    if (glyph)
+                    {
+                        if (availableSpace - (glyph->xadvance + kern_value) < 0)
+                        {
+                            spaceConsumed = space - availableSpace;
+                            return stringChars;
+                        }
+                        availableSpace -= glyph->xadvance + kern_value;
+                    }
+                }
+            }
+        }
 		idLast = idCurrent;
 		++stringChars;
 

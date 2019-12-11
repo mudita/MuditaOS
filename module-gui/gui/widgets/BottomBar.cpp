@@ -4,11 +4,12 @@
  *  Created on: 13 mar 2019
  *      Author: robert
  */
-#include "Label.hpp"
 #include "BottomBar.hpp"
+#include "Label.hpp"
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
+#include <log/log.hpp>
 
 namespace gui {
 
@@ -80,34 +81,37 @@ gui::Label* BottomBar::prepareLabel( BottomBar::Side side ) {
 	return label;
 }
 
-void BottomBar::setActive( BottomBar::Side side, bool active ) {
-	switch( side ) {
-		case Side::LEFT:
-			left->setVisible(active);
-			break;
-		case Side::CENTER:
-			center->setVisible(active);
-			break;
-		case Side::RIGHT:
-			right->setVisible(active);
-			break;
-	};
+Label *BottomBar::getSide(BottomBar::Side side)
+{
+    switch (side)
+    {
+    case Side::LEFT:
+        return left;
+    case Side::CENTER:
+        return center;
+    case Side::RIGHT:
+        return right;
+    default:
+        LOG_ERROR("shall never got here - just to ommit warning");
+        return right;
+    };
+    return nullptr;
 }
-void BottomBar::setText( BottomBar::Side side, const UTF8& str, bool active ) {
-	switch( side ) {
-		case Side::LEFT:
-			left->setText(str);
-			left->setVisible(active);
-			break;
-		case Side::CENTER:
-			center->setText(str);
-			center->setVisible(active);
-			break;
-		case Side::RIGHT:
-			right->setText(str);
-			right->setVisible(active);
-			break;
-	};
+
+void BottomBar::setActive(BottomBar::Side side, bool active)
+{
+    getSide(side)->setVisible(active);
+}
+
+void BottomBar::setText(BottomBar::Side side, const UTF8 &str, bool active)
+{
+    getSide(side)->setText(str);
+    setActive(side, active);
+}
+
+UTF8 BottomBar::getText(BottomBar::Side side)
+{
+    return getSide(side)->getText();
 }
 
 bool BottomBar::onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) {

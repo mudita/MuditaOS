@@ -271,17 +271,32 @@ public:
         PowerUp
     };
 
-    //channel 0 is mandatory - Control
-    DLC_channel *GetChannel(int index) { return channels.at(index); }
+    /// @brief Get Channel by index
+    /// @note channel 0 is mandatory - Control
+    /// @param index - index
+    /// @return pointer to channel or nullptr if such channel doesn't exist
+    DLC_channel *GetChannel(const size_t index) 
+    {
+        if(index >= channels.size())
+        {
+            LOG_ERROR("No channel with index %d", index);
+            return nullptr;
+        }
+        return channels[index]; 
+    }
 
-    DLC_channel *GetChannel(std::string name) { 
+    /// @brief Get Channel by name
+    /// @param name - channel name
+    /// @return pointer to channel or nullptr if such channel doesn't exist
+    DLC_channel *GetChannel(const std::string & name) { 
         for (auto it : channels) { 
             if (it->getName() == name) return it; 
-        } 
-        return nullptr; 
-    } //return channel or empty if such name dosen't exist
+        }
+        LOG_ERROR("Channel %s doesn't exist", name.c_str());
+        return nullptr;
+    } 
 
-    DLC_channel *OpenChannel(DLCI_t DLCI, std::string name) { 
+    DLC_channel *OpenChannel(DLCI_t DLCI, const std::string& name) { 
         DLC_channel *channel = new DLC_channel(DLCI, name, pv_cellular.get()); 
         channels.push_back(channel); 
         return channels.back();
@@ -292,7 +307,7 @@ public:
         channels.erase(channels.begin() + index); 
     }
 
-    void CloseChannel(std::string name) { 
+    void CloseChannel(const std::string & name) { 
         for (size_t i = 0; i < channels.size(); i++) { 
             if (channels.at(i)->getName() == name) {
                 delete channels.at(i); 

@@ -7,6 +7,7 @@
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include <cassert>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = { {TypeOfFrame_e::SABM, "SABM"}, {TypeOfFrame_e::UA, "UA"}, {TypeOfFrame_e::DM, "DM"}, {TypeOfFrame_e::DISC, "DISC"}, {TypeOfFrame_e::UIH, "UIH"}, {TypeOfFrame_e::UI, "UI"}, {TypeOfFrame_e::I, "I"} };
 std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text = { {PortSpeed_e::PS9600, 1}, {PortSpeed_e::PS19200, 2}, {PortSpeed_e::PS38400, 3}, {PortSpeed_e::PS57600, 4}, {PortSpeed_e::PS115200, 5}, {PortSpeed_e::PS230400, 6}, {PortSpeed_e::PS460800, 7} };
@@ -360,10 +361,12 @@ TS0710::ConfState TS0710::StartMultiplexer() {
 
     // Route URCs to second (Notifications) MUX channel
     DLC_channel *c = GetChannel("Commands");
-    CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1, 300));
+    if (c != nullptr) 
+    {
+        CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1, 300));
 
     /* Let's test if this actually works */
-    if (c != nullptr) {
+    
         LOG_DEBUG("Sending test ATI");
         std::vector<std::string> v = c->SendCommandResponse("ATI\r", 4, 300);
         CheckATCommandResponse(v);
@@ -395,6 +398,11 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         {
             LOG_ERROR("signal strength not set");
         }
+    }
+    else
+    {
+        LOG_ERROR("No channel");
+        ConfState::Failure;
     }
 
     return ConfState::Success;

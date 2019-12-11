@@ -16,7 +16,7 @@
 class TS0710_DATA {
 public: 
 
-TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t> User_data, bsp::Cellular *cellular);
+TS0710_DATA(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, std::vector<uint8_t>& User_data, bsp::Cellular *cellular);
 ~TS0710_DATA() {}
 
 private:
