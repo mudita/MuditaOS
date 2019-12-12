@@ -27,19 +27,20 @@ namespace app {
 ApplicationClock::ApplicationClock(std::string name,std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
 	Application( name, parent,false, stackDepth, priority )
 {
-    timerClockID = registerTimer(1000, true, [=]() {
-        auto it = windows.find("MainWindow");
-        gui::ClockMainWindow *win = reinterpret_cast<gui::ClockMainWindow *>(it->second);
-        win->incrementSecond();
-        win->updateLabels();
-        render(gui::RefreshModes::GUI_REFRESH_FAST);
-    });
-
-    ReloadTimer(timerClockID);
+    timerClock = CreateAppTimer(1000, true, [=]() {timerClockCallback(); });
+    timerClock.restart();
 }
 
 ApplicationClock::~ApplicationClock() {
 	// TODO Auto-generated destructor stub
+}
+
+void ApplicationClock::timerClockCallback () {
+    auto it = windows.find("MainWindow");
+    gui::ClockMainWindow *win = reinterpret_cast<gui::ClockMainWindow *>(it->second);
+    win->incrementSecond();
+    win->updateLabels();
+    render(gui::RefreshModes::GUI_REFRESH_FAST);
 }
 
 // Invoked upon receiving data message
@@ -77,7 +78,7 @@ sys::ReturnCodes ApplicationClock::InitHandler() {
 }
 
 sys::ReturnCodes ApplicationClock::DeinitHandler() {
-	DeleteTimer(timerClockID);
+	DeleteTimer(timerClock);
 	return sys::ReturnCodes::Success;
 }
 
