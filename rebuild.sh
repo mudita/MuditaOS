@@ -6,7 +6,7 @@ SYS_DIR="sys"
 DB_DIR="db"
 
 #check if we're building in CI
-if [ "${HOME} = "/home/runner" ]; then
+if [ "${HOME}" = "/home/runner" ]; then
 	export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"
 fi
 
