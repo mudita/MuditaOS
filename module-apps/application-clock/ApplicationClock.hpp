@@ -22,8 +22,8 @@ namespace app {
  *
  */
 class ApplicationClock: public Application {
-	uint32_t timerClockID = 0;
-
+    AppTimer timerClock;
+    void timerClockCallback();
 public:
 	ApplicationClock(std::string name, std::string parent = "", uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~ApplicationClock();
