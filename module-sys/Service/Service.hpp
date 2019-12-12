@@ -22,7 +22,7 @@ class ServiceTimer : public Timer
 public:
     ServiceTimer(const std::string& name,TickType_t tick,bool isPeriodic,uint32_t  idx, Service* service);
 
-	uint32_t GetId(){
+	uint32_t GetId() const{
 	    return m_id;
 	}
     static uint32_t GetNextUniqueID(){
