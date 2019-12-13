@@ -264,6 +264,11 @@ private:
     std::queue<uint8_t> RXFifo;
 
 public: 
+    void SimTrayStatus() {
+        if(pv_cellular) {
+            pv_cellular->ReadSimTrack();
+        }
+    }
     enum class ConfState{
         Success,
         Failure,

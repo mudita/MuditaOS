@@ -168,6 +168,28 @@ namespace bsp {
 
     }
 
+
+    /// raw sim track read - no IRQ
+    /// this should be read at start, than state of track should be notified from IRQ too
+    Cellular::SIM_status RT1051Cellular::ReadSimTrack()
+    {
+        Cellular::SIM_status ret = SIM_status::None;
+        if(GPIO_PinRead(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN)){
+            ret = SIM_status::SIM_1;
+        }
+        if( GPIO_PinRead(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT, BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN) ){
+            if(ret != SIM_status::SIM_1) {
+                ret = SIM_status::SIM_2;
+            } else {
+                ret = SIM_status::Both;
+            }
+        }
+        LOG_DEBUG("Track status:  %d", ret);
+        LOG_DEBUG("SIM SELECT:    %d",GPIO_PinRead(BSP_CELLULAR_SIM_CARD_SELECTION_PORT, BSP_CELLULAR_SIM_CARD_SELECTION_PIN));
+        LOG_DEBUG("SIM PRESENCE:  %d",GPIO_PinRead(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN));
+        return ret;
+    }
+
     void RT1051Cellular::PowerUp() {
         const TickType_t POWER_UP_DELAY_MS = 500;
 

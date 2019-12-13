@@ -27,6 +27,13 @@ namespace bsp {
         Cellular() {}
         virtual ~Cellular() {}
 
+        enum class SIM_status {
+            None,
+            SIM_1,
+            SIM_2,
+            Both
+        };
+        virtual SIM_status ReadSimTrack() =0;
 
         virtual void PowerUp() = 0;
 

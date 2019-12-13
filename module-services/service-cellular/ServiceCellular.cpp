@@ -346,6 +346,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::Ringing, msg->data),
                                         sys::BusChannels::ServiceCellularNotifications, this);
                 break;
+            } else {
+                // TODO move it to some better place - right now there is no design for notifications
+                cmux->SimTrayStatus();
+                // set error in verbose mode
+                auto ret = channel->SendCommandResponse("AT+CMEE=1\r",2, 5000);
+                cmux->CheckATCommandResponse(ret);
+                // diagnose, will return CMEE 10 if there is no card
+                ret = channel->SendCommandResponse("AT+CPIN?\r",2, 5000);
+                cmux->CheckATCommandResponse(ret);
             }
         }
         responseMsg = std::make_shared<CellularResponseMessage>(false);

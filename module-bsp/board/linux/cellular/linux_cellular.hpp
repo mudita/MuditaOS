@@ -32,6 +32,8 @@ namespace bsp {
         LinuxCellular(const char* term, uint32_t portSpeed);
         ~LinuxCellular();
 
+        virtual SIM_status ReadSimTrack() override { return SIM_status::SIM_1; };
+
         void PowerUp() override final;
 
         void PowerDown() override final;

@@ -40,6 +40,8 @@ namespace bsp {
 
         ~RT1051Cellular();
 
+        virtual SIM_status ReadSimTrack() override;
+
         void PowerUp() override final;
 
         void PowerDown() override final;
