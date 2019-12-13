@@ -97,7 +97,8 @@ extern uint32_t SystemCoreClock;
 
 /* Software timer related definitions. */
 #define configUSE_TIMERS                        1
-#define configTIMER_TASK_PRIORITY               0
+// we can either use timer in high priority as below, or use PRIVILEDGE_BIT in freertos
+#define configTIMER_TASK_PRIORITY               5
 #define configTIMER_QUEUE_LENGTH                48
 #define configTIMER_TASK_STACK_DEPTH            (1024)
 

@@ -39,7 +39,11 @@ void LPUART1_IRQHandler(void) {
                                          1,
                                          &xHigherPriorityTaskWoken);
 
-                if (xTimerResetFromISR(bsp::RT1051Cellular::rxTimeoutTimer, &xHigherPriorityTaskWoken) != pdTRUE) {
+                BaseType_t tmpval = xTimerResetFromISR(bsp::RT1051Cellular::rxTimeoutTimer, &xHigherPriorityTaskWoken);
+                // tmpval is just for debugging purposes, with freertos timer functionality on, without prio bits,
+                // with a lot of workload it will happen very fast (timer queue depth is set to 48 and any other thread
+                // have higher priority
+                if (tmpval != pdTRUE) {
                     assert(0);
                 }
             }
