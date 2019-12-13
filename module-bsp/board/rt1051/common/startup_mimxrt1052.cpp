@@ -453,6 +453,7 @@ extern void _vStackTop(void);
 #include <stdint.h>
 #include <log/log.hpp>
 #include <log/segger/SEGGER_RTT.h>
+#include <assert.h>
 
 //*****************************************************************************
 // The vector table.
@@ -1054,13 +1055,13 @@ HardFault_Handler_C(syslog_exception_stack_frame_t *frame __attribute__((unused)
 
     printHardFaultInfo(syslog);
 
-    while (1) {};
+    assert(0);
 }
 
 WEAK_AV void MemManage_Handler_C (syslog_exception_stack_frame_t* frame __attribute__((unused)),
                                   uint32_t lr __attribute__((unused)))
 {
-    while (1);
+    assert(0);
 }
 
 /*    extern void failure_exit(syslog_exception_stack_frame_t* frame,syslog_exception_source_t source);

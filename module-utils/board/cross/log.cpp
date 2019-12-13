@@ -215,21 +215,61 @@ extern "C" {
         return numBytes;
     }
 
-int vprintf (const char *__restrict __format, va_list __arg) {
-    /* Acquire lock */
-    if (!logger.logLock())
-    {
-        return -1;
+    int vprintf (const char *__restrict __format, va_list __arg) {
+        /* Acquire lock */
+        if (!logger.logLock())
+        {
+            return -1;
+        }
+        char* ptr = loggerBuffer;
+        ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, __arg);
+
+        unsigned int numBytes = ptr - loggerBuffer;
+        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
+
+        /* Release lock */
+        logger.logUnlock();
+
+        return numBytes;
     }
-    char* ptr = loggerBuffer;
-    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, __arg);
 
-    unsigned int numBytes = ptr - loggerBuffer;
-    SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
+    int log_assert(__const char *__restrict __format, ...)
+    {
+        /* Acquire lock */
+        if (!logger.logLock())
+        {
+            return -1;
+        }
 
-    /* Release lock */
-    logger.logUnlock();
+        char *ptr = loggerBuffer;
+        ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        logger_level level = LOGFATAL;
+        ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET, level_colors[level], level_names[level],
+                       xTaskGetCurrentTaskHandle() == NULL ? "CRIT" : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle()));
 
-    return numBytes;
-}
+        va_list args;
+        va_start(args, __format);
+        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, args);
+        va_end(args);
+
+        unsigned int numBytes = ptr - loggerBuffer;
+        #if LOG_REDIRECT_TO_SERIAL == 1
+            LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
+        #else
+            SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+        #endif
+
+        /* Release lock */
+        logger.logUnlock();
+
+        return numBytes;
+    }
+
+    void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
+    {
+        log_assert("\"%s\" failed: file \"%s\", line %d%s%s\n", failedexpr, file, line, func ? ", function: " : "", func ? func : "");
+
+        abort();
+        /* NOTREACHED */
+    }
 };
