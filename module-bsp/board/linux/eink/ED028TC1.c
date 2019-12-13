@@ -96,7 +96,10 @@ static shared_memory_header* createSHMBuffer( const char* name )
 	if ((shared_header =
 		mmap (NULL, sizeof (shared_memory_header)+shared_buffer_size, PROT_READ | PROT_WRITE, MAP_SHARED, shared_fd, 0)) == MAP_FAILED) {
 		printf("mmap failed");
-	}
+	} else {
+        //start renderer application
+        system( "./service_renderer &" );
+    }
 
 	shared_buffer = ((uint8_t*)shared_header) + sizeof( shared_memory_header );
 	eink_internal_buffer = shared_buffer + shared_buffer_size;
@@ -115,9 +118,6 @@ EinkStatus_e EinkResetAndInitialize()
 	if( createSHMBuffer( shared_name ) == NULL ){
 		return EinkError;
 	}
-
-	//start renderer application
-	system( "./service_renderer &" );
 
     return EinkOK;
 }
