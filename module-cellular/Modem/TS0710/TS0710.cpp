@@ -402,7 +402,7 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     else
     {
         LOG_ERROR("No channel");
-        ConfState::Failure;
+        return ConfState::Failure;
     }
 
     return ConfState::Success;
