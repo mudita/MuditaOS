@@ -156,7 +156,14 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
     std::vector<Field> row;
     for (uint32_t i = 0; i < (uint32_t)count; i++)
     {
-        row.push_back(Field{data[i]});
+        try
+        {
+            row.push_back(Field{data[i]});
+        }
+        catch (...)
+        {
+            LOG_FATAL("Error on: %d %s", i, data[i]);
+        }
     }
 
     db->AddRow(row);
