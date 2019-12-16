@@ -33,8 +33,10 @@ public:
 	RectangleFlatFlags flatEdges;
 	//flags that defines whether paint given corner (only for rounded corners)
 	RectangleCornerFlags corners;
+	//flags that define whether to paint japs. small protrusions indicating a speech bubble
+	RectangleYapFlags yaps;
 
-public:
+  public:
 
 	Rect();
 	Rect( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
@@ -47,7 +49,8 @@ public:
 	void setEdges( RectangleEdgeFlags edges );
 	void setCorners( RectangleCornerFlags corners );
 	void setFlat( RectangleFlatFlags flats);
-	void setFilled( bool val );
+    void setYaps(RectangleYapFlags yaps);
+    void setFilled( bool val );
 
 	//virtaul methods
 	std::list<DrawCommand*> buildDrawList();

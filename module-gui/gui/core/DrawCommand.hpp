@@ -117,17 +117,19 @@ public:
 	RectangleFlatFlags flatEdges;
 	//flags that defines whether paint given corner (only for rounded corners)
 	RectangleCornerFlags corners;
-	//defines which of the edges and corners are painted
+    //flags indicating yaps for speech bubbles, it takes precendece over other properties
+    RectangleYapFlags yaps;
+    //defines which of the edges and corners are painted
 	bool filled;
 	uint8_t penWidth;
 	Color fillColor;
 	Color borderColor;
-
-	CommandRectangle() : x{0}, y{0}, w{0}, h{0},
+    CommandRectangle() : x{0}, y{0}, w{0}, h{0},
 			radius{0},
 			edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
 			flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT},
 			corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
+			yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS},
 			filled{false},
 			penWidth{1},
 			fillColor( ColorFullBlack ), borderColor( ColorFullBlack ) {
