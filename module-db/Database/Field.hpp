@@ -21,8 +21,12 @@ class Field
     {
     }
 
-    Field(const char *value) : mValue(value)
+    Field(const char *value)
     {
+        if (value)
+        {
+            mValue = value;
+        }
     }
     // Field(Field const&);
 
