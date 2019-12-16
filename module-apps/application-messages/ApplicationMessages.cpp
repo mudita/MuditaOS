@@ -12,6 +12,7 @@
 #include "windows/MessagesMainWindow.hpp"
 
 #include "ApplicationMessages.hpp"
+#include "windows/NewMessage.hpp"
 #include "windows/ThreadViewWindow.hpp"
 
 namespace app {
@@ -75,13 +76,13 @@ sys::ReturnCodes ApplicationMessages::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-void ApplicationMessages::createUserInterface() {
-
-	gui::AppWindow *window = nullptr;
-
-	window = new gui::MessagesMainWindow(this);
+void ApplicationMessages::createUserInterface()
+{
+    gui::AppWindow *window = nullptr;
+    window = new gui::MessagesMainWindow(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
+    windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
 }
 
 void ApplicationMessages::destroyUserInterface() {

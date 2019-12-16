@@ -1,11 +1,3 @@
-/*
- * @file ThreadViewWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include <functional>
 #include <memory>
 
@@ -27,6 +19,8 @@
 
 #include "../widgets/ThreadModel.hpp"
 
+#include "../data/SMSdata.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include <gui/widgets/Text.hpp>
 #include <widgets/ListItem.hpp>
 #include <widgets/ListItemProvider.hpp>
@@ -124,39 +118,71 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
-        body = new gui::VBox(this, 0, title->offset_h(), this->getWidth(), bottomBar->getY() - title->offset_h());
+        auto elements_width = this->getWidth() - style::window::default_left_margin * 2;
+        body = new gui::VBox(this, style::window::default_left_margin, title->offset_h(), elements_width, bottomBar->getY() - title->offset_h());
         body->setPenWidth(0);
         body->setPenFocusWidth(0);
 
-        // dummy new text
-        auto text = new gui::Text(nullptr, 0, 0, 480, 100, "", gui::Text::ExpandMode::EXPAND_UP);
+        // new text, TODO TODO - send it and reload sms
+        auto text = new gui::Text(nullptr, 0, 0, elements_width, 100, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
         text->setPenFocusWidth(2);
         text->setPenWidth(2);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        // TODO IFS
+        text->activatedCallback = [=](gui::Item &item) {
+            LOG_INFO("Send SMS callback");
+            CellularServiceAPI::SendSMS(application, title->getText(), text->getText());
+            return true;
+        };
+
         body->tryAddWidget(text);
-
-        /// dummy sms thread - TODO TODO load from db
-        /// this is not 'static' do it on window focus (on swtich window)
-        auto labelmeta = gui::meta::Label({0, 0, 480, 100});
-        labelmeta.edges = RectangleEdgeFlags::GUI_RECT_ALL_EDGES;
-        labelmeta.radius = 3;
-        labelmeta.focus = 3;
-        labelmeta.no_focus = 1;
-        auto label = new gui::Label(nullptr, labelmeta);
-        label->setText("Dummy text");
-        body->tryAddWidget(label);
-        label = new gui::Label(nullptr, gui::meta::Label({0, 0, 480, 100}));
-        label->setText("Dummy text2");
-        body->tryAddWidget(label);
-        label = new gui::Label(nullptr, gui::meta::Label({0, 0, 480, 100}));
-        label->setText("Dummy text3");
-        body->tryAddWidget(label);
-
         /// setup
         body->setReverseOrder(true);
         body->setVisible(true);
         setFocusItem(body);
+    }
+
+    void ThreadViewWindow::cleanMessages()
+    {
+        // hack just to fix setting pos for now
+        if (body->children.size() > 1)
+        {
+            std::for_each(std::next(body->children.begin(), 1), body->children.end(), [=](auto el) { body->removeWidget(el); });
+        }
+    }
+
+    void ThreadViewWindow::addMessages(uint32_t thread_id)
+    {
+        auto elements_width = this->getWidth() - style::window::default_left_margin * 2;
+        LOG_INFO("=============================");
+        std::unique_ptr<std::vector<SMSRecord>> sms = DBServiceAPI::SMSGetLimitOffsetByThreadID(application, 0, 4, thread_id);
+        LOG_INFO("=============================");
+        /// dummy sms thread - TODO TODO load from db - on switchData
+        /// this is not 'static' do it on window focus (on swtich window)
+        auto labelmeta = gui::meta::Label({0, 0, elements_width, 100});
+        labelmeta.edges = RectangleEdgeFlags::GUI_RECT_ALL_EDGES;
+        labelmeta.radius = 3;
+        labelmeta.align = gui::Alignment::ALIGN_VERTICAL_TOP;
+        labelmeta.focus = 3;
+        labelmeta.no_focus = 1;
+        labelmeta.margins = Margins(0, 2, 0, 2);
+        // hack - tmp to fix fitting
+        body->setReverseOrder(false);
+        for (auto &el : *sms)
+        {
+            auto label = new gui::Label(nullptr, labelmeta);
+            label->setText(el.body);
+            LOG_INFO("Add sms: %s %s", el.body.c_str(), el.number.c_str());
+            if (body->tryAddWidget(label)) {}
+            else
+            {
+                delete label;
+                break;
+            }
+        }
+        body->setReverseOrder(true);
+        body->setNavigation();
     }
 
     void ThreadViewWindow::rebuild()
@@ -182,6 +208,16 @@ namespace gui
 
     void ThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        auto pdata = dynamic_cast<SMSThreadData *>(data);
+        if (pdata)
+        {
+            LOG_INFO("We have it! %d", pdata->thread->dbID);
+            // cleanMessages
+            addMessages(pdata->thread->dbID);
+            auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
+            // should be name number for now - easier to handle
+            setTitle(ret->front().number);
+        }
     }
 
     bool ThreadViewWindow::onInput(const InputEvent &inputEvent)

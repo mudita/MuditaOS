@@ -23,8 +23,9 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
-#include <log/log.hpp>
+#include "NewMessage.hpp"
 #include <Style.hpp>
+#include <log/log.hpp>
 
 namespace gui {
 
@@ -128,7 +129,18 @@ void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
 bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
 	//check if any of the lower inheritance onInput methods catch the event
-	return AppWindow::onInput(inputEvent);
+    if (AppWindow::onInput(inputEvent))
+    {
+        return true;
+    }
+    else
+    {
+        if (inputEvent.state == InputEvent::State::keyReleasedShort)
+        {
+            application->switchWindow(gui::name::window::new_sms, nullptr);
+        }
+    }
+    return false;
 }
 
 bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl) {
