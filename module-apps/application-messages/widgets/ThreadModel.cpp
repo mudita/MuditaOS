@@ -11,6 +11,7 @@
 #include "Application.hpp"
 
 #include "../MessagesStyle.hpp"
+#include "../data/SMSdata.hpp"
 #include "../windows/ThreadViewWindow.hpp" // for name of window
 
 #include "service-db/api/DBServiceAPI.hpp"
@@ -60,7 +61,7 @@ gui::ListItem* ThreadModel::getItem(int index, int fistElement, int prevElement,
             LOG_INFO("ThreadItem ActivatedCallback");
             if (application)
             {
-                application->switchWindow(gui::name::window::thread_view, nullptr);
+                application->switchWindow(gui::name::window::thread_view, std::make_unique<SMSThreadData>(thread));
             }
             else
             {

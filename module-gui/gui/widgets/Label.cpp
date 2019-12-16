@@ -49,6 +49,7 @@ Label::Label(Item *parent, meta::Label label) : Label(parent, label.x, label.y, 
     setAlignement(label.align);
     setRadius(label.radius);
     setEdges(label.edges);
+    setMargins(label.margins);
 }
 
 Label::~Label() {
