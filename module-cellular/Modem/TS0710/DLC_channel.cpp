@@ -133,16 +133,16 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 
 			responseBuffer.clear();
 			std::vector<std::vector<uint8_t>> mFrames;
-			std::vector<uint8_t> _d;
+			std::vector<uint8_t> rawBuffer;
 
 			//get frames from buffer
 			for (int i = 0; i < v.size(); i++) {
-				_d.push_back(v[i]);
-				if (/*TS0710_Frame::isComplete(_d)*/(_d.size() > 1)
-						&& (_d[0] == 0xF9) && (_d[_d.size() - 1] == 0xF9)) {
-					//LOG_DEBUG("Pushing back FRAME");
-					mFrames.push_back(_d);
-					_d.clear();
+				rawBuffer.push_back(v[i]);
+				if (/*TS0710_Frame::isComplete(rawBuffer)*/(rawBuffer.size() > 1)
+						&& (rawBuffer[0] == 0xF9) && (rawBuffer[rawBuffer.size() - 1] == 0xF9)) {
+					//LOGrawBufferEBUG("Pushing back FRAME");
+					mFrames.push_back(rawBuffer);
+					rawBuffer.clear();
 				}
 			}
 
@@ -174,6 +174,16 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 			return tokens;
 		}
 
+	   ;
+
+#if DEBUG_MODEM_OUTPUT_RESPONSE
+	 LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime)
+
+	for (auto s : tokens)
+	{
+		LOG_DEBUG("[]%s", s.c_str());
+	}
+#endif
 		//to avoid endless loop
 		return tokens;
 	}
@@ -185,8 +195,16 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 	std::vector<std::string> tokens;
 	std::vector<uint8_t> data(cmd, cmd + strlen(cmd));
 
+    // Remove \r and \n for logging purposes
+    std::string cmdStr(cmd);
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
+    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
+
+    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
+
 	blockedTaskHandle = xTaskGetCurrentTaskHandle();
 	SendData(data);
+
 
 	uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
 	uint32_t timeoutNeeded =
@@ -196,10 +214,11 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 	//wait_for_data:
 	while (1) {
 
-		if (timeElapsed >= timeoutNeeded) {
-			blockedTaskHandle = nullptr;
-			//LOG_DEBUG("[1. returning] %i tokens", tokens.size());
-			return tokens;
+		if (timeElapsed >= timeoutNeeded)
+		{
+			std::string cmdStr(cmd);
+			LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+			break;
 		}
 
 		auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
@@ -232,7 +251,14 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 
 			return tokens;
 		}
+#if DEBUG_MODEM_OUTPUT_RESPONSE
+	 LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime)
 
+	for (auto s : tokens)
+	{
+		LOG_DEBUG("[]%s", s.c_str());
+	}
+#endif
 		//to avoid endless loop
 		return tokens;
 	}
