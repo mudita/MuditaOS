@@ -90,6 +90,14 @@ enum class RectangleFlatFlags {
 	GUI_RECT_FLAT_BOTTOM_RIGHT   = 0x08
 };
 
+enum class RectangleYapFlags {
+    GUI_RECT_YAP_NO_YAPS         = 0x00,
+    GUI_RECT_YAP_TOP_LEFT        = 0x10,
+    GUI_RECT_YAP_TOP_RIGHT       = 0x20,
+    GUI_RECT_YAP_BOTTOM_LEFT     = 0x40,
+    GUI_RECT_YAP_BOTTOM_RIGHT    = 0x80,
+};
+
 typedef uint32_t (*timeSecondsFunctionPtr)();
 
 uint32_t getTime();

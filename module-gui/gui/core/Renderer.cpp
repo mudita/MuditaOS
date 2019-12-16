@@ -155,7 +155,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	else {
 
 		//calculate centers of circle for all corners
-		int16_t xcTopRight = wgtX+cmd->areaW - cmd->radius;
+		int16_t xcTopRight = wgtX+cmd->w - cmd->radius;
 		int16_t xcTopLeft = wgtX+cmd->radius;
 		int16_t xcBottomRight = xcTopRight;
 		int16_t xcBottomLeft = xcTopLeft;
