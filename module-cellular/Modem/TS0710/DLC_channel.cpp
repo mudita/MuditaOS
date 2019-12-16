@@ -118,11 +118,6 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
             LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
             break;
         }
-		if (timeElapsed >= timeoutNeeded) {
-			blockedTaskHandle = nullptr;
-			//LOG_DEBUG("[1. returning] %i tokens", tokens.size());
-			return tokens;
-		}
 
 		auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
 		timeElapsed = cpp_freertos::Ticks::GetTicks();
@@ -221,8 +216,6 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 			frame.deserialize(v);
 			std::string str(frame.data.begin(), frame.data.end());
 			//tokenize responseBuffer
-//             auto ret = ATParser::Tokenizer(str, rxCount, "\r\n");
-//             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
 			auto pos = str.find(">");
 			if (pos != std::string::npos) {
 				tokens.push_back(str.substr(pos, strlen(">")));

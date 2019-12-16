@@ -106,13 +106,14 @@ UTF8 UCS2::toUTF8(void) {
 	for (uint32_t i = 0; i < this->length; i++) {
 		uint32_t c = this->buffer[i];
 
-		if (c > 0x07ff) //check if character must occupy 3 bytes
-				{
+		//check if character must occupy 3 bytes
+		if (c > 0x07ff) {
 			buffer[offset++] = (0x00E0 | ((c & 0xF000) >> 12));
 			buffer[offset++] = (0x0080 | ((c & 0x0FC0) >> 6));
 			buffer[offset++] = (0x0080 | (c & 0x003F));
-		} else if (c > 0x07f) //check if character must occupy 2 bytes
-				{
+		}
+		//check if character must occupy 2 bytes
+		else if (c > 0x07f) {
 			buffer[offset++] = (0x00C0 | ((c & 0x07C0) >> 6));
 			buffer[offset++] = (0x0080 | (c & 0x003F));
 		} else {
