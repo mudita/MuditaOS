@@ -73,6 +73,11 @@ void DesktopMainWindow::buildInterface() {
 	UTF8 mess = "2 " + utils::localize.get("app_desktop_unread_messages");
 
 	notificationMessages->setText(mess);
+
+	auto rect = new  Rect(this, 86, 420, 350, 70);
+	rect->setFilled(true);
+	rect->setBorderColor(gui::ColorFullBlack);
+	rect->setRadius(19);
 }
 
 void DesktopMainWindow::destroyInterface() {
