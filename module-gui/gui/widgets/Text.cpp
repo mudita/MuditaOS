@@ -56,7 +56,13 @@ Text::Text(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     cursor->setFilled(true);
     cursor->setVisible(false);
 
-    splitTextToLines(text);
+    if(text.length()) {
+        splitTextToLines(text);
+    } else {
+        textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
+        firstLine = textLines.begin();
+        lastLine = textLines.begin();
+    }
     setBorderColor(gui::ColorFullBlack);
     setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
     // TODO this is bad - cursorColumn is badly handled on newline etc.
@@ -559,6 +565,19 @@ bool Text::onInput(const InputEvent &inputEvent)
     if(code == 0) {
         LOG_ERROR("Key not handled! %d", inputEvent.keyCode);
         return false;
+    }
+
+    // get how many short presses were handled in this widget
+    if (translator.getTimes())
+    {
+        handleBackspace();
+        res = handleChar(code);
+        if (res)
+        {
+            updateCursor();
+            contentCallback(*this);
+        }
+        return res;
     }
 
     // if char is a new line char then create new line and move caret and return
