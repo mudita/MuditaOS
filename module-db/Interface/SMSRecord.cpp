@@ -12,6 +12,7 @@
 #include "SMSRecord.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
+#include <log/log.hpp>
 
 SMSRecordInterface::SMSRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb): smsDB(smsDb),contactsDB(contactsDb) {
 
@@ -115,9 +116,11 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
             break;
 
         default:
+            LOG_ERROR("SMS thread get - wrong selection: %d", field);
             return records;
     }
 
+    LOG_INFO("Get: %d SMS by selection: %d", smses.size(), field);
 
     ContactRecordInterface contactInterface(contactsDB);
     for(const auto &w : smses){
