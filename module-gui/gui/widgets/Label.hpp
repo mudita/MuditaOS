@@ -55,6 +55,7 @@ namespace gui {
         struct Label : public Rect
         {
             const UTF8 text;
+            Margins margins;
             Label(std::array<uint32_t, 4> xywh)
             {
                 operator()(xywh);

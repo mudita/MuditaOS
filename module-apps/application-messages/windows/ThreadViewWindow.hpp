@@ -25,6 +25,8 @@ namespace gui
     {
       private:
         gui::VBox *body = nullptr;
+        void cleanMessages();
+        void addMessages(uint32_t thread_id);
 
       public:
         ThreadViewWindow(app::Application *app);
