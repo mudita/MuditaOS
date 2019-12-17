@@ -12,14 +12,21 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
+
 #include "windows/UITestWindow.hpp"
 
+#include "windows/TestMessageWindow.hpp"
+
+
 #include "ApplicationSettings.hpp"
+
+#include "service-cellular/ServiceCellular.hpp"
 
 namespace app {
 
 ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound) :
 	Application( name, parent, startBackgound ) {
+	busChannels.push_back(sys::BusChannels::ServiceCellularSMSNotification);
 }
 
 ApplicationSettings::~ApplicationSettings() {
@@ -77,6 +84,7 @@ void ApplicationSettings::createUserInterface() {
 
 	window = new gui::UiTestWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
 }
 
 void ApplicationSettings::destroyUserInterface() {

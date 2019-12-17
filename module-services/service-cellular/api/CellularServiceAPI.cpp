@@ -12,7 +12,7 @@
 #include "CellularServiceAPI.hpp"
 #include "Service/Bus.hpp"
 #include "../ServiceCellular.hpp"
-
+#include "utf8/UTF8.hpp"
 
 bool CellularServiceAPI::DialNumber(sys::Service* serv,const std::string& number) {
     std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularDialNumber);
@@ -56,4 +56,20 @@ bool CellularServiceAPI::HangupCall(sys::Service* serv){
         LOG_ERROR("Failed");
         return false;
     }
+}
+
+bool CellularServiceAPI::SendSMS(sys::Service* serv, UTF8 number, UTF8 message)
+{
+	std::shared_ptr<CellularSMSRequestMessage> msg = std::make_shared<CellularSMSRequestMessage>(MessageType::CellularSendSMS);
+
+	msg->number = number;
+	msg->message = message;
+
+	auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    CellularResponseMessage* response = reinterpret_cast<CellularResponseMessage*>(ret.second.get());
+	if((ret.first == sys::ReturnCodes::Success) && (response->retCode == true))
+	{
+		return true;
+	}
+	return false;
 }
