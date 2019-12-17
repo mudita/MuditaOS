@@ -30,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MIMXRT1051.h"
+#include <log/log.hpp>
 // ----------------------------------------------------------------------------
 
 // Forward declaration
@@ -58,7 +59,7 @@ void
 __attribute__((weak))
 _exit(int code __attribute__((unused)))
 {
-
+    LOG_FATAL("_exit %d", code);
 }
 
 // ----------------------------------------------------------------------------
