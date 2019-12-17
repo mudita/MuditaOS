@@ -26,6 +26,8 @@
 #include "Common.hpp"
 #include "log/log.hpp"
 
+#include "ucs2/UCS2.hpp"
+
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
@@ -67,7 +69,13 @@ ServiceCellular::ServiceCellular()
                 break;
 
             case CellularNotificationMessage::Type::NewIncomingSMS:
-                //TODO:M.P fill message's fields
+            {
+            	//find message number
+            	std::string notification(data.begin(), data.end() );
+            	auto begin = notification.find(",");
+            	auto end = notification.find("\r");
+            	msg->data  = notification.substr(begin + 1, end);
+            }
                 break;
 
             case CellularNotificationMessage::Type::SignalStrengthUpdate:
@@ -162,15 +170,23 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     case MessageType::CellularNotification: {
         CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 
-        if ((msg->type == CellularNotificationMessage::Type::CallAborted) || (msg->type == CellularNotificationMessage::Type::CallBusy))
-        {
-            stopTimer(callStateTimer);
-        }
-        else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
-        {
-            sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure), GetName(), this);
-            state = State ::ModemConfigurationInProgress;
-        }
+
+		if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
+			(msg->type == CellularNotificationMessage::Type::CallBusy))
+		{
+			stopTimer(callStateTimer);
+		}
+		else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
+		{
+			sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+								  GetName(), this);
+			state = State ::ModemConfigurationInProgress;
+		}
+		else if(msg->type == CellularNotificationMessage::Type::NewIncomingSMS)
+		{
+			LOG_INFO("New incoming sms received");
+			receiveSMS(msg->data);
+		}
         else
         {
             // ignore rest of notifications
@@ -230,6 +246,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
             if (cmux->StartMultiplexer() == TS0710::ConfState::Success)
             {
+
                 LOG_DEBUG("[ServiceCellular] Modem is fully operational");
 
                 DLC_channel *notificationsChannel = cmux->GetChannel("Notifications"); // open channel - notifications
@@ -240,6 +257,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 }
 
                 state = State::Ready;
+
             }
             else
             {
@@ -331,26 +349,37 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     break;
 
-    case MessageType::CellularDialNumber: {
-        CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-        auto channel = cmux->GetChannel("Commands");
-        if (channel)
-        {
-            auto ret = channel->SendCommandResponse(("ATD" + msg->data + ";\r").c_str(), 1, 5000);
-            if (cmux->CheckATCommandResponse(ret))
-            {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
-                // activate call state timer
-                ReloadTimer(callStateTimer);
-                // Propagate "Ringing" notification into system
-                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::Ringing, msg->data),
-                                        sys::BusChannels::ServiceCellularNotifications, this);
-                break;
-            }
+	case MessageType::CellularDialNumber: {
+		CellularRequestMessage *msg =
+				reinterpret_cast<CellularRequestMessage*>(msgl);
+		auto channel = cmux->GetChannel("Commands");
+		if (channel) {
+			auto ret = channel->SendCommandResponse(
+					("ATD" + msg->data + ";\r").c_str(), 1, 5000);
+			if (cmux->CheckATCommandResponse(ret)) {
+				responseMsg = std::make_shared<CellularResponseMessage>(true);
+				// activate call state timer
+				ReloadTimer(callStateTimer);
+				// Propagate "Ringing" notification into system
+				sys::Bus::SendMulticast(
+						std::make_shared<CellularNotificationMessage>(
+								CellularNotificationMessage::Type::Ringing,
+								msg->data),
+						sys::BusChannels::ServiceCellularNotifications, this);
+				break;
+			}
+		}
+		responseMsg = std::make_shared<CellularResponseMessage>(false);
+	}
+		break;
+	case MessageType::CellularSendSMS: {
+        	CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
+
+        	auto ret = this->sendSMS(msg->number, msg->message);
+
+        	responseMsg = std::make_shared<CellularResponseMessage>(ret);
         }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
-    }
-    break;
+        	break;
 
     default:
         break;
@@ -409,4 +438,143 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
     LOG_TRACE(": None");
     return CellularNotificationMessage::Type::None;
 
+}
+
+bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
+	uint32_t textLen = text.length();
+
+	const uint32_t singleMessageLen = 30;
+
+
+	//if text fit in single message send
+	if (textLen < singleMessageLen) {
+
+		auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
+				("AT+CMGS=\"" + UCS2(number).modemStr() + "\"\r").c_str(), 1, 1000);
+
+		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
+			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
+					(UCS2(text).modemStr() + "\032").c_str(), 1);
+			return true;
+		}
+	}
+	//split text, and send concatenated message
+	else {
+		const uint32_t maxConcatenatedCount = 7;
+		uint32_t messagePartsCount = textLen / singleMessageLen;
+		if( (textLen % singleMessageLen) != 0 )
+		{
+			messagePartsCount++;
+		}
+
+		if(messagePartsCount > maxConcatenatedCount)
+		{
+			LOG_ERROR("Message to long");
+			return false;
+		}
+
+		for(uint32_t i = 0; i < messagePartsCount; i++)
+		{
+
+			uint32_t partLength = singleMessageLen;
+			if (i * singleMessageLen + singleMessageLen > text.length()) {
+				partLength = text.length() - i * singleMessageLen;
+			}
+			std::string messagePart = text.substr(i * singleMessageLen,
+					partLength);
+
+
+			std::string command(
+					"AT+QCMGS=\"" + UCS2(number).modemStr() + "\",120,"
+							+ std::to_string(i + 1) + ","
+							+ std::to_string(messagePartsCount) + "\r");
+
+			auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
+					command.c_str(), 1, 1000);
+
+			if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
+				//prompt sign received, send data ended by "Ctrl+Z"
+				auto sended =
+						cmux->GetChannel("Commands")->SendCommandResponse(
+								 (UCS2(messagePart).modemStr()
+										+ "\032").c_str(), 2, 2000);
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+bool ServiceCellular::receiveSMS(std::string messageNumber) {
+
+	std::string command("AT+QCMGR=" + messageNumber + "\r");
+
+	auto ret = cmux->GetChannel("Commands")->SendCommandResponse(
+			command.c_str(), 2, 2000);
+
+	bool messageParsed = false;
+
+	std::string messageRawBody;
+	UTF8 receivedNumber;
+	if (ret.size() != 0) {
+		for (uint32_t i = 0; i < ret.size(); i++) {
+			if (ret[i].find("QCMGR") != std::string::npos) {
+
+				std::istringstream ss(ret[i]);
+				std::string token;
+				std::vector<std::string> tokens;
+				while (std::getline(ss, token, ',')) {
+					tokens.push_back(token);
+				}
+				tokens[1].erase(
+						std::remove(tokens[1].begin(), tokens[1].end(), '\"'),
+						tokens[1].end());
+				receivedNumber = UCS2(tokens[1]).toUTF8();
+
+				//if its single message process
+				if (tokens.size() == 5) {
+					//todo add message to database
+
+					messageRawBody = ret[i+1];
+					messageParsed = true;
+				}
+				//if its concatenated message wait for last message
+				else if (tokens.size() == 8) {
+
+					uint32_t last = std::stoi(tokens[7]);
+					uint32_t current = std::stoi(tokens[6]);
+
+					if (current == last) {
+						messageParts.push_back(ret[i + 1]);
+
+						for (uint32_t j = 0; j < messageParts.size(); j++) {
+							messageRawBody += messageParts[j];
+						}
+						messageParts.clear();
+						messageParsed = true;
+					} else {
+						messageParts.push_back(ret[i + 1]);
+					}
+				}
+			}
+		}
+		if (messageParsed) {
+			messageParsed = false;
+			UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
+
+			// todo temporary send multicast
+			auto msg = std::make_shared<CellularSMSRequestMessage>(
+					MessageType::CellularSMSMulticast);
+
+			msg->number = receivedNumber;
+			msg->message = decodedMessage;
+
+			sys::Bus::SendMulticast(msg,
+					sys::BusChannels::ServiceCellularSMSNotification, this);
+		}
+	}
+	//delete message from modem memory
+	cmux->GetChannel("Commands")->SendCommandResponse(
+			("AT+CMGD=" + messageNumber).c_str(), 1, 150);
+	return true;
 }

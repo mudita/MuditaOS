@@ -257,6 +257,13 @@ private:
         return false;
     }
 
+    bool searchForPrompt(const std::vector<std::string> &response) {
+		for (std::string s : response) {
+			if (s == ">")
+				return true;
+		}
+		return false;
+	}
     TS0710_START::START_SystemParameters_t startParams;
     sys::Service *pv_parent;
 
@@ -347,6 +354,19 @@ public:
             return false;
         }
     }
+
+    bool CheckATCommandPrompt(const std::vector<std::string> &response) {
+           //if (response.size() == 1 && response[0] == "OK") {
+           if (searchForPrompt(response)) {
+               return true;
+           } else {
+               std::string resp;
+               for (std::string s : response)
+                   resp.append(s);
+               LOG_ERROR("Invalid response: %s", resp.c_str());
+               return false;
+           }
+       }
 
 
 TS0710(PortSpeed_e portSpeed, sys::Service *parent);

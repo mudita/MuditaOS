@@ -118,6 +118,7 @@ public:
             if (serData[3] == 0xFF)   //ugly hack for Quectel misimplementation of the standard
                 Length = myLen - 6;
             //LOG_DEBUG("[Frame] %s Addr: 0x%02X, Ctrl: 0x%02X, Len: %i", TypeOfFrame_text[static_cast<TypeOfFrame_e>(Control)].c_str(), Address, Control, Length);
+            data.clear();
             data.insert(data.begin(), serData.begin() + 4, serData.begin() + 4 + Length);   //get data - amount of data determined by Length value
 
             //check FCS
