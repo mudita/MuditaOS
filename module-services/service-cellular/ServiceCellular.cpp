@@ -21,13 +21,16 @@
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "ServiceCellular.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <bsp/rtc/rtc.hpp>
+#include "Service/Service.hpp"
+#include "Service/Message.hpp"
 
 #include "MessageType.hpp"
 
 #include "messages/CellularMessage.hpp"
 #include <ticks.hpp>
+
+#include "Common.hpp"
+#include "log/log.hpp"
 
 #include "ucs2/UCS2.hpp"
 
@@ -237,6 +240,17 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             }
         }
+        else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
+		{
+			sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+								  GetName(), this);
+			state = State ::ModemConfigurationInProgress;
+		}
+		else if(msg->type == CellularNotificationMessage::Type::NewIncomingSMS)
+		{
+			LOG_INFO("New incoming sms received");
+			receiveSMS(msg->data);
+		}
         else
         {
             LOG_ERROR("Not CellularNotificationMessage");
@@ -356,6 +370,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 LOG_ERROR("exception %s was thrown", e.what());
                 assert(0);
             }
+
             responseMsg = std::make_shared<CellularResponseMessage>(true);
         }
         else
@@ -621,6 +636,13 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 			messageParsed = false;
 			UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
 
+			SMSRecord record;
+			record.body = decodedMessage;
+			record.number = receivedNumber;
+			record.type = SMSType::INBOX;
+			record.date = 12345678; // todo parse date from at command
+
+			auto result = DBServiceAPI::SMSAdd(this, record);
 			// todo temporary send multicast
 			auto msg = std::make_shared<CellularSMSRequestMessage>(
 					MessageType::CellularSMSMulticast);

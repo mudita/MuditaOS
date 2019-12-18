@@ -32,6 +32,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
     // Contact not found, create one
     if (contactRec->size() == 0) {
         contactInterface.Add(ContactRecord{
+        		.primaryName = rec.number,
                 .contactType=ContactType::TEMPORARY,
                 .numbers=std::vector<ContactRecord::Number>{ContactRecord::Number(
                     rec.number.c_str(),
