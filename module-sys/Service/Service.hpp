@@ -51,9 +51,8 @@ public:
 	void StartService();
 
 	//Create service timer
-    uint32_t CreateTimer(TickType_t interval,bool isPeriodic,const std::string& name);
-    uint32_t CreateTimer(TickType_t interval,bool isPeriodic);
-	// Reload service timer
+    uint32_t CreateTimer(TickType_t interval,bool isPeriodic,const std::string& name = "");
+    // Reload service timer
 	void ReloadTimer(uint32_t id);
 	// Delete timer
 	void DeleteTimer(uint32_t id);
