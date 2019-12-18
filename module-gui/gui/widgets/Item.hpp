@@ -53,9 +53,10 @@ public:
 	BoundingBox drawArea;
 	//radius of corner
 	short radius;
-	//flag that defines whether widget is enabled
-	bool enabled;
-	//flag that defines whether widget is visible
+    // flag that defines if item is active
+    // if false -> than it shouldn't be used witn onInput, navitagion etc.
+    bool activeItem = true;
+    //flag that defines whether widget is visible
 	bool visible;
 	//policy for changing vertical size if Item is placed inside layout
 	LayoutVerticalPolicy verticalPolicy;
