@@ -61,7 +61,6 @@ class AppTimer // this should inherit from ServiceTimer, but *bodge*
  * @brief This is template for creating new applications
  */
 class Application: public sys::Service {
-  AppTimer longPressTimer;
   public:
     enum class State {
 		/// app doesn't exist
@@ -91,7 +90,6 @@ class Application: public sys::Service {
 		//and request System Manager to close it.
 		DEACTIVATING
 	};
-	std::map<uint32_t, std::function <void()>> timers;
     static const char *stateStr(State st);
 
   private:
@@ -100,8 +98,8 @@ class Application: public sys::Service {
   public:
 	std::list<uint32_t> timerIDs;
 	std::list <AppTimer> appTimers; // @TODO decide on type
-public:
-	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,
+    AppTimer longPressTimer;
+    Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,
 	        sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
