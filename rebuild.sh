@@ -10,6 +10,11 @@ if [ "${HOME}" = "/home/runner" ]; then
 	export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"
 fi
 
+# add pre commit hook
+if [[ ! -f '.git/hooks/pre-commit' ]]; then
+    ln -s $(pwd)/config/pre-commit.hook $(pwd)/.git/hooks/pre-commit
+fi
+
 function check_submodules() {
     local gitlist=$(cat .gitmodules | grep path | cut -d ' ' -f 3)
     for el in $gitlist; do

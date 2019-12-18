@@ -1,0 +1,46 @@
+#!/bin/bash -e
+# taken from: https://raw.githubusercontent.com/andrewseidl/githook-clang-format/master/clang-format.hook
+# - with just added check for cpp file & check for proper version of clang-format
+# - with use of clang-format diff.py - for changed chunk changes only
+# might be worth to consider: https://github.com/Sarcasm/run-clang-format
+
+set -o pipefail
+
+# check if clang format is in proper version, version is 3rd column in `clang-format --version`
+CVER=$(clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1)
+if [ $CVER -lt 9 ]; then
+    echo "Install clang-format in at least verion 9 and set as default, on ubuntu:"
+    echo 'Your clang format version used: '$(clang-format --version)
+    echo "git commit aborted"
+    exit 1
+fi
+
+# if clang-format-diff exists in path - then use it, if not - than try to use it from clang-format-${CVER}
+L_CLANG_DIFF_TOOL=$( which clang-format-diff.py && echo "clang-format-diff.py" || echo "/usr/share/clang/clang-format-${CVER}/clang-format-diff.py" )
+if [[ ! -f ${L_CLANG_DIFF_TOOL} ]]; then
+    echo "Clang tool for git diff chunk formatting not found!"
+    echo "path used: ${L_CLANG_DIFF_TOOL}"
+    exit 1
+fi
+
+format_file() {
+  file="${1}"
+  if [ -f $file ]; then
+    echo "Format file: ${1} diff"
+    git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 -i
+    git add ${1}
+  fi
+}
+
+case "${1}" in
+  --about )
+    echo "Runs clang-format on source files"
+    ;;
+  * )
+    for file in `git diff-index --cached --name-only HEAD` ; do
+        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]]; then
+            format_file "${file}"
+        fi
+    done
+    ;;
+esac
