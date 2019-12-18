@@ -38,12 +38,13 @@ class AppTimer // this should inherit from ServiceTimer, but *bodge*
 {
   private:
     uint32_t id = 0; // let's say 0 indicates not initalized timer
-    std::function <void ()> callback;
+    std::function <void ()> callback = nullptr;
     Application *parent = nullptr;
 
     void registerCallback( std::function<void ()> );
-  public:
     AppTimer();
+
+  public:
     AppTimer(Application * parent, uint32_t id, std::function<void()> callback, const std::string &name);
     ~AppTimer();
     void runCallback();
@@ -163,7 +164,7 @@ public:
 	static bool messageCloseApplication( sys::Service* sender, std::string application );
 	static bool messageRebuildApplication( sys::Service* sender, std::string application );
     void DeleteTimer(AppTimer &timer);
-    void DeleteTimer(uint32_t id); // overriden, so it's safe. It'll mask underlying Service:: method. >>> @Adam here <<<
+    void DeleteTimer(uint32_t id);
     /**
      * @brief This method is used to send message to set focus of the application.
      * Application can gain or lose focus depending on the provided focus flag.
@@ -174,7 +175,6 @@ protected:
 	//application's settings taken from database
 	SettingsRecord settings;
 
-    // protected long key release handler
     void longPressTimerCallback();
     /**
      * @param id - timer IDentificaton number
