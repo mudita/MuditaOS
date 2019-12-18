@@ -14,6 +14,13 @@
 
 namespace gui
 {
+    namespace name
+    {
+        namespace window
+        {
+            inline std::string search_results = "SearchResults";
+        };
+    }; // namespace name
 
 class PhonebookSearchResults : public AppWindow
 {
