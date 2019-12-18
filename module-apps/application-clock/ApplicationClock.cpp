@@ -25,9 +25,9 @@
 namespace app {
 
 ApplicationClock::ApplicationClock(std::string name,std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, parent,false, stackDepth, priority )
+	Application( name, parent,false, stackDepth, priority ),
+    timerClock(CreateAppTimer(1000, true, [=]() {timerClockCallback(); }))
 {
-    timerClock = CreateAppTimer(1000, true, [=]() {timerClockCallback(); });
     timerClock.restart();
 }
 

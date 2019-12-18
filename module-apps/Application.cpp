@@ -55,16 +55,17 @@ namespace app {
         }
     }
 
-Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority)
-    : Service(name, parent, stackDepth, priority), startBackground{startBackground} {
+Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
+    Service(name, parent, stackDepth, priority),
+    longPressTimer (CreateAppTimer(key_timer_ms, true, [&]() { longPressTimerCallback(); }, "longPressTimer")),
+    startBackground{startBackground}
+{
 	keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     if (startBackground)
     {
         setState(State::ACTIVE_BACKGROUND);
     }
-    longPressTimer = CreateAppTimer(
-        key_timer_ms, true, [&]() { longPressTimerCallback(); }, "longPressTimer");
     longPressTimer.restart();
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
