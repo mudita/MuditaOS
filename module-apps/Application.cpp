@@ -99,6 +99,9 @@ void Application::TickHandler(uint32_t id)
     {
         appTimer->runCallback();
     }
+    else{
+        LOG_ERROR("Requested timer doesn't exist here (ID: %s)\n", std::to_string(id).c_str()); // either timer was deleted or this id should not arrive.
+    }
 }
 
 void Application::DeleteTimer(AppTimer &timer)
@@ -111,7 +114,7 @@ void Application::DeleteTimer(AppTimer &timer)
     }
 }
 
-// @deprecated - only for compatibility
+[[deprecated("only for compatibility")]]
 void Application::DeleteTimer(uint32_t id)
 {
     auto found = std::find(appTimers.begin(), appTimers.end(), id);
@@ -124,7 +127,6 @@ void Application::longPressTimerCallback()
 {
     // TODO if(check widget type long press trigger)
     uint32_t time = xTaskGetTickCount();
-    // LOG_DEBUG(typeid(*this).name());
     if (keyTranslator->timeout(time))
     {
         // previous key press was over standard keypress timeout - send long press
@@ -475,8 +477,7 @@ bool Application::messageInputEventApplication( sys::Service* sender, std::strin
 
 AppTimer Application::CreateAppTimer(TickType_t interval, bool isPeriodic, std::function<void()> callback, const std::string &name)
 {
-    LOG_DEBUG(name.c_str());
-    auto id = !name.empty() ? CreateTimer(interval, isPeriodic, name) : CreateTimer(interval, isPeriodic);
+    auto id = CreateTimer(interval, isPeriodic, name);
     auto timer = AppTimer(this, id, callback, name);
     appTimers.push_back(timer);
     return timer; // return ptr to the timer on the list
@@ -487,7 +488,7 @@ AppTimer::AppTimer(Application * parent, uint32_t id, std::function<void()> call
     this->id = id;
     registerCallback(callback);
 }
-AppTimer::AppTimer(){}
+AppTimer::AppTimer() = default;
 
 AppTimer::~AppTimer()
 {
