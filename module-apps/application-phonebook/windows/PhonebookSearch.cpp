@@ -120,6 +120,10 @@ bool PhonebookSearch::handleSwitchData(SwitchData *data)
 bool PhonebookSearch::onInput(const InputEvent &inputEvent)
 {
     bool ret = AppWindow::onInput(inputEvent);
+    if(ret)
+    {
+        return ret;
+    }
 
     if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
     {
