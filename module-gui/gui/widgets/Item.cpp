@@ -19,7 +19,6 @@ Item::Item() :
 	type {ItemType::ITEM},
 	parent{nullptr},
 	radius{0},
-	enabled{true},
 	visible{true},
 	verticalPolicy{ LayoutVerticalPolicy::LAYOUT_POLICY_VERTICAL_EXPAND },
 	horizontalPolicy { LayoutHorizontalPolicy::LAYOUT_POLICY_HORIZONTAL_EXPAND },
