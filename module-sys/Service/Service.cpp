@@ -87,11 +87,12 @@ void Service::Run() {
 uint32_t Service::CreateTimer(uint32_t interval,bool isPeriodic,const std::string& name)
 {
     uint32_t unique = ServiceTimer::GetNextUniqueID();
+    std::string nameNew = name;
     if (name.empty()){
-        std::string name = GetName()+"Timer"+std::to_string(unique);
+        nameNew = GetName()+"Timer"+std::to_string(unique);
     }
-	timersList.push_back(std::make_unique<ServiceTimer>(name,Ticks::MsToTicks(interval),isPeriodic,unique,this));
-    LOG_DEBUG(std::string(name + "'s ID: " + std::to_string(unique)).c_str());
+	timersList.push_back(std::make_unique<ServiceTimer>(nameNew,Ticks::MsToTicks(interval),isPeriodic,unique,this));
+    LOG_DEBUG(std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
 	return unique;
 }
 
