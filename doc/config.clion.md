@@ -52,6 +52,4 @@ in the debuging configuration dropdown select a pair:
 
 For `[JLink server | rt1051]` you will only have Debug option, no Run.
 
-
-
-<tu wstaw zdjęcie>
+![Profit](https://user-images.githubusercontent.com/56958031/71167426-f28ac780-2254-11ea-8efb-8375fb004004.png)
