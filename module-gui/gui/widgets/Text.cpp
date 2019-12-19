@@ -47,8 +47,8 @@ Text::Text(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     : Rect(parent, x, y, w, h), expandMode{expandMode}, textType{textType}
 {
 
-    setPenWidth(1);
-    setPenFocusWidth(3);
+    setPenWidth(style::window::default_border_no_focus_w);
+    setPenFocusWidth(style::window::default_border_focucs_w);
     uint32_t fontID = FontManager::getInstance().getFontID(style::window::font::small);
     font = FontManager::getInstance().getFont(fontID);
 
@@ -56,12 +56,17 @@ Text::Text(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     cursor->setFilled(true);
     cursor->setVisible(false);
 
-    // insert first empty text line
-    textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
-    firstLine = textLines.begin();
-    lastLine = textLines.begin();
+    if(text.length()) {
+        splitTextToLines(text);
+    } else {
+        textLines.push_back(new TextLine(UTF8(""), 0, 0, LineEndType::EOT, 0));
+        firstLine = textLines.begin();
+        lastLine = textLines.begin();
+    }
     setBorderColor(gui::ColorFullBlack);
     setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+    // TODO this is bad - cursorColumn is badly handled on newline etc.
+    cursorColumn += text.length();
     updateCursor();
 }
 
@@ -482,21 +487,69 @@ void Text::setSize(const short &w, const short &h)
 
 bool Text::onInput(const InputEvent &inputEvent)
 {
-    if(inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_PND) {
-        mode->next();
-        return true;
+    bool res = false;
+
+    if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST)
+    {
+        if (mode)
+        {
+            mode->select_special_char();
+            return true;
+        }
     }
 
     // translate and store keypress
-    uint32_t code = translator.handle( inputEvent.key, mode?mode->get():"");
+    uint32_t code = translator.handle(inputEvent.key, mode ? mode->get() : "");
+
+    /// handling of key removal
+    if (inputEvent.keyCode == gui::KeyCode::KEY_PND)
+    {
+        // longpress -> remove all characters
+        if (inputEvent.state == InputEvent::State::keyReleasedLong)
+        {
+            // TODO handle longpress remove key
+        }
+        // shortpress remove characters n time for multipress, one time for normal press
+        else if (inputEvent.state == InputEvent::State::keyReleasedShort)
+        {
+            auto char_rm = [=](bool &res) {
+                res = handleBackspace();
+                if (res)
+                {
+                    updateCursor();
+                    contentCallback(*this);
+                }
+            };
+            if (translator.getTimes())
+            {
+                for (int i = 0; i < translator.getTimes(); ++i)
+                {
+                    char_rm(res);
+                }
+            }
+            else
+            {
+                char_rm(res);
+            }
+            return res;
+        }
+    }
 
     // process only short release events
-    if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+    if (inputEvent.state != InputEvent::State::keyReleasedShort)
+    {
         return false;
     }
 
-    // check if this is navigation event
-    bool res = false;
+    if (inputEvent.keyCode == gui::KeyCode::KEY_AST)
+    {
+        if (mode)
+        {
+            mode->next();
+            return true;
+        }
+    }
+
     if ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) || (inputEvent.keyCode == KeyCode::KEY_UP) ||
         (inputEvent.keyCode == KeyCode::KEY_DOWN))
     {
@@ -536,12 +589,6 @@ bool Text::onInput(const InputEvent &inputEvent)
             contentCallback(*this);
         }
     }
-    // backspace handling
-    else if (code == 0x08)
-    {
-        res = handleBackspace();
-        contentCallback(*this);
-    }
     else
     { // normal char -> add and check pixel width
         res = handleChar(code);
@@ -559,6 +606,11 @@ bool Text::onActivated(void *data)
 
 bool Text::onFocus(bool state)
 {
+    // inform on start what type of input there is
+    if (mode)
+    {
+        mode->on_focus(state);
+    }
     bool ret = Rect::onFocus(state);
     if (focus && editMode == EditMode::EDIT)
     {

@@ -14,9 +14,8 @@
 
 namespace app {
 
-/*
- *
- */
+inline const std::string name_desktop = "ApplicationDesktop";
+
 class ApplicationDesktop : public Application {
 protected:
 	//determines whether screen should be protected by pin verification
@@ -25,7 +24,7 @@ protected:
 	uint32_t unreadMessages = 0;
 	uint32_t missedCalls = 0;
 public:
-	ApplicationDesktop( std::string name="ApplicationDesktop", std::string parent = "" );
+	ApplicationDesktop( std::string name=name_desktop, std::string parent = "", bool startBackground =false );
 	virtual ~ApplicationDesktop();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
@@ -33,9 +32,9 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-	void createUserInterface() ;
-	void destroyUserInterface();
-	bool getScreenLocked();
+    void createUserInterface() override;
+    void destroyUserInterface() override;
+    bool getScreenLocked();
 	void setScreenLocked( bool val );
 	bool getPinLocked();
 
@@ -47,20 +46,6 @@ public:
 	 */
 //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event );
 };
-
-class ApplicationDesktopLauncher : public ApplicationLauncher {
-public:
-	ApplicationDesktopLauncher() : ApplicationLauncher("ApplicationDesktop", false) {};
-	bool run(sys::Service* caller = nullptr ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationDesktop>(name, parent), caller );
-	};
-	bool runBackground(sys::Service* caller ) override {
-		parent = (caller==nullptr?"":caller->GetName());
-		return sys::SystemManager::CreateService( std::make_shared<ApplicationDesktop>(name, parent ),caller);
-	};
-};
-
 
 } /* namespace app */
 

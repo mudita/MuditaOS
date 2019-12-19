@@ -24,6 +24,8 @@
 
 #include "SwitchData.hpp"
 
+// #define DEBUG_APPLICATION_MANAGEMENT
+
 namespace gui {
 	class AppWindow;
 };
@@ -37,6 +39,8 @@ class Application: public sys::Service {
     uint32_t longPressTimer = 0;
 public:
 	enum class State {
+        /// app doesn't exist
+        NONE,
 		//Application: Object has been created and underlying service is waiting to execute init handler method.
 		//Application Manager: Launcher for the application has been provided. Application can be started using provided launcher. The other possibility
 		//is that Appication Manager received CLOSING_FINISHED message.
@@ -62,11 +66,20 @@ public:
 		//and request System Manager to close it.
 		DEACTIVATING
 	};
-public:
+
+    static const char *stateStr(State st);
+
+  private:
+    State state = State::DEACTIVATED;
+
+  public:
 	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
-	/**
+    Application::State getState();
+    void setState(State st);
+
+    /**
 	 * Virtual methods
 	 */
 	void TickHandler(uint32_t id) override;
@@ -148,10 +161,6 @@ protected:
 	 * Flag defines whether keyboard input is processed
 	 */
 	bool acceptInput = false;
-	/**
-	 * State of the application
-	 */
-	State state = State::DEACTIVATED;
 
 	std::unique_ptr<gui::KeyInputSimpleTranslation> keyTranslator;
 	/**
@@ -202,6 +211,7 @@ public:
 	//virtual method to run the application
 	virtual bool run(sys::Service* caller = nullptr ) {return true;};
 	virtual bool runBackground(sys::Service* caller = nullptr ) {return true;};
+    std::shared_ptr<Application> handle = nullptr;
 };
 
 template <class T>
@@ -210,10 +220,14 @@ class ApplicationLauncherT : public ApplicationLauncher
     public:
     ApplicationLauncherT(std::string name, bool isCloseable=true) : ApplicationLauncher(name, isCloseable) {}
     virtual bool run(sys::Service* caller) override {
-    	return sys::SystemManager::CreateService( std::make_shared<T>(name), caller );
-	};
+        parent = (caller == nullptr ? "" : caller->GetName());
+        handle = std::make_shared<T>(name, parent);
+        return sys::SystemManager::CreateService(handle, caller);
+    };
     bool runBackground(sys::Service *caller) override {
-    	return sys::SystemManager::CreateService( std::make_shared<T>(name,"", true), caller );
+        parent = (caller == nullptr ? "" : caller->GetName());
+        handle = std::make_shared<T>(name, parent, true);
+        return sys::SystemManager::CreateService(handle, caller);
     };
 };
 

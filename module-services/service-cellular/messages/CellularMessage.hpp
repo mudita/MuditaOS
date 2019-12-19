@@ -16,7 +16,7 @@
 #include <variant>
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
-
+#include "utf8/UTF8.hpp"
 
 class CellularMessage : public sys::DataMessage {
 public:
@@ -71,6 +71,17 @@ public:
     ~CellularRequestMessage() {}
 
     std::string data;
+
+};
+
+class CellularSMSRequestMessage : public CellularMessage{
+public:
+
+	CellularSMSRequestMessage(MessageType messageType):CellularMessage(messageType){}
+    ~CellularSMSRequestMessage() {}
+
+    UTF8 number;
+    UTF8 message;
 
 };
 

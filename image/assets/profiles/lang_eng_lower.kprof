@@ -2,9 +2,9 @@
 lang_eng_lower
 #NumericKey1 = 31,
 31
-false
-''
-0
+true
+'.',' ',' ','?',':',';',')','(','!','/','*','#'
+0,0,0,0,0,0,0,0,0,0,0,0
 #NumericKey2 = 32,
 32
 true
@@ -53,12 +53,12 @@ false
 #NumericKeyAst = 61,
 61
 false
-0x08
+0x0A
 0
 #NumericKeyPnd = 63,
 63
 false
-0x0A
+0x08
 0
 #JoystickLeft = 11,
 11

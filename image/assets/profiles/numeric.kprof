@@ -53,13 +53,13 @@ false
 #NumericKeyAst = 61,
 61
 false
-'*'
+0x08
 0
 #NumericKeyPnd = 63,
 63
 false
-'#'
-3000
+'*','#'
+0,0
 #JoystickLeft = 11,
 11
 false
@@ -86,10 +86,6 @@ false
 0x0D
 0
 #FnLeft = 21,//1,
-21
-false
-''
-0
 #FnRight = 23,//3,
 23
 false

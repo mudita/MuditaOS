@@ -1,0 +1,96 @@
+#pragma once
+
+#include "../data/PhonebookItemData.hpp"
+#include "AppWindow.hpp"
+#include "ContactRecord.hpp"
+#include "Label.hpp"
+#include "Text.hpp"
+#include <memory>
+#include <string>
+#include <widgets/BoxLayout.hpp>
+
+using namespace gui;
+
+class PhonebookDialog : public AppWindow
+{
+  public:
+    PhonebookDialog(app::Application *app, const std::string &dialogName);
+    virtual ~PhonebookDialog()
+    {
+        destroyInterface();
+    }
+
+    bool onInput(const InputEvent &inputEvent) override;
+    void onBeforeShow(ShowMode mode, SwitchData *data) override
+    {
+        setFocusItem(noLabel);
+    }
+    bool handleSwitchData(SwitchData *data) override;
+    void rebuild() override
+    {
+        destroyInterface();
+        buildInterface();
+    }
+    void buildInterface() override;
+    void destroyInterface() override
+    {
+        AppWindow::destroyInterface();
+    }
+
+    virtual void setContactData() = 0;
+
+  protected:
+    Text *confirmationLabel = nullptr;
+    Label *noLabel = nullptr;
+    Label *yesLabel = nullptr;
+    Image *icon = nullptr;
+    std::shared_ptr<ContactRecord> contact = nullptr;
+};
+
+class PhonebookDeleteContact : public PhonebookDialog
+{
+  public:
+    PhonebookDeleteContact(app::Application *app) : PhonebookDialog(app, "Delete")
+    {
+        LOG_INFO("PhonebookDeleteContact::ctor");
+    }
+    virtual ~PhonebookDeleteContact() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
+    void setContactData();
+};
+
+class PhonebookBlockContact : public PhonebookDialog
+{
+  public:
+    PhonebookBlockContact(app::Application *app) : PhonebookDialog(app, "Block")
+    {
+    }
+    virtual ~PhonebookBlockContact() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
+    void setContactData();
+};
+
+class PhonebookDuplicateNumber : public PhonebookDialog
+{
+  public:
+    PhonebookDuplicateNumber(app::Application *app) : PhonebookDialog(app, "NumberAlreadyExists")
+    {
+    }
+    virtual ~PhonebookDuplicateNumber() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
+    void setContactData();
+};
+
+class PhonebookDuplicateSpeedDial : public PhonebookDialog
+{
+  protected:
+    Label *dialValue = nullptr;
+
+  public:
+    PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, "SpeedDialAlreadyAssigned")
+    {
+    }
+    virtual ~PhonebookDuplicateSpeedDial() = default;
+    void onBeforeShow(ShowMode mode, SwitchData *data);
+    void setContactData();
+};

@@ -2,8 +2,6 @@ SET(CMAKE_SYSTEM_NAME Generic)
 SET(CMAKE_SYSTEM_PROCESSOR arm)
 set(CMAKE_SYSTEM_VERSION 1)
 
-
-
 set(TOOLCHAIN_PREFIX "arm-none-eabi")
 
 # specify the cross compiler

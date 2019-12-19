@@ -5,6 +5,11 @@ ASSETS_DIR="assets"
 SYS_DIR="sys"
 DB_DIR="db"
 
+#check if we're building in CI
+if [ "${HOME}" = "/home/runner" ]; then
+	export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"
+fi
+
 function check_submodules() {
     local gitlist=$(cat .gitmodules | grep path | cut -d ' ' -f 3)
     for el in $gitlist; do

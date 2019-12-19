@@ -21,6 +21,7 @@
 #include "../MessagesStyle.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include <log/log.hpp>
 #include <Style.hpp>
@@ -53,6 +54,7 @@ void MessagesMainWindow::buildInterface() {
 	list->setProvider(threadModel);
 
 	bottomBar->setActive(BottomBar::Side::LEFT, true);
+
 	bottomBar->setActive(BottomBar::Side::CENTER, true);
 	bottomBar->setActive(BottomBar::Side::RIGHT, true);
 	bottomBar->setText(BottomBar::Side::LEFT,
@@ -73,6 +75,7 @@ void MessagesMainWindow::buildInterface() {
 	searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
 //	setFocusItem( list );
+
 }
 void MessagesMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();

@@ -6,11 +6,12 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "i18/i18.hpp"
-#include "Application.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
 #include "AppWindow.hpp"
+#include "Application.hpp"
+#include "i18/i18.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include <Style.hpp>
+#include <application-desktop/ApplicationDesktop.hpp>
 
 using namespace style::header;
 
@@ -139,20 +140,23 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
     if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF)
     {
         LOG_INFO("exit to main menu");
-        sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationDesktop", "MainWindow", nullptr);
+        sapm::ApplicationManager::messageSwitchApplication(application, app::name_desktop, "MainWindow", nullptr);
     }
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
 
 	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-		if( prevWindow == getName() ) {
-			LOG_INFO("Back to previous application"); 
+        if (prevWindow == getName() || getName() == "MainWindow")
+        {
+            LOG_INFO("Back to previous application");
 			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-		} else {
-			LOG_INFO("Back to previous window %s", prevWindow); 
+        }
+        else
+        {
+            LOG_INFO("Back to previous window %s", prevWindow.c_str());
 			application->switchWindow( prevWindow, gui::ShowMode::GUI_SHOW_RETURN );
-		}
-		return true;
+        }
+        return true;
 	}
 
 	return false;

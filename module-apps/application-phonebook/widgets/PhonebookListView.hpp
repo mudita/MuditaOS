@@ -12,25 +12,25 @@
 #include "Application.hpp"
 #include "ListView.hpp"
 
-namespace gui {
+namespace gui
+{
+class PhonebookItem;
+class PhonebookListView : public ListView
+{
+    /**
+     * Pointer to application that owns the model
+     */
+    app::Application *application = nullptr;
 
-/*
- *
- */
-class PhonebookListView: public ListView {
-	/**
-	 * Pointer to application that owns the model
-	 */
-	app::Application* application = nullptr;
-public:
-	PhonebookListView();
-	PhonebookListView( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h );
-	virtual ~PhonebookListView();
-	void setApplication( app::Application* app );
+  public:
+    PhonebookListView();
+    PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+    virtual ~PhonebookListView();
+    void setApplication(app::Application *app);
+    gui::PhonebookItem *getSelectedPhonebookItem();
 
-
-	bool onInput( const InputEvent& inputEvent ) override;
-	void updatePageItems() override;
+    bool onInput(const InputEvent &inputEvent) override;
+    void updatePageItems() override;
 };
 
 } /* namespace gui */

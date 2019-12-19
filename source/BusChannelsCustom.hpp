@@ -9,9 +9,12 @@
 
 // Custom Bus channels
 ServiceCellularNotifications,
+//todo remove sms notification
+ServiceCellularSMSNotification,
 Test2CustomBusChannel,
 ServiceDatabaseAlarmNotifications,
 ServiceAudioNotifications
+
 
 
 #endif //MODULE_CORE_BUSCHANNELSCUSTOM_HPP

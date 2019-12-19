@@ -85,11 +85,12 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 				std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
 				//send to itself message to switch (run) call application
 				callWindow->setState( gui::CallWindow::State::INCOMING_CALL );
-				if( state == State::ACTIVE_FORGROUND ) {
-					LOG_INFO("++++++++++++WINDOW SWITCH");
+                if (getState() == State::ACTIVE_FORGROUND)
+                {
+                    LOG_INFO("++++++++++++WINDOW SWITCH");
 					switchWindow( "CallWindow", std::move(data) );
-				}
-				else {
+                }
+                else {
 					LOG_INFO("++++++++++++APP SWITCH");
 
 					sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
@@ -105,10 +106,11 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 
 			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->data);
 			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
-			if( state == State::ACTIVE_FORGROUND ) {
-				switchWindow( "CallWindow", std::move(data) );
-			}
-		}
+            if (getState() == State::ACTIVE_FORGROUND)
+            {
+                switchWindow( "CallWindow", std::move(data) );
+            }
+        }
 		handled = true;
 	}
 

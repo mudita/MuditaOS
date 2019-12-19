@@ -28,3 +28,4 @@ build-rt1051/
 src/git-fame
 
 compile_commands.json
+source/version.hpp

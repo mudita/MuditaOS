@@ -28,9 +28,9 @@ protected:
 public:
 	BoxLayout();
 	BoxLayout( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
-	~BoxLayout();
+    virtual ~BoxLayout() = default;
 
-	//virtual methods from Item
+    //virtual methods from Item
 	void setPosition( const short& x, const short& y ) override;
 	void setSize( const short& w, const short& h ) override;
 	bool addWidget( gui::Item* item ) override;
@@ -44,7 +44,7 @@ protected:
 public:
 	HBox();
 	HBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
-	~HBox() {};
+    virtual ~HBox() = default;
 };
 
 class VBox : public BoxLayout {
@@ -52,7 +52,7 @@ public:
 	void resizeItems() override;
 	VBox();
 	VBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
-	~VBox() {};
+	virtual ~VBox() = default;
 };
 
 } /* namespace gui */

@@ -16,9 +16,6 @@ BoxLayout::BoxLayout( Item* parent, const uint32_t& x, const uint32_t& y, const 
 	Rect ( parent, x, y, w, h ){
 }
 
-BoxLayout::~BoxLayout() {
-}
-
 void BoxLayout::resizeItems() {
 }
 
