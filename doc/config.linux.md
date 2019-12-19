@@ -4,7 +4,8 @@
 
 ## Table of contents
 1. [Eclipse](#Eclipse)
-2. [Environment](#Environment)
+2. [CLion](#CLion)
+3. [Environment](#Environment)
 
 
 ### Eclipse <a name="Eclipse"></a>
@@ -17,6 +18,9 @@
 * Create deubg configuration ( right click on project and select debug as: local c/c++ application )
 * Open new debug configuration and in Arguments tab set 'Working directory' to **${workspace_loc:PurePhone/build}**
 * In Debugger tab set GDB command file to **${project_loc}/.gdbinit**
+
+### CLion <a name="CLion"></a>
+See here: [**doc/config.clion.md**](./config.clion.md)
 
 ### Environment <a name="Environment"></a>
 
