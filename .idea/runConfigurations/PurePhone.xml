@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PurePhone" type="CMakeRunConfiguration" factoryName="Application" activateToolWindowBeforeRun="false" WORKING_DIR="file://$PROJECT_DIR$/build" PASS_PARENT_ENVS_2="true" PROJECT_NAME="PurePhone" TARGET_NAME="PurePhone" CONFIG_NAME="Linux" RUN_TARGET_PROJECT_NAME="PurePhone" RUN_TARGET_NAME="PurePhone">
+    <method v="2">
+      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+    </method>
+  </configuration>
+</component>
