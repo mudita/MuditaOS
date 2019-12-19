@@ -173,9 +173,12 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 
 // Invoked when timer ticked
 void ServiceEink::TickHandler(uint32_t id) {
-
-	LOG_INFO("[ServiceEink] Power down eink after 3 seconds");
-	EinkPowerOff();
+    auto findID = std::find_if(timersList.begin(), timersList.end(), [id] (auto & timer) {return (timer->GetId() == id);});
+    if (findID != timersList.end())
+    {
+        LOG_INFO("[ServiceEink] Power down eink after 3 seconds");
+        EinkPowerOff();
+    }
 }
 
 // Invoked during initialization
