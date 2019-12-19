@@ -1,0 +1,20 @@
+# plik .gdbinit-1051 przerobiony na modłę Cliona, bo on *sam* woła target remote i load
+# https://stackoverflow.com/questions/39810593/gdb-monitor-commands-in-clion
+# random FreeRTOS stuff triggers this
+handle SIGUSR1 noprint nostop 
+# settings breakpoints triggers this
+# handle SIGTRAP print nostop
+
+define hookpost-load
+monitor halt
+eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
+break main
+end
+
+define target hookpost-remote
+monitor reset 0
+monitor halt
+echo Hook post- remote called!!\n
+load
+end
+
