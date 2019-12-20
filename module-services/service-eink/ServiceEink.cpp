@@ -140,7 +140,6 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 
 				if( ret != EinkOK )
 					LOG_FATAL("Failed to refresh frame");
-				EinkPowerOff();
 	//			uint32_t end_tick = xTaskGetTickCount();
 
 				ReloadTimer(timerPowerOffID);
