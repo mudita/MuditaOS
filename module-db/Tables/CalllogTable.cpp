@@ -7,6 +7,7 @@
  * @details
  */
 #include "CalllogTable.hpp"
+#include "log/log.hpp"
 
 CalllogTable::CalllogTable(Database *db) : Table(db) {
 }
@@ -19,17 +20,17 @@ bool CalllogTable::Create() {
     return db->Execute(createTableQuery);
 }
 
-bool CalllogTable::Add(CalllogTableRow entry) {
+bool CalllogTable::Add(CalllogTableRow entry)
+{
+    // TODO: alek: this casting down of 'duration' and 'date' to 32bit is a workaround as it looks like vsnprintf doesn't handle properly 64 bit values.
+    // instead of printing a value it is hard faulting.
+    // %llu or %lld doesn't help
+    // this TODO also applies to CalllogTable::Update below
+
     return db->Execute(
-            "INSERT or ignore INTO calls ( number, presentation, date, duration, type, name, contactId ) VALUES ('%s', %lu, %lu, %lu, %lu, '%s', '%s');",
-            entry.number.c_str(),
-            entry.presentation,
-            entry.date,
-            entry.duration,
-            entry.type,
-            entry.name.c_str(),
-            entry.contactId.c_str()
-    );
+        "INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId) VALUES ('%s', %lu, %lu, %lu, %lu, '%s', '%s');",
+        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), static_cast<uint32_t>(entry.date), static_cast<uint32_t>(entry.duration),
+        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
 }
 
 bool CalllogTable::RemoveByID(uint32_t id) {
@@ -40,18 +41,12 @@ bool CalllogTable::RemoveByField(CalllogTableFields field, const char *str) {
     return false; // not implemented // TODO: alek: check this
 }
 
-
-bool CalllogTable::Update(CalllogTableRow entry) {
+bool CalllogTable::Update(CalllogTableRow entry)
+{
     return db->Execute(
-            "UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s' WHERE _id=%lu;",
-            entry.number.c_str(),
-            entry.presentation,
-            entry.date,
-            entry.duration,
-            entry.type,
-            entry.name.c_str(),
-            entry.contactId.c_str()
-    );
+        "UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s' WHERE _id = %lu;",
+        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), static_cast<uint32_t>(entry.date), static_cast<uint32_t>(entry.duration),
+        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
 }
 
 CalllogTableRow CalllogTable::GetByID(uint32_t id) {
@@ -61,14 +56,15 @@ CalllogTableRow CalllogTable::GetByID(uint32_t id) {
         return CalllogTableRow();
     }
 
-    return CalllogTableRow{(*retQuery)[0].GetUInt32(),                                  // ID
-                           (*retQuery)[1].GetString(),                                  // number
-                           static_cast<PresentationType>((*retQuery)[2].GetUInt32()),   // presentation
-                           (*retQuery)[3].GetUInt32(),                                  // date
-					       (*retQuery)[4].GetUInt32(),                                  // duration
-                           static_cast<CallType>((*retQuery)[5].GetUInt32()),           // type
-                           (*retQuery)[6].GetString(),                                  // name
-                           (*retQuery)[7].GetString(),                                  // contactID
+    return CalllogTableRow{
+        (*retQuery)[0].GetUInt32(),                                // ID
+        (*retQuery)[1].GetString(),                                // number
+        static_cast<PresentationType>((*retQuery)[2].GetUInt32()), // presentation
+        static_cast<time_t>((*retQuery)[3].GetUInt64()),           // date
+        static_cast<time_t>((*retQuery)[4].GetUInt64()),           // duration
+        static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
+        (*retQuery)[6].GetString(),                                // name
+        (*retQuery)[7].GetString(),                                // contactID
     };
 }
 
@@ -84,15 +80,15 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffset(uint32_t offset, uint3
     std::vector<CalllogTableRow> ret;
 
     do {
-    	ret.push_back( // TODO: rudnik_a: add constructor for this
-    		CalllogTableRow{(*retQuery)[0].GetUInt32(),                                  // ID
-                            (*retQuery)[1].GetString(),                                  // number
-                            static_cast<PresentationType>((*retQuery)[2].GetUInt32()),   // presentation
-                            (*retQuery)[3].GetUInt32(),                                  // date
-					        (*retQuery)[4].GetUInt32(),                                  // duration
-                            static_cast<CallType>((*retQuery)[5].GetUInt32()),           // type
-                            (*retQuery)[6].GetString(),                                  // name
-                            (*retQuery)[7].GetString(),                                  // contactID
+        ret.push_back(CalllogTableRow{
+            (*retQuery)[0].GetUInt32(),                                // ID
+            (*retQuery)[1].GetString(),                                // number
+            static_cast<PresentationType>((*retQuery)[2].GetUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[3].GetUInt64()),           // date
+            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
+            (*retQuery)[6].GetString(),                                // name
+            (*retQuery)[7].GetString(),                                // contactID
         });
     } while (retQuery->NextRow());
 
@@ -127,14 +123,15 @@ CalllogTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, CalllogTabl
     std::vector<CalllogTableRow> ret;
 
     do {
-        ret.push_back(CalllogTableRow{  (*retQuery)[0].GetUInt32(),                                  // ID
-                                        (*retQuery)[1].GetString(),                                  // number
-                                        static_cast<PresentationType>((*retQuery)[2].GetUInt32()),   // presentation
-                                        (*retQuery)[3].GetUInt32(),                                  // date
-					                    (*retQuery)[4].GetUInt32(),                                  // duration
-                                        static_cast<CallType>((*retQuery)[5].GetUInt32()),           // type
-                                        (*retQuery)[6].GetString(),                                  // name
-                                        (*retQuery)[7].GetString(),                                  // contactID
+        ret.push_back(CalllogTableRow{
+            (*retQuery)[0].GetUInt32(),                                // ID
+            (*retQuery)[1].GetString(),                                // number
+            static_cast<PresentationType>((*retQuery)[2].GetUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[3].GetUInt64()),           // date
+            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
+            (*retQuery)[6].GetString(),                                // name
+            (*retQuery)[7].GetString(),                                // contactID
         });
     } while (retQuery->NextRow());
 

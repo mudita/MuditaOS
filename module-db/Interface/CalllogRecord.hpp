@@ -20,7 +20,7 @@ struct CalllogRecord{
     UTF8        number;
 	PresentationType presentation;
     time_t      date;
-    uint32_t    duration; // TODO: alek: should be time_t?
+    time_t duration;
     CallType    type;
     UTF8        name;
 	UTF8        contactId;
