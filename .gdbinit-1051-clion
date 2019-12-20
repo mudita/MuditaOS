@@ -1,4 +1,4 @@
-# plik .gdbinit-1051 przerobiony na modłę Cliona, bo on *sam* woła target remote i load
+# .gdbinit-1051 file adapted for CLion, because it performs `gdb target` and `gdb load` on it own.
 # https://stackoverflow.com/questions/39810593/gdb-monitor-commands-in-clion
 # random FreeRTOS stuff triggers this
 handle SIGUSR1 noprint nostop 
