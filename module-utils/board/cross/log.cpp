@@ -10,6 +10,8 @@ extern "C" {
 }
 #include "semphr.h"
 #include <assert.h>
+#include <board.h>
+#include <critical.hpp>
 
 /*
  * TODO: M.P
@@ -72,20 +74,48 @@ struct Logger{
 
     }
 
+    bool logLock()
+    {
+        // if called from the ISR use DI/EI. In all other cases use semaphore.
+        if (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
+        {
+            bt = cpp_freertos::CriticalSection::EnterFromISR();
+        }
+        else if (xSemaphoreTake(lock, 100) != pdPASS)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    void logUnlock()
+    {
+        // if called from the ISR use DI/EI. In all other cases use semaphore.
+        if (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
+        {
+            cpp_freertos::CriticalSection::ExitFromISR(bt);
+        }
+        else
+        {
+            xSemaphoreGive(lock);
+        }
+    }
+
     xSemaphoreHandle lock;
     logger_level level;
+    BaseType_t bt;
 };
 
 static Logger logger;
 static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
 
-
 void log_Printf(const char *fmt, ...)
 {
-    /* Acquire lock */
-    if(xSemaphoreTake(logger.lock,100) != pdPASS){
+    if (!logger.logLock())
+    {
         return;
     }
+
     char* ptr = loggerBuffer;
     va_list args;
 
@@ -99,19 +129,13 @@ void log_Printf(const char *fmt, ...)
     SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
 #endif
 
-    /* Release lock */
-    xSemaphoreGive(logger.lock);
+    logger.logUnlock();
 }
-
-#include <board.h>
 
 static void _log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, va_list args)
 {
-    /// right now there is no way to call logging from ISR -> check if we are in isr and assert
-    if(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) {
-        assert(0);
-    }
-    if(xSemaphoreTake(logger.lock,100) != pdPASS){
+    if (!logger.logLock())
+    {
         return;
     }
 
@@ -139,7 +163,7 @@ static void _log_Log(logger_level level, const char *file, int line,const char *
 #endif
 
     /* Release lock */
-    xSemaphoreGive(logger.lock);
+    logger.logUnlock();
 }
 
 void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...)
@@ -169,35 +193,83 @@ extern "C" {
 
     int printf (__const char *__restrict __format, ...)
     {
-    /* Acquire lock */
-    if(xSemaphoreTake(logger.lock,100) != pdPASS){
-        return 0;
+        /* Acquire lock */
+        if (!logger.logLock())
+        {
+            return -1;
+        }
+
+        char* ptr = loggerBuffer;
+        va_list args;
+
+        va_start(args, __format);
+        ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, args);
+        va_end(args);
+
+        unsigned int numBytes = ptr - loggerBuffer;
+        SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,numBytes);
+
+        /* Release lock */
+        logger.logUnlock();
+        
+        return numBytes;
     }
-    char* ptr = loggerBuffer;
-    va_list args;
 
-    va_start(args, __format);
-    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, args);
-    va_end(args);
+    int vprintf (const char *__restrict __format, va_list __arg) {
+        /* Acquire lock */
+        if (!logger.logLock())
+        {
+            return -1;
+        }
+        char* ptr = loggerBuffer;
+        ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, __arg);
 
-    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+        unsigned int numBytes = ptr - loggerBuffer;
+        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
 
-    /* Release lock */
-    xSemaphoreGive(logger.lock);
-    return 0;
-}
+        /* Release lock */
+        logger.logUnlock();
 
-int vprintf (const char *__restrict __format, va_list __arg) {
-    /* Acquire lock */
-    if(xSemaphoreTake(logger.lock,100) != pdPASS){
-        return 0;
+        return numBytes;
     }
-    char* ptr = loggerBuffer;
-    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, __arg);
 
-    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+    int log_assert(__const char *__restrict __format, ...)
+    {
+        /* Acquire lock */
+        if (!logger.logLock())
+        {
+            return -1;
+        }
 
-    /* Release lock */
-    xSemaphoreGive(logger.lock);
-}
+        char *ptr = loggerBuffer;
+        ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        logger_level level = LOGFATAL;
+        ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET, level_colors[level], level_names[level],
+                       xTaskGetCurrentTaskHandle() == NULL ? "CRIT" : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle()));
+
+        va_list args;
+        va_start(args, __format);
+        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, args);
+        va_end(args);
+
+        unsigned int numBytes = ptr - loggerBuffer;
+        #if LOG_REDIRECT_TO_SERIAL == 1
+            LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
+        #else
+            SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+        #endif
+
+        /* Release lock */
+        logger.logUnlock();
+
+        return numBytes;
+    }
+
+    void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
+    {
+        log_assert("\"%s\" failed: file \"%s\", line %d%s%s\n", failedexpr, file, line, func ? ", function: " : "", func ? func : "");
+
+        abort();
+        /* NOTREACHED */
+    }
 };
