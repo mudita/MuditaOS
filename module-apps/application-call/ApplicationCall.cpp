@@ -39,9 +39,9 @@ void ApplicationCall::timerCallCallback()
     ++callDuration;
 
     auto it = windows.find("CallWindow");
-    if (currentWindow == it->second)
+    if (getCurrentWindow() == it->second)
     {
-        gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(currentWindow);
+        gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(getCurrentWindow());
 
         if (callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS)
         {
@@ -53,7 +53,7 @@ void ApplicationCall::timerCallCallback()
     if (callDuration >= callEndTime)
     {
         LOG_INFO("callDuration %d, callEndTime id %d", callDuration, callEndTime);
-        stopTimer(timerCallId);
+        timerCall.stop();
         sapm::ApplicationManager::messageSwitchPreviousApplication(this);
     }
 }
