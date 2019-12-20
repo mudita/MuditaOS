@@ -174,7 +174,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
 			(msg->type == CellularNotificationMessage::Type::CallBusy))
 		{
-			stopTimer(callStateTimer);
+			stopTimer(callStateTimerID);
 		}
 		else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
 		{
