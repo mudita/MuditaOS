@@ -13,11 +13,12 @@
 #include <functional>
 
 #include "AppWindow.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Window.hpp"
+#include "PageLayout.hpp"
 #include "gui/widgets/BottomBar.hpp"
+#include "gui/widgets/Image.hpp"
+#include "gui/widgets/Label.hpp"
 #include "gui/widgets/TopBar.hpp"
+#include "gui/widgets/Window.hpp"
 
 namespace gui {
 
@@ -26,9 +27,9 @@ namespace gui {
  */
 class SettingsMainWindow: public AppWindow {
 protected:
-	std::vector<gui::Item*> options;
+  PageLayout *body = nullptr;
+  void addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
 
-	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
 public:
 	SettingsMainWindow( app::Application* app );
 	virtual ~SettingsMainWindow();

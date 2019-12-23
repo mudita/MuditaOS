@@ -31,88 +31,66 @@ SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,
 }
 
 void SettingsMainWindow::rebuild() {
-	//find which widget has focus
-	uint32_t index = 0;
-	for( uint32_t i=0; i<options.size(); i++ )
-		if( options[i] == getFocusItem()) {
-			index = i;
-			break;
-		}
-
 	destroyInterface();
 	buildInterface();
-	setFocusItem( options[index] );
 }
-void SettingsMainWindow::buildInterface() {
-	AppWindow::buildInterface();
-	bottomBar->setActive( BottomBar::Side::CENTER, true );
-	bottomBar->setActive( BottomBar::Side::RIGHT, true );
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open"));
-	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-	topBar->setActive(TopBar::Elements::SIGNAL, true );
-	topBar->setActive(TopBar::Elements::BATTERY, true );
+void SettingsMainWindow::buildInterface()
+{
+    AppWindow::buildInterface();
+    bottomBar->setActive(BottomBar::Side::CENTER, true);
+    bottomBar->setActive(BottomBar::Side::RIGHT, true);
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
+    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+
+    topBar->setActive(TopBar::Elements::SIGNAL, true);
+    topBar->setActive(TopBar::Elements::BATTERY, true);
 
     setTitle(utils::localize.get("app_settings_title_main"));
 
-	options.push_back( addOptionLabel( "Info", [=] (gui::Item& item){
-                LOG_INFO("switching to TEST UI page" );
-                application->switchWindow(gui::window::hw_info, nullptr );
-                return true;
-            }) );
+    body = new gui::PageLayout(this, {0, title->offset_h(), this->getWidth(), this->getHeight() - this->title->offset_h() - bottomBar->getHeight()});
 
-	options.push_back( addOptionLabel( "TEST UI", [=] (gui::Item& item){
-                LOG_INFO("switching to TEST UI page" );
-                application->switchWindow("TEST_UI", nullptr );
-                return true;
-            }) );
+    addOptionLabel("Info", [=](gui::Item &item) {
+        LOG_INFO("switching to TEST UI page");
+        application->switchWindow(gui::window::hw_info, nullptr);
+        return true;
+    });
 
-	//add option connectivity option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_bt"), [=] (gui::Item& item){
-                LOG_INFO("switching to bluetooth page" );
-                application->switchWindow("Bluetooth", nullptr );
-                return true;
-            }) );
+    addOptionLabel("UI TEST", [=](gui::Item &item) {
+        LOG_INFO("switching to TEST UI page");
+        application->switchWindow("TEST_UI", nullptr);
+        return true;
+    });
 
-	//add option date and time option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_date_and_time"), [=](gui::Item&){ return true;}) );
+    addOptionLabel(utils::localize.get("app_settings_bt"), [=](gui::Item &item) {
+        LOG_INFO("switching to bluetooth page");
+        application->switchWindow("Bluetooth", nullptr);
+        return true;
+    });
 
-	//add option display option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_display"), [=](gui::Item&){ return true;} ));
+    addOptionLabel(utils::localize.get("app_settings_language"), [=](gui::Item &) {
+        LOG_INFO("switching to language page");
+        application->switchWindow("Languages");
+        return true;
+    });
 
-	//add option phone mode option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_phone_modes"), [=](gui::Item&){ return true;} ));
+    addOptionLabel("[None] " + utils::localize.get("app_settings_date_and_time"), [=](gui::Item &) { return true; });
+    addOptionLabel("[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; });
+    addOptionLabel("[None] " + utils::localize.get("app_settings_phone_modes"), [=](gui::Item &) { return true; });
+    addOptionLabel("[None] " + utils::localize.get("app_settings_security"), [=](gui::Item &) { return true; });
+    addOptionLabel("[None] " + utils::localize.get("app_settings_about"), [=](gui::Item &) { return true; });
+    addOptionLabel("[Dummy]", [=](gui::Item &) { return true; });
+    addOptionLabel("[Dummy]", [=](gui::Item &) { return true; });
+    addOptionLabel("[Dummy]", [=](gui::Item &) { return true; });
+    addOptionLabel("[Dummy]", [=](gui::Item &) { return true; });
+    addOptionLabel("[Dummy]", [=](gui::Item &) { return true; });
 
-	//add option security option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_security"), [=](gui::Item&){ return true;} ));
-
-	//add option language option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_language"), [=](gui::Item&){
-		LOG_INFO("switching to language page" );
-		application->switchWindow( "Languages" );
-		return true;} ));
-
-//	//add option security option
-//	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
-
-	//set position and navigation for labels
-	uint32_t posY = 113;
-	uint32_t size = options.size();
-    const unsigned int labeloffset = 4;
-	for( uint32_t i=0; i<options.size(); i++ ){
-		options[i]->setPosition(20,(posY+labeloffset*i));
-		posY += 60;
-		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
-		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
-	}
+    setFocusItem(body);
+    body->switchPage(0);
 }
 void SettingsMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	for( uint32_t i=0; i<options.size(); i++ )
-		delete options[i];
-	options.clear();
 	this->focusItem = nullptr;
-	LOG_INFO("options size: %d", options.size());
 	children.clear();
 }
 
@@ -120,17 +98,16 @@ SettingsMainWindow::~SettingsMainWindow() {
 	destroyInterface();
 }
 
-gui::Item *SettingsMainWindow::addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback)
+void SettingsMainWindow::addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback)
 {
-    gui::Label *label = new gui::Label(this, 20, 0, 480 - 2 * 20, 55, text);
+    gui::Label *label = new gui::Label(nullptr, 20, 0, 480 - 2 * 20, 55, text);
     style::window::decorateOption(label);
     label->activatedCallback = activatedCallback;
     new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
-    return label;
+    body->addWidget(label);
 }
 
 void SettingsMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
-	setFocusItem( options[0] );
 }
 
 
