@@ -25,8 +25,6 @@
 #include "SwitchData.hpp"
 #include "windows/AppWindow.hpp"
 
-// #define DEBUG_APPLICATION_MANAGEMENT
-
 namespace gui {
 	class AppWindow;
 };
