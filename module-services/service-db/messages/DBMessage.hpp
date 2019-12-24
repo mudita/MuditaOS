@@ -105,6 +105,18 @@ class DBThreadMessage : public DBMessage
     ThreadRecord record;
 };
 
+class DBThreadMessageGet : public DBMessage
+{
+  public:
+    DBThreadMessageGet(MessageType messageType, uint32_t contactID) : DBMessage(messageType), contactID(contactID)
+    {
+    }
+    virtual ~DBThreadMessageGet() = default;
+
+    ThreadRecord record = {};
+    uint32_t contactID;
+};
+
 class DBThreadResponseMessage : public DBResponseMessage
 {
   public:

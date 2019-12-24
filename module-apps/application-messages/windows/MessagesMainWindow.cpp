@@ -24,7 +24,9 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "../data/SMSdata.hpp"
+#include "../windows/ThreadViewWindow.hpp"
 #include "NewMessage.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include <Style.hpp>
 #include <log/log.hpp>
 
@@ -116,15 +118,30 @@ MessagesMainWindow::~MessagesMainWindow() {
 
 void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
-	if (mode == ShowMode::GUI_SHOW_INIT) {
-		threadModel->clear();
-		threadModel->requestRecordsCount();
+    LOG_INFO("Data: %s", data ? data->getDescription().c_str() : "");
+    {
+        if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data))
+        {
+            auto thread = DBServiceAPI::ThreadGetByContact(application, pdata->result->dbID);
+            if (thread)
+            {
+                application->switchWindow(gui::name::window::thread_view, std::make_unique<SMSThreadData>(std::move(thread)));
+            }
+            else
+            {
+                LOG_FATAL("No thread and thread not created!");
+            }
+        }
+    }
+    if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr)
+    {
+        threadModel->clear();
+        threadModel->requestRecordsCount();
 		list->clear();
 		list->setElementsCount(threadModel->getItemCount());
 
 		setFocusItem(list);
-	}
-
+    }
 }
 
 bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {

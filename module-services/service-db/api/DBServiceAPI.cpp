@@ -141,7 +141,7 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffsetByThreadI
     }
 }
 
-ThreadRecord DBServiceAPI::ThreadGet(sys::Service *serv, uint32_t id)
+std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGet(sys::Service *serv, uint32_t id)
 {
     std::shared_ptr<DBThreadMessage> msg = std::make_shared<DBThreadMessage>(MessageType::DBThreadGet);
     msg->id = id;
@@ -150,11 +150,26 @@ ThreadRecord DBServiceAPI::ThreadGet(sys::Service *serv, uint32_t id)
     DBThreadResponseMessage *threadResponse = reinterpret_cast<DBThreadResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true))
     {
-        return std::move((*threadResponse->records)[0]);
+        return std::make_unique<ThreadRecord>((*threadResponse->records)[0]);
     }
     else
     {
-        return ThreadRecord{};
+        return nullptr;
+    }
+}
+
+std::unique_ptr<ThreadRecord> DBServiceAPI::ThreadGetByContact(sys::Service *serv, uint32_t contact)
+{
+    std::shared_ptr<DBThreadMessageGet> msg = std::make_shared<DBThreadMessageGet>(MessageType::DBThreadGetForContact, contact);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBThreadResponseMessage *threadResponse = reinterpret_cast<DBThreadResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true))
+    {
+        return std::make_unique<ThreadRecord>((*threadResponse->records)[0]);
+    }
+    else
+    {
+        return nullptr;
     }
 }
 

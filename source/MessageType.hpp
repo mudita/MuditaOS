@@ -14,10 +14,10 @@ enum class MessageType
 
     MessageTypeUninitialized = 0,
     // eink messages
-    EinkStateRequest, // message is used to pull status of the eink. If eink is ready to display image
-    EinkImageData,    // message with pointer to the image data for displaying
-    EinkDMATransfer,  // this message is internally sent from wink service to eink service. This will trigger DMA transfer to Eink's
-                     // controller. After tranfer gui service wil lbewill be notified
+    EinkStateRequest,      // message is used to pull status of the eink. If eink is ready to display image
+    EinkImageData,         // message with pointer to the image data for displaying
+    EinkDMATransfer,       // this message is internally sent from wink service to eink service. This will trigger DMA transfer to Eink's
+                           // controller. After tranfer gui service wil lbewill be notified
     EinkTemperatureUpdate, // message sent from timer handler. Message forces service to update temperature measured by the eink.
 
     // gui messages
@@ -37,13 +37,14 @@ enum class MessageType
     DBSMSGetSMSLimitOffsetByThreadID, // Get SMS records by limit,offset with specified ThreadID field
 
     DBThreadGet,            // Get thread by ID
+    DBThreadGetForContact,  // Get thread between 2 contacts
     DBThreadRemove,         // Remove thread by ID
     DBThreadGetLimitOffset, // Get Thread record by limit,offset
     DBThreadGetCount,       // get Thread count
 
-    DBContactVerify, // checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
-                     // speed dial key
-    DBContactGetByName,      // used to ask for a contact with specified primary and alternative name.
+    DBContactVerify,    // checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
+                        // speed dial key
+    DBContactGetByName, // used to ask for a contact with specified primary and alternative name.
     DBContactSearch,
     DBContactGetByID,        // used to ask for a contact with specified id
     DBContactGetBySpeedDial, // used to ask for a contact with specified speed dial key assigned
@@ -72,15 +73,14 @@ enum class MessageType
     CellularStartPowerUpProcedure,
     CellularStartConfProcedure,
     CellularStartAudioConfProcedure,
-	CellularSendSMS,	// request ot send new sms
-	CellularSMSMulticast,
+    CellularSendSMS, // request ot send new sms
+    CellularSMSMulticast,
 
-	DBNotesAdd,       // Add new note's record
-	DBNotesRemove,    // Remove selected note's record
-	DBNotesUpdate,    // Update selected note's record
-	DBNotesGetLimitOffset,   // Get notes records by limit,offset
-	DBNotesGetCount,         // Get notes reocrds count
-
+    DBNotesAdd,            // Add new note's record
+    DBNotesRemove,         // Remove selected note's record
+    DBNotesUpdate,         // Update selected note's record
+    DBNotesGetLimitOffset, // Get notes records by limit,offset
+    DBNotesGetCount,       // Get notes reocrds count
 
     DBCalllogAdd,            // Add new note's record
     DBCalllogRemove,         // Remove selected note's record
@@ -106,14 +106,14 @@ enum class MessageType
     AudioGetFileTags,
 
     // application manager
-    APMSwitch,         // request to switch to given application, optionally also to specified window
-    APMSwitchPrevApp,  // Request to switch to previous application.
-    APMConfirmSwitch,  // Used when application confirms that it is loosing focus and also when application confirms that is has gained focus
-    APMConfirmClose,   // Sent by application to confirm completion of the close procedure
-    APMRegister,       // when application finishes initHandler it is sending this messag to inform whether init was successful or not.
-    APMDeleydClose,    // this message is sent internally from and to application manager to close specified application.
-    APMChangeLanguage, // this message is sent from any application to inform application manager that it should send gui rebuild command to all
-                       // applications in background and currently active application.
+    APMSwitch,            // request to switch to given application, optionally also to specified window
+    APMSwitchPrevApp,     // Request to switch to previous application.
+    APMConfirmSwitch,     // Used when application confirms that it is loosing focus and also when application confirms that is has gained focus
+    APMConfirmClose,      // Sent by application to confirm completion of the close procedure
+    APMRegister,          // when application finishes initHandler it is sending this messag to inform whether init was successful or not.
+    APMDeleydClose,       // this message is sent internally from and to application manager to close specified application.
+    APMChangeLanguage,    // this message is sent from any application to inform application manager that it should send gui rebuild command to all
+                          // applications in background and currently active application.
     APMClose,             // this message will trigger application manager to close itself, all running applications gui and eink services.
     APMPreventBlocking,   // Prevents application manager from initializing device blocking.
     APMInitPowerSaveMode, // This message is sent to application manager from desktop when locking timeout has triggered or user explicitly locked the phone.

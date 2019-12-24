@@ -169,6 +169,7 @@ bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
         list->cb_ENTER = [=](gui::PhonebookItem *item) {
             std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
             data->result = item->getContact();
+            data->setDescription("PhonebookSearchRequest");
             return sapm::ApplicationManager::messageSwitchPreviousApplication(
                 application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
         };
