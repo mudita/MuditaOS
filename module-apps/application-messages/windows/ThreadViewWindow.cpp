@@ -20,6 +20,7 @@
 #include "../widgets/ThreadModel.hpp"
 
 #include "../data/SMSdata.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <gui/widgets/Text.hpp>
@@ -233,6 +234,12 @@ namespace gui
                 LOG_DEBUG("SEND SMS TO: %s %s %s %s %s", pdata->contact->number.c_str(), pdata->contact->numbers[0].numberE164.c_str(),
                           pdata->contact->numbers[0].numberUser.c_str(), pdata->contact->primaryName.c_str(), pdata->contact->alternativeName.c_str());
                 setTitle(pdata->contact->numbers[0].numberUser);
+            }
+        }
+        {
+            if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data))
+            {
+                LOG_INFO("PhonebookSearchRequest data");
             }
         }
     }
