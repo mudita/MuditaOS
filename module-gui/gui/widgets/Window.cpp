@@ -13,14 +13,9 @@
 
 namespace gui {
 
-Window::Window( std::string name, uint32_t id ) :
-	Item(),
-	windowID{id},
-	refreshMode{RefreshModes::GUI_REFRESH_FAST},
-	name{name},
-	focusItem{nullptr}
-	 {
-}
+    Window::Window(std::string name, uint32_t id) : Item(), windowID{id}, refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
+    {
+    }
 
 Window::~Window() {
 }
@@ -40,21 +35,6 @@ bool Window::handleSwitchData( SwitchData* data ) {
 	return true;
 }
 
-void Window::setFocusItem( Item* item ) {
-
-	//check if item is a child of the window
-//	auto it = std::find(children.begin(), children.end(), item);
-//	if( it == children.end())
-//		return;
-
-	//remove focus from previous item
-	if( focusItem != nullptr )
-		focusItem->setFocus( false );
-
-	focusItem = item;
-	if( focusItem )
-		focusItem->setFocus( true );
-}
 
 std::list<DrawCommand*> Window::buildDrawList() {
 
@@ -86,36 +66,9 @@ bool Window::onInput( const InputEvent& inputEvent) {
 	
 	// if focused item didn't handle the key event and it was navigation key
 	// check if moving focus is possible
-	gui::Item* newFocusItem = nullptr;
-	if( (!res) && (focusItem != nullptr ) && (inputEvent.state == InputEvent::State::keyReleasedShort) ) {
-		switch( inputEvent.keyCode ) {
-		case KeyCode::KEY_LEFT:
-			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);
-			break;
-		case KeyCode::KEY_RIGHT:
-			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::RIGHT);
-			break;
-		case KeyCode::KEY_UP:
-			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::UP);
-			break;
-		case KeyCode::KEY_DOWN:
-			newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::DOWN);
-			break;
-		case KeyCode::KEY_ENTER:
-			if( focusItem != nullptr)
-				return focusItem->onActivated(nullptr);
-			break;
-		default:
-			break;
-		}
-	}
+    return handleNavigation(inputEvent);
 
-	if( newFocusItem != nullptr ) {
-		setFocusItem(newFocusItem);
-		return true;
-	}
-
-	return false;
+    return false;
 }
 
 } /* namespace gui */

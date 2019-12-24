@@ -41,12 +41,14 @@ class Item {
 public:
 	//flag that informs whether item has a focus
 	bool focus;
-	//type of the widget
-	ItemType type;
+    // pointer to the child item that has focus
+    Item *focusItem = nullptr;
+    // type of the widget
+    ItemType type;
 	//pointer to the parent Item
-	Item* parent;
-	//list of items that have the same parent.
-	std::list<Item*> children;
+    Item *parent = nullptr;
+    // list of items that have the same parent.
+    std::list<Item*> children;
 	//bounding box of the item. This is in coordinates of the parent widget.
 	BoundingBox widgetArea;
 	//bounding box used for drawing. This is in coordinates of window
@@ -77,6 +79,9 @@ public:
 	std::function<bool(Item&)> activatedCallback;
 	std::function<bool(Item&, const InputEvent& inputEvent)> inputCallback;
 	std::function<bool(Item&)> contentCallback;
+    std::function<bool(const InputEvent &)> itemNavigation = nullptr;
+
+    bool handleNavigation(const InputEvent inputEvent);
 
     int16_t w() { return widgetArea.w; }
     int16_t h() { return widgetArea.h; }
@@ -94,9 +99,34 @@ public:
 		return state;
 	}
 
-	virtual bool onFocus( bool state ) { focus = state; return true; };
-	virtual bool onActivated( void* data ) { return activatedCallback(*this); };
-	virtual bool onInput( const InputEvent& inputEvent ) { return inputCallback( *this, inputEvent ); };
+    void setFocusItem(Item *item)
+    {
+        auto checknrun = [=](bool on) {
+            if (focusItem != nullptr)
+            {
+                focusItem->setFocus(on);
+            }
+        };
+        checknrun(false);
+        focusItem = item;
+        checknrun(true);
+    }
+
+    Item *getFocusItem()
+    {
+        return focusItem;
+    }
+
+    virtual bool onFocus(bool state)
+    {
+        focus = state;
+        return true;
+    };
+    virtual bool onActivated(void *data)
+    {
+        return activatedCallback(*this);
+    };
+    virtual bool onInput( const InputEvent& inputEvent ) { return inputCallback( *this, inputEvent ); };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
 	virtual bool onContent() { return false; };
 

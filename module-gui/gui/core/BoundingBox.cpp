@@ -12,7 +12,12 @@ namespace gui {
 BoundingBox::BoundingBox() : x {0}, y{0}, w{0}, h{0} {
 }
 
-BoundingBox::BoundingBox( int16_t x, int16_t y, uint16_t w, uint16_t h) : x{x}, y{y}, w{w}, h{h} {
+BoundingBox::BoundingBox(int32_t x, int32_t y, uint32_t w, uint32_t h)
+{
+    this->x = x;
+    this->y = y;
+    this->w = w;
+    this->h = h;
 }
 
 BoundingBox::~BoundingBox() {
