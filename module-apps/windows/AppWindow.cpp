@@ -164,4 +164,21 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 	return false;
 }
 
+    void AppWindow::textModeShowCB(const UTF8 &text)
+    {
+        if (bottomBar == nullptr)
+        {
+            return;
+        }
+        bottomBar->setText(BottomBar::Side::CENTER, text);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        bottomBar->getText(BottomBar::Side::CENTER);
+    }
+
+    bool AppWindow::textSelectSpecialCB()
+    {
+        return sapm::ApplicationManager::messageSwitchSpecialInput(
+            application, std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+    }
+
 } /* namespace gui */
