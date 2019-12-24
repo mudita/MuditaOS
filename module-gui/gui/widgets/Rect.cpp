@@ -39,6 +39,7 @@ Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     }
     setPosition(x, y);
     setSize(w, h);
+    setMaxSize(w, h);
 }
 
 Rect::~Rect() {
