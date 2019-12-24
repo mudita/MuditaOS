@@ -55,9 +55,9 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
     // Thread not found, create one
     if (threadRec->size() == 0) {
 
-        threadInterface.Add(ThreadRecord{
-                .contactID=contactID,
-        });
+        ThreadRecord re;
+        re.contactID = contactID;
+        threadInterface.Add(re);
 
         threadRec = threadInterface.GetLimitOffsetByField(0,1,ThreadRecordField::ContactID,std::to_string(contactID).c_str());
 

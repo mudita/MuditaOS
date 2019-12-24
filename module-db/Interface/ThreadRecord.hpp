@@ -21,13 +21,25 @@
 
 
 struct ThreadRecord{
-    uint32_t dbID;
-    uint32_t date;
-    uint32_t msgCount;
-    uint32_t msgRead;
-    UTF8 snippet;
-    SMSType type;
-    uint32_t contactID;
+    uint32_t dbID = 0;
+    uint32_t date = 0;
+    uint32_t msgCount = 0;
+    uint32_t msgRead = 0;
+    UTF8 snippet = "";
+    SMSType type = SMSType::ALL;
+    uint32_t contactID = 0;
+
+    ThreadRecord() = default;
+    ThreadRecord(const ThreadsTableRow &rec)
+    {
+        dbID = rec.ID;
+        date = rec.date;
+        msgCount = rec.msgCount;
+        msgRead = rec.msgRead;
+        snippet = rec.snippet;
+        type = rec.type;
+        contactID = rec.contactID;
+    }
 };
 
 enum class ThreadRecordField{
@@ -44,6 +56,7 @@ public:
     bool RemoveByID(uint32_t id) override final;
     bool Update(const ThreadRecord& rec) override final;
     ThreadRecord GetByID(uint32_t id) override final;
+    ThreadRecord GetByContact(uint32_t contact_id);
 
     uint32_t GetCount() override final;
 
