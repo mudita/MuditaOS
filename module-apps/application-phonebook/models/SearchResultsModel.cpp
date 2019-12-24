@@ -16,6 +16,11 @@ SearchResultsModel::~SearchResultsModel()
 gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
     auto o = *results.get();
+    if (index >= o.size())
+    {
+        LOG_ERROR("getItem error: index %d >= results size %d", index, o.size());
+        return nullptr;
+    }
     auto contact = std::make_shared<ContactRecord>(o[index]);
 
     if (contact == nullptr)
