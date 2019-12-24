@@ -18,7 +18,6 @@ class BtWindow : public AppWindow
   protected:
     std::vector<gui::Item *> options;
     VBox* box;
-    std::list<Item*> box_items;
 
     gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
 
@@ -30,6 +29,7 @@ class BtWindow : public AppWindow
     void onBeforeShow(ShowMode mode, SwitchData *data) override;
     void rebuild() override;
     void buildInterface() override;
+    bool onInput(const InputEvent &inputEvent) override;
     void destroyInterface() override;
     void set_navigation();
 };
