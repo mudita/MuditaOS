@@ -240,7 +240,15 @@ void Text::setFont(const UTF8 &fontName)
 void Text::splitTextToLines(const UTF8 &text)
 {
 
-    if (text.length() == 0) return;
+    if (text.length() == 0)
+    {
+        if (textLines.size() == 0)
+        {
+            firstLine = textLines.end();
+            lastLine = textLines.end();
+        }
+        return;
+    }
 
     // copy provided text to internal buffer
     uint32_t index = 0;
