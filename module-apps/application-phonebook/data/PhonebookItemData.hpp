@@ -58,3 +58,15 @@ class PhonebookSearchResultsData : public gui::SwitchData
     std::string searchQuery;
     std::shared_ptr<std::vector<ContactRecord>> results;
 };
+
+class PhonebookSearchReuqest : public gui::SwitchData
+{
+  public:
+    std::string request = "";
+    std::shared_ptr<std::vector<ContactRecord>> results = nullptr;
+    PhonebookSearchReuqest(std::string request, std::shared_ptr<std::vector<ContactRecord>> results) : request(request), results(results)
+    {
+    }
+    PhonebookSearchReuqest() = default;
+    std::shared_ptr<ContactRecord> result = nullptr;
+};

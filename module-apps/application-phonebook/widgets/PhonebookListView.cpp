@@ -63,6 +63,10 @@ bool PhonebookListView::onInput(const InputEvent &inputEvent)
         gui::PhonebookItem *item = getSelectedPhonebookItem();
         if (item)
         {
+            if (cb_ENTER && cb_ENTER(item))
+            {
+                return true;
+            }
             // LOG_INFO("show info on index: %d %s", item->getID(), item->getValue().c_str());
 
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(item->getContact());
