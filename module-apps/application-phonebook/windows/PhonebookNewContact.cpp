@@ -116,6 +116,9 @@ void PhonebookNewContact::buildInterface()
         page1.text[i]->setEditMode(gui::Text::EditMode::EDIT);
     }
 
+    page1.text[2]->setInputMode(new InputMode({InputMode::digit}));
+    page1.text[3]->setInputMode(new InputMode({InputMode::digit}));
+
     // set navigation for page 1
     for (uint32_t i = 0; i < 4; i++)
     {
