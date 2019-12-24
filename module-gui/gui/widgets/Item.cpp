@@ -121,9 +121,17 @@ void Item::setSize( const short& w, const short& h ) {
 	widgetArea.h = h;
 	if( widgetArea.h < 0 )
 		widgetArea.h = 0;
-	updateDrawArea();
+    if (w > maxWidth)
+    {
+        maxWidth = w;
+    }
+    if (h > maxHeight)
+    {
+        maxHeight = h;
+    }
+    updateDrawArea();
 
-	onDimensionChanged(oldArea, widgetArea);
+    onDimensionChanged(oldArea, widgetArea);
 }
 
 void Item::setBoundingBox(const BoundingBox &new_box)
