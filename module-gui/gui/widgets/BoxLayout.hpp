@@ -24,8 +24,17 @@ protected:
 		bool noUpdate;
 	};
 
-	virtual void resizeItems();
-public:
+    enum class BoxAxis
+    {
+        X,
+        Y
+    };
+
+    template <BoxAxis axis> void resizeItems();
+
+    virtual void resizeItems();
+
+  public:
 	BoxLayout();
 	BoxLayout( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
     virtual ~BoxLayout() = default;
