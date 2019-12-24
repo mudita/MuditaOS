@@ -29,16 +29,7 @@ namespace gui
         text->setEditMode(gui::Text::EditMode::EDIT);
         text->setFont(style::window::font::medium);
         text->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit},
-            [=](const UTF8 &text) {
-                bottomBar->setText(BottomBar::Side::CENTER, text);
-                application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                bottomBar->getText(BottomBar::Side::CENTER);
-            },
-            [=]() {
-                sapm::ApplicationManager::messageSwitchSpecialInput(
-                    application, std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
-            }));
+            {InputMode::ABC, InputMode::abc, InputMode::digit}, [=](const UTF8 &text) { textModeShowCB(text); }, [=]() { textSelectSpecialCB(); }));
         text->setPenFocusWidth(0);
         setFocusItem(text);
     }
