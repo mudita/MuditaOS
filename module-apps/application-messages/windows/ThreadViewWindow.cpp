@@ -20,7 +20,6 @@
 #include "../widgets/ThreadModel.hpp"
 
 #include "../data/SMSdata.hpp"
-#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <gui/widgets/Text.hpp>

@@ -51,9 +51,9 @@ public:
 
     uint32_t GetCount() override final;
     uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
+    ThreadsTableRow getByContact(uint32_t contact_id);
 
-private:
-
+  private:
     const char* createTableQuery =
             "CREATE TABLE IF NOT EXISTS threads("
             "_id INTEGER PRIMARY KEY,"

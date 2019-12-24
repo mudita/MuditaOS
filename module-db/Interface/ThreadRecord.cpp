@@ -8,10 +8,10 @@
  * @details
  */
 
-
 #include "ThreadRecord.hpp"
 #include "SMSRecord.hpp"
-
+#include <cassert>
+#include <log/log.hpp>
 
 ThreadRecordInterface::ThreadRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb): smsDB(smsDb),contactsDB(contactsDb) {
 }
@@ -70,15 +70,7 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
     auto ret = smsDB->threads.GetLimitOffset(offset, limit);
 
     for (const auto &w: ret) {
-        records->push_back(ThreadRecord{
-                .dbID = w.ID,
-                .date = w.date,
-                .msgCount=w.msgCount,
-                .msgRead=w.msgRead,
-                .snippet=w.snippet,
-                .type=w.type,
-                .contactID=w.contactID
-        });
+        records->push_back(w);
     }
 
     return records;
@@ -94,15 +86,7 @@ std::unique_ptr<std::vector<ThreadRecord>> ThreadRecordInterface::GetLimitOffset
             auto ret = smsDB->threads.GetLimitOffsetByField(offset, limit,ThreadsTableFields::ContactID,str);
 
             for(const auto &w: ret){
-                records->push_back(ThreadRecord{
-                        .dbID = w.ID,
-                        .date = w.date,
-                        .msgCount=w.msgCount,
-                        .msgRead=w.msgRead,
-                        .snippet=w.snippet,
-                        .type=w.type,
-                        .contactID=w.contactID
-                });
+                records->push_back(w);
             }
         }
             break;
@@ -116,16 +100,27 @@ ThreadRecord ThreadRecordInterface::GetByID(uint32_t id) {
 
     auto rec = smsDB->threads.GetByID(id);
     if(rec.ID == 0){
-        return ThreadRecord{};
+        return ThreadRecord();
     }
 
-    return ThreadRecord{
-            .dbID = rec.ID,
-            .date = rec.date,
-            .msgCount=rec.msgCount,
-            .msgRead=rec.msgRead,
-            .snippet=rec.snippet,
-            .type=rec.type,
-            .contactID=rec.contactID
-    };
+    return ThreadRecord(rec);
+}
+
+ThreadRecord ThreadRecordInterface::GetByContact(uint32_t contact_id)
+{
+    auto ret = smsDB->threads.GetLimitOffsetByField(0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
+    if (ret.size() == 0)
+    {
+        ThreadRecord re;
+        re.contactID = contact_id;
+        if (!Add(re))
+        {
+            LOG_ERROR("There is no thread but we cant add it");
+            assert(0);
+        }
+
+        ret = smsDB->threads.GetLimitOffsetByField(0, 1, ThreadsTableFields::ContactID, std::to_string(contact_id).c_str());
+    }
+    ThreadRecord a = ret[0];
+    return a;
 }
