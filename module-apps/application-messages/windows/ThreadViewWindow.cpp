@@ -21,6 +21,7 @@
 
 #include "../data/SMSdata.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include <application-phonebook/data/PhonebookItemData.hpp>
 #include <gui/widgets/Text.hpp>
 #include <widgets/ListItem.hpp>
 #include <widgets/ListItemProvider.hpp>
@@ -125,7 +126,8 @@ namespace gui
 
         // new text, TODO TODO - send it and reload sms
         auto text = new gui::Text(nullptr, 0, 0, elements_width, 100, "", gui::Text::ExpandMode::EXPAND_UP);
-        text->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
+        text->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc}, [=](const UTF8 &text) { textModeShowCB(text); }, [=]() { textSelectSpecialCB(); }));
         text->setPenFocusWidth(2);
         text->setPenWidth(2);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -208,15 +210,30 @@ namespace gui
 
     void ThreadViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        auto pdata = dynamic_cast<SMSThreadData *>(data);
-        if (pdata)
         {
-            LOG_INFO("We have it! %d", pdata->thread->dbID);
-            // cleanMessages
-            addMessages(pdata->thread->dbID);
-            auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
-            // should be name number for now - easier to handle
-            setTitle(ret->front().number);
+            auto pdata = dynamic_cast<SMSThreadData *>(data);
+            if (pdata)
+            {
+                LOG_INFO("We have it! %d", pdata->thread->dbID);
+                // cleanMessages
+                addMessages(pdata->thread->dbID);
+                auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
+                // should be name number for now - easier to handle
+                setTitle(ret->front().number);
+                return;
+            }
+        }
+        {
+            auto pdata = dynamic_cast<SMSSendRequest *>(data);
+            if (pdata)
+            {
+                LOG_INFO("Phonebook sms send request!");
+                // TODO agree what should be used and how. Now Request have only contact,
+                // maybe it should have additional info - which nr to use and how to show it
+                LOG_DEBUG("SEND SMS TO: %s %s %s %s %s", pdata->contact->number.c_str(), pdata->contact->numbers[0].numberE164.c_str(),
+                          pdata->contact->numbers[0].numberUser.c_str(), pdata->contact->primaryName.c_str(), pdata->contact->alternativeName.c_str());
+                setTitle(pdata->contact->numbers[0].numberUser);
+            }
         }
     }
 

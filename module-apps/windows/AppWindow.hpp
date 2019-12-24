@@ -75,6 +75,8 @@ public:
 	void destroyInterface() override;
 	bool onInput( const InputEvent& inputEvent ) override;
 	std::list<DrawCommand*> buildDrawList() override;
+    void textModeShowCB(const UTF8 &text);
+    bool textSelectSpecialCB();
 };
 
 } /* namespace gui */
