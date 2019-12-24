@@ -11,6 +11,7 @@
 
 #include "Application.hpp"
 #include "ListView.hpp"
+#include <functional>
 
 namespace gui
 {
@@ -31,6 +32,9 @@ class PhonebookListView : public ListView
 
     bool onInput(const InputEvent &inputEvent) override;
     void updatePageItems() override;
+
+    // onClick callback to register
+    std::function<bool(gui::PhonebookItem *item)> cb_ENTER = nullptr;
 };
 
 } /* namespace gui */
