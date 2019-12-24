@@ -212,4 +212,43 @@ void Item::setMinSize( const uint16_t& w, const uint16_t& h) {
 	minHeight = h;
 }
 
+bool Item::handleNavigation(const InputEvent inputEvent)
+{
+    gui::Item *newFocusItem = nullptr;
+    if ((focusItem != nullptr) && (inputEvent.state == InputEvent::State::keyReleasedShort))
+    {
+        if (itemNavigation && itemNavigation(inputEvent))
+        {
+            return true;
+        }
+        switch (inputEvent.keyCode)
+        {
+        case gui::KeyCode::KEY_LEFT:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);
+            break;
+        case gui::KeyCode::KEY_RIGHT:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::RIGHT);
+            break;
+        case gui::KeyCode::KEY_UP:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::UP);
+            break;
+        case gui::KeyCode::KEY_DOWN:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::DOWN);
+            break;
+        case gui::KeyCode::KEY_ENTER:
+            if (focusItem != nullptr)
+                return focusItem->onActivated(nullptr);
+            break;
+        default:
+            break;
+        }
+    }
+    if (newFocusItem != nullptr)
+    {
+        setFocusItem(newFocusItem);
+        return true;
+    }
+    return false;
+}
+
 } /* namespace gui */
