@@ -23,6 +23,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
+#include "../data/SMSdata.hpp"
 #include "NewMessage.hpp"
 #include <Style.hpp>
 #include <log/log.hpp>
