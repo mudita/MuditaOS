@@ -20,6 +20,7 @@
 #include "Margins.hpp"
 #include "SettingsMainWindow.hpp"
 #include <Style.hpp>
+#include "Info.hpp"
 
 namespace gui {
 
@@ -54,6 +55,12 @@ void SettingsMainWindow::buildInterface() {
 
     setTitle(utils::localize.get("app_settings_title_main"));
 
+	options.push_back( addOptionLabel( "Info", [=] (gui::Item& item){
+                LOG_INFO("switching to TEST UI page" );
+                application->switchWindow(gui::window::hw_info, nullptr );
+                return true;
+            }) );
+
 	options.push_back( addOptionLabel( "TEST UI", [=] (gui::Item& item){
                 LOG_INFO("switching to TEST UI page" );
                 application->switchWindow("TEST_UI", nullptr );
@@ -85,8 +92,8 @@ void SettingsMainWindow::buildInterface() {
 		application->switchWindow( "Languages" );
 		return true;} ));
 
-	//add option security option
-	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
+//	//add option security option
+//	options.push_back( addOptionLabel( utils::localize.get("app_settings_about"), [=](gui::Item&){ return true;} ));
 
 	//set position and navigation for labels
 	uint32_t posY = 113;
