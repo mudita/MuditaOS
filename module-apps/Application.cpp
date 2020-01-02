@@ -56,22 +56,28 @@ namespace app {
     }
 
 Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
-	Service( name, parent, stackDepth, priority ),
-	startBackground{ startBackground } {
+    Service(name, parent, stackDepth, priority),
+    longPressTimer (CreateAppTimer(key_timer_ms, true, [&]() { longPressTimerCallback(); }, "longPressTimer")),
+    startBackground{startBackground}
+{
 	keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
-    longPressTimer = CreateTimer( key_timer_ms, true);
-    Service::ReloadTimer(longPressTimer);
 	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
     if (startBackground)
     {
         setState(State::ACTIVE_BACKGROUND);
     }
+    longPressTimer.restart();
+
+    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
-Application::~Application() {
-	for( auto it = windows.begin(); it!= windows.end(); it++)
-		delete it->second;
-	windows.clear();
+Application::~Application()
+{
+    for (auto it = windows.begin(); it != windows.end(); it++)
+    {
+        delete it->second;
+    }
+    windows.clear();
 }
 
 Application::State Application::getState()
@@ -89,18 +95,46 @@ void Application::setState(State st)
 
 void Application::TickHandler(uint32_t id)
 {
-    if (id == longPressTimer)
+    auto appTimer = std::find(appTimers.begin(), appTimers.end(), id);
+    if (appTimer != appTimers.end())
     {
-        // TODO if(check widget type long press trigger)
-        uint32_t time = xTaskGetTickCount();
-        if (keyTranslator->timeout(time))
-        {
-            // previous key press was over standard keypress timeout - send long press
-            gui::InputEvent iev = keyTranslator->translate(time);
-            messageInputEventApplication(this, this->GetName(), iev);
-            // clean previous key
-            keyTranslator->prev_key_press = {};
-        }
+        appTimer->runCallback();
+    }
+    else{
+        LOG_ERROR("Requested timer doesn't exist here (ID: %s)\n", std::to_string(id).c_str()); // either timer was deleted or this id should not arrive.
+    }
+}
+
+void Application::DeleteTimer(AppTimer &timer)
+{
+    Service::DeleteTimer(timer.getID()); // remove the real FreeRTOS timer
+    auto timerOnTheList = std::find(appTimers.begin(), appTimers.end(), timer);
+    if (timerOnTheList != appTimers.end())
+    {
+        appTimers.erase(timerOnTheList);
+    }
+}
+
+[[deprecated("only for compatibility")]]
+void Application::DeleteTimer(uint32_t id)
+{
+    auto found = std::find(appTimers.begin(), appTimers.end(), id);
+    if (found != appTimers.end()){
+        DeleteTimer(*found);
+    }
+}
+
+void Application::longPressTimerCallback()
+{
+    // TODO if(check widget type long press trigger)
+    uint32_t time = xTaskGetTickCount();
+    if (keyTranslator->timeout(time))
+    {
+        // previous key press was over standard keypress timeout - send long press
+        gui::InputEvent iev = keyTranslator->translate(time);
+        messageInputEventApplication(this, this->GetName(), iev);
+        // clean previous key
+        keyTranslator->prev_key_press = {};
     }
 }
 
@@ -442,4 +476,58 @@ bool Application::messageInputEventApplication( sys::Service* sender, std::strin
 	return true;
 }
 
+AppTimer Application::CreateAppTimer(TickType_t interval, bool isPeriodic, std::function<void()> callback, const std::string &name)
+{
+    auto id = CreateTimer(interval, isPeriodic, name);
+    auto timer = AppTimer(this, id, callback, name);
+    appTimers.push_back(timer);
+    return timer; // return ptr to the timer on the list
+}
+
+AppTimer::AppTimer(Application * parent, uint32_t id, std::function<void()> callback, const std::string &name) : parent(parent)
+{
+    this->id = id;
+    registerCallback(callback);
+}
+AppTimer::AppTimer() = default;
+
+AppTimer::~AppTimer()
+{
+    callback = nullptr;
+}
+
+void AppTimer::registerCallback(std::function<void()> callback)
+{
+    this->callback = callback;
+}
+void AppTimer::runCallback()
+{
+    callback();
+}
+uint32_t AppTimer::getID()
+{
+    return id;
+}
+void AppTimer::stop()
+{
+    if (parent)
+    {
+        parent->stopTimer(getID());
+    }
+}
+void AppTimer::restart()
+{
+    if (parent)
+    {
+        parent->ReloadTimer(getID());
+    }
+}
+bool AppTimer::operator==(const AppTimer &rhs) const
+{
+    return this->id == rhs.id;
+}
+bool AppTimer::operator==(const uint32_t &rhs) const
+{
+    return this->id == rhs;
+}
 } /* namespace app */

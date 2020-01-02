@@ -53,7 +53,7 @@ class BlinkyService : public sys::Service {
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
-        timer_id = CreateTimer(5000, true);
+        timerBlinkyID = CreateTimer(5000, true);
         //ReloadTimer(timer_id);
     }
 
@@ -105,7 +105,7 @@ public:
 #if 0 // M.P: left here on purpose
         LOG_DEBUG("Blinky service tick!");
 
-        stopTimer(timer_id);
+        stopTimer(timerClockID);
         std::shared_ptr<sys::DataMessage> msg = std::make_shared<sys::DataMessage>(static_cast<uint32_t >(MessageType::AudioSetInputGain));
 
         sys::Bus::SendUnicast(msg,GetName(),this);
@@ -126,7 +126,7 @@ public:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 
-    uint32_t timer_id = 0;
+    uint32_t timerBlinkyID = 0;
 };
 
 
