@@ -21,6 +21,14 @@ namespace app {
 
 
 namespace gui {
+    namespace name
+    {
+        namespace window
+        {
+            const inline std::string main_window = "MainWindow";
+            const inline std::string no_window = "";
+        } // namespace window
+    }     // namespace name
 
 /*
  * @brief This is wrapper for gui window used within applications.
@@ -44,7 +52,6 @@ protected:
 	app::Application* application = nullptr;
 	uint32_t calculateBatteryLavel( uint32_t percentage );
 
-	std::string prevWindow = "";
 public:
 
 	AppWindow( app::Application* app, std::string name, uint32_t id=GUIWindowID++ );
@@ -68,9 +75,6 @@ public:
 	void destroyInterface() override;
 	bool onInput( const InputEvent& inputEvent ) override;
 	std::list<DrawCommand*> buildDrawList() override;
-
-	void setPrevWindow( const std::string& prevWindow ) { this->prevWindow = prevWindow; };
-	const std::string& getPrevWindow() const { return prevWindow; };
 };
 
 } /* namespace gui */

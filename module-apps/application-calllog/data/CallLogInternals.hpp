@@ -8,8 +8,9 @@
  */
 #pragma once
 
-#include "CalllogRecord.hpp"
+#include "AppWindow.hpp"
 #include "CallLogStyle.hpp"
+#include "CalllogRecord.hpp"
 #include <string>
 
 namespace calllog {
@@ -31,11 +32,11 @@ namespace calllog {
 
 	namespace settings {
 		// Windows
-		const inline std::string MainWindowStr = "MainWindow";
-		const inline std::string DetailsWindowStr = "DetailsWindow";
-		const inline std::string OptionsWindowStr = "OptionsWindow";
+        const inline std::string MainWindowStr = gui::name::window::main_window;
+        const inline std::string DetailsWindowStr = "DetailsWindow";
+        const inline std::string OptionsWindowStr = "OptionsWindow";
 		const inline std::string CallDeleteWindowStr = "CallDeleteOptionsWindow";
 
 		constexpr auto pageSize = 7;
 	}
-}
+} // namespace calllog

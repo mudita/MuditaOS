@@ -15,11 +15,12 @@
 
 namespace gui {
 
-ViewWindow::ViewWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
-	setSize( 480, 600 );
+    ViewWindow::ViewWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+    {
+        setSize(480, 600);
 
-	buildInterface();
-}
+        buildInterface();
+    }
 
 void ViewWindow::rebuild() {
 	destroyInterface();
