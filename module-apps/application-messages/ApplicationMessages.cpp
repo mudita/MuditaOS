@@ -44,9 +44,9 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl,
 		uint32_t msgType = resp->responseTo;
 		switch (msgType) {
 		case static_cast<uint32_t>(MessageType::DBThreadGetLimitOffset): {
-			if (currentWindow->onDatabaseMessage(resp))
-				refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-		}
+            if (getCurrentWindow()->onDatabaseMessage(resp))
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
 			break;
 		}
 	}
@@ -67,9 +67,9 @@ sys::ReturnCodes ApplicationMessages::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("MainWindow");
+    setActiveWindow(gui::name::window::main_window);
 
-	return ret;
+    return ret;
 }
 
 sys::ReturnCodes ApplicationMessages::DeinitHandler() {

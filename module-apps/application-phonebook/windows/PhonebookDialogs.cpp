@@ -127,7 +127,7 @@ void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
                 LOG_ERROR("failed to delete contact with id %d", contact->dbID);
             }
 
-            application->switchWindow("MainWindow", gui::ShowMode::GUI_SHOW_INIT, nullptr);
+            application->switchWindow(gui::name::window::main_window, gui::ShowMode::GUI_SHOW_INIT, nullptr);
             return (true);
         }
         return (false);

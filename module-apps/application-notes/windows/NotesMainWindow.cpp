@@ -23,13 +23,12 @@
 
 namespace gui {
 
-NotesMainWindow::NotesMainWindow( app::Application* app ) :
-	AppWindow(app,"MainWindow"),
-	notesModel{ new NotesModel( app ) }{
-	setSize( 480, 600 );
+    NotesMainWindow::NotesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window), notesModel{new NotesModel(app)}
+    {
+        setSize(480, 600);
 
-	buildInterface();
-}
+        buildInterface();
+    }
 
 void NotesMainWindow::rebuild() {
 	destroyInterface();

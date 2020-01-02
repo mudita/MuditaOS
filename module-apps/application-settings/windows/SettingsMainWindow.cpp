@@ -24,11 +24,12 @@
 
 namespace gui {
 
-SettingsMainWindow::SettingsMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
-	setSize( 480, 600 );
+    SettingsMainWindow::SettingsMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+    {
+        setSize(480, 600);
 
-	buildInterface();
-}
+        buildInterface();
+    }
 
 void SettingsMainWindow::rebuild() {
 	destroyInterface();

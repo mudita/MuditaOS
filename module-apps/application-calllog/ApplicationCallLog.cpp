@@ -45,11 +45,12 @@ sys::Message_t ApplicationCallLog::DataReceivedHandler(sys::DataMessage* msgl,sy
 		uint32_t msgType = resp->responseTo;
 		switch( msgType ) {
 			case static_cast<uint32_t>(MessageType::DBCalllogGetLimitOffset): {
-				if( currentWindow->onDatabaseMessage( resp ) ) {
-					refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-				}
-				break;
-			}
+                if (getCurrentWindow()->onDatabaseMessage(resp))
+                {
+                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
+                break;
+            }
 		}
 	}
 
