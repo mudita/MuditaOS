@@ -20,6 +20,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/BtWindow.cpp"
 
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UITestWindow.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/Info.cpp"
 
 
 	PUBLIC
