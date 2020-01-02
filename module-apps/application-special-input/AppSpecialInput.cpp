@@ -30,6 +30,6 @@ sys::ReturnCodes AppSpecialInput::InitHandler()
     {
         LOG_ERROR("");
     }
-    setActiveWindow("MainWindow");
+    setActiveWindow(gui::name::window::main_window);
     return ret;
 }

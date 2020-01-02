@@ -88,8 +88,9 @@ void DesktopMainWindow::destroyInterface() {
 	children.clear();
 }
 
-DesktopMainWindow::DesktopMainWindow( app::Application* app ) : AppWindow(app,"MainWindow"){
-	setSize( 480, 600 );
+DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+{
+    setSize( 480, 600 );
 	buildInterface();
 }
 

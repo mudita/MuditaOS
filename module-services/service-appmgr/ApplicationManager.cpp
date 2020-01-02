@@ -303,9 +303,9 @@ void ApplicationManager::TickHandler(uint32_t id) {
 		if( focusApplicationName == "ApplicationDesktop") {
 			//switch data must contain target window and information about blocking
 
-			app::Application::messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::make_unique<gui::LockPhoneData>() );
-		}
-		else {
+            app::Application::messageSwitchApplication(this, "ApplicationDesktop", gui::name::window::main_window, std::make_unique<gui::LockPhoneData>());
+        }
+        else {
 			//get the application description for application that is on top and set blocking flag for it
 			appDescription->blockClosing = true;
 
@@ -313,9 +313,9 @@ void ApplicationManager::TickHandler(uint32_t id) {
 			data->setPrevApplication( focusApplicationName );
 
 			//run normal flow of applications change
-			messageSwitchApplication(this, "ApplicationDesktop", "MainWindow", std::move(data) );
-		}
-	}
+            messageSwitchApplication(this, "ApplicationDesktop", gui::name::window::main_window, std::move(data));
+        }
+    }
 #endif
 }
 
@@ -620,6 +620,7 @@ bool ApplicationManager::handleRegisterApplication( APMRegister* msg ) {
 		else {
             app->setState(app::Application::State::ACTIVATING);
             setState(State::WAITING_GET_FOCUS_CONFIRMATION);
+            LOG_INFO("switchApplication %s %s", launchApplicationName.c_str(), app->switchData ? app->switchData->getDescription().c_str() : "");
             app::Application::messageSwitchApplication(this, launchApplicationName, app->switchWindow, std::move(app->switchData));
         }
 	}
@@ -751,12 +752,11 @@ bool ApplicationManager::handleCloseConfirmation(APMConfirmClose *msg)
 
 //Static methods
 
-bool ApplicationManager::messageSwitchApplication( sys::Service* sender, const std::string& applicationName,
-		const std::string& windowName, std::unique_ptr<gui::SwitchData> data) {
-
-	auto msg = std::make_shared<sapm::APMSwitch>( sender->GetName(), applicationName, windowName, std::move(data) );
-	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
-	return true;
+bool ApplicationManager::messageSwitchApplication(sys::Service *sender, const std::string &applicationName, const std::string &windowName,
+                                                  std::unique_ptr<gui::SwitchData> data)
+{
+    auto msg = std::make_shared<sapm::APMSwitch>(sender->GetName(), applicationName, windowName, std::move(data));
+    return sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
 }
 
 bool ApplicationManager::messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data)

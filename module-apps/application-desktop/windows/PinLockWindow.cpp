@@ -189,9 +189,9 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				return true;
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-				application->switchWindow( "MainWindow" );
-				return true;
-			}
+                application->switchWindow(gui::name::window::main_window);
+                return true;
+            }
 			else if( inputEvent.keyCode == KeyCode::KEY_PND ) {
 				if( charCount > 0 ) {
 					pinLabels[charCount-1]->setText("");
@@ -212,9 +212,9 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 
 						//if there is no application to return to simply return to main window
 						if( lockTimeoutApplilcation.empty()) {
-							application->switchWindow( "MainWindow" );
-						}
-						else {
+                            application->switchWindow(gui::name::window::main_window);
+                        }
+                        else {
 							lockTimeoutApplilcation = "";
 							sapm::ApplicationManager::messageSwitchPreviousApplication( application );
 						}
@@ -262,14 +262,14 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 			}
 			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
 				state = State::EnteringPin;
-				application->switchWindow( "MainWindow" );
-			}
-		}
+                application->switchWindow(gui::name::window::main_window);
+            }
+        }
 		else if( state == State::PhoneBlocked) {
 			if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-				application->switchWindow( "MainWindow" );
-				return true;
-			}
+                application->switchWindow(gui::name::window::main_window);
+                return true;
+            }
 		}
 	}
 
