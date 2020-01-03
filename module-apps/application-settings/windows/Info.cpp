@@ -9,9 +9,6 @@
 
 #include <../source/version.hpp>
 
-#ifndef GIT_TAG
-#define GIT_TAG "none"
-#endif
 
 namespace gui
 {
