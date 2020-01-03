@@ -328,7 +328,12 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 		//upper right corner
 		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT ) {
+		    // if corner then evaluate: sharp (flat), yap (dialog), else: round.
 			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ) {
+			    LOG_DEBUG("GUI_RECT_FLAT_TOP_RIGHT");
+			}
+			else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
+                LOG_DEBUG("GUI_RECT_YAP_TOP_RIGHT");
 			}
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
