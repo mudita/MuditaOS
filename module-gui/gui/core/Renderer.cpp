@@ -41,6 +41,17 @@ void Renderer::drawLine( Context* ctx, CommandLine* cmd ) {
 
 }
 
+/* Mateusz: convention
+ default is DOWN & RIGHT
+ a is (0,0) DOWN (& RIGHT)
+ b is (2,2) UP (& RIGHT)
+ _| 0 1 2 3
+ 0  a
+ 1      b
+ 3
+ 2
+ */
+
 //any checks are not performed as this should be done by function handling draw command
 void Renderer::drawHorizontalLine( Context* ctx, int16_t x, int16_t y,
 	uint16_t width, uint16_t penWidth,
@@ -54,10 +65,13 @@ void Renderer::drawHorizontalLine( Context* ctx, int16_t x, int16_t y,
 	int32_t rowStride;
 
 	//line can be expanded up or down, any other option will cause function to return
-	if( dir == LineExpansionDirection::LINE_EXPAND_DOWN )
-		rowStride = ctx->getW();
-	else if( dir == LineExpansionDirection::LINE_EXPAND_UP )
-		rowStride = -ctx->getW();
+	if( dir == LineExpansionDirection::LINE_EXPAND_DOWN ){
+	    rowStride = ctx->getW();
+    }
+	else if( dir == LineExpansionDirection::LINE_EXPAND_UP ){
+        rowStride = -ctx->getW();
+        drawOffset += rowStride;
+    }
 	else
 		return;
 
@@ -89,12 +103,46 @@ void Renderer::drawVerticalLine( Context* ctx, int16_t x, int16_t y,
 
 	int32_t rowStride = ctx->getW();
 
-	for( uint32_t i = 0; i<height; i++ ) {
+	for( uint32_t row = 0; row <height; row++ ) {
 		memset( ctx->getData() + drawOffset, color.intensivity, penWidth );
 		drawOffset += rowStride;
 	}
 }
 
+void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side, uint16_t penWidth, Color color, LineExpansionDirection dir, bool toRight){
+//    auto acrossWidth = [](uint16_t & widthToConvert){ widthToConvert = ((int)  1.41421356237 * widthToConvert); }
+    penWidth = (int) ((float)penWidth * 1.41421356237 );
+    penWidth = penWidth == 0 ? 1 : penWidth;
+
+    // if color is fully transparent - return
+    if (color.alpha == 0x0F){
+        return;
+    }
+    // approach: as in drawVertical rather than drawHorizontal
+    uint32_t drawOffset = y*ctx->getW() + x;
+    if( dir & LineExpansionDirection::LINE_EXPAND_RIGHT ) {
+        //no action needed unless there is need to draw gradient
+    }
+    else if( dir & LineExpansionDirection::LINE_EXPAND_LEFT ) {
+        drawOffset -= penWidth;
+    }
+
+    int32_t rowStride;
+    if( dir & LineExpansionDirection::LINE_EXPAND_DOWN ){
+        rowStride = ctx->getW();
+    }
+    else if( dir & LineExpansionDirection::LINE_EXPAND_UP ){
+        rowStride = -ctx->getW();
+        drawOffset += rowStride;
+    }
+
+    // memsets are horizontal. they fill a row
+    for( uint32_t skew = 0; skew < side; skew++ ) {
+        memset( ctx->getData() + drawOffset, color.intensivity, penWidth );
+        drawOffset += rowStride;
+        drawOffset += (toRight ? 1 : -1); // add skew
+    }
+}
 
 //43575
 void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
@@ -146,7 +194,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP )
 			drawHorizontalLine( drawCtx, wgtX, wgtY, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM )
-			drawHorizontalLine( drawCtx, wgtX, wgtY + cmd->areaH-1, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
+			drawHorizontalLine( drawCtx, wgtX, wgtY + cmd->areaH, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT )
 			drawVerticalLine( drawCtx, wgtX, wgtY, wgtH, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_RIGHT )
@@ -254,6 +302,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 					for( int32_t i=0; i<pointCount; ++i )
 						startX[i] = 0;
 				}
+				// @TODO: filled yaps, here and other corners
 				else {
 					for( int32_t i=0; i<pointCount; ++i )
 						startX[i] = wgtR-offsetX[i];
@@ -328,12 +377,10 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
 		//upper right corner
 		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT ) {
-		    // if corner then evaluate: sharp (flat), yap (dialog), else: round.
+		    // if corner then evaluate: sharp corner (aka flat), sms (aka yap), else: round.
 			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ) {
-			    LOG_DEBUG("GUI_RECT_FLAT_TOP_RIGHT");
 			}
 			else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
-                LOG_DEBUG("GUI_RECT_YAP_TOP_RIGHT");
 			}
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
@@ -353,6 +400,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_RIGHT ) {
 			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT ) {
 			}
+            else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
+            }
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
 				index = 0;
@@ -371,6 +420,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT ) {
 			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ) {
 			}
+            else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT){
+            }
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
 				index = 0;
@@ -389,6 +440,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		if( cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT ) {
 			if( cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT ) {
 			}
+            else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT){
+            }
 			else {
 				//draw arc from 0 index up to mid point using horizontal line
 				index = 0;
@@ -410,28 +463,80 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		//render edges between corners
 		int16_t xs, ys,le;
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP ) {
-			xs = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
+		    // left "corner" first
+			if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT){
+			    xs = -cmd->radius;
+			} else {
+                xs = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
+			}
+            // right "corner" now
+            le = wgtW - xs;
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
+                le += cmd->penWidth;
+            } else {
+                le -= cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
+            }
 			ys = 0;
-			le = wgtW - xs - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
 			drawHorizontalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM ) {
-			xs = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
-			ys = wgtH - 1;
-			le = wgtW - xs - cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+            // left "corner" first
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT){
+                xs = -cmd->radius;
+            } else {
+                xs = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+            }
+            // right "corner" now
+            le = wgtW - xs;
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
+                le += cmd->penWidth;
+            } else {
+                le -= cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+            }
+            ys = wgtH; // beware. doesn't -1 break rounded corners ?
 			drawHorizontalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
 		}
 
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT ) {
-			xs = 0;
-			ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ));
-			le = wgtH - ys - cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+            // top "corner" first
+            xs = 0;
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT){
+                // angled line here
+                ys = cmd->radius;
+            } else {
+                ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ));
+            }
+            // bottom "corner" now
+            le = wgtH - ys;
+
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT){
+                // angled line here
+                le -= cmd->radius;
+            } else {
+                le -= cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+            }
 			drawVerticalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT );
 		}
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_RIGHT ) {
-			xs = cmd->areaW;
-			ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ));
-			le = wgtH - ys - cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+            // top "corner" first
+            xs = cmd->areaW;
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
+                ys = cmd->radius;
+                draw45degLine(drawCtx, wgtX+xs + cmd->radius, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT , false);
+            } else {
+                ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ));
+            }
+            // bottom "corner" now
+            le = wgtH - ys;
+
+            if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
+                // angled line here
+                le -= cmd->radius;
+                draw45degLine(drawCtx, wgtX+xs + 1, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT , true);
+
+            } else {
+                le -= cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+            }
 			drawVerticalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT );
 		}
 	}

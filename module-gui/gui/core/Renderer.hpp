@@ -37,6 +37,11 @@ protected:
 	void drawVerticalLine( Context* ctx, int16_t x, int16_t y,
 		uint16_t height, uint16_t penWidth,
 		Color color, LineExpansionDirection dir );
+    /**
+     * @brief Function for drawing a line skewed at 45 deg with given width in specified direction. by default the line is draw from top to bottom in H-dim and from left to right in V-dim.
+     * @param toRight: changes V-dim draw direction, so it is drawn to the right of vertical axis
+     */
+    void draw45degLine(Context *ctx, int16_t x, int16_t y, uint16_t side, uint16_t penWidth, Color color, LineExpansionDirection dir, bool toRight);
 	/**
 	 * @brief Function that draws line on the given context
 	 */
