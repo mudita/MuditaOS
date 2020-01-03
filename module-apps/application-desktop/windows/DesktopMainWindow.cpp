@@ -75,9 +75,13 @@ void DesktopMainWindow::buildInterface() {
 	notificationMessages->setText(mess);
 
 	auto rect = new  Rect(this, 86, 420, 350, 70);
-	rect->setFilled(true);
+	rect->setFilled(false);
+	rect->setFillColor(gui::ColorFullBlack);
 	rect->setBorderColor(gui::ColorFullBlack);
 	rect->setRadius(19);
+	rect->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+	rect->setCorners(RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT);
+	rect->setFlat(RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT);
 }
 
 void DesktopMainWindow::destroyInterface() {
