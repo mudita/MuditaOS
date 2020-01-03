@@ -19,8 +19,7 @@ Service::Service(std::string name,std::string parent,uint32_t stackDepth,Service
              mailbox(this),
              pingTimestamp(UINT32_MAX),
              isReady(false),
-             enableRunLoop(false),
-             m_timers_unique_idx(0)
+             enableRunLoop(false)
 
 
 
@@ -87,9 +86,16 @@ void Service::Run() {
 //Create service timer
 uint32_t Service::CreateTimer(uint32_t interval,bool isPeriodic,const std::string& name)
 {
-	timersList.push_back(std::make_unique<ServiceTimer>(name,Ticks::MsToTicks(interval),isPeriodic,m_timers_unique_idx,this));
-	return m_timers_unique_idx++;
+    uint32_t unique = ServiceTimer::GetNextUniqueID();
+    std::string nameNew = name;
+    if (name.empty()){
+        nameNew = GetName()+"Timer"+std::to_string(unique);
+    }
+	timersList.push_back(std::make_unique<ServiceTimer>(nameNew,Ticks::MsToTicks(interval),isPeriodic,unique,this));
+    LOG_DEBUG(std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
+	return unique;
 }
+
 // Reload service timer
 void Service::ReloadTimer(uint32_t id)
 {
@@ -171,7 +177,7 @@ void ServiceTimer::Run()
 	m_service->TickHandler(m_id);
 }
 
-
+uint32_t ServiceTimer::m_timers_unique_idx = 0;
 
 
 

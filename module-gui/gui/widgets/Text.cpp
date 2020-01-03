@@ -240,7 +240,15 @@ void Text::setFont(const UTF8 &fontName)
 void Text::splitTextToLines(const UTF8 &text)
 {
 
-    if (text.length() == 0) return;
+    if (text.length() == 0)
+    {
+        if (textLines.size() == 0)
+        {
+            firstLine = textLines.end();
+            lastLine = textLines.end();
+        }
+        return;
+    }
 
     // copy provided text to internal buffer
     uint32_t index = 0;
@@ -927,6 +935,9 @@ bool Text::handleChar(uint32_t chars)
 // TODO
     // calculate width of the character that is going to be inserted
     uint32_t charWidth = font->getCharPixelWidth(chars);
+    if(charWidth == 0) {
+        return false;
+    }
 
     // insert character into string in currently selected line
     if (currentTextLine->text.insertCode(chars, cursorColumn) == false) return false;

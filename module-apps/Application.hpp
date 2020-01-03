@@ -32,15 +32,39 @@ namespace gui {
 
 namespace app {
 
+class Application;
+
+class AppTimer // this should inherit from ServiceTimer, but *bodge*
+{
+  private:
+    uint32_t id = 0; // let's say 0 indicates not initalized timer
+    std::function <void ()> callback = nullptr;
+    Application *parent = nullptr;
+
+    void registerCallback( std::function<void ()> );
+    AppTimer();
+
+  public:
+    AppTimer(Application * parent, uint32_t id, std::function<void()> callback, const std::string &name);
+    ~AppTimer();
+    void runCallback();
+    uint32_t getID();
+    static uint32_t getNextUniqueID();
+    // timer controls:
+    void restart();
+    void stop();
+    bool operator==(const AppTimer &rhs) const;
+    bool operator==(const uint32_t &rhs) const;
+};
+
 /*
  * @brief This is template for creating new applications
  */
 class Application: public sys::Service {
-    uint32_t longPressTimer = 0;
-public:
-	enum class State {
-        /// app doesn't exist
-        NONE,
+  public:
+    enum class State {
+		/// app doesn't exist
+		NONE,
 		//Application: Object has been created and underlying service is waiting to execute init handler method.
 		//Application Manager: Launcher for the application has been provided. Application can be started using provided launcher. The other possibility
 		//is that Appication Manager received CLOSING_FINISHED message.
@@ -66,14 +90,17 @@ public:
 		//and request System Manager to close it.
 		DEACTIVATING
 	};
-
     static const char *stateStr(State st);
 
   private:
     State state = State::DEACTIVATED;
 
   public:
-	Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
+	std::list<uint32_t> timerIDs;
+	std::list <AppTimer> appTimers; // @TODO decide on type
+    AppTimer longPressTimer;
+    Application(std::string name, std::string parent="", bool startBackground = false, uint32_t stackDepth=4096,
+	        sys::ServicePriority priority=sys::ServicePriority::Idle);
 	virtual ~Application();
 
     Application::State getState();
@@ -82,11 +109,11 @@ public:
     /**
 	 * Virtual methods
 	 */
-	void TickHandler(uint32_t id) override;
+    AppTimer CreateAppTimer(TickType_t interval, bool isPeriodic, std::function<void()> callback, const std::string &name = "");
 
-	/**
-	 * Method responsible for rendering currently active window.
-	 */
+    /**
+     * Method responsible for rendering currently active window.
+     */
 	void render( gui::RefreshModes mode );
 	/**
 	 * Method responsible for setting application to the state where incoming user input is blocked
@@ -134,15 +161,23 @@ public:
 	static bool messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data=nullptr );
 	static bool messageCloseApplication( sys::Service* sender, std::string application );
 	static bool messageRebuildApplication( sys::Service* sender, std::string application );
-	/**
-	 * @brief This method is used to send message to set focus of the application.
-	 * Application can gain or lose focus depending on the provided focus flag.
-	 */
-//	static bool messageFocusApplication( sys::Service* sender, std::string application, bool focus );
+    void DeleteTimer(AppTimer &timer);
+    void DeleteTimer(uint32_t id);
+    /**
+     * @brief This method is used to send message to set focus of the application.
+     * Application can gain or lose focus depending on the provided focus flag.
+     */
+    //	static bool messageFocusApplication( sys::Service* sender, std::string application, bool focus );
 
 protected:
 	//application's settings taken from database
 	SettingsRecord settings;
+
+    void longPressTimerCallback();
+    /**
+     * @param id - timer IDentificaton number
+     */
+    virtual void TickHandler(uint32_t id) override final;
 	/**
 	 * Placeholder that can be used to create window and widgets.
 	 */

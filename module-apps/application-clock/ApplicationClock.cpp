@@ -25,15 +25,22 @@
 namespace app {
 
 ApplicationClock::ApplicationClock(std::string name,std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, parent,false, stackDepth, priority ) {
-
-	timer_id = CreateTimer(100,true);
-	ReloadTimer(timer_id);
-
+	Application( name, parent,false, stackDepth, priority ),
+    timerClock(CreateAppTimer(1000, true, [=]() {timerClockCallback(); }))
+{
+    timerClock.restart();
 }
 
 ApplicationClock::~ApplicationClock() {
 	// TODO Auto-generated destructor stub
+}
+
+void ApplicationClock::timerClockCallback () {
+    auto it = windows.find("MainWindow");
+    gui::ClockMainWindow *win = reinterpret_cast<gui::ClockMainWindow *>(it->second);
+    win->incrementSecond();
+    win->updateLabels();
+    render(gui::RefreshModes::GUI_REFRESH_FAST);
 }
 
 // Invoked upon receiving data message
@@ -56,15 +63,6 @@ sys::Message_t ApplicationClock::DataReceivedHandler(sys::DataMessage* msgl,sys:
 		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
-// Invoked when timer ticked
-void ApplicationClock::TickHandler(uint32_t id) {
-	auto it = windows.find("Main");
-	gui::ClockMainWindow* win = reinterpret_cast<gui::ClockMainWindow*>( it->second );
-	win->incrementSecond();
-	win->updateLabels();
-	render(gui::RefreshModes::GUI_REFRESH_FAST );
-}
-
 // Invoked during initialization
 sys::ReturnCodes ApplicationClock::InitHandler() {
 
@@ -74,13 +72,13 @@ sys::ReturnCodes ApplicationClock::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("Main");
+	setActiveWindow("MainWindow");
 
 	return ret;
 }
 
 sys::ReturnCodes ApplicationClock::DeinitHandler() {
-	DeleteTimer( timer_id );
+	DeleteTimer(timerClock);
 	return sys::ReturnCodes::Success;
 }
 

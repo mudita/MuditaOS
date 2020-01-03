@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "ListView.hpp"
+#include <log/log.hpp>
 
 namespace gui {
 
@@ -160,25 +161,28 @@ void ListView::updatePageItems() {
 		if( availableHeight > 0 ) {
 
 			itemHeight = (*it)->minHeight;
+            gui::BoundingBox bbox= (*it)->widgetArea;
+			bbox.h = itemHeight;
+            bbox.w = itemWidth;
 
 			if( orientation == ORIENTATION_TOP_DOWN ) {
-				(*it)->setPosition(0, verticalPosition );
+				bbox.y = verticalPosition;
 				verticalPosition += itemHeight + 1; //1 for separator
 			}
 			else {
 				verticalPosition -= itemHeight - 1; //1 for separator
-				(*it)->setPosition(0, verticalPosition );
+				bbox.y = verticalPosition;
 			}
 
-			(*it)->setSize(itemWidth, itemHeight );
+			(*it)->setBoundingBox(bbox);
 
 			//if list has focus and it is visible mark selected element
 			if( visible ) {
 				if( (int)(i+firstIndex) == selectedIndex )
-					(*it)->setFocus(true);
-			}
+                    (*it)->setFocus(true);
+            }
 
-			availableHeight -=itemHeight;
+            availableHeight -=itemHeight;
 		}
 		std::advance(it, 1);
 	}

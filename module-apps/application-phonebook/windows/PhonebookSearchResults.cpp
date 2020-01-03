@@ -106,7 +106,11 @@ void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)
 {
-    bool ret = AppWindow::onInput(inputEvent);
+    bool ret = false;
+    if(AppWindow::onInput(inputEvent))
+    {
+        return true;
+    }
 
     // process only if key is released
     if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)))
