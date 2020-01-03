@@ -29,10 +29,14 @@
 #include "messages/CellularMessage.hpp"
 #include <ticks.hpp>
 
-#include "Common.hpp"
+#include "CommonCellular.hpp"
 #include "log/log.hpp"
 
 #include "ucs2/UCS2.hpp"
+
+#include "service-db/api/DBServiceAPI.hpp"
+
+#include "time/time_conversion.hpp"
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
@@ -398,7 +402,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 LOG_ERROR("Call not aborted");
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
-            break;
+           break;
         }
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
@@ -519,6 +523,14 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 
 	const uint32_t singleMessageLen = 30;
 
+	auto time = utils::time::Time();
+	SMSRecord record;
+	record.number = number;
+	record.body = text;
+	record.date = time.getTime();
+	record.type = SMSType::QUEUED;
+
+	bool result = false;
 
 	//if text fit in single message send
 	if (textLen < singleMessageLen) {
@@ -529,7 +541,10 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
 			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
 					(UCS2(text).modemStr() + "\032").c_str(), 1);
-			return true;
+			//check modem response
+			record.type = SMSType::OUTBOX;
+
+			result = true;
 		}
 	}
 	//split text, and send concatenated message
@@ -572,11 +587,14 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 						cmux->GetChannel("Commands")->SendCommandResponse(
 								 (UCS2(messagePart).modemStr()
 										+ "\032").c_str(), 2, 2000);
+				//check modem response
+				record.type = SMSType::OUTBOX;
 			}
 		}
-		return true;
+		result = true;
 	}
-	return false;
+	DBServiceAPI::SMSAdd(this, record);
+	return result;
 }
 
 bool ServiceCellular::receiveSMS(std::string messageNumber) {

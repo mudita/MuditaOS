@@ -97,6 +97,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 #if SHOW_DB_ACCESS_PERF == 1
         LOG_DEBUG("DBSMSAdd time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
+        LOG_INFO("SMS ID %d", smsRecordInterface->GetLastID());
         responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
     }
     break;
