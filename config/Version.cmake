@@ -18,7 +18,10 @@ else()
         OUTPUT_VARIABLE GIT_DIFF)
     execute_process(
         COMMAND git describe --exact-match --tags
-        OUTPUT_VARIABLE GIT_TAG ERROR_QUIET)
+        OUTPUT_VARIABLE GIT_TAG ERROR_QUIET RESULT_VARIABLE ret)
+        if(NOT ret EQUAL "0")
+            set(GIT_TAG "none")
+        endif()
     execute_process(
         COMMAND git rev-parse --abbrev-ref HEAD
         OUTPUT_VARIABLE GIT_BRANCH)
