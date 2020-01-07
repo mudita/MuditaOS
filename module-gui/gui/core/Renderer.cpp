@@ -221,7 +221,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		int16_t xcBottomRight = xcTopRight;
 		int16_t xcBottomLeft = xcTopLeft;
 
-		int16_t ycTopRight = wgtY+cmd->radius+1;
+		int16_t ycTopRight = wgtY+cmd->radius;
 		int16_t ycTopLeft = ycTopRight;
 		int16_t ycBottomRight = wgtY+cmd->h - cmd->radius;
 		int16_t ycBottomLeft = ycBottomRight;
@@ -251,7 +251,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		pointCount++;
 
 		int P = 1 - cmd->radius;
-		while (x > y)
+
+		while (y < cmd->radius) // just a failsafe
 		{
 			y++;
 
@@ -266,25 +267,44 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 				P = P + 2*y - 2*x + 1;
 			}
 
-			// All the perimeter points have already been printed
-			if (x <= y) {
-				middleIndex = index;
-				int idx = index;
-				int xValue = Px[index];
-				while( index > 0 ) {
-					Px[idx] = x--;
-					Py[idx] = Px[index]-2*xValue;
-					++idx;
-					index--;
-					pointCount++;
-				}
-				break;
-			}
+            Px[index] = x;
+            Py[index] = y;
 
-			Px[index] = x;
-			Py[index] = y;
-			++index;
-			pointCount++;
+            // All the perimeter points have already been printed
+            if (x <= y){
+
+                int16_t pointsLeft;
+                int indexOut = index;
+                if (x == y) {
+                    // we have a central point. it can be drawn with either type of line
+                    middleIndex = index;
+                    pointsLeft = index;
+                    pointsLeft++;
+                }
+                else if (x < y)
+                {
+                    pointsLeft = index;
+                    // we don't have a central point. halves are alike
+                    index--;
+                    indexOut;
+                    middleIndex = index;
+
+                }
+                int xValue = 0; // Px[index];
+
+                while( pointsLeft > 0 ) {
+                    Px[indexOut] = Py[index];
+                    Py[indexOut] = Px[index ]-2*xValue;
+                    index--;
+                    indexOut++;
+                    pointCount++;
+                    pointsLeft--;
+                }
+                break;
+            }
+            ++index;
+            pointCount++;
+
 		}
 
 		//fill the rectangle if fill flag is set using fillColor. Painting is divieded into 3 parts
