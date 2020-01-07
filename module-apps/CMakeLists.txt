@@ -26,7 +26,7 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-set( SOURCES "Application.cpp" "windows/AppWindow.cpp" )
+set( SOURCES "Application.cpp" "windows/AppWindow.cpp" "windows/OptionWindow.cpp" )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
