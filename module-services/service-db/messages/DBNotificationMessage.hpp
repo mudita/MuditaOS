@@ -17,14 +17,27 @@ enum class DBNotificatonType
 {
     Updated
 };
+enum class DBBaseType
+{
+	AlarmDB,
+	CalllogDB,
+	ContacstDB,
+	NotesDB,
+	SettingsDB,
+	SmsDB
+};
 
 class DBNotificationMessage : public sys::DataMessage
 {
-  public:
-    DBNotificationMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)){};
-    virtual ~DBNotificationMessage(){};
+public:
+	DBNotificationMessage(MessageType messageType, DBNotificatonType notificationType,
+			DBBaseType baseType) :
+			sys::DataMessage(static_cast<uint32_t>(messageType)),
+			notificationType(notificationType), baseType(baseType) {};
+	virtual ~DBNotificationMessage() {};
 
-    DBNotificatonType notificationType;
+	DBNotificatonType notificationType;
+	DBBaseType baseType;
 };
 
 class DBNotificationResponseMessage : public sys::ResponseMessage
