@@ -16,6 +16,8 @@
 #include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
 
+#include <service-db/api/DBServiceAPI.hpp>
+
 namespace app {
 
 ApplicationMessages::ApplicationMessages(std::string name, std::string parent,
@@ -92,8 +94,16 @@ void ApplicationMessages::destroyUserInterface() {
 
 bool ApplicationMessages::removeSMS_thread(const ThreadRecord *record)
 {
-    LOG_ERROR("removing SMS thread not implemented!");
-    return false;
+    if (record == nullptr)
+    {
+        LOG_ERROR("removing null SMS thread!");
+        return false;
+    }
+    else
+    {
+        LOG_DEBUG("Removing thread: %d", record->dbID);
+        return DBServiceAPI::ThreadRemove(this, record->dbID);
+    }
 }
 
 } /* namespace app */
