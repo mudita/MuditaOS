@@ -15,7 +15,14 @@
 namespace gui
 {
     class OptionWindow;
-};
+    namespace name
+    {
+        namespace window
+        {
+            inline const std::string thread_rm_confirm = "ConfirmRM";
+        };
+    }; // namespace name
+};     // namespace gui
 
 namespace app {
 
