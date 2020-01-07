@@ -15,6 +15,7 @@
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
+#include <Dialog.hpp>
 
 #include <service-db/api/DBServiceAPI.hpp>
 
@@ -87,6 +88,16 @@ void ApplicationMessages::createUserInterface()
     windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
     windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
     windows.insert({gui::name::window::thread_options, threadOptionsWindow});
+    windows.insert({gui::name::window::thread_rm_confirm, new gui::Dialog(this, gui::name::window::thread_rm_confirm,
+                                                                          {
+                                                                              .title = "rm contact?",
+                                                                              .icon = "phonebook_contact_delete_trashcan",
+                                                                              .text = "thou shall not pass",
+                                                                              .action = []() -> bool {
+                                                                                  LOG_INFO("!");
+                                                                                  return true;
+                                                                              },
+                                                                          })});
 }
 
 void ApplicationMessages::destroyUserInterface() {
@@ -102,7 +113,20 @@ bool ApplicationMessages::removeSMS_thread(const ThreadRecord *record)
     else
     {
         LOG_DEBUG("Removing thread: %d", record->dbID);
-        return DBServiceAPI::ThreadRemove(this, record->dbID);
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_rm_confirm]);
+        if (dialog != nullptr)
+        {
+            auto meta = dialog->meta;
+            meta.action = [=]() -> bool { return DBServiceAPI::ThreadRemove(this, record->dbID); };
+            meta.text = "Remove thread: " + std::to_string(record->dbID) + " ?";
+            dialog->update(meta);
+            return switchWindow(gui::name::window::thread_rm_confirm, nullptr);
+        }
+        else
+        {
+            LOG_ERROR("Dialog bad type!");
+            return false;
+        }
     }
 }
 
