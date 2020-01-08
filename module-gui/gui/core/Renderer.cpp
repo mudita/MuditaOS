@@ -109,7 +109,7 @@ void Renderer::drawVerticalLine( Context* ctx, int16_t x, int16_t y,
 	}
 }
 
-void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side, uint16_t penWidth, Color color, LineExpansionDirection dir, bool toRight){
+void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side, uint16_t penWidth, Color color, LineExpansionDirection dir, bool toRight, Line45degEnd lineEnds){
     // if color is fully transparent - return
     if (color.alpha == 0x0F){
         return;
@@ -148,14 +148,48 @@ void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side,
     else if( dir & LineExpansionDirection::LINE_EXPAND_UP ){
         drawOffset -= rowStride * penWidth;
     }
+    // memsets are vertical. they fill a column
 
-    // memsets are horizontal. they fill a row
+    // produces top tip
+    if ( lineEnds & Line45degEnd::TOP_TIP) {
+        drawOffset -= rowStride * penWidthAcross;
+        for (uint32_t skew = 0; skew < penWidthAcross; skew++)
+        {
+            if (toRight)
+            {
+                memset(ctx->getData() + drawOffset, color.intensivity, skew);
+            }
+            else
+            {
+                memset(ctx->getData() + drawOffset + (penWidthAcross - skew), color.intensivity, (skew));
+            }
+            drawOffset += rowStride;
+        }
+    }
+    // produces \\\ with flat top and bottom
     for( uint32_t skew = 0; skew < side; skew++ ) {
         memset( ctx->getData() + drawOffset, color.intensivity, penWidthAcross );
         drawOffset += rowStride;
         drawOffset += (toRight ? 1 : -1); // add skew
     }
+    // produces bottom tip
+    if ( lineEnds & Line45degEnd::BOTTOM_TIP) {
+        for( uint32_t skew = 0; skew < penWidthAcross; skew++ )
+        {
+            if (toRight)
+            {
+                memset(ctx->getData() + (drawOffset + skew), color.intensivity, (penWidthAcross - skew) - 1);
+            }
+            else
+            {
+                memset(ctx->getData() + drawOffset + 1, color.intensivity, (penWidthAcross - skew) - 1);
+            }
+            drawOffset += rowStride;
+        }
+    }
 }
+
+;
 
 //43575
 void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
@@ -555,7 +589,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             xs = cmd->areaW;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
                 ys = cmd->radius;
-                draw45degLine(drawCtx, wgtX+xs + cmd->radius - cmd->penWidth - 1, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT , false);
+                draw45degLine(drawCtx, wgtX+xs + cmd->radius - cmd->penWidth - 1, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT , false, Line45degEnd::BOTTOM_TIP);
             } else {
                 ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ));
             }
@@ -564,12 +598,12 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
                 le -= cmd->radius;
-                draw45degLine(drawCtx, wgtX+xs - cmd->penWidth, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT, true);
+                draw45degLine(drawCtx, wgtX+xs - cmd->penWidth, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT, true, Line45degEnd::TOP_TIP);
 
             } else {
                 le -= cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
             }
-			drawVerticalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT );
+			drawVerticalLine( drawCtx, wgtX+xs, wgtY + ys, le, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT);
 		}
 	}
 
