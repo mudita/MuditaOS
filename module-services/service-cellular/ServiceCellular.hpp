@@ -56,6 +56,7 @@ public:
     static int32_t getSignalStrengthDBRange() { return (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])); }
 
     bool sendSMS(UTF8& number, UTF8& text);
+    bool sendSMS(void);
     bool receiveSMS(std::string messageNumber);
 
 private:

@@ -78,6 +78,8 @@ void MessagesMainWindow::buildInterface() {
 	searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
 //	setFocusItem( list );
+	SMSRecord record;
+	DBServiceAPI::SMSAdd(this->application, record);
 
 }
 void MessagesMainWindow::destroyInterface() {

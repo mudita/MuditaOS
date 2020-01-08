@@ -12,7 +12,7 @@ ServiceCellularNotifications,
 //todo remove sms notification
 ServiceCellularSMSNotification,
 Test2CustomBusChannel,
-ServiceDatabaseNotifications,
+ServiceDBNotifications,
 //todo remove ServiceDatabaseAlarmNotifications
 ServiceDatabaseAlarmNotifications,
 ServiceAudioNotifications

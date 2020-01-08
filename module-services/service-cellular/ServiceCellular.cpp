@@ -35,6 +35,7 @@
 #include "ucs2/UCS2.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-db/messages/DBNotificationMessage.hpp"
 
 #include "time/time_conversion.hpp"
 
@@ -48,6 +49,7 @@ ServiceCellular::ServiceCellular()
     LOG_INFO("[ServiceCellular] Initializing");
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
     callDurationTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
@@ -458,7 +460,17 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         	responseMsg = std::make_shared<CellularResponseMessage>(ret);
         }
         	break;
+	case MessageType::DBServiceNotification :
+	{
+		DBNotificationMessage *msg = reinterpret_cast<DBNotificationMessage*>(msgl);
 
+		if((msg->baseType == DBBaseType::SmsDB) && (msg->notificationType == DBNotificatonType::Updated))
+		{
+			sendSMS();
+		}
+
+		break;
+	}
     default:
         break;
     }
@@ -516,6 +528,12 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
     LOG_TRACE(": None");
     return CellularNotificationMessage::Type::None;
 
+}
+
+bool ServiceCellular::sendSMS(void)
+{
+	auto record = DBServiceAPI::SMSGetLastRecord(this);
+	return false;
 }
 
 bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {

@@ -112,7 +112,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 					MessageType::DBServiceNotification,
 					DBNotificatonType::Updated, DBBaseType::SmsDB);
 			sys::Bus::SendMulticast(notificationMessage,
-					sys::BusChannels::ServiceDatabaseNotifications, this);
+					sys::BusChannels::ServiceDBNotifications, this);
 		}
     }
     break;
@@ -169,6 +169,26 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     }
     break;
 
+    case MessageType::DBSMSGetLastRecord:
+    {
+#if SHOW_DB_ACCESS_PERF == 1
+        timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+
+    	uint32_t id = smsRecordInterface->GetLastID();
+
+    	auto rec = smsRecordInterface->GetByID(id);
+    	auto records = std::make_unique<std::vector<SMSRecord>>();
+    	records->push_back(rec);
+
+    	responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(records), true);
+
+#if SHOW_DB_ACCESS_PERF == 1
+        LOG_DEBUG("DBSMSGetLastRecord time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+
+    	break;
+    }
         /**
          * Thread records
          */
