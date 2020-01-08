@@ -12,6 +12,7 @@
 #include "windows/SettingsMainWindow.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
+#include "windows/Info.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -85,6 +86,8 @@ void ApplicationSettings::createUserInterface() {
 	window = new gui::UiTestWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
+	window = new gui::Info(this);
+	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 }
 
 void ApplicationSettings::destroyUserInterface() {

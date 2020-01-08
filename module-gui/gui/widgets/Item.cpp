@@ -19,7 +19,6 @@ Item::Item() :
 	type {ItemType::ITEM},
 	parent{nullptr},
 	radius{0},
-	enabled{true},
 	visible{true},
 	verticalPolicy{ LayoutVerticalPolicy::LAYOUT_POLICY_VERTICAL_EXPAND },
 	horizontalPolicy { LayoutHorizontalPolicy::LAYOUT_POLICY_HORIZONTAL_EXPAND },
@@ -122,9 +121,25 @@ void Item::setSize( const short& w, const short& h ) {
 	widgetArea.h = h;
 	if( widgetArea.h < 0 )
 		widgetArea.h = 0;
-	updateDrawArea();
+    if (w > maxWidth)
+    {
+        maxWidth = w;
+    }
+    if (h > maxHeight)
+    {
+        maxHeight = h;
+    }
+    updateDrawArea();
 
-	onDimensionChanged(oldArea, widgetArea);
+    onDimensionChanged(oldArea, widgetArea);
+}
+
+void Item::setBoundingBox(const BoundingBox &new_box)
+{
+    BoundingBox oldArea = widgetArea;
+    widgetArea = new_box;
+    updateDrawArea();
+    onDimensionChanged(oldArea, widgetArea);
 }
 
 void Item::setRadius( int value ) {
@@ -195,6 +210,45 @@ void Item::setMaxSize( const uint16_t& w, const uint16_t& h) {
 void Item::setMinSize( const uint16_t& w, const uint16_t& h) {
 	minWidth = w;
 	minHeight = h;
+}
+
+bool Item::handleNavigation(const InputEvent inputEvent)
+{
+    gui::Item *newFocusItem = nullptr;
+    if ((focusItem != nullptr) && (inputEvent.state == InputEvent::State::keyReleasedShort))
+    {
+        if (itemNavigation && itemNavigation(inputEvent))
+        {
+            return true;
+        }
+        switch (inputEvent.keyCode)
+        {
+        case gui::KeyCode::KEY_LEFT:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::LEFT);
+            break;
+        case gui::KeyCode::KEY_RIGHT:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::RIGHT);
+            break;
+        case gui::KeyCode::KEY_UP:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::UP);
+            break;
+        case gui::KeyCode::KEY_DOWN:
+            newFocusItem = focusItem->getNavigationItem(gui::NavigationDirection::DOWN);
+            break;
+        case gui::KeyCode::KEY_ENTER:
+            if (focusItem != nullptr)
+                return focusItem->onActivated(nullptr);
+            break;
+        default:
+            break;
+        }
+    }
+    if (newFocusItem != nullptr)
+    {
+        setFocusItem(newFocusItem);
+        return true;
+    }
+    return false;
 }
 
 } /* namespace gui */

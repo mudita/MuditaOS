@@ -22,7 +22,7 @@
 
 namespace gui {
 
-ClockMainWindow::ClockMainWindow( app::Application* app ) : gui::AppWindow( app, "Main") {
+ClockMainWindow::ClockMainWindow( app::Application* app ) : gui::AppWindow( app, "MainWindow") {
 
 	setSize( 480, 600 );
 
@@ -59,8 +59,11 @@ ClockMainWindow::~ClockMainWindow() {
 bool ClockMainWindow::handleSwitchData( SwitchData* data ) {
 	ClockData* clockData = reinterpret_cast<ClockData*>( data );
 
-	hour = clockData->hour % 24;
-	minute = clockData->minute % 60;
+	if (clockData)
+    {
+        hour = clockData->hour % 24;
+        minute = clockData->minute % 60;
+    }
 
 	return true;
 }

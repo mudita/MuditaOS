@@ -26,12 +26,16 @@ void BtWindow::rebuild()
     buildInterface();
 }
 
-void add_box_label(BoxLayout* layout, std::list<Item*> &it, UTF8 name, std::function<bool(Item&)> foo) {
-    auto el = new gui::Label(layout, 0, 0, style::window_width, style::window::label::default_h);
+void add_box_label(VBox *layout, UTF8 name, std::function<bool(Item &)> foo)
+{
+    auto el = new gui::Label(nullptr, 0, 0, layout->getWidth(), style::window::label::default_h);
     style::window::decorateOption(el);
     el->setText(name);
     el->activatedCallback = foo;
-    it.push_back(el);
+    if (!layout->tryAddWidget(el))
+    {
+        delete el;
+    }
 }
 
 sys::ReturnCodes message_bt(app::Application* app, BluetoothMessage::Request req) {
@@ -41,28 +45,6 @@ sys::ReturnCodes message_bt(app::Application* app, BluetoothMessage::Request req
         LOG_ERROR("err: %d",ret.first);
     }
     return ret.first;
-}
-
-void BtWindow::set_navigation() {
-    if(!box) return;
-    if (box->children.size() > 1) {
-        auto nav_set = [=](auto el, auto end, auto dir) {
-            for (; el != std::prev(end); ++el) {
-                if ((*el)->visible == false) {  /// ignore if not visible
-                    continue;
-                }
-                for (auto next = std::next(el); next != end; ++next) {    /// get next visible item
-                    if ((*next)->visible) {
-                        (*el)->setNavigationItem(dir, *next);  /// set navigation
-                        break;
-                    }
-                }
-            }
-        };
-
-        nav_set(box->children.begin(), box->children.end(), NavigationDirection::DOWN);
-        nav_set(box->children.rbegin(), box->children.rend(), NavigationDirection::UP);
-    }
 }
 
 void BtWindow::buildInterface()
@@ -83,44 +65,44 @@ void BtWindow::buildInterface()
 
     // TODO WIP: it's just for usability now
     // TODO scan should return async - handle that... (if in scan -> add to list and refresh if new on window)
-    add_box_label(box, box_items, "Bluetooth on off", [=](Item&){
+    add_box_label(box, "Bluetooth on off", [=](Item &) {
         LOG_DEBUG("Callback Bluetooth on");
         message_bt(application, BluetoothMessage::Request::Start);
-        for (auto &el : box->children) {
+        for (auto &el : box->children)
+        {
             el->visible = true;
         }
-        set_navigation();
+        box->setVisible(true);
         application->render(gui::RefreshModes::GUI_REFRESH_FAST);
         return true;
-        });
+    });
 
-    add_box_label(box, box_items, "  -> All devices", [=](Item&){
+    add_box_label(box, "  -> All devices", [=](Item &) {
         LOG_DEBUG("Callback all devices");
         message_bt(application, BluetoothMessage::Request::Scan);
         return true;
     });
 
-    add_box_label(box, box_items, "  -> PAN", [=](Item&){
+    add_box_label(box, "  -> PAN", [=](Item &) {
         LOG_DEBUG("Callback start PAN");
         message_bt(application, BluetoothMessage::Request::PAN);
         return true;
     });
 
-    add_box_label(box, box_items, "  -> Visibility", [=](Item&){
+    add_box_label(box, "  -> Visibility", [=](Item &) {
         LOG_DEBUG("Callback visibility");
         message_bt(application, BluetoothMessage::Request::Visible);
         return true;
     });
 
-    // hide all elements except button for `bluetooth on off`
-    std::for_each(std::next(box_items.begin()), box_items.end(), [](auto &el) { el->visible = false; } );
+    // hide all elements except button for `bluetooth on off` - this would cause infinite loop
+    std::for_each(std::next(box->children.begin()), box->children.end(), [](auto &el) { el->visible = false; });
+    setFocusItem(box);
+}
 
-    box->resizeItems();
-
-    set_navigation();
-
-    this->focusItem = box_items.front();
-    this->focusItem->setFocus(true);
+bool BtWindow::onInput(const InputEvent &inputEvent)
+{
+    return AppWindow::onInput(inputEvent);
 }
 
 void BtWindow::destroyInterface()

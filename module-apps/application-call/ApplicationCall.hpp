@@ -22,16 +22,16 @@ inline const std::string name_call = "ApplicationCall";
 class ApplicationCall: public Application {
 protected:
 	std::string phoneNumber;
-	uint32_t timerCallId = 0;
+	AppTimer timerCall;
 	uint32_t callDuration = 0;
 	uint32_t callEndTime = -1;
+    void timerCallCallback();
 public:
 	ApplicationCall( std::string name=name_call, std::string parent = "", bool startBackgound = false );
 	virtual ~ApplicationCall();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
-	void TickHandler(uint32_t id) override;
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
 

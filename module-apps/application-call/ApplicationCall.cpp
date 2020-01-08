@@ -25,12 +25,36 @@
 namespace app {
 
 ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound ) :
-	Application( name, parent, startBackgound, 4096+2048 ) {
-
-	timerCallId = CreateTimer(1000,true);
+	Application( name, parent, startBackgound, 4096+2048 ),
+    timerCall (CreateAppTimer(1000, true, [=]() {timerCallCallback();} ))
+{
 }
 
 ApplicationCall::~ApplicationCall() {
+}
+
+void ApplicationCall::timerCallCallback()
+{
+    // Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
+    ++callDuration;
+    auto it = windows.find("CallWindow");
+    if (currentWindow == it->second)
+    {
+        gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(currentWindow);
+
+        if (callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS)
+        {
+            callWindow->updateDuration(callDuration);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+    }
+
+    LOG_INFO("callDuration %d, callEndTime id %d", callDuration, callEndTime);
+    if (callDuration >= callEndTime)
+    {
+        timerCall.stop();
+        sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+    }
 }
 
 // Invoked upon receiving data message
@@ -138,37 +162,9 @@ sys::ReturnCodes ApplicationCall::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-// Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
-void ApplicationCall::TickHandler(uint32_t id) {
-	if (id == timerCallId)
-	{
-		++callDuration;
-
-		auto it = windows.find("CallWindow");
-		if( currentWindow == it->second ) {
-			gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>(currentWindow);
-
-			if( callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS ) {
-				callWindow->updateDuration( callDuration );
-				refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-			}
-		}
-
-		LOG_INFO("callDuration %d, callEndTime id %d", callDuration, callEndTime);
-		if( callDuration >= callEndTime ) {
-			stopTimer(timerCallId);
-			sapm::ApplicationManager::messageSwitchPreviousApplication( this );
-		}
-	}
-	else
-	{
-        Application::TickHandler(id);
-    }
-}
-
 void ApplicationCall::stopCallTimer() {
 	LOG_INFO("switching to prev calldur: %d endTime: %d", callDuration, callEndTime );
-	stopTimer(timerCallId);
+	timerCall.stop();
 	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 }
 
@@ -215,7 +211,7 @@ const std::string& ApplicationCall::getDisplayedNumber() {
 void ApplicationCall::runCallTimer() {
 	callDuration = 0;
 	callEndTime = -1;
-	ReloadTimer(timerCallId);
+	timerCall.restart();
 }
 
 void ApplicationCall::destroyUserInterface() {
