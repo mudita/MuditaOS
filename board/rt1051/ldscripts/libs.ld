@@ -10,8 +10,8 @@
 
 GROUP (
   "libgcc.a"
-  "libc_nano.a"
-  "libstdc++_nano.a"
+  "libc.a"
+  "libstdc++.a"
   "libm.a"
   "libnosys.a"
   "crti.o"
