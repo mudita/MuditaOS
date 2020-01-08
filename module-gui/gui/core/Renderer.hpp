@@ -17,9 +17,9 @@ namespace gui {
 
 enum class LineExpansionDirection {
 	LINE_EXPAND_UP = 0x01,
-	LINE_EXPAND_DOWN,
-	LINE_EXPAND_LEFT,
-	LINE_EXPAND_RIGHT
+	LINE_EXPAND_DOWN = 0x01 << 1,
+	LINE_EXPAND_LEFT = 0x01 << 2,
+	LINE_EXPAND_RIGHT = 0x01 << 3
 };
 
 class Renderer {
