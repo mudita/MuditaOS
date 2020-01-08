@@ -110,15 +110,29 @@ void Renderer::drawVerticalLine( Context* ctx, int16_t x, int16_t y,
 }
 
 void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side, uint16_t penWidth, Color color, LineExpansionDirection dir, bool toRight){
-//    auto acrossWidth = [](uint16_t & widthToConvert){ widthToConvert = ((int)  1.41421356237 * widthToConvert); }
-    penWidth = (int) ((float)penWidth * 1.41421356237 );
-    penWidth = penWidth == 0 ? 1 : penWidth;
-
     // if color is fully transparent - return
     if (color.alpha == 0x0F){
         return;
     }
-    // approach: as in drawVertical rather than drawHorizontal
+
+    uint16_t penWidthAcross = 0;
+    switch (penWidth)
+    {
+    case 1:
+        penWidthAcross = 1;
+        break;
+    case 2:
+        penWidthAcross = 3;
+        break;
+    case 3:
+        penWidthAcross = 5;
+        break;
+    default:
+        penWidthAcross = (int)((float)penWidth * 1.41421356237);
+        break;
+    }
+
+    // approach: as in drawVertical rather than drawHorizontal. draw small horizontal lines offset to preceding one
     uint32_t drawOffset = y*ctx->getW() + x;
     if( dir & LineExpansionDirection::LINE_EXPAND_RIGHT ) {
         //no action needed unless there is need to draw gradient
@@ -127,18 +141,17 @@ void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side,
         drawOffset -= penWidth;
     }
 
-    int32_t rowStride;
+    int32_t rowStride = ctx->getW();
     if( dir & LineExpansionDirection::LINE_EXPAND_DOWN ){
-        rowStride = ctx->getW();
+
     }
     else if( dir & LineExpansionDirection::LINE_EXPAND_UP ){
-        rowStride = -ctx->getW();
-        drawOffset += rowStride;
+        drawOffset -= rowStride * penWidth;
     }
 
     // memsets are horizontal. they fill a row
     for( uint32_t skew = 0; skew < side; skew++ ) {
-        memset( ctx->getData() + drawOffset, color.intensivity, penWidth );
+        memset( ctx->getData() + drawOffset, color.intensivity, penWidthAcross );
         drawOffset += rowStride;
         drawOffset += (toRight ? 1 : -1); // add skew
     }
@@ -472,7 +485,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             // right "corner" now
             le = wgtW - xs;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
-                le += cmd->penWidth;
+                le += (cmd->radius - cmd->penWidth);
             } else {
                 le -= cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
             }
@@ -489,7 +502,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             // right "corner" now
             le = wgtW - xs;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
-                le += cmd->penWidth;
+                le += (cmd->radius - cmd->penWidth);
             } else {
                 le -= cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
             }
@@ -522,7 +535,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             xs = cmd->areaW;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
                 ys = cmd->radius;
-                draw45degLine(drawCtx, wgtX+xs + cmd->radius, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT , false);
+                draw45degLine(drawCtx, wgtX+xs + cmd->radius - cmd->penWidth - 1, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT , false);
             } else {
                 ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ));
             }
@@ -530,9 +543,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             le = wgtH - ys;
 
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
-                // angled line here
                 le -= cmd->radius;
-                draw45degLine(drawCtx, wgtX+xs + 1, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT , true);
+                draw45degLine(drawCtx, wgtX+xs - cmd->penWidth, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT, true);
 
             } else {
                 le -= cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
