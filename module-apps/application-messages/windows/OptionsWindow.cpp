@@ -11,7 +11,7 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
     ContactRecord contact = record ? DBServiceAPI::ContactGetByID(app, record->contactID)->front() : ContactRecord();
 
     return {
-        callOption(app, contact, record != nullptr),
+        callOption(app, contact, true),
         contactDetails(app, contact),
         {utils::localize.get("sms_delete_conversation"),
          [=](gui::Item &item) {
