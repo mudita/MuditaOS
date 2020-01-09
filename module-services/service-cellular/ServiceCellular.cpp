@@ -293,6 +293,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     case MessageType::CellularListCurrentCalls: {
         constexpr size_t numberOfExpectedTokens = 3;
         auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", numberOfExpectedTokens, 300);
+        // if CellularListCurrentCalls is recieved after the call is aborted it will return 2 tokens instead of 2
+        // this should be acceptable and hence no warning instead of error in such case
         if (cmux->CheckATCommandResponse(ret, numberOfExpectedTokens, LOGWARN))
         {
             auto beg = ret[1].find(",", 0);
