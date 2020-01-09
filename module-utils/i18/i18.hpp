@@ -33,7 +33,6 @@ namespace utils {
         const char* langDE_path = "sys/assets/lang/lang_de.json";
         const char* langSP_path = "sys/assets/lang/lang_sp.json";
 
-
     public:
 
         LangLoader(){}
@@ -103,39 +102,66 @@ namespace utils {
     class i18 {
 
     json11::Json    langPack;
+    json11::Json langBack; // backup language if item not found
     LangLoader      loader;
+    static const Lang lang_default = Lang::En;
+    Lang current = lang_default;
+    bool debugRequests = true;
 
-    public:
-
-        // Default constructor, left empty on purpose
-        i18(){
+  public:
+    // Default constructor, left empty on purpose
+    i18()
+    {
         }
 
         // Explicit initialization point, default constructor is omitted. This is because LangLoader uses file system which
         // is not available at program's startup.
-        void Init(){
-           langPack = loader.Create(Lang::En); 
-        }
-
         virtual ~i18(){}
-
-        const std::string& get(const char* str)
-        {
-            return langPack[std::string(str)].string_value();
-        }
 
         const std::string& get(const std::string& str)
         {
-            return langPack[str].string_value();
+            auto retwithfallback = [this](const std::string &ret, const std::string &str) -> const std::string & {
+                if (debugRequests && ret == "")
+                {
+                    return str;
+                }
+                else
+                {
+                    return ret;
+                }
+            };
+            auto &ret = langPack[str].string_value();
+            // if language pack returnet nothing then try default language
+            if (ret == "" && current != lang_default)
+            {
+                auto &ret = langBack[str].string_value();
+                return retwithfallback(ret, str);
+            }
+            return retwithfallback(ret, str);
         }
 
         void Switch(Lang lang){
-            json11::Json pack = loader.Create(lang);
-
-            //Suspend whole system during switching lang packs
-            vTaskSuspendAll();
-            langPack = pack;
-            xTaskResumeAll();
+            static bool initialized = false;
+            if (!initialized)
+            {
+                langBack = loader.Create(lang_default);
+                langPack = langBack;
+                initialized = true;
+            }
+            if (lang == current)
+                return;
+            if (lang == lang_default)
+            {
+                langPack = langBack;
+            }
+            else
+            {
+                json11::Json pack = loader.Create(lang);
+                // Suspend whole system during switching lang packs
+                vTaskSuspendAll();
+                langPack = pack;
+                xTaskResumeAll();
+            }
         }
     };
 
