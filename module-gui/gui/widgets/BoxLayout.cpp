@@ -35,7 +35,10 @@ namespace gui {
 
     bool BoxLayout::onFocus(bool state)
     {
-        this->setVisible(state);
+        if (state)
+            this->setVisible(state);
+        else
+            this->setFocusItem(nullptr);
         this->setNavigation();
         if (this->focusChangedCallback)
         {
