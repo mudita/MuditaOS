@@ -7,6 +7,8 @@
 
 gui::HBox *newCombo(app::ApplicationMessages *app, const UTF8 &text)
 {
+    auto dummy = ContactRecord();
+
     auto box = new gui::HBox(nullptr, 0, 0, style::window_width, style::window::label::big_h);
     box->setPenWidth(0);
     box->setPenFocusWidth(0);
@@ -26,16 +28,18 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const UTF8 &text)
 
     p("phonebook_phone_ringing", [=](gui::Item &) -> bool {
         LOG_INFO("Call: %s", text.c_str());
-        return true;
+        return call(app, dummy);
     });
 
     p("mail", [=](gui::Item &) -> bool {
         LOG_INFO("SMS to: %s", text.c_str());
+        sms(app, dummy);
         return true;
     });
 
     p("cross", [=](gui::Item &) -> bool {
         LOG_INFO("Add contact: %s", text.c_str());
+        addContact(app, dummy);
         return true;
     });
 
