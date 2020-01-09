@@ -336,23 +336,46 @@ public:
     TS0710_START::START_SystemParameters_t getStartParams() { return startParams; }
     ATParser* getParser() { return parser; }
 
-    // @brief It is serching the resposne for "OK" string
-    //
-    // Invalid responses are logged by defult as LOG_ERRORs
-    // 
-    // @param response - tokenized resposne
-    // @parama level - determine how the errors are logged
-    // return true - "OK" string is found, false - otherwise
-    bool CheckATCommandResponse(const std::vector<std::string> &response, logger_level level = LOGERROR) {
-        if (searchForOK(response)) {
+    /// @brief It is serching the resposne for "OK" string
+    ///
+    /// @note Invalid responses are logged by defult as LOG_ERRORs
+    ///
+    /// @param response - tokenized resposne
+    /// @param numberOfExpectedTokens - number of expected tokens, 0 means do not validate number of tokens
+    /// @param level - determine how the errors are logged
+    /// @return true - "OK" string is found, false - otherwise
+    bool CheckATCommandResponse(const std::vector<std::string> &response, size_t numberOfExpectedTokens, logger_level level = LOGERROR)
+    {
+        const size_t numberOfTokens = response.size();
+        if (searchForOK(response) && (numberOfExpectedTokens == 0 || numberOfTokens == numberOfExpectedTokens))
+        {
             return true;
-        } else {
+        }
+        else
+        {
             std::string resp;
             for (std::string s : response)
+            {
                 resp.append(s);
-            LOG_CUSTOM(level,"Invalid response: %s", resp.c_str());
+            }
+
+            LOG_CUSTOM(level, "Invalid response: %s", resp.c_str());
+            // numberOfExpectedTokens == 0, means do not validate number of tokens
+            LOG_CUSTOM(level, " - Number of tokens %u, number of expected tokens %u", numberOfTokens, numberOfExpectedTokens);
             return false;
         }
+    }
+
+    /// @brief It is serching the resposne for "OK" string
+    ///
+    /// @note Invalid responses are logged by defult as LOG_ERRORs
+    ///
+    /// @param response - tokenized resposne
+    /// @param level - determine how the errors are logged
+    /// @return true - "OK" string is found, false - otherwise
+    bool CheckATCommandResponse(const std::vector<std::string> &response, logger_level level = LOGERROR)
+    {
+        return CheckATCommandResponse(response, 0, level);
     }
 
     bool CheckATCommandPrompt(const std::vector<std::string> &response) {
