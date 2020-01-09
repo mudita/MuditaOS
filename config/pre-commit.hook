@@ -37,10 +37,10 @@ case "${1}" in
     echo "Runs clang-format on source files"
     ;;
   * )
-    for file in `git diff-index --cached --name-only HEAD` ; do
-        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]]; then
-            format_file "${file}"
-        fi
-    done
+    #for file in `git diff-index --cached --name-only HEAD` ; do
+        #if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]]; then
+            # format_file "${file}"
+        #fi
+    #done
     ;;
 esac
