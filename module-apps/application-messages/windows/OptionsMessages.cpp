@@ -43,10 +43,15 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const UTF8 &text)
     return box;
 }
 
+gui::Item *placeholder(const UTF8 &text)
+{
+    auto ret = new gui::Label(nullptr, 0, 20, style::window_height - 20, 10, text);
+    ret->activeItem = false;
+    return ret;
+}
+
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord *record)
 {
-    // TODO use record...
-    // we oy - this list needs to be buildable with items too :(
     auto contact = ContactRecord();
     return {
         gui::newOptionLabel(callOption(app, contact, true)), gui::newOptionLabel(contactDetails(app, contact)),
@@ -55,8 +60,6 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) { return false; }}),
         gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_copy")), [=](gui::Item &item) { return false; }}),
         gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")), [=](gui::Item &item) { return false; }}),
-        //        // ok - this is not selectable item...
-        //        // tell num, message, call + - item with 3 elements...
-        newCombo(app, "+123 123 123") // contact.numbers[0].numberE164)
+        placeholder(utils::localize.get("sms_from_this_sms")), newCombo(app, "+123 123 123") // contact.numbers[0].numberE164)
     };
 }
