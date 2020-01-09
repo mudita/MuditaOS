@@ -95,6 +95,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 #endif
         auto ret = smsRecordInterface->Add(msg->record);
 #if SHOW_DB_ACCESS_PERF == 1
+        LOG_DEBUG("DBSMSAdd Info");
         LOG_DEBUG("DBSMSAdd time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
 

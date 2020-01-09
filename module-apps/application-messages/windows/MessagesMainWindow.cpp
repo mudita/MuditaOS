@@ -79,6 +79,9 @@ void MessagesMainWindow::buildInterface() {
 
 //	setFocusItem( list );
 	SMSRecord record;
+	record.number = UTF8("666600925");
+	record.body = UTF8("Elo");
+	record.type = SMSType::QUEUED;
 	DBServiceAPI::SMSAdd(this->application, record);
 
 }
