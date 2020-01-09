@@ -81,7 +81,11 @@ namespace gui
 
         setTitle(utils::localize.get("app_settings_title_main"));
 
-        body = new gui::PageLayout(this, {0, title->offset_h(), this->getWidth(), this->getHeight() - this->title->offset_h() - bottomBar->getHeight()});
+        // magical offset on designs
+        int32_t offset_h = 8;
+
+        body = new gui::PageLayout(
+            this, {0, title->offset_h() + offset_h, this->getWidth(), this->getHeight() - offset_h - this->title->offset_h() - bottomBar->getHeight()});
 
         setFocusItem(body);
     }

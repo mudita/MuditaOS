@@ -120,6 +120,7 @@ public:
     void setPosition( const short& x, const short& y ) override;
 
 	void setSize( const short& w, const short& h ) override;
+    uint32_t getTextNeedSpace();
 };
 
 } /* namespace gui */

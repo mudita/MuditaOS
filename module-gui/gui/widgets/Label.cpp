@@ -310,4 +310,13 @@ void Label::setTextColor( Color color ) {
 	textColor = color;
 }
 
+uint32_t Label::getTextNeedSpace()
+{
+    if (font == nullptr)
+    {
+        return 0;
+    }
+    return font->getPixelWidth(text);
+}
+
 } /* namespace gui */

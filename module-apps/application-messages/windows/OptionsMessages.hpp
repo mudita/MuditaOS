@@ -15,4 +15,4 @@ namespace gui
     }; // namespace name
 };     // namespace gui
 
-std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *appl, const SMSRecord *record);
+std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
