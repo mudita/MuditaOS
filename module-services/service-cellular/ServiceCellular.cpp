@@ -107,10 +107,26 @@ ServiceCellular::~ServiceCellular() {
     }
 }
 
+void ServiceCellular::CallStateTimerHandler()
+{
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
+}
+
 // Invoked when timer ticked
-void ServiceCellular::TickHandler(uint32_t id) {
-    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(
-            MessageType::CellularListCurrentCalls);
+void ServiceCellular::TickHandler(uint32_t id)
+{
+    if (id == callStateTimerID)
+    {
+        CallStateTimerHandler();
+    }
+}
+
+// Invoked when timer ticked
+void ServiceCellular::TickHandler(uint32_t id)
+{
+
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
 
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
 }
