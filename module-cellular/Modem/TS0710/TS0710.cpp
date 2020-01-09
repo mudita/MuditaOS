@@ -221,7 +221,7 @@ TS0710::ConfState TS0710::ConfProcedure() {
 
     // Enable sleep mode
     LOG_DEBUG("TODO: determine while this retry loop is necessary");
-    while (!CheckATCommandResponse(parser->SendCommand("AT+QSCLK=1\r", 1), logger_level::LOGINFO))
+    while (!CheckATCommandResponse(parser->SendCommand("AT+QSCLK=1\r", 1), logger_level::LOGWARN))
     {
         vTaskDelay(1000);
     }
