@@ -122,15 +122,6 @@ void ServiceCellular::TickHandler(uint32_t id)
     }
 }
 
-// Invoked when timer ticked
-void ServiceCellular::TickHandler(uint32_t id)
-{
-
-    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularListCurrentCalls);
-
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
-}
-
 // Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler() {
 
