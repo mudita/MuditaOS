@@ -131,7 +131,7 @@ namespace gui
                 {
                     app->messageOptionWindow->clearOptions();
                     /// TODO get record properly...
-                    app->messageOptionWindow->addOptions(smsWindowOptions(app, nullptr)); /// const SMSRecord *record));
+                    app->messageOptionWindow->addOptions(smsWindowOptions(app, el));
                     app->switchWindow(gui::name::window::messages_options, nullptr);
                 }
                 return true;
