@@ -3,6 +3,7 @@
 #include "log/log.hpp"
 
 #include <assert.h>
+#include <stdlib.h>
 
 /* configSUPPORT_STATIC_ALLOCATION is set to 1, so the application must provide an
 implementation of vApplicationGetIdleTaskMemory() to provide the memory that is
@@ -77,6 +78,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 {
     (void)xTask;
     LOG_FATAL("Stack overflow:%s",pcTaskName);
+    abort();
 }
 
 void vApplicationTickHook()
