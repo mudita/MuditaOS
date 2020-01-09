@@ -92,8 +92,8 @@ public:
 
 	bool setFocus( bool state ) {
 		if( state != focus ) {
-			//focus = state;
-			onFocus( state );
+            focus = state;
+            onFocus( state );
 			focusChangedCallback( *this );
 		};
 		return state;
