@@ -45,7 +45,8 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const UTF8 &text)
 
 gui::Item *placeholder(const UTF8 &text)
 {
-    auto ret = new gui::Label(nullptr, 0, 20, style::window_height - 20, 10, text);
+    auto ret = new gui::Label(nullptr, 0, 20, style::window_height - 20, style::window::label::small_h, text);
+    ret->setPenWidth(0);
     ret->activeItem = false;
     return ret;
 }
