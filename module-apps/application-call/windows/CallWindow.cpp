@@ -376,8 +376,9 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 	bool handled = false;
 	
 	//process only if key is released
-	if( inputEvent.state == InputEvent::State::keyReleasedShort ) { // TODO: alek: seems wrong
-		switch( inputEvent.keyCode ) {
+    if (inputEvent.state == InputEvent::State::keyReleasedShort || inputEvent.state == InputEvent::State::keyReleasedLong)
+    {
+        switch( inputEvent.keyCode ) {
 			case KeyCode::KEY_ENTER:
 				handled = handleCenterButton();
 				break;
@@ -390,9 +391,9 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 			default:
 				break;	
 		}
-	}
+    }
 
-	if( handled ) {
+    if( handled ) {
 		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
 		return true;
 	}
