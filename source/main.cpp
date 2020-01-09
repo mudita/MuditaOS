@@ -23,14 +23,15 @@
 
 //module-services
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-evtmgr/EventManager.hpp"
-#include "service-db/ServiceDB.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-cellular/ServiceCellular.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
 #include "service-bluetooth/ServiceBluetooth.hpp"
+#include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
+#include "service-db/ServiceDB.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
+#include "service-desktop/ServiceDesktop.hpp"
+#include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
 
 //module-bsp
@@ -159,6 +160,7 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(),sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(),sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
