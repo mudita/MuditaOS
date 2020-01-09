@@ -163,31 +163,25 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 			if (tokens.size() < rxCount) {
 				continue;
 			}
-
-			blockedTaskHandle = nullptr;
-
-			return tokens;
 		} else {
 			//timeout
-			blockedTaskHandle = nullptr;
-
-			return tokens;
-		}
-
-	   ;
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+        }
+        break;
+    }
 
 #if DEBUG_MODEM_OUTPUT_RESPONSE
-	 LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime)
+    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
 
-	for (auto s : tokens)
-	{
+    for (auto s : tokens)
+    {
 		LOG_DEBUG("[]%s", s.c_str());
 	}
 #endif
-		//to avoid endless loop
-		return tokens;
-	}
 
+    blockedTaskHandle = nullptr;
+
+    return tokens;
 }
 
 std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
@@ -242,26 +236,24 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 			if (tokens.size() < rxCount) {
 				continue;
 			}
-			blockedTaskHandle = nullptr;
-
-			return tokens;
 		} else {
 			//timeout
-			blockedTaskHandle = nullptr;
-
-			return tokens;
-		}
+            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+        }
+        break;
+    }
 #if DEBUG_MODEM_OUTPUT_RESPONSE
-	 LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime)
+    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
 
-	for (auto s : tokens)
-	{
-		LOG_DEBUG("[]%s", s.c_str());
-	}
+    for (auto s : tokens)
+    {
+        LOG_DEBUG("[]%s", s.c_str());
+    }
 #endif
-		//to avoid endless loop
-		return tokens;
-	}
+
+    blockedTaskHandle = nullptr;
+
+    return tokens;
 }
 
 int DLC_channel::ParseInputData(std::vector<uint8_t> &data) {
