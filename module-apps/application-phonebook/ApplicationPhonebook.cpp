@@ -14,8 +14,8 @@
 namespace app
 {
 
-ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 4096)
-{
+    ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 8192)
+    {
 }
 
 ApplicationPhonebook::~ApplicationPhonebook()
