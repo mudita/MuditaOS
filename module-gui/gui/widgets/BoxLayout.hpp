@@ -83,13 +83,12 @@ namespace gui {
     };
 
 class HBox : public BoxLayout {
-protected:
-	void resizeItems() override;
 public:
-	HBox();
-	HBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
-    virtual ~HBox() = default;
-    virtual bool tryAddWidget(Item *item) override;
+  void resizeItems() override;
+  HBox();
+  HBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
+  virtual ~HBox() = default;
+  virtual bool tryAddWidget(Item *item) override;
 };
 
 class VBox : public BoxLayout {
