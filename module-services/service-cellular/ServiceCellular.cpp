@@ -7,12 +7,13 @@
  *  @details
  */
 
-#include <iostream>
-#include <vector>
-#include <string>
 #include <algorithm>
-#include <sstream>
+#include <cassert>
+#include <iostream>
 #include <iterator>
+#include <sstream>
+#include <string>
+#include <vector>
 
 #include "ServiceCellular.hpp"
 #include "Service/Service.hpp"
@@ -181,9 +182,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		if ((msg->type == CellularNotificationMessage::Type::CallAborted) ||
 			(msg->type == CellularNotificationMessage::Type::CallBusy))
 		{
-			stopTimer(callStateTimerID);
-		}
-		else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
+            stopTimer(callStateTimerID);
+        }
+        else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
 		{
 			sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
 								  GetName(), this);
@@ -290,19 +291,28 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
 
     case MessageType::CellularListCurrentCalls: {
-        auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", 3, 300);
-        if (cmux->CheckATCommandResponse(ret))
+        constexpr size_t numberOfExpectedTokens = 3;
+        auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", numberOfExpectedTokens, 300);
+        if (cmux->CheckATCommandResponse(ret, numberOfExpectedTokens, LOGWARN))
         {
             auto beg = ret[1].find(",", 0);
             beg = ret[1].find(",", beg + 1);
-            // If call changed to "Active" state stop callStateTimer(used for polling for call state)
-            if (std::stoul(ret[1].substr(beg + 1, 1)) == static_cast<uint32_t>(CallStates::Active))
+            try
             {
-                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
-                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
+                // If call changed to "Active" state stop callStateTimer(used for polling for call state)
+                if (std::stoul(ret[1].substr(beg + 1, 1)) == static_cast<uint32_t>(CallStates::Active))
+                {
+                    auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
+                    sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
 
                     stopTimer(callStateTimerID);
                 }
+            }
+            catch (const std::exception &e)
+            {
+                LOG_ERROR("exception %s was thrown", e.what());
+                assert(0);
+            }
 
             responseMsg = std::make_shared<CellularResponseMessage>(true);
         }
