@@ -19,14 +19,14 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, "SELECT");
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
-        setTitle("New message");
+        setTitle(utils::localize.get("sms_title_message"));
 
         uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
         uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
         auto body = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
         auto label = new Label(body, 0, 0, body->getWidth(), 40);
-        label->setText("Add recipient or type a number");
+        label->setText(utils::localize.get("sms_add_rec_num"));
         label->activeItem = false;
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 

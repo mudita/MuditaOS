@@ -90,7 +90,6 @@ void DesktopMainWindow::destroyInterface() {
 
 DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
 {
-    setSize( 480, 600 );
 	buildInterface();
 }
 
