@@ -452,14 +452,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		responseMsg = std::make_shared<CellularResponseMessage>(false);
 	}
 		break;
-	case MessageType::CellularSendSMS: {
-        	CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
-
-        	//auto ret = this->sendSMS(msg->number, msg->message);
-
-        	responseMsg = std::make_shared<CellularResponseMessage>(true);
-        }
-        	break;
 	case MessageType::DBServiceNotification :
 	{
 		DBNotificationMessage *msg = reinterpret_cast<DBNotificationMessage*>(msgl);
@@ -657,15 +649,11 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				//parse sender number
 				receivedNumber = UCS2(tokens[1]).toUTF8();
 
-				//parse message time
+				//parse date
 				tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
-				std::istringstream timebuf(tokens[3]);
-				std::string substring;
-				std::vector<std::string> timeTokens;
-
 				struct tm tm;
 				strptime((tokens[3] + " " + tokens[4]).c_str(), "%y/%m/%d %H:%M:%S", &tm);
-
+				auto messageDate = mktime(&tm);
 				//if its single message process
 				if (tokens.size() == 5) {
 					//todo add message to database
@@ -691,30 +679,23 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 						messageParts.push_back(ret[i + 1]);
 					}
 				}
-				if (messageParsed) {
+				if (messageParsed)
+				{
 					messageParsed = false;
+
 					UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
 
 					SMSRecord record;
 					record.body = decodedMessage;
 					record.number = receivedNumber;
 					record.type = SMSType::INBOX;
-					record.date = mktime(&tm); // todo parse date from at command
+					record.isRead = true;
+					record.date = messageDate;
 
-					auto result = DBServiceAPI::SMSAdd(this, record);
-					// todo temporary send multicast
-					auto msg = std::make_shared<CellularSMSRequestMessage>(
-							MessageType::CellularSMSMulticast);
-
-					msg->number = receivedNumber;
-					msg->message = decodedMessage;
-
-					sys::Bus::SendMulticast(msg,
-							sys::BusChannels::ServiceCellularSMSNotification, this);
+					DBServiceAPI::SMSAdd(this, record);
 				}
 			}
 		}
-
 	}
 	//delete message from modem memory
 	cmux->GetChannel("Commands")->SendCommandResponse(

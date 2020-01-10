@@ -9,8 +9,6 @@
 
 // Custom Bus channels
 ServiceCellularNotifications,
-//todo remove sms notification
-ServiceCellularSMSNotification,
 Test2CustomBusChannel,
 ServiceDBNotifications,
 //todo remove ServiceDatabaseAlarmNotifications
