@@ -2,6 +2,7 @@
 #include "i18/i18.hpp"
 #include "log/log.hpp"
 
+#include <application-phonebook/data/PhonebookItemData.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
 /// below just for apps names...
@@ -14,6 +15,7 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
 {
 
     auto contact = record ? DBServiceAPI::ContactGetByID(app, record->contactID)->front() : ContactRecord();
+
     return {
         {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
          [=](gui::Item &item) {
@@ -28,7 +30,10 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
              }
          }},
         {utils::localize.get("sms_contact_details"),
-         [=](gui::Item &item) { return sapm::ApplicationManager::messageSwitchApplication(app, app::name_phonebook, "Contact", nullptr); }},
+         [=](gui::Item &item) {
+             return sapm::ApplicationManager::messageSwitchApplication(
+                 app, app::name_phonebook, "Contact", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+         }},
         {utils::localize.get("sms_delete_conversation"),
          [=](gui::Item &item) {
              LOG_INFO("Removing sms thread!");
