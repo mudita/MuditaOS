@@ -81,17 +81,17 @@ protected:
 	gui::ShowMode command;
 	std::unique_ptr<gui::SwitchData> data;
 public:
-	AppSwitchWindowMessage() = delete;
+  bool LastSeenWindow = false;
+  AppSwitchWindowMessage() = delete;
 
-	AppSwitchWindowMessage( const std::string& window, const std::string senderWindow, std::unique_ptr<gui::SwitchData> data, const gui::ShowMode command = gui::ShowMode::GUI_SHOW_INIT) :
-		AppMessage( MessageType::AppSwitchWindow ),
-		window{window},
-		senderWindow{ senderWindow },
-		command{ command },
-		data{std::move(data)} {};
-	virtual ~AppSwitchWindowMessage() = default;
+  AppSwitchWindowMessage(const std::string &window, const std::string senderWindow, std::unique_ptr<gui::SwitchData> data,
+                         const gui::ShowMode command = gui::ShowMode::GUI_SHOW_INIT)
+      : AppMessage(MessageType::AppSwitchWindow), window{window}, senderWindow{senderWindow}, command{command}, data{std::move(data)} {};
+  virtual ~AppSwitchWindowMessage() = default;
 
-	const std::string& getWindowName() const { return window; };
+  const std::string &getWindowName() const
+  {
+      return window; };
 	const std::string& getSenderWindowName() const { return senderWindow; };
 	const gui::ShowMode& getCommand() const { return command; };
 	std::unique_ptr<gui::SwitchData>& getData() { return data; };

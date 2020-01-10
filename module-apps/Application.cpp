@@ -29,6 +29,7 @@
 #include "messages/AppMessage.hpp"
 #include "windows/AppWindow.hpp"
 #include <Text.hpp>
+#include <cassert>
 
 namespace app {
 
@@ -139,16 +140,17 @@ void Application::longPressTimerCallback()
 }
 
 void Application::render( gui::RefreshModes mode ) {
-	if( currentWindow == nullptr ){
-		LOG_ERROR("Current window is not defined");
+    if (getCurrentWindow() == nullptr)
+    {
+        LOG_ERROR("Current window is not defined");
 		return;
-	}
+    }
 
-	//send drawing commands only when if application is in active and visible.
+    //send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
-		std::list<gui::DrawCommand*> commandsList = currentWindow->buildDrawList();
+        std::list<gui::DrawCommand *> commandsList = getCurrentWindow()->buildDrawList();
 
-		if( shutdownInProgress ) {
+        if( shutdownInProgress ) {
 			auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::SHUTDOWN );
 			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
 		}
@@ -172,21 +174,20 @@ int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd,
 
 	std::string window;
 #ifdef DEBUG_APPLICATION_MANAGEMENT
-    LOG_INFO("switching [%s] to window: %s", GetName().c_str(), windowName.length() ? windowName.c_str() : "MainWindow");
+    LOG_INFO("switching [%s] to window: %s data description: %s", GetName().c_str(),
+             windowName.length() ? windowName.c_str() : gui::name::window::main_window.c_str(), data ? data->getDescription().c_str() : "");
 #endif
 
     //case to handle returning to previous application
 	if( windowName == "LastWindow" ) {
-		window = currentWindow->getName();
-        auto ret = dynamic_cast<gui::SwitchSpecialChar *>(data.get());
-        auto msg = std::make_shared<AppSwitchWindowMessage>(window, currentWindow->getName(),
-                                                            ret ? std::move(data) : std::make_unique<gui::SwitchData>("LastWindow"), cmd);
+        window = getCurrentWindow()->getName();
+        auto msg = std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow()->getName(), std::move(data), cmd);
         sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 	else {
-		window = windowName.empty() ? "MainWindow" : windowName;
-		auto msg = std::make_shared<AppSwitchWindowMessage>( window, currentWindow->getName(), std::move(data), cmd );
-		sys::Bus::SendUnicast(msg, this->GetName(), this );
+        window = windowName.empty() ? gui::name::window::main_window : windowName;
+        auto msg = std::make_shared<AppSwitchWindowMessage>(window, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd);
+        sys::Bus::SendUnicast(msg, this->GetName(), this );
 	}
 
 	return 0;
@@ -213,23 +214,24 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
 		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-			if( ( state == State::ACTIVE_FORGROUND ) && (currentWindow->updateSignalStrength( msg->signalStrength) ) ) {
-				//loop and update all widnows
+            if ((state == State::ACTIVE_FORGROUND) && (getCurrentWindow()->updateSignalStrength(msg->signalStrength)))
+            {
+                //loop and update all widnows
 				for ( auto it = windows.begin(); it != windows.end(); it++ ) {
 					it->second->updateSignalStrength( msg->signalStrength);
 				}
 				handled = true;
 				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-			}
-		}
+            }
+        }
 	}
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
 		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
-		if( currentWindow != nullptr )
-			currentWindow->onInput( msg->getEvent() );
+        if (getCurrentWindow() != nullptr)
+            getCurrentWindow()->onInput(msg->getEvent());
 
-//		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
+        //		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
 		handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
@@ -246,12 +248,13 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		sevm::BatteryLevelMessage* msg = static_cast<sevm::BatteryLevelMessage*>(msgl);
 		LOG_INFO("Application battery level: %d", msg->levelPercents );
 
-		if( currentWindow ) {
-			if( currentWindow->updateBatteryLevel( msg->levelPercents ) )
-				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-		}
+        if (getCurrentWindow())
+        {
+            if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents))
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
 
-		handled = true;
+        handled = true;
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) )
 	{
@@ -273,9 +276,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		sevm::RtcMinuteAlarmMessage* msg = static_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
 		LOG_INFO("Application time updated");
 
-		currentWindow->updateTime( msg->timestamp, !settings.timeFormat12 );
+        getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
 
-		if( state == State::ACTIVE_FORGROUND )
+        if( state == State::ACTIVE_FORGROUND )
 			refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 
 		handled = true;
@@ -290,6 +293,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
             if( msg->getTargetApplicationName() == this->GetName()) {
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
+                    LOG_INFO("%s : %s", msg->getTargetWindowName().c_str(), msg->getData() ? msg->getData()->getDescription().c_str() : "");
                     setState(State::ACTIVE_FORGROUND);
 
                     switchWindow( msg->getTargetWindowName(), std::move( msg->getData()));
@@ -341,20 +345,16 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 			setActiveWindow( msg->getWindowName() );
 
-			currentWindow->handleSwitchData( msg->getData().get() );
+            getCurrentWindow()->handleSwitchData(msg->getData().get());
 
-			if( currentWindow->getPrevWindow().empty() ) {
-				currentWindow->setPrevWindow( msg->getSenderWindowName() );
-			}
             //check if this is case where application is returning to the last visible window.
-			if( (msg->getData() != nullptr) && (msg->getData()->getDescription() == "LastWindow") ) {
-			}
-			else {
-				currentWindow->onBeforeShow( msg->getCommand(), msg->getData().get() );
+            if ((msg->getData() != nullptr) && (msg->LastSeenWindow)) {}
+            else {
+                getCurrentWindow()->onBeforeShow(msg->getCommand(), msg->getData().get());
                 auto ret = dynamic_cast<gui::SwitchSpecialChar *>(msg->getData().get());
                 if (ret != nullptr && msg->getData() != nullptr)
                 {
-                    auto text = dynamic_cast<gui::Text *>(currentWindow->getFocusItem());
+                    auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                     if (text)
                     {
                         if (text->handleChar(ret->getDescription()[0]))
@@ -407,8 +407,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
     }
 	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
 		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
-		//currentWindow->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
-		render( msg->getMode() );
+        // getCurrentWindow()->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
+        render( msg->getMode() );
 		handled = true;
 	}
 
@@ -433,16 +433,10 @@ sys::ReturnCodes Application::InitHandler() {
 	return retCode;
 }
 
-void Application::setActiveWindow( const std::string& windowName ) {
-	auto it = windows.find(windowName);
-
-	//if there is a window with specified name set it as active window
-	//and unlock accepting keyboard events
-	if( it!=windows.end() ) {
-		previousWindow = currentWindow;
-		currentWindow = it->second;
-		acceptInput = true;
-	}
+void Application::setActiveWindow(const std::string &windowName)
+{
+    pushWindow(windowName);
+    acceptInput = true;
 }
 
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {
@@ -475,6 +469,79 @@ bool Application::messageInputEventApplication( sys::Service* sender, std::strin
 	sys::Bus::SendUnicast(msg, application, sender );
 	return true;
 }
+
+bool Application::popToWindow(const std::string &window)
+{
+    auto ret = std::find(windowStack.begin(), windowStack.end(), window);
+    if (ret != windowStack.end())
+    {
+        LOG_INFO("Pop last window(s) : %d! %s", std::distance(ret, windowStack.end()), ret->c_str());
+        windowStack.erase(std::next(ret), windowStack.end());
+        return true;
+    }
+    return false;
+}
+
+void Application::pushWindow(const std::string &newWindow)
+{
+    // handle if window was already on
+    if (popToWindow(newWindow))
+    {
+        return;
+    }
+    else
+    {
+        windowStack.push_back(newWindow);
+    }
+#ifdef DEBUG_APPLICATION_MANAGEMENT
+    LOG_DEBUG("[%d] newWindow: %s", windowStack.size(), newWindow.c_str());
+    for (auto &el : windowStack)
+    {
+        LOG_DEBUG("-> %s", el.c_str());
+    }
+    LOG_INFO("\n\n");
+#endif
+};
+
+const std::string Application::getPrevWindow() const
+{
+    if (this->windowStack.size() <= 1)
+    {
+        return gui::name::window::no_window;
+    }
+    return *std::prev(windowStack.end(), 2);
+}
+
+void Application::Application::cleanPrevWindw()
+{
+    this->windowStack.clear();
+}
+
+gui::AppWindow *Application::getWindow(const std::string &window)
+{
+    auto it = windows.find(window);
+    if (it != windows.end())
+    {
+        return it->second;
+    }
+    return nullptr;
+}
+
+gui::AppWindow *Application::getCurrentWindow()
+{
+    std::string window = "";
+    if (windowStack.size() == 0)
+    {
+        window = gui::name::window::main_window;
+    }
+    else
+    {
+        window = windowStack.back();
+    }
+
+    return getWindow(window);
+}
+
 
 AppTimer Application::CreateAppTimer(TickType_t interval, bool isPeriodic, std::function<void()> callback, const std::string &name)
 {

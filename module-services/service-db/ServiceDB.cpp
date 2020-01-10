@@ -172,6 +172,19 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     }
     break;
 
+    case MessageType::DBThreadGetForContact: {
+        auto msg = dynamic_cast<DBThreadMessageGet *>(msgl);
+        if (!msg)
+        {
+            LOG_ERROR("ERROR wrong message sent!");
+        }
+        auto ret = threadRecordInterface->GetByContact(msg->contactID);
+        auto records = std::make_unique<std::vector<ThreadRecord>>();
+        records->push_back(ret);
+        responseMsg = std::make_shared<DBThreadResponseMessage>(std::move(records), ret.dbID == 0 ? false : true);
+    };
+    break;
+
     case MessageType::DBThreadRemove: {
         DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
 #if SHOW_DB_ACCESS_PERF == 1

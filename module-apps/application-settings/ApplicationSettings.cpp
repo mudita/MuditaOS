@@ -61,9 +61,9 @@ sys::ReturnCodes ApplicationSettings::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("MainWindow");
+    setActiveWindow(gui::name::window::main_window);
 
-	return ret;
+    return ret;
 }
 
 sys::ReturnCodes ApplicationSettings::DeinitHandler() {

@@ -14,8 +14,8 @@
 namespace app
 {
 
-ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 4096)
-{
+    ApplicationPhonebook::ApplicationPhonebook(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 8192)
+    {
 }
 
 ApplicationPhonebook::~ApplicationPhonebook()
@@ -44,7 +44,7 @@ sys::Message_t ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl,
         switch (msgType)
         {
         case static_cast<uint32_t>(MessageType::DBContactGetLimitOffset): {
-            if (currentWindow->onDatabaseMessage(resp))
+            if (getCurrentWindow()->onDatabaseMessage(resp))
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         break;
@@ -67,7 +67,6 @@ sys::ReturnCodes ApplicationPhonebook::InitHandler()
 
     createUserInterface();
 
-    setActiveWindow("MainWindow");
 
     return ret;
 }
