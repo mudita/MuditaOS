@@ -27,83 +27,16 @@
 #include <widgets/ListItemProvider.hpp>
 #include <widgets/ListView.hpp>
 
-namespace gui
+namespace style
 {
-    class LolListItem : public gui::ListItem
+    namespace window
     {
-        gui::Label *body = nullptr;
-
-      public:
-        LolListItem(int i = 0)
-        {
-            { // copied from ThreadItem
-                minWidth = 431;
-                minHeight = 100;
-                maxWidth = 431;
-                maxHeight = 100;
-                setRadius(0);
-                setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-                setPenWidth(0);
-                setPenFocusWidth(2);
-            }
-
-            setID(i);
-            body = new gui::Label(this, gui::meta::Label({0, 0, 0, 0}));
-            body->setText("Text: " + std::to_string(i));
-        }
-
-        // this won't work - copying label and other crap
-        LolListItem(const LolListItem &) = default;
-
-        bool onDimensionChanged(const gui::BoundingBox &oldDim, const gui::BoundingBox &newDim) override
-        {
-            LOG_INFO("Dim changed! %s : %d", body->getText().c_str(), getID());
-            LOG_INFO("%x", body);
-            body->setPosition(newDim.x, newDim.y);
-            body->setSize(newDim.w, newDim.h);
-            return true;
-        }
-
-        virtual bool onFocus(bool state) override
-        {
-            ListItem::onFocus(state);
-            LOG_INFO("Focus changed for! %s", body->getText().c_str());
-            return true;
-        }
+        inline const uint32_t sms_radius = 7;
+        inline const uint32_t sms_border_no_focus = 1;
+        /// TODO 100 is static size, sms elements should have size depending on text amount
+        inline const uint32_t sms_height = 100;
     };
-}; // namespace gui
-
-class Provider : public gui::ListItemProvider
-{
-    std::map<int, gui::LolListItem *> items;
-
-  public:
-    Provider(app::Application *app)
-    {
-    }
-
-    virtual ~Provider() = default;
-
-    gui::ListItem *getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override
-    {
-        LOG_INFO("getItem");
-        if (index > getItemCount())
-        {
-            return nullptr;
-        }
-        if (items.find(index) == items.end())
-        {
-            items[index] = new gui::LolListItem(index);
-        }
-        // copy as getItem will push element onto list with parent..
-        return new gui::LolListItem(*items[index]);
-    }
-
-    int getItemCount() const override
-    {
-        return 11;
-    };
-};
+}; // namespace style
 
 namespace gui
 {
@@ -121,15 +54,15 @@ namespace gui
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         auto elements_width = this->getWidth() - style::window::default_left_margin * 2;
         body = new gui::VBox(this, style::window::default_left_margin, title->offset_h(), elements_width, bottomBar->getY() - title->offset_h());
-        body->setPenWidth(0);
-        body->setPenFocusWidth(0);
+        body->setPenWidth(style::window::default_border_no_focus_w);
+        body->setPenFocusWidth(style::window::default_border_no_focus_w);
 
-        // new text, TODO TODO - send it and reload sms
-        auto text = new gui::Text(nullptr, 0, 0, elements_width, 100, "", gui::Text::ExpandMode::EXPAND_UP);
+        // new text, TODO - send it and reload sms
+        auto text = new gui::Text(nullptr, 0, 0, elements_width, style::window::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc}, [=](const UTF8 &text) { textModeShowCB(text); }, [=]() { textSelectSpecialCB(); }));
-        text->setPenFocusWidth(2);
-        text->setPenWidth(2);
+        text->setPenFocusWidth(style::window::default_border_focucs_w);
+        text->setPenWidth(style::window::default_border_focucs_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         // TODO IFS
         text->activatedCallback = [=](gui::Item &item) {
@@ -162,12 +95,12 @@ namespace gui
         LOG_INFO("=============================");
         /// dummy sms thread - TODO TODO load from db - on switchData
         /// this is not 'static' do it on window focus (on swtich window)
-        auto labelmeta = gui::meta::Label({0, 0, elements_width, 100});
+        auto labelmeta = gui::meta::Label({0, 0, elements_width, style::window::sms_height});
         labelmeta.edges = RectangleEdgeFlags::GUI_RECT_ALL_EDGES;
-        labelmeta.radius = 3;
+        labelmeta.radius = style::window::sms_radius;
         labelmeta.align = gui::Alignment::ALIGN_VERTICAL_TOP;
-        labelmeta.focus = 3;
-        labelmeta.no_focus = 1;
+        labelmeta.focus = style::window::default_border_focucs_w;
+        labelmeta.no_focus = style::window::sms_border_no_focus;
         labelmeta.margins = Margins(0, 2, 0, 2);
         // hack - tmp to fix fitting
         body->setReverseOrder(false);
