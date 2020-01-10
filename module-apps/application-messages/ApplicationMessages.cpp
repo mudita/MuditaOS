@@ -13,6 +13,7 @@
 
 #include "ApplicationMessages.hpp"
 #include "windows/NewMessage.hpp"
+#include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
 
 namespace app {
@@ -78,14 +79,21 @@ sys::ReturnCodes ApplicationMessages::DeinitHandler() {
 
 void ApplicationMessages::createUserInterface()
 {
-    gui::AppWindow *window = nullptr;
-    window = new gui::MessagesMainWindow(this);
-    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+    threadOptionsWindow = gui::newOptionWindow(this, gui::name::window::thread_options, {});
+
+    windows.insert({gui::name::window::main_window, new gui::MessagesMainWindow(this)});
     windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
     windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
+    windows.insert({gui::name::window::thread_options, threadOptionsWindow});
 }
 
 void ApplicationMessages::destroyUserInterface() {
+}
+
+bool ApplicationMessages::removeSMS_thread(const ThreadRecord *record)
+{
+    LOG_ERROR("removing SMS thread not implemented!");
+    return false;
 }
 
 } /* namespace app */
