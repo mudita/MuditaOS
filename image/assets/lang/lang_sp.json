@@ -158,6 +158,10 @@
     "app_phonebook_new_speed_dial_key": "Speed dial key",
     "app_phonebook_new_addto_fav": "add to favourites",
 
+    "sms_call_text"  : "Llamado: ",
+    "sms_contact_details" : "Detales de contacto: ",
+    "sms_delete_conversation" : "Eliminar conversación",
+
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG",
     "settings_lang_DE": "DE",

@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 
+#include "../ApplicationMessages.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "service-db/messages/DBMessage.hpp"
@@ -26,6 +27,7 @@
 #include "../data/SMSdata.hpp"
 #include "../windows/ThreadViewWindow.hpp"
 #include "NewMessage.hpp"
+#include "OptionsWindow.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include <Style.hpp>
 #include <log/log.hpp>
@@ -145,8 +147,9 @@ void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
     }
 }
 
-bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
-	//check if any of the lower inheritance onInput methods catch the event
+bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
+{
+    // check if any of the lower inheritance onInput methods catch the event
     if (AppWindow::onInput(inputEvent))
     {
         return true;
@@ -155,7 +158,29 @@ bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
     {
         if (inputEvent.state == InputEvent::State::keyReleasedShort)
         {
-            application->switchWindow(gui::name::window::new_sms, nullptr);
+            switch (inputEvent.keyCode)
+            {
+            case gui::KeyCode::KEY_LEFT:
+                application->switchWindow(gui::name::window::new_sms, nullptr);
+                return true;
+            case gui::KeyCode::KEY_LF: {
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                if (app == nullptr)
+                {
+                    LOG_ERROR("Something went horribly wrong");
+                    return false;
+                }
+                if (app->threadOptionsWindow != nullptr)
+                {
+                    app->threadOptionsWindow->clearOptions();
+                    app->threadOptionsWindow->addOptions(threadWindowOptions(app, threadModel->getRecord(0).get()));
+                    app->switchWindow(gui::name::window::thread_options, nullptr);
+                }
+                return true;
+            }
+            default:
+                LOG_DEBUG("SMS main window not handled key: %d", inputEvent.keyCode);
+            }
         }
     }
     return false;
