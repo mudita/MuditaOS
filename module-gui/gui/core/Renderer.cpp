@@ -41,17 +41,6 @@ void Renderer::drawLine( Context* ctx, CommandLine* cmd ) {
 
 }
 
-/* Mateusz: convention
- default is DOWN & RIGHT
- a is (0,0) DOWN (& RIGHT)
- b is (2,2) UP (& RIGHT)
- _| 0 1 2 3
- 0  a
- 1      b
- 3
- 2
- */
-
 //any checks are not performed as this should be done by function handling draw command
 void Renderer::drawHorizontalLine( Context* ctx, int16_t x, int16_t y,
 	uint16_t width, uint16_t penWidth,
@@ -128,7 +117,7 @@ void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side,
         penWidthAcross = 5;
         break;
     default:
-        penWidthAcross = (int)((float)penWidth * 1.41421356237);
+        penWidthAcross = penWidth * 141 / 100;
         break;
     }
 
