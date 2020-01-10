@@ -85,7 +85,23 @@ ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 }
 #endif
 
+inline void LogTimeout(const std::string &cmdStr, uint32_t timeout)
+{
+    LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+}
 
+inline void LogDebugModemOutputResponse(const std::string &cmdStr, const std::vector<std::string> &tokens, const uint32_t timeElapsed,
+                                        const uint32_t currentTime)
+{
+#if DEBUG_MODEM_OUTPUT_RESPONSE
+    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
+
+    for (auto s : tokens)
+    {
+        LOG_DEBUG("[]%s", s.c_str());
+    }
+#endif
+}
 
 std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 		size_t rxCount, uint32_t timeout) {
@@ -114,8 +130,7 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 
         if (timeElapsed >= timeoutNeeded)
         {
-        	std::string cmdStr(cmd);
-            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LogTimeout(cmdStr, timeout);
             break;
         }
 
@@ -165,19 +180,12 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 			}
 		} else {
 			//timeout
-            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LogTimeout(cmdStr, timeout);
         }
         break;
     }
 
-#if DEBUG_MODEM_OUTPUT_RESPONSE
-    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
-
-    for (auto s : tokens)
-    {
-		LOG_DEBUG("[]%s", s.c_str());
-	}
-#endif
+    LogDebugModemOutputResponse(cmdStr, tokens, timeElapsed, currentTime);
 
     blockedTaskHandle = nullptr;
 
@@ -210,9 +218,8 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 
 		if (timeElapsed >= timeoutNeeded)
 		{
-			std::string cmdStr(cmd);
-			LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
-			break;
+            LogTimeout(cmdStr, timeout);
+            break;
 		}
 
 		auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
@@ -238,18 +245,12 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 			}
 		} else {
 			//timeout
-            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
+            LogTimeout(cmdStr, timeout);
         }
         break;
     }
-#if DEBUG_MODEM_OUTPUT_RESPONSE
-    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
 
-    for (auto s : tokens)
-    {
-        LOG_DEBUG("[]%s", s.c_str());
-    }
-#endif
+    LogDebugModemOutputResponse(cmdStr, tokens, timeElapsed, currentTime);
 
     blockedTaskHandle = nullptr;
 

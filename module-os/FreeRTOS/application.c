@@ -78,6 +78,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
 {
     (void)xTask;
     LOG_FATAL("Stack overflow:%s",pcTaskName);
+    // TODO: add better error handling and logging here
     abort();
 }
 
