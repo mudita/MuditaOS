@@ -35,6 +35,7 @@ public:
 	virtual ~ApplicationMessages();
 
     gui::OptionWindow *threadOptionsWindow = nullptr;
+    gui::OptionWindow *messageOptionWindow = nullptr;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,
 			sys::ResponseMessage *resp) override;

@@ -20,7 +20,9 @@
 
 #include "../widgets/ThreadModel.hpp"
 
+#include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
+#include "OptionsMessages.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include <application-phonebook/data/PhonebookItemData.hpp>
 #include <gui/widgets/Text.hpp>
@@ -117,6 +119,23 @@ namespace gui
         {
             auto label = new gui::Label(nullptr, labelmeta);
             label->setText(el.body);
+            label->activatedCallback = [=](Item &) {
+                LOG_INFO("Message activated!");
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                if (app == nullptr)
+                {
+                    LOG_ERROR("Something went horribly wrong");
+                    return false;
+                }
+                if (app->messageOptionWindow != nullptr)
+                {
+                    app->messageOptionWindow->clearOptions();
+                    /// TODO get record properly...
+                    app->messageOptionWindow->addOptions(smsWindowOptions(app, nullptr)); /// const SMSRecord *record));
+                    app->switchWindow(gui::name::window::messages_options, nullptr);
+                }
+                return true;
+            };
             LOG_INFO("Add sms: %s %s", el.body.c_str(), el.number.c_str());
             if (body->tryAddWidget(label)) {}
             else

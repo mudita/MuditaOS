@@ -13,6 +13,7 @@
 
 #include "ApplicationMessages.hpp"
 #include "windows/NewMessage.hpp"
+#include "windows/OptionsMessages.hpp"
 #include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
 #include <Dialog.hpp>
@@ -83,6 +84,7 @@ sys::ReturnCodes ApplicationMessages::DeinitHandler() {
 void ApplicationMessages::createUserInterface()
 {
     threadOptionsWindow = gui::newOptionWindow(this, gui::name::window::thread_options, {});
+    messageOptionWindow = gui::newOptionWindow(this, gui::name::window::messages_options, {});
 
     windows.insert({gui::name::window::main_window, new gui::MessagesMainWindow(this)});
     windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
@@ -98,6 +100,7 @@ void ApplicationMessages::createUserInterface()
                                                                                   return true;
                                                                               },
                                                                           })});
+    windows.insert({gui::name::window::messages_options, messageOptionWindow});
 }
 
 void ApplicationMessages::destroyUserInterface() {
