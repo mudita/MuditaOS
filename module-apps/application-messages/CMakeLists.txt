@@ -24,6 +24,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesMainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/ThreadViewWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/NewMessage.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/OptionsWindow.cpp"
 
 	PUBLIC
 		#"${CMAKE_CURRENT_LIST_DIR}/MessagesModel.hpp"
