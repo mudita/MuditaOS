@@ -124,7 +124,10 @@ public:
     };
     virtual bool onActivated(void *data)
     {
-        return activatedCallback(*this);
+        if (activatedCallback)
+            return activatedCallback(*this);
+        else
+            return false;
     };
     virtual bool onInput( const InputEvent& inputEvent ) { return inputCallback( *this, inputEvent ); };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
