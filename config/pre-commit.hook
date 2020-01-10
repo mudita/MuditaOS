@@ -6,30 +6,77 @@
 
 set -o pipefail
 
-# check if clang format is in proper version, version is 3rd column in `clang-format --version`
-CVER=$(clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1)
-if [ $CVER -lt 9 ]; then
-    echo "Install clang-format in at least verion 9 and set as default, on ubuntu:"
-    echo 'Your clang format version used: '$(clang-format --version)
-    echo "git commit aborted"
+L_GIT_DIR=$(git rev-parse --show-toplevel)
+source $L_GIT_DIR/config/format-config.sh
+
+# if autoformatting was disabled by user - then ignore this commit hook
+if [[ $DISABLE_AUTO_FORMATTING ]]; then
+    exit 0
+fi
+
+# check if clang-format in path is in proper version, version is 3rd column in `clang-format --version`
+CVER=$( [[ $(which clang-format) ]] && echo $(clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1) || echo "0")
+# check for either clang-format or clang-format-9
+if [[ $CVER -lt 9 && ! $(which clang-format-9) ]]; then
+    cat << EOF > 1
+Either install:
+    clang-format in at least version 9 and set as default"
+    or
+    clang-format-9
+
+    Your clang format version in path used:
+        $(clang-format --version)
+        $(clang-format-9 --version)
+    git commit aborted"
+EOF
     exit 1
 fi
 
-# if clang-format-diff exists in path - then use it, if not - than try to use it from clang-format-${CVER}
-L_CLANG_DIFF_TOOL=$( which clang-format-diff.py && echo "clang-format-diff.py" || echo "/usr/share/clang/clang-format-${CVER}/clang-format-diff.py" )
-if [[ ! -f ${L_CLANG_DIFF_TOOL} ]]; then
-    echo "Clang tool for git diff chunk formatting not found!"
-    echo "path used: ${L_CLANG_DIFF_TOOL}"
+get_clang_format_script() {
+    local declare searchpaths=(
+        $(which "clang-format-diff.py")                                 # clang-format-diff in path
+        "/usr/share/clang/clang-format-9/clang-format-diff.py"          # clang-format-diff location for clang format 9 Ubuntu/Debian 18.04
+        "/usr/share/clang/clang-format-${CVER}/clang-format-diff.py"    # clang-format-diff location on Ubuntu/Debian
+        "/usr/share/clang/clang-format-diff.py"                         # clang-format_diff location on Arch last resort
+    )
+    local tool=""
+    for el in ${searchpaths[@]}; do
+        if [[ -f ${el} ]]; then
+            tool=${el}
+            break
+        fi
+    done
+    if [[ ${tool} == "" ]]; then
+        echo clang-format-diff not found in path and: ${sarchpaths[@]} >2
+    fi
+    echo "${tool}"
+}
+
+L_CLANG_DIFF_TOOL=$(get_clang_format_script)
+if ! [[ $L_CLANG_DIFF_TOOL ]] || [[ $L_CLANG_DIFF_TOOL == "" ]]; then
     exit 1
 fi
 
 format_file() {
   file="${1}"
   if [ -f $file ]; then
-    echo "Format file: ${1} diff"
+    [[ $VERBOSE ]] && echo "Format: ${1} diff"
     git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 -i
     git add ${1}
   fi
+}
+
+# bash function using above config function
+shouldnt_ignore() {
+    # change full name path to path relative to root git dir
+    local fname=${1/"$L_GIT_DIR"/"./"}
+    for el in ${ignore_paths[@]}; do
+        if [[ ./${fname}  =~ ^${el}.* ]]; then
+            [[ $VERBOSE ]] && echo "Ignore: ${fname} formatting due to: $el match!"
+            return 1
+        fi
+    done
+    return 0
 }
 
 case "${1}" in
@@ -38,7 +85,7 @@ case "${1}" in
     ;;
   * )
     for file in `git diff-index --cached --name-only HEAD` ; do
-        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]]; then
+        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
             format_file "${file}"
         fi
     done
