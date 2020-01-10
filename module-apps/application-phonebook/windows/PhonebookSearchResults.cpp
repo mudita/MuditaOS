@@ -13,13 +13,16 @@
 #include <log/log.hpp>
 #include <memory>
 
+#include "../widgets/PhonebookItem.hpp"
+
 namespace gui
 {
 
-PhonebookSearchResults::PhonebookSearchResults(app::Application *app) : AppWindow(app, "SearchResults"), searchResultsModel{new SearchResultsModel(app)}
-{
-    setSize(style::window_width, style::window_height);
-    buildInterface();
+    PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
+        : AppWindow(app, name::window::search_results), searchResultsModel{new SearchResultsModel(app)}
+    {
+        setSize(style::window_width, style::window_height);
+        buildInterface();
 }
 
 void PhonebookSearchResults::rebuild()
@@ -142,15 +145,35 @@ bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
     if (data == nullptr)
         return false;
 
+    auto fill_results = [=](std::shared_ptr<std::vector<ContactRecord>> res, const std::string &title) {
+        if (res == nullptr || res->size() == 0)
+        {
+            return;
+        }
+        searchResultsModel->setResults(res);
+        list->clear();
+        list->setElementsCount(res.get()->size());
+        setTitle(utils::localize.get("app_phonebook_search_results_prefix") + "\"" + title + "\"");
+    };
+
     auto searchResults = dynamic_cast<PhonebookSearchResultsData *>(data);
     if (searchResults)
     {
-        searchResultsModel->setResults(searchResults->getResults());
-        list->clear();
-        list->setElementsCount(searchResults->getResults().get()->size());
-
-        setTitle(utils::localize.get("app_phonebook_search_results_prefix") + "\"" + searchResults->getQuery() + "\"");
+        fill_results(searchResults->getResults(), searchResults->getQuery());
         return (true);
+    }
+
+    auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
+    if (contactRequest)
+    {
+        list->cb_ENTER = [=](gui::PhonebookItem *item) {
+            std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+            data->result = item->getContact();
+            data->setDescription("PhonebookSearchRequest");
+            return sapm::ApplicationManager::messageSwitchPreviousApplication(
+                application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
+        };
+        fill_results(contactRequest->results, contactRequest->request);
     }
 
     return (false);

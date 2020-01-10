@@ -23,8 +23,7 @@
 #include "Interface/SettingsRecord.hpp"
 
 #include "SwitchData.hpp"
-
-// #define DEBUG_APPLICATION_MANAGEMENT
+#include "windows/AppWindow.hpp"
 
 namespace gui {
 	class AppWindow;
@@ -189,10 +188,22 @@ protected:
 	/**
 	 * Map containing application's windows
 	 */
-	std::map<std::string, gui::AppWindow*> windows;
-	gui::AppWindow* currentWindow = nullptr;
-	gui::AppWindow* previousWindow = nullptr;
-	/**
+    std::map<std::string, gui::AppWindow *> windows;
+
+    std::vector<std::string> windowStack;
+
+  public:
+    /// get to the first time we entered this &window
+    bool popToWindow(const std::string &window);
+    // push window to the top of windows stack
+    void pushWindow(const std::string &newWindow);
+    const std::string getPrevWindow() const;
+    void cleanPrevWindw();
+    gui::AppWindow *getWindow(const std::string &window);
+    gui::AppWindow *getCurrentWindow();
+
+  protected:
+    /**
 	 * Flag defines whether keyboard input is processed
 	 */
 	bool acceptInput = false;

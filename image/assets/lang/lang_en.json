@@ -146,6 +146,16 @@
     "app_phonebook_new_contact_note": "Note",
     "app_phonebook_new_speed_dial_key": "Speed dial key",
     "app_phonebook_new_addto_fav": "Add to favourites",
+
+    "sms_add_rec_num" : "Add recipient or type a number",
+    "sms_title_message": "New message",
+    "sms_call_text"  : "Call: ",
+    "sms_contact_details" : "Contact details",
+    "sms_delete_conversation" : "Delete conversation",
+    "sms_forvard_message" : "Forward message",
+    "sms_copy" : "Copy",
+    "sms_delete_message" : "Delete",
+    "sms_from_this_sms" : "From this message",
     
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG",

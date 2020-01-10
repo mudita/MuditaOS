@@ -23,17 +23,20 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
-#include <log/log.hpp>
+#include "../data/SMSdata.hpp"
+#include "../windows/ThreadViewWindow.hpp"
+#include "NewMessage.hpp"
+#include "application-phonebook/data/PhonebookItemData.hpp"
 #include <Style.hpp>
+#include <log/log.hpp>
 
 namespace gui {
 
-MessagesMainWindow::MessagesMainWindow(app::Application *app) :
-		AppWindow(app, "MainWindow"), threadModel { new ThreadModel(app) } {
-	setSize(style::window_width, style::window_height);
-	buildInterface();
-
-}
+    MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window), threadModel{new ThreadModel(app)}
+    {
+        setSize(style::window_width, style::window_height);
+        buildInterface();
+    }
 
 void MessagesMainWindow::rebuild() {
 	destroyInterface();
@@ -115,20 +118,46 @@ MessagesMainWindow::~MessagesMainWindow() {
 
 void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
 
-	if (mode == ShowMode::GUI_SHOW_INIT) {
-		threadModel->clear();
-		threadModel->requestRecordsCount();
+    LOG_INFO("Data: %s", data ? data->getDescription().c_str() : "");
+    {
+        if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data))
+        {
+            auto thread = DBServiceAPI::ThreadGetByContact(application, pdata->result->dbID);
+            if (thread)
+            {
+                application->switchWindow(gui::name::window::thread_view, std::make_unique<SMSThreadData>(std::move(thread)));
+            }
+            else
+            {
+                LOG_FATAL("No thread and thread not created!");
+            }
+        }
+    }
+    if (mode == ShowMode::GUI_SHOW_INIT || data == nullptr)
+    {
+        threadModel->clear();
+        threadModel->requestRecordsCount();
 		list->clear();
 		list->setElementsCount(threadModel->getItemCount());
 
 		setFocusItem(list);
-	}
-
+    }
 }
 
 bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
 	//check if any of the lower inheritance onInput methods catch the event
-	return AppWindow::onInput(inputEvent);
+    if (AppWindow::onInput(inputEvent))
+    {
+        return true;
+    }
+    else
+    {
+        if (inputEvent.state == InputEvent::State::keyReleasedShort)
+        {
+            application->switchWindow(gui::name::window::new_sms, nullptr);
+        }
+    }
+    return false;
 }
 
 bool MessagesMainWindow::onDatabaseMessage(sys::Message *msgl) {

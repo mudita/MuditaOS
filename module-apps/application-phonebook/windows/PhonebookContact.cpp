@@ -7,6 +7,9 @@
 #include "Text.hpp"
 #include "Utils.hpp"
 #include "application-call/data/CallSwitchData.hpp"
+#include "application-messages/ApplicationMessages.hpp"
+#include "application-messages/data/SMSdata.hpp"
+#include "application-messages/windows/ThreadViewWindow.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
@@ -108,7 +111,8 @@ void PhonebookContact::buildInterface()
     numberPrimaryMessageLabel->inputCallback = [=](Item &item, const InputEvent &input) {
         if (input.keyCode == KeyCode::KEY_ENTER)
         {
-            return sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationMessages", "MainWindow", nullptr);
+            return sapm::ApplicationManager::messageSwitchApplication(application, app::name_messages, gui::name::window::thread_view,
+                                                                      std::make_unique<SMSSendRequest>(contact));
         }
         return (false);
     };
@@ -146,7 +150,8 @@ void PhonebookContact::buildInterface()
     numberSecondaryMessageLabel->inputCallback = [=](Item &item, const InputEvent &input) {
         if (input.keyCode == KeyCode::KEY_ENTER)
         {
-            return sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationMessages", "MainWindow", nullptr);
+            return sapm::ApplicationManager::messageSwitchApplication(application, app::name_messages, gui::name::window::thread_view,
+                                                                      std::make_unique<SMSSendRequest>(contact));
         }
         return (false);
     };

@@ -41,9 +41,9 @@ sys::Message_t ApplicationNotes::DataReceivedHandler(sys::DataMessage* msgl,sys:
 		uint32_t msgType = resp->responseTo;
 		switch( msgType ) {
 			case static_cast<uint32_t>(MessageType::DBNotesGetLimitOffset): {
-				if( currentWindow->onDatabaseMessage( resp ) )
-					refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-			}break;
+                if (getCurrentWindow()->onDatabaseMessage(resp))
+                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }break;
 		}
 	}
 
@@ -62,9 +62,9 @@ sys::ReturnCodes ApplicationNotes::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("MainWindow");
+    setActiveWindow(gui::name::window::main_window);
 
-	return ret;
+    return ret;
 }
 
 sys::ReturnCodes ApplicationNotes::DeinitHandler() {

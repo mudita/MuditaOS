@@ -122,16 +122,16 @@ void MenuWindow::buildInterface() {
 		//page1
 		TileDescription{"menu_phone","app_desktop_menu_phone",[=] (gui::Item& item) {
 			LOG_INFO("page 1 tile 1" );
-			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCallLog", "MainWindow", nullptr );
-			return true; }},
+            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationCallLog", gui::name::window::main_window, nullptr);
+            return true; }},
 		TileDescription{"menu_contacts",    "app_desktop_menu_contacts",[=] (gui::Item& item){
             LOG_INFO("Phonebook");
-            sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationPhonebook", "MainWindow",nullptr);
+            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationPhonebook", gui::name::window::main_window, nullptr);
             return true;
         }},
 		TileDescription{"menu_messages",    "app_desktop_menu_messages",[=] (gui::Item& item){
             LOG_INFO("Messages");
-            sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationMessages", "MainWindow",nullptr);
+            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationMessages", gui::name::window::main_window, nullptr);
             return true;
         }},
 		TileDescription{"menu_calendar",    "app_desktop_menu_calendar",[=] (gui::Item& item){ return true; }},
@@ -144,8 +144,8 @@ void MenuWindow::buildInterface() {
 			return true; } },},
 		TileDescription{"menu_settings","app_desktop_menu_settings",[=] (gui::Item& item){
 			LOG_INFO("page 1 settings" );
-			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationSettings", "MainWindow", nullptr );
-			return true; }},
+            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationSettings", gui::name::window::main_window, nullptr);
+            return true; }},
 	};
 
 	MenuPage* page1 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page1Definitions, MenuPage::PageID::MainPage);
@@ -153,15 +153,17 @@ void MenuWindow::buildInterface() {
     page_name.push_back(utils::localize.get("app_desktop_menu_title"));
 
 	//PAGE 2
-	std::vector<TileDescription> page2Definitions {
-		TileDescription{"menu_tools_notes",     "app_desktop_tools_notes",[=] (gui::Item& item){
-			sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationNotes", "MainWindow", nullptr );
-			return true; }},
-		TileDescription{"menu_tools_calculator","app_desktop_tools_calculator",[=] (gui::Item& item){ return true; }},
-		TileDescription{"menu_tools_recorder",  "app_desktop_tools_recorder",[=] (gui::Item& item){ return true; }},
-	};
+    std::vector<TileDescription> page2Definitions{
+        TileDescription{"menu_tools_notes", "app_desktop_tools_notes",
+                        [=](gui::Item &item) {
+                            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationNotes", gui::name::window::main_window, nullptr);
+                            return true;
+                        }},
+        TileDescription{"menu_tools_calculator", "app_desktop_tools_calculator", [=](gui::Item &item) { return true; }},
+        TileDescription{"menu_tools_recorder", "app_desktop_tools_recorder", [=](gui::Item &item) { return true; }},
+    };
 
-	MenuPage* page2 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page2Definitions, MenuPage::PageID::ToolsPage );
+    MenuPage* page2 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page2Definitions, MenuPage::PageID::ToolsPage );
 	pages.push_back( page2 );
     page_name.push_back(utils::localize.get("app_desktop_tools_title"));
 
@@ -208,8 +210,8 @@ bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 					switchPage(0);
 				}
 				else {
-					application->switchWindow( "MainWindow" );
-				}
+                    application->switchWindow(gui::name::window::main_window);
+                }
 				return true;
 			}
 			default:

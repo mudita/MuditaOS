@@ -25,7 +25,7 @@ Rect::Rect() :
 
 Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
     : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1}, penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-      flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS}
+      flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS}, yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}
 {
 
     widgetArea.x = 0;
@@ -37,6 +37,7 @@ Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     {
         parent->addWidget(this);
     }
+
     setPosition(x, y);
     setSize(w, h);
     setMaxSize(w, h);
@@ -75,6 +76,11 @@ void Rect::setFilled( bool val ) {
 	filled = val;
 }
 
+void Rect::setYaps(RectangleYapFlags yaps)
+{
+    this->yaps = yaps;
+}
+
 std::list<DrawCommand*> Rect::buildDrawList() {
 
 	std::list<DrawCommand*> commands;
@@ -101,6 +107,7 @@ std::list<DrawCommand*> Rect::buildDrawList() {
 	rect->corners = corners;
 	rect->flatEdges = this->flatEdges;
 	rect->edges =  edges;
+	rect->yaps = yaps;
 
 	rect->radius = radius;
 	if( focus )

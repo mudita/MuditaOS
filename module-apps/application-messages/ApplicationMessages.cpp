@@ -12,6 +12,8 @@
 #include "windows/MessagesMainWindow.hpp"
 
 #include "ApplicationMessages.hpp"
+#include "windows/NewMessage.hpp"
+#include "windows/ThreadViewWindow.hpp"
 
 namespace app {
 
@@ -42,9 +44,9 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl,
 		uint32_t msgType = resp->responseTo;
 		switch (msgType) {
 		case static_cast<uint32_t>(MessageType::DBThreadGetLimitOffset): {
-			if (currentWindow->onDatabaseMessage(resp))
-				refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-		}
+            if (getCurrentWindow()->onDatabaseMessage(resp))
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
 			break;
 		}
 	}
@@ -65,23 +67,22 @@ sys::ReturnCodes ApplicationMessages::InitHandler() {
 
 	createUserInterface();
 
-	setActiveWindow("MainWindow");
+    setActiveWindow(gui::name::window::main_window);
 
-	return ret;
+    return ret;
 }
 
 sys::ReturnCodes ApplicationMessages::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-void ApplicationMessages::createUserInterface() {
-
-	gui::AppWindow *window = nullptr;
-
-	window = new gui::MessagesMainWindow(this);
-	windows.insert(
-			std::pair<std::string, gui::AppWindow*>(window->getName(), window));
-
+void ApplicationMessages::createUserInterface()
+{
+    gui::AppWindow *window = nullptr;
+    window = new gui::MessagesMainWindow(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+    windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
+    windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
 }
 
 void ApplicationMessages::destroyUserInterface() {

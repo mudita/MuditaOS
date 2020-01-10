@@ -140,16 +140,18 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
     if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_RF)
     {
         LOG_INFO("exit to main menu");
-        sapm::ApplicationManager::messageSwitchApplication(application, app::name_desktop, "MainWindow", nullptr);
+        sapm::ApplicationManager::messageSwitchApplication(application, app::name_desktop, gui::name::window::main_window, nullptr);
     }
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
 
 	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-        if (prevWindow == getName() || getName() == "MainWindow")
+        auto prevWindow = application->getPrevWindow();
+        if (prevWindow == gui::name::window::no_window)
         {
             LOG_INFO("Back to previous application");
-			sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+            application->cleanPrevWindw();
+            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
         }
         else
         {
@@ -161,5 +163,22 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 
 	return false;
 }
+
+    void AppWindow::textModeShowCB(const UTF8 &text)
+    {
+        if (bottomBar == nullptr)
+        {
+            return;
+        }
+        bottomBar->setText(BottomBar::Side::CENTER, text);
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        bottomBar->getText(BottomBar::Side::CENTER);
+    }
+
+    bool AppWindow::textSelectSpecialCB()
+    {
+        return sapm::ApplicationManager::messageSwitchSpecialInput(
+            application, std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+    }
 
 } /* namespace gui */

@@ -11,7 +11,6 @@
 
 #include "ThreadsTable.hpp"
 
-
 ThreadsTable::ThreadsTable(Database *db) : Table(db) {
 }
 
@@ -120,11 +119,18 @@ ThreadsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ThreadsTabl
 
     }
 
-    auto retQuery = db->Query("SELECT * from threads WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;",
-                              fieldName.c_str(),
-                              str,
-                              limit,
-                              offset);
+    std::string querry = "SELECT * from threads WHERE " + fieldName + " = '" + str + "' ORDER BY date";
+    if (limit != 0)
+    {
+        querry += " LIMIT " + std::to_string(limit);
+    }
+    if (offset != 0)
+    {
+        querry += " OFFSET " + std::to_string(offset);
+    }
+    querry += ";";
+
+    auto retQuery = db->Query(querry.c_str());
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ThreadsTableRow>();

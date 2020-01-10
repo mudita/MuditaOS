@@ -32,12 +32,10 @@
 #ifndef LOG_LOG_H_
 #define LOG_LOG_H_
 
-
-
+#include "debug.hpp"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-
 
 #ifdef __cplusplus
 extern "C" {

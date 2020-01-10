@@ -11,6 +11,8 @@
 #include "Application.hpp"
 
 #include "../MessagesStyle.hpp"
+#include "../data/SMSdata.hpp"
+#include "../windows/ThreadViewWindow.hpp" // for name of window
 
 #include "service-db/api/DBServiceAPI.hpp"
 ThreadModel::ThreadModel(app::Application *app) :
@@ -55,11 +57,19 @@ gui::ListItem* ThreadModel::getItem(int index, int fistElement, int prevElement,
 	if (item != nullptr) {
 		item->setThreadItem(thread);
 		item->setID(index);
-		item->activatedCallback = [=](gui::Item &item) {
-			LOG_INFO("ThreadItem ActivatedCallback");
-			return true;
-		};
-		return item;
-	}
+        item->activatedCallback = [=](gui::Item &item) {
+            LOG_INFO("ThreadItem ActivatedCallback");
+            if (application)
+            {
+                application->switchWindow(gui::name::window::thread_view, std::make_unique<SMSThreadData>(thread));
+            }
+            else
+            {
+                LOG_ERROR("No application!");
+            }
+            return true;
+        };
+        return item;
+    }
 	return nullptr;
 }

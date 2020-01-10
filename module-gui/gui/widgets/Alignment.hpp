@@ -25,7 +25,8 @@ public:
 
 	Alignment();
 	Alignment( const uint32_t valH, const uint32_t valV );
-	virtual ~Alignment();
+    Alignment(const uint32_t align);
+    virtual ~Alignment();
 
 	bool setHorizontal( const uint32_t val );
 	bool setVertical( const uint32_t val );
