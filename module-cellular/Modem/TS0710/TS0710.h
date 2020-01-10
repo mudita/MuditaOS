@@ -249,21 +249,16 @@ private:
     int CloseMultiplexer();
     const static bool hardwareControlFlowEnable = false;
 
-    bool searchForOK(const std::vector<std::string> &response) {
-        for (std::string s : response) {
-            if (s == "OK")
+    bool searchForString(const std::vector<std::string> &response, std::string str)
+    {
+        for (std::string s : response)
+        {
+            if (s == str)
                 return true;
         }
         return false;
     }
 
-    bool searchForPrompt(const std::vector<std::string> &response) {
-		for (std::string s : response) {
-			if (s == ">")
-				return true;
-		}
-		return false;
-	}
     TS0710_START::START_SystemParameters_t startParams;
     sys::Service *pv_parent;
 
@@ -336,47 +331,79 @@ public:
     TS0710_START::START_SystemParameters_t getStartParams() { return startParams; }
     ATParser* getParser() { return parser; }
 
-    // @brief It is serching the resposne for "OK" string
-    //
-    // Invalid responses are logged by defult as LOG_ERRORs
-    // 
-    // @param response - tokenized resposne
-    // @parama level - determine how the errors are logged
-    // return true - "OK" string is found, false - otherwise
-    bool CheckATCommandResponse(const std::vector<std::string> &response, logger_level level = LOGERROR) {
-        if (searchForOK(response)) {
+    /// @brief It is searching the resposne for a string
+    ///
+    /// @param response - tokenized resposne
+    /// @param str - string to search in response
+    /// @param numberOfExpectedTokens - number of expected tokens, 0 means do not validate number of tokens
+    /// @param level - determine how the errors are logged
+    /// @return true - "OK" string is found, false - otherwise
+    bool SearchATCommandResponse(const std::vector<std::string> &response, const std::string &str, size_t numberOfExpectedTokens, logger_level level)
+    {
+        const size_t numberOfTokens = response.size();
+        if (searchForString(response, str) && (numberOfExpectedTokens == 0 || numberOfTokens == numberOfExpectedTokens))
+        {
             return true;
-        } else {
+        }
+        else
+        {
             std::string resp;
             for (std::string s : response)
+            {
                 resp.append(s);
-            LOG_CUSTOM(level,"Invalid response: %s", resp.c_str());
+            }
+
+            LOG_CUSTOM(level, "Invalid response: %s", resp.c_str());
+            // numberOfExpectedTokens == 0, means do not validate number of tokens
+            LOG_CUSTOM(level, " - Number of tokens %u, number of expected tokens %u", numberOfTokens, numberOfExpectedTokens);
             return false;
         }
     }
 
-    bool CheckATCommandPrompt(const std::vector<std::string> &response) {
-           //if (response.size() == 1 && response[0] == "OK") {
-           if (searchForPrompt(response)) {
-               return true;
-           } else {
-               std::string resp;
-               for (std::string s : response)
-                   resp.append(s);
-               LOG_ERROR("Invalid response: %s", resp.c_str());
-               return false;
-           }
-       }
+    /// @brief It is serching the resposne for "OK "string
+    ///
+    /// @note Invalid responses are logged by defult as LOG_ERRORs
+    ///
+    /// @param response - tokenized resposne
+    /// @param numberOfExpectedTokens - number of expected tokens, 0 means do not validate number of tokens
+    /// @param level - determine how the errors are logged
+    /// @return true - str string is found, false - otherwise
+    bool CheckATCommandResponse(const std::vector<std::string> &response, size_t numberOfExpectedTokens, logger_level level = LOGERROR)
+    {
+        return SearchATCommandResponse(response, "OK", numberOfExpectedTokens, level);
+    }
 
+    /// @brief It is serching the resposne for "OK "string
+    ///
+    /// @note Invalid responses are logged by defult as LOG_ERRORs
+    ///
+    /// @param response - tokenized resposne
+    /// @param level - determine how the errors are logged
+    /// @return true - str string is found, false - otherwise
+    bool CheckATCommandResponse(const std::vector<std::string> &response, logger_level level = LOGERROR)
+    {
+        return SearchATCommandResponse(response, "OK", 0, level);
+    }
 
-TS0710(PortSpeed_e portSpeed, sys::Service *parent);
-TS0710() = delete;
-~TS0710();
+    /// @brief It is serching the resposne for ">" string
+    ///
+    /// @note Invalid responses are logged by defult as LOG_ERRORs
+    ///
+    /// @param response - tokenized resposne
+    /// @param level - determine how the errors are logged
+    /// @return true - str string is found, false - otherwise
+    bool CheckATCommandPrompt(const std::vector<std::string> &response, logger_level level = LOGERROR)
+    {
+        return SearchATCommandResponse(response, ">", 0, level);
+    }
 
-//Add error handling - only for Advanced mode. Leave for now
-//Add callback for received frame (after error handling)
-//Add frame routing to different channels
-    
+    TS0710(PortSpeed_e portSpeed, sys::Service *parent);
+    TS0710() = delete;
+    ~TS0710();
+
+    // Add error handling - only for Advanced mode. Leave for now
+    // Add callback for received frame (after error handling)
+    // Add frame routing to different channels
 };
 
 #endif //_TS0710_H

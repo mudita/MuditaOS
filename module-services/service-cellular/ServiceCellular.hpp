@@ -63,7 +63,8 @@ private:
     //std::unique_ptr<MuxDaemon> muxdaemon;
     TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     uint32_t callStateTimerID = 0;
-    DLC_channel::Callback_t notificationCallback=nullptr;
+    void CallStateTimerHandler();
+    DLC_channel::Callback_t notificationCallback = nullptr;
 
     State state = State ::Idle;
 
