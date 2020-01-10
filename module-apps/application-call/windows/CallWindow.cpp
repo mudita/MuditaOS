@@ -374,10 +374,12 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 	LOG_INFO("key code: %d, state: %d", static_cast<uint32_t>(inputEvent.keyCode), static_cast<uint32_t>(inputEvent.state));
 	 
 	bool handled = false;
-	
-	//process only if key is released
-	if( inputEvent.state == InputEvent::State::keyReleasedShort ) { // TODO: alek: seems wrong
-		switch( inputEvent.keyCode ) {
+
+    // process only if key is released
+    // InputEvent::State::keyReleasedLong is necessary for KeyCode::KEY_RF to properly abort the active call
+    if (inputEvent.state == InputEvent::State::keyReleasedShort || inputEvent.state == InputEvent::State::keyReleasedLong)
+    {
+        switch( inputEvent.keyCode ) {
 			case KeyCode::KEY_ENTER:
 				handled = handleCenterButton();
 				break;
@@ -390,15 +392,16 @@ bool CallWindow::onInput( const InputEvent& inputEvent ) {
 			default:
 				break;	
 		}
-	}
+    }
 
-	if( handled ) {
+    if( handled ) {
 		application->refreshWindow( RefreshModes::GUI_REFRESH_FAST);
 		return true;
 	}
-
-	//check if any of the lower inheritance onInput methods catch the event
-	return AppWindow::onInput( inputEvent );
+    else
+    {
+        return AppWindow::onInput(inputEvent);
+    }
 }
 
 } /* namespace gui */
