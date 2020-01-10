@@ -30,6 +30,8 @@
 #include <Style.hpp>
 #include <log/log.hpp>
 
+#include "time/time_conversion.hpp"
+
 namespace gui {
 
     MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window), threadModel{new ThreadModel(app)}
@@ -82,6 +84,8 @@ void MessagesMainWindow::buildInterface() {
 	record.number = UTF8("666600925");
 	record.body = UTF8("Elo");
 	record.type = SMSType::QUEUED;
+	auto time = utils::time::Time();
+	record.date = time.getTime();
 	DBServiceAPI::SMSAdd(this->application, record);
 
 }

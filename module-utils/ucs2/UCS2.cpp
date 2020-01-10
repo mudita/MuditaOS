@@ -24,8 +24,8 @@ UCS2::UCS2(void) {
 }
 
 UCS2::~UCS2() {
-	if (buffer != nullptr)
-		delete[] buffer;
+//	if (buffer != nullptr)
+	delete[] buffer;
 }
 
 UCS2::UCS2(const UTF8 &string) {
@@ -156,10 +156,9 @@ std::string UCS2::modemStr(void) {
 void UCS2::clear(void) {
 	sizeUsed = 0;
 	sizeAllocated = ucs2bufferExt;
-	if(buffer != nullptr)
-	{
+
 		delete[] buffer;
-	}
+
 	buffer = new uint16_t[ucs2bufferExt];
 	length = 0;
 }

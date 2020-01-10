@@ -631,6 +631,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 		for (uint32_t i = 0; i < ret.size(); i++) {
 			if (ret[i].find("QCMGR") != std::string::npos) {
 
+
 				std::istringstream ss(ret[i]);
 				std::string token;
 				std::vector<std::string> tokens;
@@ -640,7 +641,30 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				tokens[1].erase(
 						std::remove(tokens[1].begin(), tokens[1].end(), '\"'),
 						tokens[1].end());
+				/*
+				 * tokens:
+				 * [0] - +QCMGR
+				 * [1] - sender number
+				 * [2] - none
+				 * [3] - date YY/MM/DD
+				 * [4] - hour HH/MM/SS/timezone
+				 * concatenaded messages
+				 * [5] - unique concatenated message id
+				 * [6] - current message number
+				 * [7] - total messages count
+				 *
+				 */
+				//parse sender number
 				receivedNumber = UCS2(tokens[1]).toUTF8();
+
+				//parse message time
+				tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
+				std::istringstream timebuf(tokens[3]);
+				std::string substring;
+				std::vector<std::string> timeTokens;
+
+				struct tm tm;
+				strptime((tokens[3] + " " + tokens[4]).c_str(), "%y/%m/%d %H:%M:%S", &tm);
 
 				//if its single message process
 				if (tokens.size() == 5) {
@@ -667,29 +691,30 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 						messageParts.push_back(ret[i + 1]);
 					}
 				}
+				if (messageParsed) {
+					messageParsed = false;
+					UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
+
+					SMSRecord record;
+					record.body = decodedMessage;
+					record.number = receivedNumber;
+					record.type = SMSType::INBOX;
+					record.date = mktime(&tm); // todo parse date from at command
+
+					auto result = DBServiceAPI::SMSAdd(this, record);
+					// todo temporary send multicast
+					auto msg = std::make_shared<CellularSMSRequestMessage>(
+							MessageType::CellularSMSMulticast);
+
+					msg->number = receivedNumber;
+					msg->message = decodedMessage;
+
+					sys::Bus::SendMulticast(msg,
+							sys::BusChannels::ServiceCellularSMSNotification, this);
+				}
 			}
 		}
-		if (messageParsed) {
-			messageParsed = false;
-			UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
 
-			SMSRecord record;
-			record.body = decodedMessage;
-			record.number = receivedNumber;
-			record.type = SMSType::INBOX;
-			record.date = 12345678; // todo parse date from at command
-
-			auto result = DBServiceAPI::SMSAdd(this, record);
-			// todo temporary send multicast
-			auto msg = std::make_shared<CellularSMSRequestMessage>(
-					MessageType::CellularSMSMulticast);
-
-			msg->number = receivedNumber;
-			msg->message = decodedMessage;
-
-			sys::Bus::SendMulticast(msg,
-					sys::BusChannels::ServiceCellularSMSNotification, this);
-		}
 	}
 	//delete message from modem memory
 	cmux->GetChannel("Commands")->SendCommandResponse(
