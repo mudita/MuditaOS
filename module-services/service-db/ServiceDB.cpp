@@ -111,7 +111,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         	// send notification
 			auto notificationMessage = std::make_shared<DBNotificationMessage>(
 					MessageType::DBServiceNotification,
-					DBNotificatonType::Updated, DBBaseType::SmsDB);
+					DB::NotificatonType::Added, DB::BaseType::SmsDB);
 			sys::Bus::SendMulticast(notificationMessage,
 					sys::BusChannels::ServiceDBNotifications, this);
 		}
@@ -440,8 +440,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         {
 			auto notificationMessage = std::make_shared<DBNotificationMessage>(
 					MessageType::DBAlarmUpdateNotification,
-					DBNotificatonType::Updated, DBBaseType::AlarmDB);
-			notificationMessage->notificationType = DBNotificatonType::Updated;
+					DB::NotificatonType::Updated, DB::BaseType::AlarmDB);
+			notificationMessage->notificationType = DB::NotificatonType::Updated;
 			sys::Bus::SendMulticast(notificationMessage,
 					sys::BusChannels::ServiceDatabaseAlarmNotifications, this);
 		}

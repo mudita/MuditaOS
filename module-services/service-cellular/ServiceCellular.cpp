@@ -457,7 +457,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		DBNotificationMessage *msg = reinterpret_cast<DBNotificationMessage*>(msgl);
 
 		LOG_DEBUG("Received multicast");
-		if((msg->baseType == DBBaseType::SmsDB) && (msg->notificationType == DBNotificatonType::Updated))
+		if((msg->baseType == DB::BaseType::SmsDB) &&
+				((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)) )
 		{
 			sendSMS();
 		}
@@ -548,12 +549,17 @@ bool ServiceCellular::sendSMS(void)
 
 		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
 			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
-					(UCS2(record.body).modemStr() + "\032").c_str(), 1);
-			//check modem response
-			record.type = SMSType::OUTBOX;
+					(UCS2(record.body).modemStr() + "\032").c_str(), 2, 5000);
 
-			result = true;
-		}
+            if ((retText.size() == 2) && (retText[1] == "OK"))
+            {
+                result = true;
+            }
+            else
+            {
+            	LOG_INFO("SMS sending failed.");
+            }
+        }
 	}
 	//split text, and send concatenated messages
 	else {
@@ -577,7 +583,7 @@ bool ServiceCellular::sendSMS(void)
 			if (i * singleMessageLen + singleMessageLen > record.body.length()) {
 				partLength = record.body.length() - i * singleMessageLen;
 			}
-			std::string messagePart = record.body.substr(i * singleMessageLen,
+			UTF8 messagePart = record.body.substr(i * singleMessageLen,
 					partLength);
 
 
@@ -595,14 +601,22 @@ bool ServiceCellular::sendSMS(void)
 						cmux->GetChannel("Commands")->SendCommandResponse(
 								 (UCS2(messagePart).modemStr()
 										+ "\032").c_str(), 2, 2000);
-				//check modem response
-				record.type = SMSType::OUTBOX;
+	            if ((sended.size() == 2) && (sended[1] == "OK"))
+	            {
+	                result = true;
+	            }
+	            else
+	            {
+	            	result = false;
+	            	LOG_INFO("SMS sending failed.");
+	            }
 			}
 		}
-		result = true;
 	}
     if (result)
     {
+    	LOG_INFO("SMS sended.");
+        record.type = SMSType::OUTBOX;
         DBServiceAPI::SMSUpdate(this, record);
     }
     return result;
