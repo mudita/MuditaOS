@@ -31,5 +31,9 @@ public:
 	bool onDimensionChanged(const BoundingBox &oldDim,
 			const BoundingBox &newDim) override;
 	void setThreadItem(std::shared_ptr<ThreadRecord> &thread);
+    std::shared_ptr<ThreadRecord> getThreadItem()
+    {
+        return thread;
+    }
 };
 } /*namespace gui*/

@@ -25,6 +25,7 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "../data/SMSdata.hpp"
+#include "../widgets/ThreadItem.hpp"
 #include "../windows/ThreadViewWindow.hpp"
 #include "NewMessage.hpp"
 #include "OptionsWindow.hpp"
@@ -173,8 +174,16 @@ bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
                 if (app->threadOptionsWindow != nullptr)
                 {
                     app->threadOptionsWindow->clearOptions();
-                    app->threadOptionsWindow->addOptions(threadWindowOptions(app, threadModel->getRecord(0).get()));
-                    app->switchWindow(gui::name::window::thread_options, nullptr);
+                    auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
+                    if (it)
+                    {
+                        app->threadOptionsWindow->addOptions(threadWindowOptions(app, it->getThreadItem().get()));
+                        app->switchWindow(gui::name::window::thread_options, nullptr);
+                    }
+                    else
+                    {
+                        LOG_ERROR("Can't switch to options -wrong input type");
+                    }
                 }
                 return true;
             }
