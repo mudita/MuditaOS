@@ -12,7 +12,7 @@
 #include <unistd.h>
 extern int errno;
 
-void desktop_receive(void *pointer)
+void desktopServiceReceive(void *pointer)
 {
     ServiceDesktop *owner = (ServiceDesktop *)pointer;
 
@@ -26,16 +26,12 @@ void desktop_receive(void *pointer)
         {
             owner->dataReceived(inputData, ret);
         }
-        else if (ret == -1)
-        {
-            LOG_ERROR("reading from PTY resulted in an error %d", errno);
-        }
     }
 
     LOG_INFO("exit");
 }
 
-int desktop_send(int fd, uint8_t *data, size_t dataSize)
+int desktopServiceSend(int fd, uint8_t *data, size_t dataSize)
 {
     size_t t = write(fd, data, dataSize);
     if (t >= 0)
@@ -49,7 +45,7 @@ int desktop_send(int fd, uint8_t *data, size_t dataSize)
     }
 }
 
-int desktop_init()
+int desktopServiceInit()
 {
     int fd = 0;
 
