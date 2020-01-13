@@ -99,7 +99,7 @@ namespace bsp {
         qHandleIrq = qHandle;
 
         //check Power-On reset bit
-        uint16_t status;
+        uint16_t status = 0;
         const uint16_t porMask = 0x0002;
         battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
 
@@ -139,25 +139,25 @@ namespace bsp {
 
 
     void battery_getBatteryLevel(uint8_t &levelPercent) {
-        uint16_t val;
-        battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepSOC_REG, &val);
-        uint16_t percent = val & 0xff00;
-        percent = percent >> 8;
-        levelPercent = percent;
+        uint16_t val = 0;
+        if (battery_fuelGaugeRead(bsp::batteryChargerRegisters::RepSOC_REG, &val) != kStatus_Success)
+        {
+            LOG_ERROR("failed to get battery percent");
+        }
+        levelPercent = (val & 0xff00) >> 8;
     }
 
     void battery_getChargeStatus(bool &status) {
         uint8_t val = 0;
-        val = 0;
-        battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_OK, &val);
-        if (val & 0x40)
-            status = true;
-        else
-            status = false;
+        if (battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_OK, &val) != kStatus_Success)
+        {
+            LOG_ERROR("failed to read charge status");
+        }
+        status = val & 0x40;
     }
 
     void battery_ClearAllIRQs(void) {
-        uint8_t val;
+        uint8_t val = 0;
         battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_REG, &val);
         if (val != 0) {
             //write zero to clear irq source
@@ -196,7 +196,7 @@ static int battery_fuelGaugeRead(bsp::batteryChargerRegisters registerAddress, u
     }
 
     I2CAddress addr{.deviceAddress=BSP_FUEL_GAUGE_I2C_ADDR, .subAddress=static_cast<uint32_t>(registerAddress), .subAddressSize=i2cSubaddresSize};
-    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(&value), sizeof(uint16_t));
+    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(value), sizeof(uint16_t));
 
     if( ret != sizeof(uint16_t)){
         return kStatus_Fail;
@@ -225,7 +225,7 @@ static int battery_chargerRead(bsp::batteryChargerRegisters registerAddress, uin
     }
 
     I2CAddress addr{.deviceAddress=BSP_BATTERY_CHARGER_I2C_ADDR, .subAddress=static_cast<uint32_t>(registerAddress), .subAddressSize=i2cSubaddresSize};
-    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(&value), sizeof(uint8_t));
+    auto ret = i2c->Read(addr, value, sizeof(uint8_t));
     if( ret != sizeof(uint8_t)){
         return kStatus_Fail;
     }
@@ -253,7 +253,7 @@ static int battery_chargerTopControllerRead(bsp::batteryChargerRegisters registe
     }
 
     I2CAddress addr{.deviceAddress=BSP_TOP_CONTROLLER_I2C_ADDR, .subAddress=static_cast<uint32_t>(registerAddress), .subAddressSize=i2cSubaddresSize};
-    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(&value), sizeof(uint8_t));
+    auto ret = i2c->Read(addr, reinterpret_cast<uint8_t *>(value), sizeof(uint8_t));
     if( ret != sizeof(uint8_t)){
         return kStatus_Fail;
     }
