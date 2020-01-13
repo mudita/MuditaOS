@@ -5,12 +5,12 @@ extern "C"
 #include "include/virtual_com.h"
 }
 
-int desktop_init()
+int desktopServiceInit()
 {
     return (VCOMAPPInit());
 }
 
-void desktop_receive(void *ptr)
+void desktopServiceReceive(void *ptr)
 {
     ServiceDesktop *owner = (ServiceDesktop *)ptr;
     static uint8_t readbuf[SERIAL_BUFFER_LEN];
@@ -32,7 +32,7 @@ void desktop_receive(void *ptr)
 }
 
 /* fd is not needed on pure phone */
-int desktop_send(int fd, uint8_t *data, size_t dataSize)
+int desktopServiceSend(int fd, uint8_t *data, size_t dataSize)
 {
     usb_status_t t = USB_CDCSend(data, dataSize);
     if (t == 0x00)
