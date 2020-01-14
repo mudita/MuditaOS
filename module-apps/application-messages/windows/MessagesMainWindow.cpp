@@ -80,16 +80,6 @@ void MessagesMainWindow::buildInterface() {
 	searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
 //	setFocusItem( list );
-	SMSRecord record;
-	record.number = UTF8("666600925");
-	//record.body = UTF8("Elo taki to dlugi bedzie smsm zeby sie wyslal w kilku wiadomosciach i tak dalej piszemy co by nie było za mało");
-	record.body = UTF8("Elo  mało");
-
-	record.type = SMSType::QUEUED;
-	auto time = utils::time::Time();
-	record.date = time.getTime();
-	DBServiceAPI::SMSAdd(this->application, record);
-
 }
 void MessagesMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();

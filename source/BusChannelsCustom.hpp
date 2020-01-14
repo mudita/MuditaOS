@@ -11,8 +11,6 @@
 ServiceCellularNotifications,
 Test2CustomBusChannel,
 ServiceDBNotifications,
-//todo remove ServiceDatabaseAlarmNotifications
-//ServiceDatabaseAlarmNotifications,
 ServiceAudioNotifications
 
 
