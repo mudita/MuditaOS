@@ -201,6 +201,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::CallBusy: {
                 stopTimer(callDurationTimerId);
                 stopTimer(callStateTimerId);
+                // TODO: alek: clean this up
+                // ************************** This is only temporary to check DB api is working as expected **********
                 LOG_DEBUG("callDuration %d, callEndTime %d", callDuration, callEndTime);
                 CalllogRecord calllogRec;
                 calllogRec.number = "+48600226908";
@@ -217,6 +219,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 {
                     LOG_ERROR("CalllogAdd failed");
                 }
+                // *****************************************************************************************************
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
