@@ -32,7 +32,7 @@ class ServiceDesktop : public sys::Service
     void dataReceived(const uint8_t *data, const ssize_t dataLen);
 
   private:
-    void sendRecorsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count, bool favourite);
+    void sendRecordsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count, bool favourite);
 
     static const char *serviceName;
     xTaskHandle taskHandle;

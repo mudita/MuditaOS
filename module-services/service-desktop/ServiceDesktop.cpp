@@ -26,19 +26,27 @@ static Json fileItem(const vfs::DirectoryEntry &e)
 
 static Json contactItem(const ContactRecord &item)
 {
-    const std::string primaryNumber = item.numbers[0].numberE164.c_str();
+    const std::string primaryNumber = (item.numbers.size() > 0) ? item.numbers[0].numberE164.c_str() : "";
     const std::string secondaryNumber = (item.numbers.size() == 2) ? item.numbers[1].numberE164.c_str() : "";
 
-    return (Json::object{{"primaryName", item.primaryName.c_str()},
-                         {"alternativeName", item.alternativeName.c_str()},
-                         {"mail", item.mail.c_str()},
-                         {"primaryNumber", primaryNumber.c_str()},
-                         {"secondaryNumber", secondaryNumber.c_str()}});
-}
+    return (Json::object{
+        {"dbID", static_cast<int>(item.dbID)},
+        {"primaryName", item.primaryName.c_str()},
+        {"alternativeName", item.alternativeName.c_str()},
+        {"contactType", static_cast<int>(item.contactType)},
+        {"country", item.country.c_str()},
+        {"city", item.city.c_str()},
+        {"street", item.street.c_str()},
+        {"primaryNumber", primaryNumber.c_str()},
+        {"secondaryNumber", secondaryNumber.c_str()},
+        {"note", item.note.c_str()},
+        {"mail", item.mail.c_str()}
+    });
+};
 
 ServiceDesktop::ServiceDesktop() : sys::Service(serviceName), taskHandle(nullptr), ptyDescriptor(-1)
 {
-    LOG_INFO("ServiceDesktop::ctor");
+    LOG_DEBUG("ServiceDesktop::ctor");
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
@@ -70,21 +78,29 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
     // handle database response
     if (resp != nullptr)
     {
-
         uint32_t msgType = resp->responseTo;
         switch (msgType)
         {
         case static_cast<uint32_t>(MessageType::DBContactGetLimitOffset): {
             DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
-            LOG_INFO("DBContactGetLimitOffset count=%d offset=%d favs=%d", dbResp->count, dbResp->offset, dbResp->favourite);
-            sendRecorsInResponse(std::move(dbResp->records), dbResp->offset, dbResp->limit, dbResp->count, dbResp->favourite);
+            LOG_DEBUG("DBContactGetLimitOffset count=%d offset=%d favs=%d", dbResp->count, dbResp->offset, dbResp->favourite);
+            sendRecordsInResponse(std::move(dbResp->records), dbResp->offset, dbResp->limit, dbResp->count, dbResp->favourite);
             break;
         }
         case static_cast<uint32_t>(MessageType::DBContactGetCount): {
             DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
-            LOG_INFO("DataReceivedHandler db count: %d", dbResp->count);
-            Json my_json = Json::object{{"count", (int)dbResp->count}};
-            std::string responseStr = my_json.dump();
+            LOG_DEBUG("DBContactGetCount: %d", dbResp->count);
+            Json json = Json::object{{"count", (int)dbResp->count}};
+            std::string responseStr = json.dump();
+            sendData(responseStr.c_str(), responseStr.length());
+            break;
+        }
+        case static_cast<uint32_t>(MessageType::DBContactGetByID): {
+            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
+            ContactRecord contact_record = dbResp->records->front();
+            Json json = contactItem(contact_record);
+            std::string responseStr = json.dump();
+            LOG_DEBUG("DBContactGetByID: %s", responseStr.c_str());
             sendData(responseStr.c_str(), responseStr.length());
             break;
         }
@@ -94,7 +110,7 @@ sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::R
     return std::make_shared<sys::ResponseMessage>();
 }
 
-void ServiceDesktop::sendRecorsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count,
+void ServiceDesktop::sendRecordsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count,
                                           bool favourite)
 {
     std::vector<ContactRecord> contacts = *records.get();
@@ -129,7 +145,7 @@ void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
 {
     std::string possibleJsonData((const char *)data, (size_t)dataLen);
     std::string errorString;
-    LOG_INFO("dataReceived len: %d data:\"%s\"", dataLen, data);
+    LOG_DEBUG("dataReceived len: %d data:\"%s\"", dataLen, data);
     json11::Json request = json11::Json::parse(possibleJsonData, errorString);
     if (request.is_null())
     {
@@ -137,7 +153,7 @@ void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
     }
     else
     {
-        LOG_INFO("got serial command: %s", request["command"].string_value().c_str());
+        LOG_DEBUG("got serial command: %s", request["command"].string_value().c_str());
         if (request["command"].string_value() == "running_tasks")
         {
             Json my_json = Json::object{{"tasks", (int)uxTaskGetNumberOfTasks()}};
@@ -175,8 +191,15 @@ void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
             int offset = request["offset"].int_value();
             int limit = request["limit"].int_value();
             bool favs = request["favs"].bool_value();
-            LOG_INFO("offset:%d limit:%d favs:%d", offset, limit, favs);
             DBServiceAPI::ContactGetLimitOffset(this, offset, limit, favs);
+        }
+
+        if (request["command"].string_value() == "contact")
+        {
+           if (request["id"].is_number())
+            {
+                DBServiceAPI::ContactGetByID(this, request["id"].int_value());
+            }
         }
     }
 }
