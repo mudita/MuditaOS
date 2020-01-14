@@ -31,6 +31,8 @@
 #include <Text.hpp>
 #include <cassert>
 
+#include "common_data/EventStore.hpp"
+
 namespace app {
 
     const char *Application::stateStr(Application::State st)
@@ -148,7 +150,17 @@ void Application::render( gui::RefreshModes mode ) {
 
     //send drawing commands only when if application is in active and visible.
 	if( state == State::ACTIVE_FORGROUND ) {
-        std::list<gui::DrawCommand *> commandsList = getCurrentWindow()->buildDrawList();
+        auto currwin = getCurrentWindow();
+        if (Store::Battery::get().state == Store::Battery::State::Charging)
+        {
+            currwin->batteryCharging(true);
+        }
+        else
+        {
+            currwin->updateBatteryLevel(Store::Battery::get().level);
+        }
+
+        std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
 
         if( shutdownInProgress ) {
 			auto msg = std::make_shared<sgui::DrawMessage>(commandsList, mode, sgui::DrawMessage::DrawCommand::SHUTDOWN );
@@ -248,10 +260,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		sevm::BatteryLevelMessage* msg = static_cast<sevm::BatteryLevelMessage*>(msgl);
 		LOG_INFO("Application battery level: %d", msg->levelPercents );
 
-        if (getCurrentWindow())
+        if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents))
         {
-            if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents))
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         handled = true;
@@ -260,13 +271,16 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	{
 		sevm::BatteryPlugMessage* msg = static_cast<sevm::BatteryPlugMessage*>(msgl);
 		if(msg->plugged == true) {
-			//TODO show plug icon
 			LOG_INFO("Application charger connected" );
-		}
+            getCurrentWindow()->batteryCharging(true);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
 		else {
 			//hide plug icon
 			LOG_INFO("Application charger disconnected" );
-		}
+            getCurrentWindow()->batteryCharging(false);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
 
 		refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		handled = true;

@@ -15,8 +15,9 @@ extern "C" {
 #include "vfs.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
-#include "drivers/i2c/DriverI2C.hpp"
+#include "common_data/EventStore.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
+#include "drivers/i2c/DriverI2C.hpp"
 
 #define BSP_BATTERY_CHARGER_I2C_ADDR                        (0xD2 >> 1)
 #define BSP_FUEL_GAUGE_I2C_ADDR                             (0x6C >> 1)
@@ -91,6 +92,42 @@ static xQueueHandle qHandleIrq = NULL;
 
 namespace bsp {
 
+    // STATUS register bits
+    enum B_STATUS
+    {
+        Inm = (1 << 0),
+        POR = (1 << 1),
+        SPR_2 = (1 << 2),
+        BST = (1 << 3),
+        Isysmx = (1 << 4),
+        SPR_5 = (1 << 5),
+        ThmHot = (1 << 6),
+        dSOCi = (1 << 7),
+        Vmn = (1 << 8),
+        Tmn = (1 << 9),
+        Smn = (1 << 10),
+        Bi = (1 << 11),
+        Vmx = (1 << 12),
+        Tmx = (1 << 13),
+        Smx = (1 << 14),
+        Br = (1 << 15),
+    };
+
+    /// CHG_INT registers from documentation
+    enum B_CHG_INT
+    {
+        BYP_I = (1 << 0),
+        RSVD = (1 << 1),
+        BATP_I = (1 << 2),
+        BAT_I = (1 << 3),
+        CHG_I = (1 << 4),
+        WCIN_I = (1 << 5),
+        CHGIN_I = (1 << 6),
+        AICL_I = (1 << 7),
+    };
+
+    uint16_t battery_get_STATUS();
+    uint16_t battery_get_CHG_INT_OK();
 
     int battery_Init(xQueueHandle qHandle) {
         i2c = DriverI2C::Create(static_cast<I2CInstances >(BoardDefinitions::BATTERY_CHARGER_I2C),
@@ -115,6 +152,12 @@ namespace bsp {
 
         battery_disableAlerts();
         battery_enableFuelGuageIRQs();
+
+        uint8_t level = 0;
+        bool charging = false;
+        battery_getBatteryLevel(level);
+        battery_getChargeStatus(charging);
+        LOG_INFO("Phone battery start state: %d %d", level, charging);
 
         battery_ClearAllIRQs();
         battery_enableTopIRQs();
@@ -145,15 +188,32 @@ namespace bsp {
             LOG_ERROR("failed to get battery percent");
         }
         levelPercent = (val & 0xff00) >> 8;
+        Store::Battery::modify().level = levelPercent;
     }
 
     void battery_getChargeStatus(bool &status) {
         uint8_t val = 0;
+        // read clears state
         if (battery_chargerRead(bsp::batteryChargerRegisters::CHG_INT_OK, &val) != kStatus_Success)
         {
             LOG_ERROR("failed to read charge status");
         }
-        status = val & 0x40;
+        status = val & B_CHG_INT::CHGIN_I;
+        if (status)
+        {
+            Store::Battery::modify().state = Store::Battery::State::Charging;
+        }
+        else
+        {
+            Store::Battery::modify().state = Store::Battery::State::Discharging;
+        }
+    }
+
+    uint16_t battery_get_STATUS()
+    {
+        uint16_t status = 0;
+        battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
+        return status;
     }
 
     void battery_ClearAllIRQs(void) {
@@ -164,8 +224,7 @@ namespace bsp {
             battery_chargerWrite(bsp::batteryChargerRegisters::CHG_INT_REG, 0);
         }
 
-        uint16_t status = 0;
-        battery_fuelGaugeRead(bsp::batteryChargerRegisters::STATUS_REG, &status);
+        uint16_t status = battery_get_STATUS();
         if (status != 0) {
             //write zero to clear irq source
             battery_fuelGaugeWrite(bsp::batteryChargerRegisters::STATUS_REG, 0);
@@ -468,9 +527,9 @@ static void s_BSP_BatteryChargerIrqPinsInit() {
             .defLogic = 0,
             .pin = static_cast<uint32_t >(BoardDefinitions::BATTERY_CHARGER_INTB_PIN)});
 
-    gpio->EnableInterrupt(1<< static_cast<uint32_t >(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
     gpio->EnableInterrupt(1<< static_cast<uint32_t >(BoardDefinitions::BATTERY_CHARGER_WCINOKB));
     gpio->EnableInterrupt(1<< static_cast<uint32_t >(BoardDefinitions::BATTERY_CHARGER_INOKB_PIN));
+    gpio->EnableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::BATTERY_CHARGER_INTB_PIN));
 }
 
 

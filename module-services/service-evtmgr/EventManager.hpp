@@ -22,7 +22,9 @@ class EventManager: public sys::Service {
 private:
 	void HandleAlarmTrigger(sys::DataMessage* msgl);
 	void GetNextAlarmTimestamp(time_t timestamp);
-protected:
+    uint32_t pollTimerID = 0;
+
+  protected:
 	std::unique_ptr<WorkerEvent> EventWorker;
 	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
 	std::string targetApplication;
@@ -36,11 +38,16 @@ protected:
 	bool alarmIsValid = false;
 	//flag informs about suspend/resume status
 	bool suspended = false;
-public:
+    /// to periodically check and update battery state, to be removed when battery charger will work fine
+    void handleBatPolling();
+
+  public:
 	EventManager(const std::string& name);
     ~EventManager();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+
+    void TickHandler(uint32_t id) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
