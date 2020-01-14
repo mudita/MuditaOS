@@ -364,7 +364,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     case MessageType::CellularHangupCall: {
         auto channel = cmux->GetChannel("Commands");
-        LOG_ERROR("************************************************CellularHangupCall");
+        LOG_INFO("CellularHangupCall");
         if (channel)
         {
             if (cmux->CheckATCommandResponse(channel->SendCommandResponse("ATH\r", 1, 5000)))
