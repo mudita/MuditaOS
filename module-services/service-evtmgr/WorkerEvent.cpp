@@ -64,7 +64,6 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		if(notification & static_cast<uint8_t>(bsp::batteryIRQSource::INTB))
 		{
             uint8_t battLevel = 0;
-
             bsp::battery_getBatteryLevel(battLevel);
             bsp::battery_ClearAllIRQs();
 			auto message = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);

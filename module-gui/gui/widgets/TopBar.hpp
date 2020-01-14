@@ -15,68 +15,83 @@
 
 namespace gui {
 
-class TopBar: public Rect {
-	static const uint32_t signalOffset;
-	static const uint32_t batteryOffset;
-public:
-	enum class Elements {
-		SIGNAL = 0x01,
-		LOCK,
-		BATTERY,
-		TIME,
-	};
-	enum class TimeMode {
-		TIME_12H,
-		TIME_24H
-	};
-	static const uint32_t signalImgCount = 6;
-	static const uint32_t batteryLevelCount = 6;
-	static uint32_t time;
-protected:
-	static uint32_t signalStrength;
-	static uint32_t batteryLevel;
-	Label* timeLabel;
-	Image* signal[6];
-	Image* lock;
-	Image* battery[6];
-	void prepareWidget();
-	static TimeMode timeMode;
-public:
+    static const uint32_t batteryLevelCount = 6;
+    static const uint32_t signalImgCount = 6;
 
+    class TopBar : public Rect
+    {
+        static const uint32_t signalOffset;
+        static const uint32_t batteryOffset;
 
-	TopBar();
-	TopBar( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h );
-	virtual ~TopBar();
+      public:
+        enum class Elements
+        {
+            SIGNAL = 0x01,
+            LOCK,
+            BATTERY,
+            TIME,
+        };
+        enum class TimeMode
+        {
+            TIME_12H,
+            TIME_24H
+        };
+        static uint32_t time;
 
+      protected:
+        static uint32_t signalStrength;
+        Label *timeLabel;
+        Image *signal[6];
+        Image *lock;
+        std::array<Image *, batteryLevelCount> battery = {nullptr};
+        Label *charging = nullptr;
+        void prepareWidget();
+        static TimeMode timeMode;
 
-	/**
-	 * @brief Sets mode of time displaying according to TimeMode enum
-	 * @note Variable is common for all instances of TopBar
-	 */
+        /// show bars in number - 0 bars, 1 bar, 2 bars...
+        void batteryShowBars(uint32_t val);
 
-	/**
-	 * @brief Hides or shows images.
-	 * @note LOCK and TIME are located in the same place so only 1 can be active at the same time.
-	 */
-	void setActive( TopBar::Elements element, bool active );
-	/**
-	 * @brief Sets charge level of the battery. This will cause appropriate image to be displayed.
-	 */
-	void setBatteryLevel( uint32_t level );
-	/**
-	 * @brief Sets signal strength. This will cause appropriate image to be displayed.
-	 */
-	void setSignalStrength( uint32_t sth);
-	uint32_t getBatteryLevel() {return batteryLevel; };
-	uint32_t getSignalStrength() {return signalStrength; };
+      public:
+        TopBar();
+        TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        virtual ~TopBar();
 
-	void setTime( const UTF8& time );
-	void setTime( const uint32_t& time, bool mode24H );
-	UTF8 getTimeString();
-	uint32_t getTime() { return time; };
+        /**
+         * @brief Sets mode of time displaying according to TimeMode enum
+         * @note Variable is common for all instances of TopBar
+         */
 
-	//virtual methods from Item
-	std::list<DrawCommand*> buildDrawList() override;
+        /**
+         * @brief Hides or shows images.
+         * @note LOCK and TIME are located in the same place so only 1 can be active at the same time.
+         */
+        void setActive(TopBar::Elements element, bool active);
+        /**
+         * @brief Sets charge level of the battery based on percent value. This will cause appropriate image to be displayed.
+         * @return if display should be refreshed or not
+         */
+        bool setBatteryLevel(uint32_t percent);
+
+        void setBatteryCharging(bool plugged);
+        /**
+         * @brief Sets signal strength. This will cause appropriate image to be displayed.
+         */
+        void setSignalStrength(uint32_t sth);
+        uint32_t getSignalStrength()
+        {
+            return signalStrength;
+        };
+
+        void setTime(const UTF8 &time);
+        void setTime(const uint32_t &time, bool mode24H);
+        UTF8 getTimeString();
+        uint32_t getTime()
+        {
+            return time;
+        };
+
+        // virtual methods from Item
+        std::list<DrawCommand *> buildDrawList() override;
 };
 
 } /* namespace gui */

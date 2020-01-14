@@ -63,33 +63,17 @@ void AppWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::SIGNAL, false );
 }
 
-uint32_t AppWindow::calculateBatteryLavel( uint32_t percentage ) {
-	if( percentage <=5 )
-		return 0;
-	if( percentage <=27 )
-		return 1;
-	if( percentage <=50 )
-		return 2;
-	if( percentage <=73 )
-		return 3;
-	if( percentage <=95 )
-		return 4;
-
-	return 5;
+bool AppWindow::batteryCharging(bool charging)
+{
+    topBar->setBatteryCharging(charging);
+    return true;
 }
 
 //updates battery level in the window
 bool AppWindow::updateBatteryLevel( uint32_t percentage ) {
 	//get old value of battery level, calcualte new level and comapre both
 	//if they are different make a change and return true, otherwise return false;
-	uint32_t oldLevel = topBar->getBatteryLevel();
-	uint32_t newLevel = calculateBatteryLavel( percentage );
-	if( oldLevel != newLevel ) {
-		topBar->setBatteryLevel( newLevel );
-		return true;
-	}
-
-	return false;
+    return topBar->setBatteryLevel(percentage);
 }
 //updates battery level in the window
 bool AppWindow::updateSignalStrength( uint32_t strength ) {
