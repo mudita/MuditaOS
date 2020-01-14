@@ -15,10 +15,11 @@
 #include <time/time_conversion.hpp>
 #include "Style.hpp"
 
+#include "common_data/EventStore.hpp"
+
 namespace gui {
 
 uint32_t TopBar::signalStrength = 0;
-uint32_t TopBar::batteryLevel = 5;
 
 const uint32_t TopBar::signalOffset = 35;
 const uint32_t TopBar::batteryOffset = 415;
@@ -47,6 +48,20 @@ TopBar::TopBar( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h ) :
 TopBar::~TopBar() {
 }
 
+void TopBar::batteryShowBars(uint32_t val)
+{
+    int i = 0;
+    if (val > battery.size())
+    {
+        LOG_ERROR("Trying to set battery level out of scope");
+        val = battery.size();
+    }
+    for (int i = 0; i < battery.size(); ++i)
+    {
+        battery[i]->setVisible(val > i);
+    }
+}
+
 void TopBar::prepareWidget() {
 
 	signal[0] = new gui::Image( this, signalOffset,17,0,0, "signal0" );
@@ -61,16 +76,21 @@ void TopBar::prepareWidget() {
 	signal[signalStrength]->setVisible( true );
 
 	//icons for battery
-	battery[0] = new gui::Image( this, batteryOffset,17,0,0, "battery0" );
- 	battery[1] = new gui::Image( this, batteryOffset,17,0,0, "battery1" );
-	battery[2] = new gui::Image( this, batteryOffset,17,0,0, "battery2" );
-	battery[3] = new gui::Image( this, batteryOffset,17,0,0, "battery3" );
-	battery[4] = new gui::Image( this, batteryOffset,17,0,0, "battery4" );
-	battery[5] = new gui::Image( this, batteryOffset,17,0,0, "battery5" );
-	for( uint32_t i=0; i<batteryLevelCount; ++i )
-		battery[i]->setVisible( false );
+    battery = {
+        new gui::Image(this, batteryOffset, 17, 0, 0, "battery0"), new gui::Image(this, batteryOffset, 17, 0, 0, "battery1"),
+        new gui::Image(this, batteryOffset, 17, 0, 0, "battery2"), new gui::Image(this, batteryOffset, 17, 0, 0, "battery3"),
+        new gui::Image(this, batteryOffset, 17, 0, 0, "battery4"), new gui::Image(this, batteryOffset, 17, 0, 0, "battery5"),
+    };
+    batteryShowBars(0);
 
-	//icon of the lock
+    charging = new Label(this, batteryOffset, 17, 30, this->drawArea.h);
+    charging->setFilled(false);
+    charging->setBorderColor(gui::ColorNoColor);
+    charging->setFont(style::header::font::title);
+    charging->setText("Z");
+    charging->setVisible(false);
+
+    //icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
 
 	//time label
@@ -85,19 +105,31 @@ void TopBar::prepareWidget() {
 void TopBar::setActive( TopBar::Elements element, bool active ) {
 	switch( element ) {
 		case Elements::BATTERY: {
-			for( uint32_t i=0; i<TopBar::batteryLevelCount; ++i )
-				battery[i]->setVisible(false);
-			if( active )
-				battery[batteryLevel]->setVisible(active);
-		} break;
+            if (Store::Battery::get().state == Store::Battery::State::Discharging)
+            {
+                setBatteryLevel(active ? Store::Battery::get().level : 0);
+            }
+            else
+            {
+                if (active)
+                {
+                    setBatteryCharging(true);
+                }
+                else
+                {
+                    charging->setVisible(false);
+                    setBatteryLevel(0);
+                }
+            }
+        } break;
 		case Elements::LOCK: {
 			lock->setVisible(active);
 			if( active )
 				timeLabel->setVisible(false);
 		} break;
 		case Elements::SIGNAL: {
-			for( uint32_t i=0; i<TopBar::batteryLevelCount; ++i )
-				signal[i]->setVisible(false);
+            for (uint32_t i = 0; i < signalImgCount; ++i)
+                signal[i]->setVisible(false);
 			if( active )
 				signal[signalStrength]->setVisible(true);
 
@@ -110,12 +142,59 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 	};
 }
 
-void TopBar::setBatteryLevel( uint32_t level ) {
-	batteryLevel = level;
-	for( uint32_t i=0; i<batteryLevelCount; i++ ) {
-		battery[i]->setVisible( false );
-	}
-	battery[level]->setVisible( true );
+uint32_t calculateBatteryLavel(uint32_t percentage)
+{
+    uint32_t level = 0;
+    if (percentage <= 5)
+        level = 0;
+    else if (percentage <= 27)
+        level = 1;
+    else if (percentage <= 50)
+        level = 2;
+    else if (percentage <= 73)
+        level = 3;
+    else if (percentage <= 95)
+        level = 4;
+    else
+        level = 5;
+
+    if (level >= batteryLevelCount)
+    {
+        LOG_ERROR("Battery level calculations are done wrong!");
+        return batteryLevelCount - 1;
+    }
+    return level;
+}
+
+bool TopBar::setBatteryLevel(uint32_t percent)
+{
+    if (Store::Battery::get().state != Store::Battery::State::Discharging)
+    {
+        return false;
+    }
+    charging->setVisible(false);
+    batteryShowBars(calculateBatteryLavel(percent));
+    return true;
+}
+
+void TopBar::setBatteryCharging(bool plugged)
+{
+    if (plugged)
+    {
+        batteryShowBars(0);
+    }
+    if (charging == nullptr)
+        return;
+    if (plugged)
+    {
+        charging->setVisible(true);
+        batteryShowBars(0);
+    }
+    else
+    {
+        charging->setVisible(false);
+        setBatteryLevel(Store::Battery::get().level);
+    }
 }
 
 void TopBar::setSignalStrength( uint32_t sth) {

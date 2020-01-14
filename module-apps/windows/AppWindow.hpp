@@ -50,7 +50,6 @@ protected:
 	 * Pointer to the application object that owns the window.
 	 */
 	app::Application* application = nullptr;
-	uint32_t calculateBatteryLavel( uint32_t percentage );
 
 public:
 
@@ -62,7 +61,8 @@ public:
 	void setApplication( app::Application* app ) { application = app; };
 	virtual bool onDatabaseMessage( sys::Message* msg );
 
-	//updates battery level in the window
+    bool batteryCharging(bool charging);
+    //updates battery level in the window
 	bool updateBatteryLevel( uint32_t percentage );
 	//updates battery level in the window
 	bool updateSignalStrength( uint32_t strength );

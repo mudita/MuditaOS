@@ -17,6 +17,7 @@
 #include "EventManager.hpp"
 
 #include "bsp/common.hpp"
+#include "bsp/keyboard/key_codes.hpp"
 
 struct KeyState{
 	uint8_t event;
