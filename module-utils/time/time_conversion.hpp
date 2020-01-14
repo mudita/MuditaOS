@@ -63,6 +63,8 @@ class Time : protected Localer {
 
     /// set Time time_t value held (set timestamp)
     void set_time(time_t newtime);
+    /// set Time from string
+    void set_time(std::string time, const char* format);
     void set_format(std::string format) { this->format = format;}
 
     operator UTF8() { return str(); }

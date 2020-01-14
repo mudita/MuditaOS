@@ -18,6 +18,7 @@
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -45,11 +46,17 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 	bool handled = false;
 
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
 	{
+		DBNotificationMessage *msg = reinterpret_cast<DBNotificationMessage*>(msgl);
 
-		alarmDBEmpty = false;
-		alarmIsValid = false;
+		if((msg->baseType == DB::BaseType::AlarmDB) &&
+						((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)) )
+		{
+			alarmDBEmpty = false;
+			alarmIsValid = false;
+			handled = true;
+		}
 	}
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {

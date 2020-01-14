@@ -64,7 +64,7 @@ enum class MessageType
     DBAlarmGetLimitOffset, // Get alarm records by limit,offset
     DBAlarmGetCount,       // Get alarm count
     DBAlarmGetNext,        // Get alarm, closest or equal to current timestamp.
-    DBAlarmUpdateNotification,
+   // DBAlarmUpdateNotification,
 
     // Cellular messages
     CellularNotification,       // Async notification message

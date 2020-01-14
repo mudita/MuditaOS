@@ -644,10 +644,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				while (std::getline(ss, token, ',')) {
 					tokens.push_back(token);
 				}
-				tokens[1].erase(
-						std::remove(tokens[1].begin(), tokens[1].end(), '\"'),
-						tokens[1].end());
-				/*
+                tokens[1].erase(std::remove(tokens[1].begin(), tokens[1].end(), '\"'), tokens[1].end());
+                /*
 				 * tokens:
 				 * [0] - +QCMGR
 				 * [1] - sender number
@@ -665,12 +663,13 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 
 				//parse date
 				tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
-				struct tm tm;
-				strptime((tokens[3] + " " + tokens[4]).c_str(), "%y/%m/%d %H:%M:%S", &tm);
-				auto messageDate = mktime(&tm);
+
+				utils::time::Time time;
+				time.set_time(tokens[3] + " " + tokens[4], "%y/%m/%d %H:%M:%S");
+                auto messageDate = time.getTime();
+                LOG_INFO("Timestamp %d", messageDate);
 				//if its single message process
 				if (tokens.size() == 5) {
-					//todo add message to database
 
 					messageRawBody = ret[i+1];
 					messageParsed = true;
@@ -678,21 +677,32 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				//if its concatenated message wait for last message
 				else if (tokens.size() == 8) {
 
-					uint32_t last = std::stoi(tokens[7]);
-					uint32_t current = std::stoi(tokens[6]);
-
-					if (current == last) {
+                    uint32_t last = 0;
+                    uint32_t current = 0;
+                    try
+                    {
+                        last = std::stoi(tokens[7]);
+                        current = std::stoi(tokens[6]);
+                    }
+                    catch (const std::exception &e)
+                    {
+                        LOG_ERROR("ServiceCellular::receiveSMS error %s", e.what());
+                    }
+                    if (current == last) {
 						messageParts.push_back(ret[i + 1]);
 
-						for (uint32_t j = 0; j < messageParts.size(); j++) {
-							messageRawBody += messageParts[j];
-						}
-						messageParts.clear();
+                        for (uint32_t j = 0; j < messageParts.size(); j++)
+                        {
+                            messageRawBody += messageParts[j];
+                        }
+                        messageParts.clear();
 						messageParsed = true;
-					} else {
-						messageParts.push_back(ret[i + 1]);
-					}
-				}
+                    }
+                    else
+                    {
+                        messageParts.push_back(ret[i + 1]);
+                    }
+                }
 				if (messageParsed)
 				{
 					messageParsed = false;

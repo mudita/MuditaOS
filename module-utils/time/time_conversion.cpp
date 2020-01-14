@@ -7,6 +7,9 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <time.h>
+#include <iomanip>
+#include <locale>
 #include <i18/i18.hpp>
 
 #include "time_conversion.hpp"
@@ -73,6 +76,19 @@ void Time::replace_specifiers()
         timeinfo = *localtime(&time);
     }
 
+    void Time::set_time(std::string time, const char* format)
+    {
+    	std::stringstream stream (time);
+		try
+		{
+			stream >> std::get_time(&timeinfo, "%y/%m/%d %H:%M:%S");
+			time = mktime(&timeinfo);
+		}
+		catch (std::exception &e)
+		{
+			LOG_ERROR("Time::set_time error %s", e.what());
+		}
+    }
     UTF8 Time::str(std::string format)
     {
         if(format.compare("") !=0) this->format = format;
