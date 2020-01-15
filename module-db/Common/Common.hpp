@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_COMMON_HPP
-#define PUREPHONE_COMMON_HPP
+#pragma once
 
 /**
  * Types of sms message
@@ -64,4 +61,3 @@ enum class SettingsPinMode
     DAYS=1
 };
 
-#endif //PUREPHONE_COMMON_HPP
