@@ -104,6 +104,24 @@ bool DBServiceAPI::SMSUpdate(sys::Service *serv, const SMSRecord &rec)
     }
 }
 
+SMSRecord DBServiceAPI::SMSGetLastRecord(sys::Service *serv)
+{
+    std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSGetLastRecord);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true))
+    {
+        return (*smsResponse->records)[0];
+    }
+    else
+    {
+        SMSRecord rec;
+        rec.dbID = 0;
+        return rec;
+    }
+}
+
 std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSGetSMSLimitOffset);

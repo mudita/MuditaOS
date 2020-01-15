@@ -4,6 +4,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "i18/i18.hpp"
+#include "time/time_conversion.hpp"
 
 #include "Label.hpp"
 #include "ListView.hpp"
@@ -67,7 +68,15 @@ namespace gui
         // TODO IFS
         text->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("Send SMS callback");
-            CellularServiceAPI::SendSMS(application, title->getText(), text->getText());
+
+            SMSRecord record;
+            record.number = title->getText();
+            record.body = text->getText();
+            record.type = SMSType::QUEUED;
+            auto time = utils::time::Time();
+            record.date = time.getTime();
+            DBServiceAPI::SMSAdd(this->application, record);
+
             return true;
         };
 
