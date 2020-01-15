@@ -23,6 +23,8 @@
     "common_saturday": "Saturday",
     "common_sunday": "Sunday",
     
+    "common_information": "Information",
+
     "common_january": "January",
     "common_february": "February",
     "common_march": "March",
@@ -46,6 +48,22 @@
     "app_notes_save": "SAVE",
     "app_notes_edit": "EDIT",
     "app_notes_back": "BACK",
+
+    "app_calllog_title_main": "Calls",
+    "app_calllog_new_note": "New Note",
+    "app_calllog_save": "SAVE",
+    "app_calllog_edit": "EDIT",
+    "app_calllog_back": "BACK",
+    "app_calllog_type": "Type",
+    "app_calllog_duration": "Duration",
+    "app_calllog_incoming_call": "incoming call",
+    "app_calllog_outgoing_call": "outgoing call",
+    "app_calllog_missed_call": "missed call",
+    "app_calllog_date": "Date",
+    "app_calllog_options_title": "Options",
+    "app_calllog_options_contact_details": "Contact details",
+    "app_calllog_options_delete_call": "Delete call",
+    "app_calllog_delete_call_confirmation": "Do you really want to delete this call from the list?",
 
     "app_desktop_unlock": "UNLOCK",
     "app_desktop_lock": "LOCK",
@@ -85,7 +103,12 @@
     "app_call_emergency": "Emergency call",
     "app_call_is_calling": "is calling",
     "app_call_call_ended": "call ended",
+    "app_call_add": "ADD",
+    "app_call_contact": "CONTACT",
     
+    "app_messages_title_main": "Messages",
+    "app_messages_new_message": "New Message",
+
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
     "app_settings_date_and_time": "Date and Time",
@@ -99,9 +122,6 @@
 	"app_settings_language_polish": "Polish",
 	"app_settings_language_german": "German",
 	"app_settings_language_spanish": "Spanish",
-	
-	"app_messages_title_main": "Messages",
-	"app_messages_new_message": "New Message",
 
 	"app_phonebook_title_main": "Contacts",
 	"app_phonebook_call": "CALL",
