@@ -33,13 +33,7 @@
 
 namespace style
 {
-    namespace window
-    {
-        inline const uint32_t sms_radius = 7;
-        inline const uint32_t sms_border_no_focus = 1;
-        /// TODO 100 is static size, sms elements should have size depending on text amount
-        inline const uint32_t sms_height = 100;
-    };
+
 }; // namespace style
 
 namespace gui
@@ -92,7 +86,7 @@ namespace gui
         {
             body->removeWidget(text);
         }
-        text = new gui::Text(nullptr, 0, 0, body->getWidth(), style::window::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
+        text = new gui::Text(nullptr, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc}, [=](const UTF8 &text) { textModeShowCB(text); }, [=]() { textSelectSpecialCB(); }));
         text->setPenFocusWidth(style::window::default_border_focucs_w);
@@ -219,7 +213,7 @@ namespace gui
         label->setRadius(5);
         label->setFont(style::window::font::medium);
         label->setPenFocusWidth(style::window::default_border_focucs_w);
-        label->setPenWidth(style::window::sms_border_no_focus);
+        label->setPenWidth(style::window::messages::sms_border_no_focus);
         label->expandMode = Text::ExpandMode::EXPAND_DOWN;
         label->buildDrawList();
         label->setText(el.body.length() ? el.body : " "); // text doesn't really like being empty
@@ -228,9 +222,17 @@ namespace gui
         switch (el.type)
         {
         case SMSType::OUTBOX:
+            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            label->setX(body->getWidth() - label->getWidth());
+            break;
+        case SMSType::INBOX:
+            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
+            break;
         default:
-            label->setMargins(gui::Margins(10, 10, 10, 10));
+            break;
         }
+        // @TODO: need for a callback yap change. yaps don't call recalculateDrawParams() because they are not Label, but Rect
+        label->setMargins(gui::Margins(10, 10, 10, 10)); // needs to be after setYaps, because see above ↑
         label->activatedCallback = [=](Item &) {
             LOG_INFO("Message activated!");
             auto app = dynamic_cast<app::ApplicationMessages *>(application);

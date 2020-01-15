@@ -1014,8 +1014,8 @@ void Text::updateCursor()
     cursor->setSize(2, font->info.line_height);
     auto it = std::next(firstLine, cursorRow);
 
-    uint32_t posX = margins.left + font->getPixelWidth((*it)->text, 0, cursorColumn);
-    uint32_t posY = margins.top + cursorRow * font->info.line_height;
+    uint32_t posX = (margins.left + innerMargins.left) + font->getPixelWidth((*it)->text, 0, cursorColumn);
+    uint32_t posY = (margins.top + innerMargins.top) + cursorRow * font->info.line_height;
     cursor->setPosition(posX, posY);
 }
 
@@ -1023,7 +1023,7 @@ int32_t Text::expand(uint32_t rowCount, int32_t h)
 {
     if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE)
     {
-        h = font->info.line_height * textLines.size() + margins.top + margins.bottom;
+        h = font->info.line_height * textLines.size() + (margins.getVertical() + innerMargins.getVertical());
         if (parent && widgetArea.h > parent->widgetArea.h)
         {
             h = widgetArea.h;
@@ -1039,7 +1039,7 @@ void Text::recalculateDrawParams()
 {
 
     // calculate number of lines for displaying text
-    int32_t h = widgetArea.h - margins.top - margins.bottom;
+    int32_t h = widgetArea.h - (margins.getVertical() + innerMargins.getVertical());
     if (h < 0) h = 0;
 
     // remove all old labels
@@ -1058,12 +1058,13 @@ void Text::recalculateDrawParams()
     if (textType == TextType::SINGLE_LINE) { rowCount = 1; }
 
     // if there is not enough space for single line start from 0 and ignore vertical margins
-    uint32_t startY = (h < font->info.line_height) ? 0 : margins.top;
+    uint16_t startY = (h < font->info.line_height) ? 0 : (margins.top + innerMargins.top);
 
     // create labels to display text. There will be always at least one.
     for (uint32_t i = 0; i < rowCount; i++)
     {
-        gui::Label *label = new gui::Label(this, margins.left, startY, widgetArea.w - margins.left - margins.right, font->info.line_height);
+        gui::Label *label = new gui::Label(this, (margins.left + innerMargins.left), startY,
+                                           widgetArea.w - (margins.getHorizontal() + innerMargins.getHorizontal()), font->info.line_height);
         label->setFilled(false);
         label->setPenWidth(1);
         label->setPenFocusWidth(3);
