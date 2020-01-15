@@ -7,44 +7,43 @@
 
 #include "../core/BoundingBox.hpp"
 #include "../core/DrawCommand.hpp"
+#include <log/log.hpp>
 
 #include "Rect.hpp"
+#include "Style.hpp"
 #include <log/log.hpp>
 
 namespace gui {
 
-Rect::Rect() :
-	borderColor(Color(0,0)),
-	fillColor(Color(15,15)),
-	penWidth{1},
-	penFocusWidth{1},
-	filled{false},
-	edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-	flatEdges{ RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT},
-	corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS} {
-}
-
-Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
-    : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1}, penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-      flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS}, yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize {Rect::YAPS_SIZE_DEFAULT}
-{
-
-    widgetArea.x = 0;
-    widgetArea.y = 0;
-    widgetArea.w = 0;
-    widgetArea.h = 0;
-    setPosition(x, y);
-    setSize(w, h);
-    setMaxSize(w, h);
-
-    this->parent = parent;
-    if (parent)
+    Rect::Rect()
+        : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1}, penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
+          flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
+          yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{style::window::messages::yaps_size_default}
     {
-        if (!parent->addWidget(this))
-        {
-            LOG_FATAL("Terrible fail - widget add item failure (dangling ptr)");
-        }
     }
+
+    Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
+        : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1}, penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
+          flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
+          yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{style::window::messages::yaps_size_default}
+    {
+
+        widgetArea.x = 0;
+        widgetArea.y = 0;
+        widgetArea.w = 0;
+        widgetArea.h = 0;
+        setPosition(x, y);
+        setSize(w, h);
+        setMaxSize(w, h);
+
+        this->parent = parent;
+        if (parent)
+        {
+            if (!parent->addWidget(this))
+            {
+                LOG_FATAL("Terrible fail - widget add item failure (dangling ptr)");
+            }
+        }
 }
 
 Rect::~Rect() {
@@ -83,6 +82,27 @@ void Rect::setFilled( bool val ) {
 void Rect::setYaps(RectangleYapFlags yaps)
 {
     this->yaps = yaps;
+    if (yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT | RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT))
+    {
+        innerMargins.left = yapSize;
+    }
+    else
+    {
+        innerMargins.left = 0;
+    }
+    if (yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT | RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT))
+    {
+        innerMargins.right = yapSize;
+    }
+    else
+    {
+        innerMargins.right = 0;
+    }
+}
+
+void Rect::setYapSize(unsigned short value)
+{
+    yapSize = value;
 }
 
 std::list<DrawCommand*> Rect::buildDrawList() {
@@ -129,11 +149,6 @@ std::list<DrawCommand*> Rect::buildDrawList() {
 		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
 
 	return commands;
-}
-void Rect::setYapSize(short value ) {
-    if( value < 0 )
-        value = 0;
-    yapSize = value;
 }
 
 } /* namespace gui */

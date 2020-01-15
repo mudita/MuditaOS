@@ -13,8 +13,10 @@ namespace gui {
 class Margins {
 public:
 	short left, top, right, bottom;
+    short getHorizontal() const;
+    short getVertical() const;
 
-	Margins();
+    Margins();
 	Margins( const short left, const short top, const short right, const short bottom );
 	virtual ~Margins();
 };
