@@ -8,11 +8,7 @@
  * @details
  */
 
-
-#ifndef PUREPHONE_COMMON_HPP
-#define PUREPHONE_COMMON_HPP
-
-
+#pragma once
 
 enum class CallStates{
     Active, // 0 active: call in progress (setup was successful)
@@ -23,4 +19,3 @@ enum class CallStates{
     Waiting     // 5 waiting (MT call): call waiting notification while another call is active (if call waiting feature enabled)
 };
 
-#endif //PUREPHONE_COMMON_HPP
