@@ -15,8 +15,9 @@
 #include <string>
 #include <vector>
 
-#include "Common.hpp"
-#include "log/log.hpp"
+#include <ctime>
+#include <functional>
+#include <iomanip>
 
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
@@ -457,13 +458,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		DBNotificationMessage *msg = reinterpret_cast<DBNotificationMessage*>(msgl);
 
 		LOG_DEBUG("Received multicast");
-		if((msg->baseType == DB::BaseType::SmsDB) &&
-				((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)) )
-		{
-			sendSMS();
-		}
+        if ((msg->baseType == DB::BaseType::SmsDB) &&
+            ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+        {
+            sendSMS();
+        }
 
-		break;
+        break;
 	}
     default:
         break;
@@ -667,8 +668,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				utils::time::Time time;
 				time.set_time(tokens[3] + " " + tokens[4], "%y/%m/%d %H:%M:%S");
                 auto messageDate = time.getTime();
-                LOG_INFO("Timestamp %d", messageDate);
-				//if its single message process
+
+                //if its single message process
 				if (tokens.size() == 5) {
 
 					messageRawBody = ret[i+1];
@@ -722,7 +723,6 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 		}
 	}
 	//delete message from modem memory
-	cmux->GetChannel("Commands")->SendCommandResponse(
-			("AT+CMGD=" + messageNumber).c_str(), 1, 150);
-	return true;
+    cmux->GetChannel("Commands")->SendCommandResponse(("AT+CMGD=" + messageNumber).c_str(), 1, 150);
+    return true;
 }

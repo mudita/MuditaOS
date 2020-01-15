@@ -76,14 +76,18 @@ void Time::replace_specifiers()
         timeinfo = *localtime(&time);
     }
 
-    void Time::set_time(std::string time, const char* format)
+    void Time::set_time(std::string timestr, const char *format)
     {
-    	std::stringstream stream (time);
-		try
+
+        std::stringstream stream(timestr);
+        try
 		{
-			stream >> std::get_time(&timeinfo, "%y/%m/%d %H:%M:%S");
-			time = mktime(&timeinfo);
-		}
+            stream >> std::get_time(&(this->timeinfo), "%y/%m/%d %H:%M:%S");
+#ifdef TARGET_RT1051
+            timeinfo.tm_year += 100;
+#endif
+            this->time = mktime(&timeinfo);
+        }
 		catch (std::exception &e)
 		{
 			LOG_ERROR("Time::set_time error %s", e.what());

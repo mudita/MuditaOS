@@ -49,7 +49,6 @@ class vfs vfs;
 
 class BlinkyService : public sys::Service {
 
-
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {

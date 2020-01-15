@@ -83,7 +83,10 @@ class Time : protected Localer {
     UTF8 month(bool abbrev = false);
 
     // get timestamp value
-    uint32_t getTime(void) { return time; };
+    time_t getTime(void)
+    {
+        return time;
+    };
 };
 
 /// helper class to operate on time now
