@@ -19,6 +19,7 @@
 #include "input/InputEvent.hpp"
 #include "Layout.hpp"
 #include "Navigation.hpp"
+#include "Margins.hpp"
 
 namespace gui {
 
@@ -52,8 +53,11 @@ public:
 	//bounding box of the item. This is in coordinates of the parent widget.
 	BoundingBox widgetArea;
 	//bounding box used for drawing. This is in coordinates of window
-	BoundingBox drawArea;
-	//radius of corner
+	BoundingBox drawArea; // drawableArea would be more accurate
+	// bounding box used by children
+	BoundingBox innerArea; // it is widget area minus margins. it is con
+    Margins innerMargins;
+    //radius of corner
 	short radius;
     // flag that defines if item is active
     // if false -> than it shouldn't be used witn onInput, navitagion etc.
@@ -194,10 +198,10 @@ protected:
 	//On change of position or size this method will recalculate visible part of the widget
 	//considering widgets hierarchy and calculate absolute position of drawing primitives.
 	virtual void updateDrawArea();
-	/**
-	 * Pointer to navigation object. It is added when object is set for one of the directions
-	 */
-	gui::Navigation* navigationDirections;
+    /**
+     * Pointer to navigation object. It is added when object is set for one of the directions
+     */
+    gui::Navigation* navigationDirections;
 };
 
 } /* namespace gui */

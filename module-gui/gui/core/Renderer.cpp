@@ -183,8 +183,8 @@ void Renderer::draw45degLine( Context* ctx, int16_t x, int16_t y, uint16_t side,
 //43575
 void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
-	//check if there is anything to draw
-	if( cmd->w == 0 || cmd->h == 0 ){
+    // check if there is anything to draw
+    if( cmd->w == 0 || cmd->h == 0 ){
 		return;
 	}
 

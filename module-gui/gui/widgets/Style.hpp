@@ -45,6 +45,15 @@ void decorate(gui::Label *el);
 /// minimal label decoration for Option
 void decorateOption(gui::Label *el);
 
+namespace messages
+{
+    inline const uint32_t sms_radius = 7;
+    inline const uint32_t sms_border_no_focus = 1;
+    /// TODO 100 is static size, sms elements should have size depending on text amount
+    inline const uint32_t sms_height = 100;
+    const inline unsigned short yaps_size_default = 10;
+} // namespace messages
+
 };  // namespace window
 namespace footer {
 namespace font {

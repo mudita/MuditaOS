@@ -19,4 +19,14 @@ Margins::Margins( const short left, const short top, const short right, const sh
 Margins::~Margins() {
 }
 
+short Margins::getHorizontal() const
+{
+    return (left + right);
+}
+
+short Margins::getVertical() const
+{
+    return (top + bottom);
+}
+
 } /* namespace gui */
