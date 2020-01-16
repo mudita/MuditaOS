@@ -18,7 +18,7 @@
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "service-db/messages/DBNotificationMessage.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -27,7 +27,7 @@ EventManager::EventManager(const std::string& name)
 
 	alarmTimestamp = 0;
 	alarmID = 0;
-	busChannels.push_back(sys::BusChannels::ServiceDatabaseAlarmNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     // each 30 sec pollTimer execute check - right now polling for battery only
     pollTimerID = CreateTimer(30000, true);
     ReloadTimer(pollTimerID);
