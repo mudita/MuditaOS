@@ -1,13 +1,5 @@
 #include "bsp_harness.hpp"
 
-#if defined(TARGET_RT1051)
-#include "board/rt1051/bsp/harness/rt1051_harness.hpp"
-#elif defined(TARGET_Linux)
-#include "cellular/linux_cellular.hpp"
-#else
-#error "Unsupported target"
-#endif
-
 namespace bsp
 {
     namespace harness
@@ -16,6 +8,15 @@ namespace bsp
         int Init(xQueueHandle qHandle)
         {
             return hwInit(qHandle);
+        }
+
+        std::string read()
+        {
+            return hwRead();
+        }
+
+        bool flush() {
+            return hwFlush();
         }
     }; // namespace harness
 };     // namespace bsp

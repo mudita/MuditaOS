@@ -28,6 +28,8 @@ extern "C" {
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
 
+#include "harness/Parser.hpp"
+
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
 	QueueHandle_t queue = queues[queueID];
@@ -109,7 +111,33 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         {
             return false;
         }
-        LOG_INFO("EVENT! %x", notification);
+        if (notification == STX)
+        {
+            LOG_DEBUG("STX");
+            if (bsp::harness::flush() != true)
+            {
+                LOG_ERROR("processing in progres...");
+            }
+        }
+        else if (notification == ETX)
+        {
+            LOG_DEBUG("ETX");
+            std::string text = bsp::harness::read();
+            auto ret = harness::parse(text);
+            if (ret.first == harness::Error::Success)
+            {
+                sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
+            }
+            else
+            {
+                LOG_ERROR("Harness parser error: %d", ret.first);
+            }
+            LOG_INFO("EVENT! %x: %s", notification, text.c_str());
+        }
+        else
+        {
+            LOG_ERROR("Unknown event!");
+        }
     }
 
     return true;
