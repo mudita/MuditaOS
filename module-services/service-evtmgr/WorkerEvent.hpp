@@ -24,11 +24,13 @@ struct KeyState{
 	uint8_t code;
 };
 
-enum class WorkerEventQueues{
-	queueService = 0,
-	queueKeyboardIRQ,
-	queueBattery,
-	queueRTC
+enum class WorkerEventQueues
+{
+    queueService = 0,
+    queueKeyboardIRQ,
+    queueBattery,
+    queueRTC,
+    queueHarness,
 };
 
 class WorkerEvent : public sys::Worker

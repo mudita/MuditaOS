@@ -129,9 +129,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		//HandleAlarmTrigger(msgl);
 
 		handled = true;
-	}
+    }
+    //    else if ()
+    //    {
+    //    }
 
-	if( handled )
+    if( handled )
 		return std::make_shared<sys::ResponseMessage>();
 	else
 		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
@@ -175,14 +178,17 @@ sys::ReturnCodes EventManager::InitHandler() {
 	sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10 };
 	//RTC irq queue
 	sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20 };
+    // test harness queue
+    sys::WorkerQueueInfo qHarness = {"qHarness", sizeof(uint8_t), 3};
 
-	std::list<sys::WorkerQueueInfo> list;
+    std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qIrq);
 	list.push_back(qBattery);
 	list.push_back(qRTC);
+    list.push_back(qHarness);
 
-	EventWorker->init( list );
+    EventWorker->init( list );
 	EventWorker->run();
 
 	std::vector<xQueueHandle> set = EventWorker->getQueues();

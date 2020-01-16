@@ -19,6 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 
 set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/cellular/bsp_cellular.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/harness/bsp_harness.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
 
