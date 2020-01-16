@@ -15,5 +15,5 @@ namespace harness
         ParserFailed, /// error on parsing
     };
 
-    std::pair<Error, std::shared_ptr<sys::Message>> parse(std::string request);
+    std::pair<Error, std::shared_ptr<sys::DataMessage>> parse(const std::string &request);
 }; // namespace harness

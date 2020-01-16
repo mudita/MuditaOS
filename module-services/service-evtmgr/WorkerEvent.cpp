@@ -126,6 +126,7 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
             auto ret = harness::parse(text);
             if (ret.first == harness::Error::Success)
             {
+                LOG_DEBUG("success!");
                 sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
             }
             else
