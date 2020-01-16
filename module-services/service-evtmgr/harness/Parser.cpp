@@ -15,23 +15,25 @@ namespace harness
     /// "t" : type (of harness::Events type )
     /// "d" : object of data
     /// than this js goes to praser of selected event
-    std::pair<Error, std::shared_ptr<sys::Message>> parse(std::string request)
+    std::pair<Error, std::shared_ptr<sys::DataMessage>> parse(const std::string &request)
     {
-        json11::Json el;
-        std::string err;
-        std::shared_ptr<sys::Message> msg = nullptr;
 
-        el.parse(request, err);
+        std::string err;
+        std::shared_ptr<sys::DataMessage> msg = nullptr;
+        // TODO measure stack before and after..
+        json11::Json el = Json::parse(request, err);
         if (err.size() != 0 || el.is_object() != true)
         {
+            LOG_ERROR("%s : %d : %d : %d", err.c_str(), el.is_array(), el.is_object(), el.type());
             return {Error::BadRequest, nullptr};
         }
         else
         {
-            Json val = el["t"];
-            if (val.is_null())
+            if (el["t"].is_null())
             {
-                return {Error::NoType, nullptr};
+                std::shared_ptr<sys::DataMessage> ptr = std::shared_ptr<sys::DataMessage>(nullptr);
+                std::pair<Error, std::shared_ptr<sys::DataMessage>> ret = {Error::NoType, ptr};
+                return ret;
             }
             switch (el["t"].int_value())
             {

@@ -7,7 +7,7 @@ namespace harness
 
     bsp::KeyCodes fromVal(int val);
 
-    std::shared_ptr<sys::Message> parseKeyPress(json11::Json &js)
+    std::shared_ptr<sys::DataMessage> parseKeyPress(json11::Json &js)
     {
         auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
         json11::Json data = js["d"];

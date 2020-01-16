@@ -7,8 +7,8 @@ extern "C"
 
 #include <string>
 
-inline const char STX = 02;
-inline const char ETX = 03;
+inline const char STX = 0x02;
+inline const char ETX = 0x03;
 int hwInit(xQueueHandle qHandle);
 std::string hwRead();
 bool hwFlush();
