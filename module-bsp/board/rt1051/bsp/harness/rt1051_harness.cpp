@@ -10,6 +10,7 @@
 
 #include "rt1051_harness.hpp"
 #include "stream_buffer.h"
+#include <cstring>
 
 static StreamBufferHandle_t uartRxStreamBuffer = nullptr;
 static xQueueHandle qHandleIrq = NULL;
@@ -28,24 +29,26 @@ extern "C"
             {
                 characterReceived = LPUART_ReadByte(LPUART3);
 
-                //            if (characterReceived == STX)
-                //            {
-                uint8_t stx = STX;
-                xQueueSendFromISR(qHandleIrq, &stx, &xHigherPriorityTaskWoken);
-                //        }
-                //        else if (characterReceived != 0)
-                //        {
-                //            xStreamBufferSendFromISR(uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
-                //        }
-                //        else if (characterReceived == ETX)
-                //        {
-                //            xQueueSendFromISR(qHandleIrq, ETX, &xHigherPriorityTaskWoken);
-                //        }
-                //    }
+                if (characterReceived == STX)
+                {
+                    uint8_t stx = STX;
+                    xQueueSendFromISR(qHandleIrq, &stx, &xHigherPriorityTaskWoken);
+                    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+                }
+                else if (characterReceived == ETX)
+                {
+                    uint8_t etx = ETX;
+                    xQueueSendFromISR(qHandleIrq, &etx, &xHigherPriorityTaskWoken);
+                    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+                }
+                else
+                {
+                    xStreamBufferSendFromISR(uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
+                    // port switching ignored here... just do read when told
+                }
             }
-            LPUART_ClearStatusFlags(LPUART3, isrReg);
-            portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
         }
+        LPUART_ClearStatusFlags(LPUART3, isrReg);
     }
 };
 
@@ -55,9 +58,6 @@ int hwInit(xQueueHandle qHandle)
     const static uint32_t rxStreamBufferLength = 1024;
     uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, 2);
     qHandleIrq = qHandle;
-    // TODO enable IRQ on rec
-    // TODO enable        rec
-    // TODO handle :)
     lpuart_config_t s_harnessConfig;
     LPUART_GetDefaultConfig(&s_harnessConfig);
     const static uint32_t baudrate = 115200;
@@ -86,4 +86,35 @@ int hwInit(xQueueHandle qHandle)
     LPUART_EnableRx(LPUART3, true);
 
     return 0;
+}
+
+std::string hwRead()
+{
+    static size_t oldsize = 0;
+    static const char *buff = nullptr;
+    size_t size = xStreamBufferBytesAvailable(uartRxStreamBuffer);
+    if (size > oldsize)
+    {
+        delete buff;
+        buff = new char[size];
+        oldsize = size;
+    }
+    std::memset((void *)buff, 0, size);
+    ssize_t ret = xStreamBufferReceive(uartRxStreamBuffer, (void *)buff, size, 0);
+
+    std::string str(buff, buff + size);
+    if (ret != str.size())
+    {
+        LOG_ERROR("read error: %d vs %d", ret, str.size());
+    }
+    else
+    {
+        LOG_DEBUG("%s:%d:%d", str.c_str(), str.size(), size);
+    }
+    return str;
+}
+
+bool hwFlush()
+{
+    return (xStreamBufferReset(uartRxStreamBuffer) == pdPASS);
 }
