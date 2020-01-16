@@ -18,6 +18,8 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/EventManager.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/alarm/EventManagerAlarm.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/WorkerEvent.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/harness/Parser.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/harness/events/KeyPress.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/EventManager.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/WorkerEvent.hpp"
