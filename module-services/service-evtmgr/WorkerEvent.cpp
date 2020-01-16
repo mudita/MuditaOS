@@ -23,10 +23,10 @@ extern "C" {
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 
-#include "bsp/keyboard/keyboard.hpp"
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "bsp/harness/bsp_harness.hpp"
+#include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
-
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
@@ -102,7 +102,17 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		sys::Bus::SendUnicast(message, "EventManager", this->service);
 	}
 
-	return true;
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHarness))
+    {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE)
+        {
+            return false;
+        }
+        LOG_INFO("EVENT! %x", notification);
+    }
+
+    return true;
 }
 
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
@@ -112,8 +122,9 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
+    bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
 
-	time_t timestamp;
+    time_t timestamp;
 	bsp::rtc_GetCurrentTimestamp(&timestamp);
 	bsp::rtc_SetMinuteAlarm(timestamp);
 	return true;

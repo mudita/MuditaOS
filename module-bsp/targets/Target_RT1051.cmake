@@ -51,6 +51,7 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keyboard/keyboard.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/cellular/rt1051_cellular.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/harness/rt1051_harness.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/keyboard/keyboard.cpp"
 
