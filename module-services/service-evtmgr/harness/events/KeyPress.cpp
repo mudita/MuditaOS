@@ -1,6 +1,6 @@
 #include "KeyPress.hpp"
-
 #include "../../messages/EVMessages.hpp"
+#include "../Events.hpp"
 
 namespace harness
 {
@@ -10,12 +10,11 @@ namespace harness
     std::shared_ptr<sys::DataMessage> parseKeyPress(json11::Json &js)
     {
         auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
-        json11::Json data = js["d"];
-        if (data.is_array() != true)
+        if (js["d"].is_array() != true)
         {
             return nullptr;
         }
-        message->key.key_code = fromVal(data[0].int_value());
+        message->key.key_code = fromVal(js["d"][0].int_value());
         /// for now type is only released
         message->key.state = RawKey::State::Released;
         return message;

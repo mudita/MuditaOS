@@ -1,10 +1,12 @@
 #pragma once
 
+#include "Events.hpp"
 #include <Service/Message.hpp>
 #include <string>
 
 namespace harness
 {
+
     enum class Error
     {
         Success,

@@ -117,7 +117,7 @@ bool Worker::deinit() {
 bool Worker::run() {
     static int workerCount = 0;
     std::string workerName = service->GetName()+"_w" + std::to_string(workerCount);
-    BaseType_t task_error = xTaskCreate(workerTaskFunction, workerName.c_str(), 4096, this, service->GetPriority(), &taskHandle);
+    BaseType_t task_error = xTaskCreate(workerTaskFunction, workerName.c_str(), 8096, this, service->GetPriority(), &taskHandle);
     if ( task_error != pdPASS)
     {
         LOG_ERROR("Failed to start the task");
