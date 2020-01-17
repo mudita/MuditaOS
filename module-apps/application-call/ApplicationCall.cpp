@@ -118,8 +118,8 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
                 else {
 					LOG_INFO("++++++++++++APP SWITCH");
 
-					sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
-				}
+                    sapm::ApplicationManager::messageSwitchApplication(this, name_call, "CallWindow", std::move(data));
+                }
 			}
 		}
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
@@ -169,7 +169,6 @@ void ApplicationCall::stopCallTimer() {
 }
 
 bool ApplicationCall::messageSwitchToCall( sys::Service* sender, const UTF8& e164number, bool call ) {
-	std::string application = "ApplicationCall";
     std::string window = "EnterNumberWindow";
 
     std::unique_ptr<CallSwitchData> data;
@@ -186,7 +185,7 @@ bool ApplicationCall::messageSwitchToCall( sys::Service* sender, const UTF8& e16
         data = std::make_unique<EnterNumberData>(e164number.c_str());
     }
 
-    return sapm::ApplicationManager::messageSwitchApplication(sender, application, window, std::move(data));
+    return sapm::ApplicationManager::messageSwitchApplication(sender, name_call, window, std::move(data));
 }
 
 void ApplicationCall::createUserInterface() {
