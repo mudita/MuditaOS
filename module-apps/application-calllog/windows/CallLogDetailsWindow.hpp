@@ -26,13 +26,14 @@ namespace gui {
 
 class CallLogDetailsWindow: public AppWindow {
 
-	enum class FocusRects {
-		Call,
-		Sms,
-		NumOfRects
-	};
-	
-	Label* informationLabel = nullptr;
+    enum FocusRects
+    {
+        Call,
+        Sms,
+        NumOfRects
+    };
+
+    Label* informationLabel = nullptr;
 	Label* number = nullptr;
 	gui::Rect* rects[static_cast<uint32_t>(FocusRects::NumOfRects)] = {nullptr};
 	Image* callImg = nullptr;
