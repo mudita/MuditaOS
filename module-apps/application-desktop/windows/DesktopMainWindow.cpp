@@ -16,6 +16,7 @@
 #include "gui/widgets/Image.hpp"
 
 //application-call
+#include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
 
 #include "i18/i18.hpp"
@@ -196,7 +197,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
             {
                 auto key = std::to_string(val);
                 std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(key);
-                sapm::ApplicationManager::messageSwitchApplication( application, "ApplicationCall", "EnterNumberWindow", std::move(phoneNumberData) );
+                sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, "EnterNumberWindow", std::move(phoneNumberData));
                 return true;
             }
 		}
