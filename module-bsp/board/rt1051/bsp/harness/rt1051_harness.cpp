@@ -109,7 +109,7 @@ std::string hwRead()
     }
     else
     {
-        LOG_DEBUG("%s:%d:%d", str.c_str(), str.size(), size);
+        // LOG_DEBUG("%s:%d:%d", str.c_str(), str.size(), size);
     }
     str.shrink_to_fit();
     return str;

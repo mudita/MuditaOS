@@ -20,6 +20,10 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 
+#include "bsp/harness/bsp_harness.hpp"
+#include "harness/Parser.hpp"
+#include "harness/events/FocusApp.hpp"
+
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
 {
@@ -88,8 +92,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 			targetApplication = msg->getApplication();
 			handled = true;
 			LOG_INFO("Switching focus to %s", targetApplication.c_str());
-		}
-	}
+            bsp::harness::emit(harness::FocusApp(targetApplication).encode());
+        }
+    }
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
