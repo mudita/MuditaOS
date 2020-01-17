@@ -99,9 +99,9 @@ void CallLogDetailsWindow::buildInterface() {
     rects[static_cast<uint32_t>(FocusRects::Call)]->setPosition(information::imgs::call::x, information::imgs::y);
     rects[static_cast<uint32_t>(FocusRects::Sms)]->setPosition(information::imgs::sms::x, information::imgs::y);
 
-    // TODO: alek: add proper x and y
-    callImg = new gui::Image(rects[FocusRects::Call], 0, 0, 0, 0, "phonebook_phone_ringing");
-    smsImg = new gui::Image(rects[FocusRects::Sms], 0, 0, 0, 0, "mail");
+    // TODO: alek: phone ringing seems to be to small
+    callImg = new gui::Image(rects[FocusRects::Call], 1, 12, 0, 0, "phonebook_phone_ringing");
+    smsImg = new gui::Image(rects[FocusRects::Sms], 11, 12, 0, 0, "mail");
 
     // define navigation between labels
     rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem(NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Sms)]);
