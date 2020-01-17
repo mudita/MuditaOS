@@ -6,7 +6,7 @@
 #include "PhonebookNewContact.hpp"
 #include "Text.hpp"
 #include "Utils.hpp"
-#include "application-call/data/CallSwitchData.hpp"
+#include "application-call/ApplicationCall.hpp"
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/windows/ThreadViewWindow.hpp"
@@ -89,9 +89,7 @@ void PhonebookContact::buildInterface()
     numberPrimaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
         if (input.keyCode == KeyCode::KEY_ENTER)
         {
-            std::unique_ptr<app::ExecuteCallData> data = std::make_unique<app::ExecuteCallData>(contact->numbers[0].numberE164.c_str());
-            data->setDescription("call");
-            return sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationCall", "CallWindow", std::move(data));
+            return app::ApplicationCall::messageSwitchToCall(application, contact->numbers[0].numberE164.c_str());
         }
         return (false);
     };
@@ -132,9 +130,7 @@ void PhonebookContact::buildInterface()
     numberSecondaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
         if (input.keyCode == KeyCode::KEY_ENTER)
         {
-            std::unique_ptr<app::ExecuteCallData> data = std::make_unique<app::ExecuteCallData>(contact->numbers[1].numberE164.c_str());
-            data->setDescription("call");
-            return sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationCall", "CallWindow", std::move(data));
+            return app::ApplicationCall::messageSwitchToCall(application, contact->numbers[1].numberE164.c_str());
         }
         return (false);
     };
