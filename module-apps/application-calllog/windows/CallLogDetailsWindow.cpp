@@ -24,7 +24,7 @@
 #include "../data/CallLogSwitchData.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "application-call/data/CallSwitchData.hpp"
+#include "application-call/ApplicationCall.hpp"
 #include "time/time_conversion.hpp"
 #include <Style.hpp>
 
@@ -124,9 +124,8 @@ void CallLogDetailsWindow::buildInterface() {
 
     // activated callbacks
     rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
-        LOG_ERROR("activaed callback");
-        std::unique_ptr<app::ExecuteCallData> data = std::make_unique<app::ExecuteCallData>("600226908");
-        return sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationCall", "EnterNumberWindow", std::move(data));
+        LOG_ERROR("call %s", record.number.c_str());
+        return app::ApplicationCall::messageSwitchToCall(application, record.number);
     };
 
     rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {

@@ -46,7 +46,7 @@ public:
 	 * @brief Performs switch to call application with the number needed to perform the call
 	 *
 	 */
-	static bool messageSwitchToCall( sys::Service* sender, const UTF8& e164number, bool call = false );
+    static bool messageSwitchToCall(sys::Service *sender, const UTF8 &e164number, bool call = true);
 };
 
 } /* namespace app */
