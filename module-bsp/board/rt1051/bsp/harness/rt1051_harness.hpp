@@ -12,3 +12,4 @@ inline const char ETX = 0x03;
 int hwInit(xQueueHandle qHandle);
 std::string hwRead();
 bool hwFlush();
+bool hwEmit(const std::string &);

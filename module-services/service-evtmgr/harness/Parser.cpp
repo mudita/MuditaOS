@@ -11,10 +11,7 @@ namespace harness
     using namespace json11;
 
     /// super simple parser - frame is json
-    /// format is:
-    /// "t" : type (of harness::Events type )
-    /// "d" : object of data
-    /// than this js goes to praser of selected event
+    /// format is explained in Events.hpp
     std::pair<Error, std::shared_ptr<sys::DataMessage>> parse(const std::string &request)
     {
 
@@ -29,13 +26,13 @@ namespace harness
         }
         else
         {
-            if (el["t"].is_null())
+            if (el[Type].is_null())
             {
                 std::shared_ptr<sys::DataMessage> ptr = std::shared_ptr<sys::DataMessage>(nullptr);
                 std::pair<Error, std::shared_ptr<sys::DataMessage>> ret = {Error::NoType, ptr};
                 return ret;
             }
-            switch (el["t"].int_value())
+            switch (el[Type].int_value())
             {
             case (int)Events::KeyPress: {
                 msg = parseKeyPress(el);

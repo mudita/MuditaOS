@@ -113,7 +113,6 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         }
         if (notification == STX)
         {
-            LOG_DEBUG("STX");
             if (bsp::harness::flush() != true)
             {
                 LOG_ERROR("processing in progres...");
@@ -121,19 +120,17 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         }
         else if (notification == ETX)
         {
-            LOG_DEBUG("ETX");
             std::string text = bsp::harness::read();
             auto ret = harness::parse(text);
             if (ret.first == harness::Error::Success)
             {
-                LOG_DEBUG("success!");
+                LOG_INFO("EVENT! %x: %s", notification, text.c_str());
                 sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
             }
             else
             {
                 LOG_ERROR("Harness parser error: %d", ret.first);
             }
-            LOG_INFO("EVENT! %x: %s", notification, text.c_str());
         }
         else
         {
@@ -143,6 +140,8 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
     return true;
 }
+
+#include "harness/events/SysStart.hpp"
 
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
@@ -156,7 +155,8 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
     time_t timestamp;
 	bsp::rtc_GetCurrentTimestamp(&timestamp);
 	bsp::rtc_SetMinuteAlarm(timestamp);
-	return true;
+    bsp::harness::emit(harness::SysStart().encode());
+    return true;
 }
 
 bool WorkerEvent::deinit(void)
