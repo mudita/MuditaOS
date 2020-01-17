@@ -24,10 +24,10 @@ extern "C" {
 #include "service-evtmgr/messages/EVMessages.hpp"
 
 #include "bsp/battery-charger/battery_charger.hpp"
-#include "bsp/harness/bsp_harness.hpp"
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
 
+#include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
@@ -124,7 +124,7 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
             auto ret = harness::parse(text);
             if (ret.first == harness::Error::Success)
             {
-                LOG_INFO("EVENT! %x: %s", notification, text.c_str());
+                // LOG_INFO("EVENT! %x: %s", notification, text.c_str());
                 sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
             }
             else
