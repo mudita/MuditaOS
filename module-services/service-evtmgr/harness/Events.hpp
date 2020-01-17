@@ -25,7 +25,9 @@ namespace harness
     {
         KeyPress = 0, // -> key press event
         SysStart = 1, // <- system started - EventManager is on
-        Top = 2,      // <- performance monitor message
+        FocusApp = 2, // <- focus application changed to
+
+        Top, // <- performance monitor message
 
         Size /// last element for size purposes
     };
