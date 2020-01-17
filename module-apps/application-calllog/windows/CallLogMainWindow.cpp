@@ -7,12 +7,15 @@
  * @details
  */
 #include "CallLogMainWindow.hpp"
-#include <memory>
+#include <cassert>
 #include <functional>
+#include <memory>
 
+#include "application-call/ApplicationCall.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../ApplicationCallLog.hpp"
+#include "../widgets/CalllogItem.hpp"
 
 #include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
@@ -81,10 +84,16 @@ bool CallLogMainWindow::onInput( const InputEvent& inputEvent ) {
 	//process only if key is released
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) || ( inputEvent.state != InputEvent::State::keyReleasedLong )) {
 		if( inputEvent.keyCode == KeyCode::KEY_LF ) {
-			// TODO: alek: add calling
-			LOG_DEBUG("TODO:: add calling"); // TODO: alek:: add number to the log
-			return true;
-		}
+            LOG_DEBUG("calling");
+            auto it = dynamic_cast<CalllogItem *>(list->getSelectedItem());
+            if (it == nullptr)
+            {
+                LOG_ERROR("wrong item type");
+                assert(0);
+                return false;
+            }
+            return app::ApplicationCall::messageSwitchToCall(application, it->getCall().number);
+        }
 	}
 
 	return AppWindow::onInput( inputEvent );
