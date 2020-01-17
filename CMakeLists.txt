@@ -43,12 +43,17 @@ if (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
 endif ()
 
-set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
-message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
+# set target dependent directories. My (Mateusz) CLion uses it
+if (DEFINED ENV{PROJECT_BUILD_DIRECTORY})
+    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/$ENV{PROJECT_BUILD_DIRECTORY}" CACHE PATH "Output directory for building")
+else()
+    # fallback default behaviour. rebuild.sh uses it
+    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building")
+endif()
+set(PROJECT_LIB_DIRECTORY "${PROJECT_BUILD_DIRECTORY}/lib/" CACHE PATH "Output path for static libraries")
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
-
-set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building")
+message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
 message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})

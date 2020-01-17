@@ -31,11 +31,6 @@ function check_submodules() {
 # check for submodules
 check_submodules
 
-#if there is no build directory create one
-if [ ! -d "$BUILD_DIR" ]; then
-	mkdir "$BUILD_DIR"
-fi
-
 
 #first parameter specifies platform, by default it is Linux
 TARGET="Target_Linux.cmake"
@@ -49,7 +44,20 @@ if [ "$1" != "" ]; then
 		TARGET="Target_Linux.cmake"
 		TARGET_SET="true"
 		BT="DBT_STACK_SEL=\"BlueKitchen\""
+    [ ! -z "$SEPARATE_BUILDS" ] && BUILD_DIR="build-linux"
+	elif [ "$1" = "rt1051" ]; then
+		echo "Building for RT1051."
+		TARGET="Target_RT1051.cmake"
+		#BT="DBT_STACK_SEL=\"BlueKitchen\""
+		BT="DBT_STACK_SEL=\"Bluetopia\""
+    [ ! -z "$SEPARATE_BUILDS" ] && BUILD_DIR="build-rt1051"
 	fi
+
+	#if there is no taget specific build directory create one
+  if [ ! -d "$BUILD_DIR" ]; then
+    mkdir "$BUILD_DIR"
+  fi
+
 	if [ "$1" = "assets" ] ; then
 		echo "Copying assets folder"
 		cd "$BUILD_DIR"
@@ -78,17 +86,15 @@ if [ "$1" != "" ]; then
 		cp "../module-apps/application-viewer/viewerStates.txt" "sys"
 		exit 1
 	fi
-	if [ "$1" = "rt1051" ]; then
-		echo "Building for RT1051."
-		TARGET="Target_RT1051.cmake"
-		#BT="DBT_STACK_SEL=\"BlueKitchen\""
-		BT="DBT_STACK_SEL=\"Bluetopia\""
-	fi
 	if [ "$1" = "release" ]; then
 		echo "Building for RT1051."
 		TARGET="Target_RT1051.cmake"
 		TYPE="RelWithDebInfo" 
 	fi
+# check whether to build in separate folders for linux/rt1051
+elif [ ! -z "$SEPARATE_BUILDS" ]; then # require target arch argument
+  echo "SEPARATE_BUILDS require explicit target. Specify either linux or rt1051" >&2
+  exit 2
 else
 	echo "No platform specified, using target Linux."
 fi
@@ -105,6 +111,10 @@ if [ "$TARGET_SET" = "true" ]; then
 	fi
 fi
 
+#if there is no build directory create one
+if [ ! -d "$BUILD_DIR" ]; then
+	mkdir "$BUILD_DIR"
+fi
 
 #enter build directory, erase content and make /sys/assets directory
 cd "$BUILD_DIR"
@@ -117,16 +127,23 @@ MODULE_GUI_DIR="../module-gui"
 if [ -d "$MODULE_GUI_DIR" ]; then
 	
 	echo "Found module-gui, copying assets."
-#	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "sys"
+#	cp -R "$MODULE_GUI_DIR/$ASSETS_DIR" "$SYS_DIR"
 	cp -R ../image/* "$SYS_DIR"
-#	cp -R "../image/Luts.bin" "sys"
-	cp "../module-apps/application-viewer/viewerStates.txt" "sys"
+#	cp -R "../image/Luts.bin" "$SYS_DIR"
+	cp "../module-apps/application-viewer/viewerStates.txt" "$SYS_DIR"
 	#language profiles
-#	cp -R "../image/assets" "sys"
+#	cp -R "../image/assets" "$SYS_DIR"
+fi
+
+# prepare env var for cmake call
+if [ ! -z "$SEPARATE_BUILDS" ]; then
+  CMAKE_BUILD_ENV="env PROJECT_BUILD_DIRECTORY=$BUILD_DIR"
+else
+  CMAKE_BUILD_ENV=""
 fi
 
 if [ "$BUILD_TESTS" = "true" ]; then
-	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
+	$CMAKE_BUILD_ENV cmake -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
 else
-	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${BT} ../
+	$CMAKE_BUILD_ENV cmake -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${BT} ../
 fi
