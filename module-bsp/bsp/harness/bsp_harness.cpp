@@ -18,5 +18,9 @@ namespace bsp
         bool flush() {
             return hwFlush();
         }
+
+        bool emit(const std::string &evt) {
+            return hwEmit(evt);
+        }
     }; // namespace harness
 };     // namespace bsp

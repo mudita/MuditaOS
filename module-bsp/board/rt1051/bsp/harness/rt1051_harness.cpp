@@ -84,7 +84,7 @@ int hwInit(xQueueHandle qHandle)
     LPUART_ClearStatusFlags(LPUART3, 0xFFFFFFFF);
     LPUART_EnableInterrupts(LPUART3, kLPUART_RxDataRegFullInterruptEnable);
     LPUART_EnableRx(LPUART3, true);
-
+    LPUART_EnableTx(LPUART3, true);
     return 0;
 }
 
@@ -118,4 +118,15 @@ std::string hwRead()
 bool hwFlush()
 {
     return (xStreamBufferReset(uartRxStreamBuffer) == pdPASS);
+}
+
+// TODO write with DMA ...
+bool hwEmit(const std::string &str)
+{
+    uint8_t val = STX;
+    LPUART_WriteBlocking(LPUART3, &val, 1);
+    LPUART_WriteBlocking(LPUART3, (uint8_t *)str.c_str(), str.length());
+    val = ETX;
+    LPUART_WriteBlocking(LPUART3, &val, 1);
+    return true;
 }

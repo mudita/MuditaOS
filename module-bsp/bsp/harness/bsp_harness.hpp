@@ -17,5 +17,6 @@ namespace bsp {
         int Init(xQueueHandle qHandle);
         std::string read();
         bool flush();
+        bool emit(const std::string &evt);
     };
 };
