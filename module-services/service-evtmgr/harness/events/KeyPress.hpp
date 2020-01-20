@@ -8,6 +8,6 @@ namespace harness
     /// returns nullptr on fail, KbdMessage on success
     /// of json { "t" : KeyPress, "d" : [1,2,3,4]
     /// where 1,2,3,4 is: [ key_code, key_press (0 released), press_time, release_time ]
-    /// TODO now only KeyReleased
+    /// TODO now only KeyReleased - as steering on application walking is done on KeyReleased either way
     std::shared_ptr<sys::DataMessage> parseKeyPress(json11::Json &js);
 }; // namespace harness

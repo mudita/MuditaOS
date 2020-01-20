@@ -107,10 +107,6 @@ std::string hwRead()
     {
         LOG_ERROR("read error: %d vs %d", ret, str.size());
     }
-    else
-    {
-        // LOG_DEBUG("%s:%d:%d", str.c_str(), str.size(), size);
-    }
     str.shrink_to_fit();
     return str;
 }
@@ -120,7 +116,7 @@ bool hwFlush()
     return (xStreamBufferReset(uartRxStreamBuffer) == pdPASS);
 }
 
-// TODO write with DMA ...
+// TODO write/read with DMA
 bool hwEmit(const std::string &str)
 {
     uint8_t val = STX;

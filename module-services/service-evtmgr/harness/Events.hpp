@@ -9,10 +9,10 @@ namespace harness
     enum class Events;
 
     /// basic event structure:
-    // {
-    //      Type : enum class Events
-    //      Data : Json() <- per event type expectancy
-    // }
+    /// {
+    ///      Type : enum class Events
+    ///      Data : Json() <- per event type expectancy
+    /// }
     template <Events type> struct Event
     {
         const enum Events evt = type;
@@ -27,7 +27,7 @@ namespace harness
         SysStart = 1, // <- system started - EventManager is on
         FocusApp = 2, // <- focus application changed to
 
-        Top, // <- performance monitor message
+        Top, // <- performance monitor message, TODO
 
         Size /// last element for size purposes
     };
