@@ -55,6 +55,9 @@ static const char *level_colors[] = {
 };
 #endif
 
+#include <map>
+#include <string>
+
 struct Logger{
     Logger( logger_level level = LOGTRACE ) : level{ level } {
 
@@ -101,6 +104,21 @@ struct Logger{
         }
     }
 
+    std::map<std::string, logger_level> filtered = {
+        // {"ServiceDB", logger_level::LOGFATAL},
+        {"ApplicationManager", logger_level::LOGINFO},
+    };
+
+    /// Filter out not interesting logs via thread Name
+    /// its' using fact that:
+    /// - TRACE is level 0, for unedfined lookups it will be alvways trace
+    /// - it will be one time init for apps which doesn't tell what level they should have
+    /// - for others it will be o1 lookup so it's fine
+    logger_level filterThreadName(const std::string &name)
+    {
+        return filtered[name];
+    }
+
     xSemaphoreHandle lock;
     logger_level level;
     BaseType_t bt;
@@ -132,6 +150,15 @@ void log_Printf(const char *fmt, ...)
     logger.logUnlock();
 }
 
+/// get string description:
+/// - in critical seciton - return CRIT
+/// - in interrupt return - IRQ
+/// - else return thread name
+static inline const char *getTaskDesc()
+{
+    return xTaskGetCurrentTaskHandle() == NULL ? "CRIT" : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle());
+}
+
 static void _log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, va_list args)
 {
     if (!logger.logLock())
@@ -141,15 +168,19 @@ static void _log_Log(logger_level level, const char *file, int line,const char *
 
     char* ptr = loggerBuffer;
 
+    // filter out not interesing logs
+    if (logger.filterThreadName(getTaskDesc()) >= level)
+    {
+        logger.logUnlock();
+        return;
+    }
+
     ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
 
-    ptr += sprintf(ptr,"%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
-        level_colors[level],
-        level_names[level],
-        xTaskGetCurrentTaskHandle()==NULL?"CRIT":xPortIsInsideInterrupt()?"IRQ": pcTaskGetName(xTaskGetCurrentTaskHandle()),
-        file, line);
+    ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET, level_colors[level], level_names[level],
+                   getTaskDesc(), file, line);
 #else
     ptr += sprintf(ptr,"%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
@@ -244,8 +275,8 @@ extern "C" {
         char *ptr = loggerBuffer;
         ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
         logger_level level = LOGFATAL;
-        ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET, level_colors[level], level_names[level],
-                       xTaskGetCurrentTaskHandle() == NULL ? "CRIT" : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle()));
+        ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET, level_colors[level],
+                       level_names[level], getTaskDesc());
 
         va_list args;
         va_start(args, __format);
