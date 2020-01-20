@@ -138,10 +138,8 @@ ApplicationDescription *VirtualAppManager::appPrev()
 
 void VirtualAppManager::setState(State st)
 {
-#ifdef DEBUG_APPLICATION_MANAGEMENT
     LOG_DEBUG("app: [%s] prev: [%s], state: (%s) -> (%s)", appFront()->name().c_str(), appPrev() ? appPrev()->name().c_str() : "", stateStr(state),
               stateStr(st));
-#endif
     state = st;
 }
 
@@ -152,14 +150,12 @@ std::list<ApplicationDescription *> &VirtualAppManager::getApps()
 
 void VirtualAppManager::debug_log_app_list()
 {
-#ifdef DEBUG_APPLICATION_MANAGEMENT
     std::string apps = "\n";
     for (auto &el : getApps())
     {
         apps += "-> " + el->name() + " " + app::Application::stateStr(el->getState()) + "\n";
     }
     LOG_DEBUG(apps.c_str());
-#endif
 }
 
 ApplicationManager::ApplicationManager(const std::string &name, sys::SystemManager *sysmgr, std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers)
@@ -491,9 +487,7 @@ bool ApplicationManager::handleSwitchApplication(APMSwitch *msg)
         else
         {
             appStack.push_back(focusApplicationName);
-#ifdef DEBUG_APPLICATION_MANAGEMENT
             LOG_DEBUG("LaunchApp: %s", launchApplicationName.c_str());
-#endif
         }
         /// if we want to disable closing previous app - then forbid killing it - it will be moved to background instead
         bool kill_prev = true;
@@ -563,10 +557,8 @@ bool ApplicationManager::handleSwitchPrevApplication( APMSwitchPrevApp* msg ) {
 		return false;
 	}
 
-#ifdef DEBUG_APPLICATION_MANAGEMENT
     LOG_DEBUG("Switch PrevApp: [%s](%s) -> [%s](%s)", focusApplicationName.c_str(), app::Application::stateStr(appGet(previousApplicationName)->getState()),
               previousApplicationName.c_str(), app::Application::stateStr(appGet(previousApplicationName)->getState()));
-#endif
     //set name of the application to be executed and start closing previous application
 	launchApplicationName = previousApplicationName;
 	//store window and data if there is any
