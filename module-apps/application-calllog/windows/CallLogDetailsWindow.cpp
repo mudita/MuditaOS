@@ -100,8 +100,8 @@ void CallLogDetailsWindow::buildInterface() {
     rects[static_cast<uint32_t>(FocusRects::Sms)]->setPosition(information::imgs::sms::x, information::imgs::y);
 
     // TODO: alek: phone ringing seems to be to small
-    callImg = new gui::Image(rects[FocusRects::Call], 1, 12, 0, 0, "phonebook_phone_ringing");
-    smsImg = new gui::Image(rects[FocusRects::Sms], 11, 12, 0, 0, "mail");
+    callImg = new gui::Image(rects[FocusRects::Call], information::imgs::call::icon::x, information::imgs::call::icon::y, 0, 0, "phonebook_phone_ringing");
+    smsImg = new gui::Image(rects[FocusRects::Sms], information::imgs::sms::icon::x, information::imgs::call::icon::y, 0, 0, "mail");
 
     // define navigation between labels
     rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem(NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Sms)]);
@@ -158,38 +158,57 @@ void CallLogDetailsWindow::buildInterface() {
     dateDate = decorateData(new gui::Label(this, date::dataDate::x, date::dataDate::y, date::dataDate::w, 0));
 }
 
-void CallLogDetailsWindow::destroyInterface() {
-	AppWindow::destroyInterface();
+void CallLogDetailsWindow::destroyInterface()
+{
+    AppWindow::destroyInterface();
 
-	if( informationLabel ) { removeWidget(informationLabel); delete informationLabel; informationLabel = nullptr; }
-	if( number ) { removeWidget(number); delete number; number = nullptr; }
-    if (callImg)
+    removeWidget(informationLabel);
+    delete informationLabel;
+    informationLabel = nullptr;
+    removeWidget(number);
+    delete number;
+    number = nullptr;
+    rects[FocusRects::Call]->removeWidget(callImg);
+    delete callImg;
+    callImg = nullptr;
+    rects[FocusRects::Sms]->removeWidget(smsImg);
+    delete smsImg;
+    smsImg = nullptr;
+    for (auto &rect : rects)
     {
-        rects[FocusRects::Call]->removeWidget(callImg);
-        delete callImg;
-        callImg = nullptr;
+        removeWidget(rect);
+        delete rect;
+        rect = nullptr;
     }
-    if (smsImg)
+    removeWidget(typeLabel);
+    delete typeLabel;
+    typeLabel = nullptr;
+    removeWidget(durationLabel);
+    delete durationLabel;
+    durationLabel = nullptr;
+    for (auto &img : callTypeImg)
     {
-        rects[FocusRects::Sms]->removeWidget(smsImg);
-        delete smsImg;
-        smsImg = nullptr;
+        removeWidget(img);
+        delete img;
+        img = nullptr;
     }
-    for( auto& rect : rects ) {
-		if( rect ) { removeWidget(rect); delete rect; rect = nullptr;}
-	}
-	if( typeLabel ) { removeWidget(typeLabel); delete typeLabel; typeLabel = nullptr; }
-	if( durationLabel ) { removeWidget(durationLabel); delete durationLabel; durationLabel = nullptr; }
-	for( auto& img : callTypeImg ) {
-		if( img ) { removeWidget(img); delete img; img = nullptr; }
-	}
-	if( typeData ) { removeWidget(typeData); delete typeData; typeData = nullptr; }
-	if( durationData ) { removeWidget(durationData); delete durationData; durationData = nullptr; }
-	if( dateLabel ) { removeWidget(dateLabel); delete dateLabel; dateLabel = nullptr; }
-	if( dateDay ) { removeWidget(dateDay); delete dateDay; dateDay = nullptr; }	
-	if( dateDate ) { removeWidget(dateDate); delete dateDate; dateDate = nullptr; }
+    removeWidget(typeData);
+    delete typeData;
+    typeData = nullptr;
+    removeWidget(durationData);
+    delete durationData;
+    durationData = nullptr;
+    removeWidget(dateLabel);
+    delete dateLabel;
+    dateLabel = nullptr;
+    removeWidget(dateDay);
+    delete dateDay;
+    dateDay = nullptr;
+    removeWidget(dateDate);
+    delete dateDate;
+    dateDate = nullptr;
 
-	children.clear();
+    children.clear();
 }
 
 CallLogDetailsWindow::~CallLogDetailsWindow() {
