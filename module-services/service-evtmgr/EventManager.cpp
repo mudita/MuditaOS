@@ -135,9 +135,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 		handled = true;
     }
-    //    else if ()
-    //    {
-    //    }
 
     if( handled )
 		return std::make_shared<sys::ResponseMessage>();
