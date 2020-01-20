@@ -7,6 +7,7 @@ set(BOARD_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/battery-charger/battery_charger.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/cellular/linux_cellular.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/harness/harness.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/rtc/rtc.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/test/bsp_bt.cpp"
 
