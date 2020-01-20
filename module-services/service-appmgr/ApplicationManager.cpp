@@ -690,6 +690,10 @@ bool ApplicationManager::handleSwitchConfirmation(APMConfirmSwitch *msg)
             // notify event manager which application should receive keyboard messages
             EventManager::messageSetApplication(this, app->name());
         }
+        else
+        {
+            LOG_DEBUG("Focus switch ingored cause: %d %s", app == nullptr, app == nullptr ? "" : app::Application::stateStr(app->getState()));
+        }
     }
     // this is the case when application manager is waiting for newly started application to confim that it has
     // successfully gained focus.
@@ -772,8 +776,8 @@ bool ApplicationManager::messageSwitchSpecialInput(sys::Service *sender, std::un
 bool ApplicationManager::messageConfirmSwitch( sys::Service* sender) {
 
 	auto msg = std::make_shared<sapm::APMConfirmSwitch>(sender->GetName() );
-	sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
-	return true;
+    sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
+    return true;
 }
 bool ApplicationManager::messageConfirmClose( sys::Service* sender) {
 
