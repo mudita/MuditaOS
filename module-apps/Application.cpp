@@ -310,10 +310,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
         {
 
             if( msg->getTargetApplicationName() == this->GetName()) {
+                setState(State::ACTIVE_FORGROUND);
 				if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
                     LOG_INFO("%s : %s", msg->getTargetWindowName().c_str(), msg->getData() ? msg->getData()->getDescription().c_str() : "");
-                    setState(State::ACTIVE_FORGROUND);
-
                     switchWindow( msg->getTargetWindowName(), std::move( msg->getData()));
 					handled = true;
 				}
@@ -331,8 +330,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				//if window name and data are null pointers this is a message informing
 				//that application should go to background mode
 				if( (msg->getTargetWindowName() == "") && (msg->getData() == nullptr ) ) {
+                    setState(State::ACTIVE_BACKGROUND);
 					if( sapm::ApplicationManager::messageConfirmSwitch(this) ) {
-                        setState(State::ACTIVE_BACKGROUND);
                         handled = true;
 					}
 					else {
