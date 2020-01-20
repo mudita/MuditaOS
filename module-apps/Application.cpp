@@ -58,20 +58,20 @@ namespace app {
         }
     }
 
-Application::Application(std::string name, std::string parent,bool startBackground, uint32_t stackDepth,sys::ServicePriority priority) :
-    Service(name, parent, stackDepth, priority),
-    longPressTimer (CreateAppTimer(key_timer_ms, true, [&]() { longPressTimerCallback(); }, "longPressTimer")),
-    startBackground{startBackground}
-{
-	keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
-	busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
-    if (startBackground)
+    Application::Application(std::string name, std::string parent, bool startBackground, uint32_t stackDepth, sys::ServicePriority priority)
+        : Service(name, parent, stackDepth, priority), longPressTimer(CreateAppTimer(
+                                                           key_timer_ms, true, [&]() { longPressTimerCallback(); }, "longPressTimer")),
+          startBackground{startBackground}
     {
-        setState(State::ACTIVE_BACKGROUND);
-    }
-    longPressTimer.restart();
+        keyTranslator = std::make_unique<gui::KeyInputSimpleTranslation>();
+        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+        if (startBackground)
+        {
+            setState(State::ACTIVE_BACKGROUND);
+        }
+        longPressTimer.restart();
 
-    busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
 Application::~Application()
@@ -248,7 +248,11 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	}
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
 	{
-		sevm::KbdMessage* msg = static_cast<sevm::KbdMessage*>(msgl);
+        if (this->getState() != app::Application::State::ACTIVE_FORGROUND)
+        {
+            LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
+        }
+        sevm::KbdMessage *msg = static_cast<sevm::KbdMessage *>(msgl);
         gui::InputEvent iev = keyTranslator->translate(msg->key);
         if(iev.keyCode != gui::KeyCode::KEY_UNDEFINED ) {
             messageInputEventApplication( this, this->GetName(), iev );
@@ -299,9 +303,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 	}
 
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
-
-		AppSwitchMessage* msg = reinterpret_cast<AppSwitchMessage*>( msgl );
-		//Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
+        LOG_DEBUG("AppSwitch");
+        AppSwitchMessage *msg = reinterpret_cast<AppSwitchMessage *>(msgl);
+        // Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
         if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND))
         {
 
@@ -456,7 +460,7 @@ void Application::setActiveWindow(const std::string &windowName)
 bool Application::messageSwitchApplication( sys::Service* sender, std::string application, std::string window, std::unique_ptr<gui::SwitchData> data ) {
 	auto msg = std::make_shared<AppSwitchMessage>( application, window, std::move(data) );
 	sys::Bus::SendUnicast(msg, application, sender );
-	return true;
+    return true;
 }
 
 bool Application::messageRefreshApplication( sys::Service* sender, std::string application, std::string window, gui::SwitchData* data ) {
