@@ -24,8 +24,8 @@ UCS2::UCS2(void) {
 }
 
 UCS2::~UCS2() {
-//	if (buffer != nullptr)
-	delete[] buffer;
+
+    delete[] buffer;
 }
 
 UCS2::UCS2(const UTF8 &string) {

@@ -545,14 +545,11 @@ bool ServiceCellular::sendSMS(void)
 	//if text fit in single message send
 	if (textLen < singleMessageLen) {
 
-		auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
-				("AT+CMGS=\"" + UCS2(record.number).modemStr() + "\"\r").c_str(), 1, 1000);
+        if (cmux->CheckATCommandPrompt(
+                cmux->GetChannel("Commands")->SendCommandPrompt(("AT+CMGS=\"" + UCS2(record.number).modemStr() + "\"\r").c_str(), 1, 1000)))
+        {
 
-		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
-			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
-					(UCS2(record.body).modemStr() + "\032").c_str(), 2, 5000);
-
-            if ((retText.size() == 2) && (retText[1] == "OK"))
+            if (cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse((UCS2(record.body).modemStr() + "\032").c_str(), 2, 5000)))
             {
                 result = true;
             }
@@ -561,7 +558,7 @@ bool ServiceCellular::sendSMS(void)
             	LOG_INFO("SMS sending failed.");
             }
         }
-	}
+    }
 	//split text, and send concatenated messages
 	else {
 		const uint32_t maxConcatenatedCount = 7;
@@ -593,26 +590,20 @@ bool ServiceCellular::sendSMS(void)
 							+ std::to_string(i + 1) + ","
 							+ std::to_string(messagePartsCount) + "\r");
 
-			auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
-					command.c_str(), 1, 1000);
-
-			if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
-				//prompt sign received, send data ended by "Ctrl+Z"
-				auto sended =
-						cmux->GetChannel("Commands")->SendCommandResponse(
-								 (UCS2(messagePart).modemStr()
-										+ "\032").c_str(), 2, 2000);
-	            if ((sended.size() == 2) && (sended[1] == "OK"))
-	            {
-	                result = true;
-	            }
-	            else
+            if (cmux->CheckATCommandPrompt(cmux->GetChannel("Commands")->SendCommandPrompt(command.c_str(), 1, 5000)))
+            {
+                //prompt sign received, send data ended by "Ctrl+Z"
+                if (cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)))
+                {
+                    result = true;
+                }
+                else
 	            {
 	            	result = false;
 	            	LOG_INFO("SMS sending failed.");
 	            }
-			}
-		}
+            }
+        }
 	}
     if (result)
     {
@@ -688,6 +679,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
                     catch (const std::exception &e)
                     {
                         LOG_ERROR("ServiceCellular::receiveSMS error %s", e.what());
+                        return false;
                     }
                     if (current == last) {
 						messageParts.push_back(ret[i + 1]);
@@ -723,6 +715,6 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 		}
 	}
 	//delete message from modem memory
-    cmux->GetChannel("Commands")->SendCommandResponse(("AT+CMGD=" + messageNumber).c_str(), 1, 150);
+    cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse(("AT+CMGD=" + messageNumber).c_str(), 1, 150));
     return true;
 }

@@ -83,9 +83,9 @@ void Time::replace_specifiers()
         try
 		{
             stream >> std::get_time(&(this->timeinfo), "%y/%m/%d %H:%M:%S");
-#ifdef TARGET_RT1051
+
+            // add missing years, otherwise mktime returns bad timestamp
             timeinfo.tm_year += 100;
-#endif
             this->time = mktime(&timeinfo);
         }
 		catch (std::exception &e)

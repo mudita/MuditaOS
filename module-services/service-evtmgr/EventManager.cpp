@@ -48,9 +48,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
 	{
-		DBNotificationMessage *msg = reinterpret_cast<DBNotificationMessage*>(msgl);
+        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
 
-		if((msg->baseType == DB::BaseType::AlarmDB) &&
+        if((msg->baseType == DB::BaseType::AlarmDB) &&
 						((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)) )
 		{
 			alarmDBEmpty = false;
