@@ -673,7 +673,7 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
     return true;
 }
 
-bool DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
+uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
@@ -681,7 +681,7 @@ bool DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true))
     {
-        return true;
+        calllogResponse->recordId;
     }
     else
     {

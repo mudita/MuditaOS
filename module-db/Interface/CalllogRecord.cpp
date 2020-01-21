@@ -15,19 +15,22 @@ CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(
 CalllogRecordInterface::~CalllogRecordInterface() {
 }
 
-bool CalllogRecordInterface::Add(const CalllogRecord &rec) {
-    return calllogDB->calls.Add(CalllogTableRow{
-            .id=rec.id, // this is only to remove warning
-            .number=rec.number,
-            .presentation=rec.presentation,
-            .date=rec.date,
-			.duration=rec.duration,
-            .type=rec.type,
-            .name=rec.name,
-            .contactId=rec.contactId
-    });
+bool CalllogRecordInterface::Add(const CalllogRecord &rec)
+{
+    return calllogDB->calls.Add(CalllogTableRow{.id = rec.id, // this is only to remove warning
+                                                .number = rec.number,
+                                                .presentation = rec.presentation,
+                                                .date = rec.date,
+                                                .duration = rec.duration,
+                                                .type = rec.type,
+                                                .name = rec.name,
+                                                .contactId = rec.contactId});
 }
 
+uint32_t CalllogRecordInterface::GetLastID()
+{
+    return calllogDB->GetLastInsertRowID();
+}
 
 std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
                                                                                   CalllogRecordField field,

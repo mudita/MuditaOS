@@ -261,9 +261,9 @@ class DBCalllogMessage : public DBMessage
 class DBCalllogResponseMessage : public DBResponseMessage
 {
   public:
-    DBCalllogResponseMessage(std::unique_ptr<std::vector<CalllogRecord>> rec, uint32_t retCode = 0, uint32_t limit = 0, uint32_t offset = 0, uint32_t count = 0,
-                             uint32_t respTo = 0)
-        : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset)
+    DBCalllogResponseMessage(std::unique_ptr<std::vector<CalllogRecord>> rec, uint32_t retCode, uint32_t recordId = 0, uint32_t limit = 0, uint32_t offset = 0,
+                             uint32_t count = 0, uint32_t respTo = 0)
+        : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset), recordId(recordId)
     {
         this->count = count;
     };
@@ -272,6 +272,7 @@ class DBCalllogResponseMessage : public DBResponseMessage
     std::unique_ptr<std::vector<CalllogRecord>> records;
     uint32_t limit = 0;
     uint32_t offset = 0;
+    uint32_t recordId = 0;
 };
 
 #endif // PUREPHONE_DBMESSAGE_HPP

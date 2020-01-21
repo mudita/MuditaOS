@@ -84,7 +84,7 @@ namespace CellularCall
             this->call.date = date;
             this->call.duration = duration;
             this->call.type = type;
-            this->call.name = "No Name";
+            this->call.name = number; // temporary set number as name
             this->call.contactId = "1";
         }
 
@@ -96,6 +96,11 @@ namespace CellularCall
         const CalllogRecord &getCallRecord() const
         {
             return call;
-        };
+        }
+
+        void setCallRecordId(uint32_t id)
+        {
+            call.id = id;
+        }
     };
 } // namespace CellularCall

@@ -429,10 +429,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
                 }
                 CellularCall::CellularCall cellularCall(msg->data, CallType::CT_OUTGOING, timestamp);
-                if (!DBServiceAPI::CalllogAdd(this, cellularCall.getCallRecord()))
+                uint32_t callId = DBServiceAPI::CalllogAdd(this, cellularCall.getCallRecord());
+                if (callId == 0)
                 {
                     LOG_ERROR("CalllogAdd failed");
                 }
+                cellularCall.setCallRecordId(callId);
+                setCellularCall(cellularCall);
 
                 // activate call state timer
                 ReloadTimer(callStateTimerId);
