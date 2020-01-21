@@ -91,10 +91,15 @@ namespace gui
 
     void ThreadViewWindow::cleanMessages()
     {
-        // hack just to fix setting pos for now
+        // remove items from list and and set text to no navigation (text is all the time same widget)
+        auto text = body->children.front();
+        body->setFocusItem(text);
+        text->setNavigationItem(NavigationDirection::UP, nullptr);
+        text->setNavigationItem(NavigationDirection::DOWN, nullptr);
         if (body->children.size() > 1)
         {
-            std::for_each(std::next(body->children.begin(), 1), body->children.end(), [=](auto el) { body->removeWidget(el); });
+            std::for_each(std::next(body->children.begin(), 1), body->children.end(), [&](auto &el) { delete el; });
+            body->children.erase(std::next(body->children.begin()), body->children.end());
         }
     }
 
@@ -127,12 +132,12 @@ namespace gui
                     LOG_ERROR("Something went horribly wrong");
                     return false;
                 }
-                if (app->messageOptionWindow != nullptr)
+                if (app->windowOptions != nullptr)
                 {
-                    app->messageOptionWindow->clearOptions();
+                    app->windowOptions->clearOptions();
                     /// TODO get record properly...
-                    app->messageOptionWindow->addOptions(smsWindowOptions(app, el));
-                    app->switchWindow(gui::name::window::messages_options, nullptr);
+                    app->windowOptions->addOptions(smsWindowOptions(app, el));
+                    app->switchWindow(app->windowOptions->getName(), nullptr);
                 }
                 return true;
             };
@@ -176,7 +181,7 @@ namespace gui
             if (pdata)
             {
                 LOG_INFO("We have it! %d", pdata->thread->dbID);
-                // cleanMessages
+                cleanMessages();
                 addMessages(pdata->thread->dbID);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 // should be name number for now - easier to handle

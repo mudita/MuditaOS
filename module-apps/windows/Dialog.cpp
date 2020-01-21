@@ -6,6 +6,7 @@ using namespace gui;
 Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Meta &meta) : gui::AppWindow(app, name), meta(meta)
 {
     AppWindow::buildInterface();
+    // TODO fix elements positioning with styles ready, right now copied from Phonebook as it is
 
     topBar->setActive(TopBar::Elements::TIME, true);
     bottomBar->setActive(BottomBar::Side::LEFT, false);

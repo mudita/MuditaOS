@@ -22,6 +22,7 @@ namespace gui
 
     Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback)
     {
+        // TODO fix elements positioning with styles ready, right now moved from Settings main window as it is
         gui::Label *label = new gui::Label(nullptr, 20, 0, style::window_width - 2 * 20, style::window::label::big_h, text);
         style::window::decorateOption(label);
         label->activatedCallback = activatedCallback;
@@ -78,8 +79,7 @@ namespace gui
 
         topBar->setActive(TopBar::Elements::SIGNAL, true);
         topBar->setActive(TopBar::Elements::BATTERY, true);
-
-        setTitle(utils::localize.get("app_settings_title_main"));
+        setTitle(name);
 
         // magical offset on designs
         int32_t offset_h = 8;
@@ -107,6 +107,11 @@ namespace gui
 
     OptionWindow *newOptionWindow(app::Application *app, std::string name, std::list<Option> options)
     {
+        if (name == "")
+        {
+            LOG_DEBUG("no name for window - take default");
+            name = utils::localize.get("app_phonebook_options_title");
+        }
         auto window = new OptionWindow(app, name);
         window->addOptions(options);
         return window;
