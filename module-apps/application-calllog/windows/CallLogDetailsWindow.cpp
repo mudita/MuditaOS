@@ -20,12 +20,12 @@
 #include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
 
+#include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
+#include "../data/CallLogSwitchData.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
+#include "application-call/ApplicationCall.hpp"
 #include "time/time_conversion.hpp"
-#include "../data/CallLogSwitchData.hpp"
-#include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
-
 #include <Style.hpp>
 
 using namespace calllog;
@@ -99,10 +99,13 @@ void CallLogDetailsWindow::buildInterface() {
     rects[static_cast<uint32_t>(FocusRects::Call)]->setPosition(information::imgs::call::x, information::imgs::y);
     rects[static_cast<uint32_t>(FocusRects::Sms)]->setPosition(information::imgs::sms::x, information::imgs::y);
 
-    //define navigation between labels
-	rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem( NavigationDirection::LEFT,
-		rects[static_cast<uint32_t>(FocusRects::Sms)]);
-	rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem( NavigationDirection::RIGHT,
+    // TODO: alek: phone ringing seems to be to small
+    callImg = new gui::Image(rects[FocusRects::Call], information::imgs::call::icon::x, information::imgs::call::icon::y, 0, 0, "phonebook_phone_ringing");
+    smsImg = new gui::Image(rects[FocusRects::Sms], information::imgs::sms::icon::x, information::imgs::call::icon::y, 0, 0, "mail");
+
+    // define navigation between labels
+    rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem(NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Sms)]);
+    rects[static_cast<uint32_t>(FocusRects::Call)]->setNavigationItem( NavigationDirection::RIGHT,
 		rects[static_cast<uint32_t>(FocusRects::Sms)]);
 
 	rects[static_cast<uint32_t>(FocusRects::Sms)]->setNavigationItem( NavigationDirection::LEFT,
@@ -112,17 +115,26 @@ void CallLogDetailsWindow::buildInterface() {
 
 	//focus callbacks
 	rects[static_cast<uint32_t>(FocusRects::Call)]->focusChangedCallback = [=] (gui::Item& item){
-		LOG_INFO("CallImg gets focus" );
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_call"));
 		return true; };
 
 	rects[static_cast<uint32_t>(FocusRects::Sms)]->focusChangedCallback = [=] (gui::Item& item){
-		LOG_INFO("SmsImg gets focus" );
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_send"));
 		return true; };
 
-	// Type
-	typeLabel = decorateLabel(new gui::Label(this, type::label::x, type::label::y, type::label::w, 0, utils::localize.get("app_calllog_type")));
+    // activated callbacks
+    rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
+        LOG_ERROR("call %s", record.number.c_str());
+        return app::ApplicationCall::messageSwitchToCall(application, record.number);
+    };
+
+    rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
+        LOG_ERROR("TODO: add sending sms from calllog");
+        return true;
+    };
+
+    // Type
+    typeLabel = decorateLabel(new gui::Label(this, type::label::x, type::label::y, type::label::w, 0, utils::localize.get("app_calllog_type")));
 	typeData = decorateData(new gui::Label(this, type::data::x, type::data::y, type::data::w, 0));
 
 	// TODO: alek: it is used in the code at least twice, possibly create one common function for this
@@ -146,28 +158,57 @@ void CallLogDetailsWindow::buildInterface() {
     dateDate = decorateData(new gui::Label(this, date::dataDate::x, date::dataDate::y, date::dataDate::w, 0));
 }
 
-void CallLogDetailsWindow::destroyInterface() {
-	AppWindow::destroyInterface();
+void CallLogDetailsWindow::destroyInterface()
+{
+    AppWindow::destroyInterface();
 
-	if( informationLabel ) { removeWidget(informationLabel); delete informationLabel; informationLabel = nullptr; }
-	if( number ) { removeWidget(number); delete number; number = nullptr; }
-	for( auto& rect : rects ) {
-		if( rect ) { removeWidget(rect); delete rect; rect = nullptr;}
-	}
-	if( callImg ) { removeWidget(callImg); delete callImg; callImg = nullptr; }
-	if( smsImg ) { removeWidget(smsImg); delete smsImg; smsImg = nullptr; }
-	if( typeLabel ) { removeWidget(typeLabel); delete typeLabel; typeLabel = nullptr; }
-	if( durationLabel ) { removeWidget(durationLabel); delete durationLabel; durationLabel = nullptr; }
-	for( auto& img : callTypeImg ) {
-		if( img ) { removeWidget(img); delete img; img = nullptr; }
-	}
-	if( typeData ) { removeWidget(typeData); delete typeData; typeData = nullptr; }
-	if( durationData ) { removeWidget(durationData); delete durationData; durationData = nullptr; }
-	if( dateLabel ) { removeWidget(dateLabel); delete dateLabel; dateLabel = nullptr; }
-	if( dateDay ) { removeWidget(dateDay); delete dateDay; dateDay = nullptr; }	
-	if( dateDate ) { removeWidget(dateDate); delete dateDate; dateDate = nullptr; }
+    removeWidget(informationLabel);
+    delete informationLabel;
+    informationLabel = nullptr;
+    removeWidget(number);
+    delete number;
+    number = nullptr;
+    rects[FocusRects::Call]->removeWidget(callImg);
+    delete callImg;
+    callImg = nullptr;
+    rects[FocusRects::Sms]->removeWidget(smsImg);
+    delete smsImg;
+    smsImg = nullptr;
+    for (auto &rect : rects)
+    {
+        removeWidget(rect);
+        delete rect;
+        rect = nullptr;
+    }
+    removeWidget(typeLabel);
+    delete typeLabel;
+    typeLabel = nullptr;
+    removeWidget(durationLabel);
+    delete durationLabel;
+    durationLabel = nullptr;
+    for (auto &img : callTypeImg)
+    {
+        removeWidget(img);
+        delete img;
+        img = nullptr;
+    }
+    removeWidget(typeData);
+    delete typeData;
+    typeData = nullptr;
+    removeWidget(durationData);
+    delete durationData;
+    durationData = nullptr;
+    removeWidget(dateLabel);
+    delete dateLabel;
+    dateLabel = nullptr;
+    removeWidget(dateDay);
+    delete dateDay;
+    dateDay = nullptr;
+    removeWidget(dateDate);
+    delete dateDate;
+    dateDate = nullptr;
 
-	children.clear();
+    children.clear();
 }
 
 CallLogDetailsWindow::~CallLogDetailsWindow() {

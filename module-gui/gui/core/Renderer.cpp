@@ -200,12 +200,23 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	int16_t wgtX = 0,wgtY = 0;
 	uint16_t wgtW = cmd->areaW, wgtH=cmd->areaH;
 	int16_t wgtR = cmd->radius;
-	//check if there is a need or making copy of context to use is as background
+
+    if (cmd->yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT | RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT))
+    {
+        wgtX += cmd->radius;
+        wgtW -= cmd->radius;
+    }
+    if (cmd->yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT | RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT))
+    {
+        wgtW -= cmd->radius;
+    }
+
+    //check if there is a need or making copy of context to use is as background
 	if( (cmd->areaW == cmd->w) && (cmd->areaH == cmd->h)) {
 		drawCtx = ctx;
-		wgtX = cmd->x;
-		wgtY = cmd->y;
-	}
+        wgtX += cmd->x;
+        wgtY += cmd->y;
+    }
 	else {
 		copyContext = true;
 		int16_t x = cmd->x;
@@ -239,8 +250,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 	else {
 
 		//calculate centers of circle for all corners
-		int16_t xcTopRight = wgtX+cmd->w - cmd->radius;
-		int16_t xcTopLeft = wgtX+cmd->radius;
+        int16_t xcTopRight = wgtX + wgtW - cmd->radius;
+        int16_t xcTopLeft = wgtX+cmd->radius;
 		int16_t xcBottomRight = xcTopRight;
 		int16_t xcBottomLeft = xcTopLeft;
 

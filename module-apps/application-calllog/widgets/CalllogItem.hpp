@@ -35,9 +35,13 @@ class CalllogItem: public ListItem {
 		virtual ~CalllogItem();
 		//sets copy of alarm's
 		void setCall( std::shared_ptr<CalllogRecord>&  );
+        CalllogRecord getCall() const
+        {
+            return *call;
+        };
 
-		//virtual methods from Item
-		bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
+        // virtual methods from Item
+        bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
 };
 
 } /* namespace gui */

@@ -52,17 +52,27 @@ constexpr uint32_t w = default_w;
 } // namespace number
 namespace imgs
 {
-constexpr uint32_t y = 162;
-constexpr uint32_t w = 55;
-constexpr uint32_t h = 55;
-namespace call
-{
-constexpr uint32_t x = 317;
-}
-namespace sms
-{
-constexpr uint32_t x = 389;
-}
+    constexpr uint32_t y = 162;
+    constexpr uint32_t w = 55;
+    constexpr uint32_t h = 55;
+    namespace call
+    {
+        constexpr uint32_t x = 317;
+        namespace icon
+        {
+            constexpr uint32_t x = 11;
+            constexpr uint32_t y = 12;
+        } // namespace icon
+    }     // namespace call
+    namespace sms
+    {
+        constexpr uint32_t x = 389;
+        namespace icon
+        {
+            constexpr uint32_t x = 11;
+            constexpr uint32_t y = 12;
+        } // namespace icon
+    }     // namespace sms
 } // namespace imgs
 } // namespace information
 namespace type

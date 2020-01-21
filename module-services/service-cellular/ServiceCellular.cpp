@@ -15,21 +15,30 @@
 #include <string>
 #include <vector>
 
-#include "Common.hpp"
-#include "log/log.hpp"
+#include <ctime>
+#include <functional>
+#include <iomanip>
 
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "ServiceCellular.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include <bsp/rtc/rtc.hpp>
+#include "Service/Service.hpp"
+#include "Service/Message.hpp"
 
 #include "MessageType.hpp"
 
 #include "messages/CellularMessage.hpp"
 #include <ticks.hpp>
 
+#include "CommonCellular.hpp"
+#include "log/log.hpp"
+
 #include "ucs2/UCS2.hpp"
+
+#include "service-db/api/DBServiceAPI.hpp"
+#include "service-db/messages/DBNotificationMessage.hpp"
+
+#include "time/time_conversion.hpp"
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
@@ -41,6 +50,7 @@ ServiceCellular::ServiceCellular()
     LOG_INFO("[ServiceCellular] Initializing");
 
     busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
     callDurationTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
@@ -237,6 +247,17 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             }
         }
+        else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
+		{
+			sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
+								  GetName(), this);
+			state = State ::ModemConfigurationInProgress;
+		}
+		else if(msg->type == CellularNotificationMessage::Type::NewIncomingSMS)
+		{
+			LOG_INFO("New incoming sms received");
+			receiveSMS(msg->data);
+		}
         else
         {
             LOG_ERROR("Not CellularNotificationMessage");
@@ -356,6 +377,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 LOG_ERROR("exception %s was thrown", e.what());
                 assert(0);
             }
+
             responseMsg = std::make_shared<CellularResponseMessage>(true);
         }
         else
@@ -383,7 +405,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 LOG_ERROR("Call not aborted");
                 responseMsg = std::make_shared<CellularResponseMessage>(false);
             }
-            break;
+           break;
         }
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
@@ -431,15 +453,25 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		responseMsg = std::make_shared<CellularResponseMessage>(false);
 	}
 		break;
-	case MessageType::CellularSendSMS: {
-        	CellularSMSRequestMessage *msg = reinterpret_cast<CellularSMSRequestMessage*>(msgl);
+	case MessageType::DBServiceNotification :
+	{
+        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
 
-        	auto ret = this->sendSMS(msg->number, msg->message);
-
-        	responseMsg = std::make_shared<CellularResponseMessage>(ret);
+        if (msg == nullptr)
+        {
+            responseMsg = std::make_shared<CellularResponseMessage>(false);
+            break;
         }
-        	break;
-
+        LOG_DEBUG("Received multicast");
+        if ((msg->baseType == DB::BaseType::SmsDB) &&
+            ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+        {
+            sendSMS();
+            responseMsg = std::make_shared<CellularResponseMessage>(true);
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        break;
+	}
     default:
         break;
     }
@@ -499,25 +531,41 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
 
 }
 
-bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
-	uint32_t textLen = text.length();
+bool ServiceCellular::sendSMS(void)
+{
+	auto record = DBServiceAPI::SMSGetLastRecord(this);
+
+	// skip if it's not sms to send
+	if(record.type != SMSType::QUEUED)
+	{
+		return false;
+	}
+
+	LOG_INFO("Trying to send SMS");
+
+	uint32_t textLen = record.body.length();
 
 	const uint32_t singleMessageLen = 30;
-
+	bool result = false;
 
 	//if text fit in single message send
 	if (textLen < singleMessageLen) {
 
-		auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
-				("AT+CMGS=\"" + UCS2(number).modemStr() + "\"\r").c_str(), 1, 1000);
+        if (cmux->CheckATCommandPrompt(
+                cmux->GetChannel("Commands")->SendCommandPrompt(("AT+CMGS=\"" + UCS2(record.number).modemStr() + "\"\r").c_str(), 1, 1000)))
+        {
 
-		if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
-			auto retText = cmux->GetChannel("Commands")->SendCommandResponse(
-					(UCS2(text).modemStr() + "\032").c_str(), 1);
-			return true;
-		}
-	}
-	//split text, and send concatenated message
+            if (cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse((UCS2(record.body).modemStr() + "\032").c_str(), 2, 5000)))
+            {
+                result = true;
+            }
+            else
+            {
+            	LOG_INFO("SMS sending failed.");
+            }
+        }
+    }
+	//split text, and send concatenated messages
 	else {
 		const uint32_t maxConcatenatedCount = 7;
 		uint32_t messagePartsCount = textLen / singleMessageLen;
@@ -536,32 +584,40 @@ bool ServiceCellular::sendSMS(UTF8& number, UTF8& text) {
 		{
 
 			uint32_t partLength = singleMessageLen;
-			if (i * singleMessageLen + singleMessageLen > text.length()) {
-				partLength = text.length() - i * singleMessageLen;
+			if (i * singleMessageLen + singleMessageLen > record.body.length()) {
+				partLength = record.body.length() - i * singleMessageLen;
 			}
-			std::string messagePart = text.substr(i * singleMessageLen,
+			UTF8 messagePart = record.body.substr(i * singleMessageLen,
 					partLength);
 
 
 			std::string command(
-					"AT+QCMGS=\"" + UCS2(number).modemStr() + "\",120,"
+					"AT+QCMGS=\"" + UCS2(record.number).modemStr() + "\",120,"
 							+ std::to_string(i + 1) + ","
 							+ std::to_string(messagePartsCount) + "\r");
 
-			auto retCommand = cmux->GetChannel("Commands")->SendCommandPrompt(
-					command.c_str(), 1, 1000);
-
-			if ((retCommand.size() == 1) && (retCommand[0] == ">")) {
-				//prompt sign received, send data ended by "Ctrl+Z"
-				auto sended =
-						cmux->GetChannel("Commands")->SendCommandResponse(
-								 (UCS2(messagePart).modemStr()
-										+ "\032").c_str(), 2, 2000);
-			}
-		}
-		return true;
+            if (cmux->CheckATCommandPrompt(cmux->GetChannel("Commands")->SendCommandPrompt(command.c_str(), 1, 5000)))
+            {
+                //prompt sign received, send data ended by "Ctrl+Z"
+                if (cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)))
+                {
+                    result = true;
+                }
+                else
+	            {
+	            	result = false;
+	            	LOG_INFO("SMS sending failed.");
+	            }
+            }
+        }
 	}
-	return false;
+    if (result)
+    {
+    	LOG_INFO("SMS sended.");
+        record.type = SMSType::OUTBOX;
+        DBServiceAPI::SMSUpdate(this, record);
+    }
+    return result;
 }
 
 bool ServiceCellular::receiveSMS(std::string messageNumber) {
@@ -579,20 +635,39 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 		for (uint32_t i = 0; i < ret.size(); i++) {
 			if (ret[i].find("QCMGR") != std::string::npos) {
 
+
 				std::istringstream ss(ret[i]);
 				std::string token;
 				std::vector<std::string> tokens;
 				while (std::getline(ss, token, ',')) {
 					tokens.push_back(token);
 				}
-				tokens[1].erase(
-						std::remove(tokens[1].begin(), tokens[1].end(), '\"'),
-						tokens[1].end());
+                tokens[1].erase(std::remove(tokens[1].begin(), tokens[1].end(), '\"'), tokens[1].end());
+                /*
+				 * tokens:
+				 * [0] - +QCMGR
+				 * [1] - sender number
+				 * [2] - none
+				 * [3] - date YY/MM/DD
+				 * [4] - hour HH/MM/SS/timezone
+				 * concatenaded messages
+				 * [5] - unique concatenated message id
+				 * [6] - current message number
+				 * [7] - total messages count
+				 *
+				 */
+				//parse sender number
 				receivedNumber = UCS2(tokens[1]).toUTF8();
 
-				//if its single message process
+				//parse date
+				tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
+
+				utils::time::Time time;
+				time.set_time(tokens[3] + " " + tokens[4], "%y/%m/%d %H:%M:%S");
+                auto messageDate = time.getTime();
+
+                //if its single message process
 				if (tokens.size() == 5) {
-					//todo add message to database
 
 					messageRawBody = ret[i+1];
 					messageParsed = true;
@@ -600,40 +675,52 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				//if its concatenated message wait for last message
 				else if (tokens.size() == 8) {
 
-					uint32_t last = std::stoi(tokens[7]);
-					uint32_t current = std::stoi(tokens[6]);
-
-					if (current == last) {
+                    uint32_t last = 0;
+                    uint32_t current = 0;
+                    try
+                    {
+                        last = std::stoi(tokens[7]);
+                        current = std::stoi(tokens[6]);
+                    }
+                    catch (const std::exception &e)
+                    {
+                        LOG_ERROR("ServiceCellular::receiveSMS error %s", e.what());
+                        return false;
+                    }
+                    if (current == last) {
 						messageParts.push_back(ret[i + 1]);
 
-						for (uint32_t j = 0; j < messageParts.size(); j++) {
-							messageRawBody += messageParts[j];
-						}
-						messageParts.clear();
+                        for (uint32_t j = 0; j < messageParts.size(); j++)
+                        {
+                            messageRawBody += messageParts[j];
+                        }
+                        messageParts.clear();
 						messageParsed = true;
-					} else {
-						messageParts.push_back(ret[i + 1]);
-					}
+                    }
+                    else
+                    {
+                        messageParts.push_back(ret[i + 1]);
+                    }
+                }
+				if (messageParsed)
+				{
+					messageParsed = false;
+
+					UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
+
+					SMSRecord record;
+					record.body = decodedMessage;
+					record.number = receivedNumber;
+					record.type = SMSType::INBOX;
+					record.isRead = true;
+					record.date = messageDate;
+
+					DBServiceAPI::SMSAdd(this, record);
 				}
 			}
 		}
-		if (messageParsed) {
-			messageParsed = false;
-			UTF8 decodedMessage = UCS2(messageRawBody).toUTF8();
-
-			// todo temporary send multicast
-			auto msg = std::make_shared<CellularSMSRequestMessage>(
-					MessageType::CellularSMSMulticast);
-
-			msg->number = receivedNumber;
-			msg->message = decodedMessage;
-
-			sys::Bus::SendMulticast(msg,
-					sys::BusChannels::ServiceCellularSMSNotification, this);
-		}
 	}
 	//delete message from modem memory
-	cmux->GetChannel("Commands")->SendCommandResponse(
-			("AT+CMGD=" + messageNumber).c_str(), 1, 150);
-	return true;
+    cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse(("AT+CMGD=" + messageNumber).c_str(), 1, 150));
+    return true;
 }
