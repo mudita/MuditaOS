@@ -17,5 +17,6 @@ target_sources( ${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/ServiceCellular.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/api/CellularServiceAPI.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/CellularCall.cpp"
 )
 
