@@ -183,16 +183,18 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
     {
         std::string num = callData->getPhoneNumber();
         setNumberLabel(num);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         switch (callData->getType())
         {
         case app::CallSwitchData::Type::EXECUTE_CALL: {
             LOG_INFO("number: [%s]", num.c_str());
             auto ret = CellularServiceAPI::DialNumber(application, num.c_str());
             LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+            return true;
         }
-        break;
 
         case app::CallSwitchData::Type::ENTER_NUMBER: {
+            return true;
         }
         break;
 
@@ -208,9 +210,7 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
         return false;
     }
 
-    application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
-    return true;
+    return false;
 }
 
 } /* namespace gui */
