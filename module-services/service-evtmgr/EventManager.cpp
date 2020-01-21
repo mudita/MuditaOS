@@ -49,16 +49,18 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
 	{
         DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
-
-        if((msg->baseType == DB::BaseType::AlarmDB) &&
-						((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)) )
-		{
-			alarmDBEmpty = false;
-			alarmIsValid = false;
-			handled = true;
-		}
-	}
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
+        if (msg != nullptr)
+        {
+            if ((msg->baseType == DB::BaseType::AlarmDB) &&
+                ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+            {
+                alarmDBEmpty = false;
+                alarmIsValid = false;
+                handled = true;
+            }
+        }
+    }
+    if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
