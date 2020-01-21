@@ -30,7 +30,6 @@
 #include "messages/CellularMessage.hpp"
 #include <ticks.hpp>
 
-#include "CellularCall.hpp"
 #include "log/log.hpp"
 
 #include "ucs2/UCS2.hpp"
@@ -211,25 +210,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::CallBusy: {
                 stopTimer(callDurationTimerId);
                 stopTimer(callStateTimerId);
-                // TODO: alek: clean this up
-                // ************************** This is only temporary to check DB api is working as expected **********
-                LOG_DEBUG("callDuration %d, callEndTime %d", callDuration, callEndTime);
-                CalllogRecord calllogRec;
-                calllogRec.number = "+48600226908";
-                calllogRec.presentation = PresentationType::PR_ALLOWED;
-                time_t timestamp;
-                bsp::rtc_GetCurrentTimestamp(&timestamp);
-                calllogRec.date = timestamp;
-                calllogRec.duration = callDuration;
-                calllogRec.type = CallType::CT_OUTGOING;
-                calllogRec.name = "test name";
-                calllogRec.contactId = "1";
-
-                if (!DBServiceAPI::CalllogAdd(this, calllogRec))
-                {
-                    LOG_ERROR("CalllogAdd failed");
-                }
-                // *****************************************************************************************************
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
@@ -365,10 +345,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
             try
             {
-                CellularCall::CellularCall call(callEntry);
+                ModemCall::ModemCall call(callEntry);
                 LOG_DEBUG("%s", call.getStringRepresntation().c_str());
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
-                if (call.state == CellularCall::CallState::Active)
+                if (call.state == ModemCall::CallState::Active)
                 {
                     auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
                     sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -442,7 +422,19 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 					("ATD" + msg->data + ";\r").c_str(), 1, 5000);
 			if (cmux->CheckATCommandResponse(ret)) {
 				responseMsg = std::make_shared<CellularResponseMessage>(true);
-				// activate call state timer
+                time_t timestamp;
+                RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
+                if (rtcErr != RtcBspError_e::RtcBspOK)
+                {
+                    LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
+                }
+                CellularCall::CellularCall cellularCall(msg->data, CallType::CT_OUTGOING, timestamp);
+                if (!DBServiceAPI::CalllogAdd(this, cellularCall.getCallRecord()))
+                {
+                    LOG_ERROR("CalllogAdd failed");
+                }
+
+                // activate call state timer
                 ReloadTimer(callStateTimerId);
                 // Propagate "Ringing" notification into system
 				sys::Bus::SendMulticast(

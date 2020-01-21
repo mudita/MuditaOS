@@ -1,6 +1,6 @@
 
 /*
- * @file Common.hpp
+ * @file CellularCall.hpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
  * @date 11.07.19
  * @brief
@@ -9,9 +9,11 @@
  */
 
 #pragma once
+
+#include "Interface/CalllogRecord.hpp"
 #include <string>
 
-namespace CellularCall
+namespace ModemCall
 {
     enum class CallState : uint8_t
     {
@@ -44,7 +46,7 @@ namespace CellularCall
         NationalType = 161,
     };
 
-    struct CellularCall
+    struct ModemCall
     {
         int8_t idx; // TODO: alek: need to check what that is
         CallDir dir;
@@ -57,10 +59,43 @@ namespace CellularCall
                                    // but it is defined in specification
         // CallState previousState;
 
-        CellularCall() = delete;
-        ~CellularCall() = default;
-        CellularCall(const std::string str);
+        ModemCall() = delete;
+        ~ModemCall() = default;
+        ModemCall(const std::string str);
 
         std::string getStringRepresntation();
+    };
+} // namespace ModemCall
+
+namespace CellularCall
+{
+    class CellularCall
+    {
+        CalllogRecord call;
+
+      public:
+        CellularCall() = default;
+        ~CellularCall() = default;
+        CellularCall(const UTF8 &number, CallType type = CallType::CT_NONE, time_t date = 0, time_t duration = 0)
+        {
+            this->call.id = 0; // 0 - Invalid
+            this->call.number = number;
+            this->call.presentation = PresentationType::PR_ALLOWED;
+            this->call.date = date;
+            this->call.duration = duration;
+            this->call.type = type;
+            this->call.name = "No Name";
+            this->call.contactId = "1";
+        }
+
+        bool isValid()
+        {
+            return call.id != 0;
+        }
+
+        const CalllogRecord &getCallRecord() const
+        {
+            return call;
+        };
     };
 } // namespace CellularCall

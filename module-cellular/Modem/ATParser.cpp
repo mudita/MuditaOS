@@ -178,6 +178,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     return tokens;
 }
 
+// TODO: alek: this tokenizer seems bad. Need to fix this
 std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount)
 {
     std::vector<std::string> strings;
@@ -200,7 +201,11 @@ std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std
     // To get the last substring (or only, if delimiter is not found)
     if (maxTokenCount == 0 || tokenCount < maxTokenCount)
     {
-        strings.push_back(input.substr(prev));
+        auto str = input.substr(prev);
+        if (!str.empty())
+        {
+            strings.push_back(str);
+        }
     }
     return strings;
 }

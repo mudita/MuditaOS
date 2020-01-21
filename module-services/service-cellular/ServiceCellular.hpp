@@ -12,9 +12,10 @@
 #ifndef PUREPHONE_SERVICECELLULAR_HPP
 #define PUREPHONE_SERVICECELLULAR_HPP
 
-#include "Service/Service.hpp"
+#include "CellularCall.hpp"
 #include "Modem/TS0710/DLC_channel.h"
 #include "Modem/TS0710/TS0710.h"
+#include "Service/Service.hpp"
 #include "messages/CellularMessage.hpp"
 #include "utf8/UTF8.hpp"
 //
@@ -144,7 +145,8 @@ public:
     }
 
     std::vector<std::string> messageParts;
-};
 
+    CellularCall::CellularCall activeCallRecord;
+};
 
 #endif //PUREPHONE_SERVICECELLULAR_HPP

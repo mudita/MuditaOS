@@ -3,10 +3,10 @@
 #include <log/log.hpp>
 #include <vector>
 
-namespace CellularCall
+namespace ModemCall
 {
 
-    CellularCall::CellularCall(const std::string str)
+    ModemCall::ModemCall(const std::string str)
     {
         const std::string prefix = "+CLCC: ";
         std::string callEntry = str;
@@ -46,7 +46,7 @@ namespace CellularCall
         }
     }
 
-    std::string CellularCall::getStringRepresntation()
+    std::string ModemCall::getStringRepresntation()
     {
         std::string str = " <idx> " + std::to_string(idx) + " <dir> " + std::to_string(static_cast<uint8_t>(dir)) + " <stat> " +
                           std::to_string(static_cast<uint8_t>(state)) + " <mode> " + std::to_string(static_cast<uint8_t>(mode)) + " <mpty> " +
@@ -59,4 +59,4 @@ namespace CellularCall
 
         return str;
     }
-} // namespace CellularCall
+} // namespace ModemCall
