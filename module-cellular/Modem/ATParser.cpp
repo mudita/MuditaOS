@@ -148,7 +148,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
             cpp_freertos::LockGuard lock(mutex);
             // tokenize responseBuffer
             // empty lines are also removed
-            auto ret = Tokenizer(responseBuffer, rxCount, "\r\n");
+            auto ret = Tokenizer(responseBuffer, "\r\n", rxCount);
             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
 
             if (tokens.size() < rxCount)
@@ -178,15 +178,16 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     return tokens;
 }
 
-std::vector<std::string> ATParser::Tokenizer(std::string &input, uint32_t maxTokenCount,
-                                             const std::string &delimiter) {
+std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount)
+{
     std::vector<std::string> strings;
     uint32_t tokenCount = 0;
 
 
     std::string::size_type pos = 0;
     std::string::size_type prev = 0;
-    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (tokenCount < maxTokenCount)) {
+    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (maxTokenCount == 0 || tokenCount < maxTokenCount))
+    {
         if (pos == prev) {
             prev = pos + delimiter.size();
             continue;
@@ -197,6 +198,9 @@ std::vector<std::string> ATParser::Tokenizer(std::string &input, uint32_t maxTok
     }
 
     // To get the last substring (or only, if delimiter is not found)
-    input = input.substr(prev);
+    if (maxTokenCount == 0 || tokenCount < maxTokenCount)
+    {
+        strings.push_back(input.substr(prev));
+    }
     return strings;
 }

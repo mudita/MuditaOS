@@ -360,12 +360,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         // this should be acceptable and hence warning instead of error is logged in such case
         if (cmux->CheckATCommandResponse(ret, numberOfExpectedTokens, LOGWARN))
         {
-            auto beg = ret[1].find(",", 0);
-            beg = ret[1].find(",", beg + 1);
+            bool retVal = true;
+            auto callEntry = ret[1];
+
             try
             {
+                CellularCall::CellularCall call(callEntry);
+                LOG_DEBUG("%s", call.getStringRepresntation().c_str());
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
-                if (std::stoul(ret[1].substr(beg + 1, 1)) == static_cast<uint32_t>(CallStates::Active))
+                if (call.state == CellularCall::CallState::Active)
                 {
                     auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
                     sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -376,9 +379,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             {
                 LOG_ERROR("exception %s was thrown", e.what());
                 assert(0);
+                retVal = false;
             }
-
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
+            responseMsg = std::make_shared<CellularResponseMessage>(retVal);
         }
         else
         {
