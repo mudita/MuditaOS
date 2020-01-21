@@ -23,6 +23,7 @@
 
 #include "service-cellular/ServiceCellular.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include <i18/i18.hpp>
 
 namespace app {
 
@@ -75,7 +76,8 @@ void ApplicationSettings::createUserInterface() {
 	gui::AppWindow* window = nullptr;
 
 	window = newOptionWindow(this, gui::name::window::main_window, mainWindowOptions(this));
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+    window->setTitle(utils::localize.get("app_settings_title_main"));
+    windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
 	window = new gui::LanguageWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));

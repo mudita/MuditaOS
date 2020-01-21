@@ -83,24 +83,22 @@ sys::ReturnCodes ApplicationMessages::DeinitHandler() {
 
 void ApplicationMessages::createUserInterface()
 {
-    threadOptionsWindow = gui::newOptionWindow(this, gui::name::window::thread_options, {});
-    messageOptionWindow = gui::newOptionWindow(this, gui::name::window::messages_options, {});
+    windowOptions = gui::newOptionWindow(this);
 
     windows.insert({gui::name::window::main_window, new gui::MessagesMainWindow(this)});
     windows.insert({gui::name::window::thread_view, new gui::ThreadViewWindow(this)});
     windows.insert({gui::name::window::new_sms, new gui::NewSMS_Window(this)});
-    windows.insert({gui::name::window::thread_options, threadOptionsWindow});
+    windows.insert({windowOptions->getName(), windowOptions});
     windows.insert({gui::name::window::thread_rm_confirm, new gui::Dialog(this, gui::name::window::thread_rm_confirm,
                                                                           {
-                                                                              .title = "rm contact?",
+                                                                              .title = "",
                                                                               .icon = "phonebook_contact_delete_trashcan",
-                                                                              .text = "thou shall not pass",
+                                                                              .text = "",
                                                                               .action = []() -> bool {
                                                                                   LOG_INFO("!");
                                                                                   return true;
                                                                               },
                                                                           })});
-    windows.insert({gui::name::window::messages_options, messageOptionWindow});
 }
 
 void ApplicationMessages::destroyUserInterface() {

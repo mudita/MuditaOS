@@ -47,6 +47,7 @@ namespace gui
         void destroyInterface() override;
     };
 
-    OptionWindow *newOptionWindow(app::Application *app, std::string name, std::list<Option> options);
+    /// default name will set name to Options from i18
+    OptionWindow *newOptionWindow(app::Application *app, std::string name = "", std::list<Option> options = {});
 
 }; // namespace gui
