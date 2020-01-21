@@ -30,7 +30,7 @@
 #include "messages/CellularMessage.hpp"
 #include <ticks.hpp>
 
-#include "CommonCellular.hpp"
+#include "CellularCall.hpp"
 #include "log/log.hpp"
 
 #include "ucs2/UCS2.hpp"
