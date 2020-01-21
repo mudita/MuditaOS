@@ -15,13 +15,13 @@
 class UCS2{
 private:
     //pointer to memory where ucs2 characters are stored.
-    uint16_t* buffer;
+    uint16_t* buffer = nullptr;
     //size in bytes of memory that was allcated to the buffer
-	uint32_t sizeAllocated;
+	uint32_t sizeAllocated = 0;
 	//size in bytes of memory used in buffer
-	uint32_t sizeUsed;
+	uint32_t sizeUsed = 0;
     //number of characters in the string. its equal to size of allocated memory plus null terminator
-    uint32_t length;
+    uint32_t length = 0;
     //
     static const uint32_t ucs2bufferExt;
     void clear(void);

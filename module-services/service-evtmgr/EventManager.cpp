@@ -18,6 +18,7 @@
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "service-db/messages/DBNotificationMessage.hpp"
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -26,7 +27,7 @@ EventManager::EventManager(const std::string& name)
 
 	alarmTimestamp = 0;
 	alarmID = 0;
-	busChannels.push_back(sys::BusChannels::ServiceDatabaseAlarmNotifications);
+    busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     // each 30 sec pollTimer execute check - right now polling for battery only
     pollTimerID = CreateTimer(30000, true);
     ReloadTimer(pollTimerID);
@@ -45,13 +46,21 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 	bool handled = false;
 
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBAlarmUpdateNotification))
+	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
 	{
-
-		alarmDBEmpty = false;
-		alarmIsValid = false;
-	}
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
+        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+        if (msg != nullptr)
+        {
+            if ((msg->baseType == DB::BaseType::AlarmDB) &&
+                ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+            {
+                alarmDBEmpty = false;
+                alarmIsValid = false;
+                handled = true;
+            }
+        }
+    }
+    if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
 		msgl->sender == this->GetName()) {
 
 		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);

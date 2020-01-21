@@ -97,7 +97,20 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 #if SHOW_DB_ACCESS_PERF == 1
         LOG_DEBUG("DBSMSAdd time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
-        responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, ret);
+        if (ret == true)
+        {
+            // update db ID in response message
+            auto record = std::make_unique<std::vector<SMSRecord>>();
+            msg->record.dbID = smsRecordInterface->GetLastID();
+            record->push_back(msg->record);
+            LOG_INFO("SMS added, record ID: %d", msg->record.dbID);
+            responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(record), ret);
+
+            // send notification
+            auto notificationMessage =
+                std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificatonType::Added, DB::BaseType::SmsDB);
+            sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
+        }
     }
     break;
 
@@ -153,6 +166,26 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     }
     break;
 
+    case MessageType::DBSMSGetLastRecord:
+    {
+#if SHOW_DB_ACCESS_PERF == 1
+        timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+
+    	uint32_t id = smsRecordInterface->GetLastID();
+
+    	auto rec = smsRecordInterface->GetByID(id);
+    	auto records = std::make_unique<std::vector<SMSRecord>>();
+    	records->push_back(rec);
+
+    	responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(records), true);
+
+#if SHOW_DB_ACCESS_PERF == 1
+        LOG_DEBUG("DBSMSGetLastRecord time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+
+    	break;
+    }
         /**
          * Thread records
          */
@@ -401,9 +434,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
         if (ret == true)
         {
-            auto notificationMessage = std::make_shared<DBNotificationMessage>(MessageType::DBAlarmUpdateNotification);
-            notificationMessage->notificationType = DBNotificatonType::Updated;
-            sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDatabaseAlarmNotifications, this);
+            auto notificationMessage =
+                std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificatonType::Updated, DB::BaseType::AlarmDB);
+            notificationMessage->notificationType = DB::NotificatonType::Added;
+            sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
         }
     }
     break;

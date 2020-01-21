@@ -13,18 +13,34 @@
 #include "Service/Message.hpp"
 #include <memory>
 
-enum class DBNotificatonType
+namespace DB{
+enum class NotificatonType
 {
-    Updated
+    Updated,
+	Added,
+	Removed
 };
-
+enum class BaseType
+{
+	AlarmDB,
+	CalllogDB,
+	ContacstDB,
+	NotesDB,
+	SettingsDB,
+	SmsDB
+};
+}
 class DBNotificationMessage : public sys::DataMessage
 {
-  public:
-    DBNotificationMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)){};
-    virtual ~DBNotificationMessage(){};
+public:
+	DBNotificationMessage(MessageType messageType, DB::NotificatonType notificationType,
+			DB::BaseType baseType) :
+			sys::DataMessage(static_cast<uint32_t>(messageType)),
+			notificationType(notificationType), baseType(baseType) {};
+	virtual ~DBNotificationMessage() {};
 
-    DBNotificatonType notificationType;
+	DB::NotificatonType notificationType;
+	DB::BaseType baseType;
 };
 
 class DBNotificationResponseMessage : public sys::ResponseMessage

@@ -27,7 +27,6 @@ namespace app {
 
 ApplicationSettings::ApplicationSettings(std::string name, std::string parent, bool startBackgound) :
 	Application( name, parent, startBackgound ) {
-	busChannels.push_back(sys::BusChannels::ServiceCellularSMSNotification);
 }
 
 ApplicationSettings::~ApplicationSettings() {
