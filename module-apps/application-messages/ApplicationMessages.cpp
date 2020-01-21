@@ -22,10 +22,9 @@
 
 namespace app {
 
-ApplicationMessages::ApplicationMessages(std::string name, std::string parent,
-		bool startBackgound) :
-		Application(name, parent, startBackgound, 4096) {
-}
+    ApplicationMessages::ApplicationMessages(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 4096 + 2048)
+    {
+    }
 
 ApplicationMessages::~ApplicationMessages() {
 }
