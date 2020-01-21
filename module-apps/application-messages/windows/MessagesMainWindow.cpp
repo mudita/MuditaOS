@@ -171,14 +171,14 @@ bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
                     LOG_ERROR("Something went horribly wrong");
                     return false;
                 }
-                if (app->threadOptionsWindow != nullptr)
+                if (app->windowOptions != nullptr)
                 {
-                    app->threadOptionsWindow->clearOptions();
+                    app->windowOptions->clearOptions();
                     auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
                     if (it)
                     {
-                        app->threadOptionsWindow->addOptions(threadWindowOptions(app, it->getThreadItem().get()));
-                        app->switchWindow(gui::name::window::thread_options, nullptr);
+                        app->windowOptions->addOptions(threadWindowOptions(app, it->getThreadItem().get()));
+                        app->switchWindow(app->windowOptions->getName(), nullptr);
                     }
                     else
                     {

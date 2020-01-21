@@ -34,8 +34,7 @@ public:
 			std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationMessages();
 
-    gui::OptionWindow *threadOptionsWindow = nullptr;
-    gui::OptionWindow *messageOptionWindow = nullptr;
+    gui::OptionWindow *windowOptions = nullptr;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,
 			sys::ResponseMessage *resp) override;

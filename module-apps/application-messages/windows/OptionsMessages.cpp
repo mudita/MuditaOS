@@ -15,6 +15,11 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     auto box = new gui::HBox(nullptr, offset, 0, style::window_width - 2 * offset, label::big_h);
     box->setPenWidth(0);
     box->setPenFocusWidth(0);
+    // items cant be bound to any Alignment
+    // This should be fixed with:
+    // * Time when UX design will provide us with design guide which is in progress and should be done shortly
+    // * additon of alignment to elements (so that Layouts could position them properly)
+    // right now it's added as it is, trying to conform with window which UX was being changed while it was written
     auto l = new gui::Label(box, 0, 0, style::window_width - 3 * wlabel - 2 * offset - 1, label::big_h);
     decorate(l);
     l->setText(contact.primaryName);
@@ -25,6 +30,7 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
         decorate(phone);
         // does nothing for image :|
         phone->setAlignement({gui::Alignment::ALIGN_HORIZONTAL_CENTER | gui::Alignment::ALIGN_VERTICAL_CENTER});
+        // please read comment above - this is alignment done by hand
         new gui::Image(phone, 12, 12, 50, label::big_h, icon);
         phone->activatedCallback = foo;
     };

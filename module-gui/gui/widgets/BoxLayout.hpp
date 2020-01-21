@@ -74,11 +74,8 @@ namespace gui {
         void setVisible(bool value, bool previous);
         void setReverseOrder(bool reverse_order)
         {
-            if (this->reverse_order != reverse_order)
-            {
-                this->reverse_order = reverse_order;
-                resizeItems();
-            }
+            this->reverse_order = reverse_order;
+            resizeItems();
         }
     };
 
