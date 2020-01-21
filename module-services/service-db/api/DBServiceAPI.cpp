@@ -55,7 +55,7 @@ bool DBServiceAPI::SettingsUpdate(sys::Service *serv, const SettingsRecord &rec)
     }
 }
 
-bool DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
+uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSAdd, rec);
 
@@ -63,11 +63,11 @@ bool DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true))
     {
-        return true;
+        return (*smsResponse->records)[0].dbID;
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 
@@ -101,6 +101,24 @@ bool DBServiceAPI::SMSUpdate(sys::Service *serv, const SMSRecord &rec)
     else
     {
         return false;
+    }
+}
+
+SMSRecord DBServiceAPI::SMSGetLastRecord(sys::Service *serv)
+{
+    std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSGetLastRecord);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true))
+    {
+        return (*smsResponse->records)[0];
+    }
+    else
+    {
+        SMSRecord rec;
+        rec.dbID = 0;
+        return rec;
     }
 }
 

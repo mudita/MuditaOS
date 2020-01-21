@@ -22,7 +22,6 @@ public:
     static bool DialNumber(sys::Service* serv,const std::string& number);
     static bool AnswerIncomingCall(sys::Service* serv);
     static bool HangupCall(sys::Service* serv);
-    static bool SendSMS(sys::Service* Serv, UTF8 number, UTF8 message);
 };
 
 

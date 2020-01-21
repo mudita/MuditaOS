@@ -30,6 +30,8 @@
 #include <Style.hpp>
 #include <log/log.hpp>
 
+#include "time/time_conversion.hpp"
+
 namespace gui {
 
     MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window), threadModel{new ThreadModel(app)}
@@ -78,7 +80,6 @@ void MessagesMainWindow::buildInterface() {
 	searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
 //	setFocusItem( list );
-
 }
 void MessagesMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();

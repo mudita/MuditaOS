@@ -34,11 +34,23 @@ class DBServiceAPI
     static SettingsRecord SettingsGet(sys::Service *serv);
     static bool SettingsUpdate(sys::Service *serv, const SettingsRecord &rec);
 
-    static bool SMSAdd(sys::Service *serv, const SMSRecord &rec);
+    /**
+     * @brief Function is adding new SMS to SMSDB.
+     * @param serv Pointer to Service based object that is sending request.
+     * @param rec Record to add.
+     * @return dbID of added record.
+     */
+    static uint32_t SMSAdd(sys::Service *serv, const SMSRecord &rec);
     static bool SMSRemove(sys::Service *serv, uint32_t id);
     static bool SMSUpdate(sys::Service *serv, const SMSRecord &rec);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffsetByThreadID(sys::Service *serv, uint32_t offset, uint32_t limit, uint32_t id);
+    /**
+     * @brief Function is getting last modified SMS record.
+     * @param serv Pointer to Service based object that is sending request.
+     * @return record.
+     */
+    static SMSRecord SMSGetLastRecord(sys::Service *serv);
 
     static std::unique_ptr<ThreadRecord> ThreadGet(sys::Service *serv, uint32_t id);
     static std::unique_ptr<ThreadRecord> ThreadGetByContact(sys::Service *serv, uint32_t contactID);
