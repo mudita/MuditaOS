@@ -49,7 +49,6 @@ class vfs vfs;
 
 class BlinkyService : public sys::Service {
 
-
 public:
     BlinkyService(const std::string &name)
             : sys::Service(name) {
@@ -142,6 +141,7 @@ int main() {
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]()->int{
+
 
         vfs.Init();
 

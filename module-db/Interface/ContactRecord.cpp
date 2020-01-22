@@ -41,11 +41,14 @@ ContactRecordInterface::~ContactRecordInterface()
 bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
 
-    bool ret = contactDB->contacts.Add(ContactsTableRow{.type = rec.contactType,
+    bool ret = contactDB->contacts.Add(ContactsTableRow{
+
+    													.type = rec.contactType,
                                                         .isOnWhitelist = rec.isOnBlacklist,
                                                         .isOnBlacklist = rec.isOnBlacklist,
                                                         .isOnFavourites = rec.isOnFavourites,
-                                                        .speedDial = rec.speeddial});
+                                                        .speedDial = rec.speeddial,
+														.namePrimary = rec.primaryName});
 
     if (!ret)
     {

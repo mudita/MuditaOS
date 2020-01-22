@@ -118,8 +118,8 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
                 else {
 					LOG_INFO("++++++++++++APP SWITCH");
 
-					sapm::ApplicationManager::messageSwitchApplication( this, "ApplicationCall", "CallWindow", std::move(data) );
-				}
+                    sapm::ApplicationManager::messageSwitchApplication(this, name_call, "CallWindow", std::move(data));
+                }
 			}
 		}
 		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
@@ -169,18 +169,23 @@ void ApplicationCall::stopCallTimer() {
 }
 
 bool ApplicationCall::messageSwitchToCall( sys::Service* sender, const UTF8& e164number, bool call ) {
-	std::string application = "ApplicationCall";
-	std::string window = "CallWindow";
+    std::string window = "EnterNumberWindow";
 
-	std::unique_ptr<ExecuteCallData> data = std::make_unique<ExecuteCallData>(e164number.c_str());
+    std::unique_ptr<CallSwitchData> data;
 
-	//it is possible to prepare call window and wait for user's acceptance
-	if( call )
-		data->setDescription("call"); //execute call
-	else
-		data->setDescription("prepare"); //TODO prepare call and wait for user's action
+    // it is possible to prepare call window and wait for user's acceptance
+    if (call)
+    {
+        // execute call
+        data = std::make_unique<ExecuteCallData>(e164number.c_str());
+    }
+    else
+    {
+        // prepare call and wait for user's action
+        data = std::make_unique<EnterNumberData>(e164number.c_str());
+    }
 
-	return sapm::ApplicationManager::messageSwitchApplication( sender, application, window, std::move(data));
+    return sapm::ApplicationManager::messageSwitchApplication(sender, name_call, window, std::move(data));
 }
 
 void ApplicationCall::createUserInterface() {
