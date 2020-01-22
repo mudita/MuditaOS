@@ -178,15 +178,39 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
 		return false;
 	}
 
-	app::CallSwitchData *numberData = dynamic_cast<app::EnterNumberData*>(data);
-	if(numberData!=nullptr)
-	{
-		setNumberLabel(numberData->getPhoneNumber());
-		return true;
-	}
-	LOG_ERROR("Unsupported SwitchData");
+    app::CallSwitchData *callData = dynamic_cast<app::CallSwitchData *>(data);
+    if (callData != nullptr)
+    {
+        std::string num = callData->getPhoneNumber();
+        setNumberLabel(num);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+        switch (callData->getType())
+        {
+        case app::CallSwitchData::Type::EXECUTE_CALL: {
+            LOG_INFO("number: [%s]", num.c_str());
+            auto ret = CellularServiceAPI::DialNumber(application, num.c_str());
+            LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+            return true;
+        }
 
-	return false;
+        case app::CallSwitchData::Type::ENTER_NUMBER: {
+            return true;
+        }
+        break;
+
+        default: {
+            LOG_ERROR("Unhandled callData type");
+            return false;
+        }
+        }
+    }
+    else
+    {
+        LOG_ERROR("Unrecognized SwitchData");
+        return false;
+    }
+
+    return false;
 }
 
 } /* namespace gui */

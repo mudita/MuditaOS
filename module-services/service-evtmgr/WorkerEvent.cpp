@@ -23,10 +23,12 @@ extern "C" {
 #include "EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 
-#include "bsp/keyboard/keyboard.hpp"
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
 
+#include "bsp/harness/bsp_harness.hpp"
+#include "harness/Parser.hpp"
 
 bool WorkerEvent::handleMessage( uint32_t queueID ) {
 
@@ -102,8 +104,44 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 		sys::Bus::SendUnicast(message, "EventManager", this->service);
 	}
 
-	return true;
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHarness))
+    {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE)
+        {
+            return false;
+        }
+        if (notification == STX)
+        {
+            if (bsp::harness::flush() != true)
+            {
+                LOG_ERROR("processing in progres...");
+            }
+        }
+        else if (notification == ETX)
+        {
+            std::string text = bsp::harness::read();
+            auto ret = harness::parse(text);
+            if (ret.first == harness::Error::Success)
+            {
+                // LOG_INFO("EVENT! %x: %s", notification, text.c_str());
+                sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
+            }
+            else
+            {
+                LOG_ERROR("Harness parser error: %d", ret.first);
+            }
+        }
+        else
+        {
+            LOG_ERROR("Unknown event!");
+        }
+    }
+
+    return true;
 }
+
+#include "harness/events/SysStart.hpp"
 
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
@@ -112,11 +150,13 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
+    bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
 
-	time_t timestamp;
+    time_t timestamp;
 	bsp::rtc_GetCurrentTimestamp(&timestamp);
 	bsp::rtc_SetMinuteAlarm(timestamp);
-	return true;
+    bsp::harness::emit(harness::SysStart().encode());
+    return true;
 }
 
 bool WorkerEvent::deinit(void)

@@ -20,6 +20,10 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 
+#include "bsp/harness/bsp_harness.hpp"
+#include "harness/Parser.hpp"
+#include "harness/events/FocusApp.hpp"
+
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
 {
@@ -88,8 +92,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 			targetApplication = msg->getApplication();
 			handled = true;
 			LOG_INFO("Switching focus to %s", targetApplication.c_str());
-		}
-	}
+            bsp::harness::emit(harness::FocusApp(targetApplication).encode());
+        }
+    }
 	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
@@ -138,9 +143,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		//HandleAlarmTrigger(msgl);
 
 		handled = true;
-	}
+    }
 
-	if( handled )
+    if( handled )
 		return std::make_shared<sys::ResponseMessage>();
 	else
 		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
@@ -184,14 +189,17 @@ sys::ReturnCodes EventManager::InitHandler() {
 	sys::WorkerQueueInfo qBattery = {"qBattery", sizeof(uint8_t), 10 };
 	//RTC irq queue
 	sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20 };
+    // test harness queue
+    sys::WorkerQueueInfo qHarness = {"qHarness", sizeof(uint8_t), 3};
 
-	std::list<sys::WorkerQueueInfo> list;
+    std::list<sys::WorkerQueueInfo> list;
 
 	list.push_back(qIrq);
 	list.push_back(qBattery);
 	list.push_back(qRTC);
+    list.push_back(qHarness);
 
-	EventWorker->init( list );
+    EventWorker->init( list );
 	EventWorker->run();
 
 	std::vector<xQueueHandle> set = EventWorker->getQueues();
