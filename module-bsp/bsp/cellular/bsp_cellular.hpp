@@ -61,4 +61,18 @@ namespace bsp {
 }
 
 
+#include <FreeRTOS.h>
+#include <FreeRTOS/include/queue.h>
+namespace bsp {
+    namespace cellular {
+        void Init(xQueueHandle qHandle);
+        BaseType_t SimCard1InsertionEjectionIrqHandler();
+        BaseType_t SimCard2InsertionEjectionIrqHandler();
+        // read sim - 1 inserted, 0 removed, update GSM::Store
+        int SIM1_Read();
+        // read sim - 1 inserted, 0 removed, update GSM::Store
+        int SIM2_Read();
+    };
+};
+
 #endif //PUREPHONE_BSP_CELLULAR_HPP

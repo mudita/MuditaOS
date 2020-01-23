@@ -16,6 +16,7 @@
 
 #include "dma_config.h"
 #include "fsl_cache.h"
+#include <common_data/EventStore.hpp>
 #include <map>
 
 extern "C" {
@@ -68,6 +69,10 @@ namespace bsp {
     RT1051Cellular::RT1051Cellular() {
 
         MSPInit();
+        /// to set Store::GSM sim state and to log debug
+        int sim1 = bsp::cellular::SIM1_Read();
+        int sim2 = bsp::cellular::SIM2_Read();
+        LOG_DEBUG("SIM: %d %d", sim1, sim2);
         DMAInit();
 
         uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, rxStreamBufferNotifyWatermark);
@@ -124,7 +129,6 @@ namespace bsp {
         NVIC_EnableIRQ(LPUART1_IRQn);
 
         EnableRx();
-
         isInitialized = true;
     }
 
@@ -383,9 +387,8 @@ namespace bsp {
                 .defLogic = 0,
                 .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN)});
 
-
-/*        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
-        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN);*/
+        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
+        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN);
     }
 
     void RT1051Cellular::MSPDeinit() {
@@ -440,3 +443,59 @@ namespace bsp {
     bool RT1051Cellular::GetSendingAllowed() { return pv_SendingAllowed; }
 
 }
+
+namespace bsp
+{
+    namespace cellular
+    {
+
+        xQueueHandle handleSIM = nullptr;
+
+        /// consider wakin up xHigherPrio... from simInjection for EventManager
+        void Init(xQueueHandle qHandle)
+        {
+            handleSIM = qHandle;
+        }
+
+        BaseType_t SimCard1InsertionEjectionIrqHandler()
+        {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            uint8_t val = (uint8_t)Store::GSM::Tray::SIM1;
+            if (handleSIM)
+                xQueueSendFromISR(handleSIM, &val, &xHigherPriorityTaskWoken);
+            return xHigherPriorityTaskWoken;
+        }
+
+        BaseType_t SimCard2InsertionEjectionIrqHandler()
+        {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            uint8_t val = (uint8_t)Store::GSM::Tray::SIM2;
+            if (handleSIM)
+                xQueueSendFromISR(handleSIM, &val, &xHigherPriorityTaskWoken);
+            return xHigherPriorityTaskWoken;
+        }
+
+        int SIM1_Read()
+        {
+            int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
+            LOG_DEBUG("-> SIM1 %d", val);
+            if (val == 0)
+                Store::GSM::get()->tray.set((uint8_t)Store::GSM::Tray::SIM1);
+            else
+                Store::GSM::get()->tray.reset((uint8_t)Store::GSM::Tray::SIM1);
+            // sim have inverted logic
+            return val == 0;
+        };
+
+        int SIM2_Read()
+        {
+            int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN);
+            LOG_DEBUG("-> SIM2 %d", val);
+            if (val == 0)
+                Store::GSM::get()->tray.set((uint8_t)Store::GSM::Tray::SIM2);
+            else
+                Store::GSM::get()->tray.reset((uint8_t)Store::GSM::Tray::SIM2);
+            return val == 0;
+        }
+    }; // namespace cellular
+};     // namespace bsp

@@ -90,6 +90,12 @@ void TopBar::prepareWidget() {
     charging->setText("Z");
     charging->setVisible(false);
 
+    sim = new Label(this, signalOffset + 50, 17, 110, this->drawArea.h);
+    sim->setFilled(false);
+    sim->setBorderColor(gui::ColorNoColor);
+    sim->setFont(style::header::font::title);
+    simSet(Store::GSM::get()->tray);
+
     //icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
 
@@ -128,6 +134,7 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 				timeLabel->setVisible(false);
 		} break;
 		case Elements::SIGNAL: {
+            simSet(Store::GSM::get()->tray);
             for (uint32_t i = 0; i < signalImgCount; ++i)
                 signal[i]->setVisible(false);
 			if( active )
@@ -230,6 +237,39 @@ std::list<DrawCommand*> TopBar::buildDrawList() {
 	setTime( time, (timeMode == TimeMode::TIME_24H )?true:false );
 
 	return Rect::buildDrawList();
+}
+
+void TopBar::simSet(const std::bitset<4> &tray)
+{
+    if (!sim)
+    {
+        return;
+    }
+    else
+    {
+        bool set = false;
+        std::string text = "SIM:";
+        if (tray[(uint8_t)Store::GSM::Tray::SIM1])
+        {
+            text += " 1";
+            set = true;
+        }
+        if (tray[(uint8_t)Store::GSM::Tray::SIM2])
+        {
+            text += " 2";
+            set = true;
+        }
+        if (!set)
+        {
+            text += " x";
+        }
+        sim->setText(text);
+    }
+}
+
+void TopBar::simSet()
+{
+    simSet(Store::GSM::get()->tray);
 }
 
 } /* namespace gui */

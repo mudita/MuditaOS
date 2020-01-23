@@ -69,6 +69,12 @@ bool AppWindow::batteryCharging(bool charging)
     return true;
 }
 
+bool AppWindow::setSIM()
+{
+    topBar->simSet();
+    return true;
+}
+
 //updates battery level in the window
 bool AppWindow::updateBatteryLevel( uint32_t percentage ) {
 	//get old value of battery level, calcualte new level and comapre both

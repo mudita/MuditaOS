@@ -112,6 +112,16 @@ public:
 	}
 	uint32_t timestamp = 0;
 };
+
+class SIMMessage : public sys::DataMessage
+{
+  public:
+    SIMMessage() : DataMessage(uint32_t(MessageType::SIMTrayEvent))
+    {
+        type = Type::Data;
+    }
+};
+
 /*
  * @brief Template for all messages that go to application manager
  */

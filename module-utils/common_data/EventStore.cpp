@@ -16,4 +16,15 @@ namespace Store
         return battery;
     }
 
+    GSM *GSM::ptr = nullptr;
+
+    GSM *GSM::get()
+    {
+        if (!ptr)
+        {
+            ptr = new GSM();
+        }
+        return ptr;
+    }
+
 }; // namespace Store

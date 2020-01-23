@@ -159,6 +159,7 @@ void Application::render( gui::RefreshModes mode ) {
         {
             currwin->updateBatteryLevel(Store::Battery::get().level);
         }
+        currwin->setSIM();
 
         std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
 
@@ -428,9 +429,14 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
         render( msg->getMode() );
 		handled = true;
 	}
+    else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr)
+    {
+        getCurrentWindow()->setSIM();
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
 
-	if( handled)
-		return std::make_shared<sys::ResponseMessage>();
+    if (handled)
+        return std::make_shared<sys::ResponseMessage>();
 	else
 		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
