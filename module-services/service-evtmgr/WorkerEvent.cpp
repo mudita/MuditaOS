@@ -24,6 +24,7 @@ extern "C" {
 #include "service-evtmgr/messages/EVMessages.hpp"
 
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
 
@@ -133,6 +134,19 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         }
     }
 
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueSIM))
+    {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE)
+        {
+            return false;
+        }
+        int sim = bsp::cellular::SIMTrayStatus();
+        LOG_DEBUG("SIM state change: %d", sim);
+        auto message = std::make_shared<sevm::SIMMessage>();
+        sys::Bus::SendUnicast(message, "EventManager", this->service);
+    }
+
     return true;
 }
 
@@ -146,6 +160,7 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
+    bsp::cellular::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueSIM)]);
 
     time_t timestamp;
 	bsp::rtc_GetCurrentTimestamp(&timestamp);
