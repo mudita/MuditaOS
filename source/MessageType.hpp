@@ -152,6 +152,7 @@ enum class MessageType
 
     LwIP_request,
     EVM_GPIO,
+    SIMTrayEvent,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

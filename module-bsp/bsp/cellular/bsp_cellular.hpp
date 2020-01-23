@@ -61,4 +61,15 @@ namespace bsp {
 }
 
 
+#include <FreeRTOS.h>
+#include <FreeRTOS/include/queue.h>
+namespace bsp {
+    namespace cellular {
+        void Init(xQueueHandle qHandle);
+        BaseType_t SimIOHandler();
+        // read simtray status
+        int SIMTrayStatus();
+    };
+};
+
 #endif //PUREPHONE_BSP_CELLULAR_HPP

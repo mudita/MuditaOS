@@ -9,9 +9,10 @@
 #ifndef MODULE_GUI_GUI_WIDGETS_TOPBAR_HPP_
 #define MODULE_GUI_GUI_WIDGETS_TOPBAR_HPP_
 
-#include "Rect.hpp"
-#include "Label.hpp"
 #include "Image.hpp"
+#include "Label.hpp"
+#include "Rect.hpp"
+#include <common_data/EventStore.hpp>
 
 namespace gui {
 
@@ -45,6 +46,8 @@ namespace gui {
         Image *lock;
         std::array<Image *, batteryLevelCount> battery = {nullptr};
         Label *charging = nullptr;
+        Label *sim = nullptr;
+        void simSet(const std::bitset<4> &tray);
         void prepareWidget();
         static TimeMode timeMode;
 
@@ -82,6 +85,7 @@ namespace gui {
             return signalStrength;
         };
 
+        void simSet();
         void setTime(const UTF8 &time);
         void setTime(const uint32_t &time, bool mode24H);
         UTF8 getTimeString();
