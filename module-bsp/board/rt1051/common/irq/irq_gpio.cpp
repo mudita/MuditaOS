@@ -82,11 +82,7 @@ namespace bsp {
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN)) {
-                // xHigherPriorityTaskWoken |= bsp::cellular::SimCard1InsertionEjectionIrqHandler();
-            }
-
-            if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::cellular::SimCard2InsertionEjectionIrqHandler();
+                xHigherPriorityTaskWoken |= bsp::cellular::SimIOHandler();
             }
 
             // Clear all IRQs

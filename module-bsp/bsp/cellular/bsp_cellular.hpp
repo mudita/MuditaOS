@@ -66,12 +66,9 @@ namespace bsp {
 namespace bsp {
     namespace cellular {
         void Init(xQueueHandle qHandle);
-        BaseType_t SimCard1InsertionEjectionIrqHandler();
-        BaseType_t SimCard2InsertionEjectionIrqHandler();
-        // read sim - 1 inserted, 0 removed, update GSM::Store
-        int SIM1_Read();
-        // read sim - 1 inserted, 0 removed, update GSM::Store
-        int SIM2_Read();
+        BaseType_t SimIOHandler();
+        // read simtray status
+        int SIMTrayStatus();
     };
 };
 

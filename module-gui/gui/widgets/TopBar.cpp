@@ -248,22 +248,14 @@ void TopBar::simSet(const std::bitset<4> &tray)
     else
     {
         bool set = false;
-        std::string text = "SIM:";
         if (tray[(uint8_t)Store::GSM::Tray::SIM1])
         {
-            text += " 1";
-            set = true;
+            sim->setText("o");
         }
-        if (tray[(uint8_t)Store::GSM::Tray::SIM2])
+        else
         {
-            text += " 2";
-            set = true;
+            sim->setText("x");
         }
-        if (!set)
-        {
-            text += " x";
-        }
-        sim->setText(text);
     }
 }
 

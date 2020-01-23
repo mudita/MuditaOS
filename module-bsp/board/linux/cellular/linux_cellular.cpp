@@ -203,21 +203,9 @@ namespace bsp {
         void Init(xQueueHandle qHandle)
         {
         }
-        BaseType_t SimCard1InsertionEjectionIrqHandler()
+        int SIMTrayStatus()
         {
-            return 0;
-        }
-        BaseType_t SimCard2InsertionEjectionIrqHandler()
-        {
-            return 0;
-        }
-        int SIM1_Read()
-        {
-            return 0;
-        }
-        int SIM2_Read()
-        {
-            return 0;
+            return 1;
         }
     }; // namespace cellular
 }

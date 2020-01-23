@@ -146,9 +146,8 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         {
             return false;
         }
-        int sim1 = bsp::cellular::SIM1_Read();
-        int sim2 = bsp::cellular::SIM2_Read();
-        LOG_DEBUG("SIM state change: s1: %d, s2: %d notification: %d", sim1, sim2, notification);
+        int sim = bsp::cellular::SIMTrayStatus();
+        LOG_DEBUG("SIM state change: %d", sim);
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, "EventManager", this->service);
     }
