@@ -17,6 +17,7 @@
 #include "../pit/pit.hpp"
 #include "dma_config.h"
 #include "fsl_cache.h"
+#include <common_data/EventStore.hpp>
 #include <map>
 
 void foo()
@@ -73,6 +74,9 @@ namespace bsp {
         bsp::pit::init(nullptr);
 
         MSPInit();
+        /// to set Store::GSM sim state and to log debug
+        int sim = bsp::cellular::SIMTrayStatus();
+        LOG_DEBUG("SIM: %d %d", sim);
         DMAInit();
 
         uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, rxStreamBufferNotifyWatermark);
@@ -105,7 +109,6 @@ namespace bsp {
         NVIC_EnableIRQ(LPUART1_IRQn);
 
         EnableRx();
-
         isInitialized = true;
     }
 
@@ -280,14 +283,12 @@ namespace bsp {
         gpio_3 = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::CELLULAR_GPIO_3), DriverGPIOParams{});
 
         gpio_2->ClearPortInterrupts(
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN) |
                 1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
                 1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
                 1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
         );
 
         gpio_2->DisableInterrupt(
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN) |
                 1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
                 1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
                 1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
@@ -309,11 +310,6 @@ namespace bsp {
                 .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
                 .defLogic = 1,
                 .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN)});
-
-        gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Input,
-                .irqMode=DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
-                .defLogic = 1,
-                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN)});
 
         // OUTPUTS
 
@@ -359,13 +355,10 @@ namespace bsp {
                 .defLogic = 0,
                 .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_3_DTR_PIN)});
 
-
-/*        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
-        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN);*/
+        GPIO_PortEnableInterrupts(BSP_CELLULAR_SIM_CARD_1_INSERTED_PORT, 1U << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
     }
 
     void RT1051Cellular::MSPDeinit() {
-        gpio_2->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_2_INSERTED_PIN));
         gpio_2->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN));
         gpio_2->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN));
         gpio_1->DisableInterrupt(1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN));
@@ -409,3 +402,38 @@ namespace bsp {
     bool RT1051Cellular::GetSendingAllowed() { return pv_SendingAllowed; }
 
 }
+
+namespace bsp
+{
+    namespace cellular
+    {
+
+        xQueueHandle handleSIM = nullptr;
+
+        /// consider wakin up xHigherPrio... from simInjection for EventManager
+        void Init(xQueueHandle qHandle)
+        {
+            handleSIM = qHandle;
+        }
+
+        BaseType_t SimIOHandler()
+        {
+            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+            uint8_t val = (uint8_t)Store::GSM::Tray::SIM1;
+            if (handleSIM)
+                xQueueSendFromISR(handleSIM, &val, &xHigherPriorityTaskWoken);
+            return xHigherPriorityTaskWoken;
+        }
+
+        int SIMTrayStatus()
+        {
+            int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
+            if (val == 0)
+                Store::GSM::get()->tray.set((uint8_t)Store::GSM::Tray::SIM1);
+            else
+                Store::GSM::get()->tray.reset((uint8_t)Store::GSM::Tray::SIM1);
+            // sim have inverted logic
+            return val == 0;
+        };
+    }; // namespace cellular
+};     // namespace bsp

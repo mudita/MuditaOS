@@ -14,15 +14,16 @@
 #include <iostream>
 #include <algorithm>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <time.h>
-#include <ticks.hpp>
 #include "log/log.hpp"
 #include "mutex.hpp"
+#include <common_data/EventStore.hpp>
+#include <fcntl.h>
 #include <map>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <ticks.hpp>
+#include <time.h>
+#include <unistd.h>
 
 #define _LINUX_UART_DEBUG   0
 
@@ -197,4 +198,14 @@ namespace bsp {
         ioctl(fd, TIOCMBIS, &status);
     }
 
+    namespace cellular
+    {
+        void Init(xQueueHandle qHandle)
+        {
+        }
+        int SIMTrayStatus()
+        {
+            return 1;
+        }
+    }; // namespace cellular
 }

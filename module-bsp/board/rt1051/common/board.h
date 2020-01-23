@@ -188,10 +188,6 @@
 #define BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN                 11
 #define BSP_CELLULAR_SIM_CARD_1_INSERTED_PAD                 GPIO_B0_11
 
-#define BSP_CELLULAR_SIM_CARD_2_INSERTED_PORT                GPIO2
-#define BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN                 10
-#define BSP_CELLULAR_SIM_CARD_2_INSERTED_PAD                 GPIO_B0_10
-
 #define BSP_CELLULAR_SIM_CARD_PRESENCE_PORT                  GPIO2
 #define BSP_CELLULAR_SIM_CARD_PRESENCE_PIN                   9
 #define BSP_CELLULAR_SIM_CARD_PRESENCE_PAD                   GPIO_B0_09

@@ -14,8 +14,9 @@
 #include "queue.h"
 #include "fsl_common.h"
 
-#include "bsp/keyboard/keyboard.hpp"
 #include "bsp/battery-charger/battery_charger.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
+#include "bsp/keyboard/keyboard.hpp"
 
 #include "board/rt1051/bsp/eink/bsp_eink.h"
 
@@ -81,11 +82,7 @@ namespace bsp {
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN)) {
-                //TODO:M.P BSP_CellularSimCard1InsertionEjectionIrqHandler(&xHigherPriorityTaskWoken);
-            }
-
-            if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_2_INSERTED_PIN)) {
-                //TODO:M.P BSP_CellularSimCard2InsertionEjectionIrqHandler(&xHigherPriorityTaskWoken);
+                xHigherPriorityTaskWoken |= bsp::cellular::SimIOHandler();
             }
 
             // Clear all IRQs

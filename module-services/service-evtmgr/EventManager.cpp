@@ -155,6 +155,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 
 		handled = true;
     }
+    else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr)
+    {
+        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
+    }
 
     if( handled )
 		return std::make_shared<sys::ResponseMessage>();
@@ -202,6 +206,8 @@ sys::ReturnCodes EventManager::InitHandler() {
 	sys::WorkerQueueInfo qRTC = {"qRTC", sizeof(uint8_t), 20 };
     // test harness queue
     sys::WorkerQueueInfo qHarness = {"qHarness", sizeof(uint8_t), 3};
+    // sim tray queue
+    sys::WorkerQueueInfo qSIM = {"qSIM", sizeof(uint8_t), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -209,6 +215,7 @@ sys::ReturnCodes EventManager::InitHandler() {
 	list.push_back(qBattery);
 	list.push_back(qRTC);
     list.push_back(qHarness);
+    list.push_back(qSIM);
 
     EventWorker->init( list );
 	EventWorker->run();
