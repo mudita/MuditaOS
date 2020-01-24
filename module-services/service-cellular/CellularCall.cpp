@@ -5,18 +5,18 @@
 
 namespace ModemCall
 {
-
     ModemCall::ModemCall(const std::string str)
     {
         const std::string prefix = "+CLCC: ";
         std::string callEntry = str;
+
         // Check for a valid prefix
         if (callEntry.rfind(prefix, 0) != 0)
         {
             LOG_ERROR("no valid prefix");
             LOG_ERROR("callEntry %s", callEntry.c_str());
 
-            throw 20; // TODO: alek: add proper exceptions
+            throw std::runtime_error("No valid prefix");
         }
         else
         {
@@ -30,7 +30,8 @@ namespace ModemCall
         if (numberOfTokens != 7 && numberOfTokens != 8)
         {
             LOG_ERROR("wrong number of tokens %u", numberOfTokens);
-            throw 20;
+            throw std::runtime_error("No valid prefix");
+            ;
         }
         // TODO: alek: add paramters validation
         idx = std::stoul(tokens[0]);

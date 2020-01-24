@@ -358,7 +358,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             catch (const std::exception &e)
             {
-                LOG_ERROR("exception %s was thrown", e.what());
+                LOG_ERROR("exception \"%s\" was thrown", e.what());
                 assert(0);
                 retVal = false;
             }
@@ -415,9 +415,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
 
 	case MessageType::CellularDialNumber: {
-		CellularRequestMessage *msg =
-				reinterpret_cast<CellularRequestMessage*>(msgl);
-		auto channel = cmux->GetChannel("Commands");
+        CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
+        auto channel = cmux->GetChannel("Commands");
 		if (channel) {
 			auto ret = channel->SendCommandResponse(
 					("ATD" + msg->data + ";\r").c_str(), 1, 5000);
