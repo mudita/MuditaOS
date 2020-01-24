@@ -8,6 +8,13 @@
  */
 #include "CalllogRecord.hpp"
 #include "../Tables/CalllogTable.hpp"
+#include <log/log.hpp>
+
+void printCalllogRecord(const CalllogRecord &rec)
+{
+    LOG_DEBUG("<id> %u, <number> %s, <presentation> %u, <date> %u, <duartion> %u, <type> %u, <name> %s, <contactID> %s", rec.id, rec.number.c_str(),
+              rec.presentation, static_cast<uint32_t>(rec.date), static_cast<uint32_t>(rec.duration), rec.type, rec.name.c_str(), rec.contactId.c_str());
+}
 
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(calllogDb) {
 }
@@ -70,18 +77,14 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec) {
         return false;
     }
 
-    calllogDB->calls.Update(CalllogTableRow{
-        .id=rec.id, 
-        .number=rec.number,
-        .presentation=rec.presentation,
-        .date=rec.date,
-        .duration=rec.duration,
-        .type=rec.type,
-        .name=rec.name,
-        .contactId=rec.contactId
-    });
-
-    return true;
+    return calllogDB->calls.Update(CalllogTableRow{.id = rec.id,
+                                                   .number = rec.number,
+                                                   .presentation = rec.presentation,
+                                                   .date = rec.date,
+                                                   .duration = rec.duration,
+                                                   .type = rec.type,
+                                                   .name = rec.name,
+                                                   .contactId = rec.contactId});
 }
 
 bool CalllogRecordInterface::RemoveByID(uint32_t id) {
@@ -91,11 +94,7 @@ bool CalllogRecordInterface::RemoveByID(uint32_t id) {
         return false;
     }
 
-    if(calllogDB->calls.RemoveByID(id) == false){
-        return false;
-    }
-
-    return true;
+    return calllogDB->calls.RemoveByID(id);
 }
 
 bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char *str) {

@@ -210,6 +210,33 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::CallBusy: {
                 stopTimer(callDurationTimerId);
                 stopTimer(callStateTimerId);
+                if (activeCellularCall.isActive())
+                {
+                    activeCellularCall.setDuration(callDuration);
+                }
+                else
+                {
+                    auto callType = activeCellularCall.getType();
+                    switch (callType)
+                    {
+                    case CallType::CT_INCOMING: {
+                        activeCellularCall.setType(CallType::CT_REJECTED);
+                    }
+                    break;
+
+                    case CallType::CT_OUTGOING: {
+                        activeCellularCall.setType(CallType::CT_MISSED);
+                    }
+                    break;
+
+                    default:
+                        LOG_ERROR("Not valid call type %d", callType);
+                    }
+                }
+                if (!DBServiceAPI::CalllogUpdate(this, activeCellularCall.getCallRecord()))
+                {
+                    LOG_ERROR("CalllogUpdate failed, id %d", activeCellularCall.getCallRecord().id);
+                }
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
@@ -340,6 +367,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         // this should be acceptable and hence warning instead of error is logged in such case
         if (cmux->CheckATCommandResponse(ret, numberOfExpectedTokens, LOGWARN))
         {
+            // TODO: alek: added case when more status calls is returned
+            // TODO: alek: add cellular call validation and check it with modemcall
             bool retVal = true;
             auto callEntry = ret[1];
 
@@ -350,6 +379,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
                 if (call.state == ModemCall::CallState::Active)
                 {
+                    activeCellularCall.setActive();
                     auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
                     sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
                     stopTimer(callStateTimerId);

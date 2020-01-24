@@ -72,11 +72,12 @@ namespace CellularCall
     class CellularCall
     {
         CalllogRecord call;
+        bool isActiveCall = false;
 
       public:
         CellularCall() = default;
         ~CellularCall() = default;
-        CellularCall(const UTF8 &number, CallType type = CallType::CT_NONE, time_t date = 0, time_t duration = 0)
+        CellularCall(const UTF8 &number, const CallType type = CallType::CT_NONE, const time_t date = 0, const time_t duration = 0)
         {
             this->call.id = 0; // 0 - Invalid
             this->call.number = number;
@@ -88,9 +89,19 @@ namespace CellularCall
             this->call.contactId = "1";
         }
 
-        bool isValid()
+        bool isValid() const
         {
             return call.id != 0;
+        }
+
+        bool isActive() const
+        {
+            return isActiveCall;
+        }
+
+        void setActive()
+        {
+            isActiveCall = true;
         }
 
         const CalllogRecord &getCallRecord() const
@@ -98,9 +109,24 @@ namespace CellularCall
             return call;
         }
 
-        void setCallRecordId(uint32_t id)
+        void setCallRecordId(const uint32_t id)
         {
             call.id = id;
+        }
+
+        void setDuration(const time_t duration)
+        {
+            call.duration = duration;
+        }
+
+        CallType getType() const
+        {
+            return call.type;
+        }
+
+        void setType(CallType type)
+        {
+            call.type = type;
         }
     };
 } // namespace CellularCall

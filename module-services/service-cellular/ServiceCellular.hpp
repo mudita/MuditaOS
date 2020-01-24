@@ -73,12 +73,14 @@ public:
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
 
-  private:
-
     void setCellularCall(CellularCall::CellularCall call)
     {
         activeCellularCall = call;
     }
+
+    CellularCall::CellularCall activeCellularCall;
+
+  private:
 
     //std::unique_ptr<MuxDaemon> muxdaemon;
     TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
@@ -151,8 +153,6 @@ public:
     }
 
     std::vector<std::string> messageParts;
-
-    CellularCall::CellularCall activeCellularCall;
 };
 
 #endif //PUREPHONE_SERVICECELLULAR_HPP

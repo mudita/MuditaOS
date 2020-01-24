@@ -41,8 +41,8 @@ bool CalllogTable::Update(CalllogTableRow entry)
 {
     return db->Execute(
         "UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s' WHERE _id = %lu;",
-        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::to_string(entry.date).c_str(), utils::to_string(entry.duration).c_str(),
-        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
+        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), static_cast<uint32_t>(entry.date), static_cast<uint32_t>(entry.duration),
+        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.id);
 }
 
 CalllogTableRow CalllogTable::GetByID(uint32_t id) {
