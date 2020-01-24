@@ -46,15 +46,15 @@ namespace ModemCall
         }
     }
 
-    std::string ModemCall::getStringRepresntation()
+    std::string to_string(const ModemCall &call)
     {
-        std::string str = " <idx> " + std::to_string(idx) + " <dir> " + std::to_string(static_cast<uint8_t>(dir)) + " <stat> " +
-                          std::to_string(static_cast<uint8_t>(state)) + " <mode> " + std::to_string(static_cast<uint8_t>(mode)) + " <mpty> " +
-                          std::to_string(static_cast<uint8_t>(isConferenceCall)) + " <number> " + phoneNumber + " <type> " +
-                          std::to_string(static_cast<uint8_t>(type));
-        if (!phoneBookName.empty())
+        std::string str = " <idx> " + std::to_string(call.idx) + " <dir> " + std::to_string(static_cast<uint8_t>(call.dir)) + " <stat> " +
+                          std::to_string(static_cast<uint8_t>(call.state)) + " <mode> " + std::to_string(static_cast<uint8_t>(call.mode)) + " <mpty> " +
+                          std::to_string(static_cast<uint8_t>(call.isConferenceCall)) + " <number> " + call.phoneNumber + " <type> " +
+                          std::to_string(static_cast<uint8_t>(call.type));
+        if (!call.phoneBookName.empty())
         {
-            str += " <alpha> " + phoneBookName;
+            str += " <alpha> " + call.phoneBookName;
         }
 
         return str;

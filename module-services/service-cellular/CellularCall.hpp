@@ -57,14 +57,14 @@ namespace ModemCall
         CallType type;
         std::string phoneBookName; // TODO: alek: seems like it is not existising in the recieved data
                                    // but it is defined in specification
-        // CallState previousState;
 
         ModemCall() = delete;
         ~ModemCall() = default;
         ModemCall(const std::string str);
 
-        std::string getStringRepresntation();
     };
+
+    std::string to_string(const ModemCall &call);
 } // namespace ModemCall
 
 namespace CellularCall

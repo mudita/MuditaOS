@@ -347,7 +347,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             try
             {
                 ModemCall::ModemCall call(callEntry);
-                LOG_DEBUG("%s", call.getStringRepresntation().c_str());
+                LOG_DEBUG("%s", ModemCall::to_string(call).c_str());
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
                 if (call.state == ModemCall::CallState::Active)
                 {
