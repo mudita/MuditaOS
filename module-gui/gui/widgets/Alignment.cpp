@@ -25,40 +25,4 @@ Alignment::~Alignment() {
 	// TODO Auto-generated destructor stub
 }
 
-bool Alignment::setHorizontal( const uint32_t val ) {
-	short horizontal =
-		Alignment::ALIGN_HORIZONTAL_CENTER |
-		Alignment::ALIGN_HORIZONTAL_LEFT |
-		Alignment::ALIGN_HORIZONTAL_RIGHT;
-
-	//if flag is valid, reset any horizontal flag and add new
-	if( val & horizontal ) {
-		alignment &= ~( horizontal );
-		alignment |= val;
-		return true;
-	}
-	return false;
-}
-
-bool Alignment::setVertical( const uint32_t val ) {
-	short vertical =
-		Alignment::ALIGN_VERTICAL_CENTER |
-		Alignment::ALIGN_VERTICAL_TOP |
-		Alignment::ALIGN_VERTICAL_BOTTOM;
-
-	//if flag is valid, reset any horizontal flag and add new
-	if( val & vertical) {
-		alignment &= ~( vertical);
-		alignment |= val;
-		return true;
-	}
-	return false;
-}
-
-bool Alignment::isAligned( const uint32_t val ) {
-	if( alignment & val )
-		return true;
-	return false;
-}
-
 } /* namespace gui */
