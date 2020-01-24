@@ -63,31 +63,25 @@ ServiceCellular::ServiceCellular()
 
         switch (type) {
 
-            case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
-                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
-                                      GetName(), this);
-                state = State ::ModemConfigurationInProgress;
-                return;
-            }
-            case CellularNotificationMessage::Type::Ringing:
-            case CellularNotificationMessage::Type::ServiceReady:
-            case CellularNotificationMessage::Type::CallBusy:
-            case CellularNotificationMessage::Type::CallActive:
-            case CellularNotificationMessage::Type::CallAborted:
-                // no data field is used
-                break;
+        case CellularNotificationMessage::Type::PowerUpProcedureComplete:
+        case CellularNotificationMessage::Type::Ringing:
+        case CellularNotificationMessage::Type::ServiceReady:
+        case CellularNotificationMessage::Type::CallBusy:
+        case CellularNotificationMessage::Type::CallActive:
+        case CellularNotificationMessage::Type::CallAborted:
+            // no data field is used
+            break;
 
-            case CellularNotificationMessage::Type::IncomingCall:
-                msg->data = message;
-                break;
+        case CellularNotificationMessage::Type::IncomingCall:
+            msg->data = message;
+            break;
 
-            case CellularNotificationMessage::Type::NewIncomingSMS:
-            {
-            	//find message number
-            	std::string notification(data.begin(), data.end() );
-            	auto begin = notification.find(",");
-            	auto end = notification.find("\r");
-            	msg->data  = notification.substr(begin + 1, end);
+        case CellularNotificationMessage::Type::NewIncomingSMS: {
+            // find message number
+            std::string notification(data.begin(), data.end());
+            auto begin = notification.find(",");
+            auto end = notification.find("\r");
+            msg->data = notification.substr(begin + 1, end);
             }
                 break;
 
@@ -204,39 +198,32 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             {
             case CellularNotificationMessage::Type::CallActive: {
                 runCallDurationTimer();
+                auto ret = setOngoingCallActive();
+                responseMsg = std::make_shared<CellularResponseMessage>(ret);
+                break;
+            }
+            case CellularNotificationMessage::Type::IncomingCall: {
+                auto ret = true;
+                if (!isOngoingCallValid())
+                {
+                    // CellularNotificationMessage::Type::IncomingCal is called periodically during not answered incomming call
+                    // create ongoing call only once
+                    ret = newOngoingCall(msg->data, CallType::CT_INCOMING);
+                }
+                responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
             case CellularNotificationMessage::Type::CallAborted:
             case CellularNotificationMessage::Type::CallBusy: {
                 stopTimer(callDurationTimerId);
                 stopTimer(callStateTimerId);
-                if (activeCellularCall.isActive())
-                {
-                    activeCellularCall.setDuration(callDuration);
-                }
-                else
-                {
-                    auto callType = activeCellularCall.getType();
-                    switch (callType)
-                    {
-                    case CallType::CT_INCOMING: {
-                        activeCellularCall.setType(CallType::CT_REJECTED);
-                    }
-                    break;
-
-                    case CallType::CT_OUTGOING: {
-                        activeCellularCall.setType(CallType::CT_MISSED);
-                    }
-                    break;
-
-                    default:
-                        LOG_ERROR("Not valid call type %d", callType);
-                    }
-                }
-                if (!DBServiceAPI::CalllogUpdate(this, activeCellularCall.getCallRecord()))
-                {
-                    LOG_ERROR("CalllogUpdate failed, id %d", activeCellularCall.getCallRecord().id);
-                }
+                auto ret = updateOngoingCall();
+                responseMsg = std::make_shared<CellularResponseMessage>(ret);
+                break;
+            }
+            case CellularNotificationMessage::Type::Ringing: {
+                auto ret = newOngoingCall(msg->data, CallType::CT_OUTGOING);
+                responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
@@ -250,24 +237,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             default: {
-                // ignore rest of notifications
+                LOG_INFO("Skipped CellularNotificationMessage::Type %d", msg->type);
             }
             }
-        }
-        else if (msg->type == CellularNotificationMessage::Type::PowerUpProcedureComplete)
-		{
-			sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure),
-								  GetName(), this);
-			state = State ::ModemConfigurationInProgress;
-		}
-		else if(msg->type == CellularNotificationMessage::Type::NewIncomingSMS)
-		{
-			LOG_INFO("New incoming sms received");
-			receiveSMS(msg->data);
-		}
-        else
-        {
-            LOG_ERROR("Not CellularNotificationMessage");
         }
     }
     break;
@@ -379,7 +351,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
                 if (call.state == ModemCall::CallState::Active)
                 {
-                    activeCellularCall.setActive();
                     auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive);
                     sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
                     stopTimer(callStateTimerId);
@@ -426,20 +397,20 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     case MessageType::CellularAnswerIncomingCall: {
         auto channel = cmux->GetChannel("Commands");
+        auto ret = false;
         if (channel)
         {
             // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
-            auto ret = channel->SendCommandResponse("ATA\r", 1, 90000);
-            if (cmux->CheckATCommandResponse(ret))
+            auto response = channel->SendCommandResponse("ATA\r", 1, 90000);
+            if (cmux->CheckATCommandResponse(response))
             {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // Propagate "CallActive" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive),
                                         sys::BusChannels::ServiceCellularNotifications, this);
-                break;
+                ret = true;
             }
         }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        responseMsg = std::make_shared<CellularResponseMessage>(ret);
     }
     break;
 
@@ -450,35 +421,18 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 		if (channel) {
 			auto ret = channel->SendCommandResponse(
 					("ATD" + msg->data + ";\r").c_str(), 1, 5000);
-			if (cmux->CheckATCommandResponse(ret)) {
-				responseMsg = std::make_shared<CellularResponseMessage>(true);
-                time_t timestamp;
-                RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
-                if (rtcErr != RtcBspError_e::RtcBspOK)
-                {
-                    LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
-                }
-                CellularCall::CellularCall cellularCall(msg->data, CallType::CT_OUTGOING, timestamp);
-                uint32_t callId = DBServiceAPI::CalllogAdd(this, cellularCall.getCallRecord());
-                if (callId == 0)
-                {
-                    LOG_ERROR("CalllogAdd failed");
-                }
-                cellularCall.setCallRecordId(callId);
-                setCellularCall(cellularCall);
-
+            if (cmux->CheckATCommandResponse(ret))
+            {
+                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
                 ReloadTimer(callStateTimerId);
                 // Propagate "Ringing" notification into system
-				sys::Bus::SendMulticast(
-						std::make_shared<CellularNotificationMessage>(
-								CellularNotificationMessage::Type::Ringing,
-								msg->data),
-						sys::BusChannels::ServiceCellularNotifications, this);
-				break;
-			}
-		}
-		responseMsg = std::make_shared<CellularResponseMessage>(false);
+                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::Ringing, msg->data),
+                                        sys::BusChannels::ServiceCellularNotifications, this);
+                break;
+            }
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
 	}
 		break;
 	case MessageType::DBServiceNotification :
@@ -530,6 +484,78 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
 
     return responseMsg;
+}
+
+bool ServiceCellular::newOngoingCall(const UTF8 &number, const CallType type)
+{
+    if (ongoingCall.isValid())
+    {
+        LOG_ERROR("Ongoing call already set");
+        return false;
+    }
+
+    time_t timestamp;
+    RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
+    if (rtcErr != RtcBspError_e::RtcBspOK)
+    {
+        LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
+        return false;
+    }
+    CellularCall::CellularCall cellularCall(number, type, timestamp);
+    uint32_t callId = DBServiceAPI::CalllogAdd(this, cellularCall.getCallRecord());
+    if (callId == 0)
+    {
+        LOG_ERROR("CalllogAdd failed");
+        return false;
+    }
+    cellularCall.setCallRecordId(callId);
+    ongoingCall = cellularCall;
+
+    return true;
+}
+
+bool ServiceCellular::updateOngoingCall()
+{
+    if (!ongoingCall.isValid())
+    {
+        LOG_ERROR("Trying to update invalid call");
+        return false;
+    }
+
+    if (ongoingCall.isActive())
+    {
+        ongoingCall.setDuration(callDuration);
+    }
+    else
+    {
+        auto callType = ongoingCall.getType();
+        switch (callType)
+        {
+        case CallType::CT_INCOMING: {
+            ongoingCall.setType(CallType::CT_REJECTED);
+        }
+        break;
+
+        case CallType::CT_OUTGOING: {
+            ongoingCall.setType(CallType::CT_MISSED);
+        }
+        break;
+
+        default:
+            LOG_ERROR("Not a valid call type %u", callType);
+            return false;
+        }
+    }
+    if (!DBServiceAPI::CalllogUpdate(this, ongoingCall.getCallRecord()))
+    {
+        LOG_ERROR("CalllogUpdate failed, id %u", ongoingCall.getCallRecord().id);
+        return false;
+    }
+
+    // Calllog entry was updated, we can clear ongoingCall
+    ongoingCall.clear();
+
+    return true;
 }
 
 CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vector<uint8_t> data, std::string &message) {

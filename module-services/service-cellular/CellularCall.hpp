@@ -75,9 +75,7 @@ namespace CellularCall
         bool isActiveCall = false;
 
       public:
-        CellularCall() = default;
-        ~CellularCall() = default;
-        CellularCall(const UTF8 &number, const CallType type = CallType::CT_NONE, const time_t date = 0, const time_t duration = 0)
+        CellularCall(const UTF8 &number = "", const CallType type = CallType::CT_NONE, const time_t date = 0, const time_t duration = 0)
         {
             this->call.id = 0; // 0 - Invalid
             this->call.number = number;
@@ -87,6 +85,21 @@ namespace CellularCall
             this->call.type = type;
             this->call.name = number; // temporary set number as name
             this->call.contactId = "1";
+        }
+
+        ~CellularCall() = default;
+
+        void clear()
+        {
+            call.id = 0; // 0 - Invalid
+            call.number = "";
+            call.presentation = PresentationType::PR_ALLOWED;
+            call.date = 0;
+            call.duration = 0;
+            call.type = CallType::CT_NONE;
+            call.name = "";
+            call.contactId = "";
+            isActiveCall = false;
         }
 
         bool isValid() const

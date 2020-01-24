@@ -73,13 +73,6 @@ public:
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
 
-    void setCellularCall(CellularCall::CellularCall call)
-    {
-        activeCellularCall = call;
-    }
-
-    CellularCall::CellularCall activeCellularCall;
-
   private:
 
     //std::unique_ptr<MuxDaemon> muxdaemon;
@@ -140,19 +133,26 @@ public:
 
     CellularNotificationMessage::Type identifyNotification(std::vector<uint8_t> data, std::string &message);
 
-    bool searchForOK(const std::vector<std::string> &response) {
-        for (std::string s : response) {
-            //LOG_DEBUG("[Processing] %s", s.c_str());
-            if (s == "OK") {
-                //LOG_DEBUG("[TRUE]");
-                return true;
-            }
+    std::vector<std::string> messageParts;
+
+    CellularCall::CellularCall ongoingCall;
+
+    bool newOngoingCall(const UTF8 &number, const CallType type = CallType::CT_NONE);
+    bool isOngoingCallValid()
+    {
+        return ongoingCall.isValid();
+        ;
+    }
+    bool setOngoingCallActive()
+    {
+        if (ongoingCall.isValid())
+        {
+            ongoingCall.setActive();
+            return true;
         }
-        //LOG_DEBUG("[FALSE]");
         return false;
     }
-
-    std::vector<std::string> messageParts;
+    bool updateOngoingCall();
 };
 
 #endif //PUREPHONE_SERVICECELLULAR_HPP
