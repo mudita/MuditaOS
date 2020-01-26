@@ -184,7 +184,6 @@ std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std
     std::vector<std::string> strings;
     uint32_t tokenCount = 0;
 
-
     std::string::size_type pos = 0;
     std::string::size_type prev = 0;
     while (((pos = input.find(delimiter, prev)) != std::string::npos) && (maxTokenCount == 0 || tokenCount < maxTokenCount))

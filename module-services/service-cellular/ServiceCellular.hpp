@@ -136,23 +136,22 @@ public:
     std::vector<std::string> messageParts;
 
     CellularCall::CellularCall ongoingCall;
-
-    bool newOngoingCall(const UTF8 &number, const CallType type = CallType::CT_NONE);
+    bool startOngoingCall(const UTF8 &number, const CallType type = CallType::CT_NONE);
+    bool endOngoingCall();
     bool isOngoingCallValid()
     {
         return ongoingCall.isValid();
-        ;
     }
     bool setOngoingCallActive()
     {
         if (ongoingCall.isValid())
         {
+            runCallDurationTimer();
             ongoingCall.setActive();
             return true;
         }
         return false;
     }
-    bool updateOngoingCall();
 };
 
 #endif //PUREPHONE_SERVICECELLULAR_HPP

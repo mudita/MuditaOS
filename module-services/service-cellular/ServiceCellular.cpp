@@ -136,6 +136,10 @@ void ServiceCellular::TickHandler(uint32_t id)
     {
         CallDurationTimerHandler();
     }
+    else
+    {
+        LOG_ERROR("Unrecognized timer ID = %u", id);
+    }
 }
 
 // Invoked during initialization
@@ -188,7 +192,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     switch (static_cast<MessageType>(msgl->messageType))
     {
-
     // Incoming notifications from Notification Virtual Channel
     case MessageType::CellularNotification: {
         CellularNotificationMessage *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
@@ -197,7 +200,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             switch (msg->type)
             {
             case CellularNotificationMessage::Type::CallActive: {
-                runCallDurationTimer();
                 auto ret = setOngoingCallActive();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
@@ -206,23 +208,22 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 auto ret = true;
                 if (!isOngoingCallValid())
                 {
-                    // CellularNotificationMessage::Type::IncomingCal is called periodically during not answered incomming call
+                    // CellularNotificationMessage::Type::IncomingCall is called periodically during not answered incomming call
                     // create ongoing call only once
-                    ret = newOngoingCall(msg->data, CallType::CT_INCOMING);
+                    ret = startOngoingCall(msg->data, CallType::CT_INCOMING);
                 }
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
             case CellularNotificationMessage::Type::CallAborted:
             case CellularNotificationMessage::Type::CallBusy: {
-                stopTimer(callDurationTimerId);
                 stopTimer(callStateTimerId);
-                auto ret = updateOngoingCall();
+                auto ret = endOngoingCall();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
             case CellularNotificationMessage::Type::Ringing: {
-                auto ret = newOngoingCall(msg->data, CallType::CT_OUTGOING);
+                auto ret = startOngoingCall(msg->data, CallType::CT_OUTGOING);
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
@@ -485,7 +486,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     return responseMsg;
 }
 
-bool ServiceCellular::newOngoingCall(const UTF8 &number, const CallType type)
+bool ServiceCellular::startOngoingCall(const UTF8 &number, const CallType type)
 {
     if (ongoingCall.isValid())
     {
@@ -513,8 +514,10 @@ bool ServiceCellular::newOngoingCall(const UTF8 &number, const CallType type)
     return true;
 }
 
-bool ServiceCellular::updateOngoingCall()
+bool ServiceCellular::endOngoingCall()
 {
+    stopTimer(callDurationTimerId);
+
     if (!ongoingCall.isValid())
     {
         LOG_ERROR("Trying to update invalid call");
@@ -551,7 +554,7 @@ bool ServiceCellular::updateOngoingCall()
         return false;
     }
 
-    // Calllog entry was updated, we can clear ongoingCall
+    // Calllog entry was updated, ongoingCall can be cleared
     ongoingCall.clear();
 
     return true;

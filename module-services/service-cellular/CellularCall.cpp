@@ -31,7 +31,6 @@ namespace ModemCall
         {
             LOG_ERROR("wrong number of tokens %u", numberOfTokens);
             throw std::runtime_error("No valid prefix");
-            ;
         }
         // TODO: alek: add paramters validation
         idx = std::stoul(tokens[0]);
