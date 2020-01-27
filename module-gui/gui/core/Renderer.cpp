@@ -203,12 +203,12 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 
     if (cmd->yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT | RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT))
     {
-        wgtX += cmd->radius;
-        wgtW -= cmd->radius;
+        wgtX += cmd->yapSize;
+        wgtW -= cmd->yapSize;
     }
     if (cmd->yaps & (RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT | RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT))
     {
-        wgtW -= cmd->radius;
+        wgtW -= cmd->yapSize;
     }
 
     //check if there is a need or making copy of context to use is as background
@@ -533,7 +533,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             le = wgtW;
 		    // left "corner" first
 			if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT){
-                xs = -cmd->radius;
+                xs = -cmd->yapSize;
                 xs += cmd->penWidth;
             } else {
                 xs = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
@@ -541,7 +541,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             // right "corner" now
             le -= xs;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
-                le += (cmd->radius - cmd->penWidth);
+                le += (cmd->yapSize - cmd->penWidth);
             } else {
                 le -= cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
             }
@@ -552,7 +552,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             le = wgtW;
             // left "corner" first
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT){
-                xs = -cmd->radius;
+                xs = -cmd->yapSize;
                 xs += cmd->penWidth;
             } else {
                 xs = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
@@ -560,7 +560,7 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             // right "corner" now
             le -= xs;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
-                le += (cmd->radius - cmd->penWidth);
+                le += (cmd->yapSize - cmd->penWidth);
             } else {
                 le -= cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
             }
@@ -572,8 +572,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             // top "corner" first
             xs = 0;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT){
-                ys = cmd->radius;
-                draw45degLine(drawCtx, wgtX + xs - cmd->radius + cmd->penWidth + 1, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor,
+                ys = cmd->yapSize;
+                draw45degLine(drawCtx, wgtX + xs - cmd->yapSize + cmd->penWidth + 1, wgtY + ys - cmd->yapSize, cmd->yapSize, cmd->penWidth, cmd->borderColor,
                               LineExpansionDirection::LINE_EXPAND_LEFT, true, Line45degEnd::BOTTOM_TIP);
             } else {
                 ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT ));
@@ -582,8 +582,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             le = wgtH - ys;
 
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT){
-                le -= cmd->radius;
-                draw45degLine(drawCtx, wgtX + xs + cmd->penWidth, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor,
+                le -= cmd->yapSize;
+                draw45degLine(drawCtx, wgtX + xs + cmd->penWidth, wgtY + ys + le, cmd->yapSize, cmd->penWidth, cmd->borderColor,
                               LineExpansionDirection::LINE_EXPAND_LEFT, false, Line45degEnd::TOP_TIP);
             } else {
                 le -= cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
@@ -594,8 +594,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             // top "corner" first
             xs = wgtW;
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT){
-                ys = cmd->radius;
-                draw45degLine(drawCtx, wgtX+xs + cmd->radius - cmd->penWidth - 1, wgtY + ys - cmd->radius, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT , false, Line45degEnd::BOTTOM_TIP);
+                ys = cmd->yapSize;
+                draw45degLine(drawCtx, wgtX+xs + cmd->yapSize - cmd->penWidth - 1, wgtY + ys - cmd->yapSize, cmd->yapSize, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT , false, Line45degEnd::BOTTOM_TIP);
             } else {
                 ys = cmd->radius*( !(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT ));
             }
@@ -603,8 +603,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
             le = wgtH - ys;
 
             if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT){
-                le -= cmd->radius;
-                draw45degLine(drawCtx, wgtX+xs - cmd->penWidth, wgtY + ys + le, cmd->radius, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT, true, Line45degEnd::TOP_TIP);
+                le -= cmd->yapSize;
+                draw45degLine(drawCtx, wgtX+xs - cmd->penWidth, wgtY + ys + le, cmd->yapSize, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT, true, Line45degEnd::TOP_TIP);
 
             } else {
                 le -= cmd->radius*(!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
