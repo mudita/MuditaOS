@@ -26,7 +26,7 @@ Rect::Rect() :
 
 Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
     : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1}, penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
-      flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS}, yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}
+      flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS}, yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize {Rect::YAPS_SIZE_DEFAULT}
 {
 
     widgetArea.x = 0;
@@ -112,8 +112,8 @@ std::list<DrawCommand*> Rect::buildDrawList() {
 	rect->flatEdges = this->flatEdges;
 	rect->edges =  edges;
 	rect->yaps = yaps;
-
-	rect->radius = radius;
+	rect->yapSize = yapSize;
+    rect->radius = radius;
 	if( focus )
 		rect->penWidth = penFocusWidth;
 	else
@@ -129,6 +129,11 @@ std::list<DrawCommand*> Rect::buildDrawList() {
 		commands.insert( commands.end(), childrenCommands.begin(), childrenCommands.end());
 
 	return commands;
+}
+void Rect::setYapSize(short value ) {
+    if( value < 0 )
+        value = 0;
+    yapSize = value;
 }
 
 } /* namespace gui */
