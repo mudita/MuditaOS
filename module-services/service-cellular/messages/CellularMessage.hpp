@@ -74,24 +74,14 @@ public:
 
 };
 
-class CellularSMSRequestMessage : public CellularMessage{
-public:
-
-	CellularSMSRequestMessage(MessageType messageType):CellularMessage(messageType){}
-    ~CellularSMSRequestMessage() {}
-
-    UTF8 number;
-    UTF8 message;
-
-};
-
-class CellularResponseMessage: public sys::ResponseMessage {
-public:
-    CellularResponseMessage(uint32_t retCode) : sys::ResponseMessage(),retCode(retCode) {};
-    virtual ~CellularResponseMessage() {};
+class CellularResponseMessage : public sys::ResponseMessage
+{
+  public:
+    CellularResponseMessage(uint32_t retCode, std::string retdata = std::string()) : sys::ResponseMessage(), retCode(retCode), data(retdata){};
+    virtual ~CellularResponseMessage(){};
 
     uint32_t retCode;
+    std::string data;
 };
-
 
 #endif //PUREPHONE_CELLULARMESSAGE_HPP
