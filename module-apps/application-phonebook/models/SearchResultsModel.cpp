@@ -16,7 +16,7 @@ SearchResultsModel::~SearchResultsModel()
 gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
     auto o = *results.get();
-    if (index >= o.size())
+    if (index >= (int)o.size())
     {
         LOG_ERROR("getItem error: index %d >= results size %d", index, o.size());
         return nullptr;
