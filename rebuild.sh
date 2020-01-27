@@ -43,6 +43,9 @@ TARGET_SET="false"
 BUILD_TESTS="false"
 TYPE="Debug"
 
+# uncomment below to see verbose output from make
+# VERBOSE="-DCMAKE_VERBOSE_MAKEFILE=True"
+
 if [ "$1" != "" ]; then
 	if [ "$1" = "linux" ]; then
 		echo "Building for Linux."
@@ -105,7 +108,6 @@ if [ "$TARGET_SET" = "true" ]; then
 	fi
 fi
 
-
 #enter build directory, erase content and make /sys/assets directory
 cd "$BUILD_DIR"
 rm -rf *
@@ -126,7 +128,7 @@ if [ -d "$MODULE_GUI_DIR" ]; then
 fi
 
 if [ "$BUILD_TESTS" = "true" ]; then
-	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
+	cmake $VERBOSE -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DBUILD_UNIT_TESTS="" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ../
 else
-	cmake -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${BT} ../
+	cmake $VERBOSE -DCMAKE_EXPORT_COMPILE_COMMANDS="True" -DCMAKE_BUILD_TYPE="$TYPE" -DCMAKE_TOOLCHAIN_FILE=../"$TARGET" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${BT} ../
 fi

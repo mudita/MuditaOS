@@ -47,7 +47,7 @@ set(TARGET_COMPILE_OPTIONS
         -MP
         -fno-builtin
         -mno-unaligned-access
-
+        -Werror
         -Wno-psabi
 
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-register> # "register" keyword was marked as deprecated in C++17
