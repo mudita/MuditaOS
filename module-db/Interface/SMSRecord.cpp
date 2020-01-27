@@ -14,6 +14,20 @@
 #include "ThreadRecord.hpp"
 #include <log/log.hpp>
 
+SMSRecord::SMSRecord(const SMSTableRow &w, const UTF8 &num)
+{
+    ID = w.ID;
+    date = w.date;
+    dateSent = w.dateSent;
+    errorCode = w.errorCode;
+    number = num;
+    body = w.body;
+    isRead = w.isRead;
+    type = w.type;
+    threadID = w.threadID;
+    contactID = w.contactID;
+}
+
 SMSRecordInterface::SMSRecordInterface(SmsDB* smsDb,ContactsDB* contactsDb): smsDB(smsDb),contactsDB(contactsDb) {
 
 }
@@ -132,20 +146,8 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
     for(const auto &w : smses){
 
         auto contactRec = contactInterface.GetByID(w.contactID);
-
-        records->push_back({
-                                   .dbID=w.ID,
-                                   .date=w.date,
-                                   .dateSent=w.dateSent,
-                                   .errorCode=w.errorCode,
-                                   .number=contactRec.numbers[0].numberE164,// TODO: or numberUser? or other number?
-                                   .body=w.body,
-                                   .isRead=w.isRead,
-                                   .type=w.type,
-                                   .threadID=w.threadID,
-                                   .contactID=w.contactID
-
-                           });
+        // TODO: or numberUser? or other number?
+        records->push_back({w, contactRec.numbers[0].numberE164});
     }
 
     return records;
@@ -161,20 +163,8 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
     for(const auto &w : smses){
 
         auto contactRec = contactInterface.GetByID(w.contactID);
-
-        records->push_back({
-           .dbID=w.ID,
-           .date=w.date,
-           .dateSent=w.dateSent,
-           .errorCode=w.errorCode,
-           .number=contactRec.numbers[0].numberE164,// TODO: or numberUser? or other number
-           .body=w.body,
-           .isRead=w.isRead,
-           .type=w.type,
-           .threadID=w.threadID,
-           .contactID=w.contactID
-
-        });
+        // TODO: or numberUser? or other number
+        records->push_back({w, contactRec.numbers[0].numberE164});
     }
 
     return records;
@@ -182,22 +172,20 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffset(uint3
 
 bool SMSRecordInterface::Update(const SMSRecord &rec) {
 
-    auto sms = smsDB->sms.GetByID(rec.dbID);
+    auto sms = smsDB->sms.GetByID(rec.ID);
     if(sms.ID == 0){
         return false;
     }
 
-    smsDB->sms.Update(SMSTableRow{
-        .ID=rec.dbID,
-        .threadID=sms.threadID,
-        .contactID=sms.contactID,
-        .date=rec.date,
-        .dateSent=rec.dateSent,
-        .errorCode=rec.errorCode,
-        .body=rec.body,
-        .isRead=rec.isRead,
-        .type=rec.type
-    });
+    smsDB->sms.Update(SMSTableRow{.ID = rec.ID,
+                                  .threadID = sms.threadID,
+                                  .contactID = sms.contactID,
+                                  .date = rec.date,
+                                  .dateSent = rec.dateSent,
+                                  .errorCode = rec.errorCode,
+                                  .body = rec.body,
+                                  .isRead = rec.isRead,
+                                  .type = rec.type});
 
     // Update messages read count if necessary
     if(!sms.isRead && rec.isRead){
@@ -273,21 +261,8 @@ SMSRecord SMSRecordInterface::GetByID(uint32_t id) {
 
     ContactRecordInterface contactInterface(contactsDB);
     auto contactRec = contactInterface.GetByID(sms.contactID);
-
-    return SMSRecord{
-        .dbID=sms.ID,
-        .date=sms.date,
-        .dateSent=sms.dateSent,
-        .errorCode=sms.errorCode,
-        .number=contactRec.numbers[0].numberE164,// TODO: or numberUser?
-        .body=sms.body,
-        .isRead=sms.isRead,
-        .type=sms.type,
-        .threadID=sms.threadID,
-        .contactID=sms.contactID
-
-    };
-
+    // TODO: or numberUser?
+    return SMSRecord{sms, contactRec.numbers[0].numberE164};
 }
 
 

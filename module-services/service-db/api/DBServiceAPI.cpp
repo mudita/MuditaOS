@@ -65,7 +65,7 @@ uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true))
     {
-        return (*smsResponse->records)[0].dbID;
+        return (*smsResponse->records)[0].ID;
     }
     else
     {
@@ -119,7 +119,7 @@ SMSRecord DBServiceAPI::SMSGetLastRecord(sys::Service *serv)
     else
     {
         SMSRecord rec;
-        rec.dbID = 0;
+        rec.ID = 0;
         return rec;
     }
 }
