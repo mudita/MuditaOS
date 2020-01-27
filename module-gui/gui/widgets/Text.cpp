@@ -1007,6 +1007,22 @@ void Text::updateCursor()
     cursor->setPosition(posX, posY);
 }
 
+int32_t Text::expand(uint32_t rowCount, int32_t h)
+{
+    if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE)
+    {
+        h = font->info.line_height * textLines.size() + margins.top + margins.bottom;
+        if (parent && widgetArea.h > parent->widgetArea.h)
+        {
+            h = widgetArea.h;
+        }
+        setSize(getWidth(), h);
+        setMaxSize(getWidth(), h);
+        LOG_DEBUG("Resized Text to: %d %d", getWidth(), getHeight());
+    }
+    return h;
+}
+
 void Text::recalculateDrawParams()
 {
 
@@ -1025,7 +1041,7 @@ void Text::recalculateDrawParams()
 
     // calculate how many rows can fit in available height.
     uint32_t rowCount = h / font->info.line_height;
-    rowCount = (rowCount == 0) ? 1 : rowCount;
+    h = expand(rowCount, h);
 
     if (textType == TextType::SINGLE_LINE) { rowCount = 1; }
 
