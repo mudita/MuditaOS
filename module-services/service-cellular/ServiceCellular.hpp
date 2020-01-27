@@ -58,9 +58,21 @@ public:
     bool sendSMS(UTF8& number, UTF8& text);
     bool sendSMS(void);
     bool receiveSMS(std::string messageNumber);
+    /**
+     * @brief Its getting selected SIM card own number.
+     * @param destination Reference to destination string.
+     * @return true when succeed, false when fails
+     */
+    bool getOwnNumber(std::string &destination);
+    /**
+     * @brief Its getting IMSI from selected SIM card.
+     * @param fullNumber Its returning full IMSI number when fullNumber is true, otherwise its returning only country identification number
+     * @param destination Reference to destination string.
+     * @return true when succeed, false when fails
+     */
+    bool getIMSI(std::string &destination, bool fullNumber = false);
 
-private:
-
+  private:
     //std::unique_ptr<MuxDaemon> muxdaemon;
     TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     // used for polling for call state

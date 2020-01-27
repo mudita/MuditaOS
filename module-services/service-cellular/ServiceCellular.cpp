@@ -472,6 +472,31 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         responseMsg = std::make_shared<CellularResponseMessage>(false);
         break;
 	}
+    case MessageType::CellularGetIMSI: {
+
+        std::string temp;
+        if (getIMSI(temp))
+        {
+            responseMsg = std::make_shared<CellularResponseMessage>(true, temp);
+        }
+        else
+        {
+            responseMsg = std::make_shared<CellularResponseMessage>(false);
+        }
+        break;
+    }
+    case MessageType::CellularGetOwnNumber: {
+        std::string temp;
+        if (getOwnNumber(temp))
+        {
+            responseMsg = std::make_shared<CellularResponseMessage>(true, temp);
+        }
+        else
+        {
+            responseMsg = std::make_shared<CellularResponseMessage>(false);
+        }
+    }
+    break;
     default:
         break;
     }
@@ -723,4 +748,63 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 	//delete message from modem memory
     cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse(("AT+CMGD=" + messageNumber).c_str(), 1, 150));
     return true;
+}
+
+bool ServiceCellular::getOwnNumber(std::string &destination)
+{
+    auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CNUM\r", 2, 300);
+
+    if (cmux->CheckATCommandResponse(ret))
+    {
+        auto begin = ret[0].find(',');
+        auto end = ret[0].rfind(',');
+        if (begin != std::string::npos && end != std::string::npos)
+        {
+            std::string number;
+            try
+            {
+                number = ret[0].substr(begin, end - begin);
+            }
+            catch (std::exception &e)
+            {
+                LOG_ERROR("ServiceCellular::getOwnNumber exception: %s", e.what());
+                return false;
+            }
+            number.erase(std::remove(number.begin(), number.end(), '"'), number.end());
+            number.erase(std::remove(number.begin(), number.end(), ','), number.end());
+
+            destination = number;
+            return true;
+        }
+    }
+    LOG_ERROR("ServiceCellular::getOwnNumber failed.");
+    return false;
+}
+
+bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
+{
+    auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CIMI\r", 2, 300);
+
+    if (cmux->CheckATCommandResponse(ret))
+    {
+        if (fullNumber)
+        {
+            destination = ret[0];
+        }
+        else
+        {
+            try
+            {
+                destination = ret[0].substr(0, 3);
+            }
+            catch (std::exception &e)
+            {
+                LOG_ERROR("ServiceCellular::getIMSI exception: %s", e.what());
+                return false;
+            }
+        }
+        return true;
+    }
+    LOG_ERROR("ServiceCellular::getIMSI failed.");
+    return false;
 }
