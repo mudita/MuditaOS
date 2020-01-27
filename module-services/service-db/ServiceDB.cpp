@@ -103,9 +103,9 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         {
             // update db ID in response message
             auto record = std::make_unique<std::vector<SMSRecord>>();
-            msg->record.dbID = smsRecordInterface->GetLastID();
+            msg->record.ID = smsRecordInterface->GetLastID();
             record->push_back(msg->record);
-            LOG_INFO("SMS added, record ID: %d", msg->record.dbID);
+            LOG_INFO("SMS added, record ID: %d", msg->record.ID);
             responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(record), ret);
 
             // send notification

@@ -17,6 +17,11 @@
 
 constexpr uint32_t DB_ID_NONE = 0;
 
+struct Record
+{
+    uint32_t ID = DB_ID_NONE;
+};
+
 template<typename T, typename F>
 class RecordInterface {
 public:
