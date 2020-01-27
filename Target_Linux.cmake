@@ -23,7 +23,7 @@ set(TARGET_COMPILE_DEFINITIONS
 set(TARGET_COMPILE_OPTIONS
 
         -fsanitize=address
-
+	-Werror
         CACHE INTERNAL ""
         )
 
