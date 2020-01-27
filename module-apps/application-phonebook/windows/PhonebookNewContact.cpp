@@ -147,10 +147,14 @@ void PhonebookNewContact::buildInterface()
 
     page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         int val = gui::toNumeric(inputEvent.keyCode);
-        if ((val >= 0) && (val < 9))
+        if ((val >= 0) && (val <= 9))
         {
             page2.speedValue->setText(std::to_string(val));
-            return true;
+            return (true);
+        }
+        else
+        {
+            page2.speedValue->setText("");
         }
         return false;
     };
@@ -174,11 +178,10 @@ void PhonebookNewContact::buildInterface()
     page2.favValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
     page2.favValue->setFont(style::window::font::small);
     page2.favValue->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
     page2.favValue->focusChangedCallback = [=](gui::Item &item) {
         if (item.focus)
         {
-            bottomBar->setText(BottomBar::Side::CENTER, "SELECT");
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
         }
         else
         {
@@ -186,7 +189,6 @@ void PhonebookNewContact::buildInterface()
         }
         return true;
     };
-
     page2.favValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
@@ -427,6 +429,7 @@ void PhonebookNewContact::switchPage(uint32_t page)
     {
         page1.setVisibile(false);
         page2.setVisibile(true);
+        setFocusItem(page2.text[0]);
     }
 }
 
@@ -504,14 +507,7 @@ bool PhonebookNewContact::verifyAndSave()
     record.isOnFavourites = page2.favSelected;
     record.speeddial = atoi(page2.speedValue->getText().c_str());
 
-    /** basic sanity checks */
-    if (!isValidName(record.primaryName))
-    {
-        LOG_ERROR("verifyAndSave name not valid");
-        return (false);
-    }
-
-    if (record.numbers.size() > 0 && isValidNumber(record.numbers[0].numberUser) == false)
+    if (record.numbers.size() > 0 && (isValidNumber(record.numbers[0].numberUser) == false))
     {
         LOG_ERROR("verifyAndSave primaryNumber not valid");
         return (false);
@@ -559,6 +555,8 @@ bool PhonebookNewContact::verifyAndSave()
         else
         {
             LOG_INFO("verifyAndSave new contact UPDATED");
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return (true);
         }
     }
