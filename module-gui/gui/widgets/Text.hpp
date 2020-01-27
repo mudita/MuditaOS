@@ -121,7 +121,11 @@ class Text : public Rect
     Rect *cursor = nullptr;
 
     EditMode editMode = EditMode::EDIT;
+
+  public:
     ExpandMode expandMode = ExpandMode::EXPAND_NONE;
+
+  private:
     TextType textType = TextType::MULTI_LINE;
     // maximum number of lines until which widget will expand its size;
     uint32_t maxExpansionLines = 0;
@@ -199,6 +203,10 @@ class Text : public Rect
     }
 
     void recalculateDrawParams();
+    /// check height available in h by rowCound and Font set
+    /// if size needed is bigger and mode is set to Expand -> make item bigger
+    /// TODO think about callback to parent on expansion
+    int32_t expand(uint32_t rowCount, int32_t h);
 
   public:
     Text();
