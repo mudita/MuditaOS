@@ -22,6 +22,19 @@ public:
     static bool DialNumber(sys::Service* serv,const std::string& number);
     static bool AnswerIncomingCall(sys::Service* serv);
     static bool HangupCall(sys::Service* serv);
+    /*
+     * @brief Its calls sercive-cellular for selected SIM IMSI number.
+     * @param serv pointer to caller service.
+     * @param getFullIMSINumber returned string format. false returns only country code, true returns whole iMSI number.
+     * #return IMSI number when succeeds, empty string when fails
+     */
+    static std::string GetIMSI(sys::Service *serv, bool getFullIMSINumber = false);
+    /*
+     * @brief Its calls sercive-cellular for selected SIM own phone number.
+     * @param serv pointer to caller service.
+     * #return SIM own number when succeeds, empty string when fails
+     */
+    static std::string GetOwnNumber(sys::Service *serv);
 };
 
 

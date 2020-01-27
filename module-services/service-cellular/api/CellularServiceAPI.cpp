@@ -58,4 +58,51 @@ bool CellularServiceAPI::HangupCall(sys::Service* serv){
     }
 }
 
+std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)
+{
 
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetIMSI);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
+
+    if (response == nullptr)
+    {
+        LOG_ERROR("Failed");
+        return std::string();
+    }
+
+    if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true))
+    {
+        return response->data;
+    }
+    else
+    {
+        LOG_ERROR("Failed");
+        return std::string();
+    }
+}
+
+std::string CellularServiceAPI::GetOwnNumber(sys::Service *serv)
+{
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetOwnNumber);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+    CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
+
+    if (response == nullptr)
+    {
+        LOG_ERROR("Failed");
+        return std::string();
+    }
+
+    if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true))
+    {
+        return response->data;
+    }
+    else
+    {
+        LOG_ERROR("Failed");
+        return std::string();
+    }
+}
