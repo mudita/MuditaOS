@@ -8,12 +8,12 @@
  * @details
  */
 
-
 #include "ATParser.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "ticks.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
 #include "Service/Bus.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
+#include "ticks.hpp"
+#include <Utils.hpp>
 
 ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
     isInitialized = true;
@@ -178,33 +178,8 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     return tokens;
 }
 
-// TODO: alek: this tokenizer seems bad. Need to fix this
+// for string delimiter
 std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount)
 {
-    std::vector<std::string> strings;
-    uint32_t tokenCount = 0;
-
-    std::string::size_type pos = 0;
-    std::string::size_type prev = 0;
-    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (maxTokenCount == 0 || tokenCount < maxTokenCount))
-    {
-        if (pos == prev) {
-            prev = pos + delimiter.size();
-            continue;
-        }
-        strings.push_back(input.substr(prev, pos - prev));
-        prev = pos + delimiter.size();
-        tokenCount++;
-    }
-
-    // To get the last substring (or only, if delimiter is not found)
-    if (maxTokenCount == 0 || tokenCount < maxTokenCount)
-    {
-        auto str = input.substr(prev);
-        if (!str.empty())
-        {
-            strings.push_back(str);
-        }
-    }
-    return strings;
+    return utils::split(input, delimiter, true, maxTokenCount);
 }

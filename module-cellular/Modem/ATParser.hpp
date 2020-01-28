@@ -51,7 +51,6 @@ public:
 
     std::vector<std::string> SendCommand(const char *cmd, size_t rxCount, uint32_t timeout = 500);
 
-    // TODO: alek: put it somewhere as a general purpose method
     // @param maxTokenCount max token count, if 0 no max number limitation
     static std::vector<std::string> Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount = 0);
 

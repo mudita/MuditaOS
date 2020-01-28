@@ -1,5 +1,6 @@
 #include "CellularCall.hpp"
 #include <Modem/ATParser.hpp>
+#include <Utils.hpp>
 #include <log/log.hpp>
 #include <vector>
 
@@ -24,7 +25,7 @@ namespace ModemCall
             callEntry.erase(0, prefix.length());
         }
 
-        std::vector<std::string> tokens = ATParser::Tokenizer(callEntry, ",");
+        std::vector<std::string> tokens = utils::split(callEntry, ",");
 
         auto numberOfTokens = tokens.size();
         if (numberOfTokens != 7 && numberOfTokens != 8)
