@@ -65,10 +65,10 @@ void CallLogCallDeleteWindow::buildInterface() {
 	questionText->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES );
 	questionText->setFont(style::window::font::medium);
 	questionText->setText(utils::localize.get("app_calllog_delete_call_confirmation"));
-	// TODO: alek: set alignment
+    questionText->setAlignment((gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER}));
 
-	//add option connectivity option
-	options.push_back( addOptionLabel( utils::localize.get("common_no"), 
+    // add option connectivity option
+    options.push_back( addOptionLabel( utils::localize.get("common_no"), 
 		[=] (gui::Item& item){ 
 			application->switchWindow( calllog::settings::OptionsWindowStr, gui::ShowMode::GUI_SHOW_RETURN );
 			return true; 
