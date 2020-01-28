@@ -8,6 +8,13 @@ namespace callLogStyle
 // DELETE WINDOW
 namespace deleteWindow
 {
+    namespace trash
+    {
+        constexpr uint32_t x = 176;
+        constexpr uint32_t y = 135;
+        constexpr uint32_t w = 128;
+        constexpr uint32_t h = 128;
+    } // namespace trash
 namespace question
 {
 constexpr uint32_t x = 68;

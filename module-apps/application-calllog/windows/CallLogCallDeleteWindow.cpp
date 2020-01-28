@@ -56,9 +56,9 @@ void CallLogCallDeleteWindow::buildInterface() {
 
 	topBar->setActive(TopBar::Elements::TIME, true );
 
-	// trashImg =  // TODO: add this
+    trashImg = new Image(this, trash::x, trash::y, trash::w, trash::h, "phonebook_contact_delete_trashcan");
 
-	questionText = new gui::Text(this, question::x, question::y, question::w, question::h);
+    questionText = new gui::Text(this, question::x, question::y, question::w, question::h);
 	questionText->setFilled( false );
 	questionText->setBorderColor( gui::ColorNoColor );
 	questionText->setTextType( Text::TextType::MULTI_LINE );
