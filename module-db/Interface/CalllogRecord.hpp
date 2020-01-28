@@ -24,9 +24,9 @@ struct CalllogRecord{
     CallType    type;
     UTF8        name;
 	UTF8        contactId;
-};
 
-std::string to_string(const CalllogRecord &rec);
+    static std::string to_string(const CalllogRecord &rec);
+};
 
 enum class CalllogRecordField{
     DATE,

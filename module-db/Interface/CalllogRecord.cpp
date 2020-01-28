@@ -10,7 +10,7 @@
 #include "../Tables/CalllogTable.hpp"
 #include <log/log.hpp>
 
-std::string to_string(const CalllogRecord &rec)
+std::string CalllogRecord::to_string(const CalllogRecord &rec)
 {
     std::string str = " <id> " + std::to_string(rec.id) + " <number> " + rec.number.c_str() + " <presentation> " +
                       std::to_string(static_cast<uint8_t>(rec.presentation)) + " <date> " + std::to_string(rec.date) + " <duration> " +

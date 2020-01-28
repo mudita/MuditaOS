@@ -62,9 +62,8 @@ namespace ModemCall
         ~ModemCall() = default;
         ModemCall(const std::string str);
 
+        static std::string to_string(const ModemCall &call);
     };
-
-    std::string to_string(const ModemCall &call);
 } // namespace ModemCall
 
 namespace CellularCall

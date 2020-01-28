@@ -20,7 +20,7 @@
 #include "mutex.hpp"
 #include "Service/Service.hpp"
 
-#define DEBUG_MODEM_OUTPUT_RESPONSE 1
+#define DEBUG_MODEM_OUTPUT_RESPONSE 0
 #define DEBUG_MODEM_TIMEOUT_AS_ERROR 0
 
 #if DEBUG_MODEM_TIMEOUT_AS_ERROR

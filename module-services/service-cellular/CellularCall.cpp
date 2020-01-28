@@ -47,7 +47,7 @@ namespace ModemCall
         }
     }
 
-    std::string to_string(const ModemCall &call)
+    std::string ModemCall::to_string(const ModemCall &call)
     {
         std::string str = " <idx> " + std::to_string(call.idx) + " <dir> " + std::to_string(static_cast<uint8_t>(call.dir)) + " <stat> " +
                           std::to_string(static_cast<uint8_t>(call.state)) + " <mode> " + std::to_string(static_cast<uint8_t>(call.mode)) + " <mpty> " +
