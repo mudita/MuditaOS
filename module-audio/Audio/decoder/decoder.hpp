@@ -23,25 +23,25 @@ namespace audio {
     struct Tags {
 
         /* Total audio duration in seconds */
-        uint32_t total_duration_s;
+        uint32_t total_duration_s = 0;
         /* Audio duration - hours part */
-        uint32_t duration_hour;
+        uint32_t duration_hour = 0;
         /* Audio duration - minutes part */
-        uint32_t duration_min;
+        uint32_t duration_min = 0;
         /* Audio duration - seconds part */
-        uint32_t duration_sec;
+        uint32_t duration_sec = 0;
 
         /* Sample rate */
-        uint32_t sample_rate;
+        uint32_t sample_rate = 0;
         /* Number of channels */
-        uint32_t num_channel;
+        uint32_t num_channel = 0;
 
-        std::string artist;
-        std::string genre;
-        std::string title;
-        std::string album;
-        std::string year;
-        std::string filePath;
+        std::string artist = "";
+        std::string genre = "";
+        std::string title = "";
+        std::string album = "";
+        std::string year = "";
+        std::string filePath = "";
 
         Tags() {}
 
