@@ -48,7 +48,7 @@ namespace ModemCall
 
     struct ModemCall
     {
-        int8_t idx; // TODO: alek: need to check what that is
+        int8_t idx;
         CallDir dir;
         CallState state;
         CallMode mode;

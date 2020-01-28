@@ -26,8 +26,7 @@ struct CalllogRecord{
 	UTF8        contactId;
 };
 
-// TODO: alek: change to string
-void printCalllogRecord(const CalllogRecord &rec);
+std::string to_string(const CalllogRecord &rec);
 
 enum class CalllogRecordField{
     DATE,

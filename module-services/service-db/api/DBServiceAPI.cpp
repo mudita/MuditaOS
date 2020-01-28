@@ -677,7 +677,7 @@ uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
-    printCalllogRecord(rec);
+    LOG_DEBUG("CalllogAdd %s", to_string(rec).c_str());
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
@@ -712,7 +712,8 @@ bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
 bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate, rec);
-    printCalllogRecord(rec);
+
+    LOG_DEBUG("CalllogUpdate %s", to_string(rec).c_str());
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());

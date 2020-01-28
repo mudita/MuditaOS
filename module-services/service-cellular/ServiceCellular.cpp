@@ -340,7 +340,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         // this should be acceptable and hence warning instead of error is logged in such case
         if (cmux->CheckATCommandResponse(ret, numberOfExpectedTokens, LOGWARN))
         {
-            // TODO: alek: added case when more status calls is returned
+            // TODO: alek: add case when more status calls is returned
             // TODO: alek: add cellular call validation and check it with modemcall
             bool retVal = true;
             auto callEntry = ret[1];

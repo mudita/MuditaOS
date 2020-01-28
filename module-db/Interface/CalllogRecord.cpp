@@ -10,10 +10,14 @@
 #include "../Tables/CalllogTable.hpp"
 #include <log/log.hpp>
 
-void printCalllogRecord(const CalllogRecord &rec)
+std::string to_string(const CalllogRecord &rec)
 {
-    LOG_DEBUG("<id> %u, <number> %s, <presentation> %u, <date> %u, <duartion> %u, <type> %u, <name> %s, <contactID> %s", rec.id, rec.number.c_str(),
-              rec.presentation, static_cast<uint32_t>(rec.date), static_cast<uint32_t>(rec.duration), rec.type, rec.name.c_str(), rec.contactId.c_str());
+    std::string str = " <id> " + std::to_string(rec.id) + " <number> " + rec.number.c_str() + " <presentation> " +
+                      std::to_string(static_cast<uint8_t>(rec.presentation)) + " <date> " + std::to_string(rec.date) + " <duration> " +
+                      std::to_string(rec.duration) + " <type> " + std::to_string(static_cast<uint8_t>(rec.type)) + " <name> " + rec.name.c_str() +
+                      " <contactID> " + rec.contactId.c_str();
+
+    return str;
 }
 
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(calllogDb) {
