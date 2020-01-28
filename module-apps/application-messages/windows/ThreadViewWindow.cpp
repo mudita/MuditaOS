@@ -209,12 +209,6 @@ namespace gui
                 }
             }
         }
-        {
-            if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data))
-            {
-                LOG_INFO("PhonebookSearchRequest data");
-            }
-        }
     }
 
     bool ThreadViewWindow::onInput(const InputEvent &inputEvent)
