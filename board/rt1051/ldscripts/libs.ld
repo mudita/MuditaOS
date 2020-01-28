@@ -11,7 +11,7 @@
 GROUP (
   "libgcc.a"
   "libc_nano.a"
-  "libstdc++_nano.a"
+  "libstdc++.a"
   "libm.a"
   "libnosys.a"
   "crti.o"
