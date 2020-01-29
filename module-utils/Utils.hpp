@@ -47,7 +47,7 @@ namespace utils
         return rtrim(ltrim(s));
     }
 
-    template <typename T> std::string NumberToString(T Number)
+    template <typename T> std::string to_string(T Number)
     {
         std::ostringstream ss;
         ss << Number;

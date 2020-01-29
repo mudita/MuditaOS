@@ -25,8 +25,8 @@ bool CalllogTable::Add(CalllogTableRow entry)
 {
 
     return db->Execute("INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId) VALUES ('%s', %lu, %s, %s, %lu, '%s', '%s');",
-                       entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::NumberToString(entry.date).c_str(),
-                       utils::NumberToString(entry.duration).c_str(), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
+                       entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::to_string(entry.date).c_str(),
+                       utils::to_string(entry.duration).c_str(), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
 }
 
 bool CalllogTable::RemoveByID(uint32_t id) {
@@ -41,8 +41,8 @@ bool CalllogTable::Update(CalllogTableRow entry)
 {
     return db->Execute(
         "UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s' WHERE _id = %lu;",
-        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::NumberToString(entry.date).c_str(),
-        utils::NumberToString(entry.duration).c_str(), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
+        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::to_string(entry.date).c_str(), utils::to_string(entry.duration).c_str(),
+        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
 }
 
 CalllogTableRow CalllogTable::GetByID(uint32_t id) {
