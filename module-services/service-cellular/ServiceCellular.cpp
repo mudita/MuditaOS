@@ -441,23 +441,21 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         responseMsg = std::make_shared<CellularResponseMessage>(false);
 	}
 		break;
-	case MessageType::DBServiceNotification :
-	{
-        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
-
-        if (msg == nullptr)
-        {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-            break;
-        }
-        LOG_DEBUG("Received multicast");
-        if ((msg->baseType == DB::BaseType::SmsDB) &&
-            ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
-        {
-            sendSMS();
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
-        }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        case MessageType::DBServiceNotification: {
+            DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+            if (msg == nullptr)
+            {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                break;
+            }
+            LOG_DEBUG("Received multicast");
+            if ((msg->baseType == DB::BaseType::SmsDB) &&
+                ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+            {
+                sendSMS();
+                return std::make_shared<sys::ResponseMessage>();
+            }
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
         break;
 	}
     case MessageType::CellularGetIMSI: {
