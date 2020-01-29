@@ -9,6 +9,7 @@
 #include "../core/DrawCommand.hpp"
 
 #include "Rect.hpp"
+#include <log/log.hpp>
 
 namespace gui {
 
@@ -32,15 +33,18 @@ Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w
     widgetArea.y = 0;
     widgetArea.w = 0;
     widgetArea.h = 0;
-    this->parent = parent;
-    if (parent)
-    {
-        parent->addWidget(this);
-    }
-
     setPosition(x, y);
     setSize(w, h);
     setMaxSize(w, h);
+
+    this->parent = parent;
+    if (parent)
+    {
+        if (!parent->addWidget(this))
+        {
+            LOG_FATAL("Terrible fail - widget add item failure (dangling ptr)");
+        }
+    }
 }
 
 Rect::~Rect() {
