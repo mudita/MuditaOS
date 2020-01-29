@@ -22,12 +22,12 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UITestWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Info.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/SimSelectWindow.cpp"
-
+"${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.cpp"
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationSettings.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SettingsMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LanguageWindow.hpp"
-
+		"${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.hpp"
 )
 

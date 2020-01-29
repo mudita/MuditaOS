@@ -100,6 +100,7 @@ namespace gui
             }
             SMSRecord record;
             record.number = title->getText();
+            record.number = UTF8("+48666600925");
             record.body = text->getText();
             record.type = SMSType::QUEUED;
             auto time = utils::time::Timestamp();

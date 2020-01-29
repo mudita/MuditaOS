@@ -93,6 +93,12 @@ class Timestamp : protected Localer
     {
         return time;
     };
+    // get month day
+    UTF8 getMDay(void);
+    // get month
+    UTF8 getMonth(void);
+    // gert year
+    UTF8 getYear(void);
 };
 
 /// helper class to operate on time now
