@@ -1,16 +1,7 @@
-
-/*
- * @file CellularCall.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 11.07.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #pragma once
 
 #include "Interface/CalllogRecord.hpp"
+#include <functional>
 #include <string>
 
 namespace ModemCall
@@ -72,21 +63,15 @@ namespace CellularCall
     {
         CalllogRecord call;
         bool isActiveCall = false;
+        std::function<uint32_t(const CalllogRecord &rec)> startCallAction;
+        std::function<bool(const CalllogRecord &rec)> endCallAction;
+        // uint32_t timerId = 0;
+        time_t duration = 0;
 
-      public:
-        CellularCall(const UTF8 &number = "", const CallType type = CallType::CT_NONE, const time_t date = 0, const time_t duration = 0)
+        void setType(const CallType type)
         {
-            this->call.id = 0; // 0 - Invalid
-            this->call.number = number;
-            this->call.presentation = PresentationType::PR_ALLOWED;
-            this->call.date = date;
-            this->call.duration = duration;
-            this->call.type = type;
-            this->call.name = number; // temporary set number as name
-            this->call.contactId = "1";
+            call.type = type;
         }
-
-        ~CellularCall() = default;
 
         void clear()
         {
@@ -101,44 +86,44 @@ namespace CellularCall
             isActiveCall = false;
         }
 
+      public:
+        CellularCall(const UTF8 &number = "", const CallType type = CallType::CT_NONE, const time_t date = 0, const time_t duration = 0)
+        {
+            clear();
+            this->call.number = number;
+            this->call.date = date;
+            this->call.duration = duration;
+            this->call.type = type;
+            this->call.name = number; // temporary set number as name
+            this->call.contactId = "1";
+        }
+
+        ~CellularCall() = default;
+
+        void setStartCallAction(const std::function<uint32_t(const CalllogRecord &rec)> callAction)
+        {
+            startCallAction = callAction;
+        }
+
+        void setEndCallAction(const std::function<bool(const CalllogRecord &rec)> callAction)
+        {
+            endCallAction = callAction;
+        }
+
+        bool startCall(const UTF8 &number, const CallType type);
+
+        bool setActive();
+
+        bool endCall();
+
+        void incDuration()
+        {
+            duration++;
+        }
+
         bool isValid() const
         {
             return call.id != 0;
-        }
-
-        bool isActive() const
-        {
-            return isActiveCall;
-        }
-
-        void setActive()
-        {
-            isActiveCall = true;
-        }
-
-        const CalllogRecord &getCallRecord() const
-        {
-            return call;
-        }
-
-        void setCallRecordId(const uint32_t id)
-        {
-            call.id = id;
-        }
-
-        void setDuration(const time_t duration)
-        {
-            call.duration = duration;
-        }
-
-        CallType getType() const
-        {
-            return call.type;
-        }
-
-        void setType(CallType type)
-        {
-            call.type = type;
         }
     };
 } // namespace CellularCall

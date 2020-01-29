@@ -4,6 +4,9 @@
 #include <log/log.hpp>
 #include <vector>
 
+//#include <Service.hpp>
+#include "bsp/rtc/rtc.hpp"
+
 namespace ModemCall
 {
     ModemCall::ModemCall(const std::string str)
@@ -61,3 +64,96 @@ namespace ModemCall
         return str;
     }
 } // namespace ModemCall
+
+namespace CellularCall
+{
+    bool CellularCall::startCall(const UTF8 &number, const CallType type)
+    {
+        if (isValid())
+        {
+            LOG_ERROR("call already set");
+            return false;
+        }
+
+        time_t timestamp;
+        RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
+        if (rtcErr != RtcBspError_e::RtcBspOK)
+        {
+            LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
+            return false;
+        }
+        clear();
+        call.number = number;
+        call.type = type;
+        call.date = timestamp;
+        call.name = number; // temporary set name as number
+        uint32_t callId = startCallAction ? startCallAction(call) : 0;
+        if (callId == 0)
+        {
+            LOG_ERROR("startCallAction failed");
+            clear();
+            return false;
+        }
+        call.id = callId;
+
+        return true;
+    }
+
+    bool CellularCall::setActive()
+    {
+        if (isValid())
+        {
+            // startTimer(timerId);
+            isActiveCall = true;
+            return true;
+        }
+        return false;
+    }
+
+    bool CellularCall::endCall()
+    {
+        // stopTimer(timerId);
+
+        if (!isValid())
+        {
+            LOG_ERROR("Trying to update invalid call");
+            return false;
+        }
+
+        if (isActiveCall)
+        {
+            call.duration = duration;
+        }
+        else
+        {
+            auto callType = call.type;
+            switch (callType)
+            {
+            case CallType::CT_INCOMING: {
+                setType(CallType::CT_REJECTED);
+            }
+            break;
+
+            case CallType::CT_OUTGOING: {
+                setType(CallType::CT_MISSED);
+            }
+            break;
+
+            default:
+                LOG_ERROR("Not a valid call type %u", callType);
+                return false;
+            }
+        }
+
+        if (!(endCallAction && endCallAction(call)))
+        {
+            LOG_ERROR("CalllogUpdate failed, id %u", call.id);
+            return false;
+        }
+
+        // Calllog entry was updated, ongoingCall can be cleared
+        clear();
+
+        return true;
+    }
+} // namespace CellularCall

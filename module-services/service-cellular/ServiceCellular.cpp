@@ -54,6 +54,17 @@ ServiceCellular::ServiceCellular()
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
     callDurationTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
 
+    ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
+        uint32_t callId = DBServiceAPI::CalllogAdd(this, rec);
+        if (callId == 0)
+        {
+            LOG_ERROR("CalllogAdd failed");
+        }
+        return callId;
+    });
+
+    ongoingCall.setEndCallAction([=](const CalllogRecord &rec) { return DBServiceAPI::CalllogUpdate(this, rec); });
+
     notificationCallback = [this](std::vector<uint8_t> &data) {
         LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
         TS0710_Frame frame(data);
@@ -61,7 +72,8 @@ ServiceCellular::ServiceCellular()
         CellularNotificationMessage::Type type = identifyNotification(frame.getFrame().data, message);
         auto msg = std::make_shared<CellularNotificationMessage>(type);
 
-        switch (type) {
+        switch (type)
+        {
 
         case CellularNotificationMessage::Type::PowerUpProcedureComplete:
         case CellularNotificationMessage::Type::Ringing:
@@ -82,24 +94,27 @@ ServiceCellular::ServiceCellular()
             auto begin = notification.find(",");
             auto end = notification.find("\r");
             msg->data = notification.substr(begin + 1, end);
+        }
+        break;
+
+        case CellularNotificationMessage::Type::SignalStrengthUpdate:
+            LOG_DEBUG("Setting new signal strength");
+            msg->signalStrength = std::stoll(message);
+            if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])))
+            {
+                LOG_ERROR("Signal strength value out of range.");
+                msg->dBmSignalStrength = signalStrengthToDB[0];
             }
-                break;
+            else
+            {
+                msg->dBmSignalStrength = signalStrengthToDB[msg->signalStrength];
+            }
 
-            case CellularNotificationMessage::Type::SignalStrengthUpdate:
-                LOG_DEBUG("Setting new signal strength");
-                msg->signalStrength = std::stoll(message);
-                if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0]))) {
-                    LOG_ERROR("Signal strength value out of range.");
-                    msg->dBmSignalStrength = signalStrengthToDB[0];
-                } else {
-                    msg->dBmSignalStrength = signalStrengthToDB[msg->signalStrength];
-                }
+            break;
 
-                break;
-            
-            case CellularNotificationMessage::Type::None:
-                // do not send notification msg
-                return;
+        case CellularNotificationMessage::Type::None:
+            // do not send notification msg
+            return;
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -122,7 +137,7 @@ void ServiceCellular::CallStateTimerHandler()
 
 void ServiceCellular::CallDurationTimerHandler()
 {
-    callDuration++;
+    ongoingCall.incDuration();
 }
 
 // Invoked when timer ticked
@@ -200,17 +215,17 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             switch (msg->type)
             {
             case CellularNotificationMessage::Type::CallActive: {
-                auto ret = setOngoingCallActive();
+                auto ret = ongoingCall.setActive();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
             case CellularNotificationMessage::Type::IncomingCall: {
                 auto ret = true;
-                if (!isOngoingCallValid())
+                if (!ongoingCall.isValid())
                 {
                     // CellularNotificationMessage::Type::IncomingCall is called periodically during not answered incomming call
                     // create ongoing call only once
-                    ret = startOngoingCall(msg->data, CallType::CT_INCOMING);
+                    ret = ongoingCall.startCall(msg->data, CallType::CT_INCOMING);
                 }
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
@@ -218,12 +233,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             case CellularNotificationMessage::Type::CallAborted:
             case CellularNotificationMessage::Type::CallBusy: {
                 stopTimer(callStateTimerId);
-                auto ret = endOngoingCall();
+                auto ret = ongoingCall.endCall();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
             case CellularNotificationMessage::Type::Ringing: {
-                auto ret = startOngoingCall(msg->data, CallType::CT_OUTGOING);
+                auto ret = ongoingCall.startCall(msg->data, CallType::CT_OUTGOING);
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
@@ -486,79 +501,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     return responseMsg;
 }
 
-bool ServiceCellular::startOngoingCall(const UTF8 &number, const CallType type)
-{
-    if (ongoingCall.isValid())
-    {
-        LOG_ERROR("Ongoing call already set");
-        return false;
-    }
-
-    time_t timestamp;
-    RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
-    if (rtcErr != RtcBspError_e::RtcBspOK)
-    {
-        LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
-        return false;
-    }
-    CellularCall::CellularCall cellularCall(number, type, timestamp);
-    uint32_t callId = DBServiceAPI::CalllogAdd(this, cellularCall.getCallRecord());
-    if (callId == 0)
-    {
-        LOG_ERROR("CalllogAdd failed");
-        return false;
-    }
-    cellularCall.setCallRecordId(callId);
-    ongoingCall = cellularCall;
-
-    return true;
-}
-
-bool ServiceCellular::endOngoingCall()
-{
-    stopTimer(callDurationTimerId);
-
-    if (!ongoingCall.isValid())
-    {
-        LOG_ERROR("Trying to update invalid call");
-        return false;
-    }
-
-    if (ongoingCall.isActive())
-    {
-        ongoingCall.setDuration(callDuration);
-    }
-    else
-    {
-        auto callType = ongoingCall.getType();
-        switch (callType)
-        {
-        case CallType::CT_INCOMING: {
-            ongoingCall.setType(CallType::CT_REJECTED);
-        }
-        break;
-
-        case CallType::CT_OUTGOING: {
-            ongoingCall.setType(CallType::CT_MISSED);
-        }
-        break;
-
-        default:
-            LOG_ERROR("Not a valid call type %u", callType);
-            return false;
-        }
-    }
-    if (!DBServiceAPI::CalllogUpdate(this, ongoingCall.getCallRecord()))
-    {
-        LOG_ERROR("CalllogUpdate failed, id %u", ongoingCall.getCallRecord().id);
-        return false;
-    }
-
-    // Calllog entry was updated, ongoingCall can be cleared
-    ongoingCall.clear();
-
-    return true;
-}
 
 CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vector<uint8_t> data, std::string &message) {
 
