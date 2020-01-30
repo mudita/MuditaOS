@@ -52,7 +52,6 @@ ServiceCellular::ServiceCellular()
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
 
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
-    callDurationTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
         uint32_t callId = DBServiceAPI::CalllogAdd(this, rec);
@@ -135,21 +134,12 @@ void ServiceCellular::CallStateTimerHandler()
     sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, this);
 }
 
-void ServiceCellular::CallDurationTimerHandler()
-{
-    ongoingCall.incDuration();
-}
-
 // Invoked when timer ticked
 void ServiceCellular::TickHandler(uint32_t id)
 {
     if (id == callStateTimerId)
     {
         CallStateTimerHandler();
-    }
-    else if (id == callDurationTimerId)
-    {
-        CallDurationTimerHandler();
     }
     else
     {

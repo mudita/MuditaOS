@@ -79,19 +79,7 @@ public:
     TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     // used for polling for call state
     uint32_t callStateTimerId = 0;
-    // used for calculation of callduration
-    uint32_t callDurationTimerId = 0;
-    uint32_t callDuration = 0;
-    uint32_t callEndTime = -1;
-    void runCallDurationTimer()
-    {
-        callDuration = 0;
-        callEndTime = -1;
-        ReloadTimer(callDurationTimerId);
-    }
-
     void CallStateTimerHandler();
-    void CallDurationTimerHandler();
 
     DLC_channel::Callback_t notificationCallback = nullptr;
 

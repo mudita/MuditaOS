@@ -66,7 +66,7 @@ namespace CellularCall
         std::function<uint32_t(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
         // uint32_t timerId = 0;
-        time_t duration = 0;
+        time_t startActiveTime = 0;
 
         void setType(const CallType type)
         {
@@ -84,6 +84,7 @@ namespace CellularCall
             call.name = "";
             call.contactId = "";
             isActiveCall = false;
+            startActiveTime = 0;
         }
 
       public:
@@ -115,11 +116,6 @@ namespace CellularCall
         bool setActive();
 
         bool endCall();
-
-        void incDuration()
-        {
-            duration++;
-        }
 
         bool isValid() const
         {

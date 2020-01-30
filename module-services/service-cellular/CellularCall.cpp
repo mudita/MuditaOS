@@ -65,6 +65,23 @@ namespace ModemCall
     }
 } // namespace ModemCall
 
+namespace
+{
+    // TODO: alek: possibly make a new general API for this
+    time_t getCurrentTimeStamp()
+    {
+        time_t timestamp;
+        RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
+        if (rtcErr != RtcBspError_e::RtcBspOK)
+        {
+            LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
+            timestamp = 0;
+        }
+
+        return timestamp;
+    }
+} // namespace
+
 namespace CellularCall
 {
     bool CellularCall::startCall(const UTF8 &number, const CallType type)
@@ -75,17 +92,10 @@ namespace CellularCall
             return false;
         }
 
-        time_t timestamp;
-        RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
-        if (rtcErr != RtcBspError_e::RtcBspOK)
-        {
-            LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
-            return false;
-        }
         clear();
         call.number = number;
         call.type = type;
-        call.date = timestamp;
+        call.date = getCurrentTimeStamp();
         call.name = number; // temporary set name as number
         uint32_t callId = startCallAction ? startCallAction(call) : 0;
         if (callId == 0)
@@ -103,7 +113,7 @@ namespace CellularCall
     {
         if (isValid())
         {
-            // startTimer(timerId);
+            startActiveTime = getCurrentTimeStamp();
             isActiveCall = true;
             return true;
         }
@@ -112,7 +122,6 @@ namespace CellularCall
 
     bool CellularCall::endCall()
     {
-        // stopTimer(timerId);
 
         if (!isValid())
         {
@@ -122,7 +131,8 @@ namespace CellularCall
 
         if (isActiveCall)
         {
-            call.duration = duration;
+            time_t endTime = getCurrentTimeStamp();
+            call.duration = endTime > startActiveTime ? endTime - startActiveTime : 0;
         }
         else
         {
