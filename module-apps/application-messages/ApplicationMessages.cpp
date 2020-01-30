@@ -41,24 +41,21 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl,
 		return retMsg;
 	}
 
-    if (msgl->messageType == (uint32_t)MessageType::DBServiceNotification)
+    if (msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
     {
         DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
         LOG_DEBUG("Received multicast");
-        if ((msg->baseType == DB::BaseType::SmsDB) &&
+        if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB) &&
             ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
         {
             if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view])
             {
                 LOG_DEBUG("TODO");
                 this->getCurrentWindow()->rebuild();
-                // TODO rebuild fixme
-                // TODO refresh if it's for interesting thread
             }
             return std::make_shared<sys::ResponseMessage>();
         }
     }
-
     // this variable defines whether message was processed.
     bool handled = false;
 
