@@ -55,7 +55,8 @@ class Text : public Rect
     enum class EditMode
     {
         BROWSE,
-        EDIT
+        EDIT,
+        SCROLL,
     };
 
     /**
