@@ -45,6 +45,7 @@ class DBServiceAPI
     static bool SMSUpdate(sys::Service *serv, const SMSRecord &rec);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffsetByThreadID(sys::Service *serv, uint32_t offset, uint32_t limit, uint32_t id);
+    static uint32_t SMSGetCount(sys::Service *serv);
     /**
      * @brief Function is getting last modified SMS record.
      * @param serv Pointer to Service based object that is sending request.
