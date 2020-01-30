@@ -18,12 +18,14 @@
 #include "windows/ThreadViewWindow.hpp"
 #include <Dialog.hpp>
 
+#include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
 namespace app {
 
-    ApplicationMessages::ApplicationMessages(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 4096 + 2048)
+    ApplicationMessages::ApplicationMessages(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 4096 * 2)
     {
+        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
 
 ApplicationMessages::~ApplicationMessages() {
@@ -39,10 +41,28 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl,
 		return retMsg;
 	}
 
-	// this variable defines whether message was processed.
-	bool handled = false;
+    if (msgl->messageType == (uint32_t)MessageType::DBServiceNotification)
+    {
+        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+        LOG_DEBUG("Received multicast");
+        if ((msg->baseType == DB::BaseType::SmsDB) &&
+            ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+        {
+            if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view])
+            {
+                LOG_DEBUG("TODO");
+                this->getCurrentWindow()->rebuild();
+                // TODO rebuild fixme
+                // TODO refresh if it's for interesting thread
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        }
+    }
 
-	//handle database response
+    // this variable defines whether message was processed.
+    bool handled = false;
+
+    //handle database response
 	if (resp != nullptr) {
 		handled = true;
 		uint32_t msgType = resp->responseTo;
