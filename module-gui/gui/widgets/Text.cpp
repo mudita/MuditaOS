@@ -506,6 +506,29 @@ bool Text::onInput(const InputEvent &inputEvent)
         }
     }
 
+    // handle navigation
+    if (inputEvent.state == InputEvent::State::keyReleasedShort && ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) ||
+                                                                    (inputEvent.keyCode == KeyCode::KEY_UP) || (inputEvent.keyCode == KeyCode::KEY_DOWN)))
+    {
+        switch (editMode)
+        {
+        case EditMode::BROWSE:
+            res = handleBrowsing(inputEvent);
+            break;
+        case EditMode::EDIT:
+            res = handleNavigation(inputEvent);
+            break;
+        case EditMode::SCROLL:
+            LOG_DEBUG("TODO");
+            res = false;
+            break;
+        }
+
+        if (res && editMode != EditMode::SCROLL)
+            updateCursor();
+        return res;
+    }
+
     // translate and store keypress
     uint32_t code = translator.handle(inputEvent.key, mode ? mode->get() : "");
 
@@ -556,17 +579,6 @@ bool Text::onInput(const InputEvent &inputEvent)
             mode->next();
             return true;
         }
-    }
-
-    if ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) || (inputEvent.keyCode == KeyCode::KEY_UP) ||
-        (inputEvent.keyCode == KeyCode::KEY_DOWN))
-    {
-        if (editMode == EditMode::BROWSE) res = handleBrowsing(inputEvent);
-        else
-            res = handleNavigation(inputEvent);
-
-        if (res) updateCursor();
-        return res;
     }
 
     // it there is no key char it means that translator didn't handled the key and this key
