@@ -683,15 +683,17 @@ uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
+    uint32_t recId = DB_ID_NONE;
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true))
     {
-        LOG_DEBUG("CalllogAdd returned ID = %u", calllogResponse->recordId);
-        return calllogResponse->recordId;
+        auto records = *calllogResponse->records;
+        if (!records.empty())
+        {
+            recId = records[0].id;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return recId;
 }
 
 bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
@@ -741,7 +743,7 @@ uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv)
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 

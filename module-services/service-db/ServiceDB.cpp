@@ -578,17 +578,20 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 #if SHOW_DB_ACCESS_PERF == 1
         timestamp = cpp_freertos::Ticks::GetTicks();
 #endif
+        auto record = std::make_unique<std::vector<CalllogRecord>>();
+        msg->record.id = DB_ID_NONE;
         auto ret = calllogRecordInterface->Add(msg->record);
 #if SHOW_DB_ACCESS_PERF == 1
         LOG_DEBUG("DBCalllogAdd time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
-        uint32_t callId = 0;
         if (ret)
         {
-            callId = calllogRecordInterface->GetLastID();
-            LOG_INFO("Last ID %d", callId);
+            // update db ID in response message
+            msg->record.id = calllogRecordInterface->GetLastID();
         }
-        responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, ret, callId);
+        record->push_back(msg->record);
+        LOG_INFO("Last ID %d", msg->record.id);
+        responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
     }
     break;
 

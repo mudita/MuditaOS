@@ -15,6 +15,7 @@
 #include <memory>
 #include "../Database/Database.hpp"
 
+constexpr uint32_t DB_ID_NONE = 0;
 
 template<typename T, typename F>
 class RecordInterface {
