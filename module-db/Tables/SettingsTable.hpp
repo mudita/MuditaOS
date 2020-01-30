@@ -18,6 +18,7 @@ struct SettingsTableRow{
     uint32_t ID;
     bool timeFormat12;
     bool timeAuto;
+    bool timeDateFormat;
     bool brightnessAuto;
     uint32_t brightnessLevel;
     uint32_t fontSize;

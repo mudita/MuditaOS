@@ -12,25 +12,36 @@
 namespace utils {
 namespace time {
 
-// helper class to not put everything in time
-struct Localer {
-    const unsigned int abbrev_len = 3;
-    /// order matters, it's used in replace_locale with enum Replacements
-    const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
-                                                             "%A",  // day long
-                                                             "%b",  // month abbrew
-                                                             "%B",  // month long
-                                                             "%Z"}; // timezone
-    /// see specifiers_replacements description above
-    enum Replacements {
-        DayAbbrev,
-        DayLong,
-        MonthAbbrev,
-        MonthLong,
-        Timezone,
+    enum class GetParameters
+    {
+        Hour,
+        Minute,
+        Day,
+        Month,
+        Year
     };
 
-    UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
+    // helper class to not put everything in time
+    struct Localer
+    {
+        const unsigned int abbrev_len = 3;
+        /// order matters, it's used in replace_locale with enum Replacements
+        const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
+                                                                 "%A",  // day long
+                                                                 "%b",  // month abbrew
+                                                                 "%B",  // month long
+                                                                 "%Z"}; // timezone
+        /// see specifiers_replacements description above
+        enum Replacements
+        {
+            DayAbbrev,
+            DayLong,
+            MonthAbbrev,
+            MonthLong,
+            Timezone,
+        };
+
+        UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
 };
 
 class Timestamp : protected Localer
@@ -93,12 +104,10 @@ class Timestamp : protected Localer
     {
         return time;
     };
-    // get month day
-    UTF8 getMDay(void);
-    // get month
-    UTF8 getMonth(void);
-    // gert year
-    UTF8 getYear(void);
+    /*
+     * @breif Returns
+     */
+    UTF8 get_date_time_substr(GetParameters param);
 };
 
 /// helper class to operate on time now

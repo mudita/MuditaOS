@@ -164,7 +164,28 @@ void Timestamp::replace_specifiers()
             return Timestamp::str(Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
         }
     }
-
+UTF8 Time::get_date_time_substr(GetParameters param)
+    {
+        switch (param)
+        {
+        case GetParameters::Hour:
+            return UTF8(std::to_string(timeinfo.tm_hour));
+            break;
+        case GetParameters::Minute:
+            return UTF8(std::to_string(timeinfo.tm_min));
+            break;
+        case GetParameters::Day:
+            return UTF8(std::to_string(timeinfo.tm_mday));
+            break;
+        case GetParameters::Month:
+            return UTF8(std::to_string(timeinfo.tm_mon + 1));
+            break;
+        case GetParameters::Year:
+            return UTF8(std::to_string(timeinfo.tm_year + 1900));
+            break;
+        }
+        return UTF8();
+    }
     UTF8 Date::str(std::string format)
     {
         if (!format.empty())

@@ -52,51 +52,91 @@ namespace gui
         setTitle(utils::localize.get("app_settings_date_and_time"));
 
         // create date widgets
-        // todo add date format to settings db, false american layout
-        bool dateFormat = false;
+
         utils::time::Time time;
-
-        if (dateFormat)
+        SettingsRecord appSettings = application->getSettings();
+        if (appSettings.timeDateFormat)
         {
-            dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_day"), time.getMDay(), [=](gui::Item &) {
-                LOG_INFO("Activated callback");
-                return true;
-            }));
+            dateItems.push_back(
+                addDateTimeItem(utils::localize.get("app_settings_title_day"), time.get_date_time_substr(utils::time::GetParameters::Day), [=](gui::Item &) {
+                    LOG_INFO("Activated callback");
+                    return true;
+                }));
 
-            dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_month"), time.getMonth(), [=](gui::Item &) {
-                LOG_INFO("Activated callback");
-                return true;
-            }));
+            dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_month"), time.get_date_time_substr(utils::time::GetParameters::Month),
+                                                [=](gui::Item &) {
+                                                    LOG_INFO("Activated callback");
+                                                    return true;
+                                                }));
         }
         else
         {
-            dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_month"), time.getMonth(), [=](gui::Item &) {
-                LOG_INFO("Activated callback");
-                return true;
-            }));
-
-            dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_day"), time.getMDay(), [=](gui::Item &) {
-                LOG_INFO("Activated callback");
-                return true;
-            }));
+            dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_month"), time.get_date_time_substr(utils::time::GetParameters::Month),
+                                                [=](gui::Item &) {
+                                                    LOG_INFO("Activated callback");
+                                                    return true;
+                                                }));
+            dateItems.push_back(
+                addDateTimeItem(utils::localize.get("app_settings_title_day"), time.get_date_time_substr(utils::time::GetParameters::Day), [=](gui::Item &) {
+                    LOG_INFO("Activated callback");
+                    return true;
+                }));
         }
 
-        dateItems.push_back(addDateTimeItem(utils::localize.get("app_settings_title_year"), time.getYear(), [=](gui::Item &) {
+        dateItems.push_back(
+            addDateTimeItem(utils::localize.get("app_settings_title_year"), time.get_date_time_substr(utils::time::GetParameters::Year), [=](gui::Item &) {
+                LOG_INFO("Activated callback");
+                return true;
+            }));
+
+        for (uint32_t i = 0; i < dateItems.size(); i++)
+        {
+            uint32_t y = 123;
+            uint32_t x = 30 + 150 * i;
+            dateItems[i]->setPosition(x, y);
+        }
+
+        // create time items
+        timeItems.push_back(
+            addDateTimeItem(utils::localize.get("app_settings_title_time"), time.get_date_time_substr(utils::time::GetParameters::Hour), [=](gui::Item &) {
+                LOG_INFO("Activated callback");
+                return true;
+            }));
+
+        timeItems.push_back(addDateTimeItem("", time.get_date_time_substr(utils::time::GetParameters::Minute), [=](gui::Item &) {
             LOG_INFO("Activated callback");
             return true;
         }));
 
-        for (uint32_t i = 0; i < dateItems.size(); i++)
+        timeItems.push_back(addDateTimeItem("", "", [=](gui::Item &) {
+            LOG_INFO("Activated callback");
+            return true;
+        }));
+
+        for (uint32_t i = 0; i < timeItems.size(); i++)
         {
-            uint32_t y = 228;
+            uint32_t y = 285;
             uint32_t x = 30 + 150 * i;
-            dateItems[i]->setPosition(x, y);
+            timeItems[i]->setPosition(x, y);
         }
     }
     void DateTimeWindow::destroyInterface()
     {
         AppWindow::destroyInterface();
         this->focusItem = nullptr;
+
+        for (uint32_t i = 0; i < dateItems.size(); i++)
+        {
+            delete dateItems[i];
+        }
+
+        for (uint32_t i = 0; i < timeItems.size(); i++)
+        {
+            delete timeItems[i];
+        }
+
+        dateItems.clear();
+        timeItems.clear();
         children.clear();
     }
 

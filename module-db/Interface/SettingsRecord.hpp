@@ -18,6 +18,7 @@ struct SettingsRecord{
     uint32_t dbID;
     bool timeFormat12;
     bool timeAuto;
+    bool timeDateFormat;
     bool brightnessAuto;
     uint32_t brightnessLevel;
     uint32_t fontSize;
