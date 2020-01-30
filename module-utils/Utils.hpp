@@ -25,8 +25,8 @@ namespace utils
         return elems;
     }
 
-    static inline std::vector<std::string> split(const std::string &s, const std::string &delimiter, const bool skipEmptyTokens = false,
-                                                 const uint32_t maxTokenCount = 0)
+    static inline std::vector<std::string> split(const std::string &s, const std::string &delimiter, const uint32_t maxTokenCount = 0,
+                                                 const bool skipEmptyTokens = true)
     {
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
         std::string token;

@@ -181,5 +181,5 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
 // for string delimiter
 std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount)
 {
-    return utils::split(input, delimiter, true, maxTokenCount);
+    return utils::split(input, delimiter, maxTokenCount);
 }
