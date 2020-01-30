@@ -8,6 +8,16 @@
  */
 #include "CalllogRecord.hpp"
 #include "../Tables/CalllogTable.hpp"
+#include <log/log.hpp>
+#include <sstream>
+
+std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
+{
+    out << " <id> " << rec.id << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
+        << " <duration> " << rec.duration << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
+
+    return out;
+}
 
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(calllogDb) {
 }
@@ -15,19 +25,22 @@ CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(
 CalllogRecordInterface::~CalllogRecordInterface() {
 }
 
-bool CalllogRecordInterface::Add(const CalllogRecord &rec) {
-    return calllogDB->calls.Add(CalllogTableRow{
-            .id=rec.id, // this is only to remove warning
-            .number=rec.number,
-            .presentation=rec.presentation,
-            .date=rec.date,
-			.duration=rec.duration,
-            .type=rec.type,
-            .name=rec.name,
-            .contactId=rec.contactId
-    });
+bool CalllogRecordInterface::Add(const CalllogRecord &rec)
+{
+    return calllogDB->calls.Add(CalllogTableRow{.id = rec.id, // this is only to remove warning
+                                                .number = rec.number,
+                                                .presentation = rec.presentation,
+                                                .date = rec.date,
+                                                .duration = rec.duration,
+                                                .type = rec.type,
+                                                .name = rec.name,
+                                                .contactId = rec.contactId});
 }
 
+uint32_t CalllogRecordInterface::GetLastID()
+{
+    return calllogDB->GetLastInsertRowID();
+}
 
 std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
                                                                                   CalllogRecordField field,
@@ -67,18 +80,14 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec) {
         return false;
     }
 
-    calllogDB->calls.Update(CalllogTableRow{
-        .id=rec.id, 
-        .number=rec.number,
-        .presentation=rec.presentation,
-        .date=rec.date,
-        .duration=rec.duration,
-        .type=rec.type,
-        .name=rec.name,
-        .contactId=rec.contactId
-    });
-
-    return true;
+    return calllogDB->calls.Update(CalllogTableRow{.id = rec.id,
+                                                   .number = rec.number,
+                                                   .presentation = rec.presentation,
+                                                   .date = rec.date,
+                                                   .duration = rec.duration,
+                                                   .type = rec.type,
+                                                   .name = rec.name,
+                                                   .contactId = rec.contactId});
 }
 
 bool CalllogRecordInterface::RemoveByID(uint32_t id) {
@@ -88,11 +97,7 @@ bool CalllogRecordInterface::RemoveByID(uint32_t id) {
         return false;
     }
 
-    if(calllogDB->calls.RemoveByID(id) == false){
-        return false;
-    }
-
-    return true;
+    return calllogDB->calls.RemoveByID(id);
 }
 
 bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char *str) {
