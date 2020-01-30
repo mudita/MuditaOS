@@ -26,6 +26,27 @@
 
 const char *ServiceDB::serviceName = "ServiceDB";
 
+class TimeStamp
+{
+    ssize_t timestamp;
+    std::string text;
+
+  public:
+    TimeStamp(const std::string &text)
+    {
+#if SHOW_DB_ACCESS_PERF == 1
+        this->text = text;
+        timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+    }
+    ~TimeStamp()
+    {
+#if SHOW_DB_ACCESS_PERF == 1
+        LOG_DEBUG("%s time: %lu", text.c_str(), cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+    }
+};
+
 ServiceDB::ServiceDB() : sys::Service(serviceName, "", 1024 * 24, sys::ServicePriority::Idle)
 {
     LOG_INFO("[ServiceDB] Initializing");
@@ -168,23 +189,20 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
     case MessageType::DBSMSGetLastRecord:
     {
-#if SHOW_DB_ACCESS_PERF == 1
-        timestamp = cpp_freertos::Ticks::GetTicks();
-#endif
+        TimeStamp("DBSMSGetLastRecord");
 
-    	uint32_t id = smsRecordInterface->GetLastID();
-
-    	auto rec = smsRecordInterface->GetByID(id);
+        uint32_t id = smsRecordInterface->GetLastID();
+        auto rec = smsRecordInterface->GetByID(id);
     	auto records = std::make_unique<std::vector<SMSRecord>>();
     	records->push_back(rec);
-
     	responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(records), true);
-
-#if SHOW_DB_ACCESS_PERF == 1
-        LOG_DEBUG("DBSMSGetLastRecord time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
-#endif
-
     	break;
+    }
+    case MessageType::DBSMSGetCount: {
+        TimeStamp("DBSMSGetCount");
+        auto ret = smsRecordInterface->GetCount();
+        responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, true, ret);
+        break;
     }
         /**
          * Thread records
@@ -247,14 +265,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
     case MessageType::DBThreadGetCount: {
         //  DBThreadMessage *msg = reinterpret_cast<DBThreadMessage *>(msgl);
-#if SHOW_DB_ACCESS_PERF == 1
-        timestamp = cpp_freertos::Ticks::GetTicks();
-#endif
+        TimeStamp("DBThreadGetCount");
         auto ret = threadRecordInterface->GetCount();
-#if SHOW_DB_ACCESS_PERF == 1
-        LOG_DEBUG("DBThreadGetCount time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
-#endif
-        // DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,uint32_t retCode=0,uint32_t count=0,uint32_t respTo=0)
         responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, 0, 0, ret);
     }
     break;
