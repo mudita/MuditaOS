@@ -9,23 +9,37 @@
 #define MIDDLEWARES_GUI_WIDGETS_BOUNDINGBOX_HPP_
 
 #include <cstdint>
+#include <string>
 
 namespace gui {
 
-class BoundingBox {
-public:
-	int16_t x,y;
-	uint16_t w,h;
-	BoundingBox();
-    BoundingBox(int32_t x, int32_t y, uint32_t w, uint32_t h);
-    virtual ~BoundingBox();
+    enum class Axis
+    {
+        X,
+        Y
+    };
 
-    static bool intersect(const BoundingBox &box1, const BoundingBox &box2, BoundingBox &result);
+    class BoundingBox
+    {
+      public:
+        struct
+        {
+            int16_t x = 0, y = 0;
+            uint16_t w = 0, h = 0;
+        };
+        BoundingBox(int32_t x = 0, int32_t y = 0, uint32_t w = 0, uint32_t h = 0);
+        virtual ~BoundingBox() = default;
 
-    //inline
-	void clear() { x=0; y=0; w=0; h=0; };
+        static bool intersect(const BoundingBox &box1, const BoundingBox &box2, BoundingBox &result);
 
-};
+        /// set x,y,w,h to zero
+        void clear();
+        /// get size in axis - in x get width in y get height
+        uint16_t &size(gui::Axis axis);
+        /// get position in axis - in x get x, in y get y
+        int16_t &pos(gui::Axis axis);
+        std::string str();
+    };
 
 } /* namespace gui */
 
