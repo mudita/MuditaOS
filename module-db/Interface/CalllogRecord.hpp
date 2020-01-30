@@ -24,6 +24,8 @@ struct CalllogRecord{
     CallType    type;
     UTF8        name;
 	UTF8        contactId;
+
+    friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
 };
 
 enum class CalllogRecordField{
@@ -52,7 +54,9 @@ public:
 
     std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,CalllogRecordField field, const char* str) override final;
 
-private:
+    uint32_t GetLastID();
+
+  private:
     const uint32_t snippetLength = 60;
     CalllogDB* calllogDB;
 };
