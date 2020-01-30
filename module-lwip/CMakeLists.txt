@@ -2,6 +2,9 @@ project(module-lwip VERSION 1.0 DESCRIPTION "LwIP port layer")
 
 include(${CMAKE_SOURCE_DIR}/config/ModuleConfig.cmake)
 
+# remove -Werror for lwip
+string(REPLACE "-Werror" "" TARGET_COMPILE_OPTIONS "${TARGET_COMPILE_OPTIONS}")
+
 # TODO check me
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
 set(LWIP_COMPILER_FLAGS ${TARGET_COMPILE_OPTIONS})
