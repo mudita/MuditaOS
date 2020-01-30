@@ -53,7 +53,7 @@ namespace ModemCall
         ~ModemCall() = default;
         ModemCall(const std::string str);
 
-        static std::string to_string(const ModemCall &call);
+        friend std::ostream &operator<<(std::ostream &out, const ModemCall &call);
     };
 } // namespace ModemCall
 

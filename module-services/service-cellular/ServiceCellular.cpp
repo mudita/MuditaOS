@@ -38,6 +38,7 @@
 #include "service-db/messages/DBNotificationMessage.hpp"
 
 #include "time/time_conversion.hpp"
+#include <Utils.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
@@ -353,7 +354,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             try
             {
                 ModemCall::ModemCall call(callEntry);
-                LOG_DEBUG("%s", ModemCall::ModemCall::to_string(call).c_str());
+                LOG_DEBUG("%s", utils::to_string(call).c_str());
                 // If call changed to "Active" state stop callStateTimer(used for polling for call state)
                 if (call.state == ModemCall::CallState::Active)
                 {

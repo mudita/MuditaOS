@@ -14,6 +14,8 @@
 
 #include "../ServiceDB.hpp"
 
+#include <Utils.hpp>
+
 SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
 {
 
@@ -677,7 +679,7 @@ uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
-    LOG_DEBUG("CalllogAdd %s", CalllogRecord::to_string(rec).c_str());
+    LOG_DEBUG("CalllogAdd %s", utils::to_string(rec).c_str());
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
@@ -713,7 +715,7 @@ bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate, rec);
 
-    LOG_DEBUG("CalllogUpdate %s", CalllogRecord::to_string(rec).c_str());
+    LOG_DEBUG("CalllogUpdate %s", utils::to_string(rec).c_str());
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());

@@ -11,12 +11,12 @@
 #include <log/log.hpp>
 #include <sstream>
 
-std::string CalllogRecord::to_string(const CalllogRecord &rec)
+std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 {
-    std::ostringstream ss;
-    ss << " <id> " << rec.id << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
-       << " <duration> " << rec.duration << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
-    return ss.str();
+    out << " <id> " << rec.id << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
+        << " <duration> " << rec.duration << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
+
+    return out;
 }
 
 CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(calllogDb) {

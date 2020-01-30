@@ -25,7 +25,7 @@ struct CalllogRecord{
     UTF8        name;
 	UTF8        contactId;
 
-    static std::string to_string(const CalllogRecord &rec);
+    friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
 };
 
 enum class CalllogRecordField{

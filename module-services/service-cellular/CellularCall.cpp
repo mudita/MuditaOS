@@ -50,19 +50,18 @@ namespace ModemCall
         }
     }
 
-    std::string ModemCall::to_string(const ModemCall &call)
+    std::ostream &operator<<(std::ostream &out, const ModemCall &call)
     {
-        std::ostringstream ss;
-        ss << " <idx> " << call.idx << " <dir> " << static_cast<uint32_t>(call.dir) << " <stat> " << static_cast<uint32_t>(call.state) << " <mode> "
-           << static_cast<uint32_t>(call.mode) << " <mpty> " << static_cast<uint32_t>(call.isConferenceCall) << " <number> " << call.phoneNumber << " <type> "
-           << static_cast<uint32_t>(call.type);
+        out << " <idx> " << call.idx << " <dir> " << static_cast<uint32_t>(call.dir) << " <stat> " << static_cast<uint32_t>(call.state) << " <mode> "
+            << static_cast<uint32_t>(call.mode) << " <mpty> " << static_cast<uint32_t>(call.isConferenceCall) << " <number> " << call.phoneNumber << " <type> "
+            << static_cast<uint32_t>(call.type);
 
         if (!call.phoneBookName.empty())
         {
-            ss << " <alpha> " << call.phoneBookName;
+            out << " <alpha> " << call.phoneBookName;
         }
 
-        return ss.str();
+        return out;
     }
 } // namespace ModemCall
 
