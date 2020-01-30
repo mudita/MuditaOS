@@ -629,7 +629,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 #if SHOW_DB_ACCESS_PERF == 1
         LOG_DEBUG("DBCalllogGetCount time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
-        responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, true, 0, 0, 0, ret);
+        responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, true, 0, 0, ret);
     }
     break;
 
@@ -642,7 +642,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 #if SHOW_DB_ACCESS_PERF == 1
         LOG_DEBUG("DBCalllogGetLimitOffset time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
-        responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(ret), true, 0, msg->limit, msg->offset, ret->size());
+        responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
     }
     break;
 
