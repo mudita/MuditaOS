@@ -14,6 +14,7 @@
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "Interface/ContactRecord.hpp"
+#include "Interface/CountryCodeRecord.hpp"
 #include "Interface/NotesRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
@@ -274,4 +275,28 @@ class DBCalllogResponseMessage : public DBResponseMessage
     uint32_t offset = 0;
 };
 
+class DBCountryCodeMessage : public DBMessage
+{
+  public:
+    DBCountryCodeMessage(MessageType messageType, const uint32_t _mcc, const uint32_t _country_code)
+        : DBMessage(messageType), mcc(_mcc), country_code(_country_code)
+    {
+    }
+    virtual ~DBCountryCodeMessage()
+    {
+    }
+
+    uint32_t mcc;
+    uint32_t country_code;
+};
+
+class DBCountryCodeResponseMessage : public DBResponseMessage
+{
+  public:
+    DBCountryCodeResponseMessage(uint32_t _country_code, uint32_t retCode = 0, uint32_t count = 0, uint32_t respTo = 0)
+        : DBResponseMessage(retCode, count, respTo), country_code(_country_code){};
+    virtual ~DBCountryCodeResponseMessage(){};
+
+    uint32_t country_code;
+};
 #endif // PUREPHONE_DBMESSAGE_HPP

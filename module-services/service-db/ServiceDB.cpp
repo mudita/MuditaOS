@@ -37,6 +37,7 @@ ServiceDB::~ServiceDB()
     smsDB.reset();
     alarmsDB.reset();
     notesDB.reset();
+    countryCodesDB.reset();
 
     Database::Deinitialize();
     LOG_INFO("[ServiceDB] Cleaning resources");
@@ -438,6 +439,19 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto ret = calllogRecordInterface->GetLimitOffset(msg->offset, msg->limit);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(ret), true, msg->limit, msg->offset, ret->size());
+    }
+    break;
+
+    case MessageType::DBCountryCode: {
+        DBCountryCodeMessage *msg = reinterpret_cast<DBCountryCodeMessage *>(msgl);
+#if SHOW_DB_ACCESS_PERF == 1
+        timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+        auto ret = countryCodeRecordInterface->GetCountryCodeByMCC(msg->mcc);
+#if SHOW_DB_ACCESS_PERF == 1
+        LOG_DEBUG("DBCalllogGetLimitOffset time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+        responseMsg = std::make_shared<DBCountryCodeResponseMessage>(ret);
     }
     break;
 
