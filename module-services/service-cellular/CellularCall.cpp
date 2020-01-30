@@ -4,8 +4,8 @@
 #include <log/log.hpp>
 #include <vector>
 
-//#include <Service.hpp>
 #include "bsp/rtc/rtc.hpp"
+#include <sstream>
 
 namespace ModemCall
 {
@@ -52,16 +52,17 @@ namespace ModemCall
 
     std::string ModemCall::to_string(const ModemCall &call)
     {
-        std::string str = " <idx> " + std::to_string(call.idx) + " <dir> " + std::to_string(static_cast<uint8_t>(call.dir)) + " <stat> " +
-                          std::to_string(static_cast<uint8_t>(call.state)) + " <mode> " + std::to_string(static_cast<uint8_t>(call.mode)) + " <mpty> " +
-                          std::to_string(static_cast<uint8_t>(call.isConferenceCall)) + " <number> " + call.phoneNumber + " <type> " +
-                          std::to_string(static_cast<uint8_t>(call.type));
+        std::ostringstream ss;
+        ss << " <idx> " << call.idx << " <dir> " << static_cast<uint32_t>(call.dir) << " <stat> " << static_cast<uint32_t>(call.state) << " <mode> "
+           << static_cast<uint32_t>(call.mode) << " <mpty> " << static_cast<uint32_t>(call.isConferenceCall) << " <number> " << call.phoneNumber << " <type> "
+           << static_cast<uint32_t>(call.type);
+
         if (!call.phoneBookName.empty())
         {
-            str += " <alpha> " + call.phoneBookName;
+            ss << " <alpha> " << call.phoneBookName;
         }
 
-        return str;
+        return ss.str();
     }
 } // namespace ModemCall
 
