@@ -14,6 +14,7 @@
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "Interface/ContactRecord.hpp"
+#include "Interface/CountryCodeRecord.hpp"
 #include "Interface/NotesRecord.hpp"
 #include "Interface/SMSRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
@@ -30,6 +31,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<AlarmsDB> alarmsDB;
     std::unique_ptr<NotesDB> notesDB;
     std::unique_ptr<CalllogDB> calllogDB;
+    std::unique_ptr<CountryCodesDB> countryCodesDB;
 
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
@@ -38,6 +40,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
     std::unique_ptr<NotesRecordInterface> notesRecordInterface;
     std::unique_ptr<CalllogRecordInterface> calllogRecordInterface;
+    std::unique_ptr<CountryCodeRecordInterface> countryCodeRecordInterface;
 
   protected:
   public:
