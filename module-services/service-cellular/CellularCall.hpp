@@ -46,8 +46,8 @@ namespace ModemCall
         bool isConferenceCall;
         std::string phoneNumber;
         CallType type;
-        std::string phoneBookName; // TODO: alek: seems like it is not existising in the recieved data
-                                   // but it is defined in specification
+        std::string phoneBookName; // TODO: alek: This field is defined in the AT+CLCC command resposne but our modem is not returning it.
+                                   // Need to verify in modem specification
 
         ModemCall() = delete;
         ~ModemCall() = default;
