@@ -7,11 +7,6 @@ namespace gui
 
     class PageLayout : public BoxLayout
     {
-        virtual bool tryAddWidget(gui::Item *it) override
-        {
-            return BoxLayout::addWidget(it);
-        }
-
       public:
         PageLayout() = default;
         virtual ~PageLayout() = default;
