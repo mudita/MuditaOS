@@ -51,9 +51,10 @@ public:
 
     std::vector<std::string> SendCommand(const char *cmd, size_t rxCount, uint32_t timeout = 500);
 
-    static std::vector<std::string> Tokenizer(std::string& input,uint32_t maxTokenCount,const std::string& delimiter);
+    // @param maxTokenCount max token count, if 0 no max number limitation
+    static std::vector<std::string> Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount = 0);
 
-private:
+  private:
 
     std::vector<Urc> ParseURC();
 

@@ -8,7 +8,6 @@
  * @details
  */
 
-#include "Modem/MuxDaemon.hpp"
 #include <iostream>
 #include <memory>
 #include <cstring>
@@ -25,23 +24,22 @@ TEST_CASE("Tokenizer tests")
     std::string delimiter = "\r\n";
 
     std::string inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nUNFINIS";
-    auto ret = ATParser::Tokenizer(inputStr1,2,delimiter);
+    auto ret = ATParser::Tokenizer(inputStr1, delimiter, 2);
     REQUIRE(ret.size() == 2);
     REQUIRE(ret[0] == "OK");
     REQUIRE(ret[1] == "NO CARRIER");
 
     inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
-    ret = ATParser::Tokenizer(inputStr1,3,delimiter);
+    ret = ATParser::Tokenizer(inputStr1, delimiter, 3);
     REQUIRE(ret.size() == 3);
     REQUIRE(ret[0] == "OK");
     REQUIRE(ret[1] == "NO CARRIER");
     REQUIRE(ret[2] == "FINISHED");
 
     inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
-    ret = ATParser::Tokenizer(inputStr1,2,delimiter);
+    ret = ATParser::Tokenizer(inputStr1, delimiter, 2);
     REQUIRE(ret.size() == 2);
     REQUIRE(ret[0] == "OK");
     REQUIRE(ret[1] == "NO CARRIER");
-    REQUIRE(inputStr1 == "\r\nFINISHED\r\n");
 }
 

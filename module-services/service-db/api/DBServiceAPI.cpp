@@ -14,6 +14,8 @@
 
 #include "../ServiceDB.hpp"
 
+#include <Utils.hpp>
+
 SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
 {
 
@@ -673,20 +675,25 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
     return true;
 }
 
-bool DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
+uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
+    LOG_DEBUG("CalllogAdd %s", utils::to_string(rec).c_str());
+
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
+    uint32_t recId = DB_ID_NONE;
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true))
     {
-        return true;
+        auto records = *calllogResponse->records;
+        if (!records.empty())
+        {
+            recId = records[0].id;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return recId;
 }
 
 bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
@@ -709,6 +716,8 @@ bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
 bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate, rec);
+
+    LOG_DEBUG("CalllogUpdate %s", utils::to_string(rec).c_str());
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
@@ -734,7 +743,7 @@ uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv)
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 
