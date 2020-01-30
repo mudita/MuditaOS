@@ -24,7 +24,11 @@ namespace gui {
             {
                 return true;
             }
-            if (handleNavigation(inputEvent))
+            else if (handleNavigation(inputEvent))
+            {
+                return true;
+            }
+            else if (borderCallback && borderCallback(inputEvent))
             {
                 return true;
             }
