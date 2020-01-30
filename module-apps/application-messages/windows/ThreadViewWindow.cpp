@@ -45,7 +45,6 @@ namespace style
 namespace gui
 {
 
-
     ThreadViewWindow::ThreadViewWindow(app::Application *app) : AppWindow(app, name::window::thread_view)
     {
         AppWindow::buildInterface();
@@ -57,7 +56,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
-
         auto elements_width = this->getWidth() - style::window::default_left_margin * 2;
         body = new gui::VBox(this, style::window::default_left_margin, title->offset_h(), elements_width, bottomBar->getY() - title->offset_h());
         body->setPenWidth(style::window::default_border_no_focus_w);
@@ -88,7 +86,6 @@ namespace gui
         setFocusItem(body);
     }
 
-    // TODO fix text and dont rebuild it...
     void ThreadViewWindow::rebuildText()
     {
         if (text)
@@ -101,7 +98,6 @@ namespace gui
         text->setPenFocusWidth(style::window::default_border_focucs_w);
         text->setPenWidth(style::window::default_border_focucs_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        // TODO IFS
         text->activatedCallback = [&](gui::Item &item) {
             if (text->getText().length() == 0)
             {
@@ -139,8 +135,6 @@ namespace gui
         return true;
     }
 
-    // TODO TODO TODO
-    // ez - najpierw wylicz ile sie zmieści - potem wstaw
     void ThreadViewWindow::addSMS(ThreadViewWindow::Action what)
     {
         LOG_DEBUG("--- %d ---", what);
@@ -184,8 +178,7 @@ namespace gui
             {
                 SMS.start -= maxsmsinwindow;
             }
-            // TODO show text field here!
-            LOG_DEBUG("---> In progress %d", SMS.start);
+            LOG_DEBUG("in progress %d", SMS.start);
         }
         SMS.sms = DBServiceAPI::SMSGetLimitOffsetByThreadID(this->application, SMS.start, maxsmsinwindow, SMS.thread);
         LOG_DEBUG("=> SMS %d < %d < %d", SMS.start, SMS.sms->size(), maxsmsinwindow);
@@ -213,14 +206,12 @@ namespace gui
         {
             body->setVisible(true, true);
         }
-        LOG_DEBUG("-------------");
+        LOG_DEBUG("sms built");
     }
 
     bool ThreadViewWindow::smsBuild(const SMSRecord &el, bool bottom)
     {
-        /// dummy sms thread - TODO TODO load from db - on switchData
-        /// this is not 'static' do it on window focus (on swtich window)
-        // auto label = new gui::Label(nullptr, labelmeta);
+        /// dummy sms thread - TODO load from db - on switchData
         auto label = new Text(nullptr, 0, 1, 300, 5);
         label->setTextType(Text::TextType::MULTI_LINE);
         label->setEditMode(Text::EditMode::SCROLL);
@@ -281,8 +272,6 @@ namespace gui
     void ThreadViewWindow::rebuild()
     {
         addSMS(ThreadViewWindow::Action::Start);
-        // destroyInterface();
-        // buildInterface();
     }
 
     void ThreadViewWindow::buildInterface()

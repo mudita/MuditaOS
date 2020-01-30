@@ -173,7 +173,7 @@ uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv)
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 

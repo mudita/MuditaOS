@@ -28,7 +28,7 @@ const char *ServiceDB::serviceName = "ServiceDB";
 
 class TimeStamp
 {
-    ssize_t timestamp;
+    TickType_t timestamp;
     std::string text;
 
   public:
