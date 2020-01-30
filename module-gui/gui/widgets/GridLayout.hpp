@@ -43,11 +43,6 @@ namespace gui
         }
 
         virtual bool onFocus(bool state) override;
-
-        bool tryAddWidget(gui::Item *item) override
-        {
-            return addWidget(item);
-        }
     };
 
 }; // namespace gui

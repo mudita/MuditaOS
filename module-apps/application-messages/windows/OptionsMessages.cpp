@@ -28,9 +28,6 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     auto p = [=](const UTF8 &icon, auto foo) {
         auto phone = new gui::Label(box, 0, 0, wlabel, label::big_h);
         decorate(phone);
-        // does nothing for image :|
-        phone->setAlignement({gui::Alignment::ALIGN_HORIZONTAL_CENTER | gui::Alignment::ALIGN_VERTICAL_CENTER});
-        // please read comment above - this is alignment done by hand
         new gui::Image(phone, 12, 12, 50, label::big_h, icon);
         phone->activatedCallback = foo;
     };
@@ -52,7 +49,6 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
         return true;
     });
 
-    box->resizeItems();
     return box;
 }
 

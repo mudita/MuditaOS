@@ -47,7 +47,7 @@ namespace gui
         };
 
         body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        body->tryAddWidget(text);
+        body->addWidget(text);
         body->setVisible(true);
         body->setNavigation();
         setFocusItem(body);

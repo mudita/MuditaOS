@@ -79,7 +79,7 @@ namespace gui
             }
         }
         auto el = dynamic_cast<VBox *>(children.back());
-        bool added = el ? el->tryAddWidget(item) : false;
+        bool added = el ? el->addWidget(item) : false;
         if (!added)
         {
             // add next page and try again - first set last box to not visible to avoid it's rebuild
@@ -91,7 +91,7 @@ namespace gui
             children.back()->setVisible(false);
             /// to not recure on addWidget
             auto el = dynamic_cast<VBox *>(children.back());
-            if (!el->tryAddWidget(item))
+            if (!el->addWidget(item))
             {
                 LOG_ERROR("Child not added on 2nd try, check sizes of Page and children u try to add!");
                 return false;

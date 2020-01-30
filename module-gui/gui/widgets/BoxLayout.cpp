@@ -9,6 +9,7 @@
 #include <log/log.hpp>
 
 #include <Label.hpp>
+#include "Alignment.hpp"
 
 namespace gui {
 
@@ -77,7 +78,8 @@ bool BoxLayout::removeWidget( Item* item ) {
 	return ret;
 }
 std::list<DrawCommand*> BoxLayout::buildDrawList() {
-	return Rect::buildDrawList();
+    auto el = Rect::buildDrawList();
+    return el;
 }
 
 void BoxLayout::setVisible(bool value, bool previous)
@@ -121,156 +123,27 @@ void BoxLayout::setVisible(bool value)
     setVisible(value, false);
 }
 
-template <BoxLayout::BoxAxis axis> void BoxLayout::resizeItems()
+template <Axis axis> void BoxLayout::resizeItems()
 {
-    if (children.empty())
-    {
-        return;
-    }
-    uint32_t freeSpace = inAxisSpace(axis, this);
-    int16_t offsetInAxis = 0;
-    uint16_t movedInAxis = 0;
-
-    // accessor lambdas, depending on if it's in Y or X axiss we want to access in x or Y
-    auto setPosInAxis = [this](Item *it, uint16_t off) {
-        if (this->reverse_order)
-        {
-            off = inAxisSpace(axis, this) - this->inAxisMax(axis, it) - off;
-        }
-        // LOG_DEBUG("Box [%d] move in axis %s to %u", this->inAxisMax(axis,it), axis==BoxLayout::BoxAxis::Y?"Y":"X", off);
-        if (axis == BoxAxis::Y)
-        {
-            it->widgetArea.y = off;
-        }
-        else
-        {
-            it->widgetArea.x = off;
-        }
-    };
-
-    auto setSizeInAxis = [](Item *it, uint16_t val) {
-        // LOG_DEBUG("Size in axis %s to %u", axis==BoxLayout::BoxAxis::Y?"Y":"X", val);
-        auto oldbox = it->widgetArea;
-        if (axis == BoxAxis::Y)
-        {
-            it->widgetArea.h = val;
-        }
-        else
-        {
-            it->widgetArea.w = val;
-        }
-        auto newbox = it->widgetArea;
-        it->onDimensionChanged(oldbox, newbox);
-    };
-
-    // create list of elements to be modified. Each element is placed in the BoxElement structure;
-    // width of all elements are set to 0
-    std::list<BoxElement> boxElements;
-    for (Item *item : children)
-    {
-        // ignore not visible elements
-        if (item->visible)
-        {
-            boxElements.push_back(BoxElement(item));
-            inAxisSize(axis, item) = 0;
-        }
-    }
-
-    uint32_t elementsToChange = boxElements.size();
-    while (freeSpace > 0)
-    {
-        offsetInAxis = 0;
-        uint16_t expandValue = freeSpace / elementsToChange;
-
-        // for case when freeSpace is greater than 0 but smaller than elementsToChange
-        // expand value is set to 1
-        if (expandValue == 0)
-            expandValue = 1;
-
-        std::list<BoxElement>::iterator i = boxElements.begin();
-
-        while ((i != boxElements.end()) && (freeSpace > 0))
-        {
-            // element was already updated in previous run and no further modification is possible or required
-            if (i->noUpdate)
-            {
-                setPosInAxis(i->item, offsetInAxis);
-                offsetInAxis += inAxisSize(axis, i->item);
-                ++i;
-                continue;
-            }
-            else if (inAxisSize(axis, i->item) == inAxisMax(axis, i->item))
-            {
-                movedInAxis = inAxisSize(axis, i->item);
-                offsetInAxis += movedInAxis;
-                freeSpace -= movedInAxis;
-                setPosInAxis(i->item, offsetInAxis);
-                setSizeInAxis(i->item, movedInAxis);
-                i->noUpdate = true;
-                elementsToChange--;
-            }
-            else
-            {
-                uint16_t maxInAxis = inAxisMax(axis, i->item);
-                movedInAxis = inAxisSize(axis, i->item) + expandValue;
-
-                if (movedInAxis > maxInAxis)
-                {
-                    movedInAxis = maxInAxis;
-                    elementsToChange--;
-                    i->noUpdate = true;
-                }
-
-                freeSpace -= (movedInAxis - inAxisSize(axis, i->item));
-                setPosInAxis(i->item, offsetInAxis);
-                setSizeInAxis(i->item, movedInAxis);
-
-                offsetInAxis += movedInAxis;
-            }
-
-            ++i;
-        }
-
-        if (elementsToChange <= 0)
-        {
-            break;
-        }
-    }
-
+    // TODO rethink resize based on: maxSize, drawArea, alignment etc
     Rect::updateDrawArea();
 }
 
-/// this actually should be addWidget - but there are noChecks nowhere when addWidget is being used...
-template <BoxLayout::BoxAxis axis> bool BoxLayout::tryAddWidget(Item *item)
+template <Axis axis> bool BoxLayout::addWidget(Item *item)
 {
-
-    if (children.size() == 0)
+    if (size<axis>(this) - sizeUsed<axis>(this) >= inAxisMax<axis>(item))
     {
-        // get max in Axis
-        if (inAxisSpace(axis, this) > inAxisMax(axis, item))
+        if (!reverse_order)
         {
-            return addWidget(item);
+            item->widgetArea.pos(axis) = children.size() ? children.back()->offset(axis) : 0;
         }
         else
         {
-            LOG_ERROR("Element too big to even try to fit in! %d > %d", inAxisSpace(axis, this), inAxisMax(axis, item));
-            return false;
+            item->widgetArea.pos(axis) = this->widgetArea.size(axis) - sizeUsed<axis>(this) - item->widgetArea.size(axis);
         }
-    }
-    else
-    {
-        if (inAxisSpace(axis, this) - inAxisOffset(axis, children.back()) > inAxisMax(axis, item))
-        {
-            LOG_DEBUG("add  ->: %d - %d > %d", inAxisSpace(axis, this), inAxisOffset(axis, children.back()), inAxisMax(axis, item));
-            return addWidget(item);
-        }
-        else
-        {
-            /// there is no space for next element
-            LOG_ERROR("Not enough space!  ->: ! %d - %d > %d [%d]", inAxisSpace(axis, this), inAxisOffset(axis, children.back()), inAxisMax(axis, item),
-                      children.size());
-            return false;
-        }
+        Rect::addWidget(item);
+        resizeItems<axis>();
+        return true;
     }
     return false;
 }
@@ -307,12 +180,12 @@ HBox::HBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 }
 
 void HBox::resizeItems() {
-    BoxLayout::resizeItems<BoxLayout::BoxAxis::X>();
+    BoxLayout::resizeItems<Axis::X>();
 }
 
-bool HBox::tryAddWidget(Item *item)
+bool HBox::addWidget(Item *item)
 {
-    return BoxLayout::tryAddWidget<BoxLayout::BoxAxis::X>(item);
+    return BoxLayout::addWidget<Axis::X>(item);
 }
 
 VBox::VBox() : BoxLayout() {
@@ -324,12 +197,12 @@ VBox::VBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& 
 }
 
 void VBox::resizeItems() {
-    BoxLayout::resizeItems<BoxLayout::BoxAxis::Y>();
+    BoxLayout::resizeItems<Axis::Y>();
 }
 
-bool VBox::tryAddWidget(Item *item)
+bool VBox::addWidget(Item *item)
 {
-    return BoxLayout::tryAddWidget<BoxLayout::BoxAxis::Y>(item);
+    return BoxLayout::addWidget<Axis::Y>(item);
 }
 
 } /* namespace gui */
