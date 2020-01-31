@@ -1,0 +1,39 @@
+#pragma once
+
+namespace utils
+{
+    namespace time
+    {
+
+#include <FreeRTOS.h>
+#include <log/log.hpp>
+#include <string>
+#include <ticks.hpp>
+
+        class Scoped
+        {
+            TickType_t timestamp;
+            std::string text;
+
+          public:
+            /// scoped timer usage:
+            /// auto time = Scoped("lol");
+            /// will log how much time elapsed in form 'lol time: 123'
+            /// auto time is important - othervise item will be created and removed instantly
+            Scoped(const std::string &text)
+            {
+#if DEBUG_SCOPED_TIMINGS == 1
+                this->text = text;
+                timestamp = cpp_freertos::Ticks::GetTicks();
+#endif
+            }
+            ~Scoped()
+            {
+#if DEBUG_SCOPED_TIMINGS == 1
+                LOG_DEBUG("%s time: %lu", text.c_str(), cpp_freertos::Ticks::GetTicks() - timestamp);
+#endif
+            }
+        };
+
+    }; // namespace time
+};     // namespace utils
