@@ -11,7 +11,6 @@
 #include "data/CallLogInternals.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBMessage.hpp"
-#include "windows/CallLogCallDeleteWindow.hpp"
 #include "windows/CallLogDetailsWindow.hpp"
 #include "windows/CallLogMainWindow.hpp"
 #include "windows/CallLogOptionsWindow.hpp"
