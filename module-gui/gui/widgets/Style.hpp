@@ -28,6 +28,7 @@ namespace font {
 const inline std::string verybig = "gt_pressura_light_46";
 const inline std::string bigbold = "gt_pressura_bold_30";
 const inline std::string big     = "gt_pressura_regular_30";
+const inline std::string mediumbold = "gt_pressura_bold_27";
 const inline std::string medium  = "gt_pressura_regular_27";
 const inline std::string small   = "gt_pressura_regular_24";
 const inline std::string verysmall   = "gt_pressura_regular_20";

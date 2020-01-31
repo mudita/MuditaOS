@@ -20,7 +20,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogMainWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogDetailsWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogOptionsWindow.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogCallDeleteWindow.cpp"
 		
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCallLog.hpp"
@@ -28,7 +27,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogDetailsWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogOptionsWindow.hpp"
-		"${CMAKE_CURRENT_LIST_DIR}/windows/CallLogCallDeleteWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/data/CallLogSwitchData.hpp"
 )
 
