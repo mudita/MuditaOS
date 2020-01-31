@@ -20,10 +20,12 @@
 #include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
 
+#include "../ApplicationCallLog.hpp"
+#include "../data/CallLogSwitchData.hpp"
+#include "CalllogRecord.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "time/time_conversion.hpp"
-#include "../data/CallLogSwitchData.hpp"
 
 #include <Style.hpp>
 
@@ -66,8 +68,9 @@ void CallLogOptionsWindow::buildInterface() {
 	options.push_back( addOptionLabel( utils::localize.get("app_calllog_options_delete_call"),
 			[=] (gui::Item& item){ 
 				std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
-				application->switchWindow(calllog::settings::CallDeleteWindowStr, std::move(data));
-				return true;
+                auto app = dynamic_cast<app::ApplicationCallLog *>(application);
+                app->removeCalllogEntry(record);
+                return true;
 			}) );
 
 	//set position and navigation for labels

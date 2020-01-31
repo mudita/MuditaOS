@@ -44,8 +44,10 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     yes->setFont(style::window::font::small);
     yes->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    no->setNavigationItem(NavigationDirection::DOWN, yes);
-    yes->setNavigationItem(NavigationDirection::UP, no);
+    no->setNavigationItem(NavigationDirection::RIGHT, yes);
+    yes->setNavigationItem(NavigationDirection::LEFT, no);
+    no->setNavigationItem(NavigationDirection::LEFT, yes);
+    yes->setNavigationItem(NavigationDirection::RIGHT, no);
     setFocusItem(no);
 }
 

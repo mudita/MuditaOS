@@ -55,10 +55,11 @@ void AppWindow::buildInterface() {
 	title->setText("");
 	title->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
     title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM );
+    title->setDotsMode(true);
     title->visible = false;
 
-	topBar = new gui::TopBar( this, 0,0, 480, 50 );
-	topBar->setActive(TopBar::Elements::LOCK, false );
+    topBar = new gui::TopBar(this, 0, 0, 480, 50);
+    topBar->setActive(TopBar::Elements::LOCK, false );
 	topBar->setActive(TopBar::Elements::BATTERY, false );
 	topBar->setActive(TopBar::Elements::SIGNAL, false );
 }
