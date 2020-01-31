@@ -1,3 +1,4 @@
 #pragma once
 
 // #define DEBUG_APPLICATION_MANAGEMENT
+#define DEBUG_SCOPED_TIMINGS 1
