@@ -44,6 +44,8 @@ public:
 	void rebuild() override;
 	void buildInterface() override;
 	void destroyInterface() override;
+
+    bool removeCalllogEntry(const CalllogRecord *record);
 };
 
 } /* namespace gui */

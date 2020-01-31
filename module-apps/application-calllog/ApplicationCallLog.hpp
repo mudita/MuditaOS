@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Application.hpp"
+#include "CalllogRecord.hpp"
 
 namespace app {
 
@@ -28,6 +29,8 @@ public:
 
 	void createUserInterface() final;
 	void destroyUserInterface() final;
+
+    bool removeCalllogEntry(const CalllogRecord &record);
 };
 
 } /* namespace app */
