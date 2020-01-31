@@ -1,0 +1,88 @@
+#include "pit.hpp"
+#include <board.h>
+#include <clock_config.h>
+#include <fsl_pit.h>
+#include <pin_mux.h>
+#include <stdint.h>
+
+struct PIT_t
+{
+    uint32_t usec = 1000000;
+    xQueueHandle qhandle = nullptr;
+};
+
+static PIT_t LPIT;
+
+static void pit_init(xQueueHandle qhandle);
+static void pit_start(uint32_t usec);
+static void pit_stop();
+
+namespace bsp
+{
+    namespace pit
+    {
+        void init(xQueueHandle qhandle)
+        {
+            pit_init(qhandle);
+        }
+
+        void start(uint32_t usec)
+        {
+            pit_start(usec);
+        }
+
+        void stop()
+        {
+            pit_stop();
+        }
+
+    }; // namespace pit
+};     // namespace bsp
+
+/// bsp
+
+static void pit_init(xQueueHandle qhandle)
+{
+    LPIT.qhandle = qhandle;
+    pit_config_t pitConfig;
+    PIT_GetDefaultConfig(&pitConfig);
+    PIT_Init(PIT, &pitConfig);
+}
+
+static void pit_start(uint32_t usec)
+{
+    LPIT.usec = usec;
+    DisableIRQ(PIT_IRQn);
+    PIT_DisableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
+
+    PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(usec, CLOCK_GetFreq(kCLOCK_OscClk)));
+
+    PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
+    EnableIRQ(PIT_IRQn);
+
+    LOG_DEBUG("PIT started!");
+    PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+
+static void pit_stop()
+{
+    PIT_StopTimer(PIT, kPIT_Chnl_0);
+}
+
+extern "C"
+{
+    void PIT_IRQHandler(void)
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        if (LPIT.qhandle)
+        {
+            auto val = bsp::pit::Event::Overflow;
+            xQueueSendFromISR(LPIT.qhandle, &val, &xHigherPriorityTaskWoken);
+        }
+        PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
+        __DSB();
+        /// stop timer - we are interested in one time run
+        pit_stop();
+        portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+    }
+};

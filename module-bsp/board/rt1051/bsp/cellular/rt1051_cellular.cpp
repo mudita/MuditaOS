@@ -14,6 +14,7 @@
 #include "task.h"
 #include "stream_buffer.h"
 
+#include "../pit/pit.hpp"
 #include "dma_config.h"
 #include "fsl_cache.h"
 #include <map>
@@ -66,6 +67,8 @@ namespace bsp {
     StreamBufferHandle_t            RT1051Cellular::uartRxStreamBuffer = nullptr;
 
     RT1051Cellular::RT1051Cellular() {
+        bsp::pit::init(nullptr);
+        bsp::pit::start(300000000);
 
         MSPInit();
         DMAInit();
