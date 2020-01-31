@@ -506,6 +506,29 @@ bool Text::onInput(const InputEvent &inputEvent)
         }
     }
 
+    // handle navigation
+    if (inputEvent.state == InputEvent::State::keyReleasedShort && ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) ||
+                                                                    (inputEvent.keyCode == KeyCode::KEY_UP) || (inputEvent.keyCode == KeyCode::KEY_DOWN)))
+    {
+        switch (editMode)
+        {
+        case EditMode::BROWSE:
+            res = handleBrowsing(inputEvent);
+            break;
+        case EditMode::EDIT:
+            res = handleNavigation(inputEvent);
+            break;
+        case EditMode::SCROLL:
+            LOG_DEBUG("TODO");
+            res = false;
+            break;
+        }
+
+        if (res && editMode != EditMode::SCROLL)
+            updateCursor();
+        return res;
+    }
+
     // translate and store keypress
     uint32_t code = translator.handle(inputEvent.key, mode ? mode->get() : "");
 
@@ -556,17 +579,6 @@ bool Text::onInput(const InputEvent &inputEvent)
             mode->next();
             return true;
         }
-    }
-
-    if ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) || (inputEvent.keyCode == KeyCode::KEY_UP) ||
-        (inputEvent.keyCode == KeyCode::KEY_DOWN))
-    {
-        if (editMode == EditMode::BROWSE) res = handleBrowsing(inputEvent);
-        else
-            res = handleNavigation(inputEvent);
-
-        if (res) updateCursor();
-        return res;
     }
 
     // it there is no key char it means that translator didn't handled the key and this key
@@ -1007,6 +1019,22 @@ void Text::updateCursor()
     cursor->setPosition(posX, posY);
 }
 
+int32_t Text::expand(uint32_t rowCount, int32_t h)
+{
+    if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE)
+    {
+        h = font->info.line_height * textLines.size() + margins.top + margins.bottom;
+        if (parent && widgetArea.h > parent->widgetArea.h)
+        {
+            h = widgetArea.h;
+        }
+        setSize(getWidth(), h);
+        setMaxSize(getWidth(), h);
+        LOG_DEBUG("Resized Text to: %d %d", getWidth(), getHeight());
+    }
+    return h;
+}
+
 void Text::recalculateDrawParams()
 {
 
@@ -1025,7 +1053,7 @@ void Text::recalculateDrawParams()
 
     // calculate how many rows can fit in available height.
     uint32_t rowCount = h / font->info.line_height;
-    rowCount = (rowCount == 0) ? 1 : rowCount;
+    h = expand(rowCount, h);
 
     if (textType == TextType::SINGLE_LINE) { rowCount = 1; }
 

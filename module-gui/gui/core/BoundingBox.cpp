@@ -6,11 +6,9 @@
  */
 
 #include "BoundingBox.hpp"
+#include <sstream>
 
 namespace gui {
-
-BoundingBox::BoundingBox() : x {0}, y{0}, w{0}, h{0} {
-}
 
 BoundingBox::BoundingBox(int32_t x, int32_t y, uint32_t w, uint32_t h)
 {
@@ -18,9 +16,6 @@ BoundingBox::BoundingBox(int32_t x, int32_t y, uint32_t w, uint32_t h)
     this->y = y;
     this->w = w;
     this->h = h;
-}
-
-BoundingBox::~BoundingBox() {
 }
 
 bool BoundingBox::intersect( const BoundingBox& box1, const BoundingBox& box2, BoundingBox& result ) {
@@ -75,6 +70,39 @@ bool BoundingBox::intersect( const BoundingBox& box1, const BoundingBox& box2, B
 	result.h = h;
 
 	return true;
+}
+
+void BoundingBox::clear()
+{
+    x = 0;
+    y = 0;
+    w = 0;
+    h = 0;
+}
+
+uint16_t &BoundingBox::size(gui::Axis axis)
+{
+    if (axis == Axis::X)
+        return w;
+    else
+        return h;
+}
+
+int16_t &BoundingBox::pos(gui::Axis axis)
+{
+    if (axis == Axis::X)
+        return x;
+    else
+        return y;
+}
+
+std::string BoundingBox::str()
+{
+    std::stringstream ss;
+    ss << "{";
+    ss << "x: " << x << ", y: " << y << ", w: " << w << ", h: " << h;
+    ss << "}";
+    return ss.str();
 }
 
 } /* namespace gui */

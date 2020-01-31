@@ -38,6 +38,7 @@ enum class MessageType
     DBSMSGetSMSLimitOffset,           // Get SMS records by limit,offset
     DBSMSGetSMSLimitOffsetByThreadID, // Get SMS records by limit,offset with specified ThreadID field
     DBSMSGetLastRecord,               // Get last edited record
+    DBSMSGetCount,                    // Get all sms count
 
     DBThreadGet,            // Get thread by ID
     DBThreadGetForContact,  // Get thread between 2 contacts

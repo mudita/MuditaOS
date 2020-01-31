@@ -166,10 +166,12 @@ TS0710::ConfState TS0710::ConfProcedure() {
     // Print current firmware version
     LOG_INFO("GSM modem info:");
     auto retVersion = parser->SendCommand("ATI\r", 4);
-    CheckATCommandResponse(retVersion);
-    for (uint32_t i = 0; i < retVersion.size() - 1; ++i) // skip final "OK"
-    { 
-        LOG_INFO(retVersion[i].c_str());
+    if (CheckATCommandResponse(retVersion))
+    {
+        for (uint32_t i = 0; i < retVersion.size() - 1; ++i) // skip final "OK"
+        {
+            LOG_INFO(retVersion[i].c_str());
+        }
     }
 
     // Set up modem configuration

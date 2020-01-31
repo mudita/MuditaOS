@@ -21,16 +21,18 @@ public:
 	static const uint32_t ALIGN_HORIZONTAL_LEFT   = 0x10;
 	static const uint32_t ALIGN_HORIZONTAL_RIGHT  = 0x20;
 
-	uint32_t alignment;
+    union {
+        uint32_t alignment;
+        struct
+        {
+            uint32_t vertical_center : 1, vertical_top : 1, vertical_bottom : 1, horizontal_center : 1, horizontal_left : 1, horizontal_right : 1;
+        };
+    };
 
-	Alignment();
-	Alignment( const uint32_t valH, const uint32_t valV );
+    Alignment();
+    Alignment(const uint32_t valH, const uint32_t valV);
     Alignment(const uint32_t align);
     virtual ~Alignment();
-
-	bool setHorizontal( const uint32_t val );
-	bool setVertical( const uint32_t val );
-	bool isAligned( const uint32_t val );
 };
 
 } /* namespace gui */

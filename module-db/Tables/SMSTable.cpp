@@ -98,9 +98,7 @@ SMSTableRow SMSTable::GetByID(uint32_t id) {
 }
 
 std::vector<SMSTableRow> SMSTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto retQuery = db->Query("SELECT * from sms ORDER BY date LIMIT %lu OFFSET %lu;",
-                              limit,
-                              offset);
+    auto retQuery = db->Query("SELECT * from sms ORDER BY date DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTableRow>();
@@ -142,11 +140,7 @@ SMSTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, SMSTableFields 
             return std::vector<SMSTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from sms WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;",
-                              fieldName.c_str(),
-                              str,
-                              limit,
-                              offset);
+    auto retQuery = db->Query("SELECT * from sms WHERE %s='%s' ORDER BY date DESC LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTableRow>();

@@ -8,12 +8,12 @@
  * @details
  */
 
-
 #include "ATParser.hpp"
-#include "bsp/cellular/bsp_cellular.hpp"
-#include "ticks.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
 #include "Service/Bus.hpp"
+#include "bsp/cellular/bsp_cellular.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
+#include "ticks.hpp"
+#include <Utils.hpp>
 
 ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
     isInitialized = true;
@@ -148,7 +148,7 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
             cpp_freertos::LockGuard lock(mutex);
             // tokenize responseBuffer
             // empty lines are also removed
-            auto ret = Tokenizer(responseBuffer, rxCount, "\r\n");
+            auto ret = Tokenizer(responseBuffer, "\r\n", rxCount);
             tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
 
             if (tokens.size() < rxCount)
@@ -178,25 +178,8 @@ std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, 
     return tokens;
 }
 
-std::vector<std::string> ATParser::Tokenizer(std::string &input, uint32_t maxTokenCount,
-                                             const std::string &delimiter) {
-    std::vector<std::string> strings;
-    uint32_t tokenCount = 0;
-
-
-    std::string::size_type pos = 0;
-    std::string::size_type prev = 0;
-    while (((pos = input.find(delimiter, prev)) != std::string::npos) && (tokenCount < maxTokenCount)) {
-        if (pos == prev) {
-            prev = pos + delimiter.size();
-            continue;
-        }
-        strings.push_back(input.substr(prev, pos - prev));
-        prev = pos + delimiter.size();
-        tokenCount++;
-    }
-
-    // To get the last substring (or only, if delimiter is not found)
-    input = input.substr(prev);
-    return strings;
+// for string delimiter
+std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount)
+{
+    return utils::split(input, delimiter, maxTokenCount);
 }
