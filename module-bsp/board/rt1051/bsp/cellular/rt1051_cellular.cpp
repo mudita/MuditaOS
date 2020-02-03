@@ -19,56 +19,48 @@
 #include "fsl_cache.h"
 #include <map>
 
-extern "C" {
+extern "C"
+{
+    void LPUART1_IRQHandler(void)
+    {
+        BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-void LPUART1_IRQHandler(void) {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+        uint32_t isrReg = LPUART_GetStatusFlags(CELLULAR_UART_BASE);
+        static char characterReceived = 0;
 
-    uint32_t isrReg = LPUART_GetStatusFlags(CELLULAR_UART_BASE);
-    static char characterReceived = 0;
+        if (bsp::RT1051Cellular::uartRxStreamBuffer != NULL)
+        {
+            if (isrReg & kLPUART_RxDataRegFullFlag)
+            {
+                characterReceived = LPUART_ReadByte(CELLULAR_UART_BASE);
 
-    if (bsp::RT1051Cellular::uartRxStreamBuffer != NULL) {
-        if (isrReg & kLPUART_RxDataRegFullFlag) {
-            characterReceived = LPUART_ReadByte(CELLULAR_UART_BASE);
-
-            if (characterReceived != 0) {
-                if (xStreamBufferSpacesAvailable(bsp::RT1051Cellular::uartRxStreamBuffer) < 8) {
-                    //BSP_CellularDeassertRTS();
-                }
-                xStreamBufferSendFromISR(bsp::RT1051Cellular::uartRxStreamBuffer,
-                                         (void *) &characterReceived,
-                                         1,
-                                         &xHigherPriorityTaskWoken);
-
-                if (xTimerResetFromISR(bsp::RT1051Cellular::rxTimeoutTimer, &xHigherPriorityTaskWoken) != pdTRUE) {
-                    assert(0);
+                if (characterReceived != 0)
+                {
+                    if (xStreamBufferSpacesAvailable(bsp::RT1051Cellular::uartRxStreamBuffer) < 8)
+                    {
+                        // BSP_CellularDeassertRTS();
+                    }
+                    xStreamBufferSendFromISR(bsp::RT1051Cellular::uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
+                    bsp::pit::start(25 * 1000, [&]() { vTaskNotifyGiveFromISR(bsp::RT1051Cellular::blockedTaskHandle, &xHigherPriorityTaskWoken); });
                 }
             }
+            LPUART_ClearStatusFlags(CELLULAR_UART_BASE, isrReg);
 
+            portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
         }
     }
-    LPUART_ClearStatusFlags(CELLULAR_UART_BASE, isrReg);
-
-
-    portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-}
-
-}
-
-#define _RT1051_UART_DEBUG   0
+};
 
 namespace bsp {
 
     using namespace drivers;
 
-    TimerHandle_t                   RT1051Cellular::rxTimeoutTimer = nullptr;
     lpuart_edma_handle_t            RT1051Cellular::uartDmaHandle = {};
     TaskHandle_t                    RT1051Cellular::blockedTaskHandle = nullptr;
     StreamBufferHandle_t            RT1051Cellular::uartRxStreamBuffer = nullptr;
 
     RT1051Cellular::RT1051Cellular() {
         bsp::pit::init(nullptr);
-        bsp::pit::start(300000000);
 
         MSPInit();
         DMAInit();
@@ -76,30 +68,6 @@ namespace bsp {
         uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, rxStreamBufferNotifyWatermark);
         if (uartRxStreamBuffer == NULL) {
             LOG_ERROR("Could not create the RX stream buffer!");
-            return;
-        }
-
-        rxTimeoutTimer = xTimerCreate
-                ( /* Just a text name, not used by the RTOS
-                kernel. */
-                        "celltim",
-                        /* The timer period in ticks, must be
-                        greater than 0. */
-                        25,
-                        /* The timers will auto-reload themselves
-                        when they expire. */
-                        pdFALSE,
-                        /* The ID is used to store a count of the
-                        number of times the timer has expired, which
-                        is initialised to 0. */
-                        (void *) 0,
-                        /* Each timer calls the same callback when
-                        it expires. */
-                        rxTimeoutTimerHandle
-                );
-
-        if (rxTimeoutTimer == nullptr) {
-            LOG_ERROR("Could not create rxTimeoutTimer");
             return;
         }
 
@@ -143,11 +111,6 @@ namespace bsp {
         if (uartRxStreamBuffer) {
             vStreamBufferDelete(uartRxStreamBuffer);
             uartRxStreamBuffer = nullptr;
-        }
-
-        if (rxTimeoutTimer) {
-            xTimerDelete(rxTimeoutTimer, 100);
-            rxTimeoutTimer = nullptr;
         }
 
         DisableRx();
@@ -430,13 +393,6 @@ namespace bsp {
         vTaskNotifyGiveFromISR((TaskHandle_t) userData, &higherPriorTaskWoken);
 
         portEND_SWITCHING_ISR(higherPriorTaskWoken);
-    }
-
-    void RT1051Cellular::rxTimeoutTimerHandle(TimerHandle_t xTimer) {
-        if (blockedTaskHandle) {
-            xTaskNotifyGive(blockedTaskHandle);
-        }
-
     }
 
     void RT1051Cellular::SetSendingAllowed(bool state) { pv_SendingAllowed = state; }
