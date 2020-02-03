@@ -9,12 +9,13 @@ struct PIT_t
 {
     uint32_t usec = 1000000;
     xQueueHandle qhandle = nullptr;
+    std::function<void()> irq_cb;
 };
 
 static PIT_t LPIT;
 
 static void pit_init(xQueueHandle qhandle);
-static void pit_start(uint32_t usec);
+static void pit_start(uint32_t usec, std::function<void(void)> cb);
 static void pit_stop();
 
 namespace bsp
@@ -26,9 +27,9 @@ namespace bsp
             pit_init(qhandle);
         }
 
-        void start(uint32_t usec)
+        void start(uint32_t usec, std::function<void(void)> cb)
         {
-            pit_start(usec);
+            pit_start(usec, cb);
         }
 
         void stop()
@@ -49,18 +50,18 @@ static void pit_init(xQueueHandle qhandle)
     PIT_Init(PIT, &pitConfig);
 }
 
-static void pit_start(uint32_t usec)
+static void pit_start(uint32_t usec, std::function<void(void)> cb)
 {
     LPIT.usec = usec;
     DisableIRQ(PIT_IRQn);
     PIT_DisableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 
     PIT_SetTimerPeriod(PIT, kPIT_Chnl_0, USEC_TO_COUNT(usec, CLOCK_GetFreq(kCLOCK_OscClk)));
+    LPIT.irq_cb = cb;
 
     PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
     EnableIRQ(PIT_IRQn);
 
-    LOG_DEBUG("PIT started!");
     PIT_StartTimer(PIT, kPIT_Chnl_0);
 }
 
@@ -83,6 +84,8 @@ extern "C"
         __DSB();
         /// stop timer - we are interested in one time run
         pit_stop();
+        if (LPIT.irq_cb)
+            LPIT.irq_cb();
         portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
     }
 };
