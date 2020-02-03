@@ -137,7 +137,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 ret = parser->SendCommand("AT\r", 2, 100);
                 if ((ret.size() == 1 && ret[0] == "OK") || (ret.size() == 2 && ret[0] == "AT\r" && ret[1] == "OK"))
                     result = true;
-            }
+                }
                 step++;
                 break;
             case 6:
@@ -237,7 +237,7 @@ TS0710::ConfState TS0710::ConfProcedure() {
 }
 
 TS0710::ConfState TS0710::AudioConfProcedure() {
-    
+
     auto audioConfRet = parser->SendCommand("AT+QDAI?\r", 1);
     // no need to CheckATCommandResponse as it is checked differently below.
 
@@ -285,7 +285,7 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         0 UIH frames used only.
         1 UI frames used only.
         2 I frames used only.
-    <portspeed> 
+    <portspeed>
         1 9600bit/s
         2 19200bit/s
         3 38400bit/s
@@ -325,7 +325,6 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     //wait for confirmation
     if (pv_TS0710_Start->ConnectionStatus()) {
         channels.push_back(pv_TS0710_Start->getCtrlChannel());  //store control channel
-        
     }
     delete pv_TS0710_Start;
 
@@ -370,12 +369,12 @@ TS0710::ConfState TS0710::StartMultiplexer() {
 
     // Route URCs to second (Notifications) MUX channel
     DLC_channel *c = GetChannel("Commands");
-    if (c != nullptr) 
+    if (c != nullptr)
     {
         CheckATCommandResponse(c->SendCommandResponse("AT+QCFG=\"cmux/urcport\",2\r", 1, 300));
 
     /* Let's test if this actually works */
-    
+
         LOG_DEBUG("Sending test ATI");
         std::vector<std::string> v = c->SendCommandResponse("ATI\r", 4, 300);
         CheckATCommandResponse(v);
@@ -383,9 +382,9 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         {
             LOG_DEBUG("[]%s", s.c_str());
         }
-        
+
         v.clear();
-        v = c->SendCommandResponse("AT+CSQ\r", 2, 300); 
+        v = c->SendCommandResponse("AT+CSQ\r", 2, 300);
         if(CheckATCommandResponse(v))
         {
             auto beg = v[0].find(" ");
@@ -447,7 +446,7 @@ void workerTaskFunction(void *ptr) {
             std::vector<uint8_t> _d;
             int fifoLen = inst->RXFifo.size();
             //LOG_DEBUG("[RXFifo] %i elements", fifoLen);
-            
+
             for (int i = 0; i < fifoLen; i++) {
                 _d.push_back(inst->RXFifo.front());
                 inst->RXFifo.pop();
@@ -496,7 +495,7 @@ ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
     }
     if ((!complete) && (_timeout))
         LOG_ERROR("Incomplete frame received");
-    
+
     free(buf);
 
     return ret;

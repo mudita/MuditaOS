@@ -121,15 +121,10 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         else if (notification == ETX)
         {
             std::string text = bsp::harness::read();
-            auto ret = harness::parse(text);
-            if (ret.first == harness::Error::Success)
+            auto ret = harness::parse(text, this->service);
+            if (ret != harness::Error::Success)
             {
-                // LOG_INFO("EVENT! %x: %s", notification, text.c_str());
-                sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
-            }
-            else
-            {
-                LOG_ERROR("Harness parser error: %d", ret.first);
+                LOG_ERROR("Harness parser error: %d", ret);
             }
         }
         else

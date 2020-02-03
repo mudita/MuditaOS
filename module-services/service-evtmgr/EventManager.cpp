@@ -22,7 +22,9 @@
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
+#include "harness/events/AtResponse.hpp"
 #include "harness/events/FocusApp.hpp"
+#include <service-cellular/messages/CellularMessage.hpp>
 
 EventManager::EventManager(const std::string& name)
 		: sys::Service(name)
@@ -47,11 +49,15 @@ EventManager::~EventManager(){
 
 // Invoked upon receiving data message
 sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
+    bool handled = false;
 
-	bool handled = false;
-
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
-	{
+    if (auto msg = dynamic_cast<cellular::RawCommandResp *>(resp))
+    {
+        bsp::harness::emit(harness::AtResponse(msg->response).encode());
+        handled = true;
+    }
+    else if (msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
+    {
         DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
         if (msg != nullptr)
         {
@@ -86,8 +92,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		sapm::ApplicationManager::messagePreventBlocking(this);
 		handled = true;
 	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication) ) {
-		sevm::EVMFocusApplication* msg = reinterpret_cast<sevm::EVMFocusApplication*>( msgl );
+    else if (msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication))
+    {
+        sevm::EVMFocusApplication* msg = reinterpret_cast<sevm::EVMFocusApplication*>( msgl );
 		if( msg->sender == "ApplicationManager" ) {
 			targetApplication = msg->getApplication();
 			handled = true;
@@ -95,7 +102,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
             bsp::harness::emit(harness::FocusApp(targetApplication).encode());
         }
     }
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
+    else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
 		msgl->sender == this->GetName()) {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
 

@@ -5,7 +5,7 @@
 namespace harness
 {
     inline const std::string Type = "t";
-    inline const std::string Data = "t";
+    inline const std::string Data = "d";
     enum class Events;
 
     /// basic event structure:
@@ -26,6 +26,7 @@ namespace harness
         KeyPress = 0, // -> key press event
         SysStart = 1, // <- system started - EventManager is on
         FocusApp = 2, // <- focus application changed to
+        GSMCmd = 3,   // <-> command to send on cellular command channel, expects data string in ( { ..., Data : "command to execute" }
 
         Top, // <- performance monitor message, TODO
 
