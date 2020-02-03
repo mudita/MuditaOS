@@ -29,3 +29,4 @@ src/git-fame
 
 compile_commands.json
 source/version.hpp
+**/*.pyc

@@ -1,5 +1,6 @@
 #include "Parser.hpp"
 #include "Events.hpp"
+#include "actions/CellularCMD.hpp"
 #include "events/KeyPress.hpp"
 #include <Service/Bus.hpp>
 #include <json/json11.hpp>
@@ -12,38 +13,50 @@ namespace harness
 
     /// super simple parser - frame is json
     /// format is explained in Events.hpp
-    std::pair<Error, std::shared_ptr<sys::DataMessage>> parse(const std::string &request)
+    /// todo have them all somehow nice { from , to, what }
+    Error parse(const std::string &request, sys::Service *serv)
     {
 
         std::string err;
-        std::shared_ptr<sys::DataMessage> msg = nullptr;
         // TODO measure stack before and after..
         json11::Json el = Json::parse(request, err);
         if (err.size() != 0 || el.is_object() != true)
         {
-            LOG_ERROR("%s : %d : %d : %d", err.c_str(), el.is_array(), el.is_object(), el.type());
-            return {Error::BadRequest, nullptr};
+            LOG_ERROR("%s >> %s : %d : %d : %d", request.c_str(), err.c_str(), el.is_array(), el.is_object(), el.type());
+            return Error::BadRequest;
         }
         else
         {
             if (el[Type].is_null())
             {
                 std::shared_ptr<sys::DataMessage> ptr = std::shared_ptr<sys::DataMessage>(nullptr);
-                std::pair<Error, std::shared_ptr<sys::DataMessage>> ret = {Error::NoType, ptr};
-                return ret;
+                return Error::NoType;
             }
             switch (el[Type].int_value())
             {
-            case (int)Events::KeyPress: {
-                msg = parseKeyPress(el);
+            case static_cast<int>(Events::KeyPress): {
+                auto msg = parseKeyPress(el);
+                auto ret = sys::Bus::SendUnicast(msg, "EventManager", serv);
+                if (!ret)
+                {
+                    LOG_ERROR("Message not sent!");
+                }
+            }
+            break;
+            case static_cast<int>(Events::GSMCmd): {
+                bool ret = action::gsm_send(serv, el[Data].string_value());
+                if (!ret)
+                {
+                    return Error::ParserFailed;
+                }
             }
             break;
             default:
-                return {Error::NotHandled, nullptr};
+                return Error::NotHandled;
             };
-            return {Error::Success, msg};
+            return Error::Success;
         }
-        return {Error::Generic, nullptr};
+        return Error::Generic;
     }
 
 }; // namespace harness
