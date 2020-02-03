@@ -2,6 +2,7 @@
 
 #include "Events.hpp"
 #include <Service/Message.hpp>
+#include <Service/Service.hpp>
 #include <string>
 
 namespace harness
@@ -17,5 +18,5 @@ namespace harness
         ParserFailed, /// error on parsing
     };
 
-    std::pair<Error, std::shared_ptr<sys::DataMessage>> parse(const std::string &request);
+    Error parse(const std::string &request, sys::Service *serv);
 }; // namespace harness

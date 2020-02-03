@@ -112,9 +112,13 @@ ServiceCellular::ServiceCellular()
 
             break;
 
-        case CellularNotificationMessage::Type::None:
-            // do not send notification msg
-            return;
+            case CellularNotificationMessage::Type::None:
+                // do not send notification msg
+                return;
+            case CellularNotificationMessage::Type::RawCommand: {
+                LOG_INFO(" IGNORE RawCmd");
+                return;
+            }
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -243,6 +247,26 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 receiveSMS(msg->data);
                 break;
             }
+            case CellularNotificationMessage::Type::RawCommand: {
+                auto m = dynamic_cast<cellular::RawCommand *>(msgl);
+                auto channel = cmux->GetChannel("Commands");
+                if (!m || !channel)
+                {
+                    LOG_ERROR("Not a command");
+                    break;
+                }
+                // TODO change 10 to something better, at best wait till OK/ERROR/TIMEOUT
+                auto respMsg = std::make_shared<cellular::RawCommandResp>(true);
+                respMsg->response = channel->SendCommandResponse(m->command.c_str(), 3, m->timeout);
+                LOG_DEBUG("Raw CMD: %s %d", m->command.c_str(), m->timeout);
+                for (auto const &el : respMsg->response)
+                {
+                    LOG_DEBUG("> %s", el.c_str());
+                }
+                responseMsg = respMsg;
+                break;
+            }
+            break;
             default: {
                 LOG_INFO("Skipped CellularNotificationMessage::Type %d", msg->type);
             }
@@ -485,6 +509,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
     default:
         break;
+    }
+
+    if (responseMsg == nullptr)
+    {
+        LOG_DEBUG("message not handled!");
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
 
     return responseMsg;
