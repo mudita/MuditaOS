@@ -102,6 +102,9 @@ class DBServiceAPI
     static bool CalllogUpdate(sys::Service *serv, const CalllogRecord &rec);
     static uint32_t CalllogGetCount(sys::Service *serv);
     static bool CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
+
+    /* country codes */
+    static uint32_t GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc);
 };
 
 #endif // PUREPHONE_DBSERVICEAPI_HPP
