@@ -66,6 +66,8 @@ enum class MessageType
     DBAlarmGetCount,       // Get alarm count
     DBAlarmGetNext,        // Get alarm, closest or equal to current timestamp.
 
+    DBCountryCode,
+
     // Cellular messages
     CellularNotification,       // Async notification message
     CellularDialNumber,         // Dial number
