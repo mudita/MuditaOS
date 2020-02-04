@@ -103,6 +103,7 @@ class PhonebookNewContact : public AppWindow
     bool verifyAndSave();
     void setContactData();
     void saveStateChanged();
+    void coppyDataToContact();
 };
 
 } /* namespace gui */
