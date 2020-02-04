@@ -51,8 +51,12 @@ protected:
 
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState();
-public:
-	DesktopMainWindow( app::Application* app );
+
+    // switch active window to Call App Enter Number one and pass character key to it
+    bool switchToCallEnterNumberWindow(const char key);
+
+  public:
+    DesktopMainWindow( app::Application* app );
 	virtual ~DesktopMainWindow();
 
 	//virtual methods gui::Window

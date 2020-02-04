@@ -124,7 +124,6 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 		//if numeric key was pressed record that key and send it to call application with a switch command
         else if (isNumeric(key))
         {
-
             auto app = dynamic_cast<app::ApplicationCall*>( application );
 			if (app == nullptr)
 			{
@@ -136,9 +135,9 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			num += key;
 			setNumberLabel(num);
 
-            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
-			return true;
+            return true;
         }
     }
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong) {
@@ -162,11 +161,28 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
-			return true;
-		}
-	}
+            return true;
+        }
+        else if (inputEvent.keyCode == KeyCode::KEY_0)
+        {
+            auto app = dynamic_cast<app::ApplicationCall *>(application);
+            if (app == nullptr)
+            {
+                LOG_ERROR("app != ApplicationCall");
+                return false;
+            }
+            std::string num = app->getDisplayedNumber();
 
-	//check if any of the lower inheritance onInput methods catch the event
+            num += '+';
+            setNumberLabel(num);
+
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
+			return true;
+        }
+    }
+
+    //check if any of the lower inheritance onInput methods catch the event
 	return AppWindow::onInput( inputEvent );
 }
 

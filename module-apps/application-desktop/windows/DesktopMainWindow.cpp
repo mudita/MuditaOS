@@ -132,6 +132,14 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setVisibleState();
 }
 
+bool DesktopMainWindow::switchToCallEnterNumberWindow(const char key)
+{
+    std::string keyStr;
+    keyStr = key;
+    std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(keyStr);
+    return sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, "EnterNumberWindow", std::move(phoneNumberData));
+}
+
 bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	
 	// do nothing
@@ -195,32 +203,38 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			//if numeric key was pressed record that key and send it to call application with a switch command
             else if (gui::isNumeric(key))
             {
-                std::string keyStr;
-                keyStr = key;
-                std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(keyStr);
-                sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, "EnterNumberWindow", std::move(phoneNumberData));
-                return true;
+
+                return switchToCallEnterNumberWindow(key);
             }
 		}
 	}
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
 		//long press of # locks screen if it was unlocked
 		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( app->getScreenLocked() == false ) ) {
-			app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-			app->setScreenLocked(true);
-			setVisibleState();
-			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
-			reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
-		}
-		//long press of right function button move user to power off window
+            app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+            if (app == nullptr)
+            {
+                LOG_ERROR("Not ApplicationDesktop");
+                return false;
+            }
+            app->setScreenLocked(true);
+            setVisibleState();
+            app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            app->setSuspendFlag(true);
+            return true;
+        }
+        //long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
 			application->switchWindow( "PowerOffWindow" );
             return true;
 		}
-	}
+        else if (inputEvent.keyCode == KeyCode::KEY_0 && app->getScreenLocked() == false)
+        {
+            return switchToCallEnterNumberWindow('+');
+        }
+    }
 
-	//check if any of the lower inheritance onInput methods catch the event
+    //check if any of the lower inheritance onInput methods catch the event
 	return AppWindow::onInput( inputEvent );
 }
 
