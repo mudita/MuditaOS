@@ -112,11 +112,10 @@ namespace bsp {
 
         static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
 
-        static void rxTimeoutTimerHandle(TimerHandle_t xTimer);
-
+      public:
         static TaskHandle_t blockedTaskHandle;
 
-
+      private:
         // Constants
         const static uint32_t baudrate = 115200;
         const static uint32_t rxStreamBufferLength = 1024;
