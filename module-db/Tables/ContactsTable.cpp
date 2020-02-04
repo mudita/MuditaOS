@@ -9,6 +9,7 @@
  */
 
 #include "ContactsTable.hpp"
+#include <log/log.hpp>
 
 ContactsTable::ContactsTable(Database *db) : Table(db)
 {
@@ -87,18 +88,19 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
 
     if (!primaryName.empty())
     {
-        q += "t2.name_primary like '%%" + primaryName + "'";
+        q += "t2.name_primary like '%%" + primaryName + "%%'";
         if (!alternativeName.empty()) q += " or ";
     }
 
     if (!alternativeName.empty())
     {
-        q += "t2.name_alternative like '%%" + alternativeName + "'";
+        q += "t2.name_alternative like '%%" + alternativeName + "%%'";
         if (!number.empty()) q += " or ";
     }
 
     if (!number.empty()) q += "t3.number_e164 like '%%" + number + "%%'";
 
+    LOG_DEBUG("query: \"%s\"", q.c_str());
     auto retQuery = db->Query(q.c_str());
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) { return std::vector<ContactsTableRow>(); }
