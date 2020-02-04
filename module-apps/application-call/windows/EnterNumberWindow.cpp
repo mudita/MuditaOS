@@ -85,8 +85,8 @@ EnterNumberWindow::~EnterNumberWindow() {
 }
 
 bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
-    int val = gui::toNumeric(inputEvent.keyCode);
-	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
+    auto key = gui::toNumeric(inputEvent.keyCode);
+    if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
         if(inputEvent.keyCode == KeyCode::KEY_LF) {
 			auto app = dynamic_cast<app::ApplicationCall*>( application );
 			if (app == nullptr)
@@ -122,15 +122,15 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 			return true;
 		}
 		//if numeric key was pressed record that key and send it to call application with a switch command
-		else if(val >= 0 && val <= 9 ) {
+        else if (isNumeric(key))
+        {
 
-			auto app = dynamic_cast<app::ApplicationCall*>( application );
+            auto app = dynamic_cast<app::ApplicationCall*>( application );
 			if (app == nullptr)
 			{
 				LOG_ERROR("app != ApplicationCall");
 				return false;
 			}
-			auto key = std::to_string(val);
 			std::string num = app->getDisplayedNumber();
 
 			num += key;
@@ -139,8 +139,8 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
 			return true;
-		}
-	}
+        }
+    }
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong) {
 		//erase all characters from phone number
 		if(inputEvent.keyCode == KeyCode::KEY_RF) {
