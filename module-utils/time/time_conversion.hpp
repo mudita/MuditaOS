@@ -108,6 +108,7 @@ class Timestamp : protected Localer
      * @breif Returns
      */
     UTF8 get_date_time_substr(GetParameters param);
+    uint32_t get_date_time_sub_value(GetParameters param);
 };
 
 /// helper class to operate on time now

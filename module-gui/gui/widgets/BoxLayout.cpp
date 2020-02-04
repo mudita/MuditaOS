@@ -199,11 +199,24 @@ void BoxLayout::setNavigation()
 {
     auto previous = nextNavigationItem(children.begin()), next = children.end();
     int i = 0;
-    while ((previous != children.end()) && ((next = nextNavigationItem(std::next(previous))) != std::end(children)))
+    if (type == ItemType::VBOX)
     {
-        (*previous)->setNavigationItem(reverse_order ? NavigationDirection::UP : NavigationDirection::DOWN, *next);
-        (*next)->setNavigationItem(reverse_order ? NavigationDirection::DOWN : NavigationDirection::UP, *previous);
-        previous = next;
+        while ((previous != children.end()) && ((next = nextNavigationItem(std::next(previous))) != std::end(children)))
+        {
+            (*previous)->setNavigationItem(reverse_order ? NavigationDirection::UP : NavigationDirection::DOWN, *next);
+            (*next)->setNavigationItem(reverse_order ? NavigationDirection::DOWN : NavigationDirection::UP, *previous);
+            previous = next;
+        }
+    }
+
+    if (type == ItemType::HBOX)
+    {
+        while ((previous != children.end()) && ((next = nextNavigationItem(std::next(previous))) != std::end(children)))
+        {
+            (*previous)->setNavigationItem(reverse_order ? NavigationDirection::LEFT : NavigationDirection::RIGHT, *next);
+            (*next)->setNavigationItem(reverse_order ? NavigationDirection::RIGHT : NavigationDirection::LEFT, *previous);
+            previous = next;
+        }
     }
 }
 
