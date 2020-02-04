@@ -116,37 +116,50 @@ void MenuWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::SIGNAL, true  );
 	topBar->setActive(TopBar::Elements::BATTERY, true );
 
-	std::vector<TileDescription> page1Definitions {
-		//page1
-		TileDescription{"menu_phone","app_desktop_menu_phone",[=] (gui::Item& item) {
-			LOG_INFO("page 1 tile 1" );
-            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationCallLog", gui::name::window::main_window, nullptr);
-            return true; }},
-		TileDescription{"menu_contacts",    "app_desktop_menu_contacts",[=] (gui::Item& item){
-            LOG_INFO("Phonebook");
-            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationPhonebook", gui::name::window::main_window, nullptr);
-            return true;
-        }},
-		TileDescription{"menu_messages",    "app_desktop_menu_messages",[=] (gui::Item& item){
-            LOG_INFO("Messages");
-            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationMessages", gui::name::window::main_window, nullptr);
-            return true;
-        }},
-		TileDescription{"menu_calendar",    "app_desktop_menu_calendar",[=] (gui::Item& item){ return true; }},
-		TileDescription{"menu_alarm",       "app_desktop_menu_alarm",[=] (gui::Item& item){ return true; }},
-		TileDescription{"menu_meditation",  "app_desktop_menu_meditation",[=] (gui::Item& item){ return true; }},
-		TileDescription{"menu_music_player","app_desktop_menu_music",[=] (gui::Item& item){ return true; }},
-		TileDescription{"menu_tools",       "app_desktop_menu_tools",[=] (gui::Item& item){ {
-			LOG_INFO("page 1 tools" );
-			switchPage(1);
-			return true; } },},
-		TileDescription{"menu_settings","app_desktop_menu_settings",[=] (gui::Item& item){
-			LOG_INFO("page 1 settings" );
-            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationSettings", gui::name::window::main_window, nullptr);
-            return true; }},
-	};
+    std::vector<TileDescription> page1Definitions{
+        // page1
+        TileDescription{"menu_phone", "app_desktop_menu_phone",
+                        [=](gui::Item &item) {
+                            LOG_INFO("Call Log");
+                            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationCallLog", gui::name::window::main_window, nullptr);
+                            return true;
+                        }},
+        TileDescription{"menu_contacts", "app_desktop_menu_contacts",
+                        [=](gui::Item &item) {
+                            LOG_INFO("Phonebook");
+                            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationPhonebook", gui::name::window::main_window, nullptr);
+                            return true;
+                        }},
+        TileDescription{"menu_messages", "app_desktop_menu_messages",
+                        [=](gui::Item &item) {
+                            LOG_INFO("Messages");
+                            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationMessages", gui::name::window::main_window, nullptr);
+                            return true;
+                        }},
+        TileDescription{"menu_calendar", "app_desktop_menu_calendar", [=](gui::Item &item) { return true; }},
+        TileDescription{"menu_alarm", "app_desktop_menu_alarm", [=](gui::Item &item) { return true; }},
+        TileDescription{"menu_meditation", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
+        TileDescription{"menu_music_player", "app_desktop_menu_music", [=](gui::Item &item) { return true; }},
+        TileDescription{
+            "menu_tools",
+            "app_desktop_menu_tools",
+            [=](gui::Item &item) {
+                {
+                    LOG_INFO("page 1 tools");
+                    switchPage(1);
+                    return true;
+                }
+            },
+        },
+        TileDescription{"menu_settings", "app_desktop_menu_settings",
+                        [=](gui::Item &item) {
+                            LOG_INFO("page 1 settings");
+                            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationSettings", gui::name::window::main_window, nullptr);
+                            return true;
+                        }},
+    };
 
-	MenuPage* page1 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page1Definitions, MenuPage::PageID::MainPage);
+    MenuPage* page1 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page1Definitions, MenuPage::PageID::MainPage);
 	pages.push_back(page1);
     page_name.push_back(utils::localize.get("app_desktop_menu_title"));
 
@@ -196,14 +209,22 @@ bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 	
 	if(( inputEvent.state == InputEvent::State::keyReleasedShort ) || ( inputEvent.state == InputEvent::State::keyReleasedLong )) {
 		// putsh enter on tile number on key press (press 9 to enter 9th tile)
-        size_t num = gui::toNumeric(inputEvent.keyCode) - 1;
-        // size is unsigned, creating int() to avoid warning
-        if((num > 0) && int(num < (pages[currentPage]->tiles.size()))) {
-			LOG_ERROR("RUN tile with enter -> %d %d", num,pages[currentPage]->tiles.size());
+        size_t num = -1;
+        auto key = gui::toNumeric(inputEvent.keyCode);
+        if (std::isdigit(key))
+        {
+            std::stringstream str;
+            str << gui::toNumeric(inputEvent.keyCode);
+            str >> num;
+            num -= 1;
+        }
+        if ((num >= 0) && num < (pages[currentPage]->tiles.size()))
+        {
+            LOG_ERROR("RUN tile with enter -> %d %d", num,pages[currentPage]->tiles.size());
 			auto el = Item();
 			return pages[currentPage]->tiles[num]->activatedCallback(el);
-		}
-		switch( inputEvent.keyCode ) {
+        }
+        switch( inputEvent.keyCode ) {
 			case KeyCode::KEY_ENTER:
 				LOG_INFO("Enter pressed");
 				break;
