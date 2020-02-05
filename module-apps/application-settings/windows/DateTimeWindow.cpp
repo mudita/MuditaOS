@@ -92,6 +92,7 @@ namespace gui
             if (toAdd != dateItems.end())
             {
                 dateBody->tryAddWidget(toAdd->second);
+                dateBody->tryAddWidget(addSpacer(""));
             }
             toAdd = dateItems.find(DateItems::Month);
             if (toAdd != dateItems.end())
@@ -105,6 +106,7 @@ namespace gui
             if (toAdd != dateItems.end())
             {
                 dateBody->tryAddWidget(toAdd->second);
+                dateBody->tryAddWidget(addSpacer(""));
             }
             toAdd = dateItems.find(DateItems::Day);
             if (toAdd != dateItems.end())
@@ -112,6 +114,8 @@ namespace gui
                 dateBody->tryAddWidget(toAdd->second);
             }
         }
+        dateBody->tryAddWidget(addSpacer(""));
+
         auto toAdd = dateItems.find(DateItems::Year);
         if (toAdd != dateItems.end())
         {
@@ -141,13 +145,15 @@ namespace gui
         });
         timeItems.insert(std::pair<TimeItems, Item *>(TimeItems::Hour, item));
         timeBody->tryAddWidget(item);
+        timeBody->tryAddWidget(addSpacer(":"));
 
         item = addDateTimeItem(nullptr, (""), time.get_date_time_substr(utils::time::GetParameters::Minute), [=](gui::Item &) {
             LOG_INFO("Activated callback");
             return true;
         });
-        timeItems.insert(std::pair<TimeItems, Item *>(TimeItems::Hour, item));
+        timeItems.insert(std::pair<TimeItems, Item *>(TimeItems::Minute, item));
         timeBody->tryAddWidget(item);
+        timeBody->tryAddWidget(addSpacer(""));
 
         item = addDateTimeItem(nullptr, (""), (""), [=](gui::Item &) {
             LOG_INFO("Activated callback");
@@ -171,20 +177,17 @@ namespace gui
         timeItems.insert(std::pair<TimeItems, Item *>(TimeItems::Hour, item));
         timeBody->tryAddWidget(item);
 
+        timeBody->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+
         setFocusItem(timeBody);
         timeBody->setNavigationItem(NavigationDirection::UP, dateBody);
+
         dateBody->setNavigationItem(NavigationDirection::DOWN, timeBody);
     }
     void DateTimeWindow::destroyInterface()
     {
         AppWindow::destroyInterface();
         this->focusItem = nullptr;
-
-        //        for (uint32_t i = 0; i < dateItems.size(); i++)
-        //        {
-        //            delete dateItems[i];
-        //        }
-
         dateItems.clear();
         timeItems.clear();
         children.clear();
@@ -197,6 +200,16 @@ namespace gui
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         //	setFocusItem( options[0] );
+    }
+
+    gui::Label *DateTimeWindow::addSpacer(const UTF8 &text)
+    {
+        auto label = new gui::Label(nullptr, 0, 0, 30, 107);
+        label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        label->setText(text);
+        label->setFont(style::window::font::verybig);
+        label->setVisible(false);
+        return label;
     }
 
     gui::Label *DateTimeWindow::addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value, std::function<bool(Item &)> activatedCallback)
@@ -224,6 +237,7 @@ namespace gui
         bool ret = false;
         if (AppWindow::onInput(inputEvent))
         {
+
             return true;
         }
         else
@@ -282,6 +296,21 @@ namespace gui
         }
         return ret;
     }
+    std::string DateTimeWindow::getTimeItemValue(TimeItems itemType)
+    {
+
+        std::string ret;
+        auto selected = timeItems.find(itemType);
+        if (selected != timeItems.end())
+        {
+            auto item = dynamic_cast<gui::Label *>(selected->second);
+            if (item != nullptr)
+            {
+                ret = item->getText();
+            }
+        }
+        return ret;
+    }
     bool DateTimeWindow::setDate(int32_t keyValue)
     {
         auto item = dynamic_cast<gui::Label *>(focusItem->focusItem);
@@ -314,10 +343,17 @@ namespace gui
         {
             auto itemValue = item->getText();
             auto key = std::to_string(keyValue);
-            itemValue += key;
+            if (itemValue == "0")
+            {
+                itemValue = key;
+            }
+            else
+            {
+                itemValue += key;
+            }
             item->setText(itemValue);
 
-            if (utils::time::validateTime(getItemValue(TimeItems::Hour), getItemValue(TimeItems::Minute), timeFormat12h))
+            if (utils::time::validateTime(getTimeItemValue(TimeItems::Hour), getTimeItemValue(TimeItems::Minute), timeFormat12h))
             {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }

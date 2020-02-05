@@ -49,8 +49,10 @@ namespace gui
         bool timeDateFormat = false; // true europe format, flase american format
 
         gui::Label *addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value, std::function<bool(Item &)> activatedCallback);
+        gui::Label *addSpacer(const UTF8 &text);
         bool onInput(const InputEvent &inputEvent) override;
         std::string getDateItemValue(DateItems itemType);
+        std::string getTimeItemValue(TimeItems itemType);
         bool setDate(int32_t value);
         bool setTime(int32_t value);
 

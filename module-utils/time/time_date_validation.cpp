@@ -5,6 +5,7 @@
  *      Author: kuba
  */
 #include "time_date_validation.hpp"
+#include "log/log.hpp"
 namespace utils
 {
     namespace time
@@ -76,6 +77,7 @@ namespace utils
             }
             catch (std::exception &e)
             {
+                LOG_INFO("validateTime exception");
                 return false;
             }
             return validateTime(h, m, mode12h);
@@ -93,15 +95,15 @@ namespace utils
                 hourMax = 23;
             }
 
-            if (hour >= 0 && hour <= hourMax)
+            if (hour > hourMax)
             {
-                return true;
+                return false;
             }
-            if (minute >= 0 && minute < 60)
+            if (minute <= 0 || minute > 59)
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     } // namespace time
 } // namespace utils
