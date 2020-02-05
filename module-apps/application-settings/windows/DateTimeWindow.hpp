@@ -20,9 +20,6 @@
 namespace gui
 {
 
-    /*
-     *
-     */
     class DateTimeWindow : public AppWindow
     {
       protected:
@@ -34,12 +31,7 @@ namespace gui
             Hour,
             Minute,
         };
-        //        enum class TimeItems
-        //        {
-        //            Hour,
-        //            Minute,
-        //            AmPm
-        //        };
+
         std::map<DateTimeItems, gui::Item *> dateItems;
         std::map<DateTimeItems, gui::Item *> timeItems;
 
@@ -54,7 +46,6 @@ namespace gui
         gui::Label *addSpacer(const UTF8 &text);
         bool onInput(const InputEvent &inputEvent) override;
         std::string getDateTimeItemValue(DateTimeItems itemType);
-        //        std::string getTimeItemValue(TimeItems itemType);
         bool setDate(int32_t value);
         bool setTime(int32_t value);
         void setRTC(void);

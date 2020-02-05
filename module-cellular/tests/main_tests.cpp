@@ -42,6 +42,5 @@ TEST_CASE("Tokenizer tests")
     REQUIRE(ret.size() == 2);
     REQUIRE(ret[0] == "OK");
     REQUIRE(ret[1] == "NO CARRIER");
-    REQUIRE(inputStr1 == "\r\nFINISHED\r\n");
 }
 

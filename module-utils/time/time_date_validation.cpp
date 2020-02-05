@@ -99,7 +99,7 @@ namespace utils
             {
                 return false;
             }
-            if (minute <= 0 || minute > 59)
+            if (minute > 59)
             {
                 return false;
             }

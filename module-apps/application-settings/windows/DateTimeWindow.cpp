@@ -230,7 +230,6 @@ namespace gui
             if (inputEvent.state == gui::InputEvent::State::keyReleasedShort)
             {
                 auto key = std::to_string(gui::toNumeric(inputEvent.keyCode));
-                LOG_INFO("Pressed: %s", key.c_str());
                 auto value = gui::toNumeric(inputEvent.keyCode);
                 // handle numeric keys
                 if (value >= 0)
@@ -243,6 +242,7 @@ namespace gui
                     {
                         setTime(value);
                     }
+                    ret = true;
                 }
                 else if (inputEvent.keyCode == gui::KeyCode::KEY_AST)
                 {
@@ -261,6 +261,7 @@ namespace gui
                             }
                         }
                     }
+                    ret = true;
                 }
             }
         }
@@ -359,20 +360,28 @@ namespace gui
     {
         struct tm timeinfo = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        timeinfo.tm_year = std::stoi(getDateTimeItemValue(DateTimeItems::Year)) - 1900;
-        timeinfo.tm_mon = std::stoi(getDateTimeItemValue(DateTimeItems::Month)) - 1;
-        timeinfo.tm_mday = std::stoi(getDateTimeItemValue(DateTimeItems::Day));
-
-        auto hourValue = std::stoi(getDateTimeItemValue(DateTimeItems::Hour));
-        if (timeFormat12h)
+        try
         {
-            if (dayPeriod)
+            timeinfo.tm_year = std::stoi(getDateTimeItemValue(DateTimeItems::Year)) - 1900;
+            timeinfo.tm_mon = std::stoi(getDateTimeItemValue(DateTimeItems::Month)) - 1;
+            timeinfo.tm_mday = std::stoi(getDateTimeItemValue(DateTimeItems::Day));
+
+            auto hourValue = std::stoi(getDateTimeItemValue(DateTimeItems::Hour));
+            if (timeFormat12h)
             {
-                hourValue += 12;
+                if (dayPeriod)
+                {
+                    hourValue += 12;
+                }
             }
+            timeinfo.tm_hour = hourValue;
+            timeinfo.tm_min = std::stoi(getDateTimeItemValue(DateTimeItems::Minute));
         }
-        timeinfo.tm_hour = hourValue;
-        timeinfo.tm_min = std::stoi(getDateTimeItemValue(DateTimeItems::Minute));
+        catch (std::exception &e)
+        {
+            LOG_ERROR("ServiceCellular::getIMSI exception: %s", e.what());
+        }
+
         bsp::rtc_SetDateTime(&timeinfo);
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
     }
