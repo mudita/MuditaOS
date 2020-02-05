@@ -27,34 +27,38 @@ namespace gui
     class DateTimeWindow : public AppWindow
     {
       protected:
-        enum class DateItems
+        enum class DateTimeItems
         {
             Day,
             Month,
-            Year
-        };
-        enum class TimeItems
-        {
+            Year,
             Hour,
             Minute,
-            AmPm
         };
-        std::map<DateItems, gui::Item *> dateItems;
-        std::map<TimeItems, gui::Item *> timeItems;
+        //        enum class TimeItems
+        //        {
+        //            Hour,
+        //            Minute,
+        //            AmPm
+        //        };
+        std::map<DateTimeItems, gui::Item *> dateItems;
+        std::map<DateTimeItems, gui::Item *> timeItems;
 
         gui::HBox *dateBody = nullptr;
         gui::HBox *timeBody = nullptr;
 
         bool timeFormat12h = false;
         bool timeDateFormat = false; // true europe format, flase american format
+        bool dayPeriod = false;      // day period indicator false am, true pm
 
-        gui::Label *addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value, std::function<bool(Item &)> activatedCallback);
+        gui::Label *addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value);
         gui::Label *addSpacer(const UTF8 &text);
         bool onInput(const InputEvent &inputEvent) override;
-        std::string getDateItemValue(DateItems itemType);
-        std::string getTimeItemValue(TimeItems itemType);
+        std::string getDateTimeItemValue(DateTimeItems itemType);
+        //        std::string getTimeItemValue(TimeItems itemType);
         bool setDate(int32_t value);
         bool setTime(int32_t value);
+        void setRTC(void);
 
       public:
         DateTimeWindow(app::Application *app);
