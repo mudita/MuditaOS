@@ -2,17 +2,16 @@
  * Project Untitled
  */
 
-
 #include "DLC_channel.h"
-#include "TS0710_DLC_RELEASE.h"
+#include "TS0710.h"
 #include "TS0710_DATA.h"
 #include "TS0710_DLC_ESTABL.h"
-#include "TS0710.h"
-#include "log/log.hpp"
+#include "TS0710_DLC_RELEASE.h"
 #include "TS0710_Frame.h"
+#include "log/log.hpp"
 #include "ticks.hpp"
+#include <Utils.hpp>
 #include <cstdlib>
-#include "Modem/ATParser.hpp"
 
 /**
  * DLC_channel implementation
@@ -85,131 +84,64 @@ ssize_t DLC_channel::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 }
 #endif
 
-inline void LogTimeout(const std::string &cmdStr, uint32_t timeout)
+void DLC_channel::cmd_init()
 {
-    LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
 }
 
-inline void LogDebugModemOutputResponse(const std::string &cmdStr, const std::vector<std::string> &tokens, const uint32_t timeElapsed,
-                                        const uint32_t currentTime)
+void DLC_channel::cmd_send(std::string cmd)
 {
-#if DEBUG_MODEM_OUTPUT_RESPONSE
-    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
+    std::vector<uint8_t> data(cmd.begin(), cmd.end());
+    SendData(data);
+}
 
-    for (auto s : tokens)
+std::vector<std::string> DLC_channel::cmd_receive()
+{
+    cpp_freertos::LockGuard lock(mutex);
+    TS0710_Frame::frame_t frame;
+    std::vector<uint8_t> v(responseBuffer.begin(), responseBuffer.end());
+
+    responseBuffer.clear();
+    std::vector<std::vector<uint8_t>> mFrames;
+    std::vector<uint8_t> rawBuffer;
+
+    // get frames from buffer
+    for (int i = 0; i < v.size(); i++)
     {
-        LOG_DEBUG("[]%s", s.c_str());
-    }
-#endif
-}
-
-std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
-		size_t rxCount, uint32_t timeout) {
-
-	std::vector<std::string> tokens;
-	std::vector<uint8_t> data(cmd, cmd + strlen(cmd));
-
-    // Remove \r and \n for logging purposes
-    std::string cmdStr(cmd);
-    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
-    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
-
-    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
-
-	blockedTaskHandle = xTaskGetCurrentTaskHandle();
-	SendData(data);
-
-
-	uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
-	uint32_t timeoutNeeded =
-			timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
-	uint32_t timeElapsed = currentTime;
-
-	//wait_for_data:
-	while (1) {
-
-        if (timeElapsed >= timeoutNeeded)
+        rawBuffer.push_back(v[i]);
+        if (/*TS0710_Frame::isComplete(rawBuffer)*/ (rawBuffer.size() > 1) && (rawBuffer[0] == 0xF9) && (rawBuffer[rawBuffer.size() - 1] == 0xF9))
         {
-            LogTimeout(cmdStr, timeout);
-            break;
+            // LOGrawBufferEBUG("Pushing back FRAME");
+            mFrames.push_back(rawBuffer);
+            rawBuffer.clear();
         }
-
-		auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
-		timeElapsed = cpp_freertos::Ticks::GetTicks();
-		if (ret) {
-
-
-			std::vector<std::string> strings;
-
-			cpp_freertos::LockGuard lock(mutex);
-			TS0710_Frame::frame_t frame;
-			std::vector<uint8_t> v(responseBuffer.begin(),
-					responseBuffer.end());
-
-			responseBuffer.clear();
-			std::vector<std::vector<uint8_t>> mFrames;
-			std::vector<uint8_t> rawBuffer;
-
-			//get frames from buffer
-			for (int i = 0; i < v.size(); i++) {
-				rawBuffer.push_back(v[i]);
-				if (/*TS0710_Frame::isComplete(rawBuffer)*/(rawBuffer.size() > 1)
-						&& (rawBuffer[0] == 0xF9) && (rawBuffer[rawBuffer.size() - 1] == 0xF9)) {
-					//LOGrawBufferEBUG("Pushing back FRAME");
-					mFrames.push_back(rawBuffer);
-					rawBuffer.clear();
-				}
-			}
-
-			//deseriaise data from received frames
-			std::string deserialisedData;
-			for (std::vector<uint8_t> vv : mFrames) {
-				frame.deserialize(vv);
-				std::string str(frame.data.begin(), frame.data.end());
-				//append deserialised buffer
-				deserialisedData += str;
-			}
-			mFrames.clear();
-
-			//tokenize data
-			LOG_DEBUG("[Tokenizing] frame");
-            auto ret = ATParser::Tokenizer(deserialisedData, "\r\n", rxCount);
-            tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-            // TODO: alek: handle case when rxCount == 0 - no desired number/only timeout
-            if (tokens.size() < rxCount) {
-				continue;
-			}
-		} else {
-			//timeout
-            LogTimeout(cmdStr, timeout);
-        }
-        break;
     }
-
-    LogDebugModemOutputResponse(cmdStr, tokens, timeElapsed, currentTime);
-
-    blockedTaskHandle = nullptr;
-
-    return tokens;
+    // deseriaise data from received frames
+    std::string deserialisedData;
+    for (std::vector<uint8_t> vv : mFrames)
+    {
+        frame.deserialize(vv);
+        std::string str(frame.data.begin(), frame.data.end());
+        // append deserialised buffer
+        deserialisedData += str;
+    }
+    mFrames.clear();
+    return utils::split(deserialisedData, "\r\n");
 }
 
-std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
-		size_t rxCount, uint32_t timeout) {
-	std::vector<std::string> tokens;
-	std::vector<uint8_t> data(cmd, cmd + strlen(cmd));
+void DLC_channel::cmd_post()
+{
+}
 
-    // Remove \r and \n for logging purposes
-    std::string cmdStr(cmd);
-    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
-    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
-
-    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
+std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t rxCount, uint32_t timeout)
+{
+    std::vector<std::string> tokens;
 
 	blockedTaskHandle = xTaskGetCurrentTaskHandle();
-	SendData(data);
+    at::Result result;
+    cmd_init();
+    cmd_send(cmd);
 
-
-	uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
+    uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
 	uint32_t timeoutNeeded =
 			timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
 	uint32_t timeElapsed = currentTime;
@@ -219,7 +151,7 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 
 		if (timeElapsed >= timeoutNeeded)
 		{
-            LogTimeout(cmdStr, timeout);
+            result.code = at::Result::Code::TIMEOUT;
             break;
 		}
 
@@ -244,15 +176,11 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd,
 			if (tokens.size() < rxCount) {
 				continue;
 			}
-		} else {
-			//timeout
-            LogTimeout(cmdStr, timeout);
         }
-        break;
     }
 
-    LogDebugModemOutputResponse(cmdStr, tokens, timeElapsed, currentTime);
-
+    cmd_log(cmd, result, timeout);
+    cmd_post();
     blockedTaskHandle = nullptr;
 
     return tokens;

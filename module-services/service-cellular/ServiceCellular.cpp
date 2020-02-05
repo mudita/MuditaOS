@@ -252,16 +252,19 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 auto channel = cmux->GetChannel("Commands");
                 if (!m || !channel)
                 {
-                    LOG_ERROR("Not a command");
+                    LOG_ERROR("RawCommand error: %s %s", m == nullptr ? "" : "bad cmd", !channel ? "no channel" : "");
                     break;
                 }
                 // TODO change 10 to something better, at best wait till OK/ERROR/TIMEOUT
                 auto respMsg = std::make_shared<cellular::RawCommandResp>(true);
-                respMsg->response = channel->SendCommandResponse(m->command.c_str(), 3, m->timeout);
-                LOG_DEBUG("Raw CMD: %s %d", m->command.c_str(), m->timeout);
-                for (auto const &el : respMsg->response)
+                auto ret = channel->cmd(m->command.c_str(), m->timeout);
+                respMsg->response = ret.response;
+                if (respMsg->response.size())
                 {
-                    LOG_DEBUG("> %s", el.c_str());
+                    for (auto const &el : respMsg->response)
+                    {
+                        LOG_DEBUG("> %s", el.c_str());
+                    }
                 }
                 responseMsg = respMsg;
                 break;
@@ -315,7 +318,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             std::string buf = "AT+IPR=" + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
             LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
-            if (!cmux->CheckATCommandResponse(cmux->getParser()->SendCommand(buf.c_str(), 1)))
+            if (!cmux->getParser()->cmd(buf.c_str()))
             {
                 LOG_ERROR("Baudrate setup error");
                 state = State::Failed;
@@ -364,16 +367,17 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
 
     case MessageType::CellularListCurrentCalls: {
-        constexpr size_t numberOfExpectedTokens = 3;
-        auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CLCC\r", numberOfExpectedTokens, 300);
-        // if CellularListCurrentCalls is recieved after the call is aborted it will return 2 tokens instead of 3
-        // this should be acceptable and hence warning instead of error is logged in such case
-        if (cmux->CheckATCommandResponse(ret, numberOfExpectedTokens, LOGWARN))
+        auto ret = cmux->GetChannel("Commands")->cmd("AT+CLCC\r", 300);
+        if (ret)
         {
             // TODO: alek: add case when more status calls is returned
             // TODO: alek: add cellular call validation and check it with modemcall
+
+            // TODO: alek - just handle parts of response properly
+            // if CellularListCurrentCalls is recieved after the call is aborted it will return 2 tokens instead of 3
+            // this should be acceptable and hence warning instead of error is logged in such case
             bool retVal = true;
-            auto callEntry = ret[1];
+            auto callEntry = ret.response[1];
 
             try
             {
@@ -407,7 +411,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         LOG_INFO("CellularHangupCall");
         if (channel)
         {
-            if (cmux->CheckATCommandResponse(channel->SendCommandResponse("ATH\r", 1, 5000)))
+            if (channel->cmd("ATH\r", 5000))
             {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 stopTimer(callStateTimerId);
@@ -432,8 +436,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         if (channel)
         {
             // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
-            auto response = channel->SendCommandResponse("ATA\r", 1, 90000);
-            if (cmux->CheckATCommandResponse(response))
+            // TODO alek: check if your request isn't for 5 sec when you wait in command for 90000, it's exclusivelly set to 5000ms in command requesting...
+            auto response = channel->cmd("ATA\r", 90000);
+            if (response)
             {
                 // Propagate "CallActive" notification into system
                 sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallActive),
@@ -449,9 +454,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
         auto channel = cmux->GetChannel("Commands");
 		if (channel) {
-			auto ret = channel->SendCommandResponse(
-					("ATD" + msg->data + ";\r").c_str(), 1, 5000);
-            if (cmux->CheckATCommandResponse(ret))
+            auto ret = channel->cmd(("ATD" + msg->data + ";\r").c_str(), 5000);
+            if (ret)
             {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
@@ -513,7 +517,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     if (responseMsg == nullptr)
     {
-        LOG_DEBUG("message not handled!");
+        LOG_DEBUG("message not handled: %d, %d", msgl->type, msgl->messageType);
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
 
@@ -597,7 +601,7 @@ bool ServiceCellular::sendSMS(void)
                 cmux->GetChannel("Commands")->SendCommandPrompt(("AT+CMGS=\"" + UCS2(record.number).modemStr() + "\"\r").c_str(), 1, 1000)))
         {
 
-            if (cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse((UCS2(record.body).modemStr() + "\032").c_str(), 2, 5000)))
+            if (cmux->GetChannel("Commands")->cmd((UCS2(record.body).modemStr() + "\032").c_str(), 5000))
             {
                 result = true;
             }
@@ -641,7 +645,7 @@ bool ServiceCellular::sendSMS(void)
             if (cmux->CheckATCommandPrompt(cmux->GetChannel("Commands")->SendCommandPrompt(command.c_str(), 1, 5000)))
             {
                 //prompt sign received, send data ended by "Ctrl+Z"
-                if (cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)))
+                if (cmux->GetChannel("Commands")->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000))
                 {
                     result = true;
                 }
@@ -666,20 +670,21 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 
 	std::string command("AT+QCMGR=" + messageNumber + "\r");
 
-	auto ret = cmux->GetChannel("Commands")->SendCommandResponse(
-			command.c_str(), 2, 2000);
+    auto ret = cmux->GetChannel("Commands")->cmd(command, 2000);
 
-	bool messageParsed = false;
+    bool messageParsed = false;
 
 	std::string messageRawBody;
 	UTF8 receivedNumber;
-	if (ret.size() != 0) {
-		for (uint32_t i = 0; i < ret.size(); i++) {
-			if (ret[i].find("QCMGR") != std::string::npos) {
+    if (ret)
+    {
+        for (uint32_t i = 0; i < ret.response.size(); i++)
+        {
+            if (ret.response[i].find("QCMGR") != std::string::npos)
+            {
 
-
-				std::istringstream ss(ret[i]);
-				std::string token;
+                std::istringstream ss(ret.response[i]);
+                std::string token;
 				std::vector<std::string> tokens;
 				while (std::getline(ss, token, ',')) {
 					tokens.push_back(token);
@@ -711,8 +716,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
                 //if its single message process
 				if (tokens.size() == 5) {
 
-					messageRawBody = ret[i+1];
-					messageParsed = true;
+                    messageRawBody = ret.response[i + 1];
+                    messageParsed = true;
 				}
 				//if its concatenated message wait for last message
 				else if (tokens.size() == 8) {
@@ -730,7 +735,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
                         return false;
                     }
                     if (current == last) {
-						messageParts.push_back(ret[i + 1]);
+                        messageParts.push_back(ret.response[i + 1]);
 
                         for (uint32_t j = 0; j < messageParts.size(); j++)
                         {
@@ -741,7 +746,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
                     }
                     else
                     {
-                        messageParts.push_back(ret[i + 1]);
+                        messageParts.push_back(ret.response[i + 1]);
                     }
                 }
 				if (messageParsed)
@@ -759,28 +764,28 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 
 					DBServiceAPI::SMSAdd(this, record);
 				}
-			}
-		}
-	}
-	//delete message from modem memory
-    cmux->CheckATCommandResponse(cmux->GetChannel("Commands")->SendCommandResponse(("AT+CMGD=" + messageNumber).c_str(), 1, 150));
+            }
+        }
+    }
+    //delete message from modem memory
+    cmux->GetChannel("Commands")->cmd("AT+CMGD=" + messageNumber, 150);
     return true;
 }
 
 bool ServiceCellular::getOwnNumber(std::string &destination)
 {
-    auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CNUM\r", 2, 300);
+    auto ret = cmux->GetChannel("Commands")->cmd("AT+CNUM\r");
 
-    if (cmux->CheckATCommandResponse(ret))
+    if (ret)
     {
-        auto begin = ret[0].find(',');
-        auto end = ret[0].rfind(',');
+        auto begin = ret.response[0].find(',');
+        auto end = ret.response[0].rfind(',');
         if (begin != std::string::npos && end != std::string::npos)
         {
             std::string number;
             try
             {
-                number = ret[0].substr(begin, end - begin);
+                number = ret.response[0].substr(begin, end - begin);
             }
             catch (std::exception &e)
             {
@@ -800,19 +805,19 @@ bool ServiceCellular::getOwnNumber(std::string &destination)
 
 bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
 {
-    auto ret = cmux->GetChannel("Commands")->SendCommandResponse("AT+CIMI\r", 2, 300);
+    auto ret = cmux->GetChannel("Commands")->cmd("AT+CIMI\r");
 
-    if (cmux->CheckATCommandResponse(ret))
+    if (ret)
     {
         if (fullNumber)
         {
-            destination = ret[0];
+            destination = ret.response[0];
         }
         else
         {
             try
             {
-                destination = ret[0].substr(0, 3);
+                destination = ret.response[0].substr(0, 3);
             }
             catch (std::exception &e)
             {
