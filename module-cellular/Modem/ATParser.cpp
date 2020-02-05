@@ -14,50 +14,38 @@
 #include "service-cellular/messages/CellularMessage.hpp"
 #include "ticks.hpp"
 #include <Utils.hpp>
+#include <utility>
+#include <vector>
 
 ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
     isInitialized = true;
 }
 
+/// plz see 12.7 summary of urc in documentation
 std::vector<ATParser::Urc> ATParser::ParseURC() {
 
     std::vector<ATParser::Urc> resp;
-    size_t maxPos = 0;
+    size_t maxPos = 0, pos = 0;
 
     cpp_freertos::LockGuard lock(mutex);
 
-    auto pos = responseBuffer.find("RDY");
-    if (pos != std::string::npos) {
-        resp.push_back(ATParser::Urc::MeInitializationSuccessful);
-        maxPos = std::max(pos + strlen("RDY"), maxPos);
-        LOG_DEBUG("Received URC: MeInitializationSuccessful");
-    }
+    std::vector<std::pair<std::string, ATParser::Urc>> vals = {
+        {"RDY", ATParser::Urc::MeInitializationSuccessful},
+        {"+CFUN: 1", ATParser::Urc::FullFuncionalityAvailable},
+        {"+CPIN: READY", ATParser::Urc::SimCardReady},
+        {"+QIND: SMS DONE", ATParser::Urc::SMSInitializationComplete},
+        {"+QIND: PB DONE", ATParser::Urc::PhonebookInitializationComplete},
+    };
 
-    pos = responseBuffer.find("+CFUN: 1");
-    if (pos != std::string::npos) {
-        resp.push_back(ATParser::Urc::FullFuncionalityAvailable);
-        maxPos = std::max(pos + strlen("+CFUN: 1"), maxPos);
-        LOG_DEBUG("Received URC: FullFuncionalityAvailable");
-    }
-    pos = responseBuffer.find("+CPIN: READY");
-    if (pos != std::string::npos) {
-        resp.push_back(ATParser::Urc::SimCardReady);
-        maxPos = std::max(pos + strlen("+CPIN: READY"), maxPos);
-        LOG_DEBUG("Received URC: SimCardReady");
-    }
-
-    pos = responseBuffer.find("+QIND: SMS DONE");
-    if (pos != std::string::npos) {
-        resp.push_back(ATParser::Urc::SMSInitializationComplete);
-        maxPos = std::max(pos + strlen("+QIND: SMS DONE"), maxPos);
-        LOG_DEBUG("Received URC: SMSInitializationComplete");
-    }
-
-    pos = responseBuffer.find("+QIND: PB DONE");
-    if (pos != std::string::npos) {
-        resp.push_back(ATParser::Urc::PhonebookInitializationComplete);
-        maxPos = std::max(pos + strlen("+QIND: PB DONE"), maxPos);
-        LOG_DEBUG("Received URC: PhonebookInitializationComplete");
+    for (const auto &el : vals)
+    {
+        pos = responseBuffer.find(el.first);
+        if (pos != std::string::npos)
+        {
+            resp.push_back(el.second);
+            maxPos = std::max(pos + el.first.length(), maxPos);
+            LOG_DEBUG(("[URC]: " + el.first).c_str());
+        }
     }
 
     // manage string buffer
@@ -81,14 +69,16 @@ int ATParser::ProcessNewData(sys::Service *service) {
 
     {
         cpp_freertos::LockGuard lock(mutex);
-        LOG_DEBUG("Appending %i bytes to responseBuffer", length);
+        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s", length, responseBuffer.size(), responseBuffer);
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
     }
 
+    auto ret = ParseURC();
     if (blockedTaskHandle) {
         xTaskNotifyGive(blockedTaskHandle);
-    } else {
-        auto ret = ParseURC();
+    }
+    else if (ret.size())
+    {
         urcs.insert(std::end(urcs),std::begin(ret),std::end(ret));
         // GSM modem is considered as fully operational when it outputs URCs specified below:
         // 1) RDY
@@ -104,82 +94,29 @@ int ATParser::ProcessNewData(sys::Service *service) {
             responseBuffer.erase();
             urcs.clear();
         }
-
     }
     return 1;
 }
 
-std::vector<std::string> ATParser::SendCommand(const char *cmd, size_t rxCount, uint32_t timeout) {
-    std::vector<std::string> tokens;
-
-    {
-        cpp_freertos::LockGuard lock(mutex);
-        responseBuffer.erase();
-    }
-
-    // Remove \r and \n for logging purposes
-    std::string cmdStr(cmd);
-    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\r'), cmdStr.end());
-    cmdStr.erase(std::remove(cmdStr.begin(), cmdStr.end(), '\n'), cmdStr.end());
-
-    blockedTaskHandle = xTaskGetCurrentTaskHandle();
-    cellular->Write((void*)cmd, strlen(cmd));
-
-    uint32_t currentTime = cpp_freertos::Ticks::GetTicks();
-    uint32_t timeoutNeeded = timeout == UINT32_MAX ? UINT32_MAX : currentTime + timeout;
-    uint32_t timeElapsed = currentTime;
-    
-    LOG_INFO("[AT]: %s, timeout value %d", cmdStr.c_str(), timeout);
-
-    while(1) {
-
-        if (timeElapsed >= timeoutNeeded)
-        {
-            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
-            break;
-        }
-
-        auto ret = ulTaskNotifyTake(pdTRUE, timeoutNeeded - timeElapsed);
-        timeElapsed = cpp_freertos::Ticks::GetTicks();
-        if (ret)
-        {
-            std::vector<std::string> strings;
-
-            cpp_freertos::LockGuard lock(mutex);
-            // tokenize responseBuffer
-            // empty lines are also removed
-            auto ret = Tokenizer(responseBuffer, "\r\n", rxCount);
-            tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-
-            if (tokens.size() < rxCount)
-            {
-                continue;
-            }
-        }
-        else
-        {
-            LOG_MODEM_TIMEOUT("[AT]: %s, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf", cmdStr.c_str(), timeout);
-        }
-        
-        break;
-    }
-
-    blockedTaskHandle = nullptr;
-    responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
-    LOG_INFO("[AT]: %s - returning %i tokens in %d ms", cmdStr.c_str(), tokens.size(), timeElapsed - currentTime);
-
-#if DEBUG_MODEM_OUTPUT_RESPONSE
-    for (auto s : tokens)
-    {
-        LOG_DEBUG("[]%s", s.c_str());
-    }
-#endif
-
-    return tokens;
+void ATParser::cmd_init()
+{
+    cpp_freertos::LockGuard lock(mutex);
+    responseBuffer.erase();
 }
 
-// for string delimiter
-std::vector<std::string> ATParser::Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount)
+void ATParser::cmd_send(std::string cmd)
 {
-    return utils::split(input, delimiter, maxTokenCount);
+    cellular->Write((void *)cmd.c_str(), cmd.size());
+}
+
+std::vector<std::string> ATParser::cmd_receive()
+{
+    cpp_freertos::LockGuard lock(mutex);
+    return utils::split(responseBuffer, "\r\n");
+}
+
+void ATParser::cmd_post()
+{
+    cpp_freertos::LockGuard lock(mutex);
+    responseBuffer.erase(); // TODO:M.P is it okay to flush buffer here ?
 }

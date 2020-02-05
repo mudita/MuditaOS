@@ -25,15 +25,14 @@ namespace utils
         return elems;
     }
 
-    static inline std::vector<std::string> split(const std::string &s, const std::string &delimiter, const uint32_t maxTokenCount = 0,
-                                                 const bool skipEmptyTokens = true)
+    static inline std::vector<std::string> split(const std::string &s, const std::string &delimiter, const bool skipEmptyTokens = true)
     {
         size_t pos_start = 0, pos_end, delim_len = delimiter.length();
         std::string token;
         std::vector<std::string> res;
         uint32_t tokenCount = 0;
 
-        while (((pos_end = s.find(delimiter, pos_start)) != std::string::npos) && (maxTokenCount == 0 || tokenCount < maxTokenCount))
+        while (((pos_end = s.find(delimiter, pos_start)) != std::string::npos))
         {
             token = s.substr(pos_start, pos_end - pos_start);
             pos_start = pos_end + delim_len;
@@ -45,7 +44,7 @@ namespace utils
         }
 
         token = s.substr(pos_start);
-        if ((!skipEmptyTokens || !token.empty()) && (maxTokenCount == 0 || tokenCount < maxTokenCount))
+        if (!skipEmptyTokens || !token.empty())
         {
             res.push_back(token);
         }
