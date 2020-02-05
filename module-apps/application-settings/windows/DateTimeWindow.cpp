@@ -17,7 +17,6 @@
 #include "time/time_conversion.hpp"
 #include "time/time_date_validation.hpp"
 
-#include "../widgets/DateTimeItem.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "Text.hpp"
@@ -79,13 +78,13 @@ namespace gui
             auto toAdd = dateItems.find(DateTimeItems::Day);
             if (toAdd != dateItems.end())
             {
-                dateBody->tryAddWidget(toAdd->second);
-                dateBody->tryAddWidget(addSpacer(""));
+                dateBody->addWidget(toAdd->second);
+                dateBody->addWidget(addSpacer(""));
             }
             toAdd = dateItems.find(DateTimeItems::Month);
             if (toAdd != dateItems.end())
             {
-                dateBody->tryAddWidget(toAdd->second);
+                dateBody->addWidget(toAdd->second);
             }
         }
         else
@@ -93,21 +92,21 @@ namespace gui
             auto toAdd = dateItems.find(DateTimeItems::Month);
             if (toAdd != dateItems.end())
             {
-                dateBody->tryAddWidget(toAdd->second);
-                dateBody->tryAddWidget(addSpacer(""));
+                dateBody->addWidget(toAdd->second);
+                dateBody->addWidget(addSpacer(""));
             }
             toAdd = dateItems.find(DateTimeItems::Day);
             if (toAdd != dateItems.end())
             {
-                dateBody->tryAddWidget(toAdd->second);
+                dateBody->addWidget(toAdd->second);
             }
         }
-        dateBody->tryAddWidget(addSpacer(""));
+        dateBody->addWidget(addSpacer(""));
 
         auto toAdd = dateItems.find(DateTimeItems::Year);
         if (toAdd != dateItems.end())
         {
-            dateBody->tryAddWidget(toAdd->second);
+            dateBody->addWidget(toAdd->second);
         }
 
         dateBody->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -128,13 +127,13 @@ namespace gui
         timeBody = new gui::HBox(this, style::window::default_left_margin, (uint32_t)title->offset_h() * 2, w, h);
         item = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_time"), std::to_string(hourValue));
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
-        timeBody->tryAddWidget(item);
-        timeBody->tryAddWidget(addSpacer(":"));
+        timeBody->addWidget(item);
+        timeBody->addWidget(addSpacer(":"));
 
         item = addDateTimeItem(nullptr, (""), time.get_date_time_substr(utils::time::GetParameters::Minute));
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Minute, item));
-        timeBody->tryAddWidget(item);
-        timeBody->tryAddWidget(addSpacer(""));
+        timeBody->addWidget(item);
+        timeBody->addWidget(addSpacer(""));
 
         item = addDateTimeItem(nullptr, (""), (""));
         if (timeFormat12h)
@@ -153,7 +152,7 @@ namespace gui
             item->setVisible(false);
         }
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
-        timeBody->tryAddWidget(item);
+        timeBody->addWidget(item);
 
         timeBody->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 

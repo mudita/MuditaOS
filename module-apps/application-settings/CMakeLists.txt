@@ -29,5 +29,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/SettingsMainWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/LanguageWindow.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.hpp"
+		#"${CMAKE_CURRENT_LIST_DIR}/widgets/DateTimeItem.hpp"
 )
 
