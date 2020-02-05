@@ -19,6 +19,16 @@
 #include "fsl_cache.h"
 #include <map>
 
+void foo()
+{
+    BaseType_t hp = pdFALSE;
+    if (bsp::RT1051Cellular::blockedTaskHandle)
+    {
+        vTaskNotifyGiveFromISR(bsp::RT1051Cellular::blockedTaskHandle, &hp);
+    }
+    portEND_SWITCHING_ISR(hp);
+}
+
 extern "C"
 {
     void LPUART1_IRQHandler(void)
@@ -38,10 +48,10 @@ extern "C"
                 {
                     if (xStreamBufferSpacesAvailable(bsp::RT1051Cellular::uartRxStreamBuffer) < 8)
                     {
-                        // BSP_CellularDeassertRTS();
+                        LOG_FATAL("...");
                     }
                     xStreamBufferSendFromISR(bsp::RT1051Cellular::uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
-                    bsp::pit::start(25 * 1000, [&]() { vTaskNotifyGiveFromISR(bsp::RT1051Cellular::blockedTaskHandle, &xHigherPriorityTaskWoken); });
+                    bsp::pit::start(25 * 1000, foo);
                 }
             }
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, isrReg);

@@ -12,29 +12,27 @@
 #ifndef PUREPHONE_ATPARSER_HPP
 #define PUREPHONE_ATPARSER_HPP
 
+#include "ATCommon.hpp"
+#include <FreeRTOS.h>
+#include <Service/Service.hpp>
 #include <memory>
 #include <optional>
+#include <task.h>
 #include <vector>
-#include "FreeRTOS.h"
-#include "task.h"
-#include "mutex.hpp"
-#include "Service/Service.hpp"
-
-#define DEBUG_MODEM_OUTPUT_RESPONSE 0
-#define DEBUG_MODEM_TIMEOUT_AS_ERROR 0
 
 #if DEBUG_MODEM_TIMEOUT_AS_ERROR
 #define LOG_MODEM_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
 #else
-#define LOG_MODEM_TIMEOUT(...) LOG_INFO(__VA_ARGS__)
+#define LOG_MODEM_TIMEOUT(...)
 #endif
 
 namespace bsp{
     class Cellular;
 }
 
-class ATParser {
-public:
+class ATParser : public at::Chanel
+{
+  public:
 
     enum class Urc{
         MeInitializationSuccessful,
@@ -49,27 +47,18 @@ public:
 
     int ProcessNewData(sys::Service *service);
 
-    std::vector<std::string> SendCommand(const char *cmd, size_t rxCount, uint32_t timeout = 500);
-
-    // @param maxTokenCount max token count, if 0 no max number limitation
-    static std::vector<std::string> Tokenizer(const std::string &input, const std::string &delimiter, uint32_t maxTokenCount = 0);
+    virtual void cmd_init() override final;
+    virtual void cmd_send(std::string cmd) override final;
+    virtual std::vector<std::string> cmd_receive() override final;
+    virtual void cmd_post() override final;
 
   private:
 
     std::vector<Urc> ParseURC();
-
     bsp::Cellular* cellular = nullptr;
-
     std::string responseBuffer;
-
-    TaskHandle_t blockedTaskHandle = nullptr;
-    cpp_freertos::MutexStandard mutex;
-
     std::vector<ATParser::Urc> urcs;
-
     bool isInitialized = false;
-
 };
-
 
 #endif //PUREPHONE_ATPARSER_HPP
