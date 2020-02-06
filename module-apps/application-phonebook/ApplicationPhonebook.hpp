@@ -2,7 +2,10 @@
 
 namespace app {
 
-inline const std::string name_phonebook = "ApplicationPhonebook";
+/* this is is a bad idea but no other exists as of 06.02.2020 */
+static std::string defaultCountryCode = "+48";
+
+const inline std::string name_phonebook = "ApplicationPhonebook";
 
 class ApplicationPhonebook: public app::Application {
 public:
