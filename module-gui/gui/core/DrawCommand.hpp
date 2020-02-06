@@ -120,8 +120,8 @@ public:
     //flags indicating yaps for speech bubbles, it takes precendece over other properties
     RectangleYapFlags yaps;
     //defines which of the edges and corners are painted
-    unsigned short yapSize;
-	bool filled;
+    unsigned short yapSize = 0;
+    bool filled;
 	uint8_t penWidth;
 	Color fillColor;
 	Color borderColor;
