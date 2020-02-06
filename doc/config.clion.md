@@ -74,6 +74,15 @@ in the debuging configuration dropdown select a pair of **<exec>** and **<toolch
 
 ![Profit](https://user-images.githubusercontent.com/56958031/71167426-f28ac780-2254-11ea-8efb-8375fb004004.png)
 
+### running target
+It is possible to see logs from a rt1051 booted from eMMC and not from RAM. 
+To do so select **JLink server (no upload)** configuration.
+Open `JLinkRTTClient` in a separate terminal.
+
+Note: remember to **stop** this debug session when you want to switch to regular **JLink server** (with upload), otherwise they will collide.
+
+True attaching to a running target (without a reset) is not known to be working.
+
 # separate builds
 To build separately for each arch we need to:
 - Open settings (CTRL+ALT+S)
