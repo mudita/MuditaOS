@@ -10,8 +10,14 @@
 
 namespace app
 {
-    bool call(Application *app, const ContactRecord contact)
+    bool call(Application *app, const ContactRecord &contact)
     {
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return false;
+        }
+
         if (contact.numbers.size() != 0)
         {
             std::unique_ptr<ExecuteCallData> data = std::make_unique<ExecuteCallData>(contact.numbers[0].numberE164.c_str());
@@ -24,7 +30,7 @@ namespace app
         }
     }
 
-    gui::Option callOption(Application *app, const ContactRecord contact, bool active)
+    gui::Option callOption(Application *app, const ContactRecord &contact, bool active)
     {
         return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName, [app, contact, active](gui::Item &item) {
                     if (active)
@@ -40,8 +46,13 @@ namespace app
                 }};
     }
 
-    gui::Option contactDetails(Application *app, ContactRecord &contact)
+    gui::Option contactDetails(Application *app, const ContactRecord &contact)
     {
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return gui::Option();
+        }
         auto foo = [=](gui::Item &item) {
             return sapm::ApplicationManager::messageSwitchApplication(
                 app, name_phonebook, "Contact", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
@@ -49,15 +60,26 @@ namespace app
         return {utils::localize.get("sms_contact_details"), foo};
     }
 
-    bool sms(Application *app, const ContactRecord contact)
+    bool sms(Application *app, const ContactRecord &contact)
     {
+        // TODO: alek: looks like only valid from SMS app
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return false;
+        }
         // TODO return to current application doesn't change application window >_>
         auto param = std::shared_ptr<ContactRecord>(new ContactRecord(contact));
         return app->switchWindow(gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
     }
 
-    bool addContact(Application *app, const ContactRecord contact)
+    bool addContact(Application *app, const ContactRecord &contact)
     {
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return false;
+        }
         return sapm::ApplicationManager::messageSwitchApplication(
             app, name_phonebook, "New", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
     }
