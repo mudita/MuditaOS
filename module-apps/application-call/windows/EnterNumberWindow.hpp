@@ -8,13 +8,14 @@
  */
 #pragma once
 
-#include "AppWindow.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Window.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/TopBar.hpp"
+#include "../ApplicationCall.hpp"
 #include "../widgets/Icon.hpp"
+#include "AppWindow.hpp"
+#include "gui/widgets/BottomBar.hpp"
+#include "gui/widgets/Image.hpp"
+#include "gui/widgets/Label.hpp"
+#include "gui/widgets/TopBar.hpp"
+#include "gui/widgets/Window.hpp"
 
 namespace gui {
 
@@ -30,7 +31,7 @@ protected:
 
   public:
     EnterNumberWindow() = delete;
-    EnterNumberWindow(app::Application *app, std::string windowName = "EnterNumberWindow");
+    EnterNumberWindow(app::Application *app, std::string windowName = app::window::name_enterNumber);
     virtual ~EnterNumberWindow();
 
 	bool onInput( const InputEvent& inputEvent ) override;

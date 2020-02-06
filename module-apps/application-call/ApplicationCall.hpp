@@ -16,6 +16,12 @@
 namespace app {
 
 inline const std::string name_call = "ApplicationCall";
+namespace window
+{
+    inline const std::string name_call = "CallWindow";
+    inline const std::string name_enterNumber = "EnterNumberWindow";
+    inline const std::string name_emergencyCall = "EmergencyCallWindow";
+} // namespace window
 /*
  *
  */

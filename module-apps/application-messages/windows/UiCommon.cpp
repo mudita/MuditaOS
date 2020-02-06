@@ -9,7 +9,7 @@ bool call(app::ApplicationMessages *app, const ContactRecord contact)
     if (contact.numbers.size() != 0)
     {
         std::unique_ptr<app::ExecuteCallData> data = std::make_unique<app::ExecuteCallData>(contact.numbers[0].numberE164.c_str());
-        return sapm::ApplicationManager::messageSwitchApplication(app, app::name_call, "CallWindow", std::move(data));
+        return sapm::ApplicationManager::messageSwitchApplication(app, app::name_call, app::window::name_call, std::move(data));
     }
     else
     {
