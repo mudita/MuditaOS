@@ -7,6 +7,9 @@ if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 	add_subdirectory( linux )
 endif()
 
+add_subdirectory( parser )
+
+
 target_compile_definitions (${PROJECT_NAME} PUBLIC USB_STACK_FREERTOS)
 target_include_directories (${PROJECT_NAME} PUBLIC usb/include usb/osa usb/device/class usb/device/include)
 

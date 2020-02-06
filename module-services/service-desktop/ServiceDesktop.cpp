@@ -6,6 +6,10 @@
 #include <errno.h>
 #include <log/log.hpp>
 #include <string.h>
+
+#include "parser/Fsmlist.hpp"
+#include "parser/SerialParser.hpp"
+
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
 #if defined(TARGET_RT1051)
@@ -65,6 +69,9 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
             return (sys::ReturnCodes::Failure);
         }
     }
+
+    fsm_list::start();
+
     return (sys::ReturnCodes::Success);
 }
 
@@ -143,63 +150,66 @@ int ServiceDesktop::sendData(const char *rawDataToSend, size_t rawDataSize)
 
 void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
 {
-    std::string possibleJsonData((const char *)data, (size_t)dataLen);
-    std::string errorString;
-    LOG_DEBUG("dataReceived len: %d data:\"%s\"", dataLen, data);
-    json11::Json request = json11::Json::parse(possibleJsonData, errorString);
-    if (request.is_null())
-    {
-        LOG_ERROR("Can't parse data as JSON [%s]", errorString.c_str());
-    }
-    else
-    {
-        LOG_DEBUG("got serial command: %s", request["command"].string_value().c_str());
-        if (request["command"].string_value() == "running_tasks")
-        {
-            Json my_json = Json::object{{"tasks", (int)uxTaskGetNumberOfTasks()}};
-            std::string responseStr = my_json.dump();
-            sendData(responseStr.c_str(), responseStr.length());
-        }
+    SerialParser::msgChunk.assign(data, data + dataLen);
+    send_event(MessageDataEvt());
 
-        if (request["command"].string_value() == "kernel_version")
-        {
-            Json my_json = Json::object{{"version", tskKERNEL_VERSION_NUMBER}};
-            std::string responseStr = my_json.dump();
-            sendData(responseStr.c_str(), responseStr.length());
-        }
+    // std::string possibleJsonData((const char *)data, (size_t)dataLen);
+    // std::string errorString;
+    // LOG_DEBUG("dataReceived len: %d data:\"%s\"", dataLen, data);
+    // json11::Json request = json11::Json::parse(possibleJsonData, errorString);
+    // if (request.is_null())
+    // {
+    //     LOG_ERROR("Can't parse data as JSON [%s]", errorString.c_str());
+    // }
+    // else
+    // {
+    //     LOG_DEBUG("got serial command: %s", request["command"].string_value().c_str());
+    //     if (request["command"].string_value() == "running_tasks")
+    //     {
+    //         Json my_json = Json::object{{"tasks", (int)uxTaskGetNumberOfTasks()}};
+    //         std::string responseStr = my_json.dump();
+    //         sendData(responseStr.c_str(), responseStr.length());
+    //     }
 
-        if (request["command"].string_value() == "list_root")
-        {
-            Json::array fileListAsJsonObjects;
-            std::vector<vfs::DirectoryEntry> root_files = vfs.listdir("sys");
+    //     if (request["command"].string_value() == "kernel_version")
+    //     {
+    //         Json my_json = Json::object{{"version", tskKERNEL_VERSION_NUMBER}};
+    //         std::string responseStr = my_json.dump();
+    //         sendData(responseStr.c_str(), responseStr.length());
+    //     }
 
-            for (auto &f : root_files)
-            {
-                fileListAsJsonObjects.push_back(fileItem(f));
-            }
-            const std::string responseStr = Json(fileListAsJsonObjects).dump();
-            sendData(responseStr.c_str(), responseStr.length());
-        }
+    //     if (request["command"].string_value() == "list_root")
+    //     {
+    //         Json::array fileListAsJsonObjects;
+    //         std::vector<vfs::DirectoryEntry> root_files = vfs.listdir("sys");
 
-        if (request["command"].string_value() == "contact-count")
-        {
-            DBServiceAPI::ContactGetCount(this);
-        }
+    //         for (auto &f : root_files)
+    //         {
+    //             fileListAsJsonObjects.push_back(fileItem(f));
+    //         }
+    //         const std::string responseStr = Json(fileListAsJsonObjects).dump();
+    //         sendData(responseStr.c_str(), responseStr.length());
+    //     }
 
-        if (request["command"].string_value() == "contact-list")
-        {
-            int offset = request["offset"].int_value();
-            int limit = request["limit"].int_value();
-            bool favs = request["favs"].bool_value();
-            DBServiceAPI::ContactGetLimitOffset(this, offset, limit, favs);
-        }
+    //     if (request["command"].string_value() == "contact-count")
+    //     {
+    //         DBServiceAPI::ContactGetCount(this);
+    //     }
 
-        if (request["command"].string_value() == "contact")
-        {
-           if (request["id"].is_number())
-            {
-                DBServiceAPI::ContactGetByID(this, request["id"].int_value());
-            }
-        }
-    }
+    //     if (request["command"].string_value() == "contact-list")
+    //     {
+    //         int offset = request["offset"].int_value();
+    //         int limit = request["limit"].int_value();
+    //         bool favs = request["favs"].bool_value();
+    //         DBServiceAPI::ContactGetLimitOffset(this, offset, limit, favs);
+    //     }
+
+    //     if (request["command"].string_value() == "contact")
+    //     {
+    //        if (request["id"].is_number())
+    //         {
+    //             DBServiceAPI::ContactGetByID(this, request["id"].int_value());
+    //         }
+    //     }
+    // }
 }
