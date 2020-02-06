@@ -79,14 +79,15 @@ int ATParser::ProcessNewData(sys::Service *service) {
     }
     else if (ret.size())
     {
-        urcs.insert(std::end(urcs),std::begin(ret),std::end(ret));
+        urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
         // GSM modem is considered as fully operational when it outputs URCs specified below:
         // 1) RDY
         // 2) +CFUN: 1
         // 3) +CPIN: READY
         // 4) +QIND: SMS DONE
         // 5) +QIND: PB DONE
-        if (urcs.size() == 5) {
+        if (urcs.size() == 5)
+        {
             cpp_freertos::LockGuard lock(mutex);
             auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
