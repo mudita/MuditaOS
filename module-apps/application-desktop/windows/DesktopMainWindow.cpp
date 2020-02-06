@@ -137,7 +137,7 @@ bool DesktopMainWindow::switchToCallEnterNumberWindow(const char key)
     std::string keyStr;
     keyStr = key;
     std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(keyStr);
-    return sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, "EnterNumberWindow", std::move(phoneNumberData));
+    return sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, app::window::name_enterNumber, std::move(phoneNumberData));
 }
 
 bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
