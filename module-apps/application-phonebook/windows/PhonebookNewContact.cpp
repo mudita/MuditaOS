@@ -10,6 +10,7 @@
 #include "Utils.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <log/log.hpp>
 
@@ -407,11 +408,25 @@ void PhonebookNewContact::setContactData()
         page1.text[1]->setText(contact->alternativeName);
         if (contact->numbers.size() > 0)
         {
-            page1.text[2]->setText(contact->numbers[0].numberE164);
+            if (contact->numbers[0].numberE164.length() == 0)
+            {
+                page1.text[2]->setText(getCountryPrefix());
+            }
+            else
+            {
+                page1.text[2]->setText(contact->numbers[0].numberE164);
+            }
         }
         if (contact->numbers.size() > 1)
         {
-            page1.text[3]->setText(contact->numbers[1].numberE164);
+            if (contact->numbers[1].numberE164.length() == 0)
+            {
+                page1.text[3]->setText(getCountryPrefix());
+            }
+            else
+            {
+                page1.text[3]->setText(contact->numbers[1].numberE164);
+            }
         }
         page1.text[4]->setText(contact->mail);
 
@@ -432,6 +447,11 @@ void PhonebookNewContact::setContactData()
             page2.speedValue->setText("-");
 
         saveStateChanged();
+    }
+    else
+    {
+        LOG_DEBUG("new contact create");
+        page1.text[2]->setText(getCountryPrefix());
     }
 }
 
@@ -595,6 +615,28 @@ bool PhonebookNewContact::verifyAndSave()
     }
 
     return (false);
+}
+const std::string PhonebookNewContact::getCountryPrefix()
+{
+    const std::string imsi = CellularServiceAPI::GetIMSI(application, false);
+    if (imsi == "")
+    {
+        LOG_ERROR("Can't get IMSI code from cellular, fall back to Poland country code");
+        return (app::defaultCountryCode);
+    }
+    LOG_DEBUG("getCountryPrefix imsi:%s", imsi.c_str());
+    const uint32_t country_code = DBServiceAPI::GetCountryCodeByMCC(application, std::stoul(imsi));
+    if (country_code < 0)
+    {
+        LOG_ERROR("Can't get country code from database, fall back to Poland country code");
+        return (app::defaultCountryCode);
+    }
+    LOG_DEBUG("getCountryPrefix country_code:%d", country_code);
+    std::string buf = "+";
+    buf += std::to_string(country_code);
+
+    LOG_DEBUG("getCountryPrefix return: \"%s\"", buf.c_str());
+    return (buf);
 }
 
 } // namespace gui

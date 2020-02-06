@@ -16,6 +16,11 @@ class PhonebookItemData : public gui::SwitchData
         return contact;
     }
 
+  public:
+    PhonebookItemData() : contact(nullptr)
+    {
+    }
+
   protected:
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
