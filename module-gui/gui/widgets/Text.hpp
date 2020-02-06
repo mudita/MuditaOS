@@ -199,7 +199,7 @@ class Text : public Rect
      */
     uint32_t getAvailableHPixelSpace()
     {
-        int32_t space = widgetArea.w - (margins.getHorizontal() + innerMargins.getHorizontal());
+        int32_t space = widgetArea.w - (margins.getAlong(Axis::X) + innerMargins.getAlong(Axis::X));
         return (space < 0) ? 0 : space;
     }
 

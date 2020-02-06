@@ -8,16 +8,11 @@
 #ifndef MIDDLEWARES_GUI_WIDGETS_BOUNDINGBOX_HPP_
 #define MIDDLEWARES_GUI_WIDGETS_BOUNDINGBOX_HPP_
 
+#include "Axes.hpp"
 #include <cstdint>
 #include <string>
 
 namespace gui {
-
-    enum class Axis
-    {
-        X,
-        Y
-    };
 
     class BoundingBox
     {
