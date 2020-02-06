@@ -47,8 +47,8 @@ gui::Option contactDetails(app::ApplicationMessages *app, ContactRecord &contact
     return {utils::localize.get("sms_contact_details"), foo};
 }
 
-#include "../data/SMSdata.hpp"
-#include "ThreadViewWindow.hpp"
+#include "application-messages/data/SMSdata.hpp"
+#include "application-messages/windows/ThreadViewWindow.hpp"
 
 bool sms(app::ApplicationMessages *app, const ContactRecord contact)
 {

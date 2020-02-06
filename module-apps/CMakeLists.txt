@@ -11,7 +11,13 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-set( SOURCES "Application.cpp" "windows/AppWindow.cpp" "windows/OptionWindow.cpp" "windows/Dialog.cpp" )
+set( SOURCES 
+    "Application.cpp"
+    "UiCommon.cpp" 
+    "windows/AppWindow.cpp" 
+    "windows/OptionWindow.cpp" 
+    "windows/Dialog.cpp" 
+    )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
