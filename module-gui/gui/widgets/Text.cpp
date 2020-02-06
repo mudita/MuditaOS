@@ -136,12 +136,15 @@ void Text::setText(const UTF8 &text)
     clear();
     cursorRow = 0;
     cursorColumn = 0;
-    // erase default empty line
-    delete textLines.front();
-    textLines.pop_front();
-    textLines.clear();
-    // split and add new lines
-    splitTextToLines(text);
+    if (text.length() > 0)
+    {
+        // erase default empty line
+        delete textLines.front();
+        textLines.pop_front();
+        textLines.clear();
+        // split and add new lines
+        splitTextToLines(text);
+    }
     recalculateDrawParams();
     updateCursor();
 }
