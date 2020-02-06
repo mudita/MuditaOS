@@ -12,6 +12,7 @@
 #include "../data/CallAppStyle.hpp"
 #include "../data/CallSwitchData.hpp"
 #include "InputMode.hpp"
+#include "UiCommon.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
@@ -68,10 +69,18 @@ void EnterNumberWindow::buildInterface() {
     numberLabel->setDotsMode( true, false);
 
     newContactIcon = new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
-	newContactIcon->activatedCallback = [=] (gui::Item& item){
-		LOG_ERROR("TODO: add new contact" );
-		return true; };
-	setFocusItem(newContactIcon);
+    newContactIcon->activatedCallback = [=](gui::Item &item) {
+        auto app = dynamic_cast<app::ApplicationCall *>(application);
+        if (app != nullptr)
+        {
+            ContactRecord contact;
+            auto num = app->getDisplayedNumber();
+            contact.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(num, num)});
+            return app::addContact(getApplication(), contact);
+        }
+        return false;
+    };
+    setFocusItem(newContactIcon);
 }
 
 void EnterNumberWindow::destroyInterface() {
