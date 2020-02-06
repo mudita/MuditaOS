@@ -1023,7 +1023,7 @@ int32_t Text::expand(uint32_t rowCount, int32_t h)
 {
     if (rowCount < textLines.size() && expandMode != Text::ExpandMode::EXPAND_NONE)
     {
-        h = font->info.line_height * textLines.size() + (margins.getVertical() + innerMargins.getVertical());
+        h = font->info.line_height * textLines.size() + (margins.getAlong(Axis::Y) + innerMargins.getAlong(Axis::Y));
         if (parent && widgetArea.h > parent->widgetArea.h)
         {
             h = widgetArea.h;
@@ -1039,7 +1039,7 @@ void Text::recalculateDrawParams()
 {
 
     // calculate number of lines for displaying text
-    int32_t h = widgetArea.h - (margins.getVertical() + innerMargins.getVertical());
+    int32_t h = widgetArea.h - (margins.getAlong(Axis::Y) + innerMargins.getAlong(Axis::Y));
     if (h < 0) h = 0;
 
     // remove all old labels
@@ -1064,7 +1064,7 @@ void Text::recalculateDrawParams()
     for (uint32_t i = 0; i < rowCount; i++)
     {
         gui::Label *label = new gui::Label(this, (margins.left + innerMargins.left), startY,
-                                           widgetArea.w - (margins.getHorizontal() + innerMargins.getHorizontal()), font->info.line_height);
+                                           widgetArea.w - (margins.getAlong(Axis::X) + innerMargins.getAlong(Axis::X)), font->info.line_height);
         label->setFilled(false);
         label->setPenWidth(1);
         label->setPenFocusWidth(3);
