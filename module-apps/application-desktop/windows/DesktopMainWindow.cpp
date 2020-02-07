@@ -132,7 +132,7 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setVisibleState();
 }
 
-bool DesktopMainWindow::switchToCallEnterNumberWindow(const char key)
+bool DesktopMainWindow::switchToCallEnterNumberWindow(const uint32_t key)
 {
     std::string keyStr;
     keyStr = key;
@@ -144,10 +144,18 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	
 	// do nothing
 	if( inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_RF ) return false;
-	
-	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 
-	//process shortpress
+    app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+    if (app == nullptr)
+    {
+        LOG_ERROR("not ApplicationDesktop");
+        return false;
+    }
+
+    auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
+    LOG_FATAL("code = %u", code);
+
+    //process shortpress
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
 		if( app->getScreenLocked() ) {
@@ -195,16 +203,14 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 		//screen is unlocked
 		else {
-            int key = gui::toNumeric(inputEvent.keyCode);
             //pressing enter moves user to menu screen
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 				application->switchWindow( "MenuWindow" );
 			}
 			//if numeric key was pressed record that key and send it to call application with a switch command
-            else if (gui::isNumeric(key))
+            else if (code != 0)
             {
-
-                return switchToCallEnterNumberWindow(key);
+                return switchToCallEnterNumberWindow(code);
             }
 		}
 	}
@@ -228,10 +234,6 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			application->switchWindow( "PowerOffWindow" );
             return true;
 		}
-        else if (inputEvent.keyCode == KeyCode::KEY_0 && app->getScreenLocked() == false)
-        {
-            return switchToCallEnterNumberWindow('+');
-        }
     }
 
     //check if any of the lower inheritance onInput methods catch the event
