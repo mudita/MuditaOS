@@ -148,10 +148,9 @@ void PhonebookNewContact::buildInterface()
 
     page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         int val = gui::toNumeric(inputEvent.keyCode);
-        if (std::isdigit(val))
+        if ((val >= 0) && (val < 9))
         {
-            std::string keyStr(1, val);
-            page2.speedValue->setText(keyStr);
+            page2.speedValue->setText(std::to_string(val));
             return true;
         }
         return false;

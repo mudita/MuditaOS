@@ -48,42 +48,23 @@ enum class KeyCode {
 	SWITCH_DN = static_cast<int>(bsp::KeyCodes::SSwitchDown),
 };
 
-/// if numeric - returns numeric char, '\0' otherwise
-inline char toNumeric(const KeyCode key)
+/// if numeric - returns numeric value, else return -1
+inline int toNumeric(KeyCode key)
 {
     switch (key) {
-    case KeyCode::KEY_0:
-        return '0';
-    case KeyCode::KEY_1:
-        return '1';
-    case KeyCode::KEY_2:
-        return '2';
-    case KeyCode::KEY_3:
-        return '3';
-    case KeyCode::KEY_4:
-        return '4';
-    case KeyCode::KEY_5:
-        return '5';
-    case KeyCode::KEY_6:
-        return '6';
-    case KeyCode::KEY_7:
-        return '7';
-    case KeyCode::KEY_8:
-        return '8';
-    case KeyCode::KEY_9:
-        return '9';
-    case KeyCode::KEY_AST:
-        return '*';
-    case KeyCode::KEY_PND:
-        return '#';
+    case KeyCode::KEY_0: return 0;
+    case KeyCode::KEY_1: return 1;
+    case KeyCode::KEY_2: return 2;
+    case KeyCode::KEY_3: return 3;
+    case KeyCode::KEY_4: return 4;
+    case KeyCode::KEY_5: return 5;
+    case KeyCode::KEY_6: return 6;
+    case KeyCode::KEY_7: return 7;
+    case KeyCode::KEY_8: return 8;
+    case KeyCode::KEY_9: return 9;
     default:
-        return '\0';
+        return -1;
     }
-}
-
-inline bool isNumeric(const char key)
-{
-    return std::isdigit(key) || key == '*' || key == '#';
 }
 
 class InputEvent

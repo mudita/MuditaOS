@@ -21,7 +21,6 @@
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
 #include <Style.hpp>
-#include <sstream>
 
 namespace gui {
 
@@ -184,13 +183,14 @@ void PinLockWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 	if( inputEvent.state == gui::InputEvent::State::keyReleasedShort ) {
-        auto key = gui::toNumeric(inputEvent.keyCode);
-        //accept only LF, enter, RF, #, and numeric values
-		if( state == State::EnteringPin ) {
-			if( inputEvent.keyCode == KeyCode::KEY_LF ) {
-				return true;
-			}
-			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+        // accept only LF, enter, RF, #, and numeric values
+        if (state == State::EnteringPin)
+        {
+            if (inputEvent.keyCode == KeyCode::KEY_LF)
+            {
+                return true;
+            }
+            else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
                 application->switchWindow(gui::name::window::main_window);
                 return true;
             }
@@ -240,43 +240,46 @@ bool PinLockWindow::onInput( const InputEvent& inputEvent ) {
 				}
 				return true;
 			}
-            else if (std::isdigit(key))
+            else if (0 <= gui::toNumeric(inputEvent.keyCode) && gui::toNumeric(inputEvent.keyCode) <= 9)
             {
-                //fill next field with star and store value in array
-				if( charCount < 4 ) {
-					pinLabels[charCount]->setText("*");
-                    std::stringstream str;
-                    str << key;
-                    str >> charValue[charCount];
+                // fill next field with star and store value in array
+                if (charCount < 4)
+                {
+                    pinLabels[charCount]->setText("*");
+                    charValue[charCount] = gui::toNumeric(inputEvent.keyCode);
                     charCount++;
 
-					//if 4 char has been entered show bottom bar confirm
-					if( charCount == 4 ) {
-						bottomBar->setActive( BottomBar::Side::CENTER, true );
-					}
-					application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-				}
-				return true;
+                    // if 4 char has been entered show bottom bar confirm
+                    if (charCount == 4)
+                    {
+                        bottomBar->setActive( BottomBar::Side::CENTER, true );
+                    }
+                    application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
+                }
+                return true;
             }
         }
-		else if( state == State::WrongPinInfo ) {
-			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
-				state = State::EnteringPin;
+        else if (state == State::WrongPinInfo)
+        {
+            if (inputEvent.keyCode == KeyCode::KEY_ENTER)
+            {
+                state = State::EnteringPin;
 				setVisibleState( State::EnteringPin );
 				application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
-			}
-			else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+            }
+            else if( inputEvent.keyCode == KeyCode::KEY_RF ) {
 				state = State::EnteringPin;
                 application->switchWindow(gui::name::window::main_window);
             }
         }
-		else if( state == State::PhoneBlocked) {
-			if( inputEvent.keyCode == KeyCode::KEY_RF ) {
+        else if (state == State::PhoneBlocked)
+        {
+            if( inputEvent.keyCode == KeyCode::KEY_RF ) {
                 application->switchWindow(gui::name::window::main_window);
                 return true;
             }
-		}
-	}
+        }
+    }
 
 	//check if any of the lower inheritance onInput methods catch the event
 	return AppWindow::onInput( inputEvent );
