@@ -153,7 +153,6 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
     }
 
     auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
-    LOG_FATAL("code = %u", code);
 
     //process shortpress
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
@@ -233,7 +232,12 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
 			application->switchWindow( "PowerOffWindow" );
             return true;
-		}
+        }
+        // long press of '0' key is translated to '+'
+        else if (inputEvent.keyCode == KeyCode::KEY_0)
+        {
+            return switchToCallEnterNumberWindow('+');
+        }
     }
 
     //check if any of the lower inheritance onInput methods catch the event
