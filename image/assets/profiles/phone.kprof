@@ -47,9 +47,9 @@ false
 0
 #NumericKey0 = 62,
 62
-false
-'0'
-0
+true
+'0','+'
+0,0
 #NumericKeyAst = 61,
 61
 false
