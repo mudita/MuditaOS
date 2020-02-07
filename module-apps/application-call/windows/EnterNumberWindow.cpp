@@ -73,10 +73,7 @@ void EnterNumberWindow::buildInterface() {
         auto app = dynamic_cast<app::ApplicationCall *>(application);
         if (app != nullptr)
         {
-            ContactRecord contact;
-            auto num = app->getDisplayedNumber();
-            contact.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(num, num)});
-            return app::addContact(getApplication(), contact);
+            return app::addContact(getApplication(), app->getDisplayedNumber());
         }
         return false;
     };

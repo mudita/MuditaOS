@@ -83,4 +83,18 @@ namespace app
         return sapm::ApplicationManager::messageSwitchApplication(
             app, name_phonebook, "New", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
     }
+
+    bool addContact(Application *app, const std::string &number)
+    {
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return false;
+        }
+
+        auto contact = std::make_shared<ContactRecord>();
+        contact->numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
+
+        return sapm::ApplicationManager::messageSwitchApplication(app, name_phonebook, "New", std::make_unique<PhonebookItemData>(contact));
+    }
 } // namespace app
