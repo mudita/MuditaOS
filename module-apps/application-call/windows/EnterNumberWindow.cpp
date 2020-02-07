@@ -8,12 +8,13 @@
  */
 #include "EnterNumberWindow.hpp"
 
-#include "../data/CallSwitchData.hpp"
 #include "../ApplicationCall.hpp"
+#include "../data/CallAppStyle.hpp"
+#include "../data/CallSwitchData.hpp"
+#include "InputMode.hpp"
+#include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
-#include "i18/i18.hpp"
-#include "../data/CallAppStyle.hpp"
 
 namespace gui {
 
@@ -85,15 +86,15 @@ EnterNumberWindow::~EnterNumberWindow() {
 }
 
 bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
-    auto key = gui::toNumeric(inputEvent.keyCode);
+    auto app = dynamic_cast<app::ApplicationCall *>(application);
+    if (app == nullptr)
+    {
+        LOG_ERROR("app != ApplicationCall");
+        return false;
+    }
+    auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
     if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
         if(inputEvent.keyCode == KeyCode::KEY_LF) {
-			auto app = dynamic_cast<app::ApplicationCall*>( application );
-			if (app == nullptr)
-			{
-				LOG_ERROR("app != ApplicationCall");
-                return false;
-            }
 			std::string num = app->getDisplayedNumber();
 			LOG_INFO("number: [%s]", num.c_str());
 			auto ret = CellularServiceAPI::DialNumber(application,num.c_str());
@@ -101,12 +102,6 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
             return true;
         }
         else if(inputEvent.keyCode == KeyCode::KEY_RF) {
-			auto app = dynamic_cast<app::ApplicationCall*>( application );
-			if (app == nullptr)
-			{
-				LOG_ERROR("app != ApplicationCall");
-				return false;
-			}
 			std::string num = app->getDisplayedNumber();
 			//if there isn't any char in phone number field return to previous application
 			if( num.empty() ) {
@@ -121,19 +116,11 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 
 			return true;
 		}
-		//if numeric key was pressed record that key and send it to call application with a switch command
-        else if (isNumeric(key))
+        else if (code != 0)
         {
-            auto app = dynamic_cast<app::ApplicationCall*>( application );
-			if (app == nullptr)
-			{
-				LOG_ERROR("app != ApplicationCall");
-				return false;
-			}
 			std::string num = app->getDisplayedNumber();
-
-			num += key;
-			setNumberLabel(num);
+            num += code;
+            setNumberLabel(num);
 
             app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
@@ -163,16 +150,10 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 
             return true;
         }
+        // long press of '0' key is translated to '+'
         else if (inputEvent.keyCode == KeyCode::KEY_0)
         {
-            auto app = dynamic_cast<app::ApplicationCall *>(application);
-            if (app == nullptr)
-            {
-                LOG_ERROR("app != ApplicationCall");
-                return false;
-            }
             std::string num = app->getDisplayedNumber();
-
             num += '+';
             setNumberLabel(num);
 

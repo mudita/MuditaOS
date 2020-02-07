@@ -10,7 +10,6 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 
 #include "AppWindow.hpp"
-#include "InputMode.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"

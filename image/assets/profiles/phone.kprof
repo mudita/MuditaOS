@@ -1,5 +1,5 @@
 #name of the profile
-home_screen
+phone
 #NumericKey1 = 31,
 31
 false
@@ -48,8 +48,8 @@ false
 #NumericKey0 = 62,
 62
 true
-'0','+'
-0,0
+'0'
+0
 #NumericKeyAst = 61,
 61
 false
