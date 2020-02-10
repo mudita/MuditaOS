@@ -15,6 +15,12 @@ namespace app
     {
         bool switchToCall(sys::Service *sender, const UTF8 &e164number, bool call = true)
         {
+
+            if (sender == nullptr)
+            {
+                LOG_ERROR("sender = nullptr");
+                return false;
+            }
             std::string window = window::name_enterNumber;
 
             std::unique_ptr<CallSwitchData> data;
@@ -45,7 +51,7 @@ namespace app
 
         if (contact.numbers.size() != 0)
         {
-            return app::call(app, contact.numbers[0].numberE164);
+            return app::switchToCall(app, contact.numbers[0].numberE164);
         }
         else
         {
