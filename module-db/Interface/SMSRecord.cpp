@@ -37,32 +37,16 @@ SMSRecordInterface::~SMSRecordInterface() {
 }
 
 bool SMSRecordInterface::Add(const SMSRecord &rec) {
-
-    uint32_t contactID = 0;
-
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, rec.number.c_str());
-
-    // Contact not found, create one
-    if (contactRec->size() == 0) {
-        contactInterface.Add(ContactRecord{
-        		.primaryName = rec.number,
-                .contactType=ContactType::TEMPORARY,
-                .numbers=std::vector<ContactRecord::Number>{ContactRecord::Number(
-                    rec.number.c_str(),
-                    rec.number.c_str())
-                },
-                });
-
-        contactRec = contactInterface.GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164,
-                                                                 rec.number.c_str());
+    auto contactRec = contactInterface.GetByNumber(rec.number, true);
+    if (contactRec->size() == 0)
+    {
+        LOG_ERROR("Cannot find contact, for number %s", rec.number.c_str());
+        return false;
     }
-    contactID = (*contactRec)[0].dbID;
-
-
-
+    uint32_t contactID = (*contactRec)[0].dbID;
     // Search for a thread with specified contactID
-    uint32_t threadID =0;
+    uint32_t threadID = 0;
     ThreadRecordInterface threadInterface(smsDB,contactsDB);
     auto threadRec = threadInterface.GetLimitOffsetByField(0, 1, ThreadRecordField::ContactID,
                                                            std::to_string(contactID).c_str());

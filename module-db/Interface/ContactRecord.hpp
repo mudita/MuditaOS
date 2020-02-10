@@ -90,7 +90,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(UTF8 number);
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, bool createTempIfNotFind = false);
 
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
 
@@ -98,9 +98,10 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
                                                        const char *number);
   private:
     ContactsDB *contactDB;
-
     /// get multiple numbers by split numbers_id
     std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
+
+    std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
 };
 
 #endif // PUREPHONE_CONTACTRECORD_HPP

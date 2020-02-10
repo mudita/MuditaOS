@@ -8,6 +8,9 @@
  */
 #include "CalllogRecord.hpp"
 #include "../Tables/CalllogTable.hpp"
+#include "ContactRecord.hpp"
+#include <Utils.hpp>
+#include <cassert>
 #include <log/log.hpp>
 #include <sstream>
 
@@ -19,7 +22,8 @@ std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
     return out;
 }
 
-CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(calllogDb) {
+CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB *contactsDb) : calllogDB(calllogDb), contactsDB(contactsDb)
+{
 }
 
 CalllogRecordInterface::~CalllogRecordInterface() {
@@ -27,6 +31,21 @@ CalllogRecordInterface::~CalllogRecordInterface() {
 
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
+    ContactRecordInterface contactInterface(contactsDB);
+    auto contactRec = contactInterface.GetByNumber(rec.number, true);
+    if (contactRec->size() == 0)
+    {
+        LOG_ERROR("Cannot get contact, for number %s", rec.number.c_str());
+        return false;
+    }
+    uint32_t contactID = (*contactRec)[0].dbID;
+
+    auto localRec = rec;
+    auto contact = (*contactRec)[0];
+    localRec.contactId = std::to_string(contact.dbID);
+    localRec.name = contact.primaryName;
+    LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec));
+
     return calllogDB->calls.Add(CalllogTableRow{.id = rec.id, // this is only to remove warning
                                                 .number = rec.number,
                                                 .presentation = rec.presentation,
@@ -35,6 +54,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
                                                 .type = rec.type,
                                                 .name = rec.name,
                                                 .contactId = rec.contactId});
+    ;
 }
 
 uint32_t CalllogRecordInterface::GetLastID()
@@ -55,7 +75,6 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
     auto records = std::make_unique<std::vector<CalllogRecord>>();
 
-	CalllogRecordInterface callsInterface(calllogDB);
         for(const auto &rec : calls){
 
             records->push_back({

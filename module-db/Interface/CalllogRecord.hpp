@@ -9,11 +9,12 @@
 #ifndef MODULE_DB_INTERFACE_CALLLOGRECORD_HPP_
 #define MODULE_DB_INTERFACE_CALLLOGRECORD_HPP_
 
-#include "Record.hpp"
-#include <stdint.h>
-#include "../Databases/CalllogDB.hpp"
-#include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
+#include "../Databases/CalllogDB.hpp"
+#include "ContactRecord.hpp"
+#include "Record.hpp"
+#include "utf8/UTF8.hpp"
+#include <stdint.h>
 
 struct CalllogRecord{
     uint32_t    id;
@@ -38,28 +39,27 @@ enum class CalllogRecordField{
  */
 class CalllogRecordInterface : public RecordInterface<CalllogRecord,CalllogRecordField > {
 public:
+  CalllogRecordInterface(CalllogDB *CalllogDb, ContactsDB *contactsDb);
+  virtual ~CalllogRecordInterface();
 
-    CalllogRecordInterface(CalllogDB* CalllogDb);
-    virtual ~CalllogRecordInterface();
-
-    bool Add(const CalllogRecord& rec) override final;
-    bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(CalllogRecordField field,const char* str) override final;
-    bool Update(const CalllogRecord& rec) override final;
-    CalllogRecord GetByID(uint32_t id) override final;
+  bool Add(const CalllogRecord &rec) override final;
+  bool RemoveByID(uint32_t id) override final;
+  bool RemoveByField(CalllogRecordField field, const char *str) override final;
+  bool Update(const CalllogRecord &rec) override final;
+  CalllogRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
     uint32_t GetCount(CallState state);
 
-    std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
+  std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,CalllogRecordField field, const char* str) override final;
+  std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit, CalllogRecordField field, const char *str) override final;
 
-    uint32_t GetLastID();
+  uint32_t GetLastID();
 
-  private:
-    const uint32_t snippetLength = 60;
-    CalllogDB* calllogDB;
+private:
+  CalllogDB *calllogDB = nullptr;
+  ContactsDB *contactsDB = nullptr;
 };
 
 #endif /* MODULE_DB_INTERFACE_CALLLOGRECORD_HPP_ */

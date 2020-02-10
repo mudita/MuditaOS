@@ -490,7 +490,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
     alarmsRecordInterface = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
     notesRecordInterface = std::make_unique<NotesRecordInterface>(notesDB.get());
-    calllogRecordInterface = std::make_unique<CalllogRecordInterface>(calllogDB.get());
+    calllogRecordInterface = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
     countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     return sys::ReturnCodes::Success;
 }

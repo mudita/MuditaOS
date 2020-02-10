@@ -9,6 +9,7 @@
  */
 
 #include "ContactRecord.hpp"
+#include <log/log.hpp>
 
 // TODO copied from Profile -> move to some utils.hpp
 #include <sstream>
@@ -641,9 +642,38 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
     return records;
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(UTF8 number)
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetContactByNumber(const UTF8 &number)
 {
     return GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, number.c_str());
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number, bool createTempIfNotFind)
+{
+    auto ret = GetContactByNumber(number);
+
+    if (createTempIfNotFind == false)
+    {
+        return ret;
+    }
+
+    // Contact not found contact, create one
+    if (ret->size() == 0)
+    {
+        LOG_INFO("Cannot find contact for number %s, creating temporary one", number.c_str());
+        if (!Add(ContactRecord{
+                .primaryName = number, // TODO: alek: rem
+                .contactType = ContactType::TEMPORARY,
+                .numbers = std::vector<ContactRecord::Number>{ContactRecord::Number(number.c_str(), number.c_str())},
+            }))
+        {
+            LOG_ERROR("Cannot add contact record");
+            return ret;
+        }
+
+        ret = GetContactByNumber(number);
+    }
+
+    return ret;
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial(uint8_t speedDial)
