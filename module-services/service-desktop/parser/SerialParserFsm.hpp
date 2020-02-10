@@ -13,11 +13,11 @@ struct MessageDataEvt               : tinyfsm::Event { };
 
 
 // ----------------------------------------------------------------------------
-// SerialParser (FSM base class) declaration
+// SerialParserFsm (FSM base class) declaration
 //
 
-class SerialParser
-: public tinyfsm::Fsm<SerialParser>
+class SerialParserFsm
+: public tinyfsm::Fsm<SerialParserFsm>
 {
     friend class Fsm;
     friend class StateDecodeJson;
@@ -32,7 +32,7 @@ protected:
     virtual void entry(void) { };  /* entry actions in some states */
     virtual void exit(void)  { };  /* entry actions in some states */
 
-    enum MessageType : uint8_t { invalid=34, endpoint, rawdata }; //printable characters for convenience
+    enum MessageType : uint8_t { Invalid=34, Endpoint, RawData }; //printable characters for convenience
     static std::string              msgPayload;
     static MessageType              msgType;
     static size_t                   msgSizeBytesToRead;

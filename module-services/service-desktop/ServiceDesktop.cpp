@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "parser/Fsmlist.hpp"
-#include "parser/SerialParser.hpp"
+#include "parser/SerialParserFsm.hpp"
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
@@ -150,7 +150,7 @@ int ServiceDesktop::sendData(const char *rawDataToSend, size_t rawDataSize)
 
 void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
 {
-    SerialParser::msgChunk.assign(data, data + dataLen);
+    SerialParserFsm::msgChunk.assign(data, data + dataLen);
     send_event(MessageDataEvt());
 
     // std::string possibleJsonData((const char *)data, (size_t)dataLen);

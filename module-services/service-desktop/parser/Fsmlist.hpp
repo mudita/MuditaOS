@@ -2,12 +2,12 @@
 
 #include "fsm/tinyfsm.hpp"
 
-#include "SerialParser.hpp"
-#include "EndpointHandler.hpp"
-#include "RawDataHandler.hpp"
+#include "SerialParserFsm.hpp"
+#include "EndpointFsm.hpp"
+#include "RawDataFsm.hpp"
 
 
-using fsm_list = tinyfsm::FsmList<SerialParser, EndpointHandler, RawDataHandler>;
+using fsm_list = tinyfsm::FsmList<SerialParserFsm, EndpointFsm, RawDataFsm>;
 
 /** dispatch event to all FSMs */
 template<typename E>

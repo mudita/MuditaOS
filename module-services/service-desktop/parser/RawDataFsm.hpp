@@ -7,14 +7,14 @@
 // Event declarations
 //
 
-struct RawDataEvt   : tinyfsm::Event { };
-struct RawDataMallocEvt   : tinyfsm::Event { };
+struct RawDataEvt           : tinyfsm::Event { };
+struct RawDataMallocEvt     : tinyfsm::Event { };
 
 // ----------------------------------------------------------------------------
-// RawDataHandler (FSM base class) declaration
+// RawDataFsm (FSM base class) declaration
 //
-class RawDataHandler
-: public tinyfsm::Fsm<RawDataHandler>
+class RawDataFsm
+: public tinyfsm::Fsm<RawDataFsm>
 {
     /* NOTE: react(), entry() and exit() functions need to be accessible
      * from tinyfsm::Fsm class. You might as well declare friendship to

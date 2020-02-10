@@ -6,6 +6,8 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DI
 target_sources(${PROJECT_NAME}
 	PRIVATE
 		"${CMAKE_CURRENT_LIST_DIR}/EndpointHandler.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/RawDataHandler.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/SerialParser.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/EndpointFsm.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ParserUtils.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/RawDataFsm.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/SerialParserFsm.cpp"
 )
