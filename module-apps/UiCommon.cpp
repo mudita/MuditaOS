@@ -13,7 +13,7 @@ namespace app
 {
     namespace
     {
-        bool switchToCall(sys::Service *sender, const UTF8 &e164number, bool call = false)
+        bool switchToCall(sys::Service *sender, const UTF8 &e164number, bool call = true)
         {
             std::string window = window::name_enterNumber;
 
