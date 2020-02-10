@@ -24,6 +24,7 @@
 #include "../data/CallLogSwitchData.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
+#include "UiCommon.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "time/time_conversion.hpp"
 #include <Style.hpp>
@@ -124,13 +125,13 @@ void CallLogDetailsWindow::buildInterface() {
 
     // activated callbacks
     rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
-        LOG_ERROR("call %s", record.number.c_str());
-        return app::ApplicationCall::messageSwitchToCall(application, record.number);
+        LOG_INFO("call %s", record.number.c_str());
+        return app::call(application, record.number);
     };
 
     rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
-        LOG_ERROR("TODO: add sending sms from calllog");
-        return true;
+        LOG_INFO("sms %s", record.number.c_str());
+        return app::sms(application, record.number);
     };
 
     // Type

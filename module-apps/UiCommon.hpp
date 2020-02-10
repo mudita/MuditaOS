@@ -7,7 +7,9 @@
 namespace app
 {
     bool call(Application *app, const ContactRecord &contact);
+    bool call(Application *app, const UTF8 &e164number);
     bool sms(Application *app, const ContactRecord &contact);
+    bool sms(Application *app, const std::string &number);
     // TODO use contact here
     bool addContact(Application *app, const ContactRecord &contact);
     bool addContact(Application *app, const std::string &number);

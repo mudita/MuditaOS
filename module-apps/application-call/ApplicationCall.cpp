@@ -170,26 +170,6 @@ void ApplicationCall::stopCallTimer() {
 	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
 }
 
-bool ApplicationCall::messageSwitchToCall(sys::Service *sender, const UTF8 &e164number, bool call)
-{
-    std::string window = window::name_enterNumber;
-
-    std::unique_ptr<CallSwitchData> data;
-
-    // it is possible to prepare call window and wait for user's acceptance
-    if (call)
-    {
-        // execute call
-        data = std::make_unique<ExecuteCallData>(e164number.c_str());
-    }
-    else
-    {
-        // prepare call and wait for user's action
-        data = std::make_unique<EnterNumberData>(e164number.c_str());
-    }
-
-    return sapm::ApplicationManager::messageSwitchApplication(sender, name_call, window, std::move(data));
-}
 
 void ApplicationCall::createUserInterface() {
 

@@ -1,6 +1,7 @@
 #include "UiCommon.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
+#include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/data/SMSdata.hpp"
 #include "application-messages/windows/ThreadViewWindow.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
@@ -10,6 +11,30 @@
 
 namespace app
 {
+    namespace
+    {
+        bool switchToCall(sys::Service *sender, const UTF8 &e164number, bool call = false)
+        {
+            std::string window = window::name_enterNumber;
+
+            std::unique_ptr<CallSwitchData> data;
+
+            // it is possible to prepare call window and wait for user's acceptance
+            if (call)
+            {
+                // execute call
+                data = std::make_unique<ExecuteCallData>(e164number.c_str());
+            }
+            else
+            {
+                // prepare call and wait for user's action
+                data = std::make_unique<EnterNumberData>(e164number.c_str());
+            }
+
+            return sapm::ApplicationManager::messageSwitchApplication(sender, name_call, window, std::move(data));
+        }
+    } // namespace
+
     bool call(Application *app, const ContactRecord &contact)
     {
         if (app == nullptr)
@@ -20,14 +45,24 @@ namespace app
 
         if (contact.numbers.size() != 0)
         {
-            std::unique_ptr<ExecuteCallData> data = std::make_unique<ExecuteCallData>(contact.numbers[0].numberE164.c_str());
-            return sapm::ApplicationManager::messageSwitchApplication(app, name_call, window::name_call, std::move(data));
+            return app::call(app, contact.numbers[0].numberE164);
         }
         else
         {
             LOG_ERROR("No contact numbers!");
             return false;
         }
+    }
+
+    bool call(Application *app, const UTF8 &e164number)
+    {
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return false;
+        }
+
+        return switchToCall(app, e164number);
     }
 
     gui::Option callOption(Application *app, const ContactRecord &contact, bool active)
@@ -62,7 +97,6 @@ namespace app
 
     bool sms(Application *app, const ContactRecord &contact)
     {
-        // TODO: alek: looks like only valid from SMS app
         if (app == nullptr)
         {
             LOG_ERROR("app = nullptr");
@@ -70,7 +104,19 @@ namespace app
         }
         // TODO return to current application doesn't change application window >_>
         auto param = std::shared_ptr<ContactRecord>(new ContactRecord(contact));
-        return app->switchWindow(gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
+        return sapm::ApplicationManager::messageSwitchApplication(app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
+    }
+
+    bool sms(Application *app, const std::string &number)
+    {
+        if (app == nullptr)
+        {
+            LOG_ERROR("app = nullptr");
+            return false;
+        }
+        auto param = std::shared_ptr<ContactRecord>(new ContactRecord());
+        param->numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
+        return sapm::ApplicationManager::messageSwitchApplication(app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
     }
 
     bool addContact(Application *app, const ContactRecord &contact)
