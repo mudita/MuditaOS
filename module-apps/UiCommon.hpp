@@ -6,13 +6,30 @@
 
 namespace app
 {
-    bool call(Application *app, const ContactRecord &contact);
-    bool call(Application *app, const UTF8 &e164number);
-    bool sms(Application *app, const ContactRecord &contact);
-    bool sms(Application *app, const std::string &number);
+    enum class CallOperation
+    {
+        ExecuteCall,
+        PrepareCall
+    };
+    bool call(Application *app, CallOperation callOperation, const ContactRecord &contact);
+    bool call(Application *app, CallOperation callOperation, const std::string &number);
+    bool call(Application *app, CallOperation callOperation, uint32_t key);
+    gui::Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact);
+
+    enum class SmsOperation
+    {
+        Add
+    };
+    bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact);
+    bool sms(Application *app, SmsOperation smsOperation, const std::string &number);
+
+    enum class ContactOperation
+    {
+        Add,
+        Details
+    };
     // TODO use contact here
-    bool addContact(Application *app, const ContactRecord &contact);
-    bool addContact(Application *app, const std::string &number);
-    gui::Option callOption(Application *app, const ContactRecord &contact, bool active);
-    gui::Option contactDetails(Application *app, const ContactRecord &contact);
+    bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact);
+    bool contact(Application *app, ContactOperation contactOperation, const std::string &number);
+    gui::Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contact);
 } // namespace app

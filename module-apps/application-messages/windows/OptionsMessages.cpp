@@ -31,18 +31,18 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
 
     p("phonebook_phone_ringing", [=](gui::Item &) -> bool {
         LOG_INFO("Call: %s", contact.primaryName);
-        return call(app, contact);
+        return app::call(app, app::CallOperation::ExecuteCall, contact);
     });
 
     p("mail", [=](gui::Item &) -> bool {
         LOG_INFO("SMS to: %s", contact.primaryName);
-        sms(app, contact);
+        app::sms(app, app::SmsOperation::Add, contact);
         return true;
     });
 
     p("cross", [=](gui::Item &) -> bool {
         LOG_INFO("Add contact: %s", contact.primaryName);
-        addContact(app, contact);
+        app::contact(app, app::ContactOperation::Add, contact);
         return true;
     });
 
@@ -69,7 +69,8 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
 {
     ContactRecord contact = DBServiceAPI::ContactGetByID(app, record.contactID)->front();
     return {
-        gui::newOptionLabel(callOption(app, contact, true)), gui::newOptionLabel(contactDetails(app, contact)),
+        gui::newOptionLabel(app::callOption(app, app::CallOperation::ExecuteCall, contact)),
+        gui::newOptionLabel(app::contactOption(app, app::ContactOperation::Details, contact)),
 
         // TODO
         gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) { return false; }}),

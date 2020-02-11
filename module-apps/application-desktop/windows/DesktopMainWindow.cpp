@@ -19,9 +19,9 @@
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
-//application-call
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
+#include <UiCommon.hpp>
 
 #include "i18/i18.hpp"
 #include <Span.hpp>
@@ -132,14 +132,6 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 	setVisibleState();
 }
 
-bool DesktopMainWindow::switchToCallEnterNumberWindow(const uint32_t key)
-{
-    std::string keyStr;
-    keyStr = key;
-    std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(keyStr);
-    return sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, app::window::name_enterNumber, std::move(phoneNumberData));
-}
-
 bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	
 	// do nothing
@@ -206,22 +198,16 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 				application->switchWindow( "MenuWindow" );
 			}
-			//if numeric key was pressed record that key and send it to call application with a switch command
+            // if numeric key was pressed record that key and send it to call application
             else if (code != 0)
             {
-                return switchToCallEnterNumberWindow(code);
+                return app::call(application, app::CallOperation::PrepareCall, code);
             }
 		}
 	}
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
 		//long press of # locks screen if it was unlocked
 		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( app->getScreenLocked() == false ) ) {
-            app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
-            if (app == nullptr)
-            {
-                LOG_ERROR("Not ApplicationDesktop");
-                return false;
-            }
             app->setScreenLocked(true);
             setVisibleState();
             app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
@@ -236,7 +222,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
         // long press of '0' key is translated to '+'
         else if (inputEvent.keyCode == KeyCode::KEY_0)
         {
-            return switchToCallEnterNumberWindow('+');
+            return app::call(application, app::CallOperation::PrepareCall, '+');
         }
     }
 

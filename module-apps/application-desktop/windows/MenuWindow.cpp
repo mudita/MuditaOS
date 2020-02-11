@@ -210,8 +210,7 @@ bool MenuWindow::onInput( const InputEvent& inputEvent ) {
 	if(( inputEvent.state == InputEvent::State::keyReleasedShort ) || ( inputEvent.state == InputEvent::State::keyReleasedLong )) {
 		// putsh enter on tile number on key press (press 9 to enter 9th tile)
         size_t num = gui::toNumeric(inputEvent.keyCode) - 1;
-        // size is unsigned, creating int() to avoid warning
-        if ((num >= 0) && int(num < (pages[currentPage]->tiles.size())))
+        if ((num >= 0) && num < (pages[currentPage]->tiles.size()))
         {
             LOG_ERROR("RUN tile with enter -> %d %d", num,pages[currentPage]->tiles.size());
 			auto el = Item();

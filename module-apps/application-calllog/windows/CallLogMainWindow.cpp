@@ -93,7 +93,7 @@ bool CallLogMainWindow::onInput( const InputEvent& inputEvent ) {
                 assert(0);
                 return false;
             }
-            return app::call(application, it->getCall().number);
+            return app::call(application, app::CallOperation::ExecuteCall, it->getCall().number);
         }
 	}
 

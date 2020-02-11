@@ -89,7 +89,7 @@ bool PhonebookListView::onInput(const InputEvent &inputEvent)
         if (item)
         {
             // LOG_INFO("calling index: %d %s", item->getID(), item->getValue().c_str());
-            return app::call(application, item->getContact()->numbers[0].numberE164);
+            return app::call(application, app::CallOperation::ExecuteCall, item->getContact()->numbers[0].numberE164);
         }
         else
         {

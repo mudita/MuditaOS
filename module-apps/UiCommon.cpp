@@ -7,51 +7,19 @@
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
+#include <cassert>
 #include <i18/i18.hpp>
+#include <log/log.hpp>
 
 namespace app
 {
-    namespace
+    bool call(Application *app, CallOperation callOperation, const ContactRecord &contact)
     {
-        bool switchToCall(sys::Service *sender, const UTF8 &e164number, bool call = true)
-        {
-
-            if (sender == nullptr)
-            {
-                LOG_ERROR("sender = nullptr");
-                return false;
-            }
-            std::string window = window::name_enterNumber;
-
-            std::unique_ptr<CallSwitchData> data;
-
-            // it is possible to prepare call window and wait for user's acceptance
-            if (call)
-            {
-                // execute call
-                data = std::make_unique<ExecuteCallData>(e164number.c_str());
-            }
-            else
-            {
-                // prepare call and wait for user's action
-                data = std::make_unique<EnterNumberData>(e164number.c_str());
-            }
-
-            return sapm::ApplicationManager::messageSwitchApplication(sender, name_call, window, std::move(data));
-        }
-    } // namespace
-
-    bool call(Application *app, const ContactRecord &contact)
-    {
-        if (app == nullptr)
-        {
-            LOG_ERROR("app = nullptr");
-            return false;
-        }
+        assert(app != nullptr);
 
         if (contact.numbers.size() != 0)
         {
-            return app::switchToCall(app, contact.numbers[0].numberE164);
+            return call(app, callOperation, contact.numbers[0].numberE164);
         }
         else
         {
@@ -60,93 +28,107 @@ namespace app
         }
     }
 
-    bool call(Application *app, const UTF8 &e164number)
+    bool call(Application *app, CallOperation callOperation, const std::string &e164number)
     {
-        if (app == nullptr)
+        assert(app != nullptr);
+        const std::string window = window::name_enterNumber;
+
+        std::unique_ptr<CallSwitchData> data;
+
+        switch (callOperation)
         {
-            LOG_ERROR("app = nullptr");
+        case CallOperation::ExecuteCall: {
+            data = std::make_unique<ExecuteCallData>(e164number.c_str());
+        }
+        break;
+        case CallOperation::PrepareCall: {
+            data = std::make_unique<EnterNumberData>(e164number.c_str());
+        }
+        break;
+        default: {
+            LOG_ERROR("callOperation not supported %d", static_cast<uint32_t>(callOperation));
             return false;
         }
-
-        return switchToCall(app, e164number);
-    }
-
-    gui::Option callOption(Application *app, const ContactRecord &contact, bool active)
-    {
-        return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName, [app, contact, active](gui::Item &item) {
-                    if (active)
-                    {
-                        LOG_DEBUG("Try call!");
-                        return call(app, contact);
-                    }
-                    else
-                    {
-                        LOG_ERROR("Inactive call option");
-                        return false;
-                    }
-                }};
-    }
-
-    gui::Option contactDetails(Application *app, const ContactRecord &contact)
-    {
-        if (app == nullptr)
-        {
-            LOG_ERROR("app = nullptr");
-            return gui::Option();
         }
-        auto foo = [=](gui::Item &item) {
-            return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, "Contact", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
-        };
-        return {utils::localize.get("sms_contact_details"), foo};
+        return sapm::ApplicationManager::messageSwitchApplication(app, name_call, window, std::move(data));
     }
 
-    bool sms(Application *app, const ContactRecord &contact)
+    bool call(Application *app, CallOperation callOperation, uint32_t key)
     {
-        if (app == nullptr)
-        {
-            LOG_ERROR("app = nullptr");
-            return false;
-        }
+        std::string keyStr;
+        keyStr = key;
+        return call(app, callOperation, keyStr);
+    }
+
+    gui::Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact)
+    {
+        assert(app != nullptr);
+        return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
+                [app, contact, callOperation](gui::Item &item) { return call(app, callOperation, contact); }};
+    }
+
+    bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)
+    {
+        assert(app != nullptr);
         // TODO return to current application doesn't change application window >_>
         auto param = std::shared_ptr<ContactRecord>(new ContactRecord(contact));
-        return sapm::ApplicationManager::messageSwitchApplication(app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
-    }
-
-    bool sms(Application *app, const std::string &number)
-    {
-        if (app == nullptr)
+        switch (smsOperation)
         {
-            LOG_ERROR("app = nullptr");
+        case SmsOperation::Add: {
+            return sapm::ApplicationManager::messageSwitchApplication(app, name_messages, gui::name::window::thread_view,
+                                                                      std::make_unique<SMSSendRequest>(param));
+        }
+        default: {
+            LOG_ERROR("SmsOperation not suppoert %d", static_cast<uint32_t>(smsOperation));
             return false;
         }
-        auto param = std::shared_ptr<ContactRecord>(new ContactRecord());
-        param->numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
-        return sapm::ApplicationManager::messageSwitchApplication(app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
+        }
     }
 
-    bool addContact(Application *app, const ContactRecord &contact)
+    bool sms(Application *app, SmsOperation smsOperation, const std::string &number)
     {
-        if (app == nullptr)
-        {
-            LOG_ERROR("app = nullptr");
-            return false;
-        }
-        return sapm::ApplicationManager::messageSwitchApplication(
-            app, name_phonebook, "New", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+        assert(app != nullptr);
+        ContactRecord contactRec;
+        contactRec.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
+        return sms(app, smsOperation, contactRec);
     }
 
-    bool addContact(Application *app, const std::string &number)
+    bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)
     {
-        if (app == nullptr)
+        assert(app != nullptr);
+        switch (contactOperation)
         {
-            LOG_ERROR("app = nullptr");
+        case ContactOperation::Add: {
+            return sapm::ApplicationManager::messageSwitchApplication(
+                app, name_phonebook, "New", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+        }
+        break;
+        case ContactOperation::Details: {
+            return sapm::ApplicationManager::messageSwitchApplication(
+                app, name_phonebook, "Contact", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+        }
+        break;
+        default: {
+            LOG_ERROR("ContactOperation not supported %d", static_cast<uint32_t>(contactOperation));
             return false;
         }
+        }
+    }
 
-        auto contact = std::make_shared<ContactRecord>();
-        contact->numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
+    bool contact(Application *app, ContactOperation contactOperation, const std::string &number)
+    {
+        assert(app != nullptr);
 
-        return sapm::ApplicationManager::messageSwitchApplication(app, name_phonebook, "New", std::make_unique<PhonebookItemData>(contact));
+        ContactRecord contactRecord;
+        contactRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
+
+        return contact(app, contactOperation, contactRecord);
+    }
+
+    gui::Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec)
+    {
+        assert(app != nullptr);
+
+        return {utils::localize.get("sms_contact_details"), [=](gui::Item &item) { return contact(app, contactOperation, contactRec); }};
     }
 } // namespace app

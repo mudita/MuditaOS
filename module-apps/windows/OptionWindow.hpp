@@ -14,11 +14,9 @@ namespace gui
     {
         const UTF8 text = "";
         std::function<bool(Item &)> activatedCallback = nullptr;
-        Option() = default;
         Option(const UTF8 &text, std::function<bool(Item &)> cb) : text(text), activatedCallback(cb) {
             LOG_INFO("text: %s", text.c_str());
         }
-        ~Option() = default;
     };
 
     /// creates new `option` label on heap with text description and on activated callback connected
