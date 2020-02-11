@@ -150,7 +150,7 @@ enum class MessageType
     BluetoothRequest,
 
     LwIP_request,
-
+    EVM_GPIO,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */

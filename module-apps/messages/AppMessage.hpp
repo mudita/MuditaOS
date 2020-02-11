@@ -23,8 +23,8 @@ namespace app {
  */
 class AppMessage: public sys::DataMessage {
 public:
-	AppMessage( MessageType messageType ) :	sys::DataMessage( static_cast<uint32_t>(messageType)) {};
-	virtual ~AppMessage() {};
+  AppMessage(MessageType messageType) : sys::DataMessage(messageType){};
+  virtual ~AppMessage(){};
 
 };
 

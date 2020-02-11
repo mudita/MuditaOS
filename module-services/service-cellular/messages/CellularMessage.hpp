@@ -20,12 +20,11 @@
 
 class CellularMessage : public sys::DataMessage {
 public:
-    CellularMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)),
-                                               type(messageType) {};
+  CellularMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
 
-    virtual ~CellularMessage() {};
+  virtual ~CellularMessage(){};
 
-    MessageType type;
+  MessageType type;
 
 };
 

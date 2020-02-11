@@ -39,7 +39,7 @@ void add_box_label(VBox *layout, UTF8 name, std::function<bool(Item &)> foo)
 }
 
 sys::ReturnCodes message_bt(app::Application* app, BluetoothMessage::Request req) {
-    std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(MessageType::BluetoothRequest, req);
+    std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(req);
     auto ret = sys::Bus::SendUnicast(msg,"ServiceBluetooth",app,5000);
     if(ret.first != sys::ReturnCodes::Success) {
         LOG_ERROR("err: %d",ret.first);

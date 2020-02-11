@@ -70,8 +70,8 @@ bool WorkerGUI::handleMessage( uint32_t queueID ) {
 //			delete received;
 
 		//notify gui service that rendering is complete
-		auto message = std::make_shared<sys::DataMessage>(static_cast<uint32_t>(MessageType::GUIRenderingFinished));
-		sys::Bus::SendUnicast(message, this->service->GetName(), this->service);
+        auto message = std::make_shared<sys::DataMessage>(MessageType::GUIRenderingFinished);
+        sys::Bus::SendUnicast(message, this->service->GetName(), this->service);
 	}
 	return true;
 }

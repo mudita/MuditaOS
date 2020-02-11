@@ -26,12 +26,13 @@ protected:
 	//name of the application that is sending message to application manager.
 	std::string senderName;
 public:
-	APMMessage( MessageType messageType, const std::string& senderName ) :
-		sys::DataMessage( static_cast<uint32_t>(messageType)),
-		senderName{senderName} {};
-	virtual ~APMMessage() {};
+  APMMessage(MessageType messageType, const std::string &senderName) : sys::DataMessage(messageType), senderName{senderName} {};
+  virtual ~APMMessage(){};
 
-	std::string getSenderName() { return senderName;};
+  std::string getSenderName()
+  {
+      return senderName;
+  }
 };
 
 

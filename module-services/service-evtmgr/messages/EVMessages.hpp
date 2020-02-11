@@ -21,94 +21,74 @@
 
 namespace sevm {
 
-class KbdMessage : public sys::DataMessage
-{
-public:
-	KbdMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
-	{
-		type = Type::Data;
+    struct Message : public sys::DataMessage
+    {
+        Message(MessageType messageType) : DataMessage(messageType)
+        {
+        }
+        auto Execute(sys::Service *service) -> sys::Message_t override
+        {
+            // Ignore incoming data message if this service is not yet initialized
+            if (service->isReady)
+            {
+                return service->DataReceivedHandler(this, nullptr);
+            }
+            else
+            {
+                return std::make_shared<sys::ResponseMessage>();
+            }
+        }
+    };
 
-	}
+    class KbdMessage : public Message
+    {
+      public:
+        KbdMessage() : Message(MessageType::KBDKeyEvent)
+        {
+            type = Type::Data;
+        }
+        RawKey key = {};
+    };
 
-	sys::Message_t Execute(sys::Service* service)
-	{
-		// Ignore incoming data message if this service is not yet initialized
-		if(service->isReady){
-			return service->DataReceivedHandler(this,nullptr);
-		}
-		else{
-			return std::make_shared<sys::ResponseMessage>();
-		}
+    namespace message
+    {
+        class GPIO : public Message
+        {
+          public:
+            GPIO() : Message(MessageType::EVM_GPIO)
+            {
+            }
+            uint32_t num = 0, port = 0, state = 0;
+        };
+    } // namespace message
 
-	}
-    RawKey key = {};
+    class BatteryLevelMessage : public Message
+    {
+      public:
+        BatteryLevelMessage(MessageType messageType) : Message(messageType)
+        {
+            type = Type::Data;
+        }
+        uint8_t levelPercents = 0;
+        bool fullyCharged = false;
 };
 
-class BatteryLevelMessage : public sys::DataMessage
+class BatteryPlugMessage : public Message
 {
 public:
-	BatteryLevelMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
-	{
-		type = Type::Data;
-
-	}
-
-	sys::Message_t Execute(sys::Service* service)
-	{
-		// Ignore incoming data message if this service is not yet initialized
-		if(service->isReady){
-			return service->DataReceivedHandler(this,nullptr);
-		}
-		else{
-			return std::make_shared<sys::ResponseMessage>();
-		}
-
-	}
-	uint8_t levelPercents = 0;
-	bool fullyCharged = false;
-};
-
-class BatteryPlugMessage : public sys::DataMessage
-{
-public:
-	BatteryPlugMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
-	{
-		type = Type::Data;
-
-	}
-
-	sys::Message_t Execute(sys::Service* service)
-	{
-		// Ignore incoming data message if this service is not yet initialized
-		if(service->isReady){
-			return service->DataReceivedHandler(this,nullptr);
-		}
-		else{
-			return std::make_shared<sys::ResponseMessage>();
-		}
-
+  BatteryPlugMessage(MessageType messageType) : Message(messageType)
+  {
+      type = Type::Data;
 	}
 	bool plugged = false;
 };
 
-class RtcMinuteAlarmMessage : public sys::DataMessage
+class RtcMinuteAlarmMessage : public Message
 {
 public:
-	RtcMinuteAlarmMessage(MessageType messageType) : DataMessage(static_cast<uint32_t>(messageType))
-	{
-		type = Type::Data;
-
-	}
-	sys::Message_t Execute(sys::Service* service)
-	{
-		// Ignore incoming data message if this service is not yet initialized
-		if(service->isReady){
-			return service->DataReceivedHandler(this,nullptr);
-		}
-		else{
-			return std::make_shared<sys::ResponseMessage>();
-		}
-
+  RtcMinuteAlarmMessage(MessageType messageType) : Message(messageType)
+  {
+      type = Type::Data;
 	}
 	uint32_t timestamp = 0;
 };
@@ -117,9 +97,8 @@ public:
  */
 class EVMMessage: public sys::DataMessage {
 public:
-	EVMMessage( MessageType messageType ) :
-		sys::DataMessage( static_cast<uint32_t>(messageType)) {};
-	virtual ~EVMMessage() {};
+  EVMMessage(MessageType messageType) : sys::DataMessage(messageType){};
+  ~EVMMessage() override = default;
 };
 
 class EVMFocusApplication : public EVMMessage {
@@ -129,16 +108,19 @@ public:
 		EVMMessage( MessageType::EVMFocusApplication),
 		application{ application } {
 	}
-	const std::string& getApplication() const { return application; };
+    [[nodiscard]] auto getApplication() const -> const std::string &
+    {
+        return application;
+    };
 };
 
 class EVMAlarmSwitchData :public gui::SwitchData
 {
 public:
-	EVMAlarmSwitchData() {};
-	EVMAlarmSwitchData(uint32_t id) : dbID(id) {};
-	~EVMAlarmSwitchData() {};
-	uint32_t dbID = 0;
+  EVMAlarmSwitchData() = default;
+  EVMAlarmSwitchData(uint32_t id) : dbID(id){};
+  ~EVMAlarmSwitchData() override = default;
+  uint32_t dbID = 0;
 };
 } /* namespace sevm*/
 

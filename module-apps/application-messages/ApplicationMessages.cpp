@@ -41,12 +41,12 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl,
 		return retMsg;
 	}
 
-    if (msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
+    if (msgl->messageType == MessageType::DBServiceNotification)
     {
         DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
         LOG_DEBUG("Received multicast");
         if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB) &&
-            ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+            ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added)))
         {
             if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view])
             {
@@ -62,15 +62,17 @@ sys::Message_t ApplicationMessages::DataReceivedHandler(sys::DataMessage *msgl,
     //handle database response
 	if (resp != nullptr) {
 		handled = true;
-		uint32_t msgType = resp->responseTo;
-		switch (msgType) {
-		case static_cast<uint32_t>(MessageType::DBThreadGetLimitOffset): {
+        switch (resp->responseTo)
+        {
+        case MessageType::DBThreadGetLimitOffset: {
             if (getCurrentWindow()->onDatabaseMessage(resp))
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-			break;
-		}
-	}
+            break;
+            default:
+                break;
+            }
+    }
 
 	if (handled)
 		return std::make_shared<sys::ResponseMessage>();

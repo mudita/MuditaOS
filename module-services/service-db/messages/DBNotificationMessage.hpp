@@ -14,33 +14,31 @@
 #include <memory>
 
 namespace DB{
-enum class NotificatonType
-{
-    Updated,
-	Added,
-	Removed
-};
-enum class BaseType
-{
-	AlarmDB,
-	CalllogDB,
-	ContacstDB,
-	NotesDB,
-	SettingsDB,
-	SmsDB
-};
+    enum class NotificationType
+    {
+        Updated,
+        Added,
+        Removed
+    };
+    enum class BaseType
+    {
+        AlarmDB,
+        CalllogDB,
+        ContacstDB,
+        NotesDB,
+        SettingsDB,
+        SmsDB
+    };
 }
 class DBNotificationMessage : public sys::DataMessage
 {
 public:
-	DBNotificationMessage(MessageType messageType, DB::NotificatonType notificationType,
-			DB::BaseType baseType) :
-			sys::DataMessage(static_cast<uint32_t>(messageType)),
-			notificationType(notificationType), baseType(baseType) {};
-	virtual ~DBNotificationMessage() {};
+  DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType)
+      : sys::DataMessage(messageType), notificationType(notificationType), baseType(baseType){};
+  ~DBNotificationMessage() override = default;
 
-	DB::NotificatonType notificationType;
-	DB::BaseType baseType;
+  DB::NotificationType notificationType;
+  DB::BaseType baseType;
 };
 
 class DBNotificationResponseMessage : public sys::ResponseMessage

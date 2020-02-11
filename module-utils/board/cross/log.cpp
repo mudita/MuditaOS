@@ -25,6 +25,7 @@ extern "C" {
 
 #define LOGGER_BUFFER_SIZE  4096
 
+#if LOG_USE_COLOR == 1
 #define CONSOLE_ESCAPE_COLOR_BLACK              "\x1b[30m"
 #define CONSOLE_ESCAPE_COLOR_RED                "\x1b[31m"
 #define CONSOLE_ESCAPE_COLOR_GREEN              "\x1b[32m"
@@ -34,8 +35,6 @@ extern "C" {
 #define CONSOLE_ESCAPE_COLOR_CYAN               "\x1b[36m"
 #define CONSOLE_ESCAPE_COLOR_WHITE              "\x1b[37m"
 #define CONSOLE_ESCAPE_COLOR_RESET              "\x1b[0m"
-
-
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_BLACK   "\x1b[40m"
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_RED     "\x1b[41m"
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_GREEN   "\x1b[42m"
@@ -44,6 +43,25 @@ extern "C" {
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_MAGENTA "\x1b[45m"
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_CYAN    "\x1b[46m"
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_WHITE   "\x1b[47m"
+#else
+#define CONSOLE_ESCAPE_COLOR_BLACK
+#define CONSOLE_ESCAPE_COLOR_RED
+#define CONSOLE_ESCAPE_COLOR_GREEN
+#define CONSOLE_ESCAPE_COLOR_YELLOW
+#define CONSOLE_ESCAPE_COLOR_BLUE
+#define CONSOLE_ESCAPE_COLOR_MAGENTA
+#define CONSOLE_ESCAPE_COLOR_CYAN
+#define CONSOLE_ESCAPE_COLOR_WHITE
+#define CONSOLE_ESCAPE_COLOR_RESET
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_BLACK
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_RED
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_GREEN
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_YELLOW
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_BLUE
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_MAGENTA
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_CYAN
+#define CONSOLE_ESCAPE_COLOR_BACKGROUND_WHITE
+#endif
 
 const char *level_names[] = {
         "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
@@ -53,6 +71,8 @@ const char *level_names[] = {
 static const char *level_colors[] = {
   "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
 };
+#else
+static const char *level_colors[] = {"", "", "", "", "", ""};
 #endif
 
 #include <map>
