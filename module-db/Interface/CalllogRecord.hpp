@@ -6,8 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#ifndef MODULE_DB_INTERFACE_CALLLOGRECORD_HPP_
-#define MODULE_DB_INTERFACE_CALLLOGRECORD_HPP_
+#pragma once
 
 #include "../Common/Common.hpp"
 #include "../Databases/CalllogDB.hpp"
@@ -61,5 +60,3 @@ private:
   CalllogDB *calllogDB = nullptr;
   ContactsDB *contactsDB = nullptr;
 };
-
-#endif /* MODULE_DB_INTERFACE_CALLLOGRECORD_HPP_ */

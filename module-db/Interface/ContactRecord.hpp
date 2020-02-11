@@ -8,8 +8,7 @@
  * @details
  */
 
-#ifndef PUREPHONE_CONTACTRECORD_HPP
-#define PUREPHONE_CONTACTRECORD_HPP
+#pragma once
 
 #include "../Common/Common.hpp"
 #include "../Databases/ContactsDB.hpp"
@@ -104,4 +103,3 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
 };
 
-#endif // PUREPHONE_CONTACTRECORD_HPP

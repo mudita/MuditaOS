@@ -5,9 +5,7 @@
  *      Author: kuba
  */
 
-#ifndef MODULE_DB_DATABASES_ALARMSDB_HPP_
-#define MODULE_DB_DATABASES_ALARMSDB_HPP_
-
+#pragma once
 #include "Database/Database.hpp"
 #include "../Tables/AlarmsTable.hpp"
 #include "../Tables/ThreadsTable.hpp"
@@ -25,8 +23,3 @@ private:
 
     static const char *dbName;
 };
-
-
-
-
-#endif /* MODULE_DB_DATABASES_ALARMSDB_HPP_ */

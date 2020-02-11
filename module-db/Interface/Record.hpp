@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_RECORD_HPP
-#define PUREPHONE_RECORD_HPP
+#pragma once
 
 #include <memory>
 #include "../Database/Database.hpp"
@@ -49,6 +46,3 @@ public:
 
 
 };
-
-
-#endif //PUREPHONE_RECORD_HPP

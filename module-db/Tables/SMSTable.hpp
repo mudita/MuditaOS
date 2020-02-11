@@ -8,9 +8,7 @@
  * @details
  */
 
-
-#ifndef PUREPHONE_SMSTABLE_HPP
-#define PUREPHONE_SMSTABLE_HPP
+#pragma once
 
 #include "Table.hpp"
 #include "Database/Database.hpp"
@@ -71,6 +69,3 @@ private:
             "FOREIGN KEY(thread_id) REFERENCES threads(_id) ON DELETE CASCADE );";
 
 };
-
-
-#endif //PUREPHONE_SMSTABLE_HPP

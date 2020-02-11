@@ -8,9 +8,7 @@
  * @details
  */
 
-
-#ifndef PUREPHONE_CONTACTSDB_HPP
-#define PUREPHONE_CONTACTSDB_HPP
+#pragma once
 
 #include "Database/Database.hpp"
 #include "../Tables/ContactsTable.hpp"
@@ -36,5 +34,3 @@ private:
     static const char *dbName;
 };
 
-
-#endif //PUREPHONE_CONTACTSDB_HPP

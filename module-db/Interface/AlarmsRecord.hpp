@@ -4,10 +4,7 @@
  *  Created on: 15 lip 2019
  *      Author: kuba
  */
-
-#ifndef MODULE_DB_INTERFACE_ALARMSRECORD_HPP_
-#define MODULE_DB_INTERFACE_ALARMSRECORD_HPP_
-
+#pragma once
 
 #include "Record.hpp"
 #include <stdint.h>
@@ -53,6 +50,3 @@ public:
 private:
     AlarmsDB* alarmsDB;
 };
-
-
-#endif /* MODULE_DB_INTERFACE_ALARMSRECORD_HPP_ */

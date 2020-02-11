@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_SMSRECORD_HPP
-#define PUREPHONE_SMSRECORD_HPP
+#pragma once
 
 #include "Record.hpp"
 #include <stdint.h>
@@ -67,6 +64,3 @@ private:
 
 
 };
-
-
-#endif //PUREPHONE_SMSRECORD_HPP
