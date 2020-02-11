@@ -12,7 +12,7 @@ extern "C"
 #endif
 
 
-sys::ReturnCodes EndpointHandler::battery(uint8_t method)
+sys::ReturnCodes EndpointHandler::battery(uint8_t method, uint8_t fd)
 {
     if (method == static_cast<uint8_t>(ParserUtils::Method::Get))
     {
@@ -35,7 +35,7 @@ sys::ReturnCodes EndpointHandler::battery(uint8_t method)
         std::string responseHeaderStr = "#" + responseSizeStr;
         std::string responseStr = responseHeaderStr + responsePayloadJson.dump();
         LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
-        desktopServiceSend(-1, (uint8_t *)responseStr.c_str(), responseStr.length());
+        desktopServiceSend(fd, (uint8_t *)responseStr.c_str(), responseStr.length());
         return sys::ReturnCodes::Success;
     }
     return sys::ReturnCodes::Failure;
