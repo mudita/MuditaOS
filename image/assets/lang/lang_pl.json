@@ -158,6 +158,10 @@
     "app_phonebook_new_contact_note": "Notatka",
     "app_phonebook_new_speed_dial_key": "Szybkie wybieranie",
     "app_phonebook_new_addto_fav": "dodaj do ulubionych",
+
+    "sms_call_text"  : "Call: ",
+    "sms_contact_details" : "Contact details",
+    "sms_delete_conversation" : "Delete conversation",
     
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG",

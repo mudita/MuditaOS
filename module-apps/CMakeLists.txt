@@ -11,7 +11,7 @@ endif()
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_LIB_DIRECTORY})
 
 if(NOT DEFINED PROJECT_BUILD_DIRECTORY )
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE STRING "Output directory for building" )
+    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building" )
     message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 endif()
 
@@ -26,7 +26,7 @@ else()
     message(FATAL_ERROR "Invalid target!")
 endif()
 
-set( SOURCES "Application.cpp" "windows/AppWindow.cpp" )
+set( SOURCES "Application.cpp" "windows/AppWindow.cpp" "windows/OptionWindow.cpp" "windows/Dialog.cpp" )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
@@ -94,7 +94,6 @@ target_compile_options(${PROJECT_NAME}
 target_compile_features(${PROJECT_NAME} PUBLIC
 
         cxx_std_14
-        cxx_noexcept
 )
 
 # Host target configuration(mainly used for unit testing)

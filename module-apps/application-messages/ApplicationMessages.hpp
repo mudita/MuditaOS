@@ -10,6 +10,19 @@
 #define MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_
 
 #include "Application.hpp"
+#include "Interface/ThreadRecord.hpp"
+
+namespace gui
+{
+    class OptionWindow;
+    namespace name
+    {
+        namespace window
+        {
+            inline const std::string thread_rm_confirm = "ConfirmRM";
+        };
+    }; // namespace name
+};     // namespace gui
 
 namespace app {
 
@@ -21,7 +34,9 @@ public:
 			std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationMessages();
 
-	sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,
+    gui::OptionWindow *windowOptions = nullptr;
+
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,
 			sys::ResponseMessage *resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
@@ -33,6 +48,8 @@ public:
 
 	void createUserInterface() override;
 	void destroyUserInterface() override;
+
+    bool removeSMS_thread(const ThreadRecord *record);
 };
 } /* namespace app */
 

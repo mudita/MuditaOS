@@ -173,9 +173,10 @@ std::vector<std::string> DLC_channel::SendCommandResponse(const char *cmd,
 
 			//tokenize data
 			LOG_DEBUG("[Tokenizing] frame");
-			auto ret = ATParser::Tokenizer(deserialisedData, rxCount, "\r\n");
-			tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
-			if (tokens.size() < rxCount) {
+            auto ret = ATParser::Tokenizer(deserialisedData, "\r\n", rxCount);
+            tokens.insert(std::end(tokens), std::begin(ret), std::end(ret));
+            // TODO: alek: handle case when rxCount == 0 - no desired number/only timeout
+            if (tokens.size() < rxCount) {
 				continue;
 			}
 		} else {

@@ -126,39 +126,38 @@ void Label::calculateDisplayText() {
 	textArea.h = font->info.line_height;
 
 	//calculate vertical position of text
-	if( alignment.isAligned(Alignment::ALIGN_VERTICAL_CENTER ))
-	{
-		textArea.y =
+    if (alignment.vertical_center)
+    {
+        textArea.y =
 			(widgetArea.h - font->info.line_height )/2 +
 			font->info.base;
-	}
-	else if( alignment.isAligned(Alignment::ALIGN_VERTICAL_TOP ))
-	{
-		textArea.y = font->info.base + margins.top;
-	}
-	else if( alignment.isAligned(Alignment::ALIGN_VERTICAL_BOTTOM ))
-	{
-		textArea.y =
+    }
+    else if (alignment.vertical_top)
+    {
+        textArea.y = font->info.base + margins.top;
+    }
+    else if (alignment.vertical_bottom)
+    {
+        textArea.y =
 			widgetArea.h -
 			font->info.line_height + font->info.base -
 			margins.bottom;
+    }
+    //calculate horizontal position o text
+    if (alignment.horizontal_center)
+    {
+        textArea.x =( widgetArea.w - textArea.w )/2;
+    }
+    else if (alignment.horizontal_left)
+    {
+        textArea.x = margins.left;
+    }
+    else if (alignment.horizontal_right)
+    {
+        textArea.x = widgetArea.w - textArea.w - margins.right;
+    }
 
-	}
-	//calculate horizontal position o text
-	if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_CENTER ))
-	{
-		textArea.x =( widgetArea.w - textArea.w )/2;
-	}
-	else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_LEFT ))
-	{
-		textArea.x = margins.left;
-	}
-	else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT ))
-	{
-		textArea.x = widgetArea.w - textArea.w - margins.right;
-	}
-
-	//if dots mode is disabled and line mode is enabled calculate positiona and width of the line
+    //if dots mode is disabled and line mode is enabled calculate positiona and width of the line
 	if( (!dotsMode) && (lineMode) && (lineFront!=nullptr) ) {
 		uint32_t spaceWidth = font->getCharPixelWidth(' ');
 		int32_t lineW = availableSpace - stringPixelWidth ;
@@ -168,23 +167,26 @@ void Label::calculateDisplayText() {
 		lineFront->setVisible(true);
 		lineBack->setVisible(true);
 		//both lines are visible
-		if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_CENTER )) {
-			lineFront->setPosition( 0, lineY );
-			lineFront->setSize( lineW/2 - spaceWidth, 2 );
+        if (alignment.horizontal_center)
+        {
+            lineFront->setPosition(0, lineY);
+            lineFront->setSize( lineW/2 - spaceWidth, 2 );
 			lineBack->setPosition( lineW/2 + stringPixelWidth +spaceWidth, lineY);
 			lineBack->setSize( lineW/2 -spaceWidth, 2 );
-		}
-		else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_RIGHT)) {
-			lineFront->setPosition( 0, lineY );
-			lineFront->setSize( lineW-spaceWidth, 2 );
+        }
+        else if (alignment.horizontal_right)
+        {
+            lineFront->setPosition(0, lineY);
+            lineFront->setSize( lineW-spaceWidth, 2 );
 			lineBack->setVisible(false);
-		}
-		else if( alignment.isAligned(Alignment::ALIGN_HORIZONTAL_LEFT )) {
-			lineBack->setPosition( stringPixelWidth +spaceWidth, lineY);
-			lineBack->setSize( lineW-spaceWidth, 2 );
+        }
+        else if (alignment.horizontal_left)
+        {
+            lineBack->setPosition(stringPixelWidth + spaceWidth, lineY);
+            lineBack->setSize( lineW-spaceWidth, 2 );
 			lineFront->setVisible(false);
-		}
-	}
+        }
+    }
 }
 
 void Label::setText( const UTF8& text ) {
@@ -308,6 +310,15 @@ void Label::setFont( const UTF8& fontName) {
 
 void Label::setTextColor( Color color ) {
 	textColor = color;
+}
+
+uint32_t Label::getTextNeedSpace()
+{
+    if (font == nullptr)
+    {
+        return 0;
+    }
+    return font->getPixelWidth(text);
 }
 
 } /* namespace gui */

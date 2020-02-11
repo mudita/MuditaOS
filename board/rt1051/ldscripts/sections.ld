@@ -130,13 +130,14 @@ SECTIONS
         *(.ARM.extab* .gnu.linkonce.armextab.*)
     } > BOARD_SDRAM_TEXT
 
-    __exidx_start = .;
+    
 
     .ARM.exidx : ALIGN(4)
     {
+        __exidx_start = .;
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+        __exidx_end = .;
     } > BOARD_SDRAM_TEXT
-    __exidx_end = .;
 
     _etext = .;
 

@@ -27,7 +27,7 @@ enum class MessageType
     GUIRenderingFinished, // Message is sent from the worker when all rendering is finished.
 
     // DB messages
-	DBServiceNotification, //Common service-db notification message.
+    DBServiceNotification, // Common service-db notification message.
 
     DBSettingsGet,    // get current settings from database
     DBSettingsUpdate, // update settings
@@ -37,7 +37,8 @@ enum class MessageType
     DBSMSUpdate,                      // Update specified SMS record
     DBSMSGetSMSLimitOffset,           // Get SMS records by limit,offset
     DBSMSGetSMSLimitOffsetByThreadID, // Get SMS records by limit,offset with specified ThreadID field
-	DBSMSGetLastRecord,				  // Get last edited record
+    DBSMSGetLastRecord,               // Get last edited record
+    DBSMSGetCount,                    // Get all sms count
 
     DBThreadGet,            // Get thread by ID
     DBThreadGetForContact,  // Get thread between 2 contacts
@@ -65,6 +66,8 @@ enum class MessageType
     DBAlarmGetCount,       // Get alarm count
     DBAlarmGetNext,        // Get alarm, closest or equal to current timestamp.
 
+    DBCountryCode,
+
     // Cellular messages
     CellularNotification,       // Async notification message
     CellularDialNumber,         // Dial number
@@ -75,8 +78,8 @@ enum class MessageType
     CellularStartPowerUpProcedure,
     CellularStartConfProcedure,
     CellularStartAudioConfProcedure,
-    CellularSendSMS, // request ot send new sms
-    CellularSMSMulticast,
+    CellularGetOwnNumber,
+    CellularGetIMSI,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record

@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory>
 
+#include "../ApplicationMessages.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "service-db/messages/DBMessage.hpp"
@@ -24,8 +25,10 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 #include "../data/SMSdata.hpp"
+#include "../widgets/ThreadItem.hpp"
 #include "../windows/ThreadViewWindow.hpp"
 #include "NewMessage.hpp"
+#include "OptionsWindow.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include <Style.hpp>
 #include <log/log.hpp>
@@ -145,8 +148,9 @@ void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data) {
     }
 }
 
-bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
-	//check if any of the lower inheritance onInput methods catch the event
+bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
+{
+    // check if any of the lower inheritance onInput methods catch the event
     if (AppWindow::onInput(inputEvent))
     {
         return true;
@@ -155,7 +159,37 @@ bool MessagesMainWindow::onInput(const InputEvent &inputEvent) {
     {
         if (inputEvent.state == InputEvent::State::keyReleasedShort)
         {
-            application->switchWindow(gui::name::window::new_sms, nullptr);
+            switch (inputEvent.keyCode)
+            {
+            case gui::KeyCode::KEY_LEFT:
+                application->switchWindow(gui::name::window::new_sms, nullptr);
+                return true;
+            case gui::KeyCode::KEY_LF: {
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                if (app == nullptr)
+                {
+                    LOG_ERROR("Something went horribly wrong");
+                    return false;
+                }
+                if (app->windowOptions != nullptr)
+                {
+                    app->windowOptions->clearOptions();
+                    auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
+                    if (it)
+                    {
+                        app->windowOptions->addOptions(threadWindowOptions(app, it->getThreadItem().get()));
+                        app->switchWindow(app->windowOptions->getName(), nullptr);
+                    }
+                    else
+                    {
+                        LOG_ERROR("Can't switch to options -wrong input type");
+                    }
+                }
+                return true;
+            }
+            default:
+                LOG_DEBUG("SMS main window not handled key: %d", inputEvent.keyCode);
+            }
         }
     }
     return false;

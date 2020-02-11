@@ -14,6 +14,8 @@
 
 #include "../ServiceDB.hpp"
 
+#include <Utils.hpp>
+
 SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
 {
 
@@ -63,7 +65,7 @@ uint32_t DBServiceAPI::SMSAdd(sys::Service *serv, const SMSRecord &rec)
     DBSMSResponseMessage *smsResponse = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (smsResponse->retCode == true))
     {
-        return (*smsResponse->records)[0].dbID;
+        return (*smsResponse->records)[0].ID;
     }
     else
     {
@@ -117,7 +119,7 @@ SMSRecord DBServiceAPI::SMSGetLastRecord(sys::Service *serv)
     else
     {
         SMSRecord rec;
-        rec.dbID = 0;
+        rec.ID = 0;
         return rec;
     }
 }
@@ -156,6 +158,22 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffsetByThreadI
     else
     {
         return std::make_unique<std::vector<SMSRecord>>();
+    }
+}
+
+uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv)
+{
+    std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSMessage>(MessageType::DBSMSGetCount);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto *sms = reinterpret_cast<DBSMSResponseMessage *>(ret.second.get());
+    if ((ret.first == sys::ReturnCodes::Success) && (sms->retCode == true))
+    {
+        return sms->count;
+    }
+    else
+    {
+        return 0;
     }
 }
 
@@ -673,20 +691,25 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
     return true;
 }
 
-bool DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
+uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
+    LOG_DEBUG("CalllogAdd %s", utils::to_string(rec).c_str());
+
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
+    uint32_t recId = DB_ID_NONE;
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true))
     {
-        return true;
+        auto records = *calllogResponse->records;
+        if (!records.empty())
+        {
+            recId = records[0].id;
+        }
     }
-    else
-    {
-        return false;
-    }
+
+    return recId;
 }
 
 bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
@@ -709,6 +732,8 @@ bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
 bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogUpdate, rec);
+
+    LOG_DEBUG("CalllogUpdate %s", utils::to_string(rec).c_str());
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
@@ -734,7 +759,7 @@ uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv)
     }
     else
     {
-        return false;
+        return 0;
     }
 }
 
@@ -746,4 +771,20 @@ bool DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, ui
 
     sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
     return true;
+}
+
+uint32_t DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc)
+{
+    std::shared_ptr<DBCountryCodeMessage> msg = std::make_shared<DBCountryCodeMessage>(MessageType::DBCountryCode, mcc, 0);
+
+    auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    DBCountryCodeMessage *response = reinterpret_cast<DBCountryCodeMessage *>(mcc);
+    if (ret.first == sys::ReturnCodes::Success)
+    {
+        return response->country_code;
+    }
+    else
+    {
+        return (0);
+    }
 }

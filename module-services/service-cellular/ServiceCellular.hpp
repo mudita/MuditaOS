@@ -12,9 +12,10 @@
 #ifndef PUREPHONE_SERVICECELLULAR_HPP
 #define PUREPHONE_SERVICECELLULAR_HPP
 
-#include "Service/Service.hpp"
+#include "CellularCall.hpp"
 #include "Modem/TS0710/DLC_channel.h"
 #include "Modem/TS0710/TS0710.h"
+#include "Service/Service.hpp"
 #include "messages/CellularMessage.hpp"
 #include "utf8/UTF8.hpp"
 //
@@ -58,26 +59,27 @@ public:
     bool sendSMS(UTF8& number, UTF8& text);
     bool sendSMS(void);
     bool receiveSMS(std::string messageNumber);
+    /**
+     * @brief Its getting selected SIM card own number.
+     * @param destination Reference to destination string.
+     * @return true when succeed, false when fails
+     */
+    bool getOwnNumber(std::string &destination);
+    /**
+     * @brief Its getting IMSI from selected SIM card.
+     * @param fullNumber Its returning full IMSI number when fullNumber is true, otherwise its returning only country identification number
+     * @param destination Reference to destination string.
+     * @return true when succeed, false when fails
+     */
+    bool getIMSI(std::string &destination, bool fullNumber = false);
 
-private:
+  private:
 
     //std::unique_ptr<MuxDaemon> muxdaemon;
     TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     // used for polling for call state
     uint32_t callStateTimerId = 0;
-    // used for calculation of callduration
-    uint32_t callDurationTimerId = 0;
-    uint32_t callDuration = 0;
-    uint32_t callEndTime = -1;
-    void runCallDurationTimer()
-    {
-        callDuration = 0;
-        callEndTime = -1;
-        ReloadTimer(callDurationTimerId);
-    }
-
     void CallStateTimerHandler();
-    void CallDurationTimerHandler();
 
     DLC_channel::Callback_t notificationCallback = nullptr;
 
@@ -119,20 +121,9 @@ private:
 
     CellularNotificationMessage::Type identifyNotification(std::vector<uint8_t> data, std::string &message);
 
-    bool searchForOK(const std::vector<std::string> &response) {
-        for (std::string s : response) {
-            //LOG_DEBUG("[Processing] %s", s.c_str());
-            if (s == "OK") {
-                //LOG_DEBUG("[TRUE]");
-                return true;
-            }
-        }
-        //LOG_DEBUG("[FALSE]");
-        return false;
-    }
-
     std::vector<std::string> messageParts;
-};
 
+    CellularCall::CellularCall ongoingCall;
+};
 
 #endif //PUREPHONE_SERVICECELLULAR_HPP

@@ -45,6 +45,7 @@ class DBServiceAPI
     static bool SMSUpdate(sys::Service *serv, const SMSRecord &rec);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffsetByThreadID(sys::Service *serv, uint32_t offset, uint32_t limit, uint32_t id);
+    static uint32_t SMSGetCount(sys::Service *serv);
     /**
      * @brief Function is getting last modified SMS record.
      * @param serv Pointer to Service based object that is sending request.
@@ -96,11 +97,14 @@ class DBServiceAPI
     static uint32_t NotesGetCount(sys::Service *serv);
     static bool NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
 
-    static bool CalllogAdd(sys::Service *serv, const CalllogRecord &rec);
+    static uint32_t CalllogAdd(sys::Service *serv, const CalllogRecord &rec);
     static bool CalllogRemove(sys::Service *serv, uint32_t id);
     static bool CalllogUpdate(sys::Service *serv, const CalllogRecord &rec);
     static uint32_t CalllogGetCount(sys::Service *serv);
     static bool CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
+
+    /* country codes */
+    static uint32_t GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc);
 };
 
 #endif // PUREPHONE_DBSERVICEAPI_HPP

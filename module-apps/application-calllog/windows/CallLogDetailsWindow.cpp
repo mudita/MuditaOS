@@ -86,9 +86,9 @@ void CallLogDetailsWindow::buildInterface() {
     informationLabel =
         decorateLabel(new gui::Label(this, information::label::x, information::label::y, information::label::w, 0, utils::localize.get("common_information")));
     number = decorateData(new gui::Label(this, information::number::x, information::number::y, information::number::w, 0));
-    // number->setFont(style::window::font::bigbold); // TODO: alek: must be set to bold 27px 
+    number->setFont(style::window::font::mediumbold);
 
-	for( uint32_t i=0; i<2; ++i ) {
+    for( uint32_t i=0; i<2; ++i ) {
 		rects[i] = new gui::Rect( this, 0,0, information::imgs::w, information::imgs::h );
 		rects[i]->setFilled( false );
 		rects[i]->setEdges( RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP );

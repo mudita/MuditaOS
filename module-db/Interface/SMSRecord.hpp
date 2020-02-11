@@ -19,17 +19,20 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
-struct SMSRecord{
-    uint32_t dbID;
-    uint32_t date;
-    uint32_t dateSent;
-    uint32_t errorCode;
-    UTF8 number;
-    UTF8 body;
-    bool isRead;
-    SMSType type;
-    uint32_t threadID;
-    uint32_t contactID;
+struct SMSRecord : public Record
+{
+    uint32_t date = 0;
+    uint32_t dateSent = 0;
+    uint32_t errorCode = 0;
+    UTF8 number = "";
+    UTF8 body = "";
+    bool isRead = false;
+    SMSType type = SMSType::ALL;
+    uint32_t threadID = 0;
+    uint32_t contactID = 0;
+
+    SMSRecord() = default;
+    SMSRecord(const SMSTableRow &, const UTF8 & = "");
 };
 
 enum class SMSRecordField{

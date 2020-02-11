@@ -32,7 +32,7 @@ void add_box_label(VBox *layout, UTF8 name, std::function<bool(Item &)> foo)
     style::window::decorateOption(el);
     el->setText(name);
     el->activatedCallback = foo;
-    if (!layout->tryAddWidget(el))
+    if (!layout->addWidget(el))
     {
         delete el;
     }

@@ -11,36 +11,38 @@
 #include "../Common.hpp"
 #include "Item.hpp"
 
-class Item;
 
 namespace gui {
 
-/**
- * Class holds GUI Items for 4 possible directions for navigating using keyboard.
- */
-class Navigation {
-protected:
-	Item* left;
-	Item* up;
-	Item* right;
-	Item* down;
-public:
-	/**
-	 * Sets pointer to the widget that should receive focus after receiving navigation event.
-	 */
-	void setDirectionItem( NavigationDirection direction, Item* item );
-	/**
-	 * Retrives item from specified durection
-	 */
-	Item* getDirectionItem( const NavigationDirection direction );
-	/**
-	 * Clears Item's pointer for specified direction.
-	 */
-	void clearDirection(const NavigationDirection direction);
+    class Item;
+    /**
+     * Class holds GUI Items for 4 possible directions for navigating using keyboard.
+     */
+    class Navigation
+    {
+      protected:
+        Item *left;
+        Item *up;
+        Item *right;
+        Item *down;
 
-	Navigation();
-	virtual ~Navigation();
-};
+      public:
+        /**
+         * Sets pointer to the widget that should receive focus after receiving navigation event.
+         */
+        void setDirectionItem(NavigationDirection direction, Item *item);
+        /**
+         * Retrives item from specified durection
+         */
+        Item *getDirectionItem(const NavigationDirection direction);
+        /**
+         * Clears Item's pointer for specified direction.
+         */
+        void clearDirection(const NavigationDirection direction);
+
+        Navigation();
+        virtual ~Navigation();
+    };
 
 } /* namespace gui */
 

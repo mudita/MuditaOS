@@ -89,15 +89,21 @@ public:
     int32_t offset_w() { return w() + widgetArea.x; }
     /// helper function to show where widget ends in y axis
     int32_t offset_h() { return h() + widgetArea.y; }
+    int32_t offset(Axis axis)
+    {
+        return this->widgetArea.size(axis) + this->widgetArea.pos(axis);
+    };
 
-	bool setFocus( bool state ) {
-		if( state != focus ) {
-			//focus = state;
-			onFocus( state );
+    bool setFocus(bool state)
+    {
+        if (state != focus)
+        {
+            focus = state;
+            onFocus( state );
 			focusChangedCallback( *this );
-		};
-		return state;
-	}
+        };
+        return state;
+    }
 
     void setFocusItem(Item *item)
     {
@@ -124,7 +130,10 @@ public:
     };
     virtual bool onActivated(void *data)
     {
-        return activatedCallback(*this);
+        if (activatedCallback)
+            return activatedCallback(*this);
+        else
+            return false;
     };
     virtual bool onInput( const InputEvent& inputEvent ) { return inputCallback( *this, inputEvent ); };
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
