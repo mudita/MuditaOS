@@ -22,6 +22,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/harness/events/KeyPress.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/harness/events/SysStart.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/harness/events/FocusApp.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/harness/events/GPIO.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/harness/actions/CellularCMD.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/harness/events/AtResponse.cpp"
 	PUBLIC
