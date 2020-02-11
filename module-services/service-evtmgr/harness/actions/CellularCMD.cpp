@@ -6,13 +6,16 @@ namespace harness
 {
     namespace action
     {
-        bool gsm_send(sys::Service *serv, const std::string &cmd)
+        auto gsm_send(sys::Service *serv, const std::string &cmd) -> bool
         {
             auto msg = std::make_shared<cellular::RawCommand>();
             msg->command = cmd;
             msg->timeout = 3000; // TODO - from parameter or defult
-            auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
-            if (ret)
+            // TODO anywhere in system commands have 5s, for modem its seriously bad
+            // as commands on modem can be much longer
+            auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+            auto *response = dynamic_cast<cellular::RawCommandResp *>(ret.second.get());
+            if (response == nullptr)
             {
                 return true;
             }
