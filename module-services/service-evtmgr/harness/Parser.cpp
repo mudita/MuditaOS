@@ -1,6 +1,7 @@
 #include "Parser.hpp"
 #include "Events.hpp"
 #include "actions/CellularCMD.hpp"
+#include "events/GPIO.hpp"
 #include "events/KeyPress.hpp"
 #include <Service/Bus.hpp>
 #include <json/json11.hpp>
@@ -14,7 +15,7 @@ namespace harness
     /// super simple parser - frame is json
     /// format is explained in Events.hpp
     /// todo have them all somehow nice { from , to, what }
-    Error parse(const std::string &request, sys::Service *serv)
+    auto parse(const std::string &request, sys::Service *serv) -> Error
     {
 
         std::string err;
@@ -34,12 +35,11 @@ namespace harness
             }
             switch (el[Type].int_value())
             {
-            case static_cast<int>(Events::KeyPress): {
-                auto msg = parseKeyPress(el);
-                auto ret = sys::Bus::SendUnicast(msg, "EventManager", serv);
-                if (!ret)
+            case (int)Events::KeyPress: {
+                auto evt = events::KeyPress(el);
+                if (evt && evt.msg)
                 {
-                    LOG_ERROR("Message not sent!");
+                    sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
                 }
             }
             break;
@@ -51,8 +51,21 @@ namespace harness
                 }
             }
             break;
+            case (int)Events::GPIO: {
+                auto evt = events::GPIO(el);
+                if (!evt)
+                {
+                    LOG_DEBUG("GPIO processing request failed");
+                }
+                else if (evt.msg)
+                {
+                    sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
+                }
+                LOG_DEBUG("> evt: %s", evt.encode().c_str());
+            }
+            break;
             default:
-                return Error::NotHandled;
+                break;
             };
             return Error::Success;
         }

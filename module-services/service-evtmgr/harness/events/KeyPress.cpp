@@ -2,26 +2,41 @@
 #include "../../messages/EVMessages.hpp"
 #include "../Events.hpp"
 
-namespace harness
+namespace harness::events
 {
 
-    bsp::KeyCodes fromVal(int val);
+    using namespace json11;
 
-    std::shared_ptr<sys::DataMessage> parseKeyPress(json11::Json &js)
+    KeyPress::KeyPress(const Json &js)
+    {
+        state = decode(js);
+    }
+
+    auto fromVal(int val) -> bsp::KeyCodes;
+
+    auto KeyPress::decode(const Json &js) -> bool
     {
         auto message = std::make_shared<sevm::KbdMessage>();
-        if (!js[Data].is_array())
+        msg = message;
+        if (js[Data].is_array() != true)
         {
-            LOG_ERROR("bad json format, data not array: %s", js.dump().c_str());
-            return std::make_shared<sys::DataMessage>(MessageType::MessageTypeUninitialized);
+            return false;
         }
         message->key.key_code = fromVal(js[Data][0].int_value());
         /// for now type is only released
         message->key.state = RawKey::State::Released;
-        return message;
+        return true;
     }
 
-    bsp::KeyCodes fromVal(int val)
+    auto KeyPress::encode() -> std::string
+    {
+        Json::object el;
+        el[Type] = (int)evt;
+        el[Data] = {};
+        return Json(el).dump();
+    }
+
+    auto fromVal(int val) -> bsp::KeyCodes
     {
         switch (val)
         {

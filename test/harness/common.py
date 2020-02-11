@@ -10,8 +10,32 @@ log = logging.getLogger(__name__)
 
 CMD_KEY = 0
 CMD_GSM = 3
+CMD_GPIO = 4
 STX = b'\x02'
 CTX = b'\x03'
+
+
+class GPIO:
+    '''
+    GPIO input output class boilerplate
+    '''
+
+    def dumps(self):
+        '''
+        default object <- json encoder
+        '''
+        return json.dumps(self.__dict__)
+
+    def __init__(self, num, what, state):
+        '''
+        which - which gpio to trigger
+        mode - 1 output 0 input
+        value - on write: set HI, on read: read HI
+        '''
+        self.num = num
+        self.what = what
+        self.state = state
+
 
 class Serial:
 
@@ -83,3 +107,9 @@ class Serial:
         write GSM command i.e. `AT?`
         '''
         self.write(CMD_GSM, val)
+
+    def gpio(self, gpio: GPIO):
+        '''
+        GPIO phone request
+        '''
+        self.write(CMD_GPIO, gpio.dumps())

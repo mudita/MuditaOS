@@ -8,7 +8,7 @@ namespace harness
     struct SysStart : public Event<harness::Events::SysStart>
     {
         // encoded json event
-        virtual std::string encode() final;
+        auto encode() -> std::string final;
     };
 
 }; // namespace harness
