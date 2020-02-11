@@ -6,6 +6,7 @@
  */
 
 #include "Margins.hpp"
+#include <core/BoundingBox.hpp>
 
 namespace gui {
 
@@ -17,6 +18,19 @@ Margins::Margins( const short left, const short top, const short right, const sh
 }
 
 Margins::~Margins() {
+}
+
+short Margins::getAlong(gui::Axis axis) const
+{
+    switch (axis)
+    {
+    case Axis::X:
+        return (left + right);
+    case Axis::Y:
+        return (top + bottom);
+    default:
+        return 0;
+    }
 }
 
 } /* namespace gui */
