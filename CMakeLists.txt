@@ -18,6 +18,17 @@ message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
 add_executable(${PROJECT_NAME} "")
 
+# set target dependent directories. My (Mateusz) CLion uses it
+if (DEFINED ENV{PROJECT_BUILD_DIRECTORY})
+    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/$ENV{PROJECT_BUILD_DIRECTORY}" CACHE PATH "Output directory for building")
+else()
+    # fallback default behaviour. rebuild.sh uses it
+    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building")
+endif()
+set(PROJECT_LIB_DIRECTORY "${PROJECT_BUILD_DIRECTORY}/lib/" CACHE PATH "Output path for static libraries")
+
+message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
+message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 
 # If build type not passed assume it is Debug
 if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -43,18 +54,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
 endif ()
 
-# set target dependent directories. My (Mateusz) CLion uses it
-if (DEFINED ENV{PROJECT_BUILD_DIRECTORY})
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/$ENV{PROJECT_BUILD_DIRECTORY}" CACHE PATH "Output directory for building")
-else()
-    # fallback default behaviour. rebuild.sh uses it
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building")
-endif()
-set(PROJECT_LIB_DIRECTORY "${PROJECT_BUILD_DIRECTORY}/lib/" CACHE PATH "Output path for static libraries")
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
-
-message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
-message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
