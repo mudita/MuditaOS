@@ -77,12 +77,14 @@ after running provisioning you are ready to build project for both linux and rt1
 
 * [doc/development_workflow](./doc/development_workflow.md)
 * [doc/config](./doc/config.linux.md)
+* [GUI](./module-gui/README.md)
 * [doc/bluetooth](./doc/bluetooth.md)
     * [./module-bsp/bsp/bluetooth](./module-bsp/bsp/bluetooth/)
     * [./module-bluetooth/](./module-bluetooth/README.md)
 * [module-lwip](./module-lwip/README.md)
 * [doc/database](./doc/database_v2.md)
 * [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
+* [test/harness](./test/README.md)
 
 # Linux Bluetooth device
 

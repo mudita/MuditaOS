@@ -1,19 +1,19 @@
 #!/bin/python3
 # unlock Desktop
-from common import *
+from harness.common import Serial
+import logging
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
-ser = start()
-registerCTRLP(ser)
+conn = Serial()
 
 # write pin
-writeKey(ser, 10, 0.5)
-writeKey(ser, 35, 0.5)
-writeKey(ser, 3, 0.5)
-writeKey(ser, 3, 0.5)
-writeKey(ser, 3, 0.5)
-writeKey(ser, 3, 0.5)
-writeKey(ser, 10, 0.5)
+conn.key(ord('\n'))
+conn.key(ord('#'))
+conn.key(3)
+conn.key(3)
+conn.key(3)
+conn.key(3)
+conn.key(ord('\n'))
 # enter menu
-writeKey(ser, 10, 1.5)
-
-ser.close()
+conn.key(ord('\n'))
