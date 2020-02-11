@@ -474,7 +474,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             LOG_DEBUG("Received multicast");
             if ((msg->baseType == DB::BaseType::SmsDB) &&
-                ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+                ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added)))
             {
                 sendSMS();
                 return std::make_shared<sys::ResponseMessage>();

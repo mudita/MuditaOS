@@ -2,11 +2,11 @@
 
 #include "Common.hpp"
 #include "LogOutput.hpp"
+#include "MessageType.hpp"
+#include <memory>
+#include <stdint.h>
 #include <string>
 #include <vector>
-#include <stdint.h>
-#include <memory>
-
 
 namespace sys
 {
@@ -103,12 +103,13 @@ namespace sys
     class DataMessage : public Message
     {
     public:
-    	//This field must by provided by the class that inherits DataMessage
-    	uint32_t messageType = 0;
+      // This field must by provided by the class that inherits DataMessage
+      MessageType messageType = MessageType::MessageTypeUninitialized;
 
-        DataMessage( uint32_t messageType ) : messageType{messageType} {
-            type = Type::Data;
-        }
+      DataMessage(MessageType messageType) : messageType{messageType}
+      {
+          type = Type::Data;
+      }
 
         DataMessage(BusChannels channel): Message(channel)
         {
@@ -121,12 +122,12 @@ namespace sys
     class ResponseMessage : public Message
     {
     public:
-
-        ResponseMessage(ReturnCodes retCode = ReturnCodes::Success,uint32_t responseTo=0): Message(),responseTo(responseTo),retCode(retCode)
-        {
-            type = Type::Response;
+      ResponseMessage(ReturnCodes retCode = ReturnCodes::Success, MessageType responseTo = MessageType::MessageTypeUninitialized)
+          : Message(), responseTo(responseTo), retCode(retCode)
+      {
+          type = Type::Response;
         }
-        uint32_t responseTo;
+        MessageType responseTo;
         ReturnCodes retCode;
 
         Message_t Execute(Service* service) override;

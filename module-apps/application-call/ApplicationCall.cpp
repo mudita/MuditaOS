@@ -70,9 +70,10 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 
 	//this variable defines whether message was processed.
 	bool handled = false;
-	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
+    if (msgl->messageType == MessageType::CellularNotification)
+    {
 
-		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+        CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		gui::CallWindow* callWindow = reinterpret_cast<gui::CallWindow*>( windows.find( "CallWindow")->second);
 
 		if (msg->type == CellularNotificationMessage::Type::CallAborted) {
@@ -136,9 +137,9 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
             }
         }
 		handled = true;
-	}
+    }
 
-	if( handled )
+    if( handled )
 		return std::make_shared<sys::ResponseMessage>();
 	else
 		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);

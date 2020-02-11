@@ -165,24 +165,26 @@ bool WorkerEvent::deinit(void)
 
  void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
  {
-	auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
+     auto message = std::make_shared<sevm::KbdMessage>();
 
-	message->key.key_code = code;
+     message->key.key_code = code;
 
-	if(event == bsp::KeyEvents::Pressed)
-	{
-		if(lastState == bsp::KeyEvents::Pressed) {
-			return;
-		}
+     if (event == bsp::KeyEvents::Pressed)
+     {
+         if (lastState == bsp::KeyEvents::Pressed)
+         {
+             return;
+         }
 
-		message->key.state =  RawKey::State::Pressed;
-		message->key.time_press = xTaskGetTickCount();
+         message->key.state = RawKey::State::Pressed;
+         message->key.time_press = xTaskGetTickCount();
 
-		// Slider sends only press, not release state so it would block the entire keyboard
-		if( (code != bsp::KeyCodes::SSwitchUp) && (code != bsp::KeyCodes::SSwitchMid) && (code != bsp::KeyCodes::SSwitchDown) ) {
-			lastPressed = code;
-			lastState = event;
-		}
+         // Slider sends only press, not release state so it would block the entire keyboard
+         if ((code != bsp::KeyCodes::SSwitchUp) && (code != bsp::KeyCodes::SSwitchMid) && (code != bsp::KeyCodes::SSwitchDown))
+         {
+             lastPressed = code;
+             lastState = event;
+         }
 	}
 	else
 	{

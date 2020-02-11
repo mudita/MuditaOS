@@ -44,17 +44,19 @@ sys::Message_t ApplicationCallLog::DataReceivedHandler(sys::DataMessage* msgl,sy
 	//handle database response
 	if( resp != nullptr ) {
 		handled = true;
-		uint32_t msgType = resp->responseTo;
-		switch( msgType ) {
-			case static_cast<uint32_t>(MessageType::DBCalllogGetLimitOffset): {
-                if (getCurrentWindow()->onDatabaseMessage(resp))
-                {
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                }
-                break;
+        switch (resp->responseTo)
+        {
+        case MessageType::DBCalllogGetLimitOffset: {
+            if (getCurrentWindow()->onDatabaseMessage(resp))
+            {
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
-		}
-	}
+            break;
+        }
+        default:
+            break;
+        }
+    }
 
 	if( handled ) {
 		return std::make_shared<sys::ResponseMessage>();

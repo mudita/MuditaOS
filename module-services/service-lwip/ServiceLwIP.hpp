@@ -13,7 +13,7 @@ class LwIP_message : public sys::DataMessage {
         Stop,
     };
     enum Request req = Request::None;
-    LwIP_message(MessageType messageType, enum Request req = None) : sys::DataMessage(static_cast<uint32_t>(messageType)), req(req){};
+    LwIP_message(enum Request req = None) : sys::DataMessage(MessageType::LwIP_request), req(req){};
     virtual ~LwIP_message() = default;
 };
 

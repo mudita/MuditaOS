@@ -72,98 +72,101 @@ sys::Message_t ServiceEink::DataReceivedHandler(sys::DataMessage* msgl,sys::Resp
 
 	switch( msg->messageType ) {
 
-		case static_cast<uint32_t>(MessageType::EinkImageData): {
-			stopTimer(timerPowerOffID);
-			auto dmsg = static_cast<seink::ImageMessage*>( msgl );
-//			LOG_INFO("[%s] EinkImageData", GetName().c_str());
-			memcpy( einkRenderBuffer, dmsg->getData(), dmsg->getSize() );
-			deepRefresh = dmsg->getDeepRefresh();
+    case MessageType::EinkImageData: {
+        stopTimer(timerPowerOffID);
+        auto dmsg = static_cast<seink::ImageMessage *>(msgl);
+        //			LOG_INFO("[%s] EinkImageData", GetName().c_str());
+        memcpy(einkRenderBuffer, dmsg->getData(), dmsg->getSize());
+        deepRefresh = dmsg->getDeepRefresh();
 
-			shutdownInProgress = dmsg->getShutdown();
-			if(shutdownInProgress)
-				LOG_DEBUG("Shutdown In Progress");
+        shutdownInProgress = dmsg->getShutdown();
+        if (shutdownInProgress)
+            LOG_DEBUG("Shutdown In Progress");
 
-			suspendInProgress = dmsg->getSuspend();
-			if(suspendInProgress)
-				LOG_DEBUG("Suspend In Progress");
-			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer );
-			sys::Bus::SendUnicast(msg, this->GetName(), this);
-		} break;
-		case static_cast<uint32_t>(MessageType::EinkDMATransfer): {
+        suspendInProgress = dmsg->getSuspend();
+        if (suspendInProgress)
+            LOG_DEBUG("Suspend In Progress");
+        auto msg = std::make_shared<sgui::GUIMessage>(MessageType::EinkDMATransfer);
+        sys::Bus::SendUnicast(msg, this->GetName(), this);
+    }
+    break;
+    case MessageType::EinkDMATransfer: {
 
-//			LOG_INFO("[%s] EinkDMATransfer", GetName().c_str());
-//			uint32_t start_tick = xTaskGetTickCount();
+        //			LOG_INFO("[%s] EinkDMATransfer", GetName().c_str());
+        //			uint32_t start_tick = xTaskGetTickCount();
 
-			if( suspended ) {
-				if( suspendInProgress ) {
-					LOG_ERROR("drawing before suspend failed");
-					suspendInProgress = false;
-				}
+        if (suspended)
+        {
+            if (suspendInProgress)
+            {
+                LOG_ERROR("drawing before suspend failed");
+                suspendInProgress = false;
+            }
 
-				LOG_INFO("[ServiceEink] Received image while suspended, ignoring");
-			}
+            LOG_INFO("[ServiceEink] Received image while suspended, ignoring");
+        }
 
-			else {
-				EinkPowerOn();
+        else
+        {
+            EinkPowerOn();
 
-				int32_t temperature = EinkGetTemperatureInternal();
-	//			LOG_INFO("temperature: %d", temperature );
+            int32_t temperature = EinkGetTemperatureInternal();
+            //			LOG_INFO("temperature: %d", temperature );
 
-				EinkStatus_e ret;
-				if( deepRefresh ) {
-					changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
-					EinkDitherDisplay();
-				}
-				else{
-					changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
-				}
+            EinkStatus_e ret;
+            if (deepRefresh)
+            {
+                changeWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+                EinkDitherDisplay();
+            }
+            else
+            {
+                changeWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+            }
 
-				ret =
-				EinkUpdateFrame ( 0,
-								  0,
-								  480,
-								  600,
-								  einkRenderBuffer,
-								  Eink4Bpp,
-								  EinkDisplayColorModeStandard );
-				if( ret != EinkOK )
-					LOG_FATAL("Failed to update frame");
+            ret = EinkUpdateFrame(0, 0, 480, 600, einkRenderBuffer, Eink4Bpp, EinkDisplayColorModeStandard);
+            if (ret != EinkOK)
+                LOG_FATAL("Failed to update frame");
 
-				if( deepRefresh ) {
-	//				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
-					ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode );
-				}
-				else{
-	//				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
-					ret = EinkRefreshImage (0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode );
-				}
+            if (deepRefresh)
+            {
+                //				LOG_INFO("EinkDisplayTimingsDeepCleanMode");
+                ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsDeepCleanMode);
+            }
+            else
+            {
+                //				LOG_INFO("EinkDisplayTimingsFastRefreshMode");
+                ret = EinkRefreshImage(0, 0, 480, 600, EinkDisplayTimingsFastRefreshMode);
+            }
 
-				if( ret != EinkOK )
-					LOG_FATAL("Failed to refresh frame");
-	//			uint32_t end_tick = xTaskGetTickCount();
+            if (ret != EinkOK)
+                LOG_FATAL("Failed to refresh frame");
+            //			uint32_t end_tick = xTaskGetTickCount();
 
-				ReloadTimer(timerPowerOffID);
+            ReloadTimer(timerPowerOffID);
 
-				auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress, shutdownInProgress );
-				suspendInProgress = false;
-				shutdownInProgress = false;
-				sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-			}
+            auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady, suspendInProgress, shutdownInProgress);
+            suspendInProgress = false;
+            shutdownInProgress = false;
+            sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+        }
+    }
+    break;
 
-		} break;
+    case MessageType::EinkTemperatureUpdate: {
+        //			LOG_INFO("[%s] EinkTemperatureUpdate", GetName().c_str());
+    }
+    break;
 
-		case static_cast<uint32_t>(MessageType::EinkTemperatureUpdate): {
-//			LOG_INFO("[%s] EinkTemperatureUpdate", GetName().c_str());
-		} break;
+    case MessageType::EinkStateRequest: {
+        //			LOG_INFO("[%s] EinkStateRequest", GetName().c_str());
+        auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady);
+        sys::Bus::SendUnicast(msg, "ServiceGUI", this);
+    }
+    break;
 
-		case static_cast<uint32_t>(MessageType::EinkStateRequest ): {
-//			LOG_INFO("[%s] EinkStateRequest", GetName().c_str());
-			auto msg = std::make_shared<sgui::GUIMessage>(MessageType::GUIDisplayReady );
-			sys::Bus::SendUnicast(msg, "ServiceGUI", this);
-		} break;
-
-		default:
-		    break;
+    default:
+        break;
 
 	};
 

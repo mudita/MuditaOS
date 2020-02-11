@@ -40,14 +40,15 @@ sys::Message_t ApplicationPhonebook::DataReceivedHandler(sys::DataMessage *msgl,
     if (resp != nullptr)
     {
         handled = true;
-        uint32_t msgType = resp->responseTo;
-        switch (msgType)
+        switch (resp->responseTo)
         {
-        case static_cast<uint32_t>(MessageType::DBContactGetLimitOffset): {
+        case MessageType::DBContactGetLimitOffset: {
             if (getCurrentWindow()->onDatabaseMessage(resp))
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         break;
+        default:
+            break;
         }
     }
 
