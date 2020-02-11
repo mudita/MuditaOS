@@ -155,7 +155,10 @@ void VirtualAppManager::debug_log_app_list()
     {
         apps += "-> " + el->name() + " " + app::Application::stateStr(el->getState()) + "\n";
     }
+
+#if DEBUG_APPLICATION_MANAGEMENT == 1
     LOG_DEBUG(apps.c_str());
+#endif
 }
 
 ApplicationManager::ApplicationManager(const std::string &name, sys::SystemManager *sysmgr, std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers)
@@ -212,68 +215,82 @@ bool ApplicationManager::closeApplications() {
 
 sys::Message_t ApplicationManager::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
-	uint32_t msgType = msgl->messageType;
+    auto msgType = msgl->messageType;
 
-	switch( msgType ) {
-		case static_cast<uint32_t>( MessageType::APMInitPowerSaveMode ): {
-			handlePowerSavingModeInit();
-		} break;
-		case static_cast<uint32_t>( MessageType::APMPreventBlocking ): {
-//			LOG_INFO("Restarting screen locking timer");
-			ReloadTimer(blockingTimerID);
-		} break;
-		case static_cast<uint32_t>(MessageType::APMSwitch): {
-			sapm::APMSwitch* msg = reinterpret_cast<sapm::APMSwitch*>( msgl );
-			handleSwitchApplication( msg );
-		}break;
-		case static_cast<uint32_t>(MessageType::APMSwitchPrevApp): {
-			sapm::APMSwitchPrevApp* msg = reinterpret_cast<sapm::APMSwitchPrevApp*>( msgl );
-            if (!handleSwitchPrevApplication(msg))
-            {
-                LOG_ERROR("Switch from app: failed", msg->getSenderName().c_str());
-            }
-        }break;
-		case static_cast<uint32_t>(MessageType::APMConfirmSwitch): {
-			sapm::APMConfirmSwitch* msg = reinterpret_cast<sapm::APMConfirmSwitch*>( msgl );
-			handleSwitchConfirmation( msg );
-		}break;
-		case static_cast<uint32_t>(MessageType::APMConfirmClose): {
-			sapm::APMConfirmClose* msg = reinterpret_cast<sapm::APMConfirmClose*>( msgl );
-			LOG_INFO("APMConfirmClose %s", msg->getSenderName().c_str());
-			handleCloseConfirmation( msg );
+    switch( msgType ) {
+    case MessageType::APMInitPowerSaveMode: {
+        handlePowerSavingModeInit();
+    }
+    break;
+    case MessageType::APMPreventBlocking: {
+        //			LOG_INFO("Restarting screen locking timer");
+        ReloadTimer(blockingTimerID);
+    }
+    break;
+    case MessageType::APMSwitch: {
+        sapm::APMSwitch *msg = reinterpret_cast<sapm::APMSwitch *>(msgl);
+        handleSwitchApplication(msg);
+    }
+    break;
+    case MessageType::APMSwitchPrevApp: {
+        sapm::APMSwitchPrevApp *msg = reinterpret_cast<sapm::APMSwitchPrevApp *>(msgl);
+        if (!handleSwitchPrevApplication(msg))
+        {
+            LOG_ERROR("Switch from app: failed", msg->getSenderName().c_str());
+        }
+    }
+    break;
+    case MessageType::APMConfirmSwitch: {
+        sapm::APMConfirmSwitch *msg = reinterpret_cast<sapm::APMConfirmSwitch *>(msgl);
+        handleSwitchConfirmation(msg);
+    }
+    break;
+    case MessageType::APMConfirmClose: {
+        sapm::APMConfirmClose *msg = reinterpret_cast<sapm::APMConfirmClose *>(msgl);
+        LOG_INFO("APMConfirmClose %s", msg->getSenderName().c_str());
+        handleCloseConfirmation(msg);
 
-			//if application manager was waiting for close confirmation and name of the application
-			//for launching is defined then start application function is called
-            if ((getState() == State::WAITING_CLOSE_CONFIRMATION) && (launchApplicationName.empty() == false))
-            {
-                startApplication( launchApplicationName );
-            }
-        }break;
-		case static_cast<int32_t>(MessageType::APMDeleydClose) : {
-			sapm::APMDelayedClose* msg = reinterpret_cast<sapm::APMDelayedClose*>( msgl );
-			LOG_INFO("APMDeleydClose %s", msg->getApplication().c_str() );
-			sys::SystemManager::DestroyService(msg->getApplication().c_str(),this);
-		} break;
-		case static_cast<int32_t>(MessageType::APMRegister) : {
-			sapm::APMRegister* msg = reinterpret_cast<sapm::APMRegister*>( msgl );
-            LOG_INFO("APMregister [%s] (%s)", msg->getSenderName().c_str(), (msg->getStatus() ? "true" : "false"));
-            handleRegisterApplication( msg );
-		} break;
-		case static_cast<int32_t>(MessageType::APMChangeLanguage) : {
-			sapm::APMChangeLanguage* msg = reinterpret_cast<sapm::APMChangeLanguage*>( msgl );
-			std::string lang;
-			if( msg->getLanguage() == utils::Lang::En ) lang = "English";
-			if( msg->getLanguage() == utils::Lang::Pl ) lang = "Polish";
-			if( msg->getLanguage() == utils::Lang::De ) lang = "German";
-			if( msg->getLanguage() == utils::Lang::Sp ) lang = "Spanish";
-			LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
-			handleLanguageChange( msg );
-		} break;
-		case static_cast<uint32_t>(MessageType::APMClose): {
-			closeApplications();
-			closeServices();
-		} break;
-		default : {
+        // if application manager was waiting for close confirmation and name of the application
+        // for launching is defined then start application function is called
+        if ((getState() == State::WAITING_CLOSE_CONFIRMATION) && (launchApplicationName.empty() == false))
+        {
+            startApplication(launchApplicationName);
+        }
+    }
+    break;
+    case MessageType::APMDeleydClose: {
+        sapm::APMDelayedClose *msg = reinterpret_cast<sapm::APMDelayedClose *>(msgl);
+        LOG_INFO("APMDeleydClose %s", msg->getApplication().c_str());
+        sys::SystemManager::DestroyService(msg->getApplication().c_str(), this);
+    }
+    break;
+    case MessageType::APMRegister: {
+        sapm::APMRegister *msg = reinterpret_cast<sapm::APMRegister *>(msgl);
+        LOG_INFO("APMregister [%s] (%s)", msg->getSenderName().c_str(), (msg->getStatus() ? "true" : "false"));
+        handleRegisterApplication(msg);
+    }
+    break;
+    case MessageType::APMChangeLanguage: {
+        sapm::APMChangeLanguage *msg = reinterpret_cast<sapm::APMChangeLanguage *>(msgl);
+        std::string lang;
+        if (msg->getLanguage() == utils::Lang::En)
+            lang = "English";
+        if (msg->getLanguage() == utils::Lang::Pl)
+            lang = "Polish";
+        if (msg->getLanguage() == utils::Lang::De)
+            lang = "German";
+        if (msg->getLanguage() == utils::Lang::Sp)
+            lang = "Spanish";
+        LOG_INFO("APChangeLanguage; %s %s", msg->getSenderName().c_str(), lang.c_str());
+        handleLanguageChange(msg);
+    }
+    break;
+    case MessageType::APMClose: {
+        closeApplications();
+        closeServices();
+    }
+    break;
+    default: {
 		} break;
 	};
 

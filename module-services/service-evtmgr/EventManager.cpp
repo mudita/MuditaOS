@@ -56,13 +56,13 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
         bsp::harness::emit(harness::AtResponse(msg->response).encode());
         handled = true;
     }
-    else if (msgl->messageType == static_cast<uint32_t>(MessageType::DBServiceNotification))
+    if (msgl->messageType == MessageType::DBServiceNotification)
     {
-        DBNotificationMessage *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+        auto *msg = dynamic_cast<DBNotificationMessage *>(msgl);
         if (msg != nullptr)
         {
             if ((msg->baseType == DB::BaseType::AlarmDB) &&
-                ((msg->notificationType == DB::NotificatonType::Updated) || (msg->notificationType == DB::NotificatonType::Added)))
+                ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added)))
             {
                 alarmDBEmpty = false;
                 alarmIsValid = false;
@@ -70,12 +70,16 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
             }
         }
     }
-    if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) &&
-		msgl->sender == this->GetName()) {
+    else if (msgl->messageType == MessageType::EVM_GPIO)
+    {
+        LOG_DEBUG("EVM_GPIO msg");
+    }
+    else if (msgl->messageType == MessageType::KBDKeyEvent && msgl->sender == this->GetName())
+    {
 
-		sevm::KbdMessage* msg = reinterpret_cast<sevm::KbdMessage*>(msgl);
+        auto *msg = reinterpret_cast<sevm::KbdMessage *>(msgl);
 
-		auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
+        auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
         if (suspended && (message->key.state == RawKey::State::Pressed))
@@ -92,9 +96,9 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		sapm::ApplicationManager::messagePreventBlocking(this);
 		handled = true;
 	}
-    else if (msgl->messageType == static_cast<uint32_t>(MessageType::EVMFocusApplication))
+    else if (msgl->messageType == MessageType::EVMFocusApplication)
     {
-        sevm::EVMFocusApplication* msg = reinterpret_cast<sevm::EVMFocusApplication*>( msgl );
+        auto *msg = reinterpret_cast<sevm::EVMFocusApplication *>(msgl);
 		if( msg->sender == "ApplicationManager" ) {
 			targetApplication = msg->getApplication();
 			handled = true;
@@ -102,8 +106,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
             bsp::harness::emit(harness::FocusApp(targetApplication).encode());
         }
     }
-    else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) &&
-		msgl->sender == this->GetName()) {
+    else if (msgl->messageType == MessageType::EVMBatteryLevel && msgl->sender == this->GetName())
+    {
 		sevm::BatteryLevelMessage* msg = reinterpret_cast<sevm::BatteryLevelMessage*>(msgl);
 
 		if( suspended ) {
@@ -120,10 +124,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 		}
 
 		handled = true;
-	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) &&
-		msgl->sender == this->GetName()) {
-		sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
+    }
+    else if (msgl->messageType == MessageType::EVMChargerPlugged && msgl->sender == this->GetName())
+    {
+        sevm::BatteryPlugMessage* msg = reinterpret_cast<sevm::BatteryPlugMessage*>(msgl);
 
 		if( suspended ) {
 			suspended = false;
@@ -137,11 +141,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage* msgl,sys::Res
 			sys::Bus::SendUnicast(message, targetApplication, this);
 		}
 		handled = true;
-	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated) &&
-			msgl->sender == this->GetName() ){
+    }
+    else if (msgl->messageType == MessageType::EVMMinuteUpdated && msgl->sender == this->GetName())
+    {
 
-		//resume system first
+        //resume system first
 		if( suspended ) {
 			//suspended = false;
 			//sys::SystemManager::ResumeSystem(this);

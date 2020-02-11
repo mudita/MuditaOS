@@ -68,7 +68,7 @@ namespace sys {
     Message_t ResponseMessage::Execute(Service *service) {
         // Ignore incoming data message if this service is not yet initialized
         if(service->isReady){
-            DataMessage dummy(0);
+            DataMessage dummy(MessageType::MessageTypeUninitialized);
             return service->DataReceivedHandler(&dummy,this);
         }
         else{
@@ -80,4 +80,4 @@ namespace sys {
     uint32_t Message::unitestsMsgInstancesCount=0;
 #endif
 
-}
+} // namespace sys
