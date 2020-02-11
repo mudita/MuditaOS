@@ -24,10 +24,10 @@ extern "C"
 #endif
 using namespace json11;
 
-static Json fileItem(const vfs::DirectoryEntry &e)
-{
-    return (Json::object{{"name", e.fileName}, {"size", (int)e.fileSize}, {"attrs", (int)e.attributes}});
-}
+// static Json fileItem(const vfs::DirectoryEntry &e)
+// {
+//     return (Json::object{{"name", e.fileName}, {"size", (int)e.fileSize}, {"attrs", (int)e.attributes}});
+// }
 
 static Json contactItem(const ContactRecord &item)
 {

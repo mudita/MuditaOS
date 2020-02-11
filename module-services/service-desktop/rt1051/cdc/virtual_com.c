@@ -46,15 +46,17 @@ extern uint8_t USB_EnterLowpowerMode(void);
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-void BOARD_InitHardware(void);
+// void BOARD_InitHardware(void);
 void USB_DeviceClockInit(void);
 void USB_DeviceIsrEnable(void);
+void USB_DeviceEhciIsrFunction(usb_device_handle);
 #if USB_DEVICE_CONFIG_USE_TASK
 void USB_DeviceTaskFn(void *deviceHandle);
 #endif
-
+// void BOARD_ConfigMPU(void);
 void BOARD_DbgConsole_Deinit(void);
 void BOARD_DbgConsole_Init(void);
+void BOARD_InitDebugConsole(void);
 usb_status_t USB_DeviceCdcVcomCallback(class_handle_t handle, uint32_t event, void *param);
 usb_status_t USB_DeviceCallback(usb_device_handle handle, uint32_t event, void *param);
 
@@ -605,9 +607,9 @@ int virtual_com(void)
 void virtual_com(void)
 #endif
 {
-    BOARD_ConfigMPU();
+    // BOARD_ConfigMPU();
 
-    BOARD_InitPins();
+    // BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
 
