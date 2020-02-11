@@ -3,4 +3,4 @@
 
 int desktopServiceInit();
 void desktopServiceReceive(void *pointer);
-int desktopServiceSend(int fd, uint8_t *data, size_t dataSize);
+void desktopServiceSend(void *pointer);

@@ -35,7 +35,8 @@ class ServiceDesktop : public sys::Service
     void sendRecordsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count, bool favourite);
 
     static const char *serviceName;
-    xTaskHandle taskHandle;
+    xTaskHandle taskHandleReceive;
+    xTaskHandle taskHandleSend;
     bool isRunning;
     int ptyDescriptor;
 };

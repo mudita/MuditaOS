@@ -10,7 +10,9 @@
 #include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
+#include <queue.h>
 extern int errno;
+extern xQueueHandle queueHandleBuffer;
 
 void desktopServiceReceive(void *pointer)
 {
@@ -24,6 +26,8 @@ void desktopServiceReceive(void *pointer)
         ssize_t ret = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
         if (ret > 0)
         {
+            LOG_DEBUG("Received: %d signs", ret);
+            xQueueSend(queueHandleBuffer, inputData, portMAX_DELAY);
             owner->dataReceived(inputData, ret);
         }
     }
@@ -31,17 +35,28 @@ void desktopServiceReceive(void *pointer)
     LOG_INFO("exit");
 }
 
-int desktopServiceSend(int fd, uint8_t *data, size_t dataSize)
+void desktopServiceSend(void *pointer)
 {
-    size_t t = write(fd, data, dataSize);
-    if (t >= 0)
+    ServiceDesktop *owner = (ServiceDesktop *)pointer;
+
+    static uint8_t outputData[SERIAL_BUFFER_LEN];
+
+    while (1)
     {
-        return (t);
-    }
-    else
-    {
-        LOG_ERROR("writing to PTY failed with code: %d", errno);
-        return (-1);
+        if (xQueueReceive(queueHandleBuffer, outputData, portMAX_DELAY))
+        {
+
+            size_t t = write(owner->getPtyDescriptor(), outputData, sizeof(outputData));
+            if (t >= 0)
+            {
+                LOG_DEBUG("Send: %d signs", t);
+            }
+            else
+            {
+                LOG_ERROR("writing to PTY failed with code: %d", errno);
+            }
+
+        }
     }
 }
 

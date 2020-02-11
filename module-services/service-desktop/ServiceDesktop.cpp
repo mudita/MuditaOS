@@ -12,6 +12,7 @@
 #include "parser/EndpointFsm.hpp"
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
+xQueueHandle queueHandleBuffer(nullptr);
 
 #if defined(TARGET_RT1051)
 extern "C"
@@ -29,27 +30,27 @@ using namespace json11;
 //     return (Json::object{{"name", e.fileName}, {"size", (int)e.fileSize}, {"attrs", (int)e.attributes}});
 // }
 
-static Json contactItem(const ContactRecord &item)
-{
-    const std::string primaryNumber = (item.numbers.size() > 0) ? item.numbers[0].numberE164.c_str() : "";
-    const std::string secondaryNumber = (item.numbers.size() == 2) ? item.numbers[1].numberE164.c_str() : "";
+// static Json contactItem(const ContactRecord &item)
+//{
+//    const std::string primaryNumber = (item.numbers.size() > 0) ? item.numbers[0].numberE164.c_str() : "";
+//    const std::string secondaryNumber = (item.numbers.size() == 2) ? item.numbers[1].numberE164.c_str() : "";
+//
+//    return (Json::object{
+//        {"dbID", static_cast<int>(item.dbID)},
+//        {"primaryName", item.primaryName.c_str()},
+//        {"alternativeName", item.alternativeName.c_str()},
+//        {"contactType", static_cast<int>(item.contactType)},
+//        {"country", item.country.c_str()},
+//        {"city", item.city.c_str()},
+//        {"street", item.street.c_str()},
+//        {"primaryNumber", primaryNumber.c_str()},
+//        {"secondaryNumber", secondaryNumber.c_str()},
+//        {"note", item.note.c_str()},
+//        {"mail", item.mail.c_str()}
+//    });
+//};
 
-    return (Json::object{
-        {"dbID", static_cast<int>(item.dbID)},
-        {"primaryName", item.primaryName.c_str()},
-        {"alternativeName", item.alternativeName.c_str()},
-        {"contactType", static_cast<int>(item.contactType)},
-        {"country", item.country.c_str()},
-        {"city", item.city.c_str()},
-        {"street", item.street.c_str()},
-        {"primaryNumber", primaryNumber.c_str()},
-        {"secondaryNumber", secondaryNumber.c_str()},
-        {"note", item.note.c_str()},
-        {"mail", item.mail.c_str()}
-    });
-};
-
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName), taskHandle(nullptr), ptyDescriptor(-1)
+ServiceDesktop::ServiceDesktop() : sys::Service(serviceName), taskHandleReceive(nullptr), taskHandleSend(nullptr), ptyDescriptor(-1)
 {
     LOG_DEBUG("ServiceDesktop::ctor");
 }
@@ -63,12 +64,23 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     }
     else
     {
-        BaseType_t task_error = xTaskCreate(desktopServiceReceive, "USBRead", SERIAL_BUFFER_LEN * 8, this, tskIDLE_PRIORITY, &taskHandle);
+
+        queueHandleBuffer = xQueueCreate(10, sizeof(uint8_t[SERIAL_BUFFER_LEN]));
+
+        BaseType_t task_error = xTaskCreate(desktopServiceReceive, "USBReceive", SERIAL_BUFFER_LEN * 8, this, tskIDLE_PRIORITY, &taskHandleReceive);
         if (task_error != pdPASS)
         {
             LOG_ERROR("failed to start freertos core task");
             return (sys::ReturnCodes::Failure);
         }
+
+        task_error = xTaskCreate(desktopServiceSend, "USBSend", SERIAL_BUFFER_LEN * 8, this, tskIDLE_PRIORITY, &taskHandleSend);
+        if (task_error != pdPASS)
+        {
+            LOG_ERROR("failed to start freertos core task");
+            return (sys::ReturnCodes::Failure);
+        }
+
     }
 
     fsm_list::start();
@@ -83,53 +95,53 @@ sys::ReturnCodes ServiceDesktop::DeinitHandler()
 
 sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
-    // handle database response
-    if (resp != nullptr)
-    {
-        uint32_t msgType = resp->responseTo;
-        switch (msgType)
-        {
-        case static_cast<uint32_t>(MessageType::DBContactGetLimitOffset): {
-            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
-            LOG_DEBUG("DBContactGetLimitOffset count=%d offset=%d favs=%d", dbResp->count, dbResp->offset, dbResp->favourite);
-            sendRecordsInResponse(std::move(dbResp->records), dbResp->offset, dbResp->limit, dbResp->count, dbResp->favourite);
-            break;
-        }
-        case static_cast<uint32_t>(MessageType::DBContactGetCount): {
-            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
-            LOG_DEBUG("DBContactGetCount: %d", dbResp->count);
-            Json json = Json::object{{"count", (int)dbResp->count}};
-            std::string responseStr = json.dump();
-            sendData(responseStr.c_str(), responseStr.length());
-            break;
-        }
-        case static_cast<uint32_t>(MessageType::DBContactGetByID): {
-            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
-            ContactRecord contact_record = dbResp->records->front();
-            Json json = contactItem(contact_record);
-            std::string responseStr = json.dump();
-            LOG_DEBUG("DBContactGetByID: %s", responseStr.c_str());
-            sendData(responseStr.c_str(), responseStr.length());
-            break;
-        }
-        break;
-        }
-    }
+//    // handle database response
+//    if (resp != nullptr)
+//    {
+//        uint32_t msgType = resp->responseTo;
+//        switch (msgType)
+//        {
+//        case static_cast<uint32_t>(MessageType::DBContactGetLimitOffset): {
+//            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
+//            LOG_DEBUG("DBContactGetLimitOffset count=%d offset=%d favs=%d", dbResp->count, dbResp->offset, dbResp->favourite);
+//            sendRecordsInResponse(std::move(dbResp->records), dbResp->offset, dbResp->limit, dbResp->count, dbResp->favourite);
+//            break;
+//        }
+//        case static_cast<uint32_t>(MessageType::DBContactGetCount): {
+//            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
+//            LOG_DEBUG("DBContactGetCount: %d", dbResp->count);
+//            Json json = Json::object{{"count", (int)dbResp->count}};
+//            std::string responseStr = json.dump();
+//            sendData(responseStr.c_str(), responseStr.length());
+//            break;
+//        }
+//        case static_cast<uint32_t>(MessageType::DBContactGetByID): {
+//            DBContactResponseMessage *dbResp = reinterpret_cast<DBContactResponseMessage *>(resp);
+//            ContactRecord contact_record = dbResp->records->front();
+//            Json json = contactItem(contact_record);
+//            std::string responseStr = json.dump();
+//            LOG_DEBUG("DBContactGetByID: %s", responseStr.c_str());
+//            sendData(responseStr.c_str(), responseStr.length());
+//            break;
+//        }
+//        break;
+//        }
+//    }
     return std::make_shared<sys::ResponseMessage>();
 }
 
-void ServiceDesktop::sendRecordsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count,
-                                          bool favourite)
-{
-    std::vector<ContactRecord> contacts = *records.get();
-    Json::array contactsResponse;
-    for (uint32_t i = 0; i < contacts.size(); i++)
-    {
-        contactsResponse.push_back(contactItem(contacts[i]));
-    }
-    const std::string responseStr = Json(contactsResponse).dump();
-    sendData(responseStr.c_str(), responseStr.length());
-}
+//void ServiceDesktop::sendRecordsInResponse(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count,
+//                                          bool favourite)
+//{
+//    std::vector<ContactRecord> contacts = *records.get();
+//    Json::array contactsResponse;
+//    for (uint32_t i = 0; i < contacts.size(); i++)
+//    {
+//        contactsResponse.push_back(contactItem(contacts[i]));
+//    }
+//    const std::string responseStr = Json(contactsResponse).dump();
+//    sendData(responseStr.c_str(), responseStr.length());
+//}
 
 sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
@@ -144,10 +156,10 @@ int ServiceDesktop::getPtyDescriptor()
 /*
  * send data to the application
  */
-int ServiceDesktop::sendData(const char *rawDataToSend, size_t rawDataSize)
-{
-    return (desktopServiceSend(ptyDescriptor, (uint8_t *)rawDataToSend, rawDataSize));
-}
+//int ServiceDesktop::sendData(const char *rawDataToSend, size_t rawDataSize)
+//{
+//    return (desktopServiceSend(ptyDescriptor, (uint8_t *)rawDataToSend, rawDataSize));
+//}
 
 void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
 {

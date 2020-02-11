@@ -1,6 +1,8 @@
 #include "EndpointHandler.hpp"
-#include "json/json11.hpp"
 #include "ParserUtils.hpp"
+#include "json/json11.hpp"
+#include <algorithm>
+
 #if defined(TARGET_RT1051)
 extern "C"
 {
@@ -11,6 +13,7 @@ extern "C"
 #include "../linux/Worker.hpp"
 #endif
 
+extern xQueueHandle queueHandleBuffer;
 
 sys::ReturnCodes EndpointHandler::battery(uint8_t method, uint8_t fd)
 {
@@ -35,7 +38,12 @@ sys::ReturnCodes EndpointHandler::battery(uint8_t method, uint8_t fd)
         std::string responseHeaderStr = "#" + responseSizeStr;
         std::string responseStr = responseHeaderStr + responsePayloadJson.dump();
         LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
-        desktopServiceSend(fd, (uint8_t *)responseStr.c_str(), responseStr.length());
+
+        uint8_t outputData[SERIAL_BUFFER_LEN];
+        std::copy(responseStr.begin(), responseStr.end(), outputData);
+        xQueueSend(queueHandleBuffer, outputData, portMAX_DELAY);
+
+//        desktopServiceSend(fd, (uint8_t *)responseStr.c_str(), responseStr.length());
         return sys::ReturnCodes::Success;
     }
     return sys::ReturnCodes::Failure;
