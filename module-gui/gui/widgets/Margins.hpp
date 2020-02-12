@@ -8,16 +8,20 @@
 #ifndef MIDDLEWARES_GUI_WIDGETS_MARGINS_HPP_
 #define MIDDLEWARES_GUI_WIDGETS_MARGINS_HPP_
 
-namespace gui {
+#include "core/Axes.hpp"
 
-class Margins {
-public:
-	short left, top, right, bottom;
+namespace gui
+{
 
-	Margins();
-	Margins( const short left, const short top, const short right, const short bottom );
-	virtual ~Margins();
-};
+    class Margins
+    {
+      public:
+        short left, top, right, bottom;
+        short getAlong(Axis axis) const;
+        Margins();
+        Margins(const short left, const short top, const short right, const short bottom);
+        virtual ~Margins();
+    };
 
 } /* namespace gui */
 

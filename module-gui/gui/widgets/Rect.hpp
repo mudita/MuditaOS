@@ -35,6 +35,8 @@ public:
 	RectangleCornerFlags corners;
 	//flags that define whether to paint japs. small protrusions indicating a speech bubble
 	RectangleYapFlags yaps;
+    // a yap size (if present). size is horizontal width.
+    unsigned short yapSize = 0;
 
   public:
 
@@ -49,7 +51,8 @@ public:
 	void setEdges( RectangleEdgeFlags edges );
 	void setCorners( RectangleCornerFlags corners );
 	void setFlat( RectangleFlatFlags flats);
-    void setYaps(RectangleYapFlags yaps);
+    void setYaps( RectangleYapFlags yaps);
+    void setYapSize( unsigned short value);
     void setFilled( bool val );
 
 	//virtaul methods

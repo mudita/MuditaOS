@@ -120,7 +120,8 @@ public:
     //flags indicating yaps for speech bubbles, it takes precendece over other properties
     RectangleYapFlags yaps;
     //defines which of the edges and corners are painted
-	bool filled;
+    unsigned short yapSize = 0;
+    bool filled;
 	uint8_t penWidth;
 	Color fillColor;
 	Color borderColor;
@@ -130,6 +131,7 @@ public:
 			flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT},
 			corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
 			yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS},
+			yapSize{0},
 			filled{false},
 			penWidth{1},
 			fillColor( ColorFullBlack ), borderColor( ColorFullBlack ) {

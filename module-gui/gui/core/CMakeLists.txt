@@ -12,6 +12,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/ImageMap.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/VecMap.cpp"
 	PUBLIC
+		"${CMAKE_CURRENT_LIST_DIR}/Axes.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Color.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/DrawCommand.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Font.hpp"
