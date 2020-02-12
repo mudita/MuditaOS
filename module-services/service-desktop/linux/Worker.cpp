@@ -3,20 +3,18 @@
 #include <fcntl.h>
 #include <iostream>
 #include <log/log.hpp>
-#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <termios.h>
 #include <unistd.h>
 #include <queue.h>
+
 extern int errno;
 extern xQueueHandle queueHandleBuffer;
 
-void desktopServiceReceive(void *pointer)
+void desktopServiceReceive(void *ptr)
 {
-    ServiceDesktop *owner = (ServiceDesktop *)pointer;
+    ServiceDesktop *owner = (ServiceDesktop *)ptr;
 
     int fd = owner->getPtyDescriptor();
     LOG_INFO("start reading on fd:%d", owner->getPtyDescriptor());
@@ -35,9 +33,9 @@ void desktopServiceReceive(void *pointer)
     LOG_INFO("exit");
 }
 
-void desktopServiceSend(void *pointer)
+void desktopServiceSend(void *ptr)
 {
-    ServiceDesktop *owner = (ServiceDesktop *)pointer;
+    ServiceDesktop *owner = (ServiceDesktop *)ptr;
 
     static uint8_t outputData[SERIAL_BUFFER_LEN];
 
