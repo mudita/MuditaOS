@@ -33,14 +33,14 @@ namespace bsp{
 class ATParser : public at::Chanel
 {
   public:
-
-    enum class Urc{
+    enum class Urc
+    {
         MeInitializationSuccessful,
         FullFuncionalityAvailable,
         SimCardReady,
         SMSInitializationComplete,
-        PhonebookInitializationComplete
-
+        PhonebookInitializationComplete,
+        NotHandled,
     };
 
     ATParser(bsp::Cellular* cellular);

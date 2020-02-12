@@ -15,28 +15,6 @@ STX = b'\x02'
 CTX = b'\x03'
 
 
-class GPIO:
-    '''
-    GPIO input output class boilerplate
-    '''
-
-    def dumps(self):
-        '''
-        default object <- json encoder
-        '''
-        return json.dumps(self.__dict__)
-
-    def __init__(self, num, what, state):
-        '''
-        which - which gpio to trigger
-        mode - 1 output 0 input
-        value - on write: set HI, on read: read HI
-        '''
-        self.num = num
-        self.what = what
-        self.state = state
-
-
 class Serial:
 
     def __init__(self, uart='/dev/ttyACM0'):
@@ -72,22 +50,27 @@ class Serial:
         '''
         writes data on serial in frame needed for harness
         '''
-        self.ser.write(STX)
+        size = self.ser.write(STX)
         data = {
             "t": code,
             "d": val
         }
-        self.ser.write(json.dumps(data).encode())
-        self.ser.write(CTX)
+        size += self.ser.write(json.dumps(data).encode())
+        log.info("-> write: {}".format(json.dumps(data)))
+        size += self.ser.write(CTX)
+        if size != 2 + len(json.dumps(data).encode()):
+            log.error("-> error write bad size! {}".format(size))
+        else:
+            log.info("-> success")
 
     def read(self, val) -> str:
         buff = bytearray()
         start = time.time()
         while 1:
             ch = self.ser.read()
-            if ch == b'\x02':
+            if ch == STX:
                 buff = bytearray()
-            elif ch == b'\x03':
+            elif ch == CTX:
                 return buff.decode()
             else:
                 buff += ch
@@ -108,8 +91,8 @@ class Serial:
         '''
         self.write(CMD_GSM, val)
 
-    def gpio(self, gpio: GPIO):
+    def gpio(self, val):
         '''
         GPIO phone request
         '''
-        self.write(CMD_GPIO, gpio.dumps())
+        self.write(CMD_GPIO, val)
