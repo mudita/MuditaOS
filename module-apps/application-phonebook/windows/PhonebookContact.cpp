@@ -87,10 +87,12 @@ void PhonebookContact::buildInterface()
         addLabel(&page1, 328, 237, 32, 53, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP,
                  Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     numberPrimaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
-        if (input.keyCode == KeyCode::KEY_ENTER)
+        if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort)
         {
+            LOG_DEBUG("numberPrimayLabel->inputCallback switch to call window");
             return app::ApplicationCall::messageSwitchToCall(application, contact->numbers[0].numberE164.c_str());
         }
+        LOG_DEBUG("numberPrimayLabel->inputCallback just return false");
         return (false);
     };
 
@@ -109,9 +111,11 @@ void PhonebookContact::buildInterface()
     numberPrimaryMessageLabel->inputCallback = [=](Item &item, const InputEvent &input) {
         if (input.keyCode == KeyCode::KEY_ENTER)
         {
+            LOG_DEBUG("numberPrimayLabel->inputCallback switch to sms window");
             return sapm::ApplicationManager::messageSwitchApplication(application, app::name_messages, gui::name::window::thread_view,
                                                                       std::make_unique<SMSSendRequest>(contact));
         }
+        LOG_DEBUG("numberPrimaryMessageLabel->inputCallback just return false");
         return (false);
     };
 
@@ -355,7 +359,6 @@ bool PhonebookContact::handleSwitchData(SwitchData *data)
 
 bool PhonebookContact::onInput(const InputEvent &inputEvent)
 {
-    LOG_INFO("PhonebookContact::onInput state: %d keyCode: %d", inputEvent.state, inputEvent.keyCode);
     if ((inputEvent.state != InputEvent::State::keyReleasedShort) && ((inputEvent.state != InputEvent::State::keyReleasedLong)) &&
         inputEvent.keyCode == KeyCode::KEY_LF)
     {

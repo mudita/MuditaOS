@@ -9,12 +9,13 @@ namespace harness
 
     std::shared_ptr<sys::DataMessage> parseKeyPress(json11::Json &js)
     {
-        auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
-        if (js["d"].is_array() != true)
+        auto message = std::make_shared<sevm::KbdMessage>();
+        if (!js[Data].is_array())
         {
-            return nullptr;
+            LOG_ERROR("bad json format, data not array: %s", js.dump().c_str());
+            return std::make_shared<sys::DataMessage>(MessageType::MessageTypeUninitialized);
         }
-        message->key.key_code = fromVal(js["d"][0].int_value());
+        message->key.key_code = fromVal(js[Data][0].int_value());
         /// for now type is only released
         message->key.state = RawKey::State::Released;
         return message;

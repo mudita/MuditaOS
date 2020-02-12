@@ -58,8 +58,8 @@ Label::~Label() {
 void Label::calculateDisplayText() {
 
 	//calculate area needed to display text
-	uint32_t availableSpace = drawArea.w;
-	if( availableSpace < 0 )
+    uint32_t availableSpace = drawArea.w;
+    if( availableSpace < 0 )
 		availableSpace = 0;
 
 	//calculate number of chars that can fit available space

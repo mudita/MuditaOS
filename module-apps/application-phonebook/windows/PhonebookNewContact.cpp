@@ -10,6 +10,7 @@
 #include "Utils.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <log/log.hpp>
 
@@ -380,6 +381,25 @@ void PhonebookNewContact::saveStateChanged()
     }
 }
 
+void PhonebookNewContact::coppyDataToContact()
+{
+    if (contact)
+    {
+        contact->primaryName = page1.text[0]->getText();
+        contact->alternativeName = page1.text[1]->getText();
+
+        contact->numbers.clear();
+
+        contact->numbers.push_back(ContactRecord::Number(page1.text[2]->getText()));
+        contact->numbers.push_back(ContactRecord::Number(page1.text[3]->getText()));
+
+        contact->mail = page1.text[4]->getText();
+        contact->note = page2.text[1]->getText();
+        contact->isOnFavourites = page2.favSelected;
+        contact->speeddial = atoi(page2.speedValue->getText().c_str());
+    }
+}
+
 void PhonebookNewContact::setContactData()
 {
     if (contact)
@@ -388,11 +408,25 @@ void PhonebookNewContact::setContactData()
         page1.text[1]->setText(contact->alternativeName);
         if (contact->numbers.size() > 0)
         {
-            page1.text[2]->setText(contact->numbers[0].numberE164);
+            if (contact->numbers[0].numberE164.length() == 0)
+            {
+                page1.text[2]->setText(getCountryPrefix());
+            }
+            else
+            {
+                page1.text[2]->setText(contact->numbers[0].numberE164);
+            }
         }
         if (contact->numbers.size() > 1)
         {
-            page1.text[3]->setText(contact->numbers[1].numberE164);
+            if (contact->numbers[1].numberE164.length() == 0)
+            {
+                page1.text[3]->setText(getCountryPrefix());
+            }
+            else
+            {
+                page1.text[3]->setText(contact->numbers[1].numberE164);
+            }
         }
         page1.text[4]->setText(contact->mail);
 
@@ -413,6 +447,11 @@ void PhonebookNewContact::setContactData()
             page2.speedValue->setText("-");
 
         saveStateChanged();
+    }
+    else
+    {
+        LOG_DEBUG("new contact create");
+        page1.text[2]->setText(getCountryPrefix());
     }
 }
 
@@ -455,10 +494,17 @@ bool PhonebookNewContact::handleSwitchData(SwitchData *data)
 
 bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 {
+    if (AppWindow::onInput(inputEvent))
+    {
+        return (true);
+    }
+
+    if (inputEvent.state != InputEvent::State::keyReleasedShort)
+        return (false);
+
     saveStateChanged();
 
-    if (inputEvent.keyCode == KeyCode::KEY_ENTER && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-        ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    if (inputEvent.keyCode == KeyCode::KEY_ENTER)
     {
         // if focus is on the favourite selection field do nothing
         if (focusItem == page2.favValue)
@@ -468,8 +514,7 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
 
         return (verifyAndSave());
     }
-    else if (inputEvent.keyCode == KeyCode::KEY_DOWN && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-             ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    else if (inputEvent.keyCode == KeyCode::KEY_DOWN)
     {
         LOG_INFO("switching to second page");
         if (getFocusItem() == page1.text[4])
@@ -478,8 +523,7 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
             setFocusItem(page2.speedValue);
         }
     }
-    else if (inputEvent.keyCode == KeyCode::KEY_UP && (inputEvent.state != InputEvent::State::keyReleasedShort) &&
-             ((inputEvent.state != InputEvent::State::keyReleasedLong)))
+    else if (inputEvent.keyCode == KeyCode::KEY_UP)
     {
         LOG_INFO("switching to first page");
         if (getFocusItem() == page2.speedValue)
@@ -489,7 +533,7 @@ bool PhonebookNewContact::onInput(const InputEvent &inputEvent)
         }
     }
 
-    return (AppWindow::onInput(inputEvent));
+    return (false);
 }
 
 bool PhonebookNewContact::verifyAndSave()
@@ -545,6 +589,9 @@ bool PhonebookNewContact::verifyAndSave()
         }
         else
         {
+            coppyDataToContact();
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             LOG_INFO("verifyAndSave contact ADDED");
             return (true);
         }
@@ -558,12 +605,38 @@ bool PhonebookNewContact::verifyAndSave()
         }
         else
         {
+            coppyDataToContact();
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+
             LOG_INFO("verifyAndSave new contact UPDATED");
             return (true);
         }
     }
 
     return (false);
+}
+const std::string PhonebookNewContact::getCountryPrefix()
+{
+    const std::string imsi = CellularServiceAPI::GetIMSI(application, false);
+    if (imsi == "")
+    {
+        LOG_ERROR("Can't get IMSI code from cellular, fall back to Poland country code");
+        return (app::defaultCountryCode);
+    }
+    LOG_DEBUG("getCountryPrefix imsi:%s", imsi.c_str());
+    const uint32_t country_code = DBServiceAPI::GetCountryCodeByMCC(application, std::stoul(imsi));
+    if (country_code < 0)
+    {
+        LOG_ERROR("Can't get country code from database, fall back to Poland country code");
+        return (app::defaultCountryCode);
+    }
+    LOG_DEBUG("getCountryPrefix country_code:%d", country_code);
+    std::string buf = "+";
+    buf += std::to_string(country_code);
+
+    LOG_DEBUG("getCountryPrefix return: \"%s\"", buf.c_str());
+    return (buf);
 }
 
 } // namespace gui

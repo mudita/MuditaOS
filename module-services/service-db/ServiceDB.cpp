@@ -88,7 +88,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
             // send notification
             auto notificationMessage =
-                std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificatonType::Added, DB::BaseType::SmsDB);
+                std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificationType::Added, DB::BaseType::SmsDB);
             sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
         }
     }
@@ -208,7 +208,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret = contactRecordInterface->GetByName(msg->record.primaryName, msg->record.alternativeName);
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(),
-                                                                 static_cast<uint32_t>(MessageType::DBContactGetByName));
+                                                                 MessageType::DBContactGetByName);
     }
     break;
     
@@ -226,8 +226,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto ret = contactRecordInterface->GetByID(msg->record.dbID);
         auto records = std::make_unique<std::vector<ContactRecord>>();
         records->push_back(ret);
-        responseMsg = std::make_shared<DBContactResponseMessage>(std::move(records), true, msg->limit, msg->offset, msg->favourite, 1,
-                                                                 static_cast<uint32_t>(MessageType::DBContactGetByID));
+        responseMsg =
+            std::make_shared<DBContactResponseMessage>(std::move(records), true, msg->limit, msg->offset, msg->favourite, 1, MessageType::DBContactGetByID);
     }
     break;
 
@@ -236,7 +236,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret = contactRecordInterface->GetBySpeedDial(msg->record.speeddial);
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(),
-                                                                 static_cast<uint32_t>(MessageType::DBContactGetBySpeedDial));
+                                                                 MessageType::DBContactGetBySpeedDial);
     }
     break;
 
@@ -245,7 +245,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret = contactRecordInterface->GetByNumber(msg->record.number);
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(),
-                                                                 static_cast<uint32_t>(MessageType::DBContactGetByNumber));
+                                                                 MessageType::DBContactGetByNumber);
     }
     break;
 
@@ -294,7 +294,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         else
             ret = contactRecordInterface->GetLimitOffset(msg->offset, msg->limit);
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(),
-                                                                 static_cast<uint32_t>(MessageType::DBContactGetLimitOffset));
+                                                                 MessageType::DBContactGetLimitOffset);
     }
     break;
 
@@ -306,8 +306,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         if (ret == true)
         {
             auto notificationMessage =
-                std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificatonType::Updated, DB::BaseType::AlarmDB);
-            notificationMessage->notificationType = DB::NotificatonType::Added;
+                std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificationType::Updated, DB::BaseType::AlarmDB);
+            notificationMessage->notificationType = DB::NotificationType::Added;
             sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
         }
     }
@@ -460,7 +460,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         return std::make_shared<sys::ResponseMessage>();
     }
 
-    responseMsg->responseTo = static_cast<uint32_t>(msgl->messageType);
+    responseMsg->responseTo = msgl->messageType;
     return responseMsg;
 }
 

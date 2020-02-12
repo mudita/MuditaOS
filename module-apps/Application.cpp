@@ -90,7 +90,7 @@ Application::State Application::getState()
 
 void Application::setState(State st)
 {
-#ifdef DEBUG_APPLICATION_MANAGEMENT
+#if DEBUG_APPLICATION_MANAGEMENT == 1
     LOG_DEBUG("[%s] (%s) -> (%s)", GetName().c_str(), stateStr(state), stateStr(st));
 #endif
     state = st;
@@ -185,7 +185,7 @@ void Application::blockEvents(bool isBlocked ) {
 int Application::switchWindow( const std::string& windowName, gui::ShowMode cmd, std::unique_ptr<gui::SwitchData> data ) {
 
 	std::string window;
-#ifdef DEBUG_APPLICATION_MANAGEMENT
+#if DEBUG_APPLICATION_MANAGEMENT == 1
     LOG_INFO("switching [%s] to window: %s data description: %s", GetName().c_str(),
              windowName.length() ? windowName.c_str() : gui::name::window::main_window.c_str(), data ? data->getDescription().c_str() : "");
 #endif
@@ -223,8 +223,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	bool handled = false;
 
-	if( msgl->messageType == static_cast<int32_t>(MessageType::CellularNotification) ) {
-		CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
+    if (msgl->messageType == MessageType::CellularNotification)
+    {
+        CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
 		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
             if ((state == State::ACTIVE_FORGROUND) && (getCurrentWindow()->updateSignalStrength(msg->signalStrength)))
             {
@@ -236,18 +237,19 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
             }
         }
-	}
+    }
 
-	if(msgl->messageType == static_cast<uint32_t>(MessageType::AppInputEvent) ) {
-		AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
+    if (msgl->messageType == MessageType::AppInputEvent)
+    {
+        AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
         if (getCurrentWindow() != nullptr)
             getCurrentWindow()->onInput(msg->getEvent());
 
         //		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
 		handled = true;
-	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::KBDKeyEvent) )
-	{
+    }
+    else if (msgl->messageType == MessageType::KBDKeyEvent)
+    {
         if (this->getState() != app::Application::State::ACTIVE_FORGROUND)
         {
             LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
@@ -259,8 +261,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
         }
         handled = true;
 	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMBatteryLevel) )
-	{
+    else if (msgl->messageType == MessageType::EVMBatteryLevel)
+    {
 		sevm::BatteryLevelMessage* msg = static_cast<sevm::BatteryLevelMessage*>(msgl);
 		LOG_INFO("Application battery level: %d", msg->levelPercents );
 
@@ -271,8 +273,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
         handled = true;
 	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMChargerPlugged) )
-	{
+    else if (msgl->messageType == MessageType::EVMChargerPlugged)
+    {
 		sevm::BatteryPlugMessage* msg = static_cast<sevm::BatteryPlugMessage*>(msgl);
 		if(msg->plugged == true) {
 			LOG_INFO("Application charger connected" );
@@ -289,8 +291,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
 		handled = true;
 	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::EVMMinuteUpdated))
-	{
+    else if (msgl->messageType == MessageType::EVMMinuteUpdated)
+    {
 		sevm::RtcMinuteAlarmMessage* msg = static_cast<sevm::RtcMinuteAlarmMessage*>(msgl);
 		LOG_INFO("Application time updated");
 
@@ -302,7 +304,8 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		handled = true;
 	}
 
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitch) ) {
+    else if (msgl->messageType == MessageType::AppSwitch)
+    {
         LOG_DEBUG("AppSwitch");
         AppSwitchMessage *msg = reinterpret_cast<AppSwitchMessage *>(msgl);
         // Application is starting or it is in the background. Upon switch command if name if correct it goes foreground
@@ -353,9 +356,10 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 		else {
             LOG_ERROR("Wrong internal application %s switch to ACTIVE state form %s", msg->getTargetApplicationName().c_str(), stateStr(state));
         }
-	}
-	else if(msgl->messageType == static_cast<uint32_t>(MessageType::AppSwitchWindow ) ) {
-		AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
+    }
+    else if (msgl->messageType == MessageType::AppSwitchWindow)
+    {
+        AppSwitchWindowMessage* msg = reinterpret_cast<AppSwitchWindowMessage*>( msgl );
 		//check if specified window is in the application
 		auto it = windows.find( msg->getWindowName() );
 		if( it != windows.end() ) {
@@ -389,17 +393,19 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
             LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
         }
         handled = true;
-	}
+    }
 
-	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppClose)) {
+    else if (msgl->messageType == MessageType::AppClose)
+    {
         setState(State::DEACTIVATING);
         sapm::ApplicationManager::messageConfirmClose(this);
 		//here should go all the cleaning
 		handled = true;
-	}
-	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRebuild )) {
+    }
+    else if (msgl->messageType == MessageType::AppRebuild)
+    {
 
-		LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
+        LOG_INFO("Application %s rebuilding gui", GetName().c_str() );
 		//for all windows call rebuild method
         for (auto it = windows.begin(); it != windows.end(); it++)
         {
@@ -422,14 +428,15 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
         handled = true;
         LOG_INFO("App rebuild done");
     }
-	else if( msgl->messageType == static_cast<uint32_t>(MessageType::AppRefresh)) {
-		AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
+    else if (msgl->messageType == MessageType::AppRefresh)
+    {
+        AppRefreshMessage* msg = reinterpret_cast<AppRefreshMessage*>( msgl );
         // getCurrentWindow()->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
         render( msg->getMode() );
 		handled = true;
-	}
+    }
 
-	if( handled)
+    if( handled)
 		return std::make_shared<sys::ResponseMessage>();
 	else
 		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
@@ -510,7 +517,7 @@ void Application::pushWindow(const std::string &newWindow)
     {
         windowStack.push_back(newWindow);
     }
-#ifdef DEBUG_APPLICATION_MANAGEMENT
+#if DEBUG_APPLICATION_MANAGEMENT == 1
     LOG_DEBUG("[%d] newWindow: %s", windowStack.size(), newWindow.c_str());
     for (auto &el : windowStack)
     {

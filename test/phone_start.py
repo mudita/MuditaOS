@@ -1,11 +1,11 @@
 #!/bin/python3
 # Phone wait for system start + 8 sec for GSM to end it's work and unlock
-from common import *
+from harness.common import Serial
+import logging
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
-ser = start()
-registerCTRLP(ser)
-data = read_cmd(ser,30)
-print("SYS Started! {}".format(data))
-time.sleep(8)
-ser.close()
-print("test end")
+conn = Serial()
+data = conn.read(30)
+log.debug("SYS Started! {}".format(data))
+conn.sleep(8)

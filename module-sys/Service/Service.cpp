@@ -64,6 +64,11 @@ void Service::Run() {
 
 
     	auto ret =  msg->Execute(this);
+        if (ret == nullptr)
+        {
+            LOG_FATAL("NO MESSAGE from: %s msg type: %d", msg->sender.c_str(), msg->type);
+            ret = std::make_shared<DataMessage>(MessageType::MessageTypeUninitialized);
+        }
 
         // Unicast messages always need response with the same ID as received message
         // Don't send responses to themselves,

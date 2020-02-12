@@ -68,7 +68,7 @@ protected:
 	UTF8 text;
 	UTF8 textDisplayed;
 	uint32_t charDrawableCount;
-	//number of pixels ccupied by displayed text;
+	//number of pixels occupied by displayed text;
 	uint32_t stringPixelWidth;
 
 	//color of the text

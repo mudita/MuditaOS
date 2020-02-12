@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../data/PhonebookItemData.hpp"
+#include "../Application.hpp"
 #include "AppWindow.hpp"
 #include "ContactRecord.hpp"
 #include "Label.hpp"
@@ -103,6 +104,8 @@ class PhonebookNewContact : public AppWindow
     bool verifyAndSave();
     void setContactData();
     void saveStateChanged();
+    void coppyDataToContact();
+    const std::string getCountryPrefix();
 };
 
 } /* namespace gui */

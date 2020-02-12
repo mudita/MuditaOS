@@ -22,12 +22,11 @@
 
 class AudioMessage : public sys::DataMessage {
 public:
-    AudioMessage(MessageType messageType) : sys::DataMessage(static_cast<uint32_t>(messageType)),
-                                               type(messageType) {};
+  AudioMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
 
-    virtual ~AudioMessage() {};
+  virtual ~AudioMessage(){};
 
-    MessageType type;
+  MessageType type;
 
 };
 

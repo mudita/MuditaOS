@@ -13,6 +13,6 @@ public:
         Visible,
     };
     enum Request req = Request::None;
-    BluetoothMessage(MessageType messageType, enum Request req = None) : sys::DataMessage(static_cast<uint32_t>(messageType)), req(req) {};
+    BluetoothMessage(enum Request req = None) : sys::DataMessage(MessageType::BluetoothRequest), req(req){};
     virtual ~BluetoothMessage() = default;
 };

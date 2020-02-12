@@ -121,15 +121,10 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
         else if (notification == ETX)
         {
             std::string text = bsp::harness::read();
-            auto ret = harness::parse(text);
-            if (ret.first == harness::Error::Success)
+            auto ret = harness::parse(text, this->service);
+            if (ret != harness::Error::Success)
             {
-                // LOG_INFO("EVENT! %x: %s", notification, text.c_str());
-                sys::Bus::SendUnicast(ret.second, "EventManager", this->service);
-            }
-            else
-            {
-                LOG_ERROR("Harness parser error: %d", ret.first);
+                LOG_ERROR("Harness parser error: %d", ret);
             }
         }
         else
@@ -170,24 +165,26 @@ bool WorkerEvent::deinit(void)
 
  void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
  {
-	auto message = std::make_shared<sevm::KbdMessage>(MessageType::KBDKeyEvent);
+     auto message = std::make_shared<sevm::KbdMessage>();
 
-	message->key.key_code = code;
+     message->key.key_code = code;
 
-	if(event == bsp::KeyEvents::Pressed)
-	{
-		if(lastState == bsp::KeyEvents::Pressed) {
-			return;
-		}
+     if (event == bsp::KeyEvents::Pressed)
+     {
+         if (lastState == bsp::KeyEvents::Pressed)
+         {
+             return;
+         }
 
-		message->key.state =  RawKey::State::Pressed;
-		message->key.time_press = xTaskGetTickCount();
+         message->key.state = RawKey::State::Pressed;
+         message->key.time_press = xTaskGetTickCount();
 
-		// Slider sends only press, not release state so it would block the entire keyboard
-		if( (code != bsp::KeyCodes::SSwitchUp) && (code != bsp::KeyCodes::SSwitchMid) && (code != bsp::KeyCodes::SSwitchDown) ) {
-			lastPressed = code;
-			lastState = event;
-		}
+         // Slider sends only press, not release state so it would block the entire keyboard
+         if ((code != bsp::KeyCodes::SSwitchUp) && (code != bsp::KeyCodes::SSwitchMid) && (code != bsp::KeyCodes::SSwitchDown))
+         {
+             lastPressed = code;
+             lastState = event;
+         }
 	}
 	else
 	{
