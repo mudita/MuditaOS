@@ -70,8 +70,6 @@ namespace app {
             setState(State::ACTIVE_BACKGROUND);
         }
         longPressTimer.restart();
-
-        busChannels.push_back(sys::BusChannels::ServiceCellularNotifications);
 }
 
 Application::~Application()
