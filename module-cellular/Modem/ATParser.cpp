@@ -35,6 +35,7 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
         {"+CPIN: READY", ATParser::Urc::SimCardReady},
         {"+QIND: SMS DONE", ATParser::Urc::SMSInitializationComplete},
         {"+QIND: PB DONE", ATParser::Urc::PhonebookInitializationComplete},
+        {"+CPIN:", ATParser::Urc::NotHandled},
     };
 
     for (const auto &el : vals)

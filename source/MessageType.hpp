@@ -146,7 +146,6 @@ enum class MessageType
     EVMChargerPlugged,
     // rtc messages
     EVMMinuteUpdated, // This message is send to current focused application on every minute time change.
-    EVM_GPIO,
 
     BluetoothRequest,
 
