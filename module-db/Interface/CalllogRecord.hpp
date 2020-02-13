@@ -15,17 +15,21 @@
 #include "utf8/UTF8.hpp"
 #include <stdint.h>
 
-struct CalllogRecord{
-    uint32_t    id;
-    UTF8        number;
-	PresentationType presentation;
-    time_t      date;
-    time_t duration;
-    CallType    type;
-    UTF8        name;
-	UTF8        contactId;
+struct CalllogRecord : public Record
+{
+    UTF8 number = "";
+    PresentationType presentation = PresentationType::PR_UNKNOWN;
+    time_t date = 0;
+    time_t duration = 0;
+    CallType type = CallType::CT_NONE;
+    UTF8 name = "";
+    UTF8 contactId = "";
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
+
+    CalllogRecord() = default;
+    ~CalllogRecord() = default;
+    CalllogRecord(const CalllogTableRow &);
 };
 
 enum class CalllogRecordField{

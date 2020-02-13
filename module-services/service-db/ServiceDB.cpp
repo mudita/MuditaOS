@@ -401,15 +401,15 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto time = utils::time::Scoped("DBCalllogAdd");
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto record = std::make_unique<std::vector<CalllogRecord>>();
-        msg->record.id = DB_ID_NONE;
+        msg->record.ID = DB_ID_NONE;
         auto ret = calllogRecordInterface->Add(msg->record);
         if (ret)
         {
             // update db ID in response message
-            msg->record.id = calllogRecordInterface->GetLastID();
+            msg->record.ID = calllogRecordInterface->GetLastID();
         }
         record->push_back(msg->record);
-        LOG_INFO("Last ID %d", msg->record.id);
+        LOG_INFO("Last ID %d", msg->record.ID);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
     }
     break;

@@ -14,9 +14,21 @@
 #include <log/log.hpp>
 #include <sstream>
 
+CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
+{
+    ID = tableRow.id;
+    number = tableRow.number;
+    presentation = tableRow.presentation;
+    date = tableRow.date;
+    duration = tableRow.duration;
+    type = tableRow.type;
+    name = tableRow.name;
+    contactId = tableRow.contactId;
+}
+
 std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 {
-    out << " <id> " << rec.id << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
+    out << " <id> " << rec.ID << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
         << " <duration> " << rec.duration << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
 
     return out;
@@ -46,7 +58,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     localRec.name = contact.primaryName;
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec));
 
-    return calllogDB->calls.Add(CalllogTableRow{.id = rec.id, // this is only to remove warning
+    return calllogDB->calls.Add(CalllogTableRow{.id = rec.ID, // this is only to remove warning
                                                 .number = rec.number,
                                                 .presentation = rec.presentation,
                                                 .date = rec.date,
@@ -75,31 +87,23 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
     auto records = std::make_unique<std::vector<CalllogRecord>>();
 
-        for(const auto &rec : calls){
+    for (const auto &c : calls)
+    {
 
-            records->push_back({
-                .id=rec.id,
-                .number=rec.number,
-                .presentation=rec.presentation,
-                .date=rec.date,
-			    .duration=rec.duration,
-                .type=rec.type,
-                .name=rec.name,
-                .contactId=rec.contactId
-            });
-        }
+        records->push_back({c});
+    }
 
         return records;
 }
 
 bool CalllogRecordInterface::Update(const CalllogRecord &rec) {
 
-    auto call = calllogDB->calls.GetByID(rec.id);
+    auto call = calllogDB->calls.GetByID(rec.ID);
     if(call.id == 0){
         return false;
     }
 
-    return calllogDB->calls.Update(CalllogTableRow{.id = rec.id,
+    return calllogDB->calls.Update(CalllogTableRow{.id = rec.ID,
                                                    .number = rec.number,
                                                    .presentation = rec.presentation,
                                                    .date = rec.date,
@@ -133,18 +137,9 @@ bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char 
 }
 
 CalllogRecord CalllogRecordInterface::GetByID(uint32_t id) {
-    auto rec = calllogDB->calls.GetByID(id);
+    auto call = calllogDB->calls.GetByID(id);
 
-    return CalllogRecord{
-        .id=rec.id, // this is only to remove warning
-        .number=rec.number,
-        .presentation=rec.presentation,
-        .date=rec.date,
-        .duration=rec.duration,
-        .type=rec.type,
-        .name=rec.name,
-        .contactId=rec.contactId
-    };
+    return CalllogRecord{call};
 }
 
 uint32_t CalllogRecordInterface::GetCount(CallState state)

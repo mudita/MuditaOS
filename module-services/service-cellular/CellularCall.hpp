@@ -75,7 +75,7 @@ namespace CellularCall
 
         void clear()
         {
-            call.id = 0; // 0 - Invalid
+            call.ID = 0; // 0 - Invalid
             call.number = "";
             call.presentation = PresentationType::PR_ALLOWED;
             call.date = 0;
@@ -119,7 +119,7 @@ namespace CellularCall
 
         bool isValid() const
         {
-            return call.id != 0;
+            return call.ID != 0;
         }
     };
 } // namespace CellularCall

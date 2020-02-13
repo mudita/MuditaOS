@@ -104,7 +104,7 @@ namespace CellularCall
             clear();
             return false;
         }
-        call.id = callId;
+        call.ID = callId;
 
         return true;
     }
@@ -157,7 +157,7 @@ namespace CellularCall
 
         if (!(endCallAction && endCallAction(call)))
         {
-            LOG_ERROR("CalllogUpdate failed, id %u", call.id);
+            LOG_ERROR("CalllogUpdate failed, id %u", call.ID);
             return false;
         }
 
