@@ -1,4 +1,5 @@
 #include "SettingsMainWindow.hpp"
+#include "../ApplicationSettings.hpp"
 #include "Info.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
@@ -6,11 +7,11 @@
 std::list<gui::Option> mainWindowOptions(app::Application *app)
 {
     return {gui::Option{"Info",
-             [=](gui::Item &item) {
-                 LOG_INFO("switching to TEST UI page");
-                 app->switchWindow(gui::window::hw_info, nullptr);
-                 return true;
-             }},
+                        [=](gui::Item &item) {
+                            LOG_INFO("switching to TEST UI page");
+                            app->switchWindow(gui::window::hw_info, nullptr);
+                            return true;
+                        }},
             {"UI TEST",
              [=](gui::Item &item) {
                  LOG_INFO("switching to TEST UI page");
@@ -32,6 +33,11 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
                  return true;
              }},
 
+            {"SIM SELECT",
+             [=](gui::Item &) {
+                 app->switchWindow(app::sim_select, nullptr);
+                 return true;
+             }},
             {"[None] " + utils::localize.get("app_settings_date_and_time"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_phone_modes"), [=](gui::Item &) { return true; }},
