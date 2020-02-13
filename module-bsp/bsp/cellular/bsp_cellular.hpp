@@ -68,6 +68,7 @@ namespace bsp {
         /// trigger swap pin on gsm so that it would reload sim card in tray
         /// after that +QPIN urc should come
         void hotswap_trigger();
+        void sim_sel();
     };
 
 }

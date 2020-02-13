@@ -23,6 +23,7 @@
 
 #include "service-cellular/ServiceCellular.hpp"
 #include "windows/SettingsMainWindow.hpp"
+#include "windows/SimSelectWindow.hpp"
 #include <i18/i18.hpp>
 
 namespace app {
@@ -90,6 +91,9 @@ void ApplicationSettings::createUserInterface() {
 
 	window = new gui::Info(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+    window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 }
 
 void ApplicationSettings::destroyUserInterface() {

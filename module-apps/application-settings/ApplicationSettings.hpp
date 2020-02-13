@@ -14,6 +14,7 @@
 namespace app {
 
 inline const std::string name_settings = "ApplicationSettings";
+inline const std::string sim_select = "SimSelect";
 
 class ApplicationSettings: public app::Application {
 public:
