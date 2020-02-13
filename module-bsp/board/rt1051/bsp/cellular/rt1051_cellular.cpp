@@ -428,5 +428,17 @@ namespace bsp {
             ulTaskNotifyTake(pdTRUE, 100); // sleep for 100 ms...
             GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
         }
+
+        void sim_sel()
+        {
+            if (Store::GSM::get()->selected == Store::GSM::SIM::SIM2)
+            {
+                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 1);
+            }
+            else
+            {
+                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 0);
+            }
+        }
     } // namespace cellular::sim
 } // namespace bsp

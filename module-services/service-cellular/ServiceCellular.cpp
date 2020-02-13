@@ -552,7 +552,6 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
             LOG_ERROR("SIM ERROR");
             Store::GSM::get()->sim = Store::GSM::SIM::NONE;
         }
-        // TODO - send it in ServiceCellular or better it worker based on SIM selected - check me
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, "EventManager", this);
     }
