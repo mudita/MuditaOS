@@ -97,7 +97,7 @@ class DBServiceAPI
     static uint32_t NotesGetCount(sys::Service *serv);
     static bool NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
 
-    static uint32_t CalllogAdd(sys::Service *serv, const CalllogRecord &rec);
+    static CalllogRecord CalllogAdd(sys::Service *serv, const CalllogRecord &rec);
     static bool CalllogRemove(sys::Service *serv, uint32_t id);
     static bool CalllogUpdate(sys::Service *serv, const CalllogRecord &rec);
     static uint32_t CalllogGetCount(sys::Service *serv, CallState state = CallState::ALL);

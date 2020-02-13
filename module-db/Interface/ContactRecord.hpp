@@ -20,7 +20,7 @@
 struct ContactRecord
 {
 
-    uint32_t dbID;
+    uint32_t dbID = DB_ID_NONE;
     UTF8 primaryName;
     UTF8 alternativeName;
     ContactType contactType;

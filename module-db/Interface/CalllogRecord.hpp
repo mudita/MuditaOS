@@ -29,7 +29,7 @@ struct CalllogRecord : public Record
 
     CalllogRecord() = default;
     ~CalllogRecord() = default;
-    CalllogRecord(const CalllogTableRow &);
+    CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name);
 };
 
 enum class CalllogRecordField{
@@ -63,4 +63,5 @@ public:
 private:
   CalllogDB *calllogDB = nullptr;
   ContactsDB *contactsDB = nullptr;
+  ContactRecord GetContactRecordByID(const UTF8 &contactId);
 };

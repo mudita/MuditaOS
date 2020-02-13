@@ -93,18 +93,18 @@ namespace CellularCall
         }
 
         clear();
-        call.number = number;
-        call.type = type;
-        call.date = getCurrentTimeStamp();
-        call.name = number; // temporary set name as number
-        uint32_t callId = startCallAction ? startCallAction(call) : 0;
-        if (callId == 0)
+        CalllogRecord callRec;
+        callRec.number = number;
+        callRec.type = type;
+        callRec.date = getCurrentTimeStamp();
+        callRec.name = number; // temporary set name as number
+        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        if (call.ID == DB_ID_NONE)
         {
             LOG_ERROR("startCallAction failed");
             clear();
             return false;
         }
-        call.ID = callId;
 
         return true;
     }

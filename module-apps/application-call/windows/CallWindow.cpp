@@ -300,7 +300,7 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
     if (records->size() == 1)
     {
         auto rec = records->operator[](0);
-        LOG_INFO("number = %s recognized as contact id = %u, ", phoneNumber, rec.dbID, rec.primaryName.c_str());
+        LOG_INFO("number = %s recognized as contact id = %u, name = %s", phoneNumber.c_str(), rec.dbID, rec.primaryName.c_str());
         phoneNumber = rec.primaryName;
     }
     else if (records->size() > 1)

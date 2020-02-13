@@ -405,8 +405,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto ret = calllogRecordInterface->Add(msg->record);
         if (ret)
         {
-            // update db ID in response message
-            msg->record.ID = calllogRecordInterface->GetLastID();
+            // return the newly added record
+            msg->record = calllogRecordInterface->GetByID(calllogRecordInterface->GetLastID());
         }
         record->push_back(msg->record);
         LOG_INFO("Last ID %d", msg->record.ID);

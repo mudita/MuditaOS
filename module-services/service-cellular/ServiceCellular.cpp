@@ -58,12 +58,12 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
-        uint32_t callId = DBServiceAPI::CalllogAdd(this, rec);
-        if (callId == 0)
+        auto call = DBServiceAPI::CalllogAdd(this, rec);
+        if (call.ID == DB_ID_NONE)
         {
             LOG_ERROR("CalllogAdd failed");
         }
-        return callId;
+        return call;
     });
 
     ongoingCall.setEndCallAction([=](const CalllogRecord &rec) { return DBServiceAPI::CalllogUpdate(this, rec); });

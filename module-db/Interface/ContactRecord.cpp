@@ -43,7 +43,6 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
 
     bool ret = contactDB->contacts.Add(ContactsTableRow{
-
     													.type = rec.contactType,
                                                         .isOnWhitelist = rec.isOnBlacklist,
                                                         .isOnBlacklist = rec.isOnBlacklist,
@@ -57,6 +56,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     }
 
     uint32_t contactID = contactDB->GetLastInsertRowID();
+    LOG_DEBUG("New contact with ID %u created", contactID);
 
     ret = contactDB->name.Add(
         ContactsNameTableRow{.contactID = contactID, .namePrimary = rec.primaryName, .nameAlternative = rec.alternativeName, .favourite = rec.isOnFavourites});
