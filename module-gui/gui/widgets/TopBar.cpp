@@ -94,7 +94,7 @@ void TopBar::prepareWidget() {
     sim->setFilled(false);
     sim->setBorderColor(gui::ColorNoColor);
     sim->setFont(style::header::font::title);
-    simSet(Store::GSM::get()->tray);
+    simSet();
 
     //icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
@@ -134,7 +134,7 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 				timeLabel->setVisible(false);
 		} break;
 		case Elements::SIGNAL: {
-            simSet(Store::GSM::get()->tray);
+            simSet();
             for (uint32_t i = 0; i < signalImgCount; ++i)
                 signal[i]->setVisible(false);
 			if( active )
@@ -239,7 +239,7 @@ std::list<DrawCommand*> TopBar::buildDrawList() {
 	return Rect::buildDrawList();
 }
 
-void TopBar::simSet(const std::bitset<4> &tray)
+void TopBar::simSet()
 {
     if (!sim)
     {
@@ -247,21 +247,19 @@ void TopBar::simSet(const std::bitset<4> &tray)
     }
     else
     {
-        bool set = false;
-        if (tray[(uint8_t)Store::GSM::Tray::SIM1])
+        switch (Store::GSM::get()->sim)
         {
-            sim->setText("o");
-        }
-        else
-        {
+        case Store::GSM::SIM::NONE:
             sim->setText("x");
+            break;
+        case Store::GSM::SIM::SIM1:
+            sim->setText("1");
+            break;
+        case Store::GSM::SIM::SIM2:
+            sim->setText("2");
+            break;
         }
     }
-}
-
-void TopBar::simSet()
-{
-    simSet(Store::GSM::get()->tray);
 }
 
 } /* namespace gui */

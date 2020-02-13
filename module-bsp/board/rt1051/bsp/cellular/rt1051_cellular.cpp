@@ -75,8 +75,7 @@ namespace bsp {
 
         MSPInit();
         /// to set Store::GSM sim state and to log debug
-        int sim = bsp::cellular::SIMTrayStatus();
-        LOG_DEBUG("SIM: %d %d", sim);
+        Store::GSM::get()->tray = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN : Store::GSM::Tray::OUT;
         DMAInit();
 
         uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, rxStreamBufferNotifyWatermark);
@@ -401,39 +400,33 @@ namespace bsp {
     void RT1051Cellular::SetSendingAllowed(bool state) { pv_SendingAllowed = state; }
     bool RT1051Cellular::GetSendingAllowed() { return pv_SendingAllowed; }
 
-}
-
-namespace bsp
-{
-    namespace cellular
+    namespace cellular::sim
     {
+        static xQueueHandle qhandle = nullptr;
 
-        xQueueHandle handleSIM = nullptr;
-
-        /// consider wakin up xHigherPrio... from simInjection for EventManager
-        void Init(xQueueHandle qHandle)
+        auto init(QueueHandle_t qHandle) -> int
         {
-            handleSIM = qHandle;
+            qhandle = qHandle;
+            return 0;
         }
 
-        BaseType_t SimIOHandler()
+        auto trayIRQ_handler() -> BaseType_t
         {
             BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            uint8_t val = (uint8_t)Store::GSM::Tray::SIM1;
-            if (handleSIM)
-                xQueueSendFromISR(handleSIM, &val, &xHigherPriorityTaskWoken);
+            Store::GSM::get()->tray = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN : Store::GSM::Tray::OUT;
+            if (qhandle)
+            {
+                int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
+                xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
+            }
             return xHigherPriorityTaskWoken;
         }
 
-        int SIMTrayStatus()
+        void hotswap_trigger()
         {
-            int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN);
-            if (val == 0)
-                Store::GSM::get()->tray.set((uint8_t)Store::GSM::Tray::SIM1);
-            else
-                Store::GSM::get()->tray.reset((uint8_t)Store::GSM::Tray::SIM1);
-            // sim have inverted logic
-            return val == 0;
-        };
-    }; // namespace cellular
-};     // namespace bsp
+            GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 1);
+            ulTaskNotifyTake(pdTRUE, 100); // sleep for 100 ms...
+            GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
+        }
+    } // namespace cellular::sim
+} // namespace bsp

@@ -29,12 +29,19 @@ namespace Store
         static GSM *ptr;
 
       public:
-        enum class Tray : uint8_t
+        enum class Tray
+        {
+            OUT,
+            IN
+        } tray = Tray::IN;
+        /// tray - tray actual status which is visible right now on screen
+        /// selected - tray selection settings settable sim tray
+        enum class SIM : uint8_t
         {
             SIM1,
             SIM2,
-        };
-        std::bitset<4> tray;
+            NONE,
+        } sim = SIM::NONE, selected = SIM::SIM1;
         static GSM *get();
     };
 }; // namespace Store
