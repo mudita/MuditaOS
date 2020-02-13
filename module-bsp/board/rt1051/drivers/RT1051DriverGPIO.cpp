@@ -103,5 +103,4 @@ void RT1051DriverGPIO::ClearPortInterrupts(const uint32_t mask) {
     GPIO_PortClearInterruptFlags(base,mask);
 }
 
-
-}
+} // namespace drivers

@@ -32,6 +32,7 @@
 
 #include "log/log.hpp"
 
+#include "service-evtmgr/messages/EVMessages.hpp"
 #include "ucs2/UCS2.hpp"
 
 #include "service-db/api/DBServiceAPI.hpp"
@@ -39,6 +40,7 @@
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
+#include <common_data/EventStore.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
@@ -529,6 +531,31 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
 
     /* let's convert uint8_t vector to std::string*/
     std::string str = std::string(reinterpret_cast<char*>(data.data()), reinterpret_cast<char*>(data.data() + data.size()));
+
+    if (auto ret = str.find("+CPIN: ") != std::string::npos)
+    {
+        /// TODO handle different sim statuses - i.e. no sim, sim error, sim puk, sim pin etc.
+        if (str.find("NOT READY", ret) == std::string::npos)
+        {
+            if (Store::GSM::get()->selected == Store::GSM::SIM::SIM1)
+            {
+                Store::GSM::get()->sim = Store::GSM::SIM::SIM1;
+            }
+            else
+            {
+                Store::GSM::get()->sim = Store::GSM::SIM::SIM2;
+            }
+            LOG_DEBUG("SIM OK!");
+        }
+        else
+        {
+            LOG_ERROR("SIM ERROR");
+            Store::GSM::get()->sim = Store::GSM::SIM::NONE;
+        }
+        // TODO - send it in ServiceCellular or better it worker based on SIM selected - check me
+        auto message = std::make_shared<sevm::SIMMessage>();
+        sys::Bus::SendUnicast(message, "EventManager", this);
+    }
 
     // Incoming call
     if (auto ret = str.find("+CLIP: ") != std::string::npos) {

@@ -96,7 +96,7 @@ public:
 class SIMMessage : public sys::DataMessage
 {
   public:
-    SIMMessage() : DataMessage(uint32_t(MessageType::SIMTrayEvent))
+    SIMMessage() : DataMessage(MessageType::SIMTrayEvent)
     {
         type = Type::Data;
     }

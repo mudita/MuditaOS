@@ -14,11 +14,10 @@
 #include "queue.h"
 #include "fsl_common.h"
 
+#include "board/rt1051/bsp/eink/bsp_eink.h"
 #include "bsp/battery-charger/battery_charger.hpp"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
-
-#include "board/rt1051/bsp/eink/bsp_eink.h"
 
 #if 0 //TODO:M.P implement the rest of BSP drivers
 
@@ -82,7 +81,7 @@ namespace bsp {
             }
 
             if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN)) {
-                xHigherPriorityTaskWoken |= bsp::cellular::SimIOHandler();
+                xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQ_handler();
             }
 
             // Clear all IRQs
