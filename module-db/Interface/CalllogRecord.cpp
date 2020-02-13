@@ -49,7 +49,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     auto localRec = rec;
     auto contact = (*contactRec)[0];
     localRec.contactId = std::to_string(contact.dbID);
-    localRec.name = contact.primaryName;
+    localRec.name = contact.getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
     return calllogDB->calls.Add(CalllogTableRow{.id = localRec.ID, // this is only to remove warning
@@ -105,7 +105,7 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
             continue;
         }
 
-        records->push_back({c, contactRec.numbers[0].numberE164, contactRec.primaryName});
+        records->push_back({c, contactRec.numbers[0].numberE164, contactRec.getFormattedName()});
     }
 
     return records;
@@ -163,7 +163,7 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
         return CalllogRecord();
     }
 
-    return CalllogRecord{call, contactRec.numbers[0].numberE164, contactRec.primaryName};
+    return CalllogRecord{call, contactRec.numbers[0].numberE164, contactRec.getFormattedName()};
 }
 
 uint32_t CalllogRecordInterface::GetCount(CallState state)

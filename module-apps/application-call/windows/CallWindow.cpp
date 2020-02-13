@@ -300,15 +300,15 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
     if (records->size() == 1)
     {
         auto rec = records->operator[](0);
-        LOG_INFO("number = %s recognized as contact id = %u, name = %s", phoneNumber.c_str(), rec.dbID, rec.primaryName.c_str());
-        phoneNumber = rec.primaryName;
+        LOG_INFO("number = %s recognized as contact id = %u, name = %s", phoneNumber.c_str(), rec.dbID, rec.getFormattedName().c_str());
+        phoneNumber = rec.getFormattedName();
     }
     else if (records->size() > 1)
     {
         LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.c_str());
         for (auto i : *records)
         {
-            LOG_ERROR("contact id = %u, name = %s", i.dbID, i.primaryName.c_str());
+            LOG_ERROR("contact id = %u, name = %s", i.dbID, i.getFormattedName().c_str());
         }
     }
     else

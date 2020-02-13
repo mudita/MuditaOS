@@ -51,6 +51,11 @@ struct ContactRecord
     bool isOnBlacklist;
     bool isOnFavourites;
     uint8_t speeddial;
+
+    inline UTF8 getFormattedName()
+    {
+        return primaryName + " " + alternativeName;
+    }
 };
 
 enum class ContactRecordField
