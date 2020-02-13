@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <memory>
+#include <FreeRTOS.h>
+#include <FreeRTOS/include/queue.h>
 
 namespace bsp {
 
@@ -58,18 +60,16 @@ namespace bsp {
 
     };
 
-}
-
-
-#include <FreeRTOS.h>
-#include <FreeRTOS/include/queue.h>
-namespace bsp {
-    namespace cellular {
-        void Init(xQueueHandle qHandle);
-        BaseType_t SimIOHandler();
-        // read simtray status
-        int SIMTrayStatus();
+    namespace cellular::sim {
+        /// initialize SIM queue directed to EventWorker
+        int init(xQueueHandle qHandle);
+        /// handler for SIM tray which is connected to phone, not GSM
+        BaseType_t trayIRQ_handler();
+        /// trigger swap pin on gsm so that it would reload sim card in tray
+        /// after that +QPIN urc should come
+        void hotswap_trigger();
     };
-};
+
+}
 
 #endif //PUREPHONE_BSP_CELLULAR_HPP

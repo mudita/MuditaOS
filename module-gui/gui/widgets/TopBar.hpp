@@ -47,7 +47,6 @@ namespace gui {
         std::array<Image *, batteryLevelCount> battery = {nullptr};
         Label *charging = nullptr;
         Label *sim = nullptr;
-        void simSet(const std::bitset<4> &tray);
         void prepareWidget();
         static TimeMode timeMode;
 
