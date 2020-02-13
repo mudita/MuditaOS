@@ -9,27 +9,8 @@
  */
 
 #include "ContactRecord.hpp"
+#include <Utils.hpp>
 #include <log/log.hpp>
-
-// TODO copied from Profile -> move to some utils.hpp
-#include <sstream>
-template <typename Out> void split(const std::string &s, char delim, Out result)
-{
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim))
-    {
-        *(result++) = item;
-    }
-}
-
-static std::vector<std::string> split(const std::string &s, char delim)
-{
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-/// <- copy end
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
 {
@@ -684,7 +665,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDi
 std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)
 {
     std::vector<ContactRecord::Number> nrs;
-    for (auto nr_str : split(numbers_id, ' '))
+    for (auto nr_str : utils::split(numbers_id, ' '))
     {
         auto nr = contactDB->number.GetByID(std::stol(nr_str));
         if (nr.ID == 0)
