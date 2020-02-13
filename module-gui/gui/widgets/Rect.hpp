@@ -51,8 +51,8 @@ public:
 	void setEdges( RectangleEdgeFlags edges );
 	void setCorners( RectangleCornerFlags corners );
 	void setFlat( RectangleFlatFlags flats);
-    void setYaps( RectangleYapFlags yaps);
-    void setYapSize( unsigned short value);
+    virtual void setYaps(RectangleYapFlags yaps);
+    virtual void setYapSize(unsigned short value);
     void setFilled( bool val );
 
 	//virtaul methods

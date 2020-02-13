@@ -27,6 +27,7 @@ namespace gui
     {
       private:
         gui::VBox *body = nullptr;
+        uint16_t elements_width = this->getWidth() - style::window::default_left_margin * 2;
         void cleanView();
         enum class Action
         {
@@ -38,6 +39,7 @@ namespace gui
         bool showMessages(Action what);
         void addSMS(Action what);
         bool smsBuild(const SMSRecord &el, bool top);
+        HBox *smsSpanBuild(Text *smsBubble, const Alignment position, const uint32_t timestamp) const;
         const ssize_t maxsmsinwindow = 7;
 
         struct
