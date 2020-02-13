@@ -10,58 +10,50 @@
 #include <queue.h>
 
 extern int errno;
-extern xQueueHandle queueHandleBuffer;
 
-void desktopServiceReceive(void *ptr)
+extern xQueueHandle USBReceiveQueue;
+extern xQueueHandle USBSendQueue;
+
+int fd;
+
+void desktopServiceReceive(void *)
 {
-    ServiceDesktop *owner = (ServiceDesktop *)ptr;
-
-    int fd = owner->getPtyDescriptor();
-    LOG_INFO("start reading on fd:%d", owner->getPtyDescriptor());
+    LOG_INFO("start reading on fd:%d", fd);
     static uint8_t inputData[SERIAL_BUFFER_LEN];
+
     while (1)
     {
         ssize_t ret = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
         if (ret > 0)
         {
+            static std::string msg;
+            msg = std::string(inputData, inputData + ret);
             LOG_DEBUG("Received: %d signs", ret);
-            xQueueSend(queueHandleBuffer, inputData, portMAX_DELAY);
-            owner->dataReceived(inputData, ret);
+            xQueueSend(USBReceiveQueue, &msg, portMAX_DELAY);
         }
     }
-
     LOG_INFO("exit");
 }
 
-void desktopServiceSend(void *ptr)
+int desktopServiceSend(std::string msg)
 {
-    ServiceDesktop *owner = (ServiceDesktop *)ptr;
 
-    static uint8_t outputData[SERIAL_BUFFER_LEN];
-
-    while (1)
+    ssize_t t = write(fd, msg.c_str(), msg.length());
+    if (t >= 0)
     {
-        if (xQueueReceive(queueHandleBuffer, outputData, portMAX_DELAY))
-        {
-
-            size_t t = write(owner->getPtyDescriptor(), outputData, sizeof(outputData));
-            if (t >= 0)
-            {
-                LOG_DEBUG("Send: %d signs", t);
-            }
-            else
-            {
-                LOG_ERROR("writing to PTY failed with code: %d", errno);
-            }
-
-        }
+        return (t);
+    }
+    else
+    {
+        LOG_ERROR("writing to PTY failed with code: %d", errno);
+        return (-1);
     }
 }
 
 int desktopServiceInit()
 {
-    int fd = 0;
 
+    fd = 0;
     fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
 
     if (fd == -1)
@@ -91,5 +83,15 @@ int desktopServiceInit()
     cfsetispeed(&newtio, SERIAL_BAUDRATE);
     cfsetospeed(&newtio, SERIAL_BAUDRATE);
     tcsetattr(fd, TCSANOW, &newtio);
+
+    xTaskHandle taskHandleReceive;
+
+    BaseType_t task_error = xTaskCreate(desktopServiceReceive, "USB_Linux_Receive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
+
+    if (task_error != pdPASS)
+    {
+        LOG_ERROR("failed to start freertos core task");
+    }
+
     return (fd);
 }

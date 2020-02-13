@@ -9,5 +9,5 @@ private:
     std::string rspPayloadSizeToStr(std::size_t);
 
 public:
-    sys::ReturnCodes battery(uint8_t, uint8_t);
+  sys::ReturnCodes battery(uint8_t);
 };

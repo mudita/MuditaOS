@@ -13,9 +13,9 @@ extern "C"
 #include "../linux/Worker.hpp"
 #endif
 
-extern xQueueHandle queueHandleBuffer;
+extern xQueueHandle USBSendQueue;
 
-sys::ReturnCodes EndpointHandler::battery(uint8_t method, uint8_t fd)
+sys::ReturnCodes EndpointHandler::battery(uint8_t method)
 {
     if (method == static_cast<uint8_t>(ParserUtils::Method::Get))
     {
@@ -36,14 +36,12 @@ sys::ReturnCodes EndpointHandler::battery(uint8_t method, uint8_t fd)
 
         std::string responseSizeStr = EndpointHandler::rspPayloadSizeToStr(responsePayloadJson.dump().size());
         std::string responseHeaderStr = "#" + responseSizeStr;
-        std::string responseStr = responseHeaderStr + responsePayloadJson.dump();
+
+        static std::string responseStr;
+        responseStr = responseHeaderStr + responsePayloadJson.dump();
         LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
+        xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
 
-        uint8_t outputData[SERIAL_BUFFER_LEN];
-        std::copy(responseStr.begin(), responseStr.end(), outputData);
-        xQueueSend(queueHandleBuffer, outputData, portMAX_DELAY);
-
-//        desktopServiceSend(fd, (uint8_t *)responseStr.c_str(), responseStr.length());
         return sys::ReturnCodes::Success;
     }
     return sys::ReturnCodes::Failure;

@@ -27,8 +27,6 @@ class EndpointFsm
    */
 public:
 
-    static uint8_t linux_fd;
-
     /* default reaction for unhandled events */
   void react(tinyfsm::Event const &) { };
 

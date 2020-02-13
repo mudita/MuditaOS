@@ -18,9 +18,9 @@ namespace sys {
 
 class WorkerQueueInfo {
 public:
-	std::string name;
-	int elementSize;
-	int length;
+  const char *name;
+  int elementSize;
+  int length;
 };
 
 struct WorkerCommand {

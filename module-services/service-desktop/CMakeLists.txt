@@ -16,4 +16,5 @@ target_include_directories (${PROJECT_NAME} PUBLIC usb/include usb/osa usb/devic
 target_sources( ${PROJECT_NAME}
     PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}/ServiceDesktop.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/WorkerDesktop.cpp"
 )

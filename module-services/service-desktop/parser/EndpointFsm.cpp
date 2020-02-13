@@ -122,7 +122,7 @@ class StateEndpointBattery
         // LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
         // desktopServiceSend(-1, (uint8_t *)responseStr.c_str(), responseStr.length());
 
-        endpointHandler.battery(method, linux_fd);
+        endpointHandler.battery(method);
 
         transit<StateDecodeJson>();
     };
@@ -197,7 +197,6 @@ std::string EndpointFsm::rspPayloadSizeToStr(std::size_t rspSize){
 
 uint8_t     EndpointFsm::endpoint;
 uint8_t     EndpointFsm::method;
-uint8_t     EndpointFsm::linux_fd;
 
 // ----------------------------------------------------------------------------
 // Initial state definition

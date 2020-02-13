@@ -1,6 +1,6 @@
 #pragma once
-#include "../ServiceDesktop.hpp"
+#include "../WorkerDesktop.hpp"
 
 int desktopServiceInit();
 void desktopServiceReceive(void *pointer);
-void desktopServiceSend(void *pointer);
+int desktopServiceSend(std::string msg);
