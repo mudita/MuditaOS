@@ -15,6 +15,5 @@ define target hookpost-remote
 monitor reset 0
 monitor halt
 echo Hook post- remote called!!\n
-# load
 end
 

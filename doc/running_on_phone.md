@@ -50,4 +50,8 @@ If you have bootloader flashed and working use a key combo, to mount PurePhone a
 - press key 4
 
 ### Ozone
-@TODO
+If you don't have bootloader, you can temporarily load a binary that will make the phone appear as USB MSC.
+From there you can flash the eMMC as described [above](#eMMC_upload).
+
+
+Details can be found here: [D1_eMMC_FlashLoader](https://github.com/muditacom/D1_eMMC_FlashLoader) 
