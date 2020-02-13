@@ -254,7 +254,9 @@ class Text : public Rect
     bool onContent() override;
     void setTextColor(Color color);
     void setAlignment(const Alignment alignment);
-private:
+    void setYaps(RectangleYapFlags yaps) override;
+
+  private:
     InputMode *mode = nullptr;
     gui::KeyInputMappedTranslation translator;
 };

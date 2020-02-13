@@ -87,6 +87,12 @@ Text::~Text()
     }
 }
 
+void Text::setYaps(RectangleYapFlags yaps)
+{
+    Rect::setYaps(yaps);
+    recalculateDrawParams();
+}
+
 void Text::setEditMode(EditMode mode)
 {
     editMode = mode;
