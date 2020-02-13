@@ -14,7 +14,7 @@ constexpr auto pageSize = 4;
 constexpr auto listHeight = 445;
 constexpr auto listWidth = 458;
 constexpr auto listPositionX = 11;
-constexpr auto ListPositionY = 105;
+constexpr auto ListPositionY = 105; // @TODO M.G. tweak it to design. Spacers between entries, top margin
 } //namespace threads
 
 namespace threadItem {

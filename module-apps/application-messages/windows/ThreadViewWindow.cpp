@@ -50,7 +50,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
-        auto elements_width = this->getWidth() - style::window::default_left_margin * 2;
         body = new gui::VBox(this, style::window::default_left_margin, title->offset_h(), elements_width, bottomBar->getY() - title->offset_h());
         body->setPenWidth(style::window::default_border_no_focus_w);
         body->setPenFocusWidth(style::window::default_border_no_focus_w);
@@ -203,36 +202,64 @@ namespace gui
         LOG_DEBUG("sms built");
     }
 
+    HBox *ThreadViewWindow::smsSpanBuild(Text *smsBubble, const Alignment position, const uint32_t timestamp) const
+    {
+        auto labelSpan = new gui::HBox();
+        labelSpan->setPenWidth(style::window::default_border_no_focus_w);
+        labelSpan->setPenFocusWidth(style::window::default_border_no_focus_w);
+        labelSpan->setReverseOrder(position.alignment != Alignment::ALIGN_HORIZONTAL_LEFT);
+        labelSpan->setSize(elements_width, smsBubble->getHeight());
+        labelSpan->addWidget(smsBubble);
+
+        auto timeLabel = new gui::Label(nullptr, 0, 0, 0, smsBubble->getHeight());
+        timeLabel->activeItem = false;
+        timeLabel->setFont(style::window::font::verysmall);
+        timeLabel->setText(utils::time::Time(timestamp));
+        timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
+        timeLabel->setPenWidth(style::window::default_border_no_focus_w);
+        timeLabel->setVisible(false);
+        timeLabel->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+
+        uint16_t dateLabelSpacerWidth = (elements_width - smsBubble->getWidth() - timeLabel->getWidth() - smsBubble->yapSize);
+        auto timeLabelSpacer = new gui::Label(nullptr, 0, 0, dateLabelSpacerWidth, smsBubble->getHeight());
+        timeLabelSpacer->activeItem = false;
+        timeLabelSpacer->setPenWidth(0);
+
+        labelSpan->addWidget(timeLabelSpacer);
+
+        labelSpan->addWidget(timeLabel);
+
+        timeLabel->setVisible(false);
+        labelSpan->focusChangedCallback = [=](gui::Item &item) {
+            timeLabel->setVisible(item.focus);
+            return true;
+        };
+
+        if (!smsBubble->visible)
+        {
+            delete labelSpan; // total fail
+            labelSpan = nullptr;
+        }
+        return labelSpan;
+    }
+
     bool ThreadViewWindow::smsBuild(const SMSRecord &el, bool bottom)
     {
         /// dummy sms thread - TODO load from db - on switchData
-        auto label = new Text(nullptr, 0, 1, 300, 5);
+        auto label = new Text(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
         label->setTextType(Text::TextType::MULTI_LINE);
         label->setEditMode(Text::EditMode::SCROLL);
         label->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        label->setRadius(5);
+        label->setRadius(style::window::messages::sms_radius);
         label->setFont(style::window::font::medium);
         label->setPenFocusWidth(style::window::default_border_focucs_w);
         label->setPenWidth(style::window::messages::sms_border_no_focus);
         label->expandMode = Text::ExpandMode::EXPAND_DOWN;
         label->buildDrawList();
-        label->setText(el.body.length() ? el.body : " "); // text doesn't really like being empty
-        // TODO move to other decorating function depending on what happens (bind left, right, add dashdot etc)
-        LOG_DEBUG("ADD SMS TYPE: %d", el.type);
-        switch (el.type)
-        {
-        case SMSType::OUTBOX:
-            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
-            label->setX(body->getWidth() - label->getWidth());
-            break;
-        case SMSType::INBOX:
-            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
-            break;
-        default:
-            break;
-        }
-        // @TODO: need for a callback yap change. yaps don't call recalculateDrawParams() because they are not Label, but Rect
-        label->setMargins(gui::Margins(10, 10, 10, 10)); // needs to be after setYaps, because see above ↑
+        label->setText(el.body.length() ? el.body : " "); // text doesn't really like being empty//
+        label->setMargins(gui::Margins(style::window::messages::sms_h_padding, style::window::messages::sms_v_padding, style::window::messages::sms_h_padding,
+                                       style::window::messages::sms_v_padding));
+
         label->activatedCallback = [=](Item &) {
             LOG_INFO("Message activated!");
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
@@ -249,13 +276,40 @@ namespace gui
             }
             return true;
         };
-        auto rect = new gui::Rect(nullptr, 0, 0, 10, 10);
-        rect->activeItem = false;
-        rect->setPenWidth(0);
-        body->addWidget(rect);
+
+        // wrap label in H box, to make fit datetime in it
+        HBox *labelSpan = nullptr;
+
+        // TODO dashed (dotted) outline
+        LOG_DEBUG("ADD SMS TYPE: %d", el.type);
+        switch (el.type)
+        {
+        case SMSType::OUTBOX:
+            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            label->setX(body->getWidth() - label->getWidth());
+            labelSpan = smsSpanBuild(label, Alignment::ALIGN_HORIZONTAL_RIGHT, el.date);
+            break;
+        case SMSType::INBOX:
+            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
+            labelSpan = smsSpanBuild(label, Alignment::ALIGN_HORIZONTAL_LEFT, el.date);
+            break;
+        default:
+            break;
+        }
+
+        if (labelSpan == nullptr)
+        {
+            return false;
+        }
+
+        auto verticalSpacer = new gui::Rect(nullptr, 0, 0, elements_width, style::window::messages::sms_vertical_spacer);
+        verticalSpacer->activeItem = false;
+        verticalSpacer->setPenWidth(style::window::default_border_no_focus_w);
+        body->addWidget(verticalSpacer);
+
         LOG_INFO("Add sms: %s %s", el.body.c_str(), el.number.c_str());
-        body->addWidget(label);
-        return label->visible;
+        body->addWidget(labelSpan);
+        return labelSpan->visible;
     }
 
     void ThreadViewWindow::rebuild()
