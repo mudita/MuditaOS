@@ -369,8 +369,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
 
     case MessageType::CellularListCurrentCalls: {
+        constexpr size_t numberOfExpectedTokens = 3;
         auto ret = cmux->GetChannel("Commands")->cmd("AT+CLCC\r", 300);
-        if (ret)
+        if (ret && ret.response.size() == numberOfExpectedTokens)
         {
             // TODO: alek: add case when more status calls is returned
             // TODO: alek: add cellular call validation and check it with modemcall

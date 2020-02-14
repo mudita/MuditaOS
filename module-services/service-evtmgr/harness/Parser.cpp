@@ -60,8 +60,9 @@ namespace harness
                 else if (evt.msg)
                 {
                     sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
+                } else {
+                    LOG_DEBUG("> evt: %s", evt.encode().c_str());
                 }
-                LOG_DEBUG("> evt: %s", evt.encode().c_str());
             }
             break;
             default:

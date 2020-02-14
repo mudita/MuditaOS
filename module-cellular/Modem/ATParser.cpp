@@ -108,7 +108,7 @@ void ATParser::cmd_init()
 
 void ATParser::cmd_send(std::string cmd)
 {
-    cellular->Write((void *)cmd.c_str(), cmd.size());
+    cellular->Write(const_cast<char *>(cmd.c_str()), cmd.size());
 }
 
 std::vector<std::string> ATParser::cmd_receive()

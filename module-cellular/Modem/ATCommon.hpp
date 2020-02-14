@@ -59,6 +59,14 @@ namespace at
       public:
         static const std::string OK;
         static const std::string ERROR;
+        // /// other codes unused right now: Please see quectel QuectelEC2526EC21ATCommandsManualV1.3 page 21
+        // const std::string Chanel::CONNECT = "CONNECT";
+        // const std::string Chanel::RING = "RING";
+        // const std::string Chanel::NO_CARRIER = "NO CARRIER";
+        // const std::string Chanel::NO_DIALTONE = "NO DIALTONE";
+        // const std::string Chanel::BUSY = "BUSY";
+        // const std::string Chanel::NO_ANSVER = "NO ANSWER";
+
         /// waits till ok or timeout
         virtual Result cmd(const std::string cmd, uint32_t timeout = 5000, size_t rxCount = 0) final;
         /// check for OK, ERROR in string in last token
