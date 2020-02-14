@@ -6,8 +6,6 @@
 // - gsm SIM tray
 // it's not meant to serve as polling interface - rather to serve data
 
-#include <bitset>
-
 namespace Store
 {
     struct Battery
@@ -36,7 +34,7 @@ namespace Store
         } tray = Tray::IN;
         /// tray - tray actual status which is visible right now on screen
         /// selected - tray selection settings settable sim tray
-        enum class SIM : uint8_t
+        enum class SIM
         {
             SIM1,
             SIM2,

@@ -4,7 +4,6 @@
 
 namespace harness::events
 {
-
     /// returns nullptr on fail, KbdMessage on success
     /// of json { "t" : KeyPress, "d" : [1,2,3,4]
     /// where 1,2,3,4 is: [ key_code, key_press (0 released), press_time, release_time ]

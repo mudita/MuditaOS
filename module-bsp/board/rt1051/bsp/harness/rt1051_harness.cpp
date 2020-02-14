@@ -11,6 +11,7 @@
 #include "rt1051_harness.hpp"
 #include "stream_buffer.h"
 #include <cstring>
+#include "bsp/harness/bsp_pinmap.hpp"
 
 static StreamBufferHandle_t uartRxStreamBuffer = nullptr;
 static xQueueHandle qHandleIrq = NULL;
