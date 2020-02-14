@@ -94,12 +94,19 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, bool createTempIfNotFind = false);
+    enum class CreateTempContact : bool
+    {
+        False,
+        True
+    };
+
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::True);
 
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
 
     std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName, const char *alternativeName,
                                                        const char *number);
+
   private:
     ContactsDB *contactDB;
     /// get multiple numbers by split numbers_id

@@ -38,7 +38,7 @@ CalllogRecordInterface::~CalllogRecordInterface() {
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.GetByNumber(rec.number, true);
+    auto contactRec = contactInterface.GetByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
     if (contactRec->size() == 0)
     {
         LOG_ERROR("Cannot get contact, for number %s", rec.number.c_str());

@@ -38,7 +38,7 @@ SMSRecordInterface::~SMSRecordInterface() {
 
 bool SMSRecordInterface::Add(const SMSRecord &rec) {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.GetByNumber(rec.number, true);
+    auto contactRec = contactInterface.GetByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
     if (contactRec->size() == 0)
     {
         LOG_ERROR("Cannot find contact, for number %s", rec.number.c_str());

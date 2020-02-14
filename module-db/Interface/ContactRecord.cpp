@@ -628,11 +628,11 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetContactBy
     return GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, number.c_str());
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number, bool createTempIfNotFind)
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number, CreateTempContact createTempContact)
 {
     auto ret = GetContactByNumber(number);
 
-    if (createTempIfNotFind == false)
+    if (createTempContact == CreateTempContact::False)
     {
         return ret;
     }
