@@ -20,7 +20,8 @@
 #include <common_data/EventStore.hpp>
 #include <map>
 
-void foo()
+namespace bsp::cellular {
+void readline_timeout()
 {
     BaseType_t hp = pdFALSE;
     if (bsp::RT1051Cellular::blockedTaskHandle)
@@ -29,6 +30,7 @@ void foo()
     }
     portEND_SWITCHING_ISR(hp);
 }
+};
 
 extern "C"
 {
@@ -52,7 +54,7 @@ extern "C"
                         LOG_FATAL("...");
                     }
                     xStreamBufferSendFromISR(bsp::RT1051Cellular::uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
-                    bsp::pit::start(25 * 1000, foo);
+                    bsp::pit::start(25 * 1000, bsp::cellular::readline_timeout);
                 }
             }
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, isrReg);

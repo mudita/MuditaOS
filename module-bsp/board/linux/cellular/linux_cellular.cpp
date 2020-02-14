@@ -198,14 +198,24 @@ namespace bsp {
         ioctl(fd, TIOCMBIS, &status);
     }
 
-    namespace cellular
+    namespace cellular::sim
     {
-        void Init(xQueueHandle qHandle)
+        auto init(QueueHandle_t qHandle) -> int
+        {
+            return 0;
+        }
+
+        auto trayIRQ_handler() -> BaseType_t
+        {
+            return BaseType_t();
+        }
+
+        void hotswap_trigger()
         {
         }
-        int SIMTrayStatus()
+
+        void sim_sel()
         {
-            return 1;
         }
-    }; // namespace cellular
+    } // namespace cellular::sim
 }

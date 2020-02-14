@@ -20,12 +20,6 @@
 #include <task.h>
 #include <vector>
 
-#if DEBUG_MODEM_TIMEOUT_AS_ERROR
-#define LOG_MODEM_TIMEOUT(...) LOG_ERROR(__VA_ARGS__)
-#else
-#define LOG_MODEM_TIMEOUT(...)
-#endif
-
 namespace bsp{
     class Cellular;
 }

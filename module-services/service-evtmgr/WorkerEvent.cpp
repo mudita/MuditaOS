@@ -158,7 +158,6 @@ bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
-    // bsp::cellular::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueSIM)]);
     bsp::cellular::sim::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueSIM)]);
 
     time_t timestamp;
