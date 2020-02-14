@@ -642,7 +642,6 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(
     {
         LOG_INFO("Cannot find contact for number %s, creating temporary one", number.c_str());
         if (!Add(ContactRecord{
-                .primaryName = number, // TODO: alek: rem
                 .contactType = ContactType::TEMPORARY,
                 .numbers = std::vector<ContactRecord::Number>{ContactRecord::Number(number.c_str(), number.c_str())},
             }))

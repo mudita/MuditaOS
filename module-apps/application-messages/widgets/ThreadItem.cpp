@@ -83,8 +83,8 @@ void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> &thread) {
 		auto contactRec = DBServiceAPI::ContactGetByID(model->getApplication(),
 				thread->contactID);
 		auto cont = contactRec->front();
-		contact->setText(cont.primaryName + " " + cont.alternativeName);
-	}
+        contact->setText(cont.getFormattedName());
+    }
 
     timestamp->setText(utils::time::DateTime(thread->date));
 

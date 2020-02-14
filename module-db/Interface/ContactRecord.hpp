@@ -54,6 +54,11 @@ struct ContactRecord
 
     inline UTF8 getFormattedName()
     {
+        if (contactType == ContactType::TEMPORARY)
+        {
+            return numbers[0].numberE164;
+        }
+
         return primaryName + " " + alternativeName;
     }
 };
@@ -100,7 +105,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
         True
     };
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::True);
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
 
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
 
