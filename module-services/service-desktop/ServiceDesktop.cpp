@@ -36,18 +36,22 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
     DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    DesktopWorker->init({{"receiveQueueBuffer", sizeof(std::string), 10}, {"sendQueueBuffer", sizeof(std::string), 10}});
+    DesktopWorker->init({{"receiveQueueBuffer", sizeof(std::string), 1}, {"sendQueueBuffer", sizeof(std::string*), 10}});
+
     DesktopWorker->run();
 
     USBReceiveQueue = DesktopWorker->getQueues().at(1);
     USBSendQueue = DesktopWorker->getQueues().at(2);
+
+
+    //    USBSendQueue = xQueueCreate(10, sizeof(std::string));
 
     //    const char *name = pcQueueGetQueueName(USBReciveQueue);
     //    const char *name2 = pcQueueGetQueueName(USBSendQueue);
     //
     //    std::string name3 = DesktopWorker->getQueueNameMap()[DesktopWorker->getQueues().at(1)];
 
-    if ((ptyDescriptor = desktopServiceInit()) < 0)
+    if ((ptyDescriptor = bsp::desktopServiceInit()) < 0)
     {
         LOG_ERROR("won't start desktop service without serial port");
         return (sys::ReturnCodes::Failure);
@@ -71,16 +75,4 @@ sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerM
 sys::Message_t ServiceDesktop::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     return std::make_shared<sys::ResponseMessage>();
-}
-
-void ServiceDesktop::dataReceived(const uint8_t *data, const ssize_t dataLen)
-{
-    SerialParserFsm::msgChunk.assign(data, data + dataLen);
-    send_event(MessageDataEvt());
-
-}
-
-int ServiceDesktop::getPtyDescriptor()
-{
-    return (ptyDescriptor);
 }

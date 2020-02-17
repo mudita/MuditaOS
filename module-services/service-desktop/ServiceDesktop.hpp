@@ -22,17 +22,11 @@ class ServiceDesktop : public sys::Service
 
     xTaskHandle taskHandleReceive;
     xTaskHandle taskHandleSend;
-    bool isRunning;
     int ptyDescriptor;
 
   public:
     ServiceDesktop();
     ~ServiceDesktop();
-
-    int getPtyDescriptor();
-
-    //    int sendData(const char *rawDataToSend, size_t rawDataSize);
-    void dataReceived(const uint8_t *data, const ssize_t dataLen);
 
     sys::ReturnCodes InitHandler() override;
 

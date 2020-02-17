@@ -1,6 +1,9 @@
 #pragma once
 #include "../WorkerDesktop.hpp"
 
-int desktopServiceInit();
-void desktopServiceReceive(void *pointer);
-int desktopServiceSend(std::string msg);
+namespace bsp
+{
+    int desktopServiceInit();
+    void desktopServiceReceive(void *ptr);
+    int desktopServiceSend(std::string *msg);
+} // namespace bsp

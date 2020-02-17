@@ -28,6 +28,11 @@ class StateMessageType
         msgPayload.clear();
         EndpointFsm::reset();
         RawDataFsm::reset();
+
+        if (!msgChunk.empty())
+        {
+            send_event(MessageDataEvt());
+        }
     };
 
     void react(MessageDataEvt const &) override

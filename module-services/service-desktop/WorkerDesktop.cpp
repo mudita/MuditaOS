@@ -24,25 +24,24 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     std::string qname = getQueueNameMap()[queue];
     LOG_INFO("[ServiceDesktop:Worker] Received data from queue: %s", qname.c_str());
 
-    static std::string msg;
+    static std::string receive_msg;
+    static std::string *send_msg;
 
     if (qname == "receiveQueueBuffer")
     {
-
-        if (xQueueReceive(queue, &msg, 0) != pdTRUE)
+        if (xQueueReceive(queue, &receive_msg, 0) != pdTRUE)
             return false;
 
-        SerialParserFsm::msgChunk.assign(msg.begin(), msg.end());
+        SerialParserFsm::msgChunk.assign(receive_msg.begin(), receive_msg.end());
         send_event(MessageDataEvt());
     }
 
     if (qname == "sendQueueBuffer")
     {
-
-        if (xQueueReceive(queue, &msg, 0) != pdTRUE)
+        if (xQueueReceive(queue, &send_msg, 0) != pdTRUE)
             return false;
 
-        desktopServiceSend(msg);
+        bsp::desktopServiceSend(send_msg);
     }
 
     return true;

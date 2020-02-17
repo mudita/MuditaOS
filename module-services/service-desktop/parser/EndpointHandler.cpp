@@ -17,30 +17,23 @@ extern xQueueHandle USBSendQueue;
 
 sys::ReturnCodes EndpointHandler::battery(uint8_t method)
 {
+
     if (method == static_cast<uint8_t>(ParserUtils::Method::Get))
     {
         //sample json response
-        json11::Json responseBodyJson = json11::Json::object ({
-            { "level", 75 },
-            { "charging", true },
-            { "maximumCapacity", 100 }
-        });
+        json11::Json responseBodyJson = json11::Json::object({{"level", 75}, {"charging", true}, {"maximumCapacity", 100}});
 
         int statusCode = static_cast<int>(ParserUtils::Code::OK);
 
-        json11::Json responsePayloadJson = json11::Json::object({
-            { "endpoint", 0 },
-            { "status", statusCode},
-            { "body", responseBodyJson }
-        });
+        json11::Json responsePayloadJson = json11::Json::object({{"endpoint", 0}, {"status", statusCode}, {"body", responseBodyJson}});
 
         std::string responseSizeStr = EndpointHandler::rspPayloadSizeToStr(responsePayloadJson.dump().size());
         std::string responseHeaderStr = "#" + responseSizeStr;
-
-        static std::string responseStr;
-        responseStr = responseHeaderStr + responsePayloadJson.dump();
+        std::string responseStr = responseHeaderStr + responsePayloadJson.dump();
         LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
-        xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
+
+        std::string *response_string = new std::string(responseStr);
+        xQueueSend(USBSendQueue, &response_string, portMAX_DELAY);
 
         return sys::ReturnCodes::Success;
     }
