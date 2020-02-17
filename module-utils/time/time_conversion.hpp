@@ -104,9 +104,7 @@ class Timestamp : protected Localer
     {
         return time;
     };
-    /*
-     * @breif Returns
-     */
+
     UTF8 get_date_time_substr(GetParameters param);
     uint32_t get_date_time_sub_value(GetParameters param);
 };

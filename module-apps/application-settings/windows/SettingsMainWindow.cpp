@@ -40,7 +40,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
              }},
             {utils::localize.get("app_settings_date_and_time"),
              [=](gui::Item &) {
-                 LOG_INFO("switching to language page");
+                 LOG_INFO("switching to date and time page");
                  app->switchWindow("DateTime");
                  return true;
              }},

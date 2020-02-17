@@ -28,8 +28,6 @@ namespace gui
 
     DateTimeWindow::DateTimeWindow(app::Application *app) : AppWindow(app, "DateTime")
     {
-        setSize(style::window_width, style::window_height);
-
         buildInterface();
     }
 
@@ -244,7 +242,7 @@ namespace gui
                     }
                     ret = true;
                 }
-                else if (inputEvent.keyCode == gui::KeyCode::KEY_AST)
+                else if (inputEvent.keyCode == gui::KeyCode::KEY_PND)
                 {
                     if (focusItem == dateBody || focusItem == timeBody)
                     {
