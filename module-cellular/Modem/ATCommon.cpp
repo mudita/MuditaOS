@@ -109,3 +109,18 @@ class Result Chanel::cmd(const std::string cmd, uint32_t timeout, size_t rxCount
 
     return result;
 }
+
+auto Chanel::cmd(at::Cmd &at) -> Result
+{
+    at.last.requested = cpp_freertos::Ticks::GetTicks();
+    Result result = this->cmd(at.cmd, at.timeout);
+    at.last.response = cpp_freertos::Ticks::GetTicks();
+    at.last.status = result.code;
+    return result;
+}
+
+auto Chanel::cmd(const at::AT at) -> Result
+{
+    auto cmd = at::factory(at);
+    return this->cmd(cmd);
+}
