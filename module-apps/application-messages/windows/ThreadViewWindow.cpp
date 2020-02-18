@@ -102,7 +102,7 @@ namespace gui
             record.number = title->getText();
             record.body = text->getText();
             record.type = SMSType::QUEUED;
-            auto time = utils::time::Time();
+            auto time = utils::time::Timestamp();
             record.date = time.getTime();
             DBServiceAPI::SMSAdd(this->application, record);
 

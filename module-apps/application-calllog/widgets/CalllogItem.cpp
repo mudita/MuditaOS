@@ -97,7 +97,7 @@ void CalllogItem::setCall( std::shared_ptr<CalllogRecord>& call ) {
 
 	imageCallType[static_cast<uint32_t>(callType)]->setVisible(true);
 
-	timestamp->setText( utils::time::SysTime(call->date, false)); // TODO: alek: check for AM/PM and 24h
+    timestamp->setText(utils::time::DateTime(call->date, false)); // TODO: alek: check for AM/PM and 24h
 }
 
 } /* namespace gui */

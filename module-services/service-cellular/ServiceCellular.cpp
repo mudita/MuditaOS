@@ -731,8 +731,8 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 				//parse date
 				tokens[3].erase(std::remove(tokens[3].begin(), tokens[3].end(), '\"'), tokens[3].end());
 
-				utils::time::Time time;
-				time.set_time(tokens[3] + " " + tokens[4], "%y/%m/%d %H:%M:%S");
+                utils::time::Timestamp time;
+                time.set_time(tokens[3] + " " + tokens[4], "%y/%m/%d %H:%M:%S");
                 auto messageDate = time.getTime();
 
                 //if its single message process

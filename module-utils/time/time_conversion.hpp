@@ -33,9 +33,10 @@ struct Localer {
     UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
 };
 
-class Time : protected Localer {
-    protected:
-    time_t time=0;
+class Timestamp : protected Localer
+{
+  protected:
+    time_t time = 0;
     struct tm timeinfo;
     /// only reformat on: new format
     std::string format = "";
@@ -52,14 +53,18 @@ class Time : protected Localer {
     void replace_specifiers();
 
   public:
-    Time() {
+    Timestamp()
+    {
         auto err = bsp::rtc_GetCurrentTimestamp(&time);
         if(err) {
             LOG_ERROR("rtc_GetCurrentTimestamp failure!");
         }
-        timeinfo =*localtime(&time);
+        timeinfo = *localtime(&time);
     }
-    Time(time_t newtime) : time(newtime) { timeinfo = *localtime(&time); }
+    Timestamp(time_t newtime) : time(newtime)
+    {
+        timeinfo = *localtime(&time);
+    }
 
     /// set Time time_t value held (set timestamp)
     void set_time(time_t newtime);
@@ -68,7 +73,8 @@ class Time : protected Localer {
     void set_format(std::string format) { this->format = format;}
 
     operator UTF8() { return str(); }
-    friend std::ostream& operator<<(std::ostream &os, Time t) {
+    friend std::ostream &operator<<(std::ostream &os, Timestamp t)
+    {
         os << t.str();
         return os;
     }
@@ -91,21 +97,24 @@ class Time : protected Localer {
 
 /// helper class to operate on time now
 /// takes timestamp and can show time in past
-class SysTime : public Time {
-    time_t ref_time = 0;
-    public:
+class DateTime : public Timestamp
+{
+    time_t local_time = 0;
 
+  public:
     bool show_textual_past = true;
     bool date_format_long = true;
     std::string today_format = "%H:%M";
     std::string long_ago_format = "%d.%m.%y";
 
     /// shows time in past: time_now - val in seconds
-    SysTime(time_t val=0, bool date_format_long=true) : date_format_long(date_format_long) {
+    DateTime(time_t val = 0, bool date_format_long = true) : date_format_long(date_format_long)
+    {
         before_n_sec(val);
     }
 
-    friend std::ostream& operator<<(std::ostream &os, SysTime t) {
+    friend std::ostream &operator<<(std::ostream &os, DateTime t)
+    {
         os << t.str();
         return os;
     }
@@ -114,8 +123,23 @@ class SysTime : public Time {
     void before_n_sec(time_t val);
 
     /// Time have str(std::string ) this one uses presets
-    virtual UTF8 str(std::string format="");
+    virtual UTF8 str(std::string format = "");
+    bool isToday();
+    bool isYesterday();
 };
 
+class Date : public DateTime
+{
+  public:
+    Date(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
+    virtual UTF8 str(std::string format = "") final;
+};
+
+class Time : public DateTime
+{
+  public:
+    Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
+    virtual UTF8 str(std::string format = "") final;
+};
 };
 };
