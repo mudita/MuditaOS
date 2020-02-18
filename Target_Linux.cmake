@@ -1,45 +1,23 @@
 set(PROJECT_TARGET "TARGET_Linux" CACHE INTERNAL "")
 
-set(TARGET_SOURCES
+set(TARGET_SOURCES CACHE INTERNAL "")
 
+set(TARGET_DIR_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/board/linux  CACHE INTERNAL "")
 
-        CACHE INTERNAL "")
+set(TARGET_COMPILE_FEATURES CACHE INTERNAL "")
 
-set(TARGET_DIR_INCLUDES
+set(TARGET_COMPILE_DEFINITIONS CACHE INTERNAL "")
 
-        ${CMAKE_CURRENT_LIST_DIR}/board/linux
-
-        CACHE INTERNAL "")
-
-set(TARGET_COMPILE_FEATURES
-
-        CACHE INTERNAL "")
-
-set(TARGET_COMPILE_DEFINITIONS
-
-        CACHE INTERNAL ""
-        )
-
-set(TARGET_COMPILE_OPTIONS
-	-Werror
-        -fsanitize=address
-
-        CACHE INTERNAL ""
-        )
+set(TARGET_COMPILE_OPTIONS -Werror -fsanitize=address  CACHE INTERNAL "")
 
 
 set(TARGET_LIBRARIES
+    rt
+    pthread
+    portaudio
+    CACHE INTERNAL "" )
 
-		rt
-        pthread
-		portaudio
+set(TARGET_LINK_OPTIONS  -fsanitize=address  CACHE INTERNAL "" )
 
-        CACHE INTERNAL ""
-        )
-
-set(TARGET_LINK_OPTIONS
-
-        -fsanitize=address
-
-        CACHE INTERNAL ""
-        )
+set(CMAKE_STRIP strip CACHE INTERNAL "")
+set(CMAKE_OBJCOPY objcopy CACHE INTERNAL "")

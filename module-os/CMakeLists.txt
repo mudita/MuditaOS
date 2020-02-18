@@ -3,23 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 project(module-os VERSION 1.0
         DESCRIPTION "OS module library")
 
-set(CMAKE_CXX_STANDARD 14)
-
-
-if(NOT DEFINED PROJECT_LIB_DIRECTORY )
-    set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
-    message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
-endif()
-
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_LIB_DIRECTORY})
-
-if(NOT DEFINED PROJECT_BUILD_DIRECTORY )
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building" )
-    message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
-endif()
-
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
-
 set(SOURCES
 
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/ccondition_variable.cpp
@@ -46,7 +29,6 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/timers.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/usermem.c
-
         )
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
@@ -59,7 +41,6 @@ endif()
 
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
-
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
