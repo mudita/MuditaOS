@@ -8,7 +8,7 @@ Prior to any build setup environment, need to be run once. (See: `## Run provisi
 
 ## Super quick and dirty to run app on linux:
 ```
-cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake     # set env.cmake
+cat env.cmake.sample | sed "s:<HOME>:$HOME:" > env.cmake                     # set env.cmake
 git submodule update --init --recursive                                     # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                                    # bootstrap requirements
 ./rebuild.sh && make -C build -j4                                           # run rebuild (cmake configuration) and build
