@@ -52,7 +52,9 @@ protected:
 	xQueueHandle serviceQueue;
 	std::vector<xQueueHandle> queues;
 	QueueSetHandle_t queueSet;
-	//workers task handle
+	// worker queue name map
+	std::map<xQueueHandle, std::string> queueNameMap;
+	// workers task handle
 	xTaskHandle taskHandle;
 public:
 	Worker( sys::Service* service );
@@ -85,8 +87,19 @@ public:
 	 * @brief Sends command and pointer to data to worker
 	 */
 	virtual bool send( uint32_t cmd, uint32_t* data );
-	std::vector<xQueueHandle>& getQueues(){ return queues; };
-	QueueSetHandle_t getSet(){ return queueSet; };
+
+	std::vector<xQueueHandle> &getQueues()
+	{
+		return queues;
+	};
+	std::map<xQueueHandle, std::string> &getQueueNameMap()
+	{
+		return queueNameMap;
+	};
+	QueueSetHandle_t getSet()
+	{
+		return queueSet;
+    };
 };
 
 } /* namespace sys */

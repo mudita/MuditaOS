@@ -65,17 +65,23 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
         deinit();
         return false;
 	}
-	queues.push_back( serviceQueue );
+	vQueueAddToRegistry(serviceQueue, "ServiceQueue");
+	queueNameMap.insert(std::pair<xQueueHandle, std::string>(serviceQueue, "ServiceQueue"));
+	queues.push_back(serviceQueue);
 
-	//create and add all queues provided from service
-	for( auto wqi : queuesList ) {
-		auto q = xQueueCreate(wqi.length, wqi.elementSize );
-		if( q == NULL ) {
-//			LOG_FATAL("xQueueCreate %s failed", wqi.name.c_str());
+	// create and add all queues provided from service
+	for (auto wqi : queuesList)
+	{
+		auto q = xQueueCreate(wqi.length, wqi.elementSize);
+		if (q == NULL)
+		{
+		    LOG_FATAL("xQueueCreate %s failed", wqi.name.c_str());
 			deinit();
 			return false;
 		}
-		queues.push_back( q );
+		queueNameMap.insert(std::pair<xQueueHandle, std::string>(q, wqi.name));
+		vQueueAddToRegistry(q, wqi.name.c_str());
+		queues.push_back(q);
 	}
 
 	//iterate over all queues and add them to set
