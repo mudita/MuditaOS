@@ -2,22 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(module-apps VERSION 1.0
         DESCRIPTION "Library with all applications.")
-        
-if(NOT DEFINED PROJECT_LIB_DIRECTORY )
-    set(PROJECT_LIB_DIRECTORY "${CMAKE_SOURCE_DIR}/lib/" CACHE STRING "Output path for static libraries")
-    message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
-endif()
 
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_LIB_DIRECTORY})
-
-if(NOT DEFINED PROJECT_BUILD_DIRECTORY )
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building" )
-    message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
-endif()
-
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BUILD_DIRECTORY})
-
-set(CMAKE_CXX_STANDARD 17)
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
 elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
