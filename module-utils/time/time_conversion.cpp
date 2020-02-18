@@ -153,7 +153,7 @@ void Timestamp::replace_specifiers()
         }
         if (isToday()) // if the same computer day, then return hour.
         {
-            return Timestamp::str(Locale::format(Locale::Format12HourMin));
+            return Timestamp::str(Locale::format(Locale::FormatTime12H));
         }
         else if (show_textual_past && isYesterday())
         {
@@ -194,7 +194,7 @@ void Timestamp::replace_specifiers()
         }
         else
         {
-            return Timestamp::str(Locale::format(Locale::Format12HourMin));
+            return Timestamp::str(Locale::format(Locale::FormatTime12H));
         }
     }
 

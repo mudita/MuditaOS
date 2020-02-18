@@ -45,11 +45,13 @@ class Locale {
 
     enum Month { Jan = 0, Feb, Mar, Apr, May, Jun, Jul, Aug, Sept, Oct, Now, Dec };
 
-    enum TimeFormat {
-        Format12HourMin = 0,    // H:M in 12h format
-        Format24HourMin,        // H:M in 24h format
-        FormatLocaleDateFull,   // format locale specified format
-        FormatLocaleDateShort,  // format locale specified format
+    enum TimeFormat
+    {
+        FormatTime12H = 0,     // H:M in 12h format
+        FormatTime24H,         // H:M in 24h format
+        FormatLocaleTime,      // H:M [AM/PM] locale specified format
+        FormatLocaleDateFull,  // format locale specified format
+        FormatLocaleDateShort, // format locale specified format
     };
 
     // this could return variant<bool, UTF8> -> on error -> false -> visit -> handle defaults
