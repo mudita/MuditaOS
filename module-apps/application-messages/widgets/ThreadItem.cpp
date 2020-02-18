@@ -86,10 +86,9 @@ void ThreadItem::setThreadItem(std::shared_ptr<ThreadRecord> &thread) {
 		contact->setText(cont.primaryName + " " + cont.alternativeName);
 	}
 
-	timestamp->setText(utils::time::SysTime(thread->date));
+    timestamp->setText(utils::time::DateTime(thread->date));
 
-	preview->setText(thread->snippet);
-
+    preview->setText(thread->snippet);
 }
 
 } /*namespace gui*/
