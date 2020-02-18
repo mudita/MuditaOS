@@ -42,8 +42,7 @@ UTF8 Localer::get_replacement(Replacements val, const struct tm &timeinfo)
     return retval;
 }
 
-
-void Time::replace_specifiers()
+void Timestamp::replace_specifiers()
 {
         int replacements_n = 0;
         const int strtof_formatter_size = 2;
@@ -70,13 +69,13 @@ void Time::replace_specifiers()
         }
     }
 
-    void Time::set_time(time_t newtime)
+    void Timestamp::set_time(time_t newtime)
     {
         time = newtime;
         timeinfo = *localtime(&time);
     }
 
-    void Time::set_time(std::string timestr, const char *format)
+    void Timestamp::set_time(std::string timestr, const char *format)
     {
 
         std::stringstream stream(timestr);
@@ -93,7 +92,7 @@ void Time::replace_specifiers()
 			LOG_ERROR("Time::set_time error %s", e.what());
 		}
     }
-    UTF8 Time::str(std::string format)
+    UTF8 Timestamp::str(std::string format)
     {
         if(format.compare("") !=0) this->format = format;
         UTF8 datetimestr = "";
@@ -103,7 +102,7 @@ void Time::replace_specifiers()
         return datetimestr;
     }
 
-    UTF8 Time::day(bool abbrev)
+    UTF8 Timestamp::day(bool abbrev)
     {
         if(abbrev) {
             return get_replacement(Replacements::DayAbbrev, timeinfo);
@@ -112,8 +111,7 @@ void Time::replace_specifiers()
         }
     }
 
-
-    UTF8 Time::month(bool abbrev)
+    UTF8 Timestamp::month(bool abbrev)
     {
         if(abbrev) {
             return get_replacement(Replacements::MonthAbbrev, timeinfo);
@@ -122,35 +120,83 @@ void Time::replace_specifiers()
         }
     }
 
-    void SysTime::before_n_sec(time_t val)
+    void DateTime::before_n_sec(time_t val)
     {
-        ref_time = time;
-        if(val) {
+        local_time = time;
+        if (val)
+        {
             set_time(val);
         }
     }
 
-    UTF8 SysTime::str(std::string format)
+    bool DateTime::isToday()
     {
-        auto newer_timeinfo = *localtime(&ref_time);
-        const unsigned int seconds_in_2days = 3600 * 24 * 2;
+        auto newer_timeinfo = *localtime(&local_time);
+        return (newer_timeinfo.tm_yday == timeinfo.tm_yday && newer_timeinfo.tm_year == timeinfo.tm_year);
+    }
+
+    bool DateTime::isYesterday()
+    {
+        auto newer_timeinfo = *localtime(&local_time);
         bool is_leap_year = (timeinfo.tm_year % 4 == 0 && timeinfo.tm_year % 100 != 0) || timeinfo.tm_year % 400 == 0;
-        if(format.compare("") != 0) {
-            return Time::str(format);
+
+        return (((newer_timeinfo.tm_yday - timeinfo.tm_yday == 1) && (newer_timeinfo.tm_year == timeinfo.tm_year)) // day difference
+                || (timeinfo.tm_year == 0 && newer_timeinfo.tm_year + 364 + is_leap_year)                          // day next year day difference
+        );
+    }
+
+    UTF8 DateTime::str(std::string format)
+    {
+        if (format.compare("") != 0)
+        {
+            return Timestamp::str(format);
         }
-        if( newer_timeinfo.tm_yday - timeinfo.tm_yday == 0) {
-            return Time::str(Locale::format(Locale::Format12HourMin));
-        } else if( show_textual_past
-                && ((newer_timeinfo.tm_yday - timeinfo.tm_yday == 1)                            // day difference
-                    ||(timeinfo.tm_year == 0 && newer_timeinfo.tm_year + 364 + is_leap_year)    // day next year day difference
-                   )
-                ) {
+        if (isToday()) // if the same computer day, then return hour.
+        {
+            return Timestamp::str(Locale::format(Locale::Format12HourMin));
+        }
+        else if (show_textual_past && isYesterday())
+        {
             return Locale::yesterday();
-        } else {
-            return Time::str(Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
+        }
+        else
+        {
+            return Timestamp::str(Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
         }
     }
 
+    UTF8 Date::str(std::string format)
+    {
+        if (!format.empty())
+        {
+            return Timestamp::str(format);
+        }
+        else if (show_textual_past)
+        {
+            if (isToday())
+            {
+                return Locale::today();
+            }
+            else if (isYesterday())
+            {
+                return Locale::yesterday();
+            }
+        }
 
-}; //time
+        return Timestamp::str(Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
+    }
+
+    UTF8 Time::str(std::string format)
+    {
+        if (!format.empty())
+        {
+            return Timestamp::str(format);
+        }
+        else
+        {
+            return Timestamp::str(Locale::format(Locale::Format12HourMin));
+        }
+    }
+
+}; // namespace time
 }; // utils

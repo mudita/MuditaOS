@@ -35,6 +35,7 @@ class Locale {
         "locale_date_short",
     };
 
+    const std::string ltoday = "common_today";
     const std::string lyesterday = "common_yesterday";
     const std::string ltimezone  = "common_timezone";
 
@@ -70,8 +71,14 @@ class Locale {
         }
     }
 
-    static const UTF8 yesterday() {
+    static const UTF8 yesterday()
+    {
         return localize.get(tlocale.lyesterday);
+    }
+
+    static const UTF8 today()
+    {
+        return localize.get(tlocale.ltoday);
     }
 
     static const std::string format(enum TimeFormat what) {

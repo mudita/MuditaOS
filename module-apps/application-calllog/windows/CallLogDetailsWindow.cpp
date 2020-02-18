@@ -238,11 +238,11 @@ void CallLogDetailsWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 		}
 		typeData->setText(callTypeStr);
 
-		durationData->setText(utils::time::Time(record.duration).str("%Mm %Ss")); // TODO: alek: add duration class
+        durationData->setText(utils::time::Timestamp(record.duration).str("%Mm %Ss")); // TODO: alek: add duration class
 
-		utils::time::Time t(record.date);
-		dateDay->setText(t.day()+",");
-		dateDate->setText(t.str(utils::localize.get("locale_date_full") + ", " + utils::localize.get("locale_12hour_min"))); // TODO: alek 12/24 h
+        utils::time::Timestamp t(record.date);
+        dateDay->setText(t.day() + ",");
+        dateDate->setText(t.str(utils::localize.get("locale_date_full") + ", " + utils::localize.get("locale_12hour_min"))); // TODO: alek 12/24 h
 	}
 
 	if( mode == ShowMode::GUI_SHOW_INIT) setFocusItem( rects[static_cast<uint32_t>(FocusRects::Call)] );
