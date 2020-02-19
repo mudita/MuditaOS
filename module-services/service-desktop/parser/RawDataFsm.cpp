@@ -9,19 +9,19 @@
 class StateRawDataType
 : public RawDataFsm
 {
-  void react(RawDataEvt const &) override {
-    LOG_DEBUG("RawDataFsm: StateRawDataType");
-    type = 1;
-  };
+    void react(RawDataEvt const &) override
+    {
+        LOG_DEBUG("RawDataFsm: StateRawDataType");
+    };
 };
 
 class StateRawDataPayload
 : public RawDataFsm
 {
-  void react(RawDataEvt const &) override {
-    LOG_DEBUG("RawDataFsm: StateRawDataPayload");
-    payload = 1;
-  };
+    void react(RawDataEvt const &) override
+    {
+        LOG_DEBUG("RawDataFsm: StateRawDataPayload");
+    };
 };
 
 
@@ -29,14 +29,15 @@ class StateRawDataPayload
 // Base State: default implementations
 //
 
-void RawDataFsm::react(RawDataEvt const &) {
-  LOG_DEBUG("RawDataEvt ignored");
+void RawDataFsm::react(RawDataEvt const &)
+{
+    LOG_DEBUG("RawDataEvt ignored");
 }
 
-void RawDataFsm::react(RawDataMallocEvt const &) {
-  LOG_DEBUG("RawDataMallocEvt ignored");
+void RawDataFsm::react(RawDataMallocEvt const &)
+{
+    LOG_DEBUG("RawDataMallocEvt ignored");
 }
-
 
 int RawDataFsm::type{0};
 int RawDataFsm::payload{0};

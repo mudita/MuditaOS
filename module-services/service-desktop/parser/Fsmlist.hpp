@@ -13,5 +13,5 @@ using fsm_list = tinyfsm::FsmList<SerialParserFsm, EndpointFsm, RawDataFsm>;
 template<typename E>
 void send_event(E const & event)
 {
-  fsm_list::template dispatch<E>(event);
+    fsm_list::template dispatch<E>(event);
 }

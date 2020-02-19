@@ -1,8 +1,7 @@
 #include "EndpointHandler.hpp"
 #include "ParserUtils.hpp"
 #include "json/json11.hpp"
-#include <algorithm>
-
+#include <string>
 #if defined(TARGET_RT1051)
 extern "C"
 {
@@ -13,40 +12,38 @@ extern "C"
 #include "../linux/Worker.hpp"
 #endif
 
-extern xQueueHandle USBSendQueue;
-
-sys::ReturnCodes EndpointHandler::battery(uint8_t method)
+sys::ReturnCodes EndpointHandler::battery(uint8_t httpMethod, std::string &responseStr)
 {
-
-    if (method == static_cast<uint8_t>(ParserUtils::Method::Get))
+    if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::get))
     {
         //sample json response
         json11::Json responseBodyJson = json11::Json::object({{"level", 75}, {"charging", true}, {"maximumCapacity", 100}});
 
-        int statusCode = static_cast<int>(ParserUtils::Code::OK);
+        int statusCode = static_cast<int>(parserutils::http::Code::OK);
+        int endpoint = static_cast<int>(parserutils::Endpoint::battery);
 
-        json11::Json responsePayloadJson = json11::Json::object({{"endpoint", 0}, {"status", statusCode}, {"body", responseBodyJson}});
+        json11::Json responsePayloadJson = json11::Json::object(
+            {{parserutils::json::endpoint, endpoint}, {parserutils::json::status, statusCode}, {parserutils::json::body, responseBodyJson}});
 
-        std::string responseSizeStr = EndpointHandler::rspPayloadSizeToStr(responsePayloadJson.dump().size());
-        std::string responseHeaderStr = "#" + responseSizeStr;
-        std::string responseStr = responseHeaderStr + responsePayloadJson.dump();
-        LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
-
-        std::string *response_string = new std::string(responseStr);
-        xQueueSend(USBSendQueue, &response_string, portMAX_DELAY);
+        responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
 
         return sys::ReturnCodes::Success;
     }
-    return sys::ReturnCodes::Failure;
+    else
+    {
+        LOG_ERROR("Incorrect method");
+        return sys::ReturnCodes::Failure;
+    }
 }
 
-
-std::string EndpointHandler::rspPayloadSizeToStr(std::size_t rspSize)
+std::string EndpointHandler::buildResponseStr(std::size_t responseSize, std::string responsePayloadString)
 {
-    std::string rspPayloadSizeStr = std::to_string(rspSize);
-    while (rspPayloadSizeStr.length() < 9)
+    std::string responsePayloadSizeStr = std::to_string(responseSize);
+    while (responsePayloadSizeStr.length() < parserutils::message::size_length)
     {
-        rspPayloadSizeStr.insert(0, 1, '0');
+        responsePayloadSizeStr.insert(0, 1, '0');
     }
-    return rspPayloadSizeStr;
+
+    std::string responseStr = static_cast<char>(parserutils::message::type::endpoint) + responsePayloadSizeStr + responsePayloadString;
+    return responseStr;
 }

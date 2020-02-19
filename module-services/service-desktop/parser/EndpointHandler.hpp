@@ -5,9 +5,13 @@
 
 class EndpointHandler
 {
-private:
-    std::string rspPayloadSizeToStr(std::size_t);
+  public:
+    sys::ReturnCodes battery(uint8_t httpMethod, std::string &responseStr);
+    sys::ReturnCodes backups(uint8_t httpMethod, std::string &responseStr);
+    sys::ReturnCodes deviceInfo(uint8_t httpMethod, std::string &responseStr);
+    sys::ReturnCodes network(uint8_t httpMethod, std::string &responseStr);
+    sys::ReturnCodes storage(uint8_t httpMethod, std::string &responseStr);
 
-public:
-  sys::ReturnCodes battery(uint8_t);
+  private:
+    std::string buildResponseStr(std::size_t responseSize, std::string responsePayloadString);
 };

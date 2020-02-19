@@ -16,26 +16,16 @@ struct RawDataMallocEvt     : tinyfsm::Event { };
 class RawDataFsm
 : public tinyfsm::Fsm<RawDataFsm>
 {
-    /* NOTE: react(), entry() and exit() functions need to be accessible
-     * from tinyfsm::Fsm class. You might as well declare friendship to
-     * tinyfsm::Fsm, and make these functions private:
-     *
-     * friend class Fsm;
-     */
-public:
+    friend class Fsm;
 
-    /* default reaction for unhandled events */
-    void react(tinyfsm::Event const &) { };
-
- 
-    virtual void react(RawDataEvt   const &); /* pure virtual: enforce implementation in all states */
+  private:
+    void react(tinyfsm::Event const &){};   /* default reaction for unhandled events */
+    virtual void react(RawDataEvt const &); /* pure virtual: enforce implementation in all states */
     void react(RawDataMallocEvt   const &);
+    void entry(void){}; /* no entry actions at all */
+    void exit(void){};  /* no exit actions at all */
 
-    void entry(void) { };          /* no entry actions at all */
-    void exit(void)  { };          /* no exit actions at all */
-
-protected:
-
+  protected:
     static int type;
     static int payload;
 };

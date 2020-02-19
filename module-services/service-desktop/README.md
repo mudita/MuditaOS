@@ -47,20 +47,27 @@ responsePayloadJson:
 *Each endpoint has its unique number.*
 
 ```
-enum Endpoint: uint8_t { Battery, Backups, DeviceInfo, Network, Storage };
+enum class Endpoint
+{
+    battery,
+    backups,
+    deviceInfo,
+    network,
+    storage
+};
 ```
 
 ###### Method
 *HTTP - like methods. Each has different number. Only in request message.*
 
 ```
-    enum class Method: uint8_t
-    {
-        Get,
-        Post,
-        Put,
-        Delete
-    };
+enum class Method
+{
+    get,
+    post,
+    put,
+    del
+};
 ```
 
 ###### Status

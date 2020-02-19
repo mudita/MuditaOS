@@ -4,7 +4,6 @@
 #include "log/log.hpp"
 #include "ParserUtils.hpp"
 #include "SerialParserFsm.hpp"
-#include "../ServiceDesktop.hpp"
 #if defined(TARGET_RT1051)
 extern "C"
 {
@@ -14,7 +13,7 @@ extern "C"
 #else
 #include "../linux/Worker.hpp"
 #endif
-
+extern xQueueHandle USBSendQueue;
 
 class StateEndpointBattery;
 class StateEndpointBackups;
@@ -36,9 +35,6 @@ class StateDecodeJson
 
     void react(EndpointEvt const &) override
     {
-        LOG_DEBUG("EndpointFsm: StateDecodeJson");
-
-        ParserUtils parserUtils;
         std::string errorString;
 
         json11::Json msgJson = json11::Json::parse(SerialParserFsm::msgPayload, errorString);
@@ -46,40 +42,31 @@ class StateDecodeJson
         {
             LOG_ERROR("Can't parse data as JSON [%s]", errorString.c_str());
         }
-        LOG_DEBUG("SerialParser::msgPayload [%s]", SerialParserFsm::msgPayload.c_str());
 
-        method = msgJson["method"].number_value();
-        LOG_DEBUG("method [%d]", method);
+        method = msgJson[parserutils::json::method].number_value();
 
-        if(!parserUtils.isMethodValid(method))
+        if (!parserutils::http::isMethodValid(method))
         {
             return;
         }
 
-        // if (!msgJson["payload"].is_object() || msgJson["payload"].is_null())
-        //     {
-        //         LOG_ERROR("Invalid payload!");
-        //         return;
-        //     }
-
-        endpoint = msgJson["endpoint"].number_value();
-        LOG_DEBUG("Endpoint [%d]", endpoint);
+        endpoint = msgJson[parserutils::json::endpoint].number_value();
 
         switch (endpoint)
         {
-        case Battery:
+        case static_cast<uint8_t>(parserutils::Endpoint::battery):
             transit<StateEndpointBattery>();
             break;
-        case Backups:
+        case static_cast<uint8_t>(parserutils::Endpoint::backups):
             transit<StateEndpointBackups>();
             break;
-        case DeviceInfo:
+        case static_cast<uint8_t>(parserutils::Endpoint::deviceInfo):
             transit<StateEndpointDeviceInfo>();
             break;
-        case Network:
+        case static_cast<uint8_t>(parserutils::Endpoint::network):
             transit<StateEndpointNetwork>();
             break;
-        case Storage:
+        case static_cast<uint8_t>(parserutils::Endpoint::storage):
             transit<StateEndpointStorage>();
             break;
         
@@ -96,34 +83,16 @@ class StateEndpointBattery
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointBattery ***");
-        //interprete payload and prepare answer if possible
-        //othervise, go to StateDecodeJson
 
-        EndpointHandler endpointHandler;
+        EndpointHandler endpointHandler = EndpointHandler();
 
-        //sample json response
-        // json11::Json responseBodyJson = json11::Json::object ({
-        //     { "level", 75 },
-        //     { "charging", true },
-        //     { "maximumCapacity", 100 }
-        // });
+        std::string responseStr;
+        sys::ReturnCodes retCode = endpointHandler.battery(method, responseStr);
+        LOG_DEBUG("endpointHandler.battery retCode %d", retCode);
 
-        // int statusCode = static_cast<int>(Http::Code::OK);
+        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
 
-        // json11::Json responsePayloadJson = json11::Json::object({
-        //     { "endpoint", Battery },
-        //     { "status", statusCode},
-        //     { "body", responseBodyJson }
-        // });
-
-        // std::string responseSizeStr = EndpointFsm::rspPayloadSizeToStr(responsePayloadJson.dump().size());
-        // std::string responseHeaderStr = "#" + responseSizeStr;
-        // std::string responseStr = responseHeaderStr + responsePayloadJson.dump();
-        // LOG_DEBUG("EndpointBattery responseStr [%s]", responseStr.c_str());
-        // desktopServiceSend(-1, (uint8_t *)responseStr.c_str(), responseStr.length());
-
-        endpointHandler.battery(method);
-
+        LOG_DEBUG("%s", responseStr.c_str());
         transit<StateDecodeJson>();
     };
 };
@@ -134,8 +103,12 @@ class StateEndpointBackups
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointBackups ***");
-        //interprete payload and prepare answer if possible
-        //othervise, go to StateDecodeJson
+
+        EndpointHandler endpointHandler = EndpointHandler();
+        std::string responseStr;
+        // sys::ReturnCodes retCode = endpointHandler.backups(method, responseStr);
+        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
+
         transit<StateDecodeJson>();
     };
 };
@@ -146,8 +119,12 @@ class StateEndpointDeviceInfo
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointDeviceInfo ***");
-        //interprete payload and prepare answer if possible
-        //othervise, go to StateDecodeJson
+
+        EndpointHandler endpointHandler = EndpointHandler();
+        std::string responseStr;
+        // sys::ReturnCodes retCode = endpointHandler.deviceInfo(method, responseStr);
+        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
+
         transit<StateDecodeJson>();
     };
 };
@@ -158,8 +135,12 @@ class StateEndpointNetwork
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointNetwork ***");
-        //interprete payload and prepare answer if possible
-        //othervise, go to StateDecodeJson
+
+        EndpointHandler endpointHandler = EndpointHandler();
+        std::string responseStr;
+        // sys::ReturnCodes retCode = endpointHandler.network(method, responseStr);
+        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
+
         transit<StateDecodeJson>();
     };
 };
@@ -170,8 +151,12 @@ class StateEndpointStorage
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointStorage ***");
-        //interprete payload and prepare answer if possible
-        //othervise, go to StateDecodeJson
+
+        EndpointHandler endpointHandler = EndpointHandler();
+        std::string responseStr;
+        // sys::ReturnCodes retCode = endpointHandler.storage(method, responseStr);
+        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
+
         transit<StateDecodeJson>();
     };
 };
@@ -181,19 +166,10 @@ class StateEndpointStorage
 // Base State: default implementations
 //
 
-void EndpointFsm::react(EndpointEvt const &) {
-  LOG_DEBUG("EndpointEvt ignored");
+void EndpointFsm::react(EndpointEvt const &)
+{
+    LOG_DEBUG("EndpointEvt ignored");
 }
-
-std::string EndpointFsm::rspPayloadSizeToStr(std::size_t rspSize){
-    std::string rspPayloadSizeStr = std::to_string(rspSize);
-    while (rspPayloadSizeStr.length() < 9)
-    {
-        rspPayloadSizeStr.insert(0, 1, '0');
-    }
-    return rspPayloadSizeStr;
-}
-
 
 uint8_t     EndpointFsm::endpoint;
 uint8_t     EndpointFsm::method;

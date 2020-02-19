@@ -1,14 +1,11 @@
-#include "Fsmlist.hpp"
-#include "log/log.hpp"
 #include "SerialParserFsm.hpp"
-
-
+#include "Fsmlist.hpp"
+#include "ParserUtils.hpp"
+#include "log/log.hpp"
 
 class StateMessageType;
 class StateMessageSize;
 class StateMessagePayload;
-
-
 
 // ----------------------------------------------------------------------------
 // State: MessageType
@@ -21,8 +18,8 @@ class StateMessageType
     {
         LOG_DEBUG("*** entry StateMessageType ***");
         //Restore initial state of all buffers and FSMs
-        msgType = MessageType::Invalid;
-        msgSizeBytesToRead = 9;
+        msgType = static_cast<uint8_t>(parserutils::message::type::invalid);
+        msgSizeBytesToRead = parserutils::message::size_length;
         msgPayloadSizeStr.erase();
         msgPayloadSize = 0;
         msgPayload.clear();
@@ -38,36 +35,33 @@ class StateMessageType
     void react(MessageDataEvt const &) override
     {
         LOG_DEBUG("*** react MessageTypeEvt ***");
-        msgType = static_cast<MessageType>(msgChunk.front()); //get first byte of message
+        msgType = static_cast<uint8_t>(msgChunk.front());
         msgChunk.pop_front();
-        
-        LOG_DEBUG("msgType: %d", msgType);
-        
+
         switch (msgType)
         {
-            case MessageType::Endpoint:
-            case MessageType::RawData:
-                transit<StateMessageSize>();
-                break;
-            default:
-                LOG_ERROR("Invalid msg type!");
-                if (msgChunk.empty())
-                {
-                    return;
-                }
-                else
-                {
-                    send_event(MessageDataEvt());
-                }
-                //alternative: transit to StateMessageType
-                //it will erase all buffs and prevent stackoverflow in some cases, but we loose some data
+        case parserutils::message::type::endpoint:
+        case parserutils::message::type::rawData:
+            transit<StateMessageSize>();
+            break;
+        default:
+            LOG_ERROR("Invalid msg type: %d", msgType);
+            if (msgChunk.empty())
+            {
+                return;
+            }
+            else
+            {
+                send_event(MessageDataEvt());
+            }
+            // alternative: transit to StateMessageType
+            // it will erase all buffs and prevent stackoverflow in some cases, but we loose some data
         }
     };
 
     void exit() override
     {
         LOG_DEBUG("*** exit StateMessageType ***");
-        //quit parser after reaching end of buff
         if (msgChunk.empty())
         {
             return;
@@ -119,13 +113,12 @@ class StateMessageSize
                 processSingleDigit();
             }
             msgPayloadSize = stoi(msgPayloadSizeStr);
-            LOG_DEBUG("msgPayloadSize: %d", msgPayloadSize);
 
-            auto msgPayloadMalloc = [this] { 
-              if(msgType == MessageType::Endpoint)
-                msgPayload.reserve(msgPayloadSize);
-              else if(msgType == MessageType::RawData)
-                send_event(RawDataMallocEvt());//send event for memory alloc on emmc
+            auto msgPayloadMalloc = [this] {
+                if (msgType == parserutils::message::type::endpoint)
+                    msgPayload.reserve(msgPayloadSize);
+                else if (msgType == parserutils::message::type::rawData)
+                    send_event(RawDataMallocEvt());
             };
             transit<StateMessagePayload>(msgPayloadMalloc);
         }
@@ -158,7 +151,7 @@ class StateMessagePayload
 
         if (msgPayloadSize > msgChunk.size())
         {
-            if (msgType == MessageType::RawData)
+            if (msgType == parserutils::message::type::rawData)
             {
                 msgPayload.reserve(msgChunk.size());
             }
@@ -167,7 +160,7 @@ class StateMessagePayload
             {
                 getSingleByte();
             }
-            if (msgType == MessageType::RawData)
+            if (msgType == parserutils::message::type::rawData)
             {
                 send_event(RawDataEvt()); //invoke raw data fsm to let it store pyaload chunk to emmc
                 msgPayload.clear();
@@ -177,7 +170,7 @@ class StateMessagePayload
         }
         else
         {
-            if (msgType == MessageType::RawData)
+            if (msgType == parserutils::message::type::rawData)
             {
                 msgPayload.reserve(msgPayloadSize);
             }
@@ -187,11 +180,11 @@ class StateMessagePayload
                 getSingleByte();
             }
 
-            auto runHandler = [this] { 
-              if(msgType == MessageType::Endpoint)
-                send_event(EndpointEvt()); //invoke endpoint fsm
-              else if(msgType == MessageType::RawData)
-                send_event(RawDataEvt()); //invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
+            auto runHandler = [this] {
+                if (msgType == parserutils::message::type::endpoint)
+                    send_event(EndpointEvt());
+                else if (msgType == parserutils::message::type::rawData)
+                    send_event(RawDataEvt()); // invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
             };
 
             transit<StateMessageType>(runHandler);
@@ -204,16 +197,17 @@ class StateMessagePayload
 // Base state: default implementations
 //
 
-void SerialParserFsm::react(MessageDataEvt const &) {
-  LOG_DEBUG("MessageDataEvt ignored");
+void SerialParserFsm::react(MessageDataEvt const &)
+{
+    LOG_DEBUG("MessageDataEvt ignored");
 }
 
-std::list<int>                  SerialParserFsm::msgChunk;
-SerialParserFsm::MessageType    SerialParserFsm::msgType;
-size_t                          SerialParserFsm::msgSizeBytesToRead;
-std::string                     SerialParserFsm::msgPayloadSizeStr;
-uint32_t                        SerialParserFsm::msgPayloadSize;
-std::string                     SerialParserFsm::msgPayload;
+std::list<int> SerialParserFsm::msgChunk;
+uint8_t SerialParserFsm::msgType;
+size_t SerialParserFsm::msgSizeBytesToRead;
+std::string SerialParserFsm::msgPayloadSizeStr;
+uint32_t SerialParserFsm::msgPayloadSize;
+std::string SerialParserFsm::msgPayload;
 
 // ----------------------------------------------------------------------------
 // Initial state definition
