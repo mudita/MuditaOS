@@ -27,10 +27,6 @@ protected:
 	gui::Label* description = nullptr;
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;
-	gui::Label* dayMonth = nullptr;
-	gui::Text* notificationCalls = nullptr;
-	gui::Text* notificationMessages = nullptr;
-	gui::Image* callsImage = nullptr;
 	gui::Image* messagesImage = nullptr;
 	/**
 	 * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
