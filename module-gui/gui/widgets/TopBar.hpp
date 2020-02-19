@@ -31,6 +31,7 @@ namespace gui {
             LOCK,
             BATTERY,
             TIME,
+            SIM,
         };
         enum class TimeMode
         {
@@ -53,6 +54,16 @@ namespace gui {
         /// show bars in number - 0 bars, 1 bar, 2 bars...
         void batteryShowBars(uint32_t val);
 
+        /// elements shown on TopBar
+        struct
+        {
+            bool signal : 1;
+            bool lock : 1;
+            bool battery : 1;
+            bool time : 1;
+            bool sim : 1;
+        } elements = {false, false, false, false, false};
+
       public:
         TopBar();
         TopBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
@@ -68,6 +79,7 @@ namespace gui {
          * @note LOCK and TIME are located in the same place so only 1 can be active at the same time.
          */
         void setActive(TopBar::Elements element, bool active);
+        void setActive(std::list<std::pair<TopBar::Elements, bool>> elements);
         /**
          * @brief Sets charge level of the battery based on percent value. This will cause appropriate image to be displayed.
          * @return if display should be refreshed or not
