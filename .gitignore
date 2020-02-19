@@ -1,6 +1,6 @@
 
-build/
 
+build-*/
 .vscode/ipch
 
 lib/
@@ -9,6 +9,7 @@ lib/
 env.cmake
 
 config/config_target\.h
+config/*.tgz
 
 OzoneJlink\.jdebug\.user
 
@@ -17,9 +18,6 @@ OzoneJlink\.jdebug\.user
 .project
 .settings/
 
-build-linux/
-
-build-rt1051/
 
 \.idea/vcs\.xml
 
