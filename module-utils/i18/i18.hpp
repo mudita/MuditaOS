@@ -150,6 +150,7 @@ namespace utils {
             }
             if (lang == current)
                 return;
+            current = lang;
             if (lang == lang_default)
             {
                 langPack = langBack;
