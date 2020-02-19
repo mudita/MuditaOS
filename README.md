@@ -8,10 +8,10 @@ Prior to any build setup environment, need to be run once. (See: `## Run provisi
 
 ## Super quick and dirty to run app on linux:
 ```
-cat env.cmake.sample | sed "s:<HOME>:$HOME:" > env.cmake                     # set env.cmake
+cat env.cmake.sample | sed "s:<HOME>:$HOME:" > env.cmake                    # set env.cmake
 git submodule update --init --recursive                                     # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                                    # bootstrap requirements
-./cofnigure.sh arm|linux Debug|Release|RelWithDebInfo                       # configure build
+./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo                    # configure build
 cd <build-dir>                                                              # build dir depends on configuration
 make -j                                                                     # build
 ./PurePhone                                                                 # run PurePhone - emulator screen will pop up
@@ -25,7 +25,7 @@ Prior to all - install JLink driver (see `## Install JLink driver`)
 cp ./env.cmake.sample ./env.cmake && sed -i "s:<HOME>:$HOME:" env.cmake
 git submodule update --init --recursive
 cd ./config/ && ./bootstrap.sh && cd ../
-./configure.sh arm RelWithDebInfo
+./configure.sh rt1051 RelWithDebInfo
 cd build-arm-RelWithDebInfo
 make -j
 
