@@ -194,7 +194,7 @@ void Timestamp::replace_specifiers()
         }
         else
         {
-            return Timestamp::str(Locale::format(Locale::FormatTime12H));
+            return Timestamp::str(Locale::format(Locale::FormatTime12H)); // @TODO: M.G. FormatLocaleTime which actually works
         }
     }
 
