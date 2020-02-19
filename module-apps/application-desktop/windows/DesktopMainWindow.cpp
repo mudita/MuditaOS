@@ -31,7 +31,7 @@ namespace gui {
 
         auto design_time_offset = 106;
         auto design_time_h = 96;
-        auto ttime = utils::time::SysTime();
+        auto ttime = utils::time::Time();
         AppWindow::buildInterface();
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
