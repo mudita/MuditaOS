@@ -233,7 +233,7 @@ void TopBar::setTime( const UTF8& time ) {
 void TopBar::setTime( const uint32_t& time, bool mode24H ) {
 
 	std::time_t t= time;
-    setTime(utils::time::DateTime());
+    setTime(utils::time::Time());
 
     timeMode = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
     this->time = time;
