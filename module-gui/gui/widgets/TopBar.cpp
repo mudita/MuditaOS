@@ -94,7 +94,6 @@ void TopBar::prepareWidget() {
     sim->setFilled(false);
     sim->setBorderColor(gui::ColorNoColor);
     sim->setFont(style::header::font::title);
-    simSet();
 
     //icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
@@ -108,9 +107,18 @@ void TopBar::prepareWidget() {
 	timeLabel->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 }
 
+void TopBar::setActive(std::list<std::pair<TopBar::Elements, bool>> elements)
+{
+    for (auto el : elements)
+    {
+        setActive(el.first, el.second);
+    }
+}
+
 void TopBar::setActive( TopBar::Elements element, bool active ) {
 	switch( element ) {
 		case Elements::BATTERY: {
+            elements.battery = active;
             if (Store::Battery::get().state == Store::Battery::State::Discharging)
             {
                 setBatteryLevel(active ? Store::Battery::get().level : 0);
@@ -129,24 +137,29 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
             }
         } break;
 		case Elements::LOCK: {
-			lock->setVisible(active);
+            elements.lock = active;
+            lock->setVisible(active);
 			if( active )
 				timeLabel->setVisible(false);
 		} break;
 		case Elements::SIGNAL: {
-            simSet();
+            elements.signal = active;
             for (uint32_t i = 0; i < signalImgCount; ++i)
                 signal[i]->setVisible(false);
 			if( active )
 				signal[signalStrength]->setVisible(true);
-
 		} break;
 		case Elements::TIME: {
-			timeLabel->setVisible(active);
+            elements.time = active;
+            timeLabel->setVisible(active);
 			if( active )
 				lock->setVisible(false);
 		} break;
-	};
+        case Elements::SIM:
+            elements.sim = active;
+            simSet();
+            break;
+    };
 }
 
 uint32_t calculateBatteryLavel(uint32_t percentage)
@@ -247,17 +260,24 @@ void TopBar::simSet()
     }
     else
     {
-        switch (Store::GSM::get()->sim)
+        if (elements.sim)
         {
-        case Store::GSM::SIM::NONE:
-            sim->setText("x");
-            break;
-        case Store::GSM::SIM::SIM1:
-            sim->setText("1");
-            break;
-        case Store::GSM::SIM::SIM2:
-            sim->setText("2");
-            break;
+            switch (Store::GSM::get()->sim)
+            {
+            case Store::GSM::SIM::NONE:
+                sim->setText("x");
+                break;
+            case Store::GSM::SIM::SIM1:
+                sim->setText("1");
+                break;
+            case Store::GSM::SIM::SIM2:
+                sim->setText("2");
+                break;
+            }
+        }
+        else
+        {
+            sim->visible = false;
         }
     }
 }

@@ -11,9 +11,10 @@
 
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include "Alignment.hpp"
 #include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 
 //application-call
 #include "application-call/ApplicationCall.hpp"
@@ -25,66 +26,39 @@
 
 namespace gui {
 
-void DesktopMainWindow::buildInterface() {
-	AppWindow::buildInterface();
-	bottomBar->setActive( BottomBar::Side::CENTER, true );
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
+    void DesktopMainWindow::buildInterface()
+    {
 
-	topBar->setActive(TopBar::Elements::SIGNAL, true );
-	topBar->setActive(TopBar::Elements::LOCK, true );
-	topBar->setActive(TopBar::Elements::BATTERY, true );
+        auto design_time_offset = 106;
+        auto design_time_h = 96;
+        auto ttime = utils::time::SysTime();
+        AppWindow::buildInterface();
 
-	callsImage = new gui::Image( this, 28,258,0,0, "phone" );
-	messagesImage = new gui::Image( this, 28, 333,0,0, "mail" );
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
+        topBar->setActive({{TopBar::Elements::SIGNAL, true}, {TopBar::Elements::LOCK, true}, {TopBar::Elements::BATTERY, true}});
 
-	time = new gui::Label(this, 20, 90, 280, 116 );
-	time->setFilled( false );
-	time->setBorderColor( gui::ColorNoColor );
-	time->setFont(style::window::font::verybig);
-	time->setText("12:07");
-	time->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+        time = new gui::Label(this, 0, design_time_offset, style::window_width, design_time_h);
+        time->setFilled(false);
+        time->setBorderColor(gui::ColorNoColor);
+        time->setFont(style::window::font::supersizeme);
+        time->setText(ttime);
+        time->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
 
-	dayText = new gui::Label(this, 264, 108, 190, 42 );
-	dayText->setFilled( false );
-	dayText->setBorderColor( gui::ColorNoColor );
-	dayText->setFont(style::window::font::medium);
-    auto time = utils::time::SysTime();
-	dayText->setText(time.day());
-	dayText->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
-	dayMonth = new gui::Label(this, 264, 150, 190, 42 );
-	dayMonth->setFilled( false );
-	dayMonth->setBorderColor( gui::ColorNoColor );
-	dayMonth->setFont(style::window::font::medium);
-	dayMonth->setText(time.str("%d %B"));
-	dayMonth->setAlignement( gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_TOP));
-
-	notificationCalls = new gui::Text(this, 86, 255, 350, 70 );
-	notificationCalls->setFilled( false );
-	notificationCalls->setBorderColor( gui::ColorNoColor );
-	notificationCalls->setFont(style::window::font::medium);
-	UTF8 calls = "2 " + utils::localize.get("app_desktop_missed_calls");
-	notificationCalls->setText(calls);
-
-
-	notificationMessages = new gui::Text(this, 86, 330, 350, 70 );
-	notificationMessages->setFilled( false );
-	notificationMessages->setBorderColor( gui::ColorNoColor );
-	notificationMessages->setFont(style::window::font::medium);
-	UTF8 mess = "2 " + utils::localize.get("app_desktop_unread_messages");
-
-	notificationMessages->setText(mess);
-}
+        auto design_day_offset = 204;
+        auto design_day_h = 51;
+        dayText = new gui::Label(this, 0, design_day_offset, style::window_width, design_day_h);
+        dayText->setFilled(false);
+        dayText->setBorderColor(gui::ColorNoColor);
+        dayText->setFont(style::window::font::biglight);
+        dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
+        dayText->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
+    }
 
 void DesktopMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
 	delete time;
 	delete dayText;
-	delete dayMonth;
-	delete notificationCalls;
-	delete notificationMessages;
-	delete callsImage;
-	delete messagesImage;
 	focusItem = nullptr;
 	children.clear();
 }
@@ -101,9 +75,13 @@ DesktopMainWindow::~DesktopMainWindow() {
 //method hides or show widgets and sets bars according to provided state
 void DesktopMainWindow::setVisibleState() {
 
-	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
+    auto app = dynamic_cast<app::ApplicationDesktop *>(application);
+    if (!app)
+    {
+        return;
+    }
 
-	if( app->getScreenLocked() ) {
+    if( app->getScreenLocked() ) {
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 		topBar->setActive( TopBar::Elements::LOCK, true );
 	}
@@ -120,8 +98,12 @@ void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 
 	//check if there was a signal to lock the pone due to inactivity.
 	if( (data != nullptr) && (data->getDescription() == "LockPhoneData")) {
-		app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-		app->setScreenLocked(true);
+        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
+        if (!app)
+        {
+            return;
+        }
+        app->setScreenLocked(true);
 
 		LockPhoneData* lockData = reinterpret_cast<LockPhoneData*>( data );
 		lockTimeoutApplilcation = lockData->getPreviousApplication();
