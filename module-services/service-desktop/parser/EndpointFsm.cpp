@@ -89,8 +89,8 @@ class StateEndpointBattery
         std::string responseStr;
         sys::ReturnCodes retCode = endpointHandler.battery(method, responseStr);
         LOG_DEBUG("endpointHandler.battery retCode %d", retCode);
-
-        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
+        std::string *responseString = new std::string(responseStr);
+        xQueueSend(USBSendQueue, &responseString, portMAX_DELAY);
 
         LOG_DEBUG("%s", responseStr.c_str());
         transit<StateDecodeJson>();
