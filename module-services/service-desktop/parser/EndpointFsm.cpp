@@ -92,7 +92,6 @@ class StateEndpointBattery
         std::string *responseString = new std::string(responseStr);
         xQueueSend(USBSendQueue, &responseString, portMAX_DELAY);
 
-        LOG_DEBUG("%s", responseStr.c_str());
         transit<StateDecodeJson>();
     };
 };
@@ -104,8 +103,8 @@ class StateEndpointBackups
     {
         LOG_DEBUG("*** entry StateEndpointBackups ***");
 
-        EndpointHandler endpointHandler = EndpointHandler();
-        std::string responseStr;
+        // EndpointHandler endpointHandler = EndpointHandler();
+        // std::string responseStr;
         // sys::ReturnCodes retCode = endpointHandler.backups(method, responseStr);
         // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
 
@@ -120,8 +119,8 @@ class StateEndpointDeviceInfo
     {
         LOG_DEBUG("*** entry StateEndpointDeviceInfo ***");
 
-        EndpointHandler endpointHandler = EndpointHandler();
-        std::string responseStr;
+        // EndpointHandler endpointHandler = EndpointHandler();
+        // std::string responseStr;
         // sys::ReturnCodes retCode = endpointHandler.deviceInfo(method, responseStr);
         // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
 
@@ -136,8 +135,8 @@ class StateEndpointNetwork
     {
         LOG_DEBUG("*** entry StateEndpointNetwork ***");
 
-        EndpointHandler endpointHandler = EndpointHandler();
-        std::string responseStr;
+        // EndpointHandler endpointHandler = EndpointHandler();
+        // std::string responseStr;
         // sys::ReturnCodes retCode = endpointHandler.network(method, responseStr);
         // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
 
@@ -152,8 +151,8 @@ class StateEndpointStorage
     {
         LOG_DEBUG("*** entry StateEndpointStorage ***");
 
-        EndpointHandler endpointHandler = EndpointHandler();
-        std::string responseStr;
+        // EndpointHandler endpointHandler = EndpointHandler();
+        // std::string responseStr;
         // sys::ReturnCodes retCode = endpointHandler.storage(method, responseStr);
         // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
 
