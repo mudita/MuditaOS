@@ -1,4 +1,4 @@
-#include "SerialParserFsm.hpp"
+#include "ParserFsm.hpp"
 #include "Fsmlist.hpp"
 #include "ParserUtils.hpp"
 #include "log/log.hpp"
@@ -11,13 +11,12 @@ class StateMessagePayload;
 // State: MessageType
 //
 
-class StateMessageType
-: public SerialParserFsm
+class StateMessageType : public ParserFsm
 {
     void entry() override
     {
         LOG_DEBUG("*** entry StateMessageType ***");
-        //Restore initial state of all buffers and FSMs
+        // Restore initial state of all buffers and FSMs
         msgType = static_cast<uint8_t>(parserutils::message::type::invalid);
         msgSizeBytesToRead = parserutils::message::size_length;
         msgPayloadSizeStr.erase();
@@ -46,28 +45,30 @@ class StateMessageType
     };
 };
 
-
 // ----------------------------------------------------------------------------
 // State: MessageSize
 //
 
-class StateMessageSize
-: public SerialParserFsm
+class StateMessageSize : public ParserFsm
 {
     void react(MessageDataEvt const &) override
     {
         LOG_DEBUG("*** react MessageSizeEvt ***");
 
-        auto processSingleDigit = [this] { 
-              if(!isdigit(msgChunk.front()))
-                {msgChunk.pop_front();
-                transit<StateMessageType>();}
-              else
-                {msgPayloadSizeStr.push_back(msgChunk.front());
+        auto processSingleDigit = [this] {
+            if (!isdigit(msgChunk.front()))
+            {
                 msgChunk.pop_front();
-                msgSizeBytesToRead--;}
-            };
-        
+                transit<StateMessageType>();
+            }
+            else
+            {
+                msgPayloadSizeStr.push_back(msgChunk.front());
+                msgChunk.pop_front();
+                msgSizeBytesToRead--;
+            }
+        };
+
         if (msgSizeBytesToRead > msgChunk.size())
         {
             while (!msgChunk.empty())
@@ -96,19 +97,17 @@ class StateMessageSize
     };
 };
 
-
 // ----------------------------------------------------------------------------
 // State: CommandMessagePayload
 //
 
-class StateMessagePayload
-: public SerialParserFsm
+class StateMessagePayload : public ParserFsm
 {
     void react(MessageDataEvt const &) override
     {
         LOG_DEBUG("*** react MessagePayloadEvt ***");
 
-        auto getSingleByte = [this] { 
+        auto getSingleByte = [this] {
             msgPayload.push_back(msgChunk.front());
             msgChunk.pop_front();
             msgPayloadSize--;
@@ -127,7 +126,7 @@ class StateMessagePayload
             }
             if (msgType == parserutils::message::type::rawData)
             {
-                send_event(RawDataEvt()); //invoke raw data fsm to let it store pyaload chunk to emmc
+                send_event(RawDataEvt()); // invoke raw data fsm to let it store pyaload chunk to emmc
                 msgPayload.clear();
             }
             LOG_DEBUG("serial data buff empty, wait for new data");
@@ -157,24 +156,23 @@ class StateMessagePayload
     };
 };
 
-
 // ----------------------------------------------------------------------------
 // Base state: default implementations
 //
 
-void SerialParserFsm::react(MessageDataEvt const &)
+void ParserFsm::react(MessageDataEvt const &)
 {
     LOG_DEBUG("MessageDataEvt ignored");
 }
 
-std::list<int> SerialParserFsm::msgChunk;
-uint8_t SerialParserFsm::msgType;
-size_t SerialParserFsm::msgSizeBytesToRead;
-std::string SerialParserFsm::msgPayloadSizeStr;
-uint32_t SerialParserFsm::msgPayloadSize;
-std::string SerialParserFsm::msgPayload;
+std::list<int> ParserFsm::msgChunk;
+uint8_t ParserFsm::msgType;
+size_t ParserFsm::msgSizeBytesToRead;
+std::string ParserFsm::msgPayloadSizeStr;
+uint32_t ParserFsm::msgPayloadSize;
+std::string ParserFsm::msgPayload;
 
 // ----------------------------------------------------------------------------
 // Initial state definition
 //
-FSM_INITIAL_STATE(SerialParserFsm, StateMessageType)
+FSM_INITIAL_STATE(ParserFsm, StateMessageType)

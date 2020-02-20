@@ -1,9 +1,9 @@
 #include "EndpointFsm.hpp"
 #include "EndpointHandler.hpp"
-#include "json/json11.hpp"
-#include "log/log.hpp"
+#include "ParserFsm.hpp"
 #include "ParserUtils.hpp"
-#include "SerialParserFsm.hpp"
+#include "log/log.hpp"
+#include "json/json11.hpp"
 #if defined(TARGET_RT1051)
 extern "C"
 {
@@ -32,7 +32,7 @@ class StateDecodeJson
     {
         std::string errorString;
 
-        json11::Json msgJson = json11::Json::parse(SerialParserFsm::msgPayload, errorString);
+        json11::Json msgJson = json11::Json::parse(ParserFsm::msgPayload, errorString);
         if (msgJson.is_null())
         {
             LOG_ERROR("Can't parse data as JSON [%s]", errorString.c_str());

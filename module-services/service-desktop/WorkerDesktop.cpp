@@ -13,7 +13,7 @@ extern "C"
 
 #include "parser/EndpointFsm.hpp"
 #include "parser/Fsmlist.hpp"
-#include "parser/SerialParserFsm.hpp"
+#include "parser/ParserFsm.hpp"
 
 #include "WorkerDesktop.hpp"
 
@@ -32,8 +32,8 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         if (xQueueReceive(queue, &receive_msg, 0) != pdTRUE)
             return false;
 
-        SerialParserFsm::msgChunk.assign(receive_msg.begin(), receive_msg.end());
-        while (!SerialParserFsm::msgChunk.empty())
+        ParserFsm::msgChunk.assign(receive_msg.begin(), receive_msg.end());
+        while (!ParserFsm::msgChunk.empty())
         {
             send_event(MessageDataEvt());
         }

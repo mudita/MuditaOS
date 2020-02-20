@@ -9,5 +9,5 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/EndpointFsm.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ParserUtils.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/RawDataFsm.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/SerialParserFsm.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/ParserFsm.cpp"
 )

@@ -7,9 +7,9 @@
 #include <log/log.hpp>
 #include <string.h>
 
-#include "parser/Fsmlist.hpp"
-#include "parser/SerialParserFsm.hpp"
 #include "parser/EndpointFsm.hpp"
+#include "parser/Fsmlist.hpp"
+#include "parser/ParserFsm.hpp"
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
