@@ -50,13 +50,37 @@ public:
     Item *parent = nullptr;
     // list of items that have the same parent.
     std::list<Item*> children;
+    enum class Area
+    {
+        Normal,
+        Draw,
+        Actual, // actual area in use between: Normal <-> Max
+        Max,
+    };
     /// bounding box of the item. This is in coordinates of the parent widget.
     BoundingBox widgetArea;
     /// bounding box of the item maximal size, if not specified other - the same as widget Area
     BoundingBox widgetMaxArea;
-    // bounding box used for drawing. This is in coordinates of window
-    BoundingBox drawArea; // drawableArea would be more accurate
+    /// bounding box of the item maximal size, if not specified other - the same as widget Area
+    BoundingBox widgetActualArea;
+    //bounding box used for drawing. This is in coordinates of window
+	BoundingBox drawArea; // drawableArea would be more accurate
                           // maximal bounding box size
+    auto area(Area which = Area::Normal) -> BoundingBox &
+    {
+        switch (which)
+        {
+        case Area::Normal:
+            return widgetArea;
+        case Area::Draw:
+            return drawArea;
+        case Area::Max:
+            return widgetMaxArea;
+        case Area::Actual:
+            return widgetActualArea;
+        }
+        return widgetArea;
+    }
     Margins innerMargins;
     //radius of corner
 	short radius;
