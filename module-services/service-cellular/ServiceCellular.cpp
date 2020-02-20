@@ -257,7 +257,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     LOG_ERROR("RawCommand error: %s %s", m == nullptr ? "" : "bad cmd", !channel ? "no channel" : "");
                     break;
                 }
-                // TODO change 10 to something better, at best wait till OK/ERROR/TIMEOUT
                 auto respMsg = std::make_shared<cellular::RawCommandResp>(true);
                 auto ret = channel->cmd(m->command.c_str(), m->timeout);
                 respMsg->response = ret.response;
@@ -318,9 +317,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto audioRet = cmux->AudioConfProcedure();
         if (audioRet == TS0710::ConfState::Success)
         {
-            std::string buf = "AT+IPR=" + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
+            auto cmd = at::factory(at::AT::IPR) + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
             LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
-            if (!cmux->getParser()->cmd(buf.c_str()))
+            if (!cmux->getParser()->cmd(cmd))
             {
                 LOG_ERROR("Baudrate setup error");
                 state = State::Failed;
@@ -370,7 +369,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     case MessageType::CellularListCurrentCalls: {
         constexpr size_t numberOfExpectedTokens = 3;
-        auto ret = cmux->GetChannel("Commands")->cmd("AT+CLCC\r", 300);
+        auto ret = cmux->GetChannel("Commands")->cmd(at::AT::CLCC);
         if (ret && ret.response.size() == numberOfExpectedTokens)
         {
             // TODO: alek: add case when more status calls is returned
@@ -414,7 +413,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         LOG_INFO("CellularHangupCall");
         if (channel)
         {
-            if (channel->cmd("ATH\r", 5000))
+            if (channel->cmd(at::AT::ATH))
             {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 stopTimer(callStateTimerId);
@@ -438,9 +437,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         auto ret = false;
         if (channel)
         {
-            // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be possibly set up to 90s
             // TODO alek: check if your request isn't for 5 sec when you wait in command for 90000, it's exclusivelly set to 5000ms in command requesting...
-            auto response = channel->cmd("ATA\r", 90000);
+            auto response = channel->cmd(at::AT::ATA);
             if (response)
             {
                 // Propagate "CallActive" notification into system
@@ -457,7 +455,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
         auto channel = cmux->GetChannel("Commands");
 		if (channel) {
-            auto ret = channel->cmd(("ATD" + msg->data + ";\r").c_str(), 5000);
+            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->data + ";\r");
             if (ret)
             {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
@@ -625,10 +623,11 @@ bool ServiceCellular::sendSMS(void)
 	if (textLen < singleMessageLen) {
 
         if (cmux->CheckATCommandPrompt(
-                cmux->GetChannel("Commands")->SendCommandPrompt(("AT+CMGS=\"" + UCS2(record.number).modemStr() + "\"\r").c_str(), 1, 1000)))
+                cmux->GetChannel("Commands")
+                    ->SendCommandPrompt((std::string(at::factory(at::AT::CMGS)) + UCS2(record.number).modemStr() + "\"\r").c_str(), 1, 1000)))
         {
 
-            if (cmux->GetChannel("Commands")->cmd((UCS2(record.body).modemStr() + "\032").c_str(), 5000))
+            if (cmux->GetChannel("Commands")->cmd((UCS2(record.body).modemStr() + "\032").c_str()))
             {
                 result = true;
             }
@@ -663,11 +662,8 @@ bool ServiceCellular::sendSMS(void)
 			UTF8 messagePart = record.body.substr(i * singleMessageLen,
 					partLength);
 
-
-			std::string command(
-					"AT+QCMGS=\"" + UCS2(record.number).modemStr() + "\",120,"
-							+ std::to_string(i + 1) + ","
-							+ std::to_string(messagePartsCount) + "\r");
+            std::string command(at::factory(at::AT::QCMGS) + UCS2(record.number).modemStr() + "\",120," + std::to_string(i + 1) + "," +
+                                std::to_string(messagePartsCount) + "\r");
 
             if (cmux->CheckATCommandPrompt(cmux->GetChannel("Commands")->SendCommandPrompt(command.c_str(), 1, 5000)))
             {
@@ -695,9 +691,8 @@ bool ServiceCellular::sendSMS(void)
 
 bool ServiceCellular::receiveSMS(std::string messageNumber) {
 
-	std::string command("AT+QCMGR=" + messageNumber + "\r");
-
-    auto ret = cmux->GetChannel("Commands")->cmd(command, 2000);
+    auto cmd = at::factory(at::AT::QCMGR);
+    auto ret = cmux->GetChannel("Commands")->cmd(cmd + messageNumber + "\r", cmd.timeout);
 
     bool messageParsed = false;
 
@@ -795,13 +790,13 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
         }
     }
     //delete message from modem memory
-    cmux->GetChannel("Commands")->cmd("AT+CMGD=" + messageNumber, 150);
+    cmux->GetChannel("Commands")->cmd(at::factory(at::AT::CMGD) + messageNumber);
     return true;
 }
 
 bool ServiceCellular::getOwnNumber(std::string &destination)
 {
-    auto ret = cmux->GetChannel("Commands")->cmd("AT+CNUM\r");
+    auto ret = cmux->GetChannel("Commands")->cmd(at::AT::CNUM);
 
     if (ret)
     {
@@ -832,7 +827,7 @@ bool ServiceCellular::getOwnNumber(std::string &destination)
 
 bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
 {
-    auto ret = cmux->GetChannel("Commands")->cmd("AT+CIMI\r");
+    auto ret = cmux->GetChannel("Commands")->cmd(at::AT::CIMI);
 
     if (ret)
     {

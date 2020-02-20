@@ -2,12 +2,12 @@
  * Project Untitled
  */
 
-
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
 #include <cassert>
+#include <sstream>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = { {TypeOfFrame_e::SABM, "SABM"}, {TypeOfFrame_e::UA, "UA"}, {TypeOfFrame_e::DM, "DM"}, {TypeOfFrame_e::DISC, "DISC"}, {TypeOfFrame_e::UIH, "UIH"}, {TypeOfFrame_e::UI, "UI"}, {TypeOfFrame_e::I, "I"} };
 std::map<PortSpeed_e, int> QuectelCMUXPortSpeeds_text = { {PortSpeed_e::PS9600, 1}, {PortSpeed_e::PS19200, 2}, {PortSpeed_e::PS38400, 3}, {PortSpeed_e::PS57600, 4}, {PortSpeed_e::PS115200, 5}, {PortSpeed_e::PS230400, 6}, {PortSpeed_e::PS460800, 7} };
@@ -72,7 +72,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //1. Send AT - check for answer
                 //2. OK ? -> ret success
                 LOG_DEBUG("1. Sending AT...");
-                if (parser->cmd("AT\r", 100))
+                if (parser->cmd(at::AT::AT))
                     result = true;
                 step++;
                 break;
@@ -83,7 +83,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 LOG_DEBUG("2. Setting baudrate to %i...", ATPortSpeeds_text[startParams.PortSpeed]);
                 pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
                 LOG_DEBUG("Sending AT...");
-                if (parser->cmd("AT\r", 100))
+                if (parser->cmd(at::AT::AT))
                     result = true;
                 step++;
                 break;
@@ -101,7 +101,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 // GSM module needs some time to close multiplexer
                 vTaskDelay(1000);
                 LOG_DEBUG("Sending AT...");
-                if (parser->cmd("AT\r", 100))
+                if (parser->cmd(at::AT::AT))
                 {
                     result = true;
                 }
@@ -115,7 +115,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 // OK THIS IS BAD for modem restart... baud on cmux is 460800bit, we wont be able to close cmux if it stays
                 // pv_cellular->SetSpeed(115200);
                 LOG_DEBUG("Sending AT...");
-                if (parser->cmd("AT\r", 100))
+                if (parser->cmd(at::AT::AT))
                 {
                     result = true;
                 }
@@ -135,7 +135,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 // GSM module needs some time to close multiplexer
                 vTaskDelay(1000);
                 LOG_DEBUG("Sending AT...");
-                if (parser->cmd("AT\r", 100))
+                if (parser->cmd(at::AT::AT))
                     result = true;
                 }
                 step++;
@@ -157,10 +157,10 @@ TS0710::ConfState TS0710::ConfProcedure() {
 
     LOG_DEBUG("Configuring modem...");
 
-    parser->cmd(at::cmd::FACTORY_RESET);
-    parser->cmd(at::cmd::ECHO_OFF);
+    parser->cmd(at::AT::FACTORY_RESET);
+    parser->cmd(at::AT::ECHO_OFF);
     LOG_INFO("GSM modem info:");
-    auto ret = parser->cmd(at::cmd::SW_INFO);
+    auto ret = parser->cmd(at::AT::SW_INFO);
     if (ret)
     {
         for (uint32_t i = 0; i < ret.response.size() - 1; ++i) // skip final "OK"
@@ -170,56 +170,36 @@ TS0710::ConfState TS0710::ConfProcedure() {
     }
     if (hardwareControlFlowEnable)
     {
-        parser->cmd(at::cmd::FLOW_CTRL_ON, 500);
+        parser->cmd(at::AT::FLOW_CTRL_ON);
     }
     else
     {
-        parser->cmd(at::cmd::FLOW_CTRL_OFF, 500);
+        parser->cmd(at::AT::FLOW_CTRL_OFF);
     }
 
-    // Set fixed baudrate
-    // parser->cmd(("AT+IPR=" + std::to_string(baudRate) + "\r").c_str());   //done with TS0710_Start
-    // LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[startParams.PortSpeed]);
-    // sprintf(buf,"AT+IPR=%i\r", ATPortSpeeds_text[startParams.PortSpeed]);
-    // if (!parser->cmd(buf)) {
-    //     LOG_ERROR("Baudrate setup error");
-    //     return ConfState::Failure;
-    // }
-    // pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
-
-    using namespace at::cmd;
-    parser->cmd(URC_NOTIF_CHANNEL);
-    parser->cmd(RI_PIN_OFF_CALL);
-    parser->cmd(RI_PIN_OFF_SMS);
-    parser->cmd(URC_UART1);
-    parser->cmd(AT_PIN_READY_LOGIC);
-    parser->cmd(URC_NOTIF_SIGNAL);
-    parser->cmd(CRC_ON);
-    parser->cmd(CALLER_NUMBER_PRESENTATION, 15000); // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
-    parser->cmd(SMS_TEXT_FORMAT);
-    parser->cmd(SMS_UCSC2);
-    parser->cmd(SMS_STORAGE);
+    parser->cmd(at::AT::URC_NOTIF_CHANNEL);
+    parser->cmd(at::AT::RI_PIN_OFF_CALL);
+    parser->cmd(at::AT::RI_PIN_OFF_SMS);
+    parser->cmd(at::AT::URC_UART1);
+    parser->cmd(at::AT::AT_PIN_READY_LOGIC);
+    parser->cmd(at::AT::URC_NOTIF_SIGNAL);
+    parser->cmd(at::AT::CRC_ON);
+    parser->cmd(at::AT::CALLER_NUMBER_PRESENTATION); // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
+    parser->cmd(at::AT::SMS_TEXT_FORMAT);
+    parser->cmd(at::AT::SMS_UCSC2);
+    parser->cmd(at::AT::SMS_STORAGE);
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
-    while (!parser->cmd(QSCLK_ON, 3000)) {}
-
-    /*    // Set Message format to Text
-    SendAT("AT+CMGF=1\r", 500);
-    // Set SMS received report format
-    SendAT("AT+CNMI=1,2,0,1,0\r", 500);*/
-
+    while (!parser->cmd(at::AT::QSCLK_ON)) {}
     return ConfState ::Success;
 }
 
 TS0710::ConfState TS0710::AudioConfProcedure() {
-
-    auto ret = parser->cmd("AT+QDAI?\r");
-    // no need to CheckATCommandResponse as it is checked differently below.
-
+    auto ret = parser->cmd(at::AT::QDAI);
     // There is possibility for SendATCommand to capture invalid response (it can be ERROR or async URC)
-    // Hence we are checking here for beginning of valid response for "AT+QDAI?" command. AudioConfProcedure
+    // Hence we are checking here for beginning of valid response for at::QDAI command. AudioConfProcedure
     // procedure will be invoked from AudioService's context as many times as needed.
-    if (ret && ret.response[0].compare(0, strlen("+QDAI:"), "+QDAI:", strlen("+QDAI:")) != 0)
+    if (!ret)
     {
         return ConfState ::Failure;
     }
@@ -228,14 +208,7 @@ TS0710::ConfState TS0710::AudioConfProcedure() {
         return ConfState ::Success;
     }
     else {
-        // Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
-        // Quectel confirmed that during init phase modem sends "ready notification" way before
-        // audio subsystem is initialized. The only recommended solution for this is to send configuration
-        // command repetitively until modem responds with OK. Due to our system characteristic we can't use here simple
-        // while loop with vTaskDelay as this function will be invoked from AudioService context. By design service's
-        // routines should be as fast as they can and non blocking. Therefore there is possibility for audioservice to block
-        // for too long waiting in while loop which will trigger SystemManager ping/pong failure procedure.
-        if (!parser->cmd("AT+QDAI=1,0,0,5,0,1\r"))
+        if (!parser->cmd(at::AT::QDAI_INIT))
         {
             return ConfState ::Failure;
         }
@@ -290,10 +263,19 @@ TS0710::ConfState TS0710::StartMultiplexer() {
 
     //enable cmux
     LOG_DEBUG("Enabling CMUX");
-    sprintf(buf, "AT+CMUX=0,0,%i,%i,%i,%i,%i,%i,%i\r", QuectelCMUXPortSpeeds_text[startParams.PortSpeed], startParams.MaxFrameSize, startParams.AckTimer, \
-                                                        startParams.MaxNumOfRetransmissions, startParams.MaxCtrlRespTime, startParams.WakeUpRespTime, \
-                                                        startParams.ErrRecovWindowSize);
-    if (!parser->cmd(buf))
+    std::stringstream ss;
+    ss << std::string(at::factory(at::AT::CMUX));
+    ss << "0,0";
+    ss << "," << QuectelCMUXPortSpeeds_text[startParams.PortSpeed];
+    ss << "," << startParams.MaxFrameSize;
+    ss << "," << startParams.AckTimer;
+    ss << "," << startParams.MaxNumOfRetransmissions;
+    ss << "," << startParams.MaxCtrlRespTime;
+    ss << "," << startParams.WakeUpRespTime;
+    ss << "," << startParams.ErrRecovWindowSize;
+    ss << "\r";
+
+    if (!parser->cmd(ss.str()))
     {
         LOG_ERROR("CMUX setup error");
         return ConfState::Failure;
@@ -350,13 +332,10 @@ TS0710::ConfState TS0710::StartMultiplexer() {
     DLC_channel *c = GetChannel("Commands");
     if (c != nullptr)
     {
-        c->cmd("AT+QCFG=\"cmux/urcport\",2\r", 300);
-
-        /* Let's test if this actually works */
-
+        c->cmd(at::AT::SET_URC_CHANNEL);
         LOG_DEBUG("Sending test ATI");
-        auto res = c->cmd("ATI\r", 300);
-        res = c->cmd("AT+CSQ\r", 300);
+        auto res = c->cmd(at::AT::SW_INFO);
+        res = c->cmd(at::AT::CSQ);
         if (res)
         {
             auto beg = res.response[0].find(" ");

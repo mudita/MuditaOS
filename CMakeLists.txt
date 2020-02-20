@@ -8,6 +8,7 @@ project(PurePhone)
 
 include(config/ProjectConfig.cmake)
 include(config/Version.cmake)
+include(config/ModuleConfig.cmake)
 include(module-lwip/lwip-includes.cmake)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
@@ -18,44 +19,16 @@ message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
 add_executable(${PROJECT_NAME} "")
 
-# set target dependent directories. My (Mateusz) CLion uses it
-if (DEFINED ENV{PROJECT_BUILD_DIRECTORY})
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/$ENV{PROJECT_BUILD_DIRECTORY}" CACHE PATH "Output directory for building")
-else()
-    # fallback default behaviour. rebuild.sh uses it
-    set(PROJECT_BUILD_DIRECTORY "${CMAKE_SOURCE_DIR}/build" CACHE PATH "Output directory for building")
-endif()
-set(PROJECT_LIB_DIRECTORY "${PROJECT_BUILD_DIRECTORY}/lib/" CACHE PATH "Output path for static libraries")
 
-message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
-message("Setting PROJECT_BUILD_DIRECTORY to ${PROJECT_BUILD_DIRECTORY}")
-
-# If build type not passed assume it is Debug
-if (CMAKE_BUILD_TYPE STREQUAL "")
-    set(CMAKE_BUILD_TYPE Debug)
-    message(STATUS "CMAKE_BUILD_TYPE not set, assuming debug build...")
-endif ()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(STATUS "Build type: Debug")
-    target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
-    #target_compile_options(${PROJECT_NAME} PUBLIC -O3)
-endif ()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    message(STATUS "Build type: Release")
-    target_compile_options(${PROJECT_NAME} PUBLIC -O0)
-endif ()
-
-if (CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    message(STATUS "Build type: RelWithDebInfo")
-    target_compile_options(${PROJECT_NAME} PUBLIC -O0)
-    target_compile_options(${PROJECT_NAME} PUBLIC -g3)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG)
-endif ()
+# setting build flags
+set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DDEBUG" CACHE STRING "")
 
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
+message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
+message("Setting CMAKE_BINARY_DIR to ${CMAKE_BINARY_DIR}")
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
@@ -158,9 +131,11 @@ add_subdirectory(module-bluetooth)
 message("${PROJECT_NAME}: add_subdirectory module-lwip")
 add_subdirectory(module-lwip)
 
+add_subdirectory(image)
+
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${PROJECT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")
 
 # M.P: Please don't change the order of modules in the first group ("module-bsp" - "module-utils")
 # They have to be arranged in specific order because of circular dependencies that need to be correctly resolved
@@ -172,8 +147,6 @@ target_link_libraries(${PROJECT_NAME}
         module-utils
         module-vfs
         module-utils
-
-
         module-sys
         module-cellular
         module-audio
@@ -190,10 +163,27 @@ target_link_libraries(${PROJECT_NAME}
 
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
-set(HEX_FILE ${PROJECT_BUILD_DIRECTORY}/${CMAKE_PROJECT_NAME}.hex)
-set(BIN_FILE ${PROJECT_BUILD_DIRECTORY}/boot.bin)
+set(HEX_FILE ${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.hex)
+set(BIN_FILE ${CMAKE_BINARY_DIR}/boot.bin)
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${HEX_FILE}
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${BIN_FILE}
         )
 
+
+if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+        )
+endif()
+
+if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} --only-keep-debug
+                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.dbg
+        COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+        COMMAND ${CMAKE_OBJCOPY} --add-gnu-debuglink=$<TARGET_FILE:${CMAKE_PROJECT_NAME}>.dbg
+                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.dbg
+        )
+endif()
