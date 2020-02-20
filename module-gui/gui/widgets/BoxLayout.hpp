@@ -12,6 +12,7 @@
 
 #include "Layout.hpp"
 #include "Rect.hpp"
+#include <Alignment.hpp>
 
 namespace gui {
 
@@ -29,15 +30,15 @@ namespace gui {
         {
             return it->widgetArea.size(axis);
         };
-        template <Axis axis> uint32_t sizeUsed(Item *it)
+        template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Normal)
         {
             uint32_t sum = 0;
-            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->widgetArea.size(axis); });
+            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->area(area).size(axis); });
             return sum;
         };
-        template <Axis axis> uint32_t sizeLeft(Item *it)
+        template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
         {
-            return size<axis>(it) - sizeUsed<axis>(it);
+            return size<axis>(it) - sizeUsed<axis>(it, area);
         };
 
         template <Axis axis> void resizeItems();
