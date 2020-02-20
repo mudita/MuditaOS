@@ -12,6 +12,7 @@
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
 #include "Alignment.hpp"
+#include "Common.hpp"
 #include "DesktopMainWindow.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -21,16 +22,26 @@
 #include "application-call/data/CallSwitchData.hpp"
 
 #include "i18/i18.hpp"
-#include <time/time_conversion.hpp>
+#include <Span.hpp>
 #include <Style.hpp>
+#include <time/time_conversion.hpp>
+
+namespace style
+{
+    const auto design_time_offset = 106;
+    const auto design_time_h = 96;
+    const auto design_day_offset = 204;
+    const auto design_day_h = 51;
+    const auto design_border_offset = 20;
+    const auto design_option_span = 8;
+    const auto design_notifications_offset = 284;
+}; // namespace style
 
 namespace gui {
 
     void DesktopMainWindow::buildInterface()
     {
 
-        auto design_time_offset = 106;
-        auto design_time_h = 96;
         auto ttime = utils::time::Time();
         AppWindow::buildInterface();
 
@@ -38,22 +49,21 @@ namespace gui {
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
         topBar->setActive({{TopBar::Elements::SIGNAL, true}, {TopBar::Elements::LOCK, true}, {TopBar::Elements::BATTERY, true}});
 
-        time = new gui::Label(this, 0, design_time_offset, style::window_width, design_time_h);
+        time = new gui::Label(this, 0, style::design_time_offset, style::window_width, style::design_time_h);
         time->setFilled(false);
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizeme);
         time->setText(ttime);
         time->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
 
-        auto design_day_offset = 204;
-        auto design_day_h = 51;
-        dayText = new gui::Label(this, 0, design_day_offset, style::window_width, design_day_h);
+        dayText = new gui::Label(this, 0, style::design_day_offset, style::window_width, style::design_day_h);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
         dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
         dayText->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
-    }
+
+}
 
 void DesktopMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
@@ -72,7 +82,6 @@ DesktopMainWindow::~DesktopMainWindow() {
 	destroyInterface();
 }
 
-//method hides or show widgets and sets bars according to provided state
 void DesktopMainWindow::setVisibleState() {
 
     auto app = dynamic_cast<app::ApplicationDesktop *>(application);
@@ -89,6 +98,10 @@ void DesktopMainWindow::setVisibleState() {
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
 		topBar->setActive( TopBar::Elements::LOCK, false );
 	}
+    if (!fillNotifications())
+    {
+        LOG_ERROR("Couldn't fit in all notifications");
+    }
 }
 
 void DesktopMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
@@ -223,7 +236,139 @@ bool DesktopMainWindow::updateTime( const uint32_t& timestamp, bool mode24H ) {
 
 std::list<DrawCommand*> DesktopMainWindow::buildDrawList() {
 	time->setText( topBar->getTimeString());
-	return Window::buildDrawList();
+    return gui::AppWindow::buildDrawList();
+}
+
+/// try item to parent, if fails -> remove item
+auto try_add_del(Item *parent, Item *item)
+{
+    if (parent->addWidget(item))
+    {
+        return true;
+    }
+    delete item;
+    return false;
+}
+
+auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
+{
+    auto thumbnail = new gui::Image(icon);
+    auto center = (layout->h() - thumbnail->h()) / 2;
+    if (center > 0)
+    {
+        thumbnail->widgetArea.pos(Axis::Y) += center;
+    }
+    thumbnail->activeItem = false;
+    return try_add_del(layout, thumbnail);
+}
+
+/// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of notifications]<span>$`
+auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, std::function<bool(Item &)> foo) -> bool
+{
+    const auto text_normal_size = 200;
+    const auto size_needed_for_2digits = 30;
+    auto el = new gui::HBox(nullptr, 0, 0, layout->getWidth(), style::window::label::default_h);
+    do
+    {
+        /// box left inner margin
+        auto span = new gui::Span(Axis::X, style::design_border_offset);
+        if (!try_add_del(el, span))
+        {
+            break;
+        }
+        if (!add_box_icon(el, icon))
+        {
+            break;
+        }
+        auto span2 = new gui::Span(Axis::X, style::design_border_offset);
+        if (!try_add_del(el, span2))
+        {
+            break;
+        }
+        auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
+        {
+            // set area from 0 to normal
+            text->area(Item::Area::Max) = text->area(Item::Area::Normal);
+            // set max area for text in axis to max
+            text->area(Item::Area::Max).size(Axis::X) = el->w();
+        }
+        text->setText(name);
+        text->setFont(style::window::font::medium);
+        text->setAlignement(Alignment::ALIGN_VERTICAL_CENTER);
+        text->setPenWidth(0);
+        text->activeItem = false;
+        if (!try_add_del(el, text))
+        {
+            break;
+        }
+        if (!add_box_icon(el, "dot_12px_soft"))
+        {
+            break;
+        }
+        auto number = new gui::Label();
+        number->setText(indicator);
+        number->setFont(style::window::font::mediumbold);
+        number->setPenWidth(style::window::default_border_no_focus_w);
+        number->setSize(size_needed_for_2digits, el->h());
+        number->setAlignement(Alignment::ALIGN_VERTICAL_CENTER | Alignment::ALIGN_HORIZONTAL_RIGHT);
+        number->activeItem = false;
+        if (!try_add_del(el, number))
+        {
+            break;
+        }
+        /// box right inner margin
+        auto span3 = new gui::Span(Axis::X, style::design_border_offset);
+        if (!try_add_del(el, span3))
+        {
+            break;
+        }
+
+        el->setPenWidth(style::window::default_border_no_focus_w);
+        el->setPenFocusWidth(style::window::default_border_focucs_w);
+        el->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        if (!try_add_del(layout, el))
+        {
+            el = nullptr;
+            break;
+        }
+        /// space between next notifications to show
+        layout->addWidget(new gui::Span(Axis::Y, style::design_option_span));
+        return true;
+    } while (false);
+    delete el;
+    return false;
+}
+
+auto DesktopMainWindow::fillNotifications() -> bool
+{
+    auto app = dynamic_cast<app::ApplicationDesktop *>(application);
+    if (!app || app->getScreenLocked())
+    {
+        return false;
+    }
+    if (notifications)
+    {
+        this->removeWidget(notifications);
+        delete notifications;
+    }
+    // 1. create notifications box
+    notifications =
+        new gui::VBox(nullptr, style::window::default_left_margin, style::design_notifications_offset,
+                      style::window_width - 2 * style::window::default_left_margin, bottomBar->widgetArea.pos(Axis::Y) - style::design_notifications_offset);
+    notifications->setPenWidth(style::window::default_border_no_focus_w);
+    notifications->setPenFocusWidth(style::window::default_border_no_focus_w);
+    if (!this->addWidget(notifications))
+    {
+        LOG_ERROR("Can't create notifications box!");
+        delete notifications;
+        return false;
+    }
+
+    // 2. actually fill it in
+    add_notification(notifications, "phone", "texttemplate", "2", [](Item &) { return true; });
+    add_notification(notifications, "mail", "texttemplate", "13", [](Item &) { return true; });
+    setFocusItem(notifications);
+    return true;
 }
 
 } /* namespace gui */
