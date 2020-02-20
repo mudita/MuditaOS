@@ -2,15 +2,6 @@
 #include "ParserUtils.hpp"
 #include "json/json11.hpp"
 #include <string>
-#if defined(TARGET_RT1051)
-extern "C"
-{
-#include "../rt1051/include/virtual_com.h"
-}
-#include "../rt1051/Worker.hpp"
-#else
-#include "../linux/Worker.hpp"
-#endif
 
 sys::ReturnCodes EndpointHandler::battery(uint8_t httpMethod, std::string &responseStr)
 {

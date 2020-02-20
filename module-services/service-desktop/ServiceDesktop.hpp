@@ -10,6 +10,7 @@
 #include "task.h"
 #include "vfs.hpp"
 #include <memory>
+#include <string.h>
 
 #include "WorkerDesktop.hpp"
 
@@ -22,7 +23,6 @@ class ServiceDesktop : public sys::Service
 
     xTaskHandle taskHandleReceive;
     xTaskHandle taskHandleSend;
-    int ptyDescriptor;
 
   public:
     ServiceDesktop();

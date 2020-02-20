@@ -1,23 +1,8 @@
 #include "ServiceDesktop.hpp"
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "Service/Service.hpp"
-#include "json/json11.hpp"
-#include <errno.h>
-#include <log/log.hpp>
-#include <string.h>
-
-#include "parser/EndpointFsm.hpp"
-#include "parser/Fsmlist.hpp"
-#include "parser/ParserFsm.hpp"
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
-// Temporary solution to queue passing to bsp driver mock up
-xQueueHandle USBReceiveQueue;
-xQueueHandle USBSendQueue;
-
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName), taskHandleReceive(nullptr), taskHandleSend(nullptr), ptyDescriptor(-1)
+ServiceDesktop::ServiceDesktop() : sys::Service(serviceName), taskHandleReceive(nullptr), taskHandleSend(nullptr)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 }
@@ -36,28 +21,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
     DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    DesktopWorker->init({{"receiveQueueBuffer", sizeof(std::string), 1}, {"sendQueueBuffer", sizeof(std::string*), 10}});
-
+    DesktopWorker->init({{"receiveQueueBuffer", sizeof(std::string), 1}, {"sendQueueBuffer", sizeof(std::string *), 10}});
     DesktopWorker->run();
-
-    USBReceiveQueue = DesktopWorker->getQueues().at(1);
-    USBSendQueue = DesktopWorker->getQueues().at(2);
-
-
-    //    USBSendQueue = xQueueCreate(10, sizeof(std::string));
-
-    //    const char *name = pcQueueGetQueueName(USBReciveQueue);
-    //    const char *name2 = pcQueueGetQueueName(USBSendQueue);
-    //
-    //    std::string name3 = DesktopWorker->getQueueNameMap()[DesktopWorker->getQueues().at(1)];
-
-    if ((ptyDescriptor = bsp::desktopServiceInit()) < 0)
-    {
-        LOG_ERROR("won't start desktop service without serial port");
-        return (sys::ReturnCodes::Failure);
-    }
-
-    fsm_list::start();
 
     return (sys::ReturnCodes::Success);
 }

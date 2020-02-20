@@ -1,23 +1,26 @@
 #pragma once
 
+#include <string.h>
+
+extern "C"
+{
+#include "FreeRTOS.h"
+#include "task.h"
+}
+
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 #include "Service/Worker.hpp"
-
-#define SERIAL_TRANSMISSION_START 0x02
-#define SERIAL_TRANSMISSION_END 0x03
-#define SERIAL_SHELL_START 0x33
-#define SERIAL_BAUDRATE 115200
-#define SERIAL_BUFFER_LEN 512 // this matches the buffer length in rt1051 cdc implementaion
+#include "parser/Fsmlist.hpp"
 
 #if defined(TARGET_RT1051)
 extern "C"
 {
 #include "rt1051/include/virtual_com.h"
 }
-#include "rt1051/Worker.hpp"
+#include "rt1051/usb_cdc.hpp"
 #else
-#include "linux/Worker.hpp"
+#include "linux/usb_cdc.hpp"
 #endif
 
 class WorkerDesktop : public sys::Worker

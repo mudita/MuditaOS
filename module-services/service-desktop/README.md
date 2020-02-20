@@ -18,7 +18,6 @@ uint8_t payload[payload_length];
 ##### Message types
 *Single printable ASCII character.*
 ```
-Invalid = '"'
 Endpoint = '#'
 RawData = '$'
 ```
@@ -73,6 +72,14 @@ enum class Method
 ###### Status
 *HTTP status codes. Only in response message.*
 
+```
+enum class Code
+{
+    OK = 200,
+    BadRequest = 400,
+    InternalServerError = 500
+};
+```
 
 ###### Body
 *Actual response from endpoint in response message. In request message its optional and depends on used method.*

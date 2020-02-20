@@ -4,16 +4,6 @@
 #include "ParserUtils.hpp"
 #include "log/log.hpp"
 #include "json/json11.hpp"
-#if defined(TARGET_RT1051)
-extern "C"
-{
-#include "../rt1051/include/virtual_com.h"
-}
-#include "../rt1051/Worker.hpp"
-#else
-#include "../linux/Worker.hpp"
-#endif
-extern xQueueHandle USBSendQueue;
 
 class StateEndpointBattery;
 class StateEndpointBackups;
@@ -25,8 +15,7 @@ class StateEndpointStorage;
 // Endpoint FSM states
 //
 
-class StateDecodeJson
-: public EndpointFsm
+class StateDecodeJson : public EndpointFsm
 {
     void react(EndpointEvt const &) override
     {
@@ -64,7 +53,7 @@ class StateDecodeJson
         case static_cast<uint8_t>(parserutils::Endpoint::storage):
             transit<StateEndpointStorage>();
             break;
-        
+
         default:
             LOG_ERROR("Invalid Endpoint!");
             return;
@@ -72,8 +61,7 @@ class StateDecodeJson
     };
 };
 
-class StateEndpointBattery
-: public EndpointFsm
+class StateEndpointBattery : public EndpointFsm
 {
     void entry() override
     {
@@ -84,15 +72,14 @@ class StateEndpointBattery
         std::string responseStr;
         sys::ReturnCodes retCode = endpointHandler.battery(method, responseStr);
         LOG_DEBUG("endpointHandler.battery retCode %d", retCode);
-        std::string *responseString = new std::string(responseStr);
-        xQueueSend(USBSendQueue, &responseString, portMAX_DELAY);
+
+        putToSendQueue(responseStr);
 
         transit<StateDecodeJson>();
     };
 };
 
-class StateEndpointBackups
-: public EndpointFsm
+class StateEndpointBackups : public EndpointFsm
 {
     void entry() override
     {
@@ -107,8 +94,7 @@ class StateEndpointBackups
     };
 };
 
-class StateEndpointDeviceInfo
-: public EndpointFsm
+class StateEndpointDeviceInfo : public EndpointFsm
 {
     void entry() override
     {
@@ -123,8 +109,7 @@ class StateEndpointDeviceInfo
     };
 };
 
-class StateEndpointNetwork
-: public EndpointFsm
+class StateEndpointNetwork : public EndpointFsm
 {
     void entry() override
     {
@@ -139,8 +124,7 @@ class StateEndpointNetwork
     };
 };
 
-class StateEndpointStorage
-: public EndpointFsm
+class StateEndpointStorage : public EndpointFsm
 {
     void entry() override
     {
@@ -155,7 +139,6 @@ class StateEndpointStorage
     };
 };
 
-
 // ----------------------------------------------------------------------------
 // Base State: default implementations
 //
@@ -165,8 +148,24 @@ void EndpointFsm::react(EndpointEvt const &)
     LOG_DEBUG("EndpointEvt ignored");
 }
 
-uint8_t     EndpointFsm::endpoint;
-uint8_t     EndpointFsm::method;
+bool EndpointFsm::putToSendQueue(std::string sendMsg)
+{
+    if (uxQueueSpacesAvailable(sendQueue) != 0)
+    {
+        std::string *responseString = new std::string(sendMsg);
+        xQueueSend(sendQueue, &responseString, portMAX_DELAY);
+        return true;
+    }
+    else
+    {
+        LOG_DEBUG("Endpoint Send Queue full, response lost");
+        return false;
+    }
+}
+
+xQueueHandle EndpointFsm::sendQueue;
+uint8_t EndpointFsm::endpoint;
+uint8_t EndpointFsm::method;
 
 // ----------------------------------------------------------------------------
 // Initial state definition

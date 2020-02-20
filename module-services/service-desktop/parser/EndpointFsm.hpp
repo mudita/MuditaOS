@@ -1,17 +1,20 @@
 #pragma once
 
+extern "C"
+{
+#include "FreeRTOS.h"
+#include "queue.h"
+}
+
 #include <stdint.h>
 #include <string>
 #include "fsm/tinyfsm.hpp"
-
-
 
 // ----------------------------------------------------------------------------
 // Event declarations
 //
 
 struct EndpointEvt   : tinyfsm::Event { };
-
 
 // ----------------------------------------------------------------------------
 // EndpointFsm (FSM base class) declaration
@@ -21,6 +24,9 @@ class EndpointFsm
 {
     friend class Fsm;
 
+  public:
+    static xQueueHandle sendQueue;
+
   private:
     void react(tinyfsm::Event const &){};
     virtual void react(EndpointEvt const &);
@@ -28,6 +34,7 @@ class EndpointFsm
     void exit(void){};
 
   protected:
+    bool putToSendQueue(std::string);
     static uint8_t endpoint;
     static uint8_t method;
 };

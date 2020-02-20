@@ -22,5 +22,5 @@ target_sources(${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/cdc/usb_device_descriptor.c"
 		"${CMAKE_CURRENT_LIST_DIR}/cdc/usb_device_cdc_acm.c"
 		"${CMAKE_CURRENT_LIST_DIR}/osa/usb_osa_freertos.c"
-		"${CMAKE_CURRENT_LIST_DIR}/Worker.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/usb_cdc.cpp"
 )

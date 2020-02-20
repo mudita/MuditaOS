@@ -17,7 +17,6 @@ extern "C" {
 #include "Worker.hpp"
 
 namespace sys {
-
     void workerTaskFunction(void *ptr)
     {
         Worker *worker = reinterpret_cast<Worker *>(ptr);

@@ -17,7 +17,7 @@ class StateMessageType : public ParserFsm
     {
         LOG_DEBUG("*** entry StateMessageType ***");
         // Restore initial state of all buffers and FSMs
-        msgType = static_cast<uint8_t>(parserutils::message::type::invalid);
+        msgType = 0;
         msgSizeBytesToRead = parserutils::message::size_length;
         msgPayloadSizeStr.erase();
         msgPayloadSize = 0;

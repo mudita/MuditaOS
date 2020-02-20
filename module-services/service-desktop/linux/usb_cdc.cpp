@@ -1,28 +1,17 @@
-#include "Worker.hpp"
-#include <errno.h>
-#include <fcntl.h>
-#include <iostream>
-#include <log/log.hpp>
-#include <queue.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
+#include "usb_cdc.hpp"
 
 extern int errno;
 
-extern xQueueHandle USBReceiveQueue;
-
 namespace bsp
 {
-
     int fd;
+    xQueueHandle USBReceiveQueue;
 
-    void desktopServiceReceive(void *)
+    void usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading on fd:%d", fd);
         uint8_t inputData[SERIAL_BUFFER_LEN];
-        static std::string receive_msg;
+        static std::string receiveMsg;
 
         while (1)
         {
@@ -31,9 +20,9 @@ namespace bsp
                 ssize_t length = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
                 if (length > 0)
                 {
-                    receive_msg = std::string(inputData, inputData + length);
+                    receiveMsg = std::string(inputData, inputData + length);
                     LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", length);
-                    xQueueSend(USBReceiveQueue, &receive_msg, portMAX_DELAY);
+                    xQueueSend(USBReceiveQueue, &receiveMsg, portMAX_DELAY);
                 }
                 else
                 {
@@ -49,10 +38,10 @@ namespace bsp
         }
     }
 
-    int desktopServiceSend(std::string *send_msg)
+    int usbCDCSend(std::string *sendMsg)
     {
-        ssize_t t = write(fd, (*send_msg).c_str(), (*send_msg).length());
-        delete send_msg;
+        ssize_t t = write(fd, (*sendMsg).c_str(), (*sendMsg).length());
+        delete sendMsg;
 
         if (t >= 0)
         {
@@ -66,7 +55,7 @@ namespace bsp
         }
     }
 
-    int desktopServiceInit()
+    int usbCDCInit(xQueueHandle receiveQueue)
     {
 
         fd = 0;
@@ -101,8 +90,9 @@ namespace bsp
         tcsetattr(fd, TCSANOW, &newtio);
 
         xTaskHandle taskHandleReceive;
+        USBReceiveQueue = receiveQueue;
 
-        BaseType_t task_error = xTaskCreate(desktopServiceReceive, "USB_Linux_Receive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
+        BaseType_t task_error = xTaskCreate(usbCDCReceive, "USBLinuxReceive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
 
         if (task_error != pdPASS)
         {

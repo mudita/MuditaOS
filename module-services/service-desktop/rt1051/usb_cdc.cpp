@@ -1,15 +1,15 @@
-#include "Worker.hpp"
-
-extern xQueueHandle USBReceiveQueue;
+#include "usb_cdc.hpp"
 
 extern "C"
 {
 #include "include/virtual_com.h"
 }
 
-namespace bsp{
+namespace bsp
+{
+    xQueueHandle USBReceiveQueue;
 
-    void desktopServiceReceive(void *)
+    void usbCDCReceive(void *)
     {
         LOG_INFO("[ServiceDesktop:BSP_Driver] Start reading USB_CDC");
         uint8_t inputData[SERIAL_BUFFER_LEN];
@@ -29,7 +29,6 @@ namespace bsp{
                     LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", length);
                     xQueueSend(USBReceiveQueue, &receive_msg, portMAX_DELAY);
 
-                    // TODO: Is that needed?
                     USB_CDCSend(NULL, 0);
                 }
                 else if (length == -1)
@@ -45,10 +44,10 @@ namespace bsp{
         }
     }
 
-    int desktopServiceSend(std::string *send_msg)
+    int usbCDCSend(std::string *send_msg)
     {
 
-        usb_status_t t = USB_CDCSend((uint8_t *)(*send_msg).c_str(),  (*send_msg).length());
+        usb_status_t t = USB_CDCSend((uint8_t *)(*send_msg).c_str(), (*send_msg).length());
         delete send_msg;
 
         if (t == 0x00)
@@ -60,18 +59,17 @@ namespace bsp{
         {
             LOG_ERROR("[ServiceDesktop:BSP_Driver] USB_CDCSend failed with code: %d", t);
             return -1;
-
         }
     }
 
-
-    int desktopServiceInit()
+    int usbCDCInit(xQueueHandle receiveQueue)
     {
         int ret = VCOMAPPInit();
 
         xTaskHandle taskHandleReceive;
+        USBReceiveQueue = receiveQueue;
 
-        BaseType_t task_error = xTaskCreate(desktopServiceReceive, "USB_RT1051_Receive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
+        BaseType_t task_error = xTaskCreate(usbCDCReceive, "USBRT1051Receive", SERIAL_BUFFER_LEN * 8, (void *)1, tskIDLE_PRIORITY, &taskHandleReceive);
 
         if (task_error != pdPASS)
         {
@@ -80,4 +78,4 @@ namespace bsp{
 
         return ret;
     }
-}
+} // namespace bsp
