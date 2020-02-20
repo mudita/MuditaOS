@@ -25,11 +25,6 @@ class StateMessageType
         msgPayload.clear();
         EndpointFsm::reset();
         RawDataFsm::reset();
-
-        if (!msgChunk.empty())
-        {
-            send_event(MessageDataEvt());
-        }
     };
 
     void react(MessageDataEvt const &) override
@@ -46,24 +41,6 @@ class StateMessageType
             break;
         default:
             LOG_ERROR("Invalid msg type: %d", msgType);
-            if (msgChunk.empty())
-            {
-                return;
-            }
-            else
-            {
-                send_event(MessageDataEvt());
-            }
-            // alternative: transit to StateMessageType
-            // it will erase all buffs and prevent stackoverflow in some cases, but we loose some data
-        }
-    };
-
-    void exit() override
-    {
-        LOG_DEBUG("*** exit StateMessageType ***");
-        if (msgChunk.empty())
-        {
             return;
         }
     };
@@ -77,12 +54,6 @@ class StateMessageType
 class StateMessageSize
 : public SerialParserFsm
 {
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateMessageSize ***");
-        send_event(MessageDataEvt());
-    };
-
     void react(MessageDataEvt const &) override
     {
         LOG_DEBUG("*** react MessageSizeEvt ***");
@@ -133,12 +104,6 @@ class StateMessageSize
 class StateMessagePayload
 : public SerialParserFsm
 {
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateMessagePayload ***");
-        send_event(MessageDataEvt());
-    };
-
     void react(MessageDataEvt const &) override
     {
         LOG_DEBUG("*** react MessagePayloadEvt ***");

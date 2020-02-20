@@ -28,11 +28,6 @@ class StateEndpointStorage;
 class StateDecodeJson
 : public EndpointFsm
 {
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateDecodeJson ***");
-    };
-
     void react(EndpointEvt const &) override
     {
         std::string errorString;

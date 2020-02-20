@@ -33,7 +33,10 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
             return false;
 
         SerialParserFsm::msgChunk.assign(receive_msg.begin(), receive_msg.end());
-        send_event(MessageDataEvt());
+        while (!SerialParserFsm::msgChunk.empty())
+        {
+            send_event(MessageDataEvt());
+        }
     }
 
     if (qname == "sendQueueBuffer")

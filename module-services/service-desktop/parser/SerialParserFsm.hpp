@@ -29,7 +29,7 @@ protected:
     void react(tinyfsm::Event const &) { }; /* default reaction for unhandled events */
     virtual void react(MessageDataEvt const &);
     virtual void entry(void) { };  /* entry actions in some states */
-    virtual void exit(void)  { };  /* entry actions in some states */
+    void exit(void){};             /* no exit actions at all */
 
     static std::string msgPayload;
     static uint8_t msgType;
