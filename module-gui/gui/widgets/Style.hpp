@@ -36,6 +36,7 @@ namespace font {
     const inline std::string verysmall = "gt_pressura_regular_20";
 };  // namespace font
 
+const inline uint32_t list_offset_default = 12;
         namespace label
         {
             const inline uint32_t small_h = 33;
