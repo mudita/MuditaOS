@@ -11,7 +11,7 @@ function help() {
     echo -e "ussage:"
     echo -e "\t$0 <target> <build_type>"
     echo -e "available targests ar:"
-    echo -e "\t\t\tlinux\n\t\t\tarm"
+    echo -e "\t\t\tlinux\n\t\t\trt1051"
     echo -e "available build types:"
     echo -e "\t\t\t\tDebug\t\t- standard debug build"
     echo -e "\t\t\t\tRelease\t\t- release build (not for debugging)"
@@ -30,10 +30,10 @@ function test_env.cmake() {
 function check_target() {
     case ${TARGET,,} in
         linux ) 
-            CMAKE_TOOLCHAIN_FILE="Target_RT1051.cmake"
-            return 0 ;;
-        arm ) 
             CMAKE_TOOLCHAIN_FILE="Target_Linux.cmake"
+            return 0 ;;
+        rt1051 ) 
+            CMAKE_TOOLCHAIN_FILE="Target_RT1051.cmake"
             return 0 ;;
         *) 
             echo "Wrong target: \"${TARGET}\""
