@@ -28,7 +28,8 @@ protected:
 	gui::Label* time = nullptr;
 	gui::Label* dayText = nullptr;
 	gui::Image* messagesImage = nullptr;
-	/**
+    gui::VBox *notifications = nullptr;
+    /**
 	 * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
 	 */
 	uint32_t unclockTime = 3000;
@@ -47,7 +48,9 @@ protected:
 
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState();
-public:
+    auto fillNotifications() -> bool;
+
+  public:
 	DesktopMainWindow( app::Application* app );
 	virtual ~DesktopMainWindow();
 
