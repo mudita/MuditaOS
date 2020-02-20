@@ -38,4 +38,5 @@ jobs:
       run: |
         echo 'set(TOOLCHAIN_PATH "/home/runner/gcc-arm-none-eabi-8-2019-q3-update" CACHE INTERNAL "")' > ./env.cmake
         sudo apt-get -q -y remove cmake
-        ./configure.sh linux release && make -C build-linux-Release -j4
+        ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
+
