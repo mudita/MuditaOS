@@ -10,7 +10,8 @@
 
 echo "Install neccessary packages"
 sudo apt update && sudo apt dist-upgrade -y
-sudo apt install -y binutils wget git make pkg-config gtkmm-3.0 gcc-8 g++-8 portaudio19-dev
+sudo apt install -y binutils wget git make pkg-config gtkmm-3.0 portaudio19-dev
+#gcc-8 g++-8 
 sudo apt install -y --reinstall build-essential
 
 # names taken from catalogs in tar file
@@ -38,8 +39,8 @@ export PATH="${HOME}/${CMAKEV}/bin:$PATH"
 
 echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
 
-echo "set gcc-8 as default alternative (instead of default gcc-7 in ubuntu)"
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+#echo "set gcc-8 as default alternative (instead of default gcc-7 in ubuntu)"
+#sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 
 echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
 echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"

@@ -38,7 +38,17 @@ elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
 else()
     message(FATAL_ERROR "Invalid target!")
 endif()
-
+if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    #add_subdirectory(cpp11_gcc_lib_src)
+    list(APPEND SOURCES
+    cpp11_gcc_lib_src/condition_variable.cpp
+    cpp11_gcc_lib_src/freertos_time.cpp
+    cpp11_gcc_lib_src/future.cc
+    cpp11_gcc_lib_src/gthr_key.cpp
+    cpp11_gcc_lib_src/mutex.cc
+    cpp11_gcc_lib_src/thread.cpp
+)
+endif()
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
@@ -71,7 +81,22 @@ target_include_directories(${PROJECT_NAME}
 
 )
 
-target_link_libraries(${PROJECT_NAME} module-bsp module-utils)
+if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    #add_subdirectory(cpp11_gcc_lib_src)
+    target_include_directories(
+        ${PROJECT_NAME}
+        PUBLIC
+        cpp11_gcc_lib_src)
+    target_compile_definitions(${PROJECT_NAME}
+        PUBLIC
+        _GCC_MULTITHREAD_FREERTOS_ENABLE
+    )
+endif()
+
+target_link_libraries(${PROJECT_NAME}
+    module-bsp
+    module-utils
+)
 
 # Host target configuration(mainly used for unit testing)
 

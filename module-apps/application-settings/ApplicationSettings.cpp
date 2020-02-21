@@ -9,10 +9,11 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
-#include "windows/SettingsMainWindow.hpp"
-#include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
+#include "windows/ICUTestWindow.hpp"
 #include "windows/Info.hpp"
+#include "windows/LanguageWindow.hpp"
+#include "windows/SettingsMainWindow.hpp"
 
 #include "windows/UITestWindow.hpp"
 
@@ -94,6 +95,9 @@ void ApplicationSettings::createUserInterface() {
 
     window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+    window = new gui::ICUTestWindow(this, app::icu_test);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(app::icu_test, window));
 }
 
 void ApplicationSettings::destroyUserInterface() {

@@ -22,6 +22,9 @@ set( SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
+
+
+
 add_subdirectory( application-clock )
 add_subdirectory( application-calendar )
 add_subdirectory( application-viewer )
@@ -43,7 +46,16 @@ include_directories( ../module-os )
 include_directories( ../module-bsp )
 include_directories( ../module-db )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-services module-db ${TARGET_LIBRARIES} )
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    module-bsp
+    module-os
+    module-sys
+    module-utils
+    module-gui
+    module-services
+    module-db
+    ${TARGET_LIBRARIES}
+    ${ICU_LIBRARIES})
 
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
@@ -51,6 +63,8 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${ICU_INCLUDE_DIRS})
+target_link_directories(${PROJECT_NAME} PUBLIC ${ICU_LIB_DIR})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
 target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 

@@ -17,13 +17,42 @@ message("TARGET_COMPILE_DEFINITIONS: ${TARGET_COMPILE_OPTIONS}")
 message("TARGET_LIBRARIES: ${TARGET_LIBRARIES}")
 message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
+#find_package(ICU REQUIRED)
+set(ICU_LIB_NAMES icui18n icuuc icuio icudata )
+if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
+    set(ICU_ROOT "/home/rockford/mudita/icu-66-arm")
+    set(ICU_LIB_DIR "${ICU_ROOT}/lib")
+#    foreach(ICU_LIB ${ICU_LIB_NAMES})
+#        list(APPEND ICU_LIBRARIES ${ICU_LIB_DIR}/lib${ICU_LIB}.a)
+#    endforeach()
+elseif(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    set(ICU_ROOT "/home/rockford/mudita/icu-66-x86")
+    set(ICU_LIB_DIR "${ICU_ROOT}/lib")
+#    set(ICU_LIBRARIES ${ICU_LIB_NAMES})
+else()
+    message(FATAL_ERROR "Invalid target!")
+endif()
+
+set(ICU_INCLUDE_DIRS "${ICU_ROOT}/include")
+set(ICU_LIBRARIES -Wl,--start-group ${ICU_LIB_NAMES} -Wl,--end-group)
+
+message("ICU_FOUND: ${ICU_FOUND}")
+message("ICU version: ${ICU_VERSION}")
+message("ICU_INCLUDE_DIR: ${ICU_INCLUDE_DIR}")
+message("ICU_LIBRARIES: ${ICU_LIBRARIES}")
+
 add_executable(${PROJECT_NAME} "")
 
+if (ICU_FOUND)
+    target_link_directories(${PROJECT_NAME} PUBLIC ${ICU_ROOT}/lib)
+    target_include_directories(${PROJECT_NAME} PUBLIC ${ICU_INCLUDE_DIRS})
+endif ()
 
 # setting build flags
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DDEBUG" CACHE STRING "")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DDEBUG -Wl,--start-group" CACHE STRING "")
+
 
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
@@ -158,6 +187,7 @@ target_link_libraries(${PROJECT_NAME}
         ${LWIP_LIBRARIES}
         module-lwip
         ${TARGET_LIBRARIES}
+        ${ICU_LIBRARIES}
         )
 
 

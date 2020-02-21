@@ -38,6 +38,12 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
                  app->switchWindow(app::sim_select, nullptr);
                  return true;
              }},
+            {"ICU Test",
+             [=](gui::Item &) {
+                 LOG_INFO("switch to ICU test");
+                 app->switchWindow(app::icu_test, nullptr);
+                 return true;
+             }},
             {"[None] " + utils::localize.get("app_settings_date_and_time"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_phone_modes"), [=](gui::Item &) { return true; }},
