@@ -18,25 +18,26 @@ extern "C" {
 
 namespace sys {
 
-static void workerTaskFunction( void* ptr ) {
-	Worker* worker = reinterpret_cast<Worker*>(ptr);
-	QueueSetMemberHandle_t activeMember;
-	std::vector<xQueueHandle> queues = worker->getQueues();
+    void workerTaskFunction(void *ptr)
+    {
+        Worker *worker = reinterpret_cast<Worker *>(ptr);
+        QueueSetMemberHandle_t activeMember;
+        std::vector<xQueueHandle> queues = worker->queues;
 
-	while (1)
-	{
-		activeMember = xQueueSelectFromSet( worker->getSet(), portMAX_DELAY);
-		//find id of the queue that was activated
+        while (1)
+        {
+            activeMember = xQueueSelectFromSet(worker->queueSet, portMAX_DELAY);
+            // find id of the queue that was activated
 
-		for( uint32_t i=0; i<queues.size(); i++ ) {
-			if( queues[i] == activeMember ) {
-				worker->handleMessage( i );
-			}
-		}
-	}
-}
-
-
+            for (uint32_t i = 0; i < queues.size(); i++)
+            {
+                if (queues[i] == activeMember)
+                {
+                    worker->handleMessage(i);
+                }
+            }
+        }
+    }
 
 Worker::Worker( sys::Service* service ) : service {service }, serviceQueue{ NULL }, queueSet{ NULL }, taskHandle{ NULL } {
 }
@@ -49,8 +50,14 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 	//initial value is because there is always a queue to communicate with service
 	uint32_t setSize = SERVICE_QUEUE_LENGTH;
 
-	//iterate over all entries in the list of queues and summarize queue sizes
-	for( auto wqi : queuesList ) {
+    auto addQueueInfo = [&](xQueueHandle q, std::string qName) {
+        queueNameMap.insert(std::pair<xQueueHandle, std::string>(q, qName));
+        vQueueAddToRegistry(q, qName.c_str());
+        queues.push_back(q);
+    };
+
+    // iterate over all entries in the list of queues and summarize queue sizes
+    for( auto wqi : queuesList ) {
 		setSize += wqi.length;
 	}
 
@@ -65,11 +72,10 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
         deinit();
         return false;
 	}
-	vQueueAddToRegistry(serviceQueue, "ServiceQueue");
-	queueNameMap.insert(std::pair<xQueueHandle, std::string>(serviceQueue, "ServiceQueue"));
-	queues.push_back(serviceQueue);
 
-	// create and add all queues provided from service
+    addQueueInfo(serviceQueue, SERVICE_QUEUE_NAME);
+
+    // create and add all queues provided from service
 	for (auto wqi : queuesList)
 	{
 		auto q = xQueueCreate(wqi.length, wqi.elementSize);
@@ -79,12 +85,10 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 			deinit();
 			return false;
 		}
-		queueNameMap.insert(std::pair<xQueueHandle, std::string>(q, wqi.name));
-		vQueueAddToRegistry(q, wqi.name.c_str());
-		queues.push_back(q);
-	}
+        addQueueInfo(q, wqi.name);
+    };
 
-	//iterate over all queues and add them to set
+    //iterate over all queues and add them to set
 	for( uint32_t i=0; i<queues.size(); ++i ) {
 
 		if(xQueueAddToSet( queues[i], queueSet ) != pdPASS)
@@ -137,7 +141,6 @@ bool Worker::stop() {
 
 }
 
-
 bool Worker::handleMessage( uint32_t queueID ) {
 
 	QueueHandle_t queue = queues[queueID];
@@ -155,10 +158,6 @@ bool Worker::handleMessage( uint32_t queueID ) {
 	return true;
 }
 
-xQueueHandle Worker::getQueue() {
-	return serviceQueue;
-}
-
 bool Worker::send( uint32_t cmd, uint32_t* data ) {
 	if( serviceQueue != NULL ) {
 		WorkerCommand wcmd {cmd, data };
@@ -166,6 +165,16 @@ bool Worker::send( uint32_t cmd, uint32_t* data ) {
 			return true;
 	}
 	return false;
+}
+
+xQueueHandle Worker::getQueueByName(std::string qname)
+{
+    for (auto q_handle : this->queues)
+    {
+        if (this->queueNameMap[q_handle] == qname)
+            return q_handle;
+    }
+    return nullptr;
 }
 
 } /* namespace sys */
