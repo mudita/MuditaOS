@@ -220,8 +220,6 @@ sys::ReturnCodes EventManager::InitHandler() {
     EventWorker->init( list );
 	EventWorker->run();
 
-	std::vector<xQueueHandle> set = EventWorker->getQueues();
-
 	return sys::ReturnCodes::Success;
 }
 

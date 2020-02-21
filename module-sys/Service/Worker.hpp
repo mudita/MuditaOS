@@ -46,17 +46,19 @@ class Worker {
 protected:
 	const static uint32_t SERVICE_QUEUE_LENGTH = 10;
 	const static uint32_t SERVICE_QUEUE_SIZE = sizeof( WorkerCommand );
+    const std::string SERVICE_QUEUE_NAME = "ServiceQueue";
 
-	sys::Service* service;
+    sys::Service* service;
 	//queue used by service to send commands to service.
 	xQueueHandle serviceQueue;
 	std::vector<xQueueHandle> queues;
 	QueueSetHandle_t queueSet;
-	// worker queue name map
-	std::map<xQueueHandle, std::string> queueNameMap;
-	// workers task handle
-	xTaskHandle taskHandle;
-public:
+    std::map<xQueueHandle, std::string> queueNameMap;
+    xTaskHandle taskHandle;
+
+    friend void workerTaskFunction(void *ptr);
+
+  public:
 	Worker( sys::Service* service );
 	virtual ~Worker();
 
@@ -80,26 +82,13 @@ public:
 	 */
 	virtual bool handleMessage( uint32_t queueID );
 	/**
-	 * @brief Returns handle to the queue used to communicate with worker.
-	 */
-	virtual xQueueHandle getQueue();
-	/**
 	 * @brief Sends command and pointer to data to worker
 	 */
 	virtual bool send( uint32_t cmd, uint32_t* data );
-
-	std::vector<xQueueHandle> &getQueues()
-	{
-		return queues;
-	};
-	std::map<xQueueHandle, std::string> &getQueueNameMap()
-	{
-		return queueNameMap;
-	};
-	QueueSetHandle_t getSet()
-	{
-		return queueSet;
-    };
+    /**
+     * @brief Returns handle to queue by its name
+     */
+    virtual xQueueHandle getQueueByName(std::string);
 };
 
 } /* namespace sys */

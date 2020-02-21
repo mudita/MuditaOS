@@ -26,7 +26,7 @@ bool BluetoothWorker::run() {
     if(Worker::run()) {
         is_running = true;
         // TODO what - that's just wrong -_-
-        auto el = getQueues()[queueIO_handle];
+        auto el = queues[queueIO_handle];
         BlueKitchen::getInstance()->qHandle = el;
         Bt::initialize_stack();
         Bt::register_hw_error_callback();
