@@ -5,6 +5,7 @@ extern "C"
 #include "FreeRTOS.h"
 #include "task.h"
 #include <queue.h>
+#include "driver/include/virtual_com.h"
 }
 
 #include <errno.h>

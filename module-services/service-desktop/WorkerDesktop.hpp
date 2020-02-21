@@ -16,7 +16,7 @@ extern "C"
 #if defined(TARGET_RT1051)
 extern "C"
 {
-#include "rt1051/include/virtual_com.h"
+#include "rt1051/driver/include/virtual_com.h"
 }
 #include "rt1051/usb_cdc.hpp"
 #else

@@ -1,0 +1,26 @@
+target_include_directories(${PROJECT_NAME} 
+	PUBLIC 
+		"${CMAKE_CURRENT_LIST_DIR}/device/class"
+		"${CMAKE_CURRENT_LIST_DIR}/device/class/hid"
+		"${CMAKE_CURRENT_LIST_DIR}/device/include"
+		"${CMAKE_CURRENT_LIST_DIR}/device/source"
+		"${CMAKE_CURRENT_LIST_DIR}/device/source/ehci"
+		"${CMAKE_CURRENT_LIST_DIR}/include"
+		"${CMAKE_CURRENT_LIST_DIR}/phy"
+		"${CMAKE_CURRENT_LIST_DIR}/osa"
+)
+target_compile_options(${PROJECT_NAME} PUBLIC "-w")
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
+target_sources(${PROJECT_NAME}
+	PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}/device/class/usb_device_class.c"
+		"${CMAKE_CURRENT_LIST_DIR}/device/class/hid/usb_device_hid.c"
+		"${CMAKE_CURRENT_LIST_DIR}/device/source/usb_device_ch9.c"
+		"${CMAKE_CURRENT_LIST_DIR}/device/source/usb_device_dci.c"
+		"${CMAKE_CURRENT_LIST_DIR}/device/source/ehci/usb_device_ehci.c"
+		"${CMAKE_CURRENT_LIST_DIR}/phy/usb_phy.c"
+		"${CMAKE_CURRENT_LIST_DIR}/cdc/virtual_com.c"
+		"${CMAKE_CURRENT_LIST_DIR}/cdc/usb_device_descriptor.c"
+		"${CMAKE_CURRENT_LIST_DIR}/cdc/usb_device_cdc_acm.c"
+		"${CMAKE_CURRENT_LIST_DIR}/osa/usb_osa_freertos.c"
+)

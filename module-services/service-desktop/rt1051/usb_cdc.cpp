@@ -1,10 +1,5 @@
 #include "usb_cdc.hpp"
 
-extern "C"
-{
-#include "include/virtual_com.h"
-}
-
 namespace bsp
 {
     xQueueHandle USBReceiveQueue;
