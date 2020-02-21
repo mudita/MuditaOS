@@ -17,6 +17,7 @@ extern "C" {
 #include "Worker.hpp"
 
 namespace sys {
+
     void workerTaskFunction(void *ptr)
     {
         Worker *worker = reinterpret_cast<Worker *>(ptr);
@@ -60,7 +61,7 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 		setSize += wqi.length;
 	}
 
-	//create set of queues
+    //create set of queues
 	queueSet = xQueueCreateSet( setSize );
 	if( queueSet == NULL )
 		return false;

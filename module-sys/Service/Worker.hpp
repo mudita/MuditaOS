@@ -18,7 +18,7 @@ namespace sys {
 
 class WorkerQueueInfo {
 public:
-  const char *name;
+  std::string name;
   int elementSize;
   int length;
 };
