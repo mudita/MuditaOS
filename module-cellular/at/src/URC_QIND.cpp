@@ -29,7 +29,6 @@ auto QIND::csq_val() -> std::pair<int, int>
     return {};
 }
 
-/// by docs ivalid csq is 99,99
 auto QIND::csq_ivalid() -> std::pair<int, int>
 {
     return {99, 99};
