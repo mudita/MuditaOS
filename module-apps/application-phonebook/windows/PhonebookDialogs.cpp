@@ -23,7 +23,6 @@
 PhonebookDialog::PhonebookDialog(app::Application *app, const std::string &dialogName) : AppWindow(app, dialogName)
 {
     LOG_INFO("PhonebookDialog::ctor %s", dialogName.c_str());
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 

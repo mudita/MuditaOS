@@ -25,8 +25,6 @@ namespace gui {
 
 TestMessageWindow::TestMessageWindow(app::Application *app) :
 		AppWindow(app, "Message") {
-	setSize(480, 600);
-
 	buildInterface();
 }
 

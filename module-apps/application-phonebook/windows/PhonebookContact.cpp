@@ -17,7 +17,6 @@
 
 PhonebookContact::PhonebookContact(app::Application *app) : AppWindow(app, "Contact")
 {
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
