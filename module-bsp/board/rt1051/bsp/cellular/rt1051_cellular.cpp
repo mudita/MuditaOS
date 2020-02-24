@@ -402,6 +402,20 @@ namespace bsp {
     void RT1051Cellular::SetSendingAllowed(bool state) { pv_SendingAllowed = state; }
     bool RT1051Cellular::GetSendingAllowed() { return pv_SendingAllowed; }
 
+    void RT1051Cellular::SelectAntenna(uint8_t antenna)
+    {
+        if (antenna == 0)
+        {
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN), CELLULAR_BSP_ANTSEL_PIN_A_STATE);
+            LOG_INFO("Selecting Antenna A");
+        }
+        else if (antenna == 1)
+        {
+            gpio_2->WritePin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN), CELLULAR_BSP_ANTSEL_PIN_B_STATE);
+            LOG_INFO("Selecting Antenna B");
+        }
+    }
+
     namespace cellular::sim
     {
         static xQueueHandle qhandle = nullptr;

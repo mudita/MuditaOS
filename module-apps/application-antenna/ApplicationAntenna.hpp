@@ -18,6 +18,11 @@ namespace app
 
     class ApplicationAntenna : public app::Application
     {
+      protected:
+        AppTimer appTimer;
+        void timerHandler(void);
+        bool scanInProgress = false;
+
       public:
         ApplicationAntenna(std::string name = name_antenna, std::string parent = "", bool startBackgound = false);
         virtual ~ApplicationAntenna();
@@ -33,6 +38,10 @@ namespace app
 
         void createUserInterface() override;
         void destroyUserInterface() override;
+        void setScanInProgress(bool value)
+        {
+            scanInProgress = value;
+        };
     };
 
 } /* namespace app */

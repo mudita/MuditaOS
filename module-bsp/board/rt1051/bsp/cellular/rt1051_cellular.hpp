@@ -68,7 +68,9 @@ namespace bsp {
         static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;
 
-    private:
+        void SelectAntenna(uint8_t antenna) override final;
+
+      private:
         void MSPInit();
 
         void MSPDeinit();

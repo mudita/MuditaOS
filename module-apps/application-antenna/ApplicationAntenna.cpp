@@ -6,14 +6,27 @@
  */
 
 #include "ApplicationAntenna.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "windows/AntennaMainWindow.hpp"
-#include <map>
-
+#include <ticks.hpp>
 namespace app
 {
 
-    ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, bool startBackgound) : Application(name, parent, startBackgound, 4096 * 2)
+    void ApplicationAntenna::timerHandler(void)
     {
+
+        if (!scanInProgress)
+        {
+            LOG_INFO("Get Network info");
+            CellularServiceAPI::GetNetworkInfo(this);
+        }
+    }
+
+    ApplicationAntenna::ApplicationAntenna(std::string name, std::string parent, bool startBackgound)
+        : Application(name, parent, startBackgound, 4096 * 2), appTimer(CreateAppTimer(2000, true, [=]() { timerHandler(); }))
+
+    {
+        appTimer.restart();
     }
 
     ApplicationAntenna::~ApplicationAntenna()
@@ -23,7 +36,59 @@ namespace app
     // Invoked upon receiving data message
     sys::Message_t ApplicationAntenna::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        return std::make_shared<sys::ResponseMessage>();
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        // if message was handled by application's template there is no need to process further.
+        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success))
+        {
+            return retMsg;
+        }
+
+        // this variable defines whether message was processed.
+        bool handled = false;
+        if (msgl->messageType == MessageType::CellularOperatorsScanResult)
+        {
+            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
+            if (msg != nullptr)
+            {
+                auto win = getCurrentWindow();
+
+                if (win->getName() == "MainWindow")
+                {
+                    auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
+                    if (window != nullptr)
+                    {
+
+                        window->updateOperatorsScan(msg->data);
+                    }
+                }
+                scanInProgress = false;
+            }
+            handled = true;
+        }
+        if (msgl->messageType == MessageType::CellularNetworkInfoResult)
+        {
+            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
+            if (msg != nullptr)
+            {
+                auto win = getCurrentWindow();
+
+                if (win->getName() == "MainWindow")
+                {
+                    auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
+                    if (window != nullptr)
+                    {
+
+                        window->updateDebugInfo(msg->data);
+                    }
+                }
+            }
+            handled = true;
+        }
+
+        if (handled)
+            return std::make_shared<sys::ResponseMessage>();
+        else
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
     // Invoked during initialization

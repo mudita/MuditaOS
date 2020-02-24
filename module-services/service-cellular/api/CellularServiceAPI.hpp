@@ -35,6 +35,23 @@ public:
      * #return SIM own number when succeeds, empty string when fails
      */
     static std::string GetOwnNumber(sys::Service *serv);
+    /*
+     * @brief It calls service-cellulat fo newtwork info
+     * @param serv pointer to caller service.
+     */
+    static void GetNetworkInfo(sys::Service *serv);
+    /*
+     * @brief It calls service-cellulat to perform operators scan
+     * @param serv pointer to caller service.
+     *
+     */
+    static void StartOperatorsScan(sys::Service *serv);
+    /*
+     * @brief It calls service-cellulat to switch antenna
+     * @param serv pointer to caller service.
+     * @param antenna selected antenna. 0 to select antenna A, 1 to select antenna B
+     */
+    static bool SelectAntenna(sys::Service *serv, uint8_t antenna);
 };
 
 
