@@ -153,8 +153,8 @@ bool WorkerEvent::handleMessage( uint32_t queueID ) {
 bool WorkerEvent::init( std::list<sys::WorkerQueueInfo> queues )
 {
 	Worker::init(queues);
-	std::vector<xQueueHandle> qhandles = this->getQueues();
-	bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
+    std::vector<xQueueHandle> qhandles = this->queues;
+    bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
 	bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
 	bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
