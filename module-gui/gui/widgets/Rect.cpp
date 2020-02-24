@@ -34,7 +34,6 @@ namespace gui {
         widgetArea.h = 0;
         setPosition(x, y);
         setSize(w, h);
-        setMaxSize(w, h);
 
         this->parent = parent;
         if (parent)

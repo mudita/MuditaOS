@@ -34,6 +34,12 @@ namespace gui {
         /// get position in axis - in x get x, in y get y
         int16_t &pos(gui::Axis axis);
         std::string str();
+        /// check if box have values
+        auto isset() -> bool;
+        /// logical sum of box space by {w,h}
+        void sum(uint32_t w, uint32_t h);
+        /// logical sum of bounding box by another bounding box values
+        void sum(const BoundingBox &box);
     };
 
 } /* namespace gui */

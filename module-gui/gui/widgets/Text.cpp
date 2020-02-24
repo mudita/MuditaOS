@@ -486,7 +486,7 @@ void Text::setPosition(const short &x, const short &y)
     updateCursor();
 }
 
-void Text::setSize(const short &w, const short &h)
+void Text::setSize(const unsigned short w, const unsigned short h)
 {
     Rect::setSize(w, h);
     recalculateDrawParams();
@@ -1029,7 +1029,6 @@ int32_t Text::expand(uint32_t rowCount, int32_t h)
             h = widgetArea.h;
         }
         setSize(getWidth(), h);
-        setMaxSize(getWidth(), h);
         LOG_DEBUG("Resized Text to: %d %d", getWidth(), getHeight());
     }
     return h;

@@ -22,10 +22,6 @@ Item::Item() :
 	visible{true},
 	verticalPolicy{ LayoutVerticalPolicy::LAYOUT_POLICY_VERTICAL_EXPAND },
 	horizontalPolicy { LayoutHorizontalPolicy::LAYOUT_POLICY_HORIZONTAL_EXPAND },
-	minHeight { 0 },
-	minWidth { 0 },
-	maxHeight { 0xFFFF },
-	maxWidth { 0xFFFF },
 	navigationDirections{ nullptr } {
 
 	focusChangedCallback = [](Item&){ return false;};
@@ -112,23 +108,12 @@ void Item::setY(const uint32_t y)
 	onDimensionChanged(oldArea, widgetArea);
 }
 
-void Item::setSize( const short& w, const short& h ) {
-
-	BoundingBox oldArea = widgetArea;
-	widgetArea.w = w;
-	if( widgetArea.w < 0 )
-		widgetArea.w = 0;
+void Item::setSize(const unsigned short w, const unsigned short h)
+{
+    BoundingBox oldArea = widgetArea;
+    widgetArea.w = w;
 	widgetArea.h = h;
-	if( widgetArea.h < 0 )
-		widgetArea.h = 0;
-    if (w > maxWidth)
-    {
-        maxWidth = w;
-    }
-    if (h > maxHeight)
-    {
-        maxHeight = h;
-    }
+    widgetMaxArea.sum(widgetArea);
     updateDrawArea();
 
     onDimensionChanged(oldArea, widgetArea);
@@ -185,31 +170,6 @@ void Item::setNavigationItem( gui::NavigationDirection direction, Item* item ) {
 	if( navigationDirections == nullptr )
 		navigationDirections = new Navigation();
 	navigationDirections->setDirectionItem(direction, item);
-}
-
-uint32_t Item::getMinHeight() {
-	return minHeight;
-}
-
-uint32_t Item::getMinWidth() {
-	return minWidth;
-}
-
-uint32_t Item::getMaxHeight() {
-	return maxHeight;
-}
-
-uint32_t Item::getMaxWidth() {
-	return maxWidth;
-}
-
-void Item::setMaxSize( const uint16_t& w, const uint16_t& h) {
-	maxWidth = w;
-	maxHeight = h;
-}
-void Item::setMinSize( const uint16_t& w, const uint16_t& h) {
-	minWidth = w;
-	minHeight = h;
 }
 
 bool Item::handleNavigation(const InputEvent inputEvent)

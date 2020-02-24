@@ -61,10 +61,10 @@ bool Image::setImageWithID( int id ) {
 	drawArea.w = imageMapWidth;
 	drawArea.h = imageMapHeight;
 
-	minWidth = maxWidth = widgetArea.w = imageMapWidth;
-	minHeight = maxHeight = widgetArea.h = imageMapHeight;
+    widgetMaxArea.w = widgetArea.w = imageMapWidth;
+    widgetMaxArea.h = widgetArea.h = imageMapHeight;
 
-	return true;
+    return true;
 }
 
 std::list<DrawCommand*> Image::buildDrawList() {
