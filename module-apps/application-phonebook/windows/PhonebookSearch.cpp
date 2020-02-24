@@ -12,7 +12,6 @@
 
 PhonebookSearch::PhonebookSearch(app::Application *app) : AppWindow(app, "Search"), phonebookModel{new PhonebookModel(app)}
 {
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 

@@ -25,8 +25,6 @@
 namespace gui {
 
 PowerOffWindow::PowerOffWindow( app::Application* app ) : AppWindow(app, "PowerOffWindow"){
-	setSize( 480, 600 );
-
 	buildInterface();
 }
 

@@ -19,7 +19,6 @@ namespace gui
 
 PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, "New")
 {
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 

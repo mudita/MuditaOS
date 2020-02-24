@@ -19,7 +19,6 @@ namespace gui
 
     PhonebookMainWindow::PhonebookMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window), phonebookModel{new PhonebookModel(app)}
     {
-        setSize(style::window_width, style::window_height);
         buildInterface();
 }
 
