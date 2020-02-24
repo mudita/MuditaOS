@@ -50,12 +50,13 @@ public:
     Item *parent = nullptr;
     // list of items that have the same parent.
     std::list<Item*> children;
-	//bounding box of the item. This is in coordinates of the parent widget.
-	BoundingBox widgetArea;
-	//bounding box used for drawing. This is in coordinates of window
-	BoundingBox drawArea; // drawableArea would be more accurate
-	// bounding box used by children
-	BoundingBox innerArea; // it is widget area minus margins. it is con
+    /// bounding box of the item. This is in coordinates of the parent widget.
+    BoundingBox widgetArea;
+    /// bounding box of the item maximal size, if not specified other - the same as widget Area
+    BoundingBox widgetMaxArea;
+    // bounding box used for drawing. This is in coordinates of window
+    BoundingBox drawArea; // drawableArea would be more accurate
+                          // maximal bounding box size
     Margins innerMargins;
     //radius of corner
 	short radius;
@@ -68,10 +69,6 @@ public:
 	LayoutVerticalPolicy verticalPolicy;
 	//policy for changing horizontal size if Item is placed inside layout
 	LayoutHorizontalPolicy horizontalPolicy;
-	//Minimal height to which Layout base widget can scale current widget
-	uint16_t minHeight;
-	//Minimal width to which Layout base widget can scale current widget
-	uint16_t minWidth;
 	//Maximum height to which Layout base widget can scale current widget
 	uint16_t maxHeight;
 	//Maximum width to which Layout base widget can scale current widget
@@ -147,7 +144,7 @@ public:
 	virtual bool removeWidget( Item* item );
 	virtual void setVisible( bool value );
 	virtual void setPosition( const short& x, const short& y );
-	virtual void setSize( const short& w, const short& h );
+    virtual void setSize(const unsigned short w, const unsigned short h);
     virtual void setBoundingBox(const BoundingBox &new_box);
 	virtual std::list<DrawCommand*> buildDrawList();
 	virtual void setRadius( int value );
@@ -159,41 +156,25 @@ public:
 	Item();
 	virtual ~Item();
 
-	/**
-	 * @brief Method returns minimal height for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note This method is used by containers that inherit from the Layout class (HBox, VBox...).
-	 * This value takes into consideration specific elements of widget like font's height, rounded corners and border's width.
-	 */
-	uint32_t getMinHeight();
-	/**
-	 * @brief Method returns minimal width for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note This method is used by containers that inherit from the Layout class (HBox, VBox...).
-	 * This value takes into consideration specific elements of widget like rounded corners and border's width.
-	 */
-	uint32_t getMinWidth();
-	/**
-	 * @brief Method returns maximum height for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note Returned value must be equal or greater than value returned by getMinHeight.
-	 */
-	uint32_t getMaxHeight();
-	/**
-	 * @brief Method returns maximum width for the widget.
-	 * @return Unsigned value between 0 and 0xFFFF.
-	 * @note Returned value must be equal or greater than value returned by getMinWidth.
-	 */
-	uint32_t getMaxWidth();
-
-	void setMaxSize( const uint16_t& w, const uint16_t& h);
-	void setMinSize( const uint16_t& w, const uint16_t& h);
 	void setX(const uint32_t x);
 	void setY(const uint32_t y);
-	const uint32_t getX() const			{ return (widgetArea.x); }
-	const uint32_t getY() const			{ return (widgetArea.y); }
-	const uint32_t getWidth() const		{ return (widgetArea.w); }
-	const uint32_t getHeight() const	{ return (widgetArea.h); }
+    [[nodiscard]] const uint32_t getX() const
+    {
+        return (widgetArea.x);
+    }
+    [[nodiscard]] const uint32_t getY() const
+    {
+        return (widgetArea.y);
+    }
+    [[nodiscard]] const uint32_t getWidth() const
+    {
+        return (widgetArea.w);
+    }
+    [[nodiscard]] const uint32_t getHeight() const
+    {
+        return (widgetArea.h);
+    }
+
 protected:
 	//On change of position or size this method will recalculate visible part of the widget
 	//considering widgets hierarchy and calculate absolute position of drawing primitives.

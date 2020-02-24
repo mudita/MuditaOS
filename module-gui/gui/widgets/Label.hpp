@@ -119,7 +119,7 @@ public:
 	std::list<DrawCommand*> buildDrawList() override;
     void setPosition( const short& x, const short& y ) override;
 
-	void setSize( const short& w, const short& h ) override;
+    void setSize(const unsigned short w, const unsigned short h) override;
     uint32_t getTextNeedSpace();
 };
 

@@ -105,4 +105,26 @@ std::string BoundingBox::str()
     return ss.str();
 }
 
+auto BoundingBox::isset() -> bool
+{
+    return x == y == w == h == 0;
+}
+
+void BoundingBox::sum(uint32_t w, uint32_t h)
+{
+    if (this->w < w)
+    {
+        this->w = w;
+    }
+    if (this->h < h)
+    {
+        this->h = h;
+    }
+}
+
+void BoundingBox::sum(const BoundingBox &box)
+{
+    sum(box.w, box.h);
+}
+
 } /* namespace gui */

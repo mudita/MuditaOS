@@ -242,7 +242,7 @@ class Text : public Rect
     // virtual methods from Item
     std::list<DrawCommand *> buildDrawList() override;
     void setPosition(const short &x, const short &y) override;
-    void setSize(const short &w, const short &h) override;
+    void setSize(const unsigned short w, const unsigned short h) override;
     bool onInput(const InputEvent &inputEvent) override;
     /// move ownership of mode ptr to Text
     void setInputMode(InputMode *&&mode) { this->mode = mode; };
