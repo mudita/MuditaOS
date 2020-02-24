@@ -21,7 +21,6 @@ namespace parserutils
         constexpr size_t size_length = 9;
         namespace type
         {
-            constexpr uint8_t invalid = '"';
             constexpr uint8_t endpoint = '#';
             constexpr uint8_t rawData = '$';
         } // namespace type
