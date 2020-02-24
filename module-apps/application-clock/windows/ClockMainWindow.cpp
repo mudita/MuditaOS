@@ -23,9 +23,6 @@
 namespace gui {
 
 ClockMainWindow::ClockMainWindow( app::Application* app ) : gui::AppWindow( app, "MainWindow") {
-
-	setSize( 480, 600 );
-
 	uint32_t xOffset = 0;
 	uint32_t yOffset = 0;
 

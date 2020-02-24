@@ -43,8 +43,6 @@ sys::ReturnCodes ApplicationCalendar::DeinitHandler() {
 void ApplicationCalendar::createUserInterface() {
 
 	gui::AppWindow* win = new CalendarMainWindow(this, "Main");
-	win->setSize( 480, 600 );
-
 	windows.insert( std::pair<std::string,gui::AppWindow*>(win->getName(), win));
 }
 

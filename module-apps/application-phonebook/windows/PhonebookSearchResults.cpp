@@ -21,7 +21,6 @@ namespace gui
     PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
         : AppWindow(app, name::window::search_results), searchResultsModel{new SearchResultsModel(app)}
     {
-        setSize(style::window_width, style::window_height);
         buildInterface();
 }
 

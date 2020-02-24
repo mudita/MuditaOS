@@ -32,8 +32,6 @@ namespace gui {
 
 NotesEditWindow::NotesEditWindow( app::Application* app ) :
 	AppWindow(app,"EditWindow") {
-	setSize( 480, 600 );
-
 	buildInterface();
 }
 

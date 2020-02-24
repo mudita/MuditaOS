@@ -20,7 +20,6 @@
 
 PhonebookOptions::PhonebookOptions(app::Application *app) : AppWindow(app, "Options")
 {
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 

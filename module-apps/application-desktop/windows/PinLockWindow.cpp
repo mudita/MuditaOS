@@ -25,8 +25,6 @@
 namespace gui {
 
 PinLockWindow::PinLockWindow( app::Application* app ) : AppWindow(app, "PinLockWindow"){
-	setSize( 480, 600 );
-
 	buildInterface();
 }
 

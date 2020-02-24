@@ -24,8 +24,6 @@
 namespace gui {
 
 LanguageWindow::LanguageWindow( app::Application* app ) : AppWindow(app,"Languages"){
-	setSize( 480, 600 );
-
 	buildInterface();
 }
 

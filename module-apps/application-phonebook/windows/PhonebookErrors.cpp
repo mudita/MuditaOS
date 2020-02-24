@@ -28,7 +28,6 @@ static Label *addLabel(gui::Item *parentPage, int x, int y, int w, int h, const 
 
 NoResults::NoResults(app::Application *app) : AppWindow(app, "NoResults")
 {
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
@@ -107,7 +106,6 @@ bool NoResults::onInput(const InputEvent &inputEvent)
  */
 ContactBlocked::ContactBlocked(app::Application *app) : AppWindow(app, "NoResults")
 {
-    setSize(style::window_width, style::window_height);
     buildInterface();
 }
 
