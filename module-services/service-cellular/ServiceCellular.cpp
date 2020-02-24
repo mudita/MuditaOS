@@ -653,7 +653,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     break;
     case MessageType::CellularSelectAntenna: {
-        uint8_t value;
+        uint8_t value = 0;
         auto msg = dynamic_cast<CellularRequestMessage *>(msgl);
         if (msg != nullptr)
         {
