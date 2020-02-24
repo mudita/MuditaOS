@@ -36,9 +36,14 @@ class CountryCodeRecordInterface : public RecordInterface<CountryCodeRecord, Cou
     ~CountryCodeRecordInterface()
     {
     }
-    uint32_t GetCountryCodeByMCC(uint32_t mcc)
+    CodesTableRow GetByMCC(uint32_t mcc)
     {
-        return (0);
+        if (codesDB)
+        {
+            return (codesDB->countryCodes.GetByMCC(mcc));
+        }
+
+        return (CodesTableRow());
     }
 
   private:

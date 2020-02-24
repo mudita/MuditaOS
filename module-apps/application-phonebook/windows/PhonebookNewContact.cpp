@@ -618,7 +618,7 @@ bool PhonebookNewContact::verifyAndSave()
 }
 const std::string PhonebookNewContact::getCountryPrefix()
 {
-    const std::string imsi = CellularServiceAPI::GetIMSI(application, false);
+    std::string imsi = CellularServiceAPI::GetIMSI(application, false);
     if (imsi == "")
     {
         LOG_ERROR("Can't get IMSI code from cellular, fall back to Poland country code");
@@ -626,7 +626,7 @@ const std::string PhonebookNewContact::getCountryPrefix()
     }
     LOG_DEBUG("getCountryPrefix imsi:%s", imsi.c_str());
     const uint32_t country_code = DBServiceAPI::GetCountryCodeByMCC(application, std::stoul(imsi));
-    if (country_code < 0)
+    if (country_code <= 0)
     {
         LOG_ERROR("Can't get country code from database, fall back to Poland country code");
         return (app::defaultCountryCode);
