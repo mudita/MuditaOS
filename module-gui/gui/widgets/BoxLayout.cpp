@@ -58,10 +58,11 @@ void BoxLayout::resizeItems() {
 void BoxLayout::setPosition( const short& x, const short& y ) {
 	Rect::setPosition( x, y );
 }
-void BoxLayout::setSize( const short& w, const short& h ) {
-	Rect::setSize( w, h );
+void BoxLayout::setSize(const unsigned short w, const unsigned short h)
+{
+    Rect::setSize(w, h);
 
-	resizeItems();
+    resizeItems();
 }
 bool BoxLayout::addWidget( Item* item ) {
 	bool ret = Rect::addWidget( item );
@@ -125,13 +126,12 @@ void BoxLayout::setVisible(bool value)
 
 template <Axis axis> void BoxLayout::resizeItems()
 {
-    // TODO rethink resize based on: maxSize, drawArea, alignment etc
     Rect::updateDrawArea();
 }
 
 template <Axis axis> bool BoxLayout::addWidget(Item *item)
 {
-    if (size<axis>(this) - sizeUsed<axis>(this) >= inAxisMax<axis>(item))
+    if (size<axis>(this) - sizeUsed<axis>(this) >= size<axis>(item))
     {
         if (!reverse_order)
         {

@@ -39,10 +39,6 @@ namespace gui {
         {
             return size<axis>(it) - sizeUsed<axis>(it);
         };
-        template <Axis axis> uint32_t inAxisMax(Item *it)
-        {
-            return (axis == Axis::Y) ? (it->getMaxHeight()) : (it->getMaxWidth());
-        };
 
         template <Axis axis> void resizeItems();
 
@@ -59,7 +55,7 @@ namespace gui {
 
         // virtual methods from Item
         void setPosition(const short &x, const short &y) override;
-        void setSize(const short &w, const short &h) override;
+        void setSize(const unsigned short w, const unsigned short h) override;
         bool addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
         std::list<DrawCommand *> buildDrawList() override;
