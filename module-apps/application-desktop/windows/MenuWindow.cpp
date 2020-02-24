@@ -160,7 +160,7 @@ void MenuWindow::buildInterface() {
                             return true;
                         }},
         TileDescription{"menu_tools_calculator", "app_desktop_tools_calculator", [=](gui::Item &item) { return true; }},
-        TileDescription{"menu_tools_recorder", "app_desktop_tools_recorder",
+        TileDescription{"menu_tools_recorder", "app_desktop_tools_antenna",
                         [=](gui::Item &item) {
                             sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationAntenna", gui::name::window::main_window, nullptr);
                             return true;

@@ -16,7 +16,6 @@
 #include "../ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
-#include <algorithm>
 
 namespace gui
 {
@@ -41,13 +40,13 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
         topBar->setActive(TopBar::Elements::TIME, true);
+        topBar->setActive(TopBar::Elements::BATTERY, true);
 
-        setTitle(utils::localize.get("app_messages_title_main"));
+        setTitle(utils::localize.get("app_desktop_tools_antenna"));
 
         for (auto title : titlesText)
         {
@@ -63,23 +62,19 @@ namespace gui
         }
 
         buttons.push_back(addLabel("Antenna A", [=](gui::Item &) {
-            LOG_INFO("select antenna A");
-
-            buttons[0]->setFont("gt_pressura_bold_18");
-            buttons[1]->setFont("gt_pressura_regular_18");
+            buttons[0]->setFont(style::window::font::mediumbold);
+            buttons[1]->setFont(style::window::font::medium);
             CellularServiceAPI::SelectAntenna(application, 0);
             return true;
         }));
         buttons.push_back(addLabel("Antenna B", [=](gui::Item &) {
-            LOG_INFO("select antenna B");
-            buttons[0]->setFont("gt_pressura_regular_18");
-            buttons[1]->setFont("gt_pressura_bold_18");
+            buttons[0]->setFont(style::window::font::medium);
+            buttons[1]->setFont(style::window::font::mediumbold);
             CellularServiceAPI::SelectAntenna(application, 1);
             return true;
         }));
 
         buttons.push_back(addLabel("Start operators scan", [=](gui::Item &) {
-            LOG_INFO("Start scan");
             buttons[2]->setText("Scan in progress");
             CellularServiceAPI::StartOperatorsScan(this->application);
             this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -93,7 +88,9 @@ namespace gui
         uint32_t posX = 40;
         for (uint32_t i = 0; i < buttons.size(); i++)
         {
+            buttons[i]->setFont(style::window::font::medium);
             buttons[i]->setPosition(posX, 500);
+            buttons[i]->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
             posX += 240;
         }
 
@@ -123,6 +120,8 @@ namespace gui
         buttons[1]->setNavigationItem(NavigationDirection::UP, buttons[2]);
 
         setFocusItem(buttons[0]);
+        buttons[0]->setFont(style::window::font::mediumbold);
+        CellularServiceAPI::SelectAntenna(application, 0);
     }
     void AntennaMainWindow::destroyInterface()
     {

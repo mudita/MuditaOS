@@ -283,17 +283,15 @@ namespace bsp {
         gpio_2 = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::CELLULAR_GPIO_2), DriverGPIOParams{});
         gpio_3 = DriverGPIO::Create(static_cast<GPIOInstances >(BoardDefinitions::CELLULAR_GPIO_3), DriverGPIOParams{});
 
-        gpio_2->ClearPortInterrupts(
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
-        );
+        gpio_2->ClearPortInterrupts(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
+                                    1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
+                                    1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN) |
+                                    1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN));
 
-        gpio_2->DisableInterrupt(
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
-                1 << static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN)
-        );
+        gpio_2->DisableInterrupt(1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN) |
+                                 1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN) |
+                                 1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_CTS_PIN) |
+                                 1 << static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN));
 
         // INPUTS
 
@@ -350,6 +348,10 @@ namespace bsp {
                 .defLogic = 0,
                 .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_WAKEUP_PIN)});
 
+        gpio_2->ConfPin(DriverGPIOPinParams{.dir = DriverGPIOPinParams::Direction::Output,
+                                            .irqMode = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                            .defLogic = 0,
+                                            .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN)});
 
         gpio_3->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
