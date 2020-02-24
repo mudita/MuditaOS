@@ -15,7 +15,7 @@ bool CountryCodesTable::Create()
 
 CodesTableRow CountryCodesTable::GetByMCC(uint32_t mcc)
 {
-    auto retQuery = db->Query("SELECT * FROM codes WHERE mcc= %lu;", mcc);
+    auto retQuery = db->Query("SELECT * FROM codes WHERE mcc= %lu LIMIT 1;", mcc);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
     {
