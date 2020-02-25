@@ -9,16 +9,17 @@
 #include "version.hpp"
 
 //module-applications
-#include "application-clock/ApplicationClock.hpp"
+#include "application-antenna/ApplicationAntenna.hpp"
 #include "application-call/ApplicationCall.hpp"
-#include "application-viewer/ApplicationViewer.hpp"
+#include "application-calllog/ApplicationCallLog.hpp"
+#include "application-clock/ApplicationClock.hpp"
 #include "application-desktop/ApplicationDesktop.hpp"
-#include "application-settings/ApplicationSettings.hpp"
+#include "application-messages/ApplicationMessages.hpp"
 #include "application-notes/ApplicationNotes.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
-#include "application-messages/ApplicationMessages.hpp"
-#include "application-calllog/ApplicationCallLog.hpp"
+#include "application-settings/ApplicationSettings.hpp"
 #include "application-special-input/AppSpecialInput.hpp"
+#include "application-viewer/ApplicationViewer.hpp"
 
 //module-services
 #include "service-appmgr/ApplicationManager.hpp"
@@ -170,6 +171,7 @@ int main() {
         applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
         applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
         applications.push_back(app::CreateLauncher<app::AppSpecialInput>(app::special_input, false));
+        applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
 
         // start application manager
         ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications), sysmgr.get());

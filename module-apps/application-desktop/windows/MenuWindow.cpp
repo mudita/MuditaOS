@@ -160,7 +160,11 @@ void MenuWindow::buildInterface() {
                             return true;
                         }},
         TileDescription{"menu_tools_calculator", "app_desktop_tools_calculator", [=](gui::Item &item) { return true; }},
-        TileDescription{"menu_tools_recorder", "app_desktop_tools_recorder", [=](gui::Item &item) { return true; }},
+        TileDescription{"menu_tools_recorder", "app_desktop_tools_antenna",
+                        [=](gui::Item &item) {
+                            sapm::ApplicationManager::messageSwitchApplication(application, "ApplicationAntenna", gui::name::window::main_window, nullptr);
+                            return true;
+                        }},
     };
 
     MenuPage* page2 = new MenuPage( this, 0, 60, 480, 70+128*3+2*17, page2Definitions, MenuPage::PageID::ToolsPage );

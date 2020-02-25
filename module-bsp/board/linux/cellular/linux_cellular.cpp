@@ -198,6 +198,9 @@ namespace bsp {
         ioctl(fd, TIOCMBIS, &status);
     }
 
+    void LinuxCellular::SelectAntenna(uint8_t antenna)
+    {
+    }
     namespace cellular::sim
     {
         auto init(QueueHandle_t qHandle) -> int

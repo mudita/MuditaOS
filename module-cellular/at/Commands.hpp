@@ -89,6 +89,10 @@ namespace at
         CMUX, /// setup cmux params
         CMGS, /// sms
         QCMGS,
+        CREG,    /// networ registration status
+        QNWINFO, /// network informations (band etc)
+        COPS     /// operators scan
+
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -128,6 +132,9 @@ namespace at
             {AT::CMUX, {"AT+CMUX="}},
             {AT::CMGS, {"AT+CMGS=\""}},
             {AT::QCMGS, {"AT+QCMGS=\""}},
+            {AT::CREG, {"AT+CREG?\r"}},
+            {AT::QNWINFO, {"AT+QNWINFO\r"}},
+            {AT::COPS, {"AT+COPS=?\r", 180000}},
         };
         if (fact.count(at))
         {
