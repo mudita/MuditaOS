@@ -68,7 +68,9 @@ namespace bsp {
         static StreamBufferHandle_t uartRxStreamBuffer;
         static TimerHandle_t rxTimeoutTimer;
 
-    private:
+        void SelectAntenna(uint8_t antenna) override final;
+
+      private:
         void MSPInit();
 
         void MSPDeinit();
@@ -121,8 +123,8 @@ namespace bsp {
         const static uint32_t rxStreamBufferLength = 1024;
         const static uint32_t rxStreamBufferNotifyWatermark = 1;
         const static uint32_t CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE = 1;
-
-
+        const static uint32_t CELLULAR_BSP_ANTSEL_PIN_A_STATE = 0;
+        const static uint32_t CELLULAR_BSP_ANTSEL_PIN_B_STATE = 1;
     };
 
 }

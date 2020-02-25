@@ -1424,7 +1424,7 @@ void PINMUX_InitCellular(void) {
     IOMUXC_SetPinMux(
             PINMUX_CELLULAR_SIM_PRESENCE,
             0U);
-
+    IOMUXC_SetPinMux(PINMUX_CELLULAR_ANTENNA_SELECT, 0U);
     IOMUXC_SetPinMux(
             PINMUX_CELLULAR_SAIx_MCLK,
             1U);

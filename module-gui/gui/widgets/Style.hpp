@@ -36,16 +36,17 @@ namespace font {
     const inline std::string verysmall = "gt_pressura_regular_20";
 };  // namespace font
 
-namespace label {
-const inline uint32_t small_h           = 33;
-const inline uint32_t default_h         = 50;
-const inline uint32_t big_h             = 55;
-};  // namespace label
+        namespace label
+        {
+            const inline uint32_t small_h = 33;
+            const inline uint32_t default_h = 50;
+            const inline uint32_t big_h = 55;
+        }; // namespace label
 
-/// minimal label decoration - edges, focus & alignment
-void decorate(gui::Label *el);
-/// minimal label decoration for Option
-void decorateOption(gui::Label *el);
+        /// minimal label decoration - edges, focus & alignment
+        void decorate(gui::Label *el);
+        /// minimal label decoration for Option
+        void decorateOption(gui::Label *el);
 
 namespace messages
 {

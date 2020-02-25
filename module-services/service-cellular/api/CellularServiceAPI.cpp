@@ -68,7 +68,7 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
 
     if (response == nullptr)
     {
-        LOG_ERROR("Failed");
+        LOG_ERROR("CellularServiceAPI::GetIMSI failed");
         return std::string();
     }
 
@@ -78,7 +78,7 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
     }
     else
     {
-        LOG_ERROR("Failed");
+        LOG_ERROR("CellularServiceAPI::GetIMSI failed");
         return std::string();
     }
 }
@@ -92,7 +92,7 @@ std::string CellularServiceAPI::GetOwnNumber(sys::Service *serv)
 
     if (response == nullptr)
     {
-        LOG_ERROR("Failed");
+        LOG_ERROR("CellularServiceAPI::GetOwnNumber failed");
         return std::string();
     }
 
@@ -102,7 +102,38 @@ std::string CellularServiceAPI::GetOwnNumber(sys::Service *serv)
     }
     else
     {
-        LOG_ERROR("Failed");
+        LOG_ERROR("CellularServiceAPI::GetOwnNumber failed");
         return std::string();
     }
+}
+
+void CellularServiceAPI::GetNetworkInfo(sys::Service *serv)
+{
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetNetworkInfo);
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+}
+
+void CellularServiceAPI::StartOperatorsScan(sys::Service *serv)
+{
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularStartOperatorsScan);
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+}
+
+bool CellularServiceAPI::SelectAntenna(sys::Service *serv, uint8_t antenna)
+{
+    std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularGetNetworkInfo);
+    msg->data = std::to_string(antenna);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+
+    CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
+
+    if (response != nullptr)
+    {
+        if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
