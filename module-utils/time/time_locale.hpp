@@ -49,7 +49,6 @@ class Locale {
     {
         FormatTime12H = 0,     // H:M in 12h format
         FormatTime24H,         // H:M in 24h format
-        FormatLocaleTime,      // H:M [AM/PM] locale specified format
         FormatLocaleDateFull,  // format locale specified format
         FormatLocaleDateShort, // format locale specified format
     };

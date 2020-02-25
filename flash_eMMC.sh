@@ -35,8 +35,11 @@ cp -v $BUILD_PATH/sys/* "$PURE_PATH"/ -r  # | sed 's/'-\>'/'→'/g'
 echo -e "PurePhone copied\n"
 
 PURE_PARTITION=$(lsblk -nlp /dev/sda | tail +2 | awk '{print $1}')
+if [ -z $PURE_PARTITION ]; then
+       PURE_PARTITION=$PURE_DISK # it is formatted like so apparently
+fi
 # unmount the partition (sdX1), but eject the whole disk (sdX). then the PurePhone will detect it's been removed (=ejected)
-if $(udisksctl unmount -b "$PURE_PARTITION" > /dev/null ) || ! $(umount "$PURE_PARTITION" > /dev/null ); then
+if $(udisksctl unmount -b "$PURE_PARTITION" > /dev/null ) || $(umount "$PURE_PARTITION" > /dev/null ); then
 	echo "PurePhone unmouted"
 	timeout --signal=SIGINT 1 udisksctl power-off -b $PURE_DISK # timeout because there is known error, that this command hangs up.
 	echo "PurePhone ejected"
