@@ -13,7 +13,6 @@ extern "C"
 #include <log/log.hpp>
 #include <stdlib.h>
 #include <string.h>
-#include <termios.h>
 #include <unistd.h>
 
 #define SERIAL_TRANSMISSION_START 0x02

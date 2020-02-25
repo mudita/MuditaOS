@@ -72,6 +72,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/CodecMAX98090.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/audio/qfilter.c"
 
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/usb_cdc.cpp"
+		"${USB_CDC_SRC}"
 
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverPLL.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/drivers/RT1051DriverI2C.cpp"
@@ -91,10 +93,37 @@ set(BOARD_DIR_INCLUDES ${BOARD_DIR_INCLUDES}
             ${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/common/cmsis
             ${CMAKE_SOURCE_DIR}/module-bluetooth/Bluetooth
             ${CMAKE_SOURCE_DIR}/module-sys/
-
+			${USB_CDC_DIR_INCLUDES}
 
         CACHE INTERNAL "")
 
+set(USB_CDC_SRC
+
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class/usb_device_class.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class/hid/usb_device_hid.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/usb_device_ch9.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/usb_device_dci.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/ehci/usb_device_ehci.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/phy/usb_phy.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/cdc/virtual_com.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/cdc/usb_device_descriptor.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/cdc/usb_device_cdc_acm.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/osa/usb_osa_freertos.c"
+
+		CACHE INTERNAL "")
+
+set(USB_CDC_DIR_INCLUDES
+
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/class/hid"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/include"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/device/source/ehci"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/include"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/phy"
+		"${CMAKE_CURRENT_SOURCE_DIR}/board/rt1051/bsp/usb_cdc/driver/osa"
+
+		CACHE INTERNAL "")
 
 set(BOARD_SOURCE_FILES_PROPERTIES ${BOARD_SOURCE_FILES_PROPERTIES}
 

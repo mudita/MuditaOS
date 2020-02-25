@@ -4,13 +4,19 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
 {
 
     QueueHandle_t queue = queues[queueID];
+
     std::string qname = queueNameMap[queue];
     LOG_INFO("[ServiceDesktop:Worker] Received data from queue: %s", qname.c_str());
 
     static std::string receiveMsg;
     static std::string *sendMsg;
 
-    if (qname == "receiveQueueBuffer")
+    if (qname == SERVICE_QUEUE_NAME)
+    {
+        LOG_ERROR("[ServiceDesktop:Worker] Service Queue invoked but not implemented!");
+    }
+
+    if (qname == RECEIVE_QUEUE_BUFFER_NAME)
     {
         if (xQueueReceive(queue, &receiveMsg, 0) != pdTRUE)
             return false;
@@ -23,7 +29,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
     }
 
     // TODO: Consider moving sendBuffer receive to bsp driver
-    if (qname == "sendQueueBuffer")
+    if (qname == SEND_QUEUE_BUFFER_NAME)
     {
         if (xQueueReceive(queue, &sendMsg, 0) != pdTRUE)
             return false;

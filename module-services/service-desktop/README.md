@@ -89,7 +89,7 @@ enum class Code
 
 ##### Example request
 
-```#000000053{"endpoint":0, "method":0, "payload":{"test":"test"}}```
+```#000000053{"endpoint":0, "method":1, "payload":{"test":"test"}}```
 
 ##### Example response
 

@@ -10,8 +10,8 @@
 #define __USB_H__
 
 #include "fsl_common.h"
-#include "usb_osa.h"
 #include "usb_misc.h"
+#include "usb_osa.h"
 #include "usb_spec.h"
 #include <stdint.h>
 #include <stdio.h>

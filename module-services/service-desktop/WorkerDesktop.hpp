@@ -13,31 +13,17 @@ extern "C"
 #include "Service/Worker.hpp"
 #include "parser/Fsmlist.hpp"
 
-#if defined(TARGET_RT1051)
-extern "C"
-{
-#include "rt1051/driver/include/virtual_com.h"
-}
-#include "rt1051/usb_cdc.hpp"
-#else
-#include "linux/usb_cdc.hpp"
-#endif
+#include "bsp/usb_cdc/usb_cdc.hpp"
 
 class WorkerDesktop : public sys::Worker
 {
   private:
   public:
+    const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
+    const std::string SEND_QUEUE_BUFFER_NAME = "sendQueueBuffer";
+
     WorkerDesktop(sys::Service *service) : sys::Worker(service){};
-    /**
-     * This function is responsible for creating all queues provided in the constructor.
-     * When all queues are created this method creates set of queues.
-     */
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;
     virtual bool deinit() override;
-
-    /**
-     * This method is called from thread when new message arrives in queue.
-     * @param queueID Index of the queue in the queues vector.
-     */
     bool handleMessage(uint32_t queueID) override final;
 };

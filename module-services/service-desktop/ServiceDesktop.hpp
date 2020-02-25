@@ -21,9 +21,6 @@ class ServiceDesktop : public sys::Service
     std::unique_ptr<WorkerDesktop> DesktopWorker;
     static const char *serviceName;
 
-    xTaskHandle taskHandleReceive;
-    xTaskHandle taskHandleSend;
-
   public:
     ServiceDesktop();
     ~ServiceDesktop();

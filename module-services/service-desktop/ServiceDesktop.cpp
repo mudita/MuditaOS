@@ -2,7 +2,7 @@
 
 const char *ServiceDesktop::serviceName = "ServiceDesktop";
 
-ServiceDesktop::ServiceDesktop() : sys::Service(serviceName), taskHandleReceive(nullptr), taskHandleSend(nullptr)
+ServiceDesktop::ServiceDesktop() : sys::Service(serviceName)
 {
     LOG_INFO("[ServiceDesktop] Initializing");
 }
@@ -21,7 +21,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
     DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    DesktopWorker->init({{"receiveQueueBuffer", sizeof(std::string), 1}, {"sendQueueBuffer", sizeof(std::string *), 10}});
+    DesktopWorker->init(
+        {{DesktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1}, {DesktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
     DesktopWorker->run();
 
     return (sys::ReturnCodes::Success);

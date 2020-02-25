@@ -1,6 +1,5 @@
-#include "usb_cdc.hpp"
-
-extern int errno;
+#include "bsp/usb_cdc/usb_cdc.hpp"
+#include <termios.h>
 
 namespace bsp
 {

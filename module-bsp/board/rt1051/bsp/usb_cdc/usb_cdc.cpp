@@ -1,4 +1,9 @@
-#include "usb_cdc.hpp"
+#include "bsp/usb_cdc/usb_cdc.hpp"
+
+extern "C"
+{
+#include "driver/include/virtual_com.h"
+}
 
 namespace bsp
 {
