@@ -293,10 +293,10 @@ class DBCountryCodeMessage : public DBMessage
 class DBCountryCodeResponseMessage : public DBResponseMessage
 {
   public:
-    DBCountryCodeResponseMessage(uint32_t _country_code, uint32_t retCode = 0, uint32_t count = 0, MessageType respTo = MessageType::MessageTypeUninitialized)
-        : DBResponseMessage(retCode, count, respTo), country_code(_country_code){};
+    DBCountryCodeResponseMessage(const CodesTableRow _row, bool retCode = true, int count = 0, MessageType respTo = MessageType::MessageTypeUninitialized)
+    : DBResponseMessage(retCode, count, respTo), row(_row) {};
     virtual ~DBCountryCodeResponseMessage(){};
 
-    uint32_t country_code;
+    CodesTableRow row;
 };
 #endif // PUREPHONE_DBMESSAGE_HPP

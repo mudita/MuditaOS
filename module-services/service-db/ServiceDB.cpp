@@ -444,13 +444,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 
     case MessageType::DBCountryCode: {
         DBCountryCodeMessage *msg = reinterpret_cast<DBCountryCodeMessage *>(msgl);
-#if SHOW_DB_ACCESS_PERF == 1
-        timestamp = cpp_freertos::Ticks::GetTicks();
-#endif
-        auto ret = countryCodeRecordInterface->GetCountryCodeByMCC(msg->mcc);
-#if SHOW_DB_ACCESS_PERF == 1
-        LOG_DEBUG("DBCalllogGetLimitOffset time: %lu", cpp_freertos::Ticks::GetTicks() - timestamp);
-#endif
+        auto ret = countryCodeRecordInterface->GetByMCC(msg->mcc);
         responseMsg = std::make_shared<DBCountryCodeResponseMessage>(ret);
     }
     break;
@@ -482,6 +476,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     alarmsDB = std::make_unique<AlarmsDB>();
     notesDB = std::make_unique<NotesDB>();
     calllogDB = std::make_unique<CalllogDB>();
+    countryCodesDB = std::make_unique<CountryCodesDB>();
 
     // Create record interfaces
     settingsRecordInterface = std::make_unique<SettingsRecordInterface>(settingsDB.get());
@@ -491,7 +486,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     alarmsRecordInterface = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
     notesRecordInterface = std::make_unique<NotesRecordInterface>(notesDB.get());
     calllogRecordInterface = std::make_unique<CalllogRecordInterface>(calllogDB.get());
-
+    countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     return sys::ReturnCodes::Success;
 }
 

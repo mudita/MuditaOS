@@ -775,13 +775,14 @@ bool DBServiceAPI::CalllogGetLimitOffset(sys::Service *serv, uint32_t offset, ui
 
 uint32_t DBServiceAPI::GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc)
 {
-    std::shared_ptr<DBCountryCodeMessage> msg = std::make_shared<DBCountryCodeMessage>(MessageType::DBCountryCode, mcc, 0);
+    std::shared_ptr<DBCountryCodeMessage> msg =
+            std::make_shared<DBCountryCodeMessage>(MessageType::DBCountryCode, mcc, 0);
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
-    DBCountryCodeMessage *response = reinterpret_cast<DBCountryCodeMessage *>(mcc);
+    DBCountryCodeResponseMessage *response = reinterpret_cast<DBCountryCodeResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success)
     {
-        return response->country_code;
+        return (response->row.country_code);
     }
     else
     {
