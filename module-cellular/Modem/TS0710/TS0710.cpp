@@ -454,12 +454,9 @@ ssize_t TS0710::ReceiveData(std::vector<uint8_t> &data, uint32_t timeout) {
 
 void TS0710::SelectAntenna(uint8_t antenna)
 {
-    if (antenna == 0)
+    if (antenna == 0 || antenna == 1)
     {
         // select antenna A
-    }
-    else if (antenna == 1)
-    {
-        // select antenna B
+        pv_cellular->SelectAntenna(antenna);
     }
 }

@@ -22,7 +22,6 @@ namespace gui
 
     AntennaMainWindow::AntennaMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
     {
-        setSize(style::window_width, style::window_height);
         buildInterface();
     }
 

@@ -514,142 +514,20 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     break;
     case MessageType::CellularGetNetworkInfo: {
         LOG_INFO("CellularGetNetworkInfo handled");
-        // cellular::RawCommandResp response = (true);
-        std::vector<std::string> data;
-        auto channel = cmux->GetChannel("Commands");
-        if (channel)
-        {
-            auto resp = channel->cmd("AT+CSQ\r", 300);
-            if (resp.code == at::Result::Code::OK)
-            {
-                // push back to response message
-                std::string ret = resp.response[0];
-                std::string toErase = "+CSQ: ";
-                auto pos = ret.find(toErase);
-                if (pos != std::string::npos)
-                {
-                    ret.erase(pos, toErase.length());
-                    data.push_back(ret);
-                }
-                else
-                {
-                    data.push_back("");
-                }
-            }
-            else
-            {
-                data.push_back("");
-            }
-
-            resp = channel->cmd("AT+CREG?\r", 300, 2);
-            if (resp.code == at::Result::Code::OK)
-            {
-                std::map<uint32_t, std::string> cregCodes;
-                cregCodes.insert(std::pair<uint32_t, std::string>(0, "Not registred"));
-                cregCodes.insert(std::pair<uint32_t, std::string>(1, "Registered, home network"));
-                cregCodes.insert(std::pair<uint32_t, std::string>(2, "Not registered, searching"));
-                cregCodes.insert(std::pair<uint32_t, std::string>(3, "Registration denied"));
-                cregCodes.insert(std::pair<uint32_t, std::string>(4, "Unknown"));
-                cregCodes.insert(std::pair<uint32_t, std::string>(5, "Registerd, roaming"));
-                // +CREG: 0,2
-                std::string rawResponse = resp.response[0];
-                auto pos = rawResponse.find(',');
-
-                uint32_t cregValue;
-                try
-                {
-                    cregValue = std::stoi(rawResponse.substr(pos + 1, 1));
-                }
-                catch (const std::exception &e)
-                {
-                    LOG_ERROR("ServiceCellular::GetNetworkInfo error %s", e.what());
-                    cregValue = UINT32_MAX;
-                }
-                // push back to response message
-                auto commandCode = cregCodes.find(cregValue);
-                if (commandCode != cregCodes.end())
-                {
-                    data.push_back(commandCode->second);
-                }
-                else
-                {
-                    data.push_back("");
-                }
-            }
-            else
-            {
-                data.push_back("");
-            }
-
-            resp = channel->cmd("AT+QNWINFO\r", 300, 2);
-            if (resp.code == at::Result::Code::OK)
-            {
-                auto rawResponse = resp.response[0];
-                std::string toErase("+QNWINFO: ");
-                auto pos = rawResponse.find(toErase);
-                if (pos != std::string::npos)
-                {
-                    rawResponse.erase(pos, toErase.length());
-                }
-                rawResponse.erase(std::remove(rawResponse.begin(), rawResponse.end(), '\"'), rawResponse.end());
-                data.push_back(rawResponse);
-            }
-            else
-            {
-                data.push_back("");
-            }
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
-        }
-        else
-        {
-            responseMsg = std::make_shared<CellularResponseMessage>(false);
-        }
+        responseMsg = std::make_shared<CellularResponseMessage>(true);
 
         auto msg = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularNetworkInfoResult);
-        msg->data = data;
+        msg->data = getNetworkInfo();
         sys::Bus::SendUnicast(msg, msgl->sender, this);
     }
     break;
     case MessageType::CellularStartOperatorsScan: {
         LOG_INFO("CellularStartOperatorsScan handled");
         cellular::RawCommandResp response = (true);
-        auto channel = cmux->GetChannel("Commands");
-        std::vector<std::string> result;
-        if (channel)
-        {
-            auto resp = channel->cmd("AT+COPS=?\r", 180000, 2);
-            if (resp.code == at::Result::Code::OK)
-            {
-                std::string rawResponse = resp.response[0];
-                std::string toErase("+COPS: ");
-                auto pos = rawResponse.find(toErase);
-                if (pos != std::string::npos)
-                {
-                    rawResponse.erase(pos, toErase.length());
-                }
-                std::string delimiter("),(");
 
-                auto end = rawResponse.find(delimiter);
-                auto begin = 0;
-                while (end != std::string::npos)
-                {
-                    auto operatorInfo = rawResponse.substr(begin, end - begin);
-                    operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), '('), operatorInfo.end());
-                    operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), ')'), operatorInfo.end());
-                    operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), ','), operatorInfo.end());
-                    result.push_back(operatorInfo);
-                    begin = end;
-                    end = rawResponse.find(delimiter, end + 1);
-                }
-                for (size_t i = 0; i < result.size(); i++)
-                {
-                    LOG_INFO("%s", result[i].c_str());
-                }
-            }
-            auto msg = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
-            msg->data = result;
-            sys::Bus::SendUnicast(msg, msgl->sender, this);
-        }
+        auto msg = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularOperatorsScanResult);
+        msg->data = scanOperators();
+        sys::Bus::SendUnicast(msg, msgl->sender, this);
     }
     break;
     case MessageType::CellularSelectAntenna: {
@@ -1013,4 +891,126 @@ bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
     }
     LOG_ERROR("ServiceCellular::getIMSI failed.");
     return false;
+}
+std::vector<std::string> ServiceCellular::getNetworkInfo(void)
+{
+    std::vector<std::string> data;
+    auto channel = cmux->GetChannel("Commands");
+    if (channel)
+    {
+        auto resp = channel->cmd(at::AT::CSQ);
+        if (resp.code == at::Result::Code::OK)
+        {
+            // push back to response message
+            std::string ret = resp.response[0];
+            std::string toErase = "+CSQ: ";
+            auto pos = ret.find(toErase);
+            if (pos != std::string::npos)
+            {
+                ret.erase(pos, toErase.length());
+                data.push_back(ret);
+            }
+            else
+            {
+                data.push_back("");
+            }
+        }
+        else
+        {
+            data.push_back("");
+        }
+
+        resp = channel->cmd(at::AT::CREG);
+        if (resp.code == at::Result::Code::OK)
+        {
+            std::map<uint32_t, std::string> cregCodes;
+            cregCodes.insert(std::pair<uint32_t, std::string>(0, "Not registred"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(1, "Registered, home network"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(2, "Not registered, searching"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(3, "Registration denied"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(4, "Unknown"));
+            cregCodes.insert(std::pair<uint32_t, std::string>(5, "Registerd, roaming"));
+
+            std::string rawResponse = resp.response[0];
+            auto pos = rawResponse.find(',');
+
+            uint32_t cregValue;
+            try
+            {
+                cregValue = std::stoi(rawResponse.substr(pos + 1, 1));
+            }
+            catch (const std::exception &e)
+            {
+                LOG_ERROR("ServiceCellular::GetNetworkInfo exception %s", e.what());
+                cregValue = UINT32_MAX;
+            }
+            // push back to response message
+            auto commandCode = cregCodes.find(cregValue);
+            if (commandCode != cregCodes.end())
+            {
+                data.push_back(commandCode->second);
+            }
+            else
+            {
+                data.push_back("");
+            }
+        }
+        else
+        {
+            data.push_back("");
+        }
+
+        resp = channel->cmd(at::AT::QNWINFO);
+        if (resp.code == at::Result::Code::OK)
+        {
+            auto rawResponse = resp.response[0];
+            std::string toErase("+QNWINFO: ");
+            auto pos = rawResponse.find(toErase);
+            if (pos != std::string::npos)
+            {
+                rawResponse.erase(pos, toErase.length());
+            }
+            rawResponse.erase(std::remove(rawResponse.begin(), rawResponse.end(), '\"'), rawResponse.end());
+            data.push_back(rawResponse);
+        }
+        else
+        {
+            data.push_back("");
+        }
+    }
+    return data;
+}
+std::vector<std::string> ServiceCellular::scanOperators(void)
+{
+    auto channel = cmux->GetChannel("Commands");
+    std::vector<std::string> result;
+    if (channel)
+    {
+        auto resp = channel->cmd("AT+COPS=?\r", 180000, 2);
+        if (resp.code == at::Result::Code::OK)
+        {
+            std::string rawResponse = resp.response[0];
+            std::string toErase("+COPS: ");
+            auto pos = rawResponse.find(toErase);
+            if (pos != std::string::npos)
+            {
+                rawResponse.erase(pos, toErase.length());
+            }
+            std::string delimiter("),(");
+
+            auto end = rawResponse.find(delimiter);
+            auto begin = 0;
+            while (end != std::string::npos)
+            {
+                auto operatorInfo = rawResponse.substr(begin, end - begin);
+                operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), '('), operatorInfo.end());
+                operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), ')'), operatorInfo.end());
+                operatorInfo.erase(std::remove(operatorInfo.begin(), operatorInfo.end(), ','), operatorInfo.end());
+                result.push_back(operatorInfo);
+                begin = end;
+                end = rawResponse.find(delimiter, end + 1);
+            }
+        }
+    }
+    return result;
 }
