@@ -1,6 +1,5 @@
 #include "ParserFsm.hpp"
 #include "Fsmlist.hpp"
-#include "ParserUtils.hpp"
 #include "log/log.hpp"
 
 class StateMessageType;
@@ -17,7 +16,6 @@ class StateMessageType : public ParserFsm
     {
         LOG_DEBUG("*** entry StateMessageType ***");
         // Restore initial state of all buffers and FSMs
-        msgType = 0;
         msgSizeBytesToRead = parserutils::message::size_length;
         msgPayloadSizeStr.erase();
         msgPayloadSize = 0;
@@ -29,13 +27,13 @@ class StateMessageType : public ParserFsm
     void react(MessageDataEvt const &) override
     {
         LOG_DEBUG("*** react MessageTypeEvt ***");
-        msgType = static_cast<uint8_t>(msgChunk.front());
+        msgType = static_cast<parserutils::message::Type>(msgChunk.front());
         msgChunk.pop_front();
 
         switch (msgType)
         {
-        case parserutils::message::type::endpoint:
-        case parserutils::message::type::rawData:
+        case parserutils::message::Type::endpoint:
+        case parserutils::message::Type::rawData:
             transit<StateMessageSize>();
             break;
         default:
@@ -86,10 +84,10 @@ class StateMessageSize : public ParserFsm
             }
             msgPayloadSize = stoi(msgPayloadSizeStr);
 
-            auto msgPayloadMalloc = [this] {
-                if (msgType == parserutils::message::type::endpoint)
+            auto msgPayloadMalloc = [] {
+                if (msgType == parserutils::message::Type::endpoint)
                     msgPayload.reserve(msgPayloadSize);
-                else if (msgType == parserutils::message::type::rawData)
+                else if (msgType == parserutils::message::Type::rawData)
                     send_event(RawDataMallocEvt());
             };
             transit<StateMessagePayload>(msgPayloadMalloc);
@@ -107,7 +105,7 @@ class StateMessagePayload : public ParserFsm
     {
         LOG_DEBUG("*** react MessagePayloadEvt ***");
 
-        auto getSingleByte = [this] {
+        auto getSingleByte = [] {
             msgPayload.push_back(msgChunk.front());
             msgChunk.pop_front();
             msgPayloadSize--;
@@ -115,18 +113,16 @@ class StateMessagePayload : public ParserFsm
 
         if (msgPayloadSize > msgChunk.size())
         {
-            if (msgType == parserutils::message::type::rawData)
-            {
-                msgPayload.reserve(msgChunk.size());
-            }
+            msgPayload.reserve(msgPayload.size() + msgChunk.size());
 
             while (!msgChunk.empty())
             {
                 getSingleByte();
             }
-            if (msgType == parserutils::message::type::rawData)
+
+            if (msgType == parserutils::message::Type::rawData)
             {
-                send_event(RawDataEvt()); // invoke raw data fsm to let it store pyaload chunk to emmc
+                send_event(RawDataEvt()); // invoke raw data fsm to let it store payload chunk to emmc
                 msgPayload.clear();
             }
             LOG_DEBUG("serial data buff empty, wait for new data");
@@ -134,20 +130,17 @@ class StateMessagePayload : public ParserFsm
         }
         else
         {
-            if (msgType == parserutils::message::type::rawData)
-            {
-                msgPayload.reserve(msgPayloadSize);
-            }
+            msgPayload.reserve(msgPayload.size() + msgPayloadSize);
 
             while (msgPayloadSize)
             {
                 getSingleByte();
             }
 
-            auto runHandler = [this] {
-                if (msgType == parserutils::message::type::endpoint)
+            auto runHandler = [] {
+                if (msgType == parserutils::message::Type::endpoint)
                     send_event(EndpointEvt());
-                else if (msgType == parserutils::message::type::rawData)
+                else if (msgType == parserutils::message::Type::rawData)
                     send_event(RawDataEvt()); // invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
             };
 
@@ -166,7 +159,7 @@ void ParserFsm::react(MessageDataEvt const &)
 }
 
 std::list<int> ParserFsm::msgChunk;
-uint8_t ParserFsm::msgType;
+parserutils::message::Type ParserFsm::msgType;
 size_t ParserFsm::msgSizeBytesToRead;
 std::string ParserFsm::msgPayloadSizeStr;
 uint32_t ParserFsm::msgPayloadSize;

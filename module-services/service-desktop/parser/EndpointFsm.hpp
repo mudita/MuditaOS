@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ParserUtils.hpp"
 extern "C"
 {
 #include "FreeRTOS.h"
@@ -35,6 +36,6 @@ class EndpointFsm
 
   protected:
     bool putToSendQueue(std::string);
-    static uint8_t endpoint;
+    static parserutils::Endpoint endpoint;
     static uint8_t method;
 };

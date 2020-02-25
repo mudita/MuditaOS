@@ -1,7 +1,6 @@
 #include "EndpointFsm.hpp"
 #include "EndpointHandler.hpp"
 #include "ParserFsm.hpp"
-#include "ParserUtils.hpp"
 #include "log/log.hpp"
 #include "json/json11.hpp"
 
@@ -25,6 +24,7 @@ class StateDecodeJson : public EndpointFsm
         if (msgJson.is_null())
         {
             LOG_ERROR("Can't parse data as JSON [%s]", errorString.c_str());
+            return;
         }
 
         method = msgJson[parserutils::json::method].number_value();
@@ -34,29 +34,25 @@ class StateDecodeJson : public EndpointFsm
             return;
         }
 
-        endpoint = msgJson[parserutils::json::endpoint].number_value();
+        endpoint = static_cast<parserutils::Endpoint>(msgJson[parserutils::json::endpoint].number_value());
 
         switch (endpoint)
         {
-        case static_cast<uint8_t>(parserutils::Endpoint::battery):
+        case parserutils::Endpoint::battery:
             transit<StateEndpointBattery>();
             break;
-        case static_cast<uint8_t>(parserutils::Endpoint::backups):
+        case parserutils::Endpoint::backups:
             transit<StateEndpointBackups>();
             break;
-        case static_cast<uint8_t>(parserutils::Endpoint::deviceInfo):
+        case parserutils::Endpoint::deviceInfo:
             transit<StateEndpointDeviceInfo>();
             break;
-        case static_cast<uint8_t>(parserutils::Endpoint::network):
+        case parserutils::Endpoint::network:
             transit<StateEndpointNetwork>();
             break;
-        case static_cast<uint8_t>(parserutils::Endpoint::storage):
+        case parserutils::Endpoint::storage:
             transit<StateEndpointStorage>();
             break;
-
-        default:
-            LOG_ERROR("Invalid Endpoint!");
-            return;
         }
     };
 };
@@ -84,12 +80,6 @@ class StateEndpointBackups : public EndpointFsm
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointBackups ***");
-
-        // EndpointHandler endpointHandler = EndpointHandler();
-        // std::string responseStr;
-        // sys::ReturnCodes retCode = endpointHandler.backups(method, responseStr);
-        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
-
         transit<StateDecodeJson>();
     };
 };
@@ -99,12 +89,6 @@ class StateEndpointDeviceInfo : public EndpointFsm
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointDeviceInfo ***");
-
-        // EndpointHandler endpointHandler = EndpointHandler();
-        // std::string responseStr;
-        // sys::ReturnCodes retCode = endpointHandler.deviceInfo(method, responseStr);
-        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
-
         transit<StateDecodeJson>();
     };
 };
@@ -114,12 +98,6 @@ class StateEndpointNetwork : public EndpointFsm
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointNetwork ***");
-
-        // EndpointHandler endpointHandler = EndpointHandler();
-        // std::string responseStr;
-        // sys::ReturnCodes retCode = endpointHandler.network(method, responseStr);
-        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
-
         transit<StateDecodeJson>();
     };
 };
@@ -129,12 +107,6 @@ class StateEndpointStorage : public EndpointFsm
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointStorage ***");
-
-        // EndpointHandler endpointHandler = EndpointHandler();
-        // std::string responseStr;
-        // sys::ReturnCodes retCode = endpointHandler.storage(method, responseStr);
-        // xQueueSend(USBSendQueue, &responseStr, portMAX_DELAY);
-
         transit<StateDecodeJson>();
     };
 };
@@ -164,7 +136,7 @@ bool EndpointFsm::putToSendQueue(std::string sendMsg)
 }
 
 xQueueHandle EndpointFsm::sendQueue;
-uint8_t EndpointFsm::endpoint;
+parserutils::Endpoint EndpointFsm::endpoint;
 uint8_t EndpointFsm::method;
 
 // ----------------------------------------------------------------------------

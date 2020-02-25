@@ -18,8 +18,11 @@ uint8_t payload[payload_length];
 ##### Message types
 *Single printable ASCII character.*
 ```
-Endpoint = '#'
-RawData = '$'
+enum class Type
+    {
+        endpoint = '#',
+        rawData = '$'
+    };
 ```
 ##### Payload length
 *Represented by 9 printable ASCII characters.*
@@ -62,7 +65,7 @@ enum class Endpoint
 ```
 enum class Method
 {
-    get,
+    get = 1,
     post,
     put,
     del

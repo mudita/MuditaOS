@@ -19,11 +19,13 @@ namespace parserutils
     namespace message
     {
         constexpr size_t size_length = 9;
-        namespace type
+        /*! Enum class for the message types.
+         */
+        enum class Type
         {
-            constexpr uint8_t endpoint = '#';
-            constexpr uint8_t rawData = '$';
-        } // namespace type
+            endpoint = '#',
+            rawData = '$'
+        };
     }     // namespace message
 
     namespace http
@@ -41,7 +43,7 @@ namespace parserutils
          */
         enum class Method
         {
-            get,
+            get = 1,
             post,
             put,
             del

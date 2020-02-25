@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ParserUtils.hpp"
 #include "fsm/tinyfsm.hpp"
 #include <list>
 #include <string>
@@ -31,7 +32,7 @@ class ParserFsm : public tinyfsm::Fsm<ParserFsm>
     void exit(void){};          /* no exit actions at all */
 
     static std::string msgPayload;
-    static uint8_t msgType;
+    static parserutils::message::Type msgType;
     static size_t msgSizeBytesToRead;
     static std::string msgPayloadSizeStr;
     static uint32_t msgPayloadSize;
