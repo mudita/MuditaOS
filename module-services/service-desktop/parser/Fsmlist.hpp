@@ -1,7 +1,6 @@
 #pragma once
 
-#include "fsm/tinyfsm.hpp"
-
+#include "tinyfsm/include/tinyfsm.hpp"
 #include "EndpointFsm.hpp"
 #include "ParserFsm.hpp"
 #include "RawDataFsm.hpp"

@@ -3,6 +3,13 @@
 
 This service is handling communication between Mudita Deskatop App and PurePhone.
 
+**Note:
+Service desktop is disabled by default.
+To turn it on, please uncomment this line in mail.cpp:**
+
+`        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
+`
+
 ### Protocol description
 
 #### Message structure
@@ -51,7 +58,7 @@ responsePayloadJson:
 ```
 enum class Endpoint
 {
-    battery,
+    battery = 1,
     backups,
     deviceInfo,
     network,
@@ -89,8 +96,8 @@ enum class Code
 
 ##### Example request
 
-```#000000053{"endpoint":0, "method":1, "payload":{"test":"test"}}```
+```#000000053{"endpoint":1, "method":1, "payload":{"test":"test"}}```
 
 ##### Example response
 
-```#000000095{"endpoint": 0, "status": 200, "body": {"charging": true, "level": 75, "maximumCapacity": 100}}```
+```#000000095{"endpoint": 1, "status": 200, "body": {"charging": true, "level": 75, "maximumCapacity": 100}}```

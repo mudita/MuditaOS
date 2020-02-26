@@ -9,7 +9,7 @@ namespace parserutils
      */
     enum class Endpoint
     {
-        battery,
+        battery = 1,
         backups,
         deviceInfo,
         network,

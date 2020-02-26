@@ -9,7 +9,7 @@ extern "C"
 
 #include <stdint.h>
 #include <string>
-#include "fsm/tinyfsm.hpp"
+#include "tinyfsm/include/tinyfsm.hpp"
 
 // ----------------------------------------------------------------------------
 // Event declarations

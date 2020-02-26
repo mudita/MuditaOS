@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ParserUtils.hpp"
-#include "fsm/tinyfsm.hpp"
+#include "tinyfsm/include/tinyfsm.hpp"
 #include <list>
 #include <string>
 
