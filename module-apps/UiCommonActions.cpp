@@ -70,7 +70,7 @@ namespace app
                                                                       std::make_unique<SMSSendRequest>(param));
         }
         default: {
-            LOG_ERROR("SmsOperation not suppoert %d", static_cast<uint32_t>(smsOperation));
+            LOG_ERROR("SmsOperation not supported %d", static_cast<uint32_t>(smsOperation));
             return false;
         }
         }
