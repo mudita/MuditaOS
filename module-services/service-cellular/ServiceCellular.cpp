@@ -45,9 +45,8 @@
 const char *ServiceCellular::serviceName = "ServiceCellular";
 constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
-
-ServiceCellular::ServiceCellular()
-        : sys::Service(serviceName, "", 8192UL, sys::ServicePriority::Idle) {
+ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", 16384UL, sys::ServicePriority::Idle)
+{
 
     LOG_INFO("[ServiceCellular] Initializing");
 
