@@ -96,7 +96,7 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
     if (app == nullptr)
     {
         LOG_ERROR("app != ApplicationCall");
-        return false;
+        return AppWindow::onInput(inputEvent);
     }
     auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
     if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
@@ -136,13 +136,6 @@ bool EnterNumberWindow::onInput( const InputEvent& inputEvent ) {
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong) {
 		//erase all characters from phone number
 		if(inputEvent.keyCode == KeyCode::KEY_RF) {
-			auto app = dynamic_cast<app::ApplicationCall*>( application );
-			if (app == nullptr)
-			{
-				LOG_ERROR("app != ApplicationCall");
-                return false;
-            }
-
 			std::string num = app->getDisplayedNumber();
 			//if there isn't any char in phone number field return to previous application
 			if( num.empty() ) {

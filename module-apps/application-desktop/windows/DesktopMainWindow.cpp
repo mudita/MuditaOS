@@ -141,7 +141,7 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
     if (app == nullptr)
     {
         LOG_ERROR("not ApplicationDesktop");
-        return false;
+        return AppWindow::onInput(inputEvent);
     }
 
     auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
