@@ -14,7 +14,6 @@ namespace app
     bool call(Application *app, CallOperation callOperation, const ContactRecord &contact);
     bool call(Application *app, CallOperation callOperation, const std::string &number);
     bool call(Application *app, CallOperation callOperation, uint32_t key);
-    gui::Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact);
 
     enum class SmsOperation
     {
@@ -31,5 +30,4 @@ namespace app
     // TODO use contact here
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact);
     bool contact(Application *app, ContactOperation contactOperation, const std::string &number);
-    gui::Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contact);
 } // namespace app

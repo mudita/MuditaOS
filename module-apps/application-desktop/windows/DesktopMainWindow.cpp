@@ -21,7 +21,7 @@
 
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
-#include <UiCommon.hpp>
+#include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
 #include <Span.hpp>

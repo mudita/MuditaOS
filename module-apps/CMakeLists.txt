@@ -13,9 +13,10 @@ endif()
 
 set( SOURCES 
     "Application.cpp"
-    "UiCommon.cpp" 
+    "UiCommonActions.cpp" 
     "windows/AppWindow.cpp" 
-    "windows/OptionWindow.cpp" 
+    "windows/OptionWindow.cpp"
+    "windows/Options.cpp" 
     "windows/Dialog.cpp" 
     )
 

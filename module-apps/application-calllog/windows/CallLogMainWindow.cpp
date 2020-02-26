@@ -23,7 +23,7 @@
 #include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "UiCommon.hpp"
+#include "UiCommonActions.hpp"
 #include <Style.hpp>
 
 using namespace style;

@@ -5,7 +5,7 @@
 #include "Margins.hpp"
 #include "PhonebookNewContact.hpp"
 #include "Text.hpp"
-#include "UiCommon.hpp"
+#include "UiCommonActions.hpp"
 #include "Utils.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "application-messages/ApplicationMessages.hpp"

@@ -12,7 +12,7 @@
 #include "../data/CallAppStyle.hpp"
 #include "../data/CallSwitchData.hpp"
 #include "InputMode.hpp"
-#include "UiCommon.hpp"
+#include "UiCommonActions.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"

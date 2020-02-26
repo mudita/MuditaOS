@@ -9,7 +9,7 @@
 #include "PhonebookListView.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "PhonebookItem.hpp"
-#include "UiCommon.hpp"
+#include "UiCommonActions.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "log/log.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"

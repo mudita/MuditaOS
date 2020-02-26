@@ -1,7 +1,7 @@
 #include "OptionsWindow.hpp"
-#include "UiCommon.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
+#include <Options.hpp>
 
 /// below just for apps names...
 

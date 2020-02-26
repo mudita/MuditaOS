@@ -1,4 +1,4 @@
-#include "UiCommon.hpp"
+#include "UiCommonActions.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
 #include "application-messages/ApplicationMessages.hpp"
@@ -58,13 +58,6 @@ namespace app
         return call(app, callOperation, std::to_string(key));
     }
 
-    gui::Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact)
-    {
-        assert(app != nullptr);
-        return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
-                [app, contact, callOperation](gui::Item &item) { return call(app, callOperation, contact); }};
-    }
-
     bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)
     {
         assert(app != nullptr);
@@ -121,12 +114,5 @@ namespace app
         contactRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
 
         return contact(app, contactOperation, contactRecord);
-    }
-
-    gui::Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec)
-    {
-        assert(app != nullptr);
-
-        return {utils::localize.get("sms_contact_details"), [=](gui::Item &item) { return contact(app, contactOperation, contactRec); }};
     }
 } // namespace app
