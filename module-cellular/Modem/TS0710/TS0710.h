@@ -400,7 +400,7 @@ public:
     TS0710(PortSpeed_e portSpeed, sys::Service *parent);
     TS0710() = delete;
     ~TS0710();
-
+    void SelectAntenna(uint8_t antenna);
     // Add error handling - only for Advanced mode. Leave for now
     // Add callback for received frame (after error handling)
     // Add frame routing to different channels
