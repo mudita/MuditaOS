@@ -80,6 +80,11 @@ enum class MessageType
     CellularStartAudioConfProcedure,
     CellularGetOwnNumber,
     CellularGetIMSI,
+    CellularGetNetworkInfo,
+    CellularStartOperatorsScan,
+    CellularOperatorsScanResult,
+    CellularNetworkInfoResult,
+    CellularSelectAntenna,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record

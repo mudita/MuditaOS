@@ -72,6 +72,8 @@ public:
      * @return true when succeed, false when fails
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
+    std::vector<std::string> getNetworkInfo(void);
+    std::vector<std::string> scanOperators(void);
 
   private:
 

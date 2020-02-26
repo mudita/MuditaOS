@@ -57,7 +57,9 @@ namespace bsp {
         void SetSendingAllowed(bool state) override final { pv_SendingAllowed = state; }
         bool GetSendingAllowed() override final { return pv_SendingAllowed; }
 
-    private:
+        void SelectAntenna(uint8_t antenna) override final;
+
+      private:
 
         static constexpr speed_t baud_bits[] = {
                 0, B9600, B19200, B38400, B57600, B115200, B230400, B460800, B921600, B1500000, B2000000, B3000000, B4000000

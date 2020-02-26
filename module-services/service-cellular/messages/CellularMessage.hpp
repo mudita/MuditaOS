@@ -105,6 +105,14 @@ namespace cellular
         std::vector<std::string> response;
     };
 
+    class RawCommandRespAsync : public CellularMessage
+    {
+      public:
+        RawCommandRespAsync(MessageType messageType) : CellularMessage(messageType){};
+        virtual ~RawCommandRespAsync() = default;
+        std::vector<std::string> data;
+    };
+
 } // namespace cellular
 
 #endif //PUREPHONE_CELLULARMESSAGE_HPP
