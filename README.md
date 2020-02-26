@@ -40,7 +40,7 @@ Start JLink server
 
 Load app with GDB via JLink connected to PurePhone
 ```
-./run.sh
+./run.sh <build folder>
 ```
 
 Catch logs from PurePhone from JLink RTT and write them to /tmp/log.txt
