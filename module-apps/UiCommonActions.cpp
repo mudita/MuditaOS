@@ -55,7 +55,9 @@ namespace app
 
     bool call(Application *app, CallOperation callOperation, uint32_t key)
     {
-        return call(app, callOperation, std::to_string(key));
+        std::string keyStr;
+        keyStr = key;
+        return call(app, callOperation, keyStr);
     }
 
     bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)
