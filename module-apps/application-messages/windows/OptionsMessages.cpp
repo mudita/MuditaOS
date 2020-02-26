@@ -15,12 +15,9 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     auto box = new gui::HBox(nullptr, offset, 0, style::window_width - 2 * offset, label::big_h);
     box->setPenWidth(0);
     box->setPenFocusWidth(0);
-    // items cant be bound to any Alignment
-    // This should be fixed with:
-    // * Time when UX design will provide us with design guide which is in progress and should be done shortly
-    // * additon of alignment to elements (so that Layouts could position them properly)
-    // right now it's added as it is, trying to conform with window which UX was being changed while it was written
-    auto l = new gui::Label(box, 0, 0, style::window_width - 3 * wlabel - 2 * offset - 1, label::big_h);
+    auto text_len = 200; // Dumb text size - this won't be needed when Text(...) widget will be refactored
+    auto l = new gui::Label(box, 0, 0, text_len, label::big_h);
+    l->area(gui::Item::Area::Max).w = box->w(); // let box layout resize
     decorate(l);
     l->setText(contact.primaryName);
     l->activeItem = false;
