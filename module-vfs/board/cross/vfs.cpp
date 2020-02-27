@@ -11,6 +11,18 @@
 #include "board/cross/eMMC/eMMC.hpp"
 #include "ff_eMMC_user_disk.hpp"
 
+#define eMMCHIDDEN_SECTOR_COUNT		8
+#define eMMCPRIMARY_PARTITIONS		1
+#define eMMCHUNDRED_64_BIT			100ULL
+#define eMMCPARTITION_NUMBER			0 /* Only a single partition is used. */
+#define eMMCBYTES_PER_MB				( 1024ull * 1024ull )
+#define eMMCSECTORS_PER_MB			( eMMCBYTES_PER_MB / 512ull )
+
+/* Used as a magic number to indicate that an FF_Disk_t structure is a RAM
+disk. */
+#define eMMCSIGNATURE				0x61606362
+#define mainIO_MANAGER_CACHE_SIZE	( 15UL * FSL_SDMMC_DEFAULT_BLOCK_SIZE )
+
 vfs::vfs():
     emmc()
 {
@@ -172,4 +184,59 @@ std::string vfs::getline( FILE* stream, uint32_t length ) {
 	free( buffer );
 
 	return ret;
+}
+
+vfs::FilesystemStats vfs::getFilesystemStats()
+{
+    FF_Error_t xError;
+    uint64_t ullFreeSectors;
+    uint32_t ulTotalSizeMB, ulFreeSizeMB;
+    int iPercentageFree;
+    FF_IOManager_t *pxIOManager;
+    const char *pcTypeName = "unknown type";
+    BaseType_t xReturn = pdPASS;
+    vfs::FilesystemStats filesystemStats;
+
+    if( emmcFFDisk == NULL )
+    {
+        xReturn = pdFAIL;
+    }
+    else
+    {
+        pxIOManager = emmcFFDisk->pxIOManager;
+
+        switch( pxIOManager->xPartition.ucType )
+        {
+        case FF_T_FAT12:
+            filesystemStats.type = "FAT12";
+            break;
+
+        case FF_T_FAT16:
+            filesystemStats.type = "FAT16";
+            break;
+
+        case FF_T_FAT32:
+            filesystemStats.type = "FAT32";
+            break;
+
+        default:
+            filesystemStats.type = "UNKOWN";
+            break;
+        }
+
+        FF_GetFreeSize( pxIOManager, &xError );
+
+        ullFreeSectors = pxIOManager->xPartition.ulFreeClusterCount * pxIOManager->xPartition.ulSectorsPerCluster;
+        iPercentageFree = ( int ) ( ( eMMCHUNDRED_64_BIT * ullFreeSectors + pxIOManager->xPartition.ulDataSectors / 2 ) /
+                                    ( ( uint64_t )pxIOManager->xPartition.ulDataSectors ) );
+
+        ulTotalSizeMB = pxIOManager->xPartition.ulDataSectors / eMMCSECTORS_PER_MB;
+        ulFreeSizeMB = ( uint32_t ) ( ullFreeSectors / eMMCSECTORS_PER_MB );
+
+        filesystemStats.freeMbytes = ulFreeSizeMB;
+        filesystemStats.totalMbytes = ulTotalSizeMB;
+        filesystemStats.freePercent = iPercentageFree;
+    }
+
+    return (filesystemStats);
 }
