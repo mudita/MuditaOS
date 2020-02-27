@@ -29,6 +29,7 @@
 #include <time/time_conversion.hpp>
 
 #include "service-db/api/DBServiceAPI.hpp"
+#include <cassert>
 
 namespace style
 {
@@ -299,7 +300,7 @@ auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, s
         text->setText(name);
         text->setFont(style::window::font::medium);
         text->setAlignement(Alignment::ALIGN_VERTICAL_CENTER);
-        text->setPenWidth(0);
+        text->setPenWidth(style::window::default_border_no_focus_w);
         text->activeItem = false;
         if (!try_add_del(el, text))
         {
@@ -353,7 +354,8 @@ auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, s
 auto DesktopMainWindow::fillNotifications() -> bool
 {
     auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-    if (!app || app->getScreenLocked())
+    assert(app);
+    if (app->getScreenLocked())
     {
         return false;
     }
