@@ -9,7 +9,6 @@
 #include <log/log.hpp>
 
 #include <Label.hpp>
-#include "Alignment.hpp"
 
 namespace gui {
 
@@ -58,10 +57,11 @@ void BoxLayout::resizeItems() {
 void BoxLayout::setPosition( const short& x, const short& y ) {
 	Rect::setPosition( x, y );
 }
-void BoxLayout::setSize( const short& w, const short& h ) {
-	Rect::setSize( w, h );
+void BoxLayout::setSize(const unsigned short w, const unsigned short h)
+{
+    Rect::setSize(w, h);
 
-	resizeItems();
+    resizeItems();
 }
 bool BoxLayout::addWidget( Item* item ) {
 	bool ret = Rect::addWidget( item );
@@ -123,24 +123,57 @@ void BoxLayout::setVisible(bool value)
     setVisible(value, false);
 }
 
+// space left distposition `first is better` tactics
+// there could be other i.e. socialism: each element take in equal part up to it's max size
+// not needed now == not implemented
 template <Axis axis> void BoxLayout::resizeItems()
 {
-    // TODO rethink resize based on: maxSize, drawArea, alignment etc
+    // we want to split to interested parties what's left, as much as they can fit
+    auto to_split = sizeLeft<axis>(this);
+    auto pos = reverse_order ? this->area().size(axis) : 0;
+    auto pos_update = [this, &pos](Item *it) {
+        if (this->reverse_order)
+        {
+            pos -= it->area(Item::Area::Actual).size(axis);
+            it->area(Item::Area::Actual).pos(axis) = pos;
+            it->area(Item::Area::Normal).pos(axis) = pos;
+        }
+        else
+        {
+            it->area(Item::Area::Actual).pos(axis) = pos;
+            it->area(Item::Area::Normal).pos(axis) = pos;
+            pos += it->area(Item::Area::Actual).size(axis);
+        }
+    };
+
+    auto set_size = [this, &to_split, &pos_update](Item *el, auto &pos) {
+        if (el == nullptr)
+        {
+            return;
+        }
+        auto left_in_el = el->area(Item::Area::Max).size(axis) - el->area(Item::Area::Normal).size(axis);
+        if (to_split > 0 && left_in_el > 0)
+        {
+            auto resize = left_in_el < to_split ? left_in_el : to_split;
+            el->area(Item::Area::Actual).size(axis) += resize;
+            to_split -= resize;
+        }
+    };
+
+    for (auto &el : children)
+    {
+        el->area(Item::Area::Actual) = el->area(Item::Area::Normal);
+        set_size(el, pos);
+        pos_update(el);
+        // LOG_DEBUG("> el %s", el->area(Area::Normal).str().c_str()); // log to show how inefficient is adding single element at a time
+    }
     Rect::updateDrawArea();
 }
 
 template <Axis axis> bool BoxLayout::addWidget(Item *item)
 {
-    if (size<axis>(this) - sizeUsed<axis>(this) >= inAxisMax<axis>(item))
+    if (size<axis>(this) - sizeUsed<axis>(this) >= size<axis>(item))
     {
-        if (!reverse_order)
-        {
-            item->widgetArea.pos(axis) = children.size() ? children.back()->offset(axis) : 0;
-        }
-        else
-        {
-            item->widgetArea.pos(axis) = this->widgetArea.size(axis) - sizeUsed<axis>(this) - item->widgetArea.size(axis);
-        }
         Rect::addWidget(item);
         resizeItems<axis>();
         return true;

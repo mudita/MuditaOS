@@ -12,6 +12,7 @@
 
 #include "Layout.hpp"
 #include "Rect.hpp"
+#include <Alignment.hpp>
 
 namespace gui {
 
@@ -29,19 +30,15 @@ namespace gui {
         {
             return it->widgetArea.size(axis);
         };
-        template <Axis axis> uint32_t sizeUsed(Item *it)
+        template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Normal)
         {
             uint32_t sum = 0;
-            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->widgetArea.size(axis); });
+            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->area(area).size(axis); });
             return sum;
         };
-        template <Axis axis> uint32_t sizeLeft(Item *it)
+        template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
         {
-            return size<axis>(it) - sizeUsed<axis>(it);
-        };
-        template <Axis axis> uint32_t inAxisMax(Item *it)
-        {
-            return (axis == Axis::Y) ? (it->getMaxHeight()) : (it->getMaxWidth());
+            return size<axis>(it) - sizeUsed<axis>(it, area);
         };
 
         template <Axis axis> void resizeItems();
@@ -59,7 +56,7 @@ namespace gui {
 
         // virtual methods from Item
         void setPosition(const short &x, const short &y) override;
-        void setSize(const short &w, const short &h) override;
+        void setSize(const unsigned short w, const unsigned short h) override;
         bool addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
         std::list<DrawCommand *> buildDrawList() override;

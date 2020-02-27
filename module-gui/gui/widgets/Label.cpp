@@ -291,9 +291,10 @@ void Label::setPosition( const short& x, const short& y ) {
 	calculateDisplayText();
 }
 
-void Label::setSize( const short& w, const short& h ) {
-	gui::Rect::setSize( w, h );
-	calculateDisplayText();
+void Label::setSize(const unsigned short w, const unsigned short h)
+{
+    gui::Rect::setSize(w, h);
+    calculateDisplayText();
 }
 
 void Label::setFont( const UTF8& fontName) {

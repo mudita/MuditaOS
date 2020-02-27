@@ -105,4 +105,10 @@ std::string BoundingBox::str()
     return ss.str();
 }
 
+void BoundingBox::sum(const BoundingBox &box)
+{
+    w = box.w > w ? box.w : w;
+    h = box.h > h ? box.h : h;
+}
+
 } /* namespace gui */
