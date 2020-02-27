@@ -70,6 +70,8 @@ ContactsTableRow ContactsTable::GetByID(uint32_t id)
         (*retQuery)[7].GetBool(),                             // is on blacklist
         (*retQuery)[8].GetBool(),                             // is on favourites
         (*retQuery)[9].GetUInt32(),                           // speed dial key
+        (*retQuery)[10].GetString(),                          // UTF8 primary number
+        (*retQuery)[11].GetString(),                          // UTF8 alternative number
     };
 }
 
@@ -150,6 +152,8 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
             (*retQuery)[7].GetBool(),                             // is on blacklist
             (*retQuery)[8].GetBool(),                             // is on favourites
             (*retQuery)[9].GetUInt32(),                           // speed dial key
+            (*retQuery)[10].GetString(),                          // primaryName
+            (*retQuery)[11].GetString(),                          // alternativeName
         });
     } while (retQuery->NextRow());
 
@@ -194,6 +198,8 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offs
             (*retQuery)[7].GetBool(),                             // is on blacklist
             (*retQuery)[8].GetBool(),                             // is on favourites
             (*retQuery)[9].GetUInt32(),                           // speed dial key
+            (*retQuery)[10].GetString(),                          // primaryName
+            (*retQuery)[11].GetString(),                          // alternativeName
         });
     } while (retQuery->NextRow());
 
@@ -204,7 +210,7 @@ uint32_t ContactsTable::GetCount()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contacts;");
 
-    if (queryRet->GetRowCount() == 0)
+    if (queryRet == nullptr || queryRet->GetRowCount() == 0)
     {
         return 0;
     }
