@@ -431,7 +431,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     break;
 
     case MessageType::DBCalllogGetCount: {
-        auto *msg = reinterpret_cast<DBCalllogGetCount *>(msgl);
+        auto *msg = dynamic_cast<DBCalllogGetCount *>(msgl);
         assert(msg);
         auto time = utils::time::Scoped("DBCalllogGetCount");
         auto ret = calllogRecordInterface->GetCount(msg->state);
