@@ -20,6 +20,7 @@
 
 #include "log/log.hpp"
 
+#include <cassert>
 #include <time/ScopedTime.hpp>
 
 const char *ServiceDB::serviceName = "ServiceDB";
@@ -137,8 +138,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     	break;
     }
     case MessageType::DBSMSGetCount: {
+        auto msg = dynamic_cast<DBSMSGetCount *>(msgl);
+        assert(msg);
         auto time = utils::time::Scoped("DBSMSGetCount");
-        auto ret = smsRecordInterface->GetCount();
+        auto ret = smsRecordInterface->GetCount(msg->state);
         responseMsg = std::make_shared<DBSMSResponseMessage>(nullptr, true, ret);
         break;
     }
@@ -428,8 +431,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     break;
 
     case MessageType::DBCalllogGetCount: {
+        auto *msg = reinterpret_cast<DBCalllogGetCount *>(msgl);
+        assert(msg);
         auto time = utils::time::Scoped("DBCalllogGetCount");
-        auto ret = calllogRecordInterface->GetCount();
+        auto ret = calllogRecordInterface->GetCount(msg->state);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, true, 0, 0, ret);
     }
     break;

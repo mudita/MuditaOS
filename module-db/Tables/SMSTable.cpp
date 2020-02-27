@@ -10,7 +10,7 @@
 
 
 #include "SMSTable.hpp"
-
+#include <log/log.hpp>
 
 SMSTable::SMSTable(Database *db) : Table(db) {
 }
@@ -163,15 +163,34 @@ SMSTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, SMSTableFields 
 
     return ret;
 }
+uint32_t SMSTable::GetCount(SMSState state)
+{
+    std::string query = "SELECT COUNT(*) FROM sms ";
+    switch (state)
+    {
+    case SMSState::ALL:
+        break;
+    case SMSState::READ:
+        query += "WHERE sms.read=1";
+        break;
+    case SMSState::UNREAD:
+        query += "WHERE sms.read=0";
+        break;
+    };
+    query += ";";
 
-uint32_t SMSTable::GetCount() {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM SMS;");
-
-    if (queryRet->GetRowCount() == 0) {
+    auto queryRet = db->Query(query.c_str());
+    if (queryRet == nullptr || queryRet->GetRowCount() == 0)
+    {
         return 0;
     }
 
     return uint32_t{(*queryRet)[0].GetUInt32()};
+}
+
+uint32_t SMSTable::GetCount()
+{
+    return GetCount(SMSState::ALL);
 }
 
 uint32_t SMSTable::GetCountByFieldID(const char *field, uint32_t id) {

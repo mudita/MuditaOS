@@ -26,6 +26,8 @@
 #include <Style.hpp>
 #include <time/time_conversion.hpp>
 
+#include "service-db/api/DBServiceAPI.hpp"
+
 namespace style
 {
     const auto design_time_offset = 106;
@@ -365,8 +367,16 @@ auto DesktopMainWindow::fillNotifications() -> bool
     }
 
     // 2. actually fill it in
-    add_notification(notifications, "phone", "texttemplate", "2", [](Item &) { return true; });
-    add_notification(notifications, "mail", "texttemplate", "13", [](Item &) { return true; });
+    auto unhandled_calls = DBServiceAPI::CalllogGetCount(application, CallState::MISSED);
+    if (unhandled_calls)
+    {
+        add_notification(notifications, "phone", utils::localize.get("app_desktop_missed_calls"), std::to_string(unhandled_calls), [](Item &) { return true; });
+    }
+    auto unread_sms = DBServiceAPI::SMSGetCount(this->application, SMSState::UNREAD);
+    if (unread_sms)
+    {
+        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(unread_sms), [](Item &) { return true; });
+    }
     setFocusItem(notifications);
     return true;
 }
