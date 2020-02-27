@@ -6,3 +6,6 @@
 	path = module-lwip/lib/lwip
 	url = ../lwip.git
 	shallow = true
+[submodule "module-utils/tinyfsm"]
+	path = module-utils/tinyfsm
+	url = https://github.com/digint/tinyfsm.git

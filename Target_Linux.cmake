@@ -10,7 +10,6 @@ set(TARGET_COMPILE_DEFINITIONS CACHE INTERNAL "")
 
 set(TARGET_COMPILE_OPTIONS -Werror -fsanitize=address  CACHE INTERNAL "")
 
-
 set(TARGET_LIBRARIES
     rt
     pthread
