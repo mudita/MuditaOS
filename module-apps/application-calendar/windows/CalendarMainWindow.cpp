@@ -15,7 +15,6 @@
 namespace app {
 
 CalendarMainWindow::CalendarMainWindow( app::Application* app, std::string name ) : AppWindow( app, name ) {
-	setSize(480,600);
 	buildInterface();
 }
 

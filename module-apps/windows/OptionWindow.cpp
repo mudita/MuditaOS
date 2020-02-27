@@ -12,7 +12,6 @@ namespace gui
 
     OptionWindow::OptionWindow(app::Application *app, const std::string &name) : AppWindow(app, name)
     {
-        setSize(style::window_width, style::window_height);
         buildInterface();
     }
 

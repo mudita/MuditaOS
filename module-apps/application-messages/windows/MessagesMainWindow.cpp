@@ -39,7 +39,6 @@ namespace gui {
 
     MessagesMainWindow::MessagesMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window), threadModel{new ThreadModel(app)}
     {
-        setSize(style::window_width, style::window_height);
         buildInterface();
     }
 

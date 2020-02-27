@@ -85,8 +85,6 @@ MenuPage::~MenuPage() {
 }
 
 MenuWindow::MenuWindow( app::Application* app ) : AppWindow(app,"MenuWindow"){
-	setSize( 480, 600 );
-
 	buildInterface();
 }
 
