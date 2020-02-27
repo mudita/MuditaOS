@@ -54,8 +54,12 @@ bool Item::addWidget( Item* item ) {
 
 bool Item::removeWidget( Item* item ) {
 	if(item == nullptr) return false;
-	
-	auto fi = std::find( children.begin(), children.end(), item );
+    if (item == focusItem)
+    {
+        focusItem = nullptr;
+    }
+
+    auto fi = std::find( children.begin(), children.end(), item );
 	if( fi != children.end() ) {
 		children.erase(fi);
 		return true;
