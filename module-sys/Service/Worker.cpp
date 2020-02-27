@@ -61,7 +61,7 @@ bool Worker::init( std::list<WorkerQueueInfo> queuesList ) {
 		setSize += wqi.length;
 	}
 
-    //create set of queues
+	//create set of queues
 	queueSet = xQueueCreateSet( setSize );
 	if( queueSet == NULL )
 		return false;

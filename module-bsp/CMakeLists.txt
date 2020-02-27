@@ -37,11 +37,6 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 if (${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-unused-result")
 endif()
-
-if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
-    target_compile_definitions (${PROJECT_NAME} PUBLIC USB_STACK_FREERTOS)
-endif()
-
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
