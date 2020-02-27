@@ -49,7 +49,13 @@ public:
         uint32_t    fileSize;
     };
 
-
+    struct FilesystemStats
+    {
+        std::string type;
+        uint32_t freeMbytes;
+        uint32_t freePercent;
+        uint32_t totalMbytes;
+    };
 
 
     vfs();
@@ -97,6 +103,7 @@ public:
      */
     std::string getline( FILE* stream, uint32_t length = 1024 );
 
+    FilesystemStats getFilesystemStats();
 private:
 
     const char* eMMC_USER_DISK_NAME	= "/sys";
