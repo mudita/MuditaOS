@@ -43,6 +43,7 @@ struct CalllogTableRow{
     CallType    type;
     UTF8        name;
 	UTF8        contactId;
+    CallState answered = CallState::MISSED;
 };
 
  enum class CalllogTableFields{
@@ -68,7 +69,8 @@ public:
 	std::vector<CalllogTableRow> GetLimitOffsetByField(uint32_t offset,uint32_t limit,CalllogTableFields field,const char* str) override final;
 
 	uint32_t GetCount() override final;
-	uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
+    uint32_t GetCount(CallState state);
+    uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
 
 private:
 

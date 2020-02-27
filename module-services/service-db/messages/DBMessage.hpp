@@ -11,6 +11,7 @@
 #ifndef PUREPHONE_DBMESSAGE_HPP
 #define PUREPHONE_DBMESSAGE_HPP
 
+#include "Common/Common.hpp"
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
 #include "Interface/ContactRecord.hpp"
@@ -79,6 +80,15 @@ class DBSMSMessage : public DBMessage
     }
 
     SMSRecord record;
+};
+
+class DBSMSGetCount : public DBSMSMessage
+{
+  public:
+    SMSState state;
+    DBSMSGetCount(SMSState state = SMSState::ALL) : DBSMSMessage(MessageType::DBSMSGetCount), state(state)
+    {
+    }
 };
 
 class DBSMSResponseMessage : public DBResponseMessage
@@ -257,6 +267,15 @@ class DBCalllogMessage : public DBMessage
     }
 
     CalllogRecord record;
+};
+
+class DBCalllogGetCount : public DBCalllogMessage
+{
+  public:
+    CallState state;
+    DBCalllogGetCount(CallState state) : DBCalllogMessage(MessageType::DBCalllogGetCount), state(state)
+    {
+    }
 };
 
 class DBCalllogResponseMessage : public DBResponseMessage

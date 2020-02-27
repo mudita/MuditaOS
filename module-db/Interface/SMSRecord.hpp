@@ -54,6 +54,7 @@ public:
     SMSRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
+    uint32_t GetCount(SMSState state);
     uint32_t GetLastID(void);
     std::unique_ptr<std::vector<SMSRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
 

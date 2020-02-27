@@ -24,9 +24,10 @@ bool CalllogTable::Create() {
 bool CalllogTable::Add(CalllogTableRow entry)
 {
 
-    return db->Execute("INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId) VALUES ('%s', %lu, %s, %s, %lu, '%s', '%s');",
-                       entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::to_string(entry.date).c_str(),
-                       utils::to_string(entry.duration).c_str(), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str());
+    return db->Execute(
+        "INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId, answered) VALUES ('%s', %lu, %s, %s, %lu, '%s', '%s', %d);",
+        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::to_string(entry.date).c_str(), utils::to_string(entry.duration).c_str(),
+        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.answered);
 }
 
 bool CalllogTable::RemoveByID(uint32_t id) {
@@ -39,10 +40,11 @@ bool CalllogTable::RemoveByField(CalllogTableFields field, const char *str) {
 
 bool CalllogTable::Update(CalllogTableRow entry)
 {
-    return db->Execute(
-        "UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s' WHERE _id = %lu;",
-        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), static_cast<uint32_t>(entry.date), static_cast<uint32_t>(entry.duration),
-        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.id);
+    return db->Execute("UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s', answered = "
+                       "%d WHERE _id = %lu;",
+                       entry.number.c_str(), static_cast<uint32_t>(entry.presentation), static_cast<uint32_t>(entry.date),
+                       static_cast<uint32_t>(entry.duration), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.answered,
+                       entry.id);
 }
 
 CalllogTableRow CalllogTable::GetByID(uint32_t id) {
@@ -61,6 +63,7 @@ CalllogTableRow CalllogTable::GetByID(uint32_t id) {
         static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
         (*retQuery)[6].GetString(),                                // name
         (*retQuery)[7].GetString(),                                // contactID
+        static_cast<CallState>((*retQuery)[8].GetUInt64()),        // answered
     };
 }
 
@@ -85,6 +88,7 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffset(uint32_t offset, uint3
             static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
             (*retQuery)[6].GetString(),                                // name
             (*retQuery)[7].GetString(),                                // contactID
+            static_cast<CallState>((*retQuery)[8].GetUInt64()),        // answered
         });
     } while (retQuery->NextRow());
 
@@ -128,20 +132,42 @@ CalllogTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, CalllogTabl
             static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
             (*retQuery)[6].GetString(),                                // name
             (*retQuery)[7].GetString(),                                // contactID
+            static_cast<CallState>((*retQuery)[8].GetUInt64()),        // answered
         });
     } while (retQuery->NextRow());
 
     return ret;
 }
 
-uint32_t CalllogTable::GetCount() {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM calls;");
+uint32_t CalllogTable::GetCount(CallState state)
+{
+    std::string query = "SELECT COUNT(*) FROM calls ";
+    switch (state)
+    {
+    case CallState::ALL:
+        break;
+    case CallState::MISSED:
+        query += "WHERE calls.answered = 0";
+        break;
+    case CallState::ANSWERED:
+        query += "WHERE calls.answered = 1";
+        break;
+    }
+    query += ";";
+    LOG_DEBUG("> %s", query.c_str());
+    auto queryRet = db->Query(query.c_str());
 
-    if (queryRet->GetRowCount() == 0) {
+    if (queryRet == nullptr || queryRet->GetRowCount() == 0)
+    {
         return 0;
     }
 
     return uint32_t{(*queryRet)[0].GetUInt32()};
+}
+
+uint32_t CalllogTable::GetCount()
+{
+    return GetCount(CallState::ALL);
 }
 
 uint32_t CalllogTable::GetCountByFieldID(const char *field, uint32_t id) {
