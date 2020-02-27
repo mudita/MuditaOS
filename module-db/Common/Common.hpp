@@ -21,6 +21,20 @@ enum class SMSType {
     ALL = 0xFF
 };
 
+enum class SMSState
+{
+    ALL,   /// read and unread messages
+    READ,  /// only read messages
+    UNREAD /// only unread messages
+};
+
+enum class CallState
+{
+    ALL,      // all calls in record cunt (missed & not)
+    MISSED,   // only missed calls
+    ANSWERED, // only answered calls
+};
+
 /**
  * Types of contacts
  */

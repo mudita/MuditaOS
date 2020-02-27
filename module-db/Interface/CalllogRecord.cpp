@@ -128,9 +128,12 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id) {
     };
 }
 
-uint32_t CalllogRecordInterface::GetCount() {
-    return calllogDB->calls.GetCount();
+uint32_t CalllogRecordInterface::GetCount(CallState state)
+{
+    return calllogDB->calls.GetCount(state);
 }
 
-
-
+uint32_t CalllogRecordInterface::GetCount()
+{
+    return GetCount(CallState::ALL);
+}

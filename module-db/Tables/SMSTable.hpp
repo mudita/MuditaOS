@@ -52,6 +52,7 @@ public:
     std::vector<SMSTableRow> GetLimitOffsetByField(uint32_t offset,uint32_t limit,SMSTableFields field,const char* str) override final;
 
     uint32_t GetCount() override final;
+    uint32_t GetCount(SMSState state);
     uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
 
 private:

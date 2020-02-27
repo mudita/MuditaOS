@@ -49,6 +49,7 @@ public:
     CalllogRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
+    uint32_t GetCount(CallState state);
 
     std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
 
