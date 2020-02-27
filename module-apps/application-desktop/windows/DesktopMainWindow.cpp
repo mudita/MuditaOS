@@ -14,6 +14,8 @@
 #include "Alignment.hpp"
 #include "Common.hpp"
 #include "DesktopMainWindow.hpp"
+#include "application-calllog/ApplicationCallLog.hpp"
+#include "application-messages/ApplicationMessages.hpp"
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
@@ -265,7 +267,7 @@ auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
 }
 
 /// for now notifications are like that: `^<span>[icon]<span>[dumb text]       [dot image] [number of notifications]<span>$`
-auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, std::function<bool(Item &)> foo) -> bool
+auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, std::function<bool()> callback) -> bool
 {
     const auto text_normal_size = 200;
     const auto size_needed_for_2digits = 30;
@@ -328,6 +330,13 @@ auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, s
         el->setPenWidth(style::window::default_border_no_focus_w);
         el->setPenFocusWidth(style::window::default_border_focucs_w);
         el->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+        el->inputCallback = [callback](Item &, const InputEvent &event) {
+            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF)
+            {
+                return callback();
+            }
+            return false;
+        };
         if (!try_add_del(layout, el))
         {
             el = nullptr;
@@ -370,12 +379,16 @@ auto DesktopMainWindow::fillNotifications() -> bool
     auto unhandled_calls = DBServiceAPI::CalllogGetCount(application, CallState::MISSED);
     if (unhandled_calls)
     {
-        add_notification(notifications, "phone", utils::localize.get("app_desktop_missed_calls"), std::to_string(unhandled_calls), [](Item &) { return true; });
+        add_notification(notifications, "phone", utils::localize.get("app_desktop_missed_calls"), std::to_string(unhandled_calls), [this]() {
+            return sapm::ApplicationManager::messageSwitchApplication(application, app::CallLogAppStr, gui::name::window::main_window, nullptr);
+        });
     }
     auto unread_sms = DBServiceAPI::SMSGetCount(this->application, SMSState::UNREAD);
     if (unread_sms)
     {
-        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(unread_sms), [](Item &) { return true; });
+        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(unread_sms), [this]() {
+            return sapm::ApplicationManager::messageSwitchApplication(application, app::name_messages, gui::name::window::main_window, nullptr);
+        });
     }
     setFocusItem(notifications);
     return true;
