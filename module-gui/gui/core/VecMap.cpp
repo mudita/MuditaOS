@@ -33,9 +33,6 @@ VecMap::VecMap( uint16_t w, uint16_t h, uint8_t* data ) :
 	}
 }
 
-VecMap::~VecMap() {
-}
-
 gui::Status VecMap::load( uint8_t* data, uint32_t size ) {
 
 	uint32_t offset = 0;

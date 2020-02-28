@@ -5,6 +5,7 @@
 namespace gui
 {
 
+    /// Layout providing Pages for elements
     class PageLayout : public BoxLayout
     {
       public:

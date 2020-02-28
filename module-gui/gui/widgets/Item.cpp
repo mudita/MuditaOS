@@ -216,4 +216,60 @@ bool Item::handleNavigation(const InputEvent inputEvent)
     return false;
 }
 
+bool Item::setFocus(bool state)
+{
+    if (state != focus)
+    {
+        focus = state;
+        onFocus(state);
+        focusChangedCallback(*this);
+    };
+    return state;
+}
+
+void Item::setFocusItem(Item *item)
+{
+    auto checknrun = [=](bool on) {
+        if (focusItem != nullptr)
+        {
+            focusItem->setFocus(on);
+        }
+    };
+    checknrun(false);
+    focusItem = item;
+    checknrun(true);
+}
+
+Item *Item::getFocusItem()
+{
+    return focusItem;
+}
+
+bool Item::onFocus(bool state)
+{
+    focus = state;
+    return true;
+}
+
+bool Item::onActivated(void *data)
+{
+    if (activatedCallback)
+        return activatedCallback(*this);
+    return false;
+}
+
+bool Item::onInput(const InputEvent &inputEvent)
+{
+    return inputCallback(*this, inputEvent);
+}
+
+bool Item::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+{
+    return true;
+}
+
+bool Item::onContent()
+{
+    return false;
+};
 } /* namespace gui */
