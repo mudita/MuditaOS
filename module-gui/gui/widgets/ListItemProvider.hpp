@@ -15,6 +15,9 @@ namespace gui {
 
 class ListView;
 
+/// something between cache and factory for list view - it provides next elements requested by ListView
+/// it can only be used in combination with DatabaseModel which uses asynchronous request via application
+/// and caches elements requested from database
 class ListItemProvider {
 protected:
 	ListView* list = nullptr;
