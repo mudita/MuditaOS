@@ -17,7 +17,7 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     box->setPenFocusWidth(0);
     auto text_len = 200; // Dumb text size - this won't be needed when Text(...) widget will be refactored
     auto l = new gui::Label(box, 0, 0, text_len, label::big_h);
-    l->area(gui::Item::Area::Max).w = box->w(); // let box layout resize
+    l->area(gui::Item::Area::Max).w = box->area().w; // let box layout resize
     decorate(l);
     l->setText(contact.primaryName);
     l->activeItem = false;

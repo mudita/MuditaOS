@@ -63,12 +63,10 @@ void BoxLayout::setSize(const unsigned short w, const unsigned short h)
 
     resizeItems();
 }
-bool BoxLayout::addWidget( Item* item ) {
-	bool ret = Rect::addWidget( item );
-
-	resizeItems();
-
-	return ret;
+void BoxLayout::addWidget(Item *item)
+{
+    Rect::addWidget(item);
+    resizeItems();
 }
 bool BoxLayout::removeWidget( Item* item ) {
 	bool ret = Rect::removeWidget( item );
@@ -170,15 +168,15 @@ template <Axis axis> void BoxLayout::resizeItems()
     Rect::updateDrawArea();
 }
 
-template <Axis axis> bool BoxLayout::addWidget(Item *item)
+template <Axis axis> void BoxLayout::addWidget(Item *item)
 {
+    Rect::addWidget(item);
+    item->visible = false;
     if (size<axis>(this) - sizeUsed<axis>(this) >= size<axis>(item))
     {
-        Rect::addWidget(item);
+        item->visible = true;
         resizeItems<axis>();
-        return true;
     }
-    return false;
 }
 
 std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
@@ -216,9 +214,9 @@ void HBox::resizeItems() {
     BoxLayout::resizeItems<Axis::X>();
 }
 
-bool HBox::addWidget(Item *item)
+void HBox::addWidget(Item *item)
 {
-    return BoxLayout::addWidget<Axis::X>(item);
+    BoxLayout::addWidget<Axis::X>(item);
 }
 
 VBox::VBox() : BoxLayout() {
@@ -233,9 +231,9 @@ void VBox::resizeItems() {
     BoxLayout::resizeItems<Axis::Y>();
 }
 
-bool VBox::addWidget(Item *item)
+void VBox::addWidget(Item *item)
 {
-    return BoxLayout::addWidget<Axis::Y>(item);
+    BoxLayout::addWidget<Axis::Y>(item);
 }
 
 } /* namespace gui */
