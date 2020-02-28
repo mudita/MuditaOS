@@ -10,7 +10,7 @@ namespace gui
     inline const std::vector<char> special_chars = {'.', ',', '_', ':', ';', ')', '(', '?', '!', '/', '*', '+'};
 }
 
-/// this widget has one goal - nicelly change input parsing which is done in application in it's widgets
+/// this element has one goal - nicely change input parsing which is done in application in it's widgets
 class InputMode
 {
   public:

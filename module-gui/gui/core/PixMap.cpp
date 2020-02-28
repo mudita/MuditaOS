@@ -32,9 +32,6 @@ PixMap::PixMap( uint16_t w, uint16_t h, uint8_t* data ) :
 	}
 }
 
-PixMap::~PixMap() {
-}
-
 gui::Status PixMap::load( uint8_t* data, uint32_t size ) {
 
 	uint32_t offset = 0;

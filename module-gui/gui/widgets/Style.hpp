@@ -10,6 +10,7 @@ namespace gui
     class Label;
 };
 
+/// one place to gather all common magical numbers from design
 namespace style {
 const inline uint32_t window_height = 600;
 const inline uint32_t window_width  = 480;
