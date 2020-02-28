@@ -164,8 +164,8 @@ public:
 	virtual bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) { return true; };
 	virtual bool onContent() { return false; };
 
-	virtual bool addWidget( Item* item );
-	virtual bool removeWidget( Item* item );
+    virtual void addWidget(Item *item);
+    virtual bool removeWidget( Item* item );
 	virtual void setVisible( bool value );
 	virtual void setPosition( const short& x, const short& y );
     virtual void setSize(const unsigned short w, const unsigned short h);

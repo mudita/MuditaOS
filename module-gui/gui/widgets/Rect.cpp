@@ -38,10 +38,7 @@ namespace gui {
         this->parent = parent;
         if (parent)
         {
-            if (!parent->addWidget(this))
-            {
-                LOG_FATAL("Terrible fail - widget add item failure (dangling ptr)");
-            }
+            parent->addWidget(this);
         }
 }
 

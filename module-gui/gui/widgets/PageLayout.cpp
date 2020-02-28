@@ -57,55 +57,49 @@ namespace gui
         el->setPenWidth(0);
         el->setRadius(0);
         // if new element fits && To avoid cyclic addWidget -> call parent addWidget
-        if (BoxLayout::addWidget(el))
+        BoxLayout::addWidget(el);
+        if (el->visible)
         {
             return el;
         }
         else
         {
-            delete el;
             return nullptr;
         }
     }
 
-    bool PageLayout::addWidget(Item *item)
+    void PageLayout::addWidget(Item *item)
     {
         if (this->children.size() == 0)
         {
             // cant add this element to this paged view at all
             if (addPage() == nullptr)
             {
-                return false;
+                return;
             }
         }
         auto el = dynamic_cast<VBox *>(children.back());
-        bool added = el ? el->addWidget(item) : false;
-        if (!added)
+        el->addWidget(item);
+        if (!item->visible)
         {
+            el->removeWidget(item);
+            item->visible = true;
             // add next page and try again - first set last box to not visible to avoid it's rebuild
             if (!addPage())
             {
-                return false;
+                return;
             }
             // set new (next) page invisible
             children.back()->setVisible(false);
             /// to not recure on addWidget
             auto el = dynamic_cast<VBox *>(children.back());
-            if (!el->addWidget(item))
+            el->addWidget(item);
+            if (!el->visible)
             {
                 LOG_ERROR("Child not added on 2nd try, check sizes of Page and children u try to add!");
-                return false;
-            }
-            else
-            {
-                return true;
             }
         }
-        else
-        {
-            return true;
-        }
-        return false;
+        return;
     }
 
     bool PageLayout::switchPage(unsigned int n, bool previous)
