@@ -19,9 +19,9 @@
 #include "gui/widgets/Image.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
-//application-call
 #include "application-call/ApplicationCall.hpp"
 #include "application-call/data/CallSwitchData.hpp"
+#include <UiCommonActions.hpp>
 
 #include "i18/i18.hpp"
 #include <Span.hpp>
@@ -136,10 +136,17 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 	
 	// do nothing
 	if( inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_RF ) return false;
-	
-	app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
 
-	//process shortpress
+    app::ApplicationDesktop *app = dynamic_cast<app::ApplicationDesktop *>(application);
+    if (app == nullptr)
+    {
+        LOG_ERROR("not ApplicationDesktop");
+        return AppWindow::onInput(inputEvent);
+    }
+
+    auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
+
+    //process shortpress
 	if( inputEvent.state == InputEvent::State::keyReleasedShort ) {
 
 		if( app->getScreenLocked() ) {
@@ -187,39 +194,39 @@ bool DesktopMainWindow::onInput( const InputEvent& inputEvent ) {
 		}
 		//screen is unlocked
 		else {
-            int val = gui::toNumeric(inputEvent.keyCode);
-			//pressing enter moves user to menu screen
+            //pressing enter moves user to menu screen
 			if( inputEvent.keyCode == KeyCode::KEY_ENTER ) {
 				application->switchWindow( "MenuWindow" );
 			}
-			//if numeric key was pressed record that key and send it to call application with a switch command
-            else if( 0 <= val && val <= 9)
+            // if numeric key was pressed record that key and send it to call application
+            else if (code != 0)
             {
-                auto key = std::to_string(val);
-                std::unique_ptr<gui::SwitchData> phoneNumberData = std::make_unique<app::EnterNumberData>(key);
-                sapm::ApplicationManager::messageSwitchApplication(application, app::name_call, "EnterNumberWindow", std::move(phoneNumberData));
-                return true;
+                return app::call(application, app::CallOperation::PrepareCall, code);
             }
 		}
 	}
 	else if( inputEvent.state == InputEvent::State::keyReleasedLong ) {
 		//long press of # locks screen if it was unlocked
 		if( (inputEvent.keyCode == KeyCode::KEY_PND) && ( app->getScreenLocked() == false ) ) {
-			app::ApplicationDesktop* app = reinterpret_cast<app::ApplicationDesktop*>( application );
-			app->setScreenLocked(true);
-			setVisibleState();
-			application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
-			reinterpret_cast<app::ApplicationDesktop*>(application)->setSuspendFlag(true);
-		}
-		//long press of right function button move user to power off window
+            app->setScreenLocked(true);
+            setVisibleState();
+            app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            app->setSuspendFlag(true);
+            return true;
+        }
+        //long press of right function button move user to power off window
 		else if (inputEvent.keyCode == KeyCode::KEY_RF) {
 			application->switchWindow( "PowerOffWindow" );
             return true;
-		}
-	}
+        }
+        // long press of '0' key is translated to '+'
+        else if (inputEvent.keyCode == KeyCode::KEY_0)
+        {
+            return app::call(application, app::CallOperation::PrepareCall, '+');
+        }
+    }
 
-	//check if any of the lower inheritance onInput methods catch the event
+    //check if any of the lower inheritance onInput methods catch the event
 	return AppWindow::onInput( inputEvent );
 }
 

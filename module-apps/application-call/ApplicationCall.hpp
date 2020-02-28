@@ -16,6 +16,12 @@
 namespace app {
 
 inline const std::string name_call = "ApplicationCall";
+namespace window
+{
+    inline const std::string name_call = "CallWindow";
+    inline const std::string name_enterNumber = "EnterNumberWindow";
+    inline const std::string name_emergencyCall = "EmergencyCallWindow";
+} // namespace window
 /*
  *
  */
@@ -42,11 +48,6 @@ public:
 	//starts timer that upon triggering, if no user action was performed, will hide application to background and move to previous application
 	void runCallTimer();
 	void stopCallTimer();
-	/**
-	 * @brief Performs switch to call application with the number needed to perform the call
-	 *
-	 */
-    static bool messageSwitchToCall(sys::Service *sender, const UTF8 &e164number, bool call = true);
 };
 
 } /* namespace app */
