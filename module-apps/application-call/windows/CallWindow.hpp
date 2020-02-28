@@ -63,25 +63,24 @@ protected:
 	bool handleCenterButton();
 	bool handleRightButton();
 public:
-	CallWindow( app::Application* app, std::string windowName = "CallWindow" );
-	virtual ~CallWindow();
+  CallWindow(app::Application *app, std::string windowName = app::window::name_call);
+  virtual ~CallWindow();
 
-	/**
-	 * Used by application to update window's state
-	 */
-	void setState( State state );
-	const State& getState();
-	void updateDuration( uint32_t duration );
-	void setCallNumber( std::string );
+  /**
+   * Used by application to update window's state
+   */
+  void setState(State state);
+  const State &getState();
+  void updateDuration(uint32_t duration);
+  void setCallNumber(std::string);
 
-	//virtual methods
-	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
-	bool handleSwitchData( SwitchData* data ) override;
+  bool onInput(const InputEvent &inputEvent) override;
+  void onBeforeShow(ShowMode mode, SwitchData *data) override;
+  bool handleSwitchData(SwitchData *data) override;
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
+  void rebuild() override;
+  void buildInterface() override;
+  void destroyInterface() override;
 };
 
 } /* namespace gui */

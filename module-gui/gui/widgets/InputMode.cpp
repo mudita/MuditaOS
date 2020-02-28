@@ -7,6 +7,7 @@ const std::map<InputMode::Mode, std::string> input_mode = {
     {InputMode::digit, "common_kbd_numeric"},
     {InputMode::ABC, "common_kbd_upper"},
     {InputMode::abc, "common_kbd_lower"},
+    {InputMode::phone, "common_kbd_phone"},
 };
 
 static std::string getInputName(InputMode::Mode m)
@@ -19,6 +20,8 @@ static std::string getInputName(InputMode::Mode m)
         return "ABC";
     case InputMode::abc:
         return "abc";
+    case InputMode::phone:
+        return "phone";
     default:
         return "";
     }

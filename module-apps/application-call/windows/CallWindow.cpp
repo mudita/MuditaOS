@@ -18,8 +18,9 @@
 
 #include "i18/i18.hpp"
 
-#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
 
 #include "Label.hpp"
 #include "Margins.hpp"
@@ -295,9 +296,29 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 		return false;
 	}
 
-	numberLabel->setText( phoneNumber );
+    auto records = DBServiceAPI::ContactGetByPhoneNumber(this->application, phoneNumber);
+    if (records->size() == 1)
+    {
+        auto rec = records->operator[](0);
+        LOG_INFO("number = %s recognized as contact id = %u, ", phoneNumber, rec.dbID, rec.primaryName.c_str());
+        phoneNumber = rec.primaryName;
+    }
+    else if (records->size() > 1)
+    {
+        LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.c_str());
+        for (auto i : *records)
+        {
+            LOG_ERROR("contact id = %u, name = %s", i.dbID, i.primaryName.c_str());
+        }
+    }
+    else
+    {
+        LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.c_str());
+    }
 
-	setVisibleState();
+    numberLabel->setText(phoneNumber);
+
+    setVisibleState();
 	application->refreshWindow( RefreshModes::GUI_REFRESH_FAST );
 
 	return true;

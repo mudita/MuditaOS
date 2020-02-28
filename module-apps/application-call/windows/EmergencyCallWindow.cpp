@@ -15,10 +15,11 @@
 
 namespace gui {
 
-EmergencyCallWindow::EmergencyCallWindow( app::Application* app ) : EnterNumberWindow( app, "EmergencyCallWindow" ) {
+    EmergencyCallWindow::EmergencyCallWindow(app::Application *app) : EnterNumberWindow(app, app::window::name_emergencyCall)
+    {
 
-	numberLabel->setText( utils::localize.get("app_call_emergency") );
-}
+        numberLabel->setText(utils::localize.get("app_call_emergency"));
+    }
 
 void EmergencyCallWindow::rebuild() {
 

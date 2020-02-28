@@ -20,6 +20,7 @@ class InputMode
         digit,
         abc,
         ABC,
+        phone,
     };
 
   private:
