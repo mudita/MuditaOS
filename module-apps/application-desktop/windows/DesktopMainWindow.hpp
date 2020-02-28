@@ -10,12 +10,12 @@
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 
 #include "AppWindow.hpp"
-#include "gui/widgets/Text.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Window.hpp"
 #include "gui/widgets/BottomBar.hpp"
+#include "gui/widgets/Image.hpp"
+#include "gui/widgets/Label.hpp"
+#include "gui/widgets/Text.hpp"
 #include "gui/widgets/TopBar.hpp"
+#include "gui/widgets/Window.hpp"
 
 namespace gui {
 
@@ -64,6 +64,9 @@ protected:
 	bool updateTime( const UTF8& timeStr ) override;
 	bool updateTime( const uint32_t& timestamp, bool mode24H ) override;
 	std::list<DrawCommand*> buildDrawList() override;
+
+  private:
+    gui::KeyInputMappedTranslation translator;
 };
 
 } /* namespace gui */

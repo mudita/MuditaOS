@@ -1,7 +1,8 @@
 {
 	"common_kbd_lower": "lang_eng_lower",
 	"common_kbd_upper": "lang_eng_upper",
-	"common_kbd_numeric": "numeric",
+    "common_kbd_numeric": "numeric",
+    "common_kbd_phone": "phone",
 	
     "common_open": "OPEN",
     "common_call": "CALL",

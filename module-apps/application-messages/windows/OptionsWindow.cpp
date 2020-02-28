@@ -1,7 +1,7 @@
 #include "OptionsWindow.hpp"
-#include "UiCommon.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
+#include <Options.hpp>
 
 /// below just for apps names...
 
@@ -11,8 +11,8 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
     ContactRecord contact = record ? DBServiceAPI::ContactGetByID(app, record->contactID)->front() : ContactRecord();
 
     return {
-        callOption(app, contact, true),
-        contactDetails(app, contact),
+        app::callOption(app, app::CallOperation::ExecuteCall, contact),
+        app::contactOption(app, app::ContactOperation::Details, contact),
         {utils::localize.get("sms_delete_conversation"),
          [=](gui::Item &item) {
              LOG_INFO("Removing sms thread!");

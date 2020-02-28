@@ -9,6 +9,7 @@
 #include "PhonebookListView.hpp"
 #include "../data/PhonebookItemData.hpp"
 #include "PhonebookItem.hpp"
+#include "UiCommonActions.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "log/log.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
@@ -88,9 +89,7 @@ bool PhonebookListView::onInput(const InputEvent &inputEvent)
         if (item)
         {
             // LOG_INFO("calling index: %d %s", item->getID(), item->getValue().c_str());
-            app::ApplicationCall::messageSwitchToCall(application, item->getContact()->numbers[0].numberE164.c_str(), true);
-
-            return true;
+            return app::call(application, app::CallOperation::ExecuteCall, item->getContact()->numbers[0].numberE164);
         }
         else
         {

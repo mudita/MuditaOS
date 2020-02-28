@@ -20,9 +20,10 @@
 #include "service-db/messages/DBMessage.hpp"
 #include "i18/i18.hpp"
 
+#include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
+#include "UiCommonActions.hpp"
 #include <Style.hpp>
 
 using namespace style;
@@ -92,7 +93,7 @@ bool CallLogMainWindow::onInput( const InputEvent& inputEvent ) {
                 assert(0);
                 return false;
             }
-            return app::ApplicationCall::messageSwitchToCall(application, it->getCall().number);
+            return app::call(application, app::CallOperation::ExecuteCall, it->getCall().number);
         }
 	}
 
