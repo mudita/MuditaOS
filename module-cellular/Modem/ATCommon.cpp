@@ -9,12 +9,12 @@ using namespace at;
 
 const std::string Chanel::OK = "OK";
 const std::string Chanel::ERROR = "ERROR";
+const std::string Chanel::NO_CARRIER = "NO CARRIER";
+const std::string Chanel::BUSY = "BUSY";
+const std::string Chanel::NO_ANSWER = "NO ANSWER";
 // const std::string Chanel::CONNECT = "CONNECT";
 // const std::string Chanel::RING = "RING";
-// const std::string Chanel::NO_CARRIER = "NO CARRIER";
 // const std::string Chanel::NO_DIALTONE = "NO DIALTONE";
-// const std::string Chanel::BUSY = "BUSY";
-// const std::string Chanel::NO_ANSVER = "NO ANSWER";
 
 Result::Code Chanel::at_check(const std::vector<std::string> &arr)
 {

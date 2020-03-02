@@ -121,7 +121,7 @@ public:
             -53 //30
     };
 
-    CellularNotificationMessage::Type identifyNotification(std::vector<uint8_t> data, std::string &message);
+    CellularNotificationMessage::Type identifyNotification(const std::vector<uint8_t> &data, std::string &message);
 
     std::vector<std::string> messageParts;
 
