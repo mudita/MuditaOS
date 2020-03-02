@@ -22,6 +22,7 @@
 | Robert Borzęcki | Review comments           | Draft  | 04.10.2018        |
 | Robert Borzęcki | templates and settings tables          | Draft  | 10.01.2019        |
 | Robert Borzęcki | alarms         | Draft  | 05.03.2019        |
+| Alek Rudnik | calllog | Draft | 28.02.2020 |
 
 ## Scope <a name="scope"></a>
 This document is defines how SMS and contacts databases are constructed.
@@ -272,6 +273,42 @@ Table describes possible states of **status** field for alarms.
 |ARMED| 0x01| Timer is activated. At specified time in the day timer will play selelcted music. | 
 |DORMENT| 0x02| Timer is deactivated. No event will happen at the time specified in timer. |
 
+#### 14. Table with information about calls
+Name: calllog.
+
+| Field | Scope | Type | Desciption |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
+| number | (m) | TEXT | date of note's last modification. |
+| presentation | (m) | INTEGER | Up to 60 first characters from the note. |
+| date | (m) | INTEGER | Call timestamp |
+| duration | (m) | INTEGER | Call duration |
+| type | (m) | INTEGER | Call type  |
+| name | (m) | TEXT | Name associated with the phone number |
+| contactId | (m) | TEXT | Unique ID of the record from the **contacts** table from **contacts** database. Stored as TEXT to keep more than one contactIDs in case of multiuser teleconferences |
+| isRead | (m) | INTEGER | Boolean value that defines whether message was seen by the user |
+
+**presentation** field - Taken from https://developer.android.com/reference/android/provider/CallLog.Calls.html
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| PR_UNKNOWN | 0x00 | Presentation unknown |
+| PR_ALLOWED | 0x01 | Number is allowed to display for caller id. |
+| PR_PAYPHONE | 0x02 | Number is a pay phone. |
+| PR_RESTRICTED | 0x03 | Number is blocked by user. |
+
+**type** field - Taken from https://developer.android.com/reference/android/provider/CallLog.Calls.html
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| CT_NONE | 0x00 | Call type not set |
+| CT_INCOMING | 0x01 | Call log type for incoming calls. |
+| CT_OUTGOING | 0x02 | Call log type for outgoing calls.|
+| CT_MISSED | 0x03 | Call log type for missed calls. |
+| CT_VOICEMAIL | 0x04 | Call log type for voicemails. |
+| CT_REJECTED | 0x05 | Call log type for calls rejected by direct user action. |
+| CT_BLOCKED | 0x06 | Call log type for calls blocked automatically. |
+| CT_ANSW_EXT | 0x07 | Call log type for a call which was answered on another device. Used in situations where a call rings on multiple devices simultaneously and it ended up being answered on a device other than the current one. |
 
 ## Database Triggers <a name="triggers"></a>
 
