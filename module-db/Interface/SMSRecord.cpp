@@ -93,13 +93,13 @@ bool SMSRecordInterface::Add(const SMSRecord &rec) {
 
     return true;
 }
-uint32_t SMSRecordInterface::GetCount(SMSState state)
+uint32_t SMSRecordInterface::GetCount(EntryState state)
 {
     return smsDB->sms.GetCount(state);
 }
 
 uint32_t SMSRecordInterface::GetCount() {
-    return GetCount(SMSState::ALL);
+    return GetCount(EntryState::ALL);
 }
 
 uint32_t SMSRecordInterface::GetLastID(void)

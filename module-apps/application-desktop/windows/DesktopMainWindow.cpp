@@ -385,14 +385,14 @@ auto DesktopMainWindow::fillNotifications() -> bool
     }
 
     // 2. actually fill it in
-    auto unhandled_calls = DBServiceAPI::CalllogGetCount(application, CallState::MISSED);
+    auto unhandled_calls = DBServiceAPI::CalllogGetCount(application, EntryState::UNREAD);
     if (unhandled_calls)
     {
         add_notification(notifications, "phone", utils::localize.get("app_desktop_missed_calls"), std::to_string(unhandled_calls), [this]() {
             return sapm::ApplicationManager::messageSwitchApplication(application, app::CallLogAppStr, gui::name::window::main_window, nullptr);
         });
     }
-    auto unread_sms = DBServiceAPI::SMSGetCount(this->application, SMSState::UNREAD);
+    auto unread_sms = DBServiceAPI::SMSGetCount(this->application, EntryState::UNREAD);
     if (unread_sms)
     {
         add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(unread_sms), [this]() {

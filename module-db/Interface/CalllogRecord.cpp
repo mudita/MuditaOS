@@ -166,12 +166,12 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
     return CalllogRecord{call, contactRec.numbers[0].numberE164, contactRec.getFormattedName()};
 }
 
-uint32_t CalllogRecordInterface::GetCount(CallState state)
+uint32_t CalllogRecordInterface::GetCount(EntryState state)
 {
     return calllogDB->calls.GetCount(state);
 }
 
 uint32_t CalllogRecordInterface::GetCount()
 {
-    return GetCount(CallState::ALL);
+    return GetCount(EntryState::ALL);
 }

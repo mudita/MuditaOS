@@ -52,16 +52,17 @@ public:
   CalllogRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
-    uint32_t GetCount(CallState state);
+    uint32_t GetCount(EntryState state);
 
-  std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
+    std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-  std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit, CalllogRecordField field, const char *str) override final;
+    std::unique_ptr<std::vector<CalllogRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit, CalllogRecordField field,
+                                                                      const char *str) override final;
 
-  uint32_t GetLastID();
+    uint32_t GetLastID();
 
-private:
-  CalllogDB *calllogDB = nullptr;
-  ContactsDB *contactsDB = nullptr;
-  ContactRecord GetContactRecordByID(const UTF8 &contactId);
+  private:
+    CalllogDB *calllogDB = nullptr;
+    ContactsDB *contactsDB = nullptr;
+    ContactRecord GetContactRecordByID(const UTF8 &contactId);
 };

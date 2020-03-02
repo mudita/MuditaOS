@@ -13,24 +13,24 @@
 #include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
 
-enum class CallType {
-    CT_INCOMING  = 0x0001,
-    CT_OUTGOING  = 0x0002,
-    CT_MISSED    = 0x0004,
-    CT_VOICEMAIL = 0x0008,
-    CT_REJECTED  = 0x0010,
-    CT_BLOCKED   = 0x0020,
-    CT_ANSW_EXT  = 0x0040,
-    CT_NONE      = 0x0080,
-    CT_ALL       = 0x00FF
+enum class CallType
+{
+    CT_NONE = 0x00,
+    CT_INCOMING = 0x01,
+    CT_OUTGOING = 0x02,
+    CT_MISSED = 0x03,
+    CT_VOICEMAIL = 0x04,
+    CT_REJECTED = 0x05,
+    CT_BLOCKED = 0x06,
+    CT_ANSW_EXT = 0x07,
 };
 
-enum class PresentationType {
+enum class PresentationType
+{
+    PR_UNKNOWN = 0x00,
     PR_ALLOWED = 0x01,
     PR_PAYPHONE = 0x02,
-    PR_RESTRICTED = 0x04,
-    PR_UNKNOWN = 0x08,
-    PR_ALL = 0xFF
+    PR_RESTRICTED = 0x03,
 };
 
 struct CalllogTableRow{
@@ -42,7 +42,7 @@ struct CalllogTableRow{
     CallType    type;
     UTF8        name;
 	UTF8        contactId;
-    CallState answered = CallState::MISSED;
+    bool isRead = false;
 };
 
  enum class CalllogTableFields{
@@ -68,7 +68,7 @@ public:
 	std::vector<CalllogTableRow> GetLimitOffsetByField(uint32_t offset,uint32_t limit,CalllogTableFields field,const char* str) override final;
 
 	uint32_t GetCount() override final;
-    uint32_t GetCount(CallState state);
+    uint32_t GetCount(EntryState state);
     uint32_t GetCountByFieldID(const char* field,uint32_t id) override final;
 
 private:
