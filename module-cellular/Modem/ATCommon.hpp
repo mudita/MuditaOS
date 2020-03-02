@@ -20,13 +20,13 @@ namespace at
       public:
         static const std::string OK;
         static const std::string ERROR;
+        static const std::string NO_CARRIER;
+        static const std::string BUSY;
+        static const std::string NO_ANSWER;
         // /// other codes unused right now: Please see quectel QuectelEC2526EC21ATCommandsManualV1.3 page 21
         // const std::string Chanel::CONNECT = "CONNECT";
         // const std::string Chanel::RING = "RING";
-        // const std::string Chanel::NO_CARRIER = "NO CARRIER";
         // const std::string Chanel::NO_DIALTONE = "NO DIALTONE";
-        // const std::string Chanel::BUSY = "BUSY";
-        // const std::string Chanel::NO_ANSVER = "NO ANSWER";
 
         /// waits till ok or timeout
         virtual auto cmd(const std::string cmd, uint32_t timeout = at::default_timeout, size_t rxCount = 0) -> Result final;
