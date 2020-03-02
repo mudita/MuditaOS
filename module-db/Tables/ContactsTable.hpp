@@ -7,9 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-#ifndef PUREPHONE_CONTACTSTABLE_HPP
-#define PUREPHONE_CONTACTSTABLE_HPP
+#pragma once
 
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
@@ -83,5 +81,3 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
                                    "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
                                    ");";
 };
-
-#endif // PUREPHONE_CONTACTSTABLE_HPP

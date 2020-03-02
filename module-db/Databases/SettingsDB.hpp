@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_SETTINGSDB_HPP
-#define PUREPHONE_SETTINGSDB_HPP
+#pragma once
 
 #include "Database/Database.hpp"
 #include "../Tables/SettingsTable.hpp"
@@ -29,5 +26,3 @@ private:
     static const char *dbName;
 };
 
-
-#endif //PUREPHONE_SETTINGSDB_HPP

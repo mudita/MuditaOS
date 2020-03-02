@@ -9,26 +9,8 @@
  */
 
 #include "ContactRecord.hpp"
-
-// TODO copied from Profile -> move to some utils.hpp
-#include <sstream>
-template <typename Out> void split(const std::string &s, char delim, Out result)
-{
-    std::stringstream ss(s);
-    std::string item;
-    while (std::getline(ss, item, delim))
-    {
-        *(result++) = item;
-    }
-}
-
-static std::vector<std::string> split(const std::string &s, char delim)
-{
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-/// <- copy end
+#include <Utils.hpp>
+#include <log/log.hpp>
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
 {
@@ -42,7 +24,6 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
 
     bool ret = contactDB->contacts.Add(ContactsTableRow{
-
     													.type = rec.contactType,
                                                         .isOnWhitelist = rec.isOnBlacklist,
                                                         .isOnBlacklist = rec.isOnBlacklist,
@@ -56,6 +37,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     }
 
     uint32_t contactID = contactDB->GetLastInsertRowID();
+    LOG_DEBUG("New contact with ID %u created", contactID);
 
     ret = contactDB->name.Add(
         ContactsNameTableRow{.contactID = contactID, .namePrimary = rec.primaryName, .nameAlternative = rec.alternativeName, .favourite = rec.isOnFavourites});
@@ -641,9 +623,36 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
     return records;
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(UTF8 number)
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetContactByNumber(const UTF8 &number)
 {
     return GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, number.c_str());
+}
+
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number, CreateTempContact createTempContact)
+{
+    auto ret = GetContactByNumber(number);
+    if (ret->size() > 0)
+    {
+        return ret;
+    }
+
+    // Contact not found, create temporary one
+    if (createTempContact == CreateTempContact::True)
+    {
+        LOG_INFO("Cannot find contact for number %s, creating temporary one", number.c_str());
+        if (!Add(ContactRecord{
+                .contactType = ContactType::TEMPORARY,
+                .numbers = std::vector<ContactRecord::Number>{ContactRecord::Number(number.c_str(), number.c_str())},
+            }))
+        {
+            LOG_ERROR("Cannot add contact record");
+            return ret;
+        }
+
+        ret->push_back(GetByID(contactDB->GetLastInsertRowID()));
+    }
+
+    return ret;
 }
 
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial(uint8_t speedDial)
@@ -654,7 +663,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDi
 std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)
 {
     std::vector<ContactRecord::Number> nrs;
-    for (auto nr_str : split(numbers_id, ' '))
+    for (auto nr_str : utils::split(numbers_id, ' '))
     {
         auto nr = contactDB->number.GetByID(std::stol(nr_str));
         if (nr.ID == 0)

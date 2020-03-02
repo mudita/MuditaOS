@@ -163,17 +163,17 @@ SMSTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, SMSTableFields 
 
     return ret;
 }
-uint32_t SMSTable::GetCount(SMSState state)
+uint32_t SMSTable::GetCount(EntryState state)
 {
     std::string query = "SELECT COUNT(*) FROM sms ";
     switch (state)
     {
-    case SMSState::ALL:
+    case EntryState::ALL:
         break;
-    case SMSState::READ:
+    case EntryState::READ:
         query += "WHERE sms.read=1";
         break;
-    case SMSState::UNREAD:
+    case EntryState::UNREAD:
         query += "WHERE sms.read=0";
         break;
     };
@@ -190,7 +190,7 @@ uint32_t SMSTable::GetCount(SMSState state)
 
 uint32_t SMSTable::GetCount()
 {
-    return GetCount(SMSState::ALL);
+    return GetCount(EntryState::ALL);
 }
 
 uint32_t SMSTable::GetCountByFieldID(const char *field, uint32_t id) {

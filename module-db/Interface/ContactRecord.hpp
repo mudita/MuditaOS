@@ -8,8 +8,7 @@
  * @details
  */
 
-#ifndef PUREPHONE_CONTACTRECORD_HPP
-#define PUREPHONE_CONTACTRECORD_HPP
+#pragma once
 
 #include "../Common/Common.hpp"
 #include "../Databases/ContactsDB.hpp"
@@ -21,7 +20,7 @@
 struct ContactRecord
 {
 
-    uint32_t dbID;
+    uint32_t dbID = DB_ID_NONE;
     UTF8 primaryName;
     UTF8 alternativeName;
     ContactType contactType;
@@ -52,6 +51,16 @@ struct ContactRecord
     bool isOnBlacklist;
     bool isOnFavourites;
     uint8_t speeddial;
+
+    inline UTF8 getFormattedName()
+    {
+        if (contactType == ContactType::TEMPORARY)
+        {
+            return numbers[0].numberE164;
+        }
+
+        return primaryName + " " + alternativeName;
+    }
 };
 
 enum class ContactRecordField
@@ -90,17 +99,24 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(UTF8 number);
+    enum class CreateTempContact : bool
+    {
+        False,
+        True
+    };
+
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
 
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
 
     std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName, const char *alternativeName,
                                                        const char *number);
+
   private:
     ContactsDB *contactDB;
-
     /// get multiple numbers by split numbers_id
     std::vector<ContactRecord::Number> getNumbers(const std::string &numbers_id);
+
+    std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
 };
 
-#endif // PUREPHONE_CONTACTRECORD_HPP

@@ -8,8 +8,7 @@
  * @details
  */
 
-#ifndef PUREPHONE_DATABASE_HPP
-#define PUREPHONE_DATABASE_HPP
+#pragma once
 
 #include "sqlite3.h"
 
@@ -57,5 +56,3 @@ class Database
     const char *dbName;
     bool isInitialized;
 };
-
-#endif // PUREPHONE_DATABASE_HPP

@@ -8,9 +8,7 @@
  * @details
  */
 
-
-#ifndef PUREPHONE_THREADSTABLE_HPP
-#define PUREPHONE_THREADSTABLE_HPP
+#pragma once
 
 #include "Table.hpp"
 #include "Database/Database.hpp"
@@ -76,5 +74,3 @@ public:
 
 };
 
-
-#endif //PUREPHONE_THREADSTABLE_HPP

@@ -8,8 +8,7 @@
  * @details
  */
 
-#ifndef PUREPHONE_FIELD_HPP
-#define PUREPHONE_FIELD_HPP
+#pragma once
 
 #include <stdint.h>
 #include <string>
@@ -54,5 +53,3 @@ class Field
   private:
     std::string mValue;
 };
-
-#endif // PUREPHONE_FIELD_HPP
