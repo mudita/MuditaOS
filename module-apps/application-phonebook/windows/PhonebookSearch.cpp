@@ -144,7 +144,7 @@ bool PhonebookSearch::onInput(const InputEvent &inputEvent)
             {
                 number = contents;
             }
-            else if (contents.find(' '))
+            else if (contents.find(' ') != std::string::npos)
             {
                 std::vector<std::string> result = utils::split(contents, ' ');
                 primaryName = result[0];
