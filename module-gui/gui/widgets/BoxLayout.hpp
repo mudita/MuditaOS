@@ -51,6 +51,7 @@ namespace gui {
       public:
         BoxLayout();
         BoxLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
+        bool onInput(const InputEvent &inputEvent) override;
         virtual bool onFocus(bool state) override;
         virtual ~BoxLayout() = default;
 
@@ -64,7 +65,7 @@ namespace gui {
         /// axis sets direction to define space left in container
         template <Axis axis> void addWidget(Item *item);
         /// set navigation from last to fist element in box
-        void setNavigation();
+        virtual void setNavigation();
         void setVisible(bool value) override;
         /// set visible but from previous scope... (page, element etc)
         void setVisible(bool value, bool previous);

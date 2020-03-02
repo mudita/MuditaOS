@@ -10,10 +10,12 @@ using namespace gui;
 UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, app::char_select)
 {
     AppWindow::buildInterface();
-    box = new GridLayout(0, title->offset_h(), style::window_width, bottomBar->offset_h() - title->offset_h(), {90, 90});
+    box = new GridLayout(style::window::default_left_margin, title->offset_h(),
+                         style::window_width - style::window::default_left_margin - style::window::default_right_margin,
+                         bottomBar->offset_h() - title->offset_h(), {80, 80});
     for (auto schar : gui::special_chars)
     {
-        auto el = new gui::Label(box, 0, 0, 80, 80);
+        auto el = new gui::Label(box, 0, 0, 60, 60);
         style::window::decorate(el);
         el->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
         el->setText(std::string(1, schar));
@@ -27,14 +29,8 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, app::char
             return true;
         };
     }
-    box->setVisible(true);
-    box->setNavigation(nullptr, nullptr);
-    /// TODO do not resize on each addWidget .. just once :(
-    ///      shouldn't be needed here
-    ///      add widget -> put widget in it's position
-    box->resizeItems();
     addWidget(box);
-    setFocusItem(box->getNavigationItem());
+    setFocusItem(box);
 }
 
 void UiCharSelector::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -43,7 +39,7 @@ void UiCharSelector::onBeforeShow(ShowMode mode, SwitchData *data)
     if (ret)
     {
         LOG_INFO("handle for: %s", ret->requester.c_str());
-        setFocusItem(box->getNavigationItem());
+        setFocusItem(box);
         application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         dynamic_cast<app::AppSpecialInput *>(application)->requester = ret->requester;
     }
