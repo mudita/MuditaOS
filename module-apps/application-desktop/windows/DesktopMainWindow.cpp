@@ -23,13 +23,12 @@
 #include "application-call/data/CallSwitchData.hpp"
 #include <UiCommonActions.hpp>
 
+#include "Common.hpp"
 #include "i18/i18.hpp"
 #include <Span.hpp>
 #include <Style.hpp>
-#include <time/time_conversion.hpp>
-
-#include "service-db/api/DBServiceAPI.hpp"
 #include <cassert>
+#include <time/time_conversion.hpp>
 
 namespace style
 {
@@ -254,11 +253,7 @@ std::list<DrawCommand*> DesktopMainWindow::buildDrawList() {
 auto add_box_icon(gui::BoxLayout *layout, UTF8 icon)
 {
     auto thumbnail = new gui::Image(icon);
-    auto center = (layout->h() - thumbnail->h()) / 2;
-    if (center > 0)
-    {
-        thumbnail->widgetArea.pos(Axis::Y) += center;
-    }
+    center(layout, thumbnail, Axis::Y);
     thumbnail->activeItem = false;
     layout->addWidget(thumbnail);
 }
@@ -342,17 +337,15 @@ auto DesktopMainWindow::fillNotifications() -> bool
     }
 
     // 2. actually fill it in
-    auto unhandled_calls = DBServiceAPI::CalllogGetCount(application, EntryState::UNREAD);
-    if (unhandled_calls)
+    if (app->notifications.notSeenCalls)
     {
-        add_notification(notifications, "phone", utils::localize.get("app_desktop_missed_calls"), std::to_string(unhandled_calls), [this]() {
+        add_notification(notifications, "phone", utils::localize.get("app_desktop_missed_calls"), std::to_string(app->notifications.notSeenCalls), [this]() {
             return sapm::ApplicationManager::messageSwitchApplication(application, app::CallLogAppStr, gui::name::window::main_window, nullptr);
         });
     }
-    auto unread_sms = DBServiceAPI::SMSGetCount(this->application, EntryState::UNREAD);
-    if (unread_sms)
+    if (app->notifications.notSeenCalls)
     {
-        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(unread_sms), [this]() {
+        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(app->notifications.notSeenCalls), [this]() {
             return sapm::ApplicationManager::messageSwitchApplication(application, app::name_messages, gui::name::window::main_window, nullptr);
         });
     }

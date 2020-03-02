@@ -14,6 +14,12 @@
 
 namespace app {
 
+    namespace name::window
+    {
+        inline const std::string desktop_menu = "MenuWindow";
+        inline const std::string desktop_lockscreen = gui::name::window::main_window;
+    }; // namespace name::window
+
 inline const std::string name_desktop = "ApplicationDesktop";
 
 class ApplicationDesktop : public Application {
@@ -24,7 +30,12 @@ protected:
 	uint32_t unreadMessages = 0;
 	uint32_t missedCalls = 0;
 public:
-	ApplicationDesktop( std::string name=name_desktop, std::string parent = "", bool startBackground =false );
+  struct Notifications
+  {
+      unsigned int notSeenSMS = 0;
+      unsigned int notSeenCalls = 0;
+  } notifications;
+    ApplicationDesktop( std::string name=name_desktop, std::string parent = "", bool startBackground =false );
 	virtual ~ApplicationDesktop();
 	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;

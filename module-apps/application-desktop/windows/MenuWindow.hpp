@@ -1,75 +1,50 @@
-/*
- * @file MenuWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 29 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_MENUWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_MENUWINDOW_HPP_
+#pragma once
 
 #include <vector>
 
 #include "AppWindow.hpp"
+#include "GridLayout.hpp"
 #include "widgets/BottomBar.hpp"
-#include "widgets/TopBar.hpp"
 #include "widgets/Label.hpp"
 #include "widgets/Rect.hpp"
+#include "widgets/TopBar.hpp"
 
 #include "utf8/UTF8.hpp"
 
-namespace gui {
+namespace gui
+{
+    /// icon, description, name of application to run
+    struct Tile : public Rect
+    {
+        Tile(UTF8 icon, std::string title, std::function<bool(Item &)> activatedCallback, unsigned int notifications = 0);
+    };
 
-//name of icon, description, name of application to run
-struct TileDescription{
-	std::string iconName;
-	std::string i18Desctiption;
-	std::function<bool(Item&)> activatedCallback;
-};
+    class MenuPage : public gui::GridLayout
+    {
+      public:
+        UTF8 title;
+        MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles);
+    };
 
-class MenuPage : public gui::Rect {
-public:
-	enum class PageID {
-		MainPage= 1,
-		ToolsPage
-	};
-	PageID id;
-	uint32_t pageSize = 9;
-	gui::Label* title = nullptr;
-	std::vector<gui::Item*> tiles;
+    class MenuWindow : public AppWindow
+    {
+      protected:
+        // page that is currently selected by the user.
+        MenuPage *mainMenu = nullptr;
+        MenuPage *toolsMenu = nullptr;
 
-	MenuPage( gui::Item* parent, int32_t x, int32_t y, uint32_t w, uint32_t h,
-	const std::vector<TileDescription>& tilesDescription, MenuPage::PageID id );
-	virtual ~MenuPage();
+      public:
+        MenuWindow(app::Application *app);
+        virtual ~MenuWindow();
 
-	const PageID& getID(){ return id; };
-};
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(const InputEvent &inputEvent) override;
 
-/*
- *
- */
-class MenuWindow: public AppWindow {
-protected:
-	//page that is currently selected by the user.
-	uint32_t currentPage =  0;
-	std::vector<gui::MenuPage*> pages;
-    std::vector<UTF8> page_name;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
 
-public:
-	MenuWindow( app::Application* app );
-	virtual ~MenuWindow();
-
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
-	bool onInput( const InputEvent& inputEvent ) override;
-
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-
-	void switchPage( uint32_t index );
-};
+        void switchMenu(MenuPage *page);
+    };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_MENUWINDOW_HPP_ */
