@@ -84,13 +84,6 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
             callWindow->setState(gui::CallWindow::State::CALL_ENDED);
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
-        else if( msg->type == CellularNotificationMessage::Type::CallBusy) {
-			callEndTime = callDuration + 3;
-		    LOG_INFO("---------------------------------CallBusy");
-		    AudioServiceAPI::Stop(this);
-		    callWindow->setState( gui::CallWindow::State::CALL_ENDED );
-		    refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
-		}
 		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
 			callDuration = 0;
 
