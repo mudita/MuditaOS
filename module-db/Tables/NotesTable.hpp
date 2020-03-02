@@ -6,8 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#ifndef MODULE_DB_TABLES_NOTESTABLE_HPP_
-#define MODULE_DB_TABLES_NOTESTABLE_HPP_
+#pragma once
 
 #include "Table.hpp"
 #include "Database/Database.hpp"
@@ -57,4 +56,3 @@ private:
     		"path TEXT DEFAULT '')";
 };
 
-#endif /* MODULE_DB_TABLES_NOTESTABLE_HPP_ */

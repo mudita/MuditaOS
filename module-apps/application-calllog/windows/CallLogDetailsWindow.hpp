@@ -47,7 +47,7 @@ class CallLogDetailsWindow: public AppWindow {
 	Label* dateDay = nullptr;
 	Label* dateDate = nullptr;
 
-	CalllogRecord record = {0}; // TODO: consider changing to pointer
+    CalllogRecord record;
 
     Label *decorateLabel(Label *);
     Label *decorateData(Label *);

@@ -63,9 +63,8 @@ namespace CellularCall
     {
         CalllogRecord call;
         bool isActiveCall = false;
-        std::function<uint32_t(const CalllogRecord &rec)> startCallAction;
+        std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
-        // uint32_t timerId = 0;
         time_t startActiveTime = 0;
 
         void setType(const CallType type)
@@ -75,7 +74,7 @@ namespace CellularCall
 
         void clear()
         {
-            call.id = 0; // 0 - Invalid
+            call.ID = 0; // 0 - Invalid
             call.number = "";
             call.presentation = PresentationType::PR_ALLOWED;
             call.date = 0;
@@ -101,7 +100,7 @@ namespace CellularCall
 
         ~CellularCall() = default;
 
-        void setStartCallAction(const std::function<uint32_t(const CalllogRecord &rec)> callAction)
+        void setStartCallAction(const std::function<CalllogRecord(const CalllogRecord &rec)> callAction)
         {
             startCallAction = callAction;
         }
@@ -119,7 +118,7 @@ namespace CellularCall
 
         bool isValid() const
         {
-            return call.id != 0;
+            return call.ID != 0;
         }
     };
 } // namespace CellularCall

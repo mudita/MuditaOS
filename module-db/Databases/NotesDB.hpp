@@ -6,8 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#ifndef MODULE_DB_DATABASES_NOTESDB_HPP_
-#define MODULE_DB_DATABASES_NOTESDB_HPP_
+#pragma once
 
 #include "Database/Database.hpp"
 #include "../Tables/NotesTable.hpp"
@@ -26,4 +25,3 @@ private:
     static const char *dbName;
 };
 
-#endif /* MODULE_DB_DATABASES_NOTESDB_HPP_ */

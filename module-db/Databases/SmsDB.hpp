@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_SMSDB_HPP
-#define PUREPHONE_SMSDB_HPP
+#pragma once
 
 #include "Database/Database.hpp"
 #include "../Tables/SMSTable.hpp"
@@ -31,5 +28,3 @@ private:
     static const char *dbName;
 };
 
-
-#endif //PUREPHONE_SMSDB_HPP

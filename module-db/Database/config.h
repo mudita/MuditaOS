@@ -7,8 +7,7 @@
  * @details More detailed information related to this code.
  */
 
-#ifndef UTILS_SQLITE_CONFIG_H_
-#define UTILS_SQLITE_CONFIG_H_
+#pragma once
 
 #define SQLITE_OS_OTHER     1   //SQLITE has definitions for major OSes - UNIX, WIN etc. This define indicates that no known (at least to SQLITE) of is used
 #define SQLITE_TEMP_STORE   3   //Temporary files. The user must configure SQLite to use in-memory temp files when using this VFS
@@ -23,5 +22,3 @@
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Woverflow"
 
-
-#endif /* UTILS_SQLITE_CONFIG_H_ */

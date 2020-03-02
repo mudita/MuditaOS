@@ -30,8 +30,9 @@ protected:
 
 	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
 
-	CalllogRecord record = {0};
-public:
+    CalllogRecord record;
+
+  public:
 	CallLogOptionsWindow( app::Application* app );
 	virtual ~CallLogOptionsWindow();
 

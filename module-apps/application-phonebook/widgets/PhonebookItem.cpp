@@ -55,7 +55,7 @@ void PhonebookItem::setContact(std::shared_ptr<ContactRecord> contact)
 {
     this->contact = contact;
     /* alternativeName is used as Surname or Second name */
-    value->setText(contact->primaryName + " " + contact->alternativeName);
+    value->setText(contact->getFormattedName());
 }
 
 void PhonebookItem::setValue(UTF8 text)

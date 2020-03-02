@@ -8,9 +8,7 @@
  * @details
  */
 
-
-#ifndef PUREPHONE_TABLE_HPP
-#define PUREPHONE_TABLE_HPP
+#pragma once
 
 #include <stdint.h>
 #include <vector>
@@ -41,6 +39,3 @@ protected:
     Database* db;
 
 };
-
-
-#endif //PUREPHONE_TABLE_HPP

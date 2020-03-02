@@ -10,17 +10,19 @@
 5. [Design considerations](#considerations)
 6. [Database tables](#tables)
 7. [Database triggeers](#triggers)
-8. [References](#references)
+8. [SMtask service & DBUS communication](#smtask)
+9. [References](#references)
 
 ## History <a name="history"></a>
 
 | Authors           | Change description        | Status | Modification date |
 | ----------------- | ------------------------- | ------ | ----------------- |
 | Łukasz Skrzypczak | Initial version           | Draft  | 27.08.2018        |
-|Robert Borzęcki | Revision           | Draft  | 03.10.2018        |
-|Robert Borzęcki | Review comments           | Draft  | 04.10.2018        |
-|Robert Borzęcki | templates and settings tables          | Draft  | 10.01.2019        |
-|Robert Borzęcki | alarms         | Draft  | 05.03.2019        |
+| Robert Borzęcki | Revision           | Draft  | 03.10.2018        |
+| Robert Borzęcki | Review comments           | Draft  | 04.10.2018        |
+| Robert Borzęcki | templates and settings tables          | Draft  | 10.01.2019        |
+| Robert Borzęcki | alarms         | Draft  | 05.03.2019        |
+| Alek Rudnik | calllog | Draft | 28.02.2020 |
 
 ## Scope <a name="scope"></a>
 This document is defines how SMS and contacts databases are constructed.
@@ -176,7 +178,7 @@ Name: threads
 | snippet | (m) | TEXT | First row of the last message in given thread. Text is encoded in UTF8 and has up to 45 characters. |
 | last_dir | (m) | INTEGER | Defines direction of the last message in the thread. Values are same as in type field of the sms message. |
 
-####8. SMS threads counter table
+#### 8. SMS threads counter table
 Name: threads_count
 
 | Field | Scope | Type | Desciption |
@@ -184,7 +186,7 @@ Name: threads_count
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | count | (m) | INTEGER | Fields used to count sms threads. Every new thread increments value stored in count by 1. Removing any of the threads will cause decrementation of the count value by 1. Those operations are performed by database via triggers: **on_thread_insert ** and **on_thread_remove** |
 
-####9. SMS template table
+#### 9. SMS template table
 Name: sms_template
 
 | Field | Scope | Type | Desciption |
@@ -194,7 +196,7 @@ Name: sms_template
 | body | (m) | TEXT | Text field for storing body of the sms template |
 
 
-####10. Phone settings
+#### 10. Phone settings
 Name: settings
 
 | Field | Scope | Type | Desciption |
@@ -220,19 +222,19 @@ Table describes possible values of **pin_mode** field.
 
 | Name | Value |  Desciption |
 | -------- | ------- | -------------------|
-|ALWAYS | 0x01| User wil have to enter PIN after each restart. | 
+| ALWAYS | 0x01| User wil have to enter PIN after each restart. | 
 | DAYS | 0x02| Phone will ask for PIN after given number of days will elapse. |
 
 Table describes possible values of **language** field.
 
 | Name | Value |  Desciption |
 | -------- | ------- | -------------------|
-|ENGLISH | 0x01| English language. | 
+| ENGLISH | 0x01| English language. | 
 | POLISH| 0x02| Polish language. |
 | GERMAN| 0x04| German language. |
 | SPANISH| 0x08| Spanish language. |
 
-####11. Table with BT paired devices.
+#### 11. Table with BT paired devices.
 Name: bt_devices.
 
 | Field | Scope | Type | Desciption |
@@ -243,7 +245,7 @@ Name: bt_devices.
 | name | (m) | TEXT | Name of the device. |
 | link_key | (m) | TEXT | Pairing key. |
 
-####12. Table with information about notes.
+#### 12. Table with information about notes.
 Name: notes.
 
 | Field | Scope | Type | Desciption |
@@ -253,7 +255,7 @@ Name: notes.
 | snippet | (m) | TEXT | Up to 60 first characters from the note. |
 | path | (m) | TEXT | Path to the note's file in the file system. |
 
-####13. Table with information about alarms
+#### 13. Table with information about alarms
 Name: alarms
 
 | Field | Scope | Type | Desciption |
@@ -262,7 +264,7 @@ Name: alarms
 | time | (m) | INTEGER | Number of seconds from midnight that needs to elapse to genereate alarm event.  |
 | snooze | (m) | INTEGER | Number of seconds from alarm that needs to elapse to genereate alarm event after snooze.  |
 | status | (m) | INTEGER | State of the timer as defined in the table below. |
-|path | (m) | TEXT | Path to sound file that should be played when alarm event is generated. |
+| path | (m) | TEXT | Path to sound file that should be played when alarm event is generated. |
 
 Table describes possible states of **status** field for alarms.
 
@@ -271,8 +273,56 @@ Table describes possible states of **status** field for alarms.
 |ARMED| 0x01| Timer is activated. At specified time in the day timer will play selelcted music. | 
 |DORMENT| 0x02| Timer is deactivated. No event will happen at the time specified in timer. |
 
+#### 14. Table with information about calls
+Name: calllog.
 
-#### SMtask service & DBUS communication
+| Field | Scope | Type | Desciption |
+| -------- | ----------- | ------- | -------------------|
+| _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
+| number | (m) | TEXT | date of note's last modification. |
+| presentation | (m) | INTEGER | Up to 60 first characters from the note. |
+| date | (m) | INTEGER | Call timestamp |
+| duration | (m) | INTEGER | Call duration |
+| type | (m) | INTEGER | Call type  |
+| name | (m) | TEXT | Name associated with the phone number |
+| contactId | (m) | TEXT | Unique ID of the record from the **contacts** table from **contacts** database. Stored as TEXT to keep more than one contactIDs in case of multiuser teleconferences |
+| isRead | (m) | INTEGER | Boolean value that defines whether message was seen by the user |
+
+**presentation** field - Taken from https://developer.android.com/reference/android/provider/CallLog.Calls.html
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| PR_UNKNOWN | 0x00 | Presentation unknown |
+| PR_ALLOWED | 0x01 | Number is allowed to display for caller id. |
+| PR_PAYPHONE | 0x02 | Number is a pay phone. |
+| PR_RESTRICTED | 0x03 | Number is blocked by user. |
+
+**type** field - Taken from https://developer.android.com/reference/android/provider/CallLog.Calls.html
+
+| Name | Value | Description |
+| ---- | ----- | ----------- |
+| CT_NONE | 0x00 | Call type not set |
+| CT_INCOMING | 0x01 | Call log type for incoming calls. |
+| CT_OUTGOING | 0x02 | Call log type for outgoing calls.|
+| CT_MISSED | 0x03 | Call log type for missed calls. |
+| CT_VOICEMAIL | 0x04 | Call log type for voicemails. |
+| CT_REJECTED | 0x05 | Call log type for calls rejected by direct user action. |
+| CT_BLOCKED | 0x06 | Call log type for calls blocked automatically. |
+| CT_ANSW_EXT | 0x07 | Call log type for a call which was answered on another device. Used in situations where a call rings on multiple devices simultaneously and it ended up being answered on a device other than the current one. |
+
+## Database Triggers <a name="triggers"></a>
+
+This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is incremented by 1.
+```
+CREATE TRIGGER on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END;
+```
+
+This trigger is responsible for taking action when thread is removedf rom threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is decremented by 1.
+```
+CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
+```
+
+## SMtask service & DBUS communication <a name="smtask"></a>
 
 Database related task is created by ```Database_Service_Init()``` function. This function is responsible for all database initialisation & task creation.
 
@@ -319,18 +369,6 @@ All structures & data types are described in ```db.h``` file.
 
 ##### Database open & close
 If client wants to access SMS or Contacts database ```DB_OPEN_SMS_DB``` or ```    DB_OPEN_CONTACTS_DB``` command has to be sent first. When database transaction is finished, database has to be closed in order to flush it's internal buffers & commit all transactions. This can be done by sending ```DB_CLOSE_SMS_DB``` & ```DB_CLOSE_CONTACTS_DB``` commands to database service.
-
-## Database Triggers <a name="triggers"></a>
-
-This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is incremented by 1.
-```
-CREATE TRIGGER on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END;
-```
-
-This trigger is responsible for taking action when thread is removedf rom threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is decremented by 1.
-```
-CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
-```
 
 ## References <a name="references"></a>
 

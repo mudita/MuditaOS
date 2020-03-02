@@ -8,8 +8,7 @@
  * @details
  */
 
-#ifndef PUREPHONE_CONTACTSRINGTONESTABLE_HPP
-#define PUREPHONE_CONTACTSRINGTONESTABLE_HPP
+#pragma once
 
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
@@ -64,4 +63,3 @@ class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow, ContactRi
                                    ");";
 };
 
-#endif // PUREPHONE_CONTACTSRINGTONESTABLE_HPP

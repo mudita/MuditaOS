@@ -113,15 +113,15 @@ void ApplicationCallLog::destroyUserInterface() {
 
 bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
 {
-    LOG_DEBUG("Removing CalllogRecord: %d", record.id);
+    LOG_DEBUG("Removing CalllogRecord: %d", record.ID);
     auto dialog = dynamic_cast<gui::Dialog *>(windows[calllog::settings::CallDeleteWindowStr]);
     if (dialog != nullptr)
     {
         auto meta = dialog->meta;
         meta.action = [=]() -> bool {
-            if (DBServiceAPI::CalllogRemove(this, record.id) == false)
+            if (DBServiceAPI::CalllogRemove(this, record.ID) == false)
             {
-                LOG_ERROR("CalllogRemove id=%u failed", record.id);
+                LOG_ERROR("CalllogRemove id=%u failed", record.ID);
                 return false;
             }
             this->switchWindow(calllog::settings::MainWindowStr);

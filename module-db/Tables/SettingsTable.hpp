@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_SETTINGSTABLE_HPP
-#define PUREPHONE_SETTINGSTABLE_HPP
+#pragma once
 
 #include "Table.hpp"
 #include "Database/Database.hpp"
@@ -88,6 +85,3 @@ private:
     		"INSERT OR IGNORE INTO settings (_id, time_format_12, time_auto, brightness_auto, brightness_level, bigger_font, pin_mode, pin_days, pin_days_left, pin1_string,pin2_string, active_sim,network_operator,lock_pass_hash,lock_time, language) VALUES(1,0,1,1,0,0,1,0,0,'','',1,'',0,30000,1)";
 
 };
-
-
-#endif //PUREPHONE_SETTINGSTABLE_HPP
