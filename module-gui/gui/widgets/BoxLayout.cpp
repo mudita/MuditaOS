@@ -18,23 +18,28 @@ namespace gui {
 
     BoxLayout::BoxLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h) : Rect(parent, x, y, w, h)
     {
-        inputCallback = [this](Item &item, const InputEvent &inputEvent) -> bool {
-            // handle input on kid
-            if (focusItem && focusItem->onInput(inputEvent))
-            {
-                return true;
-            }
-            else if (handleNavigation(inputEvent))
-            {
-                return true;
-            }
-            else if (borderCallback && borderCallback(inputEvent))
-            {
-                return true;
-            }
-            // let item logic rule it
-            return false;
-        };
+    }
+
+    bool BoxLayout::onInput(const InputEvent &inputEvent)
+    {
+        if (inputCallback && inputCallback(*this, inputEvent))
+        {
+            return true;
+        }
+        if (focusItem && focusItem->onInput(inputEvent))
+        {
+            return true;
+        }
+        if (handleNavigation(inputEvent))
+        {
+            return true;
+        }
+        if (borderCallback && borderCallback(inputEvent))
+        {
+            return true;
+        }
+        // let item logic rule it
+        return false;
     }
 
     bool BoxLayout::onFocus(bool state)

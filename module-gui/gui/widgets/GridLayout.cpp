@@ -8,7 +8,7 @@ GridLayout::GridLayout(Item *parent, const uint32_t &x, const uint32_t &y, const
     : BoxLayout(parent, x, y, w, h), grid(grid)
 {
     setPenWidth(style::window::default_border_no_focus_w);
-    setPenFocusWidth(style::window::default_border_focucs_w);
+    setPenFocusWidth(style::window::default_border_no_focus_w);
 }
 
 void GridLayout::resizeItems()
@@ -19,8 +19,8 @@ void GridLayout::resizeItems()
         LOG_ERROR("Grid == 0 - abort");
         return;
     }
-    uint32_t el_in_x = widgetArea.w / grid.x;
-    uint32_t el_in_y = widgetArea.h / grid.y;
+    uint32_t el_in_x = area().w / grid.x;
+    uint32_t el_in_y = area().h / grid.y;
     uint32_t strech_x = 0;
     uint32_t strech_y = 0;
     uint32_t max_elements = el_in_x * el_in_y;
@@ -28,28 +28,28 @@ void GridLayout::resizeItems()
     if (children.size() > max_elements)
     {
         LOG_ERROR("More children than possible to show");
+        return;
     }
-    if (strech)
-    {
-        strech_x = (widgetArea.w - grid.x * el_in_x) / el_in_x;
-        strech_y = (widgetArea.h - grid.y * el_in_y) / el_in_y;
-    }
+    if (el_in_x > 2)
+        strech_x = (area().w - grid.x * el_in_x) / (el_in_x - 1);
+    if (el_in_y > 2)
+        strech_y = (area().h - grid.y * el_in_y) / (el_in_y - 1);
 
-    int i = 0;
     int row = 0;
     int col = 0;
-    for (auto it = children.begin(); it != children.end() && i <= max_elements; ++it, ++i)
+    for (auto it : children)
     {
         // check if element will fit in
-        if ((*it)->widgetArea.w > grid.x || (*it)->widgetArea.h > grid.y)
+        if (it->area().w > grid.x || it->area().h > grid.y)
         {
-            LOG_ERROR("Element %d too big", i);
+            continue;
         }
         // set position
-        (*it)->setPosition(col * grid.x + strech_x, row * grid.y + strech_y);
+        it->area().pos(Axis::X) = col * (grid.x + strech_x) + (grid.x - it->area().w) / 2;
+        it->area().pos(Axis::Y) = row * (grid.y + strech_y) + (grid.y - it->area().h) / 2;
         // shift row/col
         ++col;
-        if (col == el_in_y)
+        if (col == el_in_x)
         {
             col = 0;
             ++row;
@@ -58,7 +58,7 @@ void GridLayout::resizeItems()
 }
 
 // TODO commomize - move loop to lambda
-void GridLayout::setNavigation(Item *previous, Item *next)
+void GridLayout::setNavigation()
 {
     uint32_t el_in_x = widgetArea.w / grid.x;
     uint32_t el_in_y = widgetArea.h / grid.y;
@@ -78,7 +78,6 @@ void GridLayout::setNavigation(Item *previous, Item *next)
         }
         if (col + 1 % el_in_x != 0 && i + 1 < children.size())
         {
-            LOG_INFO("Set next navigation for item %d", i);
             (*it)->setNavigationItem(NavigationDirection::RIGHT, *std::next(it));
         }
         if (row != 0)
@@ -91,23 +90,10 @@ void GridLayout::setNavigation(Item *previous, Item *next)
         }
 
         ++col;
-        if (col == el_in_y)
+        if (col == el_in_x)
         {
             col = 0;
             ++row;
         }
     }
-    // TODO add next item after GridLayout element and previous item after GridLayout element
-    // children.front()->setNavigationItem(NavigationDirection::UP | NavigationDirection::LEFT, previous);
-    // auto last_element = (*std::next(children.begin(), max_elements < children.size() ? max_elements - 1 : children.size()));
-    // last_element->setNavigationItem(NavigationDirection::DOWN | NavigationDirection::RIGHT, next);
-}
-
-bool GridLayout::onFocus(bool state)
-{
-    if (children.size())
-    {
-        children.front()->setFocus(state);
-    }
-    return true;
 }

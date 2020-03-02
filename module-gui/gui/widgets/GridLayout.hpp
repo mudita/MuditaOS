@@ -24,10 +24,10 @@ namespace gui
         GridLayout() : GridLayout(0, 0, 0, 0, {0, 0})
         {
         }
-        virtual ~GridLayout() = default;
-        // shall strech elements on resize?
-        bool strech = true;
-        virtual void resizeItems() override;
+        ~GridLayout() override = default;
+        /// when reached top -> start from bottom. When reached left, start from right.
+        bool navigationRotate = true;
+        void resizeItems() override;
 
         // virtual methods from Item - use from parent
         //    void setPosition(const short &x, const short &y) override;
@@ -35,14 +35,7 @@ namespace gui
         //    bool addWidget(gui::Item *item) override;
         //    bool removeWidget(Item *item) override;
         //    std::list<DrawCommand *> buildDrawList() override;
-        /// set internal navigation and previous/next item to show when reached the end
-        void setNavigation(Item *previous, Item *next);
-        Item *getNavigationItem()
-        {
-            return children.size() ? *children.begin() : nullptr;
-        }
-
-        virtual bool onFocus(bool state) override;
+        void setNavigation() override;
     };
 
 }; // namespace gui
