@@ -12,17 +12,20 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
+#include "service-db/messages/DBNotificationMessage.hpp"
 #include "windows/DesktopMainWindow.hpp"
-#include "windows/PinLockWindow.hpp"
 #include "windows/MenuWindow.hpp"
+#include "windows/PinLockWindow.hpp"
 #include "windows/PowerOffWindow.hpp"
 
 #include "ApplicationDesktop.hpp"
+#include "service-db/api/DBServiceAPI.hpp"
 
 namespace app {
 
     ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground) : Application(name, parent)
     {
+        busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
 
 ApplicationDesktop::~ApplicationDesktop() {
@@ -42,7 +45,24 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
 		return retMsg;
 	}
 
-	bool handled = true;
+    if (msgl->messageType == MessageType::DBServiceNotification)
+    {
+        auto *msg = dynamic_cast<DBNotificationMessage *>(msgl);
+        LOG_DEBUG("Received multicast");
+        if ((msg != nullptr) && ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added)))
+        {
+            if (this->getCurrentWindow() == this->windows[app::name::window::desktop_menu] ||
+                getCurrentWindow() == this->windows[app::name::window::desktop_lockscreen])
+            {
+                notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, CallState::MISSED);
+                notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, SMSState::UNREAD);
+                this->getCurrentWindow()->rebuild();
+            }
+            return std::make_shared<sys::ResponseMessage>();
+        }
+    }
+
+    bool handled = true;
 
 	if( handled )
 		return std::make_shared<sys::ResponseMessage>();
@@ -64,7 +84,10 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 
 	screenLocked = true;
 
-	createUserInterface();
+    notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, CallState::MISSED);
+    notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, SMSState::UNREAD);
+
+    createUserInterface();
 
     setActiveWindow(gui::name::window::main_window);
 
