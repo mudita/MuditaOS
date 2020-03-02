@@ -631,14 +631,13 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetContactBy
 std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number, CreateTempContact createTempContact)
 {
     auto ret = GetContactByNumber(number);
-
-    if (createTempContact == CreateTempContact::False)
+    if (ret->size() > 0)
     {
         return ret;
     }
 
-    // Contact not found contact, create one
-    if (ret->size() == 0)
+    // Contact not found, create temporary one
+    if (createTempContact == CreateTempContact::True)
     {
         LOG_INFO("Cannot find contact for number %s, creating temporary one", number.c_str());
         if (!Add(ContactRecord{
@@ -650,7 +649,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(
             return ret;
         }
 
-        ret = GetContactByNumber(number);
+        ret->push_back(GetByID(contactDB->GetLastInsertRowID()));
     }
 
     return ret;
