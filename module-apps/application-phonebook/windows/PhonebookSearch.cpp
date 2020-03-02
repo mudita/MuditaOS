@@ -61,7 +61,7 @@ void PhonebookSearch::buildInterface()
     informationLabel->setTextType(Text::TextType::MULTI_LINE);
     informationLabel->setEditMode(Text::EditMode::BROWSE);
     informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    // informationLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_BOTTOM));
+    informationLabel->setAlignment(Alignment::ALIGN_HORIZONTAL_CENTER);
     informationLabel->setFont(style::window::font::small);
     informationLabel->setTextColor(style::color::lightgrey);
 
