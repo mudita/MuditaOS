@@ -58,12 +58,12 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
     callStateTimerId = CreateTimer(Ticks::MsToTicks(1000), true);
 
     ongoingCall.setStartCallAction([=](const CalllogRecord &rec) {
-        uint32_t callId = DBServiceAPI::CalllogAdd(this, rec);
-        if (callId == 0)
+        auto call = DBServiceAPI::CalllogAdd(this, rec);
+        if (call.ID == DB_ID_NONE)
         {
             LOG_ERROR("CalllogAdd failed");
         }
-        return callId;
+        return call;
     });
 
     ongoingCall.setEndCallAction([=](const CalllogRecord &rec) { return DBServiceAPI::CalllogUpdate(this, rec); });
@@ -81,7 +81,6 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         case CellularNotificationMessage::Type::PowerUpProcedureComplete:
         case CellularNotificationMessage::Type::Ringing:
         case CellularNotificationMessage::Type::ServiceReady:
-        case CellularNotificationMessage::Type::CallBusy:
         case CellularNotificationMessage::Type::CallActive:
         case CellularNotificationMessage::Type::CallAborted:
             // no data field is used
@@ -228,8 +227,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
-            case CellularNotificationMessage::Type::CallAborted:
-            case CellularNotificationMessage::Type::CallBusy: {
+            case CellularNotificationMessage::Type::CallAborted: {
                 stopTimer(callStateTimerId);
                 auto ret = ongoingCall.endCall();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
@@ -566,11 +564,26 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     return responseMsg;
 }
 
+namespace
+{
+    bool isAbortCallNotification(const std::string &str)
+    {
+        return ((str.find(at::Chanel::NO_CARRIER) != std::string::npos) || (str.find(at::Chanel::BUSY) != std::string::npos) ||
+                (str.find(at::Chanel::NO_ANSWER) != std::string::npos));
+    }
+} // namespace
 
-CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vector<uint8_t> data, std::string &message) {
+CellularNotificationMessage::Type ServiceCellular::identifyNotification(const std::vector<uint8_t> &data, std::string &message)
+{
 
-    /* let's convert uint8_t vector to std::string*/
-    std::string str = std::string(reinterpret_cast<char*>(data.data()), reinterpret_cast<char*>(data.data() + data.size()));
+    std::string str(data.begin(), data.end());
+
+    {
+        std::string logStr = str;
+        logStr.erase(std::remove(logStr.begin(), logStr.end(), '\r'), logStr.end());
+        logStr.erase(std::remove(logStr.begin(), logStr.end(), '\n'), logStr.end());
+        LOG_DEBUG("Notification:: %s", logStr.c_str());
+    }
 
     if (auto ret = str.find("+CPIN: ") != std::string::npos)
     {
@@ -607,22 +620,16 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
         return CellularNotificationMessage::Type::IncomingCall;
     }
 
-
     // Call aborted/failed
-    if (str.find("NO CARRIER") != std::string::npos) {
-        LOG_TRACE(": call failed/aborted");
+    if (isAbortCallNotification(str))
+    {
+        LOG_TRACE("call aborted");
         return CellularNotificationMessage::Type::CallAborted;
-    }
-
-    // Call busy
-    if (str.find("BUSY") != std::string::npos) {
-        LOG_TRACE(": call busy");
-        return CellularNotificationMessage::Type::CallBusy;
     }
 
     // Received new SMS
     if (str.find("+CMTI: ") != std::string::npos) {
-        LOG_TRACE(": received new SMS notification");
+        LOG_TRACE("received new SMS notification");
         message = "888777333"; // TODO:M.P add SMS nr parsing
 
         return CellularNotificationMessage::Type::NewIncomingSMS;
@@ -630,7 +637,7 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
 
     // Received signal strength change
     if (auto ret = str.find("+QIND: \"csq\"") != std::string::npos) {
-        LOG_TRACE(": received signal strength change notification");
+        LOG_TRACE("received signal strength change notification");
         auto beg = str.find(",",ret);
         auto end = str.find(",",ret + beg+1);
         message = str.substr(beg+1,end-beg-1);
@@ -638,9 +645,8 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(std::vec
         return CellularNotificationMessage::Type::SignalStrengthUpdate;
     }
 
-    LOG_TRACE(": None");
+    LOG_WARN("Unhandled notification");
     return CellularNotificationMessage::Type::None;
-
 }
 
 bool ServiceCellular::sendSMS(void)

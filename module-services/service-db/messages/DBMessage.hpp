@@ -85,8 +85,8 @@ class DBSMSMessage : public DBMessage
 class DBSMSGetCount : public DBSMSMessage
 {
   public:
-    SMSState state;
-    DBSMSGetCount(SMSState state = SMSState::ALL) : DBSMSMessage(MessageType::DBSMSGetCount), state(state)
+    EntryState state;
+    DBSMSGetCount(EntryState state = EntryState::ALL) : DBSMSMessage(MessageType::DBSMSGetCount), state(state)
     {
     }
 };
@@ -272,8 +272,8 @@ class DBCalllogMessage : public DBMessage
 class DBCalllogGetCount : public DBCalllogMessage
 {
   public:
-    CallState state;
-    DBCalllogGetCount(CallState state) : DBCalllogMessage(MessageType::DBCalllogGetCount), state(state)
+    EntryState state;
+    DBCalllogGetCount(EntryState state) : DBCalllogMessage(MessageType::DBCalllogGetCount), state(state)
     {
     }
 };

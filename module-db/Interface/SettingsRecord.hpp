@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_SETTINGSRECORD_HPP
-#define PUREPHONE_SETTINGSRECORD_HPP
+#pragma once
 
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
@@ -52,6 +49,3 @@ public:
 private:
     SettingsDB* settingsDB;
 };
-
-
-#endif //PUREPHONE_SETTINGSRECORD_HPP

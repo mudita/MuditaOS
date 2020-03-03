@@ -33,7 +33,7 @@ namespace gui {
         template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Normal)
         {
             uint32_t sum = 0;
-            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->area(area).size(axis); });
+            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->visible ? el->area(area).size(axis) : 0; });
             return sum;
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
@@ -57,12 +57,12 @@ namespace gui {
         // virtual methods from Item
         void setPosition(const short &x, const short &y) override;
         void setSize(const unsigned short w, const unsigned short h) override;
-        bool addWidget(gui::Item *item) override;
+        void addWidget(gui::Item *item) override;
         bool removeWidget(Item *item) override;
         std::list<DrawCommand *> buildDrawList() override;
         /// add item if it will fit in box, return true on success
         /// axis sets direction to define space left in container
-        template <Axis axis> bool addWidget(Item *item);
+        template <Axis axis> void addWidget(Item *item);
         /// set navigation from last to fist element in box
         void setNavigation();
         void setVisible(bool value) override;
@@ -84,7 +84,7 @@ public:
   HBox();
   HBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
   virtual ~HBox() = default;
-  virtual bool addWidget(Item *item) override;
+  virtual void addWidget(Item *item) override;
 };
 
 class VBox : public BoxLayout {
@@ -93,7 +93,7 @@ public:
 	VBox();
 	VBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
 	virtual ~VBox() = default;
-    virtual bool addWidget(Item *item) override;
+    virtual void addWidget(Item *item) override;
 };
 
 } /* namespace gui */

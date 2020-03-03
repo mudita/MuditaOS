@@ -401,15 +401,15 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto time = utils::time::Scoped("DBCalllogAdd");
         DBCalllogMessage *msg = reinterpret_cast<DBCalllogMessage *>(msgl);
         auto record = std::make_unique<std::vector<CalllogRecord>>();
-        msg->record.id = DB_ID_NONE;
+        msg->record.ID = DB_ID_NONE;
         auto ret = calllogRecordInterface->Add(msg->record);
         if (ret)
         {
-            // update db ID in response message
-            msg->record.id = calllogRecordInterface->GetLastID();
+            // return the newly added record
+            msg->record = calllogRecordInterface->GetByID(calllogRecordInterface->GetLastID());
         }
         record->push_back(msg->record);
-        LOG_INFO("Last ID %d", msg->record.id);
+        LOG_INFO("Last ID %d", msg->record.ID);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
     }
     break;
@@ -490,7 +490,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     threadRecordInterface = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
     alarmsRecordInterface = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
     notesRecordInterface = std::make_unique<NotesRecordInterface>(notesDB.get());
-    calllogRecordInterface = std::make_unique<CalllogRecordInterface>(calllogDB.get());
+    calllogRecordInterface = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());
     countryCodeRecordInterface = std::make_unique<CountryCodeRecordInterface>(countryCodesDB.get());
     return sys::ReturnCodes::Success;
 }

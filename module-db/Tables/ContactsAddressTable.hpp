@@ -8,8 +8,7 @@
  * @details
  */
 
-#ifndef PUREPHONE_CONTACTSADDRESSTABLE_HPP
-#define PUREPHONE_CONTACTSADDRESSTABLE_HPP
+#pragma once
 
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
@@ -79,5 +78,3 @@ class ContactsAddressTable : public Table<ContactsAddressTableRow, ContactAddres
                                    "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
                                    ");";
 };
-
-#endif // PUREPHONE_CONTACTSADDRESSTABLE_HPP

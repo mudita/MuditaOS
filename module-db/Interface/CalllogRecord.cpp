@@ -8,18 +8,28 @@
  */
 #include "CalllogRecord.hpp"
 #include "../Tables/CalllogTable.hpp"
+#include "ContactRecord.hpp"
+#include <Utils.hpp>
+#include <cassert>
 #include <log/log.hpp>
 #include <sstream>
 
+CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name)
+    : Record{tableRow.id}, number(num), presentation(tableRow.presentation), date(tableRow.date), duration(tableRow.duration), type(tableRow.type), name(name),
+      contactId(tableRow.contactId)
+{
+}
+
 std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 {
-    out << " <id> " << rec.id << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
+    out << " <id> " << rec.ID << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date
         << " <duration> " << rec.duration << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
 
     return out;
 }
 
-CalllogRecordInterface::CalllogRecordInterface(CalllogDB* calllogDb): calllogDB(calllogDb) {
+CalllogRecordInterface::CalllogRecordInterface(CalllogDB *calllogDb, ContactsDB *contactsDb) : calllogDB(calllogDb), contactsDB(contactsDb)
+{
 }
 
 CalllogRecordInterface::~CalllogRecordInterface() {
@@ -27,14 +37,30 @@ CalllogRecordInterface::~CalllogRecordInterface() {
 
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
-    return calllogDB->calls.Add(CalllogTableRow{.id = rec.id, // this is only to remove warning
-                                                .number = rec.number,
-                                                .presentation = rec.presentation,
-                                                .date = rec.date,
-                                                .duration = rec.duration,
-                                                .type = rec.type,
-                                                .name = rec.name,
-                                                .contactId = rec.contactId});
+    ContactRecordInterface contactInterface(contactsDB);
+    auto contactRec = contactInterface.GetByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
+    if (contactRec->size() == 0)
+    {
+        LOG_ERROR("Cannot get contact, for number %s", rec.number.c_str());
+        return false;
+    }
+    uint32_t contactID = (*contactRec)[0].dbID;
+
+    auto localRec = rec;
+    auto contact = (*contactRec)[0];
+    localRec.contactId = std::to_string(contact.dbID);
+    localRec.name = contact.getFormattedName();
+    LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
+
+    return calllogDB->calls.Add(CalllogTableRow{.id = localRec.ID, // this is only to remove warning
+                                                .number = localRec.number,
+                                                .presentation = localRec.presentation,
+                                                .date = localRec.date,
+                                                .duration = localRec.duration,
+                                                .type = localRec.type,
+                                                .name = localRec.name,
+                                                .contactId = localRec.contactId});
+    ;
 }
 
 uint32_t CalllogRecordInterface::GetLastID()
@@ -49,38 +75,50 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 	return GetLimitOffset(offset,limit);
 }
 
+ContactRecord CalllogRecordInterface::GetContactRecordByID(const UTF8 &contactId)
+{
+    assert(contactsDB != nullptr);
+    ContactRecordInterface contactInterface(contactsDB);
+    try
+    {
+        return contactInterface.GetByID(std::atoi(contactId.c_str()));
+    }
+    catch (const std::exception &e)
+    {
+        LOG_ERROR("Exception %s occured", e.what());
+        return ContactRecord();
+    }
+}
 
-std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit) {
-    auto calls = calllogDB->calls.GetLimitOffset(offset,limit);
+std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffset(uint32_t offset, uint32_t limit)
+{
+    auto calls = calllogDB->calls.GetLimitOffset(offset, limit);
 
     auto records = std::make_unique<std::vector<CalllogRecord>>();
 
-	CalllogRecordInterface callsInterface(calllogDB);
-        for(const auto &rec : calls){
-
-            records->push_back({
-                .id=rec.id,
-                .number=rec.number,
-                .presentation=rec.presentation,
-                .date=rec.date,
-			    .duration=rec.duration,
-                .type=rec.type,
-                .name=rec.name,
-                .contactId=rec.contactId
-            });
+    for (const auto &c : calls)
+    {
+        auto contactRec = GetContactRecordByID(c.contactId);
+        if (contactRec.dbID == DB_ID_NONE)
+        {
+            LOG_ERROR("Cannot find contact for ID %s", c.contactId.c_str());
+            continue;
         }
 
-        return records;
+        records->push_back({c, contactRec.numbers[0].numberE164, contactRec.getFormattedName()});
+    }
+
+    return records;
 }
 
 bool CalllogRecordInterface::Update(const CalllogRecord &rec) {
 
-    auto call = calllogDB->calls.GetByID(rec.id);
+    auto call = calllogDB->calls.GetByID(rec.ID);
     if(call.id == 0){
         return false;
     }
 
-    return calllogDB->calls.Update(CalllogTableRow{.id = rec.id,
+    return calllogDB->calls.Update(CalllogTableRow{.id = rec.ID,
                                                    .number = rec.number,
                                                    .presentation = rec.presentation,
                                                    .date = rec.date,
@@ -113,27 +151,27 @@ bool CalllogRecordInterface::RemoveByField(CalllogRecordField field, const char 
     }
 }
 
-CalllogRecord CalllogRecordInterface::GetByID(uint32_t id) {
-    auto rec = calllogDB->calls.GetByID(id);
+CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
+{
+    auto call = calllogDB->calls.GetByID(id);
 
-    return CalllogRecord{
-        .id=rec.id, // this is only to remove warning
-        .number=rec.number,
-        .presentation=rec.presentation,
-        .date=rec.date,
-        .duration=rec.duration,
-        .type=rec.type,
-        .name=rec.name,
-        .contactId=rec.contactId
-    };
+    auto contactRec = GetContactRecordByID(call.contactId);
+    if (contactRec.dbID == DB_ID_NONE)
+    {
+        auto contactRec = GetContactRecordByID(call.contactId);
+        LOG_ERROR("Cannot find contact for ID %s", call.contactId.c_str());
+        return CalllogRecord();
+    }
+
+    return CalllogRecord{call, contactRec.numbers[0].numberE164, contactRec.getFormattedName()};
 }
 
-uint32_t CalllogRecordInterface::GetCount(CallState state)
+uint32_t CalllogRecordInterface::GetCount(EntryState state)
 {
     return calllogDB->calls.GetCount(state);
 }
 
 uint32_t CalllogRecordInterface::GetCount()
 {
-    return GetCount(CallState::ALL);
+    return GetCount(EntryState::ALL);
 }

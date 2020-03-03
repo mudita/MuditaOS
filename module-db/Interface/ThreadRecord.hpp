@@ -7,10 +7,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
-
-#ifndef PUREPHONE_THREADRECORD_HPP
-#define PUREPHONE_THREADRECORD_HPP
+#pragma once
 
 #include "Record.hpp"
 #include <stdint.h>
@@ -68,6 +65,3 @@ private:
    ContactsDB* contactsDB;
 
 };
-
-
-#endif //PUREPHONE_THREADRECORD_HPP

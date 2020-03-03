@@ -25,9 +25,9 @@ bool CalllogTable::Add(CalllogTableRow entry)
 {
 
     return db->Execute(
-        "INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId, answered) VALUES ('%s', %lu, %s, %s, %lu, '%s', '%s', %d);",
+        "INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId, isRead) VALUES ('%s', %lu, %s, %s, %lu, '%s', '%s', %d);",
         entry.number.c_str(), static_cast<uint32_t>(entry.presentation), utils::to_string(entry.date).c_str(), utils::to_string(entry.duration).c_str(),
-        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.answered);
+        static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.isRead);
 }
 
 bool CalllogTable::RemoveByID(uint32_t id) {
@@ -40,10 +40,10 @@ bool CalllogTable::RemoveByField(CalllogTableFields field, const char *str) {
 
 bool CalllogTable::Update(CalllogTableRow entry)
 {
-    return db->Execute("UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s', answered = "
+    return db->Execute("UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, name = '%s', contactId = '%s', isRead = "
                        "%d WHERE _id = %lu;",
                        entry.number.c_str(), static_cast<uint32_t>(entry.presentation), static_cast<uint32_t>(entry.date),
-                       static_cast<uint32_t>(entry.duration), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.answered,
+                       static_cast<uint32_t>(entry.duration), static_cast<uint32_t>(entry.type), entry.name.c_str(), entry.contactId.c_str(), entry.isRead,
                        entry.id);
 }
 
@@ -63,7 +63,7 @@ CalllogTableRow CalllogTable::GetByID(uint32_t id) {
         static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
         (*retQuery)[6].GetString(),                                // name
         (*retQuery)[7].GetString(),                                // contactID
-        static_cast<CallState>((*retQuery)[8].GetUInt64()),        // answered
+        static_cast<bool>((*retQuery)[8].GetUInt64()),             // isRead
     };
 }
 
@@ -88,7 +88,7 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffset(uint32_t offset, uint3
             static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
             (*retQuery)[6].GetString(),                                // name
             (*retQuery)[7].GetString(),                                // contactID
-            static_cast<CallState>((*retQuery)[8].GetUInt64()),        // answered
+            static_cast<bool>((*retQuery)[8].GetUInt64()),             // isRead
         });
     } while (retQuery->NextRow());
 
@@ -132,25 +132,25 @@ CalllogTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, CalllogTabl
             static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
             (*retQuery)[6].GetString(),                                // name
             (*retQuery)[7].GetString(),                                // contactID
-            static_cast<CallState>((*retQuery)[8].GetUInt64()),        // answered
+            static_cast<bool>((*retQuery)[8].GetUInt64()),             // isRead
         });
     } while (retQuery->NextRow());
 
     return ret;
 }
 
-uint32_t CalllogTable::GetCount(CallState state)
+uint32_t CalllogTable::GetCount(EntryState state)
 {
     std::string query = "SELECT COUNT(*) FROM calls ";
     switch (state)
     {
-    case CallState::ALL:
+    case EntryState::ALL:
         break;
-    case CallState::MISSED:
-        query += "WHERE calls.answered = 0";
+    case EntryState::UNREAD:
+        query += "WHERE calls.isRead = 0";
         break;
-    case CallState::ANSWERED:
-        query += "WHERE calls.answered = 1";
+    case EntryState::READ:
+        query += "WHERE calls.isRead = 1";
         break;
     }
     query += ";";
@@ -167,7 +167,7 @@ uint32_t CalllogTable::GetCount(CallState state)
 
 uint32_t CalllogTable::GetCount()
 {
-    return GetCount(CallState::ALL);
+    return GetCount(EntryState::ALL);
 }
 
 uint32_t CalllogTable::GetCountByFieldID(const char *field, uint32_t id) {

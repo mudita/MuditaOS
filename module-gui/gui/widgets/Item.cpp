@@ -39,17 +39,18 @@ Item::~Item() {
 		delete navigationDirections;
 }
 
-bool Item::addWidget( Item* item ) {
-    if( item == nullptr ) return false;
-	if( item->parent ) {
-		item->parent->removeWidget(item);
-	}
-
-	item->parent = this;
+void Item::addWidget(Item *item)
+{
+    if (item == nullptr)
+        return;
+    if (item->parent)
+    {
+        item->parent->removeWidget(item);
+    }
+    item->parent = this;
 	children.push_back(item);
 
 	item->updateDrawArea();
-	return true;
 }
 
 bool Item::removeWidget( Item* item ) {

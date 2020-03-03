@@ -8,9 +8,7 @@
  * @details
  */
 
-
-#ifndef PUREPHONE_QUERYRESULT_HPP
-#define PUREPHONE_QUERYRESULT_HPP
+#pragma once
 
 #include <stdint.h>
 #include <vector>
@@ -44,5 +42,3 @@ private:
 
 };
 
-
-#endif //PUREPHONE_QUERYRESULT_HPP

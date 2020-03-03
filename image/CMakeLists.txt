@@ -1,16 +1,29 @@
-set(ASSETS_SOURCE "assets")
-set(DB_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}")
-set(SYS_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}")
+set(ASSETS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+set(ASSETS_DEST_DIR "${CMAKE_BINARY_DIR}/sys")
 
-set(SYS_DEST "${CMAKE_BINARY_DIR}/sys")
-set(ASSETS_DEST "${SYS_DEST}/assets")
-set(DB_DEST "${SYS_DEST}/db")
-
-add_custom_target(copy_assets ALL
-    COMMAND ${CMAKE_COMMAND}
-        -DSOURCE=${SYS_SOURCE}
-        -DDESTINATION=${SYS_DEST}
-        -DGLOB_EXPR="*"
-        -P ${CMAKE_CURRENT_SOURCE_DIR}/copy_assets.cmake
-    COMMENT "Copyingt assets"
+file (GLOB_RECURSE ASSETS_LIST
+    LIST_DIRECTORIES false
+    RELATIVE ${ASSETS_SOURCE_DIR}
+    ${ASSETS_SOURCE_DIR}/*
     )
+
+list(REMOVE_ITEM ASSETS_LIST "CMakeLists.txt")
+
+foreach(ASSET ${ASSETS_LIST})
+    set(asset_source "${ASSETS_SOURCE_DIR}/${ASSET}")
+    get_filename_component(filename "${ASSET}" NAME)
+    get_filename_component(dir "${ASSET}" DIRECTORY)
+
+    set(destdir "${ASSETS_DEST_DIR}/${dir}")
+    set(outfile "${destdir}/${filename}")
+
+    add_custom_command(
+        COMMENT "Copying resource: ${ASSET}"
+        OUTPUT ${outfile}
+        DEPENDS ${asset_source}
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${asset_source}
+            ${outfile}
+        )
+    add_custom_target(${filename} ALL DEPENDS ${ASSET} ${outfile})
+endforeach()

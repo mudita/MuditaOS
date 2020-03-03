@@ -6,8 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#ifndef MODULE_DB_INTERFACE_NOTESRECORD_HPP_
-#define MODULE_DB_INTERFACE_NOTESRECORD_HPP_
+#pragma once
 
 #include "Record.hpp"
 #include <stdint.h>
@@ -53,5 +52,3 @@ private:
     const uint32_t snippetLength = 60;
     NotesDB* notesDB;
 };
-
-#endif /* MODULE_DB_INTERFACE_NOTESRECORD_HPP_ */

@@ -161,7 +161,7 @@ std::unique_ptr<std::vector<SMSRecord>> DBServiceAPI::SMSGetLimitOffsetByThreadI
     }
 }
 
-uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv, SMSState state)
+uint32_t DBServiceAPI::SMSGetCount(sys::Service *serv, EntryState state)
 {
     std::shared_ptr<DBSMSMessage> msg = std::make_shared<DBSMSGetCount>(state);
 
@@ -690,7 +690,7 @@ bool DBServiceAPI::NotesGetLimitOffset(sys::Service *serv, uint32_t offset, uint
     return true;
 }
 
-uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
+CalllogRecord DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogMessage>(MessageType::DBCalllogAdd, rec);
 
@@ -698,17 +698,16 @@ uint32_t DBServiceAPI::CalllogAdd(sys::Service *serv, const CalllogRecord &rec)
 
     auto ret = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     DBCalllogResponseMessage *calllogResponse = reinterpret_cast<DBCalllogResponseMessage *>(ret.second.get());
-    uint32_t recId = DB_ID_NONE;
     if ((ret.first == sys::ReturnCodes::Success) && (calllogResponse->retCode == true))
     {
         auto records = *calllogResponse->records;
         if (!records.empty())
         {
-            recId = records[0].id;
+            return records[0];
         }
     }
 
-    return recId;
+    return CalllogRecord();
 }
 
 bool DBServiceAPI::CalllogRemove(sys::Service *serv, uint32_t id)
@@ -746,7 +745,7 @@ bool DBServiceAPI::CalllogUpdate(sys::Service *serv, const CalllogRecord &rec)
     }
 }
 
-uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv, CallState state)
+uint32_t DBServiceAPI::CalllogGetCount(sys::Service *serv, EntryState state)
 {
     std::shared_ptr<DBCalllogMessage> msg = std::make_shared<DBCalllogGetCount>(state);
 
