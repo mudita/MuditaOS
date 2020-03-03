@@ -72,11 +72,27 @@ void GridLayout::setNavigation()
     }
     for (auto it = children.begin(); it != children.end() && i < max_elements; ++it, ++i)
     {
-        if (i != 0)
+        // first column left rotation
+        if (navigationRotate && col == 0)
+        {
+            auto val = el_in_x - 1;
+            if (val + i >= children.size())
+            {
+                val = children.size() % el_in_x - 1;
+            }
+            (*it)->setNavigationItem(NavigationDirection::LEFT, *std::next(it, val));
+        }
+        else if (i != 0)
         {
             (*it)->setNavigationItem(NavigationDirection::LEFT, *std::prev(it));
         }
-        if (col + 1 % el_in_x != 0 && i + 1 < children.size())
+        // last column - right rotation
+        if (navigationRotate && col + 1 == el_in_x)
+        {
+            auto val = el_in_x - 1;
+            (*it)->setNavigationItem(NavigationDirection::RIGHT, *std::prev(it, val));
+        }
+        else if (col + 1 % el_in_x != 0 && i + 1 < children.size())
         {
             (*it)->setNavigationItem(NavigationDirection::RIGHT, *std::next(it));
         }
@@ -84,9 +100,25 @@ void GridLayout::setNavigation()
         {
             (*it)->setNavigationItem(NavigationDirection::UP, *std::prev(it, el_in_x));
         }
+        // first row - rotate UP
+        else if (navigationRotate && (children.size() >= el_in_x * 2))
+        {
+            auto maxrow = children.size() / el_in_x + children.size();
+            auto val = maxrow * el_in_x + col;
+            if (val + el_in_x < children.size())
+            {
+                val += el_in_x;
+            }
+            (*it)->setNavigationItem(NavigationDirection::UP, *std::next(children.begin(), val));
+        }
         if (row + 1 % el_in_y != 0 && i + el_in_x < children.size())
         {
             (*it)->setNavigationItem(NavigationDirection::DOWN, *std::next(it, el_in_x));
+        }
+        // last row - rotate, DOWN assign to first col
+        else if (navigationRotate && (i + el_in_x >= children.size()))
+        {
+            (*it)->setNavigationItem(NavigationDirection::DOWN, *std::next(children.begin(), col));
         }
 
         ++col;
