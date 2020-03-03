@@ -167,3 +167,8 @@ std::string vfs::getline( FILE* stream, uint32_t length ) {
 
 	return ret;
 }
+
+vfs::FilesystemStats vfs::getFilesystemStats()
+{
+    return (vfs::FilesystemStats());
+}
