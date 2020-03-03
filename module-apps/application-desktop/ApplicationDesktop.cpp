@@ -54,8 +54,8 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
             if (this->getCurrentWindow() == this->windows[app::name::window::desktop_menu] ||
                 getCurrentWindow() == this->windows[app::name::window::desktop_lockscreen])
             {
-                notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, CallState::MISSED);
-                notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, SMSState::UNREAD);
+                notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+                notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
                 this->getCurrentWindow()->rebuild();
             }
             return std::make_shared<sys::ResponseMessage>();
@@ -84,8 +84,8 @@ sys::ReturnCodes ApplicationDesktop::InitHandler() {
 
 	screenLocked = true;
 
-    notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, CallState::MISSED);
-    notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, SMSState::UNREAD);
+    notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+    notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
 
     createUserInterface();
 
