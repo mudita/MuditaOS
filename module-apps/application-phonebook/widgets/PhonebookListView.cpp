@@ -8,6 +8,7 @@
  */
 #include "PhonebookListView.hpp"
 #include "../data/PhonebookItemData.hpp"
+#include "../windows/PhonebookContact.hpp"
 #include "PhonebookItem.hpp"
 #include "UiCommonActions.hpp"
 #include "application-call/ApplicationCall.hpp"
@@ -71,7 +72,7 @@ bool PhonebookListView::onInput(const InputEvent &inputEvent)
             // LOG_INFO("show info on index: %d %s", item->getID(), item->getValue().c_str());
 
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(item->getContact());
-            application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 
             return true;
         }

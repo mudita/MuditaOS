@@ -11,6 +11,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "PhonebookContact.hpp"
+#include "PhonebookNewContact.hpp"
 #include "Text.hpp"
 #include "Utils.hpp"
 #include "application-call/data/CallSwitchData.hpp"
@@ -203,7 +204,7 @@ void PhonebookDuplicateNumber::onBeforeShow(ShowMode mode, SwitchData *data)
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
         {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("New", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         return (true);
     };
@@ -245,7 +246,7 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
         {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("New", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         return (false);
     };

@@ -6,6 +6,8 @@
 #include "application-messages/windows/ThreadViewWindow.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-phonebook/windows/PhonebookContact.hpp"
+#include "application-phonebook/windows/PhonebookNewContact.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <cassert>
 #include <i18/i18.hpp>
@@ -93,12 +95,14 @@ namespace app
         {
         case ContactOperation::Add: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, "New", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+                app, name_phonebook, gui::window::name::newContact,
+                std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         }
         break;
         case ContactOperation::Details: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, "Contact", std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+                app, name_phonebook, gui::window::name::contact,
+                std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         }
         break;
         default: {
