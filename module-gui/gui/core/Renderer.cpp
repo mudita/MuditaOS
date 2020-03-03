@@ -747,15 +747,30 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 		uint32_t offsetImage = 0;
 		uint32_t offsetContext = 0;
 		uint32_t imageWidth = pixMap->getWidth();
-		uint32_t contextWidth = drawCtx->getW();
+        uint32_t imageHeight = pixMap->getHeight();
+        uint32_t contextWidth = drawCtx->getW();
 
 		uint8_t* pixData = pixMap->getData();
-		for( uint32_t i=0; i<pixMap->getHeight(); i++ ) {
-			memcpy( ctxData + offsetContext, pixData + offsetImage, imageWidth );
-			offsetImage += imageWidth;
+
+        uint32_t drawHeight = imageHeight;
+        if (drawHeight > drawCtx->getH())
+        {
+            LOG_WARN("image %s height exceeds context (%d > %d). truncating", pixMap->getName().c_str(), imageHeight, drawCtx->getH());
+            drawHeight = drawCtx->getH();
+        }
+        uint32_t drawWidth = imageWidth;
+        if (drawWidth > drawCtx->getW())
+        {
+            LOG_WARN("image %s width exceeds context (%d > %d). truncating", pixMap->getName().c_str(), imageWidth, drawCtx->getW());
+            drawWidth = drawCtx->getW();
+        }
+        for (uint32_t i = 0; i < drawHeight; i++)
+        {
+            memcpy(ctxData + offsetContext, pixData + offsetImage, drawWidth);
+            offsetImage += imageWidth;
 			offsetContext += contextWidth;
-		}
-	}
+        }
+    }
 	else if( imageMap->getType() == gui::ImageMap::Type::VECMAP) {
 		VecMap* vecMap = reinterpret_cast<VecMap*>(imageMap);
 		uint32_t offsetContext = 0;
