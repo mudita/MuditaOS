@@ -6,19 +6,21 @@ namespace at::urc
 {
     struct QIND : public Any
     {
+        static const auto invalid_rssi = 99;
+        static const auto invalid_ber = 99;
+
         QIND(const std::string &val);
         ~QIND() override = default;
         auto what() -> std::string final;
         enum CSQ
         {
             CSQ,
-            Val1,
-            Val2
+            RSSI,
+            BER
         };
 
         auto is_csq() -> bool;
-        auto csq_val() -> std::pair<int, int>;
-        /// by docs ivalid csq is 99,99
-        auto csq_ivalid() -> std::pair<int, int>;
+        /// by docs invalid csq: RSSI: 99, 199, and ber: 99
+        auto validate(enum CSQ) -> bool;
     };
 }; // namespace at::urc
