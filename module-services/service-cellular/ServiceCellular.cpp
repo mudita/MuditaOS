@@ -640,15 +640,13 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
     auto qind = at::urc::QIND(str);
     if (qind.is())
     {
-        auto vals = qind.csq_val();
-        if (vals == qind.csq_ivalid())
+        if (!qind.validate(at::urc::QIND::RSSI))
         {
             LOG_ERROR("Invalid csq - ignore");
-            return CellularNotificationMessage::Type::None;
         }
         else
         {
-            message = std::string(qind.tokens[at::urc::QIND::Val1]);
+            message = std::string(qind.tokens[at::urc::QIND::RSSI]);
             return CellularNotificationMessage::Type::SignalStrengthUpdate;
         }
     }

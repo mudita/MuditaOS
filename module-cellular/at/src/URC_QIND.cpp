@@ -1,4 +1,5 @@
 #include "../URC_QIND.hpp"
+#include <log/debug.hpp>
 
 using namespace at::urc;
 
@@ -13,23 +14,36 @@ auto QIND::what() -> std::string
 
 auto QIND::is_csq() -> bool
 {
-    if (tokens.size() > Val2)
+    if (tokens.size() > BER)
     {
         return tokens[CSQ].find("csq");
     }
     return false;
 }
 
-auto QIND::csq_val() -> std::pair<int, int>
+auto QIND::validate(enum CSQ check) -> bool
 {
-    if (is_csq() && tokens.size() > Val2)
+    try
     {
-        return {std::stoi(tokens[Val1]), std::stoi(tokens[Val2])};
+        if (is_csq() && tokens.size() > BER)
+        {
+            int rssi = std::stoi(tokens[RSSI]);
+            int ber = std::stoi(tokens[BER]);
+            LOG_DEBUG("> %d %d", rssi, ber);
+            switch (check)
+            {
+            case RSSI:
+                return (rssi % invalid_rssi) != 0;
+            case BER:
+                return ber != invalid_ber;
+            default:
+                return false;
+            }
+        }
     }
-    return {};
-}
-
-auto QIND::csq_ivalid() -> std::pair<int, int>
-{
-    return {99, 99};
+    catch (std::exception *ex)
+    {
+        LOG_FATAL("exception: %s", ex->what());
+    }
+    return false;
 }
