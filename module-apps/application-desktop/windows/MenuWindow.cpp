@@ -70,6 +70,18 @@ namespace gui
         }
     }
 
+    void MenuPage::setMostLovedChild()
+    {
+        if (visible && love_is_real)
+        {
+            if (children.size() > loved_child_pos)
+            {
+                setFocusItem(*std::next(children.begin(), loved_child_pos));
+                love_is_real = false;
+            }
+        }
+    }
+
     MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::name::window::desktop_menu)
     {
         buildInterface();
@@ -175,6 +187,7 @@ namespace gui
         toolsMenu->setVisible(false);
 
         switchMenu(mainMenu);
+        mainMenu->setMostLovedChild();
     }
 
     void MenuWindow::destroyInterface()
