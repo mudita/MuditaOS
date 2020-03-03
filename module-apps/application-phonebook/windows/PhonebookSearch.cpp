@@ -46,6 +46,8 @@ void PhonebookSearch::buildInterface()
     AppWindow::buildInterface();
     topBar->setActive(TopBar::Elements::TIME, true);
 
+    setTitle(utils::localize.get("app_phonebook_title_main"));
+
     searchHeader = addLabel(nullptr, style::window::default_left_margin, 127, 86, 20, utils::localize.get("app_phonebook_search_win_search"));
 
     inputField = new Text(nullptr, 1, 1, style::window_width - style::window::default_left_margin - style::window::default_right_margin - 32, 33);
