@@ -6,8 +6,10 @@ namespace at::urc
 {
     struct QIND : public Any
     {
-        static const auto invalid_rssi = 99;
+        static const auto invalid_rssi_modulo = 99;
         static const auto invalid_ber = 99;
+        const std::string urc_name = "+QIND";
+        const std::string type_csq = "csq";
 
         QIND(const std::string &val);
         ~QIND() override = default;
