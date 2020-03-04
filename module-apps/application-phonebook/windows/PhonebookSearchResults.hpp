@@ -28,10 +28,7 @@ class PhonebookSearchResults : public AppWindow
     PhonebookListView *list;
     SearchResultsModel *searchResultsModel = nullptr;
 
-    Image *leftArrowImage = nullptr;
-    Image *rightArrowImage = nullptr;
     Image *newContactImage = nullptr;
-    Image *searchImage = nullptr;
 
   public:
     PhonebookSearchResults(app::Application *app);
