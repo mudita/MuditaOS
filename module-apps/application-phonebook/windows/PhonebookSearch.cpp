@@ -49,6 +49,7 @@ void PhonebookSearch::buildInterface()
     setTitle(utils::localize.get("app_phonebook_title_main"));
 
     searchHeader = addLabel(nullptr, style::window::default_left_margin, 127, 86, 20, utils::localize.get("app_phonebook_search_win_search"));
+    searchHeader->setFont(style::window::font::small);
 
     inputField = new Text(nullptr, 1, 1, style::window_width - style::window::default_left_margin - style::window::default_right_margin - 32, 33);
     inputField->setTextType(Text::TextType::SINGLE_LINE);
@@ -64,20 +65,6 @@ void PhonebookSearch::buildInterface()
     horizontalBox->addWidget(searchTop);
     horizontalBox->setPenWidth(2);
     horizontalBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-
-    searchCenter = new Image(this, 224, 265, 32, 32, "phonebook_search_glass_grey");
-
-    informationLabel = new Text(this, 64, 315, 352, 66);
-    informationLabel->setText(utils::localize.get("app_phonebook_search_win_info"));
-    informationLabel->setFillColor(ColorTray);
-    informationLabel->setTextType(Text::TextType::MULTI_LINE);
-    informationLabel->setEditMode(Text::EditMode::BROWSE);
-    informationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    informationLabel->setAlignment(Alignment::ALIGN_HORIZONTAL_CENTER);
-    informationLabel->setFont(style::window::font::medium);
-    informationLabel->setTextColor(style::color::lightgrey);
-
-    fancyArrowDown = new Image(this, 180, 370, 54, 71, "phonebook_search_arrow_down_grey");
 
     bottomBar->setActive(BottomBar::Side::LEFT, false);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
