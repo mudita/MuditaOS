@@ -137,22 +137,27 @@ bool AppWindow::onInput( const InputEvent& inputEvent) {
 	if(( inputEvent.state != InputEvent::State::keyReleasedShort )) return false;
 
 	if( inputEvent.keyCode == KeyCode::KEY_RF ) {
-        auto prevWindow = application->getPrevWindow();
-        if (prevWindow == gui::name::window::no_window)
-        {
-            LOG_INFO("Back to previous application");
-            application->cleanPrevWindw();
-            sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-        }
-        else
-        {
-            LOG_INFO("Back to previous window %s", prevWindow.c_str());
-			application->switchWindow( prevWindow, gui::ShowMode::GUI_SHOW_RETURN );
-        }
-        return true;
-	}
+        return returnToPreviousView();
+    }
 
 	return false;
+}
+
+bool AppWindow::returnToPreviousView()
+{
+    auto prevWindow = application->getPrevWindow();
+    if (prevWindow == gui::name::window::no_window)
+    {
+        LOG_INFO("Back to previous application");
+        application->cleanPrevWindw();
+        sapm::ApplicationManager::messageSwitchPreviousApplication(application);
+    }
+    else
+    {
+        LOG_INFO("Back to previous window %s", prevWindow.c_str());
+        application->switchWindow(prevWindow, gui::ShowMode::GUI_SHOW_RETURN);
+    }
+    return true;
 }
 
     void AppWindow::textModeShowCB(const UTF8 &text)

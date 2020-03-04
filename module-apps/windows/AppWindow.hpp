@@ -78,6 +78,7 @@ public:
 	std::list<DrawCommand*> buildDrawList() override;
     void textModeShowCB(const UTF8 &text);
     bool textSelectSpecialCB();
+    bool returnToPreviousView();
 };
 
 } /* namespace gui */
