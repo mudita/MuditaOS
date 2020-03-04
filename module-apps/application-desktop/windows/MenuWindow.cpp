@@ -70,14 +70,14 @@ namespace gui
         }
     }
 
-    void MenuPage::setMostLovedChild()
+    void MenuPage::setFirstTimeSelection()
     {
-        if (visible && love_is_real)
+        if (visible && first_time_selection)
         {
-            if (children.size() > loved_child_pos)
+            if (children.size() > first_time_selected)
             {
-                setFocusItem(*std::next(children.begin(), loved_child_pos));
-                love_is_real = false;
+                setFocusItem(*std::next(children.begin(), first_time_selected));
+                first_time_selection = false;
             }
         }
     }
@@ -187,7 +187,7 @@ namespace gui
         toolsMenu->setVisible(false);
 
         switchMenu(mainMenu);
-        mainMenu->setMostLovedChild();
+        mainMenu->setFirstTimeSelection();
     }
 
     void MenuWindow::destroyInterface()

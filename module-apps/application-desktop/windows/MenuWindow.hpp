@@ -22,13 +22,13 @@ namespace gui
     class MenuPage : public gui::GridLayout
     {
       public:
-        bool love_is_real = true;
+        bool first_time_selection = true;
         /// position of element which should be selected on start
-        const unsigned int loved_child_pos = 3;
+        const unsigned int first_time_selected = 3;
         UTF8 title;
         MenuPage(gui::Item *parent, UTF8 title, std::vector<Tile *> tiles);
         /// set child which should be selected on start of desktop
-        void setMostLovedChild();
+        void setFirstTimeSelection();
     };
 
     class MenuWindow : public AppWindow
