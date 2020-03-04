@@ -108,7 +108,7 @@ bool EnterNumberWindow::duplicatedContactHandler(const ContactRecord &record, co
     {
         auto meta = dialog->meta;
         meta.action = [=]() -> bool {
-            LOG_INFO("ACTION");
+            app::contact(application, app::ContactOperation::Edit, record);
             return true;
         };
         meta.title = phoneNumber;

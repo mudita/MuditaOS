@@ -106,6 +106,12 @@ namespace app
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         }
         break;
+        case ContactOperation::Edit: {
+            return sapm::ApplicationManager::messageSwitchApplication(
+                app, name_phonebook, gui::window::name::newContact, // TODO: need to be fixed when contact edition is working
+                std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
+        }
+        break;
         default: {
             LOG_ERROR("ContactOperation not supported %d", static_cast<uint32_t>(contactOperation));
             return false;
