@@ -19,12 +19,9 @@ class PhonebookSearch : public AppWindow
   protected:
     /** labels */
     Label *searchHeader = nullptr;
-    Text *informationLabel = nullptr;
     Text *inputField = nullptr;
     HBox *horizontalBox = nullptr;
     Image *searchTop;
-    Image *searchCenter;
-    Image *fancyArrowDown;
 
     PhonebookListView *searchResultList;
     PhonebookModel *phonebookModel = nullptr;
