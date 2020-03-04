@@ -9,14 +9,14 @@ QIND::QIND(const std::string &val) : Any(val)
 
 auto QIND::what() -> std::string
 {
-    return "+QIND";
+    return urc_name;
 }
 
 auto QIND::is_csq() -> bool
 {
-    if (tokens.size() > BER)
+    if (tokens.size() > CSQ)
     {
-        return tokens[CSQ].find("csq");
+        return tokens[CSQ].find(type_csq);
     }
     return false;
 }
@@ -33,7 +33,7 @@ auto QIND::validate(enum CSQ check) -> bool
             switch (check)
             {
             case RSSI:
-                return (rssi % invalid_rssi) != 0;
+                return (rssi % 100 % invalid_rssi_modulo) != 0;
             case BER:
                 return ber != invalid_ber;
             default:
@@ -41,9 +41,9 @@ auto QIND::validate(enum CSQ check) -> bool
             }
         }
     }
-    catch (std::exception *ex)
+    catch (const std::exception &ex)
     {
-        LOG_FATAL("exception: %s", ex->what());
+        LOG_FATAL("exception: %s", ex.what());
     }
     return false;
 }
