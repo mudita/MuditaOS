@@ -2,13 +2,11 @@
 #include "../ApplicationPhonebook.hpp"
 #include "InputEvent.hpp"
 #include "Label.hpp"
-#include "Margins.hpp"
 #include "PhonebookContact.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "Text.hpp"
 #include "Utils.hpp"
 #include "application-call/data/CallSwitchData.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
 PhonebookSearch::PhonebookSearch(app::Application *app) : AppWindow(app, "Search"), phonebookModel{new PhonebookModel(app)}
