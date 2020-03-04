@@ -102,7 +102,7 @@ namespace app
         break;
         case ContactOperation::Details: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, gui::window::name::newContact,
+                app, name_phonebook, gui::window::name::contact,
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         }
         break;
@@ -123,9 +123,38 @@ namespace app
     {
         assert(app != nullptr);
 
-        ContactRecord contactRecord;
-        contactRecord.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
+        auto searchResults = DBServiceAPI::ContactSearch(app, "", "", number);
+        ContactRecord contactRec;
+        if (searchResults.get()->size() == 1)
+        {
+            contactRec = searchResults->front();
+            LOG_INFO("Found contact matching search num %s : contact ID %u - %s %s", number.c_str(), contactRec.dbID, contactRec.primaryName.c_str(),
+                     contactRec.alternativeName.c_str());
 
-        return contact(app, contactOperation, contactRecord);
+            if (contactOperation == ContactOperation::Add)
+            {
+                // trying to add new contact for number already assigned to existing contact, displa warning
+                return sapm::ApplicationManager::messageSwitchApplication(
+                    app, name_phonebook, gui::window::name::duplicatedContact,
+                    std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contactRec)), number));
+            }
+        }
+        else if (searchResults.get()->size() > 1)
+        {
+            LOG_FATAL("Found more than one contact for numer %s", number.c_str());
+            for (auto i : *searchResults)
+            {
+                LOG_FATAL("ContactID = %u", i.dbID);
+            }
+            return false;
+        }
+        else if (contactOperation != ContactOperation::Add)
+        {
+            LOG_ERROR("Invalid operation for not existing contact for numer %s", number.c_str());
+            return false;
+        }
+
+        return contact(app, contactOperation, contactRec);
     }
+
 } // namespace app

@@ -22,7 +22,6 @@
 #include "service-audio/api/AudioServiceAPI.hpp"
 
 #include "service-appmgr/ApplicationManager.hpp"
-#include <Dialog.hpp>
 
 namespace app {
 
@@ -180,9 +179,6 @@ void ApplicationCall::createUserInterface() {
 
 	window = new gui::EmergencyCallWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
-    window = new gui::DuplicatedContactDialogWindow(this);
-    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 }
 
 void ApplicationCall::setDisplayedNumber( std::string num ) {
