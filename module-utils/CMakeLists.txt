@@ -40,6 +40,7 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_conversion.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/common_data/EventStore.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ucs2/UCS2.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/zip/zip.c
         )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
