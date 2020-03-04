@@ -676,46 +676,50 @@ void Renderer::drawText( Context* ctx, CommandText* cmd ) {
 	//draw every sign
 	uint32_t idLast = 0, idCurrent = 0;
 	for( uint32_t i=0; i<cmd->str.length(); ++i )
-	{
-		if( i == 0 )
-		{
-			idCurrent = cmd->str[i];
-			FontGlyph* glyph = font->glyphs.find(idCurrent)->second;
+    {
+        idCurrent = cmd->str[i]; // id stands for glued together utf-16 with no order bytes (0xFF 0xFE)
+        auto glyph_found = font->glyphs.find(idCurrent);
 
-			if( glyph != NULL)
-			{
-				drawChar( drawCtx, wgtX + posX + glyph->xoffset, wgtY + posY, font, glyph, cmd->color );
-				posX += glyph->xadvance ;//- glyph->xoffset;
-			}
-		}
-		else
-		{
-			idCurrent = cmd->str[i];
-			FontGlyph* glyph = font->glyphs.find(idCurrent)->second;
+        if (glyph_found != font->glyphs.end())
+        {
+            FontGlyph *glyph = glyph_found->second;
+            if (glyph == NULL)
+            {
+                LOG_ERROR("terribly wrong: character id=%d is said to exist, but it doesn't", idCurrent);
+                continue;
+            }
 
-			int32_t kernValue = font->getKerning( idLast, idCurrent );
+            if (i == 0)
+            {
+                drawChar(drawCtx, wgtX + posX + glyph->xoffset, wgtY + posY, font, glyph, cmd->color);
+                posX += glyph->xadvance; //- glyph->xoffset;
+            }
+            else
+            {
+                int32_t kernValue = font->getKerning(idLast, idCurrent);
+                {
+                    //#ifdef BUILD_UNIT_TESTS
+                    if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0))
+                    {
+                        LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
+                        return;
+                    }
+                    if ((wgtY + posY >= drawCtx->getH()) || (wgtY + posY < 0))
+                    {
+                        LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
+                        return;
+                    }
+                    //#endif
+                    drawChar(drawCtx, wgtX + posX + glyph->xoffset + kernValue, wgtY + posY, font, glyph, cmd->color);
+                    posX += glyph->xadvance + kernValue;
+                }
+            }
+        }
+        // TODO: M.G. else: unsupported character
+        idLast = idCurrent;
+    }
 
-			if( glyph != NULL)
-			{
-//#ifdef BUILD_UNIT_TESTS
-				if(( wgtX + posX + glyph->xoffset>=drawCtx->getW() ) || (wgtX + posX + glyph->xoffset < 0)) {
-					LOG_FATAL( "Drawing outside context's X boundary for glyph: %d", glyph->id);
-					return;
-				}
-				if(( wgtY + posY >= drawCtx->getH() ) || (wgtY + posY < 0)) {
-					LOG_FATAL( "Drawing outside context's Y boundary for glyph: %d", glyph->id);
-					return;
-				}
-//#endif
-				drawChar( drawCtx, wgtX + posX + glyph->xoffset + kernValue, wgtY + posY, font, glyph, cmd->color );
-				posX += glyph->xadvance+kernValue;
-
-			}
-		}
-		idLast = idCurrent;
-	}
-
-	//if drawing was performed in temporary context
+    //if drawing was performed in temporary context
 	if( copyContext) {
 		//reinsert drawCtx into bast context
 		ctx->insert( cmd->x, cmd->y, drawCtx );
@@ -743,15 +747,30 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 		uint32_t offsetImage = 0;
 		uint32_t offsetContext = 0;
 		uint32_t imageWidth = pixMap->getWidth();
-		uint32_t contextWidth = drawCtx->getW();
+        uint32_t imageHeight = pixMap->getHeight();
+        uint32_t contextWidth = drawCtx->getW();
 
 		uint8_t* pixData = pixMap->getData();
-		for( uint32_t i=0; i<pixMap->getHeight(); i++ ) {
-			memcpy( ctxData + offsetContext, pixData + offsetImage, imageWidth );
-			offsetImage += imageWidth;
+
+        uint32_t drawHeight = imageHeight;
+        if (drawHeight > drawCtx->getH())
+        {
+            LOG_WARN("image %s height exceeds context (%d > %d). truncating", pixMap->getName().c_str(), imageHeight, drawCtx->getH());
+            drawHeight = drawCtx->getH();
+        }
+        uint32_t drawWidth = imageWidth;
+        if (drawWidth > drawCtx->getW())
+        {
+            LOG_WARN("image %s width exceeds context (%d > %d). truncating", pixMap->getName().c_str(), imageWidth, drawCtx->getW());
+            drawWidth = drawCtx->getW();
+        }
+        for (uint32_t i = 0; i < drawHeight; i++)
+        {
+            memcpy(ctxData + offsetContext, pixData + offsetImage, drawWidth);
+            offsetImage += imageWidth;
 			offsetContext += contextWidth;
-		}
-	}
+        }
+    }
 	else if( imageMap->getType() == gui::ImageMap::Type::VECMAP) {
 		VecMap* vecMap = reinterpret_cast<VecMap*>(imageMap);
 		uint32_t offsetContext = 0;

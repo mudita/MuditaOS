@@ -18,23 +18,28 @@ namespace gui {
 
     BoxLayout::BoxLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h) : Rect(parent, x, y, w, h)
     {
-        inputCallback = [this](Item &item, const InputEvent &inputEvent) -> bool {
-            // handle input on kid
-            if (focusItem && focusItem->onInput(inputEvent))
-            {
-                return true;
-            }
-            else if (handleNavigation(inputEvent))
-            {
-                return true;
-            }
-            else if (borderCallback && borderCallback(inputEvent))
-            {
-                return true;
-            }
-            // let item logic rule it
-            return false;
-        };
+    }
+
+    bool BoxLayout::onInput(const InputEvent &inputEvent)
+    {
+        if (inputCallback && inputCallback(*this, inputEvent))
+        {
+            return true;
+        }
+        if (focusItem && focusItem->onInput(inputEvent))
+        {
+            return true;
+        }
+        if (handleNavigation(inputEvent))
+        {
+            return true;
+        }
+        if (borderCallback && borderCallback(inputEvent))
+        {
+            return true;
+        }
+        // let item logic rule it
+        return false;
     }
 
     bool BoxLayout::onFocus(bool state)
@@ -63,12 +68,10 @@ void BoxLayout::setSize(const unsigned short w, const unsigned short h)
 
     resizeItems();
 }
-bool BoxLayout::addWidget( Item* item ) {
-	bool ret = Rect::addWidget( item );
-
-	resizeItems();
-
-	return ret;
+void BoxLayout::addWidget(Item *item)
+{
+    Rect::addWidget(item);
+    resizeItems();
 }
 bool BoxLayout::removeWidget( Item* item ) {
 	bool ret = Rect::removeWidget( item );
@@ -170,15 +173,15 @@ template <Axis axis> void BoxLayout::resizeItems()
     Rect::updateDrawArea();
 }
 
-template <Axis axis> bool BoxLayout::addWidget(Item *item)
+template <Axis axis> void BoxLayout::addWidget(Item *item)
 {
+    Rect::addWidget(item);
+    item->visible = false;
     if (size<axis>(this) - sizeUsed<axis>(this) >= size<axis>(item))
     {
-        Rect::addWidget(item);
+        item->visible = true;
         resizeItems<axis>();
-        return true;
     }
-    return false;
 }
 
 std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
@@ -216,9 +219,9 @@ void HBox::resizeItems() {
     BoxLayout::resizeItems<Axis::X>();
 }
 
-bool HBox::addWidget(Item *item)
+void HBox::addWidget(Item *item)
 {
-    return BoxLayout::addWidget<Axis::X>(item);
+    BoxLayout::addWidget<Axis::X>(item);
 }
 
 VBox::VBox() : BoxLayout() {
@@ -233,9 +236,9 @@ void VBox::resizeItems() {
     BoxLayout::resizeItems<Axis::Y>();
 }
 
-bool VBox::addWidget(Item *item)
+void VBox::addWidget(Item *item)
 {
-    return BoxLayout::addWidget<Axis::Y>(item);
+    BoxLayout::addWidget<Axis::Y>(item);
 }
 
 } /* namespace gui */

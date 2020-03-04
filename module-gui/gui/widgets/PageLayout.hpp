@@ -14,7 +14,7 @@ namespace gui
         PageLayout(Item *parent, const BoundingBox &box);
 
         VBox *addPage();
-        virtual bool addWidget(Item *item) override;
+        virtual void addWidget(Item *item) override;
         /// switch page to page ∈ [0 ... (num of pages -1) )
         /// set it's navigation and select first element as selected (in setVisible)
         bool switchPage(unsigned int n, bool previous = false);

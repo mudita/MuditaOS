@@ -252,23 +252,10 @@ namespace gui
         auto rect = new gui::Rect(nullptr, 0, 0, 10, 10);
         rect->activeItem = false;
         rect->setPenWidth(0);
-        if (!body->addWidget(rect))
-        {
-            delete rect;
-            delete label;
-            return false;
-        }
-
+        body->addWidget(rect);
         LOG_INFO("Add sms: %s %s", el.body.c_str(), el.number.c_str());
-        if (body->addWidget(label))
-        {
-            return true;
-        }
-        else
-        {
-            delete label;
-            return false;
-        }
+        body->addWidget(label);
+        return label->visible;
     }
 
     void ThreadViewWindow::rebuild()
