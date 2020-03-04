@@ -1,14 +1,9 @@
 #include "PhonebookSearchResults.hpp"
 #include "../ApplicationPhonebook.hpp"
 #include "ContactRecord.hpp"
-#include "Label.hpp"
 #include "ListView.hpp"
-#include "Margins.hpp"
-#include "PhonebookNewContact.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-db/messages/DBMessage.hpp"
 #include <Style.hpp>
 #include <functional>
 #include <log/log.hpp>
@@ -54,9 +49,6 @@ void PhonebookSearchResults::buildInterface()
     topBar->setActive(TopBar::Elements::TIME, true);
 
     setTitle(utils::localize.get("app_phonebook_search_results_prefix"));
-
-    rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-    searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 }
 
 void PhonebookSearchResults::destroyInterface()
@@ -68,29 +60,11 @@ void PhonebookSearchResults::destroyInterface()
         delete list;
         list = nullptr;
     }
-    if (leftArrowImage)
-    {
-        removeWidget(leftArrowImage);
-        delete leftArrowImage;
-        leftArrowImage = nullptr;
-    }
-    if (rightArrowImage)
-    {
-        removeWidget(rightArrowImage);
-        delete rightArrowImage;
-        rightArrowImage = nullptr;
-    }
     if (newContactImage)
     {
         removeWidget(newContactImage);
         delete newContactImage;
         newContactImage = nullptr;
-    }
-    if (searchImage)
-    {
-        removeWidget(searchImage);
-        delete searchImage;
-        searchImage = nullptr;
     }
 
     children.clear();
