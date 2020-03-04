@@ -21,6 +21,7 @@ namespace window
     inline const std::string name_call = "CallWindow";
     inline const std::string name_enterNumber = "EnterNumberWindow";
     inline const std::string name_emergencyCall = "EmergencyCallWindow";
+    inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
 } // namespace window
 /*
  *

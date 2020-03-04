@@ -18,7 +18,7 @@ namespace gui
     {
         namespace window
         {
-            inline std::string search_results = "SearchResults";
+            const inline std::string search_results = "SearchResults";
         };
     }; // namespace name
 

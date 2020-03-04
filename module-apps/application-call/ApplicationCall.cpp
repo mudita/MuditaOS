@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "ApplicationCall.hpp"
 #include "Application.hpp"
 
 #include "MessageType.hpp"
@@ -21,8 +22,8 @@
 #include "service-audio/api/AudioServiceAPI.hpp"
 
 #include "service-appmgr/ApplicationManager.hpp"
+#include <Dialog.hpp>
 
-#include "ApplicationCall.hpp"
 namespace app {
 
     ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound)
@@ -179,6 +180,9 @@ void ApplicationCall::createUserInterface() {
 
 	window = new gui::EmergencyCallWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+
+    window = new gui::DuplicatedContactDialogWindow(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 }
 
 void ApplicationCall::setDisplayedNumber( std::string num ) {

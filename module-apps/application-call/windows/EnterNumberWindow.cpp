@@ -16,6 +16,8 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include <ContactRecord.hpp>
+#include <application-phonebook/windows/PhonebookContact.hpp>
 
 namespace gui {
 
@@ -69,15 +71,57 @@ void EnterNumberWindow::buildInterface() {
     numberLabel->setDotsMode( true, false);
 
     newContactIcon = new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
-    newContactIcon->activatedCallback = [=](gui::Item &item) {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        if (app != nullptr)
-        {
-            return app::contact(getApplication(), app::ContactOperation::Add, app->getDisplayedNumber());
-        }
-        return false;
-    };
+    newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };
     setFocusItem(newContactIcon);
+}
+
+bool EnterNumberWindow::addNewContact()
+{
+    auto app = dynamic_cast<app::ApplicationCall *>(application);
+    if (app != nullptr)
+    {
+        auto phoneNumber = app->getDisplayedNumber();
+        auto searchResults = DBServiceAPI::ContactSearch(app, "", "", phoneNumber);
+        if (searchResults.get()->size() == 1)
+        {
+            auto contact = searchResults->front();
+            LOG_INFO("Found contact matching search num %s : contact ID %u - %s %s", phoneNumber.c_str(), contact.dbID, contact.primaryName.c_str(),
+                     contact.alternativeName.c_str());
+            return duplicatedContactHandler(contact, phoneNumber);
+        }
+        else if (searchResults.get()->size() > 1)
+        {
+            LOG_FATAL("Found more than one contact");
+            return false;
+        }
+
+        // No contact found, open phonebook to create one
+        return app::contact(getApplication(), app::ContactOperation::Add, phoneNumber);
+    }
+    return false;
+}
+
+bool EnterNumberWindow::duplicatedContactHandler(const ContactRecord &record, const std::string &phoneNumber)
+{
+    auto dialog = dynamic_cast<gui::DuplicatedContactDialogWindow *>(application->getWindow(app::window::name_duplicatedContact));
+    if (dialog != nullptr)
+    {
+        auto meta = dialog->meta;
+        meta.action = [=]() -> bool {
+            LOG_INFO("ACTION");
+            return true;
+        };
+        meta.title = phoneNumber;
+        meta.text = DuplicatedContactDialogWindow::updateText(meta.text, record);
+        dialog->update(meta);
+        application->switchWindow(app::window::name_duplicatedContact, nullptr);
+        return true;
+    }
+    else
+    {
+        LOG_ERROR("Dialog bad type!");
+        return false;
+    }
 }
 
 void EnterNumberWindow::destroyInterface() {
@@ -207,6 +251,27 @@ bool EnterNumberWindow::handleSwitchData( SwitchData* data ) {
     }
 
     return false;
+}
+
+DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)
+    : Dialog(app, app::window::name_duplicatedContact,
+             {
+                 .title = "",
+                 .icon = "phonebook_info",
+                 .text = utils::localize.get("app_phonebook_duplicate_speed_dial"),
+                 .action = []() -> bool {
+                     LOG_INFO("!");
+                     return true;
+                 },
+             })
+{
+}
+
+std::string DuplicatedContactDialogWindow::updateText(const std::string &text, const ContactRecord &rec)
+{
+    std::string str = text;
+    fillContactData(str, std::make_shared<ContactRecord>(rec));
+    return str;
 }
 
 } /* namespace gui */

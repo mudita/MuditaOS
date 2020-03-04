@@ -16,6 +16,8 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
+#include <ContactRecord.hpp>
+#include <Dialog.hpp>
 
 namespace gui {
 
@@ -43,7 +45,18 @@ public:
 
 private:
   gui::KeyInputMappedTranslation translator;
+
+  bool addNewContact();
+  bool duplicatedContactHandler(const ContactRecord &record, const std::string &phoneNumber);
 };
 
+class DuplicatedContactDialogWindow : public Dialog
+{
+  public:
+    DuplicatedContactDialogWindow(app::Application *app);
+    virtual ~DuplicatedContactDialogWindow() = default;
+
+    static std::string updateText(const std::string &text, const ContactRecord &rec);
+};
 } /* namespace gui */
 
