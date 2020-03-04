@@ -34,6 +34,9 @@ namespace font {
     const inline std::string medium = "gt_pressura_regular_27";
     const inline std::string small = "gt_pressura_regular_24";
     const inline std::string verysmall = "gt_pressura_regular_20";
+    const inline std::string tiny = "gt_pressura_regular_16";
+    const inline std::string tinybold = "gt_pressura_bold_16";
+    const inline std::string tinylight = "gt_pressura_light_16";
 };  // namespace font
 
 const inline uint32_t list_offset_default = 12;
@@ -65,15 +68,7 @@ const inline std::string bold   = "gt_pressura_bold_24";
 const inline std::string medium = "gt_pressura_regular_24";
 };  // namespace font
 };  // namespace footer
-namespace phonebook
-{
-namespace font
-{
-const inline std::string tiny = "gt_pressura_regular_16";
-const inline std::string tinybold = "gt_pressura_bold_16";
-const inline std::string tinylight = "gt_pressura_light_16";
-}; // namespace font
-}; // namespace phonebook
+
 namespace color
 {
 const inline gui::Color lightgrey = gui::Color(3, 0);

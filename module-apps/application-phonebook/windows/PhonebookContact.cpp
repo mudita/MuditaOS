@@ -61,17 +61,17 @@ void PhonebookContact::buildInterface()
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
     favouritesIcon = new Image(this, 97, 107, 32, 32, "small_heart");
-    favouritesLabel = addLabel(nullptr, 65, 144, 89, 20, utils::localize.get("app_phonebook_contact_favourites_upper"), style::phonebook::font::tinybold,
+    favouritesLabel = addLabel(nullptr, 65, 144, 89, 20, utils::localize.get("app_phonebook_contact_favourites_upper"), style::window::font::tinybold,
                                RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     speedDial = addLabel(nullptr, 225, 107, 32, 32, "", style::footer::font::bold, RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                          Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    speedDialLabel = addLabel(nullptr, 196, 144, 89, 20, utils::localize.get("app_phonebook_contact_speed_dial_upper"), style::phonebook::font::tinybold,
+    speedDialLabel = addLabel(nullptr, 196, 144, 89, 20, utils::localize.get("app_phonebook_contact_speed_dial_upper"), style::window::font::tinybold,
                               RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     blockedIcon = new Image(this, 351, 107, 32, 32, "small_circle");
-    blockedLabel = addLabel(nullptr, 329, 144, 75, 20, utils::localize.get("app_phonebook_contact_speed_blocked_uppper"), style::phonebook::font::tinybold,
+    blockedLabel = addLabel(nullptr, 329, 144, 75, 20, utils::localize.get("app_phonebook_contact_speed_blocked_uppper"), style::window::font::tinybold,
                             RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES, Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     // page1 contents

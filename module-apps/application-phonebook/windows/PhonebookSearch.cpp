@@ -4,6 +4,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "PhonebookContact.hpp"
+#include "../data/PhonebookStyle.hpp"
 #include "Text.hpp"
 #include "Utils.hpp"
 #include "application-call/data/CallSwitchData.hpp"
@@ -48,22 +49,22 @@ void PhonebookSearch::buildInterface()
 
     setTitle(utils::localize.get("app_phonebook_title_main"));
 
-    searchHeader = addLabel(nullptr, style::window::default_left_margin, 127, 86, 20, utils::localize.get("app_phonebook_search_win_search"));
+    searchHeader = addLabel(nullptr, phonebookStyle::search::searchHeader::x, phonebookStyle::search::searchHeader::y, phonebookStyle::search::searchHeader::w, phonebookStyle::search::searchHeader::h, utils::localize.get("app_phonebook_search_win_search"));
     searchHeader->setFont(style::window::font::small);
 
-    inputField = new Text(nullptr, 1, 1, style::window_width - style::window::default_left_margin - style::window::default_right_margin - 32, 33);
+    inputField = new Text(nullptr, phonebookStyle::search::horizontalBox::inputField::x, phonebookStyle::search::horizontalBox::inputField::y, phonebookStyle::search::horizontalBox::inputField::w, phonebookStyle::search::horizontalBox::inputField::h);
     inputField->setTextType(Text::TextType::SINGLE_LINE);
     inputField->setEditMode(Text::EditMode::EDIT);
     inputField->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
     inputField->setFont(style::window::font::mediumbold);
 
-    searchTop = new Image(nullptr, style::window_width - style::window::default_left_margin - style::window::default_right_margin, 1, 32, 32, "search");
+    searchTop = new Image(nullptr, phonebookStyle::search::horizontalBox::searchTop::x, phonebookStyle::search::horizontalBox::searchTop::y, phonebookStyle::search::horizontalBox::searchTop::w, phonebookStyle::search::horizontalBox::searchTop::h, "search");
 
-    horizontalBox = new HBox(this, style::window::default_left_margin, 153, style::window_width - style::window::default_left_margin - style::window::default_right_margin, 33);
+    horizontalBox = new HBox(this, phonebookStyle::search::horizontalBox::x, phonebookStyle::search::horizontalBox::y, phonebookStyle::search::horizontalBox::w, phonebookStyle::search::horizontalBox::h);
     horizontalBox->addWidget(inputField);
     horizontalBox->addWidget(searchTop);
-    horizontalBox->setPenWidth(2);
+    horizontalBox->setPenWidth(phonebookStyle::search::horizontalBox::penWidth);
     horizontalBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
     bottomBar->setActive(BottomBar::Side::LEFT, false);
@@ -73,11 +74,11 @@ void PhonebookSearch::buildInterface()
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_search"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    searchResultList = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
-    searchResultList->setMaxElements(7);
-    searchResultList->setPageSize(7);
-    searchResultList->setPenFocusWidth(0);
-    searchResultList->setPenWidth(0);
+    searchResultList = new gui::PhonebookListView(this, phonebookStyle::search::searchResultList::x, phonebookStyle::search::searchResultList::y, phonebookStyle::search::searchResultList::w, phonebookStyle::search::searchResultList::h);
+    searchResultList->setMaxElements(phonebookStyle::search::searchResultList::maxElements);
+    searchResultList->setPageSize(phonebookStyle::search::searchResultList::pageSize);
+    searchResultList->setPenFocusWidth(phonebookStyle::search::searchResultList::penFocusWidth);
+    searchResultList->setPenWidth(phonebookStyle::search::searchResultList::penWidth);
     searchResultList->setProvider(phonebookModel);
     searchResultList->setApplication(application);
 
