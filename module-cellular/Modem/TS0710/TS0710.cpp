@@ -192,6 +192,8 @@ TS0710::ConfState TS0710::ConfProcedure() {
     LOG_WARN("TODO: determine while this retry loop is necessary");
     while (!parser->cmd(at::AT::QSCLK_ON)) {}
 
+    bool reboot_needed = false;
+
     ret = parser->cmd(at::AT::SIM_DET);
     if (!ret)
     {
@@ -205,7 +207,8 @@ TS0710::ConfState TS0710::ConfProcedure() {
         }
         else
         {
-            LOG_FATAL("SIM detection failure! %s", ret.response[0].c_str());
+            LOG_FATAL("SIM detection failure - trying to enable! %s", ret.response[0].c_str());
+            reboot_needed = true;
         }
     }
     ret = parser->cmd(at::AT::QSIMSTAT);
@@ -222,7 +225,16 @@ TS0710::ConfState TS0710::ConfProcedure() {
         else
         {
             LOG_FATAL("SIM swap status failure! %s", ret.response[0].c_str());
+            reboot_needed = true;
         }
+    }
+
+    // try to force set sim detection and sim stat
+    if (reboot_needed == true)
+    {
+        ret = parser->cmd(at::AT::SIM_DET_ON);
+        ret = parser->cmd(at::AT::SIMSTAT_ON);
+        LOG_FATAL("Please full reboot phone!");
     }
 
     return ConfState ::Success;
