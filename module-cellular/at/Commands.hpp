@@ -89,11 +89,13 @@ namespace at
         CMUX, /// setup cmux params
         CMGS, /// sms
         QCMGS,
-        CREG,     /// networ registration status
-        QNWINFO,  /// network informations (band etc)
-        COPS,     /// operators scan
-        SIM_DET,  /// sim detection on/off status (1,0)
-        QSIMSTAT, /// sim insertion / removal notification in URC
+        CREG,       /// networ registration status
+        QNWINFO,    /// network informations (band etc)
+        COPS,       /// operators scan
+        SIM_DET,    /// sim detection on/off status (1,0)
+        QSIMSTAT,   /// sim insertion / removal notification in URC
+        SIM_DET_ON, /// enable sim detection
+        SIMSTAT_ON, /// enable sim stat urc
 
     };
 
@@ -139,6 +141,8 @@ namespace at
             {AT::COPS, {"AT+COPS=?\r", 180000}},
             {AT::QSIMSTAT, {"AT+QSIMSTAT?\r"}},
             {AT::SIM_DET, {"AT+QSIMDET?\r"}},
+            {AT::SIM_DET_ON, {"AT+QSIMDET=1,0\r"}},
+            {AT::SIMSTAT_ON, {"AT+QSIMSTAT=1\r"}},
         };
         if (fact.count(at))
         {
