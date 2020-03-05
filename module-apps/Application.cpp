@@ -224,8 +224,9 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
     if (msgl->messageType == MessageType::CellularNotification)
     {
-        CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
+        auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
+        if (msg != nullptr)
+        {
             if ((state == State::ACTIVE_FORGROUND) && (getCurrentWindow()->updateSignalStrength(msg->signalStrength)))
             {
                 //loop and update all widnows

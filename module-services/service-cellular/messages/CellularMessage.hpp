@@ -55,9 +55,21 @@ public:
     Type type=Type::None;
 
     std::string data;
-    uint32_t signalStrength=0;
-    int32_t dBmSignalStrength=0;
+};
 
+class CellularSignalStrengthUpdateMessage : public CellularNotificationMessage
+{
+  public:
+    CellularSignalStrengthUpdateMessage() : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate){};
+    CellularSignalStrengthUpdateMessage(uint32_t signalStrength, int32_t dBmSignalStrength)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate), signalStrength(signalStrength),
+          dBmSignalStrength(dBmSignalStrength)
+    {
+    }
+    virtual ~CellularSignalStrengthUpdateMessage() = default;
+
+    uint32_t signalStrength = 0;
+    int32_t dBmSignalStrength = 0;
 };
 
 class CellularRequestMessage : public CellularMessage{

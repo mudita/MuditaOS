@@ -110,62 +110,20 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
         TS0710_Frame frame(data);
         std::string message;
-        CellularNotificationMessage::Type type = identifyNotification(frame.getFrame().data, message);
-        auto msg = std::make_shared<CellularNotificationMessage>(type);
+        auto msg = identifyNotification(frame.getFrame().data);
 
-        switch (type)
+        switch (msg->type)
         {
-
-        case CellularNotificationMessage::Type::ModemOn:
-        case CellularNotificationMessage::Type::PowerUpProcedureComplete:
-        case CellularNotificationMessage::Type::Ringing:
-        case CellularNotificationMessage::Type::ServiceReady:
-        case CellularNotificationMessage::Type::CallActive:
-        case CellularNotificationMessage::Type::CallAborted:
-            // no data field is used
-            break;
-
-        case CellularNotificationMessage::Type::IncomingCall:
-            msg->data = message;
-            break;
-
-        case CellularNotificationMessage::Type::NewIncomingSMS: {
-            // find message number
-            std::string notification(data.begin(), data.end());
-            auto begin = notification.find(",");
-            auto end = notification.find("\r");
-            msg->data = notification.substr(begin + 1, end);
-        }
-        break;
-
-        case CellularNotificationMessage::Type::SignalStrengthUpdate:
-            LOG_DEBUG("Setting new signal strength");
-            msg->signalStrength = std::stoll(message);
-            if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])))
-            {
-                LOG_ERROR("Signal strength value out of range.");
-                msg->dBmSignalStrength = signalStrengthToDB[0];
-            }
-            else
-            {
-                msg->dBmSignalStrength = signalStrengthToDB[msg->signalStrength];
-            }
-
-            break;
-
-        case CellularNotificationMessage::Type::SIM: {
-            auto message = std::make_shared<sevm::SIMMessage>();
-            sys::Bus::SendUnicast(message, "EventManager", this);
-        }
-        break;
-
-        case CellularNotificationMessage::Type::None:
-            // do not send notification msg
+        case CellularNotificationMessage::Type::None: {
+            LOG_INFO("Skipped uknown notification");
             return;
+        }
         case CellularNotificationMessage::Type::RawCommand: {
             LOG_INFO(" IGNORE RawCmd");
             return;
         }
+        default:
+            break;
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -631,15 +589,12 @@ namespace
     }
 } // namespace
 
-CellularNotificationMessage::Type ServiceCellular::identifyNotification(const std::vector<uint8_t> &data, std::string &message)
+std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
 {
-
     std::string str(data.begin(), data.end());
 
     {
-        std::string logStr = str;
-        logStr.erase(std::remove(logStr.begin(), logStr.end(), '\r'), logStr.end());
-        logStr.erase(std::remove(logStr.begin(), logStr.end(), '\n'), logStr.end());
+        std::string logStr = utils::removeNewLines(str);
         LOG_DEBUG("Notification:: %s", logStr.c_str());
     }
 
@@ -672,24 +627,27 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
 
         auto beg = str.find("\"",ret);
         auto end = str.find("\"",ret + beg+1);
-        message = str.substr(beg+1,end-beg-1);
+        auto message = str.substr(beg + 1, end - beg - 1);
 
-        return CellularNotificationMessage::Type::IncomingCall;
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::IncomingCall, message);
     }
 
     // Call aborted/failed
     if (isAbortCallNotification(str))
     {
         LOG_TRACE("call aborted");
-        return CellularNotificationMessage::Type::CallAborted;
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted);
     }
 
     // Received new SMS
     if (str.find("+CMTI: ") != std::string::npos) {
         LOG_TRACE("received new SMS notification");
-        message = "888777333"; // TODO:M.P add SMS nr parsing
-
-        return CellularNotificationMessage::Type::NewIncomingSMS;
+        // find message number
+        auto tokens = utils::split(str, ',');
+        if (tokens.size() == 2)
+        {
+            return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingSMS, tokens[1]);
+        }
     }
 
     // Received signal strength change
@@ -702,13 +660,26 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
         }
         else
         {
-            message = std::string(qind.tokens[at::urc::QIND::RSSI]);
-            return CellularNotificationMessage::Type::SignalStrengthUpdate;
+            auto rssi = std::string(qind.tokens[at::urc::QIND::RSSI]);
+            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
+            msg->signalStrength = std::stoll(rssi);
+            LOG_DEBUG("Setting new signal strength %d", msg->signalStrength);
+            if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])))
+            {
+                LOG_ERROR("Signal strength value out of range.");
+                msg->dBmSignalStrength = signalStrengthToDB[0];
+            }
+            else
+            {
+                msg->dBmSignalStrength = signalStrengthToDB[msg->signalStrength];
+            }
+
+            return msg;
         }
     }
 
     LOG_WARN("Unhandled notification");
-    return CellularNotificationMessage::Type::None;
+    return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::None);
 }
 
 bool ServiceCellular::sendSMS(void)

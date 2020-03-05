@@ -391,7 +391,7 @@ TS0710::ConfState TS0710::StartMultiplexer() {
             auto end = res.response[0].find(",", 1);
             auto message = res.response[0].substr(beg + 1, end - beg - 1);
             LOG_DEBUG("Setting new signal strength");
-            auto msg = std::make_shared<CellularNotificationMessage>(static_cast<CellularNotificationMessage::Type >(CellularNotificationMessage::Type::SignalStrengthUpdate));
+            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
             msg->signalStrength = std::stoll(message);
             if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
                 LOG_ERROR("Signal strength value out of range.");
