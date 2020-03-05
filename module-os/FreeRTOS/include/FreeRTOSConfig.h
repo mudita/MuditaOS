@@ -162,4 +162,6 @@ standard names. */
 /* Low power Tickless idle. Low power timer (GPT) is initialized in application code. */
 #define configGPT_CLOCK_HZ                    (32768U)
 
+#include "../SysView/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.h"
+
 #endif /* FREERTOS_CONFIG_H */
