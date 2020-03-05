@@ -50,7 +50,6 @@ namespace gui {
         AppWindow::buildInterface();
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
         topBar->setActive({{TopBar::Elements::SIGNAL, true}, {TopBar::Elements::LOCK, true}, {TopBar::Elements::BATTERY, true}});
 
         time = new gui::Label(this, 0, style::design_time_offset, style::window_width, style::design_time_h);
@@ -67,6 +66,7 @@ namespace gui {
         dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
         dayText->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
 
+        setVisibleState();
 }
 
 void DesktopMainWindow::destroyInterface() {
@@ -343,9 +343,9 @@ auto DesktopMainWindow::fillNotifications() -> bool
             return sapm::ApplicationManager::messageSwitchApplication(application, app::CallLogAppStr, gui::name::window::main_window, nullptr);
         });
     }
-    if (app->notifications.notSeenCalls)
+    if (app->notifications.notSeenSMS)
     {
-        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(app->notifications.notSeenCalls), [this]() {
+        add_notification(notifications, "mail", utils::localize.get("app_desktop_unread_messages"), std::to_string(app->notifications.notSeenSMS), [this]() {
             return sapm::ApplicationManager::messageSwitchApplication(application, app::name_messages, gui::name::window::main_window, nullptr);
         });
     }

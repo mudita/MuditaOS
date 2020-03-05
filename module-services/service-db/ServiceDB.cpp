@@ -411,6 +411,10 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         record->push_back(msg->record);
         LOG_INFO("Last ID %d", msg->record.ID);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
+
+        auto notificationMessage =
+            std::make_shared<DBNotificationMessage>(MessageType::DBServiceNotification, DB::NotificationType::Added, DB::BaseType::CalllogDB);
+        sys::Bus::SendMulticast(notificationMessage, sys::BusChannels::ServiceDBNotifications, this);
     }
     break;
 
