@@ -38,8 +38,13 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
                  app->switchWindow(app::sim_select, nullptr);
                  return true;
              }},
-            {"[None] " + utils::localize.get("app_settings_date_and_time"), [=](gui::Item &) { return true; }},
-            {"[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; }},
+            {utils::localize.get("app_settings_date_and_time"),
+             [=](gui::Item &) {
+                 LOG_INFO("switching to date and time page");
+                 app->switchWindow("DateTime");
+                 return true;
+             }},
+           {"[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_phone_modes"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_security"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_about"), [=](gui::Item &) { return true; }},
