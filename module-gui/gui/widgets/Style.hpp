@@ -68,7 +68,17 @@ const inline std::string bold   = "gt_pressura_bold_24";
 const inline std::string medium = "gt_pressura_regular_24";
 };  // namespace font
 };  // namespace footer
-
+namespace settings
+{
+    namespace date
+    {
+        const inline uint32_t date_time_item_height = 107;
+        const inline uint32_t date_time_item_width = 120;
+        const inline uint32_t date_time_item_title_height = 30;
+        const inline uint32_t date_time_spacer_width = 20;
+        const inline uint32_t date_time_x_offset = 30;
+    } // namespace date
+} // namespace settings
 namespace color
 {
 const inline gui::Color lightgrey = gui::Color(3, 0);

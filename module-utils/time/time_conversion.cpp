@@ -164,7 +164,7 @@ void Timestamp::replace_specifiers()
             return Timestamp::str(Locale::format(date_format_long ? Locale::FormatLocaleDateFull : Locale::FormatLocaleDateShort));
         }
     }
-    UTF8 Time::get_date_time_substr(GetParameters param)
+    UTF8 Timestamp::get_date_time_substr(GetParameters param)
     {
         auto value = get_date_time_sub_value(param);
         if (value != UINT32_MAX)
@@ -174,7 +174,7 @@ void Timestamp::replace_specifiers()
         return UTF8();
     }
 
-    uint32_t Time::get_date_time_sub_value(GetParameters param)
+    uint32_t Timestamp::get_date_time_sub_value(GetParameters param)
     {
         switch (param)
         {

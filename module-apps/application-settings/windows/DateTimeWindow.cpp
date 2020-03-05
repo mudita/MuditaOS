@@ -52,8 +52,7 @@ namespace gui
         // create date widgets
         uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
         uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
-        utils::time::SysTime time;
-        auto str = time.str(time.today_format);
+        utils::time::Timestamp time;
 
         SettingsRecord appSettings = application->getSettings();
         timeFormat12h = appSettings.timeFormat12;
