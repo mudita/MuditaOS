@@ -33,7 +33,6 @@ Label *PhonebookSearch::addLabel(std::list<Item *> *parentPage, int x, int y, in
     l->setAlignement(alignment);
     l->setLineMode(lineMode);
 
-    // addItem(l);
     if (parentPage)
         parentPage->push_back(l);
 
@@ -71,14 +70,6 @@ void PhonebookSearch::buildInterface()
 
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_search"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-    searchResultList = new gui::PhonebookListView(this, phonebookStyle::search::searchResultList::x, phonebookStyle::search::searchResultList::y, phonebookStyle::search::searchResultList::w, phonebookStyle::search::searchResultList::h);
-    searchResultList->setMaxElements(phonebookStyle::search::searchResultList::maxElements);
-    searchResultList->setPageSize(phonebookStyle::search::searchResultList::pageSize);
-    searchResultList->setPenFocusWidth(phonebookStyle::search::searchResultList::penFocusWidth);
-    searchResultList->setPenWidth(phonebookStyle::search::searchResultList::penWidth);
-    searchResultList->setProvider(phonebookModel);
-    searchResultList->setApplication(application);
 
     setFocusItem(inputField);
 }
