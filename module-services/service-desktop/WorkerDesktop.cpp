@@ -24,7 +24,7 @@ bool WorkerDesktop::handleMessage(uint32_t queueID)
         ParserFsm::msgChunk.assign(receiveMsg.begin(), receiveMsg.end());
         while (!ParserFsm::msgChunk.empty())
         {
-            send_event(MessageDataEvt());
+            send_event(MessageDataEvt(service));
         }
     }
 
