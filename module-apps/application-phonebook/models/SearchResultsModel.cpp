@@ -4,7 +4,7 @@
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
-SearchResultsModel::SearchResultsModel(app::Application *app) : results(nullptr), favouriteCount(0)
+SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel(app, 14)
 {
 }
 
@@ -12,6 +12,14 @@ SearchResultsModel::~SearchResultsModel()
 {
     results = nullptr;
 }
+
+void SearchResultsModel::requestFavouritesCount()
+{
+    favouriteCount = DBServiceAPI::ContactGetCount(application, true);
+}
+
+void SearchResultsModel::requestRecordsCount(){}
+void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t limit){}
 
 gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
