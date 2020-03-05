@@ -2,10 +2,9 @@
 #include "EndpointHandler.hpp"
 #include "ParserFsm.hpp"
 #include "log/log.hpp"
-#include "json/json11.hpp"
 
 class StateEndpointBattery;
-class StateEndpointBackups;
+class StateEndpointUpdate;
 class StateEndpointDeviceInfo;
 class StateEndpointNetwork;
 class StateEndpointStorage;
@@ -16,7 +15,7 @@ class StateEndpointStorage;
 
 class StateDecodeJson : public EndpointFsm
 {
-    void react(EndpointEvt const &) override
+    void react(EndpointEvt const &msg) override
     {
         std::string errorString;
 
@@ -27,7 +26,10 @@ class StateDecodeJson : public EndpointFsm
             return;
         }
 
-        method = msgJson[parserutils::json::method].number_value();
+        method       = msgJson[parserutils::json::method].number_value();
+        uuid         = msgJson[parserutils::json::uuid].number_value();
+        body         = msgJson[parserutils::json::body];
+        ownerService = msg.ownerService;
 
         if (!parserutils::http::isMethodValid(method))
         {
@@ -41,8 +43,8 @@ class StateDecodeJson : public EndpointFsm
         case parserutils::Endpoint::battery:
             transit<StateEndpointBattery>();
             break;
-        case parserutils::Endpoint::backups:
-            transit<StateEndpointBackups>();
+        case parserutils::Endpoint::update:
+            transit<StateEndpointUpdate>();
             break;
         case parserutils::Endpoint::deviceInfo:
             transit<StateEndpointDeviceInfo>();
@@ -57,39 +59,48 @@ class StateDecodeJson : public EndpointFsm
     };
 };
 
+class StateEndpointDeviceInfo : public EndpointFsm
+{
+    void entry() override
+    {
+        LOG_DEBUG("*** entry StateEndpointDeviceInfo *** uuid:%d", uuid);
+
+        EndpointHandler endpointHandler = EndpointHandler();
+
+        std::string responseStr;
+        sys::ReturnCodes retCode = endpointHandler.deviceInfo(method, uuid, body, responseStr, ownerService);
+        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %d", retCode, uuid);
+
+        putToSendQueue(responseStr);
+        transit<StateDecodeJson>();
+    };
+};
+
 class StateEndpointBattery : public EndpointFsm
 {
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointBattery ***");
+        transit<StateDecodeJson>();
+    };
+};
+
+class StateEndpointUpdate : public EndpointFsm
+{
+    void entry() override
+    {
+        LOG_DEBUG("*** entry StateEndpointUpdate ***");
 
         EndpointHandler endpointHandler = EndpointHandler();
 
         std::string responseStr;
-        sys::ReturnCodes retCode = endpointHandler.battery(method, responseStr);
-        LOG_DEBUG("endpointHandler.battery retCode %d", retCode);
+        sys::ReturnCodes retCode = endpointHandler.update(method, uuid, body, responseStr, ownerService);
+        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %d", retCode, uuid);
 
         putToSendQueue(responseStr);
-
         transit<StateDecodeJson>();
-    };
-};
 
-class StateEndpointBackups : public EndpointFsm
-{
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateEndpointBackups ***");
-        transit<StateDecodeJson>();
-    };
-};
-
-class StateEndpointDeviceInfo : public EndpointFsm
-{
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateEndpointDeviceInfo ***");
-        transit<StateDecodeJson>();
+        LOG_DEBUG("*** entry StateEndpointUpdate ***");
     };
 };
 
@@ -107,7 +118,17 @@ class StateEndpointStorage : public EndpointFsm
     void entry() override
     {
         LOG_DEBUG("*** entry StateEndpointStorage ***");
+
+        EndpointHandler endpointHandler = EndpointHandler();
+
+        std::string responseStr;
+        sys::ReturnCodes retCode = endpointHandler.storage(method, uuid, body, responseStr, ownerService);
+        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %d", retCode, uuid);
+
+        putToSendQueue(responseStr);
         transit<StateDecodeJson>();
+
+        LOG_DEBUG("*** entry StateEndpointStorage ***");
     };
 };
 
@@ -138,6 +159,9 @@ bool EndpointFsm::putToSendQueue(std::string sendMsg)
 xQueueHandle EndpointFsm::sendQueue;
 parserutils::Endpoint EndpointFsm::endpoint;
 uint8_t EndpointFsm::method;
+uint32_t EndpointFsm::uuid;
+json11::Json EndpointFsm::body;
+sys::Service *EndpointFsm::ownerService;
 
 // ----------------------------------------------------------------------------
 // Initial state definition

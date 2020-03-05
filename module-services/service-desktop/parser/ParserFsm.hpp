@@ -4,13 +4,15 @@
 #include "tinyfsm/include/tinyfsm.hpp"
 #include <list>
 #include <string>
-
+#include "Service/Service.hpp"
 // ----------------------------------------------------------------------------
 // Event declarations
 //
 
 struct MessageDataEvt : tinyfsm::Event
 {
+    MessageDataEvt(sys::Service *_ownerService) : ownerService(_ownerService) {}
+    sys::Service *ownerService;
 };
 
 // ----------------------------------------------------------------------------

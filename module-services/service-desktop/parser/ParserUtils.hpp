@@ -10,7 +10,7 @@ namespace parserutils
     enum class Endpoint
     {
         battery = 1,
-        backups,
+        update,
         deviceInfo,
         network,
         storage
@@ -56,6 +56,7 @@ namespace parserutils
     {
         const inline std::string method = "method";
         const inline std::string endpoint = "endpoint";
+        const inline std::string uuid = "uuid";
         const inline std::string status = "status";
         const inline std::string body = "body";
 
