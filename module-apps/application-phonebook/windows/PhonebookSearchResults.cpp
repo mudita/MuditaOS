@@ -79,6 +79,7 @@ PhonebookSearchResults::~PhonebookSearchResults()
 void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     setFocusItem(list);
+    searchResultsModel->requestFavouritesCount();
 }
 
 bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)
