@@ -1,6 +1,7 @@
 message( "${PROJECT_NAME}  ${CMAKE_CURRENT_LIST_DIR}" )
 
 add_subdirectory( parser )
+add_subdirectory( endpoints )
 
 target_sources( ${PROJECT_NAME}
     PRIVATE

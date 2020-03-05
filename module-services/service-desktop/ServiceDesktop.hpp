@@ -20,6 +20,7 @@ class ServiceDesktop : public sys::Service
   private:
     std::unique_ptr<WorkerDesktop> DesktopWorker;
     static const char *serviceName;
+    bool isOsUpdating;
 
   public:
     ServiceDesktop();
@@ -32,4 +33,6 @@ class ServiceDesktop : public sys::Service
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
+
+    void updateOs(const bool update = false) { isOsUpdating = update; }
 };

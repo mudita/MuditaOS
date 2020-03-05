@@ -10,12 +10,17 @@ extern "C"
 #include <stdint.h>
 #include <string>
 #include "tinyfsm/include/tinyfsm.hpp"
-
+#include "json/json11.hpp"
+#include "Service/Service.hpp"
 // ----------------------------------------------------------------------------
 // Event declarations
 //
 
-struct EndpointEvt   : tinyfsm::Event { };
+struct EndpointEvt: tinyfsm::Event
+{
+    EndpointEvt(sys::Service *_ownerService) : ownerService(_ownerService){};
+    sys::Service *ownerService;
+};
 
 // ----------------------------------------------------------------------------
 // EndpointFsm (FSM base class) declaration
@@ -36,6 +41,9 @@ class EndpointFsm
 
   protected:
     bool putToSendQueue(std::string);
+    static sys::Service *ownerService;
     static parserutils::Endpoint endpoint;
     static uint8_t method;
+    static uint32_t uuid;
+    static json11::Json body;
 };

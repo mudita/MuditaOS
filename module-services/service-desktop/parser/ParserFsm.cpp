@@ -101,7 +101,7 @@ class StateMessageSize : public ParserFsm
 
 class StateMessagePayload : public ParserFsm
 {
-    void react(MessageDataEvt const &) override
+    void react(MessageDataEvt const &msg) override
     {
         LOG_DEBUG("*** react MessagePayloadEvt ***");
 
@@ -137,9 +137,12 @@ class StateMessagePayload : public ParserFsm
                 getSingleByte();
             }
 
-            auto runHandler = [] {
+            auto runHandler = [msg] {
                 if (msgType == parserutils::message::Type::endpoint)
-                    send_event(EndpointEvt());
+                {
+                    LOG_INFO("msg.ownerService: %p", (void *)msg.ownerService);
+                    send_event(EndpointEvt(msg.ownerService));
+                }
                 else if (msgType == parserutils::message::Type::rawData)
                     send_event(RawDataEvt()); // invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
             };

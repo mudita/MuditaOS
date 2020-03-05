@@ -1,31 +1,11 @@
 #include "EndpointHandler.hpp"
 #include "ParserUtils.hpp"
-#include "json/json11.hpp"
+#include "version.hpp"
+#include "vfs.hpp"
+#include <common_data/EventStore.hpp>
 #include <string>
-
-sys::ReturnCodes EndpointHandler::battery(uint8_t httpMethod, std::string &responseStr)
-{
-    if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::get))
-    {
-        //sample json response
-        json11::Json responseBodyJson = json11::Json::object({{"level", 75}, {"charging", true}, {"maximumCapacity", 100}});
-
-        int statusCode = static_cast<int>(parserutils::http::Code::OK);
-        int endpoint = static_cast<int>(parserutils::Endpoint::battery);
-
-        json11::Json responsePayloadJson = json11::Json::object(
-            {{parserutils::json::endpoint, endpoint}, {parserutils::json::status, statusCode}, {parserutils::json::body, responseBodyJson}});
-
-        responseStr = EndpointHandler::buildResponseStr(responsePayloadJson.dump().size(), responsePayloadJson.dump());
-
-        return sys::ReturnCodes::Success;
-    }
-    else
-    {
-        LOG_ERROR("Incorrect method");
-        return sys::ReturnCodes::Failure;
-    }
-}
+#include <time/time_conversion.hpp>
+#include "service-cellular/api/CellularServiceAPI.hpp"
 
 std::string EndpointHandler::buildResponseStr(std::size_t responseSize, std::string responsePayloadString)
 {
