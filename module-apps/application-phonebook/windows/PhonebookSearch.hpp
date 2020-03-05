@@ -12,7 +12,7 @@
 #include <string>
 #include <widgets/BoxLayout.hpp>
 
-using namespace gui;
+namespace gui {
 
 class PhonebookSearch : public AppWindow
 {
@@ -21,9 +21,8 @@ class PhonebookSearch : public AppWindow
     Label *searchHeader = nullptr;
     Text *inputField = nullptr;
     HBox *horizontalBox = nullptr;
-    Image *searchTop;
+    Image *searchTop = nullptr;
 
-    PhonebookListView *searchResultList;
     PhonebookModel *phonebookModel = nullptr;
 
     /** currently displayed contact */
@@ -45,3 +44,5 @@ class PhonebookSearch : public AppWindow
     Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text, const std::string fontName,
                     const RectangleEdgeFlags edges, const Alignment alignment, const bool lineMode);
 };
+
+} /* namespace gui */
