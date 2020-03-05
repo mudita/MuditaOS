@@ -40,6 +40,7 @@
 
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
+#include <at/URC_QIND.hpp>
 #include <common_data/EventStore.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
@@ -636,13 +637,18 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
     }
 
     // Received signal strength change
-    if (auto ret = str.find("+QIND: \"csq\"") != std::string::npos) {
-        LOG_TRACE("received signal strength change notification");
-        auto beg = str.find(",",ret);
-        auto end = str.find(",",ret + beg+1);
-        message = str.substr(beg+1,end-beg-1);
-
-        return CellularNotificationMessage::Type::SignalStrengthUpdate;
+    auto qind = at::urc::QIND(str);
+    if (qind.is())
+    {
+        if (!qind.validate(at::urc::QIND::RSSI))
+        {
+            LOG_ERROR("Invalid csq - ignore");
+        }
+        else
+        {
+            message = std::string(qind.tokens[at::urc::QIND::RSSI]);
+            return CellularNotificationMessage::Type::SignalStrengthUpdate;
+        }
     }
 
     LOG_WARN("Unhandled notification");
@@ -828,7 +834,6 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 					record.body = decodedMessage;
 					record.number = receivedNumber;
 					record.type = SMSType::INBOX;
-					record.isRead = true;
 					record.date = messageDate;
 
 					DBServiceAPI::SMSAdd(this, record);

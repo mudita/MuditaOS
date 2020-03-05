@@ -51,13 +51,10 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
         LOG_DEBUG("Received multicast");
         if ((msg != nullptr) && ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added)))
         {
-            if (this->getCurrentWindow() == this->windows[app::name::window::desktop_menu] ||
-                getCurrentWindow() == this->windows[app::name::window::desktop_lockscreen])
-            {
-                notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-                notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
-                this->getCurrentWindow()->rebuild();
-            }
+            notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+            notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+            this->windows[app::name::window::desktop_menu]->rebuild();
+            this->windows[app::name::window::desktop_lockscreen]->rebuild();
             return std::make_shared<sys::ResponseMessage>();
         }
     }

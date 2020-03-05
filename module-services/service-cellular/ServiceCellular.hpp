@@ -121,6 +121,7 @@ public:
             -53 //30
     };
 
+    /// URC GSM notification handler
     CellularNotificationMessage::Type identifyNotification(const std::vector<uint8_t> &data, std::string &message);
 
     std::vector<std::string> messageParts;
