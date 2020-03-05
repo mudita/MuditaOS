@@ -834,7 +834,6 @@ bool ServiceCellular::receiveSMS(std::string messageNumber) {
 					record.body = decodedMessage;
 					record.number = receivedNumber;
 					record.type = SMSType::INBOX;
-					record.isRead = true;
 					record.date = messageDate;
 
 					DBServiceAPI::SMSAdd(this, record);
