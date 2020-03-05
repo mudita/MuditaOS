@@ -22,6 +22,7 @@
 | Robert Borzęcki | Review comments           | Draft  | 04.10.2018        |
 | Robert Borzęcki | templates and settings tables          | Draft  | 10.01.2019        |
 | Robert Borzęcki | alarms         | Draft  | 05.03.2019        |
+| Kuba Kleczkowski | Added date_format in settings.db         | Draft  | 04.02.2020  
 | Alek Rudnik | calllog | Draft | 28.02.2020 |
 
 ## Scope <a name="scope"></a>
@@ -369,6 +370,18 @@ All structures & data types are described in ```db.h``` file.
 
 ##### Database open & close
 If client wants to access SMS or Contacts database ```DB_OPEN_SMS_DB``` or ```    DB_OPEN_CONTACTS_DB``` command has to be sent first. When database transaction is finished, database has to be closed in order to flush it's internal buffers & commit all transactions. This can be done by sending ```DB_CLOSE_SMS_DB``` & ```DB_CLOSE_CONTACTS_DB``` commands to database service.
+
+## Database Triggers <a name="triggers"></a>
+
+This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is incremented by 1.
+```
+CREATE TRIGGER on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END;
+```
+
+This trigger is responsible for taking action when thread is removedf rom threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is decremented by 1.
+```
+CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
+```
 
 ## References <a name="references"></a>
 
