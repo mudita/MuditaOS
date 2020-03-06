@@ -47,3 +47,23 @@ auto QIND::validate(enum CSQ check) -> bool
     }
     return false;
 }
+
+auto QIND::rssiTodBm(const int rssi) -> int
+{
+    int ret = 0;
+    if (rssi >= rssi_low && rssi <= rssi_max)
+    {
+        ret = rssi_low_dBm - rssi * rssi_step;
+    }
+    else if (rssi >= rssi_tdscmda_low && rssi <= rssi_tdscmda_max)
+    {
+        ret = rssi_tdscmda_low_dBm - rssi * rssi_tdscmda_step;
+    }
+
+    return ret;
+}
+
+auto QIND::getRssiDbm() -> int
+{
+    return rssiTodBm(getRssi());
+}

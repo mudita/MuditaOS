@@ -44,7 +44,6 @@
 #include <common_data/EventStore.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
-constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 inline const auto cellularStack = 16384UL;
 
@@ -656,23 +655,15 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
     {
         if (!qind.validate(at::urc::QIND::RSSI))
         {
-            LOG_ERROR("Invalid csq - ignore");
+            LOG_INFO("Invalid csq - ignore");
         }
         else
         {
             auto rssi = std::string(qind.tokens[at::urc::QIND::RSSI]);
             auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
-            msg->signalStrength = std::stoll(rssi);
-            LOG_DEBUG("Setting new signal strength %d", msg->signalStrength);
-            if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])))
-            {
-                LOG_ERROR("Signal strength value out of range.");
-                msg->dBmSignalStrength = signalStrengthToDB[0];
-            }
-            else
-            {
-                msg->dBmSignalStrength = signalStrengthToDB[msg->signalStrength];
-            }
+            msg->rssi = qind.getRssi();
+            msg->rssidBm = qind.getRssiDbm();
+            LOG_DEBUG("Setting new signal strength rssi %d : %d dBm", msg->rssi, msg->rssidBm);
 
             return msg;
         }

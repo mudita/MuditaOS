@@ -7,6 +7,7 @@
 #include "projdefs.h"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
+#include <at/URC_QIND.hpp>
 #include <cassert>
 #include <sstream>
 
@@ -392,14 +393,8 @@ TS0710::ConfState TS0710::StartMultiplexer() {
             auto message = res.response[0].substr(beg + 1, end - beg - 1);
             LOG_DEBUG("Setting new signal strength");
             auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
-            msg->signalStrength = std::stoll(message);
-            if (msg->signalStrength > ServiceCellular::getSignalStrengthDBRange()) {
-                LOG_ERROR("Signal strength value out of range.");
-                msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(0);
-            }
-            else {
-                msg->dBmSignalStrength = ServiceCellular::getSignalStrengthDB(msg->signalStrength);
-            }
+            msg->rssi = std::stoi(message);
+            msg->rssidBm = at::urc::QIND::rssiTodBm(msg->rssi);
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
         }
         else

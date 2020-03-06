@@ -21,7 +21,7 @@ namespace at::urc
 
     auto Any::is() -> bool
     {
-        return head.find(what());
+        return head.find(what()) != std::string::npos;
     }
 
 } // namespace at::urc
