@@ -63,7 +63,7 @@ namespace Store
     SignalStrength::RssiBar SignalStrength::rssidBmToBar(const int rssidBm)
     {
         auto newStrength = RssiBar::zero;
-        if (rssidBm == 0)
+        if (rssidBm == rssidBm_invalid)
             newStrength = RssiBar::invalid;
         else if (rssidBm >= rssidBm_five_bar_margin)
             newStrength = RssiBar::five;
