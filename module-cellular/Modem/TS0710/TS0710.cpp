@@ -394,7 +394,6 @@ TS0710::ConfState TS0710::StartMultiplexer() {
             LOG_DEBUG("Setting new signal strength");
             auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
             msg->rssi = std::stoi(message);
-            msg->rssidBm = at::urc::QIND::rssiTodBm(msg->rssi);
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
         }
         else

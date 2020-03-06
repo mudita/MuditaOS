@@ -82,17 +82,15 @@ bool AppWindow::updateBatteryLevel( uint32_t percentage ) {
 	//if they are different make a change and return true, otherwise return false;
     return topBar->setBatteryLevel(percentage);
 }
-//updates battery level in the window
-bool AppWindow::updateSignalStrength( uint32_t strength ) {
-
-	uint32_t newStrength = 0;
-	if( strength >= 2 ) newStrength = 1;
-	if( strength >= 10 ) newStrength = 2;
-	if( strength >= 15 ) newStrength = 3;
-	if( strength >= 20 ) newStrength = 4;
-	if( strength >= 25 ) newStrength = 5;
-	topBar->setSignalStrength( newStrength );
-	return true;
+// updates battery level in the window
+bool AppWindow::updateSignalStrength()
+{
+    auto signalStrengthStore = Store::SignalStrength::get();
+    if (signalStrengthStore->isValid())
+    {
+        topBar->setSignalStrength(signalStrengthStore->rssiBar);
+    }
+    return true;
 }
 
 bool AppWindow::updateTime( const UTF8& timeStr ) {

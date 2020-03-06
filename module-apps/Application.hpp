@@ -23,6 +23,7 @@
 #include "Interface/SettingsRecord.hpp"
 
 #include "SwitchData.hpp"
+#include "service-cellular/api/CellularServiceAPI.hpp"
 #include "windows/AppWindow.hpp"
 
 namespace gui {
@@ -97,6 +98,8 @@ class Application: public sys::Service {
 
   private:
     State state = State::DEACTIVATED;
+
+    bool signalStrengthUpdateHandler(const CellularSignalStrengthUpdateMessage &);
 
   public:
 	std::list<uint32_t> timerIDs;

@@ -54,7 +54,7 @@ namespace gui {
         static uint32_t time;
 
       protected:
-        static uint32_t signalStrength;
+        static Store::SignalStrength::RssiBar signalStrengthBar;
         Label *timeLabel;
         Image *signal[6];
         Image *lock;
@@ -103,11 +103,11 @@ namespace gui {
         /**
          * @brief Sets signal strength. This will cause appropriate image to be displayed.
          */
-        void setSignalStrength(uint32_t sth);
-        uint32_t getSignalStrength()
-        {
-            return signalStrength;
-        };
+        void setSignalStrength(Store::SignalStrength::RssiBar sth);
+        /**
+         * @brief updates signal strength. This will cause appropriate image to be displayed.
+         */
+        void updateSignalStrength();
 
         void simSet();
         void setTime(const UTF8 &time);

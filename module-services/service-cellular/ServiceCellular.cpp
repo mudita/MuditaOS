@@ -213,6 +213,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             switch (msg->type)
             {
+            case CellularNotificationMessage::Type::SignalStrengthUpdate: {
+                auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
+                if (msg != nullptr)
+                {
+                    Store::SignalStrength::get()->setRssi(msg->rssi);
+                    responseMsg = std::make_shared<CellularResponseMessage>(true);
+                }
+                break;
+            }
             case CellularNotificationMessage::Type::CallActive: {
                 auto ret = ongoingCall.setActive();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
@@ -659,11 +668,9 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
         }
         else
         {
-            auto rssi = std::string(qind.tokens[at::urc::QIND::RSSI]);
             auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
-            msg->rssi = qind.getRssi();
-            msg->rssidBm = qind.getRssiDbm();
-            LOG_DEBUG("Setting new signal strength rssi %d : %d dBm", msg->rssi, msg->rssidBm);
+            msg->rssi = std::stoi(qind.tokens[at::urc::QIND::RSSI]);
+            LOG_DEBUG("Setting new signal strength rssi %d", msg->rssi);
 
             return msg;
         }

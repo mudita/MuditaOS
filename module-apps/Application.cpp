@@ -218,25 +218,26 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 	return 0;
 }
 
+bool Application::signalStrengthUpdateHandler(const CellularSignalStrengthUpdateMessage &msg)
+{
+    // loop and update all widnows
+    for (auto it = windows.begin(); it != windows.end(); it++)
+    {
+        it->second->updateSignalStrength();
+    }
+    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+
+    return true;
+}
+
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	bool handled = false;
 
-    if (msgl->messageType == MessageType::CellularNotification)
+    auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
+    if (msg != nullptr)
     {
-        auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
-        if (msg != nullptr)
-        {
-            if ((state == State::ACTIVE_FORGROUND) && (getCurrentWindow()->updateSignalStrength(msg->rssi)))
-            {
-                //loop and update all widnows
-				for ( auto it = windows.begin(); it != windows.end(); it++ ) {
-                    it->second->updateSignalStrength(msg->rssi);
-                }
-				handled = true;
-				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-            }
-        }
+        handled = signalStrengthUpdateHandler(*msg);
     }
 
     if (msgl->messageType == MessageType::AppInputEvent)
