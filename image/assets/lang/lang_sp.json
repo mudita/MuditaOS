@@ -115,6 +115,10 @@
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
     "app_settings_date_and_time": "Date and Time",
+    	"app_settings_title_day": "Day",
+		"app_settings_title_month": "Month",
+		"app_settings_title_year": "Year",
+		"app_settings_title_time": "Time",
     "app_settings_display": "Display",
     "app_settings_phone_modes": "Phone Modes",
     "app_settings_security": "Security",
@@ -125,6 +129,7 @@
 	"app_settings_language_polish": "Polaco",
 	"app_settings_language_german": "Alemana",
 	"app_settings_language_spanish": "Española",
+    "app_settings_date_time": "Date and Time",
 
     "app_phonebook_title_main": "Contactos",
 	"app_phonebook_call": "CALL",
