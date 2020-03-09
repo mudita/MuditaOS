@@ -16,6 +16,8 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
+#include <ContactRecord.hpp>
+#include <application-phonebook/windows/PhonebookContact.hpp>
 
 namespace gui {
 
@@ -69,15 +71,19 @@ void EnterNumberWindow::buildInterface() {
     numberLabel->setDotsMode( true, false);
 
     newContactIcon = new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
-    newContactIcon->activatedCallback = [=](gui::Item &item) {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        if (app != nullptr)
-        {
-            return app::contact(getApplication(), app::ContactOperation::Add, app->getDisplayedNumber());
-        }
-        return false;
-    };
+    newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };
     setFocusItem(newContactIcon);
+}
+
+bool EnterNumberWindow::addNewContact()
+{
+    auto app = dynamic_cast<app::ApplicationCall *>(application);
+    if (app != nullptr)
+    {
+        auto phoneNumber = app->getDisplayedNumber();
+        return app::contact(getApplication(), app::ContactOperation::Add, phoneNumber);
+    }
+    return false;
 }
 
 void EnterNumberWindow::destroyInterface() {

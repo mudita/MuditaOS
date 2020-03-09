@@ -100,7 +100,7 @@ void ApplicationPhonebook::createUserInterface()
     window = new PhonebookDuplicateSpeedDial(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
-    window = new PhonebookDuplicateNumber(this);
+    window = new DuplicatedContactDialogWindow(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
     window = new PhonebookSearch(this);

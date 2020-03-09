@@ -4,6 +4,7 @@
 #include "Label.hpp"
 #include "ListView.hpp"
 #include "Margins.hpp"
+#include "PhonebookNewContact.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
@@ -124,7 +125,7 @@ bool PhonebookSearchResults::onInput(const InputEvent &inputEvent)
         {
         case KeyCode::KEY_LEFT:
             LOG_INFO("Adding new contact");
-            application->switchWindow("New");
+            application->switchWindow(gui::window::name::newContact);
             return true;
         case KeyCode::KEY_RIGHT:
             LOG_INFO("Searching contact");

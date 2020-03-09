@@ -14,7 +14,13 @@
 
 namespace gui
 {
-
+    namespace window
+    {
+        namespace name
+        {
+            inline std::string newContact = "New";
+        }
+    } // namespace window
 class PhonebookNewContact : public AppWindow
 {
   public:

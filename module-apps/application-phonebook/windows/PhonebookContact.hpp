@@ -50,66 +50,75 @@ static inline void fillContactData(std::string &data, std::shared_ptr<ContactRec
     findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", std::to_string(contact->speeddial));
 }
 
-using namespace gui;
-
-class PhonebookContact : public AppWindow
+namespace gui
 {
-  protected:
-    /** labels */
-    Label *informationLabel = nullptr;
-    Label *ifnormation = nullptr;
-    Label *addressLabel = nullptr;
-    Label *addressLine1 = nullptr;
-    Label *addressLine2 = nullptr;
-    Label *email = nullptr;
-    Label *numberPrimary = nullptr;
-    Label *numberSecondary = nullptr;
-    Label *favouritesLabel = nullptr;
-    Label *speeddialLabel = nullptr;
-    Label *blockedLabel = nullptr;
-    Label *speedDialLabel = nullptr;
-    Label *speedDial = nullptr;
-    Label *noteLabel = nullptr;
-    Text *noteText = nullptr;
+    namespace window
+    {
+        namespace name
+        {
+            inline std::string contact = "Contact";
+        }
+    } // namespace window
 
-    /** icons */
-    Image *favouritesIcon = nullptr;
-    Image *blockedIcon = nullptr;
+    class PhonebookContact : public AppWindow
+    {
+      protected:
+        /** labels */
+        Label *informationLabel = nullptr;
+        Label *ifnormation = nullptr;
+        Label *addressLabel = nullptr;
+        Label *addressLine1 = nullptr;
+        Label *addressLine2 = nullptr;
+        Label *email = nullptr;
+        Label *numberPrimary = nullptr;
+        Label *numberSecondary = nullptr;
+        Label *favouritesLabel = nullptr;
+        Label *speeddialLabel = nullptr;
+        Label *blockedLabel = nullptr;
+        Label *speedDialLabel = nullptr;
+        Label *speedDial = nullptr;
+        Label *noteLabel = nullptr;
+        Text *noteText = nullptr;
 
-    Label *numberPrimaryLabel = nullptr;
-    Image *numberPrimaryIcon = nullptr;
+        /** icons */
+        Image *favouritesIcon = nullptr;
+        Image *blockedIcon = nullptr;
 
-    Label *numberPrimaryMessageLabel = nullptr;
-    Image *numberPrimaryMessage = nullptr;
+        Label *numberPrimaryLabel = nullptr;
+        Image *numberPrimaryIcon = nullptr;
 
-    Label *numberSecondaryLabel = nullptr;
-    Image *numberSecondaryIcon = nullptr;
+        Label *numberPrimaryMessageLabel = nullptr;
+        Image *numberPrimaryMessage = nullptr;
 
-    Label *numberSecondaryMessageLabel = nullptr;
-    Image *numberSecondaryMessage = nullptr;
+        Label *numberSecondaryLabel = nullptr;
+        Image *numberSecondaryIcon = nullptr;
 
-    ContactRecord readContact();
+        Label *numberSecondaryMessageLabel = nullptr;
+        Image *numberSecondaryMessage = nullptr;
 
-    /** currently displayed contact */
-    std::shared_ptr<ContactRecord> contact = nullptr;
+        ContactRecord readContact();
 
-    std::list<Item *> page1;
-    std::list<Item *> page2;
+        /** currently displayed contact */
+        std::shared_ptr<ContactRecord> contact = nullptr;
 
-    void setVisible(std::list<Item *> *page, bool shouldBeVisible);
+        std::list<Item *> page1;
+        std::list<Item *> page2;
 
-  public:
-    PhonebookContact(app::Application *app);
-    virtual ~PhonebookContact();
+        void setVisible(std::list<Item *> *page, bool shouldBeVisible);
 
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
-    void setContactData();
-    Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text, const std::string fontName,
-                    const RectangleEdgeFlags edges, const Alignment alignment, const bool lineMode);
-};
+      public:
+        PhonebookContact(app::Application *app);
+        virtual ~PhonebookContact();
+
+        // virtual methods
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool handleSwitchData(SwitchData *data) override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+        void setContactData();
+        Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text, const std::string fontName,
+                        const RectangleEdgeFlags edges, const Alignment alignment, const bool lineMode);
+    };
+} // namespace gui

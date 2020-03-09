@@ -11,6 +11,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "PhonebookContact.hpp"
+#include "PhonebookNewContact.hpp"
 #include "Text.hpp"
 #include "Utils.hpp"
 #include "application-call/data/CallSwitchData.hpp"
@@ -191,37 +192,51 @@ void PhonebookBlockContact::setContactData()
     setTitle(formatContactName(contact));
 }
 
-void PhonebookDuplicateNumber::onBeforeShow(ShowMode mode, SwitchData *data)
+DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)
+    : Dialog(app, gui::window::name::duplicatedContact,
+             {
+                 .title = "",
+                 .icon = "phonebook_info",
+                 .text = utils::localize.get("app_phonebook_duplicate_speed_dial"),
+                 .action = []() -> bool {
+                     LOG_INFO("!");
+                     return true;
+                 },
+             })
 {
-    if (icon == nullptr)
-        icon = new Image(this, 176, 135, 128, 128, "phonebook_info");
-
-    confirmationLabel->setText(utils::localize.get("app_phonebook_duplicate_numbers"));
-
-    noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("New", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        }
-        return (true);
-    };
-
-    yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {}
-        return (false);
-    };
 }
 
-void PhonebookDuplicateNumber::setContactData()
+bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)
 {
-    std::string t = utils::localize.get("app_phonebook_duplicate_numbers");
-    fillContactData(t, contact);
-    confirmationLabel->setText(t);
-    setTitle(contact.get()->numbers[0].numberE164);
+    if (data == nullptr)
+    {
+        return false;
+    }
+
+    PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
+    if (item != nullptr)
+    {
+        auto record = item->getContact();
+
+        auto meta = this->meta;
+        meta.action = [=]() -> bool {
+            application->switchWindow(gui::window::name::newContact, std::make_unique<PhonebookItemData>(record));
+            return true;
+        };
+        meta.title = item->text;
+        meta.text = updateText(meta.text, *record);
+        this->update(meta);
+        application->switchWindow(gui::window::name::duplicatedContact, nullptr);
+        return true;
+    }
+    return false;
+}
+
+std::string DuplicatedContactDialogWindow::updateText(const std::string &text, const ContactRecord &rec)
+{
+    std::string str = text;
+    fillContactData(str, std::make_shared<ContactRecord>(rec));
+    return str;
 }
 
 void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -245,7 +260,7 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
             ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
         {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("New", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
         return (false);
     };

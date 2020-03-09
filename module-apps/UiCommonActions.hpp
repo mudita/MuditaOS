@@ -25,7 +25,8 @@ namespace app
     enum class ContactOperation
     {
         Add,
-        Details
+        Details,
+        Edit
     };
     // TODO use contact here
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact);

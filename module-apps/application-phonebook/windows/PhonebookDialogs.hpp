@@ -5,6 +5,7 @@
 #include "ContactRecord.hpp"
 #include "Label.hpp"
 #include "Text.hpp"
+#include <Dialog.hpp>
 #include <memory>
 #include <string>
 #include <widgets/BoxLayout.hpp>
@@ -47,6 +48,17 @@ class PhonebookDialog : public AppWindow
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
 
+namespace gui
+{
+    namespace window
+    {
+        namespace name
+        {
+            inline const std::string duplicatedContact = "DuplicatedContactWindow";
+        }
+    } // namespace window
+} // namespace gui
+
 class PhonebookDeleteContact : public PhonebookDialog
 {
   public:
@@ -70,15 +82,15 @@ class PhonebookBlockContact : public PhonebookDialog
     void setContactData();
 };
 
-class PhonebookDuplicateNumber : public PhonebookDialog
+class DuplicatedContactDialogWindow : public Dialog
 {
   public:
-    PhonebookDuplicateNumber(app::Application *app) : PhonebookDialog(app, "NumberAlreadyExists")
-    {
-    }
-    virtual ~PhonebookDuplicateNumber() = default;
-    void onBeforeShow(ShowMode mode, SwitchData *data);
-    void setContactData();
+    DuplicatedContactDialogWindow(app::Application *app);
+    virtual ~DuplicatedContactDialogWindow() = default;
+    bool handleSwitchData(SwitchData *data) override;
+
+  private:
+    static std::string updateText(const std::string &text, const ContactRecord &rec);
 };
 
 class PhonebookDuplicateSpeedDial : public PhonebookDialog

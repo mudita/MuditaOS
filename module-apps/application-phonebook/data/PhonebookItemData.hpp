@@ -9,7 +9,7 @@
 class PhonebookItemData : public gui::SwitchData
 {
   public:
-    PhonebookItemData(std::shared_ptr<ContactRecord> _contact) : contact(_contact){};
+    PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "") : text(text), contact(contact){};
     virtual ~PhonebookItemData(){};
     std::shared_ptr<ContactRecord> getContact()
     {
@@ -20,8 +20,7 @@ class PhonebookItemData : public gui::SwitchData
     PhonebookItemData() : contact(nullptr)
     {
     }
-
-  protected:
+    std::string text;
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
 
