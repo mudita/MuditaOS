@@ -20,6 +20,19 @@ CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, c
 {
 }
 
+uint32_t CalllogRecord::getContactId()
+{
+    try
+    {
+        return static_cast<uint32_t>(std::stoi(contactId));
+    }
+    catch (const std::exception &e)
+    {
+        LOG_ERROR("Invalid contactId %s", contactId.c_str());
+        return DB_ID_NONE;
+    }
+}
+
 std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 {
     out << " <id> " << rec.ID << " <number> " << rec.number << " <presentation> " << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date

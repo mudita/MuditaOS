@@ -26,6 +26,7 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "time/time_conversion.hpp"
+#include <UiCommonActions.hpp>
 
 #include <Style.hpp>
 
@@ -59,29 +60,6 @@ void CallLogOptionsWindow::buildInterface() {
 	topBar->setActive(TopBar::Elements::TIME, true );
 
 	setTitle(utils::localize.get("app_calllog_options_title"));
-
-	//add option contact details option
-	options.push_back( addOptionLabel( utils::localize.get("app_calllog_options_contact_details"), 
-			[=](gui::Item&){ return true;}) ); // TODO: alek: contact details support
-
-	//add option delete call option
-	options.push_back( addOptionLabel( utils::localize.get("app_calllog_options_delete_call"),
-			[=] (gui::Item& item){ 
-				std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
-                auto app = dynamic_cast<app::ApplicationCallLog *>(application);
-                app->removeCalllogEntry(record);
-                return true;
-			}) );
-
-	//set position and navigation for labels
-	auto posY = title->offset_h();
-	auto size = options.size();
-	for (size_t i = 0; i < size; i++){
-		options[i]->setPosition(option::x,posY); // TODO: alek:: sthg is wrong here
-		posY += option::offset;
-		options[i]->setNavigationItem( NavigationDirection::DOWN, options[(i+1)%size]);
-		options[i]->setNavigationItem( NavigationDirection::UP, options[(size+i-1)%size]);
-	}
 }
 
 void CallLogOptionsWindow::destroyInterface() {
@@ -108,12 +86,64 @@ gui::Item* CallLogOptionsWindow::addOptionLabel( const std::string& text, std::f
 
 
 void CallLogOptionsWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
-	if( mode == ShowMode::GUI_SHOW_INIT) setFocusItem(options.front());
 
-	if(data != nullptr && data->getDescription() == calllog::CALLLOG_SWITCH_DATA_STR) {
-		auto switchData = reinterpret_cast<calllog::CallLogSwitchData*>(data);	
-		record = switchData->getRecord();
-	}
+    auto switchData = dynamic_cast<calllog::CallLogSwitchData *>(data);
+    if (switchData != nullptr)
+    {
+        record = switchData->getRecord();
+    }
+
+    options.clear();
+
+    auto searchResults = DBServiceAPI::ContactGetByID(application, record.getContactId());
+    if (searchResults.get()->empty() || searchResults->front().contactType == ContactType::TEMPORARY)
+    {
+        // add option - add contact
+        options.push_back(addOptionLabel(utils::localize.get("app_calllog_options_add_contact"), [=](gui::Item &) {
+            if (!app::contact(application, app::ContactOperation::Add, record.number))
+            {
+                LOG_ERROR("Add contact for number %s failed", record.number.c_str());
+                return false;
+            }
+            return true;
+        }));
+    }
+    else
+    {
+        ContactRecord contactRec = searchResults->front();
+        // add option - contact details
+        options.push_back(addOptionLabel(utils::localize.get("app_calllog_options_contact_details"), [=](gui::Item &) {
+            if (!app::contact(application, app::ContactOperation::Details, record.getContactId()))
+            {
+                LOG_ERROR("contact details for contact ID %u failed", record.getContactId());
+                return false;
+            }
+            return true;
+        }));
+    }
+
+    // add option delete call option
+    options.push_back(addOptionLabel(utils::localize.get("app_calllog_options_delete_call"), [=](gui::Item &item) {
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
+        auto app = dynamic_cast<app::ApplicationCallLog *>(application);
+        if (app != nullptr)
+            app->removeCalllogEntry(record);
+        return true;
+    }));
+
+    // set position and navigation for labels
+    auto posY = title->offset_h();
+    auto size = options.size();
+    for (size_t i = 0; i < size; i++)
+    {
+        options[i]->setPosition(option::x, posY); // TODO: alek:: sthg is wrong here
+        posY += option::offset;
+        options[i]->setNavigationItem(NavigationDirection::DOWN, options[(i + 1) % size]);
+        options[i]->setNavigationItem(NavigationDirection::UP, options[(size + i - 1) % size]);
+    }
+
+    if (mode == ShowMode::GUI_SHOW_INIT)
+        setFocusItem(options.front());
 }
 
 } /* namespace gui */

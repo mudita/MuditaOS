@@ -31,4 +31,5 @@ namespace app
     // TODO use contact here
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact);
     bool contact(Application *app, ContactOperation contactOperation, const std::string &number);
+    bool contact(Application *app, ContactOperation contactOperation, uint32_t contactId);
 } // namespace app
