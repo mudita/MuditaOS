@@ -103,9 +103,8 @@ void ViewWindow::buildInterface() {
 
 	for( ViewerState s : states ) {
 		gui::Image* img = new gui::Image(this,0,0,0,0);
-		uint16_t id = gui::ImageManager::getInstance().getImageMapID(s.screenName);
-		img->setImageWithID( id );
-		img->setVisible(false);
+        img->set(s.screenName);
+        img->setVisible(false);
 
 		images.push_back( img );
 	}
