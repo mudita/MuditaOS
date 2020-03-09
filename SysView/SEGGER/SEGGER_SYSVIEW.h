@@ -226,6 +226,7 @@ extern "C"
     void SEGGER_SYSVIEW_SendTaskInfo(const SEGGER_SYSVIEW_TASKINFO *pInfo);
     void SEGGER_SYSVIEW_SendSysDesc(const char *sSysDesc);
     int SEGGER_SYSVIEW_IsStarted(void);
+    void SEGGER_SYSVIEW_WaitForConnection(void);
     int SEGGER_SYSVIEW_GetChannelID(void);
 
     /*********************************************************************
