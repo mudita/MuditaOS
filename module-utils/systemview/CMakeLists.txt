@@ -6,7 +6,6 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/FreeRTOSV10/Config/"
         "${CMAKE_CURRENT_LIST_DIR}/FreeRTOSV10/Patch"
 
-
         )
 target_compile_options(${PROJECT_NAME} PUBLIC "-w")
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
