@@ -3,7 +3,7 @@
 #include "Label.hpp"
 #include "ListView.hpp"
 #include "Margins.hpp"
-#include "PhonebookMainWindow.hpp"
+#include "PhonebookNewContact.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -111,7 +111,7 @@ bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
         {
         case KeyCode::KEY_LEFT: {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
-            application->switchWindow("New", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
             return true;
         case KeyCode::KEY_RIGHT:

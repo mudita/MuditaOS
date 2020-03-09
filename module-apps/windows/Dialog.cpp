@@ -1,4 +1,5 @@
 #include "Dialog.hpp"
+#include "service-appmgr/ApplicationManager.hpp"
 #include <i18/i18.hpp>
 
 using namespace gui;
@@ -34,6 +35,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     no->setFont(style::window::font::small);
     no->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
 
     yes = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
     yes->setPenWidth(0);

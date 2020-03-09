@@ -17,9 +17,9 @@
 namespace gui
 {
 
-PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, "New")
-{
-    buildInterface();
+    PhonebookNewContact::PhonebookNewContact(app::Application *app) : AppWindow(app, window::name::newContact)
+    {
+        buildInterface();
 }
 
 void PhonebookNewContact::rebuild()
@@ -590,7 +590,7 @@ bool PhonebookNewContact::verifyAndSave()
         {
             coppyDataToContact();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             LOG_INFO("verifyAndSave contact ADDED");
             return (true);
         }
@@ -606,7 +606,7 @@ bool PhonebookNewContact::verifyAndSave()
         {
             coppyDataToContact();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-            application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 
             LOG_INFO("verifyAndSave new contact UPDATED");
             return (true);
