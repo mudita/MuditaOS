@@ -8,6 +8,7 @@
 #include <functional>
 #include <log/log.hpp>
 #include <memory>
+#include <application-phonebook/data/PhonebookStyle.hpp>
 
 #include "../widgets/PhonebookItem.hpp"
 
@@ -31,13 +32,13 @@ void PhonebookSearchResults::buildInterface()
 
     AppWindow::buildInterface();
 
-    list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
-    list->setMaxElements(7);
-    list->setPageSize(7);
-    list->setPenFocusWidth(0);
-    list->setPenWidth(0);
-    list->setProvider(searchResultsModel);
-    list->setApplication(application);
+    searchResultList = new gui::PhonebookListView(this, phonebookStyle::searchResults::searchResultList::x, phonebookStyle::searchResults::searchResultList::y, phonebookStyle::searchResults::searchResultList::w, phonebookStyle::searchResults::searchResultList::h);
+    searchResultList->setMaxElements(phonebookStyle::searchResults::searchResultList::maxElements);
+    searchResultList->setPageSize(phonebookStyle::searchResults::searchResultList::pageSize);
+    searchResultList->setPenFocusWidth(phonebookStyle::searchResults::searchResultList::penFocusWidth);
+    searchResultList->setPenWidth(phonebookStyle::searchResults::searchResultList::penWidth);
+    searchResultList->setProvider(searchResultsModel);
+    searchResultList->setApplication(application);
 
     bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -54,11 +55,11 @@ void PhonebookSearchResults::buildInterface()
 void PhonebookSearchResults::destroyInterface()
 {
     AppWindow::destroyInterface();
-    if (list)
+    if (searchResultList)
     {
-        removeWidget(list);
-        delete list;
-        list = nullptr;
+        removeWidget(searchResultList);
+        delete searchResultList;
+        searchResultList = nullptr;
     }
     if (newContactImage)
     {
@@ -78,7 +79,7 @@ PhonebookSearchResults::~PhonebookSearchResults()
 
 void PhonebookSearchResults::onBeforeShow(ShowMode mode, SwitchData *data)
 {
-    setFocusItem(list);
+    setFocusItem(searchResultList);
     searchResultsModel->requestFavouritesCount();
 }
 
@@ -126,8 +127,8 @@ bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
             return;
         }
         searchResultsModel->setResults(res);
-        list->clear();
-        list->setElementsCount(res.get()->size());
+        searchResultList->clear();
+        searchResultList->setElementsCount(res.get()->size());
         setTitle(utils::localize.get("app_phonebook_search_results_prefix") + "\"" + title + "\"");
     };
 
@@ -141,7 +142,7 @@ bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
     auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
     if (contactRequest)
     {
-        list->cb_ENTER = [=](gui::PhonebookItem *item) {
+        searchResultList->cb_ENTER = [=](gui::PhonebookItem *item) {
             std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
             data->result = item->getContact();
             data->setDescription("PhonebookSearchRequest");
