@@ -25,7 +25,7 @@ namespace gui
 class PhonebookSearchResults : public AppWindow
 {
   protected:
-    PhonebookListView *list;
+    PhonebookListView *searchResultList = nullptr;
     SearchResultsModel *searchResultsModel = nullptr;
 
     Image *newContactImage = nullptr;
