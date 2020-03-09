@@ -3166,4 +3166,21 @@ int SEGGER_SYSVIEW_IsStarted(void)
     return _SYSVIEW_Globals.EnableState;
 }
 
+/*********************************************************************
+ *
+ *       SEGGER_SYSVIEW_WaitForConnection()
+ *
+ *  Function description
+ *    Wait endless when SystemView APP will be connected
+ *
+ *  Additional information
+ */
+void SEGGER_SYSVIEW_WaitForConnection(void)
+{
+    do
+    {
+        _HandleIncomingPacket();
+    } while (0 == _SYSVIEW_Globals.EnableState);
+}
+
 /*************************** End of file ****************************/

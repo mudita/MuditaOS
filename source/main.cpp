@@ -136,9 +136,6 @@ public:
 
 int main() {
 
-    SEGGER_SYSVIEW_Conf();
-    SEGGER_SYSVIEW_Start();
-
     bsp::BoardInit();
 
     LOG_PRINTF("Launching PurePhone \n");
@@ -196,6 +193,12 @@ int main() {
 
 
     });
+
+#ifdef SYSTEM_VIEW_ENABLED
+    SEGGER_SYSVIEW_Conf();
+    SEGGER_SYSVIEW_WaitForConnection();
+    SEGGER_SYSVIEW_Start();
+#endif
 
     cpp_freertos::Thread::StartScheduler();
 #endif
