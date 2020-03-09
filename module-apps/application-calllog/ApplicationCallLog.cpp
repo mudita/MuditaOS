@@ -93,9 +93,6 @@ void ApplicationCallLog::createUserInterface() {
 	window = new gui::CallLogDetailsWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
-    // window = new gui::CallLogOptionsWindow(this);
-    // windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
     windowOptions = gui::newOptionWindow(this);
     windows.insert(std::pair<std::string, gui::AppWindow *>(windowOptions->getName(), windowOptions));
 
