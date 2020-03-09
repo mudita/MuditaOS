@@ -25,10 +25,13 @@ public:
 	Image();
     Image(const UTF8&);
 	Image( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const UTF8 = UTF8{""});
-	virtual ~Image();
-	bool setImageWithID( int id );
+    virtual ~Image() = default;
+    /// set image with id
+    bool set(int id);
+    /// set image with string name
+    void set(const UTF8 &name);
 
-	//virtual methods from Item
+    //virtual methods from Item
 	std::list<DrawCommand*> buildDrawList();
 };
 

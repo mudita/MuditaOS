@@ -12,6 +12,7 @@
 #include "Image.hpp"
 #include "Label.hpp"
 #include "Rect.hpp"
+#include "TopBar/SIM.hpp"
 #include <common_data/EventStore.hpp>
 
 namespace gui {
@@ -47,7 +48,7 @@ namespace gui {
         Image *lock;
         std::array<Image *, batteryLevelCount> battery = {nullptr};
         Label *charging = nullptr;
-        Label *sim = nullptr;
+        gui::SIM *sim = nullptr;
         void prepareWidget();
         static TimeMode timeMode;
 
@@ -62,7 +63,7 @@ namespace gui {
             bool battery : 1;
             bool time : 1;
             bool sim : 1;
-        } elements = {false, false, false, false, false};
+        } elements = {false, false, false, false, true};
 
       public:
         TopBar();
