@@ -22,6 +22,7 @@
 
 #include "../data/CallLogInternals.hpp" // TODO: alek: add easier paths
 #include "../data/CallLogSwitchData.hpp"
+#include "../windows/CallLogOptionsWindow.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "UiCommonActions.hpp"
@@ -276,8 +277,21 @@ bool CallLogDetailsWindow::onInput( const InputEvent& inputEvent ) {
     if (((inputEvent.state == InputEvent::State::keyReleasedShort) || ((inputEvent.state == InputEvent::State::keyReleasedLong))) &&
         (inputEvent.keyCode == KeyCode::KEY_LF))
     {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
-        application->switchWindow(calllog::settings::OptionsWindowStr, std::move(data));
+        auto app = dynamic_cast<app::ApplicationCallLog *>(application);
+        if (app == nullptr)
+        {
+            LOG_FATAL("Not ApplicationCallLog!!!");
+            return false;
+        }
+        if (app->windowOptions != nullptr)
+        {
+            app->windowOptions->clearOptions();
+            app->windowOptions->addOptions(calllogWindowOptions(app, record));
+            app->switchWindow(app->windowOptions->getName(), nullptr);
+        }
+
+        // std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
+        // application->switchWindow(calllog::settings::OptionsWindowStr, std::move(data));
         return true;
     }
 

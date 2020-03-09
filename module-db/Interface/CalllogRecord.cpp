@@ -20,7 +20,7 @@ CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, c
 {
 }
 
-uint32_t CalllogRecord::getContactId()
+uint32_t CalllogRecord::getContactId() const
 {
     try
     {
