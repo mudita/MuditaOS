@@ -45,8 +45,10 @@
 //module-sys
 #include "SystemManager/SystemManager.hpp"
 
-// SystemVievFun
-#include "SysView/SEGGER/SEGGER_SYSVIEW.h"
+// SystemView include if enabled
+#ifdef SYSTEM_VIEW_ENABLED
+#include "module-utils/systemview/SEGGER/SEGGER_SYSVIEW.h"
+#endif
 
 class vfs vfs;
 
