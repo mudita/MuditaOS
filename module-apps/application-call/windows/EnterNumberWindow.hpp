@@ -16,6 +16,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
+#include <ContactRecord.hpp>
 
 namespace gui {
 
@@ -43,6 +44,8 @@ public:
 
 private:
   gui::KeyInputMappedTranslation translator;
+
+  bool addNewContact();
 };
 
 } /* namespace gui */

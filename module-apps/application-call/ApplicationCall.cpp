@@ -6,6 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "ApplicationCall.hpp"
 #include "Application.hpp"
 
 #include "MessageType.hpp"
@@ -22,7 +23,6 @@
 
 #include "service-appmgr/ApplicationManager.hpp"
 
-#include "ApplicationCall.hpp"
 namespace app {
 
     ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound)
