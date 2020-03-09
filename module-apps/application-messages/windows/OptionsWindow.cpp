@@ -17,7 +17,8 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
          [=](gui::Item &item) {
              LOG_INFO("Removing sms thread!");
              return app->removeSMS_thread(record);
-         }},
+         },
+         gui::Arrow::Disabled},
 
         // TODO
         // last sms, all sms? what author had in mind?
