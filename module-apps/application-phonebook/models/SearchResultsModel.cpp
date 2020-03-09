@@ -67,6 +67,7 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
                 auto prevContact = std::make_shared<ContactRecord>(o[prevIndex]);
                 if (contact->alternativeName.substr(0, 1) == prevContact->alternativeName.substr(0, 1))
                 {
+                    item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
                 }
@@ -99,7 +100,7 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
         {
             gui::PhonebookItem *item = new gui::PhonebookItem();
 
-            // leaving normal contacts list and entering favourite area but charatcer is already placed
+            // leaving normal contacts list and entering favourite area but character is already placed
             if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex))
             {
                 item->markFavourite(true);
@@ -119,6 +120,7 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
                     // previous element has the same first character of alternative name so display first character
                     if (index == prevIndex)
                     {
+                        item->markFavourite(false);
                         item->setContact(contact);
                         item->setID(index);
                     }
@@ -129,6 +131,7 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
                 }
                 else if (((index == firstElement) || (index == prevIndex) || (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))))
                 {
+                    item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
                 }

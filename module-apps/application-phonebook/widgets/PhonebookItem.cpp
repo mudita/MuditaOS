@@ -28,7 +28,7 @@ PhonebookItem::PhonebookItem()
     value = new gui::Label(this, 0, 0, 0, 0);
     value->setPenFocusWidth(0);
     value->setPenWidth(0);
-    value->setFont(style::window::font::medium);
+    value->setFont(style::window::font::small);
     value->setAlignement(gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
 }
 
@@ -82,7 +82,7 @@ void PhonebookItem::markFavourite(bool val)
     if (val)
         value->setFont(style::window::font::bigbold);
     else
-        value->setFont(style::window::font::medium);
+        value->setFont(style::window::font::big);
 }
 
 std::shared_ptr<ContactRecord> PhonebookItem::getContact()
