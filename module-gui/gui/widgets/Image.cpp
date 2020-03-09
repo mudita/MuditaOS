@@ -22,13 +22,8 @@ Image::Image( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, cons
 	Rect( parent, x, y, w, h ),
 	imageMap { nullptr }{
 	type = ItemType::IMAGE;
-
-	if( imageName.length() ) {
-		uint32_t id = ImageManager::getInstance().getImageMapID( imageName.c_str() );
-		setImageWithID( id );
-	}
-
-	setPosition(x, y);
+    set(imageName);
+    setPosition(x, y);
 	updateDrawArea();
 }
 
@@ -37,21 +32,14 @@ Image::Image(const UTF8& imageName )
 	:imageMap { nullptr }
 {
 	type = ItemType::IMAGE;
-
-	if( imageName.length() ) {
-		uint32_t id = ImageManager::getInstance().getImageMapID( imageName.c_str() );
-		setImageWithID( id );
-	}
-	updateDrawArea();
+    set(imageName);
+    updateDrawArea();
 }
 
-Image::~Image() {
-}
+bool Image::set(int id)
+{
 
-
-bool Image::setImageWithID( int id ) {
-
-	//get pixmap for selected ID
+    //get pixmap for selected ID
 	imageMap = ImageManager::getInstance().getImageMap( id );
 
 	//set height and width and max and min dimensions
@@ -65,6 +53,15 @@ bool Image::setImageWithID( int id ) {
     widgetMaxArea.h = widgetArea.h = imageMapHeight;
 
     return true;
+}
+
+void Image::set(const UTF8 &name)
+{
+    if (name.length())
+    {
+        int id = ImageManager::getInstance().getImageMapID(name.c_str());
+        set(id);
+    }
 }
 
 std::list<DrawCommand*> Image::buildDrawList() {

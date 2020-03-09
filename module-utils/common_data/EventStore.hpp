@@ -38,8 +38,11 @@ namespace Store
         {
             SIM1,
             SIM2,
+            SIM_FAIL,
+            SIM_UNKNOWN,
             NONE,
-        } sim = SIM::NONE, selected = SIM::SIM1;
+        } sim = SIM::NONE,
+          selected = SIM::SIM1;
         static GSM *get();
     };
 }; // namespace Store
