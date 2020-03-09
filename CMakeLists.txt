@@ -133,8 +133,6 @@ add_subdirectory(module-lwip)
 
 add_subdirectory(image)
 
-add_subdirectory(SysView)
-
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES SUFFIX ".elf")
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES LINK_FLAGS "-Xlinker -Map=${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.map ")

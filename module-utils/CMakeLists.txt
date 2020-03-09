@@ -69,6 +69,9 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 
+if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (PROJECT_CONFIG_DEFINITIONS ${SYSTEM_VIEW_ENABLED}))
+    add_subdirectory(systemview)
+endif()
 
 if(DEFINED BUILD_UNIT_TESTS)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC BUILD_GTEST_TESTS)
