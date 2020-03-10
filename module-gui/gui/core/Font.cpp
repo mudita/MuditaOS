@@ -14,11 +14,9 @@
 #include "utf8/UTF8.hpp"
 #include "log/log.hpp"
 //for loading files
-#include "Context.hpp"
-#include "DrawCommand.hpp"
-#include "Renderer.hpp"
 #include "vfs.hpp"
 #include <cassert>
+
 
 namespace gui {
 
@@ -207,56 +205,55 @@ uint32_t Font::getCharCountInSpace( const UTF8& str, const uint32_t space, uint3
 	uint32_t stringChars = 0;
 	uint16_t idLast = 0, idCurrent = 0;
 
-    for (uint32_t i = 0; i < str.length(); ++i)
-    {
+    for(uint32_t i=0; i<str.length(); ++i )
+	{
         // go in reverse rather than UTF8::reverse. be careful, no NULL at the end.
-        uint32_t iAnyDir = fromBeginning ? i : (str.length() - 1 - i); // i compensated for direction
+        uint32_t iAnyDir = fromBeginning ? i : (str.length() -1 - i); // i compensated for direction
         idCurrent = str[iAnyDir];
-
-        auto glyph_found = glyphs.find(idCurrent);
-
-        std::unique_ptr<FontGlyph> unique_glyph;
-
-        FontGlyph *glyph = nullptr;
-        if (glyph_found != glyphs.end())
-        {
-            glyph = glyph_found->second;
-        }
-        else
-        {
-            unique_glyph = getGlyphUnsupported();
-            glyph = unique_glyph.get();
-        }
-
-        int32_t kern_value = 0;
-
-        if (i > 0)
-        {
-            kern_value = getKerning(idLast, idCurrent);
-        }
-
-        if (availableSpace - (glyph->xadvance + kern_value) < 0)
-        {
-            if (spaceConsumed)
+        auto it = glyphs.find(idCurrent);
+        if(it != glyphs.end()) {
+            FontGlyph* glyph = it->second;
+            if( glyph  )
             {
-                spaceConsumed = space - availableSpace; // unreachable
+                if (i == 0)
+                {
+                    {
+                        if (availableSpace - glyph->xadvance < 0)
+                        {
+                            if (spaceConsumed)
+                            {
+                                spaceConsumed = space - availableSpace;
+                            }
+                            return stringChars;
+                        }
+                        availableSpace -= glyph->xadvance;
+                    }
+                }
+                else
+                {
+                    int32_t kern_value = getKerning(idLast, idCurrent);
+                    if (glyph)
+                    {
+                        if (availableSpace - (glyph->xadvance + kern_value) < 0)
+                        {
+                            spaceConsumed = space - availableSpace;
+                            return stringChars;
+                        }
+                        availableSpace -= glyph->xadvance + kern_value;
+                    }
+                }
             }
-            return stringChars;
         }
+		idLast = idCurrent;
+		++stringChars;
 
-        availableSpace -= glyph->xadvance + kern_value;
-
-        idLast = idCurrent;
-        ++stringChars;
-
-        // check for delimiter
-        if (idCurrent == delimiter)
-        {
-            break;
-        }
-    }
-    spaceConsumed = space - availableSpace;
-    return stringChars;
+		//check for delimiter
+		if( idCurrent == delimiter ) {
+			break;
+		}
+	}
+	spaceConsumed = space - availableSpace;
+	return stringChars;
 }
 
 uint32_t Font::getPixelWidth( const UTF8& str, const uint32_t start, const uint32_t count )
@@ -278,22 +275,33 @@ uint32_t Font::getPixelWidth( const UTF8& str, const uint32_t start, const uint3
 	uint32_t stringPixelWidth = 0;
 	uint16_t idLast = 0, idCurrent = 0;
 
-    for (uint32_t i = 0; i < count; ++i)
-    {
-        idCurrent = str[start + i];
-        auto glyph_found = glyphs.find(idCurrent);
-        if (glyph_found != glyphs.end())
-        {
-            stringPixelWidth = getCharPixelWidth(idCurrent) + (i == 0 ? 0 : getKerning(idLast, idCurrent));
-        }
-        else
-        {
-            stringPixelWidth += getGlyphUnsupported()->xadvance;
-        }
-        idLast = idCurrent;
-    }
+	for( uint32_t i=0; i<count; ++i )
+	{
+		if( i == 0 )
+		{
+			idCurrent = str[start+i];
+			FontGlyph* glyph = glyphs.find(idCurrent)->second;
 
-    return stringPixelWidth;
+			if( glyph != NULL)
+			{
+				stringPixelWidth += glyph->xadvance ;
+			}
+		}
+		else
+		{
+			idCurrent = str[start+i];
+			FontGlyph* glyph = glyphs.find(idCurrent)->second;
+
+			int32_t kern_value = getKerning( idLast, idCurrent);
+			if( glyph != nullptr )
+			{
+				stringPixelWidth += glyph->xadvance+kern_value;
+			}
+		}
+		idLast = idCurrent;
+	}
+
+	return stringPixelWidth;
 }
 
 uint32_t Font::getPixelWidth( const UTF8& str ) {
@@ -316,50 +324,6 @@ uint32_t Font::getCharPixelHeight( uint32_t charCode ) {
 		return  glyph->height ;
 
 	return 0;
-}
-std::unique_ptr<FontGlyph> Font::getGlyphUnsupported() const
-{
-    std::unique_ptr<FontGlyph> unsupported = std::make_unique<FontGlyph>();
-    unsupported->height = this->info.size * 0.80;
-    unsupported->width = unsupported->height * 0.69;
-    unsupported->xoffset = 0;
-    unsupported->yoffset = 0;
-
-    // generate a rectangle based o a existing letter. otherwise use some magic numbers ↑ to approximate the size for the rectangle
-    char baseChar = 'h'; // arbitrary choice. h as a representative character to get an idea of glyph size. if not found, then use magic numbers above
-    auto baseCharFound = this->glyphs.find(baseChar);
-    if (baseCharFound != this->glyphs.end())
-    {
-        FontGlyph *baseGlyph = baseCharFound->second;
-        unsupported->width = baseGlyph->width;
-        unsupported->height = baseGlyph->height;
-        unsupported->xoffset = (baseGlyph->xadvance - baseGlyph->width) / 2;
-        unsupported->xadvance = unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
-    }
-    if (unsupported->xoffset == 0)
-    {
-        unsupported->xoffset = 1; // fallback margin.
-    }
-    unsupported->yoffset += unsupported->height;
-    // populate with a bitmap (glyph)
-    CommandRectangle *commandRect = new CommandRectangle();
-    commandRect->x = 0;
-    commandRect->y = 0;
-    commandRect->w = unsupported->width;
-    commandRect->h = unsupported->height;
-    commandRect->areaX = 0;
-    commandRect->areaY = 0;
-    commandRect->areaW = unsupported->width;
-    commandRect->areaH = unsupported->height;
-    commandRect->penWidth = unsupported->xoffset;
-
-    Context *renderCtx = new Context(unsupported->width, unsupported->height);
-    std::vector<gui::DrawCommand *> commands = {commandRect};
-    Renderer().render(renderCtx, commands);
-
-    unsupported->data = renderCtx->getData();
-
-    return std::move(unsupported);
 }
 
 FontManager::FontManager() {

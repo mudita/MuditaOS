@@ -241,8 +241,8 @@ void Renderer::drawRectangle( Context* ctx, CommandRectangle* cmd ) {
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP )
 			drawHorizontalLine( drawCtx, wgtX, wgtY, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_DOWN );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM )
-            drawHorizontalLine(drawCtx, wgtX, wgtY + wgtH, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP);
-        if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT )
+			drawHorizontalLine( drawCtx, wgtX, wgtY + cmd->areaH, wgtW, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_UP );
+		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT )
 			drawVerticalLine( drawCtx, wgtX, wgtY, wgtH, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_RIGHT );
 		if( cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_RIGHT )
 			drawVerticalLine( drawCtx, wgtX + wgtW, wgtY, wgtH, cmd->penWidth, cmd->borderColor, LineExpansionDirection::LINE_EXPAND_LEFT );
@@ -675,47 +675,47 @@ void Renderer::drawText( Context* ctx, CommandText* cmd ) {
 
 	//draw every sign
 	uint32_t idLast = 0, idCurrent = 0;
-    for (uint32_t i = 0; i < cmd->str.length(); ++i)
+	for( uint32_t i=0; i<cmd->str.length(); ++i )
     {
         idCurrent = cmd->str[i]; // id stands for glued together utf-16 with no order bytes (0xFF 0xFE)
         auto glyph_found = font->glyphs.find(idCurrent);
 
-        std::unique_ptr<FontGlyph> unique_glyph;
-
-        FontGlyph *glyph = nullptr;
         if (glyph_found != font->glyphs.end())
         {
-            glyph = glyph_found->second;
-        }
-        else
-        {
-            LOG_WARN("no glyph for character id:%d in font \"%s\"", idCurrent, font->info.face.c_str());
-            unique_glyph = font->getGlyphUnsupported();
-            glyph = unique_glyph.get();
-        }
+            FontGlyph *glyph = glyph_found->second;
+            if (glyph == NULL)
+            {
+                LOG_ERROR("terribly wrong: character id=%d is said to exist, but it doesn't", idCurrent);
+                continue;
+            }
 
-        //#ifdef BUILD_UNIT_TESTS
-        // do not start drawing outside of draw context.
-        if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0))
-        {
-            LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
-            return;
+            if (i == 0)
+            {
+                drawChar(drawCtx, wgtX + posX + glyph->xoffset, wgtY + posY, font, glyph, cmd->color);
+                posX += glyph->xadvance; //- glyph->xoffset;
+            }
+            else
+            {
+                int32_t kernValue = font->getKerning(idLast, idCurrent);
+                {
+                    //#ifdef BUILD_UNIT_TESTS
+                    if ((wgtX + posX + glyph->xoffset >= drawCtx->getW()) || (wgtX + posX + glyph->xoffset < 0))
+                    {
+                        LOG_FATAL("Drawing outside context's X boundary for glyph: %d", glyph->id);
+                        return;
+                    }
+                    if ((wgtY + posY >= drawCtx->getH()) || (wgtY + posY < 0))
+                    {
+                        LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
+                        return;
+                    }
+                    //#endif
+                    drawChar(drawCtx, wgtX + posX + glyph->xoffset + kernValue, wgtY + posY, font, glyph, cmd->color);
+                    posX += glyph->xadvance + kernValue;
+                }
+            }
         }
-        if ((wgtY + posY >= drawCtx->getH()) || (wgtY + posY < 0))
-        {
-            LOG_FATAL("Drawing outside context's Y boundary for glyph: %d", glyph->id);
-            return;
-        }
-        //#endif
-
-        int32_t kernValue = 0;
-        if (i > 0)
-        {
-            kernValue = font->getKerning(idLast, idCurrent);
-        }
-        drawChar(drawCtx, wgtX + posX + glyph->xoffset + kernValue, wgtY + posY, font, glyph, cmd->color);
-        posX += glyph->xadvance + kernValue;
-
+        // TODO: M.G. else: unsupported character
         idLast = idCurrent;
     }
 
