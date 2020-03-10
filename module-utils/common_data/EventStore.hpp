@@ -41,8 +41,17 @@ namespace Store
             SIM_FAIL,
             SIM_UNKNOWN,
             NONE,
-        } sim = SIM::NONE,
+        } sim = SIM::SIM_UNKNOWN,
           selected = SIM::SIM1;
+
+        /// state of modem
+        enum class Modem
+        {
+            OFF,             /// modem is off - it's not working
+            ON_INITIALIZING, /// modem is set to on, just started - initialization not done yet
+            ON_NEED_SIMFLOW, /// modem is on, initialized, no SIM initialization yet
+            ON_INITIALIZED,  /// modem is on, and it's fully initialized
+        } modem = Modem::OFF;
         static GSM *get();
     };
 }; // namespace Store

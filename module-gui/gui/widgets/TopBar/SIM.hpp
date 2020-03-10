@@ -7,7 +7,7 @@ namespace gui
 {
     class SIM : public Image
     {
-        Store::GSM::SIM current = Store::GSM::SIM::NONE;
+        Store::GSM::SIM current = Store::GSM::SIM::SIM_UNKNOWN;
 
       public:
         /// create first image (sim unknown) and set it
