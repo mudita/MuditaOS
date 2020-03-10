@@ -781,16 +781,18 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 
 				uint16_t vecOffset = *(vecMap->getData()+imageOffset);
 				imageOffset+=sizeof(uint16_t);
-				uint8_t vecLength = *(vecMap->getData()+imageOffset);
-				imageOffset+=sizeof(uint8_t);
+                uint16_t vecLength = *(vecMap->getData() + imageOffset);
+                imageOffset+=sizeof(uint8_t);
 				uint8_t vecColor = *(vecMap->getData()+imageOffset);
 				imageOffset+=sizeof(uint8_t);
 
 				offsetRowContext += vecOffset;
 				if( vecColor != alphaColor )
-					memset( ctxData + offsetRowContext, vecColor, vecLength );
-				offsetRowContext += vecLength;
-			}
+                {
+                    memset(ctxData + offsetRowContext, vecColor, std::min(drawCtx->getW(), vecLength));
+                }
+                offsetRowContext += vecLength;
+            }
 			offsetContext += drawCtx->getW();
         }
     }
