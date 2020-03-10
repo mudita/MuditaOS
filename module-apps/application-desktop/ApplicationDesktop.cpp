@@ -12,6 +12,7 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
@@ -20,6 +21,8 @@
 
 #include "ApplicationDesktop.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include <application-settings/ApplicationSettings.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
 
 namespace app {
 
@@ -53,6 +56,21 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
             this->windows[app::name::window::desktop_menu]->rebuild();
             this->windows[app::name::window::desktop_lockscreen]->rebuild();
             return std::make_shared<sys::ResponseMessage>();
+        }
+    }
+
+    auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+    if (msg && msg->type == CellularNotificationMessage::Type::ModemOn)
+    {
+        LOG_INFO("SIM INIT!");
+        if (screenLocked)
+        {
+            need_sim_select = true;
+        }
+        else
+        {
+            need_sim_select = false;
+            sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
         }
     }
 

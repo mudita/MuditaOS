@@ -187,10 +187,6 @@ TS0710::ConfState TS0710::ConfProcedure() {
     parser->cmd(at::AT::AT_PIN_READY_LOGIC);
     parser->cmd(at::AT::URC_NOTIF_SIGNAL);
     parser->cmd(at::AT::CRC_ON);
-    parser->cmd(at::AT::CALLER_NUMBER_PRESENTATION); // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
-    parser->cmd(at::AT::SMS_TEXT_FORMAT);
-    parser->cmd(at::AT::SMS_UCSC2);
-    parser->cmd(at::AT::SMS_STORAGE);
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
     while (!parser->cmd(at::AT::QSCLK_ON)) {}

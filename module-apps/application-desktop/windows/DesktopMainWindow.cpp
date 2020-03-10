@@ -27,7 +27,9 @@
 #include "i18/i18.hpp"
 #include <Span.hpp>
 #include <Style.hpp>
+#include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
+#include <service-appmgr/ApplicationManager.hpp>
 #include <time/time_conversion.hpp>
 
 namespace style
@@ -98,13 +100,20 @@ void DesktopMainWindow::setVisibleState() {
 		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_unlock"));
 		topBar->setActive( TopBar::Elements::LOCK, true );
 	}
-	else {
-		bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
-		topBar->setActive( TopBar::Elements::LOCK, false );
-	}
-    if (!fillNotifications())
+    else
     {
-        LOG_ERROR("Couldn't fit in all notifications");
+        auto app = dynamic_cast<app::ApplicationDesktop *>(application);
+        assert(app);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_desktop_menu"));
+        topBar->setActive(TopBar::Elements::LOCK, false);
+        if (!fillNotifications(app))
+        {
+            LOG_ERROR("Couldn't fit in all notifications");
+        }
+        if (app->need_sim_select && Store::GSM::get()->sim == Store::GSM::SIM::SIM_UNKNOWN)
+        {
+            sapm::ApplicationManager::messageSwitchApplication(this->application, app::name_settings, app::sim_select, nullptr);
+        }
     }
 }
 
@@ -310,14 +319,8 @@ auto add_notification(BoxLayout *layout, UTF8 icon, UTF8 name, UTF8 indicator, s
     return el->visible;
 }
 
-auto DesktopMainWindow::fillNotifications() -> bool
+auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
 {
-    auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-    assert(app);
-    if (app->getScreenLocked())
-    {
-        return false;
-    }
     if (notifications)
     {
         this->removeWidget(notifications);

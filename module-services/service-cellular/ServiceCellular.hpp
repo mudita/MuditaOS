@@ -63,9 +63,7 @@ public:
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;
-
     sys::ReturnCodes DeinitHandler() override;
-
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
 
@@ -145,6 +143,8 @@ public:
     std::vector<std::string> messageParts;
 
     CellularCall::CellularCall ongoingCall;
+
+    bool init_sim();
 };
 
 #endif //PUREPHONE_SERVICECELLULAR_HPP
