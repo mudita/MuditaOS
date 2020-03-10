@@ -22,6 +22,7 @@
 #include "service-audio/api/AudioServiceAPI.hpp"
 
 #include "service-appmgr/ApplicationManager.hpp"
+#include <cassert>
 
 namespace app {
 
@@ -58,6 +59,79 @@ void ApplicationCall::timerCallCallback()
     }
 }
 
+void ApplicationCall::CallAbortHandler()
+{
+    gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+    assert(callWindow != nullptr);
+
+    LOG_INFO("---------------------------------CallAborted");
+    AudioServiceAPI::Stop(this);
+    callEndTime = callDuration + 3;
+    callWindow->setState(gui::CallWindow::State::CALL_ENDED);
+    refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+}
+
+void ApplicationCall::CallActiveHandler()
+{
+    gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+    assert(callWindow != nullptr);
+
+    callDuration = 0;
+
+    LOG_INFO("---------------------------------CallActive");
+    callWindow->setState(gui::CallWindow::State::CALL_IN_PROGRESS);
+    refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+}
+
+void ApplicationCall::IncomingCallHandler(const CellularNotificationMessage *const msg)
+{
+    gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+    assert(callWindow != nullptr);
+
+    LOG_INFO("---------------------------------IncomingCall");
+    if (callWindow->getState() == gui::CallWindow::State::INCOMING_CALL)
+    {
+        LOG_INFO("ignoring call incoming");
+    }
+    else
+    {
+        AudioServiceAPI::RoutingStart(this);
+        runCallTimer();
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
+        // send to itself message to switch (run) call application
+        callWindow->setState(gui::CallWindow::State::INCOMING_CALL);
+        if (getState() == State::ACTIVE_FORGROUND)
+        {
+            LOG_INFO("++++++++++++WINDOW SWITCH");
+            switchWindow(window::name_call, std::move(data));
+        }
+        else
+        {
+            LOG_INFO("++++++++++++APP SWITCH");
+
+            sapm::ApplicationManager::messageSwitchApplication(this, name_call, window::name_call, std::move(data));
+        }
+    }
+}
+
+void ApplicationCall::RingingHandler(const CellularNotificationMessage *const msg)
+{
+    gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+    assert(callWindow != nullptr);
+
+    // reset call duration
+    runCallTimer();
+    LOG_INFO("---------------------------------Ringing");
+    AudioServiceAPI::RoutingStart(this);
+
+    std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->data);
+    callWindow->setState(gui::CallWindow::State::OUTGOING_CALL);
+    if (getState() == State::ACTIVE_FORGROUND)
+    {
+        switchWindow(window::name_call, std::move(data));
+    }
+}
+
 // Invoked upon receiving data message
 sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
@@ -70,63 +144,29 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 
     if (msgl->messageType == MessageType::CellularNotification)
     {
+        CellularNotificationMessage *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+        assert(msg != nullptr);
 
-        CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-        gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
-
-        if (msg->type == CellularNotificationMessage::Type::CallAborted)
+        switch (msg->type)
         {
-            LOG_INFO("---------------------------------CallAborted");
-            AudioServiceAPI::Stop(this);
-            callEndTime = callDuration + 3;
-            callWindow->setState(gui::CallWindow::State::CALL_ENDED);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        case CellularNotificationMessage::Type::CallAborted: {
+            CallAbortHandler();
         }
-		else if( msg->type == CellularNotificationMessage::Type::CallActive ) {
-			callDuration = 0;
-
-			LOG_INFO("---------------------------------CallActive");
-			callWindow->setState( gui::CallWindow::State::CALL_IN_PROGRESS );
-			refreshWindow( gui::RefreshModes::GUI_REFRESH_DEEP );
-		}
-		else if( msg->type == CellularNotificationMessage::Type::IncomingCall ) {
-			//reset call duration
-//		    callDuration = 0;
-			LOG_INFO("---------------------------------IncomingCall");
-			if( callWindow->getState() == gui::CallWindow::State::INCOMING_CALL ) {
-				LOG_INFO("ignoring call incoming");
-			}
-			else {
-
-				AudioServiceAPI::RoutingStart(this);
-				runCallTimer();
-				std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
-				//send to itself message to switch (run) call application
-				callWindow->setState( gui::CallWindow::State::INCOMING_CALL );
-                if (getState() == State::ACTIVE_FORGROUND)
-                {
-                    LOG_INFO("++++++++++++WINDOW SWITCH");
-                    switchWindow(window::name_call, std::move(data));
-                }
-                else {
-					LOG_INFO("++++++++++++APP SWITCH");
-
-                    sapm::ApplicationManager::messageSwitchApplication(this, name_call, window::name_call, std::move(data));
-                }
-			}
-		}
-		else if( msg->type == CellularNotificationMessage::Type::Ringing ) {
-			//reset call duration
-			runCallTimer();
-			LOG_INFO("---------------------------------Ringing");
-			AudioServiceAPI::RoutingStart(this);
-
-			std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->data);
-			callWindow->setState( gui::CallWindow::State::OUTGOING_CALL );
-            if (getState() == State::ACTIVE_FORGROUND)
-            {
-                switchWindow(window::name_call, std::move(data));
-            }
+        break;
+        case CellularNotificationMessage::Type::CallActive: {
+            CallActiveHandler();
+        }
+        break;
+        case CellularNotificationMessage::Type::IncomingCall: {
+            IncomingCallHandler(msg);
+        }
+        break;
+        case CellularNotificationMessage::Type::Ringing: {
+            RingingHandler(msg);
+        }
+        break;
+        default:
+            break;
         }
 
         return std::make_shared<sys::ResponseMessage>();
@@ -139,12 +179,7 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
         case MessageType::CellularHangupCall: {
             if (resp->retCode == sys::ReturnCodes::Success)
             {
-                gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
-                LOG_INFO("---------------------------------CallAborted");
-                AudioServiceAPI::Stop(this);
-                callEndTime = callDuration + 3;
-                callWindow->setState(gui::CallWindow::State::CALL_ENDED);
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+                CallAbortHandler();
             }
             break;
         }

@@ -1,17 +1,9 @@
-/*
- * @file ApplicationCall.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_CALL_APPLICATIONCALL_HPP_
-#define MODULE_APPS_APPLICATION_CALL_APPLICATIONCALL_HPP_
+#pragma once
 
 #include "Application.hpp"
-#include "SystemManager/SystemManager.hpp"
 #include "Service/Message.hpp"
+#include "SystemManager/SystemManager.hpp"
+#include <service-cellular/api/CellularServiceAPI.hpp>
 
 namespace app {
 
@@ -27,7 +19,13 @@ namespace window
  *
  */
 class ApplicationCall: public Application {
-protected:
+  private:
+    void CallAbortHandler();
+    void CallActiveHandler();
+    void IncomingCallHandler(const CellularNotificationMessage *const msg);
+    void RingingHandler(const CellularNotificationMessage *const msg);
+
+  protected:
 	std::string phoneNumber;
 	AppTimer timerCall;
 	uint32_t callDuration = 0;
@@ -52,5 +50,3 @@ public:
 };
 
 } /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_CALL_APPLICATIONCALL_HPP_ */
