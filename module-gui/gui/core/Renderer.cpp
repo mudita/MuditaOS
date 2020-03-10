@@ -741,45 +741,39 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 	Context* drawCtx = ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
 	uint8_t* ctxData = drawCtx->getData();
 
-	if( imageMap->getType() == gui::ImageMap::Type::PIXMAP ) {
-		PixMap* pixMap = reinterpret_cast<PixMap*>(imageMap);
-		//draw image on temporeary context
+    auto check_wh = [&](const char *img_name, auto w, auto h) {
+        if (h > ctx->getH() || w > ctx->getW())
+        {
+            LOG_WARN("image %s {w: %d,h %d} > context {w %d,h %d}", img_name, w, drawCtx->getW(), h, drawCtx->getH());
+        }
+    };
+
+    if( imageMap->getType() == gui::ImageMap::Type::PIXMAP ) {
+        auto pixMap = reinterpret_cast<PixMap *>(imageMap);
+        //draw image on temporeary context
 		uint32_t offsetImage = 0;
 		uint32_t offsetContext = 0;
-		uint32_t imageWidth = pixMap->getWidth();
-        uint32_t imageHeight = pixMap->getHeight();
-        uint32_t contextWidth = drawCtx->getW();
-
 		uint8_t* pixData = pixMap->getData();
+        check_wh(pixMap->getName().c_str(), pixMap->getWidth(), pixMap->getHeight());
 
-        uint32_t drawHeight = imageHeight;
-        if (drawHeight > drawCtx->getH())
+        for (uint32_t row = 0; row < std::min(drawCtx->getH(), pixMap->getHeight()); row++)
         {
-            LOG_WARN("image %s height exceeds context (%d > %d). truncating", pixMap->getName().c_str(), imageHeight, drawCtx->getH());
-            drawHeight = drawCtx->getH();
-        }
-        uint32_t drawWidth = imageWidth;
-        if (drawWidth > drawCtx->getW())
-        {
-            LOG_WARN("image %s width exceeds context (%d > %d). truncating", pixMap->getName().c_str(), imageWidth, drawCtx->getW());
-            drawWidth = drawCtx->getW();
-        }
-        for (uint32_t i = 0; i < drawHeight; i++)
-        {
-            memcpy(ctxData + offsetContext, pixData + offsetImage, drawWidth);
-            offsetImage += imageWidth;
-			offsetContext += contextWidth;
+            memcpy(ctxData + offsetContext, pixData + offsetImage, std::min(drawCtx->getW(), pixMap->getWidth()));
+            offsetImage += pixMap->getWidth();
+            offsetContext += drawCtx->getW();
         }
     }
 	else if( imageMap->getType() == gui::ImageMap::Type::VECMAP) {
-		VecMap* vecMap = reinterpret_cast<VecMap*>(imageMap);
-		uint32_t offsetContext = 0;
+        auto vecMap = reinterpret_cast<VecMap *>(imageMap);
+        uint32_t offsetContext = 0;
 		uint32_t offsetRowContext = 0;
 		uint32_t imageOffset = 0;
 		uint8_t alphaColor = vecMap->getAlphaColor();
-		for( uint32_t row=0; row<vecMap->getHeight(); row++) {
-			uint16_t vecCount = *(vecMap->getData()+imageOffset);
-			imageOffset+=sizeof(uint16_t);
+        for (uint32_t row = 0; row < std::min(vecMap->getHeight(), drawCtx->getH()); row++)
+        {
+            check_wh(vecMap->getName().c_str(), imageMap->getWidth(), imageMap->getHeight());
+            uint16_t vecCount = *(vecMap->getData() + imageOffset);
+            imageOffset+=sizeof(uint16_t);
 
 			offsetRowContext = offsetContext;
 
@@ -798,10 +792,10 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 				offsetRowContext += vecLength;
 			}
 			offsetContext += drawCtx->getW();
-		}
-	}
+        }
+    }
 
-	//reinsert drawCtx into bast context
+    //reinsert drawCtx into bast context
 	ctx->insert( cmd->x, cmd->y, drawCtx );
 
 	//remove draw context
