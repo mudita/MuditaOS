@@ -338,10 +338,10 @@ namespace bsp {
                 .defLogic = 0,
                 .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMSEL_PIN)});
 
-        gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
-                .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
-                .defLogic = 0,
-                .pin = static_cast<uint32_t >(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN)});
+        gpio_2->ConfPin(DriverGPIOPinParams{.dir = DriverGPIOPinParams::Direction::Output,
+                                            .irqMode = DriverGPIOPinParams::InterruptMode::NoIntmode,
+                                            .defLogic = 1,
+                                            .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir=DriverGPIOPinParams::Direction::Output,
                 .irqMode=DriverGPIOPinParams::InterruptMode::NoIntmode,
