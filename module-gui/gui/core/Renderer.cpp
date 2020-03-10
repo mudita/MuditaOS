@@ -673,12 +673,12 @@ namespace gui
                 if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT) {
                     ys = cmd->yapSize;
                     draw45degLine(drawCtx,
-                                  wgtX + xs - cmd->yapSize + cmd->penWidth + 1,
+                                  wgtX + xs - cmd->yapSize,
                                   wgtY + ys - cmd->yapSize,
                                   cmd->yapSize,
                                   cmd->penWidth,
                                   cmd->borderColor,
-                                  LineExpansionDirection::LINE_EXPAND_LEFT,
+                                  LineExpansionDirection::LINE_EXPAND_RIGHT,
                                   true,
                                   Line45degEnd::BOTTOM_TIP);
                 }
@@ -691,12 +691,12 @@ namespace gui
                 if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT) {
                     le -= cmd->yapSize;
                     draw45degLine(drawCtx,
-                                  wgtX + xs + cmd->penWidth,
+                                  wgtX + xs,
                                   wgtY + ys + le,
                                   cmd->yapSize,
                                   cmd->penWidth,
                                   cmd->borderColor,
-                                  LineExpansionDirection::LINE_EXPAND_LEFT,
+                                  LineExpansionDirection::LINE_EXPAND_RIGHT,
                                   false,
                                   Line45degEnd::TOP_TIP);
                 }
@@ -717,12 +717,12 @@ namespace gui
                 if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT) {
                     ys = cmd->yapSize;
                     draw45degLine(drawCtx,
-                                  wgtX + xs + cmd->yapSize - cmd->penWidth - 1,
+                                  wgtX + xs + cmd->yapSize,
                                   wgtY + ys - cmd->yapSize,
                                   cmd->yapSize,
                                   cmd->penWidth,
                                   cmd->borderColor,
-                                  LineExpansionDirection::LINE_EXPAND_RIGHT,
+                                  LineExpansionDirection::LINE_EXPAND_LEFT,
                                   false,
                                   Line45degEnd::BOTTOM_TIP);
                 }
@@ -735,12 +735,12 @@ namespace gui
                 if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT) {
                     le -= cmd->yapSize;
                     draw45degLine(drawCtx,
-                                  wgtX + xs - cmd->penWidth,
+                                  wgtX + xs,
                                   wgtY + ys + le,
                                   cmd->yapSize,
                                   cmd->penWidth,
                                   cmd->borderColor,
-                                  LineExpansionDirection::LINE_EXPAND_RIGHT,
+                                  LineExpansionDirection::LINE_EXPAND_LEFT,
                                   true,
                                   Line45degEnd::TOP_TIP);
                 }
