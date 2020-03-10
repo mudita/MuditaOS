@@ -9,6 +9,9 @@
 #include "application-call/data/CallSwitchData.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
+
+namespace gui
+{
 PhonebookSearch::PhonebookSearch(app::Application *app) : AppWindow(app, "Search"), phonebookModel{new PhonebookModel(app)}
 {
     buildInterface();
@@ -160,3 +163,4 @@ bool PhonebookSearch::onInput(const InputEvent &inputEvent)
 
     return (ret);
 }
+} /* namespace gui */
