@@ -44,8 +44,8 @@ PhonebookItem::~PhonebookItem()
 
 bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
 {
-    value->setPosition(11, 0);
-    value->setSize(newDim.w - 22, newDim.h);
+    value->setPosition(10, 0);
+    value->setSize(newDim.w - 10, newDim.h);
 
     return true;
 }
