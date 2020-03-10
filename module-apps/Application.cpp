@@ -158,6 +158,7 @@ void Application::render( gui::RefreshModes mode ) {
             currwin->updateBatteryLevel(Store::Battery::get().level);
         }
         currwin->setSIM();
+        currwin->updateSignalStrength();
 
         std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
 
@@ -220,12 +221,10 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 
 bool Application::signalStrengthUpdateHandler(const CellularSignalStrengthUpdateMessage &msg)
 {
-    // loop and update all widnows
-    for (auto it = windows.begin(); it != windows.end(); it++)
+    if (getCurrentWindow()->updateSignalStrength())
     {
-        it->second->updateSignalStrength();
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
-    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
 
     return true;
 }

@@ -668,9 +668,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
         }
         else
         {
-            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
-            msg->rssi = std::stoi(qind.tokens[at::urc::QIND::RSSI]);
-            LOG_DEBUG("Setting new signal strength rssi %d", msg->rssi);
+            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>(std::stoi(qind.tokens[at::urc::QIND::RSSI]));
 
             return msg;
         }

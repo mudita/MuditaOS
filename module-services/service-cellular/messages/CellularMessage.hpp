@@ -60,7 +60,7 @@ public:
 class CellularSignalStrengthUpdateMessage : public CellularNotificationMessage
 {
   public:
-    CellularSignalStrengthUpdateMessage(uint32_t rssi = 0) : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate), rssi(rssi)
+    CellularSignalStrengthUpdateMessage(int rssi = 0) : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate), rssi(rssi)
     {
     }
     virtual ~CellularSignalStrengthUpdateMessage() = default;

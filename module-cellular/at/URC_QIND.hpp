@@ -25,14 +25,5 @@ namespace at::urc
         auto is_csq() -> bool;
         /// by docs invalid csq: RSSI: 99, 199, and ber: 99
         auto validate(enum CSQ) -> bool;
-
-        auto getBer() -> int
-        {
-            return std::stoi(tokens[BER]);
-        }
-        auto getRssi() -> int
-        {
-            return std::stoi(tokens[RSSI]);
-        }
     };
 }; // namespace at::urc

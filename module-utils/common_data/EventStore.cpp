@@ -83,9 +83,10 @@ namespace Store
 
     void SignalStrength::setRssi(const int rssi)
     {
-        if (auto rssidBm = rssiTodBm(rssi) != rssidBm_invalid)
+        auto rssidBm = rssiTodBm(rssi);
+        if (rssidBm != rssidBm_invalid)
         {
-            this->rssidBm = rssiTodBm(rssi);
+            this->rssidBm = rssidBm;
             this->rssiBar = rssidBmToBar(rssidBm);
             this->rssi = rssi;
             LOG_DEBUG("Signal strength set to rssi %d : %d dBm : %d bars", this->rssi, this->rssidBm, static_cast<int>(this->rssiBar));
