@@ -21,18 +21,36 @@
 //
 class MuxDaemon;
 
+namespace cellular
+{
+    class State
+    {
+      public:
+        enum class ST
+        {
+            Idle,              /// start mode of cellular - does nothing
+            PowerUpInProgress, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state bases on URC without much thinking
+            ModemConfigurationInProgress, /// modem basic, non sim related configuration
+            AudioConfigurationInProgress, /// audio configuration for modem (could be in ModemConfiguration)
+            ModemOn,                      /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
+            SimInitInProgress,            /// initialize SIM - triggers sim ON in, ( **changed on URC** )
+            FullyFunctional,              /// modem is on, sim is initialized
+            Failed
+        };
+
+      private:
+        enum ST state = ST::Idle;
+
+      public:
+        const char *c_str(ST state) const;
+        void set(ST state);
+        ST get() const;
+    };
+} // namespace cellular
+
 class ServiceCellular : public sys::Service {
 
 public:
-
-    enum class State{
-        Idle,
-        PowerUpInProgress,
-        ModemConfigurationInProgress,
-        AudioConfigurationInProgress,
-        Ready,
-        Failed
-    };
 
     ServiceCellular();
 
@@ -85,7 +103,7 @@ public:
 
     DLC_channel::Callback_t notificationCallback = nullptr;
 
-    State state = State ::Idle;
+    cellular::State state;
 
     static constexpr int32_t signalStrengthToDB[] = {
             -109, //0
