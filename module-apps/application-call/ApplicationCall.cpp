@@ -68,8 +68,6 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
 		return retMsg;
 	}
 
-	//this variable defines whether message was processed.
-	bool handled = false;
     if (msgl->messageType == MessageType::CellularNotification)
     {
 
@@ -130,13 +128,34 @@ sys::Message_t ApplicationCall::DataReceivedHandler(sys::DataMessage* msgl,sys::
                 switchWindow(window::name_call, std::move(data));
             }
         }
-		handled = true;
+
+        return std::make_shared<sys::ResponseMessage>();
     }
 
-    if( handled )
-		return std::make_shared<sys::ResponseMessage>();
-	else
-		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    if (resp != nullptr)
+    {
+        switch (resp->responseTo)
+        {
+        case MessageType::CellularHangupCall: {
+            if (resp->retCode == sys::ReturnCodes::Success)
+            {
+                gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
+                LOG_INFO("---------------------------------CallAborted");
+                AudioServiceAPI::Stop(this);
+                callEndTime = callDuration + 3;
+                callWindow->setState(gui::CallWindow::State::CALL_ENDED);
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+
+        return std::make_shared<sys::ResponseMessage>();
+    }
+
+    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
 // Invoked during initialization

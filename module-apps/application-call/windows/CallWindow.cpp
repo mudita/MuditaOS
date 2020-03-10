@@ -327,67 +327,44 @@ bool CallWindow::handleSwitchData( SwitchData* data ) {
 void CallWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 }
 
-bool CallWindow::handleLeftButton() {
-	if( state == State::INCOMING_CALL ) {
-		auto ret = CellularServiceAPI::AnswerIncomingCall(application);
+bool CallWindow::handleLeftButton()
+{
+    if (state == State::INCOMING_CALL)
+    {
+        auto ret = CellularServiceAPI::AnswerIncomingCall(application);
 
-		LOG_INFO("AnswerIncomingCall: %s",(ret?"OK":"FAIL"));
+        LOG_INFO("AnswerIncomingCall: %s", (ret ? "OK" : "FAIL"));
         return true;
     }
-	else if( state == State::OUTGOING_CALL ) {
 
-	}
-	else if( state == State::CALL_ENDED ) {
-
-	}
-	else if( state == State::CALL_IN_PROGRESS ) {
-
-	}
-	return false;
+    return false;
 }
-bool CallWindow::handleCenterButton() {
-	if( state == State::INCOMING_CALL ) {
-		auto ret = CellularServiceAPI::HangupCall(application);
-		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
-		//TODO switch to message templates window
-		return true;
-	}
-	else if( state == State::OUTGOING_CALL ) {
 
-	}
-	else if( state == State::CALL_ENDED ) {
-
-	}
-	else if( state == State::CALL_IN_PROGRESS ) {
-
-	}
-	return false;
-}
-bool CallWindow::handleRightButton() {
-	if( state == State::INCOMING_CALL ) {
-		auto ret = CellularServiceAPI::HangupCall(application);
-		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
-
-		return true;
-	}
-	else if( state == State::OUTGOING_CALL ) {
-		auto ret = CellularServiceAPI::HangupCall(application);
-		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
-
+bool CallWindow::handleCenterButton()
+{
+    if (state == State::INCOMING_CALL)
+    {
+        LOG_ERROR("TODO: Send message template");
         return true;
     }
-//	else if( state == State::CALL_ENDED ) {
-//		//return to previous application
-//		sapm::ApplicationManager::messageSwitchPreviousApplication( application );
-//		return true;
-//	}
-	else if( state == State::CALL_IN_PROGRESS ) {
-		auto ret = CellularServiceAPI::HangupCall(application);
-		LOG_INFO("HangupCall: %s",(ret?"OK":"FAIL"));
+    return false;
+}
 
- 		return true;
-	}
-	return false;
+bool CallWindow::handleRightButton()
+{
+    switch (state)
+    {
+    case State::INCOMING_CALL:
+    case State::OUTGOING_CALL:
+    case State::CALL_IN_PROGRESS:
+        CellularServiceAPI::HangupCall(application);
+        return true;
+        break;
+    default:
+        break;
+    }
+
+    return false;
 }
 
 bool CallWindow::onInput( const InputEvent& inputEvent ) {

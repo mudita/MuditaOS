@@ -120,9 +120,8 @@ namespace CellularCall
         return false;
     }
 
-    bool CellularCall::endCall()
+    bool CellularCall::endCall(Forced forced)
     {
-
         if (!isValid())
         {
             LOG_ERROR("Trying to update invalid call");
@@ -140,12 +139,19 @@ namespace CellularCall
             switch (callType)
             {
             case CallType::CT_INCOMING: {
-                setType(CallType::CT_REJECTED);
+                if (forced == Forced::True)
+                {
+                    setType(CallType::CT_REJECTED);
+                }
+                else
+                {
+                    setType(CallType::CT_MISSED);
+                }
             }
             break;
 
             case CallType::CT_OUTGOING: {
-                setType(CallType::CT_MISSED);
+                // do nothing
             }
             break;
 
