@@ -62,6 +62,7 @@
     "app_calllog_incoming_call": "incoming call",
     "app_calllog_outgoing_call": "outgoing call",
     "app_calllog_missed_call": "missed call",
+    "app_calllog_rejected_call": "rejected call",
     "app_calllog_date": "Date",
     "app_calllog_options_title": "Options",
     "app_calllog_options_contact_details": "Contact details",
