@@ -32,9 +32,6 @@ ApplicationDesktop::~ApplicationDesktop() {
 	LOG_INFO("Desktop destruktor");
 }
 
-uint32_t ApplicationDesktop::getMisseedCalls() {return missedCalls; }
-uint32_t ApplicationDesktop::getUnreadMessages() { return unreadMessages; }
-
 // Invoked upon receiving data message
 sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
 
