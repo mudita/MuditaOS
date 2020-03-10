@@ -116,6 +116,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         switch (type)
         {
 
+        case CellularNotificationMessage::Type::ModemOn:
         case CellularNotificationMessage::Type::PowerUpProcedureComplete:
         case CellularNotificationMessage::Type::Ringing:
         case CellularNotificationMessage::Type::ServiceReady:
@@ -379,8 +380,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 }
 
                 state.set(State::ST::ModemOn);
-                // TODO
-                // sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularSimInit), GetName(), this);
+                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemOn);
+                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
             }
             else
             {
@@ -401,6 +402,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             // Reset procedure started, do nothing here
             state.set(State::ST::PowerUpInProgress);
+        }
+    }
+    break;
+
+    case MessageType::SIMTrayEvent: {
+        LOG_INFO("~~~~~~~~~~");
+        if (Store::GSM::get()->tray == Store::GSM::Tray::IN && !init_sim())
+        {
+            LOG_ERROR("SIM initialization failure!");
         }
     }
     break;
@@ -1064,4 +1074,21 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
         }
     }
     return result;
+}
+
+bool ServiceCellular::init_sim()
+{
+    auto channel = cmux->GetChannel("Commands");
+    if (!channel)
+    {
+        LOG_ERROR("Cant configure sim! no Commands channel!");
+        return false;
+    }
+    bool success = true;
+    success = success && channel->cmd(at::AT::CALLER_NUMBER_PRESENTATION);
+    success = success && channel->cmd(at::AT::SMS_TEXT_FORMAT);
+    success = success && channel->cmd(at::AT::SMS_UCSC2);
+    success = success && channel->cmd(at::AT::SMS_STORAGE);
+    state.set(State::ST::FullyFunctional);
+    return success;
 }

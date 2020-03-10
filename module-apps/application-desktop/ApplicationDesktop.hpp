@@ -28,6 +28,7 @@ protected:
 	bool screenLocked = true;
 	bool pinLocked = false;
 public:
+  bool need_sim_select = false;
   struct Notifications
   {
       unsigned int notSeenSMS = 0;

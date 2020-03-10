@@ -78,6 +78,7 @@ enum class MessageType
     CellularStartPowerUpProcedure,
     CellularStartConfProcedure,
     CellularStartAudioConfProcedure,
+    CellularSimProcedure,
     CellularGetOwnNumber,
     CellularGetIMSI,
     CellularGetNetworkInfo,

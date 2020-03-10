@@ -9,6 +9,7 @@
 #ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
 
+#include "../ApplicationDesktop.hpp"
 #include "AppWindow.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
@@ -48,7 +49,7 @@ protected:
 
 	//method hides or show widgets and sets bars according to provided state
 	void setVisibleState();
-    auto fillNotifications() -> bool;
+    auto fillNotifications(app::ApplicationDesktop *app) -> bool;
 
   public:
 	DesktopMainWindow( app::Application* app );
