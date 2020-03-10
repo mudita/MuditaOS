@@ -8,14 +8,14 @@
 #ifndef GUI_CORE_FONT_HPP_
 #define GUI_CORE_FONT_HPP_
 
-#include "../Common.hpp"
-#include "utf8/UTF8.hpp"
-#include <cstdint>
-#include <fstream>
-#include <map>
-#include <memory>
 #include <string>
 #include <vector>
+#include <map>
+#include <cstdint>
+#include <fstream>
+
+#include "utf8/UTF8.hpp"
+#include "../Common.hpp"
 
 namespace gui {
 
@@ -142,11 +142,10 @@ public:
 	 * @brief Returns number of pixels occupied by the character vertically.
 	 */
 	uint32_t getCharPixelHeight( uint32_t charCode );
-    const std::string getName()
-    {
-        return info.face;
-    }
-    std::unique_ptr<FontGlyph> getGlyphUnsupported() const;
+
+	const std::string getName() {
+		return info.face;
+	}
 };
 
 class FontManager {
