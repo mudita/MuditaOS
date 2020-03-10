@@ -2,6 +2,7 @@
 #include "../ApplicationPhonebook.hpp"
 #include "ContactRecord.hpp"
 #include "ListView.hpp"
+#include "PhonebookNewContact.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include <Style.hpp>
@@ -14,7 +15,6 @@
 
 namespace gui
 {
-
     PhonebookSearchResults::PhonebookSearchResults(app::Application *app)
         : AppWindow(app, name::window::search_results), searchResultsModel{new SearchResultsModel(app)}
     {
@@ -154,5 +154,4 @@ bool PhonebookSearchResults::handleSwitchData(SwitchData *data)
 
     return (false);
 }
-
 } /* namespace gui */
