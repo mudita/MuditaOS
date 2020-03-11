@@ -6,8 +6,7 @@
 // Raw Data FSM states
 //
 
-class StateRawDataType
-: public RawDataFsm
+class StateRawDataType : public RawDataFsm
 {
     void react(RawDataEvt const &) override
     {
@@ -15,8 +14,7 @@ class StateRawDataType
     };
 };
 
-class StateRawDataPayload
-: public RawDataFsm
+class StateRawDataPayload : public RawDataFsm
 {
     void react(RawDataEvt const &) override
     {
@@ -34,7 +32,7 @@ void RawDataFsm::react(RawDataEvt const &)
     LOG_DEBUG("RawDataEvt ignored");
 }
 
-void RawDataFsm::react(RawDataMallocEvt const &)
+void RawDataFsm::react(RawDataMallocEvt const &evt)
 {
     LOG_DEBUG("RawDataMallocEvt ignored");
 }

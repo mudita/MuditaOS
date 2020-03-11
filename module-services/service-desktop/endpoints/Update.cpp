@@ -8,12 +8,13 @@
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "../ServiceDesktop.hpp"
 
+
 sys::ReturnCodes EndpointHandler::update(uint8_t httpMethod, uint32_t uuid, json11::Json &body, std::string &responseStr, sys::Service *ownerService)
 {
     if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::post))
     {
         LOG_INFO("update request");
-        uint32_t dataSize = (uint32_t) body["fileSize"].number_value();
+        uint32_t dataSize = static_cast<uint32_t>(body["fileSize"].number_value());
         LOG_INFO("file name: %s", body["fileName"].string_value().c_str());
         LOG_INFO("file size: %d", dataSize);
 
@@ -22,12 +23,9 @@ sys::ReturnCodes EndpointHandler::update(uint8_t httpMethod, uint32_t uuid, json
                                                                     { "dataSize",  std::to_string(dataSize)}
                                                                 });
 
-        int statusCode = static_cast<int>(parserutils::http::Code::OK);
-        int endpoint = static_cast<int>(parserutils::Endpoint::update);
-
         json11::Json responsePayloadJson = json11::Json::object({
-                                                                    {parserutils::json::endpoint, endpoint},
-                                                                    {parserutils::json::status, statusCode},
+                                                                    {parserutils::json::endpoint, static_cast<int>(parserutils::Endpoint::update)},
+                                                                    {parserutils::json::status, static_cast<int>(parserutils::http::Code::OK)},
                                                                     {parserutils::json::uuid, std::to_string(uuid)},
                                                                     {parserutils::json::body, responseBodyJson}
                                                                 });
@@ -49,12 +47,16 @@ sys::ReturnCodes EndpointHandler::update(uint8_t httpMethod, uint32_t uuid, json
     }
     else if (httpMethod == static_cast<uint8_t>(parserutils::http::Method::put))
     {
-        LOG_INFO("a chunk of an update file");
-        return sys::ReturnCodes::Failure;
+        ServiceDesktop *service = dynamic_cast<ServiceDesktop *>(ownerService);
+        if (service)
+        {
+            if (service->isUpdating())
+            {
+                LOG_INFO("a chunk of an update file");
+                return sys::ReturnCodes::Success;
+            }
+        }
     }
-    else
-    {
-        LOG_ERROR("Incorrect method");
-        return sys::ReturnCodes::Failure;
-    }
+
+    return sys::ReturnCodes::Failure;
 }

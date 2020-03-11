@@ -11,7 +11,7 @@
 
 struct MessageDataEvt : tinyfsm::Event
 {
-    MessageDataEvt(sys::Service *_ownerService) : ownerService(_ownerService) {}
+    MessageDataEvt(sys::Service *ownerServicePtr) : ownerService(ownerServicePtr) {}
     sys::Service *ownerService;
 };
 

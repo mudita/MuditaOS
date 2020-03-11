@@ -21,7 +21,6 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
     DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    LOG_INFO("ServiceDesktop::InitHandler service ptr: %p", (void *)this);
     DesktopWorker->init(
         {{DesktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1}, {DesktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
     DesktopWorker->run();

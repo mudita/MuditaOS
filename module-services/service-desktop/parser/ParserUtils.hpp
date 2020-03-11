@@ -9,11 +9,8 @@ namespace parserutils
      */
     enum class Endpoint
     {
-        battery = 1,
-        update,
-        deviceInfo,
-        network,
-        storage
+        deviceInfo = 1,
+        update
     };
 
     namespace message
@@ -59,6 +56,18 @@ namespace parserutils
         const inline std::string uuid = "uuid";
         const inline std::string status = "status";
         const inline std::string body = "body";
+
+        const inline std::string batteryLevel = "batteryLevel";
+        const inline std::string batteryState = "batteryState";
+        const inline std::string selectedSim  = "selectedSim";
+        const inline std::string trayState   = "trayState";
+        const inline std::string fsTotal   = "fsTotal";
+        const inline std::string fsFreePercent   = "fsFreePercent";
+        const inline std::string fsFree   = "fsFree";
+        const inline std::string gitRevision   = "gitRevision";
+        const inline std::string gitBranch   = "gitBranch";
+        const inline std::string gitTag   = "gitTag";
+        const inline std::string currentRTCTime = "currentRTCTime";
 
     } // namespace json
 };    // namespace parserutils
