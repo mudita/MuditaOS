@@ -144,6 +144,9 @@ public:
 
     CellularCall::CellularCall ongoingCall;
 
+    /// select sim from settings
+    bool select_sim();
+    /// initialize sim (GSM commands for initialization)
     bool init_sim();
 };
 
