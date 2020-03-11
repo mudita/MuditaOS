@@ -111,18 +111,10 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         std::string message;
         auto msg = identifyNotification(frame.getFrame().data);
 
-        switch (msg->type)
+        if (msg->type == CellularNotificationMessage::Type::None)
         {
-        case CellularNotificationMessage::Type::None: {
             LOG_INFO("Skipped uknown notification");
             return;
-        }
-        case CellularNotificationMessage::Type::RawCommand: {
-            LOG_INFO(" IGNORE RawCmd");
-            return;
-        }
-        default:
-            break;
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);

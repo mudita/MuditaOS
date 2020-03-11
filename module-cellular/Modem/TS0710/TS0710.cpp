@@ -388,12 +388,10 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         res = c->cmd(at::AT::CSQ);
         if (res)
         {
+            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
             auto beg = res.response[0].find(" ");
             auto end = res.response[0].find(",", 1);
-            auto message = res.response[0].substr(beg + 1, end - beg - 1);
-            LOG_DEBUG("Setting new signal strength");
-            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
-            msg->rssi = std::stoi(message);
+            msg->rssi = std::stoi(res.response[0].substr(beg + 1, end - beg - 1));
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
         }
         else

@@ -221,7 +221,7 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 
 bool Application::signalStrengthUpdateHandler(const CellularSignalStrengthUpdateMessage &msg)
 {
-    if (getCurrentWindow()->updateSignalStrength())
+    if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength())
     {
         refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
