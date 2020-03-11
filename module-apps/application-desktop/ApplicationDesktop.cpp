@@ -12,8 +12,6 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
-#include "service-cellular/messages/CellularMessage.hpp"
-#include "service-db/messages/DBNotificationMessage.hpp"
 #include "windows/DesktopMainWindow.hpp"
 #include "windows/MenuWindow.hpp"
 #include "windows/PinLockWindow.hpp"
@@ -45,23 +43,43 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
 		return retMsg;
 	}
 
-    if (msgl->messageType == MessageType::DBServiceNotification)
+    bool handled = false;
+    if (auto msg = dynamic_cast<DBNotificationMessage *>(msgl))
     {
-        auto *msg = dynamic_cast<DBNotificationMessage *>(msgl);
-        LOG_DEBUG("Received multicast");
-        if ((msg != nullptr) && ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added)))
-        {
-            notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-            notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
-            this->windows[app::name::window::desktop_menu]->rebuild();
-            this->windows[app::name::window::desktop_lockscreen]->rebuild();
-            return std::make_shared<sys::ResponseMessage>();
-        }
+        handle(msg);
+    }
+    else if (auto msg = dynamic_cast<CellularNotificationMessage *>(msgl))
+    {
+        handle(msg);
     }
 
-    auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-    // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is done
-    if (msg && msg->type == CellularNotificationMessage::Type::ModemOn && Store::GSM::get()->sim != Store::GSM::SIM::SIM1 &&
+    if (handled)
+    {
+        return std::make_shared<sys::ResponseMessage>();
+    }
+    else
+    {
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
+}
+
+auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
+{
+    LOG_DEBUG("Received multicast");
+    if ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added))
+    {
+        notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+        notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+        this->windows[app::name::window::desktop_menu]->rebuild();
+        this->windows[app::name::window::desktop_lockscreen]->rebuild();
+        return true;
+    }
+    return false;
+}
+
+auto ApplicationDesktop::handle(CellularNotificationMessage *msg) -> bool
+{
+    if (msg->type == CellularNotificationMessage::Type::ModemOn && Store::GSM::get()->sim != Store::GSM::SIM::SIM1 &&
         Store::GSM::get()->sim != Store::GSM::SIM::SIM1)
     {
         if (screenLocked)
@@ -73,14 +91,9 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
             need_sim_select = false;
             sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
         }
+        return true;
     }
-
-    bool handled = true;
-
-	if( handled )
-		return std::make_shared<sys::ResponseMessage>();
-	else
-		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    return false;
 }
 
 // Invoked during initialization
