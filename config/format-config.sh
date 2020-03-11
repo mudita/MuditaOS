@@ -16,4 +16,8 @@ declare ignore_paths=(
     './module-db/Database/sqlite3.h'
     './module-db/Database/sqlite3.c'
     './module-db/Database/config.h'
+    './module-bluetooth/lib/btstack'
+    './module-lwip/lib/lwip'
+    './module-utils/tinyfsm'
+    './module-utils/microtar'
 )
