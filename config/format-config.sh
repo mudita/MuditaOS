@@ -12,4 +12,8 @@ VERBOSE=1
 # if you don't wish to format i.e one file - just pass whole path to this file from git root directory
 declare ignore_paths=(
     './module-bsp/bsp/'
+    './module-vfs/board/cross/freeRTOS_FAT'
+    './module-db/Database/sqlite3.h'
+    './module-db/Database/sqlite3.c'
+    './module-db/Database/config.h'
 )
