@@ -60,9 +60,10 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
     }
 
     auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-    if (msg && msg->type == CellularNotificationMessage::Type::ModemOn)
+    // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is done
+    if (msg && msg->type == CellularNotificationMessage::Type::ModemOn && Store::GSM::get()->sim != Store::GSM::SIM::SIM1 &&
+        Store::GSM::get()->sim != Store::GSM::SIM::SIM1)
     {
-        LOG_INFO("SIM INIT!");
         if (screenLocked)
         {
             need_sim_select = true;
