@@ -29,6 +29,7 @@
 #include "application-call/ApplicationCall.hpp"
 #include "time/time_conversion.hpp"
 #include <Style.hpp>
+#include <cassert>
 
 using namespace calllog;
 using namespace callLogStyle::detailsWindow;
@@ -278,11 +279,8 @@ bool CallLogDetailsWindow::onInput( const InputEvent& inputEvent ) {
         (inputEvent.keyCode == KeyCode::KEY_LF))
     {
         auto app = dynamic_cast<app::ApplicationCallLog *>(application);
-        if (app == nullptr)
-        {
-            LOG_FATAL("Not ApplicationCallLog!!!");
-            return false;
-        }
+        assert(app != nullptr);
+
         if (app->windowOptions != nullptr)
         {
             app->windowOptions->clearOptions();
@@ -290,8 +288,6 @@ bool CallLogDetailsWindow::onInput( const InputEvent& inputEvent ) {
             app->switchWindow(app->windowOptions->getName(), nullptr);
         }
 
-        // std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(record);
-        // application->switchWindow(calllog::settings::OptionsWindowStr, std::move(data));
         return true;
     }
 

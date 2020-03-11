@@ -69,3 +69,13 @@ void Dialog::update(const Meta &meta)
     text->setText(meta.text);
     yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
 }
+
+void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
+{
+    setFocusItem(no);
+}
+
+bool Dialog::handleSwitchData(SwitchData *data)
+{
+    return false;
+}
