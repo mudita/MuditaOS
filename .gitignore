@@ -1,7 +1,8 @@
-
+.clangd
 
 build-*/
 .vscode/ipch
+.vscode/settings.json
 
 lib/
 
