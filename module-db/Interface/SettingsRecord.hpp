@@ -27,11 +27,19 @@ struct SettingsRecord{
     uint32_t pinDaysLeft;
     std::string pin1;
     std::string pin2;
-    uint32_t    activeSIM;
+    enum class ActiveSim : uint32_t
+    {
+        NONE = 0,
+        SIM1 = 1,
+        SIM2 = 2,
+    } activeSIM = ActiveSim::NONE;
     std::string     networkOperator;
     uint32_t lockPassHash;
     uint32_t lockTime;
     SettingsLanguage language;
+
+    static ActiveSim to(const uint32_t sim);
+    static uint32_t from(const ActiveSim sim);
 };
 
 enum class SettingsRecordField{

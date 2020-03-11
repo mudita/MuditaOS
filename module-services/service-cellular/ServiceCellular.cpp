@@ -316,7 +316,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             break;
             case CellularNotificationMessage::Type::SIM:
-                LOG_INFO("~~~~~~~~~~");
                 if (Store::GSM::get()->tray == Store::GSM::Tray::IN && !init_sim())
                 {
                     LOG_ERROR("SIM initialization failure!");
@@ -393,6 +392,11 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 }
 
                 state.set(State::ST::ModemOn);
+                if (select_sim())
+                {
+                    bsp::cellular::sim::sim_sel();
+                    bsp::cellular::sim::hotswap_trigger();
+                }
                 auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemOn);
                 sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
             }
@@ -1077,6 +1081,24 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
         }
     }
     return result;
+}
+
+bool ServiceCellular::select_sim()
+{
+    auto settings = DBServiceAPI::SettingsGet(this);
+    switch (settings.activeSIM)
+    {
+    case SettingsRecord::ActiveSim::NONE:
+        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+        return false;
+    case SettingsRecord::ActiveSim::SIM1:
+        Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+        return true;
+    case SettingsRecord::ActiveSim::SIM2:
+        Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
+        return true;
+    }
+    return false;
 }
 
 bool ServiceCellular::init_sim()
