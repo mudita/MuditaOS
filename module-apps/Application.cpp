@@ -437,7 +437,7 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
     else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr)
     {
         getCurrentWindow()->setSIM();
-        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
     if (handled)
