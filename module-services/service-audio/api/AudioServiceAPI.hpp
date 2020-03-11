@@ -1,16 +1,4 @@
-/*
- *  @file AudioSerivceAPI.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 29.07.19
- *  @brief  
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-
-
-#ifndef PUREPHONE_AUDIOSERIVCEAPI_HPP
-#define PUREPHONE_AUDIOSERVICEAPI_HPP
+#pragma once
 
 #include "../messages/AudioMessage.hpp"
 #include <optional>
@@ -33,5 +21,3 @@ public:
     static audio::RetCode SetOutputVolume(sys::Service* serv,const audio::Volume vol);
     static audio::RetCode SetInputGain(sys::Service* serv,const audio::Gain gain);
 };
-
-#endif //PUREPHONE_AUDIOSERIVCEAPI_HPP

@@ -209,9 +209,10 @@ void CallWindow::setVisibleState() {
 			bottomBar->setActive(gui::BottomBar::Side::LEFT, false );
 			bottomBar->setActive(gui::BottomBar::Side::CENTER, false );
 			bottomBar->setActive(gui::BottomBar::Side::RIGHT, false );
-//			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_return") );
-//			durationLabel->setText(utils::localize.get("app_call_call_ended"));
-		}break;
+
+            durationLabel->setVisible(true);
+            durationLabel->setText(utils::localize.get("app_call_call_ended"));
+        }break;
 		case State::CALL_IN_PROGRESS: {
 //			titleLabel->setText("CALL_IN_PROGRESS");
 			durationLabel->setVisible(true);
@@ -235,8 +236,9 @@ void CallWindow::setVisibleState() {
 			bottomBar->setText( gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_end_call") );
 
 			showIconsLambda();
-			// durationLabel->setText(utils::localize.get("app_call_is_calling")); // TODO: alek: should be printed sthg?
-		}break;
+            durationLabel->setText(utils::localize.get("app_call_calling"));
+            durationLabel->setVisible(true);
+        }break;
 	};
 }
 
@@ -244,8 +246,9 @@ void CallWindow::setCallNumber( std::string ) {
 
 }
 
-void CallWindow::updateDuration( uint32_t duration ) {
-	uint32_t seconds = 0;
+void CallWindow::updateDuration(time_t duration)
+{
+    uint32_t seconds = 0;
 	uint32_t minutes = 0;
 	uint32_t hours = 0;
 	uint32_t days = 0;
@@ -263,7 +266,6 @@ void CallWindow::updateDuration( uint32_t duration ) {
 	ss<<std::setfill('0') << std::setw(2) << seconds;
 
 	durationLabel->setText( ss.str());
-
 }
 
 bool CallWindow::handleSwitchData( SwitchData* data ) {
@@ -344,7 +346,7 @@ bool CallWindow::handleCenterButton()
 {
     if (state == State::INCOMING_CALL)
     {
-        LOG_ERROR("TODO: Send message template");
+        LOG_ERROR("TODO: Reject call and send message template");
         return true;
     }
     return false;

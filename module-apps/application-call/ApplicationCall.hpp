@@ -28,13 +28,15 @@ class ApplicationCall: public Application {
   protected:
 	std::string phoneNumber;
 	AppTimer timerCall;
-	uint32_t callDuration = 0;
-	uint32_t callEndTime = -1;
+    time_t callStartTime = std::numeric_limits<time_t>::max();
+    ;
+    time_t callDuration = 0;
+    time_t callDelayedDuration = std::numeric_limits<time_t>::max();
     void timerCallCallback();
 public:
 	ApplicationCall( std::string name=name_call, std::string parent = "", bool startBackgound = false );
-	virtual ~ApplicationCall();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+    ~ApplicationCall() override = default;
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 

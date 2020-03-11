@@ -10,11 +10,13 @@
 #include "Application.hpp"
 
 #include "MessageType.hpp"
-#include "windows/CallMainWindow.hpp"
-#include "windows/EnterNumberWindow.hpp"
-#include "windows/EmergencyCallWindow.hpp"
-#include "windows/CallWindow.hpp"
 #include "data/CallSwitchData.hpp"
+#include "log/log.hpp"
+#include "time/time_conversion.hpp"
+#include "windows/CallMainWindow.hpp"
+#include "windows/CallWindow.hpp"
+#include "windows/EmergencyCallWindow.hpp"
+#include "windows/EnterNumberWindow.hpp"
 #include <ticks.hpp>
 
 #include "service-cellular/ServiceCellular.hpp"
@@ -31,32 +33,31 @@ namespace app {
     {
     }
 
-ApplicationCall::~ApplicationCall() {
-}
+    //  number of seconds after end call to siwtch back to previous application
+    constexpr auto delayToSwitchToPreviousApp = 3;
 
-void ApplicationCall::timerCallCallback()
-{
-    // Invoked when timer ticked, 3 seconds after end call event if user didn't press back button earlier.
-    ++callDuration;
-
-    auto it = windows.find(window::name_call);
-    if (getCurrentWindow() == it->second)
+    void ApplicationCall::timerCallCallback()
     {
-        gui::CallWindow *callWindow = reinterpret_cast<gui::CallWindow *>(getCurrentWindow());
+        callDuration = utils::time::Timestamp().getTime() - callStartTime;
 
-        if (callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS)
+        auto it = windows.find(window::name_call);
+        if (getCurrentWindow() == it->second)
         {
-            callWindow->updateDuration(callDuration);
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        }
-    }
+            auto callWindow = dynamic_cast<gui::CallWindow *>(getCurrentWindow());
 
-    if (callDuration >= callEndTime)
-    {
-        LOG_INFO("callDuration %d, callEndTime id %d", callDuration, callEndTime);
-        timerCall.stop();
-        sapm::ApplicationManager::messageSwitchPreviousApplication(this);
-    }
+            if (callWindow && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS)
+            {
+                callWindow->updateDuration(callDuration);
+                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            }
+        }
+
+        // delayed switch to previous application
+        if (callDuration >= callDelayedDuration)
+        {
+            stopCallTimer();
+            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+        }
 }
 
 void ApplicationCall::CallAbortHandler()
@@ -66,7 +67,7 @@ void ApplicationCall::CallAbortHandler()
 
     LOG_INFO("---------------------------------CallAborted");
     AudioServiceAPI::Stop(this);
-    callEndTime = callDuration + 3;
+    callDelayedDuration = callDuration + delayToSwitchToPreviousApp;
     callWindow->setState(gui::CallWindow::State::CALL_ENDED);
     refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
 }
@@ -76,7 +77,7 @@ void ApplicationCall::CallActiveHandler()
     gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
     assert(callWindow != nullptr);
 
-    callDuration = 0;
+    runCallTimer();
 
     LOG_INFO("---------------------------------CallActive");
     callWindow->setState(gui::CallWindow::State::CALL_IN_PROGRESS);
@@ -96,7 +97,6 @@ void ApplicationCall::IncomingCallHandler(const CellularNotificationMessage *con
     else
     {
         AudioServiceAPI::RoutingStart(this);
-        runCallTimer();
         std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
         // send to itself message to switch (run) call application
         callWindow->setState(gui::CallWindow::State::INCOMING_CALL);
@@ -119,8 +119,6 @@ void ApplicationCall::RingingHandler(const CellularNotificationMessage *const ms
     gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
     assert(callWindow != nullptr);
 
-    // reset call duration
-    runCallTimer();
     LOG_INFO("---------------------------------Ringing");
     AudioServiceAPI::RoutingStart(this);
 
@@ -211,12 +209,6 @@ sys::ReturnCodes ApplicationCall::DeinitHandler() {
 	return sys::ReturnCodes::Success;
 }
 
-void ApplicationCall::stopCallTimer() {
-	LOG_INFO("switching to prev calldur: %d endTime: %d", callDuration, callEndTime );
-	timerCall.stop();
-	sapm::ApplicationManager::messageSwitchPreviousApplication( this );
-}
-
 
 void ApplicationCall::createUserInterface() {
 
@@ -244,9 +236,18 @@ const std::string& ApplicationCall::getDisplayedNumber() {
 }
 
 void ApplicationCall::runCallTimer() {
-	callDuration = 0;
-	callEndTime = -1;
-	timerCall.restart();
+    callStartTime = utils::time::Timestamp().getTime();
+    callDuration = std::numeric_limits<time_t>::min();
+    callDelayedDuration = std::numeric_limits<time_t>::max();
+    timerCall.restart();
+}
+
+void ApplicationCall::stopCallTimer()
+{
+    callStartTime = std::numeric_limits<time_t>::max();
+    callDuration = std::numeric_limits<time_t>::min();
+    callDelayedDuration = std::numeric_limits<time_t>::max();
+    timerCall.stop();
 }
 
 void ApplicationCall::destroyUserInterface() {
