@@ -1,14 +1,27 @@
 #pragma once
 
 #include "tinyfsm/include/tinyfsm.hpp"
-
+#include "Service/Service.hpp"
 
 // ----------------------------------------------------------------------------
 // Event declarations
 //
 
-struct RawDataEvt           : tinyfsm::Event { };
-struct RawDataMallocEvt     : tinyfsm::Event { };
+struct RawDataEvt : tinyfsm::Event
+{
+    RawDataEvt(sys::Service *ownerServicePtr) : ownerService(ownerServicePtr)
+    {
+    }
+    sys::Service *ownerService;
+};
+
+struct RawDataMallocEvt : tinyfsm::Event
+{
+    RawDataMallocEvt(sys::Service *ownerServicePtr) : ownerService(ownerServicePtr)
+    {
+    }
+    sys::Service *ownerService;
+};
 
 // ----------------------------------------------------------------------------
 // RawDataFsm (FSM base class) declaration

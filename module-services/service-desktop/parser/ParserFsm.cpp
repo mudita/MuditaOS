@@ -49,7 +49,7 @@ class StateMessageType : public ParserFsm
 
 class StateMessageSize : public ParserFsm
 {
-    void react(MessageDataEvt const &) override
+    void react(MessageDataEvt const &msg) override
     {
         LOG_DEBUG("*** react MessageSizeEvt ***");
 
@@ -84,11 +84,11 @@ class StateMessageSize : public ParserFsm
             }
             msgPayloadSize = stoi(msgPayloadSizeStr);
 
-            auto msgPayloadMalloc = [] {
+            auto msgPayloadMalloc = [msg] {
                 if (msgType == parserutils::message::Type::endpoint)
                     msgPayload.reserve(msgPayloadSize);
                 else if (msgType == parserutils::message::Type::rawData)
-                    send_event(RawDataMallocEvt());
+                    send_event(RawDataMallocEvt(msg.ownerService));
             };
             transit<StateMessagePayload>(msgPayloadMalloc);
         }
@@ -122,7 +122,7 @@ class StateMessagePayload : public ParserFsm
 
             if (msgType == parserutils::message::Type::rawData)
             {
-                send_event(RawDataEvt()); // invoke raw data fsm to let it store payload chunk to emmc
+                send_event(RawDataEvt(msg.ownerService)); // invoke raw data fsm to let it store payload chunk to emmc
                 msgPayload.clear();
             }
             LOG_DEBUG("serial data buff empty, wait for new data");
@@ -140,11 +140,12 @@ class StateMessagePayload : public ParserFsm
             auto runHandler = [msg] {
                 if (msgType == parserutils::message::Type::endpoint)
                 {
-                    LOG_INFO("msg.ownerService: %p", (void *)msg.ownerService);
                     send_event(EndpointEvt(msg.ownerService));
                 }
                 else if (msgType == parserutils::message::Type::rawData)
-                    send_event(RawDataEvt()); // invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
+                {
+                    send_event(RawDataEvt(msg.ownerService)); // invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
+                }
             };
 
             transit<StateMessageType>(runHandler);
