@@ -153,13 +153,19 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
             break;
 
-            case CellularNotificationMessage::Type::None:
-                // do not send notification msg
-                return;
-            case CellularNotificationMessage::Type::RawCommand: {
-                LOG_INFO(" IGNORE RawCmd");
-                return;
-            }
+        case CellularNotificationMessage::Type::SIM: {
+            auto message = std::make_shared<sevm::SIMMessage>();
+            sys::Bus::SendUnicast(message, "EventManager", this);
+        }
+        break;
+
+        case CellularNotificationMessage::Type::None:
+            // do not send notification msg
+            return;
+        case CellularNotificationMessage::Type::RawCommand: {
+            LOG_INFO(" IGNORE RawCmd");
+            return;
+        }
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -309,6 +315,13 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             break;
+            case CellularNotificationMessage::Type::SIM:
+                LOG_INFO("~~~~~~~~~~");
+                if (Store::GSM::get()->tray == Store::GSM::Tray::IN && !init_sim())
+                {
+                    LOG_ERROR("SIM initialization failure!");
+                }
+                break;
             default: {
                 LOG_INFO("Skipped CellularNotificationMessage::Type %d", msg->type);
             }
@@ -402,15 +415,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             // Reset procedure started, do nothing here
             state.set(State::ST::PowerUpInProgress);
-        }
-    }
-    break;
-
-    case MessageType::SIMTrayEvent: {
-        LOG_INFO("~~~~~~~~~~");
-        if (Store::GSM::get()->tray == Store::GSM::Tray::IN && !init_sim())
-        {
-            LOG_ERROR("SIM initialization failure!");
         }
     }
     break;
@@ -655,8 +659,7 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
             LOG_ERROR("SIM ERROR");
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        auto message = std::make_shared<sevm::SIMMessage>();
-        sys::Bus::SendUnicast(message, "EventManager", this);
+        return CellularNotificationMessage::Type::SIM;
     }
 
     // Incoming call

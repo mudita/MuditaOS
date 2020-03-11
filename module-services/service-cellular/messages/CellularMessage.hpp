@@ -37,6 +37,7 @@ public:
       ServiceReady,             // Idle state of the service. This is a start state before any call is initialized by user or by network.
                                 // service returns to this state when call is finished.
       PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and cold start)
+      SIM,                      // change on SIM from URC
       ModemOn,                  // Modem initialized
       RawCommand,               // send raw command to modem -> returns raw, tokenised result
       None
