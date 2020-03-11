@@ -113,7 +113,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //8. Send AT
                 LOG_DEBUG("4. Setting baudrate to 115200...");
                 // OK THIS IS BAD for modem restart... baud on cmux is 460800bit, we wont be able to close cmux if it stays
-                // pv_cellular->SetSpeed(115200);
+                pv_cellular->SetSpeed(115200);
                 LOG_DEBUG("Sending AT...");
                 if (parser->cmd(at::AT::AT))
                 {
