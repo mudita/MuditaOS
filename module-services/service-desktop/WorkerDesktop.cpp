@@ -52,6 +52,8 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
 
     EndpointFsm::sendQueue = Worker::getQueueByName("sendQueueBuffer");
 
+
+
     fsm_list::start();
 
     return true;

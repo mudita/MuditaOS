@@ -40,20 +40,11 @@ class StateDecodeJson : public EndpointFsm
 
         switch (endpoint)
         {
-        case parserutils::Endpoint::battery:
-            transit<StateEndpointBattery>();
-            break;
         case parserutils::Endpoint::update:
             transit<StateEndpointUpdate>();
             break;
         case parserutils::Endpoint::deviceInfo:
             transit<StateEndpointDeviceInfo>();
-            break;
-        case parserutils::Endpoint::network:
-            transit<StateEndpointNetwork>();
-            break;
-        case parserutils::Endpoint::storage:
-            transit<StateEndpointStorage>();
             break;
         }
     };
@@ -76,15 +67,6 @@ class StateEndpointDeviceInfo : public EndpointFsm
     };
 };
 
-class StateEndpointBattery : public EndpointFsm
-{
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateEndpointBattery ***");
-        transit<StateDecodeJson>();
-    };
-};
-
 class StateEndpointUpdate : public EndpointFsm
 {
     void entry() override
@@ -101,34 +83,6 @@ class StateEndpointUpdate : public EndpointFsm
         transit<StateDecodeJson>();
 
         LOG_DEBUG("*** entry StateEndpointUpdate ***");
-    };
-};
-
-class StateEndpointNetwork : public EndpointFsm
-{
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateEndpointNetwork ***");
-        transit<StateDecodeJson>();
-    };
-};
-
-class StateEndpointStorage : public EndpointFsm
-{
-    void entry() override
-    {
-        LOG_DEBUG("*** entry StateEndpointStorage ***");
-
-        EndpointHandler endpointHandler = EndpointHandler();
-
-        std::string responseStr;
-        sys::ReturnCodes retCode = endpointHandler.storage(method, uuid, body, responseStr, ownerService);
-        LOG_DEBUG("endpointHandler.deviceInfo retCode %d uuid %d", retCode, uuid);
-
-        putToSendQueue(responseStr);
-        transit<StateDecodeJson>();
-
-        LOG_DEBUG("*** entry StateEndpointStorage ***");
     };
 };
 

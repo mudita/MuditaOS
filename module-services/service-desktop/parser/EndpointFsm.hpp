@@ -18,7 +18,7 @@ extern "C"
 
 struct EndpointEvt: tinyfsm::Event
 {
-    EndpointEvt(sys::Service *_ownerService) : ownerService(_ownerService){};
+    EndpointEvt(sys::Service *ownerServicePtr) : ownerService(ownerServicePtr){};
     sys::Service *ownerService;
 };
 

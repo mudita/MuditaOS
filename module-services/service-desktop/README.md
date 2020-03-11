@@ -41,7 +41,8 @@ requestPayloadJson:
 {
      { "endpoint", endpointNumber },
      { "method", methodNumber}, 
-     { "body", requestBodyJson }
+     { "body", requestBodyJson },
+     { "uuid", uuidString }
 }
 ```
 ```
@@ -49,7 +50,8 @@ responsePayloadJson:
 {
      { "endpoint", endpointNumber },
      { "status", statusCode}, 
-     { "body", responseBodyJson }
+     { "body", responseBodyJson },
+     { "uuid", uuidString }
 }
 ```
 ###### Endpoint
@@ -58,11 +60,8 @@ responsePayloadJson:
 ```
 enum class Endpoint
 {
-    battery = 1,
-    backups,
-    deviceInfo,
-    network,
-    storage
+    deviceInfo = 1,
+    update
 };
 ```
 
