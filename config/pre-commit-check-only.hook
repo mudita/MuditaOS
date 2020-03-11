@@ -70,7 +70,7 @@ check_file() {
   file="${1}"
   echo "checking file ${file}"
   if [ -f $file ]; then
-    [[ $VERBOSE ]] && echo "Format: ${1} diff"
+    [[ $VERBOSE ]] && echo -e "Format: \e[33m${1}\e[0m diff"
     OUT=$(git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
     if [ -z "$OUT" ]; then
         return 0

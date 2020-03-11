@@ -1,0 +1,41 @@
+#!/bin/bash
+#AUTHOR: Radoslaw Wicik
+#E-MAIL: 
+#Date: 2020-03-11 22:23:54
+
+L_GIT_DIR=$(git rev-parse --show-toplevel)
+source $L_GIT_DIR/config/format-config.sh
+VERBOSE=1
+echo "VERBOSE: ${VERBOSE}"
+echo "ignore_paths"
+echo "{#ignore_paths}: ${#ignore_paths[@]}"
+
+# bash function using above config function
+shouldnt_ignore() {
+    # change full name path to path relative to root git dir
+    local fname=${1/"$L_GIT_DIR"/"./"}
+    for el in ${ignore_paths[@]}; do
+        #echo -e "\t${el}"
+        if [[ ${fname}  =~ ^${el}.* ]]; then
+            [[ $VERBOSE ]] && echo -e "\e[33mIgnore: \e[32m${fname}\e[33m formatting due to: \e[34m$el\e[33m match!\e[0m"
+            return 1
+        fi
+    done
+    return 0
+}
+
+mapfile -d $'\0' source_files < <(find . -regex '.*\.\(cpp\|hpp\|c\|h\|cxx\|gcc\|cc\)$' -print0)
+
+I=0
+source_count=${#source_files[@]}
+echo "source_count: ${source_count}"
+while [ ${I} -lt ${source_count} ]
+#while [ ${I} -lt 10 ]
+do
+    file=${source_files[${I}]}
+    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
+        echo "${I}/${source_count}: clang-format-9 -i ${file}"
+        clang-format-9 --style=file -i ${file}
+    fi
+    I=$(( ${I} + 1 ))
+done
