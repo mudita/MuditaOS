@@ -1,17 +1,9 @@
-/*
- * @file ApplicationCall.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 1 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_CALL_APPLICATIONCALL_HPP_
-#define MODULE_APPS_APPLICATION_CALL_APPLICATIONCALL_HPP_
+#pragma once
 
 #include "Application.hpp"
-#include "SystemManager/SystemManager.hpp"
 #include "Service/Message.hpp"
+#include "SystemManager/SystemManager.hpp"
+#include <service-cellular/api/CellularServiceAPI.hpp>
 
 namespace app {
 
@@ -27,16 +19,24 @@ namespace window
  *
  */
 class ApplicationCall: public Application {
-protected:
+  private:
+    void CallAbortHandler();
+    void CallActiveHandler();
+    void IncomingCallHandler(const CellularNotificationMessage *const msg);
+    void RingingHandler(const CellularNotificationMessage *const msg);
+
+  protected:
 	std::string phoneNumber;
 	AppTimer timerCall;
-	uint32_t callDuration = 0;
-	uint32_t callEndTime = -1;
+    time_t callStartTime = std::numeric_limits<time_t>::max();
+    ;
+    time_t callDuration = 0;
+    time_t callDelayedDuration = std::numeric_limits<time_t>::max();
     void timerCallCallback();
 public:
 	ApplicationCall( std::string name=name_call, std::string parent = "", bool startBackgound = false );
-	virtual ~ApplicationCall();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+    ~ApplicationCall() override = default;
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 
@@ -52,5 +52,3 @@ public:
 };
 
 } /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_CALL_APPLICATIONCALL_HPP_ */
