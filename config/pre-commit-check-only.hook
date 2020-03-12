@@ -1,16 +1,16 @@
-#!/bin/bash -e
+#!/bin/bash
 # taken from: https://raw.githubusercontent.com/andrewseidl/githook-clang-format/master/clang-format.hook
 # - with just added check for cpp file & check for proper version of clang-format
 # - with use of clang-format diff.py - for changed chunk changes only
 # might be worth to consider: https://github.com/Sarcasm/run-clang-format
 
-set -o pipefail
 
 L_GIT_DIR=$(git rev-parse --show-toplevel)
 source $L_GIT_DIR/config/format-config.sh
 
 # if autoformatting was disabled by user - then ignore this commit hook
 if [[ $DISABLE_AUTO_FORMATTING ]]; then
+    [[ $VERBOSE ]] && echo "auto formatting is disabled"
     exit 0
 fi
 
@@ -68,13 +68,19 @@ format_file() {
 
 check_file() {
   file="${1}"
-  echo "checking file ${file}"
+  last_commit="${2}"
   if [ -f $file ]; then
-    [[ $VERBOSE ]] && echo -e "Format: \e[33m${1}\e[0m diff"
-    OUT=$(git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+    [[ $VERBOSE ]] && echo -en "Checking: \e[33m${1}\e[0m :\t"
+    if [[ -z ${last_commit} ]]; then
+        OUT=$(git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+    else
+        OUT=$(git diff -U0 --no-color HEAD^..HEAD ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+    fi
     if [ -z "$OUT" ]; then
+        [[ ${VERBOSE} ]] && echo "OK"
         return 0
     else
+        [[ ${VERBOSE} ]] && echo "error"
         return 1
     fi
   fi
@@ -96,23 +102,41 @@ shouldnt_ignore() {
 case "${1}" in
   --about )
     echo "Runs clang-format on source files"
+    FILES=''
+    LAST=""
+    ;;
+  --last)
+    FILES=$(git diff --name-only HEAD^..HEAD)
+    LAST="True"
     ;;
   * )
-    ERROR=0
-    for file in `git diff-index --cached --name-only HEAD` ; do
-        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
-            #format_file "${file}"
-            check_file "${file}"
-            RESULT=$?
-            if [[ ${RESULT} -eq 1 ]]; then
-                echo -e "please run:\n\t git clang-format\n before commit"
-                ERROR=1
-            else
-                ERROR=0
-            fi
-        fi
-    done
-    exit $ERROR
+    FILES=$(git diff-index --cached --name-only HEAD)
     ;;
 esac
+
+EXIT_CODE=0
+error_files=()
+for file in ${FILES}; do
+    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
+        check_file "${file}" ${LAST}
+        RESULT=$?
+        if [[ ${RESULT} -eq 1 ]]; then
+            error_files+=(${file})
+            EXIT_CODE=1
+        fi
+    fi
+done
+
+if [[ ${EXIT_CODE} -eq 1 ]]; then
+    echo -e "before commit please run:\n\t git clang-format\n "
+    echo -e "Files containing style errors:"
+    I=0
+    while [[ ${I} -lt ${#error_files[@]} ]]; do
+        echo -e "\t${error_files[${I}]}"
+        I=$(( ${I} + 1 ))
+    done
+    exit 1
+else
+    exit 0
+fi
 

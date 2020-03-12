@@ -3,7 +3,7 @@
 # ignore file for clang-format autoformating
 
 # set this variable in your shell if you wish to disable autoformatting on commit for time being
-DISABLE_AUTO_FORMATTING=1
+#DISABLE_AUTO_FORMATTING=1
 
 # set this variable to get more verbose output
 VERBOSE=1
