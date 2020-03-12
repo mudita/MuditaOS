@@ -25,13 +25,10 @@ namespace gui
 class PhonebookSearchResults : public AppWindow
 {
   protected:
-    PhonebookListView *list;
+    PhonebookListView *searchResultList = nullptr;
     SearchResultsModel *searchResultsModel = nullptr;
 
-    Image *leftArrowImage = nullptr;
-    Image *rightArrowImage = nullptr;
     Image *newContactImage = nullptr;
-    Image *searchImage = nullptr;
 
   public:
     PhonebookSearchResults(app::Application *app);

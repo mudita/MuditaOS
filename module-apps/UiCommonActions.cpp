@@ -133,7 +133,7 @@ namespace app
 
             if (contactOperation == ContactOperation::Add)
             {
-                // trying to add new contact for number already assigned to existing contact, displa warning
+                // trying to add new contact for number already assigned to existing contact, display warning
                 return sapm::ApplicationManager::messageSwitchApplication(
                     app, name_phonebook, gui::window::name::duplicatedContact,
                     std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contactRec)), number));
@@ -155,6 +155,21 @@ namespace app
         }
 
         return contact(app, contactOperation, contactRec);
+    }
+
+    bool contact(Application *app, ContactOperation contactOperation, uint32_t contactId)
+    {
+        assert(app != nullptr);
+        assert(contactOperation != ContactOperation::Add);
+
+        auto searchResults = DBServiceAPI::ContactGetByID(app, contactId);
+        if (searchResults.get()->size() == 1)
+        {
+            ContactRecord contactRec = searchResults->front();
+            return contact(app, contactOperation, contactRec);
+        }
+
+        return false;
     }
 
 } // namespace app

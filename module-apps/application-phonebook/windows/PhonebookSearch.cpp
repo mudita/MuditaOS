@@ -2,15 +2,16 @@
 #include "../ApplicationPhonebook.hpp"
 #include "InputEvent.hpp"
 #include "Label.hpp"
-#include "Margins.hpp"
 #include "PhonebookContact.hpp"
 #include "../data/PhonebookStyle.hpp"
 #include "Text.hpp"
 #include "Utils.hpp"
 #include "application-call/data/CallSwitchData.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
+
+namespace gui
+{
 PhonebookSearch::PhonebookSearch(app::Application *app) : AppWindow(app, "Search"), phonebookModel{new PhonebookModel(app)}
 {
     buildInterface();
@@ -35,7 +36,6 @@ Label *PhonebookSearch::addLabel(std::list<Item *> *parentPage, int x, int y, in
     l->setAlignement(alignment);
     l->setLineMode(lineMode);
 
-    // addItem(l);
     if (parentPage)
         parentPage->push_back(l);
 
@@ -73,14 +73,6 @@ void PhonebookSearch::buildInterface()
 
     bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_search"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-    searchResultList = new gui::PhonebookListView(this, phonebookStyle::search::searchResultList::x, phonebookStyle::search::searchResultList::y, phonebookStyle::search::searchResultList::w, phonebookStyle::search::searchResultList::h);
-    searchResultList->setMaxElements(phonebookStyle::search::searchResultList::maxElements);
-    searchResultList->setPageSize(phonebookStyle::search::searchResultList::pageSize);
-    searchResultList->setPenFocusWidth(phonebookStyle::search::searchResultList::penFocusWidth);
-    searchResultList->setPenWidth(phonebookStyle::search::searchResultList::penWidth);
-    searchResultList->setProvider(phonebookModel);
-    searchResultList->setApplication(application);
 
     setFocusItem(inputField);
 }
@@ -171,3 +163,4 @@ bool PhonebookSearch::onInput(const InputEvent &inputEvent)
 
     return (ret);
 }
+} /* namespace gui */

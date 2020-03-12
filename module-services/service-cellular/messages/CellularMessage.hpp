@@ -75,10 +75,12 @@ public:
 class CellularResponseMessage : public sys::ResponseMessage
 {
   public:
-    CellularResponseMessage(uint32_t retCode, std::string retdata = std::string()) : sys::ResponseMessage(), retCode(retCode), data(retdata){};
+    CellularResponseMessage(bool retCode, std::string retdata = std::string(), MessageType responseTo = MessageType::MessageTypeUninitialized)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
+    CellularResponseMessage(bool retCode, MessageType responseTo) : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
     virtual ~CellularResponseMessage(){};
 
-    uint32_t retCode;
+    bool retCode;
     std::string data;
 };
 

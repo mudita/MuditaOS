@@ -32,14 +32,19 @@ namespace search {
             constexpr uint32_t h = 33;
         } // namespace inputField
     } // namespace horizontalBox
+} //namespace search
+namespace searchResults {
+    constexpr uint32_t default_x = style::window::default_left_margin;
+    constexpr uint32_t default_w =
+            style::window_width - style::window::default_left_margin - style::window::default_right_margin;
     namespace searchResultList {
-        constexpr uint32_t x = 11;
-        constexpr uint32_t y = 105;
-        constexpr uint32_t w = 480 - 22;
-        constexpr uint32_t h = 600 - 105 - 50;
+        constexpr uint32_t x = style::window::default_left_margin;
+        constexpr uint32_t y = 105 + 6;
+        constexpr uint32_t w = style::window_width - style::window::default_left_margin - style::window::default_right_margin;
+        constexpr uint32_t h = style::window_height - y - 50;
         constexpr uint32_t maxElements = 7;
         constexpr uint32_t pageSize = 7;
-        constexpr uint32_t penFocusWidth = 0;
+        constexpr uint32_t penFocusWidth = style::window::default_border_no_focus_w;
         constexpr uint32_t penWidth = 0;
     } // namespace searchResultList
 } //namespace search

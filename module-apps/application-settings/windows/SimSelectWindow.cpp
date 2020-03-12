@@ -17,7 +17,8 @@ std::list<gui::Option> simSelectWindow(app::Application *app)
              bsp::cellular::sim::sim_sel();
              bsp::cellular::sim::hotswap_trigger();
              return true;
-         }},
+         },
+         gui::Arrow::Disabled},
         {"SIM 2",
          [=](gui::Item &item) {
              LOG_INFO("Switch SIM 2");
@@ -25,6 +26,7 @@ std::list<gui::Option> simSelectWindow(app::Application *app)
              bsp::cellular::sim::sim_sel();
              bsp::cellular::sim::hotswap_trigger();
              return true;
-         }},
+         },
+         gui::Arrow::Disabled},
     };
 }

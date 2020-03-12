@@ -145,7 +145,7 @@ gui::ListItem *PhonebookModel::getItem(int index, int firstElement, int prevInde
         {
             gui::PhonebookItem *item = new gui::PhonebookItem();
 
-            // leaving normal contacts list and entering favourite area but charatcer is already placed
+            // leaving normal contacts list and entering favourite area but character is already placed
             if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex))
             {
                 item->markFavourite(true);
