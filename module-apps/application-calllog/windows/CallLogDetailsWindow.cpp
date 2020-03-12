@@ -230,14 +230,26 @@ void CallLogDetailsWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
 			img->setVisible(false);
 		}
 		callTypeImg[callType]->setVisible(true);
-		
-		UTF8 callTypeStr;
-		switch(callType) {
-			case CallLogCallType::IN: callTypeStr = utils::localize.get("app_calllog_incoming_call"); break;
-			case CallLogCallType::OUT: callTypeStr = utils::localize.get("app_calllog_outgoing_call"); break;
-			default: callTypeStr = utils::localize.get("app_calllog_missed_call"); break;
-		}
-		typeData->setText(callTypeStr);
+
+        UTF8 callTypeStr;
+        switch (record.type)
+        {
+        case CallType::CT_INCOMING:
+            callTypeStr = utils::localize.get("app_calllog_incoming_call");
+            break;
+        case CallType::CT_OUTGOING:
+            callTypeStr = utils::localize.get("app_calllog_outgoing_call");
+            break;
+        case CallType::CT_MISSED:
+            callTypeStr = utils::localize.get("app_calllog_missed_call");
+            break;
+        case CallType::CT_REJECTED:
+            callTypeStr = utils::localize.get("app_calllog_rejected_call");
+            break;
+        default:
+            break;
+        }
+        typeData->setText(callTypeStr);
 
         durationData->setText(utils::time::Timestamp(record.duration).str("%Mm %Ss")); // TODO: alek: add duration class
 

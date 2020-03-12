@@ -44,18 +44,11 @@ bool CellularServiceAPI::AnswerIncomingCall(sys::Service* serv) {
     }
 }
 
-bool CellularServiceAPI::HangupCall(sys::Service* serv){
+void CellularServiceAPI::HangupCall(sys::Service *serv)
+{
     std::shared_ptr<CellularRequestMessage> msg = std::make_shared<CellularRequestMessage>(MessageType::CellularHangupCall);
 
-    auto ret = sys::Bus::SendUnicast(msg,ServiceCellular::serviceName,serv,5000);
-    CellularResponseMessage* response = reinterpret_cast<CellularResponseMessage*>(ret.second.get());
-    if((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)){
-        return true;
-    }
-    else{
-        LOG_ERROR("Failed");
-        return false;
-    }
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
 }
 
 std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumber)

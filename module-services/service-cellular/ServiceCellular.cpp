@@ -415,20 +415,21 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             if (channel->cmd(at::AT::ATH))
             {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 stopTimer(callStateTimerId);
-                // Propagate "CallAborted" notification into system
-                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted),
-                                        sys::BusChannels::ServiceCellularNotifications, this);
+                if (!ongoingCall.endCall(CellularCall::Forced::True))
+                {
+                    LOG_ERROR("Failed to end ongoing call");
+                }
+                responseMsg = std::make_shared<CellularResponseMessage>(true, msgl->messageType);
             }
             else
             {
                 LOG_ERROR("Call not aborted");
-                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                responseMsg = std::make_shared<CellularResponseMessage>(false, msgl->messageType);
             }
            break;
         }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        responseMsg = std::make_shared<CellularResponseMessage>(false, msgl->messageType);
     }
     break;
 
