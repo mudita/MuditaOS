@@ -25,6 +25,7 @@ extern "C" {
 #include "VecMap.hpp"
 //module-utils
 #include "utf8/UTF8.hpp"
+#include <cassert>
 
 namespace gui {
 
@@ -741,20 +742,20 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
 	Context* drawCtx = ctx->get( cmd->x, cmd->y, cmd->areaW, cmd->areaH );
 	uint8_t* ctxData = drawCtx->getData();
 
-    auto check_wh = [&](const char *img_name, auto w, auto h) {
+    auto check_wh = [&](const std::string &name, auto w, auto h) {
         if (h > ctx->getH() || w > ctx->getW())
         {
-            LOG_WARN("image %s {w: %d,h %d} > context {w %d,h %d}", img_name, w, drawCtx->getW(), h, drawCtx->getH());
+            LOG_WARN("image %s {w: %d,h %d} > context {w %d,h %d}", name.c_str(), w, drawCtx->getW(), h, drawCtx->getH());
         }
     };
 
     if( imageMap->getType() == gui::ImageMap::Type::PIXMAP ) {
-        auto pixMap = reinterpret_cast<PixMap *>(imageMap);
-        //draw image on temporeary context
-		uint32_t offsetImage = 0;
+        auto pixMap = dynamic_cast<PixMap *>(imageMap);
+        assert(pixMap);
+        uint32_t offsetImage = 0;
 		uint32_t offsetContext = 0;
 		uint8_t* pixData = pixMap->getData();
-        check_wh(pixMap->getName().c_str(), pixMap->getWidth(), pixMap->getHeight());
+        check_wh(pixMap->getName(), pixMap->getWidth(), pixMap->getHeight());
 
         for (uint32_t row = 0; row < std::min(drawCtx->getH(), pixMap->getHeight()); row++)
         {
@@ -764,14 +765,15 @@ void Renderer::drawImage( Context* ctx, CommandImage* cmd ) {
         }
     }
 	else if( imageMap->getType() == gui::ImageMap::Type::VECMAP) {
-        auto vecMap = reinterpret_cast<VecMap *>(imageMap);
+        auto vecMap = dynamic_cast<VecMap *>(imageMap);
+        assert(vecMap);
         uint32_t offsetContext = 0;
 		uint32_t offsetRowContext = 0;
 		uint32_t imageOffset = 0;
 		uint8_t alphaColor = vecMap->getAlphaColor();
         for (uint32_t row = 0; row < std::min(vecMap->getHeight(), drawCtx->getH()); row++)
         {
-            check_wh(vecMap->getName().c_str(), imageMap->getWidth(), imageMap->getHeight());
+            check_wh(vecMap->getName(), imageMap->getWidth(), imageMap->getHeight());
             uint16_t vecCount = *(vecMap->getData() + imageOffset);
             imageOffset+=sizeof(uint16_t);
 
