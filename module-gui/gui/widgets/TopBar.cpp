@@ -220,8 +220,11 @@ bool TopBar::updateSignalStrength()
         if (rssiBar < Store::RssiBar::noOfSupprtedBars)
         {
             signal[static_cast<size_t>(Store::GSM::get()->signalStrength.rssiBar)]->setVisible(true);
+            return true;
         }
+        return false;
     }
+    return true;
 }
 
 void TopBar::setTime( const UTF8& time ) {
