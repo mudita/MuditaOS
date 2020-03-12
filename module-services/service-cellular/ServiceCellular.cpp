@@ -1110,10 +1110,11 @@ bool ServiceCellular::init_sim()
         return false;
     }
     bool success = true;
-    success = success && channel->cmd(at::AT::CALLER_NUMBER_PRESENTATION);
-    success = success && channel->cmd(at::AT::SMS_TEXT_FORMAT);
-    success = success && channel->cmd(at::AT::SMS_UCSC2);
-    success = success && channel->cmd(at::AT::SMS_STORAGE);
+    success = channel->cmd(at::AT::CALLER_NUMBER_PRESENTATION) && success;
+    success = channel->cmd(at::AT::SMS_TEXT_FORMAT) && success;
+    success = channel->cmd(at::AT::SMS_UCSC2) && success;
+    success = channel->cmd(at::AT::SMS_STORAGE) && success;
+    success = channel->cmd(at::AT::CRC_ON) && success;
     state.set(State::ST::FullyFunctional);
     return success;
 }
