@@ -20,6 +20,7 @@
 #include "ApplicationDesktop.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <application-settings/ApplicationSettings.hpp>
+#include <cassert>
 #include <service-appmgr/ApplicationManager.hpp>
 
 namespace app {
@@ -46,11 +47,11 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
     bool handled = false;
     if (auto msg = dynamic_cast<DBNotificationMessage *>(msgl))
     {
-        handle(msg);
+        handled = handle(msg);
     }
     else if (auto msg = dynamic_cast<CellularNotificationMessage *>(msgl))
     {
-        handle(msg);
+        handled = handle(msg);
     }
 
     if (handled)
@@ -66,6 +67,7 @@ sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sy
 auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
 {
     LOG_DEBUG("Received multicast");
+    assert(msg);
     if ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added))
     {
         notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
@@ -79,6 +81,7 @@ auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
 
 auto ApplicationDesktop::handle(CellularNotificationMessage *msg) -> bool
 {
+    assert(msg);
     if (msg->type == CellularNotificationMessage::Type::ModemOn && Store::GSM::get()->sim != Store::GSM::SIM::SIM1 &&
         Store::GSM::get()->sim != Store::GSM::SIM::SIM1)
     {
