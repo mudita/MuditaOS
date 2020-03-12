@@ -74,8 +74,3 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     setFocusItem(no);
 }
-
-bool Dialog::handleSwitchData(SwitchData *data)
-{
-    return false;
-}

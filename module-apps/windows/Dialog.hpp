@@ -29,7 +29,6 @@ namespace gui
         void buildInterface() override;
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-        bool handleSwitchData(SwitchData *data) override;
 
         void update(const Meta &meta);
     };
