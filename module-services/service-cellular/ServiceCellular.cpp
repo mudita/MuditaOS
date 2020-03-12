@@ -209,7 +209,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
                 if (msg != nullptr)
                 {
-                    Store::SignalStrength::get()->setRssi(msg->rssi);
+                    Store::GSM::get()->signalStrength = msg->signalStrength.signalStrength;
                     responseMsg = std::make_shared<CellularResponseMessage>(true);
                 }
                 break;
@@ -618,7 +618,8 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
             LOG_ERROR("SIM ERROR");
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        return CellularNotificationMessage::Type::SIM;
+        auto message = std::make_shared<sevm::SIMMessage>();
+        sys::Bus::SendUnicast(message, "EventManager", this);
     }
 
     // Incoming call
