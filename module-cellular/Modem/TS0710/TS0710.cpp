@@ -114,7 +114,7 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //7. set baudrate 115200 baud
                 //8. Send AT
                 LOG_DEBUG("4. Setting baudrate to 115200...");
-#ifdef USE_DAEFAULT_BAUDRATE
+#if USE_DAEFAULT_BAUDRATE
                 pv_cellular->SetSpeed(115200);
 #endif
                 LOG_DEBUG("Sending AT...");
