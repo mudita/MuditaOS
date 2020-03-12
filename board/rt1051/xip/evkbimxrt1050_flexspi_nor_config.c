@@ -46,11 +46,11 @@ __attribute__((section(".boot_hdr.conf")))
 const flexspi_nor_config_t hyperflash_config = {
     .memConfig =
         {
-            .tag = FLEXSPI_CFG_BLK_TAG,
-            .version = FLEXSPI_CFG_BLK_VERSION,
-            .readSampleClkSrc = kFlexSPIReadSampleClk_ExternalInputFromDqsPad,
-            .csHoldTime = 3u,
-            .csSetupTime = 3u,
+            .tag                = FLEXSPI_CFG_BLK_TAG,
+            .version            = FLEXSPI_CFG_BLK_VERSION,
+            .readSampleClkSrc   = kFlexSPIReadSampleClk_ExternalInputFromDqsPad,
+            .csHoldTime         = 3u,
+            .csSetupTime        = 3u,
             .columnAddressWidth = 3u,
             // Enable DDR mode, Wordaddassable, Safe configuration, Differential clock
             .controllerMiscOption =
@@ -58,7 +58,7 @@ const flexspi_nor_config_t hyperflash_config = {
                 (1u << kFlexSpiMiscOffset_SafeConfigFreqEnable) | (1u << kFlexSpiMiscOffset_DiffClkEnable),
             .sflashPadType = kSerialFlash_8Pads,
             .serialClkFreq = kFlexSpiSerialClk_133MHz,
-            .sflashA1Size = 64u * 1024u * 1024u,
+            .sflashA1Size  = 64u * 1024u * 1024u,
             .dataValidTime = {16u, 16u},
             .lookupTable =
                 {
@@ -68,9 +68,9 @@ const flexspi_nor_config_t hyperflash_config = {
                     FLEXSPI_LUT_SEQ(READ_DDR, FLEXSPI_8PAD, 0x04, STOP, FLEXSPI_1PAD, 0x0),
                 },
         },
-    .pageSize = 512u,
-    .sectorSize = 256u * 1024u,
-    .blockSize = 256u * 1024u,
+    .pageSize           = 512u,
+    .sectorSize         = 256u * 1024u,
+    .blockSize          = 256u * 1024u,
     .isUniformBlockSize = true,
 };
 #endif /* XIP_BOOT_HEADER_ENABLE */

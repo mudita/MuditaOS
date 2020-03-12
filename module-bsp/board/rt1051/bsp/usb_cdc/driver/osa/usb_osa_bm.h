@@ -13,9 +13,9 @@
  * Definitions
  ******************************************************************************/
 
-#define USB_OSA_SR_ALLOC() uint32_t usbOsaCurrentSr;
+#define USB_OSA_SR_ALLOC()       uint32_t usbOsaCurrentSr;
 #define USB_OSA_ENTER_CRITICAL() USB_OsaEnterCritical(&usbOsaCurrentSr)
-#define USB_OSA_EXIT_CRITICAL() USB_OsaExitCritical(usbOsaCurrentSr)
+#define USB_OSA_EXIT_CRITICAL()  USB_OsaExitCritical(usbOsaCurrentSr)
 
 /*******************************************************************************
  * API

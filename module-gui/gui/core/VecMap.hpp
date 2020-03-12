@@ -11,22 +11,28 @@
 
 #include "ImageMap.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class VecMap: public ImageMap {
-protected:
-	uint8_t alphaColor = 0x0F;
-public:
-	VecMap();
-	VecMap( uint16_t w, uint16_t h, uint8_t* data );
-	~VecMap();
-	gui::Status load( uint8_t* data, uint32_t size=0 ) override;
+    /*
+     *
+     */
+    class VecMap : public ImageMap
+    {
+      protected:
+        uint8_t alphaColor = 0x0F;
 
-	uint8_t getAlphaColor() { return alphaColor; };
-};
+      public:
+        VecMap();
+        VecMap(uint16_t w, uint16_t h, uint8_t *data);
+        ~VecMap();
+        gui::Status load(uint8_t *data, uint32_t size = 0) override;
+
+        uint8_t getAlphaColor()
+        {
+            return alphaColor;
+        };
+    };
 
 } /* namespace gui */
 

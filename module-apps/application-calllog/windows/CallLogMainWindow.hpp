@@ -21,23 +21,26 @@
 
 #include "../CalllogModel.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class CallLogMainWindow: public AppWindow {
-	CalllogModel* calllogModel = nullptr;
-	gui::ListView* list = nullptr;
-public:
-	CallLogMainWindow( app::Application* app );
-	virtual ~CallLogMainWindow();
+    class CallLogMainWindow : public AppWindow
+    {
+        CalllogModel *calllogModel = nullptr;
+        gui::ListView *list        = nullptr;
 
-	//virtual methods
-	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
+      public:
+        CallLogMainWindow(app::Application *app);
+        virtual ~CallLogMainWindow();
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-	bool onDatabaseMessage( sys::Message* msg ) override;
-};
+        // virtual methods
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+        bool onDatabaseMessage(sys::Message *msg) override;
+    };
 
 } /* namespace gui */

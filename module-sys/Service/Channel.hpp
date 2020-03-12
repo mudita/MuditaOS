@@ -2,24 +2,19 @@
 
 #include <memory>
 
-
 namespace sys
 {
 
+    class Service;
 
-	class Service;
+    class Channel
+    {
 
-class Channel
-{
+      public:
+        Channel()
+        {}
 
-public:
-	Channel()
-	{
-	}
+        std::vector<std::shared_ptr<Service>> m_services;
+    };
 
-
-	std::vector<std::shared_ptr<Service>> m_services;
-};
-
-
-}
+} // namespace sys

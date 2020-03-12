@@ -7,8 +7,7 @@ using namespace bsp::harness::gpio;
 
 void hwGpioWrite(Pin pin, uint32_t state)
 {
-    switch (pin)
-    {
+    switch (pin) {
     case Pin::SIM_PRESENCE:
         GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, state);
         break;
@@ -22,8 +21,7 @@ void hwGpioWrite(Pin pin, uint32_t state)
 
 bool hwGpioRead(Pin pin)
 {
-    switch (pin)
-    {
+    switch (pin) {
     case Pin::SIM_PRESENCE:
         return GPIO_PinRead(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN) > 0;
     case Pin::SIM_SELECT:

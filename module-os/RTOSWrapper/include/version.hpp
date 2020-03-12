@@ -36,19 +36,17 @@
  *
  ***************************************************************************/
 
-
 #ifndef VERSION_CPP_WRAPPERS_HPP_
 #define VERSION_CPP_WRAPPERS_HPP_
 
+namespace cpp_freertos
+{
 
-namespace cpp_freertos {
-
-#define CPP_WRAPPERS_VERSION_MAJOR      1
-#define CPP_WRAPPERS_VERSION_MINOR      5
-#define CPP_WRAPPERS_VERSION_RELEASE    0
+#define CPP_WRAPPERS_VERSION_MAJOR   1
+#define CPP_WRAPPERS_VERSION_MINOR   5
+#define CPP_WRAPPERS_VERSION_RELEASE 0
 
 #define CPP_WRAPPERS_VERSION_STRING "1.5.0"
 
-}
+} // namespace cpp_freertos
 #endif
-

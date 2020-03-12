@@ -11,7 +11,7 @@
 #include <string>
 #include <sstream>
 
-//module-gui
+// module-gui
 #include "ApplicationViewer.hpp"
 
 #include "service-appmgr/ApplicationManager.hpp"
@@ -21,72 +21,80 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/BoxLayout.hpp"
-//module-utils
+// module-utils
 #include "log/log.hpp"
-//module-services
+// module-services
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
-//MessageType
+// MessageType
 #include "MessageType.hpp"
-//this module
+// this module
 #include "windows/ViewWindow.hpp"
 
-namespace app {
+namespace app
+{
 
-ApplicationViewer::ApplicationViewer(std::string name, std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, parent, false, stackDepth, priority ) {
-}
+    ApplicationViewer::ApplicationViewer(std::string name,
+                                         std::string parent,
+                                         uint32_t stackDepth,
+                                         sys::ServicePriority priority)
+        : Application(name, parent, false, stackDepth, priority)
+    {}
 
-ApplicationViewer::~ApplicationViewer() {
-	// TODO Auto-generated destructor stub
-}
+    ApplicationViewer::~ApplicationViewer()
+    {
+        // TODO Auto-generated destructor stub
+    }
 
-// Invoked upon receiving data message
-sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
+    // Invoked upon receiving data message
+    sys::Message_t ApplicationViewer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    {
 
-	auto retMsg = Application::DataReceivedHandler(msgl);
-	//if message was handled by application's template there is no need to process further.
-	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
-		sys::ReturnCodes::Success ) ){
-		return retMsg;
-	}
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        // if message was handled by application's template there is no need to process further.
+        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+            return retMsg;
+        }
 
-	//this variable defines whether message was processed.
-	bool handled = true;
+        // this variable defines whether message was processed.
+        bool handled = true;
 
-	if( handled )
-		return std::make_shared<sys::ResponseMessage>();
-	else
-		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-}
+        if (handled)
+            return std::make_shared<sys::ResponseMessage>();
+        else
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
 
-// Invoked during initialization
-sys::ReturnCodes ApplicationViewer::InitHandler() {
+    // Invoked during initialization
+    sys::ReturnCodes ApplicationViewer::InitHandler()
+    {
 
-	auto ret = Application::InitHandler();
-	if( ret != sys::ReturnCodes::Success )
-		return ret;
+        auto ret = Application::InitHandler();
+        if (ret != sys::ReturnCodes::Success)
+            return ret;
 
-	createUserInterface();
+        createUserInterface();
 
-	setActiveWindow("Main");
+        setActiveWindow("Main");
 
-	return ret;
-}
+        return ret;
+    }
 
-sys::ReturnCodes ApplicationViewer::DeinitHandler() {
-	return sys::ReturnCodes::Success;
-}
+    sys::ReturnCodes ApplicationViewer::DeinitHandler()
+    {
+        return sys::ReturnCodes::Success;
+    }
 
-void ApplicationViewer::createUserInterface() {
+    void ApplicationViewer::createUserInterface()
+    {
 
-	gui::AppWindow* window = nullptr;
+        gui::AppWindow *window = nullptr;
 
-	window = new gui::ViewWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-}
+        window = new gui::ViewWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+    }
 
-void ApplicationViewer::destroyUserInterface() {
-}
+    void ApplicationViewer::destroyUserInterface()
+    {}
 
 } /* namespace app */

@@ -15,9 +15,9 @@
  *     #include "logs/log.h"
  *
  *  This will define the actual objects that all the other units will use.
- *  Then invoke log_Init(VFS_FILE* fp,logger_level level) function to initialize logger utility. If you want additionally store
- *  logs into file pass valid file descriptor to init function. By default logger logs info into STDOUT stream.
- *  After that logger is ready to use.
+ *  Then invoke log_Init(VFS_FILE* fp,logger_level level) function to initialize logger utility. If you want
+ *additionally store logs into file pass valid file descriptor to init function. By default logger logs info into STDOUT
+ *stream. After that logger is ready to use.
  *
  *  Examples:
  *  1)
@@ -38,35 +38,40 @@
 #include <string.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-
-typedef enum { LOGTRACE, LOGDEBUG, LOGINFO, LOGWARN, LOGERROR, LOGFATAL }logger_level;
-
+    typedef enum
+    {
+        LOGTRACE,
+        LOGDEBUG,
+        LOGINFO,
+        LOGWARN,
+        LOGERROR,
+        LOGFATAL
+    } logger_level;
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-
-/**
- * Forward declarations
- */
-void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...);
-void log_SetLevel(logger_level level);
-void log_Printf(const char *fmt, ...);
-
+    /**
+     * Forward declarations
+     */
+    void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...);
+    void log_SetLevel(logger_level level);
+    void log_Printf(const char *fmt, ...);
 
 /**
  * Log functions (one per level).
  */
-#define LOG_PRINTF(...) log_Printf(__VA_ARGS__)
-#define LOG_TRACE(...)  log_Log(LOGTRACE, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
-#define LOG_DEBUG(...)  log_Log(LOGDEBUG, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
-#define LOG_INFO(...)   log_Log(LOGINFO,  __FILENAME__, __LINE__,__func__, __VA_ARGS__)
-#define LOG_WARN(...)   log_Log(LOGWARN,  __FILENAME__, __LINE__,__func__, __VA_ARGS__)
-#define LOG_ERROR(...)  log_Log(LOGERROR, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
-#define LOG_FATAL(...)  log_Log(LOGFATAL, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
-#define LOG_CUSTOM(loggerLevel, ...) log_Log(loggerLevel, __FILENAME__, __LINE__,__func__, __VA_ARGS__)
+#define LOG_PRINTF(...)              log_Printf(__VA_ARGS__)
+#define LOG_TRACE(...)               log_Log(LOGTRACE, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LOG_DEBUG(...)               log_Log(LOGDEBUG, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LOG_INFO(...)                log_Log(LOGINFO, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LOG_WARN(...)                log_Log(LOGWARN, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LOG_ERROR(...)               log_Log(LOGERROR, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LOG_FATAL(...)               log_Log(LOGFATAL, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
+#define LOG_CUSTOM(loggerLevel, ...) log_Log(loggerLevel, __FILENAME__, __LINE__, __func__, __VA_ARGS__)
 
 #ifdef __cplusplus
 }

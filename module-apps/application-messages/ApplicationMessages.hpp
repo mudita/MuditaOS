@@ -24,33 +24,33 @@ namespace gui
     }; // namespace name
 };     // namespace gui
 
-namespace app {
+namespace app
+{
 
-inline const std::string name_messages =  "ApplicationMessages";
+    inline const std::string name_messages = "ApplicationMessages";
 
-class ApplicationMessages: public app::Application {
-public:
-	ApplicationMessages(std::string name = name_messages,
-			std::string parent = "", bool startBackgound = false);
-	virtual ~ApplicationMessages();
+    class ApplicationMessages : public app::Application
+    {
+      public:
+        ApplicationMessages(std::string name = name_messages, std::string parent = "", bool startBackgound = false);
+        virtual ~ApplicationMessages();
 
-    gui::OptionWindow *windowOptions = nullptr;
+        gui::OptionWindow *windowOptions = nullptr;
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,
-			sys::ResponseMessage *resp) override;
-	sys::ReturnCodes InitHandler() override;
-	sys::ReturnCodes DeinitHandler() override;
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
 
-	sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode)
-			override final {
-		return sys::ReturnCodes::Success;
-	}
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        {
+            return sys::ReturnCodes::Success;
+        }
 
-	void createUserInterface() override;
-	void destroyUserInterface() override;
+        void createUserInterface() override;
+        void destroyUserInterface() override;
 
-    bool removeSMS_thread(const ThreadRecord *record);
-};
+        bool removeSMS_thread(const ThreadRecord *record);
+    };
 } /* namespace app */
 
 #endif /* MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_ */

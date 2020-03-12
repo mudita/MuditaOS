@@ -44,7 +44,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
                  app->switchWindow("DateTime");
                  return true;
              }},
-           {"[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; }},
+            {"[None] " + utils::localize.get("app_settings_display"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_phone_modes"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_security"), [=](gui::Item &) { return true; }},
             {"[None] " + utils::localize.get("app_settings_about"), [=](gui::Item &) { return true; }},

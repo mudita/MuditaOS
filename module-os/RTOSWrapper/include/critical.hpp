@@ -36,30 +36,29 @@
  *
  ***************************************************************************/
 
-
 #ifndef CRITICAL_HPP_
 #define CRITICAL_HPP_
 
 #include "FreeRTOS.h"
 #include "task.h"
 
+namespace cpp_freertos
+{
 
-namespace cpp_freertos {
+    /**
+     *  Wrapper class around various critical section type
+     *  synchronization mechanisms within FreeRTOS.
+     */
+    class CriticalSection
+    {
 
-
-/**
- *  Wrapper class around various critical section type
- *  synchronization mechanisms within FreeRTOS.
- */
-class CriticalSection {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //  Available from anywhere.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //  Available from anywhere.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Disable context switches as well as maskable interrupts.
          */
@@ -81,7 +80,7 @@ class CriticalSection {
          *  from an interrupt context.
          *
          *  @return Opaque representation of interrupt mask state.
-         *  This must be passed back to the corresponding call to 
+         *  This must be passed back to the corresponding call to
          *  ExitFromISR().
          *
          *  @note See the following for further details:
@@ -95,7 +94,7 @@ class CriticalSection {
         /**
          *  Re-enable context switches from an interrupt context.
          *
-         *  @param savedInterruptStatus This should be the value you 
+         *  @param savedInterruptStatus This should be the value you
          *  received from calling EnterFromISR().
          *
          *  @note See the following for further details:
@@ -137,8 +136,7 @@ class CriticalSection {
         {
             xTaskResumeAll();
         }
-};
+    };
 
-
-}
+} // namespace cpp_freertos
 #endif

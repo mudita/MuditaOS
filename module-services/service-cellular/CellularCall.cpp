@@ -12,18 +12,16 @@ namespace ModemCall
     ModemCall::ModemCall(const std::string str)
     {
         const std::string prefix = "+CLCC: ";
-        std::string callEntry = str;
+        std::string callEntry    = str;
 
         // Check for a valid prefix
-        if (callEntry.rfind(prefix, 0) != 0)
-        {
+        if (callEntry.rfind(prefix, 0) != 0) {
             LOG_ERROR("no valid prefix");
             LOG_ERROR("callEntry %s", callEntry.c_str());
 
             throw std::runtime_error("No valid prefix");
         }
-        else
-        {
+        else {
             // remove the prefix
             callEntry.erase(0, prefix.length());
         }
@@ -31,33 +29,31 @@ namespace ModemCall
         std::vector<std::string> tokens = utils::split(callEntry, ",");
 
         auto numberOfTokens = tokens.size();
-        if (numberOfTokens != 7 && numberOfTokens != 8)
-        {
+        if (numberOfTokens != 7 && numberOfTokens != 8) {
             LOG_ERROR("wrong number of tokens %u", numberOfTokens);
             throw std::runtime_error("No valid prefix");
         }
         // TODO: alek: add paramters validation
-        idx = std::stoul(tokens[0]);
-        dir = static_cast<CallDir>(std::stoul(tokens[1]));
-        state = static_cast<CallState>(std::stoul(tokens[2]));
-        mode = static_cast<CallMode>(std::stoul(tokens[3]));
+        idx              = std::stoul(tokens[0]);
+        dir              = static_cast<CallDir>(std::stoul(tokens[1]));
+        state            = static_cast<CallState>(std::stoul(tokens[2]));
+        mode             = static_cast<CallMode>(std::stoul(tokens[3]));
         isConferenceCall = static_cast<bool>(std::stoul(tokens[4]));
-        phoneNumber = tokens[5];
-        type = static_cast<CallType>(std::stoul(tokens[6]));
-        if (numberOfTokens == 8)
-        {
+        phoneNumber      = tokens[5];
+        type             = static_cast<CallType>(std::stoul(tokens[6]));
+        if (numberOfTokens == 8) {
             phoneBookName = tokens[7];
         }
     }
 
     std::ostream &operator<<(std::ostream &out, const ModemCall &call)
     {
-        out << " <idx> " << call.idx << " <dir> " << static_cast<uint32_t>(call.dir) << " <stat> " << static_cast<uint32_t>(call.state) << " <mode> "
-            << static_cast<uint32_t>(call.mode) << " <mpty> " << static_cast<uint32_t>(call.isConferenceCall) << " <number> " << call.phoneNumber << " <type> "
+        out << " <idx> " << call.idx << " <dir> " << static_cast<uint32_t>(call.dir) << " <stat> "
+            << static_cast<uint32_t>(call.state) << " <mode> " << static_cast<uint32_t>(call.mode) << " <mpty> "
+            << static_cast<uint32_t>(call.isConferenceCall) << " <number> " << call.phoneNumber << " <type> "
             << static_cast<uint32_t>(call.type);
 
-        if (!call.phoneBookName.empty())
-        {
+        if (!call.phoneBookName.empty()) {
             out << " <alpha> " << call.phoneBookName;
         }
 
@@ -72,8 +68,7 @@ namespace
     {
         time_t timestamp;
         RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
-        if (rtcErr != RtcBspError_e::RtcBspOK)
-        {
+        if (rtcErr != RtcBspError_e::RtcBspOK) {
             LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
             timestamp = 0;
         }
@@ -86,8 +81,7 @@ namespace CellularCall
 {
     bool CellularCall::startCall(const UTF8 &number, const CallType type)
     {
-        if (isValid())
-        {
+        if (isValid()) {
             LOG_ERROR("call already set");
             return false;
         }
@@ -95,12 +89,11 @@ namespace CellularCall
         clear();
         CalllogRecord callRec;
         callRec.number = number;
-        callRec.type = type;
-        callRec.date = getCurrentTimeStamp();
-        callRec.name = number; // temporary set name as number
-        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
-        if (call.ID == DB_ID_NONE)
-        {
+        callRec.type   = type;
+        callRec.date   = getCurrentTimeStamp();
+        callRec.name   = number; // temporary set name as number
+        call           = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        if (call.ID == DB_ID_NONE) {
             LOG_ERROR("startCallAction failed");
             clear();
             return false;
@@ -111,10 +104,9 @@ namespace CellularCall
 
     bool CellularCall::setActive()
     {
-        if (isValid())
-        {
+        if (isValid()) {
             startActiveTime = getCurrentTimeStamp();
-            isActiveCall = true;
+            isActiveCall    = true;
             return true;
         }
         return false;
@@ -123,31 +115,25 @@ namespace CellularCall
     bool CellularCall::endCall()
     {
 
-        if (!isValid())
-        {
+        if (!isValid()) {
             LOG_ERROR("Trying to update invalid call");
             return false;
         }
 
-        if (isActiveCall)
-        {
+        if (isActiveCall) {
             time_t endTime = getCurrentTimeStamp();
-            call.duration = endTime > startActiveTime ? endTime - startActiveTime : 0;
+            call.duration  = endTime > startActiveTime ? endTime - startActiveTime : 0;
         }
-        else
-        {
+        else {
             auto callType = call.type;
-            switch (callType)
-            {
+            switch (callType) {
             case CallType::CT_INCOMING: {
                 setType(CallType::CT_REJECTED);
-            }
-            break;
+            } break;
 
             case CallType::CT_OUTGOING: {
                 setType(CallType::CT_MISSED);
-            }
-            break;
+            } break;
 
             default:
                 LOG_ERROR("Not a valid call type %u", callType);
@@ -155,8 +141,7 @@ namespace CellularCall
             }
         }
 
-        if (!(endCallAction && endCallAction(call)))
-        {
+        if (!(endCallAction && endCallAction(call))) {
             LOG_ERROR("CalllogUpdate failed, id %u", call.ID);
             return false;
         }

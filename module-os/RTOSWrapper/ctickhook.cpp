@@ -36,23 +36,17 @@
  *
  ***************************************************************************/
 
-
 #include "tickhook.hpp"
 
-#if ( configUSE_TICK_HOOK == 1 )
+#if (configUSE_TICK_HOOK == 1)
 
 using namespace std;
 using namespace cpp_freertos;
 
-
 list<TickHook *> TickHook::Callbacks;
 
-
-TickHook::TickHook()
-    : Enabled(true)
-{
-}
-
+TickHook::TickHook() : Enabled(true)
+{}
 
 TickHook::~TickHook()
 {
@@ -61,14 +55,12 @@ TickHook::~TickHook()
     taskEXIT_CRITICAL();
 }
 
-
 void TickHook::Register()
 {
     taskENTER_CRITICAL();
     Callbacks.push_front(this);
     taskEXIT_CRITICAL();
 }
-
 
 void TickHook::Disable()
 {
@@ -77,7 +69,6 @@ void TickHook::Disable()
     taskEXIT_CRITICAL();
 }
 
-
 void TickHook::Enable()
 {
     taskENTER_CRITICAL();
@@ -85,24 +76,19 @@ void TickHook::Enable()
     taskEXIT_CRITICAL();
 }
 
-
 /**
  *  We are a friend of the Tick class, which makes this much simplier.
  */
 void vApplicationTickHook(void)
 {
-    for (list<TickHook *>::iterator it = TickHook::Callbacks.begin();
-         it != TickHook::Callbacks.end();
-         ++it) {
+    for (list<TickHook *>::iterator it = TickHook::Callbacks.begin(); it != TickHook::Callbacks.end(); ++it) {
 
         TickHook *tickHookObject = *it;
 
-        if (tickHookObject->Enabled){
+        if (tickHookObject->Enabled) {
             tickHookObject->Run();
         }
     }
 }
 
 #endif
-
-

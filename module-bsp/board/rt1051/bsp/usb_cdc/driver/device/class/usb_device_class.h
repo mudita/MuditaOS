@@ -128,7 +128,9 @@ typedef struct _usb_device_class_struct
 } usb_device_class_struct_t;
 
 /*callback function pointer structure for application to provide class parameters*/
-typedef usb_status_t (*usb_device_class_callback_t)(class_handle_t classHandle, uint32_t callbackEvent, void *eventParam);
+typedef usb_status_t (*usb_device_class_callback_t)(class_handle_t classHandle,
+                                                    uint32_t callbackEvent,
+                                                    void *eventParam);
 
 /*!
  * @brief Obtains the device class information structure.
@@ -264,19 +266,26 @@ typedef struct _usb_device_get_hid_physical_descriptor_struct
 } usb_device_get_hid_physical_descriptor_struct_t;
 
 /*! @brief Obtains the control get descriptor request common union. */
-typedef union _usb_device_get_descriptor_common_union {
-    usb_device_get_descriptor_common_struct_t commonDescriptor;                    /*!< Common structure. */
-    usb_device_get_device_descriptor_struct_t deviceDescriptor;                    /*!< The structure to get device descriptor. */
-    usb_device_get_device_qualifier_descriptor_struct_t deviceQualifierDescriptor; /*!< The structure to get device qualifier descriptor. */
-    usb_device_get_configuration_descriptor_struct_t configurationDescriptor;      /*!< The structure to get configuration descriptor. */
-    usb_device_get_string_descriptor_struct_t stringDescriptor;                    /*!< The structure to get string descriptor. */
-    usb_device_get_hid_descriptor_struct_t hidDescriptor;                          /*!< The structure to get HID descriptor. */
-    usb_device_get_hid_report_descriptor_struct_t hidReportDescriptor;             /*!< The structure to get HID report descriptor. */
-    usb_device_get_hid_physical_descriptor_struct_t hidPhysicalDescriptor;         /*!< The structure to get HID physical descriptor. */
+typedef union _usb_device_get_descriptor_common_union
+{
+    usb_device_get_descriptor_common_struct_t commonDescriptor; /*!< Common structure. */
+    usb_device_get_device_descriptor_struct_t deviceDescriptor; /*!< The structure to get device descriptor. */
+    usb_device_get_device_qualifier_descriptor_struct_t
+        deviceQualifierDescriptor; /*!< The structure to get device qualifier descriptor. */
+    usb_device_get_configuration_descriptor_struct_t
+        configurationDescriptor;                                /*!< The structure to get configuration descriptor. */
+    usb_device_get_string_descriptor_struct_t stringDescriptor; /*!< The structure to get string descriptor. */
+    usb_device_get_hid_descriptor_struct_t hidDescriptor;       /*!< The structure to get HID descriptor. */
+    usb_device_get_hid_report_descriptor_struct_t
+        hidReportDescriptor; /*!< The structure to get HID report descriptor. */
+    usb_device_get_hid_physical_descriptor_struct_t
+        hidPhysicalDescriptor; /*!< The structure to get HID physical descriptor. */
 } usb_device_get_descriptor_common_union_t;
 
 /*! @brief Define function type for class device instance initialization */
-typedef usb_status_t (*usb_device_class_init_call_t)(uint8_t controllerId, usb_device_class_config_struct_t *classConfig, class_handle_t *classHandle);
+typedef usb_status_t (*usb_device_class_init_call_t)(uint8_t controllerId,
+                                                     usb_device_class_config_struct_t *classConfig,
+                                                     class_handle_t *classHandle);
 /*! @brief Define function type for class device instance deinitialization, internal */
 typedef usb_status_t (*usb_device_class_deinit_call_t)(class_handle_t handle);
 /*! @brief Define function type for class device instance Event change */
@@ -285,8 +294,8 @@ typedef usb_status_t (*usb_device_class_event_callback_t)(void *classHandle, uin
 /*! @brief Define class driver interface structure. */
 typedef struct _usb_device_class_map
 {
-    usb_device_class_init_call_t classInit;               /*!< Class driver initialization- entry  of the class driver */
-    usb_device_class_deinit_call_t classDeinit;           /*!< Class driver de-initialization*/
+    usb_device_class_init_call_t classInit;     /*!< Class driver initialization- entry  of the class driver */
+    usb_device_class_deinit_call_t classDeinit; /*!< Class driver de-initialization*/
     usb_device_class_event_callback_t classEventCallback; /*!< Class driver event callback*/
     usb_device_class_type_t type;                         /*!< Class type*/
 } usb_device_class_map_t;
@@ -327,16 +336,16 @@ extern "C"
      *                           See the structure #usb_device_class_config_list_struct_t.
      * @param[out] handle        A parameter used to return pointer of the device handle to the caller.
      *                           The value of the parameter is a pointer to the device handle. This design is used to
-     *                           make a simple device align with the composite device. For the composite device, there are
-     * many
-     *                           kinds of class handles. However, there is only one device handle. Therefore, the handle
-     * points to
-     *                           a device instead of a class. The class handle can be received from the
+     *                           make a simple device align with the composite device. For the composite device, there
+     * are many kinds of class handles. However, there is only one device handle. Therefore, the handle points to a
+     * device instead of a class. The class handle can be received from the
      *                           #usb_device_class_config_struct_t::classHandle after the function successfully.
      *
      * @return A USB error code or kStatus_USB_Success.
      */
-    usb_status_t USB_DeviceClassInit(uint8_t controllerId, usb_device_class_config_list_struct_t *configList, usb_device_handle *handle);
+    usb_status_t USB_DeviceClassInit(uint8_t controllerId,
+                                     usb_device_class_config_list_struct_t *configList,
+                                     usb_device_handle *handle);
 
     /*!
      * @brief Deinitializes the common class and the supported classes.

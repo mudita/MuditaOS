@@ -11,9 +11,17 @@
 
 using namespace ErrorWindows;
 
-static Label *addLabel(gui::Item *parentPage, int x, int y, int w, int h, const std::string text = "", const std::string fontName = style::window::font::small,
+static Label *addLabel(gui::Item *parentPage,
+                       int x,
+                       int y,
+                       int w,
+                       int h,
+                       const std::string text         = "",
+                       const std::string fontName     = style::window::font::small,
                        const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                       const Alignment alignment = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM), const bool lineMode = false)
+                       const Alignment alignment      = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT,
+                                                             Alignment::ALIGN_VERTICAL_BOTTOM),
+                       const bool lineMode            = false)
 {
     Label *l = new Label(parentPage, x, y, w, h);
     l->setFilled(false);
@@ -32,8 +40,7 @@ NoResults::NoResults(app::Application *app) : AppWindow(app, "NoResults")
 }
 
 NoResults::~NoResults()
-{
-}
+{}
 
 void NoResults::buildInterface()
 {
@@ -46,7 +53,8 @@ void NoResults::buildInterface()
 
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
-    topSeparatorLabel = addLabel(this, 0, 104, style::window_width, 1, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    topSeparatorLabel = addLabel(
+        this, 0, 104, style::window_width, 1, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
     informationLabel = new Text(this, 45, 315, 390, 90);
     informationLabel->setText(utils::localize.get("app_phonebook_search_no_results"));
@@ -60,8 +68,7 @@ void NoResults::buildInterface()
 }
 
 void NoResults::rebuild()
-{
-}
+{}
 
 void NoResults::destroyInterface()
 {
@@ -70,14 +77,13 @@ void NoResults::destroyInterface()
 
 bool NoResults::handleSwitchData(SwitchData *data)
 {
-    if (data == nullptr)
-    {
+    if (data == nullptr) {
         LOG_ERROR("Received null pointer");
         return false;
     }
 
     PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
-    searchQuery = item->getQuery();
+    searchQuery                = item->getQuery();
 
     setContactData();
 
@@ -86,13 +92,13 @@ bool NoResults::handleSwitchData(SwitchData *data)
 
 void NoResults::setContactData()
 {
-    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() + std::string("\""));
+    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() +
+             std::string("\""));
 }
 
 bool NoResults::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
-    {
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchQuery);
         application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return (true);
@@ -110,8 +116,7 @@ ContactBlocked::ContactBlocked(app::Application *app) : AppWindow(app, "NoResult
 }
 
 ContactBlocked::~ContactBlocked()
-{
-}
+{}
 
 void ContactBlocked::buildInterface()
 {
@@ -123,7 +128,8 @@ void ContactBlocked::buildInterface()
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-    topSeparatorLabel = addLabel(this, 0, 104, style::window_width, 1, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+    topSeparatorLabel = addLabel(
+        this, 0, 104, style::window_width, 1, "", style::window::font::small, RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
 
     informationLabel = new Text(this, 45, 315, 390, 90);
     informationLabel->setText(utils::localize.get("app_phonebook_search_no_results"));
@@ -149,14 +155,13 @@ void ContactBlocked::destroyInterface()
 
 bool ContactBlocked::handleSwitchData(SwitchData *data)
 {
-    if (data == nullptr)
-    {
+    if (data == nullptr) {
         LOG_ERROR("Received null pointer");
         return false;
     }
 
     PhonebookSearchQuery *item = dynamic_cast<PhonebookSearchQuery *>(data);
-    searchQuery = item->getQuery();
+    searchQuery                = item->getQuery();
 
     setContactData();
 
@@ -165,13 +170,13 @@ bool ContactBlocked::handleSwitchData(SwitchData *data)
 
 void ContactBlocked::setContactData()
 {
-    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() + std::string("\""));
+    setTitle(utils::localize.get("app_phonebook_search_results").c_str() + std::string(":\"") + searchQuery.c_str() +
+             std::string("\""));
 }
 
 bool ContactBlocked::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
-    {
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookSearchQuery>(searchQuery);
         application->switchWindow("Search", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return (true);

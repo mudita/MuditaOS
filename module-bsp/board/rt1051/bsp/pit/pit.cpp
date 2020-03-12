@@ -7,7 +7,7 @@
 
 struct PIT_t
 {
-    uint32_t usec = 1000000;
+    uint32_t usec        = 1000000;
     xQueueHandle qhandle = nullptr;
     std::function<void()> irq_cb;
 };
@@ -75,8 +75,7 @@ extern "C"
     void PIT_IRQHandler(void)
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-        if (LPIT.qhandle)
-        {
+        if (LPIT.qhandle) {
             auto val = bsp::pit::Event::Overflow;
             xQueueSendFromISR(LPIT.qhandle, &val, &xHigherPriorityTaskWoken);
         }

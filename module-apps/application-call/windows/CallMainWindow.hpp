@@ -12,22 +12,24 @@
 #include "AppWindow.hpp"
 #include "Label.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- * This window is defined only to keep common approach to creating application.
- * This window should not be displayed.
- */
-class CallMainWindow: public AppWindow {
-protected:
-public:
-	CallMainWindow( app::Application* app );
-	virtual ~CallMainWindow();
+    /*
+     * This window is defined only to keep common approach to creating application.
+     * This window should not be displayed.
+     */
+    class CallMainWindow : public AppWindow
+    {
+      protected:
+      public:
+        CallMainWindow(app::Application *app);
+        virtual ~CallMainWindow();
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
 

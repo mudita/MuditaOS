@@ -13,7 +13,8 @@ namespace ModemCall
         Dialing,    // 2 dialing (MO call): number dialed
         Alerting,   // 3 alerting (MO call): number dialed and the called party is alerted
         Incoming,   // 4 incoming (MT call): incoming call, ringtone played (AT RING notification)
-        Waiting     // 5 waiting (MT call): call waiting notification while another call is active (if call waiting feature enabled)
+        Waiting // 5 waiting (MT call): call waiting notification while another call is active (if call waiting feature
+                // enabled)
     };
 
     enum class CallDir : uint8_t
@@ -25,16 +26,16 @@ namespace ModemCall
     enum class CallMode : uint8_t
     {
         Voice = 0,
-        Data = 1,
-        FAX = 2,
+        Data  = 1,
+        FAX   = 2,
     };
 
     // TODO: alek: check specification
     enum class CallType : uint8_t
     {
-        UknownType = 129,
+        UknownType      = 129,
         InternationType = 145, // contains the "+" character
-        NationalType = 161,
+        NationalType    = 161,
     };
 
     struct ModemCall
@@ -46,10 +47,10 @@ namespace ModemCall
         bool isConferenceCall;
         std::string phoneNumber;
         CallType type;
-        std::string phoneBookName; // TODO: alek: This field is defined in the AT+CLCC command resposne but our modem is not returning it.
-                                   // Need to verify in modem specification
+        std::string phoneBookName; // TODO: alek: This field is defined in the AT+CLCC command resposne but our modem is
+                                   // not returning it. Need to verify in modem specification
 
-        ModemCall() = delete;
+        ModemCall()  = delete;
         ~ModemCall() = default;
         ModemCall(const std::string str);
 
@@ -74,27 +75,30 @@ namespace CellularCall
 
         void clear()
         {
-            call.ID = 0; // 0 - Invalid
-            call.number = "";
+            call.ID           = 0; // 0 - Invalid
+            call.number       = "";
             call.presentation = PresentationType::PR_ALLOWED;
-            call.date = 0;
-            call.duration = 0;
-            call.type = CallType::CT_NONE;
-            call.name = "";
-            call.contactId = "";
-            isActiveCall = false;
-            startActiveTime = 0;
+            call.date         = 0;
+            call.duration     = 0;
+            call.type         = CallType::CT_NONE;
+            call.name         = "";
+            call.contactId    = "";
+            isActiveCall      = false;
+            startActiveTime   = 0;
         }
 
       public:
-        CellularCall(const UTF8 &number = "", const CallType type = CallType::CT_NONE, const time_t date = 0, const time_t duration = 0)
+        CellularCall(const UTF8 &number    = "",
+                     const CallType type   = CallType::CT_NONE,
+                     const time_t date     = 0,
+                     const time_t duration = 0)
         {
             clear();
-            this->call.number = number;
-            this->call.date = date;
-            this->call.duration = duration;
-            this->call.type = type;
-            this->call.name = number; // temporary set number as name
+            this->call.number    = number;
+            this->call.date      = date;
+            this->call.duration  = duration;
+            this->call.type      = type;
+            this->call.name      = number; // temporary set number as name
             this->call.contactId = "1";
         }
 

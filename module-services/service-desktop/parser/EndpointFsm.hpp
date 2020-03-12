@@ -15,13 +15,13 @@ extern "C"
 // Event declarations
 //
 
-struct EndpointEvt   : tinyfsm::Event { };
+struct EndpointEvt : tinyfsm::Event
+{};
 
 // ----------------------------------------------------------------------------
 // EndpointFsm (FSM base class) declaration
 //
-class EndpointFsm
-: public tinyfsm::Fsm<EndpointFsm>
+class EndpointFsm : public tinyfsm::Fsm<EndpointFsm>
 {
     friend class Fsm;
 

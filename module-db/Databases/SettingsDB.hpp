@@ -12,17 +12,19 @@
 #include "Database/Database.hpp"
 #include "../Tables/SettingsTable.hpp"
 
-class SettingsDB : public Database {
-public:
+class SettingsDB : public Database
+{
+  public:
     SettingsDB();
     ~SettingsDB();
 
     SettingsTable settings;
 
-    static const char* GetDBName(){return dbName;}
+    static const char *GetDBName()
+    {
+        return dbName;
+    }
 
-private:
-
+  private:
     static const char *dbName;
 };
-

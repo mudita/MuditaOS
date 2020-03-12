@@ -10,14 +10,13 @@
 
 const char *NotesDB::dbName = "sys/notes.db";
 
-NotesDB::NotesDB() :
-	Database(dbName),
-    notes(this) {
+NotesDB::NotesDB() : Database(dbName), notes(this)
+{
 
-	if(notes.Create() == false) return;
-	isInitialized = true;
+    if (notes.Create() == false)
+        return;
+    isInitialized = true;
 }
 
-NotesDB::~NotesDB() {
-}
-
+NotesDB::~NotesDB()
+{}

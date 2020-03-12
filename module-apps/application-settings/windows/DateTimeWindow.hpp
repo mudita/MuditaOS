@@ -38,9 +38,9 @@ namespace gui
         gui::HBox *dateBody = nullptr;
         gui::HBox *timeBody = nullptr;
 
-        bool timeFormat12h = false;
+        bool timeFormat12h  = false;
         bool timeDateFormat = false; // true europe format, flase american format
-        bool dayPeriod = false;      // day period indicator false am, true pm
+        bool dayPeriod      = false; // day period indicator false am, true pm
 
         gui::Label *addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value);
         gui::Label *addSpacer(const UTF8 &text);

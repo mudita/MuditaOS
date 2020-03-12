@@ -3,7 +3,7 @@
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -55,30 +55,30 @@
 /*! @brief flexram write read sel */
 enum _flexram_wr_rd_sel
 {
-    kFLEXRAM_Read = 0U,  /*!< read */
+    kFLEXRAM_Read  = 0U, /*!< read */
     kFLEXRAM_Write = 1U, /*!< write */
 };
 
 /*! @brief Interrupt status flag mask */
 enum _flexram_interrupt_status
 {
-    kFLEXRAM_OCRAMAccessError = FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK,    /*!< ocram access unallocated address */
-    kFLEXRAM_DTCMAccessError = FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK,      /*!< dtcm access unallocated address */
-    kFLEXRAM_ITCMAccessError = FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK,      /*!< itcm access unallocated address */
+    kFLEXRAM_OCRAMAccessError    = FLEXRAM_INT_STATUS_OCRAM_ERR_STATUS_MASK, /*!< ocram access unallocated address */
+    kFLEXRAM_DTCMAccessError     = FLEXRAM_INT_STATUS_DTCM_ERR_STATUS_MASK,  /*!< dtcm access unallocated address */
+    kFLEXRAM_ITCMAccessError     = FLEXRAM_INT_STATUS_ITCM_ERR_STATUS_MASK,  /*!< itcm access unallocated address */
     kFLEXRAM_OCRAMMagicAddrMatch = FLEXRAM_INT_STATUS_OCRAM_MAM_STATUS_MASK, /*!< ocram maigc address match */
-    kFLEXRAM_DTCMMagicAddrMatch = FLEXRAM_INT_STATUS_DTCM_MAM_STATUS_MASK,   /*!< dtcm maigc address match */
-    kFLEXRAM_ITCMMagicAddrMatch = FLEXRAM_INT_STATUS_ITCM_MAM_STATUS_MASK,   /*!< itcm maigc address match */
+    kFLEXRAM_DTCMMagicAddrMatch  = FLEXRAM_INT_STATUS_DTCM_MAM_STATUS_MASK,  /*!< dtcm maigc address match */
+    kFLEXRAM_ITCMMagicAddrMatch  = FLEXRAM_INT_STATUS_ITCM_MAM_STATUS_MASK,  /*!< itcm maigc address match */
 
     kFLEXRAM_InterruptStatusAll = 0x3FU, /*!< all the interrupt status mask */
 };
 
 /*! @brief FLEXRAM TCM access mode
-* Fast access mode expected to be finished in 1-cycle
-* Wait access mode expected to be finished in 2-cycle
-* Wait access mode is a feature of the flexram and it should be used when
-* the cpu clock too fast to finish tcm access in 1-cycle.
-* Normally, fast mode is the default mode, the efficiency of the tcm access will better.
-*/
+ * Fast access mode expected to be finished in 1-cycle
+ * Wait access mode expected to be finished in 2-cycle
+ * Wait access mode is a feature of the flexram and it should be used when
+ * the cpu clock too fast to finish tcm access in 1-cycle.
+ * Normally, fast mode is the default mode, the efficiency of the tcm access will better.
+ */
 typedef enum _flexram_tcm_access_mode
 {
     kFLEXRAM_TCMAccessFastMode = 0U, /*!< fast access mode */
@@ -89,16 +89,16 @@ typedef enum _flexram_tcm_access_mode
 enum _flexram_bank_type
 {
     kFLEXRAM_BankNotUsed = 0U, /*!< bank is not used */
-    kFLEXRAM_BankOCRAM = 1U,   /*!< bank is OCRAM */
-    kFLEXRAM_BankDTCM = 2U,    /*!< bank is DTCM */
-    kFLEXRAM_BankITCM = 3U,    /*!< bank is ITCM */
+    kFLEXRAM_BankOCRAM   = 1U, /*!< bank is OCRAM */
+    kFLEXRAM_BankDTCM    = 2U, /*!< bank is DTCM */
+    kFLEXRAM_BankITCM    = 3U, /*!< bank is ITCM */
 };
 
 /*! @brief FLEXRAM tcm support size */
 enum _flexram_tcm_size
 {
-    kFLEXRAM_TCMSize32KB = 32 * 1024U,   /*!< TCM total size 32KB */
-    kFLEXRAM_TCMSize64KB = 64 * 1024U,   /*!< TCM total size 64KB */
+    kFLEXRAM_TCMSize32KB  = 32 * 1024U,  /*!< TCM total size 32KB */
+    kFLEXRAM_TCMSize64KB  = 64 * 1024U,  /*!< TCM total size 64KB */
     kFLEXRAM_TCMSize128KB = 128 * 1024U, /*!< TCM total size 128KB */
     kFLEXRAM_TCMSize256KB = 256 * 1024U, /*!< TCM total size 256KB */
     kFLEXRAM_TCMSize512KB = 512 * 1024U, /*!< TCM total size 512KB */
@@ -108,7 +108,7 @@ enum _flexram_tcm_size
 typedef enum _flexram_bank_allocate_src
 {
     kFLEXRAM_BankAllocateThroughHardwareFuse = 0U, /*!< allocate ram through hardware fuse value */
-    kFLEXRAM_BankAllocateThroughBankCfg = 1U,      /*!< allocate ram through FLEXRAM_BANK_CFG */
+    kFLEXRAM_BankAllocateThroughBankCfg      = 1U, /*!< allocate ram through FLEXRAM_BANK_CFG */
 } flexram_bank_allocate_src_t;
 
 /*! @brief FLEXRAM allocate ocram, itcm, dtcm size */
@@ -252,12 +252,10 @@ static inline void FLEXRAM_SetTCMWriteAccessMode(FLEXRAM_Type *base, flexram_tcm
  */
 static inline void FLEXRAM_EnableForceRamClockOn(FLEXRAM_Type *base, bool enable)
 {
-    if (enable)
-    {
+    if (enable) {
         base->TCM_CTRL |= FLEXRAM_TCM_CTRL_FORCE_CLK_ON_MASK;
     }
-    else
-    {
+    else {
         base->TCM_CTRL &= ~FLEXRAM_TCM_CTRL_FORCE_CLK_ON_MASK;
     }
 }

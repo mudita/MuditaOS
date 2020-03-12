@@ -29,148 +29,149 @@
 #define CO_ROUTINE_H
 
 #ifndef INC_FREERTOS_H
-	#error "include FreeRTOS.h must appear in source files before include croutine.h"
+#error "include FreeRTOS.h must appear in source files before include croutine.h"
 #endif
 
 #include "list.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* Used to hide the implementation of the co-routine control block.  The
-control block structure however has to be included in the header due to
-the macro implementation of the co-routine functionality. */
-typedef void * CoRoutineHandle_t;
+    /* Used to hide the implementation of the co-routine control block.  The
+    control block structure however has to be included in the header due to
+    the macro implementation of the co-routine functionality. */
+    typedef void *CoRoutineHandle_t;
 
-/* Defines the prototype to which co-routine functions must conform. */
-typedef void (*crCOROUTINE_CODE)( CoRoutineHandle_t, UBaseType_t );
+    /* Defines the prototype to which co-routine functions must conform. */
+    typedef void (*crCOROUTINE_CODE)(CoRoutineHandle_t, UBaseType_t);
 
-typedef struct corCoRoutineControlBlock
-{
-	crCOROUTINE_CODE 	pxCoRoutineFunction;
-	ListItem_t			xGenericListItem;	/*< List item used to place the CRCB in ready and blocked queues. */
-	ListItem_t			xEventListItem;		/*< List item used to place the CRCB in event lists. */
-	UBaseType_t 		uxPriority;			/*< The priority of the co-routine in relation to other co-routines. */
-	UBaseType_t 		uxIndex;			/*< Used to distinguish between co-routines when multiple co-routines use the same co-routine function. */
-	uint16_t 			uxState;			/*< Used internally by the co-routine implementation. */
-} CRCB_t; /* Co-routine control block.  Note must be identical in size down to uxPriority with TCB_t. */
-
-/**
- * croutine. h
- *<pre>
- BaseType_t xCoRoutineCreate(
-                                 crCOROUTINE_CODE pxCoRoutineCode,
-                                 UBaseType_t uxPriority,
-                                 UBaseType_t uxIndex
-                               );</pre>
- *
- * Create a new co-routine and add it to the list of co-routines that are
- * ready to run.
- *
- * @param pxCoRoutineCode Pointer to the co-routine function.  Co-routine
- * functions require special syntax - see the co-routine section of the WEB
- * documentation for more information.
- *
- * @param uxPriority The priority with respect to other co-routines at which
- *  the co-routine will run.
- *
- * @param uxIndex Used to distinguish between different co-routines that
- * execute the same function.  See the example below and the co-routine section
- * of the WEB documentation for further information.
- *
- * @return pdPASS if the co-routine was successfully created and added to a ready
- * list, otherwise an error code defined with ProjDefs.h.
- *
- * Example usage:
-   <pre>
- // Co-routine to be created.
- void vFlashCoRoutine( CoRoutineHandle_t xHandle, UBaseType_t uxIndex )
- {
- // Variables in co-routines must be declared static if they must maintain value across a blocking call.
- // This may not be necessary for const variables.
- static const char cLedToFlash[ 2 ] = { 5, 6 };
- static const TickType_t uxFlashRates[ 2 ] = { 200, 400 };
-
-     // Must start every co-routine with a call to crSTART();
-     crSTART( xHandle );
-
-     for( ;; )
-     {
-         // This co-routine just delays for a fixed period, then toggles
-         // an LED.  Two co-routines are created using this function, so
-         // the uxIndex parameter is used to tell the co-routine which
-         // LED to flash and how int32_t to delay.  This assumes xQueue has
-         // already been created.
-         vParTestToggleLED( cLedToFlash[ uxIndex ] );
-         crDELAY( xHandle, uxFlashRates[ uxIndex ] );
-     }
-
-     // Must end every co-routine with a call to crEND();
-     crEND();
- }
-
- // Function that creates two co-routines.
- void vOtherFunction( void )
- {
- uint8_t ucParameterToPass;
- TaskHandle_t xHandle;
-
-     // Create two co-routines at priority 0.  The first is given index 0
-     // so (from the code above) toggles LED 5 every 200 ticks.  The second
-     // is given index 1 so toggles LED 6 every 400 ticks.
-     for( uxIndex = 0; uxIndex < 2; uxIndex++ )
-     {
-         xCoRoutineCreate( vFlashCoRoutine, 0, uxIndex );
-     }
- }
-   </pre>
- * \defgroup xCoRoutineCreate xCoRoutineCreate
- * \ingroup Tasks
- */
-BaseType_t xCoRoutineCreate( crCOROUTINE_CODE pxCoRoutineCode, UBaseType_t uxPriority, UBaseType_t uxIndex );
-
-
-/**
- * croutine. h
- *<pre>
- void vCoRoutineSchedule( void );</pre>
- *
- * Run a co-routine.
- *
- * vCoRoutineSchedule() executes the highest priority co-routine that is able
- * to run.  The co-routine will execute until it either blocks, yields or is
- * preempted by a task.  Co-routines execute cooperatively so one
- * co-routine cannot be preempted by another, but can be preempted by a task.
- *
- * If an application comprises of both tasks and co-routines then
- * vCoRoutineSchedule should be called from the idle task (in an idle task
- * hook).
- *
- * Example usage:
-   <pre>
- // This idle task hook will schedule a co-routine each time it is called.
- // The rest of the idle task will execute between co-routine calls.
- void vApplicationIdleHook( void )
- {
-	vCoRoutineSchedule();
- }
-
- // Alternatively, if you do not require any other part of the idle task to
- // execute, the idle task hook can call vCoRoutineScheduler() within an
- // infinite loop.
- void vApplicationIdleHook( void )
- {
-    for( ;; )
+    typedef struct corCoRoutineControlBlock
     {
+        crCOROUTINE_CODE pxCoRoutineFunction;
+        ListItem_t xGenericListItem; /*< List item used to place the CRCB in ready and blocked queues. */
+        ListItem_t xEventListItem;   /*< List item used to place the CRCB in event lists. */
+        UBaseType_t uxPriority;      /*< The priority of the co-routine in relation to other co-routines. */
+        UBaseType_t uxIndex;         /*< Used to distinguish between co-routines when multiple co-routines use the same
+                                        co-routine function. */
+        uint16_t uxState;            /*< Used internally by the co-routine implementation. */
+    } CRCB_t; /* Co-routine control block.  Note must be identical in size down to uxPriority with TCB_t. */
+
+    /**
+     * croutine. h
+     *<pre>
+     BaseType_t xCoRoutineCreate(
+                                     crCOROUTINE_CODE pxCoRoutineCode,
+                                     UBaseType_t uxPriority,
+                                     UBaseType_t uxIndex
+                                   );</pre>
+     *
+     * Create a new co-routine and add it to the list of co-routines that are
+     * ready to run.
+     *
+     * @param pxCoRoutineCode Pointer to the co-routine function.  Co-routine
+     * functions require special syntax - see the co-routine section of the WEB
+     * documentation for more information.
+     *
+     * @param uxPriority The priority with respect to other co-routines at which
+     *  the co-routine will run.
+     *
+     * @param uxIndex Used to distinguish between different co-routines that
+     * execute the same function.  See the example below and the co-routine section
+     * of the WEB documentation for further information.
+     *
+     * @return pdPASS if the co-routine was successfully created and added to a ready
+     * list, otherwise an error code defined with ProjDefs.h.
+     *
+     * Example usage:
+       <pre>
+     // Co-routine to be created.
+     void vFlashCoRoutine( CoRoutineHandle_t xHandle, UBaseType_t uxIndex )
+     {
+     // Variables in co-routines must be declared static if they must maintain value across a blocking call.
+     // This may not be necessary for const variables.
+     static const char cLedToFlash[ 2 ] = { 5, 6 };
+     static const TickType_t uxFlashRates[ 2 ] = { 200, 400 };
+
+         // Must start every co-routine with a call to crSTART();
+         crSTART( xHandle );
+
+         for( ;; )
+         {
+             // This co-routine just delays for a fixed period, then toggles
+             // an LED.  Two co-routines are created using this function, so
+             // the uxIndex parameter is used to tell the co-routine which
+             // LED to flash and how int32_t to delay.  This assumes xQueue has
+             // already been created.
+             vParTestToggleLED( cLedToFlash[ uxIndex ] );
+             crDELAY( xHandle, uxFlashRates[ uxIndex ] );
+         }
+
+         // Must end every co-routine with a call to crEND();
+         crEND();
+     }
+
+     // Function that creates two co-routines.
+     void vOtherFunction( void )
+     {
+     uint8_t ucParameterToPass;
+     TaskHandle_t xHandle;
+
+         // Create two co-routines at priority 0.  The first is given index 0
+         // so (from the code above) toggles LED 5 every 200 ticks.  The second
+         // is given index 1 so toggles LED 6 every 400 ticks.
+         for( uxIndex = 0; uxIndex < 2; uxIndex++ )
+         {
+             xCoRoutineCreate( vFlashCoRoutine, 0, uxIndex );
+         }
+     }
+       </pre>
+     * \defgroup xCoRoutineCreate xCoRoutineCreate
+     * \ingroup Tasks
+     */
+    BaseType_t xCoRoutineCreate(crCOROUTINE_CODE pxCoRoutineCode, UBaseType_t uxPriority, UBaseType_t uxIndex);
+
+    /**
+     * croutine. h
+     *<pre>
+     void vCoRoutineSchedule( void );</pre>
+     *
+     * Run a co-routine.
+     *
+     * vCoRoutineSchedule() executes the highest priority co-routine that is able
+     * to run.  The co-routine will execute until it either blocks, yields or is
+     * preempted by a task.  Co-routines execute cooperatively so one
+     * co-routine cannot be preempted by another, but can be preempted by a task.
+     *
+     * If an application comprises of both tasks and co-routines then
+     * vCoRoutineSchedule should be called from the idle task (in an idle task
+     * hook).
+     *
+     * Example usage:
+       <pre>
+     // This idle task hook will schedule a co-routine each time it is called.
+     // The rest of the idle task will execute between co-routine calls.
+     void vApplicationIdleHook( void )
+     {
         vCoRoutineSchedule();
-    }
- }
- </pre>
- * \defgroup vCoRoutineSchedule vCoRoutineSchedule
- * \ingroup Tasks
- */
-void vCoRoutineSchedule( void );
+     }
+
+     // Alternatively, if you do not require any other part of the idle task to
+     // execute, the idle task hook can call vCoRoutineScheduler() within an
+     // infinite loop.
+     void vApplicationIdleHook( void )
+     {
+        for( ;; )
+        {
+            vCoRoutineSchedule();
+        }
+     }
+     </pre>
+     * \defgroup vCoRoutineSchedule vCoRoutineSchedule
+     * \ingroup Tasks
+     */
+    void vCoRoutineSchedule(void);
 
 /**
  * croutine. h
@@ -201,7 +202,9 @@ void vCoRoutineSchedule( void );
  * \defgroup crSTART crSTART
  * \ingroup Tasks
  */
-#define crSTART( pxCRCB ) switch( ( ( CRCB_t * )( pxCRCB ) )->uxState ) { case 0:
+#define crSTART(pxCRCB)                                                                                                \
+    switch (((CRCB_t *)(pxCRCB))->uxState) {                                                                           \
+    case 0:
 
 /**
  * croutine. h
@@ -238,8 +241,14 @@ void vCoRoutineSchedule( void );
  * These macros are intended for internal use by the co-routine implementation
  * only.  The macros should not be used directly by application writers.
  */
-#define crSET_STATE0( xHandle ) ( ( CRCB_t * )( xHandle ) )->uxState = (__LINE__ * 2); return; case (__LINE__ * 2):
-#define crSET_STATE1( xHandle ) ( ( CRCB_t * )( xHandle ) )->uxState = ((__LINE__ * 2)+1); return; case ((__LINE__ * 2)+1):
+#define crSET_STATE0(xHandle)                                                                                          \
+    ((CRCB_t *)(xHandle))->uxState = (__LINE__ * 2);                                                                   \
+    return;                                                                                                            \
+    case (__LINE__ * 2):
+#define crSET_STATE1(xHandle)                                                                                          \
+    ((CRCB_t *)(xHandle))->uxState = ((__LINE__ * 2) + 1);                                                             \
+    return;                                                                                                            \
+    case ((__LINE__ * 2) + 1):
 
 /**
  * croutine. h
@@ -287,12 +296,11 @@ void vCoRoutineSchedule( void );
  * \defgroup crDELAY crDELAY
  * \ingroup Tasks
  */
-#define crDELAY( xHandle, xTicksToDelay )												\
-	if( ( xTicksToDelay ) > 0 )															\
-	{																					\
-		vCoRoutineAddToDelayedList( ( xTicksToDelay ), NULL );							\
-	}																					\
-	crSET_STATE0( ( xHandle ) );
+#define crDELAY(xHandle, xTicksToDelay)                                                                                \
+    if ((xTicksToDelay) > 0) {                                                                                         \
+        vCoRoutineAddToDelayedList((xTicksToDelay), NULL);                                                             \
+    }                                                                                                                  \
+    crSET_STATE0((xHandle));
 
 /**
  * <pre>
@@ -377,20 +385,18 @@ void vCoRoutineSchedule( void );
  * \defgroup crQUEUE_SEND crQUEUE_SEND
  * \ingroup Tasks
  */
-#define crQUEUE_SEND( xHandle, pxQueue, pvItemToQueue, xTicksToWait, pxResult )			\
-{																						\
-	*( pxResult ) = xQueueCRSend( ( pxQueue) , ( pvItemToQueue) , ( xTicksToWait ) );	\
-	if( *( pxResult ) == errQUEUE_BLOCKED )												\
-	{																					\
-		crSET_STATE0( ( xHandle ) );													\
-		*pxResult = xQueueCRSend( ( pxQueue ), ( pvItemToQueue ), 0 );					\
-	}																					\
-	if( *pxResult == errQUEUE_YIELD )													\
-	{																					\
-		crSET_STATE1( ( xHandle ) );													\
-		*pxResult = pdPASS;																\
-	}																					\
-}
+#define crQUEUE_SEND(xHandle, pxQueue, pvItemToQueue, xTicksToWait, pxResult)                                          \
+    {                                                                                                                  \
+        *(pxResult) = xQueueCRSend((pxQueue), (pvItemToQueue), (xTicksToWait));                                        \
+        if (*(pxResult) == errQUEUE_BLOCKED) {                                                                         \
+            crSET_STATE0((xHandle));                                                                                   \
+            *pxResult = xQueueCRSend((pxQueue), (pvItemToQueue), 0);                                                   \
+        }                                                                                                              \
+        if (*pxResult == errQUEUE_YIELD) {                                                                             \
+            crSET_STATE1((xHandle));                                                                                   \
+            *pxResult = pdPASS;                                                                                        \
+        }                                                                                                              \
+    }
 
 /**
  * croutine. h
@@ -469,20 +475,18 @@ void vCoRoutineSchedule( void );
  * \defgroup crQUEUE_RECEIVE crQUEUE_RECEIVE
  * \ingroup Tasks
  */
-#define crQUEUE_RECEIVE( xHandle, pxQueue, pvBuffer, xTicksToWait, pxResult )			\
-{																						\
-	*( pxResult ) = xQueueCRReceive( ( pxQueue) , ( pvBuffer ), ( xTicksToWait ) );		\
-	if( *( pxResult ) == errQUEUE_BLOCKED ) 											\
-	{																					\
-		crSET_STATE0( ( xHandle ) );													\
-		*( pxResult ) = xQueueCRReceive( ( pxQueue) , ( pvBuffer ), 0 );				\
-	}																					\
-	if( *( pxResult ) == errQUEUE_YIELD )												\
-	{																					\
-		crSET_STATE1( ( xHandle ) );													\
-		*( pxResult ) = pdPASS;															\
-	}																					\
-}
+#define crQUEUE_RECEIVE(xHandle, pxQueue, pvBuffer, xTicksToWait, pxResult)                                            \
+    {                                                                                                                  \
+        *(pxResult) = xQueueCRReceive((pxQueue), (pvBuffer), (xTicksToWait));                                          \
+        if (*(pxResult) == errQUEUE_BLOCKED) {                                                                         \
+            crSET_STATE0((xHandle));                                                                                   \
+            *(pxResult) = xQueueCRReceive((pxQueue), (pvBuffer), 0);                                                   \
+        }                                                                                                              \
+        if (*(pxResult) == errQUEUE_YIELD) {                                                                           \
+            crSET_STATE1((xHandle));                                                                                   \
+            *(pxResult) = pdPASS;                                                                                      \
+        }                                                                                                              \
+    }
 
 /**
  * croutine. h
@@ -578,8 +582,8 @@ void vCoRoutineSchedule( void );
  * \defgroup crQUEUE_SEND_FROM_ISR crQUEUE_SEND_FROM_ISR
  * \ingroup Tasks
  */
-#define crQUEUE_SEND_FROM_ISR( pxQueue, pvItemToQueue, xCoRoutinePreviouslyWoken ) xQueueCRSendFromISR( ( pxQueue ), ( pvItemToQueue ), ( xCoRoutinePreviouslyWoken ) )
-
+#define crQUEUE_SEND_FROM_ISR(pxQueue, pvItemToQueue, xCoRoutinePreviouslyWoken)                                       \
+    xQueueCRSendFromISR((pxQueue), (pvItemToQueue), (xCoRoutinePreviouslyWoken))
 
 /**
  * croutine. h
@@ -645,25 +649,25 @@ void vCoRoutineSchedule( void );
          {
              // The character was successfully posted to the queue.
          }
-		 else
-		 {
-			// Could not post the character to the queue.
-		 }
+         else
+         {
+            // Could not post the character to the queue.
+         }
 
          // Enable the UART Tx interrupt to cause an interrupt in this
-		 // hypothetical UART.  The interrupt will obtain the character
-		 // from the queue and send it.
-		 ENABLE_RX_INTERRUPT();
+         // hypothetical UART.  The interrupt will obtain the character
+         // from the queue and send it.
+         ENABLE_RX_INTERRUPT();
 
-		 // Increment to the next character then block for a fixed period.
-		 // cCharToTx will maintain its value across the delay as it is
-		 // declared static.
-		 cCharToTx++;
-		 if( cCharToTx > 'x' )
-		 {
-			cCharToTx = 'a';
-		 }
-		 crDELAY( 100 );
+         // Increment to the next character then block for a fixed period.
+         // cCharToTx will maintain its value across the delay as it is
+         // declared static.
+         cCharToTx++;
+         if( cCharToTx > 'x' )
+         {
+            cCharToTx = 'a';
+         }
+         crDELAY( 100 );
      }
 
      // All co-routines must end with a call to crEND().
@@ -679,39 +683,40 @@ void vCoRoutineSchedule( void );
      while( UART_TX_REG_EMPTY() )
      {
          // Are there any characters in the queue waiting to be sent?
-		 // xCRWokenByPost will automatically be set to pdTRUE if a co-routine
-		 // is woken by the post - ensuring that only a single co-routine is
-		 // woken no matter how many times we go around this loop.
+         // xCRWokenByPost will automatically be set to pdTRUE if a co-routine
+         // is woken by the post - ensuring that only a single co-routine is
+         // woken no matter how many times we go around this loop.
          if( crQUEUE_RECEIVE_FROM_ISR( pxQueue, &cCharToTx, &xCRWokenByPost ) )
-		 {
-			 SEND_CHARACTER( cCharToTx );
-		 }
+         {
+             SEND_CHARACTER( cCharToTx );
+         }
      }
  }</pre>
  * \defgroup crQUEUE_RECEIVE_FROM_ISR crQUEUE_RECEIVE_FROM_ISR
  * \ingroup Tasks
  */
-#define crQUEUE_RECEIVE_FROM_ISR( pxQueue, pvBuffer, pxCoRoutineWoken ) xQueueCRReceiveFromISR( ( pxQueue ), ( pvBuffer ), ( pxCoRoutineWoken ) )
+#define crQUEUE_RECEIVE_FROM_ISR(pxQueue, pvBuffer, pxCoRoutineWoken)                                                  \
+    xQueueCRReceiveFromISR((pxQueue), (pvBuffer), (pxCoRoutineWoken))
 
-/*
- * This function is intended for internal use by the co-routine macros only.
- * The macro nature of the co-routine implementation requires that the
- * prototype appears here.  The function should not be used by application
- * writers.
- *
- * Removes the current co-routine from its ready list and places it in the
- * appropriate delayed list.
- */
-void vCoRoutineAddToDelayedList( TickType_t xTicksToDelay, List_t *pxEventList );
+    /*
+     * This function is intended for internal use by the co-routine macros only.
+     * The macro nature of the co-routine implementation requires that the
+     * prototype appears here.  The function should not be used by application
+     * writers.
+     *
+     * Removes the current co-routine from its ready list and places it in the
+     * appropriate delayed list.
+     */
+    void vCoRoutineAddToDelayedList(TickType_t xTicksToDelay, List_t *pxEventList);
 
-/*
- * This function is intended for internal use by the queue implementation only.
- * The function should not be used by application writers.
- *
- * Removes the highest priority co-routine from the event list and places it in
- * the pending ready list.
- */
-BaseType_t xCoRoutineRemoveFromEventList( const List_t *pxEventList );
+    /*
+     * This function is intended for internal use by the queue implementation only.
+     * The function should not be used by application writers.
+     *
+     * Removes the highest priority co-routine from the event list and places it in
+     * the pending ready list.
+     */
+    BaseType_t xCoRoutineRemoveFromEventList(const List_t *pxEventList);
 
 #ifdef __cplusplus
 }

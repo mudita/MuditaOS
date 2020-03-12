@@ -15,7 +15,7 @@ TEST_CASE("Split tests")
     std::string delimiter = "\r\n";
 
     std::string inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
-    auto ret = utils::split(inputStr1, delimiter, 0, false);
+    auto ret              = utils::split(inputStr1, delimiter, 0, false);
     REQUIRE(ret.size() == 7);
     REQUIRE(ret[0] == "");
     REQUIRE(ret[1] == "OK");
@@ -26,20 +26,20 @@ TEST_CASE("Split tests")
     REQUIRE(ret[6] == "");
 
     inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
-    ret = utils::split(inputStr1, delimiter);
+    ret       = utils::split(inputStr1, delimiter);
     REQUIRE(ret.size() == 3);
     REQUIRE(ret[0] == "OK");
     REQUIRE(ret[1] == "NO CARRIER");
     REQUIRE(ret[2] == "FINISHED");
 
     inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
-    ret = utils::split(inputStr1, delimiter, 2, false);
+    ret       = utils::split(inputStr1, delimiter, 2, false);
     REQUIRE(ret.size() == 2);
     REQUIRE(ret[0] == "");
     REQUIRE(ret[1] == "OK");
 
     inputStr1 = "\r\nOK\r\n\r\nNO CARRIER\r\n\r\nFINISHED\r\n";
-    ret = utils::split(inputStr1, delimiter, 2);
+    ret       = utils::split(inputStr1, delimiter, 2);
     REQUIRE(ret.size() == 2);
     REQUIRE(ret[0] == "OK");
     REQUIRE(ret[1] == "NO CARRIER");

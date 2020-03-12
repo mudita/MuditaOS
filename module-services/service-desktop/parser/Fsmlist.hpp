@@ -8,8 +8,7 @@
 using fsm_list = tinyfsm::FsmList<ParserFsm, EndpointFsm, RawDataFsm>;
 
 /** dispatch event to all FSMs */
-template<typename E>
-void send_event(E const & event)
+template <typename E> void send_event(E const &event)
 {
     fsm_list::template dispatch<E>(event);
 }

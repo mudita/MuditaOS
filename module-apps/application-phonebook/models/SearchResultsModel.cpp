@@ -5,19 +5,18 @@
 #include "service-db/api/DBServiceAPI.hpp"
 
 SearchResultsModel::SearchResultsModel(app::Application *app) : results(nullptr), favouriteCount(0)
-{
-}
+{}
 
 SearchResultsModel::~SearchResultsModel()
 {
     results = nullptr;
 }
 
-gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
+gui::ListItem *SearchResultsModel::getItem(
+    int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
     auto o = *results.get();
-    if (index >= (int)o.size())
-    {
+    if (index >= (int)o.size()) {
         LOG_ERROR("getItem error: index %d >= results size %d", index, o.size());
         return nullptr;
     }
@@ -26,106 +25,85 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
     if (contact == nullptr)
         return nullptr;
 
-    if (topDown)
-    {
+    if (topDown) {
         // return item from favorite part of contacts
-        if (static_cast<uint32_t>(index) < favouriteCount)
-        {
+        if (static_cast<uint32_t>(index) < favouriteCount) {
             gui::PhonebookItem *item = new gui::PhonebookItem();
 
-            if ((index == firstElement) && (index != prevIndex))
-            {
+            if ((index == firstElement) && (index != prevIndex)) {
                 item->setValue(utils::localize.get("app_phonebook_list_favourites"));
             }
-            else
-            {
+            else {
                 item->markFavourite(true);
                 item->setContact(contact);
                 item->setID(index);
             }
             return item;
         }
-        else
-        {
+        else {
             gui::PhonebookItem *item = new gui::PhonebookItem();
             // on top the page or if element next after last favourite contact is requested
-            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex))
-            {
+            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex)) {
 
                 item->setValue(contact->primaryName.substr(0, 1));
             }
-            else
-            {
+            else {
                 auto prevContact = std::make_shared<ContactRecord>(o[prevIndex]);
-                if (contact->alternativeName.substr(0, 1) == prevContact->alternativeName.substr(0, 1))
-                {
+                if (contact->alternativeName.substr(0, 1) == prevContact->alternativeName.substr(0, 1)) {
                     item->setContact(contact);
                     item->setID(index);
                 }
-                else
-                {
+                else {
                     item->setValue(contact->primaryName.substr(0, 1));
                 }
             }
             return item;
         }
     }
-    else
-    {
-        if (static_cast<uint32_t>(index) < favouriteCount - 1)
-        {
+    else {
+        if (static_cast<uint32_t>(index) < favouriteCount - 1) {
             gui::PhonebookItem *item = new gui::PhonebookItem();
-            if (remaining == 0)
-            {
+            if (remaining == 0) {
                 item->setValue(utils::localize.get("app_phonebook_list_favourites"));
             }
-            else
-            {
+            else {
                 item->markFavourite(true);
                 item->setContact(contact);
                 item->setID(index);
             }
             return item;
         }
-        else
-        {
+        else {
             gui::PhonebookItem *item = new gui::PhonebookItem();
 
             // leaving normal contacts list and entering favourite area but charatcer is already placed
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex))
-            {
+            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex)) {
                 item->markFavourite(true);
                 item->setContact(contact);
                 item->setID(index);
             }
             // leaving normal contacts list and entering favourite area - return character
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex))
-            {
+            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex)) {
                 item->setValue(contact->primaryName.substr(0, 1));
             }
-            else
-            {
+            else {
                 auto prevContact = std::make_shared<ContactRecord>(o[prevIndex]);
-                if (remaining == 0)
-                {
+                if (remaining == 0) {
                     // previous element has the same first character of alternative name so display first character
-                    if (index == prevIndex)
-                    {
+                    if (index == prevIndex) {
                         item->setContact(contact);
                         item->setID(index);
                     }
-                    else
-                    {
+                    else {
                         item->setValue(prevContact->primaryName.substr(0, 1));
                     }
                 }
-                else if (((index == firstElement) || (index == prevIndex) || (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))))
-                {
+                else if (((index == firstElement) || (index == prevIndex) ||
+                          (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)))) {
                     item->setContact(contact);
                     item->setID(index);
                 }
-                else
-                {
+                else {
                     item->setValue(prevContact->primaryName.substr(0, 1));
                 }
             }
@@ -137,12 +115,10 @@ gui::ListItem *SearchResultsModel::getItem(int index, int firstElement, int prev
 
 int SearchResultsModel::getItemCount() const
 {
-    if (results)
-    {
+    if (results) {
         return (results.get()->size());
     }
-    else
-    {
+    else {
         return (0);
     }
 }

@@ -138,15 +138,17 @@ namespace Catch
 
 #ifdef __clang__
 
-#define CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                               \
-    _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wexit-time-destructors\"")                                                           \
+#define CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                       \
+    _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wexit-time-destructors\"")                   \
         _Pragma("clang diagnostic ignored \"-Wglobal-constructors\"")
 #define CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS _Pragma("clang diagnostic pop")
 
-#define CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wparentheses\"")
+#define CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS                                                                   \
+    _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wparentheses\"")
 #define CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS _Pragma("clang diagnostic pop")
 
-#define CATCH_INTERNAL_SUPPRESS_UNUSED_WARNINGS _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wunused-variable\"")
+#define CATCH_INTERNAL_SUPPRESS_UNUSED_WARNINGS                                                                        \
+    _Pragma("clang diagnostic push") _Pragma("clang diagnostic ignored \"-Wunused-variable\"")
 #define CATCH_INTERNAL_UNSUPPRESS_UNUSED_WARNINGS _Pragma("clang diagnostic pop")
 
 #endif // __clang__
@@ -295,13 +297,13 @@ namespace Catch
 #if defined(CATCH_INTERNAL_CONFIG_COUNTER) && !defined(CATCH_CONFIG_NO_COUNTER) && !defined(CATCH_CONFIG_COUNTER)
 #define CATCH_CONFIG_COUNTER
 #endif
-#if defined(CATCH_INTERNAL_CONFIG_WINDOWS_SEH) && !defined(CATCH_CONFIG_NO_WINDOWS_SEH) && !defined(CATCH_CONFIG_WINDOWS_SEH) &&                               \
-    !defined(CATCH_INTERNAL_CONFIG_NO_WINDOWS_SEH)
+#if defined(CATCH_INTERNAL_CONFIG_WINDOWS_SEH) && !defined(CATCH_CONFIG_NO_WINDOWS_SEH) &&                             \
+    !defined(CATCH_CONFIG_WINDOWS_SEH) && !defined(CATCH_INTERNAL_CONFIG_NO_WINDOWS_SEH)
 #define CATCH_CONFIG_WINDOWS_SEH
 #endif
 // This is set by default, because we assume that unix compilers are posix-signal-compatible by default.
-#if defined(CATCH_INTERNAL_CONFIG_POSIX_SIGNALS) && !defined(CATCH_INTERNAL_CONFIG_NO_POSIX_SIGNALS) && !defined(CATCH_CONFIG_NO_POSIX_SIGNALS) &&             \
-    !defined(CATCH_CONFIG_POSIX_SIGNALS)
+#if defined(CATCH_INTERNAL_CONFIG_POSIX_SIGNALS) && !defined(CATCH_INTERNAL_CONFIG_NO_POSIX_SIGNALS) &&                \
+    !defined(CATCH_CONFIG_NO_POSIX_SIGNALS) && !defined(CATCH_CONFIG_POSIX_SIGNALS)
 #define CATCH_CONFIG_POSIX_SIGNALS
 #endif
 // This is set by default, because we assume that compilers with no wchar_t support are just rare exceptions.
@@ -309,24 +311,28 @@ namespace Catch
 #define CATCH_CONFIG_WCHAR
 #endif
 
-#if !defined(CATCH_INTERNAL_CONFIG_NO_CPP11_TO_STRING) && !defined(CATCH_CONFIG_NO_CPP11_TO_STRING) && !defined(CATCH_CONFIG_CPP11_TO_STRING)
+#if !defined(CATCH_INTERNAL_CONFIG_NO_CPP11_TO_STRING) && !defined(CATCH_CONFIG_NO_CPP11_TO_STRING) &&                 \
+    !defined(CATCH_CONFIG_CPP11_TO_STRING)
 #define CATCH_CONFIG_CPP11_TO_STRING
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_CPP17_OPTIONAL) && !defined(CATCH_CONFIG_NO_CPP17_OPTIONAL) && !defined(CATCH_CONFIG_CPP17_OPTIONAL)
+#if defined(CATCH_INTERNAL_CONFIG_CPP17_OPTIONAL) && !defined(CATCH_CONFIG_NO_CPP17_OPTIONAL) &&                       \
+    !defined(CATCH_CONFIG_CPP17_OPTIONAL)
 #define CATCH_CONFIG_CPP17_OPTIONAL
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS) && !defined(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS) &&                                         \
+#if defined(CATCH_INTERNAL_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS) && !defined(CATCH_CONFIG_NO_CPP17_UNCAUGHT_EXCEPTIONS) && \
     !defined(CATCH_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS)
 #define CATCH_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_CPP17_STRING_VIEW) && !defined(CATCH_CONFIG_NO_CPP17_STRING_VIEW) && !defined(CATCH_CONFIG_CPP17_STRING_VIEW)
+#if defined(CATCH_INTERNAL_CONFIG_CPP17_STRING_VIEW) && !defined(CATCH_CONFIG_NO_CPP17_STRING_VIEW) &&                 \
+    !defined(CATCH_CONFIG_CPP17_STRING_VIEW)
 #define CATCH_CONFIG_CPP17_STRING_VIEW
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_CPP17_VARIANT) && !defined(CATCH_CONFIG_NO_CPP17_VARIANT) && !defined(CATCH_CONFIG_CPP17_VARIANT)
+#if defined(CATCH_INTERNAL_CONFIG_CPP17_VARIANT) && !defined(CATCH_CONFIG_NO_CPP17_VARIANT) &&                         \
+    !defined(CATCH_CONFIG_CPP17_VARIANT)
 #define CATCH_CONFIG_CPP17_VARIANT
 #endif
 
@@ -334,8 +340,8 @@ namespace Catch
 #define CATCH_INTERNAL_CONFIG_NEW_CAPTURE
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_NEW_CAPTURE) && !defined(CATCH_INTERNAL_CONFIG_NO_NEW_CAPTURE) && !defined(CATCH_CONFIG_NO_NEW_CAPTURE) &&                   \
-    !defined(CATCH_CONFIG_NEW_CAPTURE)
+#if defined(CATCH_INTERNAL_CONFIG_NEW_CAPTURE) && !defined(CATCH_INTERNAL_CONFIG_NO_NEW_CAPTURE) &&                    \
+    !defined(CATCH_CONFIG_NO_NEW_CAPTURE) && !defined(CATCH_CONFIG_NEW_CAPTURE)
 #define CATCH_CONFIG_NEW_CAPTURE
 #endif
 
@@ -343,7 +349,8 @@ namespace Catch
 #define CATCH_CONFIG_DISABLE_EXCEPTIONS
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_POLYFILL_ISNAN) && !defined(CATCH_CONFIG_NO_POLYFILL_ISNAN) && !defined(CATCH_CONFIG_POLYFILL_ISNAN)
+#if defined(CATCH_INTERNAL_CONFIG_POLYFILL_ISNAN) && !defined(CATCH_CONFIG_NO_POLYFILL_ISNAN) &&                       \
+    !defined(CATCH_CONFIG_POLYFILL_ISNAN)
 #define CATCH_CONFIG_POLYFILL_ISNAN
 #endif
 
@@ -361,23 +368,23 @@ namespace Catch
 #endif
 
 #if defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
-#define CATCH_TRY if ((true))
-#define CATCH_CATCH_ALL if ((false))
+#define CATCH_TRY              if ((true))
+#define CATCH_CATCH_ALL        if ((false))
 #define CATCH_CATCH_ANON(type) if ((false))
 #else
-#define CATCH_TRY try
-#define CATCH_CATCH_ALL catch (...)
+#define CATCH_TRY              try
+#define CATCH_CATCH_ALL        catch (...)
 #define CATCH_CATCH_ANON(type) catch (type)
 #endif
 
-#if defined(CATCH_INTERNAL_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR) && !defined(CATCH_CONFIG_NO_TRADITIONAL_MSVC_PREPROCESSOR) &&                                 \
-    !defined(CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR)
+#if defined(CATCH_INTERNAL_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR) &&                                                    \
+    !defined(CATCH_CONFIG_NO_TRADITIONAL_MSVC_PREPROCESSOR) && !defined(CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR)
 #define CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
 #endif
 
 // end catch_compiler_capabilities.h
 #define INTERNAL_CATCH_UNIQUE_NAME_LINE2(name, line) name##line
-#define INTERNAL_CATCH_UNIQUE_NAME_LINE(name, line) INTERNAL_CATCH_UNIQUE_NAME_LINE2(name, line)
+#define INTERNAL_CATCH_UNIQUE_NAME_LINE(name, line)  INTERNAL_CATCH_UNIQUE_NAME_LINE2(name, line)
 #ifdef CATCH_CONFIG_COUNTER
 #define INTERNAL_CATCH_UNIQUE_NAME(name) INTERNAL_CATCH_UNIQUE_NAME_LINE(name, __COUNTER__)
 #else
@@ -390,8 +397,7 @@ namespace Catch
 
 // We need a dummy global operator<< so we can bring it into Catch namespace later
 struct Catch_global_namespace_dummy
-{
-};
+{};
 std::ostream &operator<<(std::ostream &, Catch_global_namespace_dummy);
 
 namespace Catch
@@ -409,7 +415,7 @@ namespace Catch
     class NonCopyable
     {
         NonCopyable(NonCopyable const &) = delete;
-        NonCopyable(NonCopyable &&) = delete;
+        NonCopyable(NonCopyable &&)      = delete;
         NonCopyable &operator=(NonCopyable const &) = delete;
         NonCopyable &operator=(NonCopyable &&) = delete;
 
@@ -423,12 +429,11 @@ namespace Catch
 
         SourceLineInfo() = delete;
         SourceLineInfo(char const *_file, std::size_t _line) noexcept : file(_file), line(_line)
-        {
-        }
+        {}
 
         SourceLineInfo(SourceLineInfo const &other) = default;
         SourceLineInfo &operator=(SourceLineInfo const &) = default;
-        SourceLineInfo(SourceLineInfo &&) noexcept = default;
+        SourceLineInfo(SourceLineInfo &&) noexcept        = default;
         SourceLineInfo &operator=(SourceLineInfo &&) noexcept = default;
 
         bool empty() const noexcept;
@@ -473,12 +478,14 @@ namespace Catch
 
 } // end namespace Catch
 
-#define CATCH_REGISTER_TAG_ALIAS(alias, spec)                                                                                                                  \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        Catch::RegistrarForTagAliases INTERNAL_CATCH_UNIQUE_NAME(AutoRegisterTagAlias)(alias, spec, CATCH_INTERNAL_LINEINFO);                                  \
-    }                                                                                                                                                          \
+#define CATCH_REGISTER_TAG_ALIAS(alias, spec)                                                                          \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        Catch::RegistrarForTagAliases INTERNAL_CATCH_UNIQUE_NAME(AutoRegisterTagAlias)(alias,                          \
+                                                                                       spec,                           \
+                                                                                       CATCH_INTERNAL_LINEINFO);       \
+    }                                                                                                                  \
     CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS
 
 // end catch_tag_alias_autoregistrar.h
@@ -505,12 +512,14 @@ namespace Catch
     struct ITestCaseRegistry
     {
         virtual ~ITestCaseRegistry();
-        virtual std::vector<TestCase> const &getAllTests() const = 0;
+        virtual std::vector<TestCase> const &getAllTests() const                            = 0;
         virtual std::vector<TestCase> const &getAllTestsSorted(IConfig const &config) const = 0;
     };
 
     bool matchTest(TestCase const &testCase, TestSpec const &testSpec, IConfig const &config);
-    std::vector<TestCase> filterTests(std::vector<TestCase> const &testCases, TestSpec const &testSpec, IConfig const &config);
+    std::vector<TestCase> filterTests(std::vector<TestCase> const &testCases,
+                                      TestSpec const &testSpec,
+                                      IConfig const &config);
     std::vector<TestCase> const &getAllTestCasesSorted(IConfig const &config);
 
 } // namespace Catch
@@ -551,12 +560,10 @@ namespace Catch
 
       public: // construction/ assignment
         StringRef() noexcept : StringRef(s_empty, 0)
-        {
-        }
+        {}
 
         StringRef(StringRef const &other) noexcept : m_start(other.m_start), m_size(other.m_size)
-        {
-        }
+        {}
 
         StringRef(StringRef &&other) noexcept : m_start(other.m_start), m_size(other.m_size), m_data(other.m_data)
         {
@@ -566,12 +573,10 @@ namespace Catch
         StringRef(char const *rawChars) noexcept;
 
         StringRef(char const *rawChars, size_type size) noexcept : m_start(rawChars), m_size(size)
-        {
-        }
+        {}
 
         StringRef(std::string const &stdString) noexcept : m_start(stdString.c_str()), m_size(stdString.size())
-        {
-        }
+        {}
 
         ~StringRef() noexcept
         {
@@ -581,9 +586,9 @@ namespace Catch
         auto operator=(StringRef const &other) noexcept -> StringRef &
         {
             delete[] m_data;
-            m_data = nullptr;
+            m_data  = nullptr;
             m_start = other.m_start;
-            m_size = other.m_size;
+            m_size  = other.m_size;
             return *this;
         }
 
@@ -653,18 +658,19 @@ namespace Catch
     template <typename...> inline constexpr auto is_unique = std::true_type{};
 
     template <typename T, typename... Rest>
-    inline constexpr auto is_unique<T, Rest...> = std::bool_constant<(!std::is_same_v<T, Rest> && ...) && is_unique<Rest...>>{};
+    inline constexpr auto is_unique<T, Rest...> =
+        std::bool_constant<(!std::is_same_v<T, Rest> && ...) && is_unique<Rest...>>{};
 #else
 
     template <typename...> struct is_unique : std::true_type
-    {
-    };
+    {};
 
     template <typename T0, typename T1, typename... Rest>
     struct is_unique<T0, T1, Rest...>
-        : std::integral_constant<bool, !std::is_same<T0, T1>::value && is_unique<T0, Rest...>::value && is_unique<T1, Rest...>::value>
-    {
-    };
+        : std::integral_constant<bool,
+                                 !std::is_same<T0, T1>::value && is_unique<T0, Rest...>::value &&
+                                     is_unique<T1, Rest...>::value>
+    {};
 
 #endif
 } // namespace Catch
@@ -683,7 +689,7 @@ namespace Catch
 #define INTERNAL_CATCH_EXPAND_VARGS(...) __VA_ARGS__
 // MSVC needs more evaluations
 #define CATCH_RECURSION_LEVEL6(...) CATCH_RECURSION_LEVEL5(CATCH_RECURSION_LEVEL5(CATCH_RECURSION_LEVEL5(__VA_ARGS__)))
-#define CATCH_RECURSE(...) CATCH_RECURSION_LEVEL6(CATCH_RECURSION_LEVEL6(__VA_ARGS__))
+#define CATCH_RECURSE(...)          CATCH_RECURSION_LEVEL6(CATCH_RECURSION_LEVEL6(__VA_ARGS__))
 #else
 #define CATCH_RECURSE(...) CATCH_RECURSION_LEVEL5(__VA_ARGS__)
 #endif
@@ -694,41 +700,46 @@ namespace Catch
 #define CATCH_EMPTY()
 #define CATCH_DEFER(id) id CATCH_EMPTY()
 
-#define CATCH_REC_GET_END2() 0, CATCH_REC_END
-#define CATCH_REC_GET_END1(...) CATCH_REC_GET_END2
-#define CATCH_REC_GET_END(...) CATCH_REC_GET_END1
+#define CATCH_REC_GET_END2()             0, CATCH_REC_END
+#define CATCH_REC_GET_END1(...)          CATCH_REC_GET_END2
+#define CATCH_REC_GET_END(...)           CATCH_REC_GET_END1
 #define CATCH_REC_NEXT0(test, next, ...) next CATCH_REC_OUT
-#define CATCH_REC_NEXT1(test, next) CATCH_DEFER(CATCH_REC_NEXT0)(test, next, 0)
-#define CATCH_REC_NEXT(test, next) CATCH_REC_NEXT1(CATCH_REC_GET_END test, next)
+#define CATCH_REC_NEXT1(test, next)      CATCH_DEFER(CATCH_REC_NEXT0)(test, next, 0)
+#define CATCH_REC_NEXT(test, next)       CATCH_REC_NEXT1(CATCH_REC_GET_END test, next)
 
 #define CATCH_REC_LIST0(f, x, peek, ...) , f(x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST1))(f, peek, __VA_ARGS__)
 #define CATCH_REC_LIST1(f, x, peek, ...) , f(x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST0))(f, peek, __VA_ARGS__)
 #define CATCH_REC_LIST2(f, x, peek, ...) f(x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST1))(f, peek, __VA_ARGS__)
 
-#define CATCH_REC_LIST0_UD(f, userdata, x, peek, ...) , f(userdata, x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST1_UD))(f, userdata, peek, __VA_ARGS__)
-#define CATCH_REC_LIST1_UD(f, userdata, x, peek, ...) , f(userdata, x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST0_UD))(f, userdata, peek, __VA_ARGS__)
-#define CATCH_REC_LIST2_UD(f, userdata, x, peek, ...) f(userdata, x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST1_UD))(f, userdata, peek, __VA_ARGS__)
+#define CATCH_REC_LIST0_UD(f, userdata, x, peek, ...)                                                                  \
+    , f(userdata, x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST1_UD))(f, userdata, peek, __VA_ARGS__)
+#define CATCH_REC_LIST1_UD(f, userdata, x, peek, ...)                                                                  \
+    , f(userdata, x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST0_UD))(f, userdata, peek, __VA_ARGS__)
+#define CATCH_REC_LIST2_UD(f, userdata, x, peek, ...)                                                                  \
+    f(userdata, x) CATCH_DEFER(CATCH_REC_NEXT(peek, CATCH_REC_LIST1_UD))(f, userdata, peek, __VA_ARGS__)
 
 // Applies the function macro `f` to each of the remaining parameters, inserts commas between the results,
 // and passes userdata as the first parameter to each invocation,
 // e.g. CATCH_REC_LIST_UD(f, x, a, b, c) evaluates to f(x, a), f(x, b), f(x, c)
-#define CATCH_REC_LIST_UD(f, userdata, ...) CATCH_RECURSE(CATCH_REC_LIST2_UD(f, userdata, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
+#define CATCH_REC_LIST_UD(f, userdata, ...)                                                                            \
+    CATCH_RECURSE(CATCH_REC_LIST2_UD(f, userdata, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
 
 #define CATCH_REC_LIST(f, ...) CATCH_RECURSE(CATCH_REC_LIST2(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
 
 #define INTERNAL_CATCH_EXPAND1(param) INTERNAL_CATCH_EXPAND2(param)
-#define INTERNAL_CATCH_EXPAND2(...) INTERNAL_CATCH_NO##__VA_ARGS__
-#define INTERNAL_CATCH_DEF(...) INTERNAL_CATCH_DEF __VA_ARGS__
+#define INTERNAL_CATCH_EXPAND2(...)   INTERNAL_CATCH_NO##__VA_ARGS__
+#define INTERNAL_CATCH_DEF(...)       INTERNAL_CATCH_DEF __VA_ARGS__
 #define INTERNAL_CATCH_NOINTERNAL_CATCH_DEF
 #define INTERNAL_CATCH_STRINGIZE(...) INTERNAL_CATCH_STRINGIZE2(__VA_ARGS__)
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define INTERNAL_CATCH_STRINGIZE2(...) #__VA_ARGS__
+#define INTERNAL_CATCH_STRINGIZE2(...)                 #__VA_ARGS__
 #define INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS(param) INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_REMOVE_PARENS(param))
 #else
 // MSVC is adding extra space and needs another indirection to expand INTERNAL_CATCH_NOINTERNAL_CATCH_DEF
 #define INTERNAL_CATCH_STRINGIZE2(...) INTERNAL_CATCH_STRINGIZE3(__VA_ARGS__)
 #define INTERNAL_CATCH_STRINGIZE3(...) #__VA_ARGS__
-#define INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS(param) (INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_REMOVE_PARENS(param)) + 1)
+#define INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS(param)                                                                 \
+    (INTERNAL_CATCH_STRINGIZE(INTERNAL_CATCH_REMOVE_PARENS(param)) + 1)
 #endif
 
 #define INTERNAL_CATCH_REMOVE_PARENS(...) INTERNAL_CATCH_EXPAND1(INTERNAL_CATCH_DEF __VA_ARGS__)
@@ -736,18 +747,20 @@ namespace Catch
 #define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME2(Name, ...) INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME3(Name, __VA_ARGS__)
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
 #define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME3(Name, ...) Name " - " #__VA_ARGS__
-#define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME(Name, ...) INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME2(Name, INTERNAL_CATCH_REMOVE_PARENS(__VA_ARGS__))
+#define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME(Name, ...)                                                                 \
+    INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME2(Name, INTERNAL_CATCH_REMOVE_PARENS(__VA_ARGS__))
 #else
 // MSVC is adding extra space and needs more calls to properly remove ()
 #define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME3(Name, ...) Name " -" #__VA_ARGS__
 #define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME1(Name, ...) INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME2(Name, __VA_ARGS__)
-#define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME(Name, ...)                                                                                                         \
+#define INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME(Name, ...)                                                                 \
     INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME1(Name, INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_REMOVE_PARENS(__VA_ARGS__)))
 #endif
 
 #define INTERNAL_CATCH_MAKE_TYPE_LIST(types) Catch::TypeList<INTERNAL_CATCH_REMOVE_PARENS(types)>
 
-#define INTERNAL_CATCH_MAKE_TYPE_LISTS_FROM_TYPES(types) CATCH_REC_LIST(INTERNAL_CATCH_MAKE_TYPE_LIST, INTERNAL_CATCH_REMOVE_PARENS(types))
+#define INTERNAL_CATCH_MAKE_TYPE_LISTS_FROM_TYPES(types)                                                               \
+    CATCH_REC_LIST(INTERNAL_CATCH_MAKE_TYPE_LIST, INTERNAL_CATCH_REMOVE_PARENS(types))
 
 // end catch_preprocessor.hpp
 // start catch_meta.hpp
@@ -757,17 +770,22 @@ namespace Catch
 namespace Catch
 {
     template <typename...> struct TypeList
-    {
-    };
+    {};
 
     template <typename...> struct append;
 
-    template <template <typename...> class L1, typename... E1, template <typename...> class L2, typename... E2> struct append<L1<E1...>, L2<E2...>>
+    template <template <typename...> class L1, typename... E1, template <typename...> class L2, typename... E2>
+    struct append<L1<E1...>, L2<E2...>>
     {
         using type = L1<E1..., E2...>;
     };
 
-    template <template <typename...> class L1, typename... E1, template <typename...> class L2, typename... E2, typename... Rest>
+    template <template <typename...> class L1,
+              typename... E1,
+              template <typename...>
+              class L2,
+              typename... E2,
+              typename... Rest>
     struct append<L1<E1...>, L2<E2...>, Rest...>
     {
         using type = typename append<L1<E1..., E2...>, Rest...>::type;
@@ -775,15 +793,21 @@ namespace Catch
 
     template <template <typename...> class, typename...> struct rewrap;
 
-    template <template <typename...> class Container, template <typename...> class List, typename... elems> struct rewrap<Container, List<elems...>>
+    template <template <typename...> class Container, template <typename...> class List, typename... elems>
+    struct rewrap<Container, List<elems...>>
     {
         using type = TypeList<Container<elems...>>;
     };
 
-    template <template <typename...> class Container, template <typename...> class List, class... Elems, typename... Elements>
+    template <template <typename...> class Container,
+              template <typename...>
+              class List,
+              class... Elems,
+              typename... Elements>
     struct rewrap<Container, List<Elems...>, Elements...>
     {
-        using type = typename append<TypeList<Container<Elems...>>, typename rewrap<Container, Elements...>::type>::type;
+        using type =
+            typename append<TypeList<Container<Elems...>>, typename rewrap<Container, Elements...>::type>::type;
     };
 
     template <template <typename...> class... Containers> struct combine
@@ -798,8 +822,7 @@ namespace Catch
     };
 
     template <typename T> struct always_false : std::false_type
-    {
-    };
+    {};
 
 } // namespace Catch
 
@@ -813,8 +836,7 @@ namespace Catch
 
       public:
         TestInvokerAsMethod(void (C::*testAsMethod)()) noexcept : m_testAsMethod(testAsMethod)
-        {
-        }
+        {}
 
         void invoke() const override
         {
@@ -839,7 +861,10 @@ namespace Catch
 
     struct AutoReg : NonCopyable
     {
-        AutoReg(ITestInvoker *invoker, SourceLineInfo const &lineInfo, StringRef const &classOrMethod, NameAndTags const &nameAndTags) noexcept;
+        AutoReg(ITestInvoker *invoker,
+                SourceLineInfo const &lineInfo,
+                StringRef const &classOrMethod,
+                NameAndTags const &nameAndTags) noexcept;
         ~AutoReg();
     };
 
@@ -847,245 +872,303 @@ namespace Catch
 
 #if defined(CATCH_CONFIG_DISABLE)
 #define INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(TestName, ...) static void TestName()
-#define INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION(TestName, ClassName, ...)                                                                               \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName)                                                                                              \
-        {                                                                                                                                                      \
-            void test();                                                                                                                                       \
-        };                                                                                                                                                     \
-    }                                                                                                                                                          \
+#define INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION(TestName, ClassName, ...)                                       \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName)                                                      \
+        {                                                                                                              \
+            void test();                                                                                               \
+        };                                                                                                             \
+    }                                                                                                                  \
     void TestName::test()
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(TestName, ...) template <typename TestType> static void TestName()
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(TestName, ClassName, ...)                                                                     \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        template <typename TestType> struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>)                                                       \
-        {                                                                                                                                                      \
-            void test();                                                                                                                                       \
-        };                                                                                                                                                     \
-    }                                                                                                                                                          \
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(TestName, ...)                                               \
+    template <typename TestType> static void TestName()
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(TestName, ClassName, ...)                             \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        template <typename TestType> struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>)               \
+        {                                                                                                              \
+            void test();                                                                                               \
+        };                                                                                                             \
+    }                                                                                                                  \
     template <typename TestType> void TestName::test()
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_TESTCASE2(TestName, ...)                                                                                                                \
-    static void TestName();                                                                                                                                    \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&TestName), CATCH_INTERNAL_LINEINFO, Catch::StringRef(),               \
-                                                                 Catch::NameAndTags{__VA_ARGS__});                                                             \
-    } /* NOLINT */                                                                                                                                             \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TESTCASE2(TestName, ...)                                                                        \
+    static void TestName();                                                                                            \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&TestName),                    \
+                                                                 CATCH_INTERNAL_LINEINFO,                              \
+                                                                 Catch::StringRef(),                                   \
+                                                                 Catch::NameAndTags{__VA_ARGS__});                     \
+    } /* NOLINT */                                                                                                     \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     static void TestName()
-#define INTERNAL_CATCH_TESTCASE(...) INTERNAL_CATCH_TESTCASE2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____), __VA_ARGS__)
+#define INTERNAL_CATCH_TESTCASE(...)                                                                                   \
+    INTERNAL_CATCH_TESTCASE2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____), __VA_ARGS__)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_METHOD_AS_TEST_CASE(QualifiedMethod, ...)                                                                                               \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&QualifiedMethod), CATCH_INTERNAL_LINEINFO, "&" #QualifiedMethod,      \
-                                                                 Catch::NameAndTags{__VA_ARGS__});                                                             \
-    } /* NOLINT */                                                                                                                                             \
+#define INTERNAL_CATCH_METHOD_AS_TEST_CASE(QualifiedMethod, ...)                                                       \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&QualifiedMethod),             \
+                                                                 CATCH_INTERNAL_LINEINFO,                              \
+                                                                 "&" #QualifiedMethod,                                 \
+                                                                 Catch::NameAndTags{__VA_ARGS__});                     \
+    } /* NOLINT */                                                                                                     \
     CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_TEST_CASE_METHOD2(TestName, ClassName, ...)                                                                                             \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName)                                                                                              \
-        {                                                                                                                                                      \
-            void test();                                                                                                                                       \
-        };                                                                                                                                                     \
-        Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&TestName::test), CATCH_INTERNAL_LINEINFO, #ClassName,                 \
-                                                                 Catch::NameAndTags{__VA_ARGS__}); /* NOLINT */                                                \
-    }                                                                                                                                                          \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TEST_CASE_METHOD2(TestName, ClassName, ...)                                                     \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName)                                                      \
+        {                                                                                                              \
+            void test();                                                                                               \
+        };                                                                                                             \
+        Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(&TestName::test),              \
+                                                                 CATCH_INTERNAL_LINEINFO,                              \
+                                                                 #ClassName,                                           \
+                                                                 Catch::NameAndTags{__VA_ARGS__}); /* NOLINT */        \
+    }                                                                                                                  \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     void TestName::test()
-#define INTERNAL_CATCH_TEST_CASE_METHOD(ClassName, ...)                                                                                                        \
+#define INTERNAL_CATCH_TEST_CASE_METHOD(ClassName, ...)                                                                \
     INTERNAL_CATCH_TEST_CASE_METHOD2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____), ClassName, __VA_ARGS__)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_REGISTER_TESTCASE(Function, ...)                                                                                                        \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(Function), CATCH_INTERNAL_LINEINFO, Catch::StringRef(),                    \
-                                                             Catch::NameAndTags{__VA_ARGS__}); /* NOLINT */                                                    \
+#define INTERNAL_CATCH_REGISTER_TESTCASE(Function, ...)                                                                \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    Catch::AutoReg INTERNAL_CATCH_UNIQUE_NAME(autoRegistrar)(Catch::makeTestInvoker(Function),                         \
+                                                             CATCH_INTERNAL_LINEINFO,                                  \
+                                                             Catch::StringRef(),                                       \
+                                                             Catch::NameAndTags{__VA_ARGS__}); /* NOLINT */            \
     CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_2(TestName, TestFunc, Name, Tags, ...)                                                                               \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    template <typename TestType> static void TestFunc();                                                                                                       \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        template <typename... Types> struct TestName                                                                                                           \
-        {                                                                                                                                                      \
-            template <typename... Ts> TestName(Ts... names)                                                                                                    \
-            {                                                                                                                                                  \
-                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(CATCH_REC_LIST(INTERNAL_CATCH_REMOVE_PARENS, __VA_ARGS__))                                                   \
-                using expander = int[];                                                                                                                        \
-                (void)expander{                                                                                                                                \
-                    (Catch::AutoReg(Catch::makeTestInvoker(&TestFunc<Types>), CATCH_INTERNAL_LINEINFO, Catch::StringRef(), Catch::NameAndTags{names, Tags}),   \
-                     0)...}; /* NOLINT */                                                                                                                      \
-            }                                                                                                                                                  \
-        };                                                                                                                                                     \
-        INTERNAL_CATCH_TEMPLATE_REGISTRY_INITIATE(TestName, Name, __VA_ARGS__)                                                                                 \
-    }                                                                                                                                                          \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_2(TestName, TestFunc, Name, Tags, ...)                                       \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    template <typename TestType> static void TestFunc();                                                               \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        template <typename... Types> struct TestName                                                                   \
+        {                                                                                                              \
+            template <typename... Ts> TestName(Ts... names)                                                            \
+            {                                                                                                          \
+                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(CATCH_REC_LIST(INTERNAL_CATCH_REMOVE_PARENS, __VA_ARGS__))           \
+                using expander = int[];                                                                                \
+                (void)expander{(Catch::AutoReg(Catch::makeTestInvoker(&TestFunc<Types>),                               \
+                                               CATCH_INTERNAL_LINEINFO,                                                \
+                                               Catch::StringRef(),                                                     \
+                                               Catch::NameAndTags{names, Tags}),                                       \
+                                0)...}; /* NOLINT */                                                                   \
+            }                                                                                                          \
+        };                                                                                                             \
+        INTERNAL_CATCH_TEMPLATE_REGISTRY_INITIATE(TestName, Name, __VA_ARGS__)                                         \
+    }                                                                                                                  \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     template <typename TestType> static void TestFunc()
 
 #if defined(CATCH_CPP17_OR_GREATER)
-#define CATCH_INTERNAL_CHECK_UNIQUE_TYPES(...) static_assert(Catch::is_unique<__VA_ARGS__>, "Duplicate type detected in declaration of template test case");
+#define CATCH_INTERNAL_CHECK_UNIQUE_TYPES(...)                                                                         \
+    static_assert(Catch::is_unique<__VA_ARGS__>, "Duplicate type detected in declaration of template test case");
 #else
-#define CATCH_INTERNAL_CHECK_UNIQUE_TYPES(...)                                                                                                                 \
+#define CATCH_INTERNAL_CHECK_UNIQUE_TYPES(...)                                                                         \
     static_assert(Catch::is_unique<__VA_ARGS__>::value, "Duplicate type detected in declaration of template test case");
 #endif
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE(Name, Tags, ...)                                                                                                     \
-    INTERNAL_CATCH_TEMPLATE_TEST_CASE_2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                           \
-                                        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____), Name, Tags, __VA_ARGS__)
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE(Name, Tags, ...)                                                             \
+    INTERNAL_CATCH_TEMPLATE_TEST_CASE_2(                                                                               \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),                        \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__)
 #else
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE(Name, Tags, ...)                                                                                                     \
-    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),               \
-                                                                    INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),    \
-                                                                    Name, Tags, __VA_ARGS__))
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE(Name, Tags, ...)                                                             \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_2(                                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),                        \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__))
 #endif
 
-#define INTERNAL_CATCH_TEMPLATE_REGISTRY_INITIATE(TestName, Name, ...)                                                                                         \
-    static int INTERNAL_CATCH_UNIQUE_NAME(globalRegistrar) = []() {                                                                                            \
-        TestName<CATCH_REC_LIST(INTERNAL_CATCH_REMOVE_PARENS, __VA_ARGS__)>(CATCH_REC_LIST_UD(INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME, Name, __VA_ARGS__));        \
-        return 0;                                                                                                                                              \
+#define INTERNAL_CATCH_TEMPLATE_REGISTRY_INITIATE(TestName, Name, ...)                                                 \
+    static int INTERNAL_CATCH_UNIQUE_NAME(globalRegistrar) = []() {                                                    \
+        TestName<CATCH_REC_LIST(INTERNAL_CATCH_REMOVE_PARENS, __VA_ARGS__)>(                                           \
+            CATCH_REC_LIST_UD(INTERNAL_CATCH_TEMPLATE_UNIQUE_NAME, Name, __VA_ARGS__));                                \
+        return 0;                                                                                                      \
     }();
 
-#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE2(TestName, TestFuncName, Name, Tags, TmplTypes, TypesList)                                                   \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    template <typename TestType> static void TestFuncName();                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        template <typename... Types> struct TestName                                                                                                           \
-        {                                                                                                                                                      \
-            TestName()                                                                                                                                         \
-            {                                                                                                                                                  \
-                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(Types...)                                                                                                    \
-                int index = 0;                                                                                                                                 \
-                using expander = int[];                                                                                                                        \
-                constexpr char const *tmpl_types[] = {CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TmplTypes))};       \
-                constexpr char const *types_list[] = {CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TypesList))};       \
-                constexpr auto num_types = sizeof(types_list) / sizeof(types_list[0]);                                                                         \
-                (void)expander{(Catch::AutoReg(Catch::makeTestInvoker(&TestFuncName<Types>), CATCH_INTERNAL_LINEINFO, Catch::StringRef(),                      \
-                                               Catch::NameAndTags{Name " - " + std::string(tmpl_types[index / num_types]) + "<" +                              \
-                                                                      std::string(types_list[index % num_types]) + ">",                                        \
-                                                                  Tags}),                                                                                      \
-                                index++, 0)...}; /* NOLINT */                                                                                                  \
-            }                                                                                                                                                  \
-        };                                                                                                                                                     \
-        static int INTERNAL_CATCH_UNIQUE_NAME(globalRegistrar) = []() {                                                                                        \
-            using TestInit = Catch::combine<INTERNAL_CATCH_REMOVE_PARENS(TmplTypes)>::with_types<INTERNAL_CATCH_MAKE_TYPE_LISTS_FROM_TYPES(                    \
-                TypesList)>::into<TestName>::type;                                                                                                             \
-            TestInit();                                                                                                                                        \
-            return 0;                                                                                                                                          \
-        }();                                                                                                                                                   \
-    }                                                                                                                                                          \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE2(TestName, TestFuncName, Name, Tags, TmplTypes, TypesList)           \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    template <typename TestType> static void TestFuncName();                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        template <typename... Types> struct TestName                                                                   \
+        {                                                                                                              \
+            TestName()                                                                                                 \
+            {                                                                                                          \
+                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(Types...)                                                            \
+                int index                          = 0;                                                                \
+                using expander                     = int[];                                                            \
+                constexpr char const *tmpl_types[] = {                                                                 \
+                    CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TmplTypes))}; \
+                constexpr char const *types_list[] = {                                                                 \
+                    CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TypesList))}; \
+                constexpr auto num_types = sizeof(types_list) / sizeof(types_list[0]);                                 \
+                (void)expander{                                                                                        \
+                    (Catch::AutoReg(Catch::makeTestInvoker(&TestFuncName<Types>),                                      \
+                                    CATCH_INTERNAL_LINEINFO,                                                           \
+                                    Catch::StringRef(),                                                                \
+                                    Catch::NameAndTags{Name " - " + std::string(tmpl_types[index / num_types]) + "<" + \
+                                                           std::string(types_list[index % num_types]) + ">",           \
+                                                       Tags}),                                                         \
+                     index++,                                                                                          \
+                     0)...}; /* NOLINT */                                                                              \
+            }                                                                                                          \
+        };                                                                                                             \
+        static int INTERNAL_CATCH_UNIQUE_NAME(globalRegistrar) = []() {                                                \
+            using TestInit = Catch::combine<INTERNAL_CATCH_REMOVE_PARENS(                                              \
+                TmplTypes)>::with_types<INTERNAL_CATCH_MAKE_TYPE_LISTS_FROM_TYPES(TypesList)>::into<TestName>::type;   \
+            TestInit();                                                                                                \
+            return 0;                                                                                                  \
+        }();                                                                                                           \
+    }                                                                                                                  \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     template <typename TestType> static void TestFuncName()
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(Name, Tags, ...)                                                                                             \
-    INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                    \
-                                               INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____), Name, Tags,             \
-                                               __VA_ARGS__)
+#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(Name, Tags, ...)                                                     \
+    INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE2(                                                                        \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),                        \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__)
 #else
-#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(Name, Tags, ...)                                                                                             \
-    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE2(                                                                                    \
-        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                                                           \
-        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____), Name, Tags, __VA_ARGS__))
+#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(Name, Tags, ...)                                                     \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE2(                                            \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),                        \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__))
 #endif
 
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_2(TestNameClass, TestName, ClassName, Name, Tags, ...)                                                        \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        template <typename TestType> struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>)                                                       \
-        {                                                                                                                                                      \
-            void test();                                                                                                                                       \
-        };                                                                                                                                                     \
-        template <typename... Types> struct TestNameClass                                                                                                      \
-        {                                                                                                                                                      \
-            template <typename... Ts> TestNameClass(Ts... names)                                                                                               \
-            {                                                                                                                                                  \
-                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(CATCH_REC_LIST(INTERNAL_CATCH_REMOVE_PARENS, __VA_ARGS__))                                                   \
-                using expander = int[];                                                                                                                        \
-                (void)expander{                                                                                                                                \
-                    (Catch::AutoReg(Catch::makeTestInvoker(&TestName<Types>::test), CATCH_INTERNAL_LINEINFO, #ClassName, Catch::NameAndTags{names, Tags}),     \
-                     0)...}; /* NOLINT */                                                                                                                      \
-            }                                                                                                                                                  \
-        };                                                                                                                                                     \
-        INTERNAL_CATCH_TEMPLATE_REGISTRY_INITIATE(TestNameClass, Name, __VA_ARGS__)                                                                            \
-    }                                                                                                                                                          \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_2(TestNameClass, TestName, ClassName, Name, Tags, ...)                \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        template <typename TestType> struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>)               \
+        {                                                                                                              \
+            void test();                                                                                               \
+        };                                                                                                             \
+        template <typename... Types> struct TestNameClass                                                              \
+        {                                                                                                              \
+            template <typename... Ts> TestNameClass(Ts... names)                                                       \
+            {                                                                                                          \
+                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(CATCH_REC_LIST(INTERNAL_CATCH_REMOVE_PARENS, __VA_ARGS__))           \
+                using expander = int[];                                                                                \
+                (void)expander{(Catch::AutoReg(Catch::makeTestInvoker(&TestName<Types>::test),                         \
+                                               CATCH_INTERNAL_LINEINFO,                                                \
+                                               #ClassName,                                                             \
+                                               Catch::NameAndTags{names, Tags}),                                       \
+                                0)...}; /* NOLINT */                                                                   \
+            }                                                                                                          \
+        };                                                                                                             \
+        INTERNAL_CATCH_TEMPLATE_REGISTRY_INITIATE(TestNameClass, Name, __VA_ARGS__)                                    \
+    }                                                                                                                  \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     template <typename TestType> void TestName<TestType>::test()
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                                                                   \
-    INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____C_L_A_S_S____),                       \
-                                               INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), ClassName, Name, Tags,             \
-                                               __VA_ARGS__)
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                           \
+    INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_2(                                                                        \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____C_L_A_S_S____),                      \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        ClassName,                                                                                                     \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__)
 #else
-#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                                                                   \
-    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_2(                                                                                    \
-        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____C_L_A_S_S____),                                                              \
-        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), ClassName, Name, Tags, __VA_ARGS__))
+#define INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                           \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_2(                                            \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____C_L_A_S_S____),                      \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        ClassName,                                                                                                     \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__))
 #endif
 
-#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD_2(TestNameClass, TestName, ClassName, Name, Tags, TmplTypes, TypesList)                               \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    template <typename TestType> struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>)                                                           \
-    {                                                                                                                                                          \
-        void test();                                                                                                                                           \
-    };                                                                                                                                                         \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        template <typename... Types> struct TestNameClass                                                                                                      \
-        {                                                                                                                                                      \
-            TestNameClass()                                                                                                                                    \
-            {                                                                                                                                                  \
-                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(Types...)                                                                                                    \
-                int index = 0;                                                                                                                                 \
-                using expander = int[];                                                                                                                        \
-                constexpr char const *tmpl_types[] = {CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TmplTypes))};       \
-                constexpr char const *types_list[] = {CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TypesList))};       \
-                constexpr auto num_types = sizeof(types_list) / sizeof(types_list[0]);                                                                         \
-                (void)expander{(Catch::AutoReg(Catch::makeTestInvoker(&TestName<Types>::test), CATCH_INTERNAL_LINEINFO, #ClassName,                            \
-                                               Catch::NameAndTags{Name " - " + std::string(tmpl_types[index / num_types]) + "<" +                              \
-                                                                      std::string(types_list[index % num_types]) + ">",                                        \
-                                                                  Tags}),                                                                                      \
-                                index++, 0)...}; /* NOLINT */                                                                                                  \
-            }                                                                                                                                                  \
-        };                                                                                                                                                     \
-        static int INTERNAL_CATCH_UNIQUE_NAME(globalRegistrar) = []() {                                                                                        \
-            using TestInit = Catch::combine<INTERNAL_CATCH_REMOVE_PARENS(TmplTypes)>::with_types<INTERNAL_CATCH_MAKE_TYPE_LISTS_FROM_TYPES(                    \
-                TypesList)>::into<TestNameClass>::type;                                                                                                        \
-            TestInit();                                                                                                                                        \
-            return 0;                                                                                                                                          \
-        }();                                                                                                                                                   \
-    }                                                                                                                                                          \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD_2(                                                            \
+    TestNameClass, TestName, ClassName, Name, Tags, TmplTypes, TypesList)                                              \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    template <typename TestType> struct TestName : INTERNAL_CATCH_REMOVE_PARENS(ClassName<TestType>)                   \
+    {                                                                                                                  \
+        void test();                                                                                                   \
+    };                                                                                                                 \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        template <typename... Types> struct TestNameClass                                                              \
+        {                                                                                                              \
+            TestNameClass()                                                                                            \
+            {                                                                                                          \
+                CATCH_INTERNAL_CHECK_UNIQUE_TYPES(Types...)                                                            \
+                int index                          = 0;                                                                \
+                using expander                     = int[];                                                            \
+                constexpr char const *tmpl_types[] = {                                                                 \
+                    CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TmplTypes))}; \
+                constexpr char const *types_list[] = {                                                                 \
+                    CATCH_REC_LIST(INTERNAL_CATCH_STRINGIZE_WITHOUT_PARENS, INTERNAL_CATCH_REMOVE_PARENS(TypesList))}; \
+                constexpr auto num_types = sizeof(types_list) / sizeof(types_list[0]);                                 \
+                (void)expander{                                                                                        \
+                    (Catch::AutoReg(Catch::makeTestInvoker(&TestName<Types>::test),                                    \
+                                    CATCH_INTERNAL_LINEINFO,                                                           \
+                                    #ClassName,                                                                        \
+                                    Catch::NameAndTags{Name " - " + std::string(tmpl_types[index / num_types]) + "<" + \
+                                                           std::string(types_list[index % num_types]) + ">",           \
+                                                       Tags}),                                                         \
+                     index++,                                                                                          \
+                     0)...}; /* NOLINT */                                                                              \
+            }                                                                                                          \
+        };                                                                                                             \
+        static int INTERNAL_CATCH_UNIQUE_NAME(globalRegistrar) = []() {                                                \
+            using TestInit = Catch::combine<INTERNAL_CATCH_REMOVE_PARENS(TmplTypes)>::with_types<                      \
+                INTERNAL_CATCH_MAKE_TYPE_LISTS_FROM_TYPES(TypesList)>::into<TestNameClass>::type;                      \
+            TestInit();                                                                                                \
+            return 0;                                                                                                  \
+        }();                                                                                                           \
+    }                                                                                                                  \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     template <typename TestType> void TestName<TestType>::test()
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                                                           \
-    INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD_2(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                            \
-                                                       INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____), ClassName,      \
-                                                       Name, Tags, __VA_ARGS__)
+#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                   \
+    INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD_2(                                                                \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),                        \
+        ClassName,                                                                                                     \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__)
 #else
-#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                                                           \
-    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD_2(                                                                            \
-        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                                                           \
-        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____), ClassName, Name, Tags, __VA_ARGS__))
+#define INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(ClassName, Name, Tags, ...)                                   \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD_2(                                    \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____),                                   \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____F_U_N_C____),                        \
+        ClassName,                                                                                                     \
+        Name,                                                                                                          \
+        Tags,                                                                                                          \
+        __VA_ARGS__))
 #endif
 
 // end catch_test_registry.h
@@ -1106,18 +1189,18 @@ namespace Catch
         enum OfType
         {
             Unknown = -1,
-            Ok = 0,
-            Info = 1,
+            Ok      = 0,
+            Info    = 1,
             Warning = 2,
 
             FailureBit = 0x10,
 
             ExpressionFailed = FailureBit | 1,
-            ExplicitFailure = FailureBit | 2,
+            ExplicitFailure  = FailureBit | 2,
 
             Exception = 0x100 | FailureBit,
 
-            ThrewException = Exception | 1,
+            ThrewException      = Exception | 1,
             DidntThrowException = Exception | 2,
 
             FatalErrorCondition = 0x200 | FailureBit
@@ -1136,8 +1219,8 @@ namespace Catch
             Normal = 0x01,
 
             ContinueOnFailure = 0x02, // Failures fail test, but execution continues
-            FalseTest = 0x04,         // Prefix expression with !
-            SuppressFail = 0x08       // Failures are reported but do not fail the test
+            FalseTest         = 0x04, // Prefix expression with !
+            SuppressFail      = 0x08  // Failures are reported but do not fail the test
         };
     };
 
@@ -1260,8 +1343,7 @@ inline id performOptionalSelector(id obj, SEL sel)
 #define CATCH_ARC_STRONG
 #else
 inline void arcSafeRelease(NSObject *)
-{
-}
+{}
 inline id performOptionalSelector(id obj, SEL sel)
 {
 #ifdef __clang__
@@ -1276,7 +1358,7 @@ inline id performOptionalSelector(id obj, SEL sel)
     return nil;
 }
 #define CATCH_UNSAFE_UNRETAINED __unsafe_unretained
-#define CATCH_ARC_STRONG __strong
+#define CATCH_ARC_STRONG        __strong
 #endif
 
 // end catch_objc_arc.hpp
@@ -1284,7 +1366,8 @@ inline id performOptionalSelector(id obj, SEL sel)
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4180) // We attempt to stream a function (address) by const&, which MSVC complains about but is harmless
+#pragma warning(                                                                                                       \
+    disable : 4180) // We attempt to stream a function (address) by const&, which MSVC complains about but is harmless
 #endif
 
 namespace Catch
@@ -1303,7 +1386,8 @@ namespace Catch
 
         template <typename T> class IsStreamInsertable
         {
-            template <typename SS, typename TT> static auto test(int) -> decltype(std::declval<SS &>() << std::declval<TT>(), std::true_type());
+            template <typename SS, typename TT>
+            static auto test(int) -> decltype(std::declval<SS &>() << std::declval<TT>(), std::true_type());
 
             template <typename, typename> static auto test(...) -> std::false_type;
 
@@ -1314,17 +1398,21 @@ namespace Catch
         template <typename E> std::string convertUnknownEnumToString(E e);
 
         template <typename T>
-        typename std::enable_if<!std::is_enum<T>::value && !std::is_base_of<std::exception, T>::value, std::string>::type convertUnstreamable(T const &)
+        typename std::enable_if<!std::is_enum<T>::value && !std::is_base_of<std::exception, T>::value,
+                                std::string>::type
+        convertUnstreamable(T const &)
         {
             return Detail::unprintableString;
         }
         template <typename T>
-        typename std::enable_if<!std::is_enum<T>::value && std::is_base_of<std::exception, T>::value, std::string>::type convertUnstreamable(T const &ex)
+        typename std::enable_if<!std::is_enum<T>::value && std::is_base_of<std::exception, T>::value, std::string>::type
+        convertUnstreamable(T const &ex)
         {
             return ex.what();
         }
 
-        template <typename T> typename std::enable_if<std::is_enum<T>::value, std::string>::type convertUnstreamable(T const &value)
+        template <typename T>
+        typename std::enable_if<std::is_enum<T>::value, std::string>::type convertUnstreamable(T const &value)
         {
             return convertUnknownEnumToString(value);
         }
@@ -1335,7 +1423,7 @@ namespace Catch
         {
             if (ref == nullptr)
                 return std::string("null");
-            auto bytes = System::Text::Encoding::UTF8->GetBytes(ref->ToString());
+            auto bytes                   = System::Text::Encoding::UTF8->GetBytes(ref->ToString());
             cli::pin_ptr<System::Byte> p = &bytes[0];
             return std::string(reinterpret_cast<char const *>(p), bytes->Length);
         }
@@ -1347,7 +1435,8 @@ namespace Catch
     template <typename T, typename = void> struct StringMaker
     {
         template <typename Fake = T>
-        static typename std::enable_if<::Catch::Detail::IsStreamInsertable<Fake>::value, std::string>::type convert(const Fake &value)
+        static typename std::enable_if<::Catch::Detail::IsStreamInsertable<Fake>::value, std::string>::type convert(
+            const Fake &value)
         {
             ReusableStringStream rss;
             // NB: call using the function-like syntax to avoid ambiguity with
@@ -1357,7 +1446,8 @@ namespace Catch
         }
 
         template <typename Fake = T>
-        static typename std::enable_if<!::Catch::Detail::IsStreamInsertable<Fake>::value, std::string>::type convert(const Fake &value)
+        static typename std::enable_if<!::Catch::Detail::IsStreamInsertable<Fake>::value, std::string>::type convert(
+            const Fake &value)
         {
 #if !defined(CATCH_CONFIG_FALLBACK_STRINGIFIER)
             return Detail::convertUnstreamable(value);
@@ -1374,7 +1464,8 @@ namespace Catch
         // Should be preferably called fully qualified, like ::Catch::Detail::stringify
         template <typename T> std::string stringify(const T &e)
         {
-            return ::Catch::StringMaker<typename std::remove_cv<typename std::remove_reference<T>::type>::type>::convert(e);
+            return ::Catch::StringMaker<
+                typename std::remove_cv<typename std::remove_reference<T>::type>::type>::convert(e);
         }
 
         template <typename E> std::string convertUnknownEnumToString(E e)
@@ -1522,12 +1613,10 @@ namespace Catch
     {
         template <typename U> static std::string convert(U *p)
         {
-            if (p)
-            {
+            if (p) {
                 return ::Catch::Detail::rawMemoryToString(p);
             }
-            else
-            {
+            else {
                 return "nullptr";
             }
         }
@@ -1537,12 +1626,10 @@ namespace Catch
     {
         static std::string convert(R C::*p)
         {
-            if (p)
-            {
+            if (p) {
                 return ::Catch::Detail::rawMemoryToString(p);
             }
-            else
-            {
+            else {
                 return "nullptr";
             }
         }
@@ -1564,8 +1651,7 @@ namespace Catch
         {
             ReusableStringStream rss;
             rss << "{ ";
-            if (first != last)
-            {
+            if (first != last) {
                 rss << ::Catch::Detail::stringify(*first);
                 for (++first; first != last; ++first)
                     rss << ", " << ::Catch::Detail::stringify(*first);
@@ -1626,7 +1712,8 @@ namespace Catch
         static std::string convert(const std::pair<T1, T2> &pair)
         {
             ReusableStringStream rss;
-            rss << "{ " << ::Catch::Detail::stringify(pair.first) << ", " << ::Catch::Detail::stringify(pair.second) << " }";
+            rss << "{ " << ::Catch::Detail::stringify(pair.first) << ", " << ::Catch::Detail::stringify(pair.second)
+                << " }";
             return rss.str();
         }
     };
@@ -1642,12 +1729,10 @@ namespace Catch
         static std::string convert(const std::optional<T> &optional)
         {
             ReusableStringStream rss;
-            if (optional.has_value())
-            {
+            if (optional.has_value()) {
                 rss << ::Catch::Detail::stringify(*optional);
             }
-            else
-            {
+            else {
                 rss << "{ }";
             }
             return rss.str();
@@ -1663,7 +1748,8 @@ namespace Catch
 {
     namespace Detail
     {
-        template <typename Tuple, std::size_t N = 0, bool = (N < std::tuple_size<Tuple>::value)> struct TupleElementPrinter
+        template <typename Tuple, std::size_t N = 0, bool = (N < std::tuple_size<Tuple>::value)>
+        struct TupleElementPrinter
         {
             static void print(const Tuple &tuple, std::ostream &os)
             {
@@ -1675,8 +1761,7 @@ namespace Catch
         template <typename Tuple, std::size_t N> struct TupleElementPrinter<Tuple, N, false>
         {
             static void print(const Tuple &, std::ostream &)
-            {
-            }
+            {}
         };
 
     } // namespace Detail
@@ -1711,12 +1796,10 @@ namespace Catch
     {
         static std::string convert(const std::variant<Elements...> &variant)
         {
-            if (variant.valueless_by_exception())
-            {
+            if (variant.valueless_by_exception()) {
                 return "{valueless variant}";
             }
-            else
-            {
+            else {
                 return std::visit([](const auto &value) { return ::Catch::Detail::stringify(value); }, variant);
             }
         }
@@ -1727,8 +1810,7 @@ namespace Catch
 namespace Catch
 {
     struct not_this_one
-    {
-    }; // Tag type for detecting which begin/ end are being selected
+    {}; // Tag type for detecting which begin/ end are being selected
 
     // Import begin/ end from std here so they are considered alongside the fallback (...) overloads in this namespace
     using std::begin;
@@ -1739,8 +1821,8 @@ namespace Catch
 
     template <typename T> struct is_range
     {
-        static const bool value =
-            !std::is_same<decltype(begin(std::declval<T>())), not_this_one>::value && !std::is_same<decltype(end(std::declval<T>())), not_this_one>::value;
+        static const bool value = !std::is_same<decltype(begin(std::declval<T>())), not_this_one>::value &&
+                                  !std::is_same<decltype(end(std::declval<T>())), not_this_one>::value;
     };
 
 #if defined(_MANAGED) // Managed types are never ranges
@@ -1761,8 +1843,7 @@ namespace Catch
         ReusableStringStream rss;
         rss << "{ ";
         bool first = true;
-        for (bool b : v)
-        {
+        for (bool b : v) {
             if (first)
                 first = false;
             else
@@ -1773,7 +1854,10 @@ namespace Catch
         return rss.str();
     }
 
-    template <typename R> struct StringMaker<R, typename std::enable_if<is_range<R>::value && !::Catch::Detail::IsStreamInsertable<R>::value>::type>
+    template <typename R>
+    struct StringMaker<
+        R,
+        typename std::enable_if<is_range<R>::value && !::Catch::Detail::IsStreamInsertable<R>::value>::type>
     {
         static std::string convert(R const &range)
         {
@@ -1945,9 +2029,9 @@ namespace Catch
         }
         virtual void streamReconstructedExpression(std::ostream &os) const = 0;
 
-        ITransientExpression(bool isBinaryExpression, bool result) : m_isBinaryExpression(isBinaryExpression), m_result(result)
-        {
-        }
+        ITransientExpression(bool isBinaryExpression, bool result)
+            : m_isBinaryExpression(isBinaryExpression), m_result(result)
+        {}
 
         // We don't actually need a virtual destructor, but many static analysers
         // complain if it's not here :-(
@@ -1971,56 +2055,64 @@ namespace Catch
         }
 
       public:
-        BinaryExpr(bool comparisonResult, LhsT lhs, StringRef op, RhsT rhs) : ITransientExpression{true, comparisonResult}, m_lhs(lhs), m_op(op), m_rhs(rhs)
-        {
-        }
+        BinaryExpr(bool comparisonResult, LhsT lhs, StringRef op, RhsT rhs)
+            : ITransientExpression{true, comparisonResult}, m_lhs(lhs), m_op(op), m_rhs(rhs)
+        {}
 
         template <typename T> auto operator&&(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator||(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator==(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator!=(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator>(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator<(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator>=(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename T> auto operator<=(T) const -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<T>::value, "chained comparisons are not supported inside assertions, "
-                                                  "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<T>::value,
+                          "chained comparisons are not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
     };
 
@@ -2035,11 +2127,11 @@ namespace Catch
 
       public:
         explicit UnaryExpr(LhsT lhs) : ITransientExpression{false, static_cast<bool>(lhs)}, m_lhs(lhs)
-        {
-        }
+        {}
     };
 
-    // Specialised comparison functions to handle equality comparisons between ints and pointers (NULL deduces as an int)
+    // Specialised comparison functions to handle equality comparisons between ints and pointers (NULL deduces as an
+    // int)
     template <typename LhsT, typename RhsT> auto compareEqual(LhsT const &lhs, RhsT const &rhs) -> bool
     {
         return static_cast<bool>(lhs == rhs);
@@ -2088,8 +2180,7 @@ namespace Catch
 
       public:
         explicit ExprLhs(LhsT lhs) : m_lhs(lhs)
-        {
-        }
+        {}
 
         template <typename RhsT> auto operator==(RhsT const &rhs) -> BinaryExpr<LhsT, RhsT const &> const
         {
@@ -2128,14 +2219,16 @@ namespace Catch
 
         template <typename RhsT> auto operator&&(RhsT const &) -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<RhsT>::value, "operator&& is not supported inside assertions, "
-                                                     "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<RhsT>::value,
+                          "operator&& is not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         template <typename RhsT> auto operator||(RhsT const &) -> BinaryExpr<LhsT, RhsT const &> const
         {
-            static_assert(always_false<RhsT>::value, "operator|| is not supported inside assertions, "
-                                                     "wrap the expression inside parentheses, or decompose it");
+            static_assert(always_false<RhsT>::value,
+                          "operator|| is not supported inside assertions, "
+                          "wrap the expression inside parentheses, or decompose it");
         }
 
         auto makeUnaryExpr() const -> UnaryExpr<LhsT>
@@ -2199,35 +2292,44 @@ namespace Catch
         virtual ~IResultCapture();
 
         virtual bool sectionStarted(SectionInfo const &sectionInfo, Counts &assertions) = 0;
-        virtual void sectionEnded(SectionEndInfo const &endInfo) = 0;
-        virtual void sectionEndedEarly(SectionEndInfo const &endInfo) = 0;
+        virtual void sectionEnded(SectionEndInfo const &endInfo)                        = 0;
+        virtual void sectionEndedEarly(SectionEndInfo const &endInfo)                   = 0;
 
         virtual auto acquireGeneratorTracker(SourceLineInfo const &lineInfo) -> IGeneratorTracker & = 0;
 
         virtual void benchmarkStarting(BenchmarkInfo const &info) = 0;
-        virtual void benchmarkEnded(BenchmarkStats const &stats) = 0;
+        virtual void benchmarkEnded(BenchmarkStats const &stats)  = 0;
 
         virtual void pushScopedMessage(MessageInfo const &message) = 0;
-        virtual void popScopedMessage(MessageInfo const &message) = 0;
+        virtual void popScopedMessage(MessageInfo const &message)  = 0;
 
         virtual void emplaceUnscopedMessage(MessageBuilder const &builder) = 0;
 
         virtual void handleFatalErrorCondition(StringRef message) = 0;
 
-        virtual void handleExpr(AssertionInfo const &info, ITransientExpression const &expr, AssertionReaction &reaction) = 0;
-        virtual void handleMessage(AssertionInfo const &info, ResultWas::OfType resultType, StringRef const &message, AssertionReaction &reaction) = 0;
+        virtual void handleExpr(AssertionInfo const &info,
+                                ITransientExpression const &expr,
+                                AssertionReaction &reaction)                                                    = 0;
+        virtual void handleMessage(AssertionInfo const &info,
+                                   ResultWas::OfType resultType,
+                                   StringRef const &message,
+                                   AssertionReaction &reaction)                                                 = 0;
         virtual void handleUnexpectedExceptionNotThrown(AssertionInfo const &info, AssertionReaction &reaction) = 0;
-        virtual void handleUnexpectedInflightException(AssertionInfo const &info, std::string const &message, AssertionReaction &reaction) = 0;
-        virtual void handleIncomplete(AssertionInfo const &info) = 0;
-        virtual void handleNonExpr(AssertionInfo const &info, ResultWas::OfType resultType, AssertionReaction &reaction) = 0;
+        virtual void handleUnexpectedInflightException(AssertionInfo const &info,
+                                                       std::string const &message,
+                                                       AssertionReaction &reaction)                             = 0;
+        virtual void handleIncomplete(AssertionInfo const &info)                                                = 0;
+        virtual void handleNonExpr(AssertionInfo const &info,
+                                   ResultWas::OfType resultType,
+                                   AssertionReaction &reaction)                                                 = 0;
 
         virtual bool lastAssertionPassed() = 0;
-        virtual void assertionPassed() = 0;
+        virtual void assertionPassed()     = 0;
 
         // Deprecated, do not use:
-        virtual std::string getCurrentTestName() const = 0;
+        virtual std::string getCurrentTestName() const       = 0;
         virtual const AssertionResult *getLastResult() const = 0;
-        virtual void exceptionEarlyReported() = 0;
+        virtual void exceptionEarlyReported()                = 0;
     };
 
     IResultCapture &getResultCapture();
@@ -2238,8 +2340,7 @@ namespace Catch
 {
 
     struct TestFailureException
-    {
-    };
+    {};
     struct AssertionResultData;
     struct IResultCapture;
     class RunContext;
@@ -2266,7 +2367,7 @@ namespace Catch
     struct AssertionReaction
     {
         bool shouldDebugBreak = false;
-        bool shouldThrow = false;
+        bool shouldThrow      = false;
     };
 
     class AssertionHandler
@@ -2277,11 +2378,13 @@ namespace Catch
         IResultCapture &m_resultCapture;
 
       public:
-        AssertionHandler(StringRef const &macroName, SourceLineInfo const &lineInfo, StringRef capturedExpression, ResultDisposition::Flags resultDisposition);
+        AssertionHandler(StringRef const &macroName,
+                         SourceLineInfo const &lineInfo,
+                         StringRef capturedExpression,
+                         ResultDisposition::Flags resultDisposition);
         ~AssertionHandler()
         {
-            if (!m_completed)
-            {
+            if (!m_completed) {
                 m_resultCapture.handleIncomplete(m_assertionInfo);
             }
         }
@@ -2378,7 +2481,7 @@ namespace Catch
     {
         std::vector<MessageInfo> m_messages;
         IResultCapture &m_resultCapture = getResultCapture();
-        size_t m_captured = 0;
+        size_t m_captured               = 0;
 
       public:
         Capturer(StringRef macroName, SourceLineInfo const &lineInfo, ResultWas::OfType resultType, StringRef names);
@@ -2420,10 +2523,10 @@ namespace Catch
 #else // CATCH_CONFIG_FAST_COMPILE
 
 #define INTERNAL_CATCH_TRY try
-#define INTERNAL_CATCH_CATCH(handler)                                                                                                                          \
-    catch (...)                                                                                                                                                \
-    {                                                                                                                                                          \
-        handler.handleUnexpectedInflightException();                                                                                                           \
+#define INTERNAL_CATCH_CATCH(handler)                                                                                  \
+    catch (...)                                                                                                        \
+    {                                                                                                                  \
+        handler.handleUnexpectedInflightException();                                                                   \
     }
 
 #endif
@@ -2431,140 +2534,136 @@ namespace Catch
 #define INTERNAL_CATCH_REACT(handler) handler.complete();
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_TEST(macroName, resultDisposition, ...)                                                                                                 \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__),                    \
-                                                      resultDisposition);                                                                                      \
-        INTERNAL_CATCH_TRY                                                                                                                                     \
-        {                                                                                                                                                      \
-            CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS                                                                                                       \
-            catchAssertionHandler.handleExpr(Catch::Decomposer() <= __VA_ARGS__);                                                                              \
-            CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS                                                                                                     \
-        }                                                                                                                                                      \
-        INTERNAL_CATCH_CATCH(catchAssertionHandler)                                                                                                            \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
-    } while ((void)0,                                                                                                                                          \
-             (false) && static_cast<bool>(!!(__VA_ARGS__))) // the expression here is never evaluated at runtime but it forces the compiler to give it a look
-  // The double negation silences MSVC's C4800 warning, the static_cast forces short-circuit evaluation if the type has overloaded &&.
+#define INTERNAL_CATCH_TEST(macroName, resultDisposition, ...)                                                         \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__), resultDisposition);  \
+        INTERNAL_CATCH_TRY                                                                                             \
+        {                                                                                                              \
+            CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS                                                               \
+            catchAssertionHandler.handleExpr(Catch::Decomposer() <= __VA_ARGS__);                                      \
+            CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS                                                             \
+        }                                                                                                              \
+        INTERNAL_CATCH_CATCH(catchAssertionHandler)                                                                    \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
+    } while ((void)0,                                                                                                  \
+             (false) && static_cast<bool>(!!(__VA_ARGS__))) // the expression here is never evaluated at runtime but it
+                                                            // forces the compiler to give it a look
+  // The double negation silences MSVC's C4800 warning, the static_cast forces short-circuit evaluation if the type has
+  // overloaded &&.
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_IF(macroName, resultDisposition, ...)                                                                                                   \
-    INTERNAL_CATCH_TEST(macroName, resultDisposition, __VA_ARGS__);                                                                                            \
+#define INTERNAL_CATCH_IF(macroName, resultDisposition, ...)                                                           \
+    INTERNAL_CATCH_TEST(macroName, resultDisposition, __VA_ARGS__);                                                    \
     if (Catch::getResultCapture().lastAssertionPassed())
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_ELSE(macroName, resultDisposition, ...)                                                                                                 \
-    INTERNAL_CATCH_TEST(macroName, resultDisposition, __VA_ARGS__);                                                                                            \
+#define INTERNAL_CATCH_ELSE(macroName, resultDisposition, ...)                                                         \
+    INTERNAL_CATCH_TEST(macroName, resultDisposition, __VA_ARGS__);                                                    \
     if (!Catch::getResultCapture().lastAssertionPassed())
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_NO_THROW(macroName, resultDisposition, ...)                                                                                             \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__),                    \
-                                                      resultDisposition);                                                                                      \
-        try                                                                                                                                                    \
-        {                                                                                                                                                      \
-            static_cast<void>(__VA_ARGS__);                                                                                                                    \
-            catchAssertionHandler.handleExceptionNotThrownAsExpected();                                                                                        \
-        }                                                                                                                                                      \
-        catch (...)                                                                                                                                            \
-        {                                                                                                                                                      \
-            catchAssertionHandler.handleUnexpectedInflightException();                                                                                         \
-        }                                                                                                                                                      \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CATCH_NO_THROW(macroName, resultDisposition, ...)                                                     \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__), resultDisposition);  \
+        try {                                                                                                          \
+            static_cast<void>(__VA_ARGS__);                                                                            \
+            catchAssertionHandler.handleExceptionNotThrownAsExpected();                                                \
+        }                                                                                                              \
+        catch (...) {                                                                                                  \
+            catchAssertionHandler.handleUnexpectedInflightException();                                                 \
+        }                                                                                                              \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_THROWS(macroName, resultDisposition, ...)                                                                                               \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__),                    \
-                                                      resultDisposition);                                                                                      \
-        if (catchAssertionHandler.allowThrows())                                                                                                               \
-            try                                                                                                                                                \
-            {                                                                                                                                                  \
-                static_cast<void>(__VA_ARGS__);                                                                                                                \
-                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                                                                    \
-            }                                                                                                                                                  \
-            catch (...)                                                                                                                                        \
-            {                                                                                                                                                  \
-                catchAssertionHandler.handleExceptionThrownAsExpected();                                                                                       \
-            }                                                                                                                                                  \
-        else                                                                                                                                                   \
-            catchAssertionHandler.handleThrowingCallSkipped();                                                                                                 \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CATCH_THROWS(macroName, resultDisposition, ...)                                                       \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, CATCH_INTERNAL_STRINGIFY(__VA_ARGS__), resultDisposition);  \
+        if (catchAssertionHandler.allowThrows())                                                                       \
+            try {                                                                                                      \
+                static_cast<void>(__VA_ARGS__);                                                                        \
+                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                            \
+            }                                                                                                          \
+            catch (...) {                                                                                              \
+                catchAssertionHandler.handleExceptionThrownAsExpected();                                               \
+            }                                                                                                          \
+        else                                                                                                           \
+            catchAssertionHandler.handleThrowingCallSkipped();                                                         \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_THROWS_AS(macroName, exceptionType, resultDisposition, expr)                                                                            \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO,                                                           \
-                                                      CATCH_INTERNAL_STRINGIFY(expr) ", " CATCH_INTERNAL_STRINGIFY(exceptionType), resultDisposition);         \
-        if (catchAssertionHandler.allowThrows())                                                                                                               \
-            try                                                                                                                                                \
-            {                                                                                                                                                  \
-                static_cast<void>(expr);                                                                                                                       \
-                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                                                                    \
-            }                                                                                                                                                  \
-            catch (exceptionType const &)                                                                                                                      \
-            {                                                                                                                                                  \
-                catchAssertionHandler.handleExceptionThrownAsExpected();                                                                                       \
-            }                                                                                                                                                  \
-            catch (...)                                                                                                                                        \
-            {                                                                                                                                                  \
-                catchAssertionHandler.handleUnexpectedInflightException();                                                                                     \
-            }                                                                                                                                                  \
-        else                                                                                                                                                   \
-            catchAssertionHandler.handleThrowingCallSkipped();                                                                                                 \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CATCH_THROWS_AS(macroName, exceptionType, resultDisposition, expr)                                    \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr,                                                                                      \
+            CATCH_INTERNAL_LINEINFO,                                                                                   \
+            CATCH_INTERNAL_STRINGIFY(expr) ", " CATCH_INTERNAL_STRINGIFY(exceptionType),                               \
+            resultDisposition);                                                                                        \
+        if (catchAssertionHandler.allowThrows())                                                                       \
+            try {                                                                                                      \
+                static_cast<void>(expr);                                                                               \
+                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                            \
+            }                                                                                                          \
+            catch (exceptionType const &) {                                                                            \
+                catchAssertionHandler.handleExceptionThrownAsExpected();                                               \
+            }                                                                                                          \
+            catch (...) {                                                                                              \
+                catchAssertionHandler.handleUnexpectedInflightException();                                             \
+            }                                                                                                          \
+        else                                                                                                           \
+            catchAssertionHandler.handleThrowingCallSkipped();                                                         \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_MSG(macroName, messageType, resultDisposition, ...)                                                                                     \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::StringRef(), resultDisposition);                   \
-        catchAssertionHandler.handleMessage(messageType, (Catch::MessageStream() << __VA_ARGS__ + ::Catch::StreamEndStop()).m_stream.str());                   \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CATCH_MSG(macroName, messageType, resultDisposition, ...)                                             \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::StringRef(), resultDisposition);                     \
+        catchAssertionHandler.handleMessage(                                                                           \
+            messageType, (Catch::MessageStream() << __VA_ARGS__ + ::Catch::StreamEndStop()).m_stream.str());           \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_CAPTURE(varName, macroName, ...)                                                                                                        \
-    auto varName = Catch::Capturer(macroName, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info, #__VA_ARGS__);                                                  \
+#define INTERNAL_CATCH_CAPTURE(varName, macroName, ...)                                                                \
+    auto varName = Catch::Capturer(macroName, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info, #__VA_ARGS__);          \
     varName.captureValues(0, __VA_ARGS__)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_INFO(macroName, log)                                                                                                                    \
-    Catch::ScopedMessage INTERNAL_CATCH_UNIQUE_NAME(scopedMessage)(                                                                                            \
+#define INTERNAL_CATCH_INFO(macroName, log)                                                                            \
+    Catch::ScopedMessage INTERNAL_CATCH_UNIQUE_NAME(scopedMessage)(                                                    \
         Catch::MessageBuilder(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info) << log);
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_UNSCOPED_INFO(macroName, log)                                                                                                           \
-    Catch::getResultCapture().emplaceUnscopedMessage(Catch::MessageBuilder(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info) << log)
+#define INTERNAL_CATCH_UNSCOPED_INFO(macroName, log)                                                                   \
+    Catch::getResultCapture().emplaceUnscopedMessage(                                                                  \
+        Catch::MessageBuilder(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO, Catch::ResultWas::Info) << log)
 
 ///////////////////////////////////////////////////////////////////////////////
 // Although this is matcher-based, it can be used with just a string
-#define INTERNAL_CATCH_THROWS_STR_MATCHES(macroName, resultDisposition, matcher, ...)                                                                          \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO,                                                           \
-                                                      CATCH_INTERNAL_STRINGIFY(__VA_ARGS__) ", " CATCH_INTERNAL_STRINGIFY(matcher), resultDisposition);        \
-        if (catchAssertionHandler.allowThrows())                                                                                                               \
-            try                                                                                                                                                \
-            {                                                                                                                                                  \
-                static_cast<void>(__VA_ARGS__);                                                                                                                \
-                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                                                                    \
-            }                                                                                                                                                  \
-            catch (...)                                                                                                                                        \
-            {                                                                                                                                                  \
-                Catch::handleExceptionMatchExpr(catchAssertionHandler, matcher, #matcher##_catch_sr);                                                          \
-            }                                                                                                                                                  \
-        else                                                                                                                                                   \
-            catchAssertionHandler.handleThrowingCallSkipped();                                                                                                 \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CATCH_THROWS_STR_MATCHES(macroName, resultDisposition, matcher, ...)                                  \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr,                                                                                      \
+            CATCH_INTERNAL_LINEINFO,                                                                                   \
+            CATCH_INTERNAL_STRINGIFY(__VA_ARGS__) ", " CATCH_INTERNAL_STRINGIFY(matcher),                              \
+            resultDisposition);                                                                                        \
+        if (catchAssertionHandler.allowThrows())                                                                       \
+            try {                                                                                                      \
+                static_cast<void>(__VA_ARGS__);                                                                        \
+                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                            \
+            }                                                                                                          \
+            catch (...) {                                                                                              \
+                Catch::handleExceptionMatchExpr(catchAssertionHandler, matcher, #matcher##_catch_sr);                  \
+            }                                                                                                          \
+        else                                                                                                           \
+            catchAssertionHandler.handleThrowingCallSkipped();                                                         \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 #endif // CATCH_CONFIG_DISABLE
@@ -2590,8 +2689,8 @@ namespace Catch
         bool allPassed() const;
         bool allOk() const;
 
-        std::size_t passed = 0;
-        std::size_t failed = 0;
+        std::size_t passed      = 0;
+        std::size_t failed      = 0;
         std::size_t failedButOk = 0;
     };
 
@@ -2620,9 +2719,9 @@ namespace Catch
         SectionInfo(SourceLineInfo const &_lineInfo, std::string const &_name);
 
         // Deprecated
-        SectionInfo(SourceLineInfo const &_lineInfo, std::string const &_name, std::string const &) : SectionInfo(_lineInfo, _name)
-        {
-        }
+        SectionInfo(SourceLineInfo const &_lineInfo, std::string const &_name, std::string const &)
+            : SectionInfo(_lineInfo, _name)
+        {}
 
         std::string name;
         std::string description; // !Deprecated: this will always be empty
@@ -2689,15 +2788,16 @@ namespace Catch
 
 } // end namespace Catch
 
-#define INTERNAL_CATCH_SECTION(...)                                                                                                                            \
-    CATCH_INTERNAL_SUPPRESS_UNUSED_WARNINGS                                                                                                                    \
-    if (Catch::Section const &INTERNAL_CATCH_UNIQUE_NAME(catch_internal_Section) = Catch::SectionInfo(CATCH_INTERNAL_LINEINFO, __VA_ARGS__))                   \
+#define INTERNAL_CATCH_SECTION(...)                                                                                    \
+    CATCH_INTERNAL_SUPPRESS_UNUSED_WARNINGS                                                                            \
+    if (Catch::Section const &INTERNAL_CATCH_UNIQUE_NAME(catch_internal_Section) =                                     \
+            Catch::SectionInfo(CATCH_INTERNAL_LINEINFO, __VA_ARGS__))                                                  \
     CATCH_INTERNAL_UNSUPPRESS_UNUSED_WARNINGS
 
-#define INTERNAL_CATCH_DYNAMIC_SECTION(...)                                                                                                                    \
-    CATCH_INTERNAL_SUPPRESS_UNUSED_WARNINGS                                                                                                                    \
-    if (Catch::Section const &INTERNAL_CATCH_UNIQUE_NAME(catch_internal_Section) =                                                                             \
-            Catch::SectionInfo(CATCH_INTERNAL_LINEINFO, (Catch::ReusableStringStream() << __VA_ARGS__).str()))                                                 \
+#define INTERNAL_CATCH_DYNAMIC_SECTION(...)                                                                            \
+    CATCH_INTERNAL_SUPPRESS_UNUSED_WARNINGS                                                                            \
+    if (Catch::Section const &INTERNAL_CATCH_UNIQUE_NAME(catch_internal_Section) =                                     \
+            Catch::SectionInfo(CATCH_INTERNAL_LINEINFO, (Catch::ReusableStringStream() << __VA_ARGS__).str()))         \
     CATCH_INTERNAL_UNSUPPRESS_UNUSED_WARNINGS
 
 // end catch_section.h
@@ -2713,7 +2813,7 @@ namespace Catch
     {
 
         std::string m_name;
-        std::size_t m_count = 0;
+        std::size_t m_count           = 0;
         std::size_t m_iterationsToRun = 1;
         uint64_t m_resolution;
         Timer m_timer;
@@ -2787,11 +2887,13 @@ namespace Catch
     {
         virtual ~IMutableRegistryHub();
         virtual void registerReporter(std::string const &name, IReporterFactoryPtr const &factory) = 0;
-        virtual void registerListener(IReporterFactoryPtr const &factory) = 0;
-        virtual void registerTest(TestCase const &testInfo) = 0;
-        virtual void registerTranslator(const IExceptionTranslator *translator) = 0;
-        virtual void registerTagAlias(std::string const &alias, std::string const &tag, SourceLineInfo const &lineInfo) = 0;
-        virtual void registerStartupException() noexcept = 0;
+        virtual void registerListener(IReporterFactoryPtr const &factory)                          = 0;
+        virtual void registerTest(TestCase const &testInfo)                                        = 0;
+        virtual void registerTranslator(const IExceptionTranslator *translator)                    = 0;
+        virtual void registerTagAlias(std::string const &alias,
+                                      std::string const &tag,
+                                      SourceLineInfo const &lineInfo)                              = 0;
+        virtual void registerStartupException() noexcept                                           = 0;
     };
 
     IRegistryHub const &getRegistryHub();
@@ -2803,7 +2905,8 @@ namespace Catch
 
 // end catch_interfaces_registry_hub.h
 #if defined(CATCH_CONFIG_DISABLE)
-#define INTERNAL_CATCH_TRANSLATE_EXCEPTION_NO_REG(translatorName, signature) static std::string translatorName(signature)
+#define INTERNAL_CATCH_TRANSLATE_EXCEPTION_NO_REG(translatorName, signature)                                           \
+    static std::string translatorName(signature)
 #endif
 
 #include <exception>
@@ -2820,7 +2923,8 @@ namespace Catch
     struct IExceptionTranslator
     {
         virtual ~IExceptionTranslator();
-        virtual std::string translate(ExceptionTranslators::const_iterator it, ExceptionTranslators::const_iterator itEnd) const = 0;
+        virtual std::string translate(ExceptionTranslators::const_iterator it,
+                                      ExceptionTranslators::const_iterator itEnd) const = 0;
     };
 
     struct IExceptionTranslatorRegistry
@@ -2836,20 +2940,18 @@ namespace Catch
         {
           public:
             ExceptionTranslator(std::string (*translateFunction)(T &)) : m_translateFunction(translateFunction)
-            {
-            }
+            {}
 
-            std::string translate(ExceptionTranslators::const_iterator it, ExceptionTranslators::const_iterator itEnd) const override
+            std::string translate(ExceptionTranslators::const_iterator it,
+                                  ExceptionTranslators::const_iterator itEnd) const override
             {
-                try
-                {
+                try {
                     if (it == itEnd)
                         std::rethrow_exception(std::current_exception());
                     else
                         return (*it)->translate(it + 1, itEnd);
                 }
-                catch (T &ex)
-                {
+                catch (T &ex) {
                     return m_translateFunction(ex);
                 }
             }
@@ -2867,17 +2969,18 @@ namespace Catch
 } // namespace Catch
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_TRANSLATE_EXCEPTION2(translatorName, signature)                                                                                         \
-    static std::string translatorName(signature);                                                                                                              \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        Catch::ExceptionTranslatorRegistrar INTERNAL_CATCH_UNIQUE_NAME(catch_internal_ExceptionRegistrar)(&translatorName);                                    \
-    }                                                                                                                                                          \
-    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                                                                 \
+#define INTERNAL_CATCH_TRANSLATE_EXCEPTION2(translatorName, signature)                                                 \
+    static std::string translatorName(signature);                                                                      \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        Catch::ExceptionTranslatorRegistrar INTERNAL_CATCH_UNIQUE_NAME(catch_internal_ExceptionRegistrar)(             \
+            &translatorName);                                                                                          \
+    }                                                                                                                  \
+    CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS                                                                         \
     static std::string translatorName(signature)
 
-#define INTERNAL_CATCH_TRANSLATE_EXCEPTION(signature)                                                                                                          \
+#define INTERNAL_CATCH_TRANSLATE_EXCEPTION(signature)                                                                  \
     INTERNAL_CATCH_TRANSLATE_EXCEPTION2(INTERNAL_CATCH_UNIQUE_NAME(catch_internal_ExceptionTranslator), signature)
 
 // end catch_interfaces_exception.h
@@ -2908,19 +3011,19 @@ namespace Catch
 
             Approx operator-() const;
 
-            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type> Approx operator()(T const &value)
+            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+            Approx operator()(T const &value)
             {
                 Approx approx(static_cast<double>(value));
                 approx.m_epsilon = m_epsilon;
-                approx.m_margin = m_margin;
-                approx.m_scale = m_scale;
+                approx.m_margin  = m_margin;
+                approx.m_scale   = m_scale;
                 return approx;
             }
 
             template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
             explicit Approx(T const &value) : Approx(static_cast<double>(value))
-            {
-            }
+            {}
 
             template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
             friend bool operator==(const T &lhs, Approx const &rhs)
@@ -2971,21 +3074,24 @@ namespace Catch
                 return lhs.m_value > static_cast<double>(rhs) || lhs == rhs;
             }
 
-            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type> Approx &epsilon(T const &newEpsilon)
+            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+            Approx &epsilon(T const &newEpsilon)
             {
                 double epsilonAsDouble = static_cast<double>(newEpsilon);
                 setEpsilon(epsilonAsDouble);
                 return *this;
             }
 
-            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type> Approx &margin(T const &newMargin)
+            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+            Approx &margin(T const &newMargin)
             {
                 double marginAsDouble = static_cast<double>(newMargin);
                 setMargin(marginAsDouble);
                 return *this;
             }
 
-            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type> Approx &scale(T const &newScale)
+            template <typename T, typename = typename std::enable_if<std::is_constructible<double, T>::value>::type>
+            Approx &scale(T const &newScale)
             {
                 m_scale = static_cast<double>(newScale);
                 return *this;
@@ -3067,7 +3173,7 @@ namespace Catch
             class MatcherUntypedBase
             {
               public:
-                MatcherUntypedBase() = default;
+                MatcherUntypedBase()                           = default;
                 MatcherUntypedBase(MatcherUntypedBase const &) = default;
                 MatcherUntypedBase &operator=(MatcherUntypedBase const &) = delete;
                 std::string toString() const;
@@ -3104,8 +3210,7 @@ namespace Catch
             {
                 bool match(ArgT const &arg) const override
                 {
-                    for (auto matcher : m_matchers)
-                    {
+                    for (auto matcher : m_matchers) {
                         if (!matcher->match(arg))
                             return false;
                     }
@@ -3117,8 +3222,7 @@ namespace Catch
                     description.reserve(4 + m_matchers.size() * 32);
                     description += "( ";
                     bool first = true;
-                    for (auto matcher : m_matchers)
-                    {
+                    for (auto matcher : m_matchers) {
                         if (first)
                             first = false;
                         else
@@ -3142,8 +3246,7 @@ namespace Catch
 
                 bool match(ArgT const &arg) const override
                 {
-                    for (auto matcher : m_matchers)
-                    {
+                    for (auto matcher : m_matchers) {
                         if (matcher->match(arg))
                             return true;
                     }
@@ -3155,8 +3258,7 @@ namespace Catch
                     description.reserve(4 + m_matchers.size() * 32);
                     description += "( ";
                     bool first = true;
-                    for (auto matcher : m_matchers)
-                    {
+                    for (auto matcher : m_matchers) {
                         if (first)
                             first = false;
                         else
@@ -3180,8 +3282,7 @@ namespace Catch
             {
 
                 MatchNotOf(MatcherBase<ArgT> const &underlyingMatcher) : m_underlyingMatcher(underlyingMatcher)
-                {
-                }
+                {}
 
                 bool match(ArgT const &arg) const override
                 {
@@ -3293,8 +3394,7 @@ namespace Catch
               public:
                 PredicateMatcher(std::function<bool(T const &)> const &elem, std::string const &descr)
                     : m_predicate(std::move(elem)), m_description(Detail::finalizeDescription(descr))
-                {
-                }
+                {}
 
                 bool match(T const &item) const override
                 {
@@ -3313,7 +3413,9 @@ namespace Catch
         // The user has to explicitly specify type to the function, because
         // infering std::function<bool(T const&)> is hard (but possible) and
         // requires a lot of TMP.
-        template <typename T> Generic::PredicateMatcher<T> Predicate(std::function<bool(T const &)> const &predicate, std::string const &description = "")
+        template <typename T>
+        Generic::PredicateMatcher<T> Predicate(std::function<bool(T const &)> const &predicate,
+                                               std::string const &description = "")
         {
             return Generic::PredicateMatcher<T>(predicate, description);
         }
@@ -3390,11 +3492,16 @@ namespace Catch
         // The following functions create the actual matcher objects.
         // This allows the types to be inferred
 
-        StdString::EqualsMatcher Equals(std::string const &str, CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
-        StdString::ContainsMatcher Contains(std::string const &str, CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
-        StdString::EndsWithMatcher EndsWith(std::string const &str, CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
-        StdString::StartsWithMatcher StartsWith(std::string const &str, CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
-        StdString::RegexMatcher Matches(std::string const &regex, CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
+        StdString::EqualsMatcher Equals(std::string const &str,
+                                        CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
+        StdString::ContainsMatcher Contains(std::string const &str,
+                                            CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
+        StdString::EndsWithMatcher EndsWith(std::string const &str,
+                                            CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
+        StdString::StartsWithMatcher StartsWith(std::string const &str,
+                                                CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
+        StdString::RegexMatcher Matches(std::string const &regex,
+                                        CaseSensitive::Choice caseSensitivity = CaseSensitive::Yes);
 
     } // namespace Matchers
 } // namespace Catch
@@ -3413,24 +3520,22 @@ namespace Catch
         {
             namespace Detail
             {
-                template <typename InputIterator, typename T> size_t count(InputIterator first, InputIterator last, T const &item)
+                template <typename InputIterator, typename T>
+                size_t count(InputIterator first, InputIterator last, T const &item)
                 {
                     size_t cnt = 0;
-                    for (; first != last; ++first)
-                    {
-                        if (*first == item)
-                        {
+                    for (; first != last; ++first) {
+                        if (*first == item) {
                             ++cnt;
                         }
                     }
                     return cnt;
                 }
-                template <typename InputIterator, typename T> bool contains(InputIterator first, InputIterator last, T const &item)
+                template <typename InputIterator, typename T>
+                bool contains(InputIterator first, InputIterator last, T const &item)
                 {
-                    for (; first != last; ++first)
-                    {
-                        if (*first == item)
-                        {
+                    for (; first != last; ++first) {
+                        if (*first == item) {
                             return true;
                         }
                     }
@@ -3442,15 +3547,12 @@ namespace Catch
             {
 
                 ContainsElementMatcher(T const &comparator) : m_comparator(comparator)
-                {
-                }
+                {}
 
                 bool match(std::vector<T> const &v) const override
                 {
-                    for (auto const &el : v)
-                    {
-                        if (el == m_comparator)
-                        {
+                    for (auto const &el : v) {
+                        if (el == m_comparator) {
                             return true;
                         }
                     }
@@ -3469,27 +3571,22 @@ namespace Catch
             {
 
                 ContainsMatcher(std::vector<T> const &comparator) : m_comparator(comparator)
-                {
-                }
+                {}
 
                 bool match(std::vector<T> const &v) const override
                 {
                     // !TBD: see note in EqualsMatcher
                     if (m_comparator.size() > v.size())
                         return false;
-                    for (auto const &comparator : m_comparator)
-                    {
+                    for (auto const &comparator : m_comparator) {
                         auto present = false;
-                        for (const auto &el : v)
-                        {
-                            if (el == comparator)
-                            {
+                        for (const auto &el : v) {
+                            if (el == comparator) {
                                 present = true;
                                 break;
                             }
                         }
-                        if (!present)
-                        {
+                        if (!present) {
                             return false;
                         }
                     }
@@ -3507,8 +3604,7 @@ namespace Catch
             {
 
                 EqualsMatcher(std::vector<T> const &comparator) : m_comparator(comparator)
-                {
-                }
+                {}
 
                 bool match(std::vector<T> const &v) const override
                 {
@@ -3533,39 +3629,32 @@ namespace Catch
             template <typename T> struct UnorderedEqualsMatcher : MatcherBase<std::vector<T>>
             {
                 UnorderedEqualsMatcher(std::vector<T> const &target) : m_target(target)
-                {
-                }
+                {}
                 bool match(std::vector<T> const &vec) const override
                 {
                     // Note: This is a reimplementation of std::is_permutation,
                     //       because I don't want to include <algorithm> inside the common path
-                    if (m_target.size() != vec.size())
-                    {
+                    if (m_target.size() != vec.size()) {
                         return false;
                     }
                     auto lfirst = m_target.begin(), llast = m_target.end();
                     auto rfirst = vec.begin(), rlast = vec.end();
                     // Cut common prefix to optimize checking of permuted parts
-                    while (lfirst != llast && *lfirst == *rfirst)
-                    {
+                    while (lfirst != llast && *lfirst == *rfirst) {
                         ++lfirst;
                         ++rfirst;
                     }
-                    if (lfirst == llast)
-                    {
+                    if (lfirst == llast) {
                         return true;
                     }
 
-                    for (auto mid = lfirst; mid != llast; ++mid)
-                    {
+                    for (auto mid = lfirst; mid != llast; ++mid) {
                         // Skip already counted items
-                        if (Detail::contains(lfirst, mid, *mid))
-                        {
+                        if (Detail::contains(lfirst, mid, *mid)) {
                             continue;
                         }
                         size_t num_vec = Detail::count(rfirst, rlast, *mid);
-                        if (num_vec == 0 || Detail::count(lfirst, llast, *mid) != num_vec)
-                        {
+                        if (num_vec == 0 || Detail::count(lfirst, llast, *mid) != num_vec) {
                             return false;
                         }
                     }
@@ -3622,9 +3711,9 @@ namespace Catch
 
       public:
         MatchExpr(ArgT const &arg, MatcherT const &matcher, StringRef const &matcherString)
-            : ITransientExpression{true, matcher.match(arg)}, m_arg(arg), m_matcher(matcher), m_matcherString(matcherString)
-        {
-        }
+            : ITransientExpression{true, matcher.match(arg)}, m_arg(arg), m_matcher(matcher),
+              m_matcherString(matcherString)
+        {}
 
         void streamReconstructedExpression(std::ostream &os) const override
         {
@@ -3639,10 +3728,13 @@ namespace Catch
 
     using StringMatcher = Matchers::Impl::MatcherBase<std::string>;
 
-    void handleExceptionMatchExpr(AssertionHandler &handler, StringMatcher const &matcher, StringRef const &matcherString);
+    void handleExceptionMatchExpr(AssertionHandler &handler,
+                                  StringMatcher const &matcher,
+                                  StringRef const &matcherString);
 
     template <typename ArgT, typename MatcherT>
-    auto makeMatchExpr(ArgT const &arg, MatcherT const &matcher, StringRef const &matcherString) -> MatchExpr<ArgT, MatcherT>
+    auto makeMatchExpr(ArgT const &arg, MatcherT const &matcher, StringRef const &matcherString)
+        -> MatchExpr<ArgT, MatcherT>
     {
         return MatchExpr<ArgT, MatcherT>(arg, matcher, matcherString);
     }
@@ -3650,43 +3742,44 @@ namespace Catch
 } // namespace Catch
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CHECK_THAT(macroName, matcher, resultDisposition, arg)                                                                                        \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(macroName##_catch_sr, CATCH_INTERNAL_LINEINFO,                                                           \
-                                                      CATCH_INTERNAL_STRINGIFY(arg) ", " CATCH_INTERNAL_STRINGIFY(matcher), resultDisposition);                \
-        INTERNAL_CATCH_TRY                                                                                                                                     \
-        {                                                                                                                                                      \
-            catchAssertionHandler.handleExpr(Catch::makeMatchExpr(arg, matcher, #matcher##_catch_sr));                                                         \
-        }                                                                                                                                                      \
-        INTERNAL_CATCH_CATCH(catchAssertionHandler)                                                                                                            \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CHECK_THAT(macroName, matcher, resultDisposition, arg)                                                \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr,                                                                                      \
+            CATCH_INTERNAL_LINEINFO,                                                                                   \
+            CATCH_INTERNAL_STRINGIFY(arg) ", " CATCH_INTERNAL_STRINGIFY(matcher),                                      \
+            resultDisposition);                                                                                        \
+        INTERNAL_CATCH_TRY                                                                                             \
+        {                                                                                                              \
+            catchAssertionHandler.handleExpr(Catch::makeMatchExpr(arg, matcher, #matcher##_catch_sr));                 \
+        }                                                                                                              \
+        INTERNAL_CATCH_CATCH(catchAssertionHandler)                                                                    \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 ///////////////////////////////////////////////////////////////////////////////
-#define INTERNAL_CATCH_THROWS_MATCHES(macroName, exceptionType, resultDisposition, matcher, ...)                                                               \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        Catch::AssertionHandler catchAssertionHandler(                                                                                                         \
-            macroName##_catch_sr, CATCH_INTERNAL_LINEINFO,                                                                                                     \
-            CATCH_INTERNAL_STRINGIFY(__VA_ARGS__) ", " CATCH_INTERNAL_STRINGIFY(exceptionType) ", " CATCH_INTERNAL_STRINGIFY(matcher), resultDisposition);     \
-        if (catchAssertionHandler.allowThrows())                                                                                                               \
-            try                                                                                                                                                \
-            {                                                                                                                                                  \
-                static_cast<void>(__VA_ARGS__);                                                                                                                \
-                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                                                                    \
-            }                                                                                                                                                  \
-            catch (exceptionType const &ex)                                                                                                                    \
-            {                                                                                                                                                  \
-                catchAssertionHandler.handleExpr(Catch::makeMatchExpr(ex, matcher, #matcher##_catch_sr));                                                      \
-            }                                                                                                                                                  \
-            catch (...)                                                                                                                                        \
-            {                                                                                                                                                  \
-                catchAssertionHandler.handleUnexpectedInflightException();                                                                                     \
-            }                                                                                                                                                  \
-        else                                                                                                                                                   \
-            catchAssertionHandler.handleThrowingCallSkipped();                                                                                                 \
-        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                                                            \
+#define INTERNAL_CATCH_THROWS_MATCHES(macroName, exceptionType, resultDisposition, matcher, ...)                       \
+    do {                                                                                                               \
+        Catch::AssertionHandler catchAssertionHandler(                                                                 \
+            macroName##_catch_sr,                                                                                      \
+            CATCH_INTERNAL_LINEINFO,                                                                                   \
+            CATCH_INTERNAL_STRINGIFY(__VA_ARGS__) ", " CATCH_INTERNAL_STRINGIFY(                                       \
+                exceptionType) ", " CATCH_INTERNAL_STRINGIFY(matcher),                                                 \
+            resultDisposition);                                                                                        \
+        if (catchAssertionHandler.allowThrows())                                                                       \
+            try {                                                                                                      \
+                static_cast<void>(__VA_ARGS__);                                                                        \
+                catchAssertionHandler.handleUnexpectedExceptionNotThrown();                                            \
+            }                                                                                                          \
+            catch (exceptionType const &ex) {                                                                          \
+                catchAssertionHandler.handleExpr(Catch::makeMatchExpr(ex, matcher, #matcher##_catch_sr));              \
+            }                                                                                                          \
+            catch (...) {                                                                                              \
+                catchAssertionHandler.handleUnexpectedInflightException();                                             \
+            }                                                                                                          \
+        else                                                                                                           \
+            catchAssertionHandler.handleThrowingCallSkipped();                                                         \
+        INTERNAL_CATCH_REACT(catchAssertionHandler)                                                                    \
     } while (false)
 
 // end catch_capture_matchers.h
@@ -3720,9 +3813,9 @@ namespace Catch
     struct IGeneratorTracker
     {
         virtual ~IGeneratorTracker();
-        virtual auto hasGenerator() const -> bool = 0;
+        virtual auto hasGenerator() const -> bool                                 = 0;
         virtual auto getGenerator() const -> Generators::GeneratorBasePtr const & = 0;
-        virtual void setGenerator(Generators::GeneratorBasePtr &&generator) = 0;
+        virtual void setGenerator(Generators::GeneratorBasePtr &&generator)       = 0;
     };
 
 } // namespace Catch
@@ -3745,15 +3838,15 @@ namespace Catch
 } // namespace Catch
 
 #define CATCH_PREPARE_EXCEPTION(type, msg) type((Catch::ReusableStringStream() << msg).str())
-#define CATCH_INTERNAL_ERROR(msg)                                                                                                                              \
-    Catch::throw_exception(CATCH_PREPARE_EXCEPTION(std::logic_error, CATCH_INTERNAL_LINEINFO << ": Internal Catch error: " << msg))
-#define CATCH_ERROR(msg) Catch::throw_exception(CATCH_PREPARE_EXCEPTION(std::domain_error, msg))
+#define CATCH_INTERNAL_ERROR(msg)                                                                                      \
+    Catch::throw_exception(                                                                                            \
+        CATCH_PREPARE_EXCEPTION(std::logic_error, CATCH_INTERNAL_LINEINFO << ": Internal Catch error: " << msg))
+#define CATCH_ERROR(msg)         Catch::throw_exception(CATCH_PREPARE_EXCEPTION(std::domain_error, msg))
 #define CATCH_RUNTIME_ERROR(msg) Catch::throw_exception(CATCH_PREPARE_EXCEPTION(std::runtime_error, msg))
-#define CATCH_ENFORCE(condition, msg)                                                                                                                          \
-    do                                                                                                                                                         \
-    {                                                                                                                                                          \
-        if (!(condition))                                                                                                                                      \
-            CATCH_ERROR(msg);                                                                                                                                  \
+#define CATCH_ENFORCE(condition, msg)                                                                                  \
+    do {                                                                                                               \
+        if (!(condition))                                                                                              \
+            CATCH_ERROR(msg);                                                                                          \
     } while (false)
 
 // end catch_enforce.h
@@ -3773,8 +3866,7 @@ namespace Catch
 
       public:
         GeneratorException(const char *msg) : m_msg(msg)
-        {
-        }
+        {}
 
         const char *what() const noexcept override final;
     };
@@ -3800,7 +3892,7 @@ namespace Catch
             // \Precondition The generator is either freshly constructed,
             // or the last call to `next()` returned true
             virtual T const &get() const = 0;
-            using type = T;
+            using type                   = T;
         };
 
         template <typename T> class SingleValueGenerator final : public IGenerator<T>
@@ -3809,11 +3901,9 @@ namespace Catch
 
           public:
             SingleValueGenerator(T const &value) : m_value(value)
-            {
-            }
+            {}
             SingleValueGenerator(T &&value) : m_value(std::move(value))
-            {
-            }
+            {}
 
             T const &get() const override
             {
@@ -3832,8 +3922,7 @@ namespace Catch
 
           public:
             FixedValuesGenerator(std::initializer_list<T> values) : m_values(values)
-            {
-            }
+            {}
 
             T const &get() const override
             {
@@ -3852,8 +3941,7 @@ namespace Catch
 
           public:
             GeneratorWrapper(std::unique_ptr<IGenerator<T>> generator) : m_generator(std::move(generator))
-            {
-            }
+            {}
             T const &get() const
             {
                 return m_generator->get();
@@ -3910,30 +3998,30 @@ namespace Catch
 
             bool next() override
             {
-                if (m_current >= m_generators.size())
-                {
+                if (m_current >= m_generators.size()) {
                     return false;
                 }
                 const bool current_status = m_generators[m_current].next();
-                if (!current_status)
-                {
+                if (!current_status) {
                     ++m_current;
                 }
                 return m_current < m_generators.size();
             }
         };
 
-        template <typename... Ts> GeneratorWrapper<std::tuple<Ts...>> table(std::initializer_list<std::tuple<typename std::decay<Ts>::type...>> tuples)
+        template <typename... Ts>
+        GeneratorWrapper<std::tuple<Ts...>> table(
+            std::initializer_list<std::tuple<typename std::decay<Ts>::type...>> tuples)
         {
             return values<std::tuple<Ts...>>(tuples);
         }
 
         // Tag type to signal that a generator sequence should convert arguments to a specific type
         template <typename T> struct as
-        {
-        };
+        {};
 
-        template <typename T, typename... Gs> auto makeGenerators(GeneratorWrapper<T> &&generator, Gs... moreGenerators) -> Generators<T>
+        template <typename T, typename... Gs>
+        auto makeGenerators(GeneratorWrapper<T> &&generator, Gs... moreGenerators) -> Generators<T>
         {
             return Generators<T>(std::move(generator), std::forward<Gs>(moreGenerators)...);
         }
@@ -3945,7 +4033,8 @@ namespace Catch
         {
             return makeGenerators(value(std::forward<T>(val)), std::forward<Gs>(moreGenerators)...);
         }
-        template <typename T, typename U, typename... Gs> auto makeGenerators(as<T>, U &&val, Gs... moreGenerators) -> Generators<T>
+        template <typename T, typename U, typename... Gs>
+        auto makeGenerators(as<T>, U &&val, Gs... moreGenerators) -> Generators<T>
         {
             return makeGenerators(value(T(std::forward<U>(val))), std::forward<Gs>(moreGenerators)...);
         }
@@ -3956,13 +4045,13 @@ namespace Catch
         // Note: The type after -> is weird, because VS2015 cannot parse
         //       the expression used in the typedef inside, when it is in
         //       return type. Yeah.
-        auto generate(SourceLineInfo const &lineInfo, L const &generatorExpression) -> decltype(std::declval<decltype(generatorExpression())>().get())
+        auto generate(SourceLineInfo const &lineInfo, L const &generatorExpression)
+            -> decltype(std::declval<decltype(generatorExpression())>().get())
         {
             using UnderlyingType = typename decltype(generatorExpression())::type;
 
             IGeneratorTracker &tracker = acquireGeneratorTracker(lineInfo);
-            if (!tracker.hasGenerator())
-            {
+            if (!tracker.hasGenerator()) {
                 tracker.setGenerator(pf::make_unique<Generators<UnderlyingType>>(generatorExpression()));
             }
 
@@ -3973,20 +4062,20 @@ namespace Catch
     } // namespace Generators
 } // namespace Catch
 
-#define GENERATE(...)                                                                                                                                          \
-    Catch::Generators::generate(CATCH_INTERNAL_LINEINFO, [] {                                                                                                  \
-        using namespace Catch::Generators;                                                                                                                     \
-        return makeGenerators(__VA_ARGS__);                                                                                                                    \
+#define GENERATE(...)                                                                                                  \
+    Catch::Generators::generate(CATCH_INTERNAL_LINEINFO, [] {                                                          \
+        using namespace Catch::Generators;                                                                             \
+        return makeGenerators(__VA_ARGS__);                                                                            \
     })
-#define GENERATE_COPY(...)                                                                                                                                     \
-    Catch::Generators::generate(CATCH_INTERNAL_LINEINFO, [=] {                                                                                                 \
-        using namespace Catch::Generators;                                                                                                                     \
-        return makeGenerators(__VA_ARGS__);                                                                                                                    \
+#define GENERATE_COPY(...)                                                                                             \
+    Catch::Generators::generate(CATCH_INTERNAL_LINEINFO, [=] {                                                         \
+        using namespace Catch::Generators;                                                                             \
+        return makeGenerators(__VA_ARGS__);                                                                            \
     })
-#define GENERATE_REF(...)                                                                                                                                      \
-    Catch::Generators::generate(CATCH_INTERNAL_LINEINFO, [&] {                                                                                                 \
-        using namespace Catch::Generators;                                                                                                                     \
-        return makeGenerators(__VA_ARGS__);                                                                                                                    \
+#define GENERATE_REF(...)                                                                                              \
+    Catch::Generators::generate(CATCH_INTERNAL_LINEINFO, [&] {                                                         \
+        using namespace Catch::Generators;                                                                             \
+        return makeGenerators(__VA_ARGS__);                                                                            \
     })
 
 // end catch_generators.hpp
@@ -4004,7 +4093,8 @@ namespace Catch
             size_t m_target;
 
           public:
-            TakeGenerator(size_t target, GeneratorWrapper<T> &&generator) : m_generator(std::move(generator)), m_target(target)
+            TakeGenerator(size_t target, GeneratorWrapper<T> &&generator)
+                : m_generator(std::move(generator)), m_target(target)
             {
                 assert(target != 0 && "Empty generators are not allowed");
             }
@@ -4015,16 +4105,14 @@ namespace Catch
             bool next() override
             {
                 ++m_returned;
-                if (m_returned >= m_target)
-                {
+                if (m_returned >= m_target) {
                     return false;
                 }
 
                 const auto success = m_generator.next();
                 // If the underlying generator does not contain enough values
                 // then we cut short as well
-                if (!success)
-                {
+                if (!success) {
                     m_returned = m_target;
                 }
                 return success;
@@ -4043,15 +4131,14 @@ namespace Catch
 
           public:
             template <typename P = Predicate>
-            FilterGenerator(P &&pred, GeneratorWrapper<T> &&generator) : m_generator(std::move(generator)), m_predicate(std::forward<P>(pred))
+            FilterGenerator(P &&pred, GeneratorWrapper<T> &&generator)
+                : m_generator(std::move(generator)), m_predicate(std::forward<P>(pred))
             {
-                if (!m_predicate(m_generator.get()))
-                {
+                if (!m_predicate(m_generator.get())) {
                     // It might happen that there are no values that pass the
                     // filter. In that case we throw an exception.
                     auto has_initial_value = next();
-                    if (!has_initial_value)
-                    {
+                    if (!has_initial_value) {
                         Catch::throw_exception(GeneratorException("No valid value found in filtered generator"));
                     }
                 }
@@ -4065,8 +4152,7 @@ namespace Catch
             bool next() override
             {
                 bool success = m_generator.next();
-                if (!success)
-                {
+                if (!success) {
                     return false;
                 }
                 while (!m_predicate(m_generator.get()) && (success = m_generator.next()) == true)
@@ -4075,10 +4161,11 @@ namespace Catch
             }
         };
 
-        template <typename T, typename Predicate> GeneratorWrapper<T> filter(Predicate &&pred, GeneratorWrapper<T> &&generator)
+        template <typename T, typename Predicate>
+        GeneratorWrapper<T> filter(Predicate &&pred, GeneratorWrapper<T> &&generator)
         {
-            return GeneratorWrapper<T>(
-                std::unique_ptr<IGenerator<T>>(pf::make_unique<FilterGenerator<T, Predicate>>(std::forward<Predicate>(pred), std::move(generator))));
+            return GeneratorWrapper<T>(std::unique_ptr<IGenerator<T>>(
+                pf::make_unique<FilterGenerator<T, Predicate>>(std::forward<Predicate>(pred), std::move(generator))));
         }
 
         template <typename T> class RepeatGenerator : public IGenerator<T>
@@ -4087,18 +4174,18 @@ namespace Catch
             mutable std::vector<T> m_returned;
             size_t m_target_repeats;
             size_t m_current_repeat = 0;
-            size_t m_repeat_index = 0;
+            size_t m_repeat_index   = 0;
 
           public:
-            RepeatGenerator(size_t repeats, GeneratorWrapper<T> &&generator) : m_generator(std::move(generator)), m_target_repeats(repeats)
+            RepeatGenerator(size_t repeats, GeneratorWrapper<T> &&generator)
+                : m_generator(std::move(generator)), m_target_repeats(repeats)
             {
                 assert(m_target_repeats > 0 && "Repeat generator must repeat at least once");
             }
 
             T const &get() const override
             {
-                if (m_current_repeat == 0)
-                {
+                if (m_current_repeat == 0) {
                     m_returned.push_back(m_generator.get());
                     return m_returned.back();
                 }
@@ -4113,11 +4200,9 @@ namespace Catch
 
                 // In the first case, we need to poke the underlying generator.
                 // If it happily moves, we are left in that state, otherwise it is time to start reading from our cache
-                if (m_current_repeat == 0)
-                {
+                if (m_current_repeat == 0) {
                     const auto success = m_generator.next();
-                    if (!success)
-                    {
+                    if (!success) {
                         ++m_current_repeat;
                     }
                     return m_current_repeat < m_target_repeats;
@@ -4125,8 +4210,7 @@ namespace Catch
 
                 // In the second case, we need to move indices forward and check that we haven't run up against the end
                 ++m_repeat_index;
-                if (m_repeat_index == m_returned.size())
-                {
+                if (m_repeat_index == m_returned.size()) {
                     m_repeat_index = 0;
                     ++m_current_repeat;
                 }
@@ -4150,9 +4234,9 @@ namespace Catch
           public:
             template <typename F2 = Func>
             MapGenerator(F2 &&function, GeneratorWrapper<U> &&generator)
-                : m_generator(std::move(generator)), m_function(std::forward<F2>(function)), m_cache(m_function(m_generator.get()))
-            {
-            }
+                : m_generator(std::move(generator)), m_function(std::forward<F2>(function)),
+                  m_cache(m_function(m_generator.get()))
+            {}
 
             T const &get() const override
             {
@@ -4161,8 +4245,7 @@ namespace Catch
             bool next() override
             {
                 const auto success = m_generator.next();
-                if (success)
-                {
+                if (success) {
                     m_cache = m_function(m_generator.get());
                 }
                 return success;
@@ -4173,21 +4256,26 @@ namespace Catch
         // std::result_of is deprecated in C++17 and removed in C++20. Hence, it is
         // replaced with std::invoke_result here. Also *_t format is preferred over
         // typename *::type format.
-        template <typename Func, typename U> using MapFunctionReturnType = std::remove_reference_t<std::remove_cv_t<std::invoke_result_t<Func, U>>>;
+        template <typename Func, typename U>
+        using MapFunctionReturnType = std::remove_reference_t<std::remove_cv_t<std::invoke_result_t<Func, U>>>;
 #else
         template <typename Func, typename U>
-        using MapFunctionReturnType = typename std::remove_reference<typename std::remove_cv<typename std::result_of<Func(U)>::type>::type>::type;
+        using MapFunctionReturnType =
+            typename std::remove_reference<typename std::remove_cv<typename std::result_of<Func(U)>::type>::type>::type;
 #endif
 
         template <typename Func, typename U, typename T = MapFunctionReturnType<Func, U>>
         GeneratorWrapper<T> map(Func &&function, GeneratorWrapper<U> &&generator)
         {
-            return GeneratorWrapper<T>(pf::make_unique<MapGenerator<T, U, Func>>(std::forward<Func>(function), std::move(generator)));
+            return GeneratorWrapper<T>(
+                pf::make_unique<MapGenerator<T, U, Func>>(std::forward<Func>(function), std::move(generator)));
         }
 
-        template <typename T, typename U, typename Func> GeneratorWrapper<T> map(Func &&function, GeneratorWrapper<U> &&generator)
+        template <typename T, typename U, typename Func>
+        GeneratorWrapper<T> map(Func &&function, GeneratorWrapper<U> &&generator)
         {
-            return GeneratorWrapper<T>(pf::make_unique<MapGenerator<T, U, Func>>(std::forward<Func>(function), std::move(generator)));
+            return GeneratorWrapper<T>(
+                pf::make_unique<MapGenerator<T, U, Func>>(std::forward<Func>(function), std::move(generator)));
         }
 
         template <typename T> class ChunkGenerator final : public IGenerator<std::vector<T>>
@@ -4198,14 +4286,13 @@ namespace Catch
             bool m_used_up = false;
 
           public:
-            ChunkGenerator(size_t size, GeneratorWrapper<T> generator) : m_chunk_size(size), m_generator(std::move(generator))
+            ChunkGenerator(size_t size, GeneratorWrapper<T> generator)
+                : m_chunk_size(size), m_generator(std::move(generator))
             {
                 m_chunk.reserve(m_chunk_size);
                 m_chunk.push_back(m_generator.get());
-                for (size_t i = 1; i < m_chunk_size; ++i)
-                {
-                    if (!m_generator.next())
-                    {
+                for (size_t i = 1; i < m_chunk_size; ++i) {
+                    if (!m_generator.next()) {
                         Catch::throw_exception(GeneratorException("Not enough values to initialize the first chunk"));
                     }
                     m_chunk.push_back(m_generator.get());
@@ -4218,10 +4305,8 @@ namespace Catch
             bool next() override
             {
                 m_chunk.clear();
-                for (size_t idx = 0; idx < m_chunk_size; ++idx)
-                {
-                    if (!m_generator.next())
-                    {
+                for (size_t idx = 0; idx < m_chunk_size; ++idx) {
+                    if (!m_generator.next()) {
                         return false;
                     }
                     m_chunk.push_back(m_generator.get());
@@ -4259,8 +4344,8 @@ namespace Catch
     {
         virtual ~IContext();
 
-        virtual IResultCapture *getResultCapture() = 0;
-        virtual IRunner *getRunner() = 0;
+        virtual IResultCapture *getResultCapture()  = 0;
+        virtual IRunner *getRunner()                = 0;
         virtual IConfigPtr const &getConfig() const = 0;
     };
 
@@ -4268,8 +4353,8 @@ namespace Catch
     {
         virtual ~IMutableContext();
         virtual void setResultCapture(IResultCapture *resultCapture) = 0;
-        virtual void setRunner(IRunner *runner) = 0;
-        virtual void setConfig(IConfigPtr const &config) = 0;
+        virtual void setRunner(IRunner *runner)                      = 0;
+        virtual void setConfig(IConfigPtr const &config)             = 0;
 
       private:
         static IMutableContext *currentContext;
@@ -4315,9 +4400,9 @@ namespace Catch
     {
         enum What
         {
-            Nothing = 0x00,
+            Nothing      = 0x00,
             NoAssertions = 0x01,
-            NoTests = 0x02
+            NoTests      = 0x02
         };
     };
 
@@ -4353,8 +4438,8 @@ namespace Catch
         enum When
         {
             Never,
-            BeforeStart = 1,
-            BeforeExit = 2,
+            BeforeStart        = 1,
+            BeforeExit         = 2,
             BeforeStartAndExit = BeforeStart | BeforeExit
         };
     };
@@ -4366,25 +4451,25 @@ namespace Catch
 
         virtual ~IConfig();
 
-        virtual bool allowThrows() const = 0;
-        virtual std::ostream &stream() const = 0;
-        virtual std::string name() const = 0;
-        virtual bool includeSuccessfulResults() const = 0;
-        virtual bool shouldDebugBreak() const = 0;
-        virtual bool warnAboutMissingAssertions() const = 0;
-        virtual bool warnAboutNoTests() const = 0;
-        virtual int abortAfter() const = 0;
-        virtual bool showInvisibles() const = 0;
-        virtual ShowDurations::OrNot showDurations() const = 0;
-        virtual TestSpec const &testSpec() const = 0;
-        virtual bool hasTestFilters() const = 0;
-        virtual std::vector<std::string> const &getTestsOrTags() const = 0;
-        virtual RunTests::InWhatOrder runOrder() const = 0;
-        virtual unsigned int rngSeed() const = 0;
-        virtual int benchmarkResolutionMultiple() const = 0;
-        virtual UseColour::YesOrNo useColour() const = 0;
+        virtual bool allowThrows() const                                 = 0;
+        virtual std::ostream &stream() const                             = 0;
+        virtual std::string name() const                                 = 0;
+        virtual bool includeSuccessfulResults() const                    = 0;
+        virtual bool shouldDebugBreak() const                            = 0;
+        virtual bool warnAboutMissingAssertions() const                  = 0;
+        virtual bool warnAboutNoTests() const                            = 0;
+        virtual int abortAfter() const                                   = 0;
+        virtual bool showInvisibles() const                              = 0;
+        virtual ShowDurations::OrNot showDurations() const               = 0;
+        virtual TestSpec const &testSpec() const                         = 0;
+        virtual bool hasTestFilters() const                              = 0;
+        virtual std::vector<std::string> const &getTestsOrTags() const   = 0;
+        virtual RunTests::InWhatOrder runOrder() const                   = 0;
+        virtual unsigned int rngSeed() const                             = 0;
+        virtual int benchmarkResolutionMultiple() const                  = 0;
+        virtual UseColour::YesOrNo useColour() const                     = 0;
         virtual std::vector<std::string> const &getSectionsToRun() const = 0;
-        virtual Verbosity verbosity() const = 0;
+        virtual Verbosity verbosity() const                              = 0;
     };
 
     using IConfigPtr = std::shared_ptr<IConfig const>;
@@ -4429,7 +4514,8 @@ namespace Catch
             Integer m_current_number;
 
           public:
-            RandomIntegerGenerator(Integer a, Integer b) : m_rand(getCurrentContext().getConfig()->rngSeed()), m_dist(a, b)
+            RandomIntegerGenerator(Integer a, Integer b)
+                : m_rand(getCurrentContext().getConfig()->rngSeed()), m_dist(a, b)
             {
                 static_cast<void>(next());
             }
@@ -4447,12 +4533,15 @@ namespace Catch
 
         // TODO: Ideally this would be also constrained against the various char types,
         //       but I don't expect users to run into that in practice.
-        template <typename T> typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value, GeneratorWrapper<T>>::type random(T a, T b)
+        template <typename T>
+        typename std::enable_if<std::is_integral<T>::value && !std::is_same<T, bool>::value, GeneratorWrapper<T>>::type
+        random(T a, T b)
         {
             return GeneratorWrapper<T>(pf::make_unique<RandomIntegerGenerator<T>>(a, b));
         }
 
-        template <typename T> typename std::enable_if<std::is_floating_point<T>::value, GeneratorWrapper<T>>::type random(T a, T b)
+        template <typename T>
+        typename std::enable_if<std::is_floating_point<T>::value, GeneratorWrapper<T>>::type random(T a, T b)
         {
             return GeneratorWrapper<T>(pf::make_unique<RandomFloatingGenerator<T>>(a, b));
         }
@@ -4465,16 +4554,17 @@ namespace Catch
             bool m_positive;
 
           public:
-            RangeGenerator(T const &start, T const &end, T const &step) : m_current(start), m_end(end), m_step(step), m_positive(m_step > T(0))
+            RangeGenerator(T const &start, T const &end, T const &step)
+                : m_current(start), m_end(end), m_step(step), m_positive(m_step > T(0))
             {
                 assert(m_current != m_end && "Range start and end cannot be equal");
                 assert(m_step != T(0) && "Step size cannot be zero");
-                assert(((m_positive && m_current <= m_end) || (!m_positive && m_current >= m_end)) && "Step moves away from end");
+                assert(((m_positive && m_current <= m_end) || (!m_positive && m_current >= m_end)) &&
+                       "Step moves away from end");
             }
 
             RangeGenerator(T const &start, T const &end) : RangeGenerator(start, end, (start < end) ? T(1) : T(-1))
-            {
-            }
+            {}
 
             T const &get() const override
             {
@@ -4527,16 +4617,19 @@ namespace Catch
     {
         enum SpecialProperties
         {
-            None = 0,
-            IsHidden = 1 << 1,
-            ShouldFail = 1 << 2,
-            MayFail = 1 << 3,
-            Throws = 1 << 4,
+            None        = 0,
+            IsHidden    = 1 << 1,
+            ShouldFail  = 1 << 2,
+            MayFail     = 1 << 3,
+            Throws      = 1 << 4,
             NonPortable = 1 << 5,
-            Benchmark = 1 << 6
+            Benchmark   = 1 << 6
         };
 
-        TestCaseInfo(std::string const &_name, std::string const &_className, std::string const &_description, std::vector<std::string> const &_tags,
+        TestCaseInfo(std::string const &_name,
+                     std::string const &_className,
+                     std::string const &_description,
+                     std::vector<std::string> const &_tags,
                      SourceLineInfo const &_lineInfo);
 
         friend void setTags(TestCaseInfo &testCaseInfo, std::vector<std::string> tags);
@@ -4575,7 +4668,10 @@ namespace Catch
         std::shared_ptr<ITestInvoker> test;
     };
 
-    TestCase makeTestCase(ITestInvoker *testCase, std::string const &className, NameAndTags const &nameAndTags, SourceLineInfo const &lineInfo);
+    TestCase makeTestCase(ITestInvoker *testCase,
+                          std::string const &className,
+                          NameAndTags const &nameAndTags,
+                          SourceLineInfo const &lineInfo);
 } // namespace Catch
 
 #ifdef __clang__
@@ -4628,8 +4724,7 @@ namespace Catch
 
       public:
         OcMethod(Class cls, SEL sel) : m_cls(cls), m_sel(sel)
-        {
-        }
+        {}
 
         virtual void invoke() const
         {
@@ -4644,8 +4739,7 @@ namespace Catch
 
       private:
         virtual ~OcMethod()
-        {
-        }
+        {}
 
         Class m_cls;
         SEL m_sel;
@@ -4656,7 +4750,8 @@ namespace Catch
 
         inline std::string getAnnotation(Class cls, std::string const &annotationName, std::string const &testCaseName)
         {
-            NSString *selStr = [[NSString alloc] initWithFormat:@"Catch_%s_%s", annotationName.c_str(), testCaseName.c_str()];
+            NSString *selStr =
+                [[NSString alloc] initWithFormat:@"Catch_%s_%s", annotationName.c_str(), testCaseName.c_str()];
             SEL sel = NSSelectorFromString(selStr);
             arcSafeRelease(selStr);
             id value = performOptionalSelector(cls, sel);
@@ -4669,30 +4764,29 @@ namespace Catch
     inline std::size_t registerTestMethods()
     {
         std::size_t noTestMethods = 0;
-        int noClasses = objc_getClassList(nullptr, 0);
+        int noClasses             = objc_getClassList(nullptr, 0);
 
         Class *classes = (CATCH_UNSAFE_UNRETAINED Class *)malloc(sizeof(Class) * noClasses);
         objc_getClassList(classes, noClasses);
 
-        for (int c = 0; c < noClasses; c++)
-        {
+        for (int c = 0; c < noClasses; c++) {
             Class cls = classes[c];
             {
                 u_int count;
                 Method *methods = class_copyMethodList(cls, &count);
-                for (u_int m = 0; m < count; m++)
-                {
-                    SEL selector = method_getName(methods[m]);
+                for (u_int m = 0; m < count; m++) {
+                    SEL selector           = method_getName(methods[m]);
                     std::string methodName = sel_getName(selector);
-                    if (startsWith(methodName, "Catch_TestCase_"))
-                    {
+                    if (startsWith(methodName, "Catch_TestCase_")) {
                         std::string testCaseName = methodName.substr(15);
-                        std::string name = Detail::getAnnotation(cls, "Name", testCaseName);
-                        std::string desc = Detail::getAnnotation(cls, "Description", testCaseName);
-                        const char *className = class_getName(cls);
+                        std::string name         = Detail::getAnnotation(cls, "Name", testCaseName);
+                        std::string desc         = Detail::getAnnotation(cls, "Description", testCaseName);
+                        const char *className    = class_getName(cls);
 
-                        getMutableRegistryHub().registerTest(
-                            makeTestCase(new OcMethod(cls, selector), className, NameAndTags(name.c_str(), desc.c_str()), SourceLineInfo("", 0)));
+                        getMutableRegistryHub().registerTest(makeTestCase(new OcMethod(cls, selector),
+                                                                          className,
+                                                                          NameAndTags(name.c_str(), desc.c_str()),
+                                                                          SourceLineInfo("", 0)));
                         noTestMethods++;
                     }
                 }
@@ -4714,11 +4808,9 @@ namespace Catch
                 struct StringHolder : MatcherBase<NSString *>
                 {
                     StringHolder(NSString *substr) : m_substr([substr copy])
-                    {
-                    }
+                    {}
                     StringHolder(StringHolder const &other) : m_substr([other.m_substr copy])
-                    {
-                    }
+                    {}
                     StringHolder()
                     {
                         arcSafeRelease(m_substr);
@@ -4735,8 +4827,7 @@ namespace Catch
                 struct Equals : StringHolder
                 {
                     Equals(NSString *substr) : StringHolder(substr)
-                    {
-                    }
+                    {}
 
                     bool match(NSString *const &str) const override
                     {
@@ -4752,8 +4843,7 @@ namespace Catch
                 struct Contains : StringHolder
                 {
                     Contains(NSString *substr) : StringHolder(substr)
-                    {
-                    }
+                    {}
 
                     bool match(NSString *const &str) const override
                     {
@@ -4769,8 +4859,7 @@ namespace Catch
                 struct StartsWith : StringHolder
                 {
                     StartsWith(NSString *substr) : StringHolder(substr)
-                    {
-                    }
+                    {}
 
                     bool match(NSString *const &str) const override
                     {
@@ -4785,12 +4874,12 @@ namespace Catch
                 struct EndsWith : StringHolder
                 {
                     EndsWith(NSString *substr) : StringHolder(substr)
-                    {
-                    }
+                    {}
 
                     bool match(NSString *const &str) const override
                     {
-                        return (str != nil || m_substr == nil) && [str rangeOfString:m_substr].location == [str length] - [m_substr length];
+                        return (str != nil || m_substr == nil) &&
+                               [str rangeOfString:m_substr].location == [str length] - [m_substr length];
                     }
 
                     std::string describe() const override
@@ -4832,15 +4921,15 @@ namespace Catch
 
 ///////////////////////////////////////////////////////////////////////////////
 #define OC_MAKE_UNIQUE_NAME(root, uniqueSuffix) root##uniqueSuffix
-#define OC_TEST_CASE2(name, desc, uniqueSuffix)                                                                                                                \
-    +(NSString *)OC_MAKE_UNIQUE_NAME(Catch_Name_test_, uniqueSuffix)                                                                                           \
-    {                                                                                                                                                          \
-        return @name;                                                                                                                                          \
-    }                                                                                                                                                          \
-    +(NSString *)OC_MAKE_UNIQUE_NAME(Catch_Description_test_, uniqueSuffix)                                                                                    \
-    {                                                                                                                                                          \
-        return @desc;                                                                                                                                          \
-    }                                                                                                                                                          \
+#define OC_TEST_CASE2(name, desc, uniqueSuffix)                                                                        \
+    +(NSString *)OC_MAKE_UNIQUE_NAME(Catch_Name_test_, uniqueSuffix)                                                   \
+    {                                                                                                                  \
+        return @name;                                                                                                  \
+    }                                                                                                                  \
+    +(NSString *)OC_MAKE_UNIQUE_NAME(Catch_Description_test_, uniqueSuffix)                                            \
+    {                                                                                                                  \
+        return @desc;                                                                                                  \
+    }                                                                                                                  \
     -(void)OC_MAKE_UNIQUE_NAME(Catch_TestCase_test_, uniqueSuffix)
 
 #define OC_TEST_CASE(name, desc) OC_TEST_CASE2(name, desc, __LINE__)
@@ -4879,9 +4968,9 @@ namespace Catch
     {
         enum WildcardPosition
         {
-            NoWildcard = 0,
-            WildcardAtStart = 1,
-            WildcardAtEnd = 2,
+            NoWildcard         = 0,
+            WildcardAtStart    = 1,
+            WildcardAtEnd      = 2,
             WildcardAtBothEnds = WildcardAtStart | WildcardAtEnd
         };
 
@@ -4984,7 +5073,7 @@ namespace Catch
     {
         virtual ~ITagAliasRegistry();
         // Nullptr if not present
-        virtual TagAlias const *find(std::string const &alias) const = 0;
+        virtual TagAlias const *find(std::string const &alias) const                   = 0;
         virtual std::string expandAliases(std::string const &unexpandedTestSpec) const = 0;
 
         static ITagAliasRegistry const &get();
@@ -5006,8 +5095,8 @@ namespace Catch
             Tag,
             EscapedName
         };
-        Mode m_mode = None;
-        bool m_exclusion = false;
+        Mode m_mode         = None;
+        bool m_exclusion    = false;
         std::size_t m_start = std::string::npos, m_pos = 0;
         std::string m_arg;
         std::vector<std::size_t> m_escapeChars;
@@ -5031,22 +5120,21 @@ namespace Catch
         {
             std::string token = subString();
             for (std::size_t i = 0; i < m_escapeChars.size(); ++i)
-                token = token.substr(0, m_escapeChars[i] - m_start - i) + token.substr(m_escapeChars[i] - m_start - i + 1);
+                token =
+                    token.substr(0, m_escapeChars[i] - m_start - i) + token.substr(m_escapeChars[i] - m_start - i + 1);
             m_escapeChars.clear();
-            if (startsWith(token, "exclude:"))
-            {
+            if (startsWith(token, "exclude:")) {
                 m_exclusion = true;
-                token = token.substr(8);
+                token       = token.substr(8);
             }
-            if (!token.empty())
-            {
+            if (!token.empty()) {
                 TestSpec::PatternPtr pattern = std::make_shared<T>(token);
                 if (m_exclusion)
                     pattern = std::make_shared<TestSpec::ExcludedPattern>(pattern);
                 m_currentFilter.m_patterns.push_back(pattern);
             }
             m_exclusion = false;
-            m_mode = None;
+            m_mode      = None;
         }
 
         void addFilter();
@@ -5077,28 +5165,28 @@ namespace Catch
 
     struct ConfigData
     {
-        bool listTests = false;
-        bool listTags = false;
-        bool listReporters = false;
+        bool listTests         = false;
+        bool listTags          = false;
+        bool listReporters     = false;
         bool listTestNamesOnly = false;
 
         bool showSuccessfulTests = false;
-        bool shouldDebugBreak = false;
-        bool noThrow = false;
-        bool showHelp = false;
-        bool showInvisibles = false;
-        bool filenamesAsTags = false;
-        bool libIdentify = false;
+        bool shouldDebugBreak    = false;
+        bool noThrow             = false;
+        bool showHelp            = false;
+        bool showInvisibles      = false;
+        bool filenamesAsTags     = false;
+        bool libIdentify         = false;
 
-        int abortAfter = -1;
-        unsigned int rngSeed = 0;
+        int abortAfter                  = -1;
+        unsigned int rngSeed            = 0;
         int benchmarkResolutionMultiple = 100;
 
-        Verbosity verbosity = Verbosity::Normal;
-        WarnAbout::What warnings = WarnAbout::Nothing;
-        ShowDurations::OrNot showDurations = ShowDurations::DefaultForReporter;
-        RunTests::InWhatOrder runOrder = RunTests::InDeclarationOrder;
-        UseColour::YesOrNo useColour = UseColour::Auto;
+        Verbosity verbosity                   = Verbosity::Normal;
+        WarnAbout::What warnings              = WarnAbout::Nothing;
+        ShowDurations::OrNot showDurations    = ShowDurations::DefaultForReporter;
+        RunTests::InWhatOrder runOrder        = RunTests::InDeclarationOrder;
+        UseColour::YesOrNo useColour          = UseColour::Auto;
         WaitForKeypress::When waitForKeypress = WaitForKeypress::Never;
 
         std::string outputFilename;
@@ -5226,14 +5314,11 @@ namespace Catch
     {
       public:
         Option() : nullableValue(nullptr)
-        {
-        }
+        {}
         Option(T const &_value) : nullableValue(new (storage) T(_value))
-        {
-        }
+        {}
         Option(Option const &_other) : nullableValue(_other ? new (storage) T(*_other) : nullptr)
-        {
-        }
+        {}
 
         ~Option()
         {
@@ -5242,8 +5327,7 @@ namespace Catch
 
         Option &operator=(Option const &_other)
         {
-            if (&_other != this)
-            {
+            if (&_other != this) {
                 reset();
                 if (_other)
                     nullableValue = new (storage) T(*_other);
@@ -5337,7 +5421,7 @@ namespace Catch
 
     struct ReporterPreferences
     {
-        bool shouldRedirectStdOut = false;
+        bool shouldRedirectStdOut      = false;
         bool shouldReportAllAssertions = false;
     };
 
@@ -5346,7 +5430,7 @@ namespace Catch
         LazyStat &operator=(T const &_value)
         {
             Option<T>::operator=(_value);
-            used = false;
+            used               = false;
             return *this;
         }
         void reset()
@@ -5373,10 +5457,12 @@ namespace Catch
 
     struct AssertionStats
     {
-        AssertionStats(AssertionResult const &_assertionResult, std::vector<MessageInfo> const &_infoMessages, Totals const &_totals);
+        AssertionStats(AssertionResult const &_assertionResult,
+                       std::vector<MessageInfo> const &_infoMessages,
+                       Totals const &_totals);
 
         AssertionStats(AssertionStats const &) = default;
-        AssertionStats(AssertionStats &&) = default;
+        AssertionStats(AssertionStats &&)      = default;
         AssertionStats &operator=(AssertionStats const &) = delete;
         AssertionStats &operator=(AssertionStats &&) = delete;
         virtual ~AssertionStats();
@@ -5388,9 +5474,12 @@ namespace Catch
 
     struct SectionStats
     {
-        SectionStats(SectionInfo const &_sectionInfo, Counts const &_assertions, double _durationInSeconds, bool _missingAssertions);
+        SectionStats(SectionInfo const &_sectionInfo,
+                     Counts const &_assertions,
+                     double _durationInSeconds,
+                     bool _missingAssertions);
         SectionStats(SectionStats const &) = default;
-        SectionStats(SectionStats &&) = default;
+        SectionStats(SectionStats &&)      = default;
         SectionStats &operator=(SectionStats const &) = default;
         SectionStats &operator=(SectionStats &&) = default;
         virtual ~SectionStats();
@@ -5403,10 +5492,14 @@ namespace Catch
 
     struct TestCaseStats
     {
-        TestCaseStats(TestCaseInfo const &_testInfo, Totals const &_totals, std::string const &_stdOut, std::string const &_stdErr, bool _aborting);
+        TestCaseStats(TestCaseInfo const &_testInfo,
+                      Totals const &_totals,
+                      std::string const &_stdOut,
+                      std::string const &_stdErr,
+                      bool _aborting);
 
         TestCaseStats(TestCaseStats const &) = default;
-        TestCaseStats(TestCaseStats &&) = default;
+        TestCaseStats(TestCaseStats &&)      = default;
         TestCaseStats &operator=(TestCaseStats const &) = default;
         TestCaseStats &operator=(TestCaseStats &&) = default;
         virtual ~TestCaseStats();
@@ -5424,7 +5517,7 @@ namespace Catch
         TestGroupStats(GroupInfo const &_groupInfo);
 
         TestGroupStats(TestGroupStats const &) = default;
-        TestGroupStats(TestGroupStats &&) = default;
+        TestGroupStats(TestGroupStats &&)      = default;
         TestGroupStats &operator=(TestGroupStats const &) = default;
         TestGroupStats &operator=(TestGroupStats &&) = default;
         virtual ~TestGroupStats();
@@ -5439,7 +5532,7 @@ namespace Catch
         TestRunStats(TestRunInfo const &_runInfo, Totals const &_totals, bool _aborting);
 
         TestRunStats(TestRunStats const &) = default;
-        TestRunStats(TestRunStats &&) = default;
+        TestRunStats(TestRunStats &&)      = default;
         TestRunStats &operator=(TestRunStats const &) = default;
         TestRunStats &operator=(TestRunStats &&) = default;
         virtual ~TestRunStats();
@@ -5473,15 +5566,14 @@ namespace Catch
         virtual void noMatchingTestCases(std::string const &spec) = 0;
 
         virtual void testRunStarting(TestRunInfo const &testRunInfo) = 0;
-        virtual void testGroupStarting(GroupInfo const &groupInfo) = 0;
+        virtual void testGroupStarting(GroupInfo const &groupInfo)   = 0;
 
-        virtual void testCaseStarting(TestCaseInfo const &testInfo) = 0;
+        virtual void testCaseStarting(TestCaseInfo const &testInfo)  = 0;
         virtual void sectionStarting(SectionInfo const &sectionInfo) = 0;
 
         // *** experimental ***
         virtual void benchmarkStarting(BenchmarkInfo const &)
-        {
-        }
+        {}
 
         virtual void assertionStarting(AssertionInfo const &assertionInfo) = 0;
 
@@ -5490,13 +5582,12 @@ namespace Catch
 
         // *** experimental ***
         virtual void benchmarkEnded(BenchmarkStats const &)
-        {
-        }
+        {}
 
-        virtual void sectionEnded(SectionStats const &sectionStats) = 0;
-        virtual void testCaseEnded(TestCaseStats const &testCaseStats) = 0;
+        virtual void sectionEnded(SectionStats const &sectionStats)       = 0;
+        virtual void testCaseEnded(TestCaseStats const &testCaseStats)    = 0;
         virtual void testGroupEnded(TestGroupStats const &testGroupStats) = 0;
-        virtual void testRunEnded(TestRunStats const &testRunStats) = 0;
+        virtual void testRunEnded(TestRunStats const &testRunStats)       = 0;
 
         virtual void skipTest(TestCaseInfo const &testInfo) = 0;
 
@@ -5511,19 +5602,19 @@ namespace Catch
     {
         virtual ~IReporterFactory();
         virtual IStreamingReporterPtr create(ReporterConfig const &config) const = 0;
-        virtual std::string getDescription() const = 0;
+        virtual std::string getDescription() const                               = 0;
     };
     using IReporterFactoryPtr = std::shared_ptr<IReporterFactory>;
 
     struct IReporterRegistry
     {
         using FactoryMap = std::map<std::string, IReporterFactoryPtr>;
-        using Listeners = std::vector<IReporterFactoryPtr>;
+        using Listeners  = std::vector<IReporterFactoryPtr>;
 
         virtual ~IReporterRegistry();
         virtual IStreamingReporterPtr create(std::string const &name, IConfigPtr const &config) const = 0;
-        virtual FactoryMap const &getFactories() const = 0;
-        virtual Listeners const &getListeners() const = 0;
+        virtual FactoryMap const &getFactories() const                                                = 0;
+        virtual Listeners const &getListeners() const                                                 = 0;
     };
 
 } // end namespace Catch
@@ -5569,8 +5660,7 @@ namespace Catch
         ~StreamingReporterBase() override = default;
 
         void noMatchingTestCases(std::string const &) override
-        {
-        }
+        {}
 
         void testRunStarting(TestRunInfo const &_testRunInfo) override
         {
@@ -5632,11 +5722,9 @@ namespace Catch
         template <typename T, typename ChildNodeT> struct Node
         {
             explicit Node(T const &_value) : value(_value)
-            {
-            }
+            {}
             virtual ~Node()
-            {
-            }
+            {}
 
             using ChildNodes = std::vector<std::shared_ptr<ChildNodeT>>;
             T value;
@@ -5645,8 +5733,7 @@ namespace Catch
         struct SectionNode
         {
             explicit SectionNode(SectionStats const &_stats) : stats(_stats)
-            {
-            }
+            {}
             virtual ~SectionNode() = default;
 
             bool operator==(SectionNode const &other) const
@@ -5660,7 +5747,7 @@ namespace Catch
 
             SectionStats stats;
             using ChildSections = std::vector<std::shared_ptr<SectionNode>>;
-            using Assertions = std::vector<AssertionStats>;
+            using Assertions    = std::vector<AssertionStats>;
             ChildSections childSections;
             Assertions assertions;
             std::string stdOut;
@@ -5670,14 +5757,13 @@ namespace Catch
         struct BySectionInfo
         {
             BySectionInfo(SectionInfo const &other) : m_other(other)
-            {
-            }
+            {}
             BySectionInfo(BySectionInfo const &other) : m_other(other.m_other)
-            {
-            }
+            {}
             bool operator()(std::shared_ptr<SectionNode> const &node) const
             {
-                return ((node->stats.sectionInfo.name == m_other.name) && (node->stats.sectionInfo.lineInfo == m_other.lineInfo));
+                return ((node->stats.sectionInfo.name == m_other.name) &&
+                        (node->stats.sectionInfo.lineInfo == m_other.lineInfo));
             }
             void operator=(BySectionInfo const &) = delete;
 
@@ -5685,9 +5771,9 @@ namespace Catch
             SectionInfo const &m_other;
         };
 
-        using TestCaseNode = Node<TestCaseStats, SectionNode>;
+        using TestCaseNode  = Node<TestCaseStats, SectionNode>;
         using TestGroupNode = Node<TestGroupStats, TestCaseNode>;
-        using TestRunNode = Node<TestRunStats, TestGroupNode>;
+        using TestRunNode   = Node<TestRunStats, TestGroupNode>;
 
         CumulativeReporterBase(ReporterConfig const &_config) : m_config(_config.fullConfig()), stream(_config.stream())
         {
@@ -5708,32 +5794,27 @@ namespace Catch
         }
 
         void testRunStarting(TestRunInfo const &) override
-        {
-        }
+        {}
         void testGroupStarting(GroupInfo const &) override
-        {
-        }
+        {}
 
         void testCaseStarting(TestCaseInfo const &) override
-        {
-        }
+        {}
 
         void sectionStarting(SectionInfo const &sectionInfo) override
         {
             SectionStats incompleteStats(sectionInfo, Counts(), 0, false);
             std::shared_ptr<SectionNode> node;
-            if (m_sectionStack.empty())
-            {
+            if (m_sectionStack.empty()) {
                 if (!m_rootSection)
                     m_rootSection = std::make_shared<SectionNode>(incompleteStats);
                 node = m_rootSection;
             }
-            else
-            {
+            else {
                 SectionNode &parentNode = *m_sectionStack.back();
-                auto it = std::find_if(parentNode.childSections.begin(), parentNode.childSections.end(), BySectionInfo(sectionInfo));
-                if (it == parentNode.childSections.end())
-                {
+                auto it                 = std::find_if(
+                    parentNode.childSections.begin(), parentNode.childSections.end(), BySectionInfo(sectionInfo));
+                if (it == parentNode.childSections.end()) {
                     node = std::make_shared<SectionNode>(incompleteStats);
                     parentNode.childSections.push_back(node);
                 }
@@ -5745,8 +5826,7 @@ namespace Catch
         }
 
         void assertionStarting(AssertionInfo const &) override
-        {
-        }
+        {}
 
         bool assertionEnded(AssertionStats const &assertionStats) override
         {
@@ -5765,7 +5845,7 @@ namespace Catch
         {
             assert(!m_sectionStack.empty());
             SectionNode &node = *m_sectionStack.back();
-            node.stats = sectionStats;
+            node.stats        = sectionStats;
             m_sectionStack.pop_back();
         }
         void testCaseEnded(TestCaseStats const &testCaseStats) override
@@ -5796,8 +5876,7 @@ namespace Catch
         virtual void testRunEndedCumulative() = 0;
 
         void skipTest(TestCaseInfo const &) override
-        {
-        }
+        {}
 
         IConfigPtr m_config;
         std::ostream &stream;
@@ -5817,8 +5896,7 @@ namespace Catch
     template <char C> char const *getLineOfChars()
     {
         static char line[CATCH_CONFIG_CONSOLE_WIDTH] = {0};
-        if (!*line)
-        {
+        if (!*line) {
             std::memset(line, C, CATCH_CONFIG_CONSOLE_WIDTH - 1);
             line[CATCH_CONFIG_CONSOLE_WIDTH - 1] = 0;
         }
@@ -5859,27 +5937,27 @@ namespace Catch
 
             Bright = 0x10,
 
-            BrightRed = Bright | Red,
-            BrightGreen = Bright | Green,
-            LightGrey = Bright | Grey,
-            BrightWhite = Bright | White,
+            BrightRed    = Bright | Red,
+            BrightGreen  = Bright | Green,
+            LightGrey    = Bright | Grey,
+            BrightWhite  = Bright | White,
             BrightYellow = Bright | Yellow,
 
             // By intention
-            FileName = LightGrey,
-            Warning = BrightYellow,
-            ResultError = BrightRed,
-            ResultSuccess = BrightGreen,
+            FileName              = LightGrey,
+            Warning               = BrightYellow,
+            ResultError           = BrightRed,
+            ResultSuccess         = BrightGreen,
             ResultExpectedFailure = Warning,
 
-            Error = BrightRed,
+            Error   = BrightRed,
             Success = Green,
 
-            OriginalExpression = Cyan,
+            OriginalExpression      = Cyan,
             ReconstructedExpression = BrightYellow,
 
             SecondaryText = LightGrey,
-            Headers = White
+            Headers       = White
         };
 
         // Use constructed object for RAII guard
@@ -5955,20 +6033,20 @@ namespace Catch
 
 #if !defined(CATCH_CONFIG_DISABLE)
 
-#define CATCH_REGISTER_REPORTER(name, reporterType)                                                                                                            \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        Catch::ReporterRegistrar<reporterType> catch_internal_RegistrarFor##reporterType(name);                                                                \
-    }                                                                                                                                                          \
+#define CATCH_REGISTER_REPORTER(name, reporterType)                                                                    \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        Catch::ReporterRegistrar<reporterType> catch_internal_RegistrarFor##reporterType(name);                        \
+    }                                                                                                                  \
     CATCH_INTERNAL_UNSUPPRESS_GLOBALS_WARNINGS
 
-#define CATCH_REGISTER_LISTENER(listenerType)                                                                                                                  \
-    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                                                                   \
-    namespace                                                                                                                                                  \
-    {                                                                                                                                                          \
-        Catch::ListenerRegistrar<listenerType> catch_internal_RegistrarFor##listenerType;                                                                      \
-    }                                                                                                                                                          \
+#define CATCH_REGISTER_LISTENER(listenerType)                                                                          \
+    CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS                                                                           \
+    namespace                                                                                                          \
+    {                                                                                                                  \
+        Catch::ListenerRegistrar<listenerType> catch_internal_RegistrarFor##listenerType;                              \
+    }                                                                                                                  \
     CATCH_INTERNAL_SUPPRESS_GLOBALS_WARNINGS
 #else // CATCH_CONFIG_DISABLE
 
@@ -6174,7 +6252,7 @@ namespace Catch
 
         void newlineIfNecessary();
 
-        bool m_tagIsOpen = false;
+        bool m_tagIsOpen    = false;
         bool m_needsNewline = false;
         std::vector<std::string> m_tags;
         std::string m_indent;
@@ -6225,7 +6303,7 @@ namespace Catch
         std::string stdOutForSuite;
         std::string stdErrForSuite;
         unsigned int unexpectedExceptions = 0;
-        bool m_okToFail = false;
+        bool m_okToFail                   = false;
     };
 
 } // end namespace Catch
@@ -6326,24 +6404,24 @@ namespace Catch
             virtual NameAndLocation const &nameAndLocation() const = 0;
 
             // dynamic queries
-            virtual bool isComplete() const = 0; // Successfully completed or failed
+            virtual bool isComplete() const              = 0; // Successfully completed or failed
             virtual bool isSuccessfullyCompleted() const = 0;
-            virtual bool isOpen() const = 0; // Started but not complete
-            virtual bool hasChildren() const = 0;
+            virtual bool isOpen() const                  = 0; // Started but not complete
+            virtual bool hasChildren() const             = 0;
 
             virtual ITracker &parent() = 0;
 
             // actions
-            virtual void close() = 0; // Successfully complete
-            virtual void fail() = 0;
+            virtual void close()                   = 0; // Successfully complete
+            virtual void fail()                    = 0;
             virtual void markAsNeedingAnotherRun() = 0;
 
-            virtual void addChild(ITrackerPtr const &child) = 0;
+            virtual void addChild(ITrackerPtr const &child)                       = 0;
             virtual ITrackerPtr findChild(NameAndLocation const &nameAndLocation) = 0;
-            virtual void openChild() = 0;
+            virtual void openChild()                                              = 0;
 
             // Debug/ checking
-            virtual bool isSectionTracker() const = 0;
+            virtual bool isSectionTracker() const   = 0;
             virtual bool isGeneratorTracker() const = 0;
         };
 
@@ -6359,7 +6437,7 @@ namespace Catch
 
             ITrackerPtr m_rootTracker;
             ITracker *m_currentTracker = nullptr;
-            RunState m_runState = NotStarted;
+            RunState m_runState        = NotStarted;
 
           public:
             static TrackerContext &instance();
@@ -6490,9 +6568,9 @@ namespace Catch
     namespace Detail
     {
 
-        Approx::Approx(double value) : m_epsilon(std::numeric_limits<float>::epsilon() * 100), m_margin(0.0), m_scale(0.0), m_value(value)
-        {
-        }
+        Approx::Approx(double value)
+            : m_epsilon(std::numeric_limits<float>::epsilon() * 100), m_margin(0.0), m_scale(0.0), m_value(value)
+        {}
 
         Approx Approx::custom()
         {
@@ -6517,18 +6595,21 @@ namespace Catch
         {
             // First try with fixed margin, then compute margin based on epsilon, scale and Approx's value
             // Thanks to Richard Harris for his help refining the scaled margin value
-            return marginComparison(m_value, other, m_margin) || marginComparison(m_value, other, m_epsilon * (m_scale + std::fabs(m_value)));
+            return marginComparison(m_value, other, m_margin) ||
+                   marginComparison(m_value, other, m_epsilon * (m_scale + std::fabs(m_value)));
         }
 
         void Approx::setMargin(double margin)
         {
-            CATCH_ENFORCE(margin >= 0, "Invalid Approx::margin: " << margin << '.' << " Approx::Margin has to be non-negative.");
+            CATCH_ENFORCE(margin >= 0,
+                          "Invalid Approx::margin: " << margin << '.' << " Approx::Margin has to be non-negative.");
             m_margin = margin;
         }
 
         void Approx::setEpsilon(double epsilon)
         {
-            CATCH_ENFORCE(epsilon >= 0 && epsilon <= 1.0, "Invalid Approx::epsilon: " << epsilon << '.' << " Approx::epsilon has to be in [0, 1]");
+            CATCH_ENFORCE(epsilon >= 0 && epsilon <= 1.0,
+                          "Invalid Approx::epsilon: " << epsilon << '.' << " Approx::epsilon has to be in [0, 1]");
             m_epsilon = epsilon;
         }
 
@@ -6585,12 +6666,11 @@ extern "C" __declspec(dllimport) void __stdcall DebugBreak();
 #endif
 
 #ifdef CATCH_TRAP
-#define CATCH_BREAK_INTO_DEBUGGER()                                                                                                                            \
-    [] {                                                                                                                                                       \
-        if (Catch::isDebuggerActive())                                                                                                                         \
-        {                                                                                                                                                      \
-            CATCH_TRAP();                                                                                                                                      \
-        }                                                                                                                                                      \
+#define CATCH_BREAK_INTO_DEBUGGER()                                                                                    \
+    [] {                                                                                                               \
+        if (Catch::isDebuggerActive()) {                                                                               \
+            CATCH_TRAP();                                                                                              \
+        }                                                                                                              \
     }()
 #else
 #define CATCH_BREAK_INTO_DEBUGGER() [] {}()
@@ -6709,7 +6789,10 @@ namespace Catch
         ~RunContext() override;
 
         void testGroupStarting(std::string const &testSpec, std::size_t groupIndex, std::size_t groupsCount);
-        void testGroupEnded(std::string const &testSpec, Totals const &totals, std::size_t groupIndex, std::size_t groupsCount);
+        void testGroupEnded(std::string const &testSpec,
+                            Totals const &totals,
+                            std::size_t groupIndex,
+                            std::size_t groupsCount);
 
         Totals runTest(TestCase const &testCase);
 
@@ -6718,12 +6801,21 @@ namespace Catch
 
       public: // IResultCapture
         // Assertion handlers
-        void handleExpr(AssertionInfo const &info, ITransientExpression const &expr, AssertionReaction &reaction) override;
-        void handleMessage(AssertionInfo const &info, ResultWas::OfType resultType, StringRef const &message, AssertionReaction &reaction) override;
+        void handleExpr(AssertionInfo const &info,
+                        ITransientExpression const &expr,
+                        AssertionReaction &reaction) override;
+        void handleMessage(AssertionInfo const &info,
+                           ResultWas::OfType resultType,
+                           StringRef const &message,
+                           AssertionReaction &reaction) override;
         void handleUnexpectedExceptionNotThrown(AssertionInfo const &info, AssertionReaction &reaction) override;
-        void handleUnexpectedInflightException(AssertionInfo const &info, std::string const &message, AssertionReaction &reaction) override;
+        void handleUnexpectedInflightException(AssertionInfo const &info,
+                                               std::string const &message,
+                                               AssertionReaction &reaction) override;
         void handleIncomplete(AssertionInfo const &info) override;
-        void handleNonExpr(AssertionInfo const &info, ResultWas::OfType resultType, AssertionReaction &reaction) override;
+        void handleNonExpr(AssertionInfo const &info,
+                           ResultWas::OfType resultType,
+                           AssertionReaction &reaction) override;
 
         bool sectionStarted(SectionInfo const &sectionInfo, Counts &assertions) override;
 
@@ -6764,7 +6856,10 @@ namespace Catch
         bool testForMissingAssertions(Counts &assertions);
 
         void assertionEnded(AssertionResult const &result);
-        void reportExpr(AssertionInfo const &info, ResultWas::OfType resultType, ITransientExpression const *expr, bool negated);
+        void reportExpr(AssertionInfo const &info,
+                        ResultWas::OfType resultType,
+                        ITransientExpression const *expr,
+                        bool negated);
 
         void populateReaction(AssertionReaction &reaction);
 
@@ -6774,7 +6869,7 @@ namespace Catch
         TestRunInfo m_runInfo;
         IMutableContext &m_context;
         TestCase const *m_activeTestCase = nullptr;
-        ITracker *m_testCaseTracker = nullptr;
+        ITracker *m_testCaseTracker      = nullptr;
         Option<AssertionResult> m_lastResult;
 
         IConfigPtr m_config;
@@ -6786,7 +6881,7 @@ namespace Catch
         std::vector<SectionEndInfo> m_unfinishedSections;
         std::vector<ITracker *> m_activeSections;
         TrackerContext m_trackerContext;
-        bool m_lastAssertionPassed = false;
+        bool m_lastAssertionPassed    = false;
         bool m_shouldReportUnexpected = true;
         bool m_includeSuccessfulResults;
     };
@@ -6807,12 +6902,10 @@ namespace Catch
     } // namespace
 
     LazyExpression::LazyExpression(bool isNegated) : m_isNegated(isNegated)
-    {
-    }
+    {}
 
     LazyExpression::LazyExpression(LazyExpression const &other) : m_isNegated(other.m_isNegated)
-    {
-    }
+    {}
 
     LazyExpression::operator bool() const
     {
@@ -6824,25 +6917,25 @@ namespace Catch
         if (lazyExpr.m_isNegated)
             os << "!";
 
-        if (lazyExpr)
-        {
+        if (lazyExpr) {
             if (lazyExpr.m_isNegated && lazyExpr.m_transientExpression->isBinaryExpression())
                 os << "(" << *lazyExpr.m_transientExpression << ")";
             else
                 os << *lazyExpr.m_transientExpression;
         }
-        else
-        {
+        else {
             os << "{** error - unchecked empty expression requested **}";
         }
         return os;
     }
 
-    AssertionHandler::AssertionHandler(StringRef const &macroName, SourceLineInfo const &lineInfo, StringRef capturedExpression,
+    AssertionHandler::AssertionHandler(StringRef const &macroName,
+                                       SourceLineInfo const &lineInfo,
+                                       StringRef capturedExpression,
                                        ResultDisposition::Flags resultDisposition)
-        : m_assertionInfo{macroName, lineInfo, capturedExpression, resultDisposition}, m_resultCapture(getResultCapture())
-    {
-    }
+        : m_assertionInfo{macroName, lineInfo, capturedExpression, resultDisposition},
+          m_resultCapture(getResultCapture())
+    {}
 
     void AssertionHandler::handleExpr(ITransientExpression const &expr)
     {
@@ -6861,8 +6954,7 @@ namespace Catch
     void AssertionHandler::complete()
     {
         setCompleted();
-        if (m_reaction.shouldDebugBreak)
-        {
+        if (m_reaction.shouldDebugBreak) {
 
             // If you find your debugger stopping you here then go one level up on the
             // call-stack for the code that caused it (typically a failed assertion)
@@ -6870,8 +6962,7 @@ namespace Catch
             // (To go back to the test and change execution, jump over the throw, next)
             CATCH_BREAK_INTO_DEBUGGER();
         }
-        if (m_reaction.shouldThrow)
-        {
+        if (m_reaction.shouldThrow) {
 #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
             throw Catch::TestFailureException();
 #else
@@ -6886,7 +6977,8 @@ namespace Catch
 
     void AssertionHandler::handleUnexpectedInflightException()
     {
-        m_resultCapture.handleUnexpectedInflightException(m_assertionInfo, Catch::translateActiveException(), m_reaction);
+        m_resultCapture.handleUnexpectedInflightException(
+            m_assertionInfo, Catch::translateActiveException(), m_reaction);
     }
 
     void AssertionHandler::handleExceptionThrownAsExpected()
@@ -6923,16 +7015,13 @@ namespace Catch
 {
     AssertionResultData::AssertionResultData(ResultWas::OfType _resultType, LazyExpression const &_lazyExpression)
         : lazyExpression(_lazyExpression), resultType(_resultType)
-    {
-    }
+    {}
 
     std::string AssertionResultData::reconstructExpression() const
     {
 
-        if (reconstructedExpression.empty())
-        {
-            if (lazyExpression)
-            {
+        if (reconstructedExpression.empty()) {
+            if (lazyExpression) {
                 ReusableStringStream rss;
                 rss << lazyExpression;
                 reconstructedExpression = rss.str();
@@ -6941,9 +7030,9 @@ namespace Catch
         return reconstructedExpression;
     }
 
-    AssertionResult::AssertionResult(AssertionInfo const &info, AssertionResultData const &data) : m_info(info), m_resultData(data)
-    {
-    }
+    AssertionResult::AssertionResult(AssertionInfo const &info, AssertionResultData const &data)
+        : m_info(info), m_resultData(data)
+    {}
 
     // Result was a success
     bool AssertionResult::succeeded() const
@@ -6985,8 +7074,7 @@ namespace Catch
         std::string expr;
         if (m_info.macroName[0] == 0)
             expr = m_info.capturedExpression;
-        else
-        {
+        else {
             expr.reserve(m_info.macroName.size() + m_info.capturedExpression.size() + 4);
             expr += m_info.macroName;
             expr += "( ";
@@ -7042,8 +7130,7 @@ namespace Catch
         auto elapsed = m_timer.getElapsedNanoseconds();
 
         // Exponentially increasing iterations until we're confident in our timer resolution
-        if (elapsed < m_resolution)
-        {
+        if (elapsed < m_resolution) {
             m_iterationsToRun *= 10;
             return true;
         }
@@ -7064,7 +7151,9 @@ namespace Catch
     // This is the general overload that takes a any string matcher
     // There is another overload, in catch_assertionhandler.h/.cpp, that only takes a string and infers
     // the Equals matcher (so the header does not mention matchers)
-    void handleExceptionMatchExpr(AssertionHandler &handler, StringMatcher const &matcher, StringRef const &matcherString)
+    void handleExceptionMatchExpr(AssertionHandler &handler,
+                                  StringMatcher const &matcher,
+                                  StringRef const &matcherString)
     {
         std::string exceptionMessage = Catch::translateActiveException();
         MatchExpr<std::string, StringMatcher const &> expr(exceptionMessage, matcher, matcherString);
@@ -7168,8 +7257,8 @@ namespace Catch
             class Column
             {
                 std::vector<std::string> m_strings;
-                size_t m_width = CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH;
-                size_t m_indent = 0;
+                size_t m_width         = CATCH_CLARA_TEXTFLOW_CONFIG_CONSOLE_WIDTH;
+                size_t m_indent        = 0;
                 size_t m_initialIndent = std::string::npos;
 
               public:
@@ -7179,15 +7268,14 @@ namespace Catch
 
                     Column const &m_column;
                     size_t m_stringIndex = 0;
-                    size_t m_pos = 0;
+                    size_t m_pos         = 0;
 
-                    size_t m_len = 0;
-                    size_t m_end = 0;
+                    size_t m_len  = 0;
+                    size_t m_end  = 0;
                     bool m_suffix = false;
 
                     iterator(Column const &column, size_t stringIndex) : m_column(column), m_stringIndex(stringIndex)
-                    {
-                    }
+                    {}
 
                     auto line() const -> std::string const &
                     {
@@ -7199,40 +7287,36 @@ namespace Catch
                         assert(at > 0);
                         assert(at <= line().size());
 
-                        return at == line().size() || (isWhitespace(line()[at]) && !isWhitespace(line()[at - 1])) || isBreakableBefore(line()[at]) ||
-                               isBreakableAfter(line()[at - 1]);
+                        return at == line().size() || (isWhitespace(line()[at]) && !isWhitespace(line()[at - 1])) ||
+                               isBreakableBefore(line()[at]) || isBreakableAfter(line()[at - 1]);
                     }
 
                     void calcLength()
                     {
                         assert(m_stringIndex < m_column.m_strings.size());
 
-                        m_suffix = false;
+                        m_suffix   = false;
                         auto width = m_column.m_width - indent();
-                        m_end = m_pos;
+                        m_end      = m_pos;
                         while (m_end < line().size() && line()[m_end] != '\n')
                             ++m_end;
 
-                        if (m_end < m_pos + width)
-                        {
+                        if (m_end < m_pos + width) {
                             m_len = m_end - m_pos;
                         }
-                        else
-                        {
+                        else {
                             size_t len = width;
                             while (len > 0 && !isBoundary(m_pos + len))
                                 --len;
                             while (len > 0 && isWhitespace(line()[m_pos + len - 1]))
                                 --len;
 
-                            if (len > 0)
-                            {
+                            if (len > 0) {
                                 m_len = len;
                             }
-                            else
-                            {
+                            else {
                                 m_suffix = true;
-                                m_len = width - 1;
+                                m_len    = width - 1;
                             }
                         }
                     }
@@ -7249,16 +7333,17 @@ namespace Catch
                     }
 
                   public:
-                    using difference_type = std::ptrdiff_t;
-                    using value_type = std::string;
-                    using pointer = value_type *;
-                    using reference = value_type &;
+                    using difference_type   = std::ptrdiff_t;
+                    using value_type        = std::string;
+                    using pointer           = value_type *;
+                    using reference         = value_type &;
                     using iterator_category = std::forward_iterator_tag;
 
                     explicit iterator(Column const &column) : m_column(column)
                     {
                         assert(m_column.m_width > m_column.m_indent);
-                        assert(m_column.m_initialIndent == std::string::npos || m_column.m_width > m_column.m_initialIndent);
+                        assert(m_column.m_initialIndent == std::string::npos ||
+                               m_column.m_width > m_column.m_initialIndent);
                         calcLength();
                         if (m_len == 0)
                             m_stringIndex++; // Empty string
@@ -7280,8 +7365,7 @@ namespace Catch
                             while (m_pos < line().size() && isWhitespace(line()[m_pos]))
                                 ++m_pos;
 
-                        if (m_pos == line().size())
-                        {
+                        if (m_pos == line().size()) {
                             m_pos = 0;
                             ++m_stringIndex;
                         }
@@ -7298,7 +7382,8 @@ namespace Catch
 
                     auto operator==(iterator const &other) const -> bool
                     {
-                        return m_pos == other.m_pos && m_stringIndex == other.m_stringIndex && &m_column == &other.m_column;
+                        return m_pos == other.m_pos && m_stringIndex == other.m_stringIndex &&
+                               &m_column == &other.m_column;
                     }
                     auto operator!=(iterator const &other) const -> bool
                     {
@@ -7345,8 +7430,7 @@ namespace Catch
                 inline friend std::ostream &operator<<(std::ostream &os, Column const &col)
                 {
                     bool first = true;
-                    for (auto line : col)
-                    {
+                    for (auto line : col) {
                         if (first)
                             first = false;
                         else
@@ -7385,8 +7469,7 @@ namespace Catch
                 {
                     friend Columns;
                     struct EndTag
-                    {
-                    };
+                    {};
 
                     std::vector<Column> const &m_columns;
                     std::vector<Column::iterator> m_iterators;
@@ -7401,13 +7484,14 @@ namespace Catch
                     }
 
                   public:
-                    using difference_type = std::ptrdiff_t;
-                    using value_type = std::string;
-                    using pointer = value_type *;
-                    using reference = value_type &;
+                    using difference_type   = std::ptrdiff_t;
+                    using value_type        = std::string;
+                    using pointer           = value_type *;
+                    using reference         = value_type &;
                     using iterator_category = std::forward_iterator_tag;
 
-                    explicit iterator(Columns const &columns) : m_columns(columns.m_columns), m_activeIterators(m_columns.size())
+                    explicit iterator(Columns const &columns)
+                        : m_columns(columns.m_columns), m_activeIterators(m_columns.size())
                     {
                         m_iterators.reserve(m_columns.size());
 
@@ -7427,11 +7511,9 @@ namespace Catch
                     {
                         std::string row, padding;
 
-                        for (size_t i = 0; i < m_columns.size(); ++i)
-                        {
+                        for (size_t i = 0; i < m_columns.size(); ++i) {
                             auto width = m_columns[i].width();
-                            if (m_iterators[i] != m_columns[i].end())
-                            {
+                            if (m_iterators[i] != m_columns[i].end()) {
                                 std::string col = *m_iterators[i];
                                 row += padding + col;
                                 if (col.size() < width)
@@ -7439,8 +7521,7 @@ namespace Catch
                                 else
                                     padding = "";
                             }
-                            else
-                            {
+                            else {
                                 padding += std::string(width, ' ');
                             }
                         }
@@ -7448,8 +7529,7 @@ namespace Catch
                     }
                     auto operator++() -> iterator &
                     {
-                        for (size_t i = 0; i < m_columns.size(); ++i)
-                        {
+                        for (size_t i = 0; i < m_columns.size(); ++i) {
                             if (m_iterators[i] != m_columns[i].end())
                                 ++m_iterators[i];
                         }
@@ -7489,8 +7569,7 @@ namespace Catch
                 {
 
                     bool first = true;
-                    for (auto line : cols)
-                    {
+                    for (auto line : cols) {
                         if (first)
                             first = false;
                         else
@@ -7542,18 +7621,19 @@ namespace Catch
 
             // Traits for extracting arg and return type of lambdas (for single argument lambdas)
             template <typename L> struct UnaryLambdaTraits : UnaryLambdaTraits<decltype(&L::operator())>
-            {
-            };
+            {};
 
-            template <typename ClassT, typename ReturnT, typename... Args> struct UnaryLambdaTraits<ReturnT (ClassT::*)(Args...) const>
+            template <typename ClassT, typename ReturnT, typename... Args>
+            struct UnaryLambdaTraits<ReturnT (ClassT::*)(Args...) const>
             {
                 static const bool isValid = false;
             };
 
-            template <typename ClassT, typename ReturnT, typename ArgT> struct UnaryLambdaTraits<ReturnT (ClassT::*)(ArgT) const>
+            template <typename ClassT, typename ReturnT, typename ArgT>
+            struct UnaryLambdaTraits<ReturnT (ClassT::*)(ArgT) const>
             {
                 static const bool isValid = true;
-                using ArgType = typename std::remove_const<typename std::remove_reference<ArgT>::type>::type;
+                using ArgType    = typename std::remove_const<typename std::remove_reference<ArgT>::type>::type;
                 using ReturnType = ReturnT;
             };
 
@@ -7568,12 +7648,11 @@ namespace Catch
 
               public:
                 Args(int argc, char const *const *argv) : m_exeName(argv[0]), m_args(argv + 1, argv + argc)
-                {
-                }
+                {}
 
-                Args(std::initializer_list<std::string> args) : m_exeName(*args.begin()), m_args(args.begin() + 1, args.end())
-                {
-                }
+                Args(std::initializer_list<std::string> args)
+                    : m_exeName(*args.begin()), m_args(args.begin() + 1, args.end())
+                {}
 
                 auto exeName() const -> std::string
                 {
@@ -7619,36 +7698,28 @@ namespace Catch
                     while (it != itEnd && it->empty())
                         ++it;
 
-                    if (it != itEnd)
-                    {
+                    if (it != itEnd) {
                         auto const &next = *it;
-                        if (isOptPrefix(next[0]))
-                        {
+                        if (isOptPrefix(next[0])) {
                             auto delimiterPos = next.find_first_of(" :=");
-                            if (delimiterPos != std::string::npos)
-                            {
+                            if (delimiterPos != std::string::npos) {
                                 m_tokenBuffer.push_back({TokenType::Option, next.substr(0, delimiterPos)});
                                 m_tokenBuffer.push_back({TokenType::Argument, next.substr(delimiterPos + 1)});
                             }
-                            else
-                            {
-                                if (next[1] != '-' && next.size() > 2)
-                                {
+                            else {
+                                if (next[1] != '-' && next.size() > 2) {
                                     std::string opt = "- ";
-                                    for (size_t i = 1; i < next.size(); ++i)
-                                    {
+                                    for (size_t i = 1; i < next.size(); ++i) {
                                         opt[1] = next[i];
                                         m_tokenBuffer.push_back({TokenType::Option, opt});
                                     }
                                 }
-                                else
-                                {
+                                else {
                                     m_tokenBuffer.push_back({TokenType::Option, next});
                                 }
                             }
                         }
-                        else
-                        {
+                        else {
                             m_tokenBuffer.push_back({TokenType::Argument, next});
                         }
                     }
@@ -7656,8 +7727,7 @@ namespace Catch
 
               public:
                 explicit TokenStream(Args const &args) : TokenStream(args.m_args.begin(), args.m_args.end())
-                {
-                }
+                {}
 
                 TokenStream(Iterator it, Iterator itEnd) : it(it), itEnd(itEnd)
                 {
@@ -7688,12 +7758,10 @@ namespace Catch
 
                 auto operator++() -> TokenStream &
                 {
-                    if (m_tokenBuffer.size() >= 2)
-                    {
+                    if (m_tokenBuffer.size() >= 2) {
                         m_tokenBuffer.erase(m_tokenBuffer.begin());
                     }
-                    else
-                    {
+                    else {
                         if (it != itEnd)
                             ++it;
                         loadBuffer();
@@ -7714,8 +7782,7 @@ namespace Catch
 
               protected:
                 ResultBase(Type type) : m_type(type)
-                {
-                }
+                {}
                 virtual ~ResultBase() = default;
 
                 virtual void enforceOk() const = 0;
@@ -7734,8 +7801,7 @@ namespace Catch
 
               protected:
                 ResultValueBase(Type type) : ResultBase(type)
-                {
-                }
+                {}
 
                 ResultValueBase(ResultValueBase const &other) : ResultBase(other)
                 {
@@ -7764,7 +7830,8 @@ namespace Catch
                         m_value.~T();
                 }
 
-                union {
+                union
+                {
                     T m_value;
                 };
             };
@@ -7778,7 +7845,9 @@ namespace Catch
             template <typename T = void> class BasicResult : public ResultValueBase<T>
             {
               public:
-                template <typename U> explicit BasicResult(BasicResult<U> const &other) : ResultValueBase<T>(other.type()), m_errorMessage(other.errorMessage())
+                template <typename U>
+                explicit BasicResult(BasicResult<U> const &other)
+                    : ResultValueBase<T>(other.type()), m_errorMessage(other.errorMessage())
                 {
                     assert(type() != ResultBase::Ok);
                 }
@@ -7827,7 +7896,8 @@ namespace Catch
 
                 std::string m_errorMessage; // Only populated if resultType is an error
 
-                BasicResult(ResultBase::Type type, std::string const &message) : ResultValueBase<T>(type), m_errorMessage(message)
+                BasicResult(ResultBase::Type type, std::string const &message)
+                    : ResultValueBase<T>(type), m_errorMessage(message)
                 {
                     assert(m_type != ResultBase::Ok);
                 }
@@ -7847,9 +7917,9 @@ namespace Catch
             class ParseState
             {
               public:
-                ParseState(ParseResultType type, TokenStream const &remainingTokens) : m_type(type), m_remainingTokens(remainingTokens)
-                {
-                }
+                ParseState(ParseResultType type, TokenStream const &remainingTokens)
+                    : m_type(type), m_remainingTokens(remainingTokens)
+                {}
 
                 auto type() const -> ParseResultType
                 {
@@ -7865,8 +7935,8 @@ namespace Catch
                 TokenStream m_remainingTokens;
             };
 
-            using Result = BasicResult<void>;
-            using ParserResult = BasicResult<ParseResultType>;
+            using Result              = BasicResult<void>;
+            using ParserResult        = BasicResult<ParseResultType>;
             using InternalParseResult = BasicResult<ParseState>;
 
             struct HelpColumns
@@ -7893,17 +7963,21 @@ namespace Catch
             inline auto convertInto(std::string const &source, bool &target) -> ParserResult
             {
                 std::string srcLC = source;
-                std::transform(srcLC.begin(), srcLC.end(), srcLC.begin(), [](char c) { return static_cast<char>(std::tolower(c)); });
+                std::transform(srcLC.begin(), srcLC.end(), srcLC.begin(), [](char c) {
+                    return static_cast<char>(std::tolower(c));
+                });
                 if (srcLC == "y" || srcLC == "1" || srcLC == "true" || srcLC == "yes" || srcLC == "on")
                     target = true;
                 else if (srcLC == "n" || srcLC == "0" || srcLC == "false" || srcLC == "no" || srcLC == "off")
                     target = false;
                 else
-                    return ParserResult::runtimeError("Expected a boolean value but did not recognise: '" + source + "'");
+                    return ParserResult::runtimeError("Expected a boolean value but did not recognise: '" + source +
+                                                      "'");
                 return ParserResult::ok(ParseResultType::Matched);
             }
 #ifdef CLARA_CONFIG_OPTIONAL_TYPE
-            template <typename T> inline auto convertInto(std::string const &source, CLARA_CONFIG_OPTIONAL_TYPE<T> &target) -> ParserResult
+            template <typename T>
+            inline auto convertInto(std::string const &source, CLARA_CONFIG_OPTIONAL_TYPE<T> &target) -> ParserResult
             {
                 T temp;
                 auto result = convertInto(source, temp);
@@ -7915,9 +7989,9 @@ namespace Catch
 
             struct NonCopyable
             {
-                NonCopyable() = default;
+                NonCopyable()                    = default;
                 NonCopyable(NonCopyable const &) = delete;
-                NonCopyable(NonCopyable &&) = delete;
+                NonCopyable(NonCopyable &&)      = delete;
                 NonCopyable &operator=(NonCopyable const &) = delete;
                 NonCopyable &operator=(NonCopyable &&) = delete;
             };
@@ -7952,8 +8026,7 @@ namespace Catch
                 T &m_ref;
 
                 explicit BoundValueRef(T &ref) : m_ref(ref)
-                {
-                }
+                {}
 
                 auto setValue(std::string const &arg) -> ParserResult override
                 {
@@ -7966,8 +8039,7 @@ namespace Catch
                 std::vector<T> &m_ref;
 
                 explicit BoundValueRef(std::vector<T> &ref) : m_ref(ref)
-                {
-                }
+                {}
 
                 auto isContainer() const -> bool override
                 {
@@ -7989,8 +8061,7 @@ namespace Catch
                 bool &m_ref;
 
                 explicit BoundFlagRef(bool &ref) : m_ref(ref)
-                {
-                }
+                {}
 
                 auto setFlag(bool flag) -> ParserResult override
                 {
@@ -8001,9 +8072,11 @@ namespace Catch
 
             template <typename ReturnType> struct LambdaInvoker
             {
-                static_assert(std::is_same<ReturnType, ParserResult>::value, "Lambda must return void or clara::ParserResult");
+                static_assert(std::is_same<ReturnType, ParserResult>::value,
+                              "Lambda must return void or clara::ParserResult");
 
-                template <typename L, typename ArgType> static auto invoke(L const &lambda, ArgType const &arg) -> ParserResult
+                template <typename L, typename ArgType>
+                static auto invoke(L const &lambda, ArgType const &arg) -> ParserResult
                 {
                     return lambda(arg);
                 }
@@ -8011,18 +8084,21 @@ namespace Catch
 
             template <> struct LambdaInvoker<void>
             {
-                template <typename L, typename ArgType> static auto invoke(L const &lambda, ArgType const &arg) -> ParserResult
+                template <typename L, typename ArgType>
+                static auto invoke(L const &lambda, ArgType const &arg) -> ParserResult
                 {
                     lambda(arg);
                     return ParserResult::ok(ParseResultType::Matched);
                 }
             };
 
-            template <typename ArgType, typename L> inline auto invokeLambda(L const &lambda, std::string const &arg) -> ParserResult
+            template <typename ArgType, typename L>
+            inline auto invokeLambda(L const &lambda, std::string const &arg) -> ParserResult
             {
                 ArgType temp{};
                 auto result = convertInto(arg, temp);
-                return !result ? result : LambdaInvoker<typename UnaryLambdaTraits<L>::ReturnType>::invoke(lambda, temp);
+                return !result ? result
+                               : LambdaInvoker<typename UnaryLambdaTraits<L>::ReturnType>::invoke(lambda, temp);
             }
 
             template <typename L> struct BoundLambda : BoundValueRefBase
@@ -8031,8 +8107,7 @@ namespace Catch
 
                 static_assert(UnaryLambdaTraits<L>::isValid, "Supplied lambda must take exactly one argument");
                 explicit BoundLambda(L const &lambda) : m_lambda(lambda)
-                {
-                }
+                {}
 
                 auto setValue(std::string const &arg) -> ParserResult override
                 {
@@ -8045,11 +8120,11 @@ namespace Catch
                 L m_lambda;
 
                 static_assert(UnaryLambdaTraits<L>::isValid, "Supplied lambda must take exactly one argument");
-                static_assert(std::is_same<typename UnaryLambdaTraits<L>::ArgType, bool>::value, "flags must be boolean");
+                static_assert(std::is_same<typename UnaryLambdaTraits<L>::ArgType, bool>::value,
+                              "flags must be boolean");
 
                 explicit BoundFlagLambda(L const &lambda) : m_lambda(lambda)
-                {
-                }
+                {}
 
                 auto setFlag(bool flag) -> ParserResult override
                 {
@@ -8073,7 +8148,8 @@ namespace Catch
                 {
                     return Result::ok();
                 }
-                virtual auto parse(std::string const &exeName, TokenStream const &tokens) const -> InternalParseResult = 0;
+                virtual auto parse(std::string const &exeName, TokenStream const &tokens) const
+                    -> InternalParseResult = 0;
                 virtual auto cardinality() const -> size_t
                 {
                     return 1;
@@ -8103,18 +8179,18 @@ namespace Catch
                 std::string m_description;
 
                 explicit ParserRefImpl(std::shared_ptr<BoundRef> const &ref) : m_ref(ref)
-                {
-                }
+                {}
 
               public:
-                template <typename T> ParserRefImpl(T &ref, std::string const &hint) : m_ref(std::make_shared<BoundValueRef<T>>(ref)), m_hint(hint)
-                {
-                }
+                template <typename T>
+                ParserRefImpl(T &ref, std::string const &hint)
+                    : m_ref(std::make_shared<BoundValueRef<T>>(ref)), m_hint(hint)
+                {}
 
                 template <typename LambdaT>
-                ParserRefImpl(LambdaT const &ref, std::string const &hint) : m_ref(std::make_shared<BoundLambda<LambdaT>>(ref)), m_hint(hint)
-                {
-                }
+                ParserRefImpl(LambdaT const &ref, std::string const &hint)
+                    : m_ref(std::make_shared<BoundLambda<LambdaT>>(ref)), m_hint(hint)
+                {}
 
                 auto operator()(std::string const &description) -> DerivedT &
                 {
@@ -8158,15 +8234,15 @@ namespace Catch
                 std::shared_ptr<std::string> m_name;
                 std::shared_ptr<BoundValueRefBase> m_ref;
 
-                template <typename LambdaT> static auto makeRef(LambdaT const &lambda) -> std::shared_ptr<BoundValueRefBase>
+                template <typename LambdaT>
+                static auto makeRef(LambdaT const &lambda) -> std::shared_ptr<BoundValueRefBase>
                 {
                     return std::make_shared<BoundLambda<LambdaT>>(lambda);
                 }
 
               public:
                 ExeName() : m_name(std::make_shared<std::string>("<executable>"))
-                {
-                }
+                {}
 
                 explicit ExeName(std::string &ref) : ExeName()
                 {
@@ -8192,7 +8268,7 @@ namespace Catch
                 {
 
                     auto lastSlash = newName.find_last_of("\\/");
-                    auto filename = (lastSlash == std::string::npos) ? newName : newName.substr(lastSlash + 1);
+                    auto filename  = (lastSlash == std::string::npos) ? newName : newName.substr(lastSlash + 1);
 
                     *m_name = filename;
                     if (m_ref)
@@ -8214,7 +8290,7 @@ namespace Catch
                         return InternalParseResult(validationResult);
 
                     auto remainingTokens = tokens;
-                    auto const &token = *remainingTokens;
+                    auto const &token    = *remainingTokens;
                     if (token.type != TokenType::Argument)
                         return InternalParseResult::ok(ParseState(ParseResultType::NoMatch, remainingTokens));
 
@@ -8245,21 +8321,18 @@ namespace Catch
                 std::vector<std::string> m_optNames;
 
               public:
-                template <typename LambdaT> explicit Opt(LambdaT const &ref) : ParserRefImpl(std::make_shared<BoundFlagLambda<LambdaT>>(ref))
-                {
-                }
+                template <typename LambdaT>
+                explicit Opt(LambdaT const &ref) : ParserRefImpl(std::make_shared<BoundFlagLambda<LambdaT>>(ref))
+                {}
 
                 explicit Opt(bool &ref) : ParserRefImpl(std::make_shared<BoundFlagRef>(ref))
-                {
-                }
+                {}
 
                 template <typename LambdaT> Opt(LambdaT const &ref, std::string const &hint) : ParserRefImpl(ref, hint)
-                {
-                }
+                {}
 
                 template <typename T> Opt(T &ref, std::string const &hint) : ParserRefImpl(ref, hint)
-                {
-                }
+                {}
 
                 auto operator[](std::string const &optName) -> Opt &
                 {
@@ -8271,8 +8344,7 @@ namespace Catch
                 {
                     std::ostringstream oss;
                     bool first = true;
-                    for (auto const &opt : m_optNames)
-                    {
+                    for (auto const &opt : m_optNames) {
                         if (first)
                             first = false;
                         else
@@ -8287,8 +8359,7 @@ namespace Catch
                 auto isMatch(std::string const &optToken) const -> bool
                 {
                     auto normalisedToken = normaliseOpt(optToken);
-                    for (auto const &name : m_optNames)
-                    {
+                    for (auto const &name : m_optNames) {
                         if (normaliseOpt(name) == normalisedToken)
                             return true;
                     }
@@ -8304,29 +8375,27 @@ namespace Catch
                         return InternalParseResult(validationResult);
 
                     auto remainingTokens = tokens;
-                    if (remainingTokens && remainingTokens->type == TokenType::Option)
-                    {
+                    if (remainingTokens && remainingTokens->type == TokenType::Option) {
                         auto const &token = *remainingTokens;
-                        if (isMatch(token.token))
-                        {
-                            if (m_ref->isFlag())
-                            {
+                        if (isMatch(token.token)) {
+                            if (m_ref->isFlag()) {
                                 auto flagRef = static_cast<detail::BoundFlagRefBase *>(m_ref.get());
-                                auto result = flagRef->setFlag(true);
+                                auto result  = flagRef->setFlag(true);
                                 if (!result)
                                     return InternalParseResult(result);
                                 if (result.value() == ParseResultType::ShortCircuitAll)
                                     return InternalParseResult::ok(ParseState(result.value(), remainingTokens));
                             }
-                            else
-                            {
+                            else {
                                 auto valueRef = static_cast<detail::BoundValueRefBase *>(m_ref.get());
                                 ++remainingTokens;
                                 if (!remainingTokens)
-                                    return InternalParseResult::runtimeError("Expected argument following " + token.token);
+                                    return InternalParseResult::runtimeError("Expected argument following " +
+                                                                             token.token);
                                 auto const &argToken = *remainingTokens;
                                 if (argToken.type != TokenType::Argument)
-                                    return InternalParseResult::runtimeError("Expected argument following " + token.token);
+                                    return InternalParseResult::runtimeError("Expected argument following " +
+                                                                             token.token);
                                 auto result = valueRef->setValue(argToken.token);
                                 if (!result)
                                     return InternalParseResult(result);
@@ -8343,8 +8412,7 @@ namespace Catch
                 {
                     if (m_optNames.empty())
                         return Result::logicError("No options supplied to Opt");
-                    for (auto const &name : m_optNames)
-                    {
+                    for (auto const &name : m_optNames) {
                         if (name.empty())
                             return Result::logicError("Option name cannot be empty");
 #ifdef CATCH_PLATFORM_WINDOWS
@@ -8421,8 +8489,7 @@ namespace Catch
                 auto getHelpColumns() const -> std::vector<HelpColumns>
                 {
                     std::vector<HelpColumns> cols;
-                    for (auto const &o : m_options)
-                    {
+                    for (auto const &o : m_options) {
                         auto childCols = o.getHelpColumns();
                         cols.insert(cols.end(), childCols.begin(), childCols.end());
                     }
@@ -8431,19 +8498,16 @@ namespace Catch
 
                 void writeToStream(std::ostream &os) const
                 {
-                    if (!m_exeName.name().empty())
-                    {
+                    if (!m_exeName.name().empty()) {
                         os << "usage:\n"
                            << "  " << m_exeName.name() << " ";
                         bool required = true, first = true;
-                        for (auto const &arg : m_args)
-                        {
+                        for (auto const &arg : m_args) {
                             if (first)
                                 first = false;
                             else
                                 os << " ";
-                            if (arg.isOptional() && required)
-                            {
+                            if (arg.isOptional() && required) {
                                 os << "[";
                                 required = false;
                             }
@@ -8458,16 +8522,15 @@ namespace Catch
                         os << "\n\nwhere options are:" << std::endl;
                     }
 
-                    auto rows = getHelpColumns();
+                    auto rows           = getHelpColumns();
                     size_t consoleWidth = CATCH_CLARA_CONFIG_CONSOLE_WIDTH;
-                    size_t optWidth = 0;
+                    size_t optWidth     = 0;
                     for (auto const &cols : rows)
                         optWidth = (std::max)(optWidth, cols.left.size() + 2);
 
                     optWidth = (std::min)(optWidth, consoleWidth / 2);
 
-                    for (auto const &cols : rows)
-                    {
+                    for (auto const &cols : rows) {
                         auto row = TextFlow::Column(cols.left).width(optWidth).indent(2) + TextFlow::Spacer(4) +
                                    TextFlow::Column(cols.right).width(consoleWidth - 7 - optWidth);
                         os << row << std::endl;
@@ -8482,14 +8545,12 @@ namespace Catch
 
                 auto validate() const -> Result override
                 {
-                    for (auto const &opt : m_options)
-                    {
+                    for (auto const &opt : m_options) {
                         auto result = opt.validate();
                         if (!result)
                             return result;
                     }
-                    for (auto const &arg : m_args)
-                    {
+                    for (auto const &arg : m_args) {
                         auto result = arg.validate();
                         if (!result)
                             return result;
@@ -8505,7 +8566,7 @@ namespace Catch
                     struct ParserInfo
                     {
                         ParserBase const *parser = nullptr;
-                        size_t count = 0;
+                        size_t count             = 0;
                     };
                     const size_t totalParsers = m_options.size() + m_args.size();
                     assert(totalParsers < 512);
@@ -8523,20 +8584,17 @@ namespace Catch
                     m_exeName.set(exeName);
 
                     auto result = InternalParseResult::ok(ParseState(ParseResultType::NoMatch, tokens));
-                    while (result.value().remainingTokens())
-                    {
+                    while (result.value().remainingTokens()) {
                         bool tokenParsed = false;
 
-                        for (size_t i = 0; i < totalParsers; ++i)
-                        {
+                        for (size_t i = 0; i < totalParsers; ++i) {
                             auto &parseInfo = parseInfos[i];
-                            if (parseInfo.parser->cardinality() == 0 || parseInfo.count < parseInfo.parser->cardinality())
-                            {
+                            if (parseInfo.parser->cardinality() == 0 ||
+                                parseInfo.count < parseInfo.parser->cardinality()) {
                                 result = parseInfo.parser->parse(exeName, result.value().remainingTokens());
                                 if (!result)
                                     return result;
-                                if (result.value().type() != ParseResultType::NoMatch)
-                                {
+                                if (result.value().type() != ParseResultType::NoMatch) {
                                     tokenParsed = true;
                                     ++parseInfo.count;
                                     break;
@@ -8547,14 +8605,17 @@ namespace Catch
                         if (result.value().type() == ParseResultType::ShortCircuitAll)
                             return result;
                         if (!tokenParsed)
-                            return InternalParseResult::runtimeError("Unrecognised token: " + result.value().remainingTokens()->token);
+                            return InternalParseResult::runtimeError("Unrecognised token: " +
+                                                                     result.value().remainingTokens()->token);
                     }
                     // !TBD Check missing required options
                     return result;
                 }
             };
 
-            template <typename DerivedT> template <typename T> auto ComposableParserImpl<DerivedT>::operator|(T const &other) const -> Parser
+            template <typename DerivedT>
+            template <typename T>
+            auto ComposableParserImpl<DerivedT>::operator|(T const &other) const -> Parser
             {
                 return Parser() | static_cast<DerivedT const &>(*this) | other;
             }
@@ -8640,11 +8701,9 @@ namespace Catch
                 return ParserResult::runtimeError("Unable to load input file: '" + filename + "'");
 
             std::string line;
-            while (std::getline(f, line))
-            {
+            while (std::getline(f, line)) {
                 line = trim(line);
-                if (!line.empty() && !startsWith(line, '#'))
-                {
+                if (!line.empty() && !startsWith(line, '#')) {
                     if (!startsWith(line, '"'))
                         line = '"' + line + '"';
                     config.testsOrTags.push_back(line + ',');
@@ -8679,7 +8738,8 @@ namespace Catch
             else if (mode == "auto")
                 config.useColour = UseColour::Auto;
             else
-                return ParserResult::runtimeError("colour mode must be one of: auto, yes or no. '" + useColour + "' not recognised");
+                return ParserResult::runtimeError("colour mode must be one of: auto, yes or no. '" + useColour +
+                                                  "' not recognised");
             return ParserResult::ok(ParseResultType::Matched);
         };
         auto const setWaitForKeypress = [&](std::string const &keypress) {
@@ -8691,7 +8751,8 @@ namespace Catch
             else if (keypressLc == "both")
                 config.waitForKeypress = WaitForKeypress::BeforeStartAndExit;
             else
-                return ParserResult::runtimeError("keypress argument must be one of: start, exit or both. '" + keypress + "' not recognised");
+                return ParserResult::runtimeError("keypress argument must be one of: start, exit or both. '" +
+                                                  keypress + "' not recognised");
             return ParserResult::ok(ParseResultType::Matched);
         };
         auto const setVerbosity = [&](std::string const &verbosity) {
@@ -8710,23 +8771,27 @@ namespace Catch
             IReporterRegistry::FactoryMap const &factories = getRegistryHub().getReporterRegistry().getFactories();
 
             auto lcReporter = toLower(reporter);
-            auto result = factories.find(lcReporter);
+            auto result     = factories.find(lcReporter);
 
             if (factories.end() != result)
                 config.reporterName = lcReporter;
             else
-                return ParserResult::runtimeError("Unrecognized reporter, '" + reporter + "'. Check available with --list-reporters");
+                return ParserResult::runtimeError("Unrecognized reporter, '" + reporter +
+                                                  "'. Check available with --list-reporters");
             return ParserResult::ok(ParseResultType::Matched);
         };
 
         auto cli =
-            ExeName(config.processName) | Help(config.showHelp) | Opt(config.listTests)["-l"]["--list-tests"]("list all/matching test cases") |
+            ExeName(config.processName) | Help(config.showHelp) |
+            Opt(config.listTests)["-l"]["--list-tests"]("list all/matching test cases") |
             Opt(config.listTags)["-t"]["--list-tags"]("list all/matching tags") |
             Opt(config.showSuccessfulTests)["-s"]["--success"]("include successful tests in output") |
-            Opt(config.shouldDebugBreak)["-b"]["--break"]("break into debugger on failure") | Opt(config.noThrow)["-e"]["--nothrow"]("skip exception tests") |
+            Opt(config.shouldDebugBreak)["-b"]["--break"]("break into debugger on failure") |
+            Opt(config.noThrow)["-e"]["--nothrow"]("skip exception tests") |
             Opt(config.showInvisibles)["-i"]["--invisibles"]("show invisibles (tabs, newlines)") |
             Opt(config.outputFilename, "filename")["-o"]["--out"]("output filename") |
-            Opt(setReporter, "name")["-r"]["--reporter"]("reporter to use (defaults to console)") | Opt(config.name, "name")["-n"]["--name"]("suite name") |
+            Opt(setReporter, "name")["-r"]["--reporter"]("reporter to use (defaults to console)") |
+            Opt(config.name, "name")["-n"]["--name"]("suite name") |
             Opt([&](bool) { config.abortAfter = 1; })["-a"]["--abort"]("abort at first failure") |
             Opt([&](int x) { config.abortAfter = x; }, "no. failures")["-x"]["--abortx"]("abort after x failures") |
             Opt(setWarning, "warning name")["-w"]["--warn"]("enable warnings") |
@@ -8743,7 +8808,8 @@ namespace Catch
             Opt(setColourUsage, "yes|no")["--use-colour"]("should output be colourised") |
             Opt(config.libIdentify)["--libidentify"]("report name and version according to libidentify standard") |
             Opt(setWaitForKeypress, "start|exit|both")["--wait-for-keypress"]("waits for a keypress before exiting") |
-            Opt(config.benchmarkResolutionMultiple, "multiplier")["--benchmark-resolution-multiple"]("multiple of clock resolution to run benchmarks")
+            Opt(config.benchmarkResolutionMultiple,
+                "multiplier")["--benchmark-resolution-multiple"]("multiple of clock resolution to run benchmarks")
 
             | Arg(config.testsOrTags, "test name|pattern|tags")("which test or tests to use");
 
@@ -8790,7 +8856,7 @@ namespace Catch
         return std::string();
     }
 
-    NonCopyable::NonCopyable() = default;
+    NonCopyable::NonCopyable()  = default;
     NonCopyable::~NonCopyable() = default;
 
 } // namespace Catch
@@ -8803,12 +8869,10 @@ namespace Catch
     Config::Config(ConfigData const &data) : m_data(data), m_stream(openStream())
     {
         TestSpecParser parser(ITagAliasRegistry::get());
-        if (data.testsOrTags.empty())
-        {
+        if (data.testsOrTags.empty()) {
             parser.parse("~[.]"); // All not hidden tests
         }
-        else
-        {
+        else {
             m_hasTestFilters = true;
             for (auto const &testOrTags : data.testsOrTags)
                 parser.parse(testOrTags);
@@ -8973,15 +9037,14 @@ namespace Catch
 
         struct IColourImpl
         {
-            virtual ~IColourImpl() = default;
+            virtual ~IColourImpl()                     = default;
             virtual void use(Colour::Code _colourCode) = 0;
         };
 
         struct NoColourImpl : IColourImpl
         {
             void use(Colour::Code)
-            {
-            }
+            {}
 
             static IColourImpl *instance()
             {
@@ -9015,14 +9078,15 @@ namespace Catch
             {
                 CONSOLE_SCREEN_BUFFER_INFO csbiInfo;
                 GetConsoleScreenBufferInfo(stdoutHandle, &csbiInfo);
-                originalForegroundAttributes = csbiInfo.wAttributes & ~(BACKGROUND_GREEN | BACKGROUND_RED | BACKGROUND_BLUE | BACKGROUND_INTENSITY);
-                originalBackgroundAttributes = csbiInfo.wAttributes & ~(FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+                originalForegroundAttributes = csbiInfo.wAttributes & ~(BACKGROUND_GREEN | BACKGROUND_RED |
+                                                                        BACKGROUND_BLUE | BACKGROUND_INTENSITY);
+                originalBackgroundAttributes = csbiInfo.wAttributes & ~(FOREGROUND_GREEN | FOREGROUND_RED |
+                                                                        FOREGROUND_BLUE | FOREGROUND_INTENSITY);
             }
 
             virtual void use(Colour::Code _colourCode) override
             {
-                switch (_colourCode)
-                {
+                switch (_colourCode) {
                 case Colour::None:
                     return setTextAttribute(originalForegroundAttributes);
                 case Colour::White:
@@ -9073,7 +9137,7 @@ namespace Catch
         {
             static Win32ColourImpl s_instance;
 
-            IConfigPtr config = getCurrentContext().getConfig();
+            IConfigPtr config             = getCurrentContext().getConfig();
             UseColour::YesOrNo colourMode = config ? config->useColour() : UseColour::Auto;
             if (colourMode == UseColour::Auto)
                 colourMode = UseColour::Yes;
@@ -9101,8 +9165,7 @@ namespace Catch
           public:
             virtual void use(Colour::Code _colourCode) override
             {
-                switch (_colourCode)
-                {
+                switch (_colourCode) {
                 case Colour::None:
                 case Colour::White:
                     return setColour("[0m");
@@ -9198,12 +9261,12 @@ namespace Catch
     }
     Colour::Colour(Colour &&rhs) noexcept
     {
-        m_moved = rhs.m_moved;
+        m_moved     = rhs.m_moved;
         rhs.m_moved = true;
     }
     Colour &Colour::operator=(Colour &&rhs) noexcept
     {
-        m_moved = rhs.m_moved;
+        m_moved     = rhs.m_moved;
         rhs.m_moved = true;
         return *this;
     }
@@ -9275,7 +9338,7 @@ namespace Catch
 
       private:
         IConfigPtr m_config;
-        IRunner *m_runner = nullptr;
+        IRunner *m_runner               = nullptr;
         IResultCapture *m_resultCapture = nullptr;
     };
 
@@ -9291,9 +9354,9 @@ namespace Catch
         delete IMutableContext::currentContext;
         IMutableContext::currentContext = nullptr;
     }
-    IContext::~IContext() = default;
+    IContext::~IContext()               = default;
     IMutableContext::~IMutableContext() = default;
-    Context::~Context() = default;
+    Context::~Context()                 = default;
 } // namespace Catch
 // end catch_context.cpp
 // start catch_debug_console.cpp
@@ -9374,8 +9437,7 @@ namespace Catch
         // Call sysctl.
 
         size = sizeof(info);
-        if (sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, nullptr, 0) != 0)
-        {
+        if (sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, nullptr, 0) != 0) {
             Catch::cerr() << "\n** Call to sysctl failed - unable to determine if debugger is active **\n" << std::endl;
             return false;
         }
@@ -9405,11 +9467,9 @@ namespace Catch
         // This way our users can properly assert over errno values
         ErrnoGuard guard;
         std::ifstream in("/proc/self/status");
-        for (std::string line; std::getline(in, line);)
-        {
+        for (std::string line; std::getline(in, line);) {
             static const int PREFIX_LEN = 11;
-            if (line.compare(0, PREFIX_LEN, "TracerPid:\t") == 0)
-            {
+            if (line.compare(0, PREFIX_LEN, "TracerPid:\t") == 0) {
                 // We're traced if the PID is not 0 and no other PID starts
                 // with 0 digit, so it's enough to check for just a single
                 // character.
@@ -9485,8 +9545,7 @@ namespace Catch
 namespace Catch
 {
     ErrnoGuard::ErrnoGuard() : m_oldErrno(errno)
-    {
-    }
+    {}
     ErrnoGuard::~ErrnoGuard()
     {
         errno = m_oldErrno;
@@ -9526,8 +9585,7 @@ namespace Catch
 {
 
     ExceptionTranslatorRegistry::~ExceptionTranslatorRegistry()
-    {
-    }
+    {}
 
     void ExceptionTranslatorRegistry::registerTranslator(const IExceptionTranslator *translator)
     {
@@ -9537,16 +9595,13 @@ namespace Catch
 #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
     std::string ExceptionTranslatorRegistry::translateActiveException() const
     {
-        try
-        {
+        try {
 #ifdef __OBJC__
             // In Objective-C try objective-c exceptions first
-            @try
-            {
+            @try {
                 return tryTranslators();
             }
-            @catch (NSException *exception)
-            {
+            @catch (NSException *exception) {
                 return Catch::Detail::stringify([exception description]);
             }
 #else
@@ -9558,43 +9613,35 @@ namespace Catch
             // here, but they fill-in current_exception properly, so
             // at worst the output should be a little weird, instead of
             // causing a crash.
-            if (std::current_exception() == nullptr)
-            {
+            if (std::current_exception() == nullptr) {
                 return "Non C++ exception. Possibly a CLR exception.";
             }
             return tryTranslators();
 #endif
         }
-        catch (TestFailureException &)
-        {
+        catch (TestFailureException &) {
             std::rethrow_exception(std::current_exception());
         }
-        catch (std::exception &ex)
-        {
+        catch (std::exception &ex) {
             return ex.what();
         }
-        catch (std::string &msg)
-        {
+        catch (std::string &msg) {
             return msg;
         }
-        catch (const char *msg)
-        {
+        catch (const char *msg) {
             return msg;
         }
-        catch (...)
-        {
+        catch (...) {
             return "Unknown exception";
         }
     }
 
     std::string ExceptionTranslatorRegistry::tryTranslators() const
     {
-        if (m_translators.empty())
-        {
+        if (m_translators.empty()) {
             std::rethrow_exception(std::current_exception());
         }
-        else
-        {
+        else {
             return m_translators[0]->translate(m_translators.begin() + 1, m_translators.end());
         }
     }
@@ -9655,10 +9702,8 @@ namespace Catch
 
     LONG CALLBACK FatalConditionHandler::handleVectoredException(PEXCEPTION_POINTERS ExceptionInfo)
     {
-        for (auto const &def : signalDefs)
-        {
-            if (ExceptionInfo->ExceptionRecord->ExceptionCode == def.id)
-            {
+        for (auto const &def : signalDefs) {
+            if (ExceptionInfo->ExceptionRecord->ExceptionCode == def.id) {
                 reportFatal(def.name);
             }
         }
@@ -9672,7 +9717,7 @@ namespace Catch
         isSet = true;
         // 32k seems enough for Catch to handle stack overflow,
         // but the value was found experimentally, so there is no strong guarantee
-        guaranteeSize = 32 * 1024;
+        guaranteeSize          = 32 * 1024;
         exceptionHandlerHandle = nullptr;
         // Register as first handler in current chain
         exceptionHandlerHandle = AddVectoredExceptionHandler(1, handleVectoredException);
@@ -9682,12 +9727,11 @@ namespace Catch
 
     void FatalConditionHandler::reset()
     {
-        if (isSet)
-        {
+        if (isSet) {
             RemoveVectoredExceptionHandler(exceptionHandlerHandle);
             SetThreadStackGuarantee(&guaranteeSize);
             exceptionHandlerHandle = nullptr;
-            isSet = false;
+            isSet                  = false;
         }
     }
 
@@ -9696,8 +9740,8 @@ namespace Catch
         reset();
     }
 
-    bool FatalConditionHandler::isSet = false;
-    ULONG FatalConditionHandler::guaranteeSize = 0;
+    bool FatalConditionHandler::isSet                   = false;
+    ULONG FatalConditionHandler::guaranteeSize          = 0;
     PVOID FatalConditionHandler::exceptionHandlerHandle = nullptr;
 
 } // namespace Catch
@@ -9717,17 +9761,18 @@ namespace Catch
     // is experimentally determined, so that's not guaranteed.
     constexpr static std::size_t sigStackSize = 32768 >= MINSIGSTKSZ ? 32768 : MINSIGSTKSZ;
 
-    static SignalDefs signalDefs[] = {{SIGINT, "SIGINT - Terminal interrupt signal"},    {SIGILL, "SIGILL - Illegal instruction signal"},
-                                      {SIGFPE, "SIGFPE - Floating point error signal"},  {SIGSEGV, "SIGSEGV - Segmentation violation signal"},
-                                      {SIGTERM, "SIGTERM - Termination request signal"}, {SIGABRT, "SIGABRT - Abort (abnormal termination) signal"}};
+    static SignalDefs signalDefs[] = {{SIGINT, "SIGINT - Terminal interrupt signal"},
+                                      {SIGILL, "SIGILL - Illegal instruction signal"},
+                                      {SIGFPE, "SIGFPE - Floating point error signal"},
+                                      {SIGSEGV, "SIGSEGV - Segmentation violation signal"},
+                                      {SIGTERM, "SIGTERM - Termination request signal"},
+                                      {SIGABRT, "SIGABRT - Abort (abnormal termination) signal"}};
 
     void FatalConditionHandler::handleSignal(int sig)
     {
         char const *name = "<unknown signal>";
-        for (auto const &def : signalDefs)
-        {
-            if (sig == def.id)
-            {
+        for (auto const &def : signalDefs) {
+            if (sig == def.id) {
                 name = def.name;
                 break;
             }
@@ -9749,8 +9794,7 @@ namespace Catch
 
         sa.sa_handler = handleSignal;
         sa.sa_flags = SA_ONSTACK;
-        for (std::size_t i = 0; i < sizeof(signalDefs) / sizeof(SignalDefs); ++i)
-        {
+        for (std::size_t i = 0; i < sizeof(signalDefs) / sizeof(SignalDefs); ++i) {
             sigaction(signalDefs[i].id, &sa, &oldSigActions[i]);
         }
     }
@@ -9762,11 +9806,9 @@ namespace Catch
 
     void FatalConditionHandler::reset()
     {
-        if (isSet)
-        {
+        if (isSet) {
             // Set signals back to previous values -- hopefully nobody overwrote them in the meantime
-            for (std::size_t i = 0; i < sizeof(signalDefs) / sizeof(SignalDefs); ++i)
-            {
+            for (std::size_t i = 0; i < sizeof(signalDefs) / sizeof(SignalDefs); ++i) {
                 sigaction(signalDefs[i].id, &oldSigActions[i], nullptr);
             }
             // Return the old stack
@@ -9787,8 +9829,7 @@ namespace Catch
 namespace Catch
 {
     void FatalConditionHandler::reset()
-    {
-    }
+    {}
 } // namespace Catch
 
 #endif // signals/SEH handling
@@ -9823,8 +9864,7 @@ namespace Catch
 {
 
     IGeneratorTracker::~IGeneratorTracker()
-    {
-    }
+    {}
 
     const char *GeneratorException::what() const noexcept
     {
@@ -9835,8 +9875,7 @@ namespace Catch
     {
 
         GeneratorUntypedBase::~GeneratorUntypedBase()
-        {
-        }
+        {}
 
         auto acquireGeneratorTracker(SourceLineInfo const &lineInfo) -> IGeneratorTracker &
         {
@@ -9864,7 +9903,7 @@ namespace Catch
 
 namespace Catch
 {
-    IExceptionTranslator::~IExceptionTranslator() = default;
+    IExceptionTranslator::~IExceptionTranslator()                 = default;
     IExceptionTranslatorRegistry::~IExceptionTranslatorRegistry() = default;
 } // namespace Catch
 // end catch_interfaces_exception.cpp
@@ -9872,7 +9911,7 @@ namespace Catch
 
 namespace Catch
 {
-    IRegistryHub::~IRegistryHub() = default;
+    IRegistryHub::~IRegistryHub()               = default;
     IMutableRegistryHub::~IMutableRegistryHub() = default;
 } // namespace Catch
 // end catch_interfaces_registry_hub.cpp
@@ -9929,13 +9968,13 @@ namespace Catch
 namespace Catch
 {
 
-    ReporterConfig::ReporterConfig(IConfigPtr const &_fullConfig) : m_stream(&_fullConfig->stream()), m_fullConfig(_fullConfig)
-    {
-    }
+    ReporterConfig::ReporterConfig(IConfigPtr const &_fullConfig)
+        : m_stream(&_fullConfig->stream()), m_fullConfig(_fullConfig)
+    {}
 
-    ReporterConfig::ReporterConfig(IConfigPtr const &_fullConfig, std::ostream &_stream) : m_stream(&_stream), m_fullConfig(_fullConfig)
-    {
-    }
+    ReporterConfig::ReporterConfig(IConfigPtr const &_fullConfig, std::ostream &_stream)
+        : m_stream(&_stream), m_fullConfig(_fullConfig)
+    {}
 
     std::ostream &ReporterConfig::stream() const
     {
@@ -9947,24 +9986,25 @@ namespace Catch
     }
 
     TestRunInfo::TestRunInfo(std::string const &_name) : name(_name)
-    {
-    }
+    {}
 
     GroupInfo::GroupInfo(std::string const &_name, std::size_t _groupIndex, std::size_t _groupsCount)
         : name(_name), groupIndex(_groupIndex), groupsCounts(_groupsCount)
-    {
-    }
+    {}
 
-    AssertionStats::AssertionStats(AssertionResult const &_assertionResult, std::vector<MessageInfo> const &_infoMessages, Totals const &_totals)
+    AssertionStats::AssertionStats(AssertionResult const &_assertionResult,
+                                   std::vector<MessageInfo> const &_infoMessages,
+                                   Totals const &_totals)
         : assertionResult(_assertionResult), infoMessages(_infoMessages), totals(_totals)
     {
-        assertionResult.m_resultData.lazyExpression.m_transientExpression = _assertionResult.m_resultData.lazyExpression.m_transientExpression;
+        assertionResult.m_resultData.lazyExpression.m_transientExpression =
+            _assertionResult.m_resultData.lazyExpression.m_transientExpression;
 
-        if (assertionResult.hasMessage())
-        {
+        if (assertionResult.hasMessage()) {
             // Copy message into messages list.
             // !TBD This should have been done earlier, somewhere
-            MessageBuilder builder(assertionResult.getTestMacroName(), assertionResult.getSourceInfo(), assertionResult.getResultType());
+            MessageBuilder builder(
+                assertionResult.getTestMacroName(), assertionResult.getSourceInfo(), assertionResult.getResultType());
             builder << assertionResult.getMessage();
             builder.m_info.message = builder.m_stream.str();
 
@@ -9974,46 +10014,49 @@ namespace Catch
 
     AssertionStats::~AssertionStats() = default;
 
-    SectionStats::SectionStats(SectionInfo const &_sectionInfo, Counts const &_assertions, double _durationInSeconds, bool _missingAssertions)
-        : sectionInfo(_sectionInfo), assertions(_assertions), durationInSeconds(_durationInSeconds), missingAssertions(_missingAssertions)
-    {
-    }
+    SectionStats::SectionStats(SectionInfo const &_sectionInfo,
+                               Counts const &_assertions,
+                               double _durationInSeconds,
+                               bool _missingAssertions)
+        : sectionInfo(_sectionInfo), assertions(_assertions), durationInSeconds(_durationInSeconds),
+          missingAssertions(_missingAssertions)
+    {}
 
     SectionStats::~SectionStats() = default;
 
-    TestCaseStats::TestCaseStats(TestCaseInfo const &_testInfo, Totals const &_totals, std::string const &_stdOut, std::string const &_stdErr, bool _aborting)
+    TestCaseStats::TestCaseStats(TestCaseInfo const &_testInfo,
+                                 Totals const &_totals,
+                                 std::string const &_stdOut,
+                                 std::string const &_stdErr,
+                                 bool _aborting)
         : testInfo(_testInfo), totals(_totals), stdOut(_stdOut), stdErr(_stdErr), aborting(_aborting)
-    {
-    }
+    {}
 
     TestCaseStats::~TestCaseStats() = default;
 
     TestGroupStats::TestGroupStats(GroupInfo const &_groupInfo, Totals const &_totals, bool _aborting)
         : groupInfo(_groupInfo), totals(_totals), aborting(_aborting)
-    {
-    }
+    {}
 
     TestGroupStats::TestGroupStats(GroupInfo const &_groupInfo) : groupInfo(_groupInfo), aborting(false)
-    {
-    }
+    {}
 
     TestGroupStats::~TestGroupStats() = default;
 
-    TestRunStats::TestRunStats(TestRunInfo const &_runInfo, Totals const &_totals, bool _aborting) : runInfo(_runInfo), totals(_totals), aborting(_aborting)
-    {
-    }
+    TestRunStats::TestRunStats(TestRunInfo const &_runInfo, Totals const &_totals, bool _aborting)
+        : runInfo(_runInfo), totals(_totals), aborting(_aborting)
+    {}
 
     TestRunStats::~TestRunStats() = default;
 
     void IStreamingReporter::fatalErrorEncountered(StringRef)
-    {
-    }
+    {}
     bool IStreamingReporter::isMulti() const
     {
         return false;
     }
 
-    IReporterFactory::~IReporterFactory() = default;
+    IReporterFactory::~IReporterFactory()   = default;
     IReporterRegistry::~IReporterRegistry() = default;
 
 } // end namespace Catch
@@ -10029,7 +10072,7 @@ namespace Catch
 
 namespace Catch
 {
-    ITestInvoker::~ITestInvoker() = default;
+    ITestInvoker::~ITestInvoker()           = default;
     ITestCaseRegistry::~ITestCaseRegistry() = default;
 } // namespace Catch
 // end catch_interfaces_testcase.cpp
@@ -10057,8 +10100,7 @@ namespace Catch
 #else
 
 Catch::LeakDetector::LeakDetector()
-{
-}
+{}
 
 #endif
 
@@ -10118,20 +10160,17 @@ namespace Catch
         TestSpec testSpec = config.testSpec();
         if (config.hasTestFilters())
             Catch::cout() << "Matching test cases:\n";
-        else
-        {
+        else {
             Catch::cout() << "All available test cases:\n";
         }
 
         auto matchedTestCases = filterTests(getAllTestCasesSorted(config), testSpec, config);
-        for (auto const &testCaseInfo : matchedTestCases)
-        {
+        for (auto const &testCaseInfo : matchedTestCases) {
             Colour::Code colour = testCaseInfo.isHidden() ? Colour::SecondaryText : Colour::None;
             Colour colourGuard(colour);
 
             Catch::cout() << Column(testCaseInfo.name).initialIndent(2).indent(4) << "\n";
-            if (config.verbosity() >= Verbosity::High)
-            {
+            if (config.verbosity() >= Verbosity::High) {
                 Catch::cout() << Column(Catch::Detail::stringify(testCaseInfo.lineInfo)).indent(4) << std::endl;
                 std::string description = testCaseInfo.description;
                 if (description.empty())
@@ -10151,11 +10190,10 @@ namespace Catch
 
     std::size_t listTestsNamesOnly(Config const &config)
     {
-        TestSpec testSpec = config.testSpec();
-        std::size_t matchedTests = 0;
+        TestSpec testSpec                      = config.testSpec();
+        std::size_t matchedTests               = 0;
         std::vector<TestCase> matchedTestCases = filterTests(getAllTestCasesSorted(config), testSpec, config);
-        for (auto const &testCaseInfo : matchedTestCases)
-        {
+        for (auto const &testCaseInfo : matchedTestCases) {
             matchedTests++;
             if (startsWith(testCaseInfo.name, '#'))
                 Catch::cout() << '"' << testCaseInfo.name << '"';
@@ -10187,32 +10225,31 @@ namespace Catch
         TestSpec testSpec = config.testSpec();
         if (config.hasTestFilters())
             Catch::cout() << "Tags for matching test cases:\n";
-        else
-        {
+        else {
             Catch::cout() << "All available tags:\n";
         }
 
         std::map<std::string, TagInfo> tagCounts;
 
         std::vector<TestCase> matchedTestCases = filterTests(getAllTestCasesSorted(config), testSpec, config);
-        for (auto const &testCase : matchedTestCases)
-        {
-            for (auto const &tagName : testCase.getTestCaseInfo().tags)
-            {
+        for (auto const &testCase : matchedTestCases) {
+            for (auto const &tagName : testCase.getTestCaseInfo().tags) {
                 std::string lcaseTagName = toLower(tagName);
-                auto countIt = tagCounts.find(lcaseTagName);
+                auto countIt             = tagCounts.find(lcaseTagName);
                 if (countIt == tagCounts.end())
                     countIt = tagCounts.insert(std::make_pair(lcaseTagName, TagInfo())).first;
                 countIt->second.add(tagName);
             }
         }
 
-        for (auto const &tagCount : tagCounts)
-        {
+        for (auto const &tagCount : tagCounts) {
             ReusableStringStream rss;
             rss << "  " << std::setw(2) << tagCount.second.count << "  ";
-            auto str = rss.str();
-            auto wrapper = Column(tagCount.second.all()).initialIndent(0).indent(str.size()).width(CATCH_CONFIG_CONSOLE_WIDTH - 10);
+            auto str     = rss.str();
+            auto wrapper = Column(tagCount.second.all())
+                               .initialIndent(0)
+                               .indent(str.size())
+                               .width(CATCH_CONFIG_CONSOLE_WIDTH - 10);
             Catch::cout() << str << wrapper << '\n';
         }
         Catch::cout() << pluralise(tagCounts.size(), "tag") << '\n' << std::endl;
@@ -10223,14 +10260,16 @@ namespace Catch
     {
         Catch::cout() << "Available reporters:\n";
         IReporterRegistry::FactoryMap const &factories = getRegistryHub().getReporterRegistry().getFactories();
-        std::size_t maxNameLen = 0;
+        std::size_t maxNameLen                         = 0;
         for (auto const &factoryKvp : factories)
             maxNameLen = (std::max)(maxNameLen, factoryKvp.first.size());
 
-        for (auto const &factoryKvp : factories)
-        {
+        for (auto const &factoryKvp : factories) {
             Catch::cout() << Column(factoryKvp.first + ":").indent(2).width(5 + maxNameLen) +
-                                 Column(factoryKvp.second->getDescription()).initialIndent(0).indent(2).width(CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen - 8)
+                                 Column(factoryKvp.second->getDescription())
+                                     .initialIndent(0)
+                                     .indent(2)
+                                     .width(CATCH_CONFIG_CONSOLE_WIDTH - maxNameLen - 8)
                           << "\n";
         }
         Catch::cout() << std::endl;
@@ -10363,16 +10402,14 @@ namespace
     {
         // Comparison with NaN should always be false.
         // This way we can rule it out before getting into the ugly details
-        if (Catch::isnan(lhs) || Catch::isnan(rhs))
-        {
+        if (Catch::isnan(lhs) || Catch::isnan(rhs)) {
             return false;
         }
 
         auto lc = convert(lhs);
         auto rc = convert(rhs);
 
-        if ((lc.i < 0) != (rc.i < 0))
-        {
+        if ((lc.i < 0) != (rc.i < 0)) {
             // Potentially we can have +0 and -0
             return lhs == rhs;
         }
@@ -10403,10 +10440,12 @@ namespace Catch
 
             std::string WithinAbsMatcher::describe() const
             {
-                return "is within " + ::Catch::Detail::stringify(m_margin) + " of " + ::Catch::Detail::stringify(m_target);
+                return "is within " + ::Catch::Detail::stringify(m_margin) + " of " +
+                       ::Catch::Detail::stringify(m_target);
             }
 
-            WithinUlpsMatcher::WithinUlpsMatcher(double target, int ulps, FloatingPointKind baseType) : m_target{target}, m_ulps{ulps}, m_type{baseType}
+            WithinUlpsMatcher::WithinUlpsMatcher(double target, int ulps, FloatingPointKind baseType)
+                : m_target{target}, m_ulps{ulps}, m_type{baseType}
             {
                 CATCH_ENFORCE(ulps >= 0, "Invalid ULP setting: " << ulps << '.' << " ULPs have to be non-negative.");
             }
@@ -10419,8 +10458,7 @@ namespace Catch
 
             bool WithinUlpsMatcher::match(double const &matchee) const
             {
-                switch (m_type)
-                {
+                switch (m_type) {
                 case FloatingPointKind::Float:
                     return almostEqualUlps<float>(static_cast<float>(matchee), static_cast<float>(m_target), m_ulps);
                 case FloatingPointKind::Double:
@@ -10465,12 +10503,10 @@ namespace Catch
 
 std::string Catch::Matchers::Generic::Detail::finalizeDescription(const std::string &desc)
 {
-    if (desc.empty())
-    {
+    if (desc.empty()) {
         return "matches undescribed predicate";
     }
-    else
-    {
+    else {
         return "matches predicate: \"" + desc + '"';
     }
 }
@@ -10489,8 +10525,7 @@ namespace Catch
 
             CasedString::CasedString(std::string const &str, CaseSensitive::Choice caseSensitivity)
                 : m_caseSensitivity(caseSensitivity), m_str(adjustString(str))
-            {
-            }
+            {}
             std::string CasedString::adjustString(std::string const &str) const
             {
                 return m_caseSensitivity == CaseSensitive::No ? toLower(str) : str;
@@ -10500,14 +10535,15 @@ namespace Catch
                 return m_caseSensitivity == CaseSensitive::No ? " (case insensitive)" : std::string();
             }
 
-            StringMatcherBase::StringMatcherBase(std::string const &operation, CasedString const &comparator) : m_comparator(comparator), m_operation(operation)
-            {
-            }
+            StringMatcherBase::StringMatcherBase(std::string const &operation, CasedString const &comparator)
+                : m_comparator(comparator), m_operation(operation)
+            {}
 
             std::string StringMatcherBase::describe() const
             {
                 std::string description;
-                description.reserve(5 + m_operation.size() + m_comparator.m_str.size() + m_comparator.caseSensitivitySuffix().size());
+                description.reserve(5 + m_operation.size() + m_comparator.m_str.size() +
+                                    m_comparator.caseSensitivitySuffix().size());
                 description += m_operation;
                 description += ": \"";
                 description += m_comparator.m_str;
@@ -10517,8 +10553,7 @@ namespace Catch
             }
 
             EqualsMatcher::EqualsMatcher(CasedString const &comparator) : StringMatcherBase("equals", comparator)
-            {
-            }
+            {}
 
             bool EqualsMatcher::match(std::string const &source) const
             {
@@ -10526,17 +10561,16 @@ namespace Catch
             }
 
             ContainsMatcher::ContainsMatcher(CasedString const &comparator) : StringMatcherBase("contains", comparator)
-            {
-            }
+            {}
 
             bool ContainsMatcher::match(std::string const &source) const
             {
                 return contains(m_comparator.adjustString(source), m_comparator.m_str);
             }
 
-            StartsWithMatcher::StartsWithMatcher(CasedString const &comparator) : StringMatcherBase("starts with", comparator)
-            {
-            }
+            StartsWithMatcher::StartsWithMatcher(CasedString const &comparator)
+                : StringMatcherBase("starts with", comparator)
+            {}
 
             bool StartsWithMatcher::match(std::string const &source) const
             {
@@ -10544,23 +10578,21 @@ namespace Catch
             }
 
             EndsWithMatcher::EndsWithMatcher(CasedString const &comparator) : StringMatcherBase("ends with", comparator)
-            {
-            }
+            {}
 
             bool EndsWithMatcher::match(std::string const &source) const
             {
                 return endsWith(m_comparator.adjustString(source), m_comparator.m_str);
             }
 
-            RegexMatcher::RegexMatcher(std::string regex, CaseSensitive::Choice caseSensitivity) : m_regex(std::move(regex)), m_caseSensitivity(caseSensitivity)
-            {
-            }
+            RegexMatcher::RegexMatcher(std::string regex, CaseSensitive::Choice caseSensitivity)
+                : m_regex(std::move(regex)), m_caseSensitivity(caseSensitivity)
+            {}
 
             bool RegexMatcher::match(std::string const &matchee) const
             {
                 auto flags = std::regex::ECMAScript; // ECMAScript is the default syntax option anyway
-                if (m_caseSensitivity == CaseSensitive::Choice::No)
-                {
+                if (m_caseSensitivity == CaseSensitive::Choice::No) {
                     flags |= std::regex::icase;
                 }
                 auto reg = std::regex(m_regex, flags);
@@ -10570,7 +10602,8 @@ namespace Catch
             std::string RegexMatcher::describe() const
             {
                 return "matches " + ::Catch::Detail::stringify(m_regex) +
-                       ((m_caseSensitivity == CaseSensitive::Choice::Yes) ? " case sensitively" : " case insensitively");
+                       ((m_caseSensitivity == CaseSensitive::Choice::Yes) ? " case sensitively"
+                                                                          : " case insensitively");
             }
 
         } // namespace StdString
@@ -10618,8 +10651,7 @@ namespace Catch
 
     MessageInfo::MessageInfo(StringRef const &_macroName, SourceLineInfo const &_lineInfo, ResultWas::OfType _type)
         : macroName(_macroName), lineInfo(_lineInfo), type(_type), sequence(++globalCount)
-    {
-    }
+    {}
 
     bool MessageInfo::operator==(MessageInfo const &other) const
     {
@@ -10636,10 +10668,11 @@ namespace Catch
 
     ////////////////////////////////////////////////////////////////////////////
 
-    Catch::MessageBuilder::MessageBuilder(StringRef const &macroName, SourceLineInfo const &lineInfo, ResultWas::OfType type)
+    Catch::MessageBuilder::MessageBuilder(StringRef const &macroName,
+                                          SourceLineInfo const &lineInfo,
+                                          ResultWas::OfType type)
         : m_info(macroName, lineInfo, type)
-    {
-    }
+    {}
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -10656,21 +10689,21 @@ namespace Catch
 
     ScopedMessage::~ScopedMessage()
     {
-        if (!uncaught_exceptions() && !m_moved)
-        {
+        if (!uncaught_exceptions() && !m_moved) {
             getResultCapture().popScopedMessage(m_info);
         }
     }
 
-    Capturer::Capturer(StringRef macroName, SourceLineInfo const &lineInfo, ResultWas::OfType resultType, StringRef names)
+    Capturer::Capturer(StringRef macroName,
+                       SourceLineInfo const &lineInfo,
+                       ResultWas::OfType resultType,
+                       StringRef names)
     {
         auto trimmed = [&](size_t start, size_t end) {
-            while (names[start] == ',' || isspace(names[start]))
-            {
+            while (names[start] == ',' || isspace(names[start])) {
                 ++start;
             }
-            while (names[end] == ',' || isspace(names[end]))
-            {
+            while (names[end] == ',' || isspace(names[end])) {
                 --end;
             }
             return names.substr(start, end - start + 1);
@@ -10678,11 +10711,9 @@ namespace Catch
 
         size_t start = 0;
         std::stack<char> openings;
-        for (size_t pos = 0; pos < names.size(); ++pos)
-        {
+        for (size_t pos = 0; pos < names.size(); ++pos) {
             char c = names[pos];
-            switch (c)
-            {
+            switch (c) {
             case '[':
             case '{':
             case '(':
@@ -10698,8 +10729,7 @@ namespace Catch
                 openings.pop();
                 break;
             case ',':
-                if (start != pos && openings.size() == 0)
-                {
+                if (start != pos && openings.size() == 0) {
                     m_messages.emplace_back(macroName, lineInfo, resultType);
                     m_messages.back().message = trimmed(start, pos);
                     m_messages.back().message += " := ";
@@ -10714,8 +10744,7 @@ namespace Catch
     }
     Capturer::~Capturer()
     {
-        if (!uncaught_exceptions())
-        {
+        if (!uncaught_exceptions()) {
             assert(m_captured == m_messages.size());
             for (size_t i = 0; i < m_captured; ++i)
                 m_resultCapture.popScopedMessage(m_messages[i]);
@@ -10785,7 +10814,7 @@ namespace Catch
       public:
         RedirectedStreams(RedirectedStreams const &) = delete;
         RedirectedStreams &operator=(RedirectedStreams const &) = delete;
-        RedirectedStreams(RedirectedStreams &&) = delete;
+        RedirectedStreams(RedirectedStreams &&)                 = delete;
         RedirectedStreams &operator=(RedirectedStreams &&) = delete;
 
         RedirectedStreams(std::string &redirectedCout, std::string &redirectedCerr);
@@ -10809,7 +10838,7 @@ namespace Catch
       public:
         TempFile(TempFile const &) = delete;
         TempFile &operator=(TempFile const &) = delete;
-        TempFile(TempFile &&) = delete;
+        TempFile(TempFile &&)                 = delete;
         TempFile &operator=(TempFile &&) = delete;
 
         TempFile();
@@ -10830,7 +10859,7 @@ namespace Catch
       public:
         OutputRedirect(OutputRedirect const &) = delete;
         OutputRedirect &operator=(OutputRedirect const &) = delete;
-        OutputRedirect(OutputRedirect &&) = delete;
+        OutputRedirect(OutputRedirect &&)                 = delete;
         OutputRedirect &operator=(OutputRedirect &&) = delete;
 
         OutputRedirect(std::string &stdout_dest, std::string &stderr_dest);
@@ -10860,8 +10889,8 @@ namespace Catch
 #if defined(CATCH_CONFIG_NEW_CAPTURE)
 #if defined(_MSC_VER)
 #include <io.h> //_dup and _dup2
-#define dup _dup
-#define dup2 _dup2
+#define dup    _dup
+#define dup2   _dup2
 #define fileno _fileno
 #else
 #include <unistd.h> // dup and dup2
@@ -10883,16 +10912,14 @@ namespace Catch
     }
 
     RedirectedStdOut::RedirectedStdOut() : m_cout(Catch::cout(), m_rss.get())
-    {
-    }
+    {}
     auto RedirectedStdOut::str() const -> std::string
     {
         return m_rss.str();
     }
 
     RedirectedStdErr::RedirectedStdErr() : m_cerr(Catch::cerr(), m_rss.get()), m_clog(Catch::clog(), m_rss.get())
-    {
-    }
+    {}
     auto RedirectedStdErr::str() const -> std::string
     {
         return m_rss.str();
@@ -10900,8 +10927,7 @@ namespace Catch
 
     RedirectedStreams::RedirectedStreams(std::string &redirectedCout, std::string &redirectedCerr)
         : m_redirectedCout(redirectedCout), m_redirectedCerr(redirectedCerr)
-    {
-    }
+    {}
 
     RedirectedStreams::~RedirectedStreams()
     {
@@ -10914,15 +10940,12 @@ namespace Catch
 #if defined(_MSC_VER)
     TempFile::TempFile()
     {
-        if (tmpnam_s(m_buffer))
-        {
+        if (tmpnam_s(m_buffer)) {
             CATCH_RUNTIME_ERROR("Could not get a temp filename");
         }
-        if (fopen_s(&m_file, m_buffer, "w"))
-        {
+        if (fopen_s(&m_file, m_buffer, "w")) {
             char buffer[100];
-            if (strerror_s(buffer, errno))
-            {
+            if (strerror_s(buffer, errno)) {
                 CATCH_RUNTIME_ERROR("Could not translate errno to a string");
             }
             CATCH_RUNTIME_ERROR("Coul dnot open the temp file: '" << m_buffer << "' because: " << buffer);
@@ -10932,8 +10955,7 @@ namespace Catch
     TempFile::TempFile()
     {
         m_file = std::tmpfile();
-        if (!m_file)
-        {
+        if (!m_file) {
             CATCH_RUNTIME_ERROR("Could not create a temp file.");
         }
     }
@@ -10961,8 +10983,7 @@ namespace Catch
         std::stringstream sstr;
         char buffer[100] = {};
         std::rewind(m_file);
-        while (std::fgets(buffer, sizeof(buffer), m_file))
-        {
+        while (std::fgets(buffer, sizeof(buffer), m_file)) {
             sstr << buffer;
         }
         return sstr.str();
@@ -11047,8 +11068,7 @@ namespace Catch
 
     void seedRng(IConfig const &config)
     {
-        if (config.rngSeed() != 0)
-        {
+        if (config.rngSeed() != 0) {
             std::srand(config.rngSeed());
             rng().seed(config.rngSeed());
         }
@@ -11080,7 +11100,9 @@ namespace Catch
 
     void enforceNoDuplicateTestCases(std::vector<TestCase> const &functions);
 
-    std::vector<TestCase> filterTests(std::vector<TestCase> const &testCases, TestSpec const &testSpec, IConfig const &config);
+    std::vector<TestCase> filterTests(std::vector<TestCase> const &testCases,
+                                      TestSpec const &testSpec,
+                                      IConfig const &config);
     std::vector<TestCase> const &getAllTestCasesSorted(IConfig const &config);
 
     class TestRegistry : public ITestCaseRegistry
@@ -11229,8 +11251,7 @@ namespace Catch
         static auto getInternal() -> Singleton *
         {
             static Singleton *s_instance = nullptr;
-            if (!s_instance)
-            {
+            if (!s_instance) {
                 s_instance = new Singleton;
                 addSingleton(s_instance);
             }
@@ -11300,7 +11321,9 @@ namespace Catch
             {
                 m_exceptionTranslatorRegistry.registerTranslator(translator);
             }
-            void registerTagAlias(std::string const &alias, std::string const &tag, SourceLineInfo const &lineInfo) override
+            void registerTagAlias(std::string const &alias,
+                                  std::string const &tag,
+                                  SourceLineInfo const &lineInfo) override
             {
                 m_tagAliasRegistry.add(alias, tag, lineInfo);
             }
@@ -11420,31 +11443,30 @@ namespace Catch
         {
             GeneratorBasePtr m_generator;
 
-            GeneratorTracker(TestCaseTracking::NameAndLocation const &nameAndLocation, TrackerContext &ctx, ITracker *parent)
+            GeneratorTracker(TestCaseTracking::NameAndLocation const &nameAndLocation,
+                             TrackerContext &ctx,
+                             ITracker *parent)
                 : TrackerBase(nameAndLocation, ctx, parent)
-            {
-            }
+            {}
             ~GeneratorTracker();
 
-            static GeneratorTracker &acquire(TrackerContext &ctx, TestCaseTracking::NameAndLocation const &nameAndLocation)
+            static GeneratorTracker &acquire(TrackerContext &ctx,
+                                             TestCaseTracking::NameAndLocation const &nameAndLocation)
             {
                 std::shared_ptr<GeneratorTracker> tracker;
 
                 ITracker &currentTracker = ctx.currentTracker();
-                if (TestCaseTracking::ITrackerPtr childTracker = currentTracker.findChild(nameAndLocation))
-                {
+                if (TestCaseTracking::ITrackerPtr childTracker = currentTracker.findChild(nameAndLocation)) {
                     assert(childTracker);
                     assert(childTracker->isGeneratorTracker());
                     tracker = std::static_pointer_cast<GeneratorTracker>(childTracker);
                 }
-                else
-                {
+                else {
                     tracker = std::make_shared<GeneratorTracker>(nameAndLocation, ctx, &currentTracker);
                     currentTracker.addChild(tracker);
                 }
 
-                if (!ctx.completedCycle() && !tracker->isComplete())
-                {
+                if (!ctx.completedCycle() && !tracker->isComplete()) {
                     tracker->open();
                 }
 
@@ -11464,8 +11486,7 @@ namespace Catch
             {
                 TrackerBase::close();
                 // Generator interface only finds out if it has another item on atual move
-                if (m_runState == CompletedSuccessfully && m_generator->next())
-                {
+                if (m_runState == CompletedSuccessfully && m_generator->next()) {
                     m_children.clear();
                     m_runState = Executing;
                 }
@@ -11482,14 +11503,17 @@ namespace Catch
             }
         };
         GeneratorTracker::~GeneratorTracker()
-        {
-        }
+        {}
     } // namespace Generators
 
     RunContext::RunContext(IConfigPtr const &_config, IStreamingReporterPtr &&reporter)
         : m_runInfo(_config->name()), m_context(getCurrentMutableContext()), m_config(_config),
-          m_reporter(std::move(reporter)), m_lastAssertionInfo{StringRef(), SourceLineInfo("", 0), StringRef(), ResultDisposition::Normal},
-          m_includeSuccessfulResults(m_config->includeSuccessfulResults() || m_reporter->getPreferences().shouldReportAllAssertions)
+          m_reporter(std::move(reporter)), m_lastAssertionInfo{StringRef(),
+                                                               SourceLineInfo("", 0),
+                                                               StringRef(),
+                                                               ResultDisposition::Normal},
+          m_includeSuccessfulResults(m_config->includeSuccessfulResults() ||
+                                     m_reporter->getPreferences().shouldReportAllAssertions)
     {
         m_context.setRunner(this);
         m_context.setConfig(m_config);
@@ -11507,7 +11531,10 @@ namespace Catch
         m_reporter->testGroupStarting(GroupInfo(testSpec, groupIndex, groupsCount));
     }
 
-    void RunContext::testGroupEnded(std::string const &testSpec, Totals const &totals, std::size_t groupIndex, std::size_t groupsCount)
+    void RunContext::testGroupEnded(std::string const &testSpec,
+                                    Totals const &totals,
+                                    std::size_t groupIndex,
+                                    std::size_t groupsCount)
     {
         m_reporter->testGroupEnded(TestGroupStats(GroupInfo(testSpec, groupIndex, groupsCount), totals, aborting()));
     }
@@ -11528,16 +11555,15 @@ namespace Catch
         ITracker &rootTracker = m_trackerContext.startRun();
         assert(rootTracker.isSectionTracker());
         static_cast<SectionTracker &>(rootTracker).addInitialFilters(m_config->getSectionsToRun());
-        do
-        {
+        do {
             m_trackerContext.startCycle();
-            m_testCaseTracker = &SectionTracker::acquire(m_trackerContext, TestCaseTracking::NameAndLocation(testInfo.name, testInfo.lineInfo));
+            m_testCaseTracker = &SectionTracker::acquire(
+                m_trackerContext, TestCaseTracking::NameAndLocation(testInfo.name, testInfo.lineInfo));
             runCurrentTest(redirectedCout, redirectedCerr);
         } while (!m_testCaseTracker->isSuccessfullyCompleted() && !aborting());
 
         Totals deltaTotals = m_totals.delta(prevTotals);
-        if (testInfo.expectedToFail() && deltaTotals.testCases.passed > 0)
-        {
+        if (testInfo.expectedToFail() && deltaTotals.testCases.passed > 0) {
             deltaTotals.assertions.failed++;
             deltaTotals.testCases.passed--;
             deltaTotals.testCases.failed++;
@@ -11545,7 +11571,7 @@ namespace Catch
         m_totals.testCases += deltaTotals.testCases;
         m_reporter->testCaseEnded(TestCaseStats(testInfo, deltaTotals, redirectedCout, redirectedCerr, aborting()));
 
-        m_activeTestCase = nullptr;
+        m_activeTestCase  = nullptr;
         m_testCaseTracker = nullptr;
 
         return deltaTotals;
@@ -11563,21 +11589,18 @@ namespace Catch
 
     void RunContext::assertionEnded(AssertionResult const &result)
     {
-        if (result.getResultType() == ResultWas::Ok)
-        {
+        if (result.getResultType() == ResultWas::Ok) {
             m_totals.assertions.passed++;
             m_lastAssertionPassed = true;
         }
-        else if (!result.isOk())
-        {
+        else if (!result.isOk()) {
             m_lastAssertionPassed = false;
             if (m_activeTestCase->getTestCaseInfo().okToFail())
                 m_totals.assertions.failedButOk++;
             else
                 m_totals.assertions.failed++;
         }
-        else
-        {
+        else {
             m_lastAssertionPassed = true;
         }
 
@@ -11594,13 +11617,14 @@ namespace Catch
     }
     void RunContext::resetAssertionInfo()
     {
-        m_lastAssertionInfo.macroName = StringRef();
+        m_lastAssertionInfo.macroName          = StringRef();
         m_lastAssertionInfo.capturedExpression = "{Unknown expression after the reported line}"_sr;
     }
 
     bool RunContext::sectionStarted(SectionInfo const &sectionInfo, Counts &assertions)
     {
-        ITracker &sectionTracker = SectionTracker::acquire(m_trackerContext, TestCaseTracking::NameAndLocation(sectionInfo.name, sectionInfo.lineInfo));
+        ITracker &sectionTracker = SectionTracker::acquire(
+            m_trackerContext, TestCaseTracking::NameAndLocation(sectionInfo.name, sectionInfo.lineInfo));
         if (!sectionTracker.isOpen())
             return false;
         m_activeSections.push_back(&sectionTracker);
@@ -11616,7 +11640,8 @@ namespace Catch
     auto RunContext::acquireGeneratorTracker(SourceLineInfo const &lineInfo) -> IGeneratorTracker &
     {
         using namespace Generators;
-        GeneratorTracker &tracker = GeneratorTracker::acquire(m_trackerContext, TestCaseTracking::NameAndLocation("generator", lineInfo));
+        GeneratorTracker &tracker =
+            GeneratorTracker::acquire(m_trackerContext, TestCaseTracking::NameAndLocation("generator", lineInfo));
         assert(tracker.isOpen());
         m_lastAssertionInfo.lineInfo = lineInfo;
         return tracker;
@@ -11637,16 +11662,16 @@ namespace Catch
 
     void RunContext::sectionEnded(SectionEndInfo const &endInfo)
     {
-        Counts assertions = m_totals.assertions - endInfo.prevAssertions;
+        Counts assertions      = m_totals.assertions - endInfo.prevAssertions;
         bool missingAssertions = testForMissingAssertions(assertions);
 
-        if (!m_activeSections.empty())
-        {
+        if (!m_activeSections.empty()) {
             m_activeSections.back()->close();
             m_activeSections.pop_back();
         }
 
-        m_reporter->sectionEnded(SectionStats(endInfo.sectionInfo, assertions, endInfo.durationInSeconds, missingAssertions));
+        m_reporter->sectionEnded(
+            SectionStats(endInfo.sectionInfo, assertions, endInfo.durationInSeconds, missingAssertions));
         m_messages.clear();
         m_messageScopes.clear();
     }
@@ -11727,7 +11752,7 @@ namespace Catch
         auto const &testInfo = m_activeTestCase->getTestCaseInfo();
 
         Totals deltaTotals;
-        deltaTotals.testCases.failed = 1;
+        deltaTotals.testCases.failed  = 1;
         deltaTotals.assertions.failed = 1;
         m_reporter->testCaseEnded(TestCaseStats(testInfo, deltaTotals, std::string(), std::string(), false));
         m_totals.testCases.failed++;
@@ -11758,18 +11783,17 @@ namespace Catch
         auto const &testCaseInfo = m_activeTestCase->getTestCaseInfo();
         SectionInfo testCaseSection(testCaseInfo.lineInfo, testCaseInfo.name);
         m_reporter->sectionStarting(testCaseSection);
-        Counts prevAssertions = m_totals.assertions;
-        double duration = 0;
+        Counts prevAssertions    = m_totals.assertions;
+        double duration          = 0;
         m_shouldReportUnexpected = true;
-        m_lastAssertionInfo = {"TEST_CASE"_sr, testCaseInfo.lineInfo, StringRef(), ResultDisposition::Normal};
+        m_lastAssertionInfo      = {"TEST_CASE"_sr, testCaseInfo.lineInfo, StringRef(), ResultDisposition::Normal};
 
         seedRng(*m_config);
 
         Timer timer;
         CATCH_TRY
         {
-            if (m_reporter->getPreferences().shouldRedirectStdOut)
-            {
+            if (m_reporter->getPreferences().shouldRedirectStdOut) {
 #if !defined(CATCH_CONFIG_EXPERIMENTAL_REDIRECT)
                 RedirectedStreams redirectedStreams(redirectedCout, redirectedCerr);
 
@@ -11781,8 +11805,7 @@ namespace Catch
                 invokeActiveTestCase();
 #endif
             }
-            else
-            {
+            else {
                 timer.start();
                 invokeActiveTestCase();
             }
@@ -11796,13 +11819,12 @@ namespace Catch
         {
             // Under CATCH_CONFIG_FAST_COMPILE, unexpected exceptions under REQUIRE assertions
             // are reported without translation at the point of origin.
-            if (m_shouldReportUnexpected)
-            {
+            if (m_shouldReportUnexpected) {
                 AssertionReaction dummyReaction;
                 handleUnexpectedInflightException(m_lastAssertionInfo, translateActiveException(), dummyReaction);
             }
         }
-        Counts assertions = m_totals.assertions - prevAssertions;
+        Counts assertions      = m_totals.assertions - prevAssertions;
         bool missingAssertions = testForMissingAssertions(assertions);
 
         m_testCaseTracker->close();
@@ -11830,31 +11852,32 @@ namespace Catch
         m_unfinishedSections.clear();
     }
 
-    void RunContext::handleExpr(AssertionInfo const &info, ITransientExpression const &expr, AssertionReaction &reaction)
+    void RunContext::handleExpr(AssertionInfo const &info,
+                                ITransientExpression const &expr,
+                                AssertionReaction &reaction)
     {
         m_reporter->assertionStarting(info);
 
         bool negated = isFalseTest(info.resultDisposition);
-        bool result = expr.getResult() != negated;
+        bool result  = expr.getResult() != negated;
 
-        if (result)
-        {
-            if (!m_includeSuccessfulResults)
-            {
+        if (result) {
+            if (!m_includeSuccessfulResults) {
                 assertionPassed();
             }
-            else
-            {
+            else {
                 reportExpr(info, ResultWas::Ok, &expr, negated);
             }
         }
-        else
-        {
+        else {
             reportExpr(info, ResultWas::ExpressionFailed, &expr, negated);
             populateReaction(reaction);
         }
     }
-    void RunContext::reportExpr(AssertionInfo const &info, ResultWas::OfType resultType, ITransientExpression const *expr, bool negated)
+    void RunContext::reportExpr(AssertionInfo const &info,
+                                ResultWas::OfType resultType,
+                                ITransientExpression const *expr,
+                                bool negated)
     {
 
         m_lastAssertionInfo = info;
@@ -11866,7 +11889,10 @@ namespace Catch
         assertionEnded(assertionResult);
     }
 
-    void RunContext::handleMessage(AssertionInfo const &info, ResultWas::OfType resultType, StringRef const &message, AssertionReaction &reaction)
+    void RunContext::handleMessage(AssertionInfo const &info,
+                                   ResultWas::OfType resultType,
+                                   StringRef const &message,
+                                   AssertionReaction &reaction)
     {
         m_reporter->assertionStarting(info);
 
@@ -11884,7 +11910,9 @@ namespace Catch
         handleNonExpr(info, Catch::ResultWas::DidntThrowException, reaction);
     }
 
-    void RunContext::handleUnexpectedInflightException(AssertionInfo const &info, std::string const &message, AssertionReaction &reaction)
+    void RunContext::handleUnexpectedInflightException(AssertionInfo const &info,
+                                                       std::string const &message,
+                                                       AssertionReaction &reaction)
     {
         m_lastAssertionInfo = info;
 
@@ -11898,7 +11926,7 @@ namespace Catch
     void RunContext::populateReaction(AssertionReaction &reaction)
     {
         reaction.shouldDebugBreak = m_config->shouldDebugBreak();
-        reaction.shouldThrow = aborting() || (m_lastAssertionInfo.resultDisposition & ResultDisposition::Normal);
+        reaction.shouldThrow      = aborting() || (m_lastAssertionInfo.resultDisposition & ResultDisposition::Normal);
     }
 
     void RunContext::handleIncomplete(AssertionInfo const &info)
@@ -11936,15 +11964,15 @@ namespace Catch
 namespace Catch
 {
 
-    Section::Section(SectionInfo const &info) : m_info(info), m_sectionIncluded(getResultCapture().sectionStarted(m_info, m_assertions))
+    Section::Section(SectionInfo const &info)
+        : m_info(info), m_sectionIncluded(getResultCapture().sectionStarted(m_info, m_assertions))
     {
         m_timer.start();
     }
 
     Section::~Section()
     {
-        if (m_sectionIncluded)
-        {
+        if (m_sectionIncluded) {
             SectionEndInfo endInfo{m_info, m_assertions, m_timer.getElapsedSeconds()};
             if (uncaught_exceptions())
                 getResultCapture().sectionEndedEarly(endInfo);
@@ -11966,9 +11994,9 @@ namespace Catch
 namespace Catch
 {
 
-    SectionInfo::SectionInfo(SourceLineInfo const &_lineInfo, std::string const &_name) : name(_name), lineInfo(_lineInfo)
-    {
-    }
+    SectionInfo::SectionInfo(SourceLineInfo const &_lineInfo, std::string const &_name)
+        : name(_name), lineInfo(_lineInfo)
+    {}
 
 } // end namespace Catch
 // end catch_section_info.cpp
@@ -12038,7 +12066,11 @@ namespace Catch
     {
         Version(Version const &) = delete;
         Version &operator=(Version const &) = delete;
-        Version(unsigned int _majorVersion, unsigned int _minorVersion, unsigned int _patchNumber, char const *const _branchName, unsigned int _buildNumber);
+        Version(unsigned int _majorVersion,
+                unsigned int _minorVersion,
+                unsigned int _patchNumber,
+                char const *const _branchName,
+                unsigned int _buildNumber);
 
         unsigned int const majorVersion;
         unsigned int const minorVersion;
@@ -12075,8 +12107,7 @@ namespace Catch
 
         IStreamingReporterPtr makeReporter(std::shared_ptr<Config> const &config)
         {
-            if (Catch::getRegistryHub().getReporterRegistry().getListeners().empty())
-            {
+            if (Catch::getRegistryHub().getReporterRegistry().getListeners().empty()) {
                 return createReporter(config->getReporterName(), config);
             }
 
@@ -12085,11 +12116,10 @@ namespace Catch
             // doesn't compile without a std::move call. However, this causes
             // a warning on newer platforms. Thus, we have to work around
             // it a bit and downcast the pointer manually.
-            auto ret = std::unique_ptr<IStreamingReporter>(new ListeningReporter);
-            auto &multi = static_cast<ListeningReporter &>(*ret);
+            auto ret              = std::unique_ptr<IStreamingReporter>(new ListeningReporter);
+            auto &multi           = static_cast<ListeningReporter &>(*ret);
             auto const &listeners = Catch::getRegistryHub().getReporterRegistry().getListeners();
-            for (auto const &listener : listeners)
-            {
+            for (auto const &listener : listeners) {
                 multi.addListener(listener->create(Catch::ReporterConfig(config)));
             }
             multi.addReporter(createReporter(config->getReporterName(), config));
@@ -12109,23 +12139,19 @@ namespace Catch
             TestSpec testSpec = config->testSpec();
 
             auto const &allTestCases = getAllTestCasesSorted(*config);
-            for (auto const &testCase : allTestCases)
-            {
+            for (auto const &testCase : allTestCases) {
                 if (!context.aborting() && matchTest(testCase, testSpec, *config))
                     totals += context.runTest(testCase);
                 else
                     context.reporter().skipTest(testCase);
             }
 
-            if (config->warnAboutNoTests() && totals.testCases.total() == 0)
-            {
+            if (config->warnAboutNoTests() && totals.testCases.total() == 0) {
                 ReusableStringStream testConfig;
 
                 bool first = true;
-                for (const auto &input : config->getTestsOrTags())
-                {
-                    if (!first)
-                    {
+                for (const auto &input : config->getTestsOrTags()) {
+                    if (!first) {
                         testConfig << ' ';
                     }
                     first = false;
@@ -12143,21 +12169,18 @@ namespace Catch
         void applyFilenamesAsTags(Catch::IConfig const &config)
         {
             auto &tests = const_cast<std::vector<TestCase> &>(getAllTestCasesSorted(config));
-            for (auto &testCase : tests)
-            {
+            for (auto &testCase : tests) {
                 auto tags = testCase.tags;
 
                 std::string filename = testCase.lineInfo.file;
-                auto lastSlash = filename.find_last_of("\\/");
-                if (lastSlash != std::string::npos)
-                {
+                auto lastSlash       = filename.find_last_of("\\/");
+                if (lastSlash != std::string::npos) {
                     filename.erase(0, lastSlash);
                     filename[0] = '#';
                 }
 
                 auto lastDot = filename.find_last_of('.');
-                if (lastDot != std::string::npos)
-                {
+                if (lastDot != std::string::npos) {
                     filename.erase(lastDot);
                 }
 
@@ -12171,8 +12194,7 @@ namespace Catch
     Session::Session()
     {
         static bool alreadyInstantiated = false;
-        if (alreadyInstantiated)
-        {
+        if (alreadyInstantiated) {
             CATCH_TRY
             {
                 CATCH_INTERNAL_ERROR("Only one instance of Catch::Session can ever be used");
@@ -12186,20 +12208,16 @@ namespace Catch
         // There cannot be exceptions at startup in no-exception mode.
 #if !defined(CATCH_CONFIG_DISABLE_EXCEPTIONS)
         const auto &exceptions = getRegistryHub().getStartupExceptionRegistry().getExceptions();
-        if (!exceptions.empty())
-        {
+        if (!exceptions.empty()) {
             m_startupExceptions = true;
             Colour colourGuard(Colour::Red);
             Catch::cerr() << "Errors occurred during startup!" << '\n';
             // iterate over all exceptions and notify user
-            for (const auto &ex_ptr : exceptions)
-            {
-                try
-                {
+            for (const auto &ex_ptr : exceptions) {
+                try {
                     std::rethrow_exception(ex_ptr);
                 }
-                catch (std::exception const &ex)
-                {
+                catch (std::exception const &ex) {
                     Catch::cerr() << Column(ex.what()).indent(2) << '\n';
                 }
             }
@@ -12207,7 +12225,7 @@ namespace Catch
 #endif
 
         alreadyInstantiated = true;
-        m_cli = makeCommandLineParser(m_configData);
+        m_cli               = makeCommandLineParser(m_configData);
     }
     Session::~Session()
     {
@@ -12216,7 +12234,10 @@ namespace Catch
 
     void Session::showHelp() const
     {
-        Catch::cout() << "\nCatch v" << libraryVersion() << "\n" << m_cli << std::endl << "For more detailed usage please see the project docs\n" << std::endl;
+        Catch::cout() << "\nCatch v" << libraryVersion() << "\n"
+                      << m_cli << std::endl
+                      << "For more detailed usage please see the project docs\n"
+                      << std::endl;
     }
     void Session::libIdentify()
     {
@@ -12235,11 +12256,11 @@ namespace Catch
             return 1;
 
         auto result = m_cli.parse(clara::Args(argc, argv));
-        if (!result)
-        {
+        if (!result) {
             config();
             getCurrentMutableContext().setConfig(m_config);
-            Catch::cerr() << Colour(Colour::Red) << "\nError(s) in input:\n" << Column(result.errorMessage()).indent(2) << "\n\n";
+            Catch::cerr() << Colour(Colour::Red) << "\nError(s) in input:\n"
+                          << Column(result.errorMessage()).indent(2) << "\n\n";
             Catch::cerr() << "Run with -? for usage\n" << std::endl;
             return MaxExitCode;
         }
@@ -12258,8 +12279,7 @@ namespace Catch
 
         char **utf8Argv = new char *[argc];
 
-        for (int i = 0; i < argc; ++i)
-        {
+        for (int i = 0; i < argc; ++i) {
             int bufSize = WideCharToMultiByte(CP_UTF8, 0, argv[i], -1, NULL, 0, NULL, NULL);
 
             utf8Argv[i] = new char[bufSize];
@@ -12286,14 +12306,12 @@ namespace Catch
 
     int Session::run()
     {
-        if ((m_configData.waitForKeypress & WaitForKeypress::BeforeStart) != 0)
-        {
+        if ((m_configData.waitForKeypress & WaitForKeypress::BeforeStart) != 0) {
             Catch::cout() << "...waiting for enter/ return before starting" << std::endl;
             static_cast<void>(std::getchar());
         }
         int exitCode = runInternal();
-        if ((m_configData.waitForKeypress & WaitForKeypress::BeforeExit) != 0)
-        {
+        if ((m_configData.waitForKeypress & WaitForKeypress::BeforeExit) != 0) {
             Catch::cout() << "...waiting for enter/ return before exiting, with code: " << exitCode << std::endl;
             static_cast<void>(std::getchar());
         }
@@ -12324,8 +12342,7 @@ namespace Catch
         if (m_startupExceptions)
             return 1;
 
-        if (m_configData.showHelp || m_configData.libIdentify)
-        {
+        if (m_configData.showHelp || m_configData.libIdentify) {
             return 0;
         }
 
@@ -12378,8 +12395,7 @@ namespace Catch
     } // namespace
 
     ISingleton::~ISingleton()
-    {
-    }
+    {}
 
     void addSingleton(ISingleton *singleton)
     {
@@ -12459,8 +12475,7 @@ namespace Catch
                 {
                     sync();
 
-                    if (c != EOF)
-                    {
+                    if (c != EOF) {
                         if (pbase() == epptr())
                             m_writer(std::string(1, static_cast<char>(c)));
                         else
@@ -12471,8 +12486,7 @@ namespace Catch
 
                 int sync() override
                 {
-                    if (pbase() != pptr())
-                    {
+                    if (pbase() != pptr()) {
                         m_writer(std::string(pbase(), static_cast<std::string::size_type>(pptr() - pbase())));
                         setp(pbase(), epptr());
                     }
@@ -12522,8 +12536,7 @@ namespace Catch
                 // Store the streambuf from cout up-front because
                 // cout may get redirected when running tests
                 CoutStream() : m_os(Catch::cout().rdbuf())
-                {
-                }
+                {}
                 ~CoutStream() override = default;
 
               public: // IStream
@@ -12542,8 +12555,7 @@ namespace Catch
 
               public:
                 DebugOutStream() : m_streamBuf(new StreamBufImpl<OutputDebugWriter>()), m_os(m_streamBuf.get())
-                {
-                }
+                {}
 
                 ~DebugOutStream() override = default;
 
@@ -12563,8 +12575,7 @@ namespace Catch
     {
         if (filename.empty())
             return new detail::CoutStream();
-        else if (filename[0] == '%')
-        {
+        else if (filename[0] == '%') {
             if (filename == "%debug")
                 return new detail::DebugOutStream();
             else
@@ -12583,13 +12594,11 @@ namespace Catch
 
         auto add() -> std::size_t
         {
-            if (m_unused.empty())
-            {
+            if (m_unused.empty()) {
                 m_streams.push_back(std::unique_ptr<std::ostringstream>(new std::ostringstream));
                 return m_streams.size() - 1;
             }
-            else
-            {
+            else {
                 auto index = m_unused.back();
                 m_unused.pop_back();
                 return index;
@@ -12604,9 +12613,9 @@ namespace Catch
     };
 
     ReusableStringStream::ReusableStringStream()
-        : m_index(Singleton<StringStreams>::getMutable().add()), m_oss(Singleton<StringStreams>::getMutable().m_streams[m_index].get())
-    {
-    }
+        : m_index(Singleton<StringStreams>::getMutable().add()),
+          m_oss(Singleton<StringStreams>::getMutable().m_streams[m_index].get())
+    {}
 
     ReusableStringStream::~ReusableStringStream()
     {
@@ -12689,8 +12698,8 @@ namespace Catch
     std::string trim(std::string const &str)
     {
         static char const *whitespaceChars = "\n\r\t ";
-        std::string::size_type start = str.find_first_not_of(whitespaceChars);
-        std::string::size_type end = str.find_last_not_of(whitespaceChars);
+        std::string::size_type start       = str.find_first_not_of(whitespaceChars);
+        std::string::size_type end         = str.find_last_not_of(whitespaceChars);
 
         return start != std::string::npos ? str.substr(start, 1 + end - start) : std::string();
     }
@@ -12699,10 +12708,9 @@ namespace Catch
     {
         bool replaced = false;
         std::size_t i = str.find(replaceThis);
-        while (i != std::string::npos)
-        {
+        while (i != std::string::npos) {
             replaced = true;
-            str = str.substr(0, i) + withThis + str.substr(i + replaceThis.size());
+            str      = str.substr(0, i) + withThis + str.substr(i + replaceThis.size());
             if (i < str.size() - withThis.size())
                 i = str.find(replaceThis, i + withThis.size());
             else
@@ -12712,8 +12720,7 @@ namespace Catch
     }
 
     pluralise::pluralise(std::size_t count, std::string const &label) : m_count(count), m_label(label)
-    {
-    }
+    {}
 
     std::ostream &operator<<(std::ostream &os, pluralise const &pluraliser)
     {
@@ -12745,9 +12752,9 @@ namespace
 
 namespace Catch
 {
-    StringRef::StringRef(char const *rawChars) noexcept : StringRef(rawChars, static_cast<StringRef::size_type>(std::strlen(rawChars)))
-    {
-    }
+    StringRef::StringRef(char const *rawChars) noexcept
+        : StringRef(rawChars, static_cast<StringRef::size_type>(std::strlen(rawChars)))
+    {}
 
     StringRef::operator std::string() const
     {
@@ -12783,12 +12790,11 @@ namespace Catch
 
     void StringRef::takeOwnership()
     {
-        if (!isOwned())
-        {
+        if (!isOwned()) {
             m_data = new char[m_size + 1];
             memcpy(m_data, m_start, m_size);
             m_data[m_size] = '\0';
-            m_start = m_data;
+            m_start        = m_data;
         }
     }
     auto StringRef::substr(size_type start, size_type size) const noexcept -> StringRef
@@ -12816,11 +12822,9 @@ namespace Catch
     {
         size_type noChars = m_size;
         // Make adjustments for uft encodings
-        for (size_type i = 0; i < m_size; ++i)
-        {
+        for (size_type i = 0; i < m_size; ++i) {
             char c = m_start[i];
-            if ((c & byte_2_lead) == byte_2_lead)
-            {
+            if ((c & byte_2_lead) == byte_2_lead) {
                 noChars--;
                 if ((c & byte_3_lead) == byte_3_lead)
                     noChars--;
@@ -12870,8 +12874,7 @@ namespace Catch
 namespace Catch
 {
     TagAlias::TagAlias(std::string const &_tag, SourceLineInfo _lineInfo) : tag(_tag), lineInfo(_lineInfo)
-    {
-    }
+    {}
 } // namespace Catch
 // end catch_tag_alias.cpp
 // start catch_tag_alias_autoregistrar.cpp
@@ -12902,8 +12905,7 @@ namespace Catch
 {
 
     TagAliasRegistry::~TagAliasRegistry()
-    {
-    }
+    {}
 
     TagAlias const *TagAliasRegistry::find(std::string const &alias) const
     {
@@ -12917,12 +12919,11 @@ namespace Catch
     std::string TagAliasRegistry::expandAliases(std::string const &unexpandedTestSpec) const
     {
         std::string expandedTestSpec = unexpandedTestSpec;
-        for (auto const &registryKvp : m_registry)
-        {
+        for (auto const &registryKvp : m_registry) {
             std::size_t pos = expandedTestSpec.find(registryKvp.first);
-            if (pos != std::string::npos)
-            {
-                expandedTestSpec = expandedTestSpec.substr(0, pos) + registryKvp.second.tag + expandedTestSpec.substr(pos + registryKvp.first.size());
+            if (pos != std::string::npos) {
+                expandedTestSpec = expandedTestSpec.substr(0, pos) + registryKvp.second.tag +
+                                   expandedTestSpec.substr(pos + registryKvp.first.size());
             }
         }
         return expandedTestSpec;
@@ -12930,17 +12931,18 @@ namespace Catch
 
     void TagAliasRegistry::add(std::string const &alias, std::string const &tag, SourceLineInfo const &lineInfo)
     {
-        CATCH_ENFORCE(startsWith(alias, "[@") && endsWith(alias, ']'), "error: tag alias, '" << alias << "' is not of the form [@alias name].\n" << lineInfo);
+        CATCH_ENFORCE(startsWith(alias, "[@") && endsWith(alias, ']'),
+                      "error: tag alias, '" << alias << "' is not of the form [@alias name].\n"
+                                            << lineInfo);
 
-        CATCH_ENFORCE(m_registry.insert(std::make_pair(alias, TagAlias(tag, lineInfo))).second, "error: tag alias, '"
-                                                                                                    << alias << "' already registered.\n"
-                                                                                                    << "\tFirst seen at: " << find(alias)->lineInfo << "\n"
-                                                                                                    << "\tRedefined at: " << lineInfo);
+        CATCH_ENFORCE(m_registry.insert(std::make_pair(alias, TagAlias(tag, lineInfo))).second,
+                      "error: tag alias, '" << alias << "' already registered.\n"
+                                            << "\tFirst seen at: " << find(alias)->lineInfo << "\n"
+                                            << "\tRedefined at: " << lineInfo);
     }
 
     ITagAliasRegistry::~ITagAliasRegistry()
-    {
-    }
+    {}
 
     ITagAliasRegistry const &ITagAliasRegistry::get()
     {
@@ -12980,38 +12982,39 @@ namespace Catch
         }
         bool isReservedTag(std::string const &tag)
         {
-            return parseSpecialTag(tag) == TestCaseInfo::None && tag.size() > 0 && !std::isalnum(static_cast<unsigned char>(tag[0]));
+            return parseSpecialTag(tag) == TestCaseInfo::None && tag.size() > 0 &&
+                   !std::isalnum(static_cast<unsigned char>(tag[0]));
         }
         void enforceNotReservedTag(std::string const &tag, SourceLineInfo const &_lineInfo)
         {
-            CATCH_ENFORCE(!isReservedTag(tag), "Tag name: [" << tag << "] is not allowed.\n"
-                                                             << "Tag names starting with non alpha-numeric characters are reserved\n"
-                                                             << _lineInfo);
+            CATCH_ENFORCE(!isReservedTag(tag),
+                          "Tag name: [" << tag << "] is not allowed.\n"
+                                        << "Tag names starting with non alpha-numeric characters are reserved\n"
+                                        << _lineInfo);
         }
     } // namespace
 
-    TestCase makeTestCase(ITestInvoker *_testCase, std::string const &_className, NameAndTags const &nameAndTags, SourceLineInfo const &_lineInfo)
+    TestCase makeTestCase(ITestInvoker *_testCase,
+                          std::string const &_className,
+                          NameAndTags const &nameAndTags,
+                          SourceLineInfo const &_lineInfo)
     {
         bool isHidden = false;
 
         // Parse out tags
         std::vector<std::string> tags;
         std::string desc, tag;
-        bool inTag = false;
+        bool inTag              = false;
         std::string _descOrTags = nameAndTags.tags;
-        for (char c : _descOrTags)
-        {
-            if (!inTag)
-            {
+        for (char c : _descOrTags) {
+            if (!inTag) {
                 if (c == '[')
                     inTag = true;
                 else
                     desc += c;
             }
-            else
-            {
-                if (c == ']')
-                {
+            else {
+                if (c == ']') {
                     TestCaseInfo::SpecialProperties prop = parseSpecialTag(tag);
                     if ((prop & TestCaseInfo::IsHidden) != 0)
                         isHidden = true;
@@ -13021,8 +13024,7 @@ namespace Catch
                     // Merged hide tags like `[.approvals]` should be added as
                     // `[.][approvals]`. The `[.]` is added at later point, so
                     // we only strip the prefix
-                    if (startsWith(tag, '.') && tag.size() > 1)
-                    {
+                    if (startsWith(tag, '.') && tag.size() > 1) {
                         tag.erase(0, 1);
                     }
                     tags.push_back(tag);
@@ -13033,8 +13035,7 @@ namespace Catch
                     tag += c;
             }
         }
-        if (isHidden)
-        {
+        if (isHidden) {
             tags.push_back(".");
         }
 
@@ -13048,16 +13049,19 @@ namespace Catch
         tags.erase(std::unique(begin(tags), end(tags)), end(tags));
         testCaseInfo.lcaseTags.clear();
 
-        for (auto const &tag : tags)
-        {
+        for (auto const &tag : tags) {
             std::string lcaseTag = toLower(tag);
-            testCaseInfo.properties = static_cast<TestCaseInfo::SpecialProperties>(testCaseInfo.properties | parseSpecialTag(lcaseTag));
+            testCaseInfo.properties =
+                static_cast<TestCaseInfo::SpecialProperties>(testCaseInfo.properties | parseSpecialTag(lcaseTag));
             testCaseInfo.lcaseTags.push_back(lcaseTag);
         }
         testCaseInfo.tags = std::move(tags);
     }
 
-    TestCaseInfo::TestCaseInfo(std::string const &_name, std::string const &_className, std::string const &_description, std::vector<std::string> const &_tags,
+    TestCaseInfo::TestCaseInfo(std::string const &_name,
+                               std::string const &_className,
+                               std::string const &_description,
+                               std::vector<std::string> const &_tags,
                                SourceLineInfo const &_lineInfo)
         : name(_name), className(_className), description(_description), lineInfo(_lineInfo), properties(None)
     {
@@ -13086,13 +13090,11 @@ namespace Catch
         std::string ret;
         // '[' and ']' per tag
         std::size_t full_size = 2 * tags.size();
-        for (const auto &tag : tags)
-        {
+        for (const auto &tag : tags) {
             full_size += tag.size();
         }
         ret.reserve(full_size);
-        for (const auto &tag : tags)
-        {
+        for (const auto &tag : tags) {
             ret.push_back('[');
             ret.append(tag);
             ret.push_back(']');
@@ -13102,8 +13104,7 @@ namespace Catch
     }
 
     TestCase::TestCase(ITestInvoker *testCase, TestCaseInfo &&info) : TestCaseInfo(std::move(info)), test(testCase)
-    {
-    }
+    {}
 
     TestCase TestCase::withName(std::string const &_newName) const
     {
@@ -13146,8 +13147,7 @@ namespace Catch
 
         std::vector<TestCase> sorted = unsortedTestCases;
 
-        switch (config.runOrder())
-        {
+        switch (config.runOrder()) {
         case RunTests::InLexicographicalOrder:
             std::sort(sorted.begin(), sorted.end());
             break;
@@ -13169,16 +13169,18 @@ namespace Catch
     void enforceNoDuplicateTestCases(std::vector<TestCase> const &functions)
     {
         std::set<TestCase> seenFunctions;
-        for (auto const &function : functions)
-        {
+        for (auto const &function : functions) {
             auto prev = seenFunctions.insert(function);
-            CATCH_ENFORCE(prev.second, "error: TEST_CASE( \"" << function.name << "\" ) already defined.\n"
-                                                              << "\tFirst seen at " << prev.first->getTestCaseInfo().lineInfo << "\n"
-                                                              << "\tRedefined at " << function.getTestCaseInfo().lineInfo);
+            CATCH_ENFORCE(prev.second,
+                          "error: TEST_CASE( \"" << function.name << "\" ) already defined.\n"
+                                                 << "\tFirst seen at " << prev.first->getTestCaseInfo().lineInfo << "\n"
+                                                 << "\tRedefined at " << function.getTestCaseInfo().lineInfo);
         }
     }
 
-    std::vector<TestCase> filterTests(std::vector<TestCase> const &testCases, TestSpec const &testSpec, IConfig const &config)
+    std::vector<TestCase> filterTests(std::vector<TestCase> const &testCases,
+                                      TestSpec const &testSpec,
+                                      IConfig const &config)
     {
         std::vector<TestCase> filtered;
         filtered.reserve(testCases.size());
@@ -13195,8 +13197,7 @@ namespace Catch
     void TestRegistry::registerTest(TestCase const &testCase)
     {
         std::string name = testCase.getTestCaseInfo().name;
-        if (name.empty())
-        {
+        if (name.empty()) {
             ReusableStringStream rss;
             rss << "Anonymous test case " << ++m_unnamedCount;
             return registerTest(testCase.withName(rss.str()));
@@ -13213,9 +13214,8 @@ namespace Catch
         if (m_sortedFunctions.empty())
             enforceNoDuplicateTestCases(m_functions);
 
-        if (m_currentSortOrder != config.runOrder() || m_sortedFunctions.empty())
-        {
-            m_sortedFunctions = sortTests(config, m_functions);
+        if (m_currentSortOrder != config.runOrder() || m_sortedFunctions.empty()) {
+            m_sortedFunctions  = sortTests(config, m_functions);
             m_currentSortOrder = config.runOrder();
         }
         return m_sortedFunctions;
@@ -13223,8 +13223,7 @@ namespace Catch
 
     ///////////////////////////////////////////////////////////////////////////
     TestInvokerAsFunction::TestInvokerAsFunction(void (*testAsFunction)()) noexcept : m_testAsFunction(testAsFunction)
-    {
-    }
+    {}
 
     void TestInvokerAsFunction::invoke() const
     {
@@ -13234,9 +13233,8 @@ namespace Catch
     std::string extractClassName(StringRef const &classOrQualifiedMethodName)
     {
         std::string className = classOrQualifiedMethodName;
-        if (startsWith(className, '&'))
-        {
-            std::size_t lastColons = className.rfind("::");
+        if (startsWith(className, '&')) {
+            std::size_t lastColons        = className.rfind("::");
             std::size_t penultimateColons = className.rfind("::", lastColons - 1);
             if (penultimateColons == std::string::npos)
                 penultimateColons = 1;
@@ -13265,9 +13263,9 @@ namespace Catch
     namespace TestCaseTracking
     {
 
-        NameAndLocation::NameAndLocation(std::string const &_name, SourceLineInfo const &_location) : name(_name), location(_location)
-        {
-        }
+        NameAndLocation::NameAndLocation(std::string const &_name, SourceLineInfo const &_location)
+            : name(_name), location(_location)
+        {}
 
         ITracker::~ITracker() = default;
 
@@ -13279,9 +13277,10 @@ namespace Catch
 
         ITracker &TrackerContext::startRun()
         {
-            m_rootTracker = std::make_shared<SectionTracker>(NameAndLocation("{root}", CATCH_INTERNAL_LINEINFO), *this, nullptr);
+            m_rootTracker =
+                std::make_shared<SectionTracker>(NameAndLocation("{root}", CATCH_INTERNAL_LINEINFO), *this, nullptr);
             m_currentTracker = nullptr;
-            m_runState = Executing;
+            m_runState       = Executing;
             return *m_rootTracker;
         }
 
@@ -13289,13 +13288,13 @@ namespace Catch
         {
             m_rootTracker.reset();
             m_currentTracker = nullptr;
-            m_runState = NotStarted;
+            m_runState       = NotStarted;
         }
 
         void TrackerContext::startCycle()
         {
             m_currentTracker = m_rootTracker.get();
-            m_runState = Executing;
+            m_runState       = Executing;
         }
         void TrackerContext::completeCycle()
         {
@@ -13317,8 +13316,7 @@ namespace Catch
 
         TrackerBase::TrackerBase(NameAndLocation const &nameAndLocation, TrackerContext &ctx, ITracker *parent)
             : m_nameAndLocation(nameAndLocation), m_ctx(ctx), m_parent(parent)
-        {
-        }
+        {}
 
         NameAndLocation const &TrackerBase::nameAndLocation() const
         {
@@ -13348,9 +13346,11 @@ namespace Catch
 
         ITrackerPtr TrackerBase::findChild(NameAndLocation const &nameAndLocation)
         {
-            auto it = std::find_if(m_children.begin(), m_children.end(), [&nameAndLocation](ITrackerPtr const &tracker) {
-                return tracker->nameAndLocation().location == nameAndLocation.location && tracker->nameAndLocation().name == nameAndLocation.name;
-            });
+            auto it =
+                std::find_if(m_children.begin(), m_children.end(), [&nameAndLocation](ITrackerPtr const &tracker) {
+                    return tracker->nameAndLocation().location == nameAndLocation.location &&
+                           tracker->nameAndLocation().name == nameAndLocation.name;
+                });
             return (it != m_children.end()) ? *it : nullptr;
         }
         ITracker &TrackerBase::parent()
@@ -13361,8 +13361,7 @@ namespace Catch
 
         void TrackerBase::openChild()
         {
-            if (m_runState != ExecutingChildren)
-            {
+            if (m_runState != ExecutingChildren) {
                 m_runState = ExecutingChildren;
                 if (m_parent)
                     m_parent->openChild();
@@ -13393,8 +13392,7 @@ namespace Catch
             while (&m_ctx.currentTracker() != this)
                 m_ctx.currentTracker().close();
 
-            switch (m_runState)
-            {
+            switch (m_runState) {
             case NeedsAnotherRun:
                 break;
 
@@ -13443,8 +13441,7 @@ namespace Catch
         SectionTracker::SectionTracker(NameAndLocation const &nameAndLocation, TrackerContext &ctx, ITracker *parent)
             : TrackerBase(nameAndLocation, ctx, parent)
         {
-            if (parent)
-            {
+            if (parent) {
                 while (!parent->isSectionTracker())
                     parent = &parent->parent();
 
@@ -13457,7 +13454,8 @@ namespace Catch
         {
             bool complete = true;
 
-            if ((m_filters.empty() || m_filters[0] == "") || std::find(m_filters.begin(), m_filters.end(), m_nameAndLocation.name) != m_filters.end())
+            if ((m_filters.empty() || m_filters[0] == "") ||
+                std::find(m_filters.begin(), m_filters.end(), m_nameAndLocation.name) != m_filters.end())
                 complete = TrackerBase::isComplete();
             return complete;
         }
@@ -13472,14 +13470,12 @@ namespace Catch
             std::shared_ptr<SectionTracker> section;
 
             ITracker &currentTracker = ctx.currentTracker();
-            if (ITrackerPtr childTracker = currentTracker.findChild(nameAndLocation))
-            {
+            if (ITrackerPtr childTracker = currentTracker.findChild(nameAndLocation)) {
                 assert(childTracker);
                 assert(childTracker->isSectionTracker());
                 section = std::static_pointer_cast<SectionTracker>(childTracker);
             }
-            else
-            {
+            else {
                 section = std::make_shared<SectionTracker>(nameAndLocation, ctx, &currentTracker);
                 currentTracker.addChild(section);
             }
@@ -13496,8 +13492,7 @@ namespace Catch
 
         void SectionTracker::addInitialFilters(std::vector<std::string> const &filters)
         {
-            if (!filters.empty())
-            {
+            if (!filters.empty()) {
                 m_filters.push_back(""); // Root - should never be consulted
                 m_filters.push_back(""); // Test Case - not a section filter
                 m_filters.insert(m_filters.end(), filters.begin(), filters.end());
@@ -13532,14 +13527,17 @@ namespace Catch
     }
 
     NameAndTags::NameAndTags(StringRef const &name_, StringRef const &tags_) noexcept : name(name_), tags(tags_)
-    {
-    }
+    {}
 
-    AutoReg::AutoReg(ITestInvoker *invoker, SourceLineInfo const &lineInfo, StringRef const &classOrMethod, NameAndTags const &nameAndTags) noexcept
+    AutoReg::AutoReg(ITestInvoker *invoker,
+                     SourceLineInfo const &lineInfo,
+                     StringRef const &classOrMethod,
+                     NameAndTags const &nameAndTags) noexcept
     {
         CATCH_TRY
         {
-            getMutableRegistryHub().registerTest(makeTestCase(invoker, extractClassName(classOrMethod), nameAndTags, lineInfo));
+            getMutableRegistryHub().registerTest(
+                makeTestCase(invoker, extractClassName(classOrMethod), nameAndTags, lineInfo));
         }
         CATCH_CATCH_ALL
         {
@@ -13561,30 +13559,28 @@ namespace Catch
 namespace Catch
 {
 
-    TestSpec::Pattern::~Pattern() = default;
-    TestSpec::NamePattern::~NamePattern() = default;
-    TestSpec::TagPattern::~TagPattern() = default;
+    TestSpec::Pattern::~Pattern()                 = default;
+    TestSpec::NamePattern::~NamePattern()         = default;
+    TestSpec::TagPattern::~TagPattern()           = default;
     TestSpec::ExcludedPattern::~ExcludedPattern() = default;
 
     TestSpec::NamePattern::NamePattern(std::string const &name) : m_wildcardPattern(toLower(name), CaseSensitive::No)
-    {
-    }
+    {}
     bool TestSpec::NamePattern::matches(TestCaseInfo const &testCase) const
     {
         return m_wildcardPattern.matches(toLower(testCase.name));
     }
 
     TestSpec::TagPattern::TagPattern(std::string const &tag) : m_tag(toLower(tag))
-    {
-    }
+    {}
     bool TestSpec::TagPattern::matches(TestCaseInfo const &testCase) const
     {
         return std::find(begin(testCase.lcaseTags), end(testCase.lcaseTags), m_tag) != end(testCase.lcaseTags);
     }
 
-    TestSpec::ExcludedPattern::ExcludedPattern(PatternPtr const &underlyingPattern) : m_underlyingPattern(underlyingPattern)
-    {
-    }
+    TestSpec::ExcludedPattern::ExcludedPattern(PatternPtr const &underlyingPattern)
+        : m_underlyingPattern(underlyingPattern)
+    {}
     bool TestSpec::ExcludedPattern::matches(TestCaseInfo const &testCase) const
     {
         return !m_underlyingPattern->matches(testCase);
@@ -13593,8 +13589,7 @@ namespace Catch
     bool TestSpec::Filter::matches(TestCaseInfo const &testCase) const
     {
         // All patterns in a filter must match for the filter to be a match
-        for (auto const &pattern : m_patterns)
-        {
+        for (auto const &pattern : m_patterns) {
             if (!pattern->matches(testCase))
                 return false;
         }
@@ -13621,15 +13616,14 @@ namespace Catch
 {
 
     TestSpecParser::TestSpecParser(ITagAliasRegistry const &tagAliases) : m_tagAliases(&tagAliases)
-    {
-    }
+    {}
 
     TestSpecParser &TestSpecParser::parse(std::string const &arg)
     {
-        m_mode = None;
+        m_mode      = None;
         m_exclusion = false;
-        m_start = std::string::npos;
-        m_arg = m_tagAliases->expandAliases(arg);
+        m_start     = std::string::npos;
+        m_arg       = m_tagAliases->expandAliases(arg);
         m_escapeChars.clear();
         for (m_pos = 0; m_pos < m_arg.size(); ++m_pos)
             visitChar(m_arg[m_pos]);
@@ -13645,10 +13639,8 @@ namespace Catch
 
     void TestSpecParser::visitChar(char c)
     {
-        if (m_mode == None)
-        {
-            switch (c)
-            {
+        if (m_mode == None) {
+            switch (c) {
             case ' ':
                 return;
             case '~':
@@ -13665,15 +13657,12 @@ namespace Catch
                 break;
             }
         }
-        if (m_mode == Name)
-        {
-            if (c == ',')
-            {
+        if (m_mode == Name) {
+            if (c == ',') {
                 addPattern<TestSpec::NamePattern>();
                 addFilter();
             }
-            else if (c == '[')
-            {
+            else if (c == '[') {
                 if (subString() == "exclude:")
                     m_exclusion = true;
                 else
@@ -13692,7 +13681,7 @@ namespace Catch
     }
     void TestSpecParser::startNewMode(Mode mode, std::size_t start)
     {
-        m_mode = mode;
+        m_mode  = mode;
         m_start = start;
     }
     void TestSpecParser::escape()
@@ -13709,8 +13698,7 @@ namespace Catch
 
     void TestSpecParser::addFilter()
     {
-        if (!m_currentFilter.m_patterns.empty())
-        {
+        if (!m_currentFilter.m_patterns.empty()) {
             m_testSpec.m_filters.push_back(m_currentFilter);
             m_currentFilter = TestSpec::Filter();
         }
@@ -13734,25 +13722,25 @@ namespace Catch
 
     auto getCurrentNanosecondsSinceEpoch() -> uint64_t
     {
-        return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+        return std::chrono::duration_cast<std::chrono::nanoseconds>(
+                   std::chrono::high_resolution_clock::now().time_since_epoch())
+            .count();
     }
 
     namespace
     {
         auto estimateClockResolution() -> uint64_t
         {
-            uint64_t sum = 0;
+            uint64_t sum                     = 0;
             static const uint64_t iterations = 1000000;
 
             auto startTime = getCurrentNanosecondsSinceEpoch();
 
-            for (std::size_t i = 0; i < iterations; ++i)
-            {
+            for (std::size_t i = 0; i < iterations; ++i) {
 
                 uint64_t ticks;
                 uint64_t baseTicks = getCurrentNanosecondsSinceEpoch();
-                do
-                {
+                do {
                     ticks = getCurrentNanosecondsSinceEpoch();
                 } while (ticks == baseTicks);
 
@@ -13762,8 +13750,7 @@ namespace Catch
                 // If we have been calibrating for over 3 seconds -- the clock
                 // is terrible and we should move on.
                 // TBD: How to signal that the measured resolution is probably wrong?
-                if (ticks > startTime + 3 * nanosecondsInSecond)
-                {
+                if (ticks > startTime + 3 * nanosecondsInSecond) {
                     return sum / (i + 1u);
                 }
             }
@@ -13840,7 +13827,8 @@ namespace Catch
 
                 static Arch which()
                 {
-                    union _ {
+                    union _
+                    {
                         int asInt;
                         char asChar[sizeof(int)];
                     } u;
@@ -13855,9 +13843,8 @@ namespace Catch
         {
             // Reverse order for little endian architectures
             int i = 0, end = static_cast<int>(size), inc = 1;
-            if (Endianness::which() == Endianness::Little)
-            {
-                i = end - 1;
+            if (Endianness::which() == Endianness::Little) {
+                i   = end - 1;
                 end = inc = -1;
             }
 
@@ -13872,8 +13859,7 @@ namespace Catch
 
     template <typename T> std::string fpToString(T value, int precision)
     {
-        if (Catch::isnan(value))
-        {
+        if (Catch::isnan(value)) {
             return "nan";
         }
 
@@ -13881,8 +13867,7 @@ namespace Catch
         rss << std::setprecision(precision) << std::fixed << value;
         std::string d = rss.str();
         std::size_t i = d.find_last_not_of('0');
-        if (i != std::string::npos && i != d.size() - 1)
-        {
+        if (i != std::string::npos && i != d.size() - 1) {
             if (d[i] == '.')
                 i++;
             d = d.substr(0, i + 1);
@@ -13898,16 +13883,13 @@ namespace Catch
 
     std::string StringMaker<std::string>::convert(const std::string &str)
     {
-        if (!getCurrentContext().getConfig()->showInvisibles())
-        {
+        if (!getCurrentContext().getConfig()->showInvisibles()) {
             return '"' + str + '"';
         }
 
         std::string s("\"");
-        for (char c : str)
-        {
-            switch (c)
-            {
+        for (char c : str) {
+            switch (c) {
             case '\n':
                 s.append("\\n");
                 break;
@@ -13932,23 +13914,19 @@ namespace Catch
 
     std::string StringMaker<char const *>::convert(char const *str)
     {
-        if (str)
-        {
+        if (str) {
             return ::Catch::Detail::stringify(std::string{str});
         }
-        else
-        {
+        else {
             return {"{null string}"};
         }
     }
     std::string StringMaker<char *>::convert(char *str)
     {
-        if (str)
-        {
+        if (str) {
             return ::Catch::Detail::stringify(std::string{str});
         }
-        else
-        {
+        else {
             return {"{null string}"};
         }
     }
@@ -13958,8 +13936,7 @@ namespace Catch
     {
         std::string s;
         s.reserve(wstr.size());
-        for (auto c : wstr)
-        {
+        for (auto c : wstr) {
             s += (c <= 0xff) ? static_cast<char>(c) : '?';
         }
         return ::Catch::Detail::stringify(s);
@@ -13974,23 +13951,19 @@ namespace Catch
 
     std::string StringMaker<wchar_t const *>::convert(wchar_t const *str)
     {
-        if (str)
-        {
+        if (str) {
             return ::Catch::Detail::stringify(std::wstring{str});
         }
-        else
-        {
+        else {
             return {"{null string}"};
         }
     }
     std::string StringMaker<wchar_t *>::convert(wchar_t *str)
     {
-        if (str)
-        {
+        if (str) {
             return ::Catch::Detail::stringify(std::wstring{str});
         }
-        else
-        {
+        else {
             return {"{null string}"};
         }
     }
@@ -14008,8 +13981,7 @@ namespace Catch
     {
         ReusableStringStream rss;
         rss << value;
-        if (value > Detail::hexThreshold)
-        {
+        if (value > Detail::hexThreshold) {
             rss << " (0x" << std::hex << value << ')';
         }
         return rss.str();
@@ -14027,8 +13999,7 @@ namespace Catch
     {
         ReusableStringStream rss;
         rss << value;
-        if (value > Detail::hexThreshold)
-        {
+        if (value > Detail::hexThreshold) {
             rss << " (0x" << std::hex << value << ')';
         }
         return rss.str();
@@ -14041,30 +14012,24 @@ namespace Catch
 
     std::string StringMaker<signed char>::convert(signed char value)
     {
-        if (value == '\r')
-        {
+        if (value == '\r') {
             return "'\\r'";
         }
-        else if (value == '\f')
-        {
+        else if (value == '\f') {
             return "'\\f'";
         }
-        else if (value == '\n')
-        {
+        else if (value == '\n') {
             return "'\\n'";
         }
-        else if (value == '\t')
-        {
+        else if (value == '\t') {
             return "'\\t'";
         }
-        else if ('\0' <= value && value < ' ')
-        {
+        else if ('\0' <= value && value < ' ') {
             return ::Catch::Detail::stringify(static_cast<unsigned int>(value));
         }
-        else
-        {
+        else {
             char chstr[] = "' '";
-            chstr[1] = value;
+            chstr[1]     = value;
             return chstr;
         }
     }
@@ -14131,8 +14096,8 @@ namespace Catch
     Counts Counts::operator-(Counts const &other) const
     {
         Counts diff;
-        diff.passed = passed - other.passed;
-        diff.failed = failed - other.failed;
+        diff.passed      = passed - other.passed;
+        diff.failed      = failed - other.failed;
         diff.failedButOk = failedButOk - other.failedButOk;
         return diff;
     }
@@ -14162,7 +14127,7 @@ namespace Catch
     {
         Totals diff;
         diff.assertions = assertions - other.assertions;
-        diff.testCases = testCases - other.testCases;
+        diff.testCases  = testCases - other.testCases;
         return diff;
     }
 
@@ -14210,18 +14175,20 @@ namespace Catch
 namespace Catch
 {
 
-    Version::Version(unsigned int _majorVersion, unsigned int _minorVersion, unsigned int _patchNumber, char const *const _branchName,
+    Version::Version(unsigned int _majorVersion,
+                     unsigned int _minorVersion,
+                     unsigned int _patchNumber,
+                     char const *const _branchName,
                      unsigned int _buildNumber)
-        : majorVersion(_majorVersion), minorVersion(_minorVersion), patchNumber(_patchNumber), branchName(_branchName), buildNumber(_buildNumber)
-    {
-    }
+        : majorVersion(_majorVersion), minorVersion(_minorVersion), patchNumber(_patchNumber), branchName(_branchName),
+          buildNumber(_buildNumber)
+    {}
 
     std::ostream &operator<<(std::ostream &os, Version const &version)
     {
         os << version.majorVersion << '.' << version.minorVersion << '.' << version.patchNumber;
         // branchName is never null -> 0th char is \0 if it is empty
-        if (version.branchName[0])
-        {
+        if (version.branchName[0]) {
             os << '-' << version.branchName << '.' << version.buildNumber;
         }
         return os;
@@ -14245,22 +14212,19 @@ namespace Catch
     WildcardPattern::WildcardPattern(std::string const &pattern, CaseSensitive::Choice caseSensitivity)
         : m_caseSensitivity(caseSensitivity), m_pattern(adjustCase(pattern))
     {
-        if (startsWith(m_pattern, '*'))
-        {
-            m_pattern = m_pattern.substr(1);
+        if (startsWith(m_pattern, '*')) {
+            m_pattern  = m_pattern.substr(1);
             m_wildcard = WildcardAtStart;
         }
-        if (endsWith(m_pattern, '*'))
-        {
-            m_pattern = m_pattern.substr(0, m_pattern.size() - 1);
+        if (endsWith(m_pattern, '*')) {
+            m_pattern  = m_pattern.substr(0, m_pattern.size() - 1);
             m_wildcard = static_cast<WildcardPosition>(m_wildcard | WildcardAtEnd);
         }
     }
 
     bool WildcardPattern::matches(std::string const &str) const
     {
-        switch (m_wildcard)
-        {
+        switch (m_wildcard) {
         case NoWildcard:
             return m_pattern == adjustCase(str);
         case WildcardAtStart:
@@ -14294,16 +14258,13 @@ namespace Catch
 
         size_t trailingBytes(unsigned char c)
         {
-            if ((c & 0xE0) == 0xC0)
-            {
+            if ((c & 0xE0) == 0xC0) {
                 return 2;
             }
-            if ((c & 0xF0) == 0xE0)
-            {
+            if ((c & 0xF0) == 0xE0) {
                 return 3;
             }
-            if ((c & 0xF8) == 0xF0)
-            {
+            if ((c & 0xF8) == 0xF0) {
                 return 4;
             }
             CATCH_INTERNAL_ERROR("Invalid multibyte utf-8 start byte encountered");
@@ -14311,16 +14272,13 @@ namespace Catch
 
         uint32_t headerValue(unsigned char c)
         {
-            if ((c & 0xE0) == 0xC0)
-            {
+            if ((c & 0xE0) == 0xC0) {
                 return c & 0x1F;
             }
-            if ((c & 0xF0) == 0xE0)
-            {
+            if ((c & 0xF0) == 0xE0) {
                 return c & 0x0F;
             }
-            if ((c & 0xF8) == 0xF0)
-            {
+            if ((c & 0xF8) == 0xF0) {
                 return c & 0x07;
             }
             CATCH_INTERNAL_ERROR("Invalid multibyte utf-8 start byte encountered");
@@ -14336,19 +14294,16 @@ namespace Catch
     } // anonymous namespace
 
     XmlEncode::XmlEncode(std::string const &str, ForWhat forWhat) : m_str(str), m_forWhat(forWhat)
-    {
-    }
+    {}
 
     void XmlEncode::encodeTo(std::ostream &os) const
     {
         // Apostrophe escaping not necessary if we always use " to write attributes
         // (see: http://www.w3.org/TR/xml/#syntax)
 
-        for (std::size_t idx = 0; idx < m_str.size(); ++idx)
-        {
+        for (std::size_t idx = 0; idx < m_str.size(); ++idx) {
             uchar c = m_str[idx];
-            switch (c)
-            {
+            switch (c) {
             case '<':
                 os << "&lt;";
                 break;
@@ -14376,15 +14331,13 @@ namespace Catch
 
                 // Escape control characters in standard ascii
                 // see http://stackoverflow.com/questions/404107/why-are-control-characters-illegal-in-xml-1-0
-                if (c < 0x09 || (c > 0x0D && c < 0x20) || c == 0x7F)
-                {
+                if (c < 0x09 || (c > 0x0D && c < 0x20) || c == 0x7F) {
                     hexEscapeChar(os, c);
                     break;
                 }
 
                 // Plain ASCII: Write it to stream
-                if (c < 0x7F)
-                {
+                if (c < 0x7F) {
                     os << c;
                     break;
                 }
@@ -14395,26 +14348,23 @@ namespace Catch
                 // First check that this bytes is a valid lead byte:
                 // This means that it is not encoded as 1111 1XXX
                 // Or as 10XX XXXX
-                if (c < 0xC0 || c >= 0xF8)
-                {
+                if (c < 0xC0 || c >= 0xF8) {
                     hexEscapeChar(os, c);
                     break;
                 }
 
                 auto encBytes = trailingBytes(c);
                 // Are there enough bytes left to avoid accessing out-of-bounds memory?
-                if (idx + encBytes - 1 >= m_str.size())
-                {
+                if (idx + encBytes - 1 >= m_str.size()) {
                     hexEscapeChar(os, c);
                     break;
                 }
                 // The header is valid, check data
                 // The next encBytes bytes must together be a valid utf-8
                 // This means: bitpattern 10XX XXXX and the extracted value is sane (ish)
-                bool valid = true;
+                bool valid     = true;
                 uint32_t value = headerValue(c);
-                for (std::size_t n = 1; n < encBytes; ++n)
-                {
+                for (std::size_t n = 1; n < encBytes; ++n) {
                     uchar nc = m_str[idx + n];
                     valid &= ((nc & 0xC0) == 0x80);
                     value = (value << 6) | (nc & 0x3F);
@@ -14424,17 +14374,16 @@ namespace Catch
                     // Wrong bit pattern of following bytes
                     (!valid) ||
                     // Overlong encodings
-                    (value < 0x80) || (0x80 <= value && value < 0x800 && encBytes > 2) || (0x800 < value && value < 0x10000 && encBytes > 3) ||
+                    (value < 0x80) || (0x80 <= value && value < 0x800 && encBytes > 2) ||
+                    (0x800 < value && value < 0x10000 && encBytes > 3) ||
                     // Encoded value out of range
-                    (value >= 0x110000))
-                {
+                    (value >= 0x110000)) {
                     hexEscapeChar(os, c);
                     break;
                 }
 
                 // If we got here, this is in fact a valid(ish) utf-8 sequence
-                for (std::size_t n = 0; n < encBytes; ++n)
-                {
+                for (std::size_t n = 0; n < encBytes; ++n) {
                     os << m_str[idx + n];
                 }
                 idx += encBytes - 1;
@@ -14450,8 +14399,7 @@ namespace Catch
     }
 
     XmlWriter::ScopedElement::ScopedElement(XmlWriter *writer) : m_writer(writer)
-    {
-    }
+    {}
 
     XmlWriter::ScopedElement::ScopedElement(ScopedElement &&other) noexcept : m_writer(other.m_writer)
     {
@@ -14459,11 +14407,10 @@ namespace Catch
     }
     XmlWriter::ScopedElement &XmlWriter::ScopedElement::operator=(ScopedElement &&other) noexcept
     {
-        if (m_writer)
-        {
+        if (m_writer) {
             m_writer->endElement();
         }
-        m_writer = other.m_writer;
+        m_writer       = other.m_writer;
         other.m_writer = nullptr;
         return *this;
     }
@@ -14513,13 +14460,11 @@ namespace Catch
     {
         newlineIfNecessary();
         m_indent = m_indent.substr(0, m_indent.size() - 2);
-        if (m_tagIsOpen)
-        {
+        if (m_tagIsOpen) {
             m_os << "/>";
             m_tagIsOpen = false;
         }
-        else
-        {
+        else {
             m_os << m_indent << "</" << m_tags.back() << ">";
         }
         m_os << std::endl;
@@ -14542,8 +14487,7 @@ namespace Catch
 
     XmlWriter &XmlWriter::writeText(std::string const &text, bool indent)
     {
-        if (!text.empty())
-        {
+        if (!text.empty()) {
             bool tagWasOpen = m_tagIsOpen;
             ensureTagClosed();
             if (tagWasOpen && indent)
@@ -14576,8 +14520,7 @@ namespace Catch
 
     void XmlWriter::ensureTagClosed()
     {
-        if (m_tagIsOpen)
-        {
+        if (m_tagIsOpen) {
             m_os << ">" << std::endl;
             m_tagIsOpen = false;
         }
@@ -14590,8 +14533,7 @@ namespace Catch
 
     void XmlWriter::newlineIfNecessary()
     {
-        if (m_needsNewline)
-        {
+        if (m_needsNewline) {
             m_os << std::endl;
             m_needsNewline = false;
         }
@@ -14638,8 +14580,7 @@ namespace Catch
     {
         ReusableStringStream oss;
         bool first = true;
-        for (auto &&filter : container)
-        {
+        for (auto &&filter : container) {
             if (!first)
                 oss << ' ';
             else
@@ -14651,8 +14592,7 @@ namespace Catch
     }
 
     TestEventListenerBase::TestEventListenerBase(ReporterConfig const &_config) : StreamingReporterBase(_config)
-    {
-    }
+    {}
 
     std::set<Verbosity> TestEventListenerBase::getSupportedVerbosities()
     {
@@ -14660,8 +14600,7 @@ namespace Catch
     }
 
     void TestEventListenerBase::assertionStarting(AssertionInfo const &)
-    {
-    }
+    {}
 
     bool TestEventListenerBase::assertionEnded(AssertionStats const &)
     {
@@ -14720,36 +14659,35 @@ namespace Catch
         // - green: Passed [both/all] N tests cases with M assertions.
         void printTotals(std::ostream &out, const Totals &totals)
         {
-            if (totals.testCases.total() == 0)
-            {
+            if (totals.testCases.total() == 0) {
                 out << "No tests ran.";
             }
-            else if (totals.testCases.failed == totals.testCases.total())
-            {
+            else if (totals.testCases.failed == totals.testCases.total()) {
                 Colour colour(Colour::ResultError);
-                const std::string qualify_assertions_failed =
-                    totals.assertions.failed == totals.assertions.total() ? bothOrAll(totals.assertions.failed) : std::string();
-                out << "Failed " << bothOrAll(totals.testCases.failed) << pluralise(totals.testCases.failed, "test case")
+                const std::string qualify_assertions_failed = totals.assertions.failed == totals.assertions.total()
+                                                                  ? bothOrAll(totals.assertions.failed)
+                                                                  : std::string();
+                out << "Failed " << bothOrAll(totals.testCases.failed)
+                    << pluralise(totals.testCases.failed, "test case")
                     << ", "
                        "failed "
                     << qualify_assertions_failed << pluralise(totals.assertions.failed, "assertion") << '.';
             }
-            else if (totals.assertions.total() == 0)
-            {
-                out << "Passed " << bothOrAll(totals.testCases.total()) << pluralise(totals.testCases.total(), "test case") << " (no assertions).";
+            else if (totals.assertions.total() == 0) {
+                out << "Passed " << bothOrAll(totals.testCases.total())
+                    << pluralise(totals.testCases.total(), "test case") << " (no assertions).";
             }
-            else if (totals.assertions.failed)
-            {
+            else if (totals.assertions.failed) {
                 Colour colour(Colour::ResultError);
                 out << "Failed " << pluralise(totals.testCases.failed, "test case")
                     << ", "
                        "failed "
                     << pluralise(totals.assertions.failed, "assertion") << '.';
             }
-            else
-            {
+            else {
                 Colour colour(Colour::ResultSuccess);
-                out << "Passed " << bothOrAll(totals.testCases.passed) << pluralise(totals.testCases.passed, "test case") << " with "
+                out << "Passed " << bothOrAll(totals.testCases.passed)
+                    << pluralise(totals.testCases.passed, "test case") << " with "
                     << pluralise(totals.assertions.passed, "assertion") << '.';
             }
         }
@@ -14759,12 +14697,11 @@ namespace Catch
         {
           public:
             AssertionPrinter &operator=(AssertionPrinter const &) = delete;
-            AssertionPrinter(AssertionPrinter const &) = delete;
+            AssertionPrinter(AssertionPrinter const &)            = delete;
             AssertionPrinter(std::ostream &_stream, AssertionStats const &_stats, bool _printInfoMessages)
-                : stream(_stream), result(_stats.assertionResult), messages(_stats.infoMessages), itMessage(_stats.infoMessages.begin()),
-                  printInfoMessages(_printInfoMessages)
-            {
-            }
+                : stream(_stream), result(_stats.assertionResult), messages(_stats.infoMessages),
+                  itMessage(_stats.infoMessages.begin()), printInfoMessages(_printInfoMessages)
+            {}
 
             void print()
             {
@@ -14772,8 +14709,7 @@ namespace Catch
 
                 itMessage = messages.begin();
 
-                switch (result.getResultType())
-                {
+                switch (result.getResultType()) {
                 case ResultWas::Ok:
                     printResultType(Colour::ResultSuccess, passedString());
                     printOriginalExpression();
@@ -14845,8 +14781,7 @@ namespace Catch
 
             void printResultType(Colour::Code colour, std::string const &passOrFail) const
             {
-                if (!passOrFail.empty())
-                {
+                if (!passOrFail.empty()) {
                     {
                         Colour colourGuard(colour);
                         stream << ' ' << passOrFail;
@@ -14862,8 +14797,7 @@ namespace Catch
 
             void printExpressionWas()
             {
-                if (result.hasExpression())
-                {
+                if (result.hasExpression()) {
                     stream << ';';
                     {
                         Colour colour(dimColour());
@@ -14875,16 +14809,14 @@ namespace Catch
 
             void printOriginalExpression() const
             {
-                if (result.hasExpression())
-                {
+                if (result.hasExpression()) {
                     stream << ' ' << result.getExpression();
                 }
             }
 
             void printReconstructedExpression() const
             {
-                if (result.hasExpandedExpression())
-                {
+                if (result.hasExpandedExpression()) {
                     {
                         Colour colour(dimColour());
                         stream << " for: ";
@@ -14895,8 +14827,7 @@ namespace Catch
 
             void printMessage()
             {
-                if (itMessage != messages.end())
-                {
+                if (itMessage != messages.end()) {
                     stream << " '" << itMessage->message << '\'';
                     ++itMessage;
                 }
@@ -14916,14 +14847,11 @@ namespace Catch
                     stream << " with " << pluralise(N, "message") << ':';
                 }
 
-                for (; itMessage != itEnd;)
-                {
+                for (; itMessage != itEnd;) {
                     // If this assertion is a warning ignore any INFO messages
-                    if (printInfoMessages || itMessage->type != ResultWas::Info)
-                    {
+                    if (printInfoMessages || itMessage->type != ResultWas::Info) {
                         stream << " '" << itMessage->message << '\'';
-                        if (++itMessage != itEnd)
-                        {
+                        if (++itMessage != itEnd) {
                             Colour colourGuard(dimColour());
                             stream << " and";
                         }
@@ -14957,8 +14885,7 @@ namespace Catch
     }
 
     void CompactReporter::assertionStarting(AssertionInfo const &)
-    {
-    }
+    {}
 
     bool CompactReporter::assertionEnded(AssertionStats const &_assertionStats)
     {
@@ -14967,8 +14894,7 @@ namespace Catch
         bool printInfoMessages = true;
 
         // Drop out if result was successful and we're not printing those
-        if (!m_config->includeSuccessfulResults() && result.isOk())
-        {
+        if (!m_config->includeSuccessfulResults() && result.isOk()) {
             if (result.getResultType() != ResultWas::Warning)
                 return false;
             printInfoMessages = false;
@@ -14983,9 +14909,9 @@ namespace Catch
 
     void CompactReporter::sectionEnded(SectionStats const &_sectionStats)
     {
-        if (m_config->showDurations() == ShowDurations::Always)
-        {
-            stream << getFormattedDuration(_sectionStats.durationInSeconds) << " s: " << _sectionStats.sectionInfo.name << std::endl;
+        if (m_config->showDurations() == ShowDurations::Always) {
+            stream << getFormattedDuration(_sectionStats.durationInSeconds) << " s: " << _sectionStats.sectionInfo.name
+                   << std::endl;
         }
     }
 
@@ -14997,8 +14923,7 @@ namespace Catch
     }
 
     CompactReporter::~CompactReporter()
-    {
-    }
+    {}
 
     CATCH_REGISTER_REPORTER("compact", CompactReporter)
 
@@ -15027,15 +14952,14 @@ namespace Catch
         {
           public:
             ConsoleAssertionPrinter &operator=(ConsoleAssertionPrinter const &) = delete;
-            ConsoleAssertionPrinter(ConsoleAssertionPrinter const &) = delete;
+            ConsoleAssertionPrinter(ConsoleAssertionPrinter const &)            = delete;
             ConsoleAssertionPrinter(std::ostream &_stream, AssertionStats const &_stats, bool _printInfoMessages)
-                : stream(_stream), stats(_stats), result(_stats.assertionResult), colour(Colour::None), message(result.getMessage()),
-                  messages(_stats.infoMessages), printInfoMessages(_printInfoMessages)
+                : stream(_stream), stats(_stats), result(_stats.assertionResult), colour(Colour::None),
+                  message(result.getMessage()), messages(_stats.infoMessages), printInfoMessages(_printInfoMessages)
             {
-                switch (result.getResultType())
-                {
+                switch (result.getResultType()) {
                 case ResultWas::Ok:
-                    colour = Colour::Success;
+                    colour     = Colour::Success;
                     passOrFail = "PASSED";
                     // if( result.hasMessage() )
                     if (_stats.infoMessages.size() == 1)
@@ -15044,14 +14968,12 @@ namespace Catch
                         messageLabel = "with messages";
                     break;
                 case ResultWas::ExpressionFailed:
-                    if (result.isOk())
-                    {
-                        colour = Colour::Success;
+                    if (result.isOk()) {
+                        colour     = Colour::Success;
                         passOrFail = "FAILED - but was ok";
                     }
-                    else
-                    {
-                        colour = Colour::Error;
+                    else {
+                        colour     = Colour::Error;
                         passOrFail = "FAILED";
                     }
                     if (_stats.infoMessages.size() == 1)
@@ -15060,8 +14982,8 @@ namespace Catch
                         messageLabel = "with messages";
                     break;
                 case ResultWas::ThrewException:
-                    colour = Colour::Error;
-                    passOrFail = "FAILED";
+                    colour       = Colour::Error;
+                    passOrFail   = "FAILED";
                     messageLabel = "due to unexpected exception with ";
                     if (_stats.infoMessages.size() == 1)
                         messageLabel += "message";
@@ -15069,13 +14991,13 @@ namespace Catch
                         messageLabel += "messages";
                     break;
                 case ResultWas::FatalErrorCondition:
-                    colour = Colour::Error;
-                    passOrFail = "FAILED";
+                    colour       = Colour::Error;
+                    passOrFail   = "FAILED";
                     messageLabel = "due to a fatal error condition";
                     break;
                 case ResultWas::DidntThrowException:
-                    colour = Colour::Error;
-                    passOrFail = "FAILED";
+                    colour       = Colour::Error;
+                    passOrFail   = "FAILED";
                     messageLabel = "because no exception was thrown where one was expected";
                     break;
                 case ResultWas::Info:
@@ -15086,7 +15008,7 @@ namespace Catch
                     break;
                 case ResultWas::ExplicitFailure:
                     passOrFail = "FAILED";
-                    colour = Colour::Error;
+                    colour     = Colour::Error;
                     if (_stats.infoMessages.size() == 1)
                         messageLabel = "explicitly with message";
                     if (_stats.infoMessages.size() > 1)
@@ -15097,7 +15019,7 @@ namespace Catch
                 case ResultWas::FailureBit:
                 case ResultWas::Exception:
                     passOrFail = "** internal error **";
-                    colour = Colour::Error;
+                    colour     = Colour::Error;
                     break;
                 }
             }
@@ -15105,14 +15027,12 @@ namespace Catch
             void print() const
             {
                 printSourceInfo();
-                if (stats.totals.assertions.total() > 0)
-                {
+                if (stats.totals.assertions.total() > 0) {
                     printResultType();
                     printOriginalExpression();
                     printReconstructedExpression();
                 }
-                else
-                {
+                else {
                     stream << '\n';
                 }
                 printMessage();
@@ -15121,16 +15041,14 @@ namespace Catch
           private:
             void printResultType() const
             {
-                if (!passOrFail.empty())
-                {
+                if (!passOrFail.empty()) {
                     Colour colourGuard(colour);
                     stream << passOrFail << ":\n";
                 }
             }
             void printOriginalExpression() const
             {
-                if (result.hasExpression())
-                {
+                if (result.hasExpression()) {
                     Colour colourGuard(Colour::OriginalExpression);
                     stream << "  ";
                     stream << result.getExpressionInMacro();
@@ -15139,8 +15057,7 @@ namespace Catch
             }
             void printReconstructedExpression() const
             {
-                if (result.hasExpandedExpression())
-                {
+                if (result.hasExpandedExpression()) {
                     stream << "with expansion:\n";
                     Colour colourGuard(Colour::ReconstructedExpression);
                     stream << Column(result.getExpandedExpression()).indent(2) << '\n';
@@ -15150,8 +15067,7 @@ namespace Catch
             {
                 if (!messageLabel.empty())
                     stream << messageLabel << ':' << '\n';
-                for (auto const &msg : messages)
-                {
+                for (auto const &msg : messages) {
                     // If this assertion is a warning ignore any INFO messages
                     if (printInfoMessages || msg.type != ResultWas::Info)
                         stream << Column(msg.message).indent(2) << '\n';
@@ -15202,11 +15118,9 @@ namespace Catch
             Justification justification;
         };
         struct ColumnBreak
-        {
-        };
+        {};
         struct RowBreak
-        {
-        };
+        {};
 
         class Duration
         {
@@ -15221,17 +15135,17 @@ namespace Catch
             };
             static const uint64_t s_nanosecondsInAMicrosecond = 1000;
             static const uint64_t s_nanosecondsInAMillisecond = 1000 * s_nanosecondsInAMicrosecond;
-            static const uint64_t s_nanosecondsInASecond = 1000 * s_nanosecondsInAMillisecond;
-            static const uint64_t s_nanosecondsInAMinute = 60 * s_nanosecondsInASecond;
+            static const uint64_t s_nanosecondsInASecond      = 1000 * s_nanosecondsInAMillisecond;
+            static const uint64_t s_nanosecondsInAMinute      = 60 * s_nanosecondsInASecond;
 
             uint64_t m_inNanoseconds;
             Unit m_units;
 
           public:
-            explicit Duration(uint64_t inNanoseconds, Unit units = Unit::Auto) : m_inNanoseconds(inNanoseconds), m_units(units)
+            explicit Duration(uint64_t inNanoseconds, Unit units = Unit::Auto)
+                : m_inNanoseconds(inNanoseconds), m_units(units)
             {
-                if (m_units == Unit::Auto)
-                {
+                if (m_units == Unit::Auto) {
                     if (m_inNanoseconds < s_nanosecondsInAMicrosecond)
                         m_units = Unit::Nanoseconds;
                     else if (m_inNanoseconds < s_nanosecondsInAMillisecond)
@@ -15247,8 +15161,7 @@ namespace Catch
 
             auto value() const -> double
             {
-                switch (m_units)
-                {
+                switch (m_units) {
                 case Unit::Microseconds:
                     return m_inNanoseconds / static_cast<double>(s_nanosecondsInAMicrosecond);
                 case Unit::Milliseconds:
@@ -15263,8 +15176,7 @@ namespace Catch
             }
             auto unitsAsString() const -> std::string
             {
-                switch (m_units)
-                {
+                switch (m_units) {
                 case Unit::Nanoseconds:
                     return "ns";
                 case Unit::Microseconds:
@@ -15292,12 +15204,12 @@ namespace Catch
         std::vector<ColumnInfo> m_columnInfos;
         std::ostringstream m_oss;
         int m_currentColumn = -1;
-        bool m_isOpen = false;
+        bool m_isOpen       = false;
 
       public:
-        TablePrinter(std::ostream &os, std::vector<ColumnInfo> columnInfos) : m_os(os), m_columnInfos(std::move(columnInfos))
-        {
-        }
+        TablePrinter(std::ostream &os, std::vector<ColumnInfo> columnInfos)
+            : m_os(os), m_columnInfos(std::move(columnInfos))
+        {}
 
         auto columnInfos() const -> std::vector<ColumnInfo> const &
         {
@@ -15306,8 +15218,7 @@ namespace Catch
 
         void open()
         {
-            if (!m_isOpen)
-            {
+            if (!m_isOpen) {
                 m_isOpen = true;
                 *this << RowBreak();
                 for (auto const &info : m_columnInfos)
@@ -15318,8 +15229,7 @@ namespace Catch
         }
         void close()
         {
-            if (m_isOpen)
-            {
+            if (m_isOpen) {
                 *this << RowBreak();
                 m_os << std::endl;
                 m_isOpen = false;
@@ -15339,15 +15249,16 @@ namespace Catch
             auto strSize = Catch::StringRef(colStr).numberOfCharacters();
             tp.m_oss.str("");
             tp.open();
-            if (tp.m_currentColumn == static_cast<int>(tp.m_columnInfos.size() - 1))
-            {
+            if (tp.m_currentColumn == static_cast<int>(tp.m_columnInfos.size() - 1)) {
                 tp.m_currentColumn = -1;
                 tp.m_os << "\n";
             }
             tp.m_currentColumn++;
 
             auto colInfo = tp.m_columnInfos[tp.m_currentColumn];
-            auto padding = (strSize + 2 < static_cast<std::size_t>(colInfo.width)) ? std::string(colInfo.width - (strSize + 2), ' ') : std::string();
+            auto padding = (strSize + 2 < static_cast<std::size_t>(colInfo.width))
+                               ? std::string(colInfo.width - (strSize + 2), ' ')
+                               : std::string();
             if (colInfo.justification == ColumnInfo::Left)
                 tp.m_os << colStr << padding << " ";
             else
@@ -15357,8 +15268,7 @@ namespace Catch
 
         friend TablePrinter &operator<<(TablePrinter &tp, RowBreak)
         {
-            if (tp.m_currentColumn > 0)
-            {
+            if (tp.m_currentColumn > 0) {
                 tp.m_os << "\n";
                 tp.m_currentColumn = -1;
             }
@@ -15368,12 +15278,12 @@ namespace Catch
 
     ConsoleReporter::ConsoleReporter(ReporterConfig const &config)
         : StreamingReporterBase(config),
-          m_tablePrinter(new TablePrinter(config.stream(), {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 32, ColumnInfo::Left},
-                                                            {"iters", 8, ColumnInfo::Right},
-                                                            {"elapsed ns", 14, ColumnInfo::Right},
-                                                            {"average", 14, ColumnInfo::Right}}))
-    {
-    }
+          m_tablePrinter(new TablePrinter(config.stream(),
+                                          {{"benchmark name", CATCH_CONFIG_CONSOLE_WIDTH - 32, ColumnInfo::Left},
+                                           {"iters", 8, ColumnInfo::Right},
+                                           {"elapsed ns", 14, ColumnInfo::Right},
+                                           {"average", 14, ColumnInfo::Right}}))
+    {}
     ConsoleReporter::~ConsoleReporter() = default;
 
     std::string ConsoleReporter::getDescription()
@@ -15387,8 +15297,7 @@ namespace Catch
     }
 
     void ConsoleReporter::assertionStarting(AssertionInfo const &)
-    {
-    }
+    {}
 
     bool ConsoleReporter::assertionEnded(AssertionStats const &_assertionStats)
     {
@@ -15416,8 +15325,7 @@ namespace Catch
     void ConsoleReporter::sectionEnded(SectionStats const &_sectionStats)
     {
         m_tablePrinter->close();
-        if (_sectionStats.missingAssertions)
-        {
+        if (_sectionStats.missingAssertions) {
             lazyPrint();
             Colour colour(Colour::ResultError);
             if (m_sectionStack.size() > 1)
@@ -15426,12 +15334,11 @@ namespace Catch
                 stream << "\nNo assertions in test case";
             stream << " '" << _sectionStats.sectionInfo.name << "'\n" << std::endl;
         }
-        if (m_config->showDurations() == ShowDurations::Always)
-        {
-            stream << getFormattedDuration(_sectionStats.durationInSeconds) << " s: " << _sectionStats.sectionInfo.name << std::endl;
+        if (m_config->showDurations() == ShowDurations::Always) {
+            stream << getFormattedDuration(_sectionStats.durationInSeconds) << " s: " << _sectionStats.sectionInfo.name
+                   << std::endl;
         }
-        if (m_headerPrinted)
-        {
+        if (m_headerPrinted) {
             m_headerPrinted = false;
         }
         StreamingReporterBase::sectionEnded(_sectionStats);
@@ -15444,8 +15351,7 @@ namespace Catch
         auto nameCol = Column(info.name).width(static_cast<std::size_t>(m_tablePrinter->columnInfos()[0].width - 2));
 
         bool firstLine = true;
-        for (auto line : nameCol)
-        {
+        for (auto line : nameCol) {
             if (!firstLine)
                 (*m_tablePrinter) << ColumnBreak() << ColumnBreak() << ColumnBreak();
             else
@@ -15457,7 +15363,8 @@ namespace Catch
     void ConsoleReporter::benchmarkEnded(BenchmarkStats const &stats)
     {
         Duration average(stats.elapsedTimeInNanoseconds / stats.iterations);
-        (*m_tablePrinter) << stats.iterations << ColumnBreak() << stats.elapsedTimeInNanoseconds << ColumnBreak() << average << ColumnBreak();
+        (*m_tablePrinter) << stats.iterations << ColumnBreak() << stats.elapsedTimeInNanoseconds << ColumnBreak()
+                          << average << ColumnBreak();
     }
 
     void ConsoleReporter::testCaseEnded(TestCaseStats const &_testCaseStats)
@@ -15468,8 +15375,7 @@ namespace Catch
     }
     void ConsoleReporter::testGroupEnded(TestGroupStats const &_testGroupStats)
     {
-        if (currentGroupInfo.used)
-        {
+        if (currentGroupInfo.used) {
             printSummaryDivider();
             stream << "Summary for group '" << _testGroupStats.groupInfo.name << "':\n";
             printTotals(_testGroupStats.totals);
@@ -15505,8 +15411,7 @@ namespace Catch
         if (!currentGroupInfo.used)
             lazyPrintGroupInfo();
 
-        if (!m_headerPrinted)
-        {
+        if (!m_headerPrinted) {
             printTestCaseAndSectionHeader();
             m_headerPrinted = true;
         }
@@ -15525,8 +15430,7 @@ namespace Catch
     }
     void ConsoleReporter::lazyPrintGroupInfo()
     {
-        if (!currentGroupInfo->name.empty() && currentGroupInfo->groupsCounts > 1)
-        {
+        if (!currentGroupInfo->name.empty() && currentGroupInfo->groupsCounts > 1) {
             printClosedHeader("Group: " + currentGroupInfo->name);
             currentGroupInfo.used = true;
         }
@@ -15536,11 +15440,10 @@ namespace Catch
         assert(!m_sectionStack.empty());
         printOpenHeader(currentTestCaseInfo->name);
 
-        if (m_sectionStack.size() > 1)
-        {
+        if (m_sectionStack.size() > 1) {
             Colour colourGuard(Colour::Headers);
 
-            auto it = m_sectionStack.begin() + 1, // Skip first section (test case)
+            auto it   = m_sectionStack.begin() + 1, // Skip first section (test case)
                 itEnd = m_sectionStack.end();
             for (; it != itEnd; ++it)
                 printHeaderString(it->name, 2);
@@ -15548,8 +15451,7 @@ namespace Catch
 
         SourceLineInfo lineInfo = m_sectionStack.back().lineInfo;
 
-        if (!lineInfo.empty())
-        {
+        if (!lineInfo.empty()) {
             stream << getLineOfChars<'-'>() << '\n';
             Colour colourGuard(Colour::FileName);
             stream << lineInfo << '\n';
@@ -15587,15 +15489,13 @@ namespace Catch
     {
 
         SummaryColumn(std::string _label, Colour::Code _colour) : label(std::move(_label)), colour(_colour)
-        {
-        }
+        {}
         SummaryColumn addRow(std::size_t count)
         {
             ReusableStringStream rss;
             rss << count;
             std::string row = rss.str();
-            for (auto &oldRow : rows)
-            {
+            for (auto &oldRow : rows) {
                 while (oldRow.size() < row.size())
                     oldRow = ' ' + oldRow;
                 while (oldRow.size() > row.size())
@@ -15612,44 +15512,47 @@ namespace Catch
 
     void ConsoleReporter::printTotals(Totals const &totals)
     {
-        if (totals.testCases.total() == 0)
-        {
+        if (totals.testCases.total() == 0) {
             stream << Colour(Colour::Warning) << "No tests ran\n";
         }
-        else if (totals.assertions.total() > 0 && totals.testCases.allPassed())
-        {
+        else if (totals.assertions.total() > 0 && totals.testCases.allPassed()) {
             stream << Colour(Colour::ResultSuccess) << "All tests passed";
-            stream << " (" << pluralise(totals.assertions.passed, "assertion") << " in " << pluralise(totals.testCases.passed, "test case") << ')' << '\n';
+            stream << " (" << pluralise(totals.assertions.passed, "assertion") << " in "
+                   << pluralise(totals.testCases.passed, "test case") << ')' << '\n';
         }
-        else
-        {
+        else {
 
             std::vector<SummaryColumn> columns;
-            columns.push_back(SummaryColumn("", Colour::None).addRow(totals.testCases.total()).addRow(totals.assertions.total()));
-            columns.push_back(SummaryColumn("passed", Colour::Success).addRow(totals.testCases.passed).addRow(totals.assertions.passed));
-            columns.push_back(SummaryColumn("failed", Colour::ResultError).addRow(totals.testCases.failed).addRow(totals.assertions.failed));
             columns.push_back(
-                SummaryColumn("failed as expected", Colour::ResultExpectedFailure).addRow(totals.testCases.failedButOk).addRow(totals.assertions.failedButOk));
+                SummaryColumn("", Colour::None).addRow(totals.testCases.total()).addRow(totals.assertions.total()));
+            columns.push_back(SummaryColumn("passed", Colour::Success)
+                                  .addRow(totals.testCases.passed)
+                                  .addRow(totals.assertions.passed));
+            columns.push_back(SummaryColumn("failed", Colour::ResultError)
+                                  .addRow(totals.testCases.failed)
+                                  .addRow(totals.assertions.failed));
+            columns.push_back(SummaryColumn("failed as expected", Colour::ResultExpectedFailure)
+                                  .addRow(totals.testCases.failedButOk)
+                                  .addRow(totals.assertions.failedButOk));
 
             printSummaryRow("test cases", columns, 0);
             printSummaryRow("assertions", columns, 1);
         }
     }
-    void ConsoleReporter::printSummaryRow(std::string const &label, std::vector<SummaryColumn> const &cols, std::size_t row)
+    void ConsoleReporter::printSummaryRow(std::string const &label,
+                                          std::vector<SummaryColumn> const &cols,
+                                          std::size_t row)
     {
-        for (auto col : cols)
-        {
+        for (auto col : cols) {
             std::string value = col.rows[row];
-            if (col.label.empty())
-            {
+            if (col.label.empty()) {
                 stream << label << ": ";
                 if (value != "0")
                     stream << value;
                 else
                     stream << Colour(Colour::Warning) << "- none -";
             }
-            else if (value != "0")
-            {
+            else if (value != "0") {
                 stream << Colour(Colour::LightGrey) << " | ";
                 stream << Colour(col.colour) << value << ' ' << col.label;
             }
@@ -15659,11 +15562,10 @@ namespace Catch
 
     void ConsoleReporter::printTotalsDivider(Totals const &totals)
     {
-        if (totals.testCases.total() > 0)
-        {
-            std::size_t failedRatio = makeRatio(totals.testCases.failed, totals.testCases.total());
+        if (totals.testCases.total() > 0) {
+            std::size_t failedRatio      = makeRatio(totals.testCases.failed, totals.testCases.total());
             std::size_t failedButOkRatio = makeRatio(totals.testCases.failedButOk, totals.testCases.total());
-            std::size_t passedRatio = makeRatio(totals.testCases.passed, totals.testCases.total());
+            std::size_t passedRatio      = makeRatio(totals.testCases.passed, totals.testCases.total());
             while (failedRatio + failedButOkRatio + passedRatio < CATCH_CONFIG_CONSOLE_WIDTH - 1)
                 findMax(failedRatio, failedButOkRatio, passedRatio)++;
             while (failedRatio + failedButOkRatio + passedRatio > CATCH_CONFIG_CONSOLE_WIDTH - 1)
@@ -15676,8 +15578,7 @@ namespace Catch
             else
                 stream << Colour(Colour::Success) << std::string(passedRatio, '=');
         }
-        else
-        {
+        else {
             stream << Colour(Colour::Warning) << std::string(CATCH_CONFIG_CONSOLE_WIDTH - 1, '=');
         }
         stream << '\n';
@@ -15690,7 +15591,8 @@ namespace Catch
     void ConsoleReporter::printTestFilters()
     {
         if (m_config->testSpec().hasFilters())
-            stream << Colour(Colour::BrightYellow) << "Filters: " << serializeFilters(m_config->getTestsOrTags()) << '\n';
+            stream << Colour(Colour::BrightYellow) << "Filters: " << serializeFilters(m_config->getTestsOrTags())
+                   << '\n';
     }
 
     CATCH_REGISTER_REPORTER("console", ConsoleReporter)
@@ -15751,13 +15653,12 @@ namespace Catch
 
     JunitReporter::JunitReporter(ReporterConfig const &_config) : CumulativeReporterBase(_config), xml(_config.stream())
     {
-        m_reporterPrefs.shouldRedirectStdOut = true;
+        m_reporterPrefs.shouldRedirectStdOut      = true;
         m_reporterPrefs.shouldReportAllAssertions = true;
     }
 
     JunitReporter::~JunitReporter()
-    {
-    }
+    {}
 
     std::string JunitReporter::getDescription()
     {
@@ -15765,8 +15666,7 @@ namespace Catch
     }
 
     void JunitReporter::noMatchingTestCases(std::string const & /*spec*/)
-    {
-    }
+    {}
 
     void JunitReporter::testRunStarting(TestRunInfo const &runInfo)
     {
@@ -15776,14 +15676,16 @@ namespace Catch
         if (m_config->hasTestFilters() || m_config->rngSeed() != 0)
             xml.startElement("properties");
 
-        if (m_config->hasTestFilters())
-        {
-            xml.scopedElement("property").writeAttribute("name", "filters").writeAttribute("value", serializeFilters(m_config->getTestsOrTags()));
+        if (m_config->hasTestFilters()) {
+            xml.scopedElement("property")
+                .writeAttribute("name", "filters")
+                .writeAttribute("value", serializeFilters(m_config->getTestsOrTags()));
         }
 
-        if (m_config->rngSeed() != 0)
-        {
-            xml.scopedElement("property").writeAttribute("name", "random-seed").writeAttribute("value", m_config->rngSeed());
+        if (m_config->rngSeed() != 0) {
+            xml.scopedElement("property")
+                .writeAttribute("name", "random-seed")
+                .writeAttribute("value", m_config->rngSeed());
             xml.endElement();
         }
     }
@@ -15830,7 +15732,7 @@ namespace Catch
 
     void JunitReporter::writeGroup(TestGroupNode const &groupNode, double suiteTime)
     {
-        XmlWriter::ScopedElement e = xml.scopedElement("testsuite");
+        XmlWriter::ScopedElement e  = xml.scopedElement("testsuite");
         TestGroupStats const &stats = groupNode.value;
         xml.writeAttribute("name", stats.groupInfo.name);
         xml.writeAttribute("errors", unexpectedExceptions);
@@ -15862,8 +15764,7 @@ namespace Catch
 
         std::string className = stats.testInfo.className;
 
-        if (className.empty())
-        {
+        if (className.empty()) {
             className = fileNameTag(stats.testInfo.tags);
             if (className.empty())
                 className = "global";
@@ -15875,22 +15776,21 @@ namespace Catch
         writeSection(className, "", rootSection);
     }
 
-    void JunitReporter::writeSection(std::string const &className, std::string const &rootName, SectionNode const &sectionNode)
+    void JunitReporter::writeSection(std::string const &className,
+                                     std::string const &rootName,
+                                     SectionNode const &sectionNode)
     {
         std::string name = trim(sectionNode.stats.sectionInfo.name);
         if (!rootName.empty())
             name = rootName + '/' + name;
 
-        if (!sectionNode.assertions.empty() || !sectionNode.stdOut.empty() || !sectionNode.stdErr.empty())
-        {
+        if (!sectionNode.assertions.empty() || !sectionNode.stdOut.empty() || !sectionNode.stdErr.empty()) {
             XmlWriter::ScopedElement e = xml.scopedElement("testcase");
-            if (className.empty())
-            {
+            if (className.empty()) {
                 xml.writeAttribute("classname", name);
                 xml.writeAttribute("name", "root");
             }
-            else
-            {
+            else {
                 xml.writeAttribute("classname", className);
                 xml.writeAttribute("name", name);
             }
@@ -15919,11 +15819,9 @@ namespace Catch
     void JunitReporter::writeAssertion(AssertionStats const &stats)
     {
         AssertionResult const &result = stats.assertionResult;
-        if (!result.isOk())
-        {
+        if (!result.isOk()) {
             std::string elementName;
-            switch (result.getResultType())
-            {
+            switch (result.getResultType()) {
             case ResultWas::ThrewException:
             case ResultWas::FatalErrorCondition:
                 elementName = "error";
@@ -15991,7 +15889,7 @@ namespace Catch
     void ListeningReporter::addReporter(IStreamingReporterPtr &&reporter)
     {
         assert(!m_reporter && "Listening reporter can wrap only 1 real reporter");
-        m_reporter = std::move(reporter);
+        m_reporter                         = std::move(reporter);
         m_preferences.shouldRedirectStdOut = m_reporter->getPreferences().shouldRedirectStdOut;
     }
 
@@ -16007,8 +15905,7 @@ namespace Catch
 
     void ListeningReporter::noMatchingTestCases(std::string const &spec)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->noMatchingTestCases(spec);
         }
         m_reporter->noMatchingTestCases(spec);
@@ -16016,16 +15913,14 @@ namespace Catch
 
     void ListeningReporter::benchmarkStarting(BenchmarkInfo const &benchmarkInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->benchmarkStarting(benchmarkInfo);
         }
         m_reporter->benchmarkStarting(benchmarkInfo);
     }
     void ListeningReporter::benchmarkEnded(BenchmarkStats const &benchmarkStats)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->benchmarkEnded(benchmarkStats);
         }
         m_reporter->benchmarkEnded(benchmarkStats);
@@ -16033,8 +15928,7 @@ namespace Catch
 
     void ListeningReporter::testRunStarting(TestRunInfo const &testRunInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->testRunStarting(testRunInfo);
         }
         m_reporter->testRunStarting(testRunInfo);
@@ -16042,8 +15936,7 @@ namespace Catch
 
     void ListeningReporter::testGroupStarting(GroupInfo const &groupInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->testGroupStarting(groupInfo);
         }
         m_reporter->testGroupStarting(groupInfo);
@@ -16051,8 +15944,7 @@ namespace Catch
 
     void ListeningReporter::testCaseStarting(TestCaseInfo const &testInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->testCaseStarting(testInfo);
         }
         m_reporter->testCaseStarting(testInfo);
@@ -16060,8 +15952,7 @@ namespace Catch
 
     void ListeningReporter::sectionStarting(SectionInfo const &sectionInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->sectionStarting(sectionInfo);
         }
         m_reporter->sectionStarting(sectionInfo);
@@ -16069,8 +15960,7 @@ namespace Catch
 
     void ListeningReporter::assertionStarting(AssertionInfo const &assertionInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->assertionStarting(assertionInfo);
         }
         m_reporter->assertionStarting(assertionInfo);
@@ -16079,8 +15969,7 @@ namespace Catch
     // The return value indicates if the messages buffer should be cleared:
     bool ListeningReporter::assertionEnded(AssertionStats const &assertionStats)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             static_cast<void>(listener->assertionEnded(assertionStats));
         }
         return m_reporter->assertionEnded(assertionStats);
@@ -16088,8 +15977,7 @@ namespace Catch
 
     void ListeningReporter::sectionEnded(SectionStats const &sectionStats)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->sectionEnded(sectionStats);
         }
         m_reporter->sectionEnded(sectionStats);
@@ -16097,8 +15985,7 @@ namespace Catch
 
     void ListeningReporter::testCaseEnded(TestCaseStats const &testCaseStats)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->testCaseEnded(testCaseStats);
         }
         m_reporter->testCaseEnded(testCaseStats);
@@ -16106,8 +15993,7 @@ namespace Catch
 
     void ListeningReporter::testGroupEnded(TestGroupStats const &testGroupStats)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->testGroupEnded(testGroupStats);
         }
         m_reporter->testGroupEnded(testGroupStats);
@@ -16115,8 +16001,7 @@ namespace Catch
 
     void ListeningReporter::testRunEnded(TestRunStats const &testRunStats)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->testRunEnded(testRunStats);
         }
         m_reporter->testRunEnded(testRunStats);
@@ -16124,8 +16009,7 @@ namespace Catch
 
     void ListeningReporter::skipTest(TestCaseInfo const &testInfo)
     {
-        for (auto const &listener : m_listeners)
-        {
+        for (auto const &listener : m_listeners) {
             listener->skipTest(testInfo);
         }
         m_reporter->skipTest(testInfo);
@@ -16151,7 +16035,7 @@ namespace Catch
 {
     XmlReporter::XmlReporter(ReporterConfig const &_config) : StreamingReporterBase(_config), m_xml(_config.stream())
     {
-        m_reporterPrefs.shouldRedirectStdOut = true;
+        m_reporterPrefs.shouldRedirectStdOut      = true;
         m_reporterPrefs.shouldReportAllAssertions = true;
     }
 
@@ -16216,8 +16100,7 @@ namespace Catch
     void XmlReporter::sectionStarting(SectionInfo const &sectionInfo)
     {
         StreamingReporterBase::sectionStarting(sectionInfo);
-        if (m_sectionDepth++ > 0)
-        {
+        if (m_sectionDepth++ > 0) {
             m_xml.startElement("Section").writeAttribute("name", trim(sectionInfo.name));
             writeSourceInfo(sectionInfo.lineInfo);
             m_xml.ensureTagClosed();
@@ -16225,8 +16108,7 @@ namespace Catch
     }
 
     void XmlReporter::assertionStarting(AssertionInfo const &)
-    {
-    }
+    {}
 
     bool XmlReporter::assertionEnded(AssertionStats const &assertionStats)
     {
@@ -16235,17 +16117,13 @@ namespace Catch
 
         bool includeResults = m_config->includeSuccessfulResults() || !result.isOk();
 
-        if (includeResults || result.getResultType() == ResultWas::Warning)
-        {
+        if (includeResults || result.getResultType() == ResultWas::Warning) {
             // Print any info messages in <Info> tags.
-            for (auto const &msg : assertionStats.infoMessages)
-            {
-                if (msg.type == ResultWas::Info && includeResults)
-                {
+            for (auto const &msg : assertionStats.infoMessages) {
+                if (msg.type == ResultWas::Info && includeResults) {
                     m_xml.scopedElement("Info").writeText(msg.message);
                 }
-                else if (msg.type == ResultWas::Warning)
-                {
+                else if (msg.type == ResultWas::Warning) {
                     m_xml.scopedElement("Warning").writeText(msg.message);
                 }
             }
@@ -16256,9 +16134,10 @@ namespace Catch
             return true;
 
         // Print the expression if there is one.
-        if (result.hasExpression())
-        {
-            m_xml.startElement("Expression").writeAttribute("success", result.succeeded()).writeAttribute("type", result.getTestMacroName());
+        if (result.hasExpression()) {
+            m_xml.startElement("Expression")
+                .writeAttribute("success", result.succeeded())
+                .writeAttribute("type", result.getTestMacroName());
 
             writeSourceInfo(result.getSourceInfo());
 
@@ -16267,8 +16146,7 @@ namespace Catch
         }
 
         // And... Print a result applicable to each result type.
-        switch (result.getResultType())
-        {
+        switch (result.getResultType()) {
         case ResultWas::ThrewException:
             m_xml.startElement("Exception");
             writeSourceInfo(result.getSourceInfo());
@@ -16306,8 +16184,7 @@ namespace Catch
     void XmlReporter::sectionEnded(SectionStats const &sectionStats)
     {
         StreamingReporterBase::sectionEnded(sectionStats);
-        if (--m_sectionDepth > 0)
-        {
+        if (--m_sectionDepth > 0) {
             XmlWriter::ScopedElement e = m_xml.scopedElement("OverallResults");
             e.writeAttribute("successes", sectionStats.assertions.passed);
             e.writeAttribute("failures", sectionStats.assertions.failed);
@@ -16433,167 +16310,220 @@ int main(int argc, char *const argv[])
 #ifdef CATCH_CONFIG_PREFIX_ALL
 
 #define CATCH_REQUIRE(...) INTERNAL_CATCH_TEST("CATCH_REQUIRE", Catch::ResultDisposition::Normal, __VA_ARGS__)
-#define CATCH_REQUIRE_FALSE(...) INTERNAL_CATCH_TEST("CATCH_REQUIRE_FALSE", Catch::ResultDisposition::Normal | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
+#define CATCH_REQUIRE_FALSE(...)                                                                                       \
+    INTERNAL_CATCH_TEST(                                                                                               \
+        "CATCH_REQUIRE_FALSE", Catch::ResultDisposition::Normal | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
 
-#define CATCH_REQUIRE_THROWS(...) INTERNAL_CATCH_THROWS("CATCH_REQUIRE_THROWS", Catch::ResultDisposition::Normal, __VA_ARGS__)
-#define CATCH_REQUIRE_THROWS_AS(expr, exceptionType) INTERNAL_CATCH_THROWS_AS("CATCH_REQUIRE_THROWS_AS", exceptionType, Catch::ResultDisposition::Normal, expr)
-#define CATCH_REQUIRE_THROWS_WITH(expr, matcher) INTERNAL_CATCH_THROWS_STR_MATCHES("CATCH_REQUIRE_THROWS_WITH", Catch::ResultDisposition::Normal, matcher, expr)
+#define CATCH_REQUIRE_THROWS(...)                                                                                      \
+    INTERNAL_CATCH_THROWS("CATCH_REQUIRE_THROWS", Catch::ResultDisposition::Normal, __VA_ARGS__)
+#define CATCH_REQUIRE_THROWS_AS(expr, exceptionType)                                                                   \
+    INTERNAL_CATCH_THROWS_AS("CATCH_REQUIRE_THROWS_AS", exceptionType, Catch::ResultDisposition::Normal, expr)
+#define CATCH_REQUIRE_THROWS_WITH(expr, matcher)                                                                       \
+    INTERNAL_CATCH_THROWS_STR_MATCHES("CATCH_REQUIRE_THROWS_WITH", Catch::ResultDisposition::Normal, matcher, expr)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
-#define CATCH_REQUIRE_THROWS_MATCHES(expr, exceptionType, matcher)                                                                                             \
-    INTERNAL_CATCH_THROWS_MATCHES("CATCH_REQUIRE_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::Normal, matcher, expr)
+#define CATCH_REQUIRE_THROWS_MATCHES(expr, exceptionType, matcher)                                                     \
+    INTERNAL_CATCH_THROWS_MATCHES(                                                                                     \
+        "CATCH_REQUIRE_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::Normal, matcher, expr)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
-#define CATCH_REQUIRE_NOTHROW(...) INTERNAL_CATCH_NO_THROW("CATCH_REQUIRE_NOTHROW", Catch::ResultDisposition::Normal, __VA_ARGS__)
+#define CATCH_REQUIRE_NOTHROW(...)                                                                                     \
+    INTERNAL_CATCH_NO_THROW("CATCH_REQUIRE_NOTHROW", Catch::ResultDisposition::Normal, __VA_ARGS__)
 
 #define CATCH_CHECK(...) INTERNAL_CATCH_TEST("CATCH_CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CATCH_CHECK_FALSE(...)                                                                                                                                 \
-    INTERNAL_CATCH_TEST("CATCH_CHECK_FALSE", Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
-#define CATCH_CHECKED_IF(...) INTERNAL_CATCH_IF("CATCH_CHECKED_IF", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CATCH_CHECKED_ELSE(...) INTERNAL_CATCH_ELSE("CATCH_CHECKED_ELSE", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CATCH_CHECK_NOFAIL(...)                                                                                                                                \
-    INTERNAL_CATCH_TEST("CATCH_CHECK_NOFAIL", Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::SuppressFail, __VA_ARGS__)
+#define CATCH_CHECK_FALSE(...)                                                                                         \
+    INTERNAL_CATCH_TEST("CATCH_CHECK_FALSE",                                                                           \
+                        Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::FalseTest,             \
+                        __VA_ARGS__)
+#define CATCH_CHECKED_IF(...)                                                                                          \
+    INTERNAL_CATCH_IF("CATCH_CHECKED_IF", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CATCH_CHECKED_ELSE(...)                                                                                        \
+    INTERNAL_CATCH_ELSE("CATCH_CHECKED_ELSE", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CATCH_CHECK_NOFAIL(...)                                                                                        \
+    INTERNAL_CATCH_TEST("CATCH_CHECK_NOFAIL",                                                                          \
+                        Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::SuppressFail,          \
+                        __VA_ARGS__)
 
-#define CATCH_CHECK_THROWS(...) INTERNAL_CATCH_THROWS("CATCH_CHECK_THROWS", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CATCH_CHECK_THROWS_AS(expr, exceptionType)                                                                                                             \
+#define CATCH_CHECK_THROWS(...)                                                                                        \
+    INTERNAL_CATCH_THROWS("CATCH_CHECK_THROWS", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CATCH_CHECK_THROWS_AS(expr, exceptionType)                                                                     \
     INTERNAL_CATCH_THROWS_AS("CATCH_CHECK_THROWS_AS", exceptionType, Catch::ResultDisposition::ContinueOnFailure, expr)
-#define CATCH_CHECK_THROWS_WITH(expr, matcher)                                                                                                                 \
-    INTERNAL_CATCH_THROWS_STR_MATCHES("CATCH_CHECK_THROWS_WITH", Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
+#define CATCH_CHECK_THROWS_WITH(expr, matcher)                                                                         \
+    INTERNAL_CATCH_THROWS_STR_MATCHES(                                                                                 \
+        "CATCH_CHECK_THROWS_WITH", Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
-#define CATCH_CHECK_THROWS_MATCHES(expr, exceptionType, matcher)                                                                                               \
-    INTERNAL_CATCH_THROWS_MATCHES("CATCH_CHECK_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
+#define CATCH_CHECK_THROWS_MATCHES(expr, exceptionType, matcher)                                                       \
+    INTERNAL_CATCH_THROWS_MATCHES(                                                                                     \
+        "CATCH_CHECK_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
-#define CATCH_CHECK_NOTHROW(...) INTERNAL_CATCH_NO_THROW("CATCH_CHECK_NOTHROW", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CATCH_CHECK_NOTHROW(...)                                                                                       \
+    INTERNAL_CATCH_NO_THROW("CATCH_CHECK_NOTHROW", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
 
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
-#define CATCH_CHECK_THAT(arg, matcher) INTERNAL_CHECK_THAT("CATCH_CHECK_THAT", matcher, Catch::ResultDisposition::ContinueOnFailure, arg)
+#define CATCH_CHECK_THAT(arg, matcher)                                                                                 \
+    INTERNAL_CHECK_THAT("CATCH_CHECK_THAT", matcher, Catch::ResultDisposition::ContinueOnFailure, arg)
 
-#define CATCH_REQUIRE_THAT(arg, matcher) INTERNAL_CHECK_THAT("CATCH_REQUIRE_THAT", matcher, Catch::ResultDisposition::Normal, arg)
+#define CATCH_REQUIRE_THAT(arg, matcher)                                                                               \
+    INTERNAL_CHECK_THAT("CATCH_REQUIRE_THAT", matcher, Catch::ResultDisposition::Normal, arg)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 
 #define CATCH_INFO(msg) INTERNAL_CATCH_INFO("CATCH_INFO", msg)
-#define CATCH_WARN(msg) INTERNAL_CATCH_MSG("CATCH_WARN", Catch::ResultWas::Warning, Catch::ResultDisposition::ContinueOnFailure, msg)
+#define CATCH_WARN(msg)                                                                                                \
+    INTERNAL_CATCH_MSG("CATCH_WARN", Catch::ResultWas::Warning, Catch::ResultDisposition::ContinueOnFailure, msg)
 #define CATCH_CAPTURE(...) INTERNAL_CATCH_CAPTURE(INTERNAL_CATCH_UNIQUE_NAME(capturer), "CATCH_CAPTURE", __VA_ARGS__)
 
-#define CATCH_TEST_CASE(...) INTERNAL_CATCH_TESTCASE(__VA_ARGS__)
-#define CATCH_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TEST_CASE_METHOD(className, __VA_ARGS__)
-#define CATCH_METHOD_AS_TEST_CASE(method, ...) INTERNAL_CATCH_METHOD_AS_TEST_CASE(method, __VA_ARGS__)
+#define CATCH_TEST_CASE(...)                    INTERNAL_CATCH_TESTCASE(__VA_ARGS__)
+#define CATCH_TEST_CASE_METHOD(className, ...)  INTERNAL_CATCH_TEST_CASE_METHOD(className, __VA_ARGS__)
+#define CATCH_METHOD_AS_TEST_CASE(method, ...)  INTERNAL_CATCH_METHOD_AS_TEST_CASE(method, __VA_ARGS__)
 #define CATCH_REGISTER_TEST_CASE(Function, ...) INTERNAL_CATCH_REGISTER_TESTCASE(Function, __VA_ARGS__)
-#define CATCH_SECTION(...) INTERNAL_CATCH_SECTION(__VA_ARGS__)
-#define CATCH_DYNAMIC_SECTION(...) INTERNAL_CATCH_DYNAMIC_SECTION(__VA_ARGS__)
-#define CATCH_FAIL(...) INTERNAL_CATCH_MSG("CATCH_FAIL", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::Normal, __VA_ARGS__)
-#define CATCH_FAIL_CHECK(...)                                                                                                                                  \
-    INTERNAL_CATCH_MSG("CATCH_FAIL_CHECK", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CATCH_SUCCEED(...) INTERNAL_CATCH_MSG("CATCH_SUCCEED", Catch::ResultWas::Ok, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CATCH_SECTION(...)                      INTERNAL_CATCH_SECTION(__VA_ARGS__)
+#define CATCH_DYNAMIC_SECTION(...)              INTERNAL_CATCH_DYNAMIC_SECTION(__VA_ARGS__)
+#define CATCH_FAIL(...)                                                                                                \
+    INTERNAL_CATCH_MSG("CATCH_FAIL", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::Normal, __VA_ARGS__)
+#define CATCH_FAIL_CHECK(...)                                                                                          \
+    INTERNAL_CATCH_MSG("CATCH_FAIL_CHECK",                                                                             \
+                       Catch::ResultWas::ExplicitFailure,                                                              \
+                       Catch::ResultDisposition::ContinueOnFailure,                                                    \
+                       __VA_ARGS__)
+#define CATCH_SUCCEED(...)                                                                                             \
+    INTERNAL_CATCH_MSG("CATCH_SUCCEED", Catch::ResultWas::Ok, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
 
 #define CATCH_ANON_TEST_CASE() INTERNAL_CATCH_TESTCASE()
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define CATCH_TEMPLATE_TEST_CASE(...) INTERNAL_CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
+#define CATCH_TEMPLATE_TEST_CASE(...)                   INTERNAL_CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
 #define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__)
-#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...) INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__)
-#define CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__)
+#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...)           INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__)
+#define CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...)                                                        \
+    INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__)
 #else
 #define CATCH_TEMPLATE_TEST_CASE(...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__))
-#define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__))
-#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__))
-#define CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...)                                                                                                \
+#define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__))
+#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...)                                                                          \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__))
+#define CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...)                                                        \
     INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__))
 #endif
 
 #if !defined(CATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
-#define CATCH_STATIC_REQUIRE(...)                                                                                                                              \
-    static_assert(__VA_ARGS__, #__VA_ARGS__);                                                                                                                  \
+#define CATCH_STATIC_REQUIRE(...)                                                                                      \
+    static_assert(__VA_ARGS__, #__VA_ARGS__);                                                                          \
     CATCH_SUCCEED(#__VA_ARGS__)
-#define CATCH_STATIC_REQUIRE_FALSE(...)                                                                                                                        \
-    static_assert(!(__VA_ARGS__), "!(" #__VA_ARGS__ ")");                                                                                                      \
+#define CATCH_STATIC_REQUIRE_FALSE(...)                                                                                \
+    static_assert(!(__VA_ARGS__), "!(" #__VA_ARGS__ ")");                                                              \
     CATCH_SUCCEED(#__VA_ARGS__)
 #else
-#define CATCH_STATIC_REQUIRE(...) CATCH_REQUIRE(__VA_ARGS__)
+#define CATCH_STATIC_REQUIRE(...)       CATCH_REQUIRE(__VA_ARGS__)
 #define CATCH_STATIC_REQUIRE_FALSE(...) CATCH_REQUIRE_FALSE(__VA_ARGS__)
 #endif
 
 // "BDD-style" convenience wrappers
-#define CATCH_SCENARIO(...) CATCH_TEST_CASE("Scenario: " __VA_ARGS__)
+#define CATCH_SCENARIO(...)                   CATCH_TEST_CASE("Scenario: " __VA_ARGS__)
 #define CATCH_SCENARIO_METHOD(className, ...) INTERNAL_CATCH_TEST_CASE_METHOD(className, "Scenario: " __VA_ARGS__)
-#define CATCH_GIVEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("    Given: " << desc)
-#define CATCH_AND_GIVEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("And given: " << desc)
-#define CATCH_WHEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("     When: " << desc)
-#define CATCH_AND_WHEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION(" And when: " << desc)
-#define CATCH_THEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("     Then: " << desc)
-#define CATCH_AND_THEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("      And: " << desc)
+#define CATCH_GIVEN(desc)                     INTERNAL_CATCH_DYNAMIC_SECTION("    Given: " << desc)
+#define CATCH_AND_GIVEN(desc)                 INTERNAL_CATCH_DYNAMIC_SECTION("And given: " << desc)
+#define CATCH_WHEN(desc)                      INTERNAL_CATCH_DYNAMIC_SECTION("     When: " << desc)
+#define CATCH_AND_WHEN(desc)                  INTERNAL_CATCH_DYNAMIC_SECTION(" And when: " << desc)
+#define CATCH_THEN(desc)                      INTERNAL_CATCH_DYNAMIC_SECTION("     Then: " << desc)
+#define CATCH_AND_THEN(desc)                  INTERNAL_CATCH_DYNAMIC_SECTION("      And: " << desc)
 
 // If CATCH_CONFIG_PREFIX_ALL is not defined then the CATCH_ prefix is not required
 #else
 
 #define REQUIRE(...) INTERNAL_CATCH_TEST("REQUIRE", Catch::ResultDisposition::Normal, __VA_ARGS__)
-#define REQUIRE_FALSE(...) INTERNAL_CATCH_TEST("REQUIRE_FALSE", Catch::ResultDisposition::Normal | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
+#define REQUIRE_FALSE(...)                                                                                             \
+    INTERNAL_CATCH_TEST(                                                                                               \
+        "REQUIRE_FALSE", Catch::ResultDisposition::Normal | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
 
 #define REQUIRE_THROWS(...) INTERNAL_CATCH_THROWS("REQUIRE_THROWS", Catch::ResultDisposition::Normal, __VA_ARGS__)
-#define REQUIRE_THROWS_AS(expr, exceptionType) INTERNAL_CATCH_THROWS_AS("REQUIRE_THROWS_AS", exceptionType, Catch::ResultDisposition::Normal, expr)
-#define REQUIRE_THROWS_WITH(expr, matcher) INTERNAL_CATCH_THROWS_STR_MATCHES("REQUIRE_THROWS_WITH", Catch::ResultDisposition::Normal, matcher, expr)
+#define REQUIRE_THROWS_AS(expr, exceptionType)                                                                         \
+    INTERNAL_CATCH_THROWS_AS("REQUIRE_THROWS_AS", exceptionType, Catch::ResultDisposition::Normal, expr)
+#define REQUIRE_THROWS_WITH(expr, matcher)                                                                             \
+    INTERNAL_CATCH_THROWS_STR_MATCHES("REQUIRE_THROWS_WITH", Catch::ResultDisposition::Normal, matcher, expr)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
-#define REQUIRE_THROWS_MATCHES(expr, exceptionType, matcher)                                                                                                   \
-    INTERNAL_CATCH_THROWS_MATCHES("REQUIRE_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::Normal, matcher, expr)
+#define REQUIRE_THROWS_MATCHES(expr, exceptionType, matcher)                                                           \
+    INTERNAL_CATCH_THROWS_MATCHES(                                                                                     \
+        "REQUIRE_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::Normal, matcher, expr)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 #define REQUIRE_NOTHROW(...) INTERNAL_CATCH_NO_THROW("REQUIRE_NOTHROW", Catch::ResultDisposition::Normal, __VA_ARGS__)
 
 #define CHECK(...) INTERNAL_CATCH_TEST("CHECK", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CHECK_FALSE(...) INTERNAL_CATCH_TEST("CHECK_FALSE", Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
-#define CHECKED_IF(...) INTERNAL_CATCH_IF("CHECKED_IF", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CHECK_FALSE(...)                                                                                               \
+    INTERNAL_CATCH_TEST(                                                                                               \
+        "CHECK_FALSE", Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::FalseTest, __VA_ARGS__)
+#define CHECKED_IF(...)   INTERNAL_CATCH_IF("CHECKED_IF", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
 #define CHECKED_ELSE(...) INTERNAL_CATCH_ELSE("CHECKED_ELSE", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CHECK_NOFAIL(...) INTERNAL_CATCH_TEST("CHECK_NOFAIL", Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::SuppressFail, __VA_ARGS__)
+#define CHECK_NOFAIL(...)                                                                                              \
+    INTERNAL_CATCH_TEST("CHECK_NOFAIL",                                                                                \
+                        Catch::ResultDisposition::ContinueOnFailure | Catch::ResultDisposition::SuppressFail,          \
+                        __VA_ARGS__)
 
-#define CHECK_THROWS(...) INTERNAL_CATCH_THROWS("CHECK_THROWS", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define CHECK_THROWS_AS(expr, exceptionType) INTERNAL_CATCH_THROWS_AS("CHECK_THROWS_AS", exceptionType, Catch::ResultDisposition::ContinueOnFailure, expr)
-#define CHECK_THROWS_WITH(expr, matcher) INTERNAL_CATCH_THROWS_STR_MATCHES("CHECK_THROWS_WITH", Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
+#define CHECK_THROWS(...)                                                                                              \
+    INTERNAL_CATCH_THROWS("CHECK_THROWS", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CHECK_THROWS_AS(expr, exceptionType)                                                                           \
+    INTERNAL_CATCH_THROWS_AS("CHECK_THROWS_AS", exceptionType, Catch::ResultDisposition::ContinueOnFailure, expr)
+#define CHECK_THROWS_WITH(expr, matcher)                                                                               \
+    INTERNAL_CATCH_THROWS_STR_MATCHES("CHECK_THROWS_WITH", Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
-#define CHECK_THROWS_MATCHES(expr, exceptionType, matcher)                                                                                                     \
-    INTERNAL_CATCH_THROWS_MATCHES("CHECK_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
+#define CHECK_THROWS_MATCHES(expr, exceptionType, matcher)                                                             \
+    INTERNAL_CATCH_THROWS_MATCHES(                                                                                     \
+        "CHECK_THROWS_MATCHES", exceptionType, Catch::ResultDisposition::ContinueOnFailure, matcher, expr)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
-#define CHECK_NOTHROW(...) INTERNAL_CATCH_NO_THROW("CHECK_NOTHROW", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define CHECK_NOTHROW(...)                                                                                             \
+    INTERNAL_CATCH_NO_THROW("CHECK_NOTHROW", Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
 
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
-#define CHECK_THAT(arg, matcher) INTERNAL_CHECK_THAT("CHECK_THAT", matcher, Catch::ResultDisposition::ContinueOnFailure, arg)
+#define CHECK_THAT(arg, matcher)                                                                                       \
+    INTERNAL_CHECK_THAT("CHECK_THAT", matcher, Catch::ResultDisposition::ContinueOnFailure, arg)
 
 #define REQUIRE_THAT(arg, matcher) INTERNAL_CHECK_THAT("REQUIRE_THAT", matcher, Catch::ResultDisposition::Normal, arg)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 
-#define INFO(msg) INTERNAL_CATCH_INFO("INFO", msg)
+#define INFO(msg)          INTERNAL_CATCH_INFO("INFO", msg)
 #define UNSCOPED_INFO(msg) INTERNAL_CATCH_UNSCOPED_INFO("UNSCOPED_INFO", msg)
-#define WARN(msg) INTERNAL_CATCH_MSG("WARN", Catch::ResultWas::Warning, Catch::ResultDisposition::ContinueOnFailure, msg)
+#define WARN(msg)                                                                                                      \
+    INTERNAL_CATCH_MSG("WARN", Catch::ResultWas::Warning, Catch::ResultDisposition::ContinueOnFailure, msg)
 #define CAPTURE(...) INTERNAL_CATCH_CAPTURE(INTERNAL_CATCH_UNIQUE_NAME(capturer), "CAPTURE", __VA_ARGS__)
 
-#define TEST_CASE(...) INTERNAL_CATCH_TESTCASE(__VA_ARGS__)
-#define TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TEST_CASE_METHOD(className, __VA_ARGS__)
-#define METHOD_AS_TEST_CASE(method, ...) INTERNAL_CATCH_METHOD_AS_TEST_CASE(method, __VA_ARGS__)
+#define TEST_CASE(...)                    INTERNAL_CATCH_TESTCASE(__VA_ARGS__)
+#define TEST_CASE_METHOD(className, ...)  INTERNAL_CATCH_TEST_CASE_METHOD(className, __VA_ARGS__)
+#define METHOD_AS_TEST_CASE(method, ...)  INTERNAL_CATCH_METHOD_AS_TEST_CASE(method, __VA_ARGS__)
 #define REGISTER_TEST_CASE(Function, ...) INTERNAL_CATCH_REGISTER_TESTCASE(Function, __VA_ARGS__)
-#define SECTION(...) INTERNAL_CATCH_SECTION(__VA_ARGS__)
-#define DYNAMIC_SECTION(...) INTERNAL_CATCH_DYNAMIC_SECTION(__VA_ARGS__)
-#define FAIL(...) INTERNAL_CATCH_MSG("FAIL", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::Normal, __VA_ARGS__)
-#define FAIL_CHECK(...) INTERNAL_CATCH_MSG("FAIL_CHECK", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
-#define SUCCEED(...) INTERNAL_CATCH_MSG("SUCCEED", Catch::ResultWas::Ok, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define SECTION(...)                      INTERNAL_CATCH_SECTION(__VA_ARGS__)
+#define DYNAMIC_SECTION(...)              INTERNAL_CATCH_DYNAMIC_SECTION(__VA_ARGS__)
+#define FAIL(...)                                                                                                      \
+    INTERNAL_CATCH_MSG("FAIL", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::Normal, __VA_ARGS__)
+#define FAIL_CHECK(...)                                                                                                \
+    INTERNAL_CATCH_MSG(                                                                                                \
+        "FAIL_CHECK", Catch::ResultWas::ExplicitFailure, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
+#define SUCCEED(...)                                                                                                   \
+    INTERNAL_CATCH_MSG("SUCCEED", Catch::ResultWas::Ok, Catch::ResultDisposition::ContinueOnFailure, __VA_ARGS__)
 #define ANON_TEST_CASE() INTERNAL_CATCH_TESTCASE()
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define TEMPLATE_TEST_CASE(...) INTERNAL_CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
+#define TEMPLATE_TEST_CASE(...)                   INTERNAL_CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
 #define TEMPLATE_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__)
-#define TEMPLATE_PRODUCT_TEST_CASE(...) INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__)
-#define TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__)
+#define TEMPLATE_PRODUCT_TEST_CASE(...)           INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__)
+#define TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...)                                                              \
+    INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__)
 #else
 #define TEMPLATE_TEST_CASE(...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__))
-#define TEMPLATE_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__))
-#define TEMPLATE_PRODUCT_TEST_CASE(...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__))
-#define TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__))
+#define TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                      \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__))
+#define TEMPLATE_PRODUCT_TEST_CASE(...)                                                                                \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE(__VA_ARGS__))
+#define TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...)                                                              \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, __VA_ARGS__))
 #endif
 
 #if !defined(CATCH_CONFIG_RUNTIME_STATIC_REQUIRE)
-#define STATIC_REQUIRE(...)                                                                                                                                    \
-    static_assert(__VA_ARGS__, #__VA_ARGS__);                                                                                                                  \
+#define STATIC_REQUIRE(...)                                                                                            \
+    static_assert(__VA_ARGS__, #__VA_ARGS__);                                                                          \
     SUCCEED(#__VA_ARGS__)
-#define STATIC_REQUIRE_FALSE(...)                                                                                                                              \
-    static_assert(!(__VA_ARGS__), "!(" #__VA_ARGS__ ")");                                                                                                      \
+#define STATIC_REQUIRE_FALSE(...)                                                                                      \
+    static_assert(!(__VA_ARGS__), "!(" #__VA_ARGS__ ")");                                                              \
     SUCCEED("!(" #__VA_ARGS__ ")")
 #else
-#define STATIC_REQUIRE(...) REQUIRE(__VA_ARGS__)
+#define STATIC_REQUIRE(...)       REQUIRE(__VA_ARGS__)
 #define STATIC_REQUIRE_FALSE(...) REQUIRE_FALSE(__VA_ARGS__)
 #endif
 
@@ -16602,15 +16532,15 @@ int main(int argc, char *const argv[])
 #define CATCH_TRANSLATE_EXCEPTION(signature) INTERNAL_CATCH_TRANSLATE_EXCEPTION(signature)
 
 // "BDD-style" convenience wrappers
-#define SCENARIO(...) TEST_CASE("Scenario: " __VA_ARGS__)
+#define SCENARIO(...)                   TEST_CASE("Scenario: " __VA_ARGS__)
 #define SCENARIO_METHOD(className, ...) INTERNAL_CATCH_TEST_CASE_METHOD(className, "Scenario: " __VA_ARGS__)
 
-#define GIVEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("    Given: " << desc)
+#define GIVEN(desc)     INTERNAL_CATCH_DYNAMIC_SECTION("    Given: " << desc)
 #define AND_GIVEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("And given: " << desc)
-#define WHEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("     When: " << desc)
-#define AND_WHEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION(" And when: " << desc)
-#define THEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("     Then: " << desc)
-#define AND_THEN(desc) INTERNAL_CATCH_DYNAMIC_SECTION("      And: " << desc)
+#define WHEN(desc)      INTERNAL_CATCH_DYNAMIC_SECTION("     When: " << desc)
+#define AND_WHEN(desc)  INTERNAL_CATCH_DYNAMIC_SECTION(" And when: " << desc)
+#define THEN(desc)      INTERNAL_CATCH_DYNAMIC_SECTION("     Then: " << desc)
+#define AND_THEN(desc)  INTERNAL_CATCH_DYNAMIC_SECTION("      And: " << desc)
 
 using Catch::Detail::Approx;
 
@@ -16620,26 +16550,26 @@ using Catch::Detail::Approx;
 // If this config identifier is defined then all CATCH macros are prefixed with CATCH_
 #ifdef CATCH_CONFIG_PREFIX_ALL
 
-#define CATCH_REQUIRE(...) (void)(0)
+#define CATCH_REQUIRE(...)       (void)(0)
 #define CATCH_REQUIRE_FALSE(...) (void)(0)
 
-#define CATCH_REQUIRE_THROWS(...) (void)(0)
+#define CATCH_REQUIRE_THROWS(...)                    (void)(0)
 #define CATCH_REQUIRE_THROWS_AS(expr, exceptionType) (void)(0)
-#define CATCH_REQUIRE_THROWS_WITH(expr, matcher) (void)(0)
+#define CATCH_REQUIRE_THROWS_WITH(expr, matcher)     (void)(0)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
 #define CATCH_REQUIRE_THROWS_MATCHES(expr, exceptionType, matcher) (void)(0)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 #define CATCH_REQUIRE_NOTHROW(...) (void)(0)
 
-#define CATCH_CHECK(...) (void)(0)
-#define CATCH_CHECK_FALSE(...) (void)(0)
-#define CATCH_CHECKED_IF(...) if (__VA_ARGS__)
+#define CATCH_CHECK(...)        (void)(0)
+#define CATCH_CHECK_FALSE(...)  (void)(0)
+#define CATCH_CHECKED_IF(...)   if (__VA_ARGS__)
 #define CATCH_CHECKED_ELSE(...) if (!(__VA_ARGS__))
 #define CATCH_CHECK_NOFAIL(...) (void)(0)
 
-#define CATCH_CHECK_THROWS(...) (void)(0)
+#define CATCH_CHECK_THROWS(...)                    (void)(0)
 #define CATCH_CHECK_THROWS_AS(expr, exceptionType) (void)(0)
-#define CATCH_CHECK_THROWS_WITH(expr, matcher) (void)(0)
+#define CATCH_CHECK_THROWS_WITH(expr, matcher)     (void)(0)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
 #define CATCH_CHECK_THROWS_MATCHES(expr, exceptionType, matcher) (void)(0)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
@@ -16651,42 +16581,49 @@ using Catch::Detail::Approx;
 #define CATCH_REQUIRE_THAT(arg, matcher) (void)(0)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 
-#define CATCH_INFO(msg) (void)(0)
-#define CATCH_WARN(msg) (void)(0)
+#define CATCH_INFO(msg)    (void)(0)
+#define CATCH_WARN(msg)    (void)(0)
 #define CATCH_CAPTURE(msg) (void)(0)
 
-#define CATCH_TEST_CASE(...) INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
-#define CATCH_TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
+#define CATCH_TEST_CASE(...)                                                                                           \
+    INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
+#define CATCH_TEST_CASE_METHOD(className, ...)                                                                         \
+    INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
 #define CATCH_METHOD_AS_TEST_CASE(method, ...)
 #define CATCH_REGISTER_TEST_CASE(Function, ...) (void)(0)
 #define CATCH_SECTION(...)
 #define CATCH_DYNAMIC_SECTION(...)
-#define CATCH_FAIL(...) (void)(0)
+#define CATCH_FAIL(...)       (void)(0)
 #define CATCH_FAIL_CHECK(...) (void)(0)
-#define CATCH_SUCCEED(...) (void)(0)
+#define CATCH_SUCCEED(...)    (void)(0)
 
-#define CATCH_ANON_TEST_CASE() INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
+#define CATCH_ANON_TEST_CASE()                                                                                         \
+    INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define CATCH_TEMPLATE_TEST_CASE(...)                                                                                                                          \
-    INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____))
-#define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                                                        \
-    INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className)
-#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...) CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
+#define CATCH_TEMPLATE_TEST_CASE(...)                                                                                  \
+    INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(                                                                 \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____))
+#define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                \
+    INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(                                                          \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className)
+#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...)                   CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
 #define CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__)
 #else
-#define CATCH_TEMPLATE_TEST_CASE(...)                                                                                                                          \
-    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____)))
-#define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                                                        \
-    INTERNAL_CATCH_EXPAND_VARGS(                                                                                                                               \
-        INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className))
-#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...) CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
+#define CATCH_TEMPLATE_TEST_CASE(...)                                                                                  \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(                                     \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____)))
+#define CATCH_TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(                              \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className))
+#define CATCH_TEMPLATE_PRODUCT_TEST_CASE(...)                   CATCH_TEMPLATE_TEST_CASE(__VA_ARGS__)
 #define CATCH_TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) CATCH_TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__)
 #endif
 
 // "BDD-style" convenience wrappers
-#define CATCH_SCENARIO(...) INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
-#define CATCH_SCENARIO_METHOD(className, ...)                                                                                                                  \
+#define CATCH_SCENARIO(...)                                                                                            \
+    INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
+#define CATCH_SCENARIO_METHOD(className, ...)                                                                          \
     INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____), className)
 #define CATCH_GIVEN(desc)
 #define CATCH_AND_GIVEN(desc)
@@ -16695,32 +16632,32 @@ using Catch::Detail::Approx;
 #define CATCH_THEN(desc)
 #define CATCH_AND_THEN(desc)
 
-#define CATCH_STATIC_REQUIRE(...) (void)(0)
+#define CATCH_STATIC_REQUIRE(...)       (void)(0)
 #define CATCH_STATIC_REQUIRE_FALSE(...) (void)(0)
 
 // If CATCH_CONFIG_PREFIX_ALL is not defined then the CATCH_ prefix is not required
 #else
 
-#define REQUIRE(...) (void)(0)
+#define REQUIRE(...)       (void)(0)
 #define REQUIRE_FALSE(...) (void)(0)
 
-#define REQUIRE_THROWS(...) (void)(0)
+#define REQUIRE_THROWS(...)                    (void)(0)
 #define REQUIRE_THROWS_AS(expr, exceptionType) (void)(0)
-#define REQUIRE_THROWS_WITH(expr, matcher) (void)(0)
+#define REQUIRE_THROWS_WITH(expr, matcher)     (void)(0)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
 #define REQUIRE_THROWS_MATCHES(expr, exceptionType, matcher) (void)(0)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 #define REQUIRE_NOTHROW(...) (void)(0)
 
-#define CHECK(...) (void)(0)
-#define CHECK_FALSE(...) (void)(0)
-#define CHECKED_IF(...) if (__VA_ARGS__)
+#define CHECK(...)        (void)(0)
+#define CHECK_FALSE(...)  (void)(0)
+#define CHECKED_IF(...)   if (__VA_ARGS__)
 #define CHECKED_ELSE(...) if (!(__VA_ARGS__))
 #define CHECK_NOFAIL(...) (void)(0)
 
-#define CHECK_THROWS(...) (void)(0)
+#define CHECK_THROWS(...)                    (void)(0)
 #define CHECK_THROWS_AS(expr, exceptionType) (void)(0)
-#define CHECK_THROWS_WITH(expr, matcher) (void)(0)
+#define CHECK_THROWS_WITH(expr, matcher)     (void)(0)
 #if !defined(CATCH_CONFIG_DISABLE_MATCHERS)
 #define CHECK_THROWS_MATCHES(expr, exceptionType, matcher) (void)(0)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
@@ -16732,48 +16669,55 @@ using Catch::Detail::Approx;
 #define REQUIRE_THAT(arg, matcher) (void)(0)
 #endif // CATCH_CONFIG_DISABLE_MATCHERS
 
-#define INFO(msg) (void)(0)
-#define WARN(msg) (void)(0)
+#define INFO(msg)    (void)(0)
+#define WARN(msg)    (void)(0)
 #define CAPTURE(msg) (void)(0)
 
 #define TEST_CASE(...) INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
-#define TEST_CASE_METHOD(className, ...) INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
+#define TEST_CASE_METHOD(className, ...)                                                                               \
+    INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
 #define METHOD_AS_TEST_CASE(method, ...)
 #define REGISTER_TEST_CASE(Function, ...) (void)(0)
 #define SECTION(...)
 #define DYNAMIC_SECTION(...)
-#define FAIL(...) (void)(0)
+#define FAIL(...)       (void)(0)
 #define FAIL_CHECK(...) (void)(0)
-#define SUCCEED(...) (void)(0)
-#define ANON_TEST_CASE() INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
+#define SUCCEED(...)    (void)(0)
+#define ANON_TEST_CASE()                                                                                               \
+    INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
 
 #ifndef CATCH_CONFIG_TRADITIONAL_MSVC_PREPROCESSOR
-#define TEMPLATE_TEST_CASE(...) INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____))
-#define TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                                                              \
-    INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className)
-#define TEMPLATE_PRODUCT_TEST_CASE(...) TEMPLATE_TEST_CASE(__VA_ARGS__)
+#define TEMPLATE_TEST_CASE(...)                                                                                        \
+    INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(                                                                 \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____))
+#define TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                      \
+    INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(                                                          \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className)
+#define TEMPLATE_PRODUCT_TEST_CASE(...)                   TEMPLATE_TEST_CASE(__VA_ARGS__)
 #define TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__)
 #else
-#define TEMPLATE_TEST_CASE(...)                                                                                                                                \
-    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____)))
-#define TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                                                              \
-    INTERNAL_CATCH_EXPAND_VARGS(                                                                                                                               \
-        INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className))
-#define TEMPLATE_PRODUCT_TEST_CASE(...) TEMPLATE_TEST_CASE(__VA_ARGS__)
+#define TEMPLATE_TEST_CASE(...)                                                                                        \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_NO_REGISTRATION(                                     \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____)))
+#define TEMPLATE_TEST_CASE_METHOD(className, ...)                                                                      \
+    INTERNAL_CATCH_EXPAND_VARGS(INTERNAL_CATCH_TEMPLATE_TEST_CASE_METHOD_NO_REGISTRATION(                              \
+        INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_M_P_L_A_T_E____T_E_S_T____), className))
+#define TEMPLATE_PRODUCT_TEST_CASE(...)                   TEMPLATE_TEST_CASE(__VA_ARGS__)
 #define TEMPLATE_PRODUCT_TEST_CASE_METHOD(className, ...) TEMPLATE_TEST_CASE_METHOD(className, __VA_ARGS__)
 #endif
 
-#define STATIC_REQUIRE(...) (void)(0)
+#define STATIC_REQUIRE(...)       (void)(0)
 #define STATIC_REQUIRE_FALSE(...) (void)(0)
 
 #endif
 
-#define CATCH_TRANSLATE_EXCEPTION(signature)                                                                                                                   \
+#define CATCH_TRANSLATE_EXCEPTION(signature)                                                                           \
     INTERNAL_CATCH_TRANSLATE_EXCEPTION_NO_REG(INTERNAL_CATCH_UNIQUE_NAME(catch_internal_ExceptionTranslator), signature)
 
 // "BDD-style" convenience wrappers
 #define SCENARIO(...) INTERNAL_CATCH_TESTCASE_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____))
-#define SCENARIO_METHOD(className, ...) INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____), className)
+#define SCENARIO_METHOD(className, ...)                                                                                \
+    INTERNAL_CATCH_TESTCASE_METHOD_NO_REGISTRATION(INTERNAL_CATCH_UNIQUE_NAME(____C_A_T_C_H____T_E_S_T____), className)
 
 #define GIVEN(desc)
 #define AND_GIVEN(desc)

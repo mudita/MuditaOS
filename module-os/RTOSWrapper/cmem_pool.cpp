@@ -36,15 +36,10 @@
  *
  ***************************************************************************/
 
-
-
-
 #include <stdlib.h>
 #include "mem_pool.hpp"
 
-
 using namespace cpp_freertos;
-
 
 void MemoryPool::CalculateValidAlignment()
 {
@@ -74,7 +69,6 @@ void MemoryPool::CalculateValidAlignment()
     }
 }
 
-
 void MemoryPool::CalculateItemSize()
 {
     if (ItemSize <= Alignment) {
@@ -92,12 +86,7 @@ void MemoryPool::CalculateItemSize()
     }
 }
 
-
-MemoryPool::MemoryPool( int itemSize,
-                        int itemCount,
-                        int alignment)
-    : ItemSize(itemSize),
-      Alignment(alignment)
+MemoryPool::MemoryPool(int itemSize, int itemCount, int alignment) : ItemSize(itemSize), Alignment(alignment)
 {
     CalculateValidAlignment();
 
@@ -121,13 +110,8 @@ MemoryPool::MemoryPool( int itemSize,
     Lock = new MutexStandard();
 }
 
-
-MemoryPool::MemoryPool( int itemSize,
-                        void *preallocatedMemory,
-                        int preallocatedMemorySize,
-                        int alignment)
-    : ItemSize(itemSize),
-      Alignment(alignment)
+MemoryPool::MemoryPool(int itemSize, void *preallocatedMemory, int preallocatedMemorySize, int alignment)
+    : ItemSize(itemSize), Alignment(alignment)
 {
     CalculateValidAlignment();
 
@@ -145,7 +129,6 @@ MemoryPool::MemoryPool( int itemSize,
     Lock = new MutexStandard();
 }
 
-
 void *MemoryPool::Allocate()
 {
     LockGuard guard(*Lock);
@@ -159,13 +142,11 @@ void *MemoryPool::Allocate()
     return item;
 }
 
-
 void MemoryPool::Free(void *item)
 {
     LockGuard guard(*Lock);
     FreeItems.push_back(item);
 }
-
 
 void MemoryPool::AddMemory(int itemCount)
 {
@@ -188,9 +169,7 @@ void MemoryPool::AddMemory(int itemCount)
     }
 }
 
-
-void MemoryPool::AddMemory( void *preallocatedMemory,
-                            int preallocatedMemorySize)
+void MemoryPool::AddMemory(void *preallocatedMemory, int preallocatedMemorySize)
 {
     unsigned char *address = (unsigned char *)preallocatedMemory;
 
@@ -203,5 +182,3 @@ void MemoryPool::AddMemory( void *preallocatedMemory,
         preallocatedMemorySize -= ItemSize;
     }
 }
-
-

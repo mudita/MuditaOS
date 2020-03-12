@@ -20,8 +20,7 @@ namespace Store
 
     GSM *GSM::get()
     {
-        if (!ptr)
-        {
+        if (!ptr) {
             ptr = new GSM();
         }
         return ptr;

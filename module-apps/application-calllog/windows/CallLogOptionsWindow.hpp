@@ -22,27 +22,28 @@
 
 #include "../data/CallLogInternals.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class CallLogOptionsWindow: public AppWindow {
-protected:
-	std::vector<gui::Item*> options;
+    class CallLogOptionsWindow : public AppWindow
+    {
+      protected:
+        std::vector<gui::Item *> options;
 
-	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
+        gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
 
-    CalllogRecord record;
+        CalllogRecord record;
 
-  public:
-	CallLogOptionsWindow( app::Application* app );
-	virtual ~CallLogOptionsWindow();
+      public:
+        CallLogOptionsWindow(app::Application *app);
+        virtual ~CallLogOptionsWindow();
 
-	//virtual methods
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
+        // virtual methods
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
-

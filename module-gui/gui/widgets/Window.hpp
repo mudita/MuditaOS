@@ -13,45 +13,52 @@
 #include "Common.hpp"
 #include "SwitchData.hpp"
 
-namespace gui {
+namespace gui
+{
 
-static uint32_t GUIWindowID=0;
+    static uint32_t GUIWindowID = 0;
 
-class Window: public Item {
-protected:
-	//unique ID of the window within application.
-	uint32_t windowID;
-	RefreshModes refreshMode;
-	std::string name;
+    class Window : public Item
+    {
+      protected:
+        // unique ID of the window within application.
+        uint32_t windowID;
+        RefreshModes refreshMode;
+        std::string name;
 
-public:
+      public:
+        Window(std::string name, uint32_t id = GUIWindowID++);
+        virtual ~Window();
 
-	Window( std::string name, uint32_t id=GUIWindowID++ );
-	virtual ~Window();
+        virtual void onBeforeShow(ShowMode mode, SwitchData *data);
+        virtual void getRefreshArea(RefreshModes &mode, uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h);
+        virtual int getWindowID()
+        {
+            return windowID;
+        };
+        virtual bool handleSwitchData(SwitchData *data);
 
-	virtual void onBeforeShow( ShowMode mode, SwitchData* data  );
-	virtual void getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h );
-	virtual int getWindowID() {return windowID; };
-	virtual bool handleSwitchData( SwitchData* data );
+        /**
+         * This method rebuilds window using updated phone's settings. Internal state must be preserved.
+         */
+        virtual void rebuild(){};
+        /**
+         * Methods builds window's interface
+         */
+        virtual void buildInterface(){};
+        /**
+         * Methods builds window's interface
+         */
+        virtual void destroyInterface(){};
 
-	/**
-	 * This method rebuilds window using updated phone's settings. Internal state must be preserved.
-	 */
-	virtual void rebuild() {};
-	/**
-	 * Methods builds window's interface
-	 */
-	virtual void buildInterface() {};
-	/**
-	 * Methods builds window's interface
-	 */
-	virtual void destroyInterface() {};
-
-	//virtual methods from Item
-	bool onInput( const InputEvent& inputEvent ) override;
-	std::list<DrawCommand*> buildDrawList() override;
-	std::string getName() { return name; };
-};
+        // virtual methods from Item
+        bool onInput(const InputEvent &inputEvent) override;
+        std::list<DrawCommand *> buildDrawList() override;
+        std::string getName()
+        {
+            return name;
+        };
+    };
 
 } /* namespace gui */
 

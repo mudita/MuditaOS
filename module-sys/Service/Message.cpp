@@ -12,72 +12,71 @@
 
 #include <string.h>
 
-namespace sys {
+namespace sys
+{
 
-    MessageRet_t CreateMessageRet(ReturnCodes retCode,Message_t msg){
-        return std::make_pair(retCode,msg);
+    MessageRet_t CreateMessageRet(ReturnCodes retCode, Message_t msg)
+    {
+        return std::make_pair(retCode, msg);
     };
 
-
-    Message_t DataMessage::Execute(Service *service) {
+    Message_t DataMessage::Execute(Service *service)
+    {
 
         // Ignore incoming data message if this service is not yet initialized
-        if(service->isReady){
-            return service->DataReceivedHandler(this,nullptr);
+        if (service->isReady) {
+            return service->DataReceivedHandler(this, nullptr);
         }
-        else{
+        else {
             return std::make_shared<ResponseMessage>();
         }
-
-
     }
 
-    Message_t SystemMessage::Execute(Service *service) {
-
+    Message_t SystemMessage::Execute(Service *service)
+    {
 
         ReturnCodes ret = ReturnCodes ::Success;
 
-        switch (sysMsgType){
+        switch (sysMsgType) {
 
-            case SystemMessageType ::Ping:
-                service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
-                break;
+        case SystemMessageType ::Ping:
+            service->pingTimestamp = cpp_freertos::Ticks::GetTicks();
+            break;
 
-            case SystemMessageType ::SwitchPowerMode:
-                service->SwitchPowerModeHandler(powerMode);
-                break;
+        case SystemMessageType ::SwitchPowerMode:
+            service->SwitchPowerModeHandler(powerMode);
+            break;
 
-            case SystemMessageType ::Exit:
-                ret = service->DeinitHandler();
-                service->CloseHandler();
-                break;
+        case SystemMessageType ::Exit:
+            ret = service->DeinitHandler();
+            service->CloseHandler();
+            break;
 
-            case SystemMessageType::Start:
-                ret = service->InitHandler();
-                if(ret == ReturnCodes::Success){
-                    service->isReady = true;
-                }
+        case SystemMessageType::Start:
+            ret = service->InitHandler();
+            if (ret == ReturnCodes::Success) {
+                service->isReady = true;
+            }
 
-                break;
-
+            break;
         }
         return std::make_shared<ResponseMessage>(ret);
-
     }
 
-    Message_t ResponseMessage::Execute(Service *service) {
+    Message_t ResponseMessage::Execute(Service *service)
+    {
         // Ignore incoming data message if this service is not yet initialized
-        if(service->isReady){
+        if (service->isReady) {
             DataMessage dummy(MessageType::MessageTypeUninitialized);
-            return service->DataReceivedHandler(&dummy,this);
+            return service->DataReceivedHandler(&dummy, this);
         }
-        else{
+        else {
             return std::make_shared<ResponseMessage>();
         }
     }
 
 #ifdef UNIT_TESTS
-    uint32_t Message::unitestsMsgInstancesCount=0;
+    uint32_t Message::unitestsMsgInstancesCount = 0;
 #endif
 
 } // namespace sys

@@ -16,6 +16,7 @@ namespace app
     {
         assert(app != nullptr);
 
-        return {utils::localize.get("sms_contact_details"), [=](gui::Item &item) { return contact(app, contactOperation, contactRec); }};
+        return {utils::localize.get("sms_contact_details"),
+                [=](gui::Item &item) { return contact(app, contactOperation, contactRec); }};
     }
 } // namespace app

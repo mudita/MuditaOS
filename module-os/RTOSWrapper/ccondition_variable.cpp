@@ -36,24 +36,15 @@
  *
  ***************************************************************************/
 
-
-
-
 #include "condition_variable.hpp"
 #include "thread.hpp"
 
-
 #ifdef CPP_FREERTOS_CONDITION_VARIABLES
-
 
 using namespace cpp_freertos;
 
-
-ConditionVariable::ConditionVariable()
-    : Lock(), WaitList()
-{
-}
-
+ConditionVariable::ConditionVariable() : Lock(), WaitList()
+{}
 
 void ConditionVariable::AddToWaitList(Thread *thread)
 {
@@ -73,7 +64,6 @@ void ConditionVariable::AddToWaitList(Thread *thread)
     Lock.Unlock();
 }
 
-
 void ConditionVariable::Signal()
 {
     //
@@ -81,7 +71,7 @@ void ConditionVariable::Signal()
     //
     Lock.Lock();
 
-    if ( !WaitList.empty() ) {
+    if (!WaitList.empty()) {
 
         Thread *thr = WaitList.front();
         WaitList.pop_front();
@@ -94,7 +84,6 @@ void ConditionVariable::Signal()
     Lock.Unlock();
 }
 
-
 void ConditionVariable::Broadcast()
 {
     //
@@ -102,7 +91,7 @@ void ConditionVariable::Broadcast()
     //
     Lock.Lock();
 
-    while ( !WaitList.empty() ) {
+    while (!WaitList.empty()) {
 
         Thread *thr = WaitList.front();
         WaitList.pop_front();
@@ -116,4 +105,3 @@ void ConditionVariable::Broadcast()
 }
 
 #endif
-

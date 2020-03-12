@@ -21,50 +21,41 @@ namespace harness
         std::string err;
         // TODO measure stack before and after..
         json11::Json el = Json::parse(request, err);
-        if (err.size() != 0 || el.is_object() != true)
-        {
-            LOG_ERROR("%s >> %s : %d : %d : %d", request.c_str(), err.c_str(), el.is_array(), el.is_object(), el.type());
+        if (err.size() != 0 || el.is_object() != true) {
+            LOG_ERROR(
+                "%s >> %s : %d : %d : %d", request.c_str(), err.c_str(), el.is_array(), el.is_object(), el.type());
             return Error::BadRequest;
         }
-        else
-        {
-            if (el[Type].is_null())
-            {
+        else {
+            if (el[Type].is_null()) {
                 std::shared_ptr<sys::DataMessage> ptr = std::shared_ptr<sys::DataMessage>(nullptr);
                 return Error::NoType;
             }
-            switch (el[Type].int_value())
-            {
+            switch (el[Type].int_value()) {
             case (int)Events::KeyPress: {
                 auto evt = events::KeyPress(el);
-                if (evt && evt.msg)
-                {
+                if (evt && evt.msg) {
                     sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
                 }
-            }
-            break;
+            } break;
             case static_cast<int>(Events::GSMCmd): {
                 bool ret = action::gsm_send(serv, el[Data].string_value());
-                if (!ret)
-                {
+                if (!ret) {
                     return Error::ParserFailed;
                 }
-            }
-            break;
+            } break;
             case (int)Events::GPIO: {
                 auto evt = events::GPIO(el);
-                if (!evt)
-                {
+                if (!evt) {
                     LOG_DEBUG("GPIO processing request failed");
                 }
-                else if (evt.msg)
-                {
+                else if (evt.msg) {
                     sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
-                } else {
+                }
+                else {
                     LOG_DEBUG("> evt: %s", evt.encode().c_str());
                 }
-            }
-            break;
+            } break;
             default:
                 break;
             };

@@ -8,72 +8,78 @@
 
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";
 
-ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName) {
+ServiceBluetooth::ServiceBluetooth() : sys::Service(serviceName)
+{
     LOG_INFO("[ServiceBluetooth] Initializing");
-    testTimerID = CreateTimer(3000,true);
+    testTimerID = CreateTimer(3000, true);
     ReloadTimer(testTimerID);
 }
 
-ServiceBluetooth::~ServiceBluetooth() {
+ServiceBluetooth::~ServiceBluetooth()
+{
     LOG_INFO("[ServiceBluetooth] Cleaning resources");
 }
 
 // Invoked when timer ticked
-void ServiceBluetooth::TickHandler(uint32_t id) {
-}
+void ServiceBluetooth::TickHandler(uint32_t id)
+{}
 
 // This code is experimental:
 // this means it is an init point of bluetooth feature handling
-sys::ReturnCodes ServiceBluetooth::InitHandler() {
+sys::ReturnCodes ServiceBluetooth::InitHandler()
+{
     LOG_ERROR("Bluetooth experimental!");
-    worker=std::make_unique<BluetoothWorker>(this);
+    worker = std::make_unique<BluetoothWorker>(this);
 
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceBluetooth::DeinitHandler() {
+sys::ReturnCodes ServiceBluetooth::DeinitHandler()
+{
 
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage* msg,sys::ResponseMessage* resp) {
+sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
+{
     try {
         switch (static_cast<MessageType>(msg->messageType)) {
         case MessageType::BluetoothRequest: {
             BluetoothMessage *lmsg = dynamic_cast<BluetoothMessage *>(msg);
             LOG_INFO("Bluetooth request!");
             switch (lmsg->req) {
-                case BluetoothMessage::Start:
-                    worker->run();
-                    break;
-                case BluetoothMessage::Scan:
-                    if(worker->scan()) {
-                        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Success);
-                    } else {
-                        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
-                    }
-                    break;
+            case BluetoothMessage::Start:
+                worker->run();
+                break;
+            case BluetoothMessage::Scan:
+                if (worker->scan()) {
+                    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Success);
+                }
+                else {
+                    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Failure);
+                }
+                break;
 
-                case BluetoothMessage::PAN: {
-/// TODO request lwip first...
-/// because TODO blocking message - wrecks system
-                    LOG_INFO("Request LwIP running!");
-//                    auto ret = message_lwip(this, LwIP_message::Request::Start);
-//                    if (ret != sys::ReturnCodes::Success) {
-//                        LOG_ERROR("Request for LwIP start failed");
-//                    }
-//                    else {
-                        /// TODO request PPP
-                        LOG_INFO("Start PAN");
-                        worker->start_pan();
-//                    }
-                } break;
-                case BluetoothMessage::Visible:
-                    worker->set_visible();
-                    break;
+            case BluetoothMessage::PAN: {
+                /// TODO request lwip first...
+                /// because TODO blocking message - wrecks system
+                LOG_INFO("Request LwIP running!");
+                //                    auto ret = message_lwip(this, LwIP_message::Request::Start);
+                //                    if (ret != sys::ReturnCodes::Success) {
+                //                        LOG_ERROR("Request for LwIP start failed");
+                //                    }
+                //                    else {
+                /// TODO request PPP
+                LOG_INFO("Start PAN");
+                worker->start_pan();
+                //                    }
+            } break;
+            case BluetoothMessage::Visible:
+                worker->set_visible();
+                break;
 
-                default:
-                    break;
+            default:
+                break;
             }
             break;
         }
@@ -81,7 +87,8 @@ sys::Message_t ServiceBluetooth::DataReceivedHandler(sys::DataMessage* msg,sys::
             LOG_INFO("BT not handled!");
             break;
         }
-    } catch (std::exception &ex) {
+    }
+    catch (std::exception &ex) {
         LOG_ERROR("Exception on BtService!: %s", ex.what());
     }
     return std::make_shared<sys::ResponseMessage>();

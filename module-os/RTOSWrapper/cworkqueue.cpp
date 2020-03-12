@@ -36,80 +36,64 @@
  *
  ***************************************************************************/
 
-
 #include "workqueue.hpp"
-
 
 using namespace cpp_freertos;
 
-
-WorkItem::WorkItem(bool freeAfterComplete)
-    : FreeItemAfterCompleted(freeAfterComplete)
-{
-}
-
+WorkItem::WorkItem(bool freeAfterComplete) : FreeItemAfterCompleted(freeAfterComplete)
+{}
 
 WorkItem::~WorkItem()
-{
-}
-
+{}
 
 bool WorkItem::FreeAfterRun()
 {
     return FreeItemAfterCompleted;
 }
 
-
-WorkQueue::WorkQueue(   const char * const Name,
-                        uint16_t StackDepth,
-                        UBaseType_t Priority,
-                        UBaseType_t maxWorkItems)
+WorkQueue::WorkQueue(const char *const Name, uint16_t StackDepth, UBaseType_t Priority, UBaseType_t maxWorkItems)
 {
     //
-    //  Build the Queue first, since the Thread is going to access 
+    //  Build the Queue first, since the Thread is going to access
     //  it as soon as it can, maybe before we leave this ctor.
     //
-    WorkItemQueue = new Queue(maxWorkItems, sizeof(WorkItem *));
+    WorkItemQueue  = new Queue(maxWorkItems, sizeof(WorkItem *));
     ThreadComplete = new BinarySemaphore();
-    WorkerThread = new CWorkerThread(Name, StackDepth, Priority, this);
+    WorkerThread   = new CWorkerThread(Name, StackDepth, Priority, this);
     //
     //  Our ctor chain is complete, we can start.
     //
     WorkerThread->Start();
 }
 
-
-WorkQueue::WorkQueue(   uint16_t StackDepth,
-                        UBaseType_t Priority,
-                        UBaseType_t maxWorkItems)
+WorkQueue::WorkQueue(uint16_t StackDepth, UBaseType_t Priority, UBaseType_t maxWorkItems)
 {
     //
-    //  Build the Queue first, since the Thread is going to access 
+    //  Build the Queue first, since the Thread is going to access
     //  it as soon as it can, maybe before we leave this ctor.
     //
-    WorkItemQueue = new Queue(maxWorkItems, sizeof(WorkItem *));
+    WorkItemQueue  = new Queue(maxWorkItems, sizeof(WorkItem *));
     ThreadComplete = new BinarySemaphore();
-    WorkerThread = new CWorkerThread(StackDepth, Priority, this);
+    WorkerThread   = new CWorkerThread(StackDepth, Priority, this);
     //
     //  Our ctor chain is complete, we can start.
     //
     WorkerThread->Start();
 }
-
 
 #if (INCLUDE_vTaskDelete == 1)
 
 WorkQueue::~WorkQueue()
 {
     //
-    //  This dtor is tricky, because of the multiple objects in 
+    //  This dtor is tricky, because of the multiple objects in
     //  play, and the multithreaded nature of this specific object.
     //
 
     //
-    //  Note that we cannot flush the queue. If there are items 
-    //  in the queue maked freeAfterComplete, we would leak the 
-    //  memory. 
+    //  Note that we cannot flush the queue. If there are items
+    //  in the queue maked freeAfterComplete, we would leak the
+    //  memory.
     //
 
     //
@@ -133,34 +117,24 @@ WorkQueue::~WorkQueue()
 
 #endif
 
-
 bool WorkQueue::QueueWork(WorkItem *work)
 {
     return WorkItemQueue->Enqueue(&work);
 }
 
-
-WorkQueue::CWorkerThread::CWorkerThread(const char * const Name,
+WorkQueue::CWorkerThread::CWorkerThread(const char *const Name,
                                         uint16_t StackDepth,
                                         UBaseType_t Priority,
                                         WorkQueue *Parent)
     : Thread(Name, StackDepth, Priority), ParentWorkQueue(Parent)
-{
-}
+{}
 
-
-WorkQueue::CWorkerThread::CWorkerThread(uint16_t StackDepth,
-                                        UBaseType_t Priority,
-                                        WorkQueue *Parent)
+WorkQueue::CWorkerThread::CWorkerThread(uint16_t StackDepth, UBaseType_t Priority, WorkQueue *Parent)
     : Thread(StackDepth, Priority), ParentWorkQueue(Parent)
-{
-}
-
+{}
 
 WorkQueue::CWorkerThread::~CWorkerThread()
-{
-}
-
+{}
 
 void WorkQueue::CWorkerThread::Run()
 {
@@ -190,7 +164,7 @@ void WorkQueue::CWorkerThread::Run()
         work->Run();
 
         //
-        //  If this was a dynamic, fire and forget item and we were 
+        //  If this was a dynamic, fire and forget item and we were
         //  requested to clean it up, do so.
         //
         if (work->FreeAfterRun()) {
@@ -203,5 +177,3 @@ void WorkQueue::CWorkerThread::Run()
     //
     ParentWorkQueue->ThreadComplete->Give();
 }
-
-

@@ -24,7 +24,7 @@ namespace utils
             {
 #if DEBUG_SCOPED_TIMINGS == 1
                 this->text = text;
-                timestamp = cpp_freertos::Ticks::GetTicks();
+                timestamp  = cpp_freertos::Ticks::GetTicks();
 #endif
             }
             ~Scoped()

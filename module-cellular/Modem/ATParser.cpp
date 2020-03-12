@@ -17,12 +17,14 @@
 #include <utility>
 #include <vector>
 
-ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
+ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular)
+{
     isInitialized = true;
 }
 
 /// plz see 12.7 summary of urc in documentation
-std::vector<ATParser::Urc> ATParser::ParseURC() {
+std::vector<ATParser::Urc> ATParser::ParseURC()
+{
 
     std::vector<ATParser::Urc> resp;
     size_t maxPos = 0, pos = 0;
@@ -38,11 +40,9 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
         {"+CPIN:", ATParser::Urc::NotHandled},
     };
 
-    for (const auto &el : vals)
-    {
+    for (const auto &el : vals) {
         pos = responseBuffer.find(el.first);
-        if (pos != std::string::npos)
-        {
+        if (pos != std::string::npos) {
             resp.push_back(el.second);
             maxPos = std::max(pos + el.first.length(), maxPos);
             LOG_DEBUG(("[URC]: " + el.first).c_str());
@@ -50,19 +50,19 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     }
 
     // manage string buffer
-    if(maxPos == 0){
-
-    }
+    if (maxPos == 0) {}
     else if (responseBuffer.size() >= maxPos) {
         responseBuffer.erase();
-    } else {
+    }
+    else {
         responseBuffer = responseBuffer.substr(maxPos);
     }
 
     return resp;
 }
 
-int ATParser::ProcessNewData(sys::Service *service) {
+int ATParser::ProcessNewData(sys::Service *service)
+{
     char rawBuffer[256] = {0};
 
     LOG_DEBUG("Receiving data from ProcessNewData");
@@ -70,7 +70,8 @@ int ATParser::ProcessNewData(sys::Service *service) {
 
     {
         cpp_freertos::LockGuard lock(mutex);
-        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s", length, responseBuffer.size(), responseBuffer.c_str());
+        LOG_DEBUG(
+            "Appending %i bytes to responseBuffer[%d]: %s", length, responseBuffer.size(), responseBuffer.c_str());
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
     }
 
@@ -78,8 +79,7 @@ int ATParser::ProcessNewData(sys::Service *service) {
     if (blockedTaskHandle) {
         xTaskNotifyGive(blockedTaskHandle);
     }
-    else if (ret.size())
-    {
+    else if (ret.size()) {
         urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
         // GSM modem is considered as fully operational when it outputs URCs specified below:
         // 1) RDY
@@ -87,10 +87,10 @@ int ATParser::ProcessNewData(sys::Service *service) {
         // 3) +CPIN: READY
         // 4) +QIND: SMS DONE
         // 5) +QIND: PB DONE
-        if (urcs.size() == 5)
-        {
+        if (urcs.size() == 5) {
             cpp_freertos::LockGuard lock(mutex);
-            auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);
+            auto msg = std::make_shared<CellularNotificationMessage>(
+                CellularNotificationMessage::Type::PowerUpProcedureComplete);
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
             LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();

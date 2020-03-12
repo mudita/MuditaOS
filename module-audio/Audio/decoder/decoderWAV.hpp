@@ -2,7 +2,7 @@
  *  @file decoderWAV.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 06.04.19
- *  @brief 
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
@@ -12,15 +12,17 @@
 
 #include "decoder.hpp"
 
-namespace audio {
+namespace audio
+{
 
-    class decoderWAV : public decoder {
+    class decoderWAV : public decoder
+    {
 
-    public:
-
+      public:
         decoderWAV(const char *fileName);
 
-        ~decoderWAV() {}
+        ~decoderWAV()
+        {}
 
         std::unique_ptr<Tags> fetchTags() override;
 
@@ -28,9 +30,9 @@ namespace audio {
 
         void setPosition(float pos) override;
 
-    private:
-
-        using WAVE_FormatTypeDef = struct {
+      private:
+        using WAVE_FormatTypeDef = struct
+        {
             uint32_t ChunkID;       /* 0 */
             uint32_t FileSize;      /* 4 */
             uint32_t FileFormat;    /* 8 */
@@ -53,6 +55,6 @@ namespace audio {
         std::unique_ptr<Tags> tag = nullptr;
     };
 
-}
+} // namespace audio
 
-#endif //UNTITLED1_DECODERWAV_HPP
+#endif // UNTITLED1_DECODERWAV_HPP

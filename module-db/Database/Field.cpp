@@ -7,20 +7,16 @@ const char *Field::GetCString() const
     return mValue.c_str();
 }
 
-template<class T>
-static T lget(T &val, const std::string &mValue, std::function<T()> foo)
+template <class T> static T lget(T &val, const std::string &mValue, std::function<T()> foo)
 {
-    val =0;
-    if (mValue.empty())
-    {
+    val = 0;
+    if (mValue.empty()) {
         return val;
     }
-    try
-    {
+    try {
         return foo();
     }
-    catch (...)
-    {
+    catch (...) {
         LOG_FATAL("Can't convert: %s to: %s", mValue.c_str(), typeid(T).name());
     }
     return val;

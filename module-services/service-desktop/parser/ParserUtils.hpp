@@ -24,9 +24,9 @@ namespace parserutils
         enum class Type
         {
             endpoint = '#',
-            rawData = '$'
+            rawData  = '$'
         };
-    }     // namespace message
+    } // namespace message
 
     namespace http
     {
@@ -34,8 +34,8 @@ namespace parserutils
          */
         enum class Code
         {
-            OK = 200,
-            BadRequest = 400,
+            OK                  = 200,
+            BadRequest          = 400,
             InternalServerError = 500
         };
 
@@ -54,10 +54,10 @@ namespace parserutils
 
     namespace json
     {
-        const inline std::string method = "method";
+        const inline std::string method   = "method";
         const inline std::string endpoint = "endpoint";
-        const inline std::string status = "status";
-        const inline std::string body = "body";
+        const inline std::string status   = "status";
+        const inline std::string body     = "body";
 
     } // namespace json
 };    // namespace parserutils

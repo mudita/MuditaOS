@@ -13,18 +13,20 @@
 #include "../Tables/SMSTable.hpp"
 #include "../Tables/ThreadsTable.hpp"
 
-class SmsDB : public Database {
-public:
+class SmsDB : public Database
+{
+  public:
     SmsDB();
     ~SmsDB();
 
     SMSTable sms;
     ThreadsTable threads;
 
-    static const char* GetDBName(){return dbName;}
+    static const char *GetDBName()
+    {
+        return dbName;
+    }
 
-private:
-
+  private:
     static const char *dbName;
 };
-

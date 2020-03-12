@@ -8,12 +8,13 @@
 #include "ListItem.hpp"
 #include "log/log.hpp"
 
-namespace gui {
+namespace gui
+{
 
-ListItem::ListItem() {
-}
+    ListItem::ListItem()
+    {}
 
-ListItem::~ListItem() {
-}
+    ListItem::~ListItem()
+    {}
 
 } /* namespace gui */

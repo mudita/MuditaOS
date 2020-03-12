@@ -8,21 +8,18 @@
  * @details
  */
 
-
 #include "SettingsDB.hpp"
 
 const char *SettingsDB::dbName = "sys/settings.db";
 
+SettingsDB::SettingsDB() : Database(dbName), settings(this)
+{
 
-SettingsDB::SettingsDB():
-        Database(dbName),
-        settings(this){
-
-    if(settings.Create() == false) return;
+    if (settings.Create() == false)
+        return;
 
     isInitialized = true;
 }
 
-SettingsDB::~SettingsDB() {
-
-}
+SettingsDB::~SettingsDB()
+{}

@@ -36,7 +36,6 @@
  *
  ***************************************************************************/
 
-
 #ifndef MUTEX_HPP_
 #define MUTEX_HPP_
 
@@ -44,7 +43,7 @@
  *  C++ exceptions are used by default when constructors fail.
  *  If you do not want this behavior, define the following in your makefile
  *  or project. Note that in most / all cases when a constructor fails,
- *  it's a fatal error. In the cases when you've defined this, the new 
+ *  it's a fatal error. In the cases when you've defined this, the new
  *  default behavior will be to issue a configASSERT() instead.
  */
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
@@ -58,16 +57,17 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-namespace cpp_freertos {
-
+namespace cpp_freertos
+{
 
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
-/**
- *  This is the exception that is thrown if a Mutex constructor fails.
- */
-class MutexCreateException : public std::exception {
+    /**
+     *  This is the exception that is thrown if a Mutex constructor fails.
+     */
+    class MutexCreateException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -85,33 +85,33 @@ class MutexCreateException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 #endif
 
+    /**
+     *  Base wrapper class around FreeRTOS's implementation of mutexes.
+     *
+     *  By definition, Mutexes can @em NOT be used from ISR contexts.
+     *
+     *  @note It is expected that an application will instantiate one of the
+     *        derived classes and use that object for synchronization. It is
+     *        not expected that a user or application will derive from these
+     *        classes.
+     */
+    class Mutex
+    {
 
-/**
- *  Base wrapper class around FreeRTOS's implementation of mutexes.
- *
- *  By definition, Mutexes can @em NOT be used from ISR contexts.
- *
- *  @note It is expected that an application will instantiate one of the
- *        derived classes and use that object for synchronization. It is
- *        not expected that a user or application will derive from these
- *        classes.
- */
-class Mutex {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Lock the Mutex.
          *
@@ -136,13 +136,13 @@ class Mutex {
          */
         virtual ~Mutex();
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Protected API
-    //  Not intended for use by application code.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    protected:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Protected API
+        //  Not intended for use by application code.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      protected:
         /**
          *  FreeRTOS semaphore handle.
          */
@@ -152,28 +152,28 @@ class Mutex {
          *  This constructor should not be public.
          */
         Mutex();
-};
+    };
 
+    /**
+     *  Standard usage Mutex.
+     *  By default calls to Lock these objects block forever, but this can be
+     *  changed by simply passing in a argument to the Lock() method.
+     *  These objects are not recursively acquirable. Calling Lock() twice from
+     *  the same Thread (i.e. task) will deadlock.
+     *
+     *  @note Standard mutexes use less resources than recursive mutexes. You
+     *        should typically use this type of Mutex, unless you have a strong
+     *        need for a MutexRecursive mutex.
+     */
+    class MutexStandard : public Mutex
+    {
 
-/**
- *  Standard usage Mutex.
- *  By default calls to Lock these objects block forever, but this can be
- *  changed by simply passing in a argument to the Lock() method.
- *  These objects are not recursively acquirable. Calling Lock() twice from
- *  the same Thread (i.e. task) will deadlock.
- *
- *  @note Standard mutexes use less resources than recursive mutexes. You
- *        should typically use this type of Mutex, unless you have a strong
- *        need for a MutexRecursive mutex.
- */
-class MutexStandard : public Mutex {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Create a standard, non-recursize Mutex.
          *
@@ -196,32 +196,32 @@ class MutexStandard : public Mutex {
          *           if it fails, did you call Lock() first?)
          */
         virtual bool Unlock();
-};
-
+    };
 
 #if (configUSE_RECURSIVE_MUTEXES == 1)
 
-/**
- *  Recursive usage Mutex.
- *
- *  By default calls to Lock these objects block forever, but this can be
- *  changed by simply passing in a argument to the Lock() method.
- *  These objects are recursively acquirable. Calling Lock() twice from
- *  the same Thread (i.e. task) works fine. The caller just needs to be sure to
- *  call Unlock() as many times as Lock().
- *
- *  @note Recursive mutexes use more resources than standard mutexes. You
- *        should be sure that you actually need this type of synchronization
- *        before using it.
- */
-class MutexRecursive : public Mutex {
+    /**
+     *  Recursive usage Mutex.
+     *
+     *  By default calls to Lock these objects block forever, but this can be
+     *  changed by simply passing in a argument to the Lock() method.
+     *  These objects are recursively acquirable. Calling Lock() twice from
+     *  the same Thread (i.e. task) works fine. The caller just needs to be sure to
+     *  call Unlock() as many times as Lock().
+     *
+     *  @note Recursive mutexes use more resources than standard mutexes. You
+     *        should be sure that you actually need this type of synchronization
+     *        before using it.
+     */
+    class MutexRecursive : public Mutex
+    {
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Create a recursize Mutex.
          *
@@ -244,36 +244,36 @@ class MutexRecursive : public Mutex {
          *           if it fails, did you call Lock() first?)
          */
         virtual bool Unlock();
-};
+    };
 
 #endif
 
+    /**
+     *  Synchronization helper class that leverages the C++ language to help
+     *  prevent deadlocks.
+     *  This is a C++11 feature that allows Mutex Locking and Unlocking to behave
+     *  following an RAII style. The constructor of this helper object locks the
+     *  Mutex. The destructor unlocks the Mutex. Since C++ guarantees that an
+     *  object's desctuctor is always called when it goes out of scope, calls to
+     *  Unlock become unnecessary and are in fact guaranteed as long as correct
+     *  scoping is used.
+     */
+    class LockGuard
+    {
 
-/**
- *  Synchronization helper class that leverages the C++ language to help
- *  prevent deadlocks.
- *  This is a C++11 feature that allows Mutex Locking and Unlocking to behave
- *  following an RAII style. The constructor of this helper object locks the
- *  Mutex. The destructor unlocks the Mutex. Since C++ guarantees that an
- *  object's desctuctor is always called when it goes out of scope, calls to
- *  Unlock become unnecessary and are in fact guaranteed as long as correct
- *  scoping is used.
- */
-class LockGuard {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Create a LockGuard with a specific Mutex.
          *
          *  @post The Mutex will be locked.
          *  @note There is an infinite timeout for acquiring the Lock.
          */
-        explicit LockGuard(Mutex& m);
+        explicit LockGuard(Mutex &m);
 
         /**
          *  Destroy a LockGuard.
@@ -287,19 +287,18 @@ class LockGuard {
         //  Private API
         //
         /////////////////////////////////////////////////////////////////////////
-    private:
+      private:
         /**
          *  We do not want a copy constructor.
          */
-        LockGuard(const LockGuard&);
+        LockGuard(const LockGuard &);
 
         /**
          *  Reference to the Mutex we locked, so it can be unlocked
          *  in the destructor.
          */
-        Mutex& mutex;
-};
+        Mutex &mutex;
+    };
 
-
-}
+} // namespace cpp_freertos
 #endif

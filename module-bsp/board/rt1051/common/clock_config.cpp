@@ -66,7 +66,8 @@ extern uint32_t SystemCoreClock;
 /*******************************************************************************
  ************************ BOARD_InitBootClocks function ************************
  ******************************************************************************/
-void BOARD_InitBootClocks(void) {
+void BOARD_InitBootClocks(void)
+{
     BOARD_BootClockRUN();
 }
 
@@ -116,7 +117,8 @@ void BOARD_InitBootClocks(void) {
  * ---------------------------------------------------------
  */
 
-void BOARD_BootClockRUN(void) {
+void BOARD_BootClockRUN(void)
+{
     /* Init RTC OSC clock frequency. */
     CLOCK_SetRtcXtalFreq(32768U);
 
@@ -133,136 +135,135 @@ void BOARD_BootClockRUN(void) {
     /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
     /* OSC_CLK (24M) */
     CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
-                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+                 1); // CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
     /* PERIPH_CLK2_SEL */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1); // CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
     /* Set AHB_PODF. */
-    CLOCK_SetDiv(kCLOCK_AhbDiv, 0);    //CBCDR
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 0); // CBCDR
 
     /* Set IPG_PODF. */
     /* AHB_CLK/4 */
-    CLOCK_SetDiv(kCLOCK_IpgDiv, 3);    //CBCDR
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 3); // CBCDR
 
     /* Set ARM_PODF. */
     /* PLL1/2 (864MHz / 2 = 432 MHz) */
-    CLOCK_SetDiv(kCLOCK_ArmDiv, 1);    //CACRR
+    CLOCK_SetDiv(kCLOCK_ArmDiv, 1); // CACRR
 
     /* Set PERCLK_PODF. */
     /* IPG_CLK_ROOT/2 */
-    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1);    //CSCMR1
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1); // CSCMR1
     /* Set per clock source. */
-    CLOCK_SetMux(kCLOCK_PerclkMux, 0);    //CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
-
-
-
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0); // CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
 
     /* Set USDHC1_PODF. */
-    CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1);    //CSCDR1
+    CLOCK_SetDiv(kCLOCK_Usdhc1Div, 1); // CSCDR1
     /* Set Usdhc1 clock source. */
     /* PLL2_PFD2/2 = 396MHz/2 = 198MHz */
-    CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0);    //CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
+    CLOCK_SetMux(kCLOCK_Usdhc1Mux, 0); // CSCMR1  (16) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 
     /* Set USDHC2_PODF. */
-    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2);    //CSCDR1
+    CLOCK_SetDiv(kCLOCK_Usdhc2Div, 2); // CSCDR1
     /* Set Usdhc2 clock source. */
     /* PLL2_PFD2/3 = 396MHz/3 = 132MHz */
-    CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0);    //CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
+    CLOCK_SetMux(kCLOCK_Usdhc2Mux, 0); // CSCMR1  (17) 0 - PLL2_PFD2, 1 - PLL2_PFD0
 
     /* Set FLEXSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0);    //CSCMR1
+    CLOCK_SetDiv(kCLOCK_FlexspiDiv, 0); // CSCMR1
     /* Set Flexspi clock source. */
     CLOCK_SetMux(kCLOCK_FlexspiMux,
-                 3);    //CSCMR1  (30-29) 0 - semc_clk_reet_pre, 1 - pll3_sw_clk, 2 - PLL2_PFD2, 3 - PLL3_PFD0
+                 3); // CSCMR1  (30-29) 0 - semc_clk_reet_pre, 1 - pll3_sw_clk, 2 - PLL2_PFD2, 3 - PLL3_PFD0
 
     /* Set CSI_PODF. */
-    CLOCK_SetDiv(kCLOCK_CsiDiv, 1);    //CSCDR3
+    CLOCK_SetDiv(kCLOCK_CsiDiv, 1); // CSCDR3
     /* Set Csi clock source. */
-    CLOCK_SetMux(kCLOCK_CsiMux, 0);    //CSCDR3  (10-9) 0 - osc_clk, 1 - PLL2_PFD2, 2 - pll3_120M, 3 - PLL3_PFD1
+    CLOCK_SetMux(kCLOCK_CsiMux, 0); // CSCDR3  (10-9) 0 - osc_clk, 1 - PLL2_PFD2, 2 - pll3_120M, 3 - PLL3_PFD1
 
     /* Set LPSPI_PODF. */
-    CLOCK_SetDiv(kCLOCK_LpspiDiv, 7);    //CBCMR
+    CLOCK_SetDiv(kCLOCK_LpspiDiv, 7); // CBCMR
     /* Set Lpspi clock source. */
     /* PLL2_PFD2/8 = 396MHz / 8 = 49,5MHz */
-    CLOCK_SetMux(kCLOCK_LpspiMux, 3);    //CBCMR  (5-4) 0 - PLL3_PFD1, 1 - PLL3_PFD0, 2 - PLL2, 3 - PLL2_PFD2
+    CLOCK_SetMux(kCLOCK_LpspiMux, 3); // CBCMR  (5-4) 0 - PLL3_PFD1, 1 - PLL3_PFD0, 2 - PLL2, 3 - PLL2_PFD2
 
     /* Set TRACE_PODF. */
-    CLOCK_SetDiv(kCLOCK_TraceDiv, 2);    //CSCDR1
+    CLOCK_SetDiv(kCLOCK_TraceDiv, 2); // CSCDR1
     /* Set Trace clock source. */
     /* PLL2_PFD0/4 disabled*/
-    CLOCK_SetMux(kCLOCK_TraceMux, 2);    //CBCMR  (15-14) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL2_PFD1
+    CLOCK_SetMux(kCLOCK_TraceMux, 2); // CBCMR  (15-14) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL2_PFD1
 
     /* Set SAI1_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Sai1PreDiv, 0);    //CS1CDR
+    CLOCK_SetDiv(kCLOCK_Sai1PreDiv, 0); // CS1CDR
     /* Set SAI1_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Sai1Div, 63);    //CS1CDR
+    CLOCK_SetDiv(kCLOCK_Sai1Div, 63); // CS1CDR
     /* Set Sai1 clock source. */
-    CLOCK_SetMux(kCLOCK_Sai1Mux, 2);    //CSCMR1  (11-10) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+    CLOCK_SetMux(kCLOCK_Sai1Mux, 2); // CSCMR1  (11-10) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
 
     /* Set SAI2_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Sai2PreDiv, 0);    //CS2CDR
+    CLOCK_SetDiv(kCLOCK_Sai2PreDiv, 0); // CS2CDR
     /* Set SAI2_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Sai2Div, 63);    //CS2CDR
+    CLOCK_SetDiv(kCLOCK_Sai2Div, 63); // CS2CDR
     /* Set Sai2 clock source. */
-    CLOCK_SetMux(kCLOCK_Sai2Mux, 2);    //CSCMR1  (13-12) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+    CLOCK_SetMux(kCLOCK_Sai2Mux, 2); // CSCMR1  (13-12) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
 
     /* Set SAI3_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Sai3PreDiv, 0);    //CS1CDR
+    CLOCK_SetDiv(kCLOCK_Sai3PreDiv, 0); // CS1CDR
     /* Set SAI3_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Sai3Div, 63);    //CS1CDR
+    CLOCK_SetDiv(kCLOCK_Sai3Div, 63); // CS1CDR
     /* Set Sai3 clock source. */
-    CLOCK_SetMux(kCLOCK_Sai3Mux, 2);    //CSCMR1  (15-14) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
+    CLOCK_SetMux(kCLOCK_Sai3Mux, 2); // CSCMR1  (15-14) 0 - PLL3_PFD2, 1 - PLL5, 2 - PLL4, 3 - reserved
 
     /* Set LPI2C_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1);    //CSCDR2
+    CLOCK_SetDiv(kCLOCK_Lpi2cDiv, 1); // CSCDR2
     /* Set Lpi2c clock source. */
     /* OSC_CLK (24MHz/2 = 12MHz */
-    CLOCK_SetMux(kCLOCK_Lpi2cMux, 1);    //CSCDR2  (18) 0 - pll3_60m, 1 - osc_clk
+    CLOCK_SetMux(kCLOCK_Lpi2cMux, 1); // CSCDR2  (18) 0 - pll3_60m, 1 - osc_clk
 
     /* Set CAN_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_CanDiv, 1);        //CSCMR2
+    CLOCK_SetDiv(kCLOCK_CanDiv, 1); // CSCMR2
     /* Set Can clock source. */
     CLOCK_SetMux(kCLOCK_CanMux,
-                 2);        //CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided clock 80M), 3 - disable
+                 2); // CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided clock
+                     // 80M), 3 - disable
 
     /* Set UART_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_UartDiv, 0);    //CSCDR1
+    CLOCK_SetDiv(kCLOCK_UartDiv, 0); // CSCDR1
     /* Set Uart clock source. */
     /* OSC_CLK (24MHz)/1 */
-    CLOCK_SetMux(kCLOCK_UartMux, 1);    //CSCDR1  (6) 0 - pll3_80m, 1 - osc_clk
+    CLOCK_SetMux(kCLOCK_UartMux, 1); // CSCDR1  (6) 0 - pll3_80m, 1 - osc_clk
 
     /* Set LCDIF_PRED. */
-    CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1);    //CSCDR2
+    CLOCK_SetDiv(kCLOCK_LcdifPreDiv, 1); // CSCDR2
     /* Set LCDIF_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_LcdifDiv, 3);    //CBCMR
+    CLOCK_SetDiv(kCLOCK_LcdifDiv, 3); // CBCMR
     /* Set Lcdif pre clock source. */
     /* PLL3_PFD1 (664.62MHz/4/2 = 83.08MHz disabled */
     CLOCK_SetMux(kCLOCK_LcdifPreMux,
-                 5);    //CSCDR2  (17-15) 0 - Pll2, 1 - PLL3_PFD3, 2 - PLL5, 3 - PLL2_PFD0, 4 - PLL2_PFD1, 5 - PLL3_PFD1, 6,7 - reserved
+                 5); // CSCDR2  (17-15) 0 - Pll2, 1 - PLL3_PFD3, 2 - PLL5, 3 - PLL2_PFD0, 4 - PLL2_PFD1, 5 - PLL3_PFD1,
+                     // 6,7 - reserved
 
     /* Set SPDIF0_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Spdif0PreDiv, 1);    //CDCDR
+    CLOCK_SetDiv(kCLOCK_Spdif0PreDiv, 1); // CDCDR
     /* Set SPDIF0_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Spdif0Div, 7);        //CDCDR
+    CLOCK_SetDiv(kCLOCK_Spdif0Div, 7); // CDCDR
     /* Set Spdif clock source. */
     /* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
-    CLOCK_SetMux(kCLOCK_SpdifMux, 3);        //CDCDR  (21-20) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+    CLOCK_SetMux(kCLOCK_SpdifMux, 3); // CDCDR  (21-20) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
 
     /* Set FLEXIO1_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Flexio1PreDiv, 1);    //CDCDR
+    CLOCK_SetDiv(kCLOCK_Flexio1PreDiv, 1); // CDCDR
     /* Set FLEXIO1_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Flexio1Div, 7);        //CDCDR
+    CLOCK_SetDiv(kCLOCK_Flexio1Div, 7); // CDCDR
     /* Set Flexio1 clock source. */
     /* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
-    CLOCK_SetMux(kCLOCK_Flexio1Mux, 3);        //CDCDR (8-7) 0 - PLL4, 1 - PlLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+    CLOCK_SetMux(kCLOCK_Flexio1Mux, 3); // CDCDR (8-7) 0 - PLL4, 1 - PlLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
 
     /* Set FLEXIO2_CLK_PRED. */
-    CLOCK_SetDiv(kCLOCK_Flexio2PreDiv, 1);    //CS1CDR
+    CLOCK_SetDiv(kCLOCK_Flexio2PreDiv, 1); // CS1CDR
     /* Set FLEXIO2_CLK_PODF. */
-    CLOCK_SetDiv(kCLOCK_Flexio2Div, 7);        //CS1CDR
+    CLOCK_SetDiv(kCLOCK_Flexio2Div, 7); // CS1CDR
     /* Set Flexio2 clock source. */
     /* PLL3_main/8/2 = 480MHz / 8 / 2 = 30MHz disabled*/
-    CLOCK_SetMux(kCLOCK_Flexio2Mux, 3);        //CSCMR2 (20-19) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
+    CLOCK_SetMux(kCLOCK_Flexio2Mux, 3); // CSCMR2 (20-19) 0 - PLL4, 1 - PLL3_PFD2, 2 - PLL5, 3 - pll3_sw_clk
 
     clkFLEXSPIsetup(CLK_INSTANCE_ALL, CLK_DISABLE);
 
@@ -300,11 +301,11 @@ void BOARD_BootClockRUN(void) {
 
     /* Set Pll3 sw clock source. */
     /* PLL3_main = 480 MHz */
-    CLOCK_SetMux(kCLOCK_Pll3SwMux, 0);        //CCSR  (0) 0 - pll3_main_clk, 1 - pll3_bypass_clock
+    CLOCK_SetMux(kCLOCK_Pll3SwMux, 0); // CCSR  (0) 0 - pll3_main_clk, 1 - pll3_bypass_clock
     /* Set lvds1 clock source. */
 
     CCM_ANALOG->MISC1 =
-            (CCM_ANALOG->MISC1 & (~CCM_ANALOG_MISC1_LVDS1_CLK_SEL_MASK)) | CCM_ANALOG_MISC1_LVDS1_CLK_SEL(0);
+        (CCM_ANALOG->MISC1 & (~CCM_ANALOG_MISC1_LVDS1_CLK_SEL_MASK)) | CCM_ANALOG_MISC1_LVDS1_CLK_SEL(0);
     /* Set clock out1 divider. */
     CCM->CCOSR = (CCM->CCOSR & (~CCM_CCOSR_CLKO1_DIV_MASK)) | CCM_CCOSR_CLKO1_DIV(0);
     /* Set clock out1 source. */
@@ -361,8 +362,7 @@ void BOARD_BootClockRUN(void) {
     clkPLL2_PFD3setup(CLK_DISABLE);
 
     /* Disable pfd offset. */
-    //CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
-
+    // CCM_ANALOG->PLL_SYS &= ~CCM_ANALOG_PLL_SYS_PFD_OFFSET_EN_MASK;
 
     /*
      * ------------------------------------------------------------------
@@ -410,7 +410,6 @@ void BOARD_BootClockRUN(void) {
     /* Disable Video PLL output. */
     CCM_ANALOG->PLL_VIDEO &= ~CCM_ANALOG_PLL_VIDEO_ENABLE_MASK;
 
-
     /*
      * ------------------------------------------------------------------
      * PLL6 - ENET PLL
@@ -423,19 +422,17 @@ void BOARD_BootClockRUN(void) {
     CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllEnet, 1);
     /* Set Enet output divider. */
     CCM_ANALOG->PLL_ENET =
-            (CCM_ANALOG->PLL_ENET & (~CCM_ANALOG_PLL_ENET_DIV_SELECT_MASK)) | CCM_ANALOG_PLL_ENET_DIV_SELECT(1);
+        (CCM_ANALOG->PLL_ENET & (~CCM_ANALOG_PLL_ENET_DIV_SELECT_MASK)) | CCM_ANALOG_PLL_ENET_DIV_SELECT(1);
     /* Disable Enet output. */
     CCM_ANALOG->PLL_ENET &= ~CCM_ANALOG_PLL_ENET_ENABLE_MASK;
     /* Disable Enet25M output. */
     CCM_ANALOG->PLL_ENET &= ~CCM_ANALOG_PLL_ENET_ENET_25M_REF_EN_MASK;
-
 
     /*
      * ------------------------------------------------------------------
      * PLL7 - USB2 PLL
      * ------------------------------------------------------------------
      */
-
 
     /* DeInit Usb2 PLL. */
     clkPLL7setup(CLK_DISABLE);
@@ -444,32 +441,36 @@ void BOARD_BootClockRUN(void) {
     /* Disable Usb2 PLL output. */
     CCM_ANALOG->PLL_USB2 &= ~CCM_ANALOG_PLL_USB2_ENABLE_MASK;
 
-
     /* Set preperiph clock source. */
     /* PLL1/2 = 432MHz */
-    CLOCK_SetMux(kCLOCK_PrePeriphMux, 0);        //CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
+    CLOCK_SetMux(kCLOCK_PrePeriphMux, 0); // CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
     /* Set periph clock source. */
     /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 0);            //CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+    CLOCK_SetMux(kCLOCK_PeriphMux, 0); // CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
     /* Set SystemCoreClock variable. */
     SystemCoreClockUpdate();
-
 }
 
 /* ADC */
-void clkADCsetup(uint8_t instance, uint8_t enabled) {
+void clkADCsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if (instance == 1) CLOCK_EnableClock(kCLOCK_Adc1);
-        if (instance == 2) CLOCK_EnableClock(kCLOCK_Adc2);
+        if (instance == 1)
+            CLOCK_EnableClock(kCLOCK_Adc1);
+        if (instance == 2)
+            CLOCK_EnableClock(kCLOCK_Adc2);
         if (instance == 0) {
             CLOCK_EnableClock(kCLOCK_Adc1);
             CLOCK_EnableClock(kCLOCK_Adc2);
         }
-    } else {
-        if (instance == 1) CLOCK_DisableClock(kCLOCK_Adc1);
-        if (instance == 2) CLOCK_DisableClock(kCLOCK_Adc2);
+    }
+    else {
+        if (instance == 1)
+            CLOCK_DisableClock(kCLOCK_Adc1);
+        if (instance == 2)
+            CLOCK_DisableClock(kCLOCK_Adc2);
         if (instance == 0) {
             CLOCK_DisableClock(kCLOCK_Adc1);
             CLOCK_DisableClock(kCLOCK_Adc2);
@@ -478,21 +479,29 @@ void clkADCsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* XBAR */
-void clkXBARsetup(uint8_t instance, uint8_t enabled) {
+void clkXBARsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if (instance == 1) CLOCK_EnableClock(kCLOCK_Xbar1);
-        if (instance == 2) CLOCK_EnableClock(kCLOCK_Xbar2);
-        if (instance == 3) CLOCK_EnableClock(kCLOCK_Xbar3);
+        if (instance == 1)
+            CLOCK_EnableClock(kCLOCK_Xbar1);
+        if (instance == 2)
+            CLOCK_EnableClock(kCLOCK_Xbar2);
+        if (instance == 3)
+            CLOCK_EnableClock(kCLOCK_Xbar3);
         if (instance == 0) {
             CLOCK_EnableClock(kCLOCK_Xbar1);
             CLOCK_EnableClock(kCLOCK_Xbar2);
             CLOCK_EnableClock(kCLOCK_Xbar3);
         }
-    } else {
-        if (instance == 1) CLOCK_DisableClock(kCLOCK_Xbar1);
-        if (instance == 2) CLOCK_DisableClock(kCLOCK_Xbar2);
-        if (instance == 3) CLOCK_DisableClock(kCLOCK_Xbar3);
+    }
+    else {
+        if (instance == 1)
+            CLOCK_DisableClock(kCLOCK_Xbar1);
+        if (instance == 2)
+            CLOCK_DisableClock(kCLOCK_Xbar2);
+        if (instance == 3)
+            CLOCK_DisableClock(kCLOCK_Xbar3);
         if (instance == 0) {
             CLOCK_DisableClock(kCLOCK_Xbar1);
             CLOCK_DisableClock(kCLOCK_Xbar2);
@@ -502,7 +511,8 @@ void clkXBARsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* GPT */
-void clkGPTsetup(uint8_t instance, uint8_t enabled) {
+void clkGPTsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         if (instance == 1) {
@@ -519,7 +529,8 @@ void clkGPTsetup(uint8_t instance, uint8_t enabled) {
             CLOCK_EnableClock(kCLOCK_Gpt2);
             CLOCK_EnableClock(kCLOCK_Gpt2S);
         }
-    } else {
+    }
+    else {
         if (instance == 1) {
             CLOCK_DisableClock(kCLOCK_Gpt1);
             CLOCK_DisableClock(kCLOCK_Gpt1S);
@@ -538,18 +549,21 @@ void clkGPTsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* PIT */
-void clkPITsetup(uint8_t instance, uint8_t enabled) {
+void clkPITsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         CLOCK_EnableClock(kCLOCK_Pit);
-    } else {
+    }
+    else {
         /* PIT */
         CLOCK_DisableClock(kCLOCK_Pit);
     }
 }
 
 /* USDHC */
-void clkUSDHCsetup(uint8_t instance, uint8_t enabled) {
+void clkUSDHCsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         if ((instance == 1) || (instance == 0)) {
@@ -560,7 +574,8 @@ void clkUSDHCsetup(uint8_t instance, uint8_t enabled) {
         if ((instance == 2) || (instance == 0)) {
             CLOCK_EnableClock(kCLOCK_Usdhc2);
         }
-    } else {
+    }
+    else {
         if ((instance == 1) || (instance == 0)) {
             /* USDHC */
             CLOCK_DisableClock(kCLOCK_Usdhc1);
@@ -574,12 +589,14 @@ void clkUSDHCsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* FLEXSPI */
-void clkFLEXSPIsetup(uint8_t instance, uint8_t enabled) {
+void clkFLEXSPIsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         /* FLEXSPI */
         CLOCK_EnableClock(kCLOCK_FlexSpi);
-    } else {
+    }
+    else {
         /* FLEXSPI */
         /* Disable Flexspi clock gate. */
         CLOCK_DisableClock(kCLOCK_FlexSpi);
@@ -587,11 +604,13 @@ void clkFLEXSPIsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* CSI */
-void clkCSIsetup(uint8_t instance, uint8_t enabled) {
+void clkCSIsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         CLOCK_EnableClock(kCLOCK_Csi);
-    } else {
+    }
+    else {
         /* CSI */
         /* Disable CSI clock gate. */
         CLOCK_DisableClock(kCLOCK_Csi);
@@ -599,27 +618,39 @@ void clkCSIsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* LPSPI */
-void clkLPSPICsetup(uint8_t instance, uint8_t enabled) {
+void clkLPSPICsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi1);
-        if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi2);
-        if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi3);
-        if ((instance == 4) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpspi4);
-    } else {
-        if ((instance == 1) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpspi1);
-        if ((instance == 2) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpspi2);
-        if ((instance == 3) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpspi3);
-        if ((instance == 4) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpspi4);
+        if ((instance == 1) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpspi1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpspi2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpspi3);
+        if ((instance == 4) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpspi4);
+    }
+    else {
+        if ((instance == 1) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpspi1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpspi2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpspi3);
+        if ((instance == 4) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpspi4);
     }
 }
 
 /* TRACE */
-void clkTRACEsetup(uint8_t instance, uint8_t enabled) {
+void clkTRACEsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         CLOCK_EnableClock(kCLOCK_Trace);
-    } else {
+    }
+    else {
         /* TRACE */
         /* Disable TRACE clock gate. */
         CLOCK_DisableClock(kCLOCK_Trace);
@@ -627,45 +658,59 @@ void clkTRACEsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* SAI */
-void clkSAIsetup(uint8_t instance, uint8_t enabled) {
+void clkSAIsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai1);
-        if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai2);
-        if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Sai3);
-
-    } else {
+        if ((instance == 1) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Sai1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Sai2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Sai3);
+    }
+    else {
         /* Disable SAI1 clock gate. */
-        if ((instance == 1) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Sai1);
+        if ((instance == 1) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Sai1);
 
         /* Disable SAI2 clock gate. */
-        if ((instance == 2) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Sai2);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Sai2);
 
         /* Disable SAI3 clock gate. */
-        if ((instance == 3) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Sai3);
-
+        if ((instance == 3) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Sai3);
     }
 }
 
 /* LPI2C */
-void clkLPI2Csetup(uint8_t instance, uint8_t enabled) {
+void clkLPI2Csetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c1);
-        if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c2);
-        if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpi2c3);
-    } else {
+        if ((instance == 1) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpi2c1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpi2c2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpi2c3);
+    }
+    else {
         /* LPI2C */
         /* Disable Lpi2c clock gate. */
-        if ((instance == 1) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpi2c1);
-        if ((instance == 2) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpi2c2);
-        if ((instance == 3) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpi2c3);
-
+        if ((instance == 1) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpi2c1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpi2c2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpi2c3);
     }
 }
 
 /* CAN */
-void clkCANsetup(uint8_t instance, uint8_t enabled) {
+void clkCANsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         if ((instance == 1) || (instance == 0)) {
@@ -676,9 +721,11 @@ void clkCANsetup(uint8_t instance, uint8_t enabled) {
             CLOCK_EnableClock(kCLOCK_Can2);
             CLOCK_EnableClock(kCLOCK_Can2S);
         }
-    } else {
+    }
+    else {
         CLOCK_SetMux(kCLOCK_CanMux,
-                     3);        //CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided clock 80M), 3 - disable
+                     3); // CSCMR2  (9-8) 0 - pll3_sw_clk (divided clock 60M), 1 - osc_clk, 2 - pll3_sw_clk (divided
+                         // clock 80M), 3 - disable
         if ((instance == 1) || (instance == 0)) {
             CLOCK_DisableClock(kCLOCK_Can1);
             CLOCK_DisableClock(kCLOCK_Can1S);
@@ -687,42 +734,60 @@ void clkCANsetup(uint8_t instance, uint8_t enabled) {
             CLOCK_DisableClock(kCLOCK_Can2);
             CLOCK_DisableClock(kCLOCK_Can2S);
         }
-
     }
 }
 
 /* LPUART */
-void clkLPUARTsetup(uint8_t instance, uint8_t enabled) {
+void clkLPUARTsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart1);
-        if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart2);
-        if ((instance == 3) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart3);
-        if ((instance == 4) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart4);
-        if ((instance == 5) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart5);
-        if ((instance == 6) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart6);
-        if ((instance == 7) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart7);
-        if ((instance == 8) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Lpuart8);
-    } else {
+        if ((instance == 1) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart3);
+        if ((instance == 4) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart4);
+        if ((instance == 5) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart5);
+        if ((instance == 6) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart6);
+        if ((instance == 7) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart7);
+        if ((instance == 8) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Lpuart8);
+    }
+    else {
         /* LPUART */
-        if ((instance == 1) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart1);
-        if ((instance == 2) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart2);
-        if ((instance == 3) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart3);
-        if ((instance == 4) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart4);
-        if ((instance == 5) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart5);
-        if ((instance == 6) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart6);
-        if ((instance == 7) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart7);
-        if ((instance == 8) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Lpuart8);
-
+        if ((instance == 1) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart2);
+        if ((instance == 3) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart3);
+        if ((instance == 4) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart4);
+        if ((instance == 5) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart5);
+        if ((instance == 6) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart6);
+        if ((instance == 7) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart7);
+        if ((instance == 8) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Lpuart8);
     }
 }
 
 /* LCDIF */
-void clkLCDIFsetup(uint8_t instance, uint8_t enabled) {
+void clkLCDIFsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         CLOCK_EnableClock(kCLOCK_LcdPixel);
-    } else {
+    }
+    else {
         /* LCDIF */
         /* Disable LCDIF clock gate. */
         CLOCK_DisableClock(kCLOCK_LcdPixel);
@@ -730,11 +795,13 @@ void clkLCDIFsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* SPDIF */
-void clkSPDIFsetup(uint8_t instance, uint8_t enabled) {
+void clkSPDIFsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
         CLOCK_EnableClock(kCLOCK_Spdif);
-    } else {
+    }
+    else {
         /* SPDIF */
         /* Disable SPDIF clock gate. */
         CLOCK_DisableClock(kCLOCK_Spdif);
@@ -742,266 +809,293 @@ void clkSPDIFsetup(uint8_t instance, uint8_t enabled) {
 }
 
 /* FLEXIO */
-void clkFLEXIOsetup(uint8_t instance, uint8_t enabled) {
-
+void clkFLEXIOsetup(uint8_t instance, uint8_t enabled)
+{
 
     if (enabled) {
-        if ((instance == 1) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Flexio1);
-        if ((instance == 2) || (instance == 0)) CLOCK_EnableClock(kCLOCK_Flexio2);
-    } else {
+        if ((instance == 1) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Flexio1);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_EnableClock(kCLOCK_Flexio2);
+    }
+    else {
         /* FLEXIO */
         /* Disable Flexio1 clock gate. */
-        if ((instance == 1) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Flexio1);
+        if ((instance == 1) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Flexio1);
 
         /* Disable Flexio2 clock gate. */
-        if ((instance == 2) || (instance == 0)) CLOCK_DisableClock(kCLOCK_Flexio2);
+        if ((instance == 2) || (instance == 0))
+            CLOCK_DisableClock(kCLOCK_Flexio2);
     }
 }
 
-void clkPLL1setup(uint8_t enabled) {
-    const clock_arm_pll_config_t armPllConfig_BOARD_BootClockRUN =
-            {
-                    .loopDivider = 86,                       /* PLL loop divider, Fout = Fin * 43 */
-                    .src = 0,                                 /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
-            };
+void clkPLL1setup(uint8_t enabled)
+{
+    const clock_arm_pll_config_t armPllConfig_BOARD_BootClockRUN = {
+        .loopDivider = 86, /* PLL loop divider, Fout = Fin * 43 */
+        .src         = 0,  /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
+    };
 
     if (enabled) {
         /* Init ARM PLL. */
         CLOCK_InitArmPll(&armPllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         CLOCK_DeinitArmPll();
     }
 }
 
-
-void clkPLL2setup(uint8_t enabled) {
-    const clock_sys_pll_config_t sysPllConfig_BOARD_BootClockRUN =
-            {
-                    .loopDivider = 1,                         /* PLL loop divider, Fout = Fin * ( 20 + loopDivider*2 + numerator / denominator ) */
-                    .numerator = 0,                           /* 30 bit numerator of fractional loop divider */
-                    .denominator = 1,                         /* 30 bit denominator of fractional loop divider */
-                    .src = 0,                                 /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
-            };
+void clkPLL2setup(uint8_t enabled)
+{
+    const clock_sys_pll_config_t sysPllConfig_BOARD_BootClockRUN = {
+        .loopDivider = 1, /* PLL loop divider, Fout = Fin * ( 20 + loopDivider*2 + numerator / denominator ) */
+        .numerator   = 0, /* 30 bit numerator of fractional loop divider */
+        .denominator = 1, /* 30 bit denominator of fractional loop divider */
+        .src         = 0, /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
+    };
     if (enabled) {
         CLOCK_InitSysPll(&sysPllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         CLOCK_DeinitSysPll();
     }
 }
 
-void clkPLL2_PFD0setup(uint8_t enabled) {
+void clkPLL2_PFD0setup(uint8_t enabled)
+{
     if (enabled) {
         CLOCK_InitSysPfd(kCLOCK_Pfd0, 27);
-    } else {
+    }
+    else {
         CLOCK_DeinitSysPfd(kCLOCK_Pfd0);
     }
 }
 
-void clkPLL2_PFD1setup(uint8_t enabled) {
+void clkPLL2_PFD1setup(uint8_t enabled)
+{
     if (enabled) {
         CLOCK_InitSysPfd(kCLOCK_Pfd1, 16);
-    } else {
+    }
+    else {
         CLOCK_DeinitSysPfd(kCLOCK_Pfd1);
     }
 }
 
-void clkPLL2_PFD2setup(uint8_t enabled) {
+void clkPLL2_PFD2setup(uint8_t enabled)
+{
     if (enabled) {
         CLOCK_InitSysPfd(kCLOCK_Pfd2, 24);
-    } else {
+    }
+    else {
         CLOCK_DeinitSysPfd(kCLOCK_Pfd2);
     }
 }
 
-void clkPLL2_PFD3setup(uint8_t enabled) {
+void clkPLL2_PFD3setup(uint8_t enabled)
+{
     if (enabled) {
         CLOCK_InitSysPfd(kCLOCK_Pfd3, 16);
-    } else {
+    }
+    else {
         CLOCK_DeinitSysPfd(kCLOCK_Pfd3);
     }
 }
 
-void clkPLL3setup(uint8_t enabled) {
-    const clock_usb_pll_config_t usb1PllConfig_BOARD_BootClockRUN =
-            {
-                    .loopDivider = 0,                         /* PLL loop divider, Fout = Fin * 20 */
-                    .src = 0,                                 /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
-            };
+void clkPLL3setup(uint8_t enabled)
+{
+    const clock_usb_pll_config_t usb1PllConfig_BOARD_BootClockRUN = {
+        .loopDivider = 0, /* PLL loop divider, Fout = Fin * 20 */
+        .src         = 0, /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
+    };
     if (enabled) {
         /* Init Usb1 PLL. */
         CLOCK_InitUsb1Pll(&usb1PllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         CLOCK_DeinitUsb1Pll();
     }
 }
 
-void clkPLL3_PFD0setup(uint8_t enabled) {
+void clkPLL3_PFD0setup(uint8_t enabled)
+{
     if (enabled) {
         /* Init Usb1 pfd0. */
         CLOCK_InitUsb1Pfd(kCLOCK_Pfd0, 33);
-    } else {
+    }
+    else {
         CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd0);
     }
 }
 
-void clkPLL3_PFD1setup(uint8_t enabled) {
+void clkPLL3_PFD1setup(uint8_t enabled)
+{
     if (enabled) {
         /* Init Usb1 pfd1. */
         CLOCK_InitUsb1Pfd(kCLOCK_Pfd1, 16);
-    } else {
+    }
+    else {
         CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd1);
     }
 }
 
-void clkPLL3_PFD2setup(uint8_t enabled) {
+void clkPLL3_PFD2setup(uint8_t enabled)
+{
     if (enabled) {
         /* Init Usb1 pfd2. */
         CLOCK_InitUsb1Pfd(kCLOCK_Pfd2, 17);
-    } else {
+    }
+    else {
         CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd2);
     }
 }
 
-void clkPLL3_PFD3setup(uint8_t enabled) {
+void clkPLL3_PFD3setup(uint8_t enabled)
+{
     if (enabled) {
         /* Init Usb1 pfd3. */
         CLOCK_InitUsb1Pfd(kCLOCK_Pfd3, 19);
-    } else {
+    }
+    else {
         CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd3);
     }
 }
 
-void clkPLL4setup(uint8_t enabled) {
-    const clock_audio_pll_config_t audioPllConfig_BOARD_BootClockRUN =
-            {
-                    .loopDivider = 32,  /* PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
-                    .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */
-                    .numerator = 77,    /* 30 bit numerator of fractional loop divider. */
-                    .denominator = 100, /* 30 bit denominator of fractional loop divider */
-            };
+void clkPLL4setup(uint8_t enabled)
+{
+    const clock_audio_pll_config_t audioPllConfig_BOARD_BootClockRUN = {
+        .loopDivider = 32,  /* PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
+        .postDivider = 1,   /* Divider after the PLL, should only be 1, 2, 4, 8, 16. */
+        .numerator   = 77,  /* 30 bit numerator of fractional loop divider. */
+        .denominator = 100, /* 30 bit denominator of fractional loop divider */
+    };
     if (enabled) {
         CLOCK_InitAudioPll(&audioPllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         /* DeInit Audio PLL */
         CLOCK_DeinitAudioPll();
         CLOCK_SetPllBypass(CCM_ANALOG, kCLOCK_PllAudio, 1);
     }
 }
 
-void clkPLL5setup(uint8_t enabled) {
-    const clock_video_pll_config_t videoPllConfig_BOARD_BootClockRUN =
-            {
-                    .loopDivider = 54,  /*!< PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
-                    .postDivider = 16,  /*!< Divider after the PLL, should only be 1, 2, 4, 8, 16. */
-                    .numerator = 77,    /*!< 30 bit numerator of fractional loop divider.*/
-                    .denominator = 100, /*!< 30 bit denominator of fractional loop divider */
-                    .src = kCLOCK_PllClkSrc24M          /*!< Pll clock source, reference _clock_pll_clk_src */
-            };
+void clkPLL5setup(uint8_t enabled)
+{
+    const clock_video_pll_config_t videoPllConfig_BOARD_BootClockRUN = {
+        .loopDivider = 54,                 /*!< PLL loop divider. Valid range for DIV_SELECT divider value: 27~54. */
+        .postDivider = 16,                 /*!< Divider after the PLL, should only be 1, 2, 4, 8, 16. */
+        .numerator   = 77,                 /*!< 30 bit numerator of fractional loop divider.*/
+        .denominator = 100,                /*!< 30 bit denominator of fractional loop divider */
+        .src         = kCLOCK_PllClkSrc24M /*!< Pll clock source, reference _clock_pll_clk_src */
+    };
     if (enabled) {
         CLOCK_InitVideoPll(&videoPllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         /* DeInit Video PLL. */
         CLOCK_DeinitVideoPll();
     }
 }
 
-void clkPLL6setup(uint8_t enabled) {
-    const clock_enet_pll_config_t ethernetPllConfig_BOARD_BootClockRUN =
-            {
-                    .enableClkOutput = false, /*!< Power on and enable PLL clock output for ENET0 (ref_enetpll0). */
-                    .enableClkOutput25M = false, /*!< Power on and enable PLL clock output for ENET1 (ref_enetpll1). */
-                    .loopDivider = 0,     /*!< Controls the frequency of the ENET0 reference clock.
-	                                  b00 25MHz
-	                                  b01 50MHz
-	                                  b10 100MHz (not 50% duty cycle)
-	                                  b11 125MHz */
-                    .src = kCLOCK_PllClkSrc24M             /*!< Pll clock source, reference _clock_pll_clk_src */
+void clkPLL6setup(uint8_t enabled)
+{
+    const clock_enet_pll_config_t ethernetPllConfig_BOARD_BootClockRUN = {
+        .enableClkOutput    = false, /*!< Power on and enable PLL clock output for ENET0 (ref_enetpll0). */
+        .enableClkOutput25M = false, /*!< Power on and enable PLL clock output for ENET1 (ref_enetpll1). */
+        .loopDivider        = 0,     /*!< Controls the frequency of the ENET0 reference clock.
+                                 b00 25MHz
+                                 b01 50MHz
+                                 b10 100MHz (not 50% duty cycle)
+                                 b11 125MHz */
+        .src = kCLOCK_PllClkSrc24M   /*!< Pll clock source, reference _clock_pll_clk_src */
 
-            };
+    };
     if (enabled) {
         CLOCK_InitEnetPll(&ethernetPllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         /* DeInit Enet PLL. */
         CLOCK_DeinitEnetPll();
     }
 }
 
-void clkPLL7setup(uint8_t enabled) {
-    const clock_usb_pll_config_t usb2PllConfig_BOARD_BootClockRUN =
-            {
-                    .loopDivider = 0,                         /* PLL loop divider, Fout = Fin * 20 */
-                    .src = 0,                                 /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
-            };
+void clkPLL7setup(uint8_t enabled)
+{
+    const clock_usb_pll_config_t usb2PllConfig_BOARD_BootClockRUN = {
+        .loopDivider = 0, /* PLL loop divider, Fout = Fin * 20 */
+        .src         = 0, /* Bypass clock source, 0 - OSC 24M, 1 - CLK1_P and CLK1_N */
+    };
     if (enabled) {
         CLOCK_InitUsb2Pll(&usb2PllConfig_BOARD_BootClockRUN);
-    } else {
+    }
+    else {
         /* DeInit Usb2 PLL. */
         CLOCK_DeinitUsb2Pll();
     }
 }
 
-
-uint32_t GetPerphSourceClock(PerphClock_t clock) {
+uint32_t GetPerphSourceClock(PerphClock_t clock)
+{
     switch (clock) {
 
-        case PerphClock_I2C:
-            return CLOCK_GetFreq(kCLOCK_OscClk) / (CLOCK_GetDiv(kCLOCK_Lpi2cDiv)+1);
-        case PerphClock_LPSPI:
-            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_LpspiDiv)+1);
-        case PerphClock_LPUART:
-            return CLOCK_GetFreq(kCLOCK_OscClk) / (CLOCK_GetDiv(kCLOCK_UartDiv)+1);
-        case PerphClock_SAI1:
-            return CLOCK_GetFreq(kCLOCK_AudioPllClk) / (CLOCK_GetDiv(kCLOCK_Sai1Div)+1) / (CLOCK_GetDiv(kCLOCK_Sai1PreDiv)+1);
-        case PerphClock_SAI2:
-            return CLOCK_GetFreq(kCLOCK_AudioPllClk) / (CLOCK_GetDiv(kCLOCK_Sai2Div)+1) / (CLOCK_GetDiv(kCLOCK_Sai2PreDiv)+1);
-        case PerphClock_USDHC2:
-            return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
-        default:
-            return 0;
-
+    case PerphClock_I2C:
+        return CLOCK_GetFreq(kCLOCK_OscClk) / (CLOCK_GetDiv(kCLOCK_Lpi2cDiv) + 1);
+    case PerphClock_LPSPI:
+        return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_LpspiDiv) + 1);
+    case PerphClock_LPUART:
+        return CLOCK_GetFreq(kCLOCK_OscClk) / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1);
+    case PerphClock_SAI1:
+        return CLOCK_GetFreq(kCLOCK_AudioPllClk) / (CLOCK_GetDiv(kCLOCK_Sai1Div) + 1) /
+               (CLOCK_GetDiv(kCLOCK_Sai1PreDiv) + 1);
+    case PerphClock_SAI2:
+        return CLOCK_GetFreq(kCLOCK_AudioPllClk) / (CLOCK_GetDiv(kCLOCK_Sai2Div) + 1) /
+               (CLOCK_GetDiv(kCLOCK_Sai2PreDiv) + 1);
+    case PerphClock_USDHC2:
+        return CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
+    default:
+        return 0;
     }
 }
 
-
-void PrintSystemClocks() {
-
+void PrintSystemClocks()
+{
 
     const char *_PLLNames[22] = {
-            "kCLOCK_CpuClk",  /*!< CPU clock */
-            "kCLOCK_AhbClk",  /*!< AHB clock */
-            "kCLOCK_SemcClk", /*!< SEMC clock */
-            "kCLOCK_IpgClk",  /*!< IPG clock */
+        "kCLOCK_CpuClk",  /*!< CPU clock */
+        "kCLOCK_AhbClk",  /*!< AHB clock */
+        "kCLOCK_SemcClk", /*!< SEMC clock */
+        "kCLOCK_IpgClk",  /*!< IPG clock */
 
-            "kCLOCK_OscClk", /*!< OSC clock selected by PMU_LOWPWR_CTRL[OSC_SEL]. */
-            "kCLOCK_RtcClk", /*!< RTC clock. (RTCCLK) */
+        "kCLOCK_OscClk", /*!< OSC clock selected by PMU_LOWPWR_CTRL[OSC_SEL]. */
+        "kCLOCK_RtcClk", /*!< RTC clock. (RTCCLK) */
 
-            "kCLOCK_ArmPllClk", /*!< ARMPLLCLK. */
+        "kCLOCK_ArmPllClk", /*!< ARMPLLCLK. */
 
-            "kCLOCK_Usb1PllClk",     /*!< USB1PLLCLK. */
-            "kCLOCK_Usb1PllPfd0Clk", /*!< USB1PLLPDF0CLK. */
-            "kCLOCK_Usb1PllPfd1Clk", /*!< USB1PLLPFD1CLK. */
-            "kCLOCK_Usb1PllPfd2Clk", /*!< USB1PLLPFD2CLK. */
-            "kCLOCK_Usb1PllPfd3Clk", /*!< USB1PLLPFD3CLK. */
+        "kCLOCK_Usb1PllClk",     /*!< USB1PLLCLK. */
+        "kCLOCK_Usb1PllPfd0Clk", /*!< USB1PLLPDF0CLK. */
+        "kCLOCK_Usb1PllPfd1Clk", /*!< USB1PLLPFD1CLK. */
+        "kCLOCK_Usb1PllPfd2Clk", /*!< USB1PLLPFD2CLK. */
+        "kCLOCK_Usb1PllPfd3Clk", /*!< USB1PLLPFD3CLK. */
 
-            "kCLOCK_Usb2PllClk", /*!< USB2PLLCLK. */
+        "kCLOCK_Usb2PllClk", /*!< USB2PLLCLK. */
 
-            "kCLOCK_SysPllClk",      /*!< SYSPLLCLK. */
-            "kCLOCK_SysPllPfd0Clk",  /*!< SYSPLLPDF0CLK. */
-            "kCLOCK_SysPllPfd1Clk",  /*!< SYSPLLPFD1CLK. */
-            "kCLOCK_SysPllPfd2Clk", /*!< SYSPLLPFD2CLK. */
-            "kCLOCK_SysPllPfd3Clk", /*!< SYSPLLPFD3CLK. */
+        "kCLOCK_SysPllClk",     /*!< SYSPLLCLK. */
+        "kCLOCK_SysPllPfd0Clk", /*!< SYSPLLPDF0CLK. */
+        "kCLOCK_SysPllPfd1Clk", /*!< SYSPLLPFD1CLK. */
+        "kCLOCK_SysPllPfd2Clk", /*!< SYSPLLPFD2CLK. */
+        "kCLOCK_SysPllPfd3Clk", /*!< SYSPLLPFD3CLK. */
 
-            "kCLOCK_EnetPll0Clk", /*!< Enet PLLCLK ref_enetpll0. */
-            "kCLOCK_EnetPll1Clk", /*!< Enet PLLCLK ref_enetpll1. */
+        "kCLOCK_EnetPll0Clk", /*!< Enet PLLCLK ref_enetpll0. */
+        "kCLOCK_EnetPll1Clk", /*!< Enet PLLCLK ref_enetpll1. */
 
-            "kCLOCK_AudioPllClk", /*!< Audio PLLCLK. */
-            "kCLOCK_VideoPllClk", /*!< Video PLLCLK. */
+        "kCLOCK_AudioPllClk", /*!< Audio PLLCLK. */
+        "kCLOCK_VideoPllClk", /*!< Video PLLCLK. */
     };
     int i;
 
-    for (i=0; i<22; i++) {
+    for (i = 0; i < 22; i++) {
         LOG_PRINTF("%s: %i Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
-        //volatile uint32_t val = CLOCK_GetFreq(static_cast<clock_name_t>(i));
+        // volatile uint32_t val = CLOCK_GetFreq(static_cast<clock_name_t>(i));
     }
 
     LOG_PRINTF("PerphSourceClock_I2C: %lu\r\n", GetPerphSourceClock(PerphClock_I2C));
@@ -1011,38 +1105,29 @@ void PrintSystemClocks() {
     LOG_PRINTF("PerphSourceClock_SAI2: %lu\r\n", GetPerphSourceClock(PerphClock_SAI2));
     LOG_PRINTF("PerphSourceClock_USDHC2: %lu\r\n", GetPerphSourceClock(PerphClock_USDHC2));
 
-/*    volatile auto  val1 = GetPerphSourceClock(PerphClock_I2C);
-    volatile auto  val2 = GetPerphSourceClock(PerphClock_LPSPI);
-    volatile auto  val3 = GetPerphSourceClock(PerphClock_LPUART);
-    volatile auto  val4 = GetPerphSourceClock(PerphClock_SAI1);
-    volatile auto  val5 = GetPerphSourceClock(PerphClock_SAI2);
-    volatile auto  val6 = GetPerphSourceClock(PerphClock_USDHC2);*/
+    /*    volatile auto  val1 = GetPerphSourceClock(PerphClock_I2C);
+        volatile auto  val2 = GetPerphSourceClock(PerphClock_LPSPI);
+        volatile auto  val3 = GetPerphSourceClock(PerphClock_LPUART);
+        volatile auto  val4 = GetPerphSourceClock(PerphClock_SAI1);
+        volatile auto  val5 = GetPerphSourceClock(PerphClock_SAI2);
+        volatile auto  val6 = GetPerphSourceClock(PerphClock_USDHC2);*/
 }
 
+#define CLOCK_CCM_HANDSHAKE_WAIT()                                                                                     \
+                                                                                                                       \
+    do {                                                                                                               \
+        while (CCM->CDHIPR != 0) {}                                                                                    \
+                                                                                                                       \
+    } while (0)
 
-#define CLOCK_CCM_HANDSHAKE_WAIT() \
-    \
-do                          \
-    {                              \
-        while (CCM->CDHIPR != 0)   \
-        {                          \
-        }                          \
-    \
-}                           \
-    while (0)
-
-#define LPM_DELAY(value)                         \
-    \
-do                                        \
-    {                                            \
-        for (uint32_t i = 0; i < 5 * value; i++) \
-        {                                        \
-            __NOP();                             \
-        }                                        \
-    \
-}                                         \
-    while (0)
-
+#define LPM_DELAY(value)                                                                                               \
+                                                                                                                       \
+    do {                                                                                                               \
+        for (uint32_t i = 0; i < 5 * value; i++) {                                                                     \
+            __NOP();                                                                                                   \
+        }                                                                                                              \
+                                                                                                                       \
+    } while (0)
 
 void EnableWeakLDO(void)
 {
@@ -1077,16 +1162,14 @@ void DisableRegularLDO(void)
 void BandgapOff(void)
 {
     XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
-    PMU->MISC0_SET              |= PMU_MISC0_REFTOP_PWD_MASK;
+    PMU->MISC0_SET |= PMU_MISC0_REFTOP_PWD_MASK;
 }
 
 void BandgapOn(void)
 {
     /* Turn on regular bandgap and wait for stable */
     PMU->MISC0_CLR |= PMU_MISC0_REFTOP_PWD_MASK;
-    while ((PMU->MISC0 & PMU_MISC0_REFTOP_VBGUP_MASK) == 0)
-    {
-    }
+    while ((PMU->MISC0 & PMU_MISC0_REFTOP_VBGUP_MASK) == 0) {}
     /* Low power band gap disable */
     XTALOSC24M->LOWPWR_CTRL_CLR = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
 }
@@ -1120,9 +1203,10 @@ void SetLowPowerClockGate(void)
     CCM->CCGR0 = CCM_CCGR0_CG0(1) | CCM_CCGR0_CG1(1) | CCM_CCGR0_CG3(3) | CCM_CCGR0_CG11(1) | CCM_CCGR0_CG12(1);
     CCM->CCGR1 = CCM_CCGR1_CG9(3) | CCM_CCGR1_CG10(1) | CCM_CCGR1_CG13(1) | CCM_CCGR1_CG14(1) /*| CCM_CCGR1_CG15(1)*/;
     CCM->CCGR2 = CCM_CCGR2_CG2(1) | CCM_CCGR2_CG8(1) | CCM_CCGR2_CG9(1) | CCM_CCGR2_CG10(1);
-    CCM->CCGR3 = /*CCM_CCGR3_CG2(1) |*/ CCM_CCGR3_CG4(1) /*| CCM_CCGR3_CG9(1) */ /*| CCM_CCGR3_CG14(1) | CCM_CCGR3_CG15(1)*/;
+    CCM->CCGR3 =
+        /*CCM_CCGR3_CG2(1) |*/ CCM_CCGR3_CG4(1) /*| CCM_CCGR3_CG9(1) */ /*| CCM_CCGR3_CG14(1) | CCM_CCGR3_CG15(1)*/;
     CCM->CCGR4 =
-            CCM_CCGR4_CG1(1) | CCM_CCGR4_CG2(1) | CCM_CCGR4_CG4(1) | CCM_CCGR4_CG5(1) | CCM_CCGR4_CG6(1) | CCM_CCGR4_CG7(1);
+        CCM_CCGR4_CG1(1) | CCM_CCGR4_CG2(1) | CCM_CCGR4_CG4(1) | CCM_CCGR4_CG5(1) | CCM_CCGR4_CG6(1) | CCM_CCGR4_CG7(1);
     CCM->CCGR5 = CCM_CCGR5_CG0(1) | CCM_CCGR5_CG1(1) | CCM_CCGR5_CG4(1) | CCM_CCGR5_CG6(1) | CCM_CCGR5_CG12(1) |
                  CCM_CCGR5_CG14(1) /*| CCM_CCGR5_CG15(1)*/;
     /* We can enable DCDC when need to config it and close it after configuration */
@@ -1130,24 +1214,24 @@ void SetLowPowerClockGate(void)
                  CCM_CCGR6_CG11(1);
 }
 
-#define GPR8_DOZE_BITS                                                               \
-    (IOMUXC_GPR_GPR8_LPI2C1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPI2C2_IPG_DOZE_MASK |   \
-     IOMUXC_GPR_GPR8_LPI2C3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPI2C4_IPG_DOZE_MASK |   \
-     IOMUXC_GPR_GPR8_LPSPI1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPSPI2_IPG_DOZE_MASK |   \
-     IOMUXC_GPR_GPR8_LPSPI3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPSPI4_IPG_DOZE_MASK |   \
-     IOMUXC_GPR_GPR8_LPUART1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART2_IPG_DOZE_MASK | \
-     IOMUXC_GPR_GPR8_LPUART3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART4_IPG_DOZE_MASK | \
-     IOMUXC_GPR_GPR8_LPUART5_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART6_IPG_DOZE_MASK | \
+#define GPR8_DOZE_BITS                                                                                                 \
+    (IOMUXC_GPR_GPR8_LPI2C1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPI2C2_IPG_DOZE_MASK |                                     \
+     IOMUXC_GPR_GPR8_LPI2C3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPI2C4_IPG_DOZE_MASK |                                     \
+     IOMUXC_GPR_GPR8_LPSPI1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPSPI2_IPG_DOZE_MASK |                                     \
+     IOMUXC_GPR_GPR8_LPSPI3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPSPI4_IPG_DOZE_MASK |                                     \
+     IOMUXC_GPR_GPR8_LPUART1_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART2_IPG_DOZE_MASK |                                   \
+     IOMUXC_GPR_GPR8_LPUART3_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART4_IPG_DOZE_MASK |                                   \
+     IOMUXC_GPR_GPR8_LPUART5_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART6_IPG_DOZE_MASK |                                   \
      IOMUXC_GPR_GPR8_LPUART7_IPG_DOZE_MASK | IOMUXC_GPR_GPR8_LPUART8_IPG_DOZE_MASK)
 
-#define GPR8_STOP_MODE_BITS                                                                    \
-    (IOMUXC_GPR_GPR8_LPI2C1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPI2C2_IPG_STOP_MODE_MASK |   \
-     IOMUXC_GPR_GPR8_LPI2C3_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPI2C4_IPG_STOP_MODE_MASK |   \
-     IOMUXC_GPR_GPR8_LPSPI1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPSPI2_IPG_STOP_MODE_MASK |   \
-     IOMUXC_GPR_GPR8_LPSPI3_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPSPI4_IPG_STOP_MODE_MASK |   \
-     IOMUXC_GPR_GPR8_LPUART2_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART3_IPG_STOP_MODE_MASK | \
-     IOMUXC_GPR_GPR8_LPUART4_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART5_IPG_STOP_MODE_MASK | \
-     IOMUXC_GPR_GPR8_LPUART6_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART7_IPG_STOP_MODE_MASK | \
+#define GPR8_STOP_MODE_BITS                                                                                            \
+    (IOMUXC_GPR_GPR8_LPI2C1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPI2C2_IPG_STOP_MODE_MASK |                           \
+     IOMUXC_GPR_GPR8_LPI2C3_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPI2C4_IPG_STOP_MODE_MASK |                           \
+     IOMUXC_GPR_GPR8_LPSPI1_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPSPI2_IPG_STOP_MODE_MASK |                           \
+     IOMUXC_GPR_GPR8_LPSPI3_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPSPI4_IPG_STOP_MODE_MASK |                           \
+     IOMUXC_GPR_GPR8_LPUART2_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART3_IPG_STOP_MODE_MASK |                         \
+     IOMUXC_GPR_GPR8_LPUART4_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART5_IPG_STOP_MODE_MASK |                         \
+     IOMUXC_GPR_GPR8_LPUART6_IPG_STOP_MODE_MASK | IOMUXC_GPR_GPR8_LPUART7_IPG_STOP_MODE_MASK |                         \
      IOMUXC_GPR_GPR8_LPUART8_IPG_STOP_MODE_MASK)
 
 #define GPR12_DOZE_BITS (IOMUXC_GPR_GPR12_FLEXIO1_IPG_DOZE_MASK | IOMUXC_GPR_GPR12_FLEXIO2_IPG_DOZE_MASK)
@@ -1160,53 +1244,46 @@ void PeripheralEnterDozeMode(void)
     IOMUXC_GPR->GPR12 = GPR12_DOZE_BITS;
 }
 
-
-#define GPR4_STOP_REQ_BITS                                                                                          \
-    (IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_REQ_MASK | \
-     IOMUXC_GPR_GPR4_SAI3_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_REQ_MASK | IOMUXC_GPR_GPR4_PIT_STOP_REQ_MASK |  \
+#define GPR4_STOP_REQ_BITS                                                                                             \
+    (IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_REQ_MASK |    \
+     IOMUXC_GPR_GPR4_SAI3_STOP_REQ_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_REQ_MASK | IOMUXC_GPR_GPR4_PIT_STOP_REQ_MASK |     \
      IOMUXC_GPR_GPR4_FLEXIO1_STOP_REQ_MASK | IOMUXC_GPR_GPR4_FLEXIO2_STOP_REQ_MASK)
 
-#define GPR4_STOP_ACK_BITS                                                                                          \
-    (IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_ACK_MASK | \
-     IOMUXC_GPR_GPR4_SAI3_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_ACK_MASK | IOMUXC_GPR_GPR4_PIT_STOP_ACK_MASK |  \
+#define GPR4_STOP_ACK_BITS                                                                                             \
+    (IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SAI2_STOP_ACK_MASK |    \
+     IOMUXC_GPR_GPR4_SAI3_STOP_ACK_MASK | IOMUXC_GPR_GPR4_SEMC_STOP_ACK_MASK | IOMUXC_GPR_GPR4_PIT_STOP_ACK_MASK |     \
      IOMUXC_GPR_GPR4_FLEXIO1_STOP_ACK_MASK | IOMUXC_GPR_GPR4_FLEXIO2_STOP_ACK_MASK)
 
-#define GPR7_STOP_REQ_BITS                                                           \
-    (IOMUXC_GPR_GPR7_LPI2C1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_REQ_MASK |   \
-     IOMUXC_GPR_GPR7_LPI2C3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_REQ_MASK |   \
-     IOMUXC_GPR_GPR7_LPSPI1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_REQ_MASK |   \
-     IOMUXC_GPR_GPR7_LPSPI3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_REQ_MASK |   \
-     IOMUXC_GPR_GPR7_LPUART1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_REQ_MASK | \
-     IOMUXC_GPR_GPR7_LPUART3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_REQ_MASK | \
-     IOMUXC_GPR_GPR7_LPUART5_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_REQ_MASK | \
+#define GPR7_STOP_REQ_BITS                                                                                             \
+    (IOMUXC_GPR_GPR7_LPI2C1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_REQ_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPI2C3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_REQ_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPSPI1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_REQ_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPSPI3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_REQ_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPUART1_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_REQ_MASK |                                   \
+     IOMUXC_GPR_GPR7_LPUART3_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_REQ_MASK |                                   \
+     IOMUXC_GPR_GPR7_LPUART5_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_REQ_MASK |                                   \
      IOMUXC_GPR_GPR7_LPUART7_STOP_REQ_MASK | IOMUXC_GPR_GPR7_LPUART8_STOP_REQ_MASK)
 
-#define GPR7_STOP_ACK_BITS                                                           \
-    (IOMUXC_GPR_GPR7_LPI2C1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_ACK_MASK |   \
-     IOMUXC_GPR_GPR7_LPI2C3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_ACK_MASK |   \
-     IOMUXC_GPR_GPR7_LPSPI1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_ACK_MASK |   \
-     IOMUXC_GPR_GPR7_LPSPI3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_ACK_MASK |   \
-     IOMUXC_GPR_GPR7_LPUART1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_ACK_MASK | \
-     IOMUXC_GPR_GPR7_LPUART3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_ACK_MASK | \
-     IOMUXC_GPR_GPR7_LPUART5_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_ACK_MASK | \
+#define GPR7_STOP_ACK_BITS                                                                                             \
+    (IOMUXC_GPR_GPR7_LPI2C1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C2_STOP_ACK_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPI2C3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPI2C4_STOP_ACK_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPSPI1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI2_STOP_ACK_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPSPI3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPSPI4_STOP_ACK_MASK |                                     \
+     IOMUXC_GPR_GPR7_LPUART1_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART2_STOP_ACK_MASK |                                   \
+     IOMUXC_GPR_GPR7_LPUART3_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART4_STOP_ACK_MASK |                                   \
+     IOMUXC_GPR_GPR7_LPUART5_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART6_STOP_ACK_MASK |                                   \
      IOMUXC_GPR_GPR7_LPUART7_STOP_ACK_MASK | IOMUXC_GPR_GPR7_LPUART8_STOP_ACK_MASK)
 
 void PeripheralEnterStopMode(void)
 {
     IOMUXC_GPR->GPR4 = IOMUXC_GPR_GPR4_ENET_STOP_REQ_MASK;
-    while ((IOMUXC_GPR->GPR4 & IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK) != IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK)
-    {
-    }
+    while ((IOMUXC_GPR->GPR4 & IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK) != IOMUXC_GPR_GPR4_ENET_STOP_ACK_MASK) {}
     IOMUXC_GPR->GPR4  = GPR4_STOP_REQ_BITS;
     IOMUXC_GPR->GPR7  = GPR7_STOP_REQ_BITS;
     IOMUXC_GPR->GPR8  = GPR8_DOZE_BITS | GPR8_STOP_MODE_BITS;
     IOMUXC_GPR->GPR12 = GPR12_DOZE_BITS | GPR12_STOP_MODE_BITS;
-    while ((IOMUXC_GPR->GPR4 & GPR4_STOP_ACK_BITS) != GPR4_STOP_ACK_BITS)
-    {
-    }
-    while ((IOMUXC_GPR->GPR7 & GPR7_STOP_ACK_BITS) != GPR7_STOP_ACK_BITS)
-    {
-    }
+    while ((IOMUXC_GPR->GPR4 & GPR4_STOP_ACK_BITS) != GPR4_STOP_ACK_BITS) {}
+    while ((IOMUXC_GPR->GPR7 & GPR7_STOP_ACK_BITS) != GPR7_STOP_ACK_BITS) {}
 }
 
 void PowerDownUSBPHY(void)
@@ -1215,17 +1292,18 @@ void PowerDownUSBPHY(void)
     USBPHY2->CTRL = 0xFFFFFFFF;
 }
 
-void LPM_EnterLowPowerRun(){
+void LPM_EnterLowPowerRun()
+{
     /* Switch DCDC to use DCDC internal OSC */
-   // DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
+    // DCDC_SetClockSource(DCDC, kDCDC_ClockInternalOsc);
 
     CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
 
     /* OSC_CLK (24M) */
     CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
-                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+                 1); // CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
     /* PERIPH_CLK2_SEL */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1); // CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
     /* SET AHB, IPG to 12MHz */
     CLOCK_SetDiv(kCLOCK_IpgDiv, 0);
@@ -1256,7 +1334,6 @@ void LPM_EnterLowPowerRun(){
     EnableWeakLDO();
     DisableRegularLDO();
     BandgapOff();
-
 }
 
 /*
@@ -1270,64 +1347,63 @@ status_t BOARD_InitSEMC(void)
     uint32_t clockFrq = CLOCK_GetFreq(kCLOCK_SemcClk);
 
     */
-/* Initializes the MAC configure structure to zero. *//*
+/* Initializes the MAC configure structure to zero. */                                              /*
+                                             
+                                                  memset(&config, 0, sizeof(semc_config_t));
+                                                  memset(&sdramconfig, 0, sizeof(semc_sdram_config_t));
+                                             
+                                                  */
+/* Initialize SEMC. */                                                                              /*
+                                                                             
+                                                                                  SEMC_GetDefaultConfig(&config);
+                                                                                  config.dqsMode = kSEMC_Loopbackdqspad; */
+/* For more accurate timing. */                                                                     /*
+                                                                    
+                                                                         SEMC_Init(SEMC, &config);
+                                                                    
+                                                                         */
+/* Configure SDRAM. */                                                                              /*
+                                                                             
+                                                                                  sdramconfig.csxPinMux           = kSEMC_MUXCSX0;
+                                                                                  sdramconfig.address             = 0x80000000;
+                                                                                  sdramconfig.memsize_kbytes      = 16 * 1024; */
+/* 16MB = 32*1024*1KBytes*/                                                                         /*
+                                                                        
+                                                                             sdramconfig.portSize            = kSEMC_PortSize16Bit;
+                                                                             sdramconfig.burstLen            = kSEMC_Sdram_BurstLen8;
+                                                                             sdramconfig.columnAddrBitNum    = kSEMC_SdramColunm_9bit;
+                                                                             sdramconfig.casLatency          = kSEMC_LatencyThree;
+                                                                             sdramconfig.tPrecharge2Act_Ns   = 18; */
+/* Trp 18ns */                                                                                      /*
+                                                                                     
+                                                                                          sdramconfig.tAct2ReadWrite_Ns   = 18; */
+/* Trcd 18ns */                                                                                     /*
+                                                                                    
+                                                                                         sdramconfig.tRefreshRecovery_Ns = 67; */
+/* Use the maximum of the (Trfc , Txsr). */                                                         /*
+                                                        
+                                                             sdramconfig.tWriteRecovery_Ns   = 12; */
+/* 12ns */                                                                                          /*
+                                                                                         
+                                                                                              sdramconfig.tCkeOff_Ns =
+                                                                                                      42; */
+/* The minimum cycle of SDRAM CLK off state. CKE is off in self refresh at a minimum period tRAS.*/ /*
 
-    memset(&config, 0, sizeof(semc_config_t));
-    memset(&sdramconfig, 0, sizeof(semc_sdram_config_t));
-
-    */
-/* Initialize SEMC. *//*
-
-    SEMC_GetDefaultConfig(&config);
-    config.dqsMode = kSEMC_Loopbackdqspad; */
-/* For more accurate timing. *//*
-
-    SEMC_Init(SEMC, &config);
-
-    */
-/* Configure SDRAM. *//*
-
-    sdramconfig.csxPinMux           = kSEMC_MUXCSX0;
-    sdramconfig.address             = 0x80000000;
-    sdramconfig.memsize_kbytes      = 16 * 1024; */
-/* 16MB = 32*1024*1KBytes*//*
-
-    sdramconfig.portSize            = kSEMC_PortSize16Bit;
-    sdramconfig.burstLen            = kSEMC_Sdram_BurstLen8;
-    sdramconfig.columnAddrBitNum    = kSEMC_SdramColunm_9bit;
-    sdramconfig.casLatency          = kSEMC_LatencyThree;
-    sdramconfig.tPrecharge2Act_Ns   = 18; */
-/* Trp 18ns *//*
-
-    sdramconfig.tAct2ReadWrite_Ns   = 18; */
-/* Trcd 18ns *//*
-
-    sdramconfig.tRefreshRecovery_Ns = 67; */
-/* Use the maximum of the (Trfc , Txsr). *//*
-
-    sdramconfig.tWriteRecovery_Ns   = 12; */
-/* 12ns *//*
-
-    sdramconfig.tCkeOff_Ns =
-            42; */
-/* The minimum cycle of SDRAM CLK off state. CKE is off in self refresh at a minimum period tRAS.*//*
-
-    sdramconfig.tAct2Prechage_Ns       = 42; */
-/* Tras 42ns *//*
-
-    sdramconfig.tSelfRefRecovery_Ns    = 67;
-    sdramconfig.tRefresh2Refresh_Ns    = 60;
-    sdramconfig.tAct2Act_Ns            = 60;
-    sdramconfig.tPrescalePeriod_Ns     = 160 * (1000000000 / clockFrq);
-    sdramconfig.refreshPeriod_nsPerRow = 64 * 1000000 / 8192; */
-/* 64ms/8192 *//*
-
-    sdramconfig.refreshUrgThreshold    = sdramconfig.refreshPeriod_nsPerRow;
-    sdramconfig.refreshBurstLen        = 1;
-    return SEMC_ConfigureSDRAM(SEMC, kSEMC_SDRAM_CS0, &sdramconfig, clockFrq);
-}
-*/
-
+     sdramconfig.tAct2Prechage_Ns       = 42; */
+/* Tras 42ns */                                                                                     /*
+                                                                                    
+                                                                                         sdramconfig.tSelfRefRecovery_Ns    = 67;
+                                                                                         sdramconfig.tRefresh2Refresh_Ns    = 60;
+                                                                                         sdramconfig.tAct2Act_Ns            = 60;
+                                                                                         sdramconfig.tPrescalePeriod_Ns     = 160 * (1000000000 / clockFrq);
+                                                                                         sdramconfig.refreshPeriod_nsPerRow = 64 * 1000000 / 8192; */
+/* 64ms/8192 */                                                                                     /*
+                                                                                    
+                                                                                         sdramconfig.refreshUrgThreshold    = sdramconfig.refreshPeriod_nsPerRow;
+                                                                                         sdramconfig.refreshBurstLen        = 1;
+                                                                                         return SEMC_ConfigureSDRAM(SEMC, kSEMC_SDRAM_CS0, &sdramconfig, clockFrq);
+                                                                                     }
+                                                                                     */
 
 void LPM_EnterFullSpeed(void)
 {
@@ -1357,37 +1433,36 @@ void LPM_EnterFullSpeed(void)
     /* Setting PeriphClk2Mux and PeriphMux to provide stable clock before PLLs are initialed */
     /* OSC_CLK (24M) */
     CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
-                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+                 1); // CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
     /* PERIPH_CLK2_SEL */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1); // CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
     /* Set AHB_PODF. */
-    CLOCK_SetDiv(kCLOCK_AhbDiv, 0);    //CBCDR
+    CLOCK_SetDiv(kCLOCK_AhbDiv, 0); // CBCDR
 
     /* Set IPG_PODF. */
     /* AHB_CLK/4 */
-    CLOCK_SetDiv(kCLOCK_IpgDiv, 3);    //CBCDR
+    CLOCK_SetDiv(kCLOCK_IpgDiv, 3); // CBCDR
 
     /* Set ARM_PODF. */
     /* PLL1/2 (864MHz / 2 = 432 MHz) */
-    CLOCK_SetDiv(kCLOCK_ArmDiv, 1);    //CACRR
+    CLOCK_SetDiv(kCLOCK_ArmDiv, 1); // CACRR
 
     /* Set PERCLK_PODF. */
     /* IPG_CLK_ROOT/2 */
-    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1);    //CSCMR1
+    CLOCK_SetDiv(kCLOCK_PerclkDiv, 1); // CSCMR1
     /* Set per clock source. */
-    CLOCK_SetMux(kCLOCK_PerclkMux, 0);    //CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
-
+    CLOCK_SetMux(kCLOCK_PerclkMux, 0); // CSCMR1  (6) 0 - ipg_clk_root, 1 - osc_clk - PIT, GPT
 
     clkPLL2setup(CLK_ENABLE);
-    CLOCK_SetMux(kCLOCK_SemcMux,1);
+    CLOCK_SetMux(kCLOCK_SemcMux, 1);
 
     /* Set preperiph clock source. */
     /* PLL1/2 = 432MHz */
-    CLOCK_SetMux(kCLOCK_PrePeriphMux, 0);        //CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
+    CLOCK_SetMux(kCLOCK_PrePeriphMux, 0); // CBCMR  (19-18) 0 - PLL2, 1 - PLL2_PFD2, 2 - PLL2_PFD0, 3 - PLL1
     /* Set periph clock source. */
     /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 0);            //CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+    CLOCK_SetMux(kCLOCK_PeriphMux, 0); // CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
     /* Adjust SOC voltage to 1.15V */
     DCDC_AdjustTargetVoltage(DCDC, 0xe, 0x1);
@@ -1404,15 +1479,15 @@ void LPM_EnterLowPowerIdle(void)
     PGC->MEGA_CTRL &= ~PGC_MEGA_CTRL_PCR_MASK;
 
     LPM_SetWaitModeConfig();
-    //SetLowPowerClockGate();
+    // SetLowPowerClockGate();
 
     CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
 
     /* OSC_CLK (24M) */
     CLOCK_SetMux(kCLOCK_PeriphClk2Mux,
-                 1); //CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
+                 1); // CBCMR (13-12) 0 - pll3_sw_clk, 1 - osc_clk (pll1_ref_clk), 2 - pll2_bypass_clk, 3 - reserved
     /* PERIPH_CLK2_SEL */
-    CLOCK_SetMux(kCLOCK_PeriphMux, 1);     //CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
+    CLOCK_SetMux(kCLOCK_PeriphMux, 1); // CBCDR (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
     /* SET AHB, IPG to 12MHz */
     CLOCK_SetDiv(kCLOCK_IpgDiv, 0);
@@ -1445,11 +1520,10 @@ void LPM_EnterLowPowerIdle(void)
     /* Connect vdd_high_in and connect vdd_snvs_in */
     PMU->MISC0_CLR = PMU_MISC0_DISCON_HIGH_SNVS_MASK;
 
-
     EnableWeakLDO();
     DisableRegularLDO();
     BandgapOff();
 
-    CLOCK_SetMux(kCLOCK_SemcMux,0);
+    CLOCK_SetMux(kCLOCK_SemcMux, 0);
     clkPLL2setup(CLK_DISABLE);
 }

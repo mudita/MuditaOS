@@ -19,7 +19,7 @@ class PhonebookSearch : public AppWindow
   protected:
     /** labels */
     Label *searchHeader = nullptr;
-    Text *inputField = nullptr;
+    Text *inputField    = nullptr;
     HBox *horizontalBox = nullptr;
     Image *searchTop;
 
@@ -42,6 +42,14 @@ class PhonebookSearch : public AppWindow
     void destroyInterface() override;
 
   private:
-    Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text, const std::string fontName,
-                    const RectangleEdgeFlags edges, const Alignment alignment, const bool lineMode);
+    Label *addLabel(std::list<Item *> *parentPage,
+                    int x,
+                    int y,
+                    int w,
+                    int h,
+                    const std::string text,
+                    const std::string fontName,
+                    const RectangleEdgeFlags edges,
+                    const Alignment alignment,
+                    const bool lineMode);
 };

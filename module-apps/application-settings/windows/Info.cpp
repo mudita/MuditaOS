@@ -9,7 +9,6 @@
 
 #include <../source/version.hpp>
 
-
 namespace gui
 {
 
@@ -65,7 +64,6 @@ namespace gui
     }
 
     void Info::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-    }
+    {}
 
 } // namespace gui

@@ -3,25 +3,27 @@
 
 #include <string>
 
-namespace atag {
-namespace id3v1 {
-
-struct tag
+namespace atag
 {
-    std::string title;
-    std::string artist;
-    std::string album;
-    std::string comment;
-    int track_number;
-    int year;
-    int genre;
-};
+    namespace id3v1
+    {
 
-template<typename Source> bool is_tagged(const Source& s);
+        struct tag
+        {
+            std::string title;
+            std::string artist;
+            std::string album;
+            std::string comment;
+            int track_number;
+            int year;
+            int genre;
+        };
 
-template<typename Source> tag parse(const Source& s);
+        template <typename Source> bool is_tagged(const Source &s);
 
-} // namespace id3v1
+        template <typename Source> tag parse(const Source &s);
+
+    } // namespace id3v1
 } // namespace atag
 
 #include "impl/id3v1.ipp"

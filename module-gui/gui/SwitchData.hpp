@@ -11,36 +11,44 @@
 
 #include <string>
 
-namespace gui {
-
-//class template that stores information that was sent along with switch message
-class SwitchData {
-protected:
-	std::string description = "";
-public:
-
-	SwitchData() = default;
-	SwitchData( const std::string& description ) : description{description} {};
-	virtual ~SwitchData() = default;
-	virtual const std::string& getDescription() const { return description; };
-	virtual void setDescription( const std::string desc ) { description = desc; };
-    bool disableAppClose = false;
-};
-
-class SwitchSpecialChar : public SwitchData
+namespace gui
 {
-  public:
-    std::string requester = "";
-    enum class Type
+
+    // class template that stores information that was sent along with switch message
+    class SwitchData
     {
-        Request,
-        Response,
-    } type = Type::Request;
-    SwitchSpecialChar(Type type, const std::string requester, const std::string &description = "") : SwitchData(description), requester(requester), type(type)
+      protected:
+        std::string description = "";
+
+      public:
+        SwitchData() = default;
+        SwitchData(const std::string &description) : description{description} {};
+        virtual ~SwitchData() = default;
+        virtual const std::string &getDescription() const
+        {
+            return description;
+        };
+        virtual void setDescription(const std::string desc)
+        {
+            description = desc;
+        };
+        bool disableAppClose = false;
+    };
+
+    class SwitchSpecialChar : public SwitchData
     {
-    }
-    virtual ~SwitchSpecialChar() = default;
-};
+      public:
+        std::string requester = "";
+        enum class Type
+        {
+            Request,
+            Response,
+        } type = Type::Request;
+        SwitchSpecialChar(Type type, const std::string requester, const std::string &description = "")
+            : SwitchData(description), requester(requester), type(type)
+        {}
+        virtual ~SwitchSpecialChar() = default;
+    };
 
 } /* namespace gui */
 

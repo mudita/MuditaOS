@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define XING_HEADER_SIZE    120
+#define XING_HEADER_SIZE 120
 
 typedef struct
 {
@@ -21,7 +21,7 @@ typedef struct
     uint32_t TotalBytes;
     uint8_t TOC[100];
     uint32_t Quality;
-}xing_info_t;
+} xing_info_t;
 
 /**
  * @brief This function is used to parse Xing header in MP3 file
@@ -30,7 +30,6 @@ typedef struct
  * @param info [out] Pointer to structure describing xing header
  * @return 1 if success, otherwise 0.
  */
-uint8_t parseXingHeader(uint8_t* data,size_t datasize,xing_info_t* info);
-
+uint8_t parseXingHeader(uint8_t *data, size_t datasize, xing_info_t *info);
 
 #endif /* AUDIOPLAYER_CODECS_XING_HEADER_H_ */

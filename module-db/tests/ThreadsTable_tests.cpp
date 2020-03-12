@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -30,16 +29,16 @@ TEST_CASE("Threads Table tests")
     Database::Initialize();
 
     vfs.remove(SmsDB::GetDBName());
-    
+
     SmsDB smsdb;
 
-    ThreadsTableRow testRow1 = {.ID=0,
-            .date=0,
-            .msgCount=0,
-            .msgRead=0,
-            .contactID=0,
-            .snippet="Test snippet",
-            .type = SMSType ::DRAFT
+    ThreadsTableRow testRow1 = {.ID        = 0,
+                                .date      = 0,
+                                .msgCount  = 0,
+                                .msgRead   = 0,
+                                .contactID = 0,
+                                .snippet   = "Test snippet",
+                                .type      = SMSType ::DRAFT
 
     };
 
@@ -53,7 +52,7 @@ TEST_CASE("Threads Table tests")
     REQUIRE(smsdb.threads.GetCount() == 4);
 
     // Update existing element in table
-    testRow1.ID = 4;
+    testRow1.ID      = 4;
     testRow1.snippet = "Updated Test snippet";
     REQUIRE(smsdb.threads.Update(testRow1));
 
@@ -63,28 +62,28 @@ TEST_CASE("Threads Table tests")
 
     // Get table row using invalid ID(should return empty SMSTableRow)
     auto threadFailed = smsdb.threads.GetByID(100);
-    REQUIRE(threadFailed.snippet  == "");
+    REQUIRE(threadFailed.snippet == "");
 
     // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = smsdb.threads.GetLimitOffset(0,4);
+    auto retOffsetLimit = smsdb.threads.GetLimitOffset(0, 4);
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = smsdb.threads.GetLimitOffset(0,100);
+    auto retOffsetLimitBigger = smsdb.threads.GetLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = smsdb.threads.GetLimitOffset(5,4);
+    auto retOffsetLimitFailed = smsdb.threads.GetLimitOffset(5, 4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(smsdb.threads.GetLimitOffsetByField(0,4,ThreadsTableFields::MsgCount,"0").size() == 4);
+    REQUIRE(smsdb.threads.GetLimitOffsetByField(0, 4, ThreadsTableFields::MsgCount, "0").size() == 4);
 
     // Get count of elements by field's ID
-    REQUIRE(smsdb.threads.GetCountByFieldID("contact_id",0) == 4);
+    REQUIRE(smsdb.threads.GetCountByFieldID("contact_id", 0) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(smsdb.threads.GetCountByFieldID("invalid_field",0) == 0);
+    REQUIRE(smsdb.threads.GetCountByFieldID("invalid_field", 0) == 0);
 
     REQUIRE(smsdb.threads.RemoveByID(2));
 

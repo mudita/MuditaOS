@@ -12,7 +12,8 @@
 #include <cstdint>
 #include <string>
 
-namespace gui {
+namespace gui
+{
 
     class BoundingBox
     {

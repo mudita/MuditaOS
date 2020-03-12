@@ -36,7 +36,6 @@
  *
  ***************************************************************************/
 
-
 #ifndef TICK_HOOK_HPP_
 #define TICK_HOOK_HPP_
 
@@ -44,38 +43,40 @@
 #include "task.h"
 #include <list>
 
-#if ( configUSE_TICK_HOOK == 1 )
+#if (configUSE_TICK_HOOK == 1)
 
 /**
- *  FreeRTOS expects this function to exist and requires it to be 
+ *  FreeRTOS expects this function to exist and requires it to be
  *  named as such with the following signature.
  */
 extern "C" void vApplicationTickHook(void);
 
-namespace cpp_freertos {
+namespace cpp_freertos
+{
 
-/**
- *  Wrapper class for Tick hooks, functions you want to run within 
- *  the tick ISR. 
- *
- *  This is an abstract base class.
- *  To use this, you need to subclass it. All of your tick functions 
- *  should be derived from this class. Then implement the virtual Run
- *  function. 
- *
- *  You can register multiple hooks with this class. The order of 
- *  execution should not be assumed. All tick hooks will execute 
- *  every tick.
- */    
-class TickHook {
+    /**
+     *  Wrapper class for Tick hooks, functions you want to run within
+     *  the tick ISR.
+     *
+     *  This is an abstract base class.
+     *  To use this, you need to subclass it. All of your tick functions
+     *  should be derived from this class. Then implement the virtual Run
+     *  function.
+     *
+     *  You can register multiple hooks with this class. The order of
+     *  execution should not be assumed. All tick hooks will execute
+     *  every tick.
+     */
+    class TickHook
+    {
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //  Available from anywhere. 
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //  Available from anywhere.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Constructor.
          */
@@ -87,18 +88,18 @@ class TickHook {
         virtual ~TickHook();
 
         /**
-         *  After this is called your Run routine will execute in the 
-         *  Tick ISR. This registration cannot be done in the base class 
+         *  After this is called your Run routine will execute in the
+         *  Tick ISR. This registration cannot be done in the base class
          *  constructor. Once your object is fully constructed, you "may"
          *  call this in your derived class's constructor.
          *  @note Immedately after you call this function, your TickHook
-         *  Run() method will run, perhaps before you even return from this 
+         *  Run() method will run, perhaps before you even return from this
          *  call. You "must" be ready to run before you call Register().
          */
         void Register();
-        
+
         /**
-         *  Disable the tick hook from running, without removing it 
+         *  Disable the tick hook from running, without removing it
          *  from the tick hook list.
          */
         void Disable();
@@ -108,51 +109,45 @@ class TickHook {
          *  if you haven't called Disable.
          */
         void Enable();
-        
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Protected API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    protected:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Protected API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      protected:
         /**
          *  Implementation of your actual Tick Hook code.
          *  You must override this function.
          */
         virtual void Run() = 0;
 
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Private API
-    //  The internals of this wrapper class.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    private:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Private API
+        //  The internals of this wrapper class.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      private:
         /**
-         *  List of Tick Hook callbacks that are executed in the 
+         *  List of Tick Hook callbacks that are executed in the
          *  Tick ISR.
          */
-        static std::list<TickHook *>Callbacks;
+        static std::list<TickHook *> Callbacks;
 
         /**
          *  Should the tick hook run?
          */
         bool Enabled;
 
-    /**
-     *  Allow the global vApplicationTickHook() function access
-     *  to the internals of this class. This simplifies the overall
-     *  design.
-     */
-    friend void ::vApplicationTickHook();
-};
+        /**
+         *  Allow the global vApplicationTickHook() function access
+         *  to the internals of this class. This simplifies the overall
+         *  design.
+         */
+        friend void ::vApplicationTickHook();
+    };
 
-
-
-}
+} // namespace cpp_freertos
 #endif
 #endif
-
-

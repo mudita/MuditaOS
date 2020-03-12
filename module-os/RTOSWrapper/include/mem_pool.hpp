@@ -36,7 +36,6 @@
  *
  ***************************************************************************/
 
-
 #ifndef MEM_POOL_HPP_
 #define MEM_POOL_HPP_
 
@@ -59,16 +58,17 @@
 #include "FreeRTOS.h"
 #include "mutex.hpp"
 
-namespace cpp_freertos {
-
+namespace cpp_freertos
+{
 
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
-/**
- *  This is the exception that is thrown if a MemoryPool malloc fails.
- */
-class MemoryPoolMallocException : public std::exception {
+    /**
+     *  This is the exception that is thrown if a MemoryPool malloc fails.
+     */
+    class MemoryPoolMallocException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -86,20 +86,21 @@ class MemoryPoolMallocException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 
-/**
- *  This is the exception that is thrown if the Alignment argument
- *  is invalid.
- */
-class MemoryPoolBadAlignmentException : public std::exception {
+    /**
+     *  This is the exception that is thrown if the Alignment argument
+     *  is invalid.
+     */
+    class MemoryPoolBadAlignmentException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -117,35 +118,34 @@ class MemoryPoolBadAlignmentException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 
 #endif
 
+    /**
+     *  Memory Pools are fixed size allocations to prevent fragmentation.
+     *
+     *  This is a new feature to FreeRTOS Wrappers and is not in and of
+     *  itself a wrapper.
+     *
+     *  Memory Pools are thread safe, but cannot be used in ISR context.
+     *  The OS must be running, because these use Mutexes to protect internal
+     *  data structures.
+     */
+    class MemoryPool
+    {
 
-/**
- *  Memory Pools are fixed size allocations to prevent fragmentation.
- *
- *  This is a new feature to FreeRTOS Wrappers and is not in and of
- *  itself a wrapper.
- *
- *  Memory Pools are thread safe, but cannot be used in ISR context.
- *  The OS must be running, because these use Mutexes to protect internal
- *  data structures.
- */
-class MemoryPool {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
-
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Constructor to create a Memory Pool.
          *
@@ -160,9 +160,7 @@ class MemoryPool {
          *  @throws MemoryPoolMallocException on failure.
          *  @throws MemoryPoolBadAlignmentException on failure.
          */
-        MemoryPool( int itemSize,
-                    int itemCount,
-                    int alignment);
+        MemoryPool(int itemSize, int itemCount, int alignment);
 
         /**
          *  Constructor to create a Memory Pool.
@@ -179,10 +177,7 @@ class MemoryPool {
          *      memory will be aligned to. Must be at least sizeof(unsigned char *).
          *  @throws MemoryPoolBadAlignmentException on failure.
          */
-        MemoryPool( int itemSize,
-                    void *preallocatedMemory,
-                    int preallocatedMemorySize,
-                    int alignment);
+        MemoryPool(int itemSize, void *preallocatedMemory, int preallocatedMemorySize, int alignment);
 
         /**
          *  Allows you to add memory to a MemoryPool.
@@ -204,8 +199,7 @@ class MemoryPool {
          *  @param preallocatedMemorySize How big is the buffer you are
          *  passing in.
          */
-        void AddMemory( void *preallocatedMemory,
-                        int preallocatedMemorySize);
+        void AddMemory(void *preallocatedMemory, int preallocatedMemorySize);
 
         /**
          *  Allocate an item from the pool.
@@ -222,14 +216,13 @@ class MemoryPool {
          */
         void Free(void *item);
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Private API
-    //  The internals of this class.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    private:
-
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Private API
+        //  The internals of this class.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      private:
         /**
          *  Standard Mutex to allow thread safety.
          */
@@ -248,7 +241,7 @@ class MemoryPool {
         /**
          *  All of the real work is done with STL lists.
          */
-        std::list<void *>FreeItems;
+        std::list<void *> FreeItems;
 
         /**
          *  Adjusts and validates the alignment argument
@@ -281,12 +274,8 @@ class MemoryPool {
          */
         ~MemoryPool();
 #endif
+    };
 
-
-};
-
-
-}
+} // namespace cpp_freertos
 
 #endif
-

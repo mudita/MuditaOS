@@ -14,16 +14,18 @@ enum class MessageType
 
     MessageTypeUninitialized = 0,
     // eink messages
-    EinkStateRequest,      // message is used to pull status of the eink. If eink is ready to display image
-    EinkImageData,         // message with pointer to the image data for displaying
-    EinkDMATransfer,       // this message is internally sent from wink service to eink service. This will trigger DMA transfer to Eink's
-                           // controller. After tranfer gui service wil lbewill be notified
-    EinkTemperatureUpdate, // message sent from timer handler. Message forces service to update temperature measured by the eink.
+    EinkStateRequest, // message is used to pull status of the eink. If eink is ready to display image
+    EinkImageData,    // message with pointer to the image data for displaying
+    EinkDMATransfer,  // this message is internally sent from wink service to eink service. This will trigger DMA
+                     // transfer to Eink's controller. After tranfer gui service wil lbewill be notified
+    EinkTemperatureUpdate, // message sent from timer handler. Message forces service to update temperature measured by
+                           // the eink.
 
     // gui messages
-    GUICommands,          // list of rendering commands
-    GUIFocusInfo,         // information about application that gained focus
-    GUIDisplayReady,      // message that informs gui service that service controlling display device is ready for new buffer data.
+    GUICommands,     // list of rendering commands
+    GUIFocusInfo,    // information about application that gained focus
+    GUIDisplayReady, // message that informs gui service that service controlling display device is ready for new buffer
+                     // data.
     GUIRenderingFinished, // Message is sent from the worker when all rendering is finished.
 
     // DB messages
@@ -46,8 +48,8 @@ enum class MessageType
     DBThreadGetLimitOffset, // Get Thread record by limit,offset
     DBThreadGetCount,       // get Thread count
 
-    DBContactVerify,    // checks database for a contact that has the same name (primary+" "+alternative) or phone number 1 or phone number 2 or
-                        // speed dial key
+    DBContactVerify, // checks database for a contact that has the same name (primary+" "+alternative) or phone number 1
+                     // or phone number 2 or speed dial key
     DBContactGetByName, // used to ask for a contact with specified primary and alternative name.
     DBContactSearch,
     DBContactGetByID,        // used to ask for a contact with specified id
@@ -116,27 +118,33 @@ enum class MessageType
     AudioGetFileTags,
 
     // application manager
-    APMSwitch,            // request to switch to given application, optionally also to specified window
-    APMSwitchPrevApp,     // Request to switch to previous application.
-    APMConfirmSwitch,     // Used when application confirms that it is loosing focus and also when application confirms that is has gained focus
-    APMConfirmClose,      // Sent by application to confirm completion of the close procedure
-    APMRegister,          // when application finishes initHandler it is sending this messag to inform whether init was successful or not.
-    APMDeleydClose,       // this message is sent internally from and to application manager to close specified application.
-    APMChangeLanguage,    // this message is sent from any application to inform application manager that it should send gui rebuild command to all
-                          // applications in background and currently active application.
-    APMClose,             // this message will trigger application manager to close itself, all running applications gui and eink services.
+    APMSwitch,        // request to switch to given application, optionally also to specified window
+    APMSwitchPrevApp, // Request to switch to previous application.
+    APMConfirmSwitch, // Used when application confirms that it is loosing focus and also when application confirms that
+                      // is has gained focus
+    APMConfirmClose,  // Sent by application to confirm completion of the close procedure
+    APMRegister,      // when application finishes initHandler it is sending this messag to inform whether init was
+                      // successful or not.
+    APMDeleydClose,   // this message is sent internally from and to application manager to close specified application.
+    APMChangeLanguage, // this message is sent from any application to inform application manager that it should send
+                       // gui rebuild command to all applications in background and currently active application.
+    APMClose, // this message will trigger application manager to close itself, all running applications gui and eink
+              // services.
     APMPreventBlocking,   // Prevents application manager from initializing device blocking.
-    APMInitPowerSaveMode, // This message is sent to application manager from desktop when locking timeout has triggered or user explicitly locked the phone.
+    APMInitPowerSaveMode, // This message is sent to application manager from desktop when locking timeout has triggered
+                          // or user explicitly locked the phone.
 
     // keyboard messages
     KBDKeyEvent,
 
-    AppSwitch,           // application receives this message from application manager. It a signal to gain or loose focus.
+    AppSwitch, // application receives this message from application manager. It a signal to gain or loose focus.
     AppSwitchWindowBack, // message to inform
-    AppSwitchWindow,     // This is internal message transmitted within application to change window. Additional command and data are transmitted with it.
-    AppInputEvent,       // used after key event translation to send input event to application
+    AppSwitchWindow, // This is internal message transmitted within application to change window. Additional command and
+                     // data are transmitted with it.
+    AppInputEvent,   // used after key event translation to send input event to application
     AppRefresh,
-    AppRebuild, // message used to notify application that it should recreate it's GUI (i.e. language has beed changed by the user)
+    AppRebuild, // message used to notify application that it should recreate it's GUI (i.e. language has beed changed
+                // by the user)
     AppClose,
     AppFocus,
 

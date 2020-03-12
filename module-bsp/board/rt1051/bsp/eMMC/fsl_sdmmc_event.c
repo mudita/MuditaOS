@@ -3,7 +3,7 @@
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -42,7 +42,6 @@
  * Prototypes
  ******************************************************************************/
 
-
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -56,10 +55,10 @@ static volatile uint32_t g_eventTransferComplete;
 volatile uint32_t g_eventTimeMilliseconds;
 
 static QueueHandle_t event_sync = NULL;
-static SemaphoreHandle_t guard = NULL;
+static SemaphoreHandle_t guard  = NULL;
 
 uint32_t cntnotify = 0;
-uint32_t cntwait = 0;
+uint32_t cntwait   = 0;
 /*******************************************************************************
  * Code
  ******************************************************************************/
@@ -70,17 +69,17 @@ uint32_t cntwait = 0;
  */
 bool SDMMCEVENT_Create(void)
 {
-	event_sync = xQueueCreate(1,sizeof(uint32_t));
+    event_sync = xQueueCreate(1, sizeof(uint32_t));
 
-	if(event_sync == NULL){
-		return false;
-	}
+    if (event_sync == NULL) {
+        return false;
+    }
 
-	guard = xSemaphoreCreateBinary();
-	if(guard == NULL){
-		return false;
-	}
-	xSemaphoreGive(guard);
+    guard = xSemaphoreCreateBinary();
+    if (guard == NULL) {
+        return false;
+    }
+    xSemaphoreGive(guard);
 
     return true;
 }
@@ -94,23 +93,22 @@ bool SDMMCEVENT_Create(void)
  */
 bool SDMMCEVENT_Wait(uint32_t timeoutMilliseconds)
 {
-	assert(event_sync);
+    assert(event_sync);
 
-    if (timeoutMilliseconds)
-    {
-    	cntwait++;
-    	status_t status = 0;
+    if (timeoutMilliseconds) {
+        cntwait++;
+        status_t status = 0;
 
-    	BaseType_t ret = xQueueReceive(event_sync, &status, timeoutMilliseconds);
+        BaseType_t ret = xQueueReceive(event_sync, &status, timeoutMilliseconds);
 
-    	if((ret == pdPASS) && (status == kStatus_Success)){
-    		return true;
-    	}else{
-    		return false;
-    	}
+        if ((ret == pdPASS) && (status == kStatus_Success)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-    else
-    {
+    else {
         return false;
     }
 }
@@ -124,22 +122,21 @@ bool SDMMCEVENT_Wait(uint32_t timeoutMilliseconds)
  */
 bool SDMMCEVENT_Lock(uint32_t timeoutMilliseconds)
 {
-	assert(guard);
+    assert(guard);
 
-    if (timeoutMilliseconds)
-    {
-    	status_t status = 0;
+    if (timeoutMilliseconds) {
+        status_t status = 0;
 
-    	BaseType_t ret = xSemaphoreTake(guard,timeoutMilliseconds);
+        BaseType_t ret = xSemaphoreTake(guard, timeoutMilliseconds);
 
-    	if((ret == pdPASS) && (status == kStatus_Success)){
-    		return true;
-    	}else{
-    		return false;
-    	}
+        if ((ret == pdPASS) && (status == kStatus_Success)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-    else
-    {
+    else {
         return false;
     }
 }
@@ -154,10 +151,10 @@ bool SDMMCEVENT_Lock(uint32_t timeoutMilliseconds)
  */
 bool SDMMCEVENT_Unlock(void)
 {
-	assert(guard);
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(guard,&xHigherPriorityTaskWoken);
-	return true;
+    assert(guard);
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(guard, &xHigherPriorityTaskWoken);
+    return true;
 }
 
 /*!
@@ -169,14 +166,14 @@ bool SDMMCEVENT_Unlock(void)
  */
 BaseType_t SDMMCEVENT_Notify(status_t status)
 {
-	cntnotify++;
-	assert(event_sync);
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    cntnotify++;
+    assert(event_sync);
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-	BaseType_t ret = xQueueSendFromISR(event_sync,&status,&xHigherPriorityTaskWoken);
-	if(ret != pdPASS){
-		assert(0);
-	}
+    BaseType_t ret = xQueueSendFromISR(event_sync, &status, &xHigherPriorityTaskWoken);
+    if (ret != pdPASS) {
+        assert(0);
+    }
 
     /* If xHigherPriorityTaskWoken was set to pdTRUE inside
     xStreamBufferSendFromISR() then a task that has a priority above the
@@ -198,11 +195,11 @@ BaseType_t SDMMCEVENT_Notify(status_t status)
  */
 void SDMMCEVENT_Delete()
 {
-	uint32_t dummy = 0;
+    uint32_t dummy = 0;
 
-	if(xQueueReceive(event_sync, &dummy, 0) != errQUEUE_EMPTY){
-		assert(0);
-	}
+    if (xQueueReceive(event_sync, &dummy, 0) != errQUEUE_EMPTY) {
+        assert(0);
+    }
 }
 
 /*!
@@ -214,5 +211,5 @@ void SDMMCEVENT_Delete()
  */
 void SDMMCEVENT_Delay(uint32_t milliseconds)
 {
-	vTaskDelay(pdMS_TO_TICKS(milliseconds));
+    vTaskDelay(pdMS_TO_TICKS(milliseconds));
 }

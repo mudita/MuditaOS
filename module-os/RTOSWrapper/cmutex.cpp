@@ -36,23 +36,17 @@
  *
  ***************************************************************************/
 
-
 #include "mutex.hpp"
-
 
 using namespace cpp_freertos;
 
-
 Mutex::Mutex()
-{
-}
-
+{}
 
 Mutex::~Mutex()
 {
     vSemaphoreDelete(handle);
 }
-
 
 MutexStandard::MutexStandard()
 {
@@ -67,20 +61,17 @@ MutexStandard::MutexStandard()
     }
 }
 
-
 bool MutexStandard::Lock(TickType_t Timeout)
 {
     BaseType_t success = xSemaphoreTake(handle, Timeout);
     return success == pdTRUE ? true : false;
 }
 
-
 bool MutexStandard::Unlock()
 {
     BaseType_t success = xSemaphoreGive(handle);
     return success == pdTRUE ? true : false;
 }
-
 
 #if (configUSE_RECURSIVE_MUTEXES == 1)
 
@@ -97,13 +88,11 @@ MutexRecursive::MutexRecursive()
     }
 }
 
-
 bool MutexRecursive::Lock(TickType_t Timeout)
 {
     BaseType_t success = xSemaphoreTakeRecursive(handle, Timeout);
     return success == pdTRUE ? true : false;
 }
-
 
 bool MutexRecursive::Unlock()
 {
@@ -113,14 +102,14 @@ bool MutexRecursive::Unlock()
 
 #endif
 
-
-LockGuard::LockGuard(Mutex& m) : mutex(m) {
+LockGuard::LockGuard(Mutex &m) : mutex(m)
+{
 
     mutex.Lock();
 }
 
-
-LockGuard::~LockGuard() {
+LockGuard::~LockGuard()
+{
 
     mutex.Unlock();
 }

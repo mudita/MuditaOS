@@ -33,8 +33,7 @@ static inline const std::string formatContactName(std::shared_ptr<ContactRecord>
 static inline void findAndReplaceAll(std::string &data, std::string toSearch, std::string replaceStr)
 {
     size_t pos = data.find(toSearch);
-    while (pos != std::string::npos)
-    {
+    while (pos != std::string::npos) {
         data.replace(pos, toSearch.size(), replaceStr);
         pos = data.find(toSearch, pos + replaceStr.size());
     }
@@ -65,36 +64,36 @@ namespace gui
       protected:
         /** labels */
         Label *informationLabel = nullptr;
-        Label *ifnormation = nullptr;
-        Label *addressLabel = nullptr;
-        Label *addressLine1 = nullptr;
-        Label *addressLine2 = nullptr;
-        Label *email = nullptr;
-        Label *numberPrimary = nullptr;
-        Label *numberSecondary = nullptr;
-        Label *favouritesLabel = nullptr;
-        Label *speeddialLabel = nullptr;
-        Label *blockedLabel = nullptr;
-        Label *speedDialLabel = nullptr;
-        Label *speedDial = nullptr;
-        Label *noteLabel = nullptr;
-        Text *noteText = nullptr;
+        Label *ifnormation      = nullptr;
+        Label *addressLabel     = nullptr;
+        Label *addressLine1     = nullptr;
+        Label *addressLine2     = nullptr;
+        Label *email            = nullptr;
+        Label *numberPrimary    = nullptr;
+        Label *numberSecondary  = nullptr;
+        Label *favouritesLabel  = nullptr;
+        Label *speeddialLabel   = nullptr;
+        Label *blockedLabel     = nullptr;
+        Label *speedDialLabel   = nullptr;
+        Label *speedDial        = nullptr;
+        Label *noteLabel        = nullptr;
+        Text *noteText          = nullptr;
 
         /** icons */
         Image *favouritesIcon = nullptr;
-        Image *blockedIcon = nullptr;
+        Image *blockedIcon    = nullptr;
 
         Label *numberPrimaryLabel = nullptr;
-        Image *numberPrimaryIcon = nullptr;
+        Image *numberPrimaryIcon  = nullptr;
 
         Label *numberPrimaryMessageLabel = nullptr;
-        Image *numberPrimaryMessage = nullptr;
+        Image *numberPrimaryMessage      = nullptr;
 
         Label *numberSecondaryLabel = nullptr;
-        Image *numberSecondaryIcon = nullptr;
+        Image *numberSecondaryIcon  = nullptr;
 
         Label *numberSecondaryMessageLabel = nullptr;
-        Image *numberSecondaryMessage = nullptr;
+        Image *numberSecondaryMessage      = nullptr;
 
         ContactRecord readContact();
 
@@ -118,7 +117,15 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
         void setContactData();
-        Label *addLabel(std::list<Item *> *parentPage, int x, int y, int w, int h, const std::string text, const std::string fontName,
-                        const RectangleEdgeFlags edges, const Alignment alignment, const bool lineMode);
+        Label *addLabel(std::list<Item *> *parentPage,
+                        int x,
+                        int y,
+                        int w,
+                        int h,
+                        const std::string text,
+                        const std::string fontName,
+                        const RectangleEdgeFlags edges,
+                        const Alignment alignment,
+                        const bool lineMode);
     };
 } // namespace gui

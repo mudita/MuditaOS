@@ -56,17 +56,17 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 
-
-namespace cpp_freertos {
-
+namespace cpp_freertos
+{
 
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
-/**
- *  This is the exception that is thrown if an EventGroup constructor fails.
- */
-class EventGroupCreateException : public std::exception {
+    /**
+     *  This is the exception that is thrown if an EventGroup constructor fails.
+     */
+    class EventGroupCreateException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -80,8 +80,7 @@ class EventGroupCreateException : public std::exception {
          */
         explicit EventGroupCreateException(const char *info)
         {
-            snprintf(errorString, sizeof(errorString),
-                        "Event Group Constructor Failed %s", info);
+            snprintf(errorString, sizeof(errorString), "Event Group Constructor Failed %s", info);
         }
 
         /**
@@ -93,33 +92,32 @@ class EventGroupCreateException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 #endif
 
+    /**
+     *  @todo - document this class
+     */
+    class EventGroup
+    {
 
-/**
- *  @todo - document this class
- */
-class EventGroup {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
-
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Construct a Event Group
          */
         EventGroup();
 
-#if( configSUPPORT_STATIC_ALLOCATION == 1 )
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
         /**
          *  Construct a Event Group with static allocation
          */
@@ -147,9 +145,7 @@ class EventGroup {
          *  If EventGroup::Sync returned because its timeout expired then
          *  not all the bits being waited for will be set.
          */
-        EventBits_t Sync(   const EventBits_t uxBitsToSet,
-                            const EventBits_t uxBitsToWaitFor,
-                            TickType_t xTicksToWait);
+        EventBits_t Sync(const EventBits_t uxBitsToSet, const EventBits_t uxBitsToWaitFor, TickType_t xTicksToWait);
 
         /**
          *  Read bits within an RTOS event group, optionally entering the
@@ -202,10 +198,10 @@ class EventGroup {
          *  value before any bits were automatically cleared because the
          *  xClearOnExit parameter was set to true.
          */
-        EventBits_t WaitBits(   const EventBits_t uxBitsToWaitFor,
-                                bool xClearOnExit,
-                                bool xWaitForAllBits,
-                                TickType_t xTicksToWait);
+        EventBits_t WaitBits(const EventBits_t uxBitsToWaitFor,
+                             bool xClearOnExit,
+                             bool xWaitForAllBits,
+                             TickType_t xTicksToWait);
 
         /**
          *  Clear bits (flags) within an event group.
@@ -230,12 +226,12 @@ class EventGroup {
         BaseType_t ClearBitsFromISR(const EventBits_t uxBitsToClear);
 
         /**
-        *  Returns the current value of the event bits (event flags) in an
-        *  event group.
-        *
-        *  @return The value of the event bits in the event group at the time
-        *  EventGroup::GetBitsFromISR was called.
-        */
+         *  Returns the current value of the event bits (event flags) in an
+         *  event group.
+         *
+         *  @return The value of the event bits in the event group at the time
+         *  EventGroup::GetBitsFromISR was called.
+         */
         EventBits_t GetBits();
 
         /**
@@ -258,8 +254,7 @@ class EventGroup {
          */
         EventBits_t SetBits(const EventBits_t uxBitsToSet);
 
-
-        #if ( ( configUSE_TRACE_FACILITY == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_TIMERS == 1 ) )
+#if ((configUSE_TRACE_FACILITY == 1) && (INCLUDE_xTimerPendFunctionCall == 1) && (configUSE_TIMERS == 1))
         /**
          *  Set bits (flags) within an event group from ISR context.
          *
@@ -278,30 +273,28 @@ class EventGroup {
          *  For that reason *pxHigherPriorityTaskWoken must be initialised
          *  to false.
          */
-        BaseType_t SetBitsFromISR(  const EventBits_t uxBitsToSet,
-                                    BaseType_t *pxHigherPriorityTaskWoken);
+        BaseType_t SetBitsFromISR(const EventBits_t uxBitsToSet, BaseType_t *pxHigherPriorityTaskWoken);
 
-        #endif
+#endif
 
         /**
          *  Our destructor
          */
         virtual ~EventGroup();
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Protected API
-    //  Not intended for use by application code.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    protected:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Protected API
+        //  Not intended for use by application code.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      protected:
         /**
          *  FreeRTOS Event Group handle.
          */
         EventGroupHandle_t handle;
+    };
 
-};
-
-}
+} // namespace cpp_freertos
 
 #endif

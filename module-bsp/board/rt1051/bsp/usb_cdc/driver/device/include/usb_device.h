@@ -50,17 +50,17 @@ typedef enum _usb_device_state
 #if (defined(USB_DEVICE_CHARGER_DETECT_ENABLE) && (USB_DEVICE_CHARGER_DETECT_ENABLE > 0U))
 typedef enum _usb_dcd_detection_sequence_status
 {
-    kUSB_DcdDetectionNotEnabled = 0x0U,
-    kUSB_DcdDataPinDetectionCompleted = 0x01U,
+    kUSB_DcdDetectionNotEnabled            = 0x0U,
+    kUSB_DcdDataPinDetectionCompleted      = 0x01U,
     kUSB_DcdChargingPortDetectionCompleted = 0x02U,
-    kUSB_DcdChargerTypeDetectionCompleted = 0x03U,
+    kUSB_DcdChargerTypeDetectionCompleted  = 0x03U,
 } usb_dcd_detection_sequence_status_t;
 
 typedef enum _usb_dcd_detection_sequence_results
 {
-    kUSB_DcdDetectionNoResults = 0x0U,
-    kUSB_DcdDetectionStandardHost = 0x01U,
-    kUSB_DcdDetectionChargingPort = 0x02U,
+    kUSB_DcdDetectionNoResults        = 0x0U,
+    kUSB_DcdDetectionStandardHost     = 0x01U,
+    kUSB_DcdDetectionChargingPort     = 0x02U,
     kUSB_DcdDetectionDedicatedCharger = 0x03U,
 } usb_dcd_detection_sequence_results_t;
 #endif
@@ -92,15 +92,15 @@ typedef enum _usb_endpoint_status
 /*! @brief Available common EVENT types in device callback */
 typedef enum _usb_device_event
 {
-    kUSB_DeviceEventBusReset = 1U,    /*!< USB bus reset signal detected */
-    kUSB_DeviceEventSuspend,          /*!< USB bus suspend signal detected */
-    kUSB_DeviceEventResume,           /*!< USB bus resume signal detected. The resume signal is driven by itself or a host */
-    kUSB_DeviceEventSleeped,          /*!< USB bus LPM suspend signal detected */
-    kUSB_DeviceEventLPMResume,        /*!< USB bus LPM resume signal detected. The resume signal is driven by itself or a host
-                                       */
-    kUSB_DeviceEventError,            /*!< An error is happened in the bus. */
-    kUSB_DeviceEventDetach,           /*!< USB device is disconnected from a host. */
-    kUSB_DeviceEventAttach,           /*!< USB device is connected to a host. */
+    kUSB_DeviceEventBusReset = 1U, /*!< USB bus reset signal detected */
+    kUSB_DeviceEventSuspend,       /*!< USB bus suspend signal detected */
+    kUSB_DeviceEventResume,    /*!< USB bus resume signal detected. The resume signal is driven by itself or a host */
+    kUSB_DeviceEventSleeped,   /*!< USB bus LPM suspend signal detected */
+    kUSB_DeviceEventLPMResume, /*!< USB bus LPM resume signal detected. The resume signal is driven by itself or a host
+                                */
+    kUSB_DeviceEventError,     /*!< An error is happened in the bus. */
+    kUSB_DeviceEventDetach,    /*!< USB device is disconnected from a host. */
+    kUSB_DeviceEventAttach,    /*!< USB device is connected to a host. */
     kUSB_DeviceEventSetConfiguration, /*!< Set configuration. */
     kUSB_DeviceEventSetInterface,     /*!< Set interface. */
 
@@ -150,7 +150,9 @@ typedef struct _usb_device_endpoint_callback_message_struct
  *
  * @return A USB error code or kStatus_USB_Success.
  */
-typedef usb_status_t (*usb_device_endpoint_callback_t)(usb_device_handle handle, usb_device_endpoint_callback_message_struct_t *message, void *callbackParam);
+typedef usb_status_t (*usb_device_endpoint_callback_t)(usb_device_handle handle,
+                                                       usb_device_endpoint_callback_message_struct_t *message,
+                                                       void *callbackParam);
 
 /*!
  * @brief Device callback function typedef.
@@ -232,11 +234,12 @@ extern "C"
      * @retval kStatus_USB_ControllerNotFound   Cannot find the controller according to the controller id.
      * @retval kStatus_USB_InvalidControllerInterface  The controller driver interfaces is invalid. There is an empty
      * 													interface entity.
-     * @retval kStatus_USB_Error                The macro USB_DEVICE_CONFIG_ENDPOINTS is more than the IP's endpoint number.
-     *                                          Or, the device has been initialized.
-     *                                          Or, the mutex or message queue is created failed.
+     * @retval kStatus_USB_Error                The macro USB_DEVICE_CONFIG_ENDPOINTS is more than the IP's endpoint
+     * number. Or, the device has been initialized. Or, the mutex or message queue is created failed.
      */
-    extern usb_status_t USB_DeviceInit(uint8_t controllerId, usb_device_callback_t deviceCallback, usb_device_handle *handle);
+    extern usb_status_t USB_DeviceInit(uint8_t controllerId,
+                                       usb_device_callback_t deviceCallback,
+                                       usb_device_handle *handle);
 
     /*!
      * @brief Enables the device functionality.
@@ -248,7 +251,8 @@ extern "C"
      *
      * @retval kStatus_USB_Success              The device is run successfully.
      * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
-     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is
+     * invalid.
      *
      */
     extern usb_status_t USB_DeviceRun(usb_device_handle handle);
@@ -296,16 +300,16 @@ extern "C"
      * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
      * @retval kStatus_USB_Error                The device is doing reset.
      *
-     * @note The return value indicates whether the sending request is successful or not. The transfer done is notified by
-     * the
-     * corresponding callback function.
-     * Currently, only one transfer request can be supported for one specific endpoint.
-     * If there is a specific requirement to support multiple transfer requests for one specific endpoint, the application
-     * should implement a queue on the application level.
-     * The subsequent transfer can begin only when the previous transfer is done (get notification through the endpoint
-     * callback).
+     * @note The return value indicates whether the sending request is successful or not. The transfer done is notified
+     * by the corresponding callback function. Currently, only one transfer request can be supported for one specific
+     * endpoint. If there is a specific requirement to support multiple transfer requests for one specific endpoint, the
+     * application should implement a queue on the application level. The subsequent transfer can begin only when the
+     * previous transfer is done (get notification through the endpoint callback).
      */
-    extern usb_status_t USB_DeviceSendRequest(usb_device_handle handle, uint8_t endpointAddress, uint8_t *buffer, uint32_t length);
+    extern usb_status_t USB_DeviceSendRequest(usb_device_handle handle,
+                                              uint8_t endpointAddress,
+                                              uint8_t *buffer,
+                                              uint32_t length);
 
     /*!
      * @brief Receives data through a specified endpoint.
@@ -323,16 +327,16 @@ extern "C"
      * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
      * @retval kStatus_USB_Error                The device is doing reset.
      *
-     * @note The return value indicates whether the receiving request is successful or not. The transfer done is notified by
-     * the
-     * corresponding callback function.
-     * Currently, only one transfer request can be supported for one specific endpoint.
-     * If there is a specific requirement to support multiple transfer requests for one specific endpoint, the application
-     * should implement a queue on the application level.
-     * The subsequent transfer can begin only when the previous transfer is done (get notification through the endpoint
-     * callback).
+     * @note The return value indicates whether the receiving request is successful or not. The transfer done is
+     * notified by the corresponding callback function. Currently, only one transfer request can be supported for one
+     * specific endpoint. If there is a specific requirement to support multiple transfer requests for one specific
+     * endpoint, the application should implement a queue on the application level. The subsequent transfer can begin
+     * only when the previous transfer is done (get notification through the endpoint callback).
      */
-    extern usb_status_t USB_DeviceRecvRequest(usb_device_handle handle, uint8_t endpointAddress, uint8_t *buffer, uint32_t length);
+    extern usb_status_t USB_DeviceRecvRequest(usb_device_handle handle,
+                                              uint8_t endpointAddress,
+                                              uint8_t *buffer,
+                                              uint32_t length);
 
     /*!
      * @brief Cancels the pending transfer in a specified endpoint.
@@ -365,7 +369,8 @@ extern "C"
      * @retval kStatus_USB_Busy                 The endpoint is busy in EHCI driver.
      * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
      */
-    extern usb_status_t USB_DeviceInitEndpoint(usb_device_handle handle, usb_device_endpoint_init_struct_t *epInit,
+    extern usb_status_t USB_DeviceInitEndpoint(usb_device_handle handle,
+                                               usb_device_endpoint_init_struct_t *epInit,
                                                usb_device_endpoint_callback_struct_t *epCallback);
 
     /*!
@@ -458,7 +463,8 @@ extern "C"
      *
      * @retval kStatus_USB_Success              The device is run successfully.
      * @retval kStatus_USB_ControllerNotFound   Cannot find the controller.
-     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidHandle        The device handle is a NULL pointer. Or the controller handle is
+     * invalid.
      *
      */
     extern usb_status_t USB_DeviceDcdInitModule(usb_device_handle handle, void *time_param);
@@ -471,7 +477,8 @@ extern "C"
      * @param[in] handle The device handle got from #USB_DeviceInit.
      *
      * @retval kStatus_USB_Success 			 The device is stopped successfully.
-     * @retval kStatus_USB_InvalidHandle		 The device handle is a NULL pointer or the controller handle is invalid.
+     * @retval kStatus_USB_InvalidHandle		 The device handle is a NULL pointer or the controller handle is
+     * invalid.
      */
     extern usb_status_t USB_DeviceDcdDeinitModule(usb_device_handle handle);
 #endif
@@ -521,7 +528,7 @@ extern "C"
 #endif
 #endif
 
-#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) ||                                                                     \
+#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) ||                             \
      ((defined(USB_DEVICE_CONFIG_LPCIP3511HS)) && (USB_DEVICE_CONFIG_LPCIP3511HS > 0U)))
 /*!
  * @brief Device LPC ip3511 controller task function.
@@ -567,7 +574,7 @@ extern "C"
     extern void USB_DeviceEhciIsrFunction(void *deviceHandle);
 #endif
 
-#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) ||                                                                     \
+#if (((defined(USB_DEVICE_CONFIG_LPCIP3511FS)) && (USB_DEVICE_CONFIG_LPCIP3511FS > 0U)) ||                             \
      ((defined(USB_DEVICE_CONFIG_LPCIP3511HS)) && (USB_DEVICE_CONFIG_LPCIP3511HS > 0U)))
     /*!
      * @brief Device LPC USB ISR function.
@@ -579,7 +586,8 @@ extern "C"
     extern void USB_DeviceLpcIp3511IsrFunction(void *deviceHandle);
 #endif
 
-#if (((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)) || ((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)))
+#if (((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)) ||                                           \
+     ((defined(USB_DEVICE_CONFIG_DWC3)) && (USB_DEVICE_CONFIG_DWC3 > 0U)))
     /*!
      * @brief Device USB DWC3 ISR function.
      *

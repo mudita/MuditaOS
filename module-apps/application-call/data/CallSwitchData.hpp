@@ -12,48 +12,66 @@
 #include <string>
 #include "SwitchData.hpp"
 
-namespace app {
+namespace app
+{
 
-class CallSwitchData: public gui::SwitchData {
-public:
-	enum class Type {
-		UNDEFINED,
-		ENTER_NUMBER,
-		INCOMMING_CALL,
-		EXECUTE_CALL 
-	};
-	static const inline std::string descriptionStr = "CallSwitchData";
-	static const inline std::string defaultPhoneNumber = "undefined";
-protected:
-	Type type = Type::UNDEFINED;
-	std::string phoneNumber;
-public:
-	CallSwitchData( const std::string& number = defaultPhoneNumber, Type type = Type::UNDEFINED ) : SwitchData(descriptionStr), type{ type }, phoneNumber{ number } {};
-	virtual ~CallSwitchData(){};
+    class CallSwitchData : public gui::SwitchData
+    {
+      public:
+        enum class Type
+        {
+            UNDEFINED,
+            ENTER_NUMBER,
+            INCOMMING_CALL,
+            EXECUTE_CALL
+        };
+        static const inline std::string descriptionStr     = "CallSwitchData";
+        static const inline std::string defaultPhoneNumber = "undefined";
 
-	const Type& getType() const { return type; };
-	const std::string& getPhoneNumber() const { return phoneNumber; };
-};
+      protected:
+        Type type = Type::UNDEFINED;
+        std::string phoneNumber;
 
-class EnterNumberData: public CallSwitchData {
-public:
-	EnterNumberData( const std::string& number = "") : CallSwitchData( number, CallSwitchData::Type::ENTER_NUMBER ) {};
-	virtual ~EnterNumberData(){};
-};
+      public:
+        CallSwitchData(const std::string &number = defaultPhoneNumber, Type type = Type::UNDEFINED)
+            : SwitchData(descriptionStr), type{type}, phoneNumber{number} {};
+        virtual ~CallSwitchData(){};
 
-class IncommingCallData: public CallSwitchData {
-public:
-	IncommingCallData( const std::string& number = "") : CallSwitchData( number, CallSwitchData::Type::INCOMMING_CALL ) {};
-	virtual ~IncommingCallData(){};
-};
+        const Type &getType() const
+        {
+            return type;
+        };
+        const std::string &getPhoneNumber() const
+        {
+            return phoneNumber;
+        };
+    };
 
-class ExecuteCallData: public CallSwitchData {
-protected:
-	std::string phoneNumber;
-public:
-	ExecuteCallData( const std::string& number = "") : CallSwitchData( number, app::CallSwitchData::Type::EXECUTE_CALL ) {};
-	virtual ~ExecuteCallData(){};
-};
+    class EnterNumberData : public CallSwitchData
+    {
+      public:
+        EnterNumberData(const std::string &number = "") : CallSwitchData(number, CallSwitchData::Type::ENTER_NUMBER){};
+        virtual ~EnterNumberData(){};
+    };
+
+    class IncommingCallData : public CallSwitchData
+    {
+      public:
+        IncommingCallData(const std::string &number = "")
+            : CallSwitchData(number, CallSwitchData::Type::INCOMMING_CALL){};
+        virtual ~IncommingCallData(){};
+    };
+
+    class ExecuteCallData : public CallSwitchData
+    {
+      protected:
+        std::string phoneNumber;
+
+      public:
+        ExecuteCallData(const std::string &number = "")
+            : CallSwitchData(number, app::CallSwitchData::Type::EXECUTE_CALL){};
+        virtual ~ExecuteCallData(){};
+    };
 
 } /* namespace app */
 

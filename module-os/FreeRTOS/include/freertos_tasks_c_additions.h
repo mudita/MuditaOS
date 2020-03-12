@@ -81,10 +81,11 @@
 #endif
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-extern const uint8_t FreeRTOSDebugConfig[];
+    extern const uint8_t FreeRTOSDebugConfig[];
 
 /* NOTES!!
  * IAR documentation is confusing. It suggests the data must be statically
@@ -92,35 +93,35 @@ extern const uint8_t FreeRTOSDebugConfig[];
  * The IAR supplied examples violate both "rules", so this is a best guess.
  */
 #if defined(__GNUC__)
-const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) =
+    const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) =
 #elif defined(__CC_ARM)
 const uint8_t FreeRTOSDebugConfig[] __attribute__((used)) =
 #elif defined(__IAR_SYSTEMS_ICC__)
-#pragma required=FreeRTOSDebugConfig
+#pragma required = FreeRTOSDebugConfig
 const uint8_t FreeRTOSDebugConfig[] =
 #endif
-{
-    FREERTOS_DEBUG_CONFIG_MAJOR_VERSION,
-    FREERTOS_DEBUG_CONFIG_MINOR_VERSION,
-    tskKERNEL_VERSION_MAJOR,
-    tskKERNEL_VERSION_MINOR,
-    tskKERNEL_VERSION_BUILD,
-    configFRTOS_MEMORY_SCHEME,
-    offsetof(struct tskTaskControlBlock, pxTopOfStack),
+        {
+            FREERTOS_DEBUG_CONFIG_MAJOR_VERSION,
+            FREERTOS_DEBUG_CONFIG_MINOR_VERSION,
+            tskKERNEL_VERSION_MAJOR,
+            tskKERNEL_VERSION_MINOR,
+            tskKERNEL_VERSION_BUILD,
+            configFRTOS_MEMORY_SCHEME,
+            offsetof(struct tskTaskControlBlock, pxTopOfStack),
 #if (tskKERNEL_VERSION_MAJOR > 8)
-    offsetof(struct tskTaskControlBlock, xStateListItem),
+            offsetof(struct tskTaskControlBlock, xStateListItem),
 #else
-    offsetof(struct tskTaskControlBlock, xGenericListItem),
+        offsetof(struct tskTaskControlBlock, xGenericListItem),
 #endif
-    offsetof(struct tskTaskControlBlock, xEventListItem),
-    offsetof(struct tskTaskControlBlock, pxStack),
-    offsetof(struct tskTaskControlBlock, pcTaskName),
-    offsetof(struct tskTaskControlBlock, uxTCBNumber),
-    offsetof(struct tskTaskControlBlock, uxTaskNumber),
-    configMAX_TASK_NAME_LEN,
-    configMAX_PRIORITIES,
-    0 /* pad to 32-bit boundary */
-};
+            offsetof(struct tskTaskControlBlock, xEventListItem),
+            offsetof(struct tskTaskControlBlock, pxStack),
+            offsetof(struct tskTaskControlBlock, pcTaskName),
+            offsetof(struct tskTaskControlBlock, uxTCBNumber),
+            offsetof(struct tskTaskControlBlock, uxTaskNumber),
+            configMAX_TASK_NAME_LEN,
+            configMAX_PRIORITIES,
+            0 /* pad to 32-bit boundary */
+    };
 
 #ifdef __cplusplus
 }

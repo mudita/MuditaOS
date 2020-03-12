@@ -17,57 +17,59 @@
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/Window.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class DesktopMainWindow: public AppWindow {
-protected:
-	gui::Label* description = nullptr;
-	gui::Label* time = nullptr;
-	gui::Label* dayText = nullptr;
-	gui::Image* messagesImage = nullptr;
-    gui::VBox *notifications = nullptr;
-    /**
-	 * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
-	 */
-	uint32_t unclockTime = 3000;
-	/**
-	 * value of the system time when enter key was pressed.
-	 */
-	uint32_t unlockStartTime = 0;
-	/**
-	 * Flag used in detecting unlock seqience
-	 */
-	bool enterPressed = false;
-	/**
-	 * Name of the appliction that was on top when lock timeout occured
-	 */
-	std::string lockTimeoutApplilcation = "";
+    /*
+     *
+     */
+    class DesktopMainWindow : public AppWindow
+    {
+      protected:
+        gui::Label *description   = nullptr;
+        gui::Label *time          = nullptr;
+        gui::Label *dayText       = nullptr;
+        gui::Image *messagesImage = nullptr;
+        gui::VBox *notifications  = nullptr;
+        /**
+         * Time for pressing sequence of two buttons for unlocking the device in miliseconds.
+         */
+        uint32_t unclockTime = 3000;
+        /**
+         * value of the system time when enter key was pressed.
+         */
+        uint32_t unlockStartTime = 0;
+        /**
+         * Flag used in detecting unlock seqience
+         */
+        bool enterPressed = false;
+        /**
+         * Name of the appliction that was on top when lock timeout occured
+         */
+        std::string lockTimeoutApplilcation = "";
 
-	//method hides or show widgets and sets bars according to provided state
-	void setVisibleState();
-    auto fillNotifications() -> bool;
+        // method hides or show widgets and sets bars according to provided state
+        void setVisibleState();
+        auto fillNotifications() -> bool;
 
-  public:
-	DesktopMainWindow( app::Application* app );
-	virtual ~DesktopMainWindow();
+      public:
+        DesktopMainWindow(app::Application *app);
+        virtual ~DesktopMainWindow();
 
-	//virtual methods gui::Window
-	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
-	//virtual methods gui::AppWindow
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-	bool updateTime( const UTF8& timeStr ) override;
-	bool updateTime( const uint32_t& timestamp, bool mode24H ) override;
-	std::list<DrawCommand*> buildDrawList() override;
+        // virtual methods gui::Window
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        // virtual methods gui::AppWindow
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+        bool updateTime(const UTF8 &timeStr) override;
+        bool updateTime(const uint32_t &timestamp, bool mode24H) override;
+        std::list<DrawCommand *> buildDrawList() override;
 
-  private:
-    gui::KeyInputMappedTranslation translator;
-};
+      private:
+        gui::KeyInputMappedTranslation translator;
+    };
 
 } /* namespace gui */
 

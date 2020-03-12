@@ -14,7 +14,8 @@
 #include "../Common/Common.hpp"
 #include "../Databases/SettingsDB.hpp"
 
-struct SettingsRecord{
+struct SettingsRecord
+{
     uint32_t dbID;
     bool timeFormat12;
     bool timeAuto;
@@ -27,26 +28,27 @@ struct SettingsRecord{
     uint32_t pinDaysLeft;
     std::string pin1;
     std::string pin2;
-    uint32_t    activeSIM;
-    std::string     networkOperator;
+    uint32_t activeSIM;
+    std::string networkOperator;
     uint32_t lockPassHash;
     uint32_t lockTime;
     SettingsLanguage language;
 };
 
-enum class SettingsRecordField{
+enum class SettingsRecordField
+{
     Dummy
 };
 
-class SettingsRecordInterface : public RecordInterface<SettingsRecord,SettingsRecordField> {
-public:
-
-    SettingsRecordInterface(SettingsDB* db);
+class SettingsRecordInterface : public RecordInterface<SettingsRecord, SettingsRecordField>
+{
+  public:
+    SettingsRecordInterface(SettingsDB *db);
     ~SettingsRecordInterface();
 
-    bool Update(const SettingsRecord& rec) override final;
+    bool Update(const SettingsRecord &rec) override final;
     SettingsRecord GetByID(uint32_t id) override final;
 
-private:
-    SettingsDB* settingsDB;
+  private:
+    SettingsDB *settingsDB;
 };

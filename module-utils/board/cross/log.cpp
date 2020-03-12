@@ -5,7 +5,8 @@
 #include "../../log/log.hpp"
 #include "../../log/segger/SEGGER_RTT.h"
 #include <ticks.hpp>
-extern "C" {
+extern "C"
+{
 #include "FreeRTOS.h"
 }
 #include "semphr.h"
@@ -16,14 +17,14 @@ extern "C" {
 /*
  * TODO: M.P
  * Redictering log output to serial console in this form need be considered as quick&dirty solution.
- * It should be refactored i.e serial terminal BSP created and used here instead of using RT1051's low-level routines directly.
+ * It should be refactored i.e serial terminal BSP created and used here instead of using RT1051's low-level routines
+ * directly.
  */
 #if LOG_REDIRECT_TO_SERIAL == 1
 #include "fsl_lpuart.h"
 #endif
 
-
-#define LOGGER_BUFFER_SIZE  4096
+#define LOGGER_BUFFER_SIZE 4096
 
 #if LOG_USE_COLOR == 1
 #define CONSOLE_ESCAPE_COLOR_BLACK              "\x1b[30m"
@@ -63,14 +64,10 @@ extern "C" {
 #define CONSOLE_ESCAPE_COLOR_BACKGROUND_WHITE
 #endif
 
-const char *level_names[] = {
-        "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
-};
+const char *level_names[] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
 #if LOG_USE_COLOR == 1
-static const char *level_colors[] = {
-  "\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"
-};
+static const char *level_colors[] = {"\x1b[94m", "\x1b[36m", "\x1b[32m", "\x1b[33m", "\x1b[31m", "\x1b[35m"};
 #else
 static const char *level_colors[] = {"", "", "", "", "", ""};
 #endif
@@ -78,15 +75,17 @@ static const char *level_colors[] = {"", "", "", "", "", ""};
 #include <map>
 #include <string>
 
-struct Logger{
-    Logger( logger_level level = LOGTRACE ) : level{ level } {
+struct Logger
+{
+    Logger(logger_level level = LOGTRACE) : level{level}
+    {
 
         lock = xSemaphoreCreateMutex();
 
         assert(lock != NULL);
 
         /* Acquire lock */
-        if(xSemaphoreTake(lock,100) != pdPASS){
+        if (xSemaphoreTake(lock, 100) != pdPASS) {
             return;
         }
 
@@ -94,18 +93,15 @@ struct Logger{
 
         /* Release lock */
         xSemaphoreGive(lock);
-
     }
 
     bool logLock()
     {
         // if called from the ISR use DI/EI. In all other cases use semaphore.
-        if (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
-        {
+        if (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) {
             bt = cpp_freertos::CriticalSection::EnterFromISR();
         }
-        else if (xSemaphoreTake(lock, 100) != pdPASS)
-        {
+        else if (xSemaphoreTake(lock, 100) != pdPASS) {
             return false;
         }
         return true;
@@ -114,12 +110,10 @@ struct Logger{
     void logUnlock()
     {
         // if called from the ISR use DI/EI. In all other cases use semaphore.
-        if (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk)
-        {
+        if (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) {
             cpp_freertos::CriticalSection::ExitFromISR(bt);
         }
-        else
-        {
+        else {
             xSemaphoreGive(lock);
         }
     }
@@ -149,22 +143,21 @@ static char loggerBuffer[LOGGER_BUFFER_SIZE] = {0};
 
 void log_Printf(const char *fmt, ...)
 {
-    if (!logger.logLock())
-    {
+    if (!logger.logLock()) {
         return;
     }
 
-    char* ptr = loggerBuffer;
+    char *ptr = loggerBuffer;
     va_list args;
 
     va_start(args, fmt);
-    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, fmt, args);
+    ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
     va_end(args);
 
 #if LOG_REDIRECT_TO_SERIAL == 1
-    LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
+    LPUART_WriteBlocking(LPUART3, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
 #else
-    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+    SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
 #endif
 
     logger.logUnlock();
@@ -176,21 +169,22 @@ void log_Printf(const char *fmt, ...)
 /// - else return thread name
 static inline const char *getTaskDesc()
 {
-    return xTaskGetCurrentTaskHandle() == NULL ? "CRIT" : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle());
+    return xTaskGetCurrentTaskHandle() == NULL
+               ? "CRIT"
+               : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle());
 }
 
-static void _log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, va_list args)
+static void _log_Log(
+    logger_level level, const char *file, int line, const char *function, const char *fmt, va_list args)
 {
-    if (!logger.logLock())
-    {
+    if (!logger.logLock()) {
         return;
     }
 
-    char* ptr = loggerBuffer;
+    char *ptr = loggerBuffer;
 
     // filter out not interesing logs
-    if (logger.filterThreadName(getTaskDesc()) >= level)
-    {
+    if (logger.filterThreadName(getTaskDesc()) >= level) {
         logger.logUnlock();
         return;
     }
@@ -199,29 +193,34 @@ static void _log_Log(logger_level level, const char *file, int line,const char *
 
 #if LOG_USE_COLOR == 1
 
-    ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET, level_colors[level], level_names[level],
-                   getTaskDesc(), file, line);
+    ptr += sprintf(ptr,
+                   "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[90m%s:%d:" CONSOLE_ESCAPE_COLOR_RESET,
+                   level_colors[level],
+                   level_names[level],
+                   getTaskDesc(),
+                   file,
+                   line);
 #else
-    ptr += sprintf(ptr,"%-5s %s:%s:%d: ", level_names[level], file, function, line);
+    ptr += sprintf(ptr, "%-5s %s:%s:%d: ", level_names[level], file, function, line);
 #endif
-    ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, fmt, args);
-    ptr += sprintf(ptr,"\r\n");
+    ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
+    ptr += sprintf(ptr, "\r\n");
 
 #if LOG_REDIRECT_TO_SERIAL == 1
-    LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
+    LPUART_WriteBlocking(LPUART3, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
 #else
-    SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
+    SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
 #endif
 
     /* Release lock */
     logger.logUnlock();
 }
 
-void log_Log(logger_level level, const char *file, int line,const char *function, const char *fmt, ...)
+void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    _log_Log(level, file,line, function, fmt, args);
+    _log_Log(level, file, line, function, fmt, args);
     va_end(args);
 }
 
@@ -229,51 +228,53 @@ void log_Log(logger_level level, const char *file, int line,const char *function
  * Update log level
  * @param level [in] - new log level
  */
-void log_SetLevel(logger_level level) {
+void log_SetLevel(logger_level level)
+{
     logger.level = level;
 }
 
-extern "C" {
+extern "C"
+{
 
-    void bt_log_custom(const char* file , int line, const char* foo, const char *fmt, ...) {
+    void bt_log_custom(const char *file, int line, const char *foo, const char *fmt, ...)
+    {
         va_list args;
         va_start(args, fmt);
-        _log_Log( LOGTRACE, file, line, foo, fmt, args);
+        _log_Log(LOGTRACE, file, line, foo, fmt, args);
         va_end(args);
-      }
+    }
 
-    int printf (__const char *__restrict __format, ...)
+    int printf(__const char *__restrict __format, ...)
     {
         /* Acquire lock */
-        if (!logger.logLock())
-        {
+        if (!logger.logLock()) {
             return -1;
         }
 
-        char* ptr = loggerBuffer;
+        char *ptr = loggerBuffer;
         va_list args;
 
         va_start(args, __format);
-        ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, args);
+        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, args);
         va_end(args);
 
         unsigned int numBytes = ptr - loggerBuffer;
-        SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,numBytes);
+        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
 
         /* Release lock */
         logger.logUnlock();
-        
+
         return numBytes;
     }
 
-    int vprintf (const char *__restrict __format, va_list __arg) {
+    int vprintf(const char *__restrict __format, va_list __arg)
+    {
         /* Acquire lock */
-        if (!logger.logLock())
-        {
+        if (!logger.logLock()) {
             return -1;
         }
-        char* ptr = loggerBuffer;
-        ptr += vsnprintf(ptr,&loggerBuffer[LOGGER_BUFFER_SIZE]-ptr, __format, __arg);
+        char *ptr = loggerBuffer;
+        ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, __format, __arg);
 
         unsigned int numBytes = ptr - loggerBuffer;
         SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, numBytes);
@@ -287,16 +288,18 @@ extern "C" {
     int log_assert(__const char *__restrict __format, ...)
     {
         /* Acquire lock */
-        if (!logger.logLock())
-        {
+        if (!logger.logLock()) {
             return -1;
         }
 
         char *ptr = loggerBuffer;
         ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
         logger_level level = LOGFATAL;
-        ptr += sprintf(ptr, "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET, level_colors[level],
-                       level_names[level], getTaskDesc());
+        ptr += sprintf(ptr,
+                       "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET,
+                       level_colors[level],
+                       level_names[level],
+                       getTaskDesc());
 
         va_list args;
         va_start(args, __format);
@@ -304,11 +307,11 @@ extern "C" {
         va_end(args);
 
         unsigned int numBytes = ptr - loggerBuffer;
-        #if LOG_REDIRECT_TO_SERIAL == 1
-            LPUART_WriteBlocking(LPUART3, (uint8_t*)loggerBuffer,ptr-loggerBuffer);
-        #else
-            SEGGER_RTT_Write(0,(uint8_t*)loggerBuffer,ptr-loggerBuffer);
-        #endif
+#if LOG_REDIRECT_TO_SERIAL == 1
+        LPUART_WriteBlocking(LPUART3, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
+#else
+        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
+#endif
 
         /* Release lock */
         logger.logUnlock();
@@ -318,7 +321,12 @@ extern "C" {
 
     void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
     {
-        log_assert("\"%s\" failed: file \"%s\", line %d%s%s\n", failedexpr, file, line, func ? ", function: " : "", func ? func : "");
+        log_assert("\"%s\" failed: file \"%s\", line %d%s%s\n",
+                   failedexpr,
+                   file,
+                   line,
+                   func ? ", function: " : "",
+                   func ? func : "");
 
         abort();
         /* NOTREACHED */

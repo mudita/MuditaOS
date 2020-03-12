@@ -5,14 +5,9 @@
 #ifndef MODULE_CORE_BUSCHANNELSCUSTOM_HPP
 #define MODULE_CORE_BUSCHANNELSCUSTOM_HPP
 
-//M.P: add here application specific definitions of bus channels
+// M.P: add here application specific definitions of bus channels
 
 // Custom Bus channels
-ServiceCellularNotifications,
-Test2CustomBusChannel,
-ServiceDBNotifications,
-ServiceAudioNotifications
+ServiceCellularNotifications, Test2CustomBusChannel, ServiceDBNotifications, ServiceAudioNotifications
 
-
-
-#endif //MODULE_CORE_BUSCHANNELSCUSTOM_HPP
+#endif // MODULE_CORE_BUSCHANNELSCUSTOM_HPP

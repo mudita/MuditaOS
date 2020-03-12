@@ -37,7 +37,7 @@
  * configTICK_RATE_HZ.
  */
 #define LPM_SYSTICK_COUNTER_FREQ (32768)
-#define LPM_COUNT_PER_TICK (LPM_SYSTICK_COUNTER_FREQ / configTICK_RATE_HZ)
+#define LPM_COUNT_PER_TICK       (LPM_SYSTICK_COUNTER_FREQ / configTICK_RATE_HZ)
 
 struct _lpm_power_mode_listener
 {
@@ -81,7 +81,7 @@ typedef void (*freertos_tick_func_t)(void);
 static lpm_power_mode_t s_curMode;
 static lpm_clock_context_t s_clockContext;
 static uint32_t s_DllBackupValue = 0;
-static int32_t s_SystemIdleFlag = 0;
+static int32_t s_SystemIdleFlag  = 0;
 static int32_t s_SkipRestorePLLs = 0;
 
 #ifdef FSL_RTOS_FREE_RTOS
@@ -117,29 +117,28 @@ static void BOARD_SetLPClockGate(void)
 
 static void LPM_SetClockMode(clock_mode_t mode, uint32_t clpcr)
 {
-    switch (mode)
-    {
-        case kCLOCK_ModeRun:
-            CCM->CLPCR = clpcr;
-            break;
-        default:
-            /*
-             * ERR007265: CCM: When improper low-power sequence is used,
-             * the SoC enters low power mode before the ARM core executes WFI.
-             *
-             * Software workaround:
-             * 1) Software should trigger IRQ #41 (GPR_IRQ) to be always pending
-             *    by setting IOMUXC_GPR_GPR1_GINT.
-             * 2) Software should then unmask IRQ #41 in GPC before setting CCM
-             *    Low-Power mode.
-             * 3) Software should mask IRQ #41 right after CCM Low-Power mode
-             *    is set (set bits 0-1 of CCM_CLPCR).
-             *
-             */
-            LPM_EnableWakeupSource(GPR_IRQ_IRQn);
-            CCM->CLPCR = clpcr;
-            LPM_DisableWakeupSource(GPR_IRQ_IRQn);
-            break;
+    switch (mode) {
+    case kCLOCK_ModeRun:
+        CCM->CLPCR = clpcr;
+        break;
+    default:
+        /*
+         * ERR007265: CCM: When improper low-power sequence is used,
+         * the SoC enters low power mode before the ARM core executes WFI.
+         *
+         * Software workaround:
+         * 1) Software should trigger IRQ #41 (GPR_IRQ) to be always pending
+         *    by setting IOMUXC_GPR_GPR1_GINT.
+         * 2) Software should then unmask IRQ #41 in GPC before setting CCM
+         *    Low-Power mode.
+         * 3) Software should mask IRQ #41 right after CCM Low-Power mode
+         *    is set (set bits 0-1 of CCM_CLPCR).
+         *
+         */
+        LPM_EnableWakeupSource(GPR_IRQ_IRQn);
+        CCM->CLPCR = clpcr;
+        LPM_DisableWakeupSource(GPR_IRQ_IRQn);
+        break;
     }
 }
 
@@ -147,13 +146,9 @@ void LPM_SwitchToXtalOSC(void)
 {
     /* Restore XTAL-OSC and enable detector */
     CCM_ANALOG->MISC0_CLR = CCM_ANALOG_MISC0_XTAL_24M_PWD_MASK; /* Power up */
-    while ((XTALOSC24M->LOWPWR_CTRL & XTALOSC24M_LOWPWR_CTRL_XTALOSC_PWRUP_STAT_MASK) == 0)
-    {
-    }
+    while ((XTALOSC24M->LOWPWR_CTRL & XTALOSC24M_LOWPWR_CTRL_XTALOSC_PWRUP_STAT_MASK) == 0) {}
     CCM_ANALOG->MISC0_SET = CCM_ANALOG_MISC0_OSC_XTALOK_EN_MASK; /* detect freq */
-    while ((CCM_ANALOG->MISC0 & CCM_ANALOG_MISC0_OSC_XTALOK_MASK) == 0)
-    {
-    }
+    while ((CCM_ANALOG->MISC0 & CCM_ANALOG_MISC0_OSC_XTALOK_MASK) == 0) {}
     CCM_ANALOG->MISC0_CLR = CCM_ANALOG_MISC0_OSC_XTALOK_EN_MASK;
 
     /* Switch to XTAL-OSC */
@@ -182,8 +177,7 @@ void LPM_SwitchToRcOSC(void)
 
 void LPM_SwitchFlexspiClock(lpm_power_mode_t power_mode)
 {
-    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK)))
-    {
+    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK))) {
         ;
     }
     FLEXSPI->MCR0 |= FLEXSPI_MCR0_MDIS_MASK;
@@ -203,21 +197,16 @@ void LPM_SwitchFlexspiClock(lpm_power_mode_t power_mode)
     /* Enable clock gate of flexspi. */
     CCM->CCGR6 |= (CCM_CCGR6_CG5_MASK);
 
-    if ((LPM_PowerModeLPIdle == power_mode) || (LPM_PowerModeLowPowerRun == power_mode))
-    {
+    if ((LPM_PowerModeLPIdle == power_mode) || (LPM_PowerModeLowPowerRun == power_mode)) {
         FLEXSPI->DLLCR[0] = FLEXSPI_DLLCR_OVRDEN(1) | FLEXSPI_DLLCR_OVRDVAL(19);
     }
-    else
-    {
+    else {
         FLEXSPI->DLLCR[0] = 0x79;
     }
     FLEXSPI->MCR0 &= ~FLEXSPI_MCR0_MDIS_MASK;
     FLEXSPI->MCR0 |= FLEXSPI_MCR0_SWRESET_MASK;
-    while (FLEXSPI->MCR0 & FLEXSPI_MCR0_SWRESET_MASK)
-    {
-    }
-    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK)))
-    {
+    while (FLEXSPI->MCR0 & FLEXSPI_MCR0_SWRESET_MASK) {}
+    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK))) {
         ;
     }
 
@@ -227,8 +216,7 @@ void LPM_SwitchFlexspiClock(lpm_power_mode_t power_mode)
 
 void LPM_RestoreFlexspiClock(void)
 {
-    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK)))
-    {
+    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK))) {
         ;
     }
     FLEXSPI->MCR0 |= FLEXSPI_MCR0_MDIS_MASK;
@@ -245,11 +233,8 @@ void LPM_RestoreFlexspiClock(void)
     FLEXSPI->DLLCR[0] = s_DllBackupValue;
     FLEXSPI->MCR0 &= ~FLEXSPI_MCR0_MDIS_MASK;
     FLEXSPI->MCR0 |= FLEXSPI_MCR0_SWRESET_MASK;
-    while (FLEXSPI->MCR0 & FLEXSPI_MCR0_SWRESET_MASK)
-    {
-    }
-    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK)))
-    {
+    while (FLEXSPI->MCR0 & FLEXSPI_MCR0_SWRESET_MASK) {}
+    while (!((FLEXSPI->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (FLEXSPI->STS0 & FLEXSPI_STS0_SEQIDLE_MASK))) {
         ;
     }
     /* Take some delay */
@@ -259,9 +244,9 @@ void LPM_RestoreFlexspiClock(void)
 void LPM_SwitchBandgap(void)
 {
     /* Switch bandgap */
-    PMU->MISC0_SET = 0x00000004;
+    PMU->MISC0_SET              = 0x00000004;
     XTALOSC24M->LOWPWR_CTRL_SET = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
-    PMU->MISC0_SET = CCM_ANALOG_MISC0_REFTOP_PWD_MASK;
+    PMU->MISC0_SET              = CCM_ANALOG_MISC0_REFTOP_PWD_MASK;
 
     /* Wait CCM operation finishes */
     CLOCK_CCM_HANDSHAKE_WAIT();
@@ -274,12 +259,10 @@ void LPM_RestoreBandgap(void)
     /* Restore bandgap */
     /* Turn on regular bandgap and wait for stable */
     CCM_ANALOG->MISC0_CLR = CCM_ANALOG_MISC0_REFTOP_PWD_MASK;
-    while ((CCM_ANALOG->MISC0 & CCM_ANALOG_MISC0_REFTOP_VBGUP_MASK) == 0)
-    {
-    }
+    while ((CCM_ANALOG->MISC0 & CCM_ANALOG_MISC0_REFTOP_VBGUP_MASK) == 0) {}
     /* Low power band gap disable */
     XTALOSC24M->LOWPWR_CTRL_CLR = XTALOSC24M_LOWPWR_CTRL_LPBG_SEL_MASK;
-    PMU->MISC0_CLR = 0x00000004;
+    PMU->MISC0_CLR              = 0x00000004;
 
     /* Wait CCM operation finishes */
     CLOCK_CCM_HANDSHAKE_WAIT();
@@ -291,43 +274,42 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
 {
     /* Application shouldn't rely on PLL in low power mode,
      * gate all PLL and PFD now */
-    if (LPM_PowerModeSuspend == power_mode)
-    {
+    if (LPM_PowerModeSuspend == power_mode) {
         return;
     }
 
-    s_clockContext.pfd480 = CCM_ANALOG->PFD_480;
-    s_clockContext.pfd528 = CCM_ANALOG->PFD_528;
-    s_clockContext.pllSys = CCM_ANALOG->PLL_SYS;
-    s_clockContext.pllUsb1 = CCM_ANALOG->PLL_USB1;
-    s_clockContext.pllUsb2 = CCM_ANALOG->PLL_USB2;
+    s_clockContext.pfd480   = CCM_ANALOG->PFD_480;
+    s_clockContext.pfd528   = CCM_ANALOG->PFD_528;
+    s_clockContext.pllSys   = CCM_ANALOG->PLL_SYS;
+    s_clockContext.pllUsb1  = CCM_ANALOG->PLL_USB1;
+    s_clockContext.pllUsb2  = CCM_ANALOG->PLL_USB2;
     s_clockContext.pllAudio = CCM_ANALOG->PLL_AUDIO;
     s_clockContext.pllVideo = CCM_ANALOG->PLL_VIDEO;
-    s_clockContext.pllEnet = CCM_ANALOG->PLL_ENET;
+    s_clockContext.pllEnet  = CCM_ANALOG->PLL_ENET;
     s_clockContext.pllArm_loopdiv =
         (CCM_ANALOG->PLL_ARM & CCM_ANALOG_PLL_ARM_DIV_SELECT_MASK) >> CCM_ANALOG_PLL_ARM_DIV_SELECT_SHIFT;
-    s_clockContext.pllArm = CCM_ANALOG->PLL_ARM;
-    s_clockContext.periphSel = CLOCK_GetMux(kCLOCK_PeriphMux);
-    s_clockContext.ipgDiv = CLOCK_GetDiv(kCLOCK_IpgDiv);
-    s_clockContext.ahbDiv = CLOCK_GetDiv(kCLOCK_AhbDiv);
-    s_clockContext.perSel = CLOCK_GetMux(kCLOCK_PerclkMux);
-    s_clockContext.perDiv = CLOCK_GetDiv(kCLOCK_PerclkDiv);
+    s_clockContext.pllArm       = CCM_ANALOG->PLL_ARM;
+    s_clockContext.periphSel    = CLOCK_GetMux(kCLOCK_PeriphMux);
+    s_clockContext.ipgDiv       = CLOCK_GetDiv(kCLOCK_IpgDiv);
+    s_clockContext.ahbDiv       = CLOCK_GetDiv(kCLOCK_AhbDiv);
+    s_clockContext.perSel       = CLOCK_GetMux(kCLOCK_PerclkMux);
+    s_clockContext.perDiv       = CLOCK_GetDiv(kCLOCK_PerclkDiv);
     s_clockContext.preperiphSel = CLOCK_GetMux(kCLOCK_PrePeriphMux);
-    s_clockContext.armDiv = CLOCK_GetDiv(kCLOCK_ArmDiv);
-    s_clockContext.is_valid = 1;
+    s_clockContext.armDiv       = CLOCK_GetDiv(kCLOCK_ArmDiv);
+    s_clockContext.is_valid     = 1;
 
     /* When need to close PLL, we need to use bypass clock first and then power it down. */
     /* Power off SYS PLL */
     CCM_ANALOG->PLL_SYS_SET = CCM_ANALOG_PLL_SYS_BYPASS_MASK;
     CCM_ANALOG->PLL_SYS_SET = CCM_ANALOG_PLL_SYS_POWERDOWN_MASK;
-    //CCM_ANALOG->PFD_528_SET = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
+    // CCM_ANALOG->PFD_528_SET = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
 
 #if !(defined(XIP_EXTERNAL_FLASH) && (XIP_EXTERNAL_FLASH == 1))
     /* If XIP in hyper flash, should switch to ARM PLL before disble USB1 PLL */
     /* Power off USB1 PLL */
     CCM_ANALOG->PLL_USB1_SET = CCM_ANALOG_PLL_USB1_BYPASS_MASK;
     CCM_ANALOG->PLL_USB1_CLR = CCM_ANALOG_PLL_USB1_POWER_MASK;
-    CCM_ANALOG->PFD_480_SET = CCM_ANALOG_PFD_480_PFD2_CLKGATE_MASK;
+    CCM_ANALOG->PFD_480_SET  = CCM_ANALOG_PFD_480_PFD2_CLKGATE_MASK;
 #endif
     /* Power off USB2 PLL */
     CCM_ANALOG->PLL_USB2_SET = CCM_ANALOG_PLL_USB2_BYPASS_MASK;
@@ -342,8 +324,7 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
     CCM_ANALOG->PLL_ENET_SET = CCM_ANALOG_PLL_ENET_BYPASS_MASK;
     CCM_ANALOG->PLL_ENET_SET = CCM_ANALOG_PLL_ENET_POWERDOWN_MASK;
 
-    if ((LPM_PowerModeSysIdle == power_mode) || (LPM_PowerModeLowSpeedRun == power_mode))
-    {
+    if ((LPM_PowerModeSysIdle == power_mode) || (LPM_PowerModeLowSpeedRun == power_mode)) {
         CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 1);
         CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
         CLOCK_SetMux(kCLOCK_PeriphMux, 1);
@@ -363,14 +344,12 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
         CLOCK_SetMux(kCLOCK_PrePeriphMux, 3);
         CLOCK_SetMux(kCLOCK_PeriphMux, 0);
 
-        if (LPM_PowerModeLowSpeedRun == power_mode)
-        {
+        if (LPM_PowerModeLowSpeedRun == power_mode) {
             /* SET AHB to 132MHz, IPG to 33MHz */
             CLOCK_SetDiv(kCLOCK_IpgDiv, 3);
             CLOCK_SetDiv(kCLOCK_AhbDiv, 0);
         }
-        else
-        {
+        else {
             /* SET AHB, IPG to 33MHz */
             CLOCK_SetDiv(kCLOCK_IpgDiv, 0);
             CLOCK_SetDiv(kCLOCK_AhbDiv, 3);
@@ -379,8 +358,7 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
         CLOCK_SetMux(kCLOCK_PerclkMux, 0);
         CLOCK_SetDiv(kCLOCK_PerclkDiv, 0);
     }
-    else if ((LPM_PowerModeLPIdle == power_mode) || (LPM_PowerModeLowPowerRun == power_mode))
-    {
+    else if ((LPM_PowerModeLPIdle == power_mode) || (LPM_PowerModeLowPowerRun == power_mode)) {
         CLOCK_SetMux(kCLOCK_PeriphClk2Mux, 1);
         CLOCK_SetDiv(kCLOCK_PeriphClk2Div, 0);
         CLOCK_SetMux(kCLOCK_PeriphMux, 1);
@@ -397,14 +375,12 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
         CLOCK_SetMux(kCLOCK_PrePeriphMux, 0x3);
         CLOCK_SetMux(kCLOCK_PeriphMux, 0x0);
 
-        if (LPM_PowerModeLowPowerRun == power_mode)
-        {
+        if (LPM_PowerModeLowPowerRun == power_mode) {
             /* SET AHB to 24MHz, IPG to 12MHz */
             CLOCK_SetDiv(kCLOCK_IpgDiv, 1);
             CLOCK_SetDiv(kCLOCK_AhbDiv, 0);
         }
-        else
-        {
+        else {
             /* SET AHB, IPG to 12MHz */
             CLOCK_SetDiv(kCLOCK_IpgDiv, 0);
             CLOCK_SetDiv(kCLOCK_AhbDiv, 1);
@@ -413,8 +389,7 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
         CLOCK_SetMux(kCLOCK_PerclkMux, 0x0);
         CLOCK_SetDiv(kCLOCK_PerclkDiv, 0x0);
     }
-    else
-    {
+    else {
         /* Direct return from RUN and Suspend */
         return;
     }
@@ -427,7 +402,7 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
     /* Power off USB1 PLL */
     CCM_ANALOG->PLL_USB1_SET = CCM_ANALOG_PLL_USB1_BYPASS_MASK;
     CCM_ANALOG->PLL_USB1_CLR = CCM_ANALOG_PLL_USB1_POWER_MASK;
-    CCM_ANALOG->PFD_480_SET = CCM_ANALOG_PFD_480_PFD2_CLKGATE_MASK;
+    CCM_ANALOG->PFD_480_SET  = CCM_ANALOG_PFD_480_PFD2_CLKGATE_MASK;
 #endif
 
     CLOCK_DeinitUsb1Pfd(kCLOCK_Pfd0);
@@ -437,14 +412,13 @@ void LPM_DisablePLLs(lpm_power_mode_t power_mode)
 
     CLOCK_DeinitSysPfd(kCLOCK_Pfd0);
     CLOCK_DeinitSysPfd(kCLOCK_Pfd1);
-//    CLOCK_DeinitSysPfd(kCLOCK_Pfd2);
+    //    CLOCK_DeinitSysPfd(kCLOCK_Pfd2);
     CLOCK_DeinitSysPfd(kCLOCK_Pfd3);
 }
 
 void LPM_RestorePLLs(lpm_power_mode_t power_mode)
 {
-    if (s_clockContext.is_valid)
-    {
+    if (s_clockContext.is_valid) {
         /* Restore USB1 PLL */
         CCM_ANALOG->PLL_USB1_SET = CCM_ANALOG_PLL_USB1_BYPASS_MASK;
         CCM_ANALOG->PLL_USB1 =
@@ -453,19 +427,14 @@ void LPM_RestorePLLs(lpm_power_mode_t power_mode)
         CCM_ANALOG->PLL_USB1_SET = CCM_ANALOG_PLL_USB1_POWER_MASK;
 
         /* Restore USB1 PLL PFD */
-        CCM_ANALOG->PFD_480 = s_clockContext.pfd480;
+        CCM_ANALOG->PFD_480     = s_clockContext.pfd480;
         CCM_ANALOG->PFD_480_CLR = CCM_ANALOG_PFD_480_PFD0_CLKGATE_MASK;
 
-        if ((CCM_ANALOG->PLL_USB1 & CCM_ANALOG_PLL_USB1_POWER_MASK) != 0)
-        {
-            while ((CCM_ANALOG->PLL_USB1 & CCM_ANALOG_PLL_USB1_LOCK_MASK) == 0)
-            {
-            }
+        if ((CCM_ANALOG->PLL_USB1 & CCM_ANALOG_PLL_USB1_POWER_MASK) != 0) {
+            while ((CCM_ANALOG->PLL_USB1 & CCM_ANALOG_PLL_USB1_LOCK_MASK) == 0) {}
         }
         /* Wait CCM operation finishes */
-        while (CCM->CDHIPR != 0)
-        {
-        }
+        while (CCM->CDHIPR != 0) {}
 #if defined(XIP_EXTERNAL_FLASH) && (XIP_EXTERNAL_FLASH == 1)
         LPM_EnterCritical();
         LPM_RestoreFlexspiClock();
@@ -474,11 +443,10 @@ void LPM_RestorePLLs(lpm_power_mode_t power_mode)
     }
 #if defined(XIP_EXTERNAL_FLASH) && (XIP_EXTERNAL_FLASH == 1)
     /* If reset from suspend, need to switch back to USB1 PLL as the clock source */
-    else if (is_suspend_reset)
-    {
+    else if (is_suspend_reset) {
         const clock_usb_pll_config_t g_ccmConfigUsbPll = {.loopDivider = 0U};
-        s_DllBackupValue = 0x79;
-        is_suspend_reset = 0;
+        s_DllBackupValue                               = 0x79;
+        is_suspend_reset                               = 0;
         CLOCK_InitUsb1Pll(&g_ccmConfigUsbPll); /* Configure USB1 PLL to 480M */
         CLOCK_InitUsb1Pfd(kCLOCK_Pfd0, 26);
 
@@ -488,8 +456,7 @@ void LPM_RestorePLLs(lpm_power_mode_t power_mode)
         return;
     }
 #endif
-    else
-    {
+    else {
         return;
     }
 
@@ -506,14 +473,10 @@ void LPM_RestorePLLs(lpm_power_mode_t power_mode)
     CLOCK_SetDiv(kCLOCK_ArmDiv, s_clockContext.armDiv);
     CCM_ANALOG->PLL_ARM_CLR = CCM_ANALOG_PLL_ARM_DIV_SELECT_MASK;
     CCM_ANALOG->PLL_ARM_SET = CCM_ANALOG_PLL_ARM_DIV_SELECT(s_clockContext.pllArm_loopdiv);
-    if ((s_clockContext.pllArm & CCM_ANALOG_PLL_ARM_BYPASS_MASK) == 0)
-    {
-        while ((CCM_ANALOG->PLL_ARM & CCM_ANALOG_PLL_ARM_LOCK_MASK) == 0)
-        {
-        }
+    if ((s_clockContext.pllArm & CCM_ANALOG_PLL_ARM_BYPASS_MASK) == 0) {
+        while ((CCM_ANALOG->PLL_ARM & CCM_ANALOG_PLL_ARM_LOCK_MASK) == 0) {}
     }
-    if ((s_clockContext.pllArm & CCM_ANALOG_PLL_ARM_BYPASS_MASK) == 0)
-    {
+    if ((s_clockContext.pllArm & CCM_ANALOG_PLL_ARM_BYPASS_MASK) == 0) {
         CCM_ANALOG->PLL_ARM_CLR = CCM_ANALOG_PLL_ARM_BYPASS_MASK;
     }
 
@@ -531,65 +494,48 @@ void LPM_RestorePLLs(lpm_power_mode_t power_mode)
         (CCM->CBCMR & ~CCM_CBCMR_PRE_PERIPH_CLK_SEL_MASK) | CCM_CBCMR_PRE_PERIPH_CLK_SEL(s_clockContext.preperiphSel);
 
     /* Wait CCM operation finishes */
-    while (CCM->CDHIPR != 0)
-    {
-    }
+    while (CCM->CDHIPR != 0) {}
 
     /* When need to enable PLL, we need to use bypass clock first and then switch pll back. */
     /* Power on SYS PLL and wait for locked */
     CCM_ANALOG->PLL_SYS_SET = CCM_ANALOG_PLL_SYS_BYPASS_MASK;
     CCM_ANALOG->PLL_SYS_CLR = CCM_ANALOG_PLL_SYS_POWERDOWN_MASK;
-    CCM_ANALOG->PLL_SYS = s_clockContext.pllSys;
-    if ((CCM_ANALOG->PLL_SYS & CCM_ANALOG_PLL_SYS_POWERDOWN_MASK) == 0)
-    {
-        while ((CCM_ANALOG->PLL_SYS & CCM_ANALOG_PLL_SYS_LOCK_MASK) == 0)
-        {
-        }
+    CCM_ANALOG->PLL_SYS     = s_clockContext.pllSys;
+    if ((CCM_ANALOG->PLL_SYS & CCM_ANALOG_PLL_SYS_POWERDOWN_MASK) == 0) {
+        while ((CCM_ANALOG->PLL_SYS & CCM_ANALOG_PLL_SYS_LOCK_MASK) == 0) {}
     }
-    //CCM_ANALOG->PFD_528_CLR = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
+    // CCM_ANALOG->PFD_528_CLR = CCM_ANALOG_PFD_528_PFD2_CLKGATE_MASK;
 
     /* Restore USB2 PLL */
     CCM_ANALOG->PLL_USB2_SET = CCM_ANALOG_PLL_USB2_BYPASS_MASK;
     CCM_ANALOG->PLL_USB2_SET = CCM_ANALOG_PLL_USB2_POWER_MASK;
-    CCM_ANALOG->PLL_USB2 = s_clockContext.pllUsb2;
-    if ((CCM_ANALOG->PLL_USB2 & CCM_ANALOG_PLL_USB2_POWER_MASK) != 0)
-    {
-        while ((CCM_ANALOG->PLL_USB2 & CCM_ANALOG_PLL_USB2_LOCK_MASK) == 0)
-        {
-        }
+    CCM_ANALOG->PLL_USB2     = s_clockContext.pllUsb2;
+    if ((CCM_ANALOG->PLL_USB2 & CCM_ANALOG_PLL_USB2_POWER_MASK) != 0) {
+        while ((CCM_ANALOG->PLL_USB2 & CCM_ANALOG_PLL_USB2_LOCK_MASK) == 0) {}
     }
 
     /* Restore AUDIO PLL */
     CCM_ANALOG->PLL_AUDIO_SET = CCM_ANALOG_PLL_AUDIO_BYPASS_MASK;
     CCM_ANALOG->PLL_AUDIO_CLR = CCM_ANALOG_PLL_AUDIO_POWERDOWN_MASK;
-    CCM_ANALOG->PLL_AUDIO = s_clockContext.pllAudio;
-    if ((CCM_ANALOG->PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_POWERDOWN_MASK) == 0)
-    {
-        while ((CCM_ANALOG->PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_LOCK_MASK) == 0)
-        {
-        }
+    CCM_ANALOG->PLL_AUDIO     = s_clockContext.pllAudio;
+    if ((CCM_ANALOG->PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_POWERDOWN_MASK) == 0) {
+        while ((CCM_ANALOG->PLL_AUDIO & CCM_ANALOG_PLL_AUDIO_LOCK_MASK) == 0) {}
     }
 
     /* Restore VIDEO PLL */
     CCM_ANALOG->PLL_VIDEO_SET = CCM_ANALOG_PLL_VIDEO_BYPASS_MASK;
     CCM_ANALOG->PLL_VIDEO_CLR = CCM_ANALOG_PLL_VIDEO_POWERDOWN_MASK;
-    CCM_ANALOG->PLL_VIDEO = s_clockContext.pllVideo;
-    if ((CCM_ANALOG->PLL_VIDEO & CCM_ANALOG_PLL_VIDEO_POWERDOWN_MASK) == 0)
-    {
-        while ((CCM_ANALOG->PLL_VIDEO & CCM_ANALOG_PLL_VIDEO_LOCK_MASK) == 0)
-        {
-        }
+    CCM_ANALOG->PLL_VIDEO     = s_clockContext.pllVideo;
+    if ((CCM_ANALOG->PLL_VIDEO & CCM_ANALOG_PLL_VIDEO_POWERDOWN_MASK) == 0) {
+        while ((CCM_ANALOG->PLL_VIDEO & CCM_ANALOG_PLL_VIDEO_LOCK_MASK) == 0) {}
     }
 
     /* Restore ENET PLL */
     CCM_ANALOG->PLL_ENET_SET = CCM_ANALOG_PLL_ENET_BYPASS_MASK;
     CCM_ANALOG->PLL_ENET_SET = CCM_ANALOG_PLL_ENET_POWERDOWN_MASK;
-    CCM_ANALOG->PLL_ENET = s_clockContext.pllEnet;
-    if ((CCM_ANALOG->PLL_ENET & CCM_ANALOG_PLL_ENET_POWERDOWN_MASK) == 0)
-    {
-        while ((CCM_ANALOG->PLL_ENET & CCM_ANALOG_PLL_ENET_LOCK_MASK) == 0)
-        {
-        }
+    CCM_ANALOG->PLL_ENET     = s_clockContext.pllEnet;
+    if ((CCM_ANALOG->PLL_ENET & CCM_ANALOG_PLL_ENET_POWERDOWN_MASK) == 0) {
+        while ((CCM_ANALOG->PLL_ENET & CCM_ANALOG_PLL_ENET_LOCK_MASK) == 0) {}
     }
 
     /* Restore SYS PLL PFD */
@@ -604,9 +550,8 @@ static void LPM_DisableRbcBypass(void)
     uint32_t i;
 
     /* Mask all GPC interrupts before disabling the RBC counters */
-    for (i = 0; i < LPM_GPC_IMR_NUM; i++)
-    {
-        gpcIMR[i] = GPC->IMR[i];
+    for (i = 0; i < LPM_GPC_IMR_NUM; i++) {
+        gpcIMR[i]   = GPC->IMR[i];
         GPC->IMR[i] = 0xFFFFFFFFU;
     }
 
@@ -617,14 +562,12 @@ static void LPM_DisableRbcBypass(void)
     /* Now delay for 2 CKIL cycles (61usec). ARM is at 528MHz at this point
      * so a short loop should be enough.
      */
-    for (i = 0; i < 528 * 22; i++)
-    {
+    for (i = 0; i < 528 * 22; i++) {
         __NOP();
     }
 
     /* Recover all the GPC interrupts. */
-    for (i = 0; i < LPM_GPC_IMR_NUM; i++)
-    {
+    for (i = 0; i < LPM_GPC_IMR_NUM; i++) {
         GPC->IMR[i] = gpcIMR[i];
     }
 }
@@ -707,27 +650,22 @@ void LPM_SystemRestoreIdle(void)
 
     /* Enable regular 2P5 and wait for stable */
     PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
-    while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0)
-    {
-    }
+    while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0) {}
     /* Turn off weak 2P5 */
     PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
 
     /* Enable regular 1P1 and wait for stable */
     PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
-    while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0)
-    {
-    }
+    while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0) {}
     /* Turn off weak 1P1 */
     PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
 
     /* If s_SkipRestorePLLs is set, skip the process to restore the PLLs. */
-    if (!s_SkipRestorePLLs)
-    {
+    if (!s_SkipRestorePLLs) {
         LPM_RestorePLLs(LPM_PowerModeLPIdle);
     }
     s_SkipRestorePLLs = 0;
-    s_SystemIdleFlag = 0;
+    s_SystemIdleFlag  = 0;
 }
 
 static void LPM_SystemDsm()
@@ -768,9 +706,8 @@ static void LPM_SystemDsm()
        avoid the counter starting too early if an interupt is already
        pending.
     */
-    for (i = 0; i < LPM_GPC_IMR_NUM; i++)
-    {
-        gpcIMR[i] = GPC->IMR[i];
+    for (i = 0; i < LPM_GPC_IMR_NUM; i++) {
+        gpcIMR[i]   = GPC->IMR[i];
         GPC->IMR[i] = 0xFFFFFFFFU;
     }
 
@@ -784,8 +721,7 @@ static void LPM_SystemDsm()
     CCM->CCR |= (CCM_CCR_RBC_EN_MASK | CCM_CCR_COSC_EN_MASK | CCM_CCR_OSCNT(0xAF));
 
     /* Recover all the GPC interrupts. */
-    for (i = 0; i < LPM_GPC_IMR_NUM; i++)
-    {
+    for (i = 0; i < LPM_GPC_IMR_NUM; i++) {
         GPC->IMR[i] = gpcIMR[i];
     }
 
@@ -794,8 +730,7 @@ static void LPM_SystemDsm()
      * the RBC counter can start counting in case an interrupt is already pending
      * or in case an interrupt arrives just as ARM is about to assert DSM_request.
      */
-    for (i = 0; i < 22 * 24; i++)
-    {
+    for (i = 0; i < 22 * 24; i++) {
         __NOP();
     }
 }
@@ -833,7 +768,7 @@ void LPM_SystemResumeDsm(void)
     LPM_DisableRbcBypass();
     LPM_SetClockMode(kCLOCK_ModeRun, clpcr);
 
-    //LPM_DisableWakeupSource(vPortGetGptIrqn());
+    // LPM_DisableWakeupSource(vPortGetGptIrqn());
 }
 
 void LPM_SystemOverRunRecovery(void)
@@ -856,17 +791,13 @@ void LPM_SystemOverRunRecovery(void)
 
     /* Enable regular 2P5 and wait for stable */
     PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
-    while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0)
-    {
-    }
+    while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0) {}
     /* Turn off weak 2P5 */
     PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
 
     /* Enable regular 1P1 and wait for stable */
     PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
-    while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0)
-    {
-    }
+    while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0) {}
     /* Turn off weak 1P1 */
     PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
 
@@ -965,7 +896,7 @@ void LPM_InitTicklessTimer(void)
     GPT_GetDefaultConfig(&gptConfig);
     gptConfig.clockSource = kGPT_ClockSource_LowFreq; /* 32K RTC OSC */
     // gptConfig.enableMode = false;                     /* Keep counter when stop */
-    gptConfig.enableMode = true; /* Don't keep counter when stop */
+    gptConfig.enableMode      = true; /* Don't keep counter when stop */
     gptConfig.enableRunInDoze = true;
     /* Initialize GPT module */
     GPT_Init(vPortGetGptBase(), &gptConfig);
@@ -989,20 +920,19 @@ bool LPM_Init(lpm_power_mode_t run_mode)
     CLOCK_SetRtcXtalFreq(BOARD_XTAL32K_CLK_HZ);
 
     /* Recover handshaking */
-	IOMUXC_GPR->GPR4 = 0x00000000;
-	IOMUXC_GPR->GPR7 = 0x00000000;
-	IOMUXC_GPR->GPR8 = 0x00000000;
-	IOMUXC_GPR->GPR12 = 0x00000000;
+    IOMUXC_GPR->GPR4  = 0x00000000;
+    IOMUXC_GPR->GPR7  = 0x00000000;
+    IOMUXC_GPR->GPR8  = 0x00000000;
+    IOMUXC_GPR->GPR12 = 0x00000000;
 
-	CCM->CCR &= ~CCM_CCR_REG_BYPASS_COUNT_MASK;
+    CCM->CCR &= ~CCM_CCR_REG_BYPASS_COUNT_MASK;
 
     s_targetPowerMode = run_mode;
 
 #ifdef FSL_RTOS_FREE_RTOS
     s_mutex = xSemaphoreCreateMutex();
 
-    if (s_mutex == NULL)
-    {
+    if (s_mutex == NULL) {
         return false;
     }
 
@@ -1013,8 +943,7 @@ bool LPM_Init(lpm_power_mode_t run_mode)
 #endif
 #endif
 
-    if (run_mode > LPM_PowerModeRunEnd)
-    {
+    if (run_mode > LPM_PowerModeRunEnd) {
         return false;
     }
     s_curMode = run_mode;
@@ -1042,7 +971,7 @@ bool LPM_Init(lpm_power_mode_t run_mode)
     tmp_reg |= XTALOSC24M_OSC_CONFIG2_COUNT_1M_TRG(0x2d7);
     XTALOSC24M->OSC_CONFIG2 = tmp_reg;
     /* Hardware requires to read OSC_CONFIG0 or OSC_CONFIG1 to make OSC_CONFIG2 write work */
-    tmp_reg = XTALOSC24M->OSC_CONFIG1;
+    tmp_reg                 = XTALOSC24M->OSC_CONFIG1;
     XTALOSC24M->OSC_CONFIG1 = tmp_reg;
 
     s_DllBackupValue = FLEXSPI->DLLCR[0];
@@ -1051,8 +980,7 @@ bool LPM_Init(lpm_power_mode_t run_mode)
     IOMUXC_GPR->GPR1 |= IOMUXC_GPR_GPR1_GINT_MASK;
 
     /* Initialize GPC to mask all IRQs */
-    for (i = 0; i < LPM_GPC_IMR_NUM; i++)
-    {
+    for (i = 0; i < LPM_GPC_IMR_NUM; i++) {
         GPC->IMR[i] = 0xFFFFFFFFU;
     }
 
@@ -1062,8 +990,7 @@ bool LPM_Init(lpm_power_mode_t run_mode)
 void LPM_Deinit(void)
 {
 #ifdef FSL_RTOS_FREE_RTOS
-    if (s_mutex != NULL)
-    {
+    if (s_mutex != NULL) {
         vSemaphoreDelete(s_mutex);
         s_mutex = NULL;
     }
@@ -1090,8 +1017,7 @@ bool LPM_SetPowerMode(lpm_power_mode_t mode)
 #endif
     bool ret = true;
 
-    if (mode == s_curMode)
-    {
+    if (mode == s_curMode) {
         return ret;
     }
 
@@ -1101,32 +1027,25 @@ bool LPM_SetPowerMode(lpm_power_mode_t mode)
                            */
     xSemaphoreTake(s_mutex, portMAX_DELAY);
 
-    for (l1 = s_listenerHead; l1 != NULL; l1 = l1->next)
-    {
-        if (l1->callback == NULL)
-        {
+    for (l1 = s_listenerHead; l1 != NULL; l1 = l1->next) {
+        if (l1->callback == NULL) {
             continue;
         }
 
-        if (!l1->callback(s_curMode, mode, l1->data))
-        {
+        if (!l1->callback(s_curMode, mode, l1->data)) {
             /* One stakeholder doesn't allow new mode */
             ret = false;
             break;
         }
     }
 
-    if (ret)
-    {
+    if (ret) {
         s_curMode = mode;
     }
-    else
-    {
+    else {
         /* roll back the state change of previous listeners */
-        for (l2 = s_listenerHead; l2 != l1; l2 = l2->next)
-        {
-            if (l2->callback == NULL)
-            {
+        for (l2 = s_listenerHead; l2 != l1; l2 = l2->next) {
+            if (l2->callback == NULL) {
                 continue;
             }
 
@@ -1149,18 +1068,16 @@ void LPM_RegisterPowerListener(lpm_power_mode_callback_t callback, void *data)
     assert(l);
 
     l->callback = callback;
-    l->data = data;
-    l->next = NULL;
+    l->data     = data;
+    l->next     = NULL;
 
     xSemaphoreTake(s_mutex, portMAX_DELAY);
 
-    if (s_listenerHead)
-    {
+    if (s_listenerHead) {
         s_listenerTail->next = l;
-        s_listenerTail = l;
+        s_listenerTail       = l;
     }
-    else
-    {
+    else {
         s_listenerHead = s_listenerTail = l;
     }
 
@@ -1173,21 +1090,16 @@ void LPM_UnregisterPowerListener(lpm_power_mode_callback_t callback, void *data)
 
     xSemaphoreTake(s_mutex, portMAX_DELAY);
 
-    for (l = s_listenerHead; l != NULL; l = l->next)
-    {
-        if (l->callback == callback && l->data == data)
-        {
-            if (p)
-            {
+    for (l = s_listenerHead; l != NULL; l = l->next) {
+        if (l->callback == callback && l->data == data) {
+            if (p) {
                 p->next = l->next;
             }
-            else
-            {
+            else {
                 s_listenerHead = l->next;
             }
 
-            if (l->next == NULL)
-            {
+            if (l->next == NULL) {
                 s_listenerTail = p;
             }
 
@@ -1224,52 +1136,50 @@ void vPortPRE_SLEEP_PROCESSING(TickType_t timeoutMilliSec)
 
     clpcr = CCM->CLPCR & (~(CCM_CLPCR_LPM_MASK | CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK));
 
-    switch (APP_GetLPMPowerMode())
-    {
-        case LPM_PowerModeOverRun:
-        case LPM_PowerModeFullRun:
-        case LPM_PowerModeLowSpeedRun:
-        case LPM_PowerModeLowPowerRun:
-            break;
-        case LPM_PowerModeSysIdle:
-            LPM_SetClockMode(kCLOCK_ModeWait, clpcr | CCM_CLPCR_LPM(kCLOCK_ModeWait) |
-                                                  CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK | CCM_CLPCR_STBY_COUNT_MASK | 0x1C |
-                                                  0x08280000);
-            BOARD_SetLPClockGate();
-            /* If last mode is idle, need to restore idle states. */
-            if (s_SystemIdleFlag)
-            {
-                s_SkipRestorePLLs = 1;
-                LPM_SystemRestoreIdle();
-            }
+    switch (APP_GetLPMPowerMode()) {
+    case LPM_PowerModeOverRun:
+    case LPM_PowerModeFullRun:
+    case LPM_PowerModeLowSpeedRun:
+    case LPM_PowerModeLowPowerRun:
+        break;
+    case LPM_PowerModeSysIdle:
+        LPM_SetClockMode(kCLOCK_ModeWait,
+                         clpcr | CCM_CLPCR_LPM(kCLOCK_ModeWait) | CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK |
+                             CCM_CLPCR_STBY_COUNT_MASK | 0x1C | 0x08280000);
+        BOARD_SetLPClockGate();
+        /* If last mode is idle, need to restore idle states. */
+        if (s_SystemIdleFlag) {
+            s_SkipRestorePLLs = 1;
+            LPM_SystemRestoreIdle();
+        }
 
-            LPM_SystemWait();
-            IOMUXC_GPR->GPR8 = 0xaaaaaaaa;
-            IOMUXC_GPR->GPR12 = 0x0000000a;
-            break;
-        case LPM_PowerModeLPIdle:
-        	LPM_SetClockMode(kCLOCK_ModeWait, clpcr | CCM_CLPCR_LPM(kCLOCK_ModeWait) |
-                                                  CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK | CCM_CLPCR_STBY_COUNT_MASK | 0x1C |
-                                                  0x08280000);
-            BOARD_SetLPClockGate();
-            LPM_SystemIdle();
-            IOMUXC_GPR->GPR8 = 0xaaaaaaaa;
-            IOMUXC_GPR->GPR12 = 0x0000000a;
+        LPM_SystemWait();
+        IOMUXC_GPR->GPR8  = 0xaaaaaaaa;
+        IOMUXC_GPR->GPR12 = 0x0000000a;
+        break;
+    case LPM_PowerModeLPIdle:
+        LPM_SetClockMode(kCLOCK_ModeWait,
+                         clpcr | CCM_CLPCR_LPM(kCLOCK_ModeWait) | CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK |
+                             CCM_CLPCR_STBY_COUNT_MASK | 0x1C | 0x08280000);
+        BOARD_SetLPClockGate();
+        LPM_SystemIdle();
+        IOMUXC_GPR->GPR8  = 0xaaaaaaaa;
+        IOMUXC_GPR->GPR12 = 0x0000000a;
 
-        	/* put SDRAM to self-refresh mode */
-        	IOMUXC_GPR->GPR4 = (1<<9U);
-        	while((IOMUXC_GPR->GPR4 & (1<<25U)) != (1<<25U)) { };
-            break;
-        case LPM_PowerModeSuspend:
-            LPM_SetClockMode(kCLOCK_ModeStop, clpcr | CCM_CLPCR_LPM(kCLOCK_ModeStop) | CCM_CLPCR_VSTBY_MASK |
-                                                  CCM_CLPCR_STBY_COUNT_MASK | CCM_CLPCR_SBYOS_MASK |
-                                                  CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK | 0x08280000);
-            LPM_SystemDsm();
-            // LPM_CoreStateSave();
-            break;
-        default:
-            assert(false);
-            break;
+        /* put SDRAM to self-refresh mode */
+        IOMUXC_GPR->GPR4 = (1 << 9U);
+        while ((IOMUXC_GPR->GPR4 & (1 << 25U)) != (1 << 25U)) {};
+        break;
+    case LPM_PowerModeSuspend:
+        LPM_SetClockMode(kCLOCK_ModeStop,
+                         clpcr | CCM_CLPCR_LPM(kCLOCK_ModeStop) | CCM_CLPCR_VSTBY_MASK | CCM_CLPCR_STBY_COUNT_MASK |
+                             CCM_CLPCR_SBYOS_MASK | CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK | 0x08280000);
+        LPM_SystemDsm();
+        // LPM_CoreStateSave();
+        break;
+    default:
+        assert(false);
+        break;
     }
 }
 
@@ -1279,50 +1189,49 @@ void vPortPOST_SLEEP_PROCESSING(TickType_t timeoutMilliSec)
 
     clpcr = CCM->CLPCR & (~(CCM_CLPCR_LPM_MASK | CCM_CLPCR_ARM_CLK_DIS_ON_LPM_MASK));
 
-    switch (APP_GetLPMPowerMode())
-    {
-        case LPM_PowerModeOverRun:
-        case LPM_PowerModeFullRun:
-        case LPM_PowerModeLowSpeedRun:
-        case LPM_PowerModeLowPowerRun:
-            break;
-        case LPM_PowerModeSysIdle:
-            IOMUXC_GPR->GPR8 = 0x00000000;
-            IOMUXC_GPR->GPR12 = 0x00000000;
-            LPM_SystemRestoreWait();
-            LPM_SetClockMode(kCLOCK_ModeRun, clpcr);
-            break;
-        case LPM_PowerModeLPIdle:
-            __NOP();
-            __NOP();
-            __NOP();
-            __NOP();
-            /* restore SDRAM from self-refresh mode */
-            IOMUXC_GPR->GPR4 = (0<<9U);
-            while((IOMUXC_GPR->GPR4 & (1<<25U)) != (1<<25U)) { };
+    switch (APP_GetLPMPowerMode()) {
+    case LPM_PowerModeOverRun:
+    case LPM_PowerModeFullRun:
+    case LPM_PowerModeLowSpeedRun:
+    case LPM_PowerModeLowPowerRun:
+        break;
+    case LPM_PowerModeSysIdle:
+        IOMUXC_GPR->GPR8  = 0x00000000;
+        IOMUXC_GPR->GPR12 = 0x00000000;
+        LPM_SystemRestoreWait();
+        LPM_SetClockMode(kCLOCK_ModeRun, clpcr);
+        break;
+    case LPM_PowerModeLPIdle:
+        __NOP();
+        __NOP();
+        __NOP();
+        __NOP();
+        /* restore SDRAM from self-refresh mode */
+        IOMUXC_GPR->GPR4 = (0 << 9U);
+        while ((IOMUXC_GPR->GPR4 & (1 << 25U)) != (1 << 25U)) {};
 
-            IOMUXC_GPR->GPR8 = 0x00000000;
-            IOMUXC_GPR->GPR12 = 0x00000000;
-            /* Interrupt occurs before system idle */
-            LPM_SystemRestoreIdle();
-            LPM_SetClockMode(kCLOCK_ModeRun, clpcr);
+        IOMUXC_GPR->GPR8  = 0x00000000;
+        IOMUXC_GPR->GPR12 = 0x00000000;
+        /* Interrupt occurs before system idle */
+        LPM_SystemRestoreIdle();
+        LPM_SetClockMode(kCLOCK_ModeRun, clpcr);
 
-            break;
-        case LPM_PowerModeSuspend:
-            /* Restore when wakeup from suspend reset */
-            LPM_SystemResumeDsm();
+        break;
+    case LPM_PowerModeSuspend:
+        /* Restore when wakeup from suspend reset */
+        LPM_SystemResumeDsm();
 
-            /* recover handshaking */
-            IOMUXC_GPR->GPR4 = 0x00000000;
-            IOMUXC_GPR->GPR7 = 0x00000000;
-            IOMUXC_GPR->GPR8 = 0x00000000;
-            IOMUXC_GPR->GPR12 = 0x00000000;
+        /* recover handshaking */
+        IOMUXC_GPR->GPR4  = 0x00000000;
+        IOMUXC_GPR->GPR7  = 0x00000000;
+        IOMUXC_GPR->GPR8  = 0x00000000;
+        IOMUXC_GPR->GPR12 = 0x00000000;
 
-            CCM->CCR &= ~CCM_CCR_REG_BYPASS_COUNT_MASK;
-            break;
-        default:
-            assert(false);
-            break;
+        CCM->CCR &= ~CCM_CCR_REG_BYPASS_COUNT_MASK;
+        break;
+    default:
+        assert(false);
+        break;
     }
 
     LPM_DisableWakeupSource(vPortGetGptIrqn());
@@ -1333,13 +1242,10 @@ void vPortPOST_SLEEP_PROCESSING(TickType_t timeoutMilliSec)
 
 void APP_PowerPreSwitchHook(lpm_power_mode_t targetMode)
 {
-    if (targetMode == LPM_PowerModeSuspend || targetMode == LPM_PowerModeSNVS)
-    {
+    if (targetMode == LPM_PowerModeSuspend || targetMode == LPM_PowerModeSNVS) {
         /* Wait for debug console output finished. */
-        while (!(kLPUART_TransmissionCompleteFlag & LPUART_GetStatusFlags((LPUART_Type *)BOARD_DEBUG_UART_BASEADDR)))
-        {
-        }
-        //DbgConsole_Deinit();
+        while (!(kLPUART_TransmissionCompleteFlag & LPUART_GetStatusFlags((LPUART_Type *)BOARD_DEBUG_UART_BASEADDR))) {}
+        // DbgConsole_Deinit();
 
         /*
          * Set pin for current leakage.
@@ -1347,16 +1253,15 @@ void APP_PowerPreSwitchHook(lpm_power_mode_t targetMode)
          * Debug console TX pin: Don't need to change.
          */
         IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_GPIO1_IO13, 0);
-        IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_GPIO1_IO13, IOMUXC_SW_PAD_CTL_PAD_PKE_MASK |
-                                                                 IOMUXC_SW_PAD_CTL_PAD_PUS(2) |
-                                                                 IOMUXC_SW_PAD_CTL_PAD_PUE_MASK);
+        IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_GPIO1_IO13,
+                            IOMUXC_SW_PAD_CTL_PAD_PKE_MASK | IOMUXC_SW_PAD_CTL_PAD_PUS(2) |
+                                IOMUXC_SW_PAD_CTL_PAD_PUE_MASK);
     }
 }
 
 void APP_PowerPostSwitchHook(lpm_power_mode_t targetMode)
 {
-    if (targetMode == LPM_PowerModeSuspend)
-    {
+    if (targetMode == LPM_PowerModeSuspend) {
         /*
          * Debug console RX pin is set to GPIO input, nee to re-configure pinmux.
          * Debug console TX pin: Don't need to change.
@@ -1364,7 +1269,7 @@ void APP_PowerPostSwitchHook(lpm_power_mode_t targetMode)
         IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, 0);
         IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B0_13_LPUART1_RX, IOMUXC_SW_PAD_CTL_PAD_SPEED(2));
 
-        //BOARD_InitDebugConsole();
+        // BOARD_InitDebugConsole();
     }
 }
 
@@ -1375,5 +1280,5 @@ lpm_power_mode_t APP_GetLPMPowerMode(void)
 
 void APP_SetLPMPowerMode(lpm_power_mode_t mode)
 {
-    s_targetPowerMode =  mode;
+    s_targetPowerMode = mode;
 }

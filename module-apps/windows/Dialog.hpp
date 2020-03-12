@@ -10,7 +10,7 @@ namespace gui
     {
 
         Label *yes = nullptr, *no = nullptr;
-        Text *text = nullptr;
+        Text *text  = nullptr;
         Image *icon = nullptr;
 
       public:

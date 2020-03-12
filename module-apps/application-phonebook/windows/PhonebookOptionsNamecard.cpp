@@ -24,10 +24,11 @@ PhonebookOptionsNamecard::PhonebookOptionsNamecard(app::Application *app) : AppW
 }
 
 PhonebookOptionsNamecard::~PhonebookOptionsNamecard()
-{
-}
+{}
 
-gui::Item *PhonebookOptionsNamecard::addOptionLabel(const std::string &text, bool hasSubOptions, std::function<bool(gui::Item &)> activatedCallback)
+gui::Item *PhonebookOptionsNamecard::addOptionLabel(const std::string &text,
+                                                    bool hasSubOptions,
+                                                    std::function<bool(gui::Item &)> activatedCallback)
 {
     gui::Label *label = new gui::Label(this, 19, 0, 480 - 21, 55, text);
     label->setMargins(gui::Margins(0, 0, 0, 0));
@@ -38,8 +39,7 @@ gui::Item *PhonebookOptionsNamecard::addOptionLabel(const std::string &text, boo
     label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->activatedCallback = activatedCallback;
     label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    if (hasSubOptions)
-    {
+    if (hasSubOptions) {
         new gui::Image(label, 427, 20, 32, 32, "right_label_arrow");
     }
     return label;
@@ -72,8 +72,7 @@ void PhonebookOptionsNamecard::buildInterface()
     // set position and navigation for labels
     uint32_t posY = 113;
     uint32_t size = options.size();
-    for (uint32_t i = 0; i < options.size(); i++)
-    {
+    for (uint32_t i = 0; i < options.size(); i++) {
         options[i]->setPosition(17, posY);
         posY += 60;
         options[i]->setNavigationItem(NavigationDirection::DOWN, options[(i + 1) % size]);
@@ -97,21 +96,19 @@ void PhonebookOptionsNamecard::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool PhonebookOptionsNamecard::handleSwitchData(SwitchData *data)
 {
-    if (data == nullptr)
-    {
+    if (data == nullptr) {
         LOG_ERROR("Received null pointer");
         return false;
     }
 
     PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
+    contact                 = item->getContact();
     return (true);
 }
 
 bool PhonebookOptionsNamecard::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
-    {
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return true;
@@ -143,8 +140,7 @@ const std::string PhonebookOptionsNamecard::formatVCARD()
           << "FN:" << contact->primaryName.c_str() << " " << contact->alternativeName.c_str() << "\n"
           << "TEL;TYPE=HOME,VOICE:" << priNumber << "\n";
 
-    if (secNumber.length() > 0)
-    {
+    if (secNumber.length() > 0) {
         vcard << "TEL;TYPE=HOME,VOICE:" << secNumber << "\n";
     }
 

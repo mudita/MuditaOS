@@ -36,12 +36,9 @@
  *
  ***************************************************************************/
 
-
 #include "tasklet.hpp"
 
-
 using namespace cpp_freertos;
-
 
 Tasklet::Tasklet()
 {
@@ -58,18 +55,14 @@ Tasklet::Tasklet()
     xSemaphoreGive(DtorLock);
 }
 
-
 Tasklet::~Tasklet()
-{
-}
-
+{}
 
 void Tasklet::CheckForSafeDelete()
 {
     xSemaphoreTake(DtorLock, portMAX_DELAY);
     vSemaphoreDelete(DtorLock);
 }
-
 
 void Tasklet::TaskletAdapterFunction(void *reference, uint32_t parameter)
 {
@@ -78,18 +71,13 @@ void Tasklet::TaskletAdapterFunction(void *reference, uint32_t parameter)
     xSemaphoreGive(tasklet->DtorLock);
 }
 
-
-bool Tasklet::Schedule( uint32_t parameter,
-                        TickType_t CmdTimeout)
+bool Tasklet::Schedule(uint32_t parameter, TickType_t CmdTimeout)
 {
     BaseType_t rc;
 
     xSemaphoreTake(DtorLock, portMAX_DELAY);
 
-    rc = xTimerPendFunctionCall(TaskletAdapterFunction,
-                                this,
-                                parameter,
-                                CmdTimeout);
+    rc = xTimerPendFunctionCall(TaskletAdapterFunction, this, parameter, CmdTimeout);
 
     if (rc == pdPASS) {
         return true;
@@ -100,9 +88,7 @@ bool Tasklet::Schedule( uint32_t parameter,
     }
 }
 
-
-bool Tasklet::ScheduleFromISR(  uint32_t parameter,
-                                BaseType_t *pxHigherPriorityTaskWoken)
+bool Tasklet::ScheduleFromISR(uint32_t parameter, BaseType_t *pxHigherPriorityTaskWoken)
 {
     BaseType_t rc;
 
@@ -111,11 +97,8 @@ bool Tasklet::ScheduleFromISR(  uint32_t parameter,
     if (rc != pdTRUE) {
         return false;
     }
-    
-    rc = xTimerPendFunctionCallFromISR( TaskletAdapterFunction,
-                                        this,
-                                        parameter,
-                                        pxHigherPriorityTaskWoken);
+
+    rc = xTimerPendFunctionCallFromISR(TaskletAdapterFunction, this, parameter, pxHigherPriorityTaskWoken);
 
     if (rc == pdPASS) {
         return true;
@@ -125,4 +108,3 @@ bool Tasklet::ScheduleFromISR(  uint32_t parameter,
         return false;
     }
 }
-

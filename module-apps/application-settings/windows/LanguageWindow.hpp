@@ -19,27 +19,30 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class LanguageWindow: public AppWindow {
-protected:
-	std::vector<gui::Item*> options;
+    /*
+     *
+     */
+    class LanguageWindow : public AppWindow
+    {
+      protected:
+        std::vector<gui::Item *> options;
 
-	gui::Item* addOptionLabel( const std::string& text, std::function<bool(Item&)> activatedCallback );
-public:
-	LanguageWindow( app::Application* app );
-	virtual ~LanguageWindow();
+        gui::Item *addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback);
 
-	//virtual methods
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
+      public:
+        LanguageWindow(app::Application *app);
+        virtual ~LanguageWindow();
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+        // virtual methods
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 } /* namespace gui */
 
 #endif /* MODULE_APPS_APPLICATION_SETTINGS_WINDOWS_LANGUAGEWINDOW_HPP_ */

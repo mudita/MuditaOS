@@ -36,16 +36,14 @@
  *
  ***************************************************************************/
 
-
 #ifndef TASKLET_HPP_
 #define TASKLET_HPP_
-
 
 /**
  *  C++ exceptions are used by default when constructors fail.
  *  If you do not want this behavior, define the following in your makefile
  *  or project. Note that in most / all cases when a constructor fails,
- *  it's a fatal error. In the cases when you've defined this, the new 
+ *  it's a fatal error. In the cases when you've defined this, the new
  *  default behavior will be to issue a configASSERT() instead.
  */
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
@@ -60,17 +58,17 @@
 #include "timers.h"
 #include "semphr.h"
 
-
-namespace cpp_freertos {
-
+namespace cpp_freertos
+{
 
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
-/**
- *  This is the exception that is thrown if a Tasklet constructor fails.
- */
-class TaskletCreateException : public std::exception {
+    /**
+     *  This is the exception that is thrown if a Tasklet constructor fails.
+     */
+    class TaskletCreateException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -84,8 +82,7 @@ class TaskletCreateException : public std::exception {
          */
         explicit TaskletCreateException(const char *info)
         {
-            snprintf(errorString, sizeof(errorString),
-                        "Tasklet Constructor Failed %s", info);
+            snprintf(errorString, sizeof(errorString), "Tasklet Constructor Failed %s", info);
         }
 
         /**
@@ -97,43 +94,43 @@ class TaskletCreateException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 #endif
 
+    /**
+     *  A FreeRTOS wrapper for its concept of a Pended Function.
+     *  In Linux, one permutation of this would be a Tasklet, or
+     *  bottom half processing from an ISR.
+     *
+     *  This is an abstract base class.
+     *  To use this, you need to subclass it. All of your Tasklets should
+     *  be derived from the Tasklet class. Then implement the virtual Run
+     *  function. This is a similar design to Java threading.
+     */
+    class Tasklet
+    {
 
-/**
- *  A FreeRTOS wrapper for its concept of a Pended Function.
- *  In Linux, one permutation of this would be a Tasklet, or
- *  bottom half processing from an ISR.
- *
- *  This is an abstract base class.
- *  To use this, you need to subclass it. All of your Tasklets should
- *  be derived from the Tasklet class. Then implement the virtual Run
- *  function. This is a similar design to Java threading.
- */
-class Tasklet {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Constructor
-         *  @note Do not construct inside an ISR! This includes creating 
+         *  @note Do not construct inside an ISR! This includes creating
          *  local instances of this object.
          */
         Tasklet();
 
         /**
          *  Destructor
-         *  @note Do not delete inside an ISR! This includes the automatic 
+         *  @note Do not delete inside an ISR! This includes the automatic
          *  deletion of local instances of this object when leaving scope.
          */
         virtual ~Tasklet();
@@ -147,8 +144,7 @@ class Tasklet {
          *  @returns true if this command will be sent to the timer daemon,
          *           false if it will not (i.e. timeout).
          */
-        bool Schedule(  uint32_t parameter,
-                        TickType_t CmdTimeout = portMAX_DELAY);
+        bool Schedule(uint32_t parameter, TickType_t CmdTimeout = portMAX_DELAY);
 
         /**
          *  Schedule this Tasklet to run from ISR context.
@@ -161,19 +157,18 @@ class Tasklet {
          *  @returns true if this command will be sent to the timer daemon,
          *           false if it will not (i.e. timeout).
          */
-        bool ScheduleFromISR(   uint32_t parameter,
-                                BaseType_t *pxHigherPriorityTaskWoken);
+        bool ScheduleFromISR(uint32_t parameter, BaseType_t *pxHigherPriorityTaskWoken);
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Protected API
-    //  Available from inside your Tasklet implementation.
-    //  You should make sure that you are only calling these methods
-    //  from within your Run() method, or that your Run() method is on the
-    //  callstack.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    protected:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Protected API
+        //  Available from inside your Tasklet implementation.
+        //  You should make sure that you are only calling these methods
+        //  from within your Run() method, or that your Run() method is on the
+        //  callstack.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      protected:
         /**
          *  Implementation of your actual tasklet code.
          *  You must override this function.
@@ -183,18 +178,18 @@ class Tasklet {
         virtual void Run(uint32_t parameter) = 0;
 
         /**
-         *  You must call this in your dtor, to synchronize between 
+         *  You must call this in your dtor, to synchronize between
          *  being called and being deleted.
          */
         void CheckForSafeDelete();
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Private API
-    //  The internals of this wrapper class.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    private:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Private API
+        //  The internals of this wrapper class.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      private:
         /**
          *  Adapter function that allows you to write a class
          *  specific Run() function that interfaces with FreeRTOS.
@@ -207,8 +202,7 @@ class Tasklet {
          *  Protect against accidental deletion before we were executed.
          */
         SemaphoreHandle_t DtorLock;
-};
+    };
 
-}
+} // namespace cpp_freertos
 #endif
-

@@ -36,15 +36,11 @@
  *
  ***************************************************************************/
 
-
 #include "read_write_lock.hpp"
-
 
 using namespace cpp_freertos;
 
-
-ReadWriteLock::ReadWriteLock()
-    : ReadCount(0)
+ReadWriteLock::ReadWriteLock() : ReadCount(0)
 {
     ReadLock = xSemaphoreCreateMutex();
     if (ReadLock == NULL) {
@@ -58,8 +54,8 @@ ReadWriteLock::ReadWriteLock()
     //
     //  ResourceLock CANNOT be a mutex. In FreeRTOS, as in most OS's,
     //  a thread is not allowed to unlock another thread's mutex. But
-    //  the very nature of a Reader Lock allows an arbitrary ordering 
-    //  of unlocks when multiple threads hold the reader lock. 
+    //  the very nature of a Reader Lock allows an arbitrary ordering
+    //  of unlocks when multiple threads hold the reader lock.
     //  Semaphores are not subject to this constraint.
     //
     ResourceLock = xSemaphoreCreateBinary();
@@ -78,13 +74,11 @@ ReadWriteLock::ReadWriteLock()
     xSemaphoreGive(ResourceLock);
 }
 
-
 ReadWriteLock::~ReadWriteLock()
 {
     vSemaphoreDelete(ReadLock);
     vSemaphoreDelete(ResourceLock);
 }
-
 
 void ReadWriteLockPreferReader::ReaderLock()
 {
@@ -98,7 +92,6 @@ void ReadWriteLockPreferReader::ReaderLock()
     xSemaphoreGive(ReadLock);
 }
 
-
 void ReadWriteLockPreferReader::ReaderUnlock()
 {
     xSemaphoreTake(ReadLock, portMAX_DELAY);
@@ -111,22 +104,17 @@ void ReadWriteLockPreferReader::ReaderUnlock()
     xSemaphoreGive(ReadLock);
 }
 
-
 void ReadWriteLockPreferReader::WriterLock()
 {
     xSemaphoreTake(ResourceLock, portMAX_DELAY);
 }
-
 
 void ReadWriteLockPreferReader::WriterUnlock()
 {
     xSemaphoreGive(ResourceLock);
 }
 
-
-ReadWriteLockPreferWriter::ReadWriteLockPreferWriter()
-    : ReadWriteLock(),
-      WriteCount(0)
+ReadWriteLockPreferWriter::ReadWriteLockPreferWriter() : ReadWriteLock(), WriteCount(0)
 {
     WriteLock = xSemaphoreCreateMutex();
     if (WriteLock == NULL) {
@@ -140,8 +128,8 @@ ReadWriteLockPreferWriter::ReadWriteLockPreferWriter()
     //
     //  BlockReadersLock CANNOT be a mutex. In FreeRTOS, as in most OS's,
     //  a thread is not allowed to unlock another thread's mutex. But
-    //  the very nature of a Reader Lock allows an arbitrary ordering 
-    //  of unlocks when multiple threads hold the reader lock. 
+    //  the very nature of a Reader Lock allows an arbitrary ordering
+    //  of unlocks when multiple threads hold the reader lock.
     //  Semaphores are not subject to this constraint.
     //
     BlockReadersLock = xSemaphoreCreateBinary();
@@ -160,13 +148,11 @@ ReadWriteLockPreferWriter::ReadWriteLockPreferWriter()
     xSemaphoreGive(BlockReadersLock);
 }
 
-
 ReadWriteLockPreferWriter::~ReadWriteLockPreferWriter()
 {
     vSemaphoreDelete(WriteLock);
     vSemaphoreDelete(BlockReadersLock);
 }
-
 
 void ReadWriteLockPreferWriter::ReaderLock()
 {
@@ -182,7 +168,6 @@ void ReadWriteLockPreferWriter::ReaderLock()
     xSemaphoreGive(BlockReadersLock);
 }
 
-
 void ReadWriteLockPreferWriter::ReaderUnlock()
 {
     xSemaphoreTake(ReadLock, portMAX_DELAY);
@@ -194,7 +179,6 @@ void ReadWriteLockPreferWriter::ReaderUnlock()
 
     xSemaphoreGive(ReadLock);
 }
-
 
 void ReadWriteLockPreferWriter::WriterLock()
 {
@@ -209,7 +193,6 @@ void ReadWriteLockPreferWriter::WriterLock()
 
     xSemaphoreTake(ResourceLock, portMAX_DELAY);
 }
-
 
 void ReadWriteLockPreferWriter::WriterUnlock()
 {

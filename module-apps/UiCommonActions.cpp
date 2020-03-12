@@ -20,12 +20,10 @@ namespace app
     {
         assert(app != nullptr);
 
-        if (contact.numbers.size() != 0)
-        {
+        if (contact.numbers.size() != 0) {
             return call(app, callOperation, contact.numbers[0].numberE164);
         }
-        else
-        {
+        else {
             LOG_ERROR("No contact numbers!");
             return false;
         }
@@ -38,16 +36,13 @@ namespace app
 
         std::unique_ptr<CallSwitchData> data;
 
-        switch (callOperation)
-        {
+        switch (callOperation) {
         case CallOperation::ExecuteCall: {
             data = std::make_unique<ExecuteCallData>(e164number.c_str());
-        }
-        break;
+        } break;
         case CallOperation::PrepareCall: {
             data = std::make_unique<EnterNumberData>(e164number.c_str());
-        }
-        break;
+        } break;
         default: {
             LOG_ERROR("callOperation not supported %d", static_cast<uint32_t>(callOperation));
             return false;
@@ -68,11 +63,10 @@ namespace app
         assert(app != nullptr);
         // TODO return to current application doesn't change application window >_>
         auto param = std::shared_ptr<ContactRecord>(new ContactRecord(contact));
-        switch (smsOperation)
-        {
+        switch (smsOperation) {
         case SmsOperation::Add: {
-            return sapm::ApplicationManager::messageSwitchApplication(app, name_messages, gui::name::window::thread_view,
-                                                                      std::make_unique<SMSSendRequest>(param));
+            return sapm::ApplicationManager::messageSwitchApplication(
+                app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
         }
         default: {
             LOG_ERROR("SmsOperation not supported %d", static_cast<uint32_t>(smsOperation));
@@ -92,26 +86,28 @@ namespace app
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)
     {
         assert(app != nullptr);
-        switch (contactOperation)
-        {
+        switch (contactOperation) {
         case ContactOperation::Add: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, gui::window::name::newContact,
+                app,
+                name_phonebook,
+                gui::window::name::newContact,
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
-        }
-        break;
+        } break;
         case ContactOperation::Details: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, gui::window::name::contact,
+                app,
+                name_phonebook,
+                gui::window::name::contact,
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
-        }
-        break;
+        } break;
         case ContactOperation::Edit: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_phonebook, gui::window::name::newContact, // TODO: need to be fixed when contact edition is working
+                app,
+                name_phonebook,
+                gui::window::name::newContact, // TODO: need to be fixed when contact edition is working
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
-        }
-        break;
+        } break;
         default: {
             LOG_ERROR("ContactOperation not supported %d", static_cast<uint32_t>(contactOperation));
             return false;
@@ -125,31 +121,32 @@ namespace app
 
         auto searchResults = DBServiceAPI::ContactSearch(app, "", "", number);
         ContactRecord contactRec;
-        if (searchResults.get()->size() == 1)
-        {
+        if (searchResults.get()->size() == 1) {
             contactRec = searchResults->front();
-            LOG_INFO("Found contact matching search num %s : contact ID %u - %s %s", number.c_str(), contactRec.dbID, contactRec.primaryName.c_str(),
+            LOG_INFO("Found contact matching search num %s : contact ID %u - %s %s",
+                     number.c_str(),
+                     contactRec.dbID,
+                     contactRec.primaryName.c_str(),
                      contactRec.alternativeName.c_str());
 
-            if (contactOperation == ContactOperation::Add)
-            {
+            if (contactOperation == ContactOperation::Add) {
                 // trying to add new contact for number already assigned to existing contact, displa warning
                 return sapm::ApplicationManager::messageSwitchApplication(
-                    app, name_phonebook, gui::window::name::duplicatedContact,
-                    std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contactRec)), number));
+                    app,
+                    name_phonebook,
+                    gui::window::name::duplicatedContact,
+                    std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contactRec)),
+                                                        number));
             }
         }
-        else if (searchResults.get()->size() > 1)
-        {
+        else if (searchResults.get()->size() > 1) {
             LOG_FATAL("Found more than one contact for numer %s", number.c_str());
-            for (auto i : *searchResults)
-            {
+            for (auto i : *searchResults) {
                 LOG_FATAL("ContactID = %u", i.dbID);
             }
             return false;
         }
-        else if (contactOperation != ContactOperation::Add)
-        {
+        else if (contactOperation != ContactOperation::Add) {
             LOG_ERROR("Invalid operation for not existing contact for numer %s", number.c_str());
             return false;
         }

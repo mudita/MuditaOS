@@ -25,10 +25,11 @@ PhonebookOptions::PhonebookOptions(app::Application *app) : AppWindow(app, "Opti
 }
 
 PhonebookOptions::~PhonebookOptions()
-{
-}
+{}
 
-gui::Item *PhonebookOptions::addOptionLabel(const std::string &text, bool hasSubOptions, std::function<bool(gui::Item &)> activatedCallback)
+gui::Item *PhonebookOptions::addOptionLabel(const std::string &text,
+                                            bool hasSubOptions,
+                                            std::function<bool(gui::Item &)> activatedCallback)
 {
     gui::Label *label = new gui::Label(this, 19, 0, 480 - 21, 55, text);
     label->setMargins(gui::Margins(0, 0, 0, 0));
@@ -39,8 +40,7 @@ gui::Item *PhonebookOptions::addOptionLabel(const std::string &text, bool hasSub
     label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->activatedCallback = activatedCallback;
     label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    if (hasSubOptions)
-    {
+    if (hasSubOptions) {
         new gui::Image(label, 427, 20, 32, 32, "right_label_arrow");
     }
     return label;
@@ -69,11 +69,12 @@ void PhonebookOptions::buildInterface()
         return (true);
     }));
 
-    options.push_back(addOptionLabel(utils::localize.get("app_phonebook_options_forward_namecard"), true, [=](gui::Item &) {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
-        application->switchWindow("OptionsNamecard", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-        return (true);
-    }));
+    options.push_back(
+        addOptionLabel(utils::localize.get("app_phonebook_options_forward_namecard"), true, [=](gui::Item &) {
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
+            application->switchWindow("OptionsNamecard", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
+            return (true);
+        }));
 
     options.push_back(addOptionLabel(utils::localize.get("app_phonebook_options_block"), false, [=](gui::Item &) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
@@ -90,8 +91,7 @@ void PhonebookOptions::buildInterface()
     // set position and navigation for labels
     uint32_t posY = 113;
     uint32_t size = options.size();
-    for (uint32_t i = 0; i < options.size(); i++)
-    {
+    for (uint32_t i = 0; i < options.size(); i++) {
         options[i]->setPosition(17, posY);
         posY += 60;
         options[i]->setNavigationItem(NavigationDirection::DOWN, options[(i + 1) % size]);
@@ -106,22 +106,20 @@ void PhonebookOptions::onBeforeShow(ShowMode mode, SwitchData *data)
 
 bool PhonebookOptions::handleSwitchData(SwitchData *data)
 {
-    if (data == nullptr)
-    {
+    if (data == nullptr) {
         LOG_ERROR("Received null pointer");
         return false;
     }
 
     PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
+    contact                 = item->getContact();
     return (true);
 }
 
 bool PhonebookOptions::onInput(const InputEvent &inputEvent)
 {
     LOG_INFO("PhonebookOptions::onInput state: %d keyCode: %d", inputEvent.state, inputEvent.keyCode);
-    if (inputEvent.keyCode == KeyCode::KEY_RF && inputEvent.state == InputEvent::State::keyReleasedShort)
-    {
+    if (inputEvent.keyCode == KeyCode::KEY_RF && inputEvent.state == InputEvent::State::keyReleasedShort) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Contact", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         return (true);

@@ -12,9 +12,10 @@ namespace gui
 
     struct Option
     {
-        const UTF8 text = "";
+        const UTF8 text                               = "";
         std::function<bool(Item &)> activatedCallback = nullptr;
-        Option(const UTF8 &text, std::function<bool(Item &)> cb) : text(text), activatedCallback(cb) {
+        Option(const UTF8 &text, std::function<bool(Item &)> cb) : text(text), activatedCallback(cb)
+        {
             LOG_INFO("text: %s", text.c_str());
         }
     };

@@ -36,16 +36,14 @@
  *
  ***************************************************************************/
 
-
 #ifndef READ_WRITE_LOCK_HPP_
 #define READ_WRITE_LOCK_HPP_
-
 
 /**
  *  C++ exceptions are used by default when constructors fail.
  *  If you do not want this behavior, define the following in your makefile
  *  or project. Note that in most / all cases when a constructor fails,
- *  it's a fatal error. In the cases when you've defined this, the new 
+ *  it's a fatal error. In the cases when you've defined this, the new
  *  default behavior will be to issue a configASSERT() instead.
  */
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
@@ -59,17 +57,17 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-
-namespace cpp_freertos {
-
+namespace cpp_freertos
+{
 
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
-/**
- *  This is the exception that is thrown if a ReadWriteLock constructor fails.
- */
-class ReadWriteLockCreateException : public std::exception {
+    /**
+     *  This is the exception that is thrown if a ReadWriteLock constructor fails.
+     */
+    class ReadWriteLockCreateException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -87,34 +85,34 @@ class ReadWriteLockCreateException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 #endif
 
+    /**
+     *  Abstract base class encapsulating a Reader/Writer lock.
+     *
+     *  These locks are based on mutexs and cannot be used in any way from
+     *  ISR context. Likewise, these locks block indefinitely.
+     *
+     *  @note It is expected that an application will instantiate one of the
+     *        derived classes and use that object for synchronization. It is
+     *        not expected that a user or application will derive from these
+     *        classes.
+     */
+    class ReadWriteLock
+    {
 
-/**
- *  Abstract base class encapsulating a Reader/Writer lock.
- *
- *  These locks are based on mutexs and cannot be used in any way from
- *  ISR context. Likewise, these locks block indefinitely.
- *
- *  @note It is expected that an application will instantiate one of the
- *        derived classes and use that object for synchronization. It is
- *        not expected that a user or application will derive from these
- *        classes.
- */
-class ReadWriteLock {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Constructor
          *
@@ -149,13 +147,13 @@ class ReadWriteLock {
          */
         virtual void WriterUnlock() = 0;
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Protected API
-    //  Not intended for use by application code.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    protected:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Protected API
+        //  Not intended for use by application code.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      protected:
         /**
          *  How many active readers are there.
          */
@@ -171,22 +169,22 @@ class ReadWriteLock {
          *  from Reader access when a writer is changing something.
          */
         SemaphoreHandle_t ResourceLock;
-};
+    };
 
+    /**
+     *  Concrete derived class that implements a Reader/Writer lock
+     *  that favors the Readers. That is, with enough aggressive readers,
+     *  a Writer may starve.
+     */
+    class ReadWriteLockPreferReader : public ReadWriteLock
+    {
 
-/**
- *  Concrete derived class that implements a Reader/Writer lock
- *  that favors the Readers. That is, with enough aggressive readers,
- *  a Writer may starve.
- */
-class ReadWriteLockPreferReader : public ReadWriteLock {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Take the lock as a Reader.
          *  This allows multiple reader access.
@@ -208,22 +206,22 @@ class ReadWriteLockPreferReader : public ReadWriteLock {
          *  Unlock the Writer.
          */
         virtual void WriterUnlock();
-};
+    };
 
+    /**
+     *  Concrete derived class that implements a Reader/Writer lock
+     *  that favors the Writers. That is, with enough aggressive writers,
+     *  a Reader may starve.
+     */
+    class ReadWriteLockPreferWriter : public ReadWriteLock
+    {
 
-/**
- *  Concrete derived class that implements a Reader/Writer lock
- *  that favors the Writers. That is, with enough aggressive writers,
- *  a Reader may starve.
- */
-class ReadWriteLockPreferWriter : public ReadWriteLock {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Our derived constructor.
          */
@@ -256,13 +254,13 @@ class ReadWriteLockPreferWriter : public ReadWriteLock {
          */
         virtual void WriterUnlock();
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Private API
-    //  The internals of this wrapper class.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    private:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Private API
+        //  The internals of this wrapper class.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      private:
         /**
          *  Number of Writers waiting for the Resource Lock, including any
          *  current Writer already holdign it.
@@ -278,8 +276,7 @@ class ReadWriteLockPreferWriter : public ReadWriteLock {
          *  Lock to stop reader threads from starving a Writer.
          */
         SemaphoreHandle_t BlockReadersLock;
-};
+    };
 
-
-}
+} // namespace cpp_freertos
 #endif

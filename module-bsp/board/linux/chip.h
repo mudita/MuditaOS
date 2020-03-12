@@ -14,14 +14,15 @@
 #include <stdbool.h>
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif /* __cplusplus */
 
-//! Test if in interrupt mode
-static inline bool isIRQ()
-{
-    return false;
-}
+    //! Test if in interrupt mode
+    static inline bool isIRQ()
+    {
+        return false;
+    }
 
 #if defined(__cplusplus)
 }

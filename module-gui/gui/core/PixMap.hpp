@@ -16,18 +16,20 @@
 
 #include "../Common.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/**
- * @brief Class that holds pixels and dimensions of the image
- */
-class PixMap : public ImageMap{
-public:
-	PixMap();
-	PixMap( uint16_t w, uint16_t h, uint8_t* data );
-	~PixMap();
-	gui::Status load( uint8_t* data, uint32_t size=0 ) override;
-};
+    /**
+     * @brief Class that holds pixels and dimensions of the image
+     */
+    class PixMap : public ImageMap
+    {
+      public:
+        PixMap();
+        PixMap(uint16_t w, uint16_t h, uint8_t *data);
+        ~PixMap();
+        gui::Status load(uint8_t *data, uint32_t size = 0) override;
+    };
 
 } /* namespace gui */
 

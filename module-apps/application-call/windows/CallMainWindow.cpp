@@ -11,25 +11,27 @@
 #include "CallMainWindow.hpp"
 #include <Style.hpp>
 
-namespace gui {
+namespace gui
+{
 
     CallMainWindow::CallMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
     {
         buildInterface();
     }
 
-void CallMainWindow::rebuild() {
-}
-void CallMainWindow::buildInterface() {
-	AppWindow::buildInterface();
-    setTitle(getName());
-}
-void CallMainWindow::destroyInterface() {
-	AppWindow::destroyInterface();
-}
+    void CallMainWindow::rebuild()
+    {}
+    void CallMainWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+        setTitle(getName());
+    }
+    void CallMainWindow::destroyInterface()
+    {
+        AppWindow::destroyInterface();
+    }
 
-
-CallMainWindow::~CallMainWindow() {
-}
+    CallMainWindow::~CallMainWindow()
+    {}
 
 } /* namespace gui */

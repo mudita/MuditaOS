@@ -16,14 +16,14 @@ namespace gui
 
       public:
         // one defined
-        GridLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, GridSize grid);
+        GridLayout(
+            Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, GridSize grid);
         // derived
-        GridLayout(const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, GridSize grid) : GridLayout(nullptr, x, y, w, h, grid)
-        {
-        }
+        GridLayout(const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, GridSize grid)
+            : GridLayout(nullptr, x, y, w, h, grid)
+        {}
         GridLayout() : GridLayout(0, 0, 0, 0, {0, 0})
-        {
-        }
+        {}
         ~GridLayout() override = default;
         /// when reached top -> start from bottom. When reached left, start from right.
         bool navigationRotate = true;

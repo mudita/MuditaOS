@@ -36,12 +36,9 @@
  *
  ***************************************************************************/
 
-
 #include "semaphore.hpp"
 
-
 using namespace cpp_freertos;
-
 
 bool Semaphore::Take(TickType_t xBlockTime)
 {
@@ -52,7 +49,6 @@ bool Semaphore::Take(TickType_t xBlockTime)
     return success == pdTRUE ? true : false;
 }
 
-
 bool Semaphore::TakeFromISR(BaseType_t *pxHigherPriorityTaskWoken)
 {
     BaseType_t success;
@@ -61,7 +57,6 @@ bool Semaphore::TakeFromISR(BaseType_t *pxHigherPriorityTaskWoken)
 
     return success == pdTRUE ? true : false;
 }
-
 
 bool Semaphore::Give()
 {
@@ -72,7 +67,6 @@ bool Semaphore::Give()
     return success == pdTRUE ? true : false;
 }
 
-
 bool Semaphore::GiveFromISR(BaseType_t *pxHigherPriorityTaskWoken)
 {
     BaseType_t success;
@@ -82,17 +76,13 @@ bool Semaphore::GiveFromISR(BaseType_t *pxHigherPriorityTaskWoken)
     return success == pdTRUE ? true : false;
 }
 
-
 Semaphore::Semaphore()
-{
-}
-
+{}
 
 Semaphore::~Semaphore()
 {
     vSemaphoreDelete(handle);
 }
-
 
 BinarySemaphore::BinarySemaphore(bool set)
 {
@@ -110,7 +100,6 @@ BinarySemaphore::BinarySemaphore(bool set)
         xSemaphoreGive(handle);
     }
 }
-
 
 CountingSemaphore::CountingSemaphore(UBaseType_t maxCount, UBaseType_t initialCount)
 {
@@ -140,5 +129,3 @@ CountingSemaphore::CountingSemaphore(UBaseType_t maxCount, UBaseType_t initialCo
 #endif
     }
 }
-
-

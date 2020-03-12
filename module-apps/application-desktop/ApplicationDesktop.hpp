@@ -12,51 +12,58 @@
 #include "Application.hpp"
 #include "Service/Message.hpp"
 
-namespace app {
+namespace app
+{
 
     namespace name::window
     {
-        inline const std::string desktop_menu = "MenuWindow";
+        inline const std::string desktop_menu       = "MenuWindow";
         inline const std::string desktop_lockscreen = gui::name::window::main_window;
     }; // namespace name::window
 
-inline const std::string name_desktop = "ApplicationDesktop";
+    inline const std::string name_desktop = "ApplicationDesktop";
 
-class ApplicationDesktop : public Application {
-protected:
-	//determines whether screen should be protected by pin verification
-	bool screenLocked = true;
-	bool pinLocked = false;
-	uint32_t unreadMessages = 0;
-	uint32_t missedCalls = 0;
-public:
-  struct Notifications
-  {
-      unsigned int notSeenSMS = 0;
-      unsigned int notSeenCalls = 0;
-  } notifications;
-    ApplicationDesktop( std::string name=name_desktop, std::string parent = "", bool startBackground =false );
-	virtual ~ApplicationDesktop();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-	sys::ReturnCodes InitHandler() override;
-	sys::ReturnCodes DeinitHandler() override;
+    class ApplicationDesktop : public Application
+    {
+      protected:
+        // determines whether screen should be protected by pin verification
+        bool screenLocked       = true;
+        bool pinLocked          = false;
+        uint32_t unreadMessages = 0;
+        uint32_t missedCalls    = 0;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+      public:
+        struct Notifications
+        {
+            unsigned int notSeenSMS   = 0;
+            unsigned int notSeenCalls = 0;
+        } notifications;
+        ApplicationDesktop(std::string name = name_desktop, std::string parent = "", bool startBackground = false);
+        virtual ~ApplicationDesktop();
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
 
-    void createUserInterface() override;
-    void destroyUserInterface() override;
-    bool getScreenLocked();
-	void setScreenLocked( bool val );
-	bool getPinLocked();
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        {
+            return sys::ReturnCodes::Success;
+        }
 
-	uint32_t getMisseedCalls();
-	uint32_t getUnreadMessages();
+        void createUserInterface() override;
+        void destroyUserInterface() override;
+        bool getScreenLocked();
+        void setScreenLocked(bool val);
+        bool getPinLocked();
 
-	/**
-	 * This static method will be used to lock the phone
-	 */
-//	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event );
-};
+        uint32_t getMisseedCalls();
+        uint32_t getUnreadMessages();
+
+        /**
+         * This static method will be used to lock the phone
+         */
+        //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event
+        //);
+    };
 
 } /* namespace app */
 

@@ -20,7 +20,7 @@ namespace harness
         const enum Events evt = type;
         std::shared_ptr<sys::DataMessage> msg; /// msg to send if success
 
-        virtual ~Event() = default;
+        virtual ~Event()                     = default;
         virtual auto encode() -> std::string = 0;
         virtual auto decode(const json11::Json &js) -> bool
         {
@@ -41,8 +41,9 @@ namespace harness
         KeyPress = 0, // -> key press event
         SysStart = 1, // <- system started - EventManager is on
         FocusApp = 2, // <- focus application changed to
-        GSMCmd = 3,   // <-> command to send on cellular command channel, expects data string in ( { ..., Data : "command to execute" }
-        GPIO     = 4, // <-> GPIO request data
+        GSMCmd = 3, // <-> command to send on cellular command channel, expects data string in ( { ..., Data : "command
+                    // to execute" }
+        GPIO = 4,   // <-> GPIO request data
 
         Top, // <- performance monitor message, TODO
 

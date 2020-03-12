@@ -2,12 +2,10 @@
  *  @file CellularServiceAPI.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 09.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_CELLULARSERVICEAPI_HPP
 #define PUREPHONE_CELLULARSERVICEAPI_HPP
@@ -17,11 +15,12 @@
 
 class Service;
 
-class CellularServiceAPI {
-public:
-    static bool DialNumber(sys::Service* serv,const std::string& number);
-    static bool AnswerIncomingCall(sys::Service* serv);
-    static bool HangupCall(sys::Service* serv);
+class CellularServiceAPI
+{
+  public:
+    static bool DialNumber(sys::Service *serv, const std::string &number);
+    static bool AnswerIncomingCall(sys::Service *serv);
+    static bool HangupCall(sys::Service *serv);
     /*
      * @brief Its calls sercive-cellular for selected SIM IMSI number.
      * @param serv pointer to caller service.
@@ -54,5 +53,4 @@ public:
     static bool SelectAntenna(sys::Service *serv, uint8_t antenna);
 };
 
-
-#endif //PUREPHONE_CELLULARSERVICEAPI_HPP
+#endif // PUREPHONE_CELLULARSERVICEAPI_HPP

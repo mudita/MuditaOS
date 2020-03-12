@@ -36,50 +36,47 @@
  *
  ***************************************************************************/
 
-
 #ifndef CONDITION_VARIABLE_HPP_
 #define CONDITION_VARIABLE_HPP_
 
 #include <list>
 #include "mutex.hpp"
 
-
 /**
  *  Condition variables are an additon to the FreeRTOS C++ Wrapper
- *  classes. If you want to include them, you need to define the 
+ *  classes. If you want to include them, you need to define the
  *  following in your makefile or project.
  */
 #ifdef CPP_FREERTOS_CONDITION_VARIABLES
 
+namespace cpp_freertos
+{
 
-namespace cpp_freertos {
-
-//
-//  Forward declaration. We need to prevent a circular dependency
-//  between the Thread class and the ConditionVariable class.
-//
-class Thread;
-
-
-/**
- *  Class implementation of condition variable based on
- *  FreeRTOS C++ Wrapper classes.
- *  
- *  A condition variable isn't really a variable. It's a list
- *  of threads.
- *
- *  The design here is that a Thread "waits", and a ConditionVariable
- *  "signals". This affects where the public interfaces reside.
- */
-class ConditionVariable {
-
-    /////////////////////////////////////////////////////////////////////////
     //
-    //  Public API
+    //  Forward declaration. We need to prevent a circular dependency
+    //  between the Thread class and the ConditionVariable class.
     //
-    /////////////////////////////////////////////////////////////////////////
-    public:
-    
+    class Thread;
+
+    /**
+     *  Class implementation of condition variable based on
+     *  FreeRTOS C++ Wrapper classes.
+     *
+     *  A condition variable isn't really a variable. It's a list
+     *  of threads.
+     *
+     *  The design here is that a Thread "waits", and a ConditionVariable
+     *  "signals". This affects where the public interfaces reside.
+     */
+    class ConditionVariable
+    {
+
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Constructor to create a condition variable.
          */
@@ -96,15 +93,13 @@ class ConditionVariable {
          */
         void Broadcast();
 
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Private API
-    //  The internals of this wrapper class.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    private:
-
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Private API
+        //  The internals of this wrapper class.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      private:
         /**
          *  Protect the internal ConditionVariable state.
          */
@@ -116,24 +111,22 @@ class ConditionVariable {
         std::list<Thread *> WaitList;
 
         /**
-         *  Internal helper function to queue a Thread to 
+         *  Internal helper function to queue a Thread to
          *  this ConditionVariable's wait list.
          */
         void AddToWaitList(Thread *thread);
 
-    /**
-     *  The Thread class and the ConditionVariable class are interdependent.
-     *  If we allow the Thread class to access the internals of the
-     *  ConditionVariable, we can reduce the public interface which is a
-     *  good thing.
-     */
-    friend class Thread;
-};
+        /**
+         *  The Thread class and the ConditionVariable class are interdependent.
+         *  If we allow the Thread class to access the internals of the
+         *  ConditionVariable, we can reduce the public interface which is a
+         *  good thing.
+         */
+        friend class Thread;
+    };
 
-
-}
-
-#endif
+} // namespace cpp_freertos
 
 #endif
 
+#endif

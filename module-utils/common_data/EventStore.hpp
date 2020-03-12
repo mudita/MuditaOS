@@ -14,7 +14,7 @@ namespace Store
         {
             Discharging,
             Charging,
-        } state = State::Discharging;
+        } state            = State::Discharging;
         unsigned int level = 0;
 
         static const Battery &get();
@@ -39,7 +39,8 @@ namespace Store
             SIM1,
             SIM2,
             NONE,
-        } sim = SIM::NONE, selected = SIM::SIM1;
+        } sim      = SIM::NONE,
+          selected = SIM::SIM1;
         static GSM *get();
     };
 }; // namespace Store

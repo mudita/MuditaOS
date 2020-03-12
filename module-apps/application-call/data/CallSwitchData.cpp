@@ -8,15 +8,17 @@
  */
 #include "CallSwitchData.hpp"
 
-namespace app {
+namespace app
+{
 
-CallSwitchData::CallSwitchData() {
-	// TODO Auto-generated constructor stub
+    CallSwitchData::CallSwitchData()
+    {
+        // TODO Auto-generated constructor stub
+    }
 
-}
-
-CallSwitchData::~CallSwitchData() {
-	// TODO Auto-generated destructor stub
-}
+    CallSwitchData::~CallSwitchData()
+    {
+        // TODO Auto-generated destructor stub
+    }
 
 } /* namespace app */

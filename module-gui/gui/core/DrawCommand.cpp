@@ -7,7 +7,5 @@
 
 #include "DrawCommand.hpp"
 
-namespace gui {
-
-
-} /* namespace gui */
+namespace gui
+{} /* namespace gui */

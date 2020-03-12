@@ -2,12 +2,10 @@
  *  @file DriverGPIO.cpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 14.08.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #include "DriverGPIO.hpp"
 
@@ -22,33 +20,34 @@
 #error "Unsupported target"
 #endif
 
-namespace drivers {
+namespace drivers
+{
 
-    std::weak_ptr<DriverGPIO> DriverGPIO::singleton[static_cast<uint32_t >(GPIOInstances ::COUNT)];
+    std::weak_ptr<DriverGPIO> DriverGPIO::singleton[static_cast<uint32_t>(GPIOInstances ::COUNT)];
 
     std::shared_ptr<DriverGPIO> DriverGPIO::Create(const drivers::GPIOInstances instance,
-                                                 const drivers::DriverGPIOParams &params) {
+                                                   const drivers::DriverGPIOParams &params)
+    {
         {
 
             cpp_freertos::CriticalSection::Enter();
-            std::shared_ptr<DriverGPIO> inst = singleton[static_cast<uint32_t >(instance)].lock();
+            std::shared_ptr<DriverGPIO> inst = singleton[static_cast<uint32_t>(instance)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
-                inst = std::make_shared<RT1051DriverGPIO>(instance,params);
+                inst = std::make_shared<RT1051DriverGPIO>(instance, params);
 #elif defined(TARGET_Linux)
-                #else
+#else
 #error "Unsupported target"
 #endif
 
-                singleton[static_cast<uint32_t >(instance)] = inst;
+                singleton[static_cast<uint32_t>(instance)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();
 
             return inst;
-
         }
     }
 
-}
+} // namespace drivers

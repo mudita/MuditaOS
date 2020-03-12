@@ -1,13 +1,11 @@
 #include "log/log.hpp"
 #include "RawDataFsm.hpp"
 
-
 // ----------------------------------------------------------------------------
 // Raw Data FSM states
 //
 
-class StateRawDataType
-: public RawDataFsm
+class StateRawDataType : public RawDataFsm
 {
     void react(RawDataEvt const &) override
     {
@@ -15,15 +13,13 @@ class StateRawDataType
     };
 };
 
-class StateRawDataPayload
-: public RawDataFsm
+class StateRawDataPayload : public RawDataFsm
 {
     void react(RawDataEvt const &) override
     {
         LOG_DEBUG("RawDataFsm: StateRawDataPayload");
     };
 };
-
 
 // ----------------------------------------------------------------------------
 // Base State: default implementations
@@ -41,8 +37,6 @@ void RawDataFsm::react(RawDataMallocEvt const &)
 
 int RawDataFsm::type{0};
 int RawDataFsm::payload{0};
-
-
 
 // ----------------------------------------------------------------------------
 // Initial state definition

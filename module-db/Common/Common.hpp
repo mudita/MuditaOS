@@ -12,13 +12,14 @@
 /**
  * Types of sms message
  */
-enum class SMSType {
-    DRAFT = 0x01,
+enum class SMSType
+{
+    DRAFT  = 0x01,
     FAILED = 0x02,
-    INBOX = 0x04,
+    INBOX  = 0x04,
     OUTBOX = 0x08,
     QUEUED = 0x10,
-    ALL = 0xFF
+    ALL    = 0xFF
 };
 
 enum class EntryState
@@ -31,7 +32,8 @@ enum class EntryState
 /**
  * Types of contacts
  */
-enum class ContactType {
+enum class ContactType
+{
     USER = 1,
     TEMPORARY,
 };
@@ -48,23 +50,22 @@ enum class ContactNumberType
 
 enum class ContactAddressType
 {
-    HOME = 0,   /*!< ID defines that address is home address. */
-    WORK,       /*!< ID defines that address is work address. */
-    OTHER       /*!< ID defines that address doesn’t belong to any of the types defined above. */
+    HOME = 0, /*!< ID defines that address is home address. */
+    WORK,     /*!< ID defines that address is work address. */
+    OTHER     /*!< ID defines that address doesn’t belong to any of the types defined above. */
 };
 
 enum class SettingsLanguage
 {
-    ENGLISH=0x01,
-    POLISH=0x02,
-    GERMAN=0x04,
-    SPANISH=0x08,
+    ENGLISH = 0x01,
+    POLISH  = 0x02,
+    GERMAN  = 0x04,
+    SPANISH = 0x08,
 
 };
 
 enum class SettingsPinMode
 {
-    ALWAYS=0,
-    DAYS=1
+    ALWAYS = 0,
+    DAYS   = 1
 };
-

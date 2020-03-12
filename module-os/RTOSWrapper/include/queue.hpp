@@ -36,7 +36,6 @@
  *
  ***************************************************************************/
 
-
 #ifndef QUEUE_HPP_
 #define QUEUE_HPP_
 
@@ -44,7 +43,7 @@
  *  C++ exceptions are used by default when constructors fail.
  *  If you do not want this behavior, define the following in your makefile
  *  or project. Note that in most / all cases when a constructor fails,
- *  it's a fatal error. In the cases when you've defined this, the new 
+ *  it's a fatal error. In the cases when you've defined this, the new
  *  default behavior will be to issue a configASSERT() instead.
  */
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
@@ -58,17 +57,17 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 
-
-namespace cpp_freertos {
-
+namespace cpp_freertos
+{
 
 #ifndef CPP_FREERTOS_NO_EXCEPTIONS
-/**
- *  This is the exception that is thrown if a Queue constructor fails.
- */
-class QueueCreateException : public std::exception {
+    /**
+     *  This is the exception that is thrown if a Queue constructor fails.
+     */
+    class QueueCreateException : public std::exception
+    {
 
-    public:
+      public:
         /**
          *  Create the exception.
          */
@@ -82,8 +81,7 @@ class QueueCreateException : public std::exception {
          */
         explicit QueueCreateException(const char *info)
         {
-            snprintf(errorString, sizeof(errorString),
-                        "Queue Constructor Failed %s", info);
+            snprintf(errorString, sizeof(errorString), "Queue Constructor Failed %s", info);
         }
 
         /**
@@ -95,31 +93,31 @@ class QueueCreateException : public std::exception {
             return errorString;
         }
 
-    private:
+      private:
         /**
          *  A text string representing what failed.
          */
         char errorString[80];
-};
+    };
 #endif
 
+    /**
+     *  Queue class wrapper for FreeRTOS queues. This class provides enqueue
+     *  and dequeue operations.
+     *
+     *  @note It is expected that an application will instantiate this class or
+     *        one of the derived classes and use that. It is not expected that
+     *        a user or application will derive from these classes.
+     */
+    class Queue
+    {
 
-/**
- *  Queue class wrapper for FreeRTOS queues. This class provides enqueue
- *  and dequeue operations.
- *
- *  @note It is expected that an application will instantiate this class or
- *        one of the derived classes and use that. It is not expected that
- *        a user or application will derive from these classes.
- */
-class Queue {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Our constructor.
          *
@@ -234,37 +232,37 @@ class Queue {
          */
         UBaseType_t NumSpacesLeft();
 
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Protected API
-    //  Not intended for use by application code.
-    //
-    /////////////////////////////////////////////////////////////////////////
-    protected:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Protected API
+        //  Not intended for use by application code.
+        //
+        /////////////////////////////////////////////////////////////////////////
+      protected:
         /**
          *  FreeRTOS queue handle.
          */
         QueueHandle_t handle;
-};
+    };
 
+    /**
+     *  Enhanced queue class that implements a double ended queue (a "deque"),
+     *  almost. Unlike the traditional CommSci version, there is no way to
+     *  dequeue from the back. Practically, this most likely isn't a big deal.
+     *
+     *  @note It is expected that an application will instantiate this class or
+     *        one of the derived classes and use that. It is not expected that
+     *        a user or application will derive from these classes.
+     */
+    class Deque : public Queue
+    {
 
-/**
- *  Enhanced queue class that implements a double ended queue (a "deque"),
- *  almost. Unlike the traditional CommSci version, there is no way to
- *  dequeue from the back. Practically, this most likely isn't a big deal.
- *
- *  @note It is expected that an application will instantiate this class or
- *        one of the derived classes and use that. It is not expected that
- *        a user or application will derive from these classes.
- */
-class Deque : public Queue {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Our constructor.
          *
@@ -298,26 +296,26 @@ class Deque : public Queue {
          *  @return true if the item was added, false if it was not.
          */
         bool EnqueueToFrontFromISR(void *item, BaseType_t *pxHigherPriorityTaskWoken);
-};
+    };
 
+    /**
+     *  Binary queue with overwrite. This queue can only hold one item.
+     *  If sucessive Enqueue operations are called, that item is overwritten
+     *  with whatever the last item was.
+     *
+     *  @note It is expected that an application will instantiate this class or
+     *        one of the derived classes and use that. It is not expected that
+     *        a user or application will derive from these classes.
+     */
+    class BinaryQueue : public Queue
+    {
 
-/**
- *  Binary queue with overwrite. This queue can only hold one item.
- *  If sucessive Enqueue operations are called, that item is overwritten
- *  with whatever the last item was.
- *
- *  @note It is expected that an application will instantiate this class or
- *        one of the derived classes and use that. It is not expected that
- *        a user or application will derive from these classes.
- */
-class BinaryQueue : public Queue {
-
-    /////////////////////////////////////////////////////////////////////////
-    //
-    //  Public API
-    //
-    /////////////////////////////////////////////////////////////////////////
-    public:
+        /////////////////////////////////////////////////////////////////////////
+        //
+        //  Public API
+        //
+        /////////////////////////////////////////////////////////////////////////
+      public:
         /**
          *  Our constructor.
          *
@@ -327,25 +325,24 @@ class BinaryQueue : public Queue {
          */
         explicit BinaryQueue(UBaseType_t itemSize);
 
-         /**
-          *  Add an item to the queue.
-          *
-          *  @param item The item you are adding.
-          *  @return true always, because of overwrite.
-          */
+        /**
+         *  Add an item to the queue.
+         *
+         *  @param item The item you are adding.
+         *  @return true always, because of overwrite.
+         */
         virtual bool Enqueue(void *item);
 
-         /**
-          *  Add an item to the queue in ISR context.
-          *
-          *  @param item The item you are adding.
-          *  @param pxHigherPriorityTaskWoken Did this operation result in a
-          *         rescheduling event.
-          *  @return true always, because of overwrite.
-          */
+        /**
+         *  Add an item to the queue in ISR context.
+         *
+         *  @param item The item you are adding.
+         *  @param pxHigherPriorityTaskWoken Did this operation result in a
+         *         rescheduling event.
+         *  @return true always, because of overwrite.
+         */
         virtual bool EnqueueFromISR(void *item, BaseType_t *pxHigherPriorityTaskWoken);
-};
+    };
 
-
-}
+} // namespace cpp_freertos
 #endif

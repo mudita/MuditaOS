@@ -18,35 +18,36 @@
 #include "gui/widgets/Window.hpp"
 #include <ContactRecord.hpp>
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class EnterNumberWindow: public AppWindow {
-protected:
-  gui::Label *numberLabel = nullptr;
-  gui::Icon *newContactIcon = nullptr;
+    /*
+     *
+     */
+    class EnterNumberWindow : public AppWindow
+    {
+      protected:
+        gui::Label *numberLabel   = nullptr;
+        gui::Icon *newContactIcon = nullptr;
 
-  void setNumberLabel(const std::string num);
+        void setNumberLabel(const std::string num);
 
-public:
-  EnterNumberWindow() = delete;
-  EnterNumberWindow(app::Application *app, std::string windowName = app::window::name_enterNumber);
-  virtual ~EnterNumberWindow();
+      public:
+        EnterNumberWindow() = delete;
+        EnterNumberWindow(app::Application *app, std::string windowName = app::window::name_enterNumber);
+        virtual ~EnterNumberWindow();
 
-  bool onInput(const InputEvent &inputEvent) override;
-  bool handleSwitchData(SwitchData *data) override;
+        bool onInput(const InputEvent &inputEvent) override;
+        bool handleSwitchData(SwitchData *data) override;
 
-  void rebuild() override;
-  void buildInterface() override;
-  void destroyInterface() override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
 
-private:
-  gui::KeyInputMappedTranslation translator;
+      private:
+        gui::KeyInputMappedTranslation translator;
 
-  bool addNewContact();
-};
+        bool addNewContact();
+    };
 
 } /* namespace gui */
-

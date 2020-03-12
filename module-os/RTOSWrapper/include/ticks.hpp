@@ -36,23 +36,22 @@
  *
  ***************************************************************************/
 
-
 #ifndef TICKS_HPP_
 #define TICKS_HPP_
 
 #include "FreeRTOS.h"
 #include "task.h"
 
+namespace cpp_freertos
+{
 
-namespace cpp_freertos {
+    /**
+     *  Class encapsulating FreeRTOS idea of a tick.
+     */
+    class Ticks
+    {
 
-
-/**
- *  Class encapsulating FreeRTOS idea of a tick.
- */
-class Ticks {
-
-    public:
+      public:
         /**
          *  Get the current tick count.
          *
@@ -105,9 +104,7 @@ class Ticks {
         {
             return (seconds * 1000) / portTICK_PERIOD_MS;
         }
-};
+    };
 
-
-}
+} // namespace cpp_freertos
 #endif
-

@@ -10,8 +10,7 @@
 //
 
 struct MessageDataEvt : tinyfsm::Event
-{
-};
+{};
 
 // ----------------------------------------------------------------------------
 // ParserFsm (FSM base class) declaration

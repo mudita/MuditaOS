@@ -13,22 +13,22 @@
 #include <stdlib.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void *usermalloc(size_t xWantedSize);
+    void *usermalloc(size_t xWantedSize);
 
-void userfree(void *pv);
+    void userfree(void *pv);
 
-size_t usermemGetFreeHeapSize(void);
+    size_t usermemGetFreeHeapSize(void);
 
-size_t usermemGetMinimumEverFreeHeapSize(void);
+    size_t usermemGetMinimumEverFreeHeapSize(void);
 
-void *userrealloc(void *pv, size_t xWantedSize);
+    void *userrealloc(void *pv, size_t xWantedSize);
 
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* USERMEM_H_ */

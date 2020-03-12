@@ -3,7 +3,7 @@
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -42,7 +42,6 @@
 #ifndef FSL_COMPONENT_ID
 #define FSL_COMPONENT_ID "platform.drivers.edma"
 #endif
-
 
 #define EDMA_TRANSFER_ENABLED_MASK 0x80U
 
@@ -84,10 +83,8 @@ static uint32_t EDMA_GetInstance(DMA_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_edmaBases); instance++)
-    {
-        if (s_edmaBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_edmaBases); instance++) {
+        if (s_edmaBases[instance] == base) {
             break;
         }
     }
@@ -104,18 +101,18 @@ void EDMA_InstallTCD(DMA_Type *base, uint32_t channel, edma_tcd_t *tcd)
     assert(((uint32_t)tcd & 0x1FU) == 0);
 
     /* Push tcd into hardware TCD register */
-    base->TCD[channel].SADDR = tcd->SADDR;
-    base->TCD[channel].SOFF = tcd->SOFF;
-    base->TCD[channel].ATTR = tcd->ATTR;
-    base->TCD[channel].NBYTES_MLNO = tcd->NBYTES;
-    base->TCD[channel].SLAST = tcd->SLAST;
-    base->TCD[channel].DADDR = tcd->DADDR;
-    base->TCD[channel].DOFF = tcd->DOFF;
+    base->TCD[channel].SADDR         = tcd->SADDR;
+    base->TCD[channel].SOFF          = tcd->SOFF;
+    base->TCD[channel].ATTR          = tcd->ATTR;
+    base->TCD[channel].NBYTES_MLNO   = tcd->NBYTES;
+    base->TCD[channel].SLAST         = tcd->SLAST;
+    base->TCD[channel].DADDR         = tcd->DADDR;
+    base->TCD[channel].DOFF          = tcd->DOFF;
     base->TCD[channel].CITER_ELINKNO = tcd->CITER;
-    base->TCD[channel].DLAST_SGA = tcd->DLAST_SGA;
+    base->TCD[channel].DLAST_SGA     = tcd->DLAST_SGA;
     /* Clear DONE bit first, otherwise ESG cannot be set */
-    base->TCD[channel].CSR = 0;
-    base->TCD[channel].CSR = tcd->CSR;
+    base->TCD[channel].CSR           = 0;
+    base->TCD[channel].CSR           = tcd->CSR;
     base->TCD[channel].BITER_ELINKNO = tcd->BITER;
 }
 
@@ -150,9 +147,9 @@ void EDMA_GetDefaultConfig(edma_config_t *config)
     assert(config != NULL);
 
     config->enableRoundRobinArbitration = false;
-    config->enableHaltOnError = true;
-    config->enableContinuousLinkMode = false;
-    config->enableDebugMode = false;
+    config->enableHaltOnError           = true;
+    config->enableContinuousLinkMode    = false;
+    config->enableDebugMode             = false;
 }
 
 void EDMA_ResetChannel(DMA_Type *base, uint32_t channel)
@@ -207,7 +204,7 @@ void EDMA_SetModulo(DMA_Type *base, uint32_t channel, edma_modulo_t srcModulo, e
 
     uint32_t tmpreg;
 
-    tmpreg = base->TCD[channel].ATTR & (~(DMA_ATTR_SMOD_MASK | DMA_ATTR_DMOD_MASK));
+    tmpreg                  = base->TCD[channel].ATTR & (~(DMA_ATTR_SMOD_MASK | DMA_ATTR_DMOD_MASK));
     base->TCD[channel].ATTR = tmpreg | DMA_ATTR_DMOD(destModulo) | DMA_ATTR_SMOD(srcModulo);
 }
 
@@ -216,20 +213,17 @@ void EDMA_EnableChannelInterrupts(DMA_Type *base, uint32_t channel, uint32_t mas
     assert(channel < FSL_FEATURE_EDMA_MODULE_CHANNEL);
 
     /* Enable error interrupt */
-    if (mask & kEDMA_ErrorInterruptEnable)
-    {
+    if (mask & kEDMA_ErrorInterruptEnable) {
         base->EEI |= (0x1U << channel);
     }
 
     /* Enable Major interrupt */
-    if (mask & kEDMA_MajorInterruptEnable)
-    {
+    if (mask & kEDMA_MajorInterruptEnable) {
         base->TCD[channel].CSR |= DMA_CSR_INTMAJOR_MASK;
     }
 
     /* Enable Half major interrupt */
-    if (mask & kEDMA_HalfInterruptEnable)
-    {
+    if (mask & kEDMA_HalfInterruptEnable) {
         base->TCD[channel].CSR |= DMA_CSR_INTHALF_MASK;
     }
 }
@@ -239,20 +233,17 @@ void EDMA_DisableChannelInterrupts(DMA_Type *base, uint32_t channel, uint32_t ma
     assert(channel < FSL_FEATURE_EDMA_MODULE_CHANNEL);
 
     /* Disable error interrupt */
-    if (mask & kEDMA_ErrorInterruptEnable)
-    {
+    if (mask & kEDMA_ErrorInterruptEnable) {
         base->EEI &= ~(0x1U << channel);
     }
 
     /* Disable Major interrupt */
-    if (mask & kEDMA_MajorInterruptEnable)
-    {
+    if (mask & kEDMA_MajorInterruptEnable) {
         base->TCD[channel].CSR &= ~DMA_CSR_INTMAJOR_MASK;
     }
 
     /* Disable Half major interrupt */
-    if (mask & kEDMA_HalfInterruptEnable)
-    {
+    if (mask & kEDMA_HalfInterruptEnable) {
         base->TCD[channel].CSR &= ~DMA_CSR_INTHALF_MASK;
     }
 }
@@ -263,17 +254,17 @@ void EDMA_TcdReset(edma_tcd_t *tcd)
     assert(((uint32_t)tcd & 0x1FU) == 0);
 
     /* Reset channel TCD */
-    tcd->SADDR = 0U;
-    tcd->SOFF = 0U;
-    tcd->ATTR = 0U;
-    tcd->NBYTES = 0U;
-    tcd->SLAST = 0U;
-    tcd->DADDR = 0U;
-    tcd->DOFF = 0U;
-    tcd->CITER = 0U;
+    tcd->SADDR     = 0U;
+    tcd->SOFF      = 0U;
+    tcd->ATTR      = 0U;
+    tcd->NBYTES    = 0U;
+    tcd->SLAST     = 0U;
+    tcd->DADDR     = 0U;
+    tcd->DOFF      = 0U;
+    tcd->CITER     = 0U;
     tcd->DLAST_SGA = 0U;
     /* Enable auto disable request feature */
-    tcd->CSR = DMA_CSR_DREQ(true);
+    tcd->CSR   = DMA_CSR_DREQ(true);
     tcd->BITER = 0U;
 }
 
@@ -301,8 +292,7 @@ void EDMA_TcdSetTransferConfig(edma_tcd_t *tcd, const edma_transfer_config_t *co
     /* Starting major iteration count */
     tcd->BITER = config->majorLoopCounts;
     /* Enable scatter/gather processing */
-    if (nextTcd != NULL)
-    {
+    if (nextTcd != NULL) {
         tcd->DLAST_SGA = (uint32_t)nextTcd;
         /*
             Before call EDMA_TcdSetTransferConfig or EDMA_SetTransferConfig,
@@ -349,7 +339,7 @@ void EDMA_TcdSetChannelLink(edma_tcd_t *tcd, edma_channel_link_type_t type, uint
         tmpreg = tcd->CITER & (~DMA_CITER_ELINKYES_LINKCH_MASK);
         tmpreg |= DMA_CITER_ELINKYES_LINKCH(linkedChannel);
         tcd->CITER = tmpreg;
-        tmpreg = tcd->BITER & (~DMA_BITER_ELINKYES_LINKCH_MASK);
+        tmpreg     = tcd->BITER & (~DMA_BITER_ELINKYES_LINKCH_MASK);
         tmpreg |= DMA_BITER_ELINKYES_LINKCH(linkedChannel);
         tcd->BITER = tmpreg;
     }
@@ -360,7 +350,7 @@ void EDMA_TcdSetChannelLink(edma_tcd_t *tcd, edma_channel_link_type_t type, uint
         /* Enable major link */
         tcd->CSR |= DMA_CSR_MAJORELINK_MASK;
         /* Set major linked channel */
-        tmpreg = tcd->CSR & (~DMA_CSR_MAJORLINKCH_MASK);
+        tmpreg   = tcd->CSR & (~DMA_CSR_MAJORLINKCH_MASK);
         tcd->CSR = tmpreg | DMA_CSR_MAJORLINKCH(linkedChannel);
     }
     else /* Link none */
@@ -378,7 +368,7 @@ void EDMA_TcdSetModulo(edma_tcd_t *tcd, edma_modulo_t srcModulo, edma_modulo_t d
 
     uint32_t tmpreg;
 
-    tmpreg = tcd->ATTR & (~(DMA_ATTR_SMOD_MASK | DMA_ATTR_DMOD_MASK));
+    tmpreg    = tcd->ATTR & (~(DMA_ATTR_SMOD_MASK | DMA_ATTR_DMOD_MASK));
     tcd->ATTR = tmpreg | DMA_ATTR_DMOD(destModulo) | DMA_ATTR_SMOD(srcModulo);
 }
 
@@ -387,14 +377,12 @@ void EDMA_TcdEnableInterrupts(edma_tcd_t *tcd, uint32_t mask)
     assert(tcd != NULL);
 
     /* Enable Major interrupt */
-    if (mask & kEDMA_MajorInterruptEnable)
-    {
+    if (mask & kEDMA_MajorInterruptEnable) {
         tcd->CSR |= DMA_CSR_INTMAJOR_MASK;
     }
 
     /* Enable Half major interrupt */
-    if (mask & kEDMA_HalfInterruptEnable)
-    {
+    if (mask & kEDMA_HalfInterruptEnable) {
         tcd->CSR |= DMA_CSR_INTHALF_MASK;
     }
 }
@@ -404,14 +392,12 @@ void EDMA_TcdDisableInterrupts(edma_tcd_t *tcd, uint32_t mask)
     assert(tcd != NULL);
 
     /* Disable Major interrupt */
-    if (mask & kEDMA_MajorInterruptEnable)
-    {
+    if (mask & kEDMA_MajorInterruptEnable) {
         tcd->CSR &= ~DMA_CSR_INTMAJOR_MASK;
     }
 
     /* Disable Half major interrupt */
-    if (mask & kEDMA_HalfInterruptEnable)
-    {
+    if (mask & kEDMA_HalfInterruptEnable) {
         tcd->CSR &= ~DMA_CSR_INTHALF_MASK;
     }
 }
@@ -422,20 +408,16 @@ uint32_t EDMA_GetRemainingMajorLoopCount(DMA_Type *base, uint32_t channel)
 
     uint32_t remainingCount = 0;
 
-    if (DMA_CSR_DONE_MASK & base->TCD[channel].CSR)
-    {
+    if (DMA_CSR_DONE_MASK & base->TCD[channel].CSR) {
         remainingCount = 0;
     }
-    else
-    {
+    else {
         /* Calculate the unfinished bytes */
-        if (base->TCD[channel].CITER_ELINKNO & DMA_CITER_ELINKNO_ELINK_MASK)
-        {
+        if (base->TCD[channel].CITER_ELINKNO & DMA_CITER_ELINKNO_ELINK_MASK) {
             remainingCount =
                 (base->TCD[channel].CITER_ELINKYES & DMA_CITER_ELINKYES_CITER_MASK) >> DMA_CITER_ELINKYES_CITER_SHIFT;
         }
-        else
-        {
+        else {
             remainingCount =
                 (base->TCD[channel].CITER_ELINKNO & DMA_CITER_ELINKNO_CITER_MASK) >> DMA_CITER_ELINKNO_CITER_SHIFT;
         }
@@ -465,18 +447,15 @@ void EDMA_ClearChannelStatusFlags(DMA_Type *base, uint32_t channel, uint32_t mas
     assert(channel < FSL_FEATURE_EDMA_MODULE_CHANNEL);
 
     /* Clear DONE bit flag */
-    if (mask & kEDMA_DoneFlag)
-    {
+    if (mask & kEDMA_DoneFlag) {
         base->CDNE = channel;
     }
     /* Clear ERROR bit flag */
-    if (mask & kEDMA_ErrorFlag)
-    {
+    if (mask & kEDMA_ErrorFlag) {
         base->CERR = channel;
     }
     /* Clear INT bit flag */
-    if (mask & kEDMA_InterruptFlag)
-    {
+    if (mask & kEDMA_InterruptFlag) {
         base->CINT = channel;
     }
 }
@@ -511,12 +490,12 @@ void EDMA_CreateHandle(edma_handle_t *handle, DMA_Type *base, uint32_t channel)
     /* Zero the handle */
     memset(handle, 0, sizeof(*handle));
 
-    handle->base = base;
+    handle->base    = base;
     handle->channel = channel;
     /* Get the DMA instance number */
-    edmaInstance = EDMA_GetInstance(base);
-    StartInstance = Get_StartInstance();
-    channelIndex = ((edmaInstance - StartInstance) * FSL_FEATURE_EDMA_MODULE_CHANNEL) + channel;
+    edmaInstance               = EDMA_GetInstance(base);
+    StartInstance              = Get_StartInstance();
+    channelIndex               = ((edmaInstance - StartInstance) * FSL_FEATURE_EDMA_MODULE_CHANNEL) + channel;
     s_EDMAHandle[channelIndex] = handle;
 
     /* Enable NVIC interrupt */
@@ -527,18 +506,18 @@ void EDMA_CreateHandle(edma_handle_t *handle, DMA_Type *base, uint32_t channel)
        CSR will be 0. Because in order to suit EDMA busy check mechanism in
        EDMA_SubmitTransfer, CSR must be set 0.
     */
-    tcdRegs = (edma_tcd_t *)&handle->base->TCD[handle->channel];
-    tcdRegs->SADDR = 0;
-    tcdRegs->SOFF = 0;
-    tcdRegs->ATTR = 0;
-    tcdRegs->NBYTES = 0;
-    tcdRegs->SLAST = 0;
-    tcdRegs->DADDR = 0;
-    tcdRegs->DOFF = 0;
-    tcdRegs->CITER = 0;
+    tcdRegs            = (edma_tcd_t *)&handle->base->TCD[handle->channel];
+    tcdRegs->SADDR     = 0;
+    tcdRegs->SOFF      = 0;
+    tcdRegs->ATTR      = 0;
+    tcdRegs->NBYTES    = 0;
+    tcdRegs->SLAST     = 0;
+    tcdRegs->DADDR     = 0;
+    tcdRegs->DOFF      = 0;
+    tcdRegs->CITER     = 0;
     tcdRegs->DLAST_SGA = 0;
-    tcdRegs->CSR = 0;
-    tcdRegs->BITER = 0;
+    tcdRegs->CSR       = 0;
+    tcdRegs->BITER     = 0;
 }
 
 void EDMA_InstallTCDMemory(edma_handle_t *handle, edma_tcd_t *tcdPool, uint32_t tcdSize)
@@ -547,11 +526,11 @@ void EDMA_InstallTCDMemory(edma_handle_t *handle, edma_tcd_t *tcdPool, uint32_t 
     assert(((uint32_t)tcdPool & 0x1FU) == 0);
 
     /* Initialize tcd queue attibute. */
-    handle->header = 0;
-    handle->tail = 0;
+    handle->header  = 0;
+    handle->tail    = 0;
     handle->tcdUsed = 0;
     handle->tcdSize = tcdSize;
-    handle->flags = 0;
+    handle->flags   = 0;
     handle->tcdPool = tcdPool;
 }
 
@@ -579,66 +558,63 @@ void EDMA_PrepareTransfer(edma_transfer_config_t *config,
     assert((destWidth == 1U) || (destWidth == 2U) || (destWidth == 4U) || (destWidth == 16U) || (destWidth == 32U));
     assert(transferBytes % bytesEachRequest == 0);
 
-    config->destAddr = (uint32_t)destAddr;
-    config->srcAddr = (uint32_t)srcAddr;
-    config->minorLoopBytes = bytesEachRequest;
+    config->destAddr        = (uint32_t)destAddr;
+    config->srcAddr         = (uint32_t)srcAddr;
+    config->minorLoopBytes  = bytesEachRequest;
     config->majorLoopCounts = transferBytes / bytesEachRequest;
-    switch (srcWidth)
-    {
-        case 1U:
-            config->srcTransferSize = kEDMA_TransferSize1Bytes;
-            break;
-        case 2U:
-            config->srcTransferSize = kEDMA_TransferSize2Bytes;
-            break;
-        case 4U:
-            config->srcTransferSize = kEDMA_TransferSize4Bytes;
-            break;
-        case 16U:
-            config->srcTransferSize = kEDMA_TransferSize16Bytes;
-            break;
-        case 32U:
-            config->srcTransferSize = kEDMA_TransferSize32Bytes;
-            break;
-        default:
-            break;
+    switch (srcWidth) {
+    case 1U:
+        config->srcTransferSize = kEDMA_TransferSize1Bytes;
+        break;
+    case 2U:
+        config->srcTransferSize = kEDMA_TransferSize2Bytes;
+        break;
+    case 4U:
+        config->srcTransferSize = kEDMA_TransferSize4Bytes;
+        break;
+    case 16U:
+        config->srcTransferSize = kEDMA_TransferSize16Bytes;
+        break;
+    case 32U:
+        config->srcTransferSize = kEDMA_TransferSize32Bytes;
+        break;
+    default:
+        break;
     }
-    switch (destWidth)
-    {
-        case 1U:
-            config->destTransferSize = kEDMA_TransferSize1Bytes;
-            break;
-        case 2U:
-            config->destTransferSize = kEDMA_TransferSize2Bytes;
-            break;
-        case 4U:
-            config->destTransferSize = kEDMA_TransferSize4Bytes;
-            break;
-        case 16U:
-            config->destTransferSize = kEDMA_TransferSize16Bytes;
-            break;
-        case 32U:
-            config->destTransferSize = kEDMA_TransferSize32Bytes;
-            break;
-        default:
-            break;
+    switch (destWidth) {
+    case 1U:
+        config->destTransferSize = kEDMA_TransferSize1Bytes;
+        break;
+    case 2U:
+        config->destTransferSize = kEDMA_TransferSize2Bytes;
+        break;
+    case 4U:
+        config->destTransferSize = kEDMA_TransferSize4Bytes;
+        break;
+    case 16U:
+        config->destTransferSize = kEDMA_TransferSize16Bytes;
+        break;
+    case 32U:
+        config->destTransferSize = kEDMA_TransferSize32Bytes;
+        break;
+    default:
+        break;
     }
-    switch (type)
-    {
-        case kEDMA_MemoryToMemory:
-            config->destOffset = destWidth;
-            config->srcOffset = srcWidth;
-            break;
-        case kEDMA_MemoryToPeripheral:
-            config->destOffset = 0U;
-            config->srcOffset = srcWidth;
-            break;
-        case kEDMA_PeripheralToMemory:
-            config->destOffset = destWidth;
-            config->srcOffset = 0U;
-            break;
-        default:
-            break;
+    switch (type) {
+    case kEDMA_MemoryToMemory:
+        config->destOffset = destWidth;
+        config->srcOffset  = srcWidth;
+        break;
+    case kEDMA_MemoryToPeripheral:
+        config->destOffset = 0U;
+        config->srcOffset  = srcWidth;
+        break;
+    case kEDMA_PeripheralToMemory:
+        config->destOffset = destWidth;
+        config->srcOffset  = 0U;
+        break;
+    default:
+        break;
     }
 }
 
@@ -649,19 +625,16 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
 
     edma_tcd_t *tcdRegs = (edma_tcd_t *)&handle->base->TCD[handle->channel];
 
-    if (handle->tcdPool == NULL)
-    {
+    if (handle->tcdPool == NULL) {
         /*
             Check if EDMA is busy: if the given channel started transfer, CSR will be not zero. Because
             if it is the last transfer, DREQ will be set. If not, ESG will be set. So in order to suit
             this check mechanism, EDMA_CreatHandle will clear CSR register.
         */
-        if ((tcdRegs->CSR != 0) && ((tcdRegs->CSR & DMA_CSR_DONE_MASK) == 0))
-        {
+        if ((tcdRegs->CSR != 0) && ((tcdRegs->CSR & DMA_CSR_DONE_MASK) == 0)) {
             return kStatus_EDMA_Busy;
         }
-        else
-        {
+        else {
             EDMA_SetTransferConfig(handle->base, handle->channel, config, NULL);
             /* Enable auto disable request feature */
             handle->base->TCD[handle->channel].CSR |= DMA_CSR_DREQ_MASK;
@@ -681,8 +654,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
 
         /* Check if tcd pool is full. */
         primask = DisableGlobalIRQ();
-        if (handle->tcdUsed >= handle->tcdSize)
-        {
+        if (handle->tcdUsed >= handle->tcdSize) {
             EnableGlobalIRQ(primask);
 
             return kStatus_EDMA_QueueFull;
@@ -691,8 +663,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
         handle->tcdUsed++;
         /* Calculate index of next TCD */
         nextTcd = currentTcd + 1U;
-        if (nextTcd == handle->tcdSize)
-        {
+        if (nextTcd == handle->tcdSize) {
             nextTcd = 0U;
         }
         /* Advance queue tail index */
@@ -708,8 +679,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
         /* Link current TCD with next TCD for identification of current TCD */
         handle->tcdPool[currentTcd].DLAST_SGA = (uint32_t)&handle->tcdPool[nextTcd];
         /* Chain from previous descriptor unless tcd pool size is 1(this descriptor is its own predecessor). */
-        if (currentTcd != previousTcd)
-        {
+        if (currentTcd != previousTcd) {
             /* Enable scatter/gather feature in the previous TCD block. */
             csr = (handle->tcdPool[previousTcd].CSR | DMA_CSR_ESG_MASK) & ~DMA_CSR_DREQ_MASK;
             handle->tcdPool[previousTcd].CSR = csr;
@@ -719,8 +689,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
                 link the TCD register in case link the current TCD with the dead chain when TCD loading occurs
                 before link the previous TCD block.
             */
-            if (tcdRegs->DLAST_SGA == (uint32_t)&handle->tcdPool[currentTcd])
-            {
+            if (tcdRegs->DLAST_SGA == (uint32_t)&handle->tcdPool[currentTcd]) {
                 /* Clear the DREQ bits for the dynamic scatter gather */
                 tcdRegs->CSR |= DMA_CSR_DREQ_MASK;
                 /* Enable scatter/gather also in the TCD registers. */
@@ -737,8 +706,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
                     transfer again. And if ESG is set, it means transfer has notfinished, so TCD dynamic
                     link succeed.
                 */
-                if (tcdRegs->CSR & DMA_CSR_ESG_MASK)
-                {
+                if (tcdRegs->CSR & DMA_CSR_ESG_MASK) {
                     tcdRegs->CSR &= ~DMA_CSR_DREQ_MASK;
                     return kStatus_Success;
                 }
@@ -747,8 +715,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
                     condition when ESG bit is not set: it means the dynamic TCD link succeed and the current
                     TCD block has been loaded into TCD registers.
                 */
-                if (tcdRegs->DLAST_SGA == (uint32_t)&handle->tcdPool[nextTcd])
-                {
+                if (tcdRegs->DLAST_SGA == (uint32_t)&handle->tcdPool[nextTcd]) {
                     return kStatus_Success;
                 }
                 /*
@@ -756,13 +723,11 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
                     So shall configure TCD registers.
                 */
             }
-            else if (tcdRegs->DLAST_SGA != 0)
-            {
+            else if (tcdRegs->DLAST_SGA != 0) {
                 /* The current TCD block has been linked successfully. */
                 return kStatus_Success;
             }
-            else
-            {
+            else {
                 /*
                     DLAST_SGA is 0 and it means the first submit transfer, so shall configure
                     TCD registers.
@@ -772,8 +737,7 @@ status_t EDMA_SubmitTransfer(edma_handle_t *handle, const edma_transfer_config_t
         /* There is no live chain, TCD block need to be installed in TCD registers. */
         EDMA_InstallTCD(handle->base, handle->channel, &handle->tcdPool[currentTcd]);
         /* Enable channel request again. */
-        if (handle->flags & EDMA_TRANSFER_ENABLED_MASK)
-        {
+        if (handle->flags & EDMA_TRANSFER_ENABLED_MASK) {
             handle->base->SERQ = DMA_SERQ_SERQ(handle->channel);
         }
 
@@ -785,8 +749,7 @@ void EDMA_StartTransfer(edma_handle_t *handle)
 {
     assert(handle != NULL);
 
-    if (handle->tcdPool == NULL)
-    {
+    if (handle->tcdPool == NULL) {
         handle->base->SERQ = DMA_SERQ_SERQ(handle->channel);
     }
     else /* Use the TCD queue. */
@@ -797,15 +760,12 @@ void EDMA_StartTransfer(edma_handle_t *handle)
         handle->flags |= EDMA_TRANSFER_ENABLED_MASK;
 
         /* Check if there was at least one descriptor submitted since reset (TCD in registers is valid) */
-        if (tcdRegs->DLAST_SGA != 0U)
-        {
+        if (tcdRegs->DLAST_SGA != 0U) {
             primask = DisableGlobalIRQ();
             /* Check if channel request is actually disable. */
-            if ((handle->base->ERQ & (1U << handle->channel)) == 0U)
-            {
+            if ((handle->base->ERQ & (1U << handle->channel)) == 0U) {
                 /* Check if transfer is paused. */
-                if ((!(tcdRegs->CSR & DMA_CSR_DONE_MASK)) || (tcdRegs->CSR & DMA_CSR_ESG_MASK))
-                {
+                if ((!(tcdRegs->CSR & DMA_CSR_DONE_MASK)) || (tcdRegs->CSR & DMA_CSR_ESG_MASK)) {
                     /*
                         Re-enable channel request must be as soon as possible, so must put it into
                         critical section to avoid task switching or interrupt service routine.
@@ -839,10 +799,9 @@ void EDMA_AbortTransfer(edma_handle_t *handle)
     handle->base->TCD[handle->channel].DLAST_SGA = 0;
 
     /* Handle the tcd */
-    if (handle->tcdPool != NULL)
-    {
-        handle->header = 0;
-        handle->tail = 0;
+    if (handle->tcdPool != NULL) {
+        handle->header  = 0;
+        handle->tail    = 0;
         handle->tcdUsed = 0;
     }
 }
@@ -853,8 +812,7 @@ void EDMA_HandleIRQ(edma_handle_t *handle)
 
     /* Clear EDMA interrupt flag */
     handle->base->CINT = handle->channel;
-    if ((handle->tcdPool == NULL) && (handle->callback != NULL))
-    {
+    if ((handle->tcdPool == NULL) && (handle->callback != NULL)) {
         (handle->callback)(handle, handle->userData, true, 0);
     }
     else /* Use the TCD queue. Please refer to the API descriptions in the eDMA header file for detailed information. */
@@ -872,34 +830,27 @@ void EDMA_HandleIRQ(edma_handle_t *handle)
         /* Get the index of the next transfer TCD blcoks to be loaded into the eDMA engine. */
         sga_index = sga / sizeof(edma_tcd_t);
         /* Adjust header positions. */
-        if (transfer_done)
-        {
+        if (transfer_done) {
             /* New header shall point to the next TCD to be loaded (current one is already finished) */
             new_header = sga_index;
         }
-        else
-        {
+        else {
             /* New header shall point to this descriptor currently loaded (not finished yet) */
             new_header = sga_index ? sga_index - 1U : handle->tcdSize - 1U;
         }
         /* Calculate the number of finished TCDs */
-        if (new_header == handle->header)
-        {
-            if (handle->tcdUsed == handle->tcdSize)
-            {
+        if (new_header == handle->header) {
+            if (handle->tcdUsed == handle->tcdSize) {
                 tcds_done = handle->tcdUsed;
             }
-            else
-            {
+            else {
                 /* No TCD in the memory are going to be loaded or internal error occurs. */
                 tcds_done = 0;
             }
         }
-        else
-        {
+        else {
             tcds_done = new_header - handle->header;
-            if (tcds_done < 0)
-            {
+            if (tcds_done < 0) {
                 tcds_done += handle->tcdSize;
             }
         }
@@ -908,8 +859,7 @@ void EDMA_HandleIRQ(edma_handle_t *handle)
         /* Release TCD blocks. tcdUsed is the TCD number which can be used/loaded in the memory pool. */
         handle->tcdUsed -= tcds_done;
         /* Invoke callback function. */
-        if (handle->callback)
-        {
+        if (handle->callback) {
             (handle->callback)(handle, handle->userData, transfer_done, tcds_done);
         }
     }
@@ -921,12 +871,10 @@ void EDMA_HandleIRQ(edma_handle_t *handle)
 #if defined(DMA0)
 void DMA0_04_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[0]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[4]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -938,12 +886,10 @@ void DMA0_04_DriverIRQHandler(void)
 
 void DMA0_15_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[1]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[5]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -955,12 +901,10 @@ void DMA0_15_DriverIRQHandler(void)
 
 void DMA0_26_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[2]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[6]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -972,12 +916,10 @@ void DMA0_26_DriverIRQHandler(void)
 
 void DMA0_37_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[3]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[7]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -993,12 +935,10 @@ void DMA0_37_DriverIRQHandler(void)
 #if defined(DMA0)
 void DMA1_04_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[8]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[12]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1010,12 +950,10 @@ void DMA1_04_DriverIRQHandler(void)
 
 void DMA1_15_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[9]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[13]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1027,12 +965,10 @@ void DMA1_15_DriverIRQHandler(void)
 
 void DMA1_26_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[10]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[14]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1044,12 +980,10 @@ void DMA1_26_DriverIRQHandler(void)
 
 void DMA1_37_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[11]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[15]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1062,12 +996,10 @@ void DMA1_37_DriverIRQHandler(void)
 #else
 void DMA1_04_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[0]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[4]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1079,12 +1011,10 @@ void DMA1_04_DriverIRQHandler(void)
 
 void DMA1_15_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[1]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[5]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1096,12 +1026,10 @@ void DMA1_15_DriverIRQHandler(void)
 
 void DMA1_26_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[2]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[6]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1113,12 +1041,10 @@ void DMA1_26_DriverIRQHandler(void)
 
 void DMA1_37_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[3]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[7]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1136,12 +1062,10 @@ void DMA1_37_DriverIRQHandler(void)
 
 void DMA0_08_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[0]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 8U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 8U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[8]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1153,12 +1077,10 @@ void DMA0_08_DriverIRQHandler(void)
 
 void DMA0_19_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[1]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 9U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 9U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[9]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1170,12 +1092,10 @@ void DMA0_19_DriverIRQHandler(void)
 
 void DMA0_210_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[2]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 10U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 10U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[10]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1187,12 +1107,10 @@ void DMA0_210_DriverIRQHandler(void)
 
 void DMA0_311_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[3]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 11U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 11U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[11]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1204,12 +1122,10 @@ void DMA0_311_DriverIRQHandler(void)
 
 void DMA0_412_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[4]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 12U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 12U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[12]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1221,12 +1137,10 @@ void DMA0_412_DriverIRQHandler(void)
 
 void DMA0_513_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[5]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 13U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 13U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[13]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1238,12 +1152,10 @@ void DMA0_513_DriverIRQHandler(void)
 
 void DMA0_614_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[6]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 14U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 14U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[14]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1255,12 +1167,10 @@ void DMA0_614_DriverIRQHandler(void)
 
 void DMA0_715_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[7]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 15U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 15U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[15]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1273,12 +1183,10 @@ void DMA0_715_DriverIRQHandler(void)
 #if defined(DMA1)
 void DMA1_08_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[16]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 8U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 8U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[24]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1290,12 +1198,10 @@ void DMA1_08_DriverIRQHandler(void)
 
 void DMA1_19_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[17]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 9U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 9U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[25]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1307,12 +1213,10 @@ void DMA1_19_DriverIRQHandler(void)
 
 void DMA1_210_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[18]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 10U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 10U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[26]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1324,12 +1228,10 @@ void DMA1_210_DriverIRQHandler(void)
 
 void DMA1_311_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[19]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 11U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 11U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[27]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1341,12 +1243,10 @@ void DMA1_311_DriverIRQHandler(void)
 
 void DMA1_412_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[20]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 12U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 12U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[28]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1358,12 +1258,10 @@ void DMA1_412_DriverIRQHandler(void)
 
 void DMA1_513_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[21]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 13U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 13U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[29]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1375,12 +1273,10 @@ void DMA1_513_DriverIRQHandler(void)
 
 void DMA1_614_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[22]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 14U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 14U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[30]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1392,12 +1288,10 @@ void DMA1_614_DriverIRQHandler(void)
 
 void DMA1_715_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA1, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[23]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA1, 15U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA1, 15U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[31]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1414,12 +1308,10 @@ void DMA1_715_DriverIRQHandler(void)
 
 void DMA0_DMA16_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[0]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 16U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 16U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[16]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1431,12 +1323,10 @@ void DMA0_DMA16_DriverIRQHandler(void)
 
 void DMA1_DMA17_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[1]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 17U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 17U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[17]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1448,12 +1338,10 @@ void DMA1_DMA17_DriverIRQHandler(void)
 
 void DMA2_DMA18_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[2]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 18U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 18U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[18]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1465,12 +1353,10 @@ void DMA2_DMA18_DriverIRQHandler(void)
 
 void DMA3_DMA19_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[3]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 19U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 19U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[19]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1482,12 +1368,10 @@ void DMA3_DMA19_DriverIRQHandler(void)
 
 void DMA4_DMA20_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[4]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 20U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 20U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[20]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1499,12 +1383,10 @@ void DMA4_DMA20_DriverIRQHandler(void)
 
 void DMA5_DMA21_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[5]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 21U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 21U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[21]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1516,12 +1398,10 @@ void DMA5_DMA21_DriverIRQHandler(void)
 
 void DMA6_DMA22_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[6]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 22U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 22U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[22]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1533,12 +1413,10 @@ void DMA6_DMA22_DriverIRQHandler(void)
 
 void DMA7_DMA23_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[7]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 23U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 23U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[23]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1550,12 +1428,10 @@ void DMA7_DMA23_DriverIRQHandler(void)
 
 void DMA8_DMA24_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 8U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 8U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[8]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 24U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 24U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[24]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1567,12 +1443,10 @@ void DMA8_DMA24_DriverIRQHandler(void)
 
 void DMA9_DMA25_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 9U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 9U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[9]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 25U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 25U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[25]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1584,12 +1458,10 @@ void DMA9_DMA25_DriverIRQHandler(void)
 
 void DMA10_DMA26_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 10U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 10U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[10]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 26U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 26U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[26]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1601,12 +1473,10 @@ void DMA10_DMA26_DriverIRQHandler(void)
 
 void DMA11_DMA27_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 11U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 11U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[11]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 27U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 27U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[27]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1618,12 +1488,10 @@ void DMA11_DMA27_DriverIRQHandler(void)
 
 void DMA12_DMA28_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 12U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 12U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[12]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 28U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 28U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[28]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1635,12 +1503,10 @@ void DMA12_DMA28_DriverIRQHandler(void)
 
 void DMA13_DMA29_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 13U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 13U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[13]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 29U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 29U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[29]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1652,12 +1518,10 @@ void DMA13_DMA29_DriverIRQHandler(void)
 
 void DMA14_DMA30_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 14U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 14U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[14]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 30U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 30U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[30]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1669,12 +1533,10 @@ void DMA14_DMA30_DriverIRQHandler(void)
 
 void DMA15_DMA31_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 15U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 15U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[15]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 31U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 31U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[31]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1690,12 +1552,10 @@ void DMA15_DMA31_DriverIRQHandler(void)
 
 void DMA0_0_4_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 0U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[0]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 4U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[4]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1707,12 +1567,10 @@ void DMA0_0_4_DriverIRQHandler(void)
 
 void DMA0_1_5_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 1U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[1]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 5U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[5]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1724,12 +1582,10 @@ void DMA0_1_5_DriverIRQHandler(void)
 
 void DMA0_2_6_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 2U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[2]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 6U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[6]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1741,12 +1597,10 @@ void DMA0_2_6_DriverIRQHandler(void)
 
 void DMA0_3_7_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 3U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[3]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 7U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[7]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1758,12 +1612,10 @@ void DMA0_3_7_DriverIRQHandler(void)
 
 void DMA0_8_12_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 8U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 8U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[8]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 12U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 12U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[12]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1775,12 +1627,10 @@ void DMA0_8_12_DriverIRQHandler(void)
 
 void DMA0_9_13_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 9U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 9U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[9]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 13U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 13U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[13]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1792,12 +1642,10 @@ void DMA0_9_13_DriverIRQHandler(void)
 
 void DMA0_10_14_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 10U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 10U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[10]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 14U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 14U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[14]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1809,12 +1657,10 @@ void DMA0_10_14_DriverIRQHandler(void)
 
 void DMA0_11_15_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 11U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 11U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[11]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 15U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 15U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[15]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1826,12 +1672,10 @@ void DMA0_11_15_DriverIRQHandler(void)
 
 void DMA0_16_20_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 16U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 16U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[16]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 20U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 20U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[20]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1843,12 +1687,10 @@ void DMA0_16_20_DriverIRQHandler(void)
 
 void DMA0_17_21_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 17U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 17U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[17]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 21U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 21U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[21]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1860,12 +1702,10 @@ void DMA0_17_21_DriverIRQHandler(void)
 
 void DMA0_18_22_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 18U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 18U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[18]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 22U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 22U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[22]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1877,12 +1717,10 @@ void DMA0_18_22_DriverIRQHandler(void)
 
 void DMA0_19_23_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 19U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 19U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[19]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 23U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 23U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[23]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1894,12 +1732,10 @@ void DMA0_19_23_DriverIRQHandler(void)
 
 void DMA0_24_28_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 24U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 24U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[24]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 28U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 28U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[28]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1911,12 +1747,10 @@ void DMA0_24_28_DriverIRQHandler(void)
 
 void DMA0_25_29_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 25U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 25U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[25]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 29U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 29U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[29]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1928,12 +1762,10 @@ void DMA0_25_29_DriverIRQHandler(void)
 
 void DMA0_26_30_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 26U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 26U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[26]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 30U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 30U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[30]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping
@@ -1945,12 +1777,10 @@ void DMA0_26_30_DriverIRQHandler(void)
 
 void DMA0_27_31_DriverIRQHandler(void)
 {
-    if ((EDMA_GetChannelStatusFlags(DMA0, 27U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 27U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[27]);
     }
-    if ((EDMA_GetChannelStatusFlags(DMA0, 31U) & kEDMA_InterruptFlag) != 0U)
-    {
+    if ((EDMA_GetChannelStatusFlags(DMA0, 31U) & kEDMA_InterruptFlag) != 0U) {
         EDMA_HandleIRQ(s_EDMAHandle[31]);
     }
     /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

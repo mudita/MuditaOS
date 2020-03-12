@@ -10,9 +10,9 @@
 //
 //#include <cstdint>
 //
-//namespace gui {
+// namespace gui {
 //
-//enum class KeyCode {
+// enum class KeyCode {
 //	KEY_LEFT,
 //	KEY_UP,
 //	KEY_RIGHT,
@@ -42,7 +42,7 @@
 //	SWITCH_DN
 //};
 //
-//enum class KeyState {
+// enum class KeyState {
 //	KEY_UNKNOWN         = 0x00,
 //	KEY_PRESSED         = 0x01,
 //    KEY_RELEASED_SHORT  = 0x02,
@@ -50,8 +50,8 @@
 //	KEY_CYCLE           = 0x08
 //};
 //
-//class KeyEvent {
-//public:
+// class KeyEvent {
+// public:
 //	//defines mapped code of the pressed button
 //	KeyCode keyCode;
 //	//defines state of the button

@@ -37,16 +37,15 @@
 
 // Forward declaration
 
-void
-_exit(int code);
+void _exit(int code);
 
 // ----------------------------------------------------------------------------
 
-
 void __reset_hardware(void)
 {
-  // Let watchdog reset system
-  while(1);
+    // Let watchdog reset system
+    while (1)
+        ;
 }
 
 // On Release, call the hardware reset procedure.
@@ -73,6 +72,5 @@ abort(void)
   
 }
 #endif
-
 
 // ----------------------------------------------------------------------------

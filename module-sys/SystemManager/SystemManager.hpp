@@ -22,82 +22,77 @@
 namespace sys
 {
 
-    enum class SystemManagerMsgType{
+    enum class SystemManagerMsgType
+    {
         CloseSystem,
     };
 
-    class SystemManagerMsg : public DataMessage{
-    public:
-
-        SystemManagerMsg(SystemManagerMsgType type):
-                DataMessage(BusChannels::SystemManagerRequests),
-                type(type){}
-
+    class SystemManagerMsg : public DataMessage
+    {
+      public:
+        SystemManagerMsg(SystemManagerMsgType type) : DataMessage(BusChannels::SystemManagerRequests), type(type)
+        {}
 
         SystemManagerMsgType type;
     };
 
+    class SystemManager : public Service
+    {
+      public:
+        SystemManager(TickType_t pingInterval);
 
-class SystemManager : public Service
-{
-public:
-	SystemManager(TickType_t pingInterval);
+        ~SystemManager();
 
-	~SystemManager();
+        void StartSystem(std::function<int()> init);
 
-	void StartSystem(std::function<int()> init);
+        // Invoke system close procedure
+        static bool CloseSystem(Service *s);
 
-	// Invoke system close procedure
-	static bool CloseSystem(Service* s);
+        static bool SuspendSystem(Service *caller);
 
-	static bool SuspendSystem(Service* caller);
+        static bool ResumeSystem(Service *caller);
 
-	static bool ResumeSystem(Service* caller);
+        static bool SuspendService(const std::string &name, Service *caller);
 
-	static bool SuspendService(const std::string& name,Service* caller);
+        static bool ResumeService(const std::string &name, Service *caller);
 
-    static bool ResumeService(const std::string& name,Service* caller);
+        // Create new service
+        static bool CreateService(std::shared_ptr<Service> service, Service *caller, TickType_t timeout = 5000);
 
-	// Create new service
-	static bool CreateService(std::shared_ptr<Service> service,Service* caller,TickType_t timeout=5000);
+        // Destroy existing service
+        static bool DestroyService(const std::string &name, Service *caller, TickType_t timeout = 5000);
 
-	// Destroy existing service
-	static bool DestroyService(const std::string& name,Service* caller,TickType_t timeout=5000);
+      private:
+        void TickHandler(uint32_t id) override;
 
-private:
+        Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;
 
-	void TickHandler(uint32_t id) override;
+        ReturnCodes InitHandler() override;
 
-    Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp) override;
+        ReturnCodes DeinitHandler() override
+        {
+            return ReturnCodes::Success;
+        }
 
-    ReturnCodes InitHandler() override;
+        ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final
+        {
+            return ReturnCodes::Success;
+        }
 
-    ReturnCodes DeinitHandler() override{return ReturnCodes::Success;}
+        void Run() override;
 
-    ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) override final{return ReturnCodes::Success;}
+        void CloseSystemHandler();
 
+        TickType_t pingInterval;
+        uint32_t pingPongTimerID;
 
+        std::function<int()> userInit;
 
+        static std::vector<std::shared_ptr<Service>> servicesList;
+        static cpp_freertos::MutexStandard destroyMutex;
+        static std::unique_ptr<PowerManager> powerManager;
+    };
 
-    void Run() override;
-
-    void CloseSystemHandler();
-
-
-    TickType_t pingInterval;
-	uint32_t    pingPongTimerID;
-
-    std::function<int()> userInit;
-
-	static std::vector<std::shared_ptr<Service>> servicesList;
-    static cpp_freertos::MutexStandard destroyMutex;
-    static std::unique_ptr<PowerManager> powerManager;
-
-};
-
-
-
-
-}
+} // namespace sys
 
 #endif /* SYSTEMMANAGER_SYSTEMMANAGER_HPP_ */

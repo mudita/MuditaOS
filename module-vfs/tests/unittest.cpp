@@ -14,48 +14,43 @@
 #include <stdint.h>
 #include <algorithm>
 
-
 #include <iostream>
-
 
 class vfs vfs;
 
+TEST_CASE("Test case 1")
+{
 
-TEST_CASE( "Test case 1" ) {
+    vfs.Init();
 
+    const size_t testBufferSize = 1024 * 1024;
 
-        vfs.Init();
+    uint8_t testBuffer[testBufferSize] = {0};
 
-        const size_t testBufferSize = 1024*1024;
+    auto fd = vfs.fopen("testFile.txt", "w");
+    REQUIRE(fd != nullptr);
 
-        uint8_t testBuffer[testBufferSize] = {0};
+    auto bytesWritten = vfs.fwrite(testBuffer, 1, testBufferSize, fd);
+    REQUIRE(bytesWritten == testBufferSize);
 
-        auto fd =  vfs.fopen("testFile.txt","w");
-        REQUIRE(fd != nullptr);
+    auto currFilePos = vfs.ftell(fd);
+    REQUIRE(currFilePos == testBufferSize);
 
-        auto bytesWritten = vfs.fwrite(testBuffer,1,testBufferSize,fd);
-        REQUIRE(bytesWritten == testBufferSize);
+    auto fileSize = vfs.filelength(fd);
+    REQUIRE(fileSize == testBufferSize);
 
-        auto currFilePos = vfs.ftell(fd);
-        REQUIRE(currFilePos == testBufferSize);
+    currFilePos = vfs.ftell(fd);
+    REQUIRE(currFilePos == testBufferSize);
 
-        auto fileSize = vfs.filelength(fd);
-        REQUIRE(fileSize == testBufferSize);
+    REQUIRE(vfs.fclose(fd) == 0);
 
-        currFilePos = vfs.ftell(fd);
-        REQUIRE(currFilePos == testBufferSize);
+    auto cwd = vfs.getcurrdir();
 
-        REQUIRE(vfs.fclose(fd) == 0);
+    auto path = cwd.substr(0, cwd.find_last_of("/\\"));
 
-        auto cwd = vfs.getcurrdir();
-
-        auto path = cwd.substr(0,cwd.find_last_of("/\\"));
-
-
-        auto dirList = vfs.listdir((path + "/module-vfs/tests/test_dir").c_str());
-        REQUIRE(dirList.size() == 3);
-        REQUIRE(dirList[0].attributes == vfs::FileAttributes::Directory);
-        REQUIRE(dirList[0].fileName == "test_dir2");
-        REQUIRE(dirList[1].attributes == vfs::FileAttributes::Writable);
-
+    auto dirList = vfs.listdir((path + "/module-vfs/tests/test_dir").c_str());
+    REQUIRE(dirList.size() == 3);
+    REQUIRE(dirList[0].attributes == vfs::FileAttributes::Directory);
+    REQUIRE(dirList[0].fileName == "test_dir2");
+    REQUIRE(dirList[1].attributes == vfs::FileAttributes::Writable);
 }
