@@ -14,12 +14,12 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
     if (searchResults.get()->empty() || searchResults->front().contactType == ContactType::TEMPORARY)
     {
         // add option - add contact
-        options.push_back(gui::options::contactOption(app, app::ContactOperation::Add, searchResults->front()));
+        options.push_back(gui::options::contact(app, app::ContactOperation::Add, searchResults->front()));
     }
     else
     {
         // add option - contact details
-        options.push_back(gui::options::contactOption(app, app::ContactOperation::Details, searchResults->front()));
+        options.push_back(gui::options::contact(app, app::ContactOperation::Details, searchResults->front()));
     }
 
     // add option delete call option

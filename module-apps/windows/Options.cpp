@@ -7,14 +7,14 @@ namespace gui::options
 {
     using namespace app;
 
-    Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact)
+    Option call(Application *app, CallOperation callOperation, const ContactRecord &contact)
     {
         assert(app != nullptr);
         return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
-                [app, contact, callOperation](gui::Item &item) { return call(app, callOperation, contact); }, gui::Arrow::Enabled};
+                [app, contact, callOperation](gui::Item &item) { return app::call(app, callOperation, contact); }, gui::Arrow::Enabled};
     }
 
-    Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec, gui::Arrow arrow)
+    Option contact(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec, gui::Arrow arrow)
     {
         assert(app != nullptr);
 
@@ -39,6 +39,6 @@ namespace gui::options
             break;
         }
 
-        return {str, [=](gui::Item &item) { return contact(app, contactOperation, contactRec); }, arrow};
+        return {str, [=](gui::Item &item) { return app::contact(app, contactOperation, contactRec); }, arrow};
     }
 } // namespace gui::options
