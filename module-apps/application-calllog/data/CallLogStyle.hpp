@@ -117,13 +117,4 @@ constexpr uint32_t w = style::window_width - leftMargin - rightMargin;
 constexpr uint32_t h = style::window_height - y;
 } // namespace mainWindow
 
-// OPTIONS WINDOW
-namespace optionsWindow
-{
-namespace option
-{
-constexpr uint32_t x = 20;
-constexpr uint32_t offset = 63;
-} // namespace option
-} // namespace optionsWindow
 } // namespace callLogStyle

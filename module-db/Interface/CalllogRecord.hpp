@@ -30,6 +30,8 @@ struct CalllogRecord : public Record
     CalllogRecord() = default;
     ~CalllogRecord() = default;
     CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name);
+
+    uint32_t getContactId() const;
 };
 
 enum class CalllogRecordField{

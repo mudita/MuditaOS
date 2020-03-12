@@ -8,8 +8,9 @@
  */
 #pragma once
 
-#include "Application.hpp"
-#include "CalllogRecord.hpp"
+#include <Application.hpp>
+#include <CalllogRecord.hpp>
+#include <OptionWindow.hpp>
 
 namespace app {
 
@@ -21,7 +22,9 @@ public:
 	ApplicationCallLog( std::string name=CallLogAppStr, std::string parent = "", bool startBackgound = false);
 	virtual ~ApplicationCallLog();
 
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+    gui::OptionWindow *windowOptions = nullptr;
+
+    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
 	sys::ReturnCodes InitHandler() override;
 	sys::ReturnCodes DeinitHandler() override;
 

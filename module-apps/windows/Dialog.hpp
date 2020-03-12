@@ -23,16 +23,12 @@ namespace gui
         } meta;
 
         Dialog(app::Application *app, const std::string &name, const Meta &meta);
-        virtual ~Dialog() = default;
+        ~Dialog() override = default;
 
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
 
-        void onBeforeShow(ShowMode mode, SwitchData *data) override{};
-        bool handleSwitchData(SwitchData *data) override
-        {
-            return false;
-        };
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         void update(const Meta &meta);
     };
