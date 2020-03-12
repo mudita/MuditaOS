@@ -12,11 +12,12 @@
 #ifndef PUREPHONE_CELLULARMESSAGE_HPP
 #define PUREPHONE_CELLULARMESSAGE_HPP
 
+#include "../SignalStrength.hpp"
+#include "MessageType.hpp"
+#include "Service/Message.hpp"
+#include "utf8/UTF8.hpp"
 #include <memory>
 #include <variant>
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
-#include "utf8/UTF8.hpp"
 
 class CellularMessage : public sys::DataMessage {
 public:
@@ -60,12 +61,13 @@ public:
 class CellularSignalStrengthUpdateMessage : public CellularNotificationMessage
 {
   public:
-    CellularSignalStrengthUpdateMessage(int rssi = 0) : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate), rssi(rssi)
+    CellularSignalStrengthUpdateMessage(int rssi = 0)
+        : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate), signalStrength(rssi)
     {
     }
     virtual ~CellularSignalStrengthUpdateMessage() = default;
 
-    int rssi = 0;
+    SignalStrength signalStrength;
 };
 
 class CellularRequestMessage : public CellularMessage{

@@ -58,7 +58,8 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     return resp;
 }
 
-int ATParser::ProcessNewData(sys::Service *service) {
+int ATParser::ProcessNewData(sys::Service *service)
+{
     char rawBuffer[256] = {0};
 
     LOG_DEBUG("Receiving data from ProcessNewData");
@@ -66,8 +67,8 @@ int ATParser::ProcessNewData(sys::Service *service) {
 
     {
         cpp_freertos::LockGuard lock(mutex);
-        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s", length, responseBuffer.size(), utils::removeNewLines(responseBuffer).c_str());
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
+        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s", length, responseBuffer.size(), utils::removeNewLines(responseBuffer).c_str());
     }
 
     auto ret = ParseURC();

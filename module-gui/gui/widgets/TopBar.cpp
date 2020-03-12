@@ -19,8 +19,6 @@
 
 namespace gui {
 
-    Store::SignalStrength::RssiBar TopBar::signalStrengthBar = Store::SignalStrength::RssiBar::zero;
-
     const uint32_t TopBar::signalOffset = 35;
     const uint32_t TopBar::batteryOffset = 415;
     gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
@@ -71,10 +69,7 @@ void TopBar::prepareWidget() {
 	signal[3] = new gui::Image( this, signalOffset,17,0,0, "signal3" );
 	signal[4] = new gui::Image( this, signalOffset,17,0,0, "signal4" );
 	signal[5] = new gui::Image( this, signalOffset,17,0,0, "signal5" );
-	for( uint32_t i=0; i<signalImgCount; ++i )
-		signal[i]->setVisible( false );
-
-    signal[static_cast<size_t>(signalStrengthBar)]->setVisible(true);
+    updateSignalStrength();
 
     //icons for battery
     battery = {
@@ -213,13 +208,7 @@ void TopBar::setBatteryCharging(bool plugged)
     }
 }
 
-void TopBar::setSignalStrength(Store::SignalStrength::RssiBar sth)
-{
-    signalStrengthBar = sth;
-    updateSignalStrength();
-}
-
-void TopBar::updateSignalStrength()
+bool TopBar::updateSignalStrength()
 {
     for (uint32_t i = 0; i < signalImgCount; i++)
     {
@@ -227,7 +216,11 @@ void TopBar::updateSignalStrength()
     }
     if (elements.signal)
     {
-        signal[static_cast<size_t>(signalStrengthBar)]->setVisible(true);
+        auto rssiBar = Store::GSM::get()->signalStrength.rssiBar;
+        if (rssiBar < Store::RssiBar::noOfSupprtedBars)
+        {
+            signal[static_cast<size_t>(Store::GSM::get()->signalStrength.rssiBar)]->setVisible(true);
+        }
     }
 }
 

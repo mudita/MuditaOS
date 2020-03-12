@@ -85,12 +85,7 @@ bool AppWindow::updateBatteryLevel( uint32_t percentage ) {
 // updates battery level in the window
 bool AppWindow::updateSignalStrength()
 {
-    auto signalStrengthStore = Store::SignalStrength::get();
-    if (signalStrengthStore->isValid())
-    {
-        topBar->setSignalStrength(signalStrengthStore->rssiBar);
-    }
-    return true;
+    return topBar->updateSignalStrength();
 }
 
 bool AppWindow::updateTime( const UTF8& timeStr ) {
