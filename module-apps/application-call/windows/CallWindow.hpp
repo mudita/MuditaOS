@@ -71,7 +71,7 @@ public:
    */
   void setState(State state);
   const State &getState();
-  void updateDuration(uint32_t duration);
+  void updateDuration(time_t duration);
   void setCallNumber(std::string);
 
   bool onInput(const InputEvent &inputEvent) override;
