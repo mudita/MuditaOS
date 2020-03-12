@@ -11,8 +11,8 @@ std::list<gui::Option> threadWindowOptions(app::ApplicationMessages *app, const 
     ContactRecord contact = record ? DBServiceAPI::ContactGetByID(app, record->contactID)->front() : ContactRecord();
 
     return {
-        app::callOption(app, app::CallOperation::ExecuteCall, contact),
-        app::contactOption(app, app::ContactOperation::Details, contact),
+        gui::options::callOption(app, app::CallOperation::ExecuteCall, contact),
+        gui::options::contactOption(app, app::ContactOperation::Details, contact),
         {utils::localize.get("sms_delete_conversation"),
          [=](gui::Item &item) {
              LOG_INFO("Removing sms thread!");

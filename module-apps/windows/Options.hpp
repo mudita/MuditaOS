@@ -4,8 +4,9 @@
 #include "OptionWindow.hpp"
 #include <UiCommonActions.hpp>
 
-namespace app
+namespace gui::options
 {
-    gui::Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact);
-    gui::Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec, gui::Arrow arrow = gui::Arrow::Disabled);
-} // namespace app
+    Option callOption(app::Application *app, app::CallOperation callOperation, const ContactRecord &contact);
+    Option contactOption(app::Application *app, app::ContactOperation contactOperation, const ContactRecord &contactRec,
+                         gui::Arrow arrow = gui::Arrow::Disabled);
+} // namespace gui::options

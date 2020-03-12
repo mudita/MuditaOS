@@ -69,8 +69,8 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
 {
     ContactRecord contact = DBServiceAPI::ContactGetByID(app, record.contactID)->front();
     return {
-        gui::newOptionLabel(app::callOption(app, app::CallOperation::ExecuteCall, contact)),
-        gui::newOptionLabel(app::contactOption(app, app::ContactOperation::Details, contact)),
+        gui::newOptionLabel(gui::options::callOption(app, app::CallOperation::ExecuteCall, contact)),
+        gui::newOptionLabel(gui::options::contactOption(app, app::ContactOperation::Details, contact)),
 
         // TODO
         gui::newOptionLabel(

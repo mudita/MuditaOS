@@ -3,16 +3,18 @@
 #include <cassert>
 #include <i18/i18.hpp>
 
-namespace app
+namespace gui::options
 {
-    gui::Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact)
+    using namespace app;
+
+    Option callOption(Application *app, CallOperation callOperation, const ContactRecord &contact)
     {
         assert(app != nullptr);
         return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
                 [app, contact, callOperation](gui::Item &item) { return call(app, callOperation, contact); }, gui::Arrow::Enabled};
     }
 
-    gui::Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec, gui::Arrow arrow)
+    Option contactOption(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec, gui::Arrow arrow)
     {
         assert(app != nullptr);
 
@@ -39,4 +41,4 @@ namespace app
 
         return {str, [=](gui::Item &item) { return contact(app, contactOperation, contactRec); }, arrow};
     }
-} // namespace app
+} // namespace gui::options
