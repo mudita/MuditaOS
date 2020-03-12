@@ -4,6 +4,7 @@
 
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
+#include "projdefs.h"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include <cassert>
@@ -186,10 +187,13 @@ TS0710::ConfState TS0710::ConfProcedure() {
     parser->cmd(at::AT::URC_UART1);
     parser->cmd(at::AT::AT_PIN_READY_LOGIC);
     parser->cmd(at::AT::URC_NOTIF_SIGNAL);
-    parser->cmd(at::AT::CRC_ON);
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
-    while (!parser->cmd(at::AT::QSCLK_ON)) {}
+    while (!parser->cmd(at::AT::QSCLK_ON))
+    {
+        auto const sec = 1000;
+        vTaskDelay(pdMS_TO_TICKS(sec)); // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
+    }
 
     bool reboot_needed = false;
 
