@@ -9,9 +9,9 @@
 
 void changeSim(app::Application *app, SettingsRecord::ActiveSim simsettings, Store::GSM::SIM sim)
 {
-    app->getSettings().activeSIM = SettingsRecord::ActiveSim::SIM1;
+    app->getSettings().activeSIM = simsettings;
     DBServiceAPI::SettingsUpdate(app, app->getSettings());
-    Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+    Store::GSM::get()->selected = sim;
     bsp::cellular::sim::sim_sel();
     bsp::cellular::sim::hotswap_trigger();
 }
