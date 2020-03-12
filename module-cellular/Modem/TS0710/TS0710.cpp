@@ -21,6 +21,8 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {P
 #define SERIAL_PORT "/dev/null"
 #endif
 
+#define USE_DAEFAULT_BAUDRATE 1
+
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
     pv_cellular = bsp::Cellular::Create(SERIAL_PORT, 115200).value_or(nullptr);
@@ -112,8 +114,9 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //7. set baudrate 115200 baud
                 //8. Send AT
                 LOG_DEBUG("4. Setting baudrate to 115200...");
-                // OK THIS IS BAD for modem restart... baud on cmux is 460800bit, we wont be able to close cmux if it stays
-                // pv_cellular->SetSpeed(115200);
+#if USE_DAEFAULT_BAUDRATE
+                pv_cellular->SetSpeed(115200);
+#endif
                 LOG_DEBUG("Sending AT...");
                 if (parser->cmd(at::AT::AT))
                 {
