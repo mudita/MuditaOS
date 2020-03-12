@@ -96,23 +96,28 @@ shouldnt_ignore() {
 case "${1}" in
   --about )
     echo "Runs clang-format on source files"
+    FILES=''
+    ;;
+  --last)
+    FILES=$(git diff --name-only HEAD..HEAD^)
     ;;
   * )
-    ERROR=0
-    for file in `git diff-index --cached --name-only HEAD` ; do
-        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
-            #format_file "${file}"
-            check_file "${file}"
-            RESULT=$?
-            if [[ ${RESULT} -eq 1 ]]; then
-                echo -e "please run:\n\t git clang-format\n before commit"
-                ERROR=1
-            else
-                ERROR=0
-            fi
-        fi
-    done
-    exit $ERROR
+    FILES=$(git diff-index --cached --name-only HEAD)
     ;;
 esac
 
+ERROR=0
+for file in ${FILES}; do
+    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
+        #format_file "${file}"
+        check_file "${file}"
+        RESULT=$?
+        if [[ ${RESULT} -eq 1 ]]; then
+            echo -e "please run:\n\t git clang-format\n before commit"
+            ERROR=1
+        else
+            ERROR=0
+        fi
+    fi
+done
+return $ERROR

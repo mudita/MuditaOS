@@ -12,6 +12,12 @@ jobs:
       with:
         token: ${{ secrets.GitHub_PAT }}
         submodules: true
+    - name: Style Linter Setup
+      run: |
+        sudo apt-get update && sudo apt-get install -y clang-format-9
+    - name: Style Check
+      run: |
+        ./config/pre-commit-check-only.hook --last
     - name: Run bootstrap & Build
       run: |
         echo "Install neccessary packages"
