@@ -24,7 +24,7 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {P
 #define SERIAL_PORT "/dev/null"
 #endif
 
-#define USE_DAEFAULT_BAUDRATE 1
+#define USE_DAEFAULT_BAUDRATE 0
 
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
@@ -394,7 +394,7 @@ TS0710::ConfState TS0710::StartMultiplexer() {
             SignalStrength signalStrength(std::stoi(res.response[0].substr(beg + 1, end - beg - 1)));
             if (signalStrength.isValid())
             {
-                Store::GSM::get()->signalStrength = signalStrength.data;
+                Store::GSM::get()->setSignalStrength(signalStrength.data);
                 auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SignalStrengthUpdate);
                 sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
             }
