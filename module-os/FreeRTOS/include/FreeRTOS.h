@@ -457,6 +457,10 @@ task that attempted the write. */
 #define traceCREATE_COUNTING_SEMAPHORE_FAILED()
 #endif
 
+#ifndef traceQueueSendReceive_LVL
+#define traceQueueSendReceive_LVL 0
+#endif
+
 #ifndef traceQUEUE_SEND
 #define traceQUEUE_SEND(pxQueue)
 #endif
@@ -547,6 +551,10 @@ task that attempted the write. */
 
 #ifndef traceTASK_INCREMENT_TICK
 #define traceTASK_INCREMENT_TICK(xTickCount)
+#endif
+
+#ifndef traceSYSTEM_TIMER
+#define traceSYSTEM_TIMER 0
 #endif
 
 #ifndef traceTIMER_CREATE
