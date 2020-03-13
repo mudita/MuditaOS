@@ -8,6 +8,39 @@
 #     `sudo apt install ccache`
 # it's support is added to default ccache
 
+function installHooks(){
+    echo -e "Install style checking hooks"
+    options=('Automatic style update.'
+             'Just notify me about style errors but do not apply it.'
+             'Let me do it manually.'
+             )
+    CUR_PS3="$PS3"
+    PS3="Please select a script:"
+    select OPT in "${options[@]}"; do
+        case ${REPLY} in 
+            1 )
+                HOOK="pre-commit.hook"
+                break
+                ;;
+            2 )
+                HOOK="pre-commit-check-only.hook"
+                break
+                ;;
+            3 )
+                PS3=$CUR_PS3
+                return
+                ;;
+            * )
+                echo "invalid option \"${REPLY}\""
+                ;;
+        esac
+    done
+
+    L_GIT_DIR=$(git rev-parse --show-toplevel)
+    ln -sf ${L_GIT_DIR}/config/${HOOK} ${L_GIT_DIR}/.git/hooks/pre-commit
+    PS3=$CUR_PS3
+}
+
 echo "Install neccessary packages"
 sudo apt update && sudo apt dist-upgrade -y
 sudo apt install -y binutils wget git make pkg-config gtkmm-3.0 gcc-8 g++-8 portaudio19-dev
@@ -40,6 +73,8 @@ echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
 
 echo "set gcc-8 as default alternative (instead of default gcc-7 in ubuntu)"
 sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+
+installHooks
 
 echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
 echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
