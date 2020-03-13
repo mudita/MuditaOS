@@ -27,4 +27,10 @@ namespace Store
         }
         return ptr;
     }
+
+    void GSM::setSignalStrength(SignalStrength &signalStrength)
+    {
+        LOG_INFO("Setting signal strenth to rssi = %d dBm (%d) : %u bars", signalStrength.rssidBm, signalStrength.rssi, signalStrength.rssiBar);
+        ptr->signalStrength = signalStrength;
+    }
 }; // namespace Store

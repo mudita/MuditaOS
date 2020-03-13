@@ -73,6 +73,7 @@ namespace Store
         } modem = Modem::OFF;
 
         SignalStrength signalStrength;
+        void setSignalStrength(SignalStrength &signalStrength);
 
         static GSM *get();
     };

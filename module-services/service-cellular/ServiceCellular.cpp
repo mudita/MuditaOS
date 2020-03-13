@@ -612,6 +612,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
         }
         auto message = std::make_shared<sevm::SIMMessage>();
         sys::Bus::SendUnicast(message, "EventManager", this);
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
     // Incoming call
@@ -645,7 +646,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
 
     // Received signal strength change
     auto qind = at::urc::QIND(str);
-    if (qind.is())
+    if (qind.is() && qind.is_csq())
     {
         if (!qind.validate(at::urc::QIND::RSSI))
         {
@@ -656,7 +657,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
             SignalStrength signalStrength(std::stoi(qind.tokens[at::urc::QIND::RSSI]));
             if (signalStrength.isValid())
             {
-                Store::GSM::get()->signalStrength = signalStrength.data;
+                Store::GSM::get()->setSignalStrength(signalStrength.data);
                 return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SignalStrengthUpdate);
             }
         }
