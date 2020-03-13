@@ -284,7 +284,7 @@ uint32_t Font::getPixelWidth( const UTF8& str, const uint32_t start, const uint3
         auto glyph_found = glyphs.find(idCurrent);
         if (glyph_found != glyphs.end())
         {
-            stringPixelWidth = getCharPixelWidth(idCurrent) + (i == 0 ? 0 : getKerning(idLast, idCurrent));
+            stringPixelWidth += getCharPixelWidth(idCurrent) + (i == 0 ? 0 : getKerning(idLast, idCurrent));
         }
         else
         {
@@ -320,12 +320,15 @@ uint32_t Font::getCharPixelHeight( uint32_t charCode ) {
 std::unique_ptr<FontGlyph> Font::getGlyphUnsupported() const
 {
     std::unique_ptr<FontGlyph> unsupported = std::make_unique<FontGlyph>();
-    unsupported->height = this->info.size * 0.80;
-    unsupported->width = unsupported->height * 0.69;
+
+    const float pt_to_px = 0.75;
+    unsupported->height = this->info.size * pt_to_px;
+    const float typical_width_as_percent_of_height = 0.62;
+    unsupported->width = unsupported->height * typical_width_as_percent_of_height;
     unsupported->xoffset = 0;
     unsupported->yoffset = 0;
 
-    // generate a rectangle based o a existing letter. otherwise use some magic numbers ↑ to approximate the size for the rectangle
+    // generate a rectangle based on an existing letter. otherwise use some magic numbers ↑ to approximate the size for the rectangle
     char baseChar = 'h'; // arbitrary choice. h as a representative character to get an idea of glyph size. if not found, then use magic numbers above
     auto baseCharFound = this->glyphs.find(baseChar);
     if (baseCharFound != this->glyphs.end())
@@ -334,13 +337,13 @@ std::unique_ptr<FontGlyph> Font::getGlyphUnsupported() const
         unsupported->width = baseGlyph->width;
         unsupported->height = baseGlyph->height;
         unsupported->xoffset = (baseGlyph->xadvance - baseGlyph->width) / 2;
-        unsupported->xadvance = unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
     }
     if (unsupported->xoffset == 0)
     {
         unsupported->xoffset = 1; // fallback margin.
     }
     unsupported->yoffset += unsupported->height;
+    unsupported->xadvance = unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
     // populate with a bitmap (glyph)
     CommandRectangle *commandRect = new CommandRectangle();
     commandRect->x = 0;

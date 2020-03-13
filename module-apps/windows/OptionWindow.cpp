@@ -19,24 +19,27 @@ namespace gui
     {
     }
 
-    Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback)
+    Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
         // TODO fix elements positioning with styles ready, right now moved from Settings main window as it is
         gui::Label *label = new gui::Label(nullptr, 20, 0, style::window_width - 2 * 20, style::window::label::big_h, text);
         style::window::decorateOption(label);
         label->activatedCallback = activatedCallback;
-        new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
+        if (arrow == Arrow::Enabled)
+        {
+            new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
+        }
         return label;
     }
 
     Item *newOptionLabel(const Option &option)
     {
-        return newOptionLabel(option.text, option.activatedCallback);
+        return newOptionLabel(option.text, option.activatedCallback, option.arrow);
     }
 
-    void OptionWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback)
+    void OptionWindow::addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
-        body->addWidget(newOptionLabel(text, activatedCallback));
+        body->addWidget(newOptionLabel(text, activatedCallback, arrow));
     }
 
     void OptionWindow::addOptions(std::list<Option> options)
@@ -44,7 +47,7 @@ namespace gui
         for (auto &el : options)
         {
             LOG_INFO("adding option: %s", el.text.c_str());
-            addOptionLabel(el.text, el.activatedCallback);
+            addOptionLabel(el.text, el.activatedCallback, el.arrow);
         }
         body->switchPage(0);
     }

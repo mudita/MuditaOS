@@ -11,6 +11,19 @@
 
 #include "SettingsRecord.hpp"
 
+SettingsRecord::ActiveSim SettingsRecord::to(const uint32_t sim)
+{
+    if (sim >= static_cast<uint32_t>(ActiveSim::NONE) && sim <= static_cast<uint32_t>(ActiveSim::SIM2))
+    {
+        return ActiveSim(sim);
+    }
+    return ActiveSim::NONE;
+}
+
+uint32_t SettingsRecord::from(const ActiveSim sim)
+{
+    return static_cast<uint32_t>(sim);
+}
 
 SettingsRecordInterface::SettingsRecordInterface(SettingsDB* db) : settingsDB(db) {
 }
@@ -35,7 +48,7 @@ SettingsRecord SettingsRecordInterface::GetByID(uint32_t id) {
                           .pinDaysLeft = rec.pinDaysLeft,
                           .pin1 = rec.pin1,
                           .pin2 = rec.pin2,
-                          .activeSIM = rec.activeSIM,
+                          .activeSIM = SettingsRecord::to(rec.activeSIM),
                           .networkOperator = rec.networkOperator,
                           .lockPassHash = rec.lockPassHash,
                           .lockTime = rec.lockTime,
@@ -56,7 +69,7 @@ bool SettingsRecordInterface::Update(const SettingsRecord &rec) {
                                                         .pinDaysLeft = rec.pinDaysLeft,
                                                         .pin1 = rec.pin1,
                                                         .pin2 = rec.pin2,
-                                                        .activeSIM = rec.activeSIM,
+                                                        .activeSIM = SettingsRecord::from(rec.activeSIM),
                                                         .networkOperator = rec.networkOperator,
                                                         .lockPassHash = rec.lockPassHash,
                                                         .lockTime = rec.lockTime,

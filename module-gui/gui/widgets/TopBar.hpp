@@ -12,6 +12,7 @@
 #include "Image.hpp"
 #include "Label.hpp"
 #include "Rect.hpp"
+#include "TopBar/SIM.hpp"
 #include <common_data/EventStore.hpp>
 
 namespace gui {
@@ -19,6 +20,18 @@ namespace gui {
     static const uint32_t batteryLevelCount = 6;
     static const uint32_t signalImgCount = 6;
 
+    /// Header of most of design Windows
+    ///
+    /// Provides way to show:
+    ///    0. Window title
+    ///    1. battery state
+    ///    2. signal
+    ///    3. time
+    ///    4. sim state
+    /// in separate areas, when enabled
+    ///
+    ///              [time]
+    /// [signal]    [title ] [sim] [battery]
     class TopBar : public Rect
     {
         static const uint32_t signalOffset;
@@ -47,7 +60,7 @@ namespace gui {
         Image *lock;
         std::array<Image *, batteryLevelCount> battery = {nullptr};
         Label *charging = nullptr;
-        Label *sim = nullptr;
+        gui::SIM *sim = nullptr;
         void prepareWidget();
         static TimeMode timeMode;
 
@@ -62,7 +75,7 @@ namespace gui {
             bool battery : 1;
             bool time : 1;
             bool sim : 1;
-        } elements = {false, false, false, false, false};
+        } elements = {false, false, false, false, true};
 
       public:
         TopBar();

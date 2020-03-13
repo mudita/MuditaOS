@@ -10,13 +10,14 @@
 
 #include <list>
 #include "Rect.hpp"
-#include "KeyEvent.hpp"
 #include "ListItemProvider.hpp"
 
 namespace gui {
 
 class ListItemProvider;
 
+/// fixed size and application Vertical ListView to be used with ListItemProvider and DatabaseModel only.
+/// For simple vertical list with no external model use VBox
 class ListView: public Rect {
 protected:
 	//id of the first element visible on the list (location depends on orientation)

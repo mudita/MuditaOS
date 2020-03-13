@@ -14,33 +14,42 @@
 
 namespace gui {
 
-class BottomBar: public Rect {
-public:
-	enum class Side {
-		LEFT = 0x01,
-		CENTER,
-		RIGHT
-	};
-protected:
-	Label* left;
-	Label* center;
-	Label* right;
-	gui::Label* prepareLabel( BottomBar::Side side );
-    Label *getSide(BottomBar::Side side);
+    /// Footer for most design windows
+    ///
+    /// Consists of 3 areas right now `[ left  ] [ center ] [ right ]`
+    /// these areas most of times inform user about possibility to execute action with keys
+    /// left is left action key, center describes center (enter) key, and right right action key
+    /// depending on screen selected elements will be visible
+    /// @note when in Text widget it will show input mode if enabled in [ left ] area
+    class BottomBar : public Rect
+    {
+      public:
+        enum class Side
+        {
+            LEFT = 0x01,
+            CENTER,
+            RIGHT
+        };
 
-  public:
+      protected:
+        Label *left;
+        Label *center;
+        Label *right;
+        gui::Label *prepareLabel(BottomBar::Side side);
+        Label *getSide(BottomBar::Side side);
 
-	BottomBar();
-	BottomBar( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h );
-	virtual ~BottomBar();
+      public:
+        BottomBar();
+        BottomBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        virtual ~BottomBar();
 
-	void setActive( BottomBar::Side side, bool active );
-	void setText( BottomBar::Side side, const UTF8& str, bool active = true );
-    UTF8 getText(BottomBar::Side side);
+        void setActive(BottomBar::Side side, bool active);
+        void setText(BottomBar::Side side, const UTF8 &str, bool active = true);
+        UTF8 getText(BottomBar::Side side);
 
-    //virtual methods from Item
-	bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim);
-};
+        // virtual methods from Item
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
+    };
 
 } /* namespace gui */
 

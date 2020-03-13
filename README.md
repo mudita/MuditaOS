@@ -92,6 +92,12 @@ after running provisioning you are ready to build project for both linux and rt1
 * [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
 * [test/harness](./test/README.md)
 
+**Doxygen genertion for GUI:**
+`cd doc && doxygen doxyfile-gui`
+to show docs:
+`firefox docs-gui/html/index.html`
+Right now docs are filled for Item.hpp + grouping
+
 # Linux Bluetooth device
 
 Bluetooth service by default initializes bluetooth device. 

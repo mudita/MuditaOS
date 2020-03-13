@@ -48,6 +48,43 @@ constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 inline const auto cellularStack = 16384UL;
 
+using namespace cellular;
+
+const char *State::c_str(State::ST state) const
+{
+    switch (state)
+    {
+    case ST::Idle:
+        return "Idle";
+    case ST::PowerUpInProgress:
+        return "PowerUpInProgress";
+    case ST::ModemConfigurationInProgress:
+        return "ModemConfigurationInProgress";
+    case ST::AudioConfigurationInProgress:
+        return "AudioConfigurationInProgress";
+    case ST::ModemOn:
+        return "ModemOn";
+    case ST::SimInitInProgress:
+        return "SimInit";
+    case ST::FullyFunctional:
+        return "FullyFunctional";
+    case ST::Failed:
+        return "Failed";
+    }
+    return "";
+}
+
+void State::set(ST state)
+{
+    LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
+    this->state = state;
+}
+
+State::ST State::get() const
+{
+    return this->state;
+}
+
 ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack, sys::ServicePriority::Idle)
 {
 
@@ -79,6 +116,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         switch (type)
         {
 
+        case CellularNotificationMessage::Type::ModemOn:
         case CellularNotificationMessage::Type::PowerUpProcedureComplete:
         case CellularNotificationMessage::Type::Ringing:
         case CellularNotificationMessage::Type::ServiceReady:
@@ -115,13 +153,19 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
             break;
 
-            case CellularNotificationMessage::Type::None:
-                // do not send notification msg
-                return;
-            case CellularNotificationMessage::Type::RawCommand: {
-                LOG_INFO(" IGNORE RawCmd");
-                return;
-            }
+        case CellularNotificationMessage::Type::SIM: {
+            auto message = std::make_shared<sevm::SIMMessage>();
+            sys::Bus::SendUnicast(message, "EventManager", this);
+        }
+        break;
+
+        case CellularNotificationMessage::Type::None:
+            // do not send notification msg
+            return;
+        case CellularNotificationMessage::Type::RawCommand: {
+            LOG_INFO(" IGNORE RawCmd");
+            return;
+        }
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -172,7 +216,7 @@ sys::ReturnCodes ServiceCellular::InitHandler() {
     // Start power-up procedure
     sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure),
                           GetName(), this);
-    state = State::PowerUpInProgress;
+    state.set(State::ST::PowerUpInProgress);
 
     return sys::ReturnCodes::Success;
 }
@@ -241,7 +285,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
                 sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure), GetName(), this);
-                state = State ::ModemConfigurationInProgress;
+                state.set(State::ST::ModemConfigurationInProgress);
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
@@ -271,6 +315,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             break;
+            case CellularNotificationMessage::Type::SIM:
+                if (Store::GSM::get()->tray == Store::GSM::Tray::IN && !init_sim())
+                {
+                    LOG_ERROR("SIM initialization failure!");
+                }
+                break;
             default: {
                 LOG_INFO("Skipped CellularNotificationMessage::Type %d", msg->type);
             }
@@ -287,12 +337,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         else if (powerRet == TS0710::ConfState::PowerUp)
         {
-            state = State::PowerUpInProgress;
+            state.set(State::ST::PowerUpInProgress);
         }
         else
         {
             LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
-            state = State::Failed;
+            state.set(State::ST::Failed);
         }
     }
     break;
@@ -303,12 +353,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         if (confRet == TS0710::ConfState::Success)
         {
             sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure), GetName(), this);
-            state = State::AudioConfigurationInProgress;
+            state.set(State::ST::AudioConfigurationInProgress);
         }
         else
         {
             LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
-            state = State::Failed;
+            state.set(State::ST::Failed);
         }
     }
     break;
@@ -322,7 +372,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             if (!cmux->getParser()->cmd(cmd))
             {
                 LOG_ERROR("Baudrate setup error");
-                state = State::Failed;
+                state.set(State::ST::Failed);
                 break;
             }
             cmux->getCellular()->SetSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
@@ -341,16 +391,22 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                     notificationsChannel->setCallback(notificationCallback);
                 }
 
-                state = State::Ready;
-
+                state.set(State::ST::ModemOn);
+                if (select_sim())
+                {
+                    bsp::cellular::sim::sim_sel();
+                    bsp::cellular::sim::hotswap_trigger();
+                }
+                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemOn);
+                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
             }
             else
             {
                 LOG_DEBUG("[ServiceCellular] Modem FAILED");
-                state = State::Failed;
+                state.set(State::ST::Failed);
             }
 
-            state = State::Ready;
+            state.set(State::ST::ModemOn);
             // Propagate "ServiceReady" notification into system
             sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ServiceReady),
                                     sys::BusChannels::ServiceCellularNotifications, this);
@@ -362,7 +418,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         else
         {
             // Reset procedure started, do nothing here
-            state = State::PowerUpInProgress;
+            state.set(State::ST::PowerUpInProgress);
         }
     }
     break;
@@ -415,20 +471,21 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             if (channel->cmd(at::AT::ATH))
             {
-                responseMsg = std::make_shared<CellularResponseMessage>(true);
                 stopTimer(callStateTimerId);
-                // Propagate "CallAborted" notification into system
-                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted),
-                                        sys::BusChannels::ServiceCellularNotifications, this);
+                if (!ongoingCall.endCall(CellularCall::Forced::True))
+                {
+                    LOG_ERROR("Failed to end ongoing call");
+                }
+                responseMsg = std::make_shared<CellularResponseMessage>(true, msgl->messageType);
             }
             else
             {
                 LOG_ERROR("Call not aborted");
-                responseMsg = std::make_shared<CellularResponseMessage>(false);
+                responseMsg = std::make_shared<CellularResponseMessage>(false, msgl->messageType);
             }
            break;
         }
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        responseMsg = std::make_shared<CellularResponseMessage>(false, msgl->messageType);
     }
     break;
 
@@ -604,10 +661,9 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
         else
         {
             LOG_ERROR("SIM ERROR");
-            Store::GSM::get()->sim = Store::GSM::SIM::NONE;
+            Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        auto message = std::make_shared<sevm::SIMMessage>();
-        sys::Bus::SendUnicast(message, "EventManager", this);
+        return CellularNotificationMessage::Type::SIM;
     }
 
     // Incoming call
@@ -1025,4 +1081,40 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
         }
     }
     return result;
+}
+
+bool ServiceCellular::select_sim()
+{
+    auto settings = DBServiceAPI::SettingsGet(this);
+    switch (settings.activeSIM)
+    {
+    case SettingsRecord::ActiveSim::NONE:
+        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+        return false;
+    case SettingsRecord::ActiveSim::SIM1:
+        Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+        return true;
+    case SettingsRecord::ActiveSim::SIM2:
+        Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
+        return true;
+    }
+    return false;
+}
+
+bool ServiceCellular::init_sim()
+{
+    auto channel = cmux->GetChannel("Commands");
+    if (!channel)
+    {
+        LOG_ERROR("Cant configure sim! no Commands channel!");
+        return false;
+    }
+    bool success = true;
+    success = channel->cmd(at::AT::CALLER_NUMBER_PRESENTATION) && success;
+    success = channel->cmd(at::AT::SMS_TEXT_FORMAT) && success;
+    success = channel->cmd(at::AT::SMS_UCSC2) && success;
+    success = channel->cmd(at::AT::SMS_STORAGE) && success;
+    success = channel->cmd(at::AT::CRC_ON) && success;
+    state.set(State::ST::FullyFunctional);
+    return success;
 }

@@ -32,10 +32,6 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     std::vector<std::pair<std::string, ATParser::Urc>> vals = {
         {"RDY", ATParser::Urc::MeInitializationSuccessful},
         {"+CFUN: 1", ATParser::Urc::FullFuncionalityAvailable},
-        {"+CPIN: READY", ATParser::Urc::SimCardReady},
-        {"+QIND: SMS DONE", ATParser::Urc::SMSInitializationComplete},
-        {"+QIND: PB DONE", ATParser::Urc::PhonebookInitializationComplete},
-        {"+CPIN:", ATParser::Urc::NotHandled},
     };
 
     for (const auto &el : vals)
@@ -81,13 +77,10 @@ int ATParser::ProcessNewData(sys::Service *service) {
     else if (ret.size())
     {
         urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
-        // GSM modem is considered as fully operational when it outputs URCs specified below:
+        // GSM modem is considered as operational when it outputs URCs specified below:
         // 1) RDY
         // 2) +CFUN: 1
-        // 3) +CPIN: READY
-        // 4) +QIND: SMS DONE
-        // 5) +QIND: PB DONE
-        if (urcs.size() == 5)
+        if (urcs.size() == 2)
         {
             cpp_freertos::LockGuard lock(mutex);
             auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);

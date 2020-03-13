@@ -11,6 +11,8 @@
 
 #include "Application.hpp"
 #include "Service/Message.hpp"
+#include "service-cellular/messages/CellularMessage.hpp"
+#include "service-db/messages/DBNotificationMessage.hpp"
 
 namespace app {
 
@@ -27,9 +29,8 @@ protected:
 	//determines whether screen should be protected by pin verification
 	bool screenLocked = true;
 	bool pinLocked = false;
-	uint32_t unreadMessages = 0;
-	uint32_t missedCalls = 0;
 public:
+  bool need_sim_select = false;
   struct Notifications
   {
       unsigned int notSeenSMS = 0;
@@ -48,11 +49,10 @@ public:
     bool getScreenLocked();
 	void setScreenLocked( bool val );
 	bool getPinLocked();
-
-	uint32_t getMisseedCalls();
-	uint32_t getUnreadMessages();
-
-	/**
+    // if there is modem notification and there is no default SIM selected, then we need to select if when unlock is done
+    bool handle(DBNotificationMessage *msg);
+    bool handle(CellularNotificationMessage *);
+    /**
 	 * This static method will be used to lock the phone
 	 */
 //	static bool messageLockPhone( sys::Service* sender, std::string application , const gui::InputEvent& event );

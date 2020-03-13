@@ -90,10 +90,8 @@ void TopBar::prepareWidget() {
     charging->setText("Z");
     charging->setVisible(false);
 
-    sim = new Label(this, signalOffset + 50, 17, 110, this->drawArea.h);
-    sim->setFilled(false);
-    sim->setBorderColor(gui::ColorNoColor);
-    sim->setFont(style::header::font::title);
+    const auto design_sim_offset = 378; // this offset is not final
+    sim = new SIM(this, design_sim_offset, 17);
 
     //icon of the lock
 	lock = new gui::Image( this, 240-11,17,0,0, "lock" );
@@ -258,28 +256,11 @@ void TopBar::simSet()
     {
         return;
     }
-    else
+    else if (elements.sim)
     {
-        if (elements.sim)
-        {
-            switch (Store::GSM::get()->sim)
-            {
-            case Store::GSM::SIM::NONE:
-                sim->setText("x");
-                break;
-            case Store::GSM::SIM::SIM1:
-                sim->setText("1");
-                break;
-            case Store::GSM::SIM::SIM2:
-                sim->setText("2");
-                break;
-            }
-        }
-        else
-        {
-            sim->visible = false;
-        }
+        return sim->show(Store::GSM::get()->sim);
     }
+    sim->visible = false;
 }
 
 } /* namespace gui */

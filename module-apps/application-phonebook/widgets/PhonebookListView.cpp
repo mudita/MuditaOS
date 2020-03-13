@@ -221,7 +221,7 @@ void PhonebookListView::updatePageItems()
     if (orientation == ORIENTATION_TOP_DOWN)
     {
         // index of requested item is incremented only if payload of returned item is not null
-        // if it's null it means that this is favourite label of label connected with showing Capital latters for surnames
+        // if it's null it means that this is favourite label of label connected with showing Capital letters for surnames
         int index = firstIndex, prevIndex = -1;
         lastIndex = firstIndex;
         for (int i = 0; i < pageSize; i++)
@@ -288,7 +288,7 @@ void PhonebookListView::updatePageItems()
     else if (orientation == ORIENTATION_BOTTOM_UP)
     {
         // index of requested item is incremented only if payload of returned item is not null
-        // if it's null it means that this is favourite label of label connected with showing Capital latters for surnames
+        // if it's null it means that this is favourite label of label connected with showing Capital letters for surnames
         int index = lastIndex, prevIndex = -1;
         firstIndex = lastIndex;
         for (int i = 0; i < pageSize; i++)

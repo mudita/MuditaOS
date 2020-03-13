@@ -20,28 +20,26 @@
 
 class CellularMessage : public sys::DataMessage {
 public:
-  CellularMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
-
+  CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
   virtual ~CellularMessage(){};
-
-  MessageType type;
-
 };
 
 class CellularNotificationMessage : public CellularMessage {
 public:
   enum class Type
   {
-      IncomingCall, // device receives connection from other device.
-      CallAborted,  // user tried to call other device but receiving side dropped call or call unsuccessful
-      CallActive,           // call is in progress both if call was initialized by user and when user received incoming call.
-      Ringing,              // user provided number to call to and service initialized calling procedure.
-      NewIncomingSMS,       // device received new sms from network. (what about sms delivery reports?).
-      SignalStrengthUpdate, // update of the strength of the network's signal.
-      ServiceReady,         // Idle state of the service. This is a start state before any call is initialized by user or by network.
-                            // service returns to this state when call is finished.
-      PowerUpProcedureComplete,
-      RawCommand, // send raw command to modem -> returns raw, tokenised result
+      IncomingCall,             // device receives connection from other device.
+      CallAborted,              // user tried to call other device but receiving side dropped call or call unsuccessful
+      CallActive,               // call is in progress both if call was initialized by user and when user received incoming call.
+      Ringing,                  // user provided number to call to and service initialized calling procedure.
+      NewIncomingSMS,           // device received new sms from network. (what about sms delivery reports?).
+      SignalStrengthUpdate,     // update of the strength of the network's signal.
+      ServiceReady,             // Idle state of the service. This is a start state before any call is initialized by user or by network.
+                                // service returns to this state when call is finished.
+      PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and cold start)
+      SIM,                      // change on SIM from URC
+      ModemOn,                  // Modem initialized
+      RawCommand,               // send raw command to modem -> returns raw, tokenised result
       None
   };
 
@@ -75,10 +73,12 @@ public:
 class CellularResponseMessage : public sys::ResponseMessage
 {
   public:
-    CellularResponseMessage(uint32_t retCode, std::string retdata = std::string()) : sys::ResponseMessage(), retCode(retCode), data(retdata){};
+    CellularResponseMessage(bool retCode, std::string retdata = std::string(), MessageType responseTo = MessageType::MessageTypeUninitialized)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
+    CellularResponseMessage(bool retCode, MessageType responseTo) : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
     virtual ~CellularResponseMessage(){};
 
-    uint32_t retCode;
+    bool retCode;
     std::string data;
 };
 

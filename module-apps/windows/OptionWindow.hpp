@@ -9,18 +9,25 @@
 
 namespace gui
 {
+    enum class Arrow : bool
+    {
+        Disabled,
+        Enabled
+    };
 
     struct Option
     {
         const UTF8 text = "";
         std::function<bool(Item &)> activatedCallback = nullptr;
-        Option(const UTF8 &text, std::function<bool(Item &)> cb) : text(text), activatedCallback(cb) {
+        Arrow arrow = Arrow::Enabled;
+        Option(const UTF8 &text, std::function<bool(Item &)> cb, Arrow arrow) : text(text), activatedCallback(cb), arrow(arrow)
+        {
             LOG_INFO("text: %s", text.c_str());
         }
     };
 
     /// creates new `option` label on heap with text description and on activated callback connected
-    Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback);
+    Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow = Arrow::Disabled);
     Item *newOptionLabel(const Option &option);
 
     class OptionWindow : public AppWindow
@@ -33,7 +40,7 @@ namespace gui
         OptionWindow(app::Application *app, const std::string &name);
         virtual ~OptionWindow();
 
-        void addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback);
+        void addOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow);
         /// add options as {text, on click callback }
         void addOptions(std::list<Option> options);
         /// add options as list of items on heap

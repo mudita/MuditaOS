@@ -4,6 +4,7 @@
 
 #include "TS0710.h"
 #include "bsp/cellular/bsp_cellular.hpp"
+#include "projdefs.h"
 #include "service-cellular/ServiceCellular.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include <cassert>
@@ -20,6 +21,8 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {P
 #ifndef SERIAL_PORT
 #define SERIAL_PORT "/dev/null"
 #endif
+
+#define USE_DAEFAULT_BAUDRATE 1
 
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
@@ -112,8 +115,9 @@ TS0710::ConfState TS0710::PowerUpProcedure() {
                 //7. set baudrate 115200 baud
                 //8. Send AT
                 LOG_DEBUG("4. Setting baudrate to 115200...");
-                // OK THIS IS BAD for modem restart... baud on cmux is 460800bit, we wont be able to close cmux if it stays
-                // pv_cellular->SetSpeed(115200);
+#if USE_DAEFAULT_BAUDRATE
+                pv_cellular->SetSpeed(115200);
+#endif
                 LOG_DEBUG("Sending AT...");
                 if (parser->cmd(at::AT::AT))
                 {
@@ -183,14 +187,13 @@ TS0710::ConfState TS0710::ConfProcedure() {
     parser->cmd(at::AT::URC_UART1);
     parser->cmd(at::AT::AT_PIN_READY_LOGIC);
     parser->cmd(at::AT::URC_NOTIF_SIGNAL);
-    parser->cmd(at::AT::CRC_ON);
-    parser->cmd(at::AT::CALLER_NUMBER_PRESENTATION); // per Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf timeout should be set to 15s
-    parser->cmd(at::AT::SMS_TEXT_FORMAT);
-    parser->cmd(at::AT::SMS_UCSC2);
-    parser->cmd(at::AT::SMS_STORAGE);
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
-    while (!parser->cmd(at::AT::QSCLK_ON)) {}
+    while (!parser->cmd(at::AT::QSCLK_ON))
+    {
+        auto const sec = 1000;
+        vTaskDelay(pdMS_TO_TICKS(sec)); // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
+    }
 
     bool reboot_needed = false;
 

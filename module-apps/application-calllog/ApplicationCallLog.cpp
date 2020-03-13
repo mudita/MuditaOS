@@ -15,6 +15,7 @@
 #include "windows/CallLogMainWindow.hpp"
 #include "windows/CallLogOptionsWindow.hpp"
 #include <Dialog.hpp>
+#include <OptionWindow.hpp>
 #include <i18/i18.hpp>
 #include <log/log.hpp>
 
@@ -92,8 +93,8 @@ void ApplicationCallLog::createUserInterface() {
 	window = new gui::CallLogDetailsWindow(this);
 	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
 
-	window = new gui::CallLogOptionsWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
+    windowOptions = gui::newOptionWindow(this);
+    windows.insert(std::pair<std::string, gui::AppWindow *>(windowOptions->getName(), windowOptions));
 
     window = new gui::Dialog(this, calllog::settings::CallDeleteWindowStr,
                              {

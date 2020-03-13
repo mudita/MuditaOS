@@ -1,7 +1,9 @@
-
+.clangd
+doc/docs-gui/
 
 build-*/
 .vscode/ipch
+.vscode/settings.json
 
 lib/
 
@@ -28,3 +30,4 @@ src/git-fame
 compile_commands.json
 source/version.hpp
 **/*.pyc
+./doc/docs-gui/

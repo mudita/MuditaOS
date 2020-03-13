@@ -59,6 +59,12 @@ namespace ModemCall
 
 namespace CellularCall
 {
+    enum class Forced : bool
+    {
+        False,
+        True
+    };
+
     class CellularCall
     {
         CalllogRecord call;
@@ -114,7 +120,7 @@ namespace CellularCall
 
         bool setActive();
 
-        bool endCall();
+        bool endCall(Forced forced = Forced::False);
 
         bool isValid() const
         {
