@@ -97,6 +97,7 @@ void ApplicationCall::IncomingCallHandler(const CellularNotificationMessage *con
     else
     {
         AudioServiceAPI::RoutingStart(this);
+        runCallTimer();
         std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
         // send to itself message to switch (run) call application
         callWindow->setState(gui::CallWindow::State::INCOMING_CALL);
@@ -121,6 +122,7 @@ void ApplicationCall::RingingHandler(const CellularNotificationMessage *const ms
 
     LOG_INFO("---------------------------------Ringing");
     AudioServiceAPI::RoutingStart(this);
+    runCallTimer();
 
     std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->data);
     callWindow->setState(gui::CallWindow::State::OUTGOING_CALL);
