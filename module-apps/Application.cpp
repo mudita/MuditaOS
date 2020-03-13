@@ -158,6 +158,7 @@ void Application::render( gui::RefreshModes mode ) {
             currwin->updateBatteryLevel(Store::Battery::get().level);
         }
         currwin->setSIM();
+        currwin->updateSignalStrength();
 
         std::list<gui::DrawCommand *> commandsList = currwin->buildDrawList();
 
@@ -218,27 +219,26 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 	return 0;
 }
 
+bool Application::signalStrengthUpdateHandler()
+{
+    if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength())
+    {
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+    }
+
+    return true;
+}
+
 sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	bool handled = false;
 
-    if (msgl->messageType == MessageType::CellularNotification)
+    auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+    if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate)
     {
-        CellularNotificationMessage *msg = reinterpret_cast<CellularNotificationMessage *>(msgl);
-		if( msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate ) {
-            if ((state == State::ACTIVE_FORGROUND) && (getCurrentWindow()->updateSignalStrength(msg->signalStrength)))
-            {
-                //loop and update all widnows
-				for ( auto it = windows.begin(); it != windows.end(); it++ ) {
-					it->second->updateSignalStrength( msg->signalStrength);
-				}
-				handled = true;
-				refreshWindow( gui::RefreshModes::GUI_REFRESH_FAST );
-            }
-        }
+        handled = signalStrengthUpdateHandler();
     }
-
-    if (msgl->messageType == MessageType::AppInputEvent)
+    else if (msgl->messageType == MessageType::AppInputEvent)
     {
         AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
         if (getCurrentWindow() != nullptr)

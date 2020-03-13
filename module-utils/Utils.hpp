@@ -51,6 +51,15 @@ namespace utils
         return res;
     }
 
+    static inline std::string removeNewLines(const std::string &s)
+    {
+        std::string retStr = s;
+        retStr.erase(std::remove(retStr.begin(), retStr.end(), '\r'), retStr.end());
+        retStr.erase(std::remove(retStr.begin(), retStr.end(), '\n'), retStr.end());
+
+        return retStr;
+    }
+
     static inline bool is_number(const std::string &s)
     {
         return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) { return !std::isdigit(c); }) == s.end();

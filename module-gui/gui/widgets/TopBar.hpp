@@ -54,9 +54,8 @@ namespace gui {
         static uint32_t time;
 
       protected:
-        static uint32_t signalStrength;
         Label *timeLabel;
-        Image *signal[6];
+        Image *signal[static_cast<size_t>(Store::RssiBar::noOfSupprtedBars)];
         Image *lock;
         std::array<Image *, batteryLevelCount> battery = {nullptr};
         Label *charging = nullptr;
@@ -100,14 +99,11 @@ namespace gui {
         bool setBatteryLevel(uint32_t percent);
 
         void setBatteryCharging(bool plugged);
+
         /**
-         * @brief Sets signal strength. This will cause appropriate image to be displayed.
+         * @brief updates signal strength. This will cause appropriate image to be displayed.
          */
-        void setSignalStrength(uint32_t sth);
-        uint32_t getSignalStrength()
-        {
-            return signalStrength;
-        };
+        bool updateSignalStrength();
 
         void simSet();
         void setTime(const UTF8 &time);

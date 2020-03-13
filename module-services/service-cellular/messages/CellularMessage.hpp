@@ -12,11 +12,12 @@
 #ifndef PUREPHONE_CELLULARMESSAGE_HPP
 #define PUREPHONE_CELLULARMESSAGE_HPP
 
+#include "../SignalStrength.hpp"
+#include "MessageType.hpp"
+#include "Service/Message.hpp"
+#include "utf8/UTF8.hpp"
 #include <memory>
 #include <variant>
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
-#include "utf8/UTF8.hpp"
 
 class CellularMessage : public sys::DataMessage {
 public:
@@ -55,9 +56,6 @@ public:
     Type type=Type::None;
 
     std::string data;
-    uint32_t signalStrength=0;
-    int32_t dBmSignalStrength=0;
-
 };
 
 class CellularRequestMessage : public CellularMessage{

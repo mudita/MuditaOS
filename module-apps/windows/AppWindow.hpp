@@ -66,8 +66,8 @@ public:
     //updates battery level in the window
 	bool updateBatteryLevel( uint32_t percentage );
 	//updates battery level in the window
-	bool updateSignalStrength( uint32_t strength );
-	virtual bool updateTime( const UTF8& timeStr );
+    bool updateSignalStrength();
+    virtual bool updateTime( const UTF8& timeStr );
 	virtual bool updateTime( const uint32_t& timestamp, bool mode24H );
     void setTitle(const UTF8 &text);
 

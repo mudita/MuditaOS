@@ -69,9 +69,6 @@ public:
 
     static const char *serviceName;
 
-    static int32_t getSignalStrengthDB(int32_t strength) { return signalStrengthToDB[strength]; }
-    static int32_t getSignalStrengthDBRange() { return (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])); }
-
     bool sendSMS(UTF8& number, UTF8& text);
     bool sendSMS(void);
     bool receiveSMS(std::string messageNumber);
@@ -103,42 +100,8 @@ public:
 
     cellular::State state;
 
-    static constexpr int32_t signalStrengthToDB[] = {
-            -109, //0
-            -109, //1
-            -109, //2
-            -107,
-            -105,
-            -103,
-            -101,
-            -99,
-            -97,
-            -95,
-            -93,
-            -91,
-            -89,
-            -87,
-            -85,
-            -83,
-            -81,
-            -79,
-            -77,
-            -75,
-            -73,
-            -71,
-            -69,
-            -67,
-            -65,
-            -63,
-            -61,
-            -59,
-            -57,
-            -55,
-            -53 //30
-    };
-
     /// URC GSM notification handler
-    CellularNotificationMessage::Type identifyNotification(const std::vector<uint8_t> &data, std::string &message);
+    std::shared_ptr<CellularNotificationMessage> identifyNotification(const std::vector<uint8_t> &data);
 
     std::vector<std::string> messageParts;
 

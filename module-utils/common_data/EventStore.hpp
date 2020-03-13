@@ -6,6 +6,7 @@
 // - gsm SIM tray
 // it's not meant to serve as polling interface - rather to serve data
 
+#include <cstddef>
 namespace Store
 {
     struct Battery
@@ -21,10 +22,29 @@ namespace Store
         static Battery &modify();
     };
 
+    enum class RssiBar : size_t
+    {
+        zero = 0,
+        one = 1,
+        two = 2,
+        three = 3,
+        four = 4,
+        five = 5,
+        noOfSupprtedBars
+    };
+
+    struct SignalStrength
+    {
+        int rssi = 0;
+        int rssidBm = 0;
+        RssiBar rssiBar = RssiBar::zero;
+    };
+
     struct GSM
     {
       private:
-        static GSM *ptr;
+        GSM() = default;
+        SignalStrength signalStrength;
 
       public:
         enum class Tray
@@ -52,6 +72,10 @@ namespace Store
             ON_NEED_SIMFLOW, /// modem is on, initialized, no SIM initialization yet
             ON_INITIALIZED,  /// modem is on, and it's fully initialized
         } modem = Modem::OFF;
+
+        void setSignalStrength(const SignalStrength &signalStrength);
+        SignalStrength getSignalStrength();
+
         static GSM *get();
     };
 }; // namespace Store
