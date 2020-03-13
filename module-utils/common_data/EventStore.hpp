@@ -6,6 +6,7 @@
 // - gsm SIM tray
 // it's not meant to serve as polling interface - rather to serve data
 
+#include "mutex.hpp"
 #include <cstddef>
 namespace Store
 {
@@ -44,6 +45,8 @@ namespace Store
     {
       private:
         static GSM *ptr;
+        GSM() = default;
+        SignalStrength signalStrength;
 
       public:
         enum class Tray
@@ -72,8 +75,8 @@ namespace Store
             ON_INITIALIZED,  /// modem is on, and it's fully initialized
         } modem = Modem::OFF;
 
-        SignalStrength signalStrength;
-        void setSignalStrength(SignalStrength &signalStrength);
+        void setSignalStrength(const SignalStrength &signalStrength);
+        SignalStrength getSignalStrength();
 
         static GSM *get();
     };

@@ -1,4 +1,5 @@
 #include "EventStore.hpp"
+#include "time/ScopedTime.hpp"
 #include <log/log.hpp>
 
 namespace Store
@@ -18,19 +19,31 @@ namespace Store
     }
 
     GSM *GSM::ptr = nullptr;
+    cpp_freertos::MutexStandard mutex;
 
     GSM *GSM::get()
     {
-        if (!ptr)
+        auto time = utils::time::Scoped("GSM get");
+        cpp_freertos::LockGuard lock(mutex);
+        if (ptr == nullptr)
         {
             ptr = new GSM();
         }
         return ptr;
     }
 
-    void GSM::setSignalStrength(SignalStrength &signalStrength)
+    void GSM::setSignalStrength(const SignalStrength &signalStrength)
     {
+        cpp_freertos::LockGuard lock(mutex);
         LOG_INFO("Setting signal strenth to rssi = %d dBm (%d) : %u bars", signalStrength.rssidBm, signalStrength.rssi, signalStrength.rssiBar);
+
         ptr->signalStrength = signalStrength;
+    }
+
+    SignalStrength GSM::getSignalStrength()
+    {
+        cpp_freertos::LockGuard lock(mutex);
+
+        return ptr->signalStrength;
     }
 }; // namespace Store

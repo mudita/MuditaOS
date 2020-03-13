@@ -216,10 +216,10 @@ bool TopBar::updateSignalStrength()
     }
     if (elements.signal)
     {
-        auto rssiBar = Store::GSM::get()->signalStrength.rssiBar;
+        auto rssiBar = Store::GSM::get()->getSignalStrength().rssiBar;
         if (rssiBar < Store::RssiBar::noOfSupprtedBars)
         {
-            signal[static_cast<size_t>(Store::GSM::get()->signalStrength.rssiBar)]->setVisible(true);
+            signal[static_cast<size_t>(rssiBar)]->setVisible(true);
             return true;
         }
         return false;
