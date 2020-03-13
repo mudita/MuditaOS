@@ -73,10 +73,11 @@ namespace gui {
 
 void DesktopMainWindow::destroyInterface() {
 	AppWindow::destroyInterface();
-	delete time;
-	delete dayText;
+    this->removeWidget(time);
+    delete time;
+    this->removeWidget(dayText);
+    delete dayText;
 	focusItem = nullptr;
-	children.clear();
 }
 
 DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)

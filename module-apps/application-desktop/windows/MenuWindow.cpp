@@ -89,7 +89,6 @@ namespace gui
 
     void MenuWindow::rebuild()
     {
-        focusItem = nullptr;
         destroyInterface();
         buildInterface();
     }
@@ -192,8 +191,8 @@ namespace gui
 
     void MenuWindow::destroyInterface()
     {
+        setFocusItem(nullptr);
         AppWindow::destroyInterface();
-        children.clear();
     }
 
     MenuWindow::~MenuWindow()
