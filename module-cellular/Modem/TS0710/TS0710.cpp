@@ -6,6 +6,7 @@
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "projdefs.h"
 #include "service-cellular/ServiceCellular.hpp"
+#include "service-cellular/SignalStrength.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include <at/URC_QIND.hpp>
 #include <cassert>
@@ -23,7 +24,7 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text = { {PortSpeed_e::PS9600, 9600}, {P
 #define SERIAL_PORT "/dev/null"
 #endif
 
-#define USE_DAEFAULT_BAUDRATE 1
+#define USE_DAEFAULT_BAUDRATE 0
 
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent) {
     pv_portSpeed = portSpeed;
@@ -388,11 +389,15 @@ TS0710::ConfState TS0710::StartMultiplexer() {
         res = c->cmd(at::AT::CSQ);
         if (res)
         {
-            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>();
             auto beg = res.response[0].find(" ");
             auto end = res.response[0].find(",", 1);
-            msg->signalStrength.setRssi(std::stoi(res.response[0].substr(beg + 1, end - beg - 1)));
-            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
+            SignalStrength signalStrength(std::stoi(res.response[0].substr(beg + 1, end - beg - 1)));
+            if (signalStrength.isValid())
+            {
+                Store::GSM::get()->signalStrength = signalStrength.data;
+                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SignalStrengthUpdate);
+                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, pv_parent);
+            }
         }
         else
         {

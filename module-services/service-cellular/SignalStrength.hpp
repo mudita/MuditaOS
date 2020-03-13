@@ -41,12 +41,12 @@ class SignalStrength
     ~SignalStrength() = default;
     SignalStrength(Store::SignalStrength);
 
-    Store::SignalStrength signalStrength;
+    Store::SignalStrength data;
 
     void setRssi(int rssi);
     bool isValid()
     {
-        return signalStrength.rssidBm != rssidBm_invalid;
+        return data.rssidBm != rssidBm_invalid;
     };
 
     /// @return 0 - if invalid

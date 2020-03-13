@@ -58,18 +58,6 @@ public:
     std::string data;
 };
 
-class CellularSignalStrengthUpdateMessage : public CellularNotificationMessage
-{
-  public:
-    CellularSignalStrengthUpdateMessage(int rssi = 0)
-        : CellularNotificationMessage(CellularNotificationMessage::Type::SignalStrengthUpdate), signalStrength(rssi)
-    {
-    }
-    virtual ~CellularSignalStrengthUpdateMessage() = default;
-
-    SignalStrength signalStrength;
-};
-
 class CellularRequestMessage : public CellularMessage{
 public:
 

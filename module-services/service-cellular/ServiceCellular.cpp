@@ -32,6 +32,7 @@
 
 #include "log/log.hpp"
 
+#include "service-cellular/SignalStrength.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "ucs2/UCS2.hpp"
 
@@ -205,15 +206,6 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         {
             switch (msg->type)
             {
-            case CellularNotificationMessage::Type::SignalStrengthUpdate: {
-                auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
-                if (msg != nullptr)
-                {
-                    Store::GSM::get()->signalStrength = msg->signalStrength.signalStrength;
-                    responseMsg = std::make_shared<CellularResponseMessage>(true);
-                }
-                break;
-            }
             case CellularNotificationMessage::Type::CallActive: {
                 auto ret = ongoingCall.setActive();
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
@@ -661,9 +653,12 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
         }
         else
         {
-            auto msg = std::make_shared<CellularSignalStrengthUpdateMessage>(std::stoi(qind.tokens[at::urc::QIND::RSSI]));
-
-            return msg;
+            SignalStrength signalStrength(std::stoi(qind.tokens[at::urc::QIND::RSSI]));
+            if (signalStrength.isValid())
+            {
+                Store::GSM::get()->signalStrength = signalStrength.data;
+                return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SignalStrengthUpdate);
+            }
         }
     }
 

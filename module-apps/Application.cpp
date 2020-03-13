@@ -219,7 +219,7 @@ int Application::refreshWindow(gui::RefreshModes mode) {
 	return 0;
 }
 
-bool Application::signalStrengthUpdateHandler(const CellularSignalStrengthUpdateMessage &msg)
+bool Application::signalStrengthUpdateHandler()
 {
     if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength())
     {
@@ -233,13 +233,12 @@ sys::Message_t Application::DataReceivedHandler(sys::DataMessage* msgl) {
 
 	bool handled = false;
 
-    auto msg = dynamic_cast<CellularSignalStrengthUpdateMessage *>(msgl);
-    if (msg != nullptr)
+    auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+    if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate)
     {
-        handled = signalStrengthUpdateHandler(*msg);
+        handled = signalStrengthUpdateHandler();
     }
-
-    if (msgl->messageType == MessageType::AppInputEvent)
+    else if (msgl->messageType == MessageType::AppInputEvent)
     {
         AppInputEventMessage* msg = reinterpret_cast<AppInputEventMessage*>( msgl );
         if (getCurrentWindow() != nullptr)

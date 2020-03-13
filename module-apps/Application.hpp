@@ -99,7 +99,7 @@ class Application: public sys::Service {
   private:
     State state = State::DEACTIVATED;
 
-    bool signalStrengthUpdateHandler(const CellularSignalStrengthUpdateMessage &);
+    bool signalStrengthUpdateHandler();
 
   public:
 	std::list<uint32_t> timerIDs;

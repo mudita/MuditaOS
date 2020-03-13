@@ -63,7 +63,7 @@ Store::RssiBar SignalStrength::rssidBmToBar(const int rssidBm)
 
 void SignalStrength::setRssi(const int rssi)
 {
-    signalStrength.rssi = rssi;
-    signalStrength.rssidBm = rssiTodBm(signalStrength.rssi);
-    signalStrength.rssiBar = rssidBmToBar(signalStrength.rssidBm);
+    data.rssi = rssi;
+    data.rssidBm = rssiTodBm(data.rssi);
+    data.rssiBar = rssidBmToBar(data.rssidBm);
 }
