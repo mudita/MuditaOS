@@ -32,6 +32,7 @@
 
 #include "log/log.hpp"
 
+#include "service-cellular/SignalStrength.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "ucs2/UCS2.hpp"
 
@@ -44,7 +45,6 @@
 #include <common_data/EventStore.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
-constexpr int32_t ServiceCellular::signalStrengthToDB[];
 
 inline const auto cellularStack = 16384UL;
 
@@ -110,62 +110,12 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
         TS0710_Frame frame(data);
         std::string message;
-        CellularNotificationMessage::Type type = identifyNotification(frame.getFrame().data, message);
-        auto msg = std::make_shared<CellularNotificationMessage>(type);
+        auto msg = identifyNotification(frame.getFrame().data);
 
-        switch (type)
+        if (msg->type == CellularNotificationMessage::Type::None)
         {
-
-        case CellularNotificationMessage::Type::ModemOn:
-        case CellularNotificationMessage::Type::PowerUpProcedureComplete:
-        case CellularNotificationMessage::Type::Ringing:
-        case CellularNotificationMessage::Type::ServiceReady:
-        case CellularNotificationMessage::Type::CallActive:
-        case CellularNotificationMessage::Type::CallAborted:
-            // no data field is used
-            break;
-
-        case CellularNotificationMessage::Type::IncomingCall:
-            msg->data = message;
-            break;
-
-        case CellularNotificationMessage::Type::NewIncomingSMS: {
-            // find message number
-            std::string notification(data.begin(), data.end());
-            auto begin = notification.find(",");
-            auto end = notification.find("\r");
-            msg->data = notification.substr(begin + 1, end);
-        }
-        break;
-
-        case CellularNotificationMessage::Type::SignalStrengthUpdate:
-            LOG_DEBUG("Setting new signal strength");
-            msg->signalStrength = std::stoll(message);
-            if (msg->signalStrength > (sizeof(signalStrengthToDB) / sizeof(signalStrengthToDB[0])))
-            {
-                LOG_ERROR("Signal strength value out of range.");
-                msg->dBmSignalStrength = signalStrengthToDB[0];
-            }
-            else
-            {
-                msg->dBmSignalStrength = signalStrengthToDB[msg->signalStrength];
-            }
-
-            break;
-
-        case CellularNotificationMessage::Type::SIM: {
-            auto message = std::make_shared<sevm::SIMMessage>();
-            sys::Bus::SendUnicast(message, "EventManager", this);
-        }
-        break;
-
-        case CellularNotificationMessage::Type::None:
-            // do not send notification msg
+            LOG_INFO("Skipped uknown notification");
             return;
-        case CellularNotificationMessage::Type::RawCommand: {
-            LOG_INFO(" IGNORE RawCmd");
-            return;
-        }
         }
 
         sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
@@ -631,15 +581,12 @@ namespace
     }
 } // namespace
 
-CellularNotificationMessage::Type ServiceCellular::identifyNotification(const std::vector<uint8_t> &data, std::string &message)
+std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
 {
-
     std::string str(data.begin(), data.end());
 
     {
-        std::string logStr = str;
-        logStr.erase(std::remove(logStr.begin(), logStr.end(), '\r'), logStr.end());
-        logStr.erase(std::remove(logStr.begin(), logStr.end(), '\n'), logStr.end());
+        std::string logStr = utils::removeNewLines(str);
         LOG_DEBUG("Notification:: %s", logStr.c_str());
     }
 
@@ -663,7 +610,9 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
             LOG_ERROR("SIM ERROR");
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        return CellularNotificationMessage::Type::SIM;
+        auto message = std::make_shared<sevm::SIMMessage>();
+        sys::Bus::SendUnicast(message, "EventManager", this);
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
     // Incoming call
@@ -672,43 +621,50 @@ CellularNotificationMessage::Type ServiceCellular::identifyNotification(const st
 
         auto beg = str.find("\"",ret);
         auto end = str.find("\"",ret + beg+1);
-        message = str.substr(beg+1,end-beg-1);
+        auto message = str.substr(beg + 1, end - beg - 1);
 
-        return CellularNotificationMessage::Type::IncomingCall;
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::IncomingCall, message);
     }
 
     // Call aborted/failed
     if (isAbortCallNotification(str))
     {
         LOG_TRACE("call aborted");
-        return CellularNotificationMessage::Type::CallAborted;
+        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::CallAborted);
     }
 
     // Received new SMS
     if (str.find("+CMTI: ") != std::string::npos) {
         LOG_TRACE("received new SMS notification");
-        message = "888777333"; // TODO:M.P add SMS nr parsing
-
-        return CellularNotificationMessage::Type::NewIncomingSMS;
+        // find message number
+        auto tokens = utils::split(str, ',');
+        if (tokens.size() == 2)
+        {
+            return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::NewIncomingSMS, tokens[1]);
+        }
     }
 
     // Received signal strength change
     auto qind = at::urc::QIND(str);
-    if (qind.is())
+    if (qind.is() && qind.is_csq())
     {
         if (!qind.validate(at::urc::QIND::RSSI))
         {
-            LOG_ERROR("Invalid csq - ignore");
+            LOG_INFO("Invalid csq - ignore");
         }
         else
         {
-            message = std::string(qind.tokens[at::urc::QIND::RSSI]);
-            return CellularNotificationMessage::Type::SignalStrengthUpdate;
+            SignalStrength signalStrength(std::stoi(qind.tokens[at::urc::QIND::RSSI]));
+            if (signalStrength.isValid())
+            {
+                Store::GSM::get()->setSignalStrength(signalStrength.data);
+                return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SignalStrengthUpdate);
+            }
         }
     }
 
     LOG_WARN("Unhandled notification");
-    return CellularNotificationMessage::Type::None;
+    return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::None);
 }
 
 bool ServiceCellular::sendSMS(void)

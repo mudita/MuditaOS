@@ -19,21 +19,20 @@
 
 namespace gui {
 
-uint32_t TopBar::signalStrength = 0;
+    const uint32_t TopBar::signalOffset = 35;
+    const uint32_t TopBar::batteryOffset = 415;
+    gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
+    uint32_t TopBar::time = 0;
 
-const uint32_t TopBar::signalOffset = 35;
-const uint32_t TopBar::batteryOffset = 415;
-gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
-uint32_t TopBar::time = 0;
+    TopBar::TopBar()
+    {
 
-TopBar::TopBar() {
+        prepareWidget();
 
-	prepareWidget();
-
-	setFillColor( ColorFullWhite );
-	setBorderColor( ColorNoColor );
-	setFilled(true);
-	setSize(480, 50);
+        setFillColor(ColorFullWhite);
+        setBorderColor(ColorNoColor);
+        setFilled(true);
+        setSize(480, 50);
 }
 TopBar::TopBar( Item* parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h ) : Rect{ parent, x, y, w, h } {
 
@@ -70,12 +69,9 @@ void TopBar::prepareWidget() {
 	signal[3] = new gui::Image( this, signalOffset,17,0,0, "signal3" );
 	signal[4] = new gui::Image( this, signalOffset,17,0,0, "signal4" );
 	signal[5] = new gui::Image( this, signalOffset,17,0,0, "signal5" );
-	for( uint32_t i=0; i<signalImgCount; ++i )
-		signal[i]->setVisible( false );
+    updateSignalStrength();
 
-	signal[signalStrength]->setVisible( true );
-
-	//icons for battery
+    //icons for battery
     battery = {
         new gui::Image(this, batteryOffset, 17, 0, 0, "battery0"), new gui::Image(this, batteryOffset, 17, 0, 0, "battery1"),
         new gui::Image(this, batteryOffset, 17, 0, 0, "battery2"), new gui::Image(this, batteryOffset, 17, 0, 0, "battery3"),
@@ -142,11 +138,8 @@ void TopBar::setActive( TopBar::Elements element, bool active ) {
 		} break;
 		case Elements::SIGNAL: {
             elements.signal = active;
-            for (uint32_t i = 0; i < signalImgCount; ++i)
-                signal[i]->setVisible(false);
-			if( active )
-				signal[signalStrength]->setVisible(true);
-		} break;
+            updateSignalStrength();
+        } break;
 		case Elements::TIME: {
             elements.time = active;
             timeLabel->setVisible(active);
@@ -215,14 +208,24 @@ void TopBar::setBatteryCharging(bool plugged)
     }
 }
 
-void TopBar::setSignalStrength( uint32_t sth) {
-
-	signalStrength = sth;
-	for( uint32_t i=0; i<signalImgCount; i++ ) {
-		signal[i]->setVisible( false );
-	}
-	signal[signalStrength]->setVisible( true );
-};
+bool TopBar::updateSignalStrength()
+{
+    for (uint32_t i = 0; i < signalImgCount; i++)
+    {
+        signal[i]->setVisible(false);
+    }
+    if (elements.signal)
+    {
+        auto rssiBar = Store::GSM::get()->getSignalStrength().rssiBar;
+        if (rssiBar < Store::RssiBar::noOfSupprtedBars)
+        {
+            signal[static_cast<size_t>(rssiBar)]->setVisible(true);
+            return true;
+        }
+        return false;
+    }
+    return true;
+}
 
 void TopBar::setTime( const UTF8& time ) {
 	timeLabel->setText(time);

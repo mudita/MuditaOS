@@ -1,15 +1,14 @@
 #pragma once
 
-namespace utils
-{
-    namespace time
-    {
-
 #include <FreeRTOS.h>
 #include <log/log.hpp>
 #include <string>
 #include <ticks.hpp>
 
+namespace utils
+{
+    namespace time
+    {
         class Scoped
         {
             TickType_t timestamp;

@@ -16,7 +16,7 @@ auto QIND::is_csq() -> bool
 {
     if (tokens.size() > CSQ)
     {
-        return tokens[CSQ].find(type_csq);
+        return tokens[CSQ].find(type_csq) != std::string::npos;
     }
     return false;
 }
