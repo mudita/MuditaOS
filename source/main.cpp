@@ -138,6 +138,15 @@ public:
 
 int main() {
 
+#ifdef SYSTEM_VIEW_ENABLED
+    SEGGER_SYSVIEW_Conf();
+    SEGGER_SYSVIEW_DisableEvents(SYSVIEW_EVTMASK_ISR_ENTER);
+    SEGGER_SYSVIEW_DisableEvents(SYSVIEW_EVTMASK_ISR_EXIT);
+    SEGGER_SYSVIEW_DisableEvents(SYSVIEW_EVTMASK_ISR_TO_SCHEDULER);
+    SEGGER_SYSVIEW_WaitForConnection();
+    SEGGER_SYSVIEW_Start();
+#endif
+
     bsp::BoardInit();
 
     LOG_PRINTF("Launching PurePhone \n");
@@ -166,7 +175,7 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(),sysmgr.get());
 
         // Service Desktop disabled on master - pulling read on usb driver
-        // ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
         //vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
@@ -188,19 +197,10 @@ int main() {
             return 0;
         }
 
-
-
-
         return 0;
 
 
     });
-
-#ifdef SYSTEM_VIEW_ENABLED
-    SEGGER_SYSVIEW_Conf();
-    SEGGER_SYSVIEW_WaitForConnection();
-    SEGGER_SYSVIEW_Start();
-#endif
 
     cpp_freertos::Thread::StartScheduler();
 #endif
