@@ -1,6 +1,6 @@
 #include "EventStore.hpp"
-#include "time/ScopedTime.hpp"
 #include <log/log.hpp>
+#include <mutex.hpp>
 
 namespace Store
 {
@@ -18,13 +18,12 @@ namespace Store
         return battery;
     }
 
-    GSM *GSM::ptr = nullptr;
     cpp_freertos::MutexStandard mutex;
 
     GSM *GSM::get()
     {
-        auto time = utils::time::Scoped("GSM get");
         cpp_freertos::LockGuard lock(mutex);
+        static GSM *ptr = nullptr;
         if (ptr == nullptr)
         {
             ptr = new GSM();
@@ -37,13 +36,13 @@ namespace Store
         cpp_freertos::LockGuard lock(mutex);
         LOG_INFO("Setting signal strenth to rssi = %d dBm (%d) : %u bars", signalStrength.rssidBm, signalStrength.rssi, signalStrength.rssiBar);
 
-        ptr->signalStrength = signalStrength;
+        get()->signalStrength = signalStrength;
     }
 
     SignalStrength GSM::getSignalStrength()
     {
         cpp_freertos::LockGuard lock(mutex);
 
-        return ptr->signalStrength;
+        return get()->signalStrength;
     }
 }; // namespace Store

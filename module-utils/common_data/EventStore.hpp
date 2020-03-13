@@ -6,7 +6,6 @@
 // - gsm SIM tray
 // it's not meant to serve as polling interface - rather to serve data
 
-#include "mutex.hpp"
 #include <cstddef>
 namespace Store
 {
@@ -44,7 +43,6 @@ namespace Store
     struct GSM
     {
       private:
-        static GSM *ptr;
         GSM() = default;
         SignalStrength signalStrength;
 
