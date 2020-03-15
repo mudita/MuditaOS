@@ -33,10 +33,10 @@ void PhonebookMainWindow::buildInterface()
 
     topBar->setActive(TopBar::Elements::TIME, true);
     setTitle(utils::localize.get("app_phonebook_title_main"));
-    leftArrowImage = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
-    rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-    newContactImage = new gui::Image(this, 50, 55, 0, 0, "cross");
-    searchImage = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
+    leftArrowImage = new gui::Image(this, 30, 62, 11, 13, "arrow_left");
+    rightArrowImage = new gui::Image(this, 480 - 30 - 11, 62, 11, 13, "arrow_right");
+    newContactImage = new gui::Image(this, 50, 55, 24, 24, "cross");
+    searchImage = new gui::Image(this, 480 - 30 - 11 - 8 - 26, 55, 26, 26, "search");
 
     list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
     list->setMaxElements(7);
