@@ -12,12 +12,10 @@
 #include <log/log.hpp>
 
 ContactsTable::ContactsTable(Database *db) : Table(db)
-{
-}
+{}
 
 ContactsTable::~ContactsTable()
-{
-}
+{}
 
 bool ContactsTable::Create()
 {
@@ -26,10 +24,18 @@ bool ContactsTable::Create()
 
 bool ContactsTable::Add(ContactsTableRow entry)
 {
-    return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, blacklist, favourites, speeddial ) VALUES "
+    return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, "
+                       "blacklist, favourites, speeddial ) VALUES "
                        "(%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, %lu);",
-                       entry.nameID, entry.numbersID.c_str(), entry.ringID, entry.addressIDs.c_str(), entry.type, entry.isOnWhitelist, entry.isOnBlacklist,
-                       entry.isOnFavourites, entry.speedDial);
+                       entry.nameID,
+                       entry.numbersID.c_str(),
+                       entry.ringID,
+                       entry.addressIDs.c_str(),
+                       entry.type,
+                       entry.isOnWhitelist,
+                       entry.isOnBlacklist,
+                       entry.isOnFavourites,
+                       entry.speedDial);
 }
 
 bool ContactsTable::RemoveByID(uint32_t id)
@@ -44,18 +50,26 @@ bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 
 bool ContactsTable::Update(ContactsTableRow entry)
 {
-    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%s' ,ring_id = %lu, address_ids = '%s', type = %lu, whitelist = %lu, blacklist = %lu, "
+    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%s' ,ring_id = %lu, address_ids = '%s', type "
+                       "= %lu, whitelist = %lu, blacklist = %lu, "
                        "favourites = %lu, speeddial = %lu WHERE _id=%lu;",
-                       entry.nameID, entry.numbersID.c_str(), entry.ringID, entry.addressIDs.c_str(), entry.type, entry.isOnWhitelist, entry.isOnBlacklist,
-                       entry.isOnFavourites, entry.speedDial, entry.ID);
+                       entry.nameID,
+                       entry.numbersID.c_str(),
+                       entry.ringID,
+                       entry.addressIDs.c_str(),
+                       entry.type,
+                       entry.isOnWhitelist,
+                       entry.isOnBlacklist,
+                       entry.isOnFavourites,
+                       entry.speedDial,
+                       entry.ID);
 }
 
 ContactsTableRow ContactsTable::GetByID(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM contacts WHERE _id= %lu;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ContactsTableRow();
     }
 
@@ -73,12 +87,13 @@ ContactsTableRow ContactsTable::GetByID(uint32_t id)
     };
 }
 
-std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryName, const std::string alternativeName, const std::string number)
+std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryName,
+                                                    const std::string alternativeName,
+                                                    const std::string number)
 {
     std::vector<ContactsTableRow> ret;
 
-    if (primaryName.empty() && alternativeName.empty() && number.empty())
-    {
+    if (primaryName.empty() && alternativeName.empty() && number.empty()) {
         return (ret);
     }
 
@@ -86,27 +101,29 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
                     "t2 "
                     "on t1._id=t2.contact_id inner join contact_number t3 on t1._id=t3.contact_id where ";
 
-    if (!primaryName.empty())
-    {
+    if (!primaryName.empty()) {
         q += "t2.name_primary like '%%" + primaryName + "%%'";
-        if (!alternativeName.empty()) q += " or ";
+        if (!alternativeName.empty())
+            q += " or ";
     }
 
-    if (!alternativeName.empty())
-    {
+    if (!alternativeName.empty()) {
         q += "t2.name_alternative like '%%" + alternativeName + "%%'";
-        if (!number.empty()) q += " or ";
+        if (!number.empty())
+            q += " or ";
     }
 
-    if (!number.empty()) q += "t3.number_e164 like '%%" + number + "%%'";
+    if (!number.empty())
+        q += "t3.number_e164 like '%%" + number + "%%'";
 
     LOG_DEBUG("query: \"%s\"", q.c_str());
     auto retQuery = db->Query(q.c_str());
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) { return std::vector<ContactsTableRow>(); }
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+        return std::vector<ContactsTableRow>();
+    }
 
-    do
-    {
+    do {
         ret.push_back(ContactsTableRow{
             (*retQuery)[0].GetUInt32(),                           // ID
             (*retQuery)[1].GetUInt32(),                           // nameID
@@ -130,15 +147,13 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
 {
     auto retQuery = db->Query("SELECT * from contacts ORDER BY name_id LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 
     std::vector<ContactsTableRow> ret;
 
-    do
-    {
+    do {
         ret.push_back(ContactsTableRow{
             (*retQuery)[0].GetUInt32(),                           // ID
             (*retQuery)[1].GetUInt32(),                           // nameID
@@ -156,12 +171,14 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
     return ret;
 }
 
-std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactTableFields field, const char *str)
+std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offset,
+                                                                   uint32_t limit,
+                                                                   ContactTableFields field,
+                                                                   const char *str)
 {
 
     std::string fieldName;
-    switch (field)
-    {
+    switch (field) {
     case ContactTableFields ::SpeedDial:
         fieldName = "speeddial";
         break;
@@ -172,17 +189,19 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offs
         return std::vector<ContactsTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contacts WHERE %s='%s' ORDER BY name_id LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
+    auto retQuery = db->Query("SELECT * from contacts WHERE %s='%s' ORDER BY name_id LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
+                              limit,
+                              offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsTableRow>();
     }
 
     std::vector<ContactsTableRow> ret;
 
-    do
-    {
+    do {
         ret.push_back(ContactsTableRow{
             (*retQuery)[0].GetUInt32(),                           // ID
             (*retQuery)[1].GetUInt32(),                           // nameID
@@ -204,8 +223,7 @@ uint32_t ContactsTable::GetCount()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contacts;");
 
-    if (queryRet->GetRowCount() == 0)
-    {
+    if (queryRet->GetRowCount() == 0) {
         return 0;
     }
 
@@ -216,8 +234,7 @@ uint32_t ContactsTable::GetCountByFieldID(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %s=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0))
-    {
+    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
     }
 

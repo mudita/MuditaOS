@@ -3,7 +3,7 @@
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright (c) 2017, NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -54,15 +54,15 @@
 /*! @brief List of SNVS interrupts */
 typedef enum _snvs_hp_interrupts
 {
-    kSNVS_RTC_AlarmInterrupt = SNVS_HPCR_HPTA_EN_MASK,  /*!< RTC time alarm */
-    kSNVS_RTC_PeriodicInterrupt = SNVS_HPCR_PI_EN_MASK, /*!< RTC periodic interrupt */
+    kSNVS_RTC_AlarmInterrupt    = SNVS_HPCR_HPTA_EN_MASK, /*!< RTC time alarm */
+    kSNVS_RTC_PeriodicInterrupt = SNVS_HPCR_PI_EN_MASK,   /*!< RTC periodic interrupt */
 } snvs_hp_interrupts_t;
 
 /*! @brief List of SNVS flags */
 typedef enum _snvs_hp_status_flags
 {
-    kSNVS_RTC_AlarmInterruptFlag = SNVS_HPSR_HPTA_MASK,  /*!< RTC time alarm flag */
-    kSNVS_RTC_PeriodicInterruptFlag = SNVS_HPSR_PI_MASK, /*!< RTC periodic interrupt flag */
+    kSNVS_RTC_AlarmInterruptFlag    = SNVS_HPSR_HPTA_MASK, /*!< RTC time alarm flag */
+    kSNVS_RTC_PeriodicInterruptFlag = SNVS_HPSR_PI_MASK,   /*!< RTC periodic interrupt flag */
 } snvs_hp_status_flags_t;
 
 /*! @brief Structure is used to hold the date and time */
@@ -100,205 +100,202 @@ typedef struct _snvs_hp_rtc_config
  ******************************************************************************/
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
-/*!
- * @name Initialization and deinitialization
- * @{
- */
+    /*!
+     * @name Initialization and deinitialization
+     * @{
+     */
 
-/*!
- * @brief Ungates the SNVS clock and configures the peripheral for basic operation.
- *
- * @note This API should be called at the beginning of the application using the SNVS driver.
- *
- * @param base   SNVS peripheral base address
- * @param config Pointer to the user's SNVS configuration structure.
- */
-void SNVS_HP_RTC_Init(SNVS_Type *base, const snvs_hp_rtc_config_t *config);
+    /*!
+     * @brief Ungates the SNVS clock and configures the peripheral for basic operation.
+     *
+     * @note This API should be called at the beginning of the application using the SNVS driver.
+     *
+     * @param base   SNVS peripheral base address
+     * @param config Pointer to the user's SNVS configuration structure.
+     */
+    void SNVS_HP_RTC_Init(SNVS_Type *base, const snvs_hp_rtc_config_t *config);
 
-/*!
- * @brief Stops the RTC and SRTC timers.
- *
- * @param base SNVS peripheral base address
- */
-void SNVS_HP_RTC_Deinit(SNVS_Type *base);
+    /*!
+     * @brief Stops the RTC and SRTC timers.
+     *
+     * @param base SNVS peripheral base address
+     */
+    void SNVS_HP_RTC_Deinit(SNVS_Type *base);
 
-/*!
- * @brief Fills in the SNVS config struct with the default settings.
- *
- * The default values are as follows.
- * @code
- *    config->rtccalenable = false;
- *    config->rtccalvalue = 0U;
- *    config->PIFreq = 0U;
- * @endcode
- * @param config Pointer to the user's SNVS configuration structure.
- */
-void SNVS_HP_RTC_GetDefaultConfig(snvs_hp_rtc_config_t *config);
+    /*!
+     * @brief Fills in the SNVS config struct with the default settings.
+     *
+     * The default values are as follows.
+     * @code
+     *    config->rtccalenable = false;
+     *    config->rtccalvalue = 0U;
+     *    config->PIFreq = 0U;
+     * @endcode
+     * @param config Pointer to the user's SNVS configuration structure.
+     */
+    void SNVS_HP_RTC_GetDefaultConfig(snvs_hp_rtc_config_t *config);
 
-/*! @}*/
+    /*! @}*/
 
-/*!
- * @name Non secure RTC current Time & Alarm
- * @{
- */
+    /*!
+     * @name Non secure RTC current Time & Alarm
+     * @{
+     */
 
-/*!
- * @brief Sets the SNVS RTC date and time according to the given time structure.
- *
- * @param base     SNVS peripheral base address
- * @param datetime Pointer to the structure where the date and time details are stored.
- *
- * @return kStatus_Success: Success in setting the time and starting the SNVS RTC
- *         kStatus_InvalidArgument: Error because the datetime format is incorrect
- */
-status_t SNVS_HP_RTC_SetDatetime(SNVS_Type *base, const snvs_hp_rtc_datetime_t *datetime);
+    /*!
+     * @brief Sets the SNVS RTC date and time according to the given time structure.
+     *
+     * @param base     SNVS peripheral base address
+     * @param datetime Pointer to the structure where the date and time details are stored.
+     *
+     * @return kStatus_Success: Success in setting the time and starting the SNVS RTC
+     *         kStatus_InvalidArgument: Error because the datetime format is incorrect
+     */
+    status_t SNVS_HP_RTC_SetDatetime(SNVS_Type *base, const snvs_hp_rtc_datetime_t *datetime);
 
-/*!
- * @brief Gets the SNVS RTC time and stores it in the given time structure.
- *
- * @param base     SNVS peripheral base address
- * @param datetime Pointer to the structure where the date and time details are stored.
- */
-void SNVS_HP_RTC_GetDatetime(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime);
+    /*!
+     * @brief Gets the SNVS RTC time and stores it in the given time structure.
+     *
+     * @param base     SNVS peripheral base address
+     * @param datetime Pointer to the structure where the date and time details are stored.
+     */
+    void SNVS_HP_RTC_GetDatetime(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime);
 
-/*!
- * @brief Sets the SNVS RTC alarm time.
- *
- * The function sets the RTC alarm. It also checks whether the specified alarm time
- * is greater than the present time. If not, the function does not set the alarm
- * and returns an error.
- *
- * @param base      SNVS peripheral base address
- * @param alarmTime Pointer to the structure where the alarm time is stored.
- *
- * @return kStatus_Success: success in setting the SNVS RTC alarm
- *         kStatus_InvalidArgument: Error because the alarm datetime format is incorrect
- *         kStatus_Fail: Error because the alarm time has already passed
- */
-status_t SNVS_HP_RTC_SetAlarm(SNVS_Type *base, const snvs_hp_rtc_datetime_t *alarmTime);
+    /*!
+     * @brief Sets the SNVS RTC alarm time.
+     *
+     * The function sets the RTC alarm. It also checks whether the specified alarm time
+     * is greater than the present time. If not, the function does not set the alarm
+     * and returns an error.
+     *
+     * @param base      SNVS peripheral base address
+     * @param alarmTime Pointer to the structure where the alarm time is stored.
+     *
+     * @return kStatus_Success: success in setting the SNVS RTC alarm
+     *         kStatus_InvalidArgument: Error because the alarm datetime format is incorrect
+     *         kStatus_Fail: Error because the alarm time has already passed
+     */
+    status_t SNVS_HP_RTC_SetAlarm(SNVS_Type *base, const snvs_hp_rtc_datetime_t *alarmTime);
 
-/*!
- * @brief Returns the SNVS RTC alarm time.
- *
- * @param base     SNVS peripheral base address
- * @param datetime Pointer to the structure where the alarm date and time details are stored.
- */
-void SNVS_HP_RTC_GetAlarm(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime);
+    /*!
+     * @brief Returns the SNVS RTC alarm time.
+     *
+     * @param base     SNVS peripheral base address
+     * @param datetime Pointer to the structure where the alarm date and time details are stored.
+     */
+    void SNVS_HP_RTC_GetAlarm(SNVS_Type *base, snvs_hp_rtc_datetime_t *datetime);
 
 #if (defined(FSL_FEATURE_SNVS_HAS_SRTC) && (FSL_FEATURE_SNVS_HAS_SRTC > 0))
-/*!
- * @brief The function synchronizes RTC counter value with SRTC.
- *
- * @param base SNVS peripheral base address
- */
-void SNVS_HP_RTC_TimeSynchronize(SNVS_Type *base);
+    /*!
+     * @brief The function synchronizes RTC counter value with SRTC.
+     *
+     * @param base SNVS peripheral base address
+     */
+    void SNVS_HP_RTC_TimeSynchronize(SNVS_Type *base);
 #endif /* FSL_FEATURE_SNVS_HAS_SRTC */
 
-/*! @}*/
+    /*! @}*/
 
-/*!
- * @name Interrupt Interface
- * @{
- */
+    /*!
+     * @name Interrupt Interface
+     * @{
+     */
 
-/*!
- * @brief Enables the selected SNVS interrupts.
- *
- * @param base SNVS peripheral base address
- * @param mask The interrupts to enable. This is a logical OR of members of the
- *             enumeration ::snvs_interrupt_enable_t
- */
-static inline void SNVS_HP_RTC_EnableInterrupts(SNVS_Type *base, uint32_t mask)
-{
-    base->HPCR |= mask;
-}
-
-/*!
- * @brief Disables the selected SNVS interrupts.
- *
- * @param base SNVS peripheral base address
- * @param mask The interrupts to enable. This is a logical OR of members of the
- *             enumeration ::snvs_interrupt_enable_t
- */
-static inline void SNVS_HP_RTC_DisableInterrupts(SNVS_Type *base, uint32_t mask)
-{
-    base->HPCR &= ~mask;
-}
-
-/*!
- * @brief Gets the enabled SNVS interrupts.
- *
- * @param base SNVS peripheral base address
- *
- * @return The enabled interrupts. This is the logical OR of members of the
- *         enumeration ::snvs_interrupt_enable_t
- */
-uint32_t SNVS_HP_RTC_GetEnabledInterrupts(SNVS_Type *base);
-
-/*! @}*/
-
-/*!
- * @name Status Interface
- * @{
- */
-
-/*!
- * @brief Gets the SNVS status flags.
- *
- * @param base SNVS peripheral base address
- *
- * @return The status flags. This is the logical OR of members of the
- *         enumeration ::snvs_status_flags_t
- */
-uint32_t SNVS_HP_RTC_GetStatusFlags(SNVS_Type *base);
-
-/*!
- * @brief  Clears the SNVS status flags.
- *
- * @param base SNVS peripheral base address
- * @param mask The status flags to clear. This is a logical OR of members of the
- *             enumeration ::snvs_status_flags_t
- */
-static inline void SNVS_HP_RTC_ClearStatusFlags(SNVS_Type *base, uint32_t mask)
-{
-    base->HPSR |= mask;
-}
-
-/*! @}*/
-
-/*!
- * @name Timer Start and Stop
- * @{
- */
-
-/*!
- * @brief Starts the SNVS RTC time counter.
- *
- * @param base SNVS peripheral base address
- */
-static inline void SNVS_HP_RTC_StartTimer(SNVS_Type *base)
-{
-    base->HPCR |= SNVS_HPCR_RTC_EN_MASK;
-    while (!(base->HPCR & SNVS_HPCR_RTC_EN_MASK))
+    /*!
+     * @brief Enables the selected SNVS interrupts.
+     *
+     * @param base SNVS peripheral base address
+     * @param mask The interrupts to enable. This is a logical OR of members of the
+     *             enumeration ::snvs_interrupt_enable_t
+     */
+    static inline void SNVS_HP_RTC_EnableInterrupts(SNVS_Type *base, uint32_t mask)
     {
+        base->HPCR |= mask;
     }
-}
 
-/*!
- * @brief Stops the SNVS RTC time counter.
- *
- * @param base SNVS peripheral base address
- */
-static inline void SNVS_HP_RTC_StopTimer(SNVS_Type *base)
-{
-    base->HPCR &= ~SNVS_HPCR_RTC_EN_MASK;
-    while (base->HPCR & SNVS_HPCR_RTC_EN_MASK)
+    /*!
+     * @brief Disables the selected SNVS interrupts.
+     *
+     * @param base SNVS peripheral base address
+     * @param mask The interrupts to enable. This is a logical OR of members of the
+     *             enumeration ::snvs_interrupt_enable_t
+     */
+    static inline void SNVS_HP_RTC_DisableInterrupts(SNVS_Type *base, uint32_t mask)
     {
+        base->HPCR &= ~mask;
     }
-}
+
+    /*!
+     * @brief Gets the enabled SNVS interrupts.
+     *
+     * @param base SNVS peripheral base address
+     *
+     * @return The enabled interrupts. This is the logical OR of members of the
+     *         enumeration ::snvs_interrupt_enable_t
+     */
+    uint32_t SNVS_HP_RTC_GetEnabledInterrupts(SNVS_Type *base);
+
+    /*! @}*/
+
+    /*!
+     * @name Status Interface
+     * @{
+     */
+
+    /*!
+     * @brief Gets the SNVS status flags.
+     *
+     * @param base SNVS peripheral base address
+     *
+     * @return The status flags. This is the logical OR of members of the
+     *         enumeration ::snvs_status_flags_t
+     */
+    uint32_t SNVS_HP_RTC_GetStatusFlags(SNVS_Type *base);
+
+    /*!
+     * @brief  Clears the SNVS status flags.
+     *
+     * @param base SNVS peripheral base address
+     * @param mask The status flags to clear. This is a logical OR of members of the
+     *             enumeration ::snvs_status_flags_t
+     */
+    static inline void SNVS_HP_RTC_ClearStatusFlags(SNVS_Type *base, uint32_t mask)
+    {
+        base->HPSR |= mask;
+    }
+
+    /*! @}*/
+
+    /*!
+     * @name Timer Start and Stop
+     * @{
+     */
+
+    /*!
+     * @brief Starts the SNVS RTC time counter.
+     *
+     * @param base SNVS peripheral base address
+     */
+    static inline void SNVS_HP_RTC_StartTimer(SNVS_Type *base)
+    {
+        base->HPCR |= SNVS_HPCR_RTC_EN_MASK;
+        while (!(base->HPCR & SNVS_HPCR_RTC_EN_MASK)) {}
+    }
+
+    /*!
+     * @brief Stops the SNVS RTC time counter.
+     *
+     * @param base SNVS peripheral base address
+     */
+    static inline void SNVS_HP_RTC_StopTimer(SNVS_Type *base)
+    {
+        base->HPCR &= ~SNVS_HPCR_RTC_EN_MASK;
+        while (base->HPCR & SNVS_HPCR_RTC_EN_MASK) {}
+    }
 
 #if defined(__cplusplus)
 }

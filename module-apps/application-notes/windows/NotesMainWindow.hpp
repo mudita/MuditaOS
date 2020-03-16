@@ -22,26 +22,28 @@
 
 #include "../NotesModel.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class NotesMainWindow: public AppWindow {
-	NotesModel* notesModel = nullptr;
-	gui::ListView* list = nullptr;
-	Label* title = nullptr;
-public:
-	NotesMainWindow( app::Application* app );
-	virtual ~NotesMainWindow();
+    class NotesMainWindow : public AppWindow
+    {
+        NotesModel *notesModel = nullptr;
+        gui::ListView *list    = nullptr;
+        Label *title           = nullptr;
 
-	//virtual methods
-	bool onInput( const InputEvent& inputEvent ) override;
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
+      public:
+        NotesMainWindow(app::Application *app);
+        virtual ~NotesMainWindow();
 
+        // virtual methods
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-	bool onDatabaseMessage( sys::Message* msg ) override;
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+        bool onDatabaseMessage(sys::Message *msg) override;
+    };
 
 } /* namespace gui */
 

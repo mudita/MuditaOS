@@ -26,7 +26,7 @@ namespace gui
     class ThreadViewWindow : public AppWindow
     {
       private:
-        gui::VBox *body = nullptr;
+        gui::VBox *body         = nullptr;
         uint16_t elements_width = this->getWidth() - style::window::default_left_margin * 2;
         void cleanView();
         enum class Action
@@ -44,10 +44,10 @@ namespace gui
 
         struct
         {
-            int start = 0;                                         // actual shown position start
-            int end = 7;                                           // actual shown position end
-            int thread = 0;                                        // thread we are showing
-            int dbsize = 0;                                        // size of elements in db
+            int start                                   = 0;       // actual shown position start
+            int end                                     = 7;       // actual shown position end
+            int thread                                  = 0;       // thread we are showing
+            int dbsize                                  = 0;       // size of elements in db
             std::unique_ptr<std::vector<SMSRecord>> sms = nullptr; // loaded sms from db
         } SMS;
 

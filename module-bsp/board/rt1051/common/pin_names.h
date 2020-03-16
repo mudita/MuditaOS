@@ -10,9 +10,10 @@
 #ifndef BSP_BOARD_PIN_NAMES_H_
 #define BSP_BOARD_PIN_NAMES_H_
 
-#define GPIO_PORT_SHIFT      0
+#define GPIO_PORT_SHIFT 0
 
-typedef enum {
+typedef enum
+{
     WAKEUP        = ((5 << GPIO_PORT_SHIFT) | 0),
     PMIC_ON_REQ   = ((5 << GPIO_PORT_SHIFT) | 1),
     PMIC_STBY_REQ = ((5 << GPIO_PORT_SHIFT) | 2),

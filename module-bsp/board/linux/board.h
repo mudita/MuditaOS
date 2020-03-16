@@ -257,12 +257,14 @@
 //#define BOARD_ACCEL_I2C_CLOCK_SOURCE_SELECT (0U)
 ///* Clock divider for LPI2C clock source */
 //#define BOARD_ACCEL_I2C_CLOCK_SOURCE_DIVIDER (5U)
-//#define BOARD_ACCEL_I2C_CLOCK_FREQ (CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8 / (BOARD_ACCEL_I2C_CLOCK_SOURCE_DIVIDER + 1U))
+//#define BOARD_ACCEL_I2C_CLOCK_FREQ (CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8 / (BOARD_ACCEL_I2C_CLOCK_SOURCE_DIVIDER +
+//1U))
 //
 //#define BOARD_CODEC_I2C_BASEADDR LPI2C1
 //#define BOARD_CODEC_I2C_CLOCK_SOURCE_SELECT (0U)
 //#define BOARD_CODEC_I2C_CLOCK_SOURCE_DIVIDER (5U)
-//#define BOARD_CODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_CODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
+//#define BOARD_CODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_CODEC_I2C_CLOCK_SOURCE_DIVIDER +
+//1U))
 //
 ///* @Brief Board CAMERA configuration */
 //#define BOARD_CAMERA_I2C_BASEADDR LPI2C1
@@ -270,7 +272,6 @@
 //#define BOARD_CAMERA_I2C_CLOCK_SOURCE_SELECT (0U) /* Select USB1 PLL (480 MHz) as LPI2C's clock source */
 /*#define BOARD_CAMERA_I2C_CLOCK_FREQ \
     (CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8 / (BOARD_CAMERA_I2C_CLOCK_SOURCE_DIVIDER + 1U))*/
-
 
 /**
  * BOARD EINK DEFINITIONS
@@ -294,11 +295,12 @@
 //#define BOARD_EINK_BUSY_IRQ			GPIO3_Combined_16_31_IRQn
 //#define BOARD_EINK_BUSY_IRQ_HANDLER	GPIO3_Combined_16_31_IRQHandler
 
-#define BOARD_EINK_DISPLAY_RES_X   480
-#define BOARD_EINK_DISPLAY_RES_Y   600
+#define BOARD_EINK_DISPLAY_RES_X 480
+#define BOARD_EINK_DISPLAY_RES_Y 600
 
-//#define CELLULAR_UART_BASE                                   LPUART1                 ///< This macro indicate port to which GSM module is connected
-//#define CELLULAR_UART_CLKSRC                                 kCLOCK_PllUsb1          ///< This macro indicate LPUART clock source
+//#define CELLULAR_UART_BASE                                   LPUART1                 ///< This macro indicate port to
+//which GSM module is connected #define CELLULAR_UART_CLKSRC                                 kCLOCK_PllUsb1 ///< This
+//macro indicate LPUART clock source
 //
 //#define BSP_CELLULAR_UART_TX_PORT                            GPIO1
 //#define BSP_CELLULAR_UART_TX_PIN                             12
@@ -387,8 +389,9 @@
 // * Definitions for BSP_BLUETOOTH pins configuration
 // */
 //
-//#define BSP_BLUETOOTH_UART_BASE                              LPUART2                     ///< This macro indicate port to which GSM module is connected
-//#define BSP_BLUETOOTH_UART_CLKSRC                            kCLOCK_PllUsb1              ///< This macro indicate LPUART clock source
+//#define BSP_BLUETOOTH_UART_BASE                              LPUART2                     ///< This macro indicate port
+//to which GSM module is connected #define BSP_BLUETOOTH_UART_CLKSRC                            kCLOCK_PllUsb1 ///< This
+//macro indicate LPUART clock source
 //
 //#define BSP_BLUETOOTH_UART_RTS_PORT                          GPIO1
 //#define BSP_BLUETOOTH_UART_RTS_PIN                           17
@@ -412,8 +415,10 @@
 //#define BOARD_KEYBOARD_I2C_BASEADDR LPI2C2
 //#define BOARD_KEYBOARD_I2C_CLOCK_SOURCE_SELECT (0U)
 //#define BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER (5U)
-////#define BOARD_KEYBOARD_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-//#define BOARD_KEYBOARD_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U))
+////#define BOARD_KEYBOARD_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) /
+///(BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER + 1U))
+//#define BOARD_KEYBOARD_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_KEYBOARD_I2C_CLOCK_SOURCE_DIVIDER +
+//1U))
 //
 //#define BOARD_KEYBOARD_RESET_GPIO_PIN 	(29U)
 //#define BOARD_KEYBOARD_RESET_GPIO		GPIO2
@@ -452,8 +457,10 @@
 //#define BOARD_AUDIOCODEC_I2C_BASEADDR LPI2C2
 //#define BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_SELECT (0U)
 //#define BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER (5U)
-////#define BOARD_AUDIOCODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) / (BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
-//#define BOARD_AUDIOCODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) / (BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
+////#define BOARD_AUDIOCODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_Usb1PllClk) / 8) /
+///(BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
+//#define BOARD_AUDIOCODEC_I2C_CLOCK_FREQ ((CLOCK_GetFreq(kCLOCK_OscClk) / 8) /
+//(BOARD_AUDIOCODEC_I2C_CLOCK_SOURCE_DIVIDER + 1U))
 //
 //
 ///**
@@ -531,11 +538,9 @@
 //#define BOARD_POWER_HOLD_GPIO_PIN 					7U
 
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif /* __cplusplus */
-
-
-
 
 #if defined(__cplusplus)
 }

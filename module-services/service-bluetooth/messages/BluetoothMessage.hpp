@@ -3,9 +3,11 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 
-class BluetoothMessage : public sys::DataMessage {
-public:
-    enum Request {
+class BluetoothMessage : public sys::DataMessage
+{
+  public:
+    enum Request
+    {
         None,
         Start,
         Scan,

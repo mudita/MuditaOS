@@ -8,17 +8,15 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_DRIVERIRQ_HPP
 #define PUREPHONE_DRIVERIRQ_HPP
 
-namespace drivers {
+namespace drivers
+{
 
-    class DriverIRQ {
+    class DriverIRQ
+    {};
 
-    };
+} // namespace drivers
 
-}
-
-
-#endif //PUREPHONE_DRIVERIRQ_HPP
+#endif // PUREPHONE_DRIVERIRQ_HPP

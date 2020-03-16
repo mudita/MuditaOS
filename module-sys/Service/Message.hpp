@@ -15,37 +15,36 @@ namespace sys
     class ResponseMessage;
     class Message;
 
-
-    enum class SystemMessageType{
+    enum class SystemMessageType
+    {
         Ping,
         SwitchPowerMode,
         Start,
         Exit
     };
 
-    using Message_t = std::shared_ptr<Message>;
-    using MessageRet_t = std::pair<ReturnCodes ,std::shared_ptr<Message>>;
+    using Message_t    = std::shared_ptr<Message>;
+    using MessageRet_t = std::pair<ReturnCodes, std::shared_ptr<Message>>;
 
-
-    MessageRet_t CreateMessageRet(ReturnCodes retCode,Message_t msg);
+    MessageRet_t CreateMessageRet(ReturnCodes retCode, Message_t msg);
 
     class Message
     {
 
-    public:
-
-        enum class TransmissionType{
+      public:
+        enum class TransmissionType
+        {
             Unicast,
             Multicast,
             Broadcaast
         };
 
-        enum class Type{
+        enum class Type
+        {
             System,
             Data,
             Response
         };
-
 
         Message()
         {
@@ -54,21 +53,21 @@ namespace sys
 #endif
         }
 
-        Message(BusChannels chan)
-        : channel(chan)
+        Message(BusChannels chan) : channel(chan)
         {
 #ifdef UNIT_TESTS
             unitestsMsgInstancesCount++;
 #endif
         }
 
-        virtual ~Message(){
+        virtual ~Message()
+        {
 #ifdef UNIT_TESTS
             unitestsMsgInstancesCount--;
 #endif
         }
 
-        virtual Message_t Execute(Service* service) = 0;
+        virtual Message_t Execute(Service *service) = 0;
 
         Type type;
         TransmissionType transType;
@@ -84,17 +83,14 @@ namespace sys
 
     class SystemMessage : public Message
     {
-    public:
-
-        SystemMessage(SystemMessageType sysMsgType,ServicePowerMode pwrMode = ServicePowerMode::Active):
-            Message(BusChannels ::System),
-            sysMsgType(sysMsgType),
-            powerMode(pwrMode)
+      public:
+        SystemMessage(SystemMessageType sysMsgType, ServicePowerMode pwrMode = ServicePowerMode::Active)
+            : Message(BusChannels ::System), sysMsgType(sysMsgType), powerMode(pwrMode)
         {
             type = Type::System;
         }
 
-        Message_t Execute(Service* service) override;
+        Message_t Execute(Service *service) override;
 
         SystemMessageType sysMsgType;
         ServicePowerMode powerMode;
@@ -102,36 +98,36 @@ namespace sys
 
     class DataMessage : public Message
     {
-    public:
-      // This field must by provided by the class that inherits DataMessage
-      MessageType messageType = MessageType::MessageTypeUninitialized;
+      public:
+        // This field must by provided by the class that inherits DataMessage
+        MessageType messageType = MessageType::MessageTypeUninitialized;
 
-      DataMessage(MessageType messageType) : messageType{messageType}
-      {
-          type = Type::Data;
-      }
-
-        DataMessage(BusChannels channel): Message(channel)
+        DataMessage(MessageType messageType) : messageType{messageType}
         {
             type = Type::Data;
         }
 
-        Message_t Execute(Service* service) override;
+        DataMessage(BusChannels channel) : Message(channel)
+        {
+            type = Type::Data;
+        }
+
+        Message_t Execute(Service *service) override;
     };
 
     class ResponseMessage : public Message
     {
-    public:
-      ResponseMessage(ReturnCodes retCode = ReturnCodes::Success, MessageType responseTo = MessageType::MessageTypeUninitialized)
-          : Message(), responseTo(responseTo), retCode(retCode)
-      {
-          type = Type::Response;
+      public:
+        ResponseMessage(ReturnCodes retCode    = ReturnCodes::Success,
+                        MessageType responseTo = MessageType::MessageTypeUninitialized)
+            : Message(), responseTo(responseTo), retCode(retCode)
+        {
+            type = Type::Response;
         }
         MessageType responseTo;
         ReturnCodes retCode;
 
-        Message_t Execute(Service* service) override;
+        Message_t Execute(Service *service) override;
     };
 
-
-}
+} // namespace sys

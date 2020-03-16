@@ -50,7 +50,7 @@ typedef enum _usb_osa_status
 typedef enum _usb_osa_event_mode
 {
     kUSB_OsaEventManualClear = 0U, /*!< The flags of the event is cleared manually. */
-    kUSB_OsaEventAutoClear = 1U,   /*!< The flags of the event is cleared automatically. */
+    kUSB_OsaEventAutoClear   = 1U, /*!< The flags of the event is cleared automatically. */
 } usb_osa_event_mode_t;
 
 /* Include required header file based on RTOS selection */
@@ -226,7 +226,8 @@ extern "C"
        @endcode
      *
      */
-    extern usb_osa_status_t USB_OsaEventWait(usb_osa_event_handle handle, uint32_t bitMask, uint32_t flag, uint32_t timeout, uint32_t *bitSet);
+    extern usb_osa_status_t USB_OsaEventWait(
+        usb_osa_event_handle handle, uint32_t bitMask, uint32_t flag, uint32_t timeout, uint32_t *bitSet);
 
     /*!
      * @brief Checks an event flag.

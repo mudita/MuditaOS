@@ -17,12 +17,14 @@
 #include <utility>
 #include <vector>
 
-ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular) {
+ATParser::ATParser(bsp::Cellular *cellular) : cellular(cellular)
+{
     isInitialized = true;
 }
 
 /// plz see 12.7 summary of urc in documentation
-std::vector<ATParser::Urc> ATParser::ParseURC() {
+std::vector<ATParser::Urc> ATParser::ParseURC()
+{
 
     std::vector<ATParser::Urc> resp;
     size_t maxPos = 0, pos = 0;
@@ -34,11 +36,9 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
         {"+CFUN: 1", ATParser::Urc::FullFuncionalityAvailable},
     };
 
-    for (const auto &el : vals)
-    {
+    for (const auto &el : vals) {
         pos = responseBuffer.find(el.first);
-        if (pos != std::string::npos)
-        {
+        if (pos != std::string::npos) {
             resp.push_back(el.second);
             maxPos = std::max(pos + el.first.length(), maxPos);
             LOG_DEBUG(("[URC]: " + el.first).c_str());
@@ -46,12 +46,11 @@ std::vector<ATParser::Urc> ATParser::ParseURC() {
     }
 
     // manage string buffer
-    if(maxPos == 0){
-
-    }
+    if (maxPos == 0) {}
     else if (responseBuffer.size() >= maxPos) {
         responseBuffer.erase();
-    } else {
+    }
+    else {
         responseBuffer = responseBuffer.substr(maxPos);
     }
 
@@ -68,23 +67,25 @@ int ATParser::ProcessNewData(sys::Service *service)
     {
         cpp_freertos::LockGuard lock(mutex);
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
-        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s", length, responseBuffer.size(), utils::removeNewLines(responseBuffer).c_str());
+        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s",
+                  length,
+                  responseBuffer.size(),
+                  utils::removeNewLines(responseBuffer).c_str());
     }
 
     auto ret = ParseURC();
     if (blockedTaskHandle) {
         xTaskNotifyGive(blockedTaskHandle);
     }
-    else if (ret.size())
-    {
+    else if (ret.size()) {
         urcs.insert(std::end(urcs), std::begin(ret), std::end(ret));
         // GSM modem is considered as operational when it outputs URCs specified below:
         // 1) RDY
         // 2) +CFUN: 1
-        if (urcs.size() == 2)
-        {
+        if (urcs.size() == 2) {
             cpp_freertos::LockGuard lock(mutex);
-            auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::PowerUpProcedureComplete);
+            auto msg = std::make_shared<CellularNotificationMessage>(
+                CellularNotificationMessage::Type::PowerUpProcedureComplete);
             sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, service);
             LOG_DEBUG("[!!!] Fucking away data");
             responseBuffer.erase();

@@ -77,7 +77,7 @@ bool PhonebookDialog::handleSwitchData(SwitchData *data)
         return false;
 
     PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
-    contact = item->getContact();
+    contact                 = item->getContact();
 
     setContactData();
 
@@ -86,8 +86,7 @@ bool PhonebookDialog::handleSwitchData(SwitchData *data)
 
 bool PhonebookDialog::onInput(const InputEvent &inputEvent)
 {
-    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort))
-    {
+    if (inputEvent.keyCode == KeyCode::KEY_RF && (inputEvent.state == InputEvent::State::keyReleasedShort)) {
         std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
         application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         contact = nullptr;
@@ -103,9 +102,8 @@ void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
     icon = new Image(this, 176, 135, 128, 128, "phonebook_contact_delete_trashcan");
 
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return (true);
@@ -114,16 +112,13 @@ void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
     };
 
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
 
-            if (DBServiceAPI::ContactRemove(application, contact->dbID))
-            {
+            if (DBServiceAPI::ContactRemove(application, contact->dbID)) {
                 LOG_INFO("contact %d removed, switch to MainWindow", contact->dbID);
             }
-            else
-            {
+            else {
                 LOG_ERROR("failed to delete contact with id %d", contact->dbID);
             }
 
@@ -147,15 +142,12 @@ void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
     confirmationLabel->setText(utils::localize.get("app_phonebook_options_block_confirm"));
 
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
-            if (DBServiceAPI::ContactBlock(application, contact->dbID, false))
-            {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
+            if (DBServiceAPI::ContactBlock(application, contact->dbID, false)) {
                 LOG_INFO("contact %d unblocked, switch to MainWindow", contact->dbID);
             }
-            else
-            {
+            else {
                 LOG_ERROR("failed to unblock contact with id %d", contact->dbID);
             }
 
@@ -167,15 +159,12 @@ void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
     };
 
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
-            if (DBServiceAPI::ContactBlock(application, contact->dbID, true))
-            {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
+            if (DBServiceAPI::ContactBlock(application, contact->dbID, true)) {
                 LOG_INFO("contact %d blocked, switch to MainWindow", contact->dbID);
             }
-            else
-            {
+            else {
                 LOG_ERROR("failed to block contact with id %d", contact->dbID);
             }
 
@@ -193,38 +182,36 @@ void PhonebookBlockContact::setContactData()
 }
 
 DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)
-    : Dialog(app, gui::window::name::duplicatedContact,
+    : Dialog(app,
+             gui::window::name::duplicatedContact,
              {
-                 .title = "",
-                 .icon = "phonebook_info",
-                 .text = utils::localize.get("app_phonebook_duplicate_speed_dial"),
+                 .title  = "",
+                 .icon   = "phonebook_info",
+                 .text   = utils::localize.get("app_phonebook_duplicate_speed_dial"),
                  .action = []() -> bool {
                      LOG_INFO("!");
                      return true;
                  },
              })
-{
-}
+{}
 
 bool DuplicatedContactDialogWindow::handleSwitchData(SwitchData *data)
 {
-    if (data == nullptr)
-    {
+    if (data == nullptr) {
         return false;
     }
 
     PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
-    if (item != nullptr)
-    {
+    if (item != nullptr) {
         auto record = item->getContact();
 
-        auto meta = this->meta;
+        auto meta   = this->meta;
         meta.action = [=]() -> bool {
             application->switchWindow(gui::window::name::newContact, std::make_unique<PhonebookItemData>(record));
             return true;
         };
         meta.title = item->text;
-        meta.text = updateText(meta.text, *record);
+        meta.text  = updateText(meta.text, *record);
         this->update(meta);
         application->switchWindow(gui::window::name::duplicatedContact, nullptr);
         return true;
@@ -256,9 +243,8 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
     dialValue->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
             application->switchWindow(gui::window::name::newContact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
         }
@@ -266,17 +252,13 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
     };
 
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
-        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) &&
-            ((inputEvent.state == InputEvent::State::keyReleasedShort) || (inputEvent.state == InputEvent::State::keyReleasedLong)))
-        {
-            if (contact != nullptr)
-            {
-                if (DBServiceAPI::ContactUpdate(application, *contact) == false)
-                {
+        if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
+                                                           (inputEvent.state == InputEvent::State::keyReleasedLong))) {
+            if (contact != nullptr) {
+                if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
                     LOG_ERROR("can't update contact %s", contact->primaryName.c_str());
                 }
-                else
-                {
+                else {
                     LOG_INFO("Contact %s updated", contact->primaryName.c_str());
                 }
             }

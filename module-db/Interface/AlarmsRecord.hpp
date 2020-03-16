@@ -12,41 +12,46 @@
 #include "utf8/UTF8.hpp"
 #include "../Common/Common.hpp"
 
-struct AlarmsRecord{
-	uint32_t ID;
-	uint32_t time;
-	uint32_t snooze;
-	uint32_t status;
-	UTF8    path;
-
+struct AlarmsRecord
+{
+    uint32_t ID;
+    uint32_t time;
+    uint32_t snooze;
+    uint32_t status;
+    UTF8 path;
 };
 
-enum class AlarmsRecordField{
+enum class AlarmsRecordField
+{
     Time,
     Snooze,
     Status,
-	Path
+    Path
 };
 
-class AlarmsRecordInterface : public RecordInterface<AlarmsRecord,AlarmsRecordField > {
-public:
-
-    AlarmsRecordInterface(AlarmsDB* alarmsDb);
+class AlarmsRecordInterface : public RecordInterface<AlarmsRecord, AlarmsRecordField>
+{
+  public:
+    AlarmsRecordInterface(AlarmsDB *alarmsDb);
     ~AlarmsRecordInterface();
 
-    bool Add(const AlarmsRecord& rec) override final;
+    bool Add(const AlarmsRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
-    bool RemoveByField(AlarmsRecordField field,const char* str) override final;
-    bool Update(const AlarmsRecord& rec) override final;
+    bool RemoveByField(AlarmsRecordField field, const char *str) override final;
+    bool Update(const AlarmsRecord &rec) override final;
     AlarmsRecord GetByID(uint32_t id) override final;
 
     uint32_t GetCount() override final;
 
-    std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffset(uint32_t offset,uint32_t limit) override final;
+    std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffsetByField(uint32_t offset,uint32_t limit,AlarmsRecordField field, const char* str) override final;
+    std::unique_ptr<std::vector<AlarmsRecord>> GetLimitOffsetByField(uint32_t offset,
+                                                                     uint32_t limit,
+                                                                     AlarmsRecordField field,
+                                                                     const char *str) override final;
 
     AlarmsRecord GetNext(time_t time);
-private:
-    AlarmsDB* alarmsDB;
+
+  private:
+    AlarmsDB *alarmsDB;
 };

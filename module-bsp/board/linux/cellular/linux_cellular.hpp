@@ -8,12 +8,10 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_LINUX_CELLULAR_HPP
 #define PUREPHONE_LINUX_CELLULAR_HPP
 
 #include "bsp/cellular/bsp_cellular.hpp"
-
 
 #include <cstring>
 #include <sys/epoll.h>
@@ -21,15 +19,16 @@
 #include <sys/ioctl.h>
 #include "mutex.hpp"
 
-namespace bsp {
+namespace bsp
+{
 
-    class LinuxCellular: public Cellular  {
-    private:
+    class LinuxCellular : public Cellular
+    {
+      private:
         bool pv_SendingAllowed = true;
 
-    public:
-
-        LinuxCellular(const char* term, uint32_t portSpeed);
+      public:
+        LinuxCellular(const char *term, uint32_t portSpeed);
         ~LinuxCellular();
 
         void PowerUp() override final;
@@ -46,7 +45,7 @@ namespace bsp {
 
         void InformModemHostAsleep() override final;
 
-		void InformModemHostWakeup() override final;
+        void InformModemHostWakeup() override final;
 
         void EnterSleep() override final;
 
@@ -54,16 +53,31 @@ namespace bsp {
 
         void SetSpeed(uint32_t portSpeed);
 
-        void SetSendingAllowed(bool state) override final { pv_SendingAllowed = state; }
-        bool GetSendingAllowed() override final { return pv_SendingAllowed; }
+        void SetSendingAllowed(bool state) override final
+        {
+            pv_SendingAllowed = state;
+        }
+        bool GetSendingAllowed() override final
+        {
+            return pv_SendingAllowed;
+        }
 
         void SelectAntenna(uint8_t antenna) override final;
 
       private:
-
-        static constexpr speed_t baud_bits[] = {
-                0, B9600, B19200, B38400, B57600, B115200, B230400, B460800, B921600, B1500000, B2000000, B3000000, B4000000
-        };
+        static constexpr speed_t baud_bits[] = {0,
+                                                B9600,
+                                                B19200,
+                                                B38400,
+                                                B57600,
+                                                B115200,
+                                                B230400,
+                                                B460800,
+                                                B921600,
+                                                B1500000,
+                                                B2000000,
+                                                B3000000,
+                                                B4000000};
 
         static const uint32_t portBaudRate = 115200;
 
@@ -78,7 +92,6 @@ namespace bsp {
         cpp_freertos::MutexStandard serOutMutex;
     };
 
-}
+} // namespace bsp
 
-
-#endif //PUREPHONE_LINUX_CELLULAR_HPP
+#endif // PUREPHONE_LINUX_CELLULAR_HPP

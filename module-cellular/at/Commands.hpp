@@ -10,8 +10,9 @@
 
 namespace at
 {
-    inline const uint32_t default_timeout = 5000;    /// if unsure - take this
-    inline const uint32_t default_doc_timeout = 300; /// if you've checked it's ok - or it was at least 300 in code somewhere, take this
+    inline const uint32_t default_timeout = 5000; /// if unsure - take this
+    inline const uint32_t default_doc_timeout =
+        300; /// if you've checked it's ok - or it was at least 300 in code somewhere, take this
 
     /// at::Cmd structure with command, it's timeout and some runtime data
     /// { command, timeout, last : {sent, response, status } }
@@ -22,8 +23,8 @@ namespace at
         struct
         {
             Result::Code status = Result::Code::NONE; /// last response for that command
-            time_t requested = 0;                     /// last time comand was requested
-            time_t response = 0;                      /// last time command was received
+            time_t requested    = 0;                  /// last time comand was requested
+            time_t response     = 0;                  /// last time command was received
             auto request_time() -> time_t
             {
                 return response - requested;
@@ -31,9 +32,9 @@ namespace at
         } last; /// last status of command execution
 
         Cmd(std::string cmd, uint32_t timeout = default_timeout) : cmd(std::move(cmd)), timeout(timeout)
-        {
-        }
-        /// not the prettiest, for now it's ok - for commands which modify strings to execute - return copy of command str
+        {}
+        /// not the prettiest, for now it's ok - for commands which modify strings to execute - return copy of command
+        /// str
         operator std::string() const
         {
             return cmd;
@@ -68,13 +69,14 @@ namespace at
         SMS_STORAGE,                /// Set SMS preferred storage
         QSCLK_ON,                   /// Configure Whether or Not to Enter into Sleep Mode
         QDAI,                       /// GSM audio initialization check
-        QDAI_INIT,                  /// Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
-                                    /// Quectel confirmed that during init phase modem sends "ready notification" way before
-                                    /// audio subsystem is initialized. The only recommended solution for this is to send configuration
-                                    /// command repetitively until modem responds with OK. Due to our system characteristic we can't use here simple
-                                    /// while loop with vTaskDelay as this function will be invoked from AudioService context. By design service's
-                                    /// routines should be as fast as they can and non blocking. Therefore there is possibility for audioservice to block
-                                    /// for too long waiting in while loop which will trigger SystemManager ping/pong failure procedure.
+        QDAI_INIT, /// Audio configuration: custom PCM, 16 bit linear samples, primary mode, 16kHz, master
+                   /// Quectel confirmed that during init phase modem sends "ready notification" way before
+                   /// audio subsystem is initialized. The only recommended solution for this is to send configuration
+                   /// command repetitively until modem responds with OK. Due to our system characteristic we can't use
+                   /// here simple while loop with vTaskDelay as this function will be invoked from AudioService
+                   /// context. By design service's routines should be as fast as they can and non blocking. Therefore
+                   /// there is possibility for audioservice to block for too long waiting in while loop which will
+                   /// trigger SystemManager ping/pong failure procedure.
         SET_URC_CHANNEL,
         CSQ,  /// Signal strength query
         CLCC, /// list current calls
@@ -144,8 +146,7 @@ namespace at
             {AT::SIM_DET_ON, {"AT+QSIMDET=1,0\r"}},
             {AT::SIMSTAT_ON, {"AT+QSIMSTAT=1\r"}},
         };
-        if (fact.count(at))
-        {
+        if (fact.count(at)) {
             return fact.at(at);
         }
         LOG_ERROR("NO SUCH AT COMMAND DEFINED: %d", at);

@@ -20,7 +20,7 @@ class WorkerDesktop : public sys::Worker
   private:
   public:
     const std::string RECEIVE_QUEUE_BUFFER_NAME = "receiveQueueBuffer";
-    const std::string SEND_QUEUE_BUFFER_NAME = "sendQueueBuffer";
+    const std::string SEND_QUEUE_BUFFER_NAME    = "sendQueueBuffer";
 
     WorkerDesktop(sys::Service *ownerServicePtr) : sys::Worker(ownerServicePtr), ownerService(ownerServicePtr){};
     virtual bool init(std::list<sys::WorkerQueueInfo> queues) override;

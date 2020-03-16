@@ -3,7 +3,7 @@
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -39,7 +39,6 @@
 #define FSL_COMPONENT_ID "platform.drivers.gpt"
 #endif
 
-
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -63,10 +62,8 @@ static uint32_t GPT_GetInstance(GPT_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0U; instance < ARRAY_SIZE(s_gptBases); instance++)
-    {
-        if (s_gptBases[instance] == base)
-        {
+    for (instance = 0U; instance < ARRAY_SIZE(s_gptBases); instance++) {
+        if (s_gptBases[instance] == base) {
             break;
         }
     }
@@ -113,12 +110,12 @@ void GPT_GetDefaultConfig(gpt_config_t *config)
 {
     assert(config);
 
-    config->clockSource = kGPT_ClockSource_Periph;
-    config->divider = 1U;
+    config->clockSource     = kGPT_ClockSource_Periph;
+    config->divider         = 1U;
     config->enableRunInStop = true;
     config->enableRunInWait = true;
     config->enableRunInDoze = false;
-    config->enableRunInDbg = false;
-    config->enableFreeRun = false;
-    config->enableMode = true;
+    config->enableRunInDbg  = false;
+    config->enableFreeRun   = false;
+    config->enableMode      = true;
 }

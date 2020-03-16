@@ -9,7 +9,8 @@
 class PhonebookItemData : public gui::SwitchData
 {
   public:
-    PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "") : text(text), contact(contact){};
+    PhonebookItemData(std::shared_ptr<ContactRecord> contact, const std::string &text = "")
+        : text(text), contact(contact){};
     virtual ~PhonebookItemData(){};
     std::shared_ptr<ContactRecord> getContact()
     {
@@ -18,8 +19,7 @@ class PhonebookItemData : public gui::SwitchData
 
   public:
     PhonebookItemData() : contact(nullptr)
-    {
-    }
+    {}
     std::string text;
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
@@ -66,11 +66,11 @@ class PhonebookSearchResultsData : public gui::SwitchData
 class PhonebookSearchReuqest : public gui::SwitchData
 {
   public:
-    std::string request = "";
+    std::string request                                 = "";
     std::shared_ptr<std::vector<ContactRecord>> results = nullptr;
-    PhonebookSearchReuqest(std::string request, std::shared_ptr<std::vector<ContactRecord>> results) : request(request), results(results)
-    {
-    }
-    PhonebookSearchReuqest() = default;
+    PhonebookSearchReuqest(std::string request, std::shared_ptr<std::vector<ContactRecord>> results)
+        : request(request), results(results)
+    {}
+    PhonebookSearchReuqest()              = default;
     std::shared_ptr<ContactRecord> result = nullptr;
 };

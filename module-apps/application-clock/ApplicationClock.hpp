@@ -15,28 +15,36 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Progress.hpp"
 
+namespace app
+{
 
-namespace app {
+    /*
+     *
+     */
+    class ApplicationClock : public Application
+    {
+        AppTimer timerClock;
+        void timerClockCallback();
 
-/*
- *
- */
-class ApplicationClock: public Application {
-    AppTimer timerClock;
-    void timerClockCallback();
-public:
-	ApplicationClock(std::string name, std::string parent = "", uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
-	virtual ~ApplicationClock();
+      public:
+        ApplicationClock(std::string name,
+                         std::string parent            = "",
+                         uint32_t stackDepth           = 4096,
+                         sys::ServicePriority priority = sys::ServicePriority::Idle);
+        virtual ~ApplicationClock();
 
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-	sys::ReturnCodes InitHandler() override;
-	sys::ReturnCodes DeinitHandler() override;
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        {
+            return sys::ReturnCodes::Success;
+        }
 
-    void createUserInterface() override;
-    void destroyUserInterface() override;
-};
+        void createUserInterface() override;
+        void destroyUserInterface() override;
+    };
 
 } /* namespace app */
 

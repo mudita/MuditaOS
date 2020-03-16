@@ -3,7 +3,7 @@
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -39,7 +39,6 @@
 #define FSL_COMPONENT_ID "platform.drivers.pit"
 #endif
 
-
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -71,10 +70,8 @@ static uint32_t PIT_GetInstance(PIT_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_pitBases); instance++)
-    {
-        if (s_pitBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_pitBases); instance++) {
+        if (s_pitBases[instance] == base) {
             break;
         }
     }
@@ -98,12 +95,10 @@ void PIT_Init(PIT_Type *base, const pit_config_t *config)
     base->MCR &= ~PIT_MCR_MDIS_MASK;
 #endif
     /* Config timer operation when in debug mode */
-    if (config->enableRunInDebug)
-    {
+    if (config->enableRunInDebug) {
         base->MCR &= ~PIT_MCR_FRZ_MASK;
     }
-    else
-    {
+    else {
         base->MCR |= PIT_MCR_FRZ_MASK;
     }
 }

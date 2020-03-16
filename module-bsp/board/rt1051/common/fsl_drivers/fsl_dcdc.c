@@ -3,7 +3,7 @@
  * Copyright (c) 2017, NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -39,7 +39,6 @@
 #define FSL_COMPONENT_ID "platform.drivers.dcdc_1"
 #endif
 
-
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -69,10 +68,8 @@ static uint32_t DCDC_GetInstance(DCDC_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_dcdcBases); instance++)
-    {
-        if (s_dcdcBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_dcdcBases); instance++) {
+        if (s_dcdcBases[instance] == base) {
             break;
         }
     }
@@ -103,24 +100,22 @@ void DCDC_SetClockSource(DCDC_Type *base, dcdc_clock_source_t clockSource)
     uint32_t tmp32;
 
     /* Configure the DCDC_REG0 register. */
-    tmp32 = base->REG0 &
-            ~(DCDC_REG0_XTAL_24M_OK_MASK | DCDC_REG0_DISABLE_AUTO_CLK_SWITCH_MASK | DCDC_REG0_SEL_CLK_MASK |
-              DCDC_REG0_PWD_OSC_INT_MASK);
-    switch (clockSource)
-    {
-        case kDCDC_ClockInternalOsc:
-            tmp32 |= DCDC_REG0_DISABLE_AUTO_CLK_SWITCH_MASK;
-            break;
-        case kDCDC_ClockExternalOsc:
-            /* Choose the external clock and disable the internal clock. */
-            tmp32 |= DCDC_REG0_DISABLE_AUTO_CLK_SWITCH_MASK | DCDC_REG0_SEL_CLK_MASK | DCDC_REG0_PWD_OSC_INT_MASK;
-            break;
-        case kDCDC_ClockAutoSwitch:
-            /* Set to switch from internal ring osc to xtal 24M if auto mode is enabled. */
-            tmp32 |= DCDC_REG0_XTAL_24M_OK_MASK;
-            break;
-        default:
-            break;
+    tmp32 = base->REG0 & ~(DCDC_REG0_XTAL_24M_OK_MASK | DCDC_REG0_DISABLE_AUTO_CLK_SWITCH_MASK |
+                           DCDC_REG0_SEL_CLK_MASK | DCDC_REG0_PWD_OSC_INT_MASK);
+    switch (clockSource) {
+    case kDCDC_ClockInternalOsc:
+        tmp32 |= DCDC_REG0_DISABLE_AUTO_CLK_SWITCH_MASK;
+        break;
+    case kDCDC_ClockExternalOsc:
+        /* Choose the external clock and disable the internal clock. */
+        tmp32 |= DCDC_REG0_DISABLE_AUTO_CLK_SWITCH_MASK | DCDC_REG0_SEL_CLK_MASK | DCDC_REG0_PWD_OSC_INT_MASK;
+        break;
+    case kDCDC_ClockAutoSwitch:
+        /* Set to switch from internal ring osc to xtal 24M if auto mode is enabled. */
+        tmp32 |= DCDC_REG0_XTAL_24M_OK_MASK;
+        break;
+    default:
+        break;
     }
     base->REG0 = tmp32;
 }
@@ -129,14 +124,14 @@ void DCDC_GetDefaultDetectionConfig(dcdc_detection_config_t *config)
 {
     assert(NULL != config);
 
-    config->enableXtalokDetection = false;
+    config->enableXtalokDetection         = false;
     config->powerDownOverVoltageDetection = true;
-    config->powerDownLowVlotageDetection = false;
+    config->powerDownLowVlotageDetection  = false;
     config->powerDownOverCurrentDetection = true;
     config->powerDownPeakCurrentDetection = true;
-    config->powerDownZeroCrossDetection = true;
-    config->OverCurrentThreshold = kDCDC_OverCurrentThresholdAlt0;
-    config->PeakCurrentThreshold = kDCDC_PeakCurrentThresholdAlt0;
+    config->powerDownZeroCrossDetection   = true;
+    config->OverCurrentThreshold          = kDCDC_OverCurrentThresholdAlt0;
+    config->PeakCurrentThreshold          = kDCDC_PeakCurrentThresholdAlt0;
 }
 
 void DCDC_SetDetectionConfig(DCDC_Type *base, const dcdc_detection_config_t *config)
@@ -152,28 +147,22 @@ void DCDC_SetDetectionConfig(DCDC_Type *base, const dcdc_detection_config_t *con
 
     tmp32 |= DCDC_REG0_CUR_SNS_THRSH(config->PeakCurrentThreshold) |
              DCDC_REG0_OVERCUR_TRIG_ADJ(config->OverCurrentThreshold);
-    if (false == config->enableXtalokDetection)
-    {
+    if (false == config->enableXtalokDetection) {
         tmp32 |= DCDC_REG0_XTALOK_DISABLE_MASK;
     }
-    if (config->powerDownOverVoltageDetection)
-    {
+    if (config->powerDownOverVoltageDetection) {
         tmp32 |= DCDC_REG0_PWD_HIGH_VOLT_DET_MASK;
     }
-    if (config->powerDownLowVlotageDetection)
-    {
+    if (config->powerDownLowVlotageDetection) {
         tmp32 |= DCDC_REG0_PWD_CMP_BATT_DET_MASK;
     }
-    if (config->powerDownOverCurrentDetection)
-    {
+    if (config->powerDownOverCurrentDetection) {
         tmp32 |= DCDC_REG0_PWD_OVERCUR_DET_MASK;
     }
-    if (config->powerDownPeakCurrentDetection)
-    {
+    if (config->powerDownPeakCurrentDetection) {
         tmp32 |= DCDC_REG0_PWD_CUR_SNS_CMP_MASK;
     }
-    if (config->powerDownZeroCrossDetection)
-    {
+    if (config->powerDownZeroCrossDetection) {
         tmp32 |= DCDC_REG0_PWD_ZCD_MASK;
     }
     base->REG0 = tmp32;
@@ -183,10 +172,10 @@ void DCDC_GetDefaultLowPowerConfig(dcdc_low_power_config_t *config)
 {
     assert(NULL != config);
 
-    config->enableOverloadDetection = true;
+    config->enableOverloadDetection     = true;
     config->enableAdjustHystereticValue = false;
-    config->countChargingTimePeriod = kDCDC_CountChargingTimePeriod8Cycle;
-    config->countChargingTimeThreshold = kDCDC_CountChargingTimeThreshold32;
+    config->countChargingTimePeriod     = kDCDC_CountChargingTimePeriod8Cycle;
+    config->countChargingTimeThreshold  = kDCDC_CountChargingTimeThreshold32;
 }
 
 void DCDC_SetLowPowerConfig(DCDC_Type *base, const dcdc_low_power_config_t *config)
@@ -195,17 +184,14 @@ void DCDC_SetLowPowerConfig(DCDC_Type *base, const dcdc_low_power_config_t *conf
 
     uint32_t tmp32;
     /* Configure the DCDC_REG0 register. */
-    tmp32 = base->REG0 &
-            ~(DCDC_REG0_EN_LP_OVERLOAD_SNS_MASK | DCDC_REG0_LP_HIGH_HYS_MASK | DCDC_REG0_LP_OVERLOAD_FREQ_SEL_MASK |
-              DCDC_REG0_LP_OVERLOAD_THRSH_MASK);
+    tmp32 = base->REG0 & ~(DCDC_REG0_EN_LP_OVERLOAD_SNS_MASK | DCDC_REG0_LP_HIGH_HYS_MASK |
+                           DCDC_REG0_LP_OVERLOAD_FREQ_SEL_MASK | DCDC_REG0_LP_OVERLOAD_THRSH_MASK);
     tmp32 |= DCDC_REG0_LP_OVERLOAD_FREQ_SEL(config->countChargingTimePeriod) |
              DCDC_REG0_LP_OVERLOAD_THRSH(config->countChargingTimeThreshold);
-    if (config->enableOverloadDetection)
-    {
+    if (config->enableOverloadDetection) {
         tmp32 |= DCDC_REG0_EN_LP_OVERLOAD_SNS_MASK;
     }
-    if (config->enableAdjustHystereticValue)
-    {
+    if (config->enableAdjustHystereticValue) {
         tmp32 |= DCDC_REG0_LP_HIGH_HYS_MASK;
     }
     base->REG0 = tmp32;
@@ -215,8 +201,7 @@ uint32_t DCDC_GetstatusFlags(DCDC_Type *base)
 {
     uint32_t tmp32 = 0U;
 
-    if (DCDC_REG0_STS_DC_OK_MASK == (DCDC_REG0_STS_DC_OK_MASK & base->REG0))
-    {
+    if (DCDC_REG0_STS_DC_OK_MASK == (DCDC_REG0_STS_DC_OK_MASK & base->REG0)) {
         tmp32 |= kDCDC_LockedOKStatus;
     }
 
@@ -225,12 +210,10 @@ uint32_t DCDC_GetstatusFlags(DCDC_Type *base)
 
 void DCDC_ResetCurrentAlertSignal(DCDC_Type *base, bool enable)
 {
-    if (enable)
-    {
+    if (enable) {
         base->REG0 |= DCDC_REG0_CURRENT_ALERT_RESET_MASK;
     }
-    else
-    {
+    else {
         base->REG0 &= ~DCDC_REG0_CURRENT_ALERT_RESET_MASK;
     }
 }
@@ -239,14 +222,14 @@ void DCDC_GetDefaultLoopControlConfig(dcdc_loop_control_config_t *config)
 {
     assert(NULL != config);
 
-    config->enableCommonHysteresis = false;
+    config->enableCommonHysteresis         = false;
     config->enableCommonThresholdDetection = false;
-    config->enableInvertHysteresisSign = false;
-    config->enableRCThresholdDetection = false;
-    config->enableRCScaleCircuit = 0U;
-    config->complementFeedForwardStep = 0U;
-    config->controlParameterMagnitude = 2U;
-    config->integralProportionalRatio = 2U;
+    config->enableInvertHysteresisSign     = false;
+    config->enableRCThresholdDetection     = false;
+    config->enableRCScaleCircuit           = 0U;
+    config->complementFeedForwardStep      = 0U;
+    config->controlParameterMagnitude      = 2U;
+    config->integralProportionalRatio      = 2U;
 }
 
 void DCDC_SetLoopControlConfig(DCDC_Type *base, const dcdc_loop_control_config_t *config)
@@ -257,31 +240,26 @@ void DCDC_SetLoopControlConfig(DCDC_Type *base, const dcdc_loop_control_config_t
 
     /* Configure the DCDC_REG1 register. */
     tmp32 = base->REG1 & ~(DCDC_REG1_LOOPCTRL_EN_HYST_MASK | DCDC_REG1_LOOPCTRL_HST_THRESH_MASK);
-    if (config->enableCommonHysteresis)
-    {
+    if (config->enableCommonHysteresis) {
         tmp32 |= DCDC_REG1_LOOPCTRL_EN_HYST_MASK;
     }
-    if (config->enableCommonThresholdDetection)
-    {
+    if (config->enableCommonThresholdDetection) {
         tmp32 |= DCDC_REG1_LOOPCTRL_HST_THRESH_MASK;
     }
     base->REG1 = tmp32;
 
     /* configure the DCDC_REG2 register. */
-    tmp32 = base->REG2 &
-            ~(DCDC_REG2_LOOPCTRL_HYST_SIGN_MASK | DCDC_REG2_LOOPCTRL_RCSCALE_THRSH_MASK |
-              DCDC_REG2_LOOPCTRL_EN_RCSCALE_MASK | DCDC_REG2_LOOPCTRL_DC_FF_MASK | DCDC_REG2_LOOPCTRL_DC_R_MASK |
-              DCDC_REG2_LOOPCTRL_DC_C_MASK);
+    tmp32 = base->REG2 & ~(DCDC_REG2_LOOPCTRL_HYST_SIGN_MASK | DCDC_REG2_LOOPCTRL_RCSCALE_THRSH_MASK |
+                           DCDC_REG2_LOOPCTRL_EN_RCSCALE_MASK | DCDC_REG2_LOOPCTRL_DC_FF_MASK |
+                           DCDC_REG2_LOOPCTRL_DC_R_MASK | DCDC_REG2_LOOPCTRL_DC_C_MASK);
     tmp32 |= DCDC_REG2_LOOPCTRL_DC_FF(config->complementFeedForwardStep) |
              DCDC_REG2_LOOPCTRL_DC_R(config->controlParameterMagnitude) |
              DCDC_REG2_LOOPCTRL_DC_C(config->integralProportionalRatio) |
              DCDC_REG2_LOOPCTRL_EN_RCSCALE(config->enableRCScaleCircuit);
-    if (config->enableInvertHysteresisSign)
-    {
+    if (config->enableInvertHysteresisSign) {
         tmp32 |= DCDC_REG2_LOOPCTRL_HYST_SIGN_MASK;
     }
-    if (config->enableRCThresholdDetection)
-    {
+    if (config->enableRCThresholdDetection) {
         tmp32 |= DCDC_REG2_LOOPCTRL_RCSCALE_THRSH_MASK;
     }
     base->REG2 = tmp32;
@@ -294,8 +272,7 @@ void DCDC_SetMinPowerConfig(DCDC_Type *base, const dcdc_min_power_config_t *conf
     uint32_t tmp32;
 
     tmp32 = base->REG3 & ~DCDC_REG3_MINPWR_DC_HALFCLK_MASK;
-    if (config->enableUseHalfFreqForContinuous)
-    {
+    if (config->enableUseHalfFreqForContinuous) {
         tmp32 |= DCDC_REG3_MINPWR_DC_HALFCLK_MASK;
     }
     base->REG3 = tmp32;
@@ -316,9 +293,7 @@ void DCDC_AdjustTargetVoltage(DCDC_Type *base, uint32_t VDDRun, uint32_t VDDStan
 
     /* DCDC_STS_DC_OK bit will be de-asserted after target register changes. After output voltage settling to new
      * target value, DCDC_STS_DC_OK will be asserted. */
-    while (DCDC_REG0_STS_DC_OK_MASK != (DCDC_REG0_STS_DC_OK_MASK & base->REG0))
-    {
-    }
+    while (DCDC_REG0_STS_DC_OK_MASK != (DCDC_REG0_STS_DC_OK_MASK & base->REG0)) {}
 }
 
 void DCDC_SetInternalRegulatorConfig(DCDC_Type *base, const dcdc_internal_regulator_config_t *config)
@@ -330,8 +305,7 @@ void DCDC_SetInternalRegulatorConfig(DCDC_Type *base, const dcdc_internal_regula
     /* Configure the DCDC_REG1 register. */
     tmp32 = base->REG1 & ~(DCDC_REG1_REG_FBK_SEL_MASK | DCDC_REG1_REG_RLOAD_SW_MASK);
     tmp32 |= DCDC_REG1_REG_FBK_SEL(config->feedbackPoint);
-    if (config->enableLoadResistor)
-    {
+    if (config->enableLoadResistor) {
         tmp32 |= DCDC_REG1_REG_RLOAD_SW_MASK;
     }
     base->REG1 = tmp32;

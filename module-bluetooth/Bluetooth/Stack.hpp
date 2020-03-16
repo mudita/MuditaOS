@@ -1,6 +1,8 @@
 #pragma once
 
-struct Stack {
+struct Stack
+{
     int id;
-    Stack() : id(0) {}
+    Stack() : id(0)
+    {}
 };

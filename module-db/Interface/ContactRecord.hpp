@@ -32,8 +32,7 @@ struct ContactRecord
         ContactNumberType numberType;
         Number(UTF8 n_user = "", UTF8 n_e164 = "", ContactNumberType n_type = ContactNumberType::CELL)
             : numberUser(n_user), numberE164(n_e164), numberType(n_type)
-        {
-        }
+        {}
     };
     std::vector<Number> numbers;
 
@@ -54,8 +53,7 @@ struct ContactRecord
 
     inline UTF8 getFormattedName()
     {
-        if (contactType == ContactType::TEMPORARY)
-        {
+        if (contactType == ContactType::TEMPORARY) {
             return numbers[0].numberE164;
         }
 
@@ -94,7 +92,9 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     std::unique_ptr<std::vector<ContactRecord>> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field,
+    std::unique_ptr<std::vector<ContactRecord>> GetLimitOffsetByField(uint32_t offset,
+                                                                      uint32_t limit,
+                                                                      ContactRecordField field,
                                                                       const char *str) override final;
 
     std::unique_ptr<std::vector<ContactRecord>> GetByName(UTF8 primaryName, UTF8 alternativeName);
@@ -105,11 +105,13 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
         True
     };
 
-    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
+    std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
+        const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
 
     std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
 
-    std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName, const char *alternativeName,
+    std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName,
+                                                       const char *alternativeName,
                                                        const char *number);
 
   private:
@@ -119,4 +121,3 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     std::unique_ptr<std::vector<ContactRecord>> GetContactByNumber(const UTF8 &number);
 };
-

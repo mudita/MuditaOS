@@ -8,17 +8,18 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_RT1051DRIVERGPIO_HPP
 #define PUREPHONE_RT1051DRIVERGPIO_HPP
 
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "../common/fsl_drivers/fsl_gpio.h"
 
-namespace drivers {
+namespace drivers
+{
 
-    class RT1051DriverGPIO : public DriverGPIO {
-    public:
+    class RT1051DriverGPIO : public DriverGPIO
+    {
+      public:
         RT1051DriverGPIO(const GPIOInstances &inst, const DriverGPIOParams &params);
 
         ~RT1051DriverGPIO();
@@ -47,13 +48,12 @@ namespace drivers {
 
         void ClearPortInterrupts(const uint32_t mask) override final;
 
-    private:
+      private:
         GPIOInstances instance;
         GPIO_Type *base;
         std::string name;
     };
 
-}
+} // namespace drivers
 
-
-#endif //PUREPHONE_RT1051DRIVERGPIO_HPP
+#endif // PUREPHONE_RT1051DRIVERGPIO_HPP

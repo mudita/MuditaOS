@@ -8,24 +8,20 @@
  * @details
  */
 
-
 #include "SmsDB.hpp"
-
 
 const char *SmsDB::dbName = "sys/sms.db";
 
-SmsDB::SmsDB() :
-        Database(dbName),
-        sms(this),
-        threads(this){
+SmsDB::SmsDB() : Database(dbName), sms(this), threads(this)
+{
 
-        if(sms.Create() == false) return;
-        if(threads.Create() == false) return;
+    if (sms.Create() == false)
+        return;
+    if (threads.Create() == false)
+        return;
 
-        isInitialized = true;
-
+    isInitialized = true;
 }
 
-SmsDB::~SmsDB() {
-
-}
+SmsDB::~SmsDB()
+{}

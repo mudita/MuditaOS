@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #ifndef MODULE_BSP_EMMC_HPP
 #define MODULE_BSP_EMMC_HPP
 
@@ -22,29 +21,30 @@
 #error "Unsupported target"
 #endif
 
-
 #include "bsp/common.hpp"
 
 namespace bsp
 {
     class eMMC
     {
-    public:
-
-        enum class Partition{
-            UserAera = 0U,                /*!< No access to boot partition (default), normal partition */
-            Boot1 = 1U,                   /*!< Read/Write boot partition 1 */
-            Boot2 = 2U,                   /*!< Read/Write boot partition 2*/
-            RPMB = 3U,                    /*!< Replay protected mem block */
-            GeneralPurpose1 = 4U,         /*!< access to general purpose partition 1 */
-            GeneralPurpose2 = 5U,         /*!< access to general purpose partition 2 */
-            GeneralPurpose3 = 6U,         /*!< access to general purpose partition 3 */
-            GeneralPurpose4 = 7U,         /*!< access to general purpose partition 4 */
+      public:
+        enum class Partition
+        {
+            UserAera        = 0U, /*!< No access to boot partition (default), normal partition */
+            Boot1           = 1U, /*!< Read/Write boot partition 1 */
+            Boot2           = 2U, /*!< Read/Write boot partition 2*/
+            RPMB            = 3U, /*!< Replay protected mem block */
+            GeneralPurpose1 = 4U, /*!< access to general purpose partition 1 */
+            GeneralPurpose2 = 5U, /*!< access to general purpose partition 2 */
+            GeneralPurpose3 = 6U, /*!< access to general purpose partition 3 */
+            GeneralPurpose4 = 7U, /*!< access to general purpose partition 4 */
 
         };
 
-        eMMC(){}
-        ~eMMC(){}
+        eMMC()
+        {}
+        ~eMMC()
+        {}
 
         RetCode Init();
         RetCode DeInit();
@@ -54,19 +54,16 @@ namespace bsp
 
         uint32_t userPartitionBlocks;
 
-    protected:
-
-    private:
-
-    #if defined(TARGET_RT1051)
+      protected:
+      private:
+#if defined(TARGET_RT1051)
         std::shared_ptr<drivers::DriverPLL> pll;
         mmc_card_t mmcCard;
-    #else
-    #error "Unsupported target"
-    #endif
-
+#else
+#error "Unsupported target"
+#endif
     };
 
-}
+} // namespace bsp
 
-#endif //MODULE_BSP_EMMC_HPP
+#endif // MODULE_BSP_EMMC_HPP

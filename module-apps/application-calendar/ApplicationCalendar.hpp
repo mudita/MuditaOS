@@ -14,26 +14,33 @@
 #include "SystemManager/SystemManager.hpp"
 #include "gui/widgets/Label.hpp"
 
-namespace app {
+namespace app
+{
 
-/*
- * @brief Class representing calendar application
- */
-class ApplicationCalendar: public Application {
-public:
+    /*
+     * @brief Class representing calendar application
+     */
+    class ApplicationCalendar : public Application
+    {
+      public:
+        ApplicationCalendar(std::string name,
+                            std::string parent,
+                            uint32_t stackDepth           = 4096,
+                            sys::ServicePriority priority = sys::ServicePriority::Idle);
+        virtual ~ApplicationCalendar();
 
-	ApplicationCalendar(std::string name, std::string parent, uint32_t stackDepth=4096,sys::ServicePriority priority=sys::ServicePriority::Idle);
-	virtual ~ApplicationCalendar();
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
 
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-	sys::ReturnCodes InitHandler() override;
-	sys::ReturnCodes DeinitHandler() override;
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        {
+            return sys::ReturnCodes::Success;
+        }
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
-
-    void createUserInterface() override;
-    void destroyUserInterface() override;
-};
+        void createUserInterface() override;
+        void destroyUserInterface() override;
+    };
 
 } /* namespace app */
 

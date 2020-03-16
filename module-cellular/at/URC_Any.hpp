@@ -16,7 +16,7 @@ namespace at::urc
     struct Any
     {
         Any(const std::string &str);
-        virtual ~Any() = default;
+        virtual ~Any()                     = default;
         virtual auto what() -> std::string = 0;
         /// split urc into: head and tokenized data (as in class descripiton)
         virtual void split(const std::string &str) final;

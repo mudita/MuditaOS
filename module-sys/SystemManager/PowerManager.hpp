@@ -2,12 +2,10 @@
  *  @file PowerManager.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 12.09.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_POWERMANAGER_HPP
 #define PUREPHONE_POWERMANAGER_HPP
@@ -16,13 +14,15 @@
 
 #include "bsp/lpm/bsp_lpm.hpp"
 
-namespace sys {
+namespace sys
+{
 
-    class PowerManager{
+    class PowerManager
+    {
 
-    public:
-
-        enum class Mode{
+      public:
+        enum class Mode
+        {
             FullSpeed,
             LowPowerRun,
             LowPowerIdle,
@@ -30,25 +30,23 @@ namespace sys {
 
         };
 
-
         PowerManager();
         ~PowerManager();
 
         int32_t Switch(const Mode mode);
         int32_t PowerOff();
 
-        Mode GetCurrentMode(){return currentPowerMode;}
+        Mode GetCurrentMode()
+        {
+            return currentPowerMode;
+        }
 
-    private:
-
+      private:
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
 
         Mode currentPowerMode = Mode ::FullSpeed;
-
-
     };
 
-}
+} // namespace sys
 
-
-#endif //PUREPHONE_POWERMANAGER_HPP
+#endif // PUREPHONE_POWERMANAGER_HPP

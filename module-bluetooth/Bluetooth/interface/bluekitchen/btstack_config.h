@@ -37,7 +37,7 @@
 
 // BTstack configuration. buffers, sizes, ...
 #define HCI_INCOMING_PRE_BUFFER_SIZE 14 // sizeof benep heade, avoid memcpy
-#define HCI_ACL_PAYLOAD_SIZE (1691 + 4)
+#define HCI_ACL_PAYLOAD_SIZE         (1691 + 4)
 
 // As an option - much slower (according to docs)
 // HCI Controller to Host Flow Control
@@ -49,4 +49,3 @@
 // #define HCI_HOST_SCO_PACKET_NUM 10
 // #define HCI_HOST_SCO_PACKET_LEN 60
 #endif
-

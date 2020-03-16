@@ -11,24 +11,29 @@
 
 #include "Application.hpp"
 
-namespace app {
+namespace app
+{
 
-inline const std::string name_settings = "ApplicationSettings";
-inline const std::string sim_select = "SimSelect";
+    inline const std::string name_settings = "ApplicationSettings";
+    inline const std::string sim_select    = "SimSelect";
 
-class ApplicationSettings: public app::Application {
-public:
-	ApplicationSettings( std::string name=name_settings, std::string parent = "", bool startBackgound = false);
-	virtual ~ApplicationSettings();
-	sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-	sys::ReturnCodes InitHandler() override;
-	sys::ReturnCodes DeinitHandler() override;
+    class ApplicationSettings : public app::Application
+    {
+      public:
+        ApplicationSettings(std::string name = name_settings, std::string parent = "", bool startBackgound = false);
+        virtual ~ApplicationSettings();
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        {
+            return sys::ReturnCodes::Success;
+        }
 
-    void createUserInterface() override;
-    void destroyUserInterface() override;
-};
+        void createUserInterface() override;
+        void destroyUserInterface() override;
+    };
 
 } /* namespace app */
 

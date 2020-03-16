@@ -11,12 +11,10 @@
 #include "ContactsAddressTable.hpp"
 
 ContactsAddressTable::ContactsAddressTable(Database *db) : Table(db)
-{
-}
+{}
 
 ContactsAddressTable::~ContactsAddressTable()
-{
-}
+{}
 
 bool ContactsAddressTable::Create()
 {
@@ -25,9 +23,16 @@ bool ContactsAddressTable::Create()
 
 bool ContactsAddressTable::Add(ContactsAddressTableRow entry)
 {
-    return db->Execute("insert or ignore into contact_address (contact_id, country, city, street, number, type, note, mail) VALUES (%lu, '%s', '%s', '%s', "
+    return db->Execute("insert or ignore into contact_address (contact_id, country, city, street, number, type, note, "
+                       "mail) VALUES (%lu, '%s', '%s', '%s', "
                        "'%s', %lu, '%s', '%s');",
-                       entry.contactID, entry.country.c_str(), entry.city.c_str(), entry.street.c_str(), entry.number.c_str(), entry.type, entry.note.c_str(),
+                       entry.contactID,
+                       entry.country.c_str(),
+                       entry.city.c_str(),
+                       entry.street.c_str(),
+                       entry.number.c_str(),
+                       entry.type,
+                       entry.note.c_str(),
                        entry.mail.c_str());
 }
 
@@ -38,18 +43,25 @@ bool ContactsAddressTable::RemoveByID(uint32_t id)
 
 bool ContactsAddressTable::Update(ContactsAddressTableRow entry)
 {
-    return db->Execute("UPDATE contact_address SET contact_id = %lu, country = '%s' ,city = '%s',street = '%s',number = '%s', type =%lu, note = '%s',mail = "
+    return db->Execute("UPDATE contact_address SET contact_id = %lu, country = '%s' ,city = '%s',street = '%s',number "
+                       "= '%s', type =%lu, note = '%s',mail = "
                        "'%s' WHERE _id=%lu;",
-                       entry.contactID, entry.country.c_str(), entry.city.c_str(), entry.street.c_str(), entry.number.c_str(), entry.type, entry.note.c_str(),
-                       entry.mail.c_str(), entry.ID);
+                       entry.contactID,
+                       entry.country.c_str(),
+                       entry.city.c_str(),
+                       entry.street.c_str(),
+                       entry.number.c_str(),
+                       entry.type,
+                       entry.note.c_str(),
+                       entry.mail.c_str(),
+                       entry.ID);
 }
 
 ContactsAddressTableRow ContactsAddressTable::GetByID(uint32_t id)
 {
     auto retQuery = db->Query("SELECT * FROM contact_address WHERE _id= %lu;", id);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return ContactsAddressTableRow();
     }
 
@@ -70,15 +82,13 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffset(uint32
 {
     auto retQuery = db->Query("SELECT * from contact_address ORDER BY contact_id LIMIT %lu OFFSET %lu;", limit, offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsAddressTableRow>();
     }
 
     std::vector<ContactsAddressTableRow> ret;
 
-    do
-    {
+    do {
         ret.push_back(ContactsAddressTableRow{
             (*retQuery)[0].GetUInt32(),                                  // ID
             (*retQuery)[1].GetUInt32(),                                  // contactID
@@ -95,13 +105,14 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffset(uint32
     return ret;
 }
 
-std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactAddressTableFields field,
+std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField(uint32_t offset,
+                                                                                 uint32_t limit,
+                                                                                 ContactAddressTableFields field,
                                                                                  const char *str)
 {
 
     std::string fieldName;
-    switch (field)
-    {
+    switch (field) {
     case ContactAddressTableFields ::City:
         fieldName = "city";
         break;
@@ -121,17 +132,19 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField
         return std::vector<ContactsAddressTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contact_address WHERE %s='%s' ORDER BY contact_id LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
+    auto retQuery = db->Query("SELECT * from contact_address WHERE %s='%s' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
+                              fieldName.c_str(),
+                              str,
+                              limit,
+                              offset);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<ContactsAddressTableRow>();
     }
 
     std::vector<ContactsAddressTableRow> ret;
 
-    do
-    {
+    do {
         ret.push_back(ContactsAddressTableRow{
             (*retQuery)[0].GetUInt32(),                                  // ID
             (*retQuery)[1].GetUInt32(),                                  // contactID
@@ -152,8 +165,7 @@ uint32_t ContactsAddressTable::GetCount()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contact_address;");
 
-    if (queryRet->GetRowCount() == 0)
-    {
+    if (queryRet->GetRowCount() == 0) {
         return 0;
     }
 
@@ -164,8 +176,7 @@ uint32_t ContactsAddressTable::GetCountByFieldID(const char *field, uint32_t id)
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM contact_address WHERE %s=%lu;", field, id);
 
-    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0))
-    {
+    if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
     }
 

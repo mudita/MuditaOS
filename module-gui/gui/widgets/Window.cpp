@@ -5,70 +5,75 @@
  *      Author: robert
  */
 #include <algorithm>
-//gui
+// gui
 #include "../core/BoundingBox.hpp"
 #include "../Common.hpp"
 #include "Window.hpp"
 #include "../core/DrawCommand.hpp"
 
-namespace gui {
+namespace gui
+{
 
-    Window::Window(std::string name, uint32_t id) : Item(), windowID{id}, refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
+    Window::Window(std::string name, uint32_t id)
+        : Item(), windowID{id}, refreshMode{RefreshModes::GUI_REFRESH_FAST}, name{name}
+    {}
+
+    Window::~Window()
+    {}
+
+    void Window::onBeforeShow(ShowMode mode, SwitchData *data)
+    {}
+
+    void Window::getRefreshArea(RefreshModes &mode, uint16_t &x, uint16_t &y, uint16_t &w, uint16_t &h)
     {
+        x    = widgetArea.x;
+        y    = widgetArea.y;
+        w    = widgetArea.w;
+        h    = widgetArea.h;
+        mode = refreshMode;
     }
 
-Window::~Window() {
-}
+    bool Window::handleSwitchData(SwitchData *data)
+    {
+        return true;
+    }
 
-void Window::onBeforeShow( ShowMode mode, SwitchData* data ) {
-}
+    std::list<DrawCommand *> Window::buildDrawList()
+    {
 
-void Window::getRefreshArea( RefreshModes& mode, uint16_t& x, uint16_t&y, uint16_t& w, uint16_t& h ) {
-	x = widgetArea.x;
-	y = widgetArea.y;
-	w = widgetArea.w;
-	h = widgetArea.h;
-	mode = refreshMode;
-}
+        std::list<DrawCommand *> commands;
+        std::list<DrawCommand *> childrenCommands = Item::buildDrawList();
 
-bool Window::handleSwitchData( SwitchData* data ) {
-	return true;
-}
+        DrawCommand *clearCommand = new DrawCommand();
+        clearCommand->id          = DrawCommandID::GUI_DRAW_CLEAR;
 
+        commands.push_back(clearCommand);
 
-std::list<DrawCommand*> Window::buildDrawList() {
+        if (!childrenCommands.empty()) {
+            commands.splice(commands.end(), childrenCommands);
+        }
 
-	std::list<DrawCommand*> commands;
-	std::list<DrawCommand*> childrenCommands = Item::buildDrawList();
+        return commands;
+    }
 
-	DrawCommand* clearCommand = new DrawCommand();
-	clearCommand->id = DrawCommandID::GUI_DRAW_CLEAR;
+    // bool Window::onDatabaseMessage( const dbus_msg_t* msg ) {
+    //	return false;
+    //}
 
-	commands.push_back(clearCommand);
+    bool Window::onInput(const InputEvent &inputEvent)
+    {
+        auto res = false;
+        if (focusItem != nullptr)
+            res = focusItem->onInput(inputEvent);
 
-	if( !childrenCommands.empty() ) {
-		commands.splice( commands.end(), childrenCommands );
-	}
+        if (res)
+            return true;
 
-	return commands;
-}
+        // if focused item didn't handle the key event and it was navigation key
+        // check if moving focus is possible
+        return handleNavigation(inputEvent);
 
-//bool Window::onDatabaseMessage( const dbus_msg_t* msg ) {
-//	return false;
-//}
-
-
-bool Window::onInput( const InputEvent& inputEvent) {
-	auto res = false;
-	if( focusItem != nullptr ) res =  focusItem->onInput(inputEvent);
-
-	if( res ) return true;
-	
-	// if focused item didn't handle the key event and it was navigation key
-	// check if moving focus is possible
-    return handleNavigation(inputEvent);
-
-    return false;
-}
+        return false;
+    }
 
 } /* namespace gui */

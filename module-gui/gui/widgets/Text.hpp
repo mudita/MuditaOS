@@ -78,12 +78,12 @@ namespace gui
 
         enum class NavigationBarrier
         {
-            BARRIER_NONE = 0x00,
-            BARRIER_UP = 0x01,
-            BARRIER_DOWN = 0x02,
-            BARRIER_LEFT = 0x04,
+            BARRIER_NONE  = 0x00,
+            BARRIER_UP    = 0x01,
+            BARRIER_DOWN  = 0x02,
+            BARRIER_LEFT  = 0x04,
             BARRIER_RIGHT = 0x08,
-            BARRIER_ALL = 0x0F,
+            BARRIER_ALL   = 0x0F,
         };
 
       protected:
@@ -91,12 +91,13 @@ namespace gui
         {
           public:
             UTF8 text;
-            uint32_t startIndex = 0;
-            uint32_t endIndex = 0;
-            LineEndType endType = LineEndType::EOT;
+            uint32_t startIndex  = 0;
+            uint32_t endIndex    = 0;
+            LineEndType endType  = LineEndType::EOT;
             uint32_t pixelLength = 0;
 
-            TextLine(const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength);
+            TextLine(
+                const UTF8 &text, uint32_t startIndex, uint32_t endIndex, LineEndType endType, uint32_t pixelLength);
             /**
              * Returns text with appropriate ending.
              */
@@ -220,8 +221,14 @@ namespace gui
 
       public:
         Text();
-        Text(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, const UTF8 &text = "",
-             ExpandMode expandMode = ExpandMode::EXPAND_NONE, TextType textType = TextType::MULTI_LINE);
+        Text(Item *parent,
+             const uint32_t &x,
+             const uint32_t &y,
+             const uint32_t &w,
+             const uint32_t &h,
+             const UTF8 &text      = "",
+             ExpandMode expandMode = ExpandMode::EXPAND_NONE,
+             TextType textType     = TextType::MULTI_LINE);
         virtual ~Text();
 
         /**
@@ -271,7 +278,7 @@ namespace gui
       private:
         InputMode *mode = nullptr;
         gui::KeyInputMappedTranslation translator;
-};
+    };
 
 } /* namespace gui */
 

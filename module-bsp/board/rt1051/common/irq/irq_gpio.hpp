@@ -10,16 +10,11 @@
 #ifndef BSP_IRQ_IRQ_GPIO_H_
 #define BSP_IRQ_IRQ_GPIO_H_
 
-
-namespace bsp{
+namespace bsp
+{
 
     void irq_gpio_Init(void);
 
 }
-
-
-
-
-
 
 #endif /* BSP_IRQ_IRQ_GPIO_H_ */

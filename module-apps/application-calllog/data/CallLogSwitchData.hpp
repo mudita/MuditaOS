@@ -11,19 +11,25 @@
 #include "CalllogRecord.hpp"
 #include "SwitchData.hpp"
 
-namespace calllog {
+namespace calllog
+{
 
-const inline std::string CALLLOG_SWITCH_DATA_STR = "CallLogSwitchData";
+    const inline std::string CALLLOG_SWITCH_DATA_STR = "CallLogSwitchData";
 
-class CallLogSwitchData: public gui::SwitchData {
-protected:
-	CalllogRecord record;
-public:
-	CallLogSwitchData() = delete; 
-	CallLogSwitchData( CalllogRecord record ) : SwitchData(CALLLOG_SWITCH_DATA_STR), record{ record } {};
-	virtual ~CallLogSwitchData() = default;
+    class CallLogSwitchData : public gui::SwitchData
+    {
+      protected:
+        CalllogRecord record;
 
-	const CalllogRecord& getRecord() const { return record; };
-};
+      public:
+        CallLogSwitchData() = delete;
+        CallLogSwitchData(CalllogRecord record) : SwitchData(CALLLOG_SWITCH_DATA_STR), record{record} {};
+        virtual ~CallLogSwitchData() = default;
 
-} // namespace calllog 
+        const CalllogRecord &getRecord() const
+        {
+            return record;
+        };
+    };
+
+} // namespace calllog

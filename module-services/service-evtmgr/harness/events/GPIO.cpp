@@ -26,24 +26,20 @@ namespace harness::events
     {
         using namespace bsp::harness;
         auto data = js[Data];
-        if (!data.is_object())
-        {
+        if (!data.is_object()) {
             LOG_ERROR("Bad data type: %d: %s", data.type(), data.string_value().c_str());
             return false;
         }
         // load data one by one
-        for (auto &el : this->data)
-        {
+        for (auto &el : this->data) {
             this->data[el.first] = data[el.first].int_value();
         }
 
-        if (this->data[in_s] == 1)
-        {
+        if (this->data[in_s] == 1) {
             auto val = gpio::read(gpio::to(this->data[num_s]));
             LOG_DEBUG("Pin %d state: %d", gpio::to(this->data[num_s]), val);
         }
-        else
-        {
+        else {
             LOG_DEBUG("Writting gpio: %d state: %d", gpio::to(this->data[num_s]), this->data[state_s]);
             gpio::write(gpio::to(this->data[num_s]), this->data[state_s]);
         }
@@ -54,10 +50,10 @@ namespace harness::events
 
     void GPIO::create_message()
     {
-        auto msg = std::make_shared<sevm::message::GPIO>();
-        msg->num = data[num_s];
-        msg->port = data[state_s];
+        auto msg   = std::make_shared<sevm::message::GPIO>();
+        msg->num   = data[num_s];
+        msg->port  = data[state_s];
         msg->state = data[in_s];
-        this->msg = msg;
+        this->msg  = msg;
     }
 } // namespace harness::events

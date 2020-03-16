@@ -12,135 +12,121 @@
 #include "Service/LogOutput.hpp"
 #include "../../SystemManager/SystemManager.hpp"
 
-
-enum class TestServiceDataMessageType{
-    Plain=1,
+enum class TestServiceDataMessageType
+{
+    Plain = 1,
     Delayed,
     DelayedFail,
     SendData
 };
 
-
-class TestServiceResponse : public sys::ResponseMessage{
-public:
-    TestServiceResponse(sys::ReturnCodes ret):
-        ResponseMessage(),
-        ret(ret){
-
-    }
+class TestServiceResponse : public sys::ResponseMessage
+{
+  public:
+    TestServiceResponse(sys::ReturnCodes ret) : ResponseMessage(), ret(ret)
+    {}
     sys::ReturnCodes ret;
 };
 
-
-class TestServiceDataMessage : public sys::DataMessage{
-public:
-
-    TestServiceDataMessage(TestServiceDataMessageType type):
-        DataMessage(static_cast<uint32_t >(0)),
-        type(type){
-
-    }
-
+class TestServiceDataMessage : public sys::DataMessage
+{
+  public:
+    TestServiceDataMessage(TestServiceDataMessageType type) : DataMessage(static_cast<uint32_t>(0)), type(type)
+    {}
 
     TestServiceDataMessageType type;
 };
 
-class TestService1 : public sys::Service {
+class TestService1 : public sys::Service
+{
 
-public:
-    TestService1(const std::string& name)
-        : sys::Service(name)
+  public:
+    TestService1(const std::string &name) : sys::Service(name)
     {
         busChannels.push_back(sys::BusChannels::TestServiceRequests);
     }
 
-    ~TestService1(){
-    }
+    ~TestService1()
+    {}
 
     // Invoked when service received data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override{
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override
+    {
 
-        TestServiceDataMessage* msg = static_cast<TestServiceDataMessage*>(msgl);
+        TestServiceDataMessage *msg = static_cast<TestServiceDataMessage *>(msgl);
 
         sys::ReturnCodes ret = sys::ReturnCodes ::Success;
 
-        switch (msg->type){
+        switch (msg->type) {
 
-            case TestServiceDataMessageType ::Delayed:
-            {
-                auto msg = std::make_shared<sys::DataMessage>(0);
-                auto retSend = sys::Bus::SendUnicast(msg,"DelayedService",this,5000);
-                REQUIRE( retSend.first == sys::ReturnCodes::Success );
-                ret = retSend.first;
-            }
-                break;
+        case TestServiceDataMessageType ::Delayed: {
+            auto msg     = std::make_shared<sys::DataMessage>(0);
+            auto retSend = sys::Bus::SendUnicast(msg, "DelayedService", this, 5000);
+            REQUIRE(retSend.first == sys::ReturnCodes::Success);
+            ret = retSend.first;
+        } break;
 
-            case TestServiceDataMessageType ::DelayedFail:
-            {
-                auto msg = std::make_shared<sys::DataMessage>(0);
-                auto retSend = sys::Bus::SendUnicast(msg,"DelayedService",this,50);
-                REQUIRE( retSend.first == sys::ReturnCodes::Timeout );
-                ret = retSend.first;
-            }
-                break;
+        case TestServiceDataMessageType ::DelayedFail: {
+            auto msg     = std::make_shared<sys::DataMessage>(0);
+            auto retSend = sys::Bus::SendUnicast(msg, "DelayedService", this, 50);
+            REQUIRE(retSend.first == sys::ReturnCodes::Timeout);
+            ret = retSend.first;
+        } break;
 
-            case TestServiceDataMessageType ::Plain:
-                TestServiceInstanceDataMsgCount++;
-                break;
+        case TestServiceDataMessageType ::Plain:
+            TestServiceInstanceDataMsgCount++;
+            break;
 
-            case TestServiceDataMessageType ::SendData:
-            {
-                if(std::stoi(GetName()) == 9 ){
+        case TestServiceDataMessageType ::SendData: {
+            if (std::stoi(GetName()) == 9) {
 
-                    for(uint32_t i=0;i<1000;i++){
-                        auto msg = std::make_shared<TestServiceDataMessage>(TestServiceDataMessageType::Plain);
-                        sys::Bus::SendUnicast(msg,"0",this);
-                    }
-                }
-                else{
-                    for(uint32_t i=0;i<1000;i++){
-                        auto msg = std::make_shared<TestServiceDataMessage>(TestServiceDataMessageType::Plain);
-                        sys::Bus::SendUnicast(msg,std::to_string(std::stoi(GetName())+1),this);
-                    }
+                for (uint32_t i = 0; i < 1000; i++) {
+                    auto msg = std::make_shared<TestServiceDataMessage>(TestServiceDataMessageType::Plain);
+                    sys::Bus::SendUnicast(msg, "0", this);
                 }
             }
+            else {
+                for (uint32_t i = 0; i < 1000; i++) {
+                    auto msg = std::make_shared<TestServiceDataMessage>(TestServiceDataMessageType::Plain);
+                    sys::Bus::SendUnicast(msg, std::to_string(std::stoi(GetName()) + 1), this);
+                }
+            }
+        }
 
-                break;
-
-
-
+        break;
         }
 
         return std::make_shared<TestServiceResponse>(ret);
     }
 
     // Invoked when timer ticked
-    void TickHandler(uint32_t id) override{
-    }
+    void TickHandler(uint32_t id) override
+    {}
 
     // Invoked during initialization
-    sys::ReturnCodes InitHandler() override{
+    sys::ReturnCodes InitHandler() override
+    {
         TestServiceInstanceCount++;
         return sys::ReturnCodes::Success;
-
     }
 
-    sys::ReturnCodes DeinitHandler() override{
+    sys::ReturnCodes DeinitHandler() override
+    {
         TestServiceInstanceCount--;
-        if(TestServiceInstanceCount == 0){
-            TestServiceInstanceDataMsgCount=0;
+        if (TestServiceInstanceCount == 0) {
+            TestServiceInstanceDataMsgCount = 0;
         }
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
-
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+    {
+        return sys::ReturnCodes::Success;
+    }
 
     static uint32_t TestServiceInstanceCount;
     static uint32_t TestServiceInstanceSuspendedCount;
     static uint32_t TestServiceInstanceDataMsgCount;
-
 };
 
-
-#endif //DBUS_TESTSERVICE1_H
+#endif // DBUS_TESTSERVICE1_H

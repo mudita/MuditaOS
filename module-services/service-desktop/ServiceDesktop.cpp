@@ -11,8 +11,7 @@ ServiceDesktop::~ServiceDesktop()
 {
 
     LOG_INFO("[ServiceDesktop] Cleaning resources");
-    if (DesktopWorker != nullptr)
-    {
+    if (DesktopWorker != nullptr) {
         DesktopWorker->deinit();
     }
 }
@@ -21,8 +20,8 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 {
 
     DesktopWorker = std::make_unique<WorkerDesktop>(this);
-    DesktopWorker->init(
-        {{DesktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1}, {DesktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
+    DesktopWorker->init({{DesktopWorker->RECEIVE_QUEUE_BUFFER_NAME, sizeof(std::string), 1},
+                         {DesktopWorker->SEND_QUEUE_BUFFER_NAME, sizeof(std::string *), 10}});
     DesktopWorker->run();
 
     return (sys::ReturnCodes::Success);

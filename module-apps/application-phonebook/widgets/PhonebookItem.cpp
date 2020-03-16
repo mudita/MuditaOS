@@ -12,82 +12,82 @@
 namespace gui
 {
 
-PhonebookItem::PhonebookItem()
-{
-    minWidth = 436;
-    minHeight = style::window::label::big_h;
-    maxWidth = 436;
-    maxHeight = 200;
-
-    setRadius(0);
-    setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-
-    setPenFocusWidth(2);
-    setPenWidth(0);
-
-    value = new gui::Label(this, 0, 0, 0, 0);
-    value->setPenFocusWidth(0);
-    value->setPenWidth(0);
-    value->setFont(style::window::font::small);
-    value->setAlignement(gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
-}
-
-PhonebookItem::~PhonebookItem()
-{
-    if (value)
+    PhonebookItem::PhonebookItem()
     {
-        removeWidget(value);
-        delete value;
-        value = nullptr;
+        minWidth  = 436;
+        minHeight = style::window::label::big_h;
+        maxWidth  = 436;
+        maxHeight = 200;
+
+        setRadius(0);
+        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+
+        setPenFocusWidth(2);
+        setPenWidth(0);
+
+        value = new gui::Label(this, 0, 0, 0, 0);
+        value->setPenFocusWidth(0);
+        value->setPenWidth(0);
+        value->setFont(style::window::font::small);
+        value->setAlignement(
+            gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
     }
-}
 
-bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
-{
-    value->setPosition(10, 0);
-    value->setSize(newDim.w - 10, newDim.h);
+    PhonebookItem::~PhonebookItem()
+    {
+        if (value) {
+            removeWidget(value);
+            delete value;
+            value = nullptr;
+        }
+    }
 
-    return true;
-}
+    bool PhonebookItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    {
+        value->setPosition(10, 0);
+        value->setSize(newDim.w - 10, newDim.h);
 
-// sets copy of alarm's
-void PhonebookItem::setContact(std::shared_ptr<ContactRecord> contact)
-{
-    this->contact = contact;
-    /* alternativeName is used as Surname or Second name */
-    value->setText(contact->getFormattedName());
-}
+        return true;
+    }
 
-void PhonebookItem::setValue(UTF8 text)
-{
-    value->setText(text);
-    value->setLineMode(true);
-    setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-}
+    // sets copy of alarm's
+    void PhonebookItem::setContact(std::shared_ptr<ContactRecord> contact)
+    {
+        this->contact = contact;
+        /* alternativeName is used as Surname or Second name */
+        value->setText(contact->getFormattedName());
+    }
 
-UTF8 PhonebookItem::getValue()
-{
-    return value->getText();
-}
+    void PhonebookItem::setValue(UTF8 text)
+    {
+        value->setText(text);
+        value->setLineMode(true);
+        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+    }
 
-bool PhonebookItem::onActivated(void *data)
-{
-    LOG_INFO("ITEM WAS PRESSED");
-    return true;
-}
+    UTF8 PhonebookItem::getValue()
+    {
+        return value->getText();
+    }
 
-void PhonebookItem::markFavourite(bool val)
-{
-    favourite = val;
-    if (val)
-        value->setFont(style::window::font::bigbold);
-    else
-        value->setFont(style::window::font::big);
-}
+    bool PhonebookItem::onActivated(void *data)
+    {
+        LOG_INFO("ITEM WAS PRESSED");
+        return true;
+    }
 
-std::shared_ptr<ContactRecord> PhonebookItem::getContact()
-{
-    return (contact);
-}
+    void PhonebookItem::markFavourite(bool val)
+    {
+        favourite = val;
+        if (val)
+            value->setFont(style::window::font::bigbold);
+        else
+            value->setFont(style::window::font::big);
+    }
+
+    std::shared_ptr<ContactRecord> PhonebookItem::getContact()
+    {
+        return (contact);
+    }
 
 } /* namespace gui */

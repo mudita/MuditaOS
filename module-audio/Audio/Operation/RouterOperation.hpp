@@ -2,16 +2,13 @@
  *  @file RouterOperation.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 25.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
 
-
-
 #ifndef PUREPHONE_ROUTEROPERATION_HPP
 #define PUREPHONE_ROUTEROPERATION_HPP
-
 
 #include <memory>
 #include <optional>
@@ -25,16 +22,17 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-namespace audio {
+namespace audio
+{
 
     void recorderWorker(void *pvp);
 
-    class RouterOperation : public Operation {
+    class RouterOperation : public Operation
+    {
 
         friend void recorderWorker(void *pvp);
 
-    public:
-
+      public:
         RouterOperation(const char *file);
 
         ~RouterOperation();
@@ -55,11 +53,14 @@ namespace audio {
 
         int32_t SetInputGain(float gain) override final;
 
-        Position GetPosition() override final { return 0.0; }
+        Position GetPosition() override final
+        {
+            return 0.0;
+        }
 
-    private:
-
-        enum class RecorderEvent {
+      private:
+        enum class RecorderEvent
+        {
             Channel1Ready = (1 << 0),
             Channel2Ready = (1 << 2)
         };
@@ -68,13 +69,11 @@ namespace audio {
         std::unique_ptr<bsp::AudioDevice> audioDevice;
         std::unique_ptr<bsp::AudioDevice> audioDeviceCellular;
 
-        std::function<int32_t(const void *inputBuffer,
-                              void *outputBuffer,
-                              unsigned long framesPerBuffer)> audioDeviceCallback = nullptr;
+        std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
+            audioDeviceCallback = nullptr;
 
-        std::function<int32_t(const void *inputBuffer,
-                              void *outputBuffer,
-                              unsigned long framesPerBuffer)> audioDeviceCellularCallback = nullptr;
+        std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
+            audioDeviceCellularCallback = nullptr;
 
         std::vector<int16_t> audioDeviceBuffer;
         std::vector<int16_t> audioDeviceCellularBuffer;
@@ -93,7 +92,6 @@ namespace audio {
         int32_t StopRecording();
     };
 
+} // namespace audio
 
-}
-
-#endif //PUREPHONE_ROUTEROPERATION_HPP
+#endif // PUREPHONE_ROUTEROPERATION_HPP

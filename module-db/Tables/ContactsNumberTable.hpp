@@ -50,7 +50,10 @@ class ContactsNumberTable : public Table<ContactsNumberTableRow, ContactNumberTa
 
     std::vector<ContactsNumberTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsNumberTableRow> GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactNumberTableFields field, const char *str) override final;
+    std::vector<ContactsNumberTableRow> GetLimitOffsetByField(uint32_t offset,
+                                                              uint32_t limit,
+                                                              ContactNumberTableFields field,
+                                                              const char *str) override final;
 
     uint32_t GetCount() override final;
 

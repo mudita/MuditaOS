@@ -2,11 +2,10 @@
  *  @file Recorder_tests.cpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 24.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
 
 #include <iostream>
 #include <memory>
@@ -27,9 +26,11 @@ using namespace audio;
 namespace fs = std::filesystem;
 static std::string testOutPath{};
 
-TEST_CASE( "RecorderOperation tests" ) {
+TEST_CASE("RecorderOperation tests")
+{
 
-    SECTION("INIT"){
+    SECTION("INIT")
+    {
         fs::path dir = fs::current_path();
 
         std::uintmax_t n = fs::remove_all(dir / "tests_out/audio");
@@ -54,24 +55,25 @@ TEST_CASE( "RecorderOperation tests" ) {
     }
 #endif
 
-    SECTION("Simple mono recording 44100"){
+    SECTION("Simple mono recording 44100")
+    {
         RecorderOperation record((testOutPath + "monorec1_44100.wav").c_str());
-        record.Start([](AudioEvents event)->int32_t{
-            std::cout<<"Error!\n";
+        record.Start([](AudioEvents event) -> int32_t {
+            std::cout << "Error!\n";
             return 0;
         });
         REQUIRE(record.GetState() == RecorderOperation::State::Active);
         sleep(2);
         record.Stop();
         REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(2).margin(0.1) );
+        REQUIRE(record.GetPosition() == Approx(2).margin(0.1));
     }
 
-
-SECTION("Simple stereo recording with profile switching 44100"){
+    SECTION("Simple stereo recording with profile switching 44100")
+    {
         RecorderOperation record((testOutPath + "rec1.wav").c_str());
-        record.Start([](AudioEvents event)->int32_t{
-            std::cout<<"Error!\n";
+        record.Start([](AudioEvents event) -> int32_t {
+            std::cout << "Error!\n";
             return 0;
         });
         REQUIRE(record.GetState() == RecorderOperation::State::Active);
@@ -81,7 +83,6 @@ SECTION("Simple stereo recording with profile switching 44100"){
         sleep(5);
         record.Stop();
         REQUIRE(record.GetState() == RecorderOperation::State::Idle);
-        REQUIRE( record.GetPosition() == Approx(6).margin(0.1) );
+        REQUIRE(record.GetPosition() == Approx(6).margin(0.1));
     }
-
 }

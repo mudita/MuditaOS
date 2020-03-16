@@ -7,8 +7,6 @@
  * @details
  */
 
-
-
 #include "Application.hpp"
 
 #include "MessageType.hpp"
@@ -23,141 +21,143 @@
 #include <cassert>
 #include <service-appmgr/ApplicationManager.hpp>
 
-namespace app {
+namespace app
+{
 
-    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground) : Application(name, parent)
+    ApplicationDesktop::ApplicationDesktop(std::string name, std::string parent, bool startBackground)
+        : Application(name, parent)
     {
         busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
     }
 
-ApplicationDesktop::~ApplicationDesktop() {
-	LOG_INFO("Desktop destruktor");
-}
-
-// Invoked upon receiving data message
-sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
-
-	auto retMsg = Application::DataReceivedHandler(msgl);
-	//if message was handled by application's template there is no need to process further.
-	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode ==
-		sys::ReturnCodes::Success ) ){
-		return retMsg;
-	}
-
-    bool handled = false;
-    if (auto msg = dynamic_cast<DBNotificationMessage *>(msgl))
+    ApplicationDesktop::~ApplicationDesktop()
     {
-        handled = handle(msg);
-    }
-    else if (auto msg = dynamic_cast<CellularNotificationMessage *>(msgl))
-    {
-        handled = handle(msg);
+        LOG_INFO("Desktop destruktor");
     }
 
-    if (handled)
+    // Invoked upon receiving data message
+    sys::Message_t ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        return std::make_shared<sys::ResponseMessage>();
-    }
-    else
-    {
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-    }
-}
 
-auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
-{
-    LOG_DEBUG("Received multicast");
-    assert(msg);
-    if ((msg->notificationType == DB::NotificationType::Updated) || (msg->notificationType == DB::NotificationType::Added))
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        // if message was handled by application's template there is no need to process further.
+        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+            return retMsg;
+        }
+
+        bool handled = false;
+        if (auto msg = dynamic_cast<DBNotificationMessage *>(msgl)) {
+            handled = handle(msg);
+        }
+        else if (auto msg = dynamic_cast<CellularNotificationMessage *>(msgl)) {
+            handled = handle(msg);
+        }
+
+        if (handled) {
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
+    }
+
+    auto ApplicationDesktop::handle(DBNotificationMessage *msg) -> bool
     {
+        LOG_DEBUG("Received multicast");
+        assert(msg);
+        if ((msg->notificationType == DB::NotificationType::Updated) ||
+            (msg->notificationType == DB::NotificationType::Added)) {
+            notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
+            notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+            this->windows[app::name::window::desktop_menu]->rebuild();
+            this->windows[app::name::window::desktop_lockscreen]->rebuild();
+            return true;
+        }
+        return false;
+    }
+
+    auto ApplicationDesktop::handle(CellularNotificationMessage *msg) -> bool
+    {
+        assert(msg);
+        if (msg->type == CellularNotificationMessage::Type::ModemOn &&
+            Store::GSM::get()->sim != Store::GSM::SIM::SIM1 && Store::GSM::get()->sim != Store::GSM::SIM::SIM1) {
+            if (screenLocked) {
+                need_sim_select = true;
+            }
+            else {
+                need_sim_select = false;
+                sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // Invoked during initialization
+    sys::ReturnCodes ApplicationDesktop::InitHandler()
+    {
+
+        auto ret = Application::InitHandler();
+        if (ret != sys::ReturnCodes::Success)
+            return ret;
+
+        // if value of the pin hash is different than 0 it means that home screen is pin protected
+        if (settings.lockPassHash) {
+            pinLocked = true;
+        }
+
+        screenLocked = true;
+
         notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-        notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
-        this->windows[app::name::window::desktop_menu]->rebuild();
-        this->windows[app::name::window::desktop_lockscreen]->rebuild();
-        return true;
-    }
-    return false;
-}
+        notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
 
-auto ApplicationDesktop::handle(CellularNotificationMessage *msg) -> bool
-{
-    assert(msg);
-    if (msg->type == CellularNotificationMessage::Type::ModemOn && Store::GSM::get()->sim != Store::GSM::SIM::SIM1 &&
-        Store::GSM::get()->sim != Store::GSM::SIM::SIM1)
+        createUserInterface();
+
+        setActiveWindow(gui::name::window::main_window);
+
+        return ret;
+    }
+
+    sys::ReturnCodes ApplicationDesktop::DeinitHandler()
     {
-        if (screenLocked)
-        {
-            need_sim_select = true;
-        }
-        else
-        {
-            need_sim_select = false;
-            sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
-        }
-        return true;
+        LOG_INFO("DeinitHandler");
+        return sys::ReturnCodes::Success;
     }
-    return false;
-}
 
-// Invoked during initialization
-sys::ReturnCodes ApplicationDesktop::InitHandler() {
+    void ApplicationDesktop::createUserInterface()
+    {
 
-	auto ret = Application::InitHandler();
-	if( ret != sys::ReturnCodes::Success )
-		return ret;
+        gui::AppWindow *window = nullptr;
 
-	//if value of the pin hash is different than 0 it means that home screen is pin protected
-	if( settings.lockPassHash ) {
-		pinLocked = true;
-	}
+        window = new gui::DesktopMainWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
-	screenLocked = true;
+        window = new gui::PinLockWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
-    notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
-    notifications.notSeenSMS = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
+        window = new gui::MenuWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
 
-    createUserInterface();
+        window = new gui::PowerOffWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+    }
 
-    setActiveWindow(gui::name::window::main_window);
+    bool ApplicationDesktop::getScreenLocked()
+    {
+        return screenLocked;
+    }
 
-    return ret;
-}
+    bool ApplicationDesktop::getPinLocked()
+    {
+        return pinLocked;
+    }
 
-sys::ReturnCodes ApplicationDesktop::DeinitHandler() {
-	LOG_INFO("DeinitHandler");
-	return sys::ReturnCodes::Success;
-}
+    void ApplicationDesktop::setScreenLocked(bool val)
+    {
+        screenLocked = val;
+    };
 
-void ApplicationDesktop::createUserInterface() {
+    void ApplicationDesktop::destroyUserInterface()
+    {}
 
-	gui::AppWindow* window = nullptr;
-
-	window = new gui::DesktopMainWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
-	window = new gui::PinLockWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>( window->getName(), window));
-
-	window = new gui::MenuWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>( window->getName(), window));
-
-	window = new gui::PowerOffWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>( window->getName(), window));
-}
-
-bool ApplicationDesktop::getScreenLocked() {
-	return screenLocked;
-}
-
-bool ApplicationDesktop::getPinLocked() {
-	return pinLocked;
-}
-
-void ApplicationDesktop::setScreenLocked( bool val ) {
-	screenLocked = val;
-};
-
-void ApplicationDesktop::destroyUserInterface() {
-}
-
-} /* namespace gui */
+} // namespace app

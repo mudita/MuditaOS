@@ -10,14 +10,13 @@
 
 const char *CalllogDB::dbName = "sys/calllog.db";
 
-CalllogDB::CalllogDB() :
-	Database(dbName),
-    calls(this) {
+CalllogDB::CalllogDB() : Database(dbName), calls(this)
+{
 
-	if (calls.Create() == false) return;
-	isInitialized = true;
+    if (calls.Create() == false)
+        return;
+    isInitialized = true;
 }
 
-CalllogDB::~CalllogDB() {
-}
-
+CalllogDB::~CalllogDB()
+{}

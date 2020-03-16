@@ -4,8 +4,7 @@
 using namespace at::urc;
 
 QIND::QIND(const std::string &val) : Any(val)
-{
-}
+{}
 
 auto QIND::what() -> std::string
 {
@@ -14,8 +13,7 @@ auto QIND::what() -> std::string
 
 auto QIND::is_csq() -> bool
 {
-    if (tokens.size() > CSQ)
-    {
+    if (tokens.size() > CSQ) {
         return tokens[CSQ].find(type_csq) != std::string::npos;
     }
     return false;
@@ -23,15 +21,12 @@ auto QIND::is_csq() -> bool
 
 auto QIND::validate(enum CSQ check) -> bool
 {
-    try
-    {
-        if (is_csq() && tokens.size() > BER)
-        {
+    try {
+        if (is_csq() && tokens.size() > BER) {
             int rssi = std::stoi(tokens[RSSI]);
-            int ber = std::stoi(tokens[BER]);
+            int ber  = std::stoi(tokens[BER]);
             LOG_DEBUG("> %d %d", rssi, ber);
-            switch (check)
-            {
+            switch (check) {
             case RSSI:
                 return (rssi % 100 % invalid_rssi_modulo) != 0;
             case BER:
@@ -41,8 +36,7 @@ auto QIND::validate(enum CSQ check) -> bool
             }
         }
     }
-    catch (const std::exception &ex)
-    {
+    catch (const std::exception &ex) {
         LOG_FATAL("exception: %s", ex.what());
     }
     return false;

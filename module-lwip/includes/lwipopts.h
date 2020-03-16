@@ -190,13 +190,13 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define CHECKSUM_CHECK_TCP 0
 #else
 /* CHECKSUM_GEN_IP==1: Generate checksums in software for outgoing IP packets.*/
-#define CHECKSUM_GEN_IP 1
+#define CHECKSUM_GEN_IP    1
 /* CHECKSUM_GEN_UDP==1: Generate checksums in software for outgoing UDP packets.*/
-#define CHECKSUM_GEN_UDP 1
+#define CHECKSUM_GEN_UDP   1
 /* CHECKSUM_GEN_TCP==1: Generate checksums in software for outgoing TCP packets.*/
-#define CHECKSUM_GEN_TCP 1
+#define CHECKSUM_GEN_TCP   1
 /* CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.*/
-#define CHECKSUM_CHECK_IP 1
+#define CHECKSUM_CHECK_IP  1
 /* CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.*/
 #define CHECKSUM_CHECK_UDP 1
 /* CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.*/
@@ -214,9 +214,9 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 // TODO: map these to <stdint.h>
 
 #ifdef LWIP_DEBUG
-#define U8_F "c"
-#define S8_F "c"
-#define X8_F "02x"
+#define U8_F  "c"
+#define S8_F  "c"
+#define X8_F  "02x"
 #define U16_F "u"
 #define S16_F "d"
 #define X16_F "x"

@@ -82,8 +82,10 @@ Database::~Database()
 
 void Database::Initialize()
 {
-    sqlite3_config(SQLITE_CONFIG_LOG, errorLogCallback,
-                   (void *)1); //(void*)1 is taken from official SQLITE examples and it appears that it ends variable args list
+    sqlite3_config(
+        SQLITE_CONFIG_LOG,
+        errorLogCallback,
+        (void *)1); //(void*)1 is taken from official SQLITE examples and it appears that it ends variable args list
     sqlite3_initialize();
 }
 void Database::Deinitialize()
@@ -94,8 +96,7 @@ void Database::Deinitialize()
 bool Database::Execute(const char *format, ...)
 {
 
-    if (!format)
-    {
+    if (!format) {
         return false;
     }
 
@@ -105,8 +106,7 @@ bool Database::Execute(const char *format, ...)
     int res = vsnprintf(szQuery.get(), maxQueryLen, format, ap);
     va_end(ap);
 
-    if (res == -1)
-    {
+    if (res == -1) {
         LOG_ERROR("SQL Query truncated (and not execute) for format: %s", format);
         return false;
     }
@@ -119,8 +119,7 @@ bool Database::Execute(const char *format, ...)
 std::unique_ptr<QueryResult> Database::Query(const char *format, ...)
 {
 
-    if (!format)
-    {
+    if (!format) {
         return nullptr;
     }
 
@@ -128,11 +127,10 @@ std::unique_ptr<QueryResult> Database::Query(const char *format, ...)
     auto szQuery = std::make_unique<char[]>(maxQueryLen);
     va_start(ap, format);
     szQuery.get()[0] = 0;
-    int res = vsnprintf(szQuery.get(), maxQueryLen, format, ap);
+    int res          = vsnprintf(szQuery.get(), maxQueryLen, format, ap);
     va_end(ap);
 
-    if (res == -1)
-    {
+    if (res == -1) {
         LOG_ERROR("SQL Query truncated (and not execute) for format: %s", format);
         return nullptr;
     }
@@ -140,8 +138,7 @@ std::unique_ptr<QueryResult> Database::Query(const char *format, ...)
     auto queryResult = std::make_unique<QueryResult>();
 
     int result = sqlite3_exec(dbConnection, szQuery.get(), queryCallback, queryResult.get(), NULL);
-    if (result != SQLITE_OK)
-    {
+    if (result != SQLITE_OK) {
         LOG_ERROR("SQL query failed selecting : %d", result);
         return nullptr;
     }
@@ -154,14 +151,11 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
     QueryResult *db = reinterpret_cast<QueryResult *>(usrPtr);
 
     std::vector<Field> row;
-    for (uint32_t i = 0; i < (uint32_t)count; i++)
-    {
-        try
-        {
+    for (uint32_t i = 0; i < (uint32_t)count; i++) {
+        try {
             row.push_back(Field{data[i]});
         }
-        catch (...)
-        {
+        catch (...) {
             LOG_FATAL("Error on: %d %s", i, data[i]);
         }
     }

@@ -20,16 +20,16 @@
 #include "fsl_lpuart.h"
 #endif
 
-namespace bsp {
+namespace bsp
+{
 
 #if LOG_REDIRECT_TO_SERIAL == 1
     static lpuart_handle_t g_lpuartHandle;
 #endif
 
-
-/* Get debug console frequency. */
-    __attribute__((unused))
-    static uint32_t BOARD_DebugConsoleSrcFreq(void) {
+    /* Get debug console frequency. */
+    __attribute__((unused)) static uint32_t BOARD_DebugConsoleSrcFreq(void)
+    {
         uint32_t freq;
 
         /* To make it simple, we assume default PLL and divider settings, and the only variable
@@ -37,17 +37,17 @@ namespace bsp {
         if (CLOCK_GetMux(kCLOCK_UartMux) == 0) /* PLL3 div6 80M */
         {
             freq = (CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6U) / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-        } else {
+        }
+        else {
             freq = CLOCK_GetOscFreq() / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
         }
 
         return freq;
     }
 
-
-
-/* Initialize debug console. */
-    static void BOARD_InitDebugConsole(void) {
+    /* Initialize debug console. */
+    static void BOARD_InitDebugConsole(void)
+    {
 #if LOG_REDIRECT_TO_SERIAL == 1
         /* The user initialization should be placed here */
         lpuart_config_t lpuartConfig;
@@ -64,8 +64,8 @@ namespace bsp {
          */
         LPUART_GetDefaultConfig(&lpuartConfig);
         lpuartConfig.baudRate_Bps = 115200;
-        lpuartConfig.enableTx = true;
-        lpuartConfig.enableRx = true;
+        lpuartConfig.enableTx     = true;
+        lpuartConfig.enableRx     = true;
 
         LPUART_TransferCreateHandle(LPUART3, &g_lpuartHandle, NULL, NULL);
 
@@ -75,9 +75,9 @@ namespace bsp {
 #endif
     }
 
-
-/* MPU configuration. */
-    static void BOARD_ConfigMPU(void) {
+    /* MPU configuration. */
+    static void BOARD_ConfigMPU(void)
+    {
         /* Disable I cache and D cache */
         if (SCB_CCR_IC_Msk == (SCB_CCR_IC_Msk & SCB->CCR)) {
             SCB_DisableICache();
@@ -90,28 +90,29 @@ namespace bsp {
         ARM_MPU_Disable();
 
         /* MPU configure:
-         * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable, SubRegionDisable, Size)
-         * API in core_cm7.h.
-         * param DisableExec       Instruction access (XN) disable bit,0=instruction fetches enabled, 1=instruction fetches disabled.
-         * param AccessPermission  Data access permissions, allows you to configure read/write access for User and Privileged mode.
-         *      Use MACROS defined in core_cm7.h: ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO
+         * Use ARM_MPU_RASR(DisableExec, AccessPermission, TypeExtField, IsShareable, IsCacheable, IsBufferable,
+         * SubRegionDisable, Size) API in core_cm7.h. param DisableExec       Instruction access (XN) disable
+         * bit,0=instruction fetches enabled, 1=instruction fetches disabled. param AccessPermission  Data access
+         * permissions, allows you to configure read/write access for User and Privileged mode. Use MACROS defined in
+         * core_cm7.h: ARM_MPU_AP_NONE/ARM_MPU_AP_PRIV/ARM_MPU_AP_URO/ARM_MPU_AP_FULL/ARM_MPU_AP_PRO/ARM_MPU_AP_RO
          * Combine TypeExtField/IsShareable/IsCacheable/IsBufferable to configure MPU memory access attributes.
          *  TypeExtField  IsShareable  IsCacheable  IsBufferable   Memory Attribtue    Shareability        Cache
          *     0             x           0           0             Strongly Ordered    shareable
          *     0             x           0           1              Device             shareable
-         *     0             0           1           0              Normal             not shareable   Outer and inner write through no write allocate
-         *     0             0           1           1              Normal             not shareable   Outer and inner write back no write allocate
-         *     0             1           1           0              Normal             shareable       Outer and inner write through no write allocate
-         *     0             1           1           1              Normal             shareable       Outer and inner write back no write allocate
-         *     1             0           0           0              Normal             not shareable   outer and inner noncache
-         *     1             1           0           0              Normal             shareable       outer and inner noncache
-         *     1             0           1           1              Normal             not shareable   outer and inner write back write/read acllocate
-         *     1             1           1           1              Normal             shareable       outer and inner write back write/read acllocate
-         *     2             x           0           0              Device              not shareable
-         *  Above are normal use settings, if your want to see more details or want to config different inner/outter cache policy.
-         *  please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide <dui0646b_cortex_m7_dgug.pdf>
-         * param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled, 1=sub-region is disabled.
-         * param Size              Region size of the region to be configured. use ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
+         *     0             0           1           0              Normal             not shareable   Outer and inner
+         * write through no write allocate 0             0           1           1              Normal             not
+         * shareable   Outer and inner write back no write allocate 0             1           1           0 Normal
+         * shareable       Outer and inner write through no write allocate 0             1           1           1
+         * Normal             shareable       Outer and inner write back no write allocate 1             0           0
+         * 0              Normal             not shareable   outer and inner noncache 1             1           0 0
+         * Normal             shareable       outer and inner noncache 1             0           1           1 Normal
+         * not shareable   outer and inner write back write/read acllocate 1             1           1           1
+         * Normal             shareable       outer and inner write back write/read acllocate 2             x 0 0 Device
+         * not shareable Above are normal use settings, if your want to see more details or want to config different
+         * inner/outter cache policy. please refer to Table 4-55 /4-56 in arm cortex-M7 generic user guide
+         * <dui0646b_cortex_m7_dgug.pdf> param SubRegionDisable  Sub-region disable field. 0=sub-region is enabled,
+         * 1=sub-region is disabled. param Size              Region size of the region to be configured. use
+         * ARM_MPU_REGION_SIZE_xxx MACRO in core_cm7.h.
          */
 
         /* Region 0 setting: Memory with Device type, not shareable, non-cacheable. */
@@ -129,8 +130,8 @@ namespace bsp {
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_512MB);
 #else
         /* Setting Memory with Device type, not shareable, non-cacheable. */
-        //TODO: MPU->RBAR = ARM_MPU_RBAR(2, 0x60000000U);
-        //TODO: MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_512MB);
+        // TODO: MPU->RBAR = ARM_MPU_RBAR(2, 0x60000000U);
+        // TODO: MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_512MB);
 #endif
 
         /* Region 3 setting: Memory with Device type, not shareable, non-cacheable. */
@@ -151,13 +152,11 @@ namespace bsp {
         MPU->RBAR = ARM_MPU_RBAR(6, 0x20200000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_64KB);
 
-
         /* Region 7 setting: Memory with Normal type, not shareable, outer/inner write back
          * BOARD_SDRAM_TEXT
          */
         MPU->RBAR = ARM_MPU_RBAR(7, 0x80000000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
-
 
         /* The define sets the cacheable memory to shareable,
          * this suggestion is referred from chapter 2.2.1 Memory regions,
@@ -174,7 +173,6 @@ namespace bsp {
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
 #endif
 
-
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
@@ -183,7 +181,8 @@ namespace bsp {
         SCB_EnableICache();
     }
 
-    void BoardInit(){
+    void BoardInit()
+    {
 
         PINMUX_InitBootPins();
 
@@ -200,5 +199,4 @@ namespace bsp {
         PrintSystemClocks();
     }
 
-
-}
+} // namespace bsp

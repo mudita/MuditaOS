@@ -17,9 +17,8 @@ namespace harness::events
     auto KeyPress::decode(const Json &js) -> bool
     {
         auto message = std::make_shared<sevm::KbdMessage>();
-        msg = message;
-        if (js[Data].is_array() != true)
-        {
+        msg          = message;
+        if (js[Data].is_array() != true) {
             return false;
         }
         message->key.key_code = fromVal(js[Data][0].int_value());
@@ -38,8 +37,7 @@ namespace harness::events
 
     auto fromVal(int val) -> bsp::KeyCodes
     {
-        switch (val)
-        {
+        switch (val) {
         case 0:
             return bsp::KeyCodes::NumericKey0;
         case 1:
@@ -94,4 +92,4 @@ namespace harness::events
             return bsp::KeyCodes::Undefined;
         };
     }
-}; // namespace harness
+}; // namespace harness::events

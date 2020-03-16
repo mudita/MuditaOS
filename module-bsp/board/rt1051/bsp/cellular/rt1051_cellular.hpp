@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_RT1501_CELLULAR_HPP
 #define PUREPHONE_RT1501_CELLULAR_HPP
 
@@ -21,7 +20,6 @@
 #include "fsl_lpuart.h"
 #include "fsl_lpuart_edma.h"
 
-
 #include "bsp/BoardDefinitions.hpp"
 
 #include "drivers/pll/DriverPLL.hpp"
@@ -29,13 +27,15 @@
 #include "drivers/dma/DriverDMA.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 
-namespace bsp {
+namespace bsp
+{
 
-    class RT1051Cellular : public Cellular {
-    private:
+    class RT1051Cellular : public Cellular
+    {
+      private:
         bool pv_SendingAllowed = true;
-    public:
 
+      public:
         RT1051Cellular();
 
         ~RT1051Cellular();
@@ -54,11 +54,11 @@ namespace bsp {
 
         void InformModemHostAsleep() override final;
 
-		void InformModemHostWakeup() override final;
+        void InformModemHostWakeup() override final;
 
-		void EnterSleep() override final;
+        void EnterSleep() override final;
 
-		void ExitSleep() override final;
+        void ExitSleep() override final;
 
         void SetSpeed(uint32_t portSpeed) override final;
 
@@ -79,23 +79,27 @@ namespace bsp {
 
         void DMADeinit();
 
-        inline void EnableRx() {
+        inline void EnableRx()
+        {
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, 0xFFFFFFFF);
             LPUART_EnableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
             LPUART_EnableRx(CELLULAR_UART_BASE, true);
         }
 
-        inline void DisableRx() {
+        inline void DisableRx()
+        {
             LPUART_DisableInterrupts(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
             LPUART_ClearStatusFlags(CELLULAR_UART_BASE, kLPUART_RxDataRegFullInterruptEnable);
             LPUART_EnableRx(CELLULAR_UART_BASE, false);
         }
 
-        inline void EnableTx() {
+        inline void EnableTx()
+        {
             LPUART_EnableTx(CELLULAR_UART_BASE, true);
         }
 
-        inline void DisableTx() {
+        inline void DisableTx()
+        {
             LPUART_EnableTx(CELLULAR_UART_BASE, false);
         }
 
@@ -108,8 +112,6 @@ namespace bsp {
         std::shared_ptr<drivers::DriverDMA> dma;
         std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
 
-
-
         static lpuart_edma_handle_t uartDmaHandle;
 
         static void DMATxCompletedCb(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
@@ -119,15 +121,14 @@ namespace bsp {
 
       private:
         // Constants
-        const static uint32_t baudrate = 115200;
-        const static uint32_t rxStreamBufferLength = 1024;
-        const static uint32_t rxStreamBufferNotifyWatermark = 1;
+        const static uint32_t baudrate                               = 115200;
+        const static uint32_t rxStreamBufferLength                   = 1024;
+        const static uint32_t rxStreamBufferNotifyWatermark          = 1;
         const static uint32_t CELLULAR_BSP_AP_READY_PIN_ACTIVE_STATE = 1;
-        const static uint32_t CELLULAR_BSP_ANTSEL_PIN_A_STATE = 0;
-        const static uint32_t CELLULAR_BSP_ANTSEL_PIN_B_STATE = 1;
+        const static uint32_t CELLULAR_BSP_ANTSEL_PIN_A_STATE        = 0;
+        const static uint32_t CELLULAR_BSP_ANTSEL_PIN_B_STATE        = 1;
     };
 
-}
+} // namespace bsp
 
-
-#endif //PUREPHONE_RT1501_CELLULAR_HPP
+#endif // PUREPHONE_RT1501_CELLULAR_HPP

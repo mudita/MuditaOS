@@ -13,101 +13,97 @@
 #include "thread.hpp"
 #include "timer.hpp"
 
-
 namespace sys
 {
 
-class ServiceTimer : public Timer
-{
-public:
-    ServiceTimer(const std::string& name,TickType_t tick,bool isPeriodic,uint32_t  idx, Service* service);
+    class ServiceTimer : public Timer
+    {
+      public:
+        ServiceTimer(const std::string &name, TickType_t tick, bool isPeriodic, uint32_t idx, Service *service);
 
-	uint32_t GetId() const{
-	    return m_id;
-	}
-    static uint32_t GetNextUniqueID(){
-	    return ++m_timers_unique_idx;
-	}
+        uint32_t GetId() const
+        {
+            return m_id;
+        }
+        static uint32_t GetNextUniqueID()
+        {
+            return ++m_timers_unique_idx;
+        }
 
-	void Run() override;
+        void Run() override;
 
+      private:
+        bool m_isPeriodic;
+        TickType_t m_interval;
+        uint32_t m_id;
+        Service *m_service;
+        static uint32_t m_timers_unique_idx;
+    };
 
-private:
-    bool m_isPeriodic;
-    TickType_t m_interval;
-	uint32_t  m_id;
-    Service* m_service;
-    static uint32_t  m_timers_unique_idx;
+    class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
+    {
+      public:
+        Service(std::string name,
+                std::string parent       = "",
+                uint32_t stackDepth      = 4096,
+                ServicePriority priority = ServicePriority::Idle);
 
-};
+        virtual ~Service();
 
-class Service : public cpp_freertos::Thread,public std::enable_shared_from_this<Service>
-{
-public:
-	Service(std::string name,std::string parent="",uint32_t stackDepth=4096,ServicePriority priority=ServicePriority::Idle);
+        void StartService();
 
-	virtual ~Service();
+        // Create service timer
+        uint32_t CreateTimer(TickType_t interval, bool isPeriodic, const std::string &name = "");
+        // Reload service timer
+        void ReloadTimer(uint32_t id);
+        // Delete timer
+        void DeleteTimer(uint32_t id);
+        void setTimerPeriod(uint32_t id, uint32_t period);
+        /**
+         * @brief Stops a timer with specified ID
+         * @param id ID of the timer;
+         */
+        void stopTimer(uint32_t id);
 
-	void StartService();
+        // Invoked when service received data message
+        virtual Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) = 0;
 
-	//Create service timer
-    uint32_t CreateTimer(TickType_t interval,bool isPeriodic,const std::string& name = "");
-    // Reload service timer
-	void ReloadTimer(uint32_t id);
-	// Delete timer
-	void DeleteTimer(uint32_t id);
-	void setTimerPeriod(uint32_t id,uint32_t period);
-	/**
-	 * @brief Stops a timer with specified ID
-	 * @param id ID of the timer;
-	 */
-	void stopTimer(uint32_t id);
+        // Invoked when timer ticked
+        virtual void TickHandler(uint32_t id){};
 
-	// Invoked when service received data message
-	virtual Message_t DataReceivedHandler(DataMessage* msg,ResponseMessage* resp) = 0;
+        // Invoked during initialization
+        virtual ReturnCodes InitHandler() = 0;
 
-	// Invoked when timer ticked
-	virtual void TickHandler(uint32_t id){};
+        // Invoked upon receiving close request
+        virtual ReturnCodes DeinitHandler() = 0;
 
-	// Invoked during initialization
-	virtual ReturnCodes InitHandler()= 0;
+        virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
 
-    // Invoked upon receiving close request
-    virtual ReturnCodes DeinitHandler()= 0;
+        void CloseHandler();
 
-	virtual ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode) = 0;
+        std::string parent;
 
-	void CloseHandler();
+        std::vector<BusChannels> busChannels;
 
-	std::string parent;
+        Mailbox<std::shared_ptr<Message>> mailbox;
 
-	std::vector<BusChannels> busChannels;
+        uint32_t pingTimestamp;
 
-	Mailbox<std::shared_ptr<Message>> mailbox;
+        bool isReady;
 
-	uint32_t pingTimestamp;
+        std::vector<std::pair<uint64_t, uint32_t>> staleUniqueMsg;
 
-    bool isReady;
+      protected:
+        bool enableRunLoop;
 
-    std::vector<std::pair<uint64_t,uint32_t>> staleUniqueMsg;
+        // TODO R.B. I've removed this private tag to be able to create application class
+        // private:
 
-protected:
+        virtual void Run();
 
+        std::vector<std::unique_ptr<ServiceTimer>> timersList;
 
-    bool enableRunLoop;
+        friend class ServiceTimer;
+    };
 
-
-//TODO R.B. I've removed this private tag to be able to create application class
-//private:
-
-	virtual void Run();
-
-	std::vector<std::unique_ptr<ServiceTimer>> timersList;
-
-	friend class ServiceTimer;
-
-};
-
-
-
-}
+} // namespace sys

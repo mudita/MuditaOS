@@ -23,7 +23,7 @@
 class DBServiceAPI
 {
   public:
-  	enum ContactVerificationError
+    enum ContactVerificationError
     {
         nameError,
         speedDialError,
@@ -43,8 +43,13 @@ class DBServiceAPI
     static uint32_t SMSAdd(sys::Service *serv, const SMSRecord &rec);
     static bool SMSRemove(sys::Service *serv, uint32_t id);
     static bool SMSUpdate(sys::Service *serv, const SMSRecord &rec);
-    static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
-    static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffsetByThreadID(sys::Service *serv, uint32_t offset, uint32_t limit, uint32_t id);
+    static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffset(sys::Service *serv,
+                                                                     uint32_t offset,
+                                                                     uint32_t limit);
+    static std::unique_ptr<std::vector<SMSRecord>> SMSGetLimitOffsetByThreadID(sys::Service *serv,
+                                                                               uint32_t offset,
+                                                                               uint32_t limit,
+                                                                               uint32_t id);
     static uint32_t SMSGetCount(sys::Service *serv, EntryState state = EntryState::ALL);
     /**
      * @brief Function is getting last modified SMS record.
@@ -65,15 +70,22 @@ class DBServiceAPI
      * @param rec Reference to the contact to be added to database.
      * @param errName in case of existing contact with same name this record will be filled with data.
      * @param errName in case of existing contact with same primary phone number this record will be filled with data.
-     * @param errName in case of existing contact with same alternative phone number this record will be filled with data.
+     * @param errName in case of existing contact with same alternative phone number this record will be filled with
+     * data.
      * @param errName in case of existing contact with same speed dial assigned this record will be filled with data.
      *
      * @note This function is blocking. It's checking until first error.
      */
-    static ContactVerificationError verifyContact(sys::Service *serv, const ContactRecord &rec, ContactRecord &errName, ContactRecord &errPhone1,
-                                                  ContactRecord &errPhone2, ContactRecord &speedDial);
+    static ContactVerificationError verifyContact(sys::Service *serv,
+                                                  const ContactRecord &rec,
+                                                  ContactRecord &errName,
+                                                  ContactRecord &errPhone1,
+                                                  ContactRecord &errPhone2,
+                                                  ContactRecord &speedDial);
     static std::string getVerificationErrorString(const ContactVerificationError err);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactGetByName(sys::Service *serv,
+                                                                        UTF8 primaryName,
+                                                                        UTF8 alternativeName);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByID(sys::Service *serv, uint32_t contactID);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial);
     static std::unique_ptr<std::vector<ContactRecord>> ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber);
@@ -83,12 +95,17 @@ class DBServiceAPI
     static bool ContactBlock(sys::Service *serv, uint32_t id, const bool shouldBeBlocked = true);
     static uint32_t ContactGetCount(sys::Service *serv, bool favourites = false);
     static bool ContactGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit, bool favourites = false);
-    static std::unique_ptr<std::vector<ContactRecord>> ContactSearch(sys::Service *serv, UTF8 primaryName, UTF8 alternativeName, UTF8 number);
+    static std::unique_ptr<std::vector<ContactRecord>> ContactSearch(sys::Service *serv,
+                                                                     UTF8 primaryName,
+                                                                     UTF8 alternativeName,
+                                                                     UTF8 number);
     static bool AlarmAdd(sys::Service *serv, const AlarmsRecord &rec);
     static bool AlarmRemove(sys::Service *serv, uint32_t id);
     static bool AlarmUpdate(sys::Service *serv, const AlarmsRecord &rec);
     static uint32_t AlarmGetCount(sys::Service *serv);
-    static std::unique_ptr<std::vector<AlarmsRecord>> AlarmGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
+    static std::unique_ptr<std::vector<AlarmsRecord>> AlarmGetLimitOffset(sys::Service *serv,
+                                                                          uint32_t offset,
+                                                                          uint32_t limit);
     static AlarmsRecord AlarmGetNext(sys::Service *serv, time_t time);
 
     static bool NotesAdd(sys::Service *serv, const NotesRecord &rec);

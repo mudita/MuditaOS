@@ -3,7 +3,7 @@
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright (c) 2017, NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -43,12 +43,12 @@
 #define FSL_COMPONENT_ID "platform.drivers.snvs_hp"
 #endif
 
-#define SECONDS_IN_A_DAY (86400U)
-#define SECONDS_IN_A_HOUR (3600U)
+#define SECONDS_IN_A_DAY    (86400U)
+#define SECONDS_IN_A_HOUR   (3600U)
 #define SECONDS_IN_A_MINUTE (60U)
-#define DAYS_IN_A_YEAR (365U)
-#define YEAR_RANGE_START (1970U)
-#define YEAR_RANGE_END (2099U)
+#define DAYS_IN_A_YEAR      (365U)
+#define YEAR_RANGE_START    (1970U)
+#define YEAR_RANGE_END      (2099U)
 
 #if !(defined(SNVS_HPCOMR_SW_SV_MASK))
 #define SNVS_HPCOMR_SW_SV_MASK (0x100U)
@@ -100,7 +100,7 @@ static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datet
  */
 static uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base);
 
-#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
+#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&                       \
      defined(SNVS_HP_CLOCKS))
 /*!
  * @brief Get the SNVS instance from peripheral base address.
@@ -115,7 +115,7 @@ static uint32_t SNVS_HP_GetInstance(SNVS_Type *base);
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
+#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&                       \
      defined(SNVS_HP_CLOCKS))
 /*! @brief Pointer to snvs_hp clock. */
 const clock_ip_name_t s_snvsHpClock[] = SNVS_HP_CLOCKS;
@@ -135,21 +135,18 @@ static bool SNVS_HP_CheckDatetimeFormat(const snvs_hp_rtc_datetime_t *datetime)
 
     /* Check year, month, hour, minute, seconds */
     if ((datetime->year < YEAR_RANGE_START) || (datetime->year > YEAR_RANGE_END) || (datetime->month > 12U) ||
-        (datetime->month < 1U) || (datetime->hour >= 24U) || (datetime->minute >= 60U) || (datetime->second >= 60U))
-    {
+        (datetime->month < 1U) || (datetime->hour >= 24U) || (datetime->minute >= 60U) || (datetime->second >= 60U)) {
         /* If not correct then error*/
         return false;
     }
 
     /* Adjust the days in February for a leap year */
-    if ((((datetime->year & 3U) == 0) && (datetime->year % 100 != 0)) || (datetime->year % 400 == 0))
-    {
+    if ((((datetime->year & 3U) == 0) && (datetime->year % 100 != 0)) || (datetime->year % 400 == 0)) {
         daysPerMonth[2] = 29U;
     }
 
     /* Check the validity of the day */
-    if ((datetime->day > daysPerMonth[datetime->month]) || (datetime->day < 1U))
-    {
+    if ((datetime->day > daysPerMonth[datetime->month]) || (datetime->day < 1U)) {
         return false;
     }
 
@@ -175,8 +172,7 @@ static uint32_t SNVS_HP_ConvertDatetimeToSeconds(const snvs_hp_rtc_datetime_t *d
      * represented in the hours, minutes and seconds field*/
     seconds += (datetime->day - 1);
     /* For leap year if month less than or equal to Febraury, decrement day counter*/
-    if ((!(datetime->year & 3U)) && (datetime->month <= 2U))
-    {
+    if ((!(datetime->year & 3U)) && (datetime->month <= 2U)) {
         seconds--;
     }
 
@@ -210,46 +206,39 @@ static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datet
     secondsRemaining = secondsRemaining % SECONDS_IN_A_DAY;
 
     /* Calculate the datetime hour, minute and second fields */
-    datetime->hour = secondsRemaining / SECONDS_IN_A_HOUR;
+    datetime->hour   = secondsRemaining / SECONDS_IN_A_HOUR;
     secondsRemaining = secondsRemaining % SECONDS_IN_A_HOUR;
     datetime->minute = secondsRemaining / 60U;
     datetime->second = secondsRemaining % SECONDS_IN_A_MINUTE;
 
     /* Calculate year */
-    daysInYear = DAYS_IN_A_YEAR;
+    daysInYear     = DAYS_IN_A_YEAR;
     datetime->year = YEAR_RANGE_START;
-    while (days > daysInYear)
-    {
+    while (days > daysInYear) {
         /* Decrease day count by a year and increment year by 1 */
         days -= daysInYear;
         datetime->year++;
 
         /* Adjust the number of days for a leap year */
-        if (datetime->year & 3U)
-        {
+        if (datetime->year & 3U) {
             daysInYear = DAYS_IN_A_YEAR;
         }
-        else
-        {
+        else {
             daysInYear = DAYS_IN_A_YEAR + 1;
         }
     }
 
     /* Adjust the days in February for a leap year */
-    if (!(datetime->year & 3U))
-    {
+    if (!(datetime->year & 3U)) {
         daysPerMonth[2] = 29U;
     }
 
-    for (x = 1U; x <= 12U; x++)
-    {
-        if (days <= daysPerMonth[x])
-        {
+    for (x = 1U; x <= 12U; x++) {
+        if (days <= daysPerMonth[x]) {
             datetime->month = x;
             break;
         }
-        else
-        {
+        else {
             days -= daysPerMonth[x];
         }
     }
@@ -257,7 +246,7 @@ static void SNVS_HP_ConvertSecondsToDatetime(uint32_t seconds, snvs_hp_rtc_datet
     datetime->day = days;
 }
 
-#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
+#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&                       \
      defined(SNVS_HP_CLOCKS))
 static uint32_t SNVS_HP_GetInstance(SNVS_Type *base)
 {
@@ -269,7 +258,7 @@ void SNVS_HP_RTC_Init(SNVS_Type *base, const snvs_hp_rtc_config_t *config)
 {
     assert(config);
 
-#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
+#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&                       \
      defined(SNVS_HP_CLOCKS))
     uint32_t instance = SNVS_HP_GetInstance(base);
     CLOCK_EnableClock(s_snvsHpClock[instance]);
@@ -279,8 +268,7 @@ void SNVS_HP_RTC_Init(SNVS_Type *base, const snvs_hp_rtc_config_t *config)
 
     base->HPCR = SNVS_HPCR_PI_FREQ(config->periodicInterruptFreq);
 
-    if (config->rtcCalEnable)
-    {
+    if (config->rtcCalEnable) {
         base->HPCR = SNVS_HPCR_HPCALB_VAL_MASK & (config->rtcCalValue << SNVS_HPCR_HPCALB_VAL_SHIFT);
         base->HPCR |= SNVS_HPCR_HPCALB_EN_MASK;
     }
@@ -290,7 +278,7 @@ void SNVS_HP_RTC_Deinit(SNVS_Type *base)
 {
     base->HPCR &= ~SNVS_HPCR_RTC_EN_MASK;
 
-#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && \
+#if (!(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) &&                       \
      defined(SNVS_HP_CLOCKS))
     uint32_t instance = SNVS_HP_GetInstance(base);
     CLOCK_DisableClock(s_snvsHpClock[instance]);
@@ -301,21 +289,20 @@ void SNVS_HP_RTC_GetDefaultConfig(snvs_hp_rtc_config_t *config)
 {
     assert(config);
 
-    config->rtcCalEnable = false;
-    config->rtcCalValue = 0U;
+    config->rtcCalEnable          = false;
+    config->rtcCalValue           = 0U;
     config->periodicInterruptFreq = 0U;
 }
 
 static uint32_t SNVS_HP_RTC_GetSeconds(SNVS_Type *base)
 {
     uint32_t seconds = 0;
-    uint32_t tmp = 0;
+    uint32_t tmp     = 0;
 
     /* Do consecutive reads until value is correct */
-    do
-    {
+    do {
         seconds = tmp;
-        tmp = (base->HPRTCMR << 17U) | (base->HPRTCLR >> 15U);
+        tmp     = (base->HPRTCMR << 17U) | (base->HPRTCLR >> 15U);
     } while (tmp != seconds);
 
     return seconds;
@@ -326,14 +313,13 @@ status_t SNVS_HP_RTC_SetDatetime(SNVS_Type *base, const snvs_hp_rtc_datetime_t *
     assert(datetime);
 
     uint32_t seconds = 0U;
-    uint32_t tmp = base->HPCR;
+    uint32_t tmp     = base->HPCR;
 
     /* disable RTC */
     SNVS_HP_RTC_StopTimer(base);
 
     /* Return error if the time provided is not valid */
-    if (!(SNVS_HP_CheckDatetimeFormat(datetime)))
-    {
+    if (!(SNVS_HP_CheckDatetimeFormat(datetime))) {
         return kStatus_InvalidArgument;
     }
 
@@ -344,8 +330,7 @@ status_t SNVS_HP_RTC_SetDatetime(SNVS_Type *base, const snvs_hp_rtc_datetime_t *
     base->HPRTCLR = (uint32_t)(seconds << 15U);
 
     /* reenable RTC in case that it was enabled before */
-    if (tmp & SNVS_HPCR_RTC_EN_MASK)
-    {
+    if (tmp & SNVS_HPCR_RTC_EN_MASK) {
         SNVS_HP_RTC_StartTimer(base);
     }
 
@@ -364,29 +349,25 @@ status_t SNVS_HP_RTC_SetAlarm(SNVS_Type *base, const snvs_hp_rtc_datetime_t *ala
     assert(alarmTime);
 
     uint32_t alarmSeconds = 0U;
-    uint32_t currSeconds = 0U;
-    uint32_t tmp = base->HPCR;
+    uint32_t currSeconds  = 0U;
+    uint32_t tmp          = base->HPCR;
 
     /* Return error if the alarm time provided is not valid */
-    if (!(SNVS_HP_CheckDatetimeFormat(alarmTime)))
-    {
+    if (!(SNVS_HP_CheckDatetimeFormat(alarmTime))) {
         return kStatus_InvalidArgument;
     }
 
     alarmSeconds = SNVS_HP_ConvertDatetimeToSeconds(alarmTime);
-    currSeconds = SNVS_HP_RTC_GetSeconds(base);
+    currSeconds  = SNVS_HP_RTC_GetSeconds(base);
 
     /* Return error if the alarm time has passed */
-    if (alarmSeconds < currSeconds)
-    {
+    if (alarmSeconds < currSeconds) {
         return kStatus_Fail;
     }
 
     /* disable RTC alarm interrupt */
     base->HPCR &= ~SNVS_HPCR_HPTA_EN_MASK;
-    while (base->HPCR & SNVS_HPCR_HPTA_EN_MASK)
-    {
-    }
+    while (base->HPCR & SNVS_HPCR_HPTA_EN_MASK) {}
 
     /* Set alarm in seconds*/
     base->HPTAMR = (uint32_t)(alarmSeconds >> 17U);
@@ -421,8 +402,7 @@ void SNVS_HP_RTC_TimeSynchronize(SNVS_Type *base)
     base->HPCR |= SNVS_HPCR_HP_TS_MASK;
 
     /* reenable RTC in case that it was enabled before */
-    if (tmp & SNVS_HPCR_RTC_EN_MASK)
-    {
+    if (tmp & SNVS_HPCR_RTC_EN_MASK) {
         SNVS_HP_RTC_StartTimer(base);
     }
 }
@@ -432,13 +412,11 @@ uint32_t SNVS_HP_RTC_GetStatusFlags(SNVS_Type *base)
 {
     uint32_t flags = 0U;
 
-    if (base->HPSR & SNVS_HPSR_PI_MASK)
-    {
+    if (base->HPSR & SNVS_HPSR_PI_MASK) {
         flags |= kSNVS_RTC_PeriodicInterruptFlag;
     }
 
-    if (base->HPSR & SNVS_HPSR_HPTA_MASK)
-    {
+    if (base->HPSR & SNVS_HPSR_HPTA_MASK) {
         flags |= kSNVS_RTC_AlarmInterruptFlag;
     }
 
@@ -449,13 +427,11 @@ uint32_t SNVS_HP_RTC_GetEnabledInterrupts(SNVS_Type *base)
 {
     uint32_t val = 0U;
 
-    if (base->HPCR & SNVS_HPCR_PI_EN_MASK)
-    {
+    if (base->HPCR & SNVS_HPCR_PI_EN_MASK) {
         val |= kSNVS_RTC_PeriodicInterrupt;
     }
 
-    if (base->HPCR & SNVS_HPCR_HPTA_EN_MASK)
-    {
+    if (base->HPCR & SNVS_HPCR_HPTA_EN_MASK) {
         val |= kSNVS_RTC_AlarmInterrupt;
     }
 

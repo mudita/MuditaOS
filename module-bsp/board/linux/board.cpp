@@ -8,10 +8,10 @@
  * @details
  */
 
-
 namespace bsp
 {
-    void BoardInit(){
+    void BoardInit()
+    {
         // dummy
     }
-}
+} // namespace bsp

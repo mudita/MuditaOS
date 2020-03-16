@@ -13,199 +13,202 @@
 #include "ImageManager.hpp"
 #include "utf8/UTF8.hpp"
 #include "log/log.hpp"
-//module-gui
+// module-gui
 #include "ImageMap.hpp"
 #include "VecMap.hpp"
 #include "PixMap.hpp"
 #include "vfs.hpp"
 
-namespace gui {
-
-ImageManager::ImageManager() {
-}
-
-ImageManager::~ImageManager() {
-	clear();
-}
-
-void ImageManager::loadImageMaps( std::string baseDirectory ) {
-	mapFolder = baseDirectory+"/images";
-	std::vector<std::string> pixMapFiles = getImageMapList(".mpi");
-	std::vector<std::string> vecMapFiles = getImageMapList(".vpi");
-
-	for( std::string mapName : pixMapFiles ) {
-		loadPixMap( mapName );
-	}
-	for( std::string mapName : vecMapFiles ) {
-		loadVecMap( mapName );
-	}
-}
-
-void ImageManager::clear() {
-	for( ImageMap* imageMap: imageMaps ) {
-		LOG_INFO("deleting image: %s", imageMap->getName().c_str());
-		delete imageMap;
-	}
-	imageMaps.clear();
-}
-
-
-std::vector<std::string> splitpath(
-  const std::string& str
-  , const std::set<char> delimiters)
+namespace gui
 {
-  std::vector<std::string> result;
 
-  char const* pch = str.c_str();
-  char const* start = pch;
-  for(; *pch; ++pch)
-  {
-    if (delimiters.find(*pch) != delimiters.end())
+    ImageManager::ImageManager()
+    {}
+
+    ImageManager::~ImageManager()
     {
-      if (start != pch)
-      {
-        std::string str(start, pch);
-        result.push_back(str);
-      }
-      else
-      {
-        result.push_back("");
-      }
-      start = pch + 1;
+        clear();
     }
-  }
-  result.push_back(start);
 
-  return result;
-}
+    void ImageManager::loadImageMaps(std::string baseDirectory)
+    {
+        mapFolder                            = baseDirectory + "/images";
+        std::vector<std::string> pixMapFiles = getImageMapList(".mpi");
+        std::vector<std::string> vecMapFiles = getImageMapList(".vpi");
 
+        for (std::string mapName : pixMapFiles) {
+            loadPixMap(mapName);
+        }
+        for (std::string mapName : vecMapFiles) {
+            loadVecMap(mapName);
+        }
+    }
 
-ImageMap* ImageManager::loadPixMap( std::string filename ) {
+    void ImageManager::clear()
+    {
+        for (ImageMap *imageMap : imageMaps) {
+            LOG_INFO("deleting image: %s", imageMap->getName().c_str());
+            delete imageMap;
+        }
+        imageMaps.clear();
+    }
 
-	auto file = vfs.fopen( filename.c_str(), "rb" );
+    std::vector<std::string> splitpath(const std::string &str, const std::set<char> delimiters)
+    {
+        std::vector<std::string> result;
 
-	auto fileSize = vfs.filelength( file );
+        char const *pch   = str.c_str();
+        char const *start = pch;
+        for (; *pch; ++pch) {
+            if (delimiters.find(*pch) != delimiters.end()) {
+                if (start != pch) {
+                    std::string str(start, pch);
+                    result.push_back(str);
+                }
+                else {
+                    result.push_back("");
+                }
+                start = pch + 1;
+            }
+        }
+        result.push_back(start);
 
-	char* data = new char[fileSize];
-	if( data == nullptr ) {
-		vfs.fclose( file );
-		LOG_ERROR( " Failed to allocate temporary font buffer");
-		return nullptr;
-	}
+        return result;
+    }
 
-	//read data to buffer
-	vfs.fread( data, 1, fileSize, file );
+    ImageMap *ImageManager::loadPixMap(std::string filename)
+    {
 
-	//close file
-	vfs.fclose( file );
+        auto file = vfs.fopen(filename.c_str(), "rb");
 
-	//allocate memory for new font
-	PixMap* pixMap = new PixMap();
-	if( pixMap->load( reinterpret_cast<uint8_t*>(data), fileSize ) != gui::Status::GUI_SUCCESS ){
-		delete pixMap;
-		delete[] data;
-		return nullptr;
-	}
-	else {
-		//set id and push it to vector
-		pixMap->setID( imageMaps.size());
-		std::set<char> delims{'/'};
-		std::vector<std::string> path = splitpath( filename, delims);
-		std::string filename = path[path.size()-1];
-		filename = filename.substr( 0, filename.length()-4);
+        auto fileSize = vfs.filelength(file);
 
-   		pixMap->setName( filename );
-		//TODO remove commented code
-		LOG_INFO("%s",filename.c_str());
-		imageMaps.push_back( pixMap );
-	}
-	delete[] data;
-	return pixMap;
-}
+        char *data = new char[fileSize];
+        if (data == nullptr) {
+            vfs.fclose(file);
+            LOG_ERROR(" Failed to allocate temporary font buffer");
+            return nullptr;
+        }
 
-ImageMap* ImageManager::loadVecMap( std::string filename ) {
+        // read data to buffer
+        vfs.fread(data, 1, fileSize, file);
 
-	auto file = vfs.fopen( filename.c_str(), "rb" );
+        // close file
+        vfs.fclose(file);
 
-	auto fileSize = vfs.filelength( file );
+        // allocate memory for new font
+        PixMap *pixMap = new PixMap();
+        if (pixMap->load(reinterpret_cast<uint8_t *>(data), fileSize) != gui::Status::GUI_SUCCESS) {
+            delete pixMap;
+            delete[] data;
+            return nullptr;
+        }
+        else {
+            // set id and push it to vector
+            pixMap->setID(imageMaps.size());
+            std::set<char> delims{'/'};
+            std::vector<std::string> path = splitpath(filename, delims);
+            std::string filename          = path[path.size() - 1];
+            filename                      = filename.substr(0, filename.length() - 4);
 
-	char* data = new char[fileSize];
-	if( data == nullptr ) {
-		vfs.fclose( file );
-		LOG_ERROR( " Failed to allocate temporary font buffer");
-		return nullptr;
-	}
+            pixMap->setName(filename);
+            // TODO remove commented code
+            LOG_INFO("%s", filename.c_str());
+            imageMaps.push_back(pixMap);
+        }
+        delete[] data;
+        return pixMap;
+    }
 
-	//read data to buffer
-	vfs.fread( data, 1, fileSize, file );
+    ImageMap *ImageManager::loadVecMap(std::string filename)
+    {
 
-	//close file
-	vfs.fclose( file );
+        auto file = vfs.fopen(filename.c_str(), "rb");
 
-	VecMap* vecMap = new VecMap();
-	if( vecMap->load( reinterpret_cast<uint8_t*>(data), fileSize ) != gui::Status::GUI_SUCCESS ){
-		delete vecMap;
-		delete[] data;
-		return nullptr;
-	}
-	else {
-		//set id and push it to vector
-		vecMap->setID( imageMaps.size());
-		std::set<char> delims{'/'};
-		std::vector<std::string> path = splitpath( filename, delims);
-		std::string filename = path[path.size()-1];
-		filename = filename.substr( 0, filename.length()-4);
-		vecMap->setName( filename );
-		//TODO remove commented code
-//		LOG_INFO("%s",filename.c_str());
-		imageMaps.push_back( vecMap );
-	}
-	delete[] data;
-	return vecMap;
-}
+        auto fileSize = vfs.filelength(file);
 
-std::vector<std::string> ImageManager::getImageMapList(std::string ext) {
+        char *data = new char[fileSize];
+        if (data == nullptr) {
+            vfs.fclose(file);
+            LOG_ERROR(" Failed to allocate temporary font buffer");
+            return nullptr;
+        }
 
-	std::vector<std::string> mapFiles;
+        // read data to buffer
+        vfs.fread(data, 1, fileSize, file);
 
-	LOG_INFO( "Scanning %s images folder: %s", ext.c_str(), mapFolder.c_str());
-	auto dirList = vfs.listdir(mapFolder.c_str(), ext );
+        // close file
+        vfs.fclose(file);
 
-	for( vfs::DirectoryEntry ent : dirList ) {
-		if( ent.attributes != vfs::FileAttributes::Directory)
-			mapFiles.push_back( mapFolder + "/" + ent.fileName );
-	}
+        VecMap *vecMap = new VecMap();
+        if (vecMap->load(reinterpret_cast<uint8_t *>(data), fileSize) != gui::Status::GUI_SUCCESS) {
+            delete vecMap;
+            delete[] data;
+            return nullptr;
+        }
+        else {
+            // set id and push it to vector
+            vecMap->setID(imageMaps.size());
+            std::set<char> delims{'/'};
+            std::vector<std::string> path = splitpath(filename, delims);
+            std::string filename          = path[path.size() - 1];
+            filename                      = filename.substr(0, filename.length() - 4);
+            vecMap->setName(filename);
+            // TODO remove commented code
+            //		LOG_INFO("%s",filename.c_str());
+            imageMaps.push_back(vecMap);
+        }
+        delete[] data;
+        return vecMap;
+    }
 
-	LOG_INFO("Total number of images: %d", mapFiles.size());
+    std::vector<std::string> ImageManager::getImageMapList(std::string ext)
+    {
 
-	return mapFiles;
-}
+        std::vector<std::string> mapFiles;
 
-bool ImageManager::init( std::string baseDirectory ) {
-	//load fonts from specified folder
-	loadImageMaps(baseDirectory);
+        LOG_INFO("Scanning %s images folder: %s", ext.c_str(), mapFolder.c_str());
+        auto dirList = vfs.listdir(mapFolder.c_str(), ext);
 
-	return true;
-}
+        for (vfs::DirectoryEntry ent : dirList) {
+            if (ent.attributes != vfs::FileAttributes::Directory)
+                mapFiles.push_back(mapFolder + "/" + ent.fileName);
+        }
 
-ImageManager& ImageManager::getInstance(){
+        LOG_INFO("Total number of images: %d", mapFiles.size());
 
-	static ImageManager instance;
+        return mapFiles;
+    }
 
-	return instance;
-}
+    bool ImageManager::init(std::string baseDirectory)
+    {
+        // load fonts from specified folder
+        loadImageMaps(baseDirectory);
 
-ImageMap* ImageManager::getImageMap( uint32_t id ) {
-	if( id >= imageMaps.size())
-		return nullptr;
-	return imageMaps[id];
-}
-uint32_t ImageManager::getImageMapID( const std::string& name ) {
-	for( uint32_t i=0; i<imageMaps.size(); i++ ) {
-		if( name.compare( imageMaps[i]->getName() ) == 0 )
-			return i;
-	}
-	return 0;
-}
+        return true;
+    }
+
+    ImageManager &ImageManager::getInstance()
+    {
+
+        static ImageManager instance;
+
+        return instance;
+    }
+
+    ImageMap *ImageManager::getImageMap(uint32_t id)
+    {
+        if (id >= imageMaps.size())
+            return nullptr;
+        return imageMaps[id];
+    }
+    uint32_t ImageManager::getImageMapID(const std::string &name)
+    {
+        for (uint32_t i = 0; i < imageMaps.size(); i++) {
+            if (name.compare(imageMaps[i]->getName()) == 0)
+                return i;
+        }
+        return 0;
+    }
 
 } /* namespace gui */

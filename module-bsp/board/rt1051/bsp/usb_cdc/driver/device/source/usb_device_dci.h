@@ -82,22 +82,33 @@ typedef enum _usb_device_control_type
 } usb_device_control_type_t;
 
 /*! @brief USB device controller initialization function typedef */
-typedef usb_status_t (*usb_device_controller_init_t)(uint8_t controllerId, usb_device_handle handle, usb_device_controller_handle *controllerHandle);
+typedef usb_status_t (*usb_device_controller_init_t)(uint8_t controllerId,
+                                                     usb_device_handle handle,
+                                                     usb_device_controller_handle *controllerHandle);
 
 /*! @brief USB device controller de-initialization function typedef */
 typedef usb_status_t (*usb_device_controller_deinit_t)(usb_device_controller_handle controllerHandle);
 
 /*! @brief USB device controller send data function typedef */
-typedef usb_status_t (*usb_device_controller_send_t)(usb_device_controller_handle controllerHandle, uint8_t endpointAddress, uint8_t *buffer, uint32_t length);
+typedef usb_status_t (*usb_device_controller_send_t)(usb_device_controller_handle controllerHandle,
+                                                     uint8_t endpointAddress,
+                                                     uint8_t *buffer,
+                                                     uint32_t length);
 
 /*! @brief USB device controller receive data function typedef */
-typedef usb_status_t (*usb_device_controller_recv_t)(usb_device_controller_handle controllerHandle, uint8_t endpointAddress, uint8_t *buffer, uint32_t length);
+typedef usb_status_t (*usb_device_controller_recv_t)(usb_device_controller_handle controllerHandle,
+                                                     uint8_t endpointAddress,
+                                                     uint8_t *buffer,
+                                                     uint32_t length);
 
 /*! @brief USB device controller cancel transfer function in a specified endpoint typedef */
-typedef usb_status_t (*usb_device_controller_cancel_t)(usb_device_controller_handle controllerHandle, uint8_t endpointAddress);
+typedef usb_status_t (*usb_device_controller_cancel_t)(usb_device_controller_handle controllerHandle,
+                                                       uint8_t endpointAddress);
 
 /*! @brief USB device controller control function typedef */
-typedef usb_status_t (*usb_device_controller_control_t)(usb_device_controller_handle controllerHandle, usb_device_control_type_t command, void *param);
+typedef usb_status_t (*usb_device_controller_control_t)(usb_device_controller_handle controllerHandle,
+                                                        usb_device_control_type_t command,
+                                                        void *param);
 
 /*! @brief USB device controller interface structure */
 typedef struct _usb_device_controller_interface_struct
@@ -121,11 +132,12 @@ typedef struct _usb_device_struct
 #if USB_DEVICE_CONFIG_USE_TASK
     usb_osa_msgq_handle notificationQueue; /*!< Message queue */
 #endif
-    usb_device_callback_t deviceCallback;                                                /*!< Device callback function pointer */
-    usb_device_endpoint_callback_struct_t epCallback[USB_DEVICE_CONFIG_ENDPOINTS << 1U]; /*!< Endpoint callback function structure */
-    uint8_t deviceAddress;                                                               /*!< Current device address */
-    uint8_t controllerId;                                                                /*!< Controller ID */
-    uint8_t state;                                                                       /*!< Current device state */
+    usb_device_callback_t deviceCallback; /*!< Device callback function pointer */
+    usb_device_endpoint_callback_struct_t
+        epCallback[USB_DEVICE_CONFIG_ENDPOINTS << 1U]; /*!< Endpoint callback function structure */
+    uint8_t deviceAddress;                             /*!< Current device address */
+    uint8_t controllerId;                              /*!< Controller ID */
+    uint8_t state;                                     /*!< Current device state */
 #if ((defined(USB_DEVICE_CONFIG_REMOTE_WAKEUP)) && (USB_DEVICE_CONFIG_REMOTE_WAKEUP > 0U))
     uint8_t remotewakeup; /*!< Remote wakeup is enabled or not */
 #endif

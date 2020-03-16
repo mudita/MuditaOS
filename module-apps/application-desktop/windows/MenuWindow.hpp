@@ -16,7 +16,10 @@ namespace gui
     /// icon, description, name of application to run
     struct Tile : public Rect
     {
-        Tile(UTF8 icon, std::string title, std::function<bool(Item &)> activatedCallback, unsigned int notifications = 0);
+        Tile(UTF8 icon,
+             std::string title,
+             std::function<bool(Item &)> activatedCallback,
+             unsigned int notifications = 0);
     };
 
     class MenuPage : public gui::GridLayout
@@ -35,7 +38,7 @@ namespace gui
     {
       protected:
         // page that is currently selected by the user.
-        MenuPage *mainMenu = nullptr;
+        MenuPage *mainMenu  = nullptr;
         MenuPage *toolsMenu = nullptr;
 
       public:

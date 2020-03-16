@@ -11,23 +11,25 @@
 
 #include "EnterNumberWindow.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class EmergencyCallWindow: public EnterNumberWindow {
-public:
-	EmergencyCallWindow( app::Application* app );
-	virtual ~EmergencyCallWindow();
+    /*
+     *
+     */
+    class EmergencyCallWindow : public EnterNumberWindow
+    {
+      public:
+        EmergencyCallWindow(app::Application *app);
+        virtual ~EmergencyCallWindow();
 
-	bool onInput( const InputEvent& inputEvent ) override;
-	bool handleSwitchData( SwitchData* data ) override;
+        bool onInput(const InputEvent &inputEvent) override;
+        bool handleSwitchData(SwitchData *data) override;
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
 

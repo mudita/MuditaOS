@@ -15,33 +15,36 @@
 
 #include "ImageMap.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class ImageManager {
-protected:
-	std::string mapFolder;
-	std::vector<ImageMap*> imageMaps;
+    class ImageManager
+    {
+      protected:
+        std::string mapFolder;
+        std::vector<ImageMap *> imageMaps;
 
-	std::vector<std::string> getImageMapList(std::string ext);
+        std::vector<std::string> getImageMapList(std::string ext);
 
-	ImageMap* loadPixMap( std::string filename );
-	ImageMap* loadVecMap( std::string filename );
-	void loadImageMaps( std::string baseDirectory );
+        ImageMap *loadPixMap(std::string filename);
+        ImageMap *loadVecMap(std::string filename);
+        void loadImageMaps(std::string baseDirectory);
 
-	ImageManager();
-public:
-	ImageManager( const ImageManager& ) = delete;
-	void operator= (const ImageManager& ) = delete;
+        ImageManager();
 
-	bool init( std::string baseDirectory );
-	static ImageManager& getInstance();
+      public:
+        ImageManager(const ImageManager &) = delete;
+        void operator=(const ImageManager &) = delete;
 
-	virtual ~ImageManager();
+        bool init(std::string baseDirectory);
+        static ImageManager &getInstance();
 
-	ImageMap* getImageMap( uint32_t id );
-	uint32_t getImageMapID( const std::string& name );
-	void clear();
-};
+        virtual ~ImageManager();
+
+        ImageMap *getImageMap(uint32_t id);
+        uint32_t getImageMapID(const std::string &name);
+        void clear();
+    };
 
 } /* namespace gui */
 

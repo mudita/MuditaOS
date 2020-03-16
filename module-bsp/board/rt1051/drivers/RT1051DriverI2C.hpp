@@ -2,12 +2,10 @@
  *  @file RT1051DriverI2C.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 29.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_RT1051DRIVERI2C_HPP
 #define PUREPHONE_RT1051DRIVERI2C_HPP
@@ -20,11 +18,12 @@
 
 #include "mutex.hpp"
 
-namespace drivers {
+namespace drivers
+{
 
-    class RT1051DriverI2C : public DriverI2C {
-    public:
-
+    class RT1051DriverI2C : public DriverI2C
+    {
+      public:
         RT1051DriverI2C(const I2CInstances inst, const DriverI2CParams &params);
 
         ~RT1051DriverI2C();
@@ -35,20 +34,25 @@ namespace drivers {
 
         ssize_t Modify(const I2CAddress &addr, const uint32_t mask, bool setClr, const size_t size) override final;
 
+      private:
+        status_t BOARD_LPI2C_Receive(LPI2C_Type *base,
+                                     uint8_t deviceAddress,
+                                     uint32_t subAddress,
+                                     uint8_t subAddressSize,
+                                     uint8_t *rxBuff,
+                                     uint8_t rxBuffSize);
 
-    private:
-
-        status_t BOARD_LPI2C_Receive(LPI2C_Type *base, uint8_t deviceAddress, uint32_t subAddress,
-                                     uint8_t subAddressSize, uint8_t *rxBuff, uint8_t rxBuffSize);
-
-        status_t BOARD_LPI2C_Send(LPI2C_Type *base, uint8_t deviceAddress, uint32_t subAddress,
-                                  uint8_t subAddressSize, uint8_t *txBuff, uint8_t txBuffSize);
-
+        status_t BOARD_LPI2C_Send(LPI2C_Type *base,
+                                  uint8_t deviceAddress,
+                                  uint32_t subAddress,
+                                  uint8_t subAddressSize,
+                                  uint8_t *txBuff,
+                                  uint8_t txBuffSize);
 
         LPI2C_Type *base;
         cpp_freertos::MutexStandard mutex;
     };
 
-}
+} // namespace drivers
 
-#endif //PUREPHONE_RT1051DRIVERI2C_HPP
+#endif // PUREPHONE_RT1051DRIVERI2C_HPP

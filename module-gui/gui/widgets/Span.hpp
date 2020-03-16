@@ -13,13 +13,12 @@ namespace gui
         Span(Axis axis, unsigned int size) : axis(axis)
         {
             area().size(axis) = size;
-            activeItem = false;
+            activeItem        = false;
         }
 
         Span(Item *parent, Axis axis, unsigned int size) : Span(axis, size)
         {
-            if (parent)
-            {
+            if (parent) {
                 parent->addWidget(this);
             }
         }

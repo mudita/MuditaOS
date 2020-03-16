@@ -30,8 +30,7 @@ class StateMessageType : public ParserFsm
         msgType = static_cast<parserutils::message::Type>(msgChunk.front());
         msgChunk.pop_front();
 
-        switch (msgType)
-        {
+        switch (msgType) {
         case parserutils::message::Type::endpoint:
         case parserutils::message::Type::rawData:
             transit<StateMessageSize>();
@@ -54,32 +53,26 @@ class StateMessageSize : public ParserFsm
         LOG_DEBUG("*** react MessageSizeEvt ***");
 
         auto processSingleDigit = [this] {
-            if (!isdigit(msgChunk.front()))
-            {
+            if (!isdigit(msgChunk.front())) {
                 msgChunk.pop_front();
                 transit<StateMessageType>();
             }
-            else
-            {
+            else {
                 msgPayloadSizeStr.push_back(msgChunk.front());
                 msgChunk.pop_front();
                 msgSizeBytesToRead--;
             }
         };
 
-        if (msgSizeBytesToRead > msgChunk.size())
-        {
-            while (!msgChunk.empty())
-            {
+        if (msgSizeBytesToRead > msgChunk.size()) {
+            while (!msgChunk.empty()) {
                 processSingleDigit();
             }
             LOG_DEBUG("serial data buff empty, wait for new data");
             return;
         }
-        else
-        {
-            while (msgSizeBytesToRead)
-            {
+        else {
+            while (msgSizeBytesToRead) {
                 processSingleDigit();
             }
             msgPayloadSize = stoi(msgPayloadSizeStr);
@@ -111,40 +104,34 @@ class StateMessagePayload : public ParserFsm
             msgPayloadSize--;
         };
 
-        if (msgPayloadSize > msgChunk.size())
-        {
+        if (msgPayloadSize > msgChunk.size()) {
             msgPayload.reserve(msgPayload.size() + msgChunk.size());
 
-            while (!msgChunk.empty())
-            {
+            while (!msgChunk.empty()) {
                 getSingleByte();
             }
 
-            if (msgType == parserutils::message::Type::rawData)
-            {
+            if (msgType == parserutils::message::Type::rawData) {
                 send_event(RawDataEvt(msg.ownerService)); // invoke raw data fsm to let it store payload chunk to emmc
                 msgPayload.clear();
             }
             LOG_DEBUG("serial data buff empty, wait for new data");
             return;
         }
-        else
-        {
+        else {
             msgPayload.reserve(msgPayload.size() + msgPayloadSize);
 
-            while (msgPayloadSize)
-            {
+            while (msgPayloadSize) {
                 getSingleByte();
             }
 
             auto runHandler = [msg] {
-                if (msgType == parserutils::message::Type::endpoint)
-                {
+                if (msgType == parserutils::message::Type::endpoint) {
                     send_event(EndpointEvt(msg.ownerService));
                 }
-                else if (msgType == parserutils::message::Type::rawData)
-                {
-                    send_event(RawDataEvt(msg.ownerService)); // invoke raw data fsm to let it store pyaload chunk to emmc and begin its own operations
+                else if (msgType == parserutils::message::Type::rawData) {
+                    send_event(RawDataEvt(msg.ownerService)); // invoke raw data fsm to let it store pyaload chunk to
+                                                              // emmc and begin its own operations
                 }
             };
 

@@ -41,10 +41,10 @@ class PhonebookDialog : public AppWindow
     virtual void setContactData() = 0;
 
   protected:
-    Text *confirmationLabel = nullptr;
-    Label *noLabel = nullptr;
-    Label *yesLabel = nullptr;
-    Image *icon = nullptr;
+    Text *confirmationLabel                = nullptr;
+    Label *noLabel                         = nullptr;
+    Label *yesLabel                        = nullptr;
+    Image *icon                            = nullptr;
     std::shared_ptr<ContactRecord> contact = nullptr;
 };
 
@@ -75,8 +75,7 @@ class PhonebookBlockContact : public PhonebookDialog
 {
   public:
     PhonebookBlockContact(app::Application *app) : PhonebookDialog(app, "Block")
-    {
-    }
+    {}
     virtual ~PhonebookBlockContact() = default;
     void onBeforeShow(ShowMode mode, SwitchData *data);
     void setContactData();
@@ -100,8 +99,7 @@ class PhonebookDuplicateSpeedDial : public PhonebookDialog
 
   public:
     PhonebookDuplicateSpeedDial(app::Application *app) : PhonebookDialog(app, "SpeedDialAlreadyAssigned")
-    {
-    }
+    {}
     virtual ~PhonebookDuplicateSpeedDial() = default;
     void onBeforeShow(ShowMode mode, SwitchData *data);
     void setContactData();

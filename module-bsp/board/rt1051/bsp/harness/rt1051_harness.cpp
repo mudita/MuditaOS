@@ -14,7 +14,7 @@
 #include "bsp/harness/bsp_pinmap.hpp"
 
 static StreamBufferHandle_t uartRxStreamBuffer = nullptr;
-static xQueueHandle qHandleIrq = NULL;
+static xQueueHandle qHandleIrq                 = NULL;
 
 extern "C"
 {
@@ -22,29 +22,25 @@ extern "C"
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-        uint32_t isrReg = LPUART_GetStatusFlags(LPUART3);
+        uint32_t isrReg               = LPUART_GetStatusFlags(LPUART3);
         static char characterReceived = 0;
-        if (qHandleIrq != NULL && uartRxStreamBuffer != NULL)
-        {
-            if (isrReg & kLPUART_RxDataRegFullFlag)
-            {
+        if (qHandleIrq != NULL && uartRxStreamBuffer != NULL) {
+            if (isrReg & kLPUART_RxDataRegFullFlag) {
                 characterReceived = LPUART_ReadByte(LPUART3);
 
-                if (characterReceived == STX)
-                {
+                if (characterReceived == STX) {
                     uint8_t stx = STX;
                     xQueueSendFromISR(qHandleIrq, &stx, &xHigherPriorityTaskWoken);
                     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
                 }
-                else if (characterReceived == ETX)
-                {
+                else if (characterReceived == ETX) {
                     uint8_t etx = ETX;
                     xQueueSendFromISR(qHandleIrq, &etx, &xHigherPriorityTaskWoken);
                     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
                 }
-                else
-                {
-                    xStreamBufferSendFromISR(uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
+                else {
+                    xStreamBufferSendFromISR(
+                        uartRxStreamBuffer, (void *)&characterReceived, 1, &xHigherPriorityTaskWoken);
                     // port switching ignored here... just do read when told
                 }
             }
@@ -57,22 +53,21 @@ int hwInit(xQueueHandle qHandle)
 {
     LOG_DEBUG("Initialize test harness!");
     const static uint32_t rxStreamBufferLength = 1024;
-    uartRxStreamBuffer = xStreamBufferCreate(rxStreamBufferLength, 2);
-    qHandleIrq = qHandle;
+    uartRxStreamBuffer                         = xStreamBufferCreate(rxStreamBufferLength, 2);
+    qHandleIrq                                 = qHandle;
     lpuart_config_t s_harnessConfig;
     LPUART_GetDefaultConfig(&s_harnessConfig);
     const static uint32_t baudrate = 115200;
-    s_harnessConfig.baudRate_Bps = baudrate;
-    s_harnessConfig.dataBitsCount = kLPUART_EightDataBits;
-    s_harnessConfig.parityMode = kLPUART_ParityDisabled;
-    s_harnessConfig.isMsb = false;
-    s_harnessConfig.rxIdleType = kLPUART_IdleTypeStartBit;
-    s_harnessConfig.rxIdleConfig = kLPUART_IdleCharacter1;
-    s_harnessConfig.enableTx = false;
-    s_harnessConfig.enableRx = false;
+    s_harnessConfig.baudRate_Bps   = baudrate;
+    s_harnessConfig.dataBitsCount  = kLPUART_EightDataBits;
+    s_harnessConfig.parityMode     = kLPUART_ParityDisabled;
+    s_harnessConfig.isMsb          = false;
+    s_harnessConfig.rxIdleType     = kLPUART_IdleTypeStartBit;
+    s_harnessConfig.rxIdleConfig   = kLPUART_IdleCharacter1;
+    s_harnessConfig.enableTx       = false;
+    s_harnessConfig.enableRx       = false;
 
-    if (LPUART_Init(LPUART3, &s_harnessConfig, GetPerphSourceClock(PerphClock_LPUART)) != kStatus_Success)
-    {
+    if (LPUART_Init(LPUART3, &s_harnessConfig, GetPerphSourceClock(PerphClock_LPUART)) != kStatus_Success) {
         LOG_FATAL("Could not initialize the uart!");
         return -1;
     }
@@ -91,21 +86,19 @@ int hwInit(xQueueHandle qHandle)
 
 std::string hwRead()
 {
-    static size_t oldsize = 0;
+    static size_t oldsize   = 0;
     static const char *buff = nullptr;
-    size_t size = xStreamBufferBytesAvailable(uartRxStreamBuffer);
-    if (size > oldsize)
-    {
+    size_t size             = xStreamBufferBytesAvailable(uartRxStreamBuffer);
+    if (size > oldsize) {
         delete buff;
-        buff = new char[size];
+        buff    = new char[size];
         oldsize = size;
     }
     std::memset((void *)buff, 0, size);
     ssize_t ret = xStreamBufferReceive(uartRxStreamBuffer, (void *)buff, size, 0);
 
     std::string str(buff, buff + size);
-    if (ret != str.size())
-    {
+    if (ret != str.size()) {
         LOG_ERROR("read error: %d vs %d", ret, str.size());
     }
     str.shrink_to_fit();

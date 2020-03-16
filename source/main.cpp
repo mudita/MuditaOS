@@ -8,7 +8,7 @@
 #include "ticks.hpp"
 #include "version.hpp"
 
-//module-applications
+// module-applications
 #include "application-antenna/ApplicationAntenna.hpp"
 #include "application-call/ApplicationCall.hpp"
 #include "application-calllog/ApplicationCallLog.hpp"
@@ -21,7 +21,7 @@
 #include "application-special-input/AppSpecialInput.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
 
-//module-services
+// module-services
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-audio/ServiceAudio.hpp"
 #include "service-audio/api/AudioServiceAPI.hpp"
@@ -34,32 +34,31 @@
 #include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
 
-//module-bsp
+// module-bsp
 #include "bsp/bsp.hpp"
 #include "bsp/rtc/rtc.hpp"
 #include "bsp/keyboard/keyboard.hpp"
 
-//module-vfs
+// module-vfs
 #include "vfs.hpp"
 
-//module-sys
+// module-sys
 #include "SystemManager/SystemManager.hpp"
-
 
 class vfs vfs;
 
+class BlinkyService : public sys::Service
+{
 
-class BlinkyService : public sys::Service {
-
-public:
-    BlinkyService(const std::string &name)
-            : sys::Service(name) {
+  public:
+    BlinkyService(const std::string &name) : sys::Service(name)
+    {
         timerBlinkyID = CreateTimer(5000, true);
-        //ReloadTimer(timer_id);
+        // ReloadTimer(timer_id);
     }
 
-    ~BlinkyService() {
-    }
+    ~BlinkyService()
+    {}
     //    DBThreadResponseMessage* threadResponse = reinterpret_cast<DBThreadResponseMessage*>(ret.second.get());
     //    if((ret.first == sys::ReturnCodes::Success) && (threadResponse->retCode == true)){
     //        return std::move(threadResponse->records);
@@ -68,10 +67,11 @@ public:
     //        return std::make_unique<std::vector<ThreadRecord>>();
     //    }
     // Invoked upon receiving data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override {
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override
+    {
 
 #if 0 // M.P: left here on purpose
-        //auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
+      // auto ret = AudioServiceAPI::PlaybackStart(this,"/home/mateusz/Music/limowreck.mp3");
 /*        auto ret = AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");
         AudioServiceAPI::Stop(this);
         AudioServiceAPI::PlaybackStart(this,"sys/audio/limowreck.flac");*/
@@ -97,11 +97,11 @@ public:
 #endif
 
         return std::make_shared<sys::ResponseMessage>();
-
     }
 
     // Invoked when timer ticked
-    void TickHandler(uint32_t id) override {
+    void TickHandler(uint32_t id) override
+    {
 
 #if 0 // M.P: left here on purpose
         LOG_DEBUG("Blinky service tick!");
@@ -111,28 +111,30 @@ public:
 
         sys::Bus::SendUnicast(msg,GetName(),this);
 #endif
-
     }
-
 
     // Invoked during initialization
-    sys::ReturnCodes InitHandler() override {
+    sys::ReturnCodes InitHandler() override
+    {
 
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes DeinitHandler() override {
+    sys::ReturnCodes DeinitHandler() override
+    {
         return sys::ReturnCodes::Success;
     }
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+    {
+        return sys::ReturnCodes::Success;
+    }
 
     uint32_t timerBlinkyID = 0;
 };
 
-
-
-int main() {
+int main()
+{
 
     bsp::BoardInit();
 
@@ -142,9 +144,7 @@ int main() {
 #if 1
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
-    sysmgr->StartSystem([sysmgr]()->int{
-
-
+    sysmgr->StartSystem([sysmgr]() -> int {
         vfs.Init();
 
         bool ret = false;
@@ -158,13 +158,13 @@ int main() {
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
 #endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(),sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(),sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceLwIP>(), sysmgr.get());
 
         // Service Desktop disabled on master - pulling read on usb driver
         // ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDesktop>(), sysmgr.get());
 
-        //vector with launchers to applications
+        // vector with launchers to applications
         std::vector<std::unique_ptr<app::ApplicationLauncher>> applications;
         applications.push_back(app::CreateLauncher<app::ApplicationViewer>(app::name_viewer));
         applications.push_back(app::CreateLauncher<app::ApplicationDesktop>(app::name_desktop, false));
@@ -178,18 +178,14 @@ int main() {
         applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
 
         // start application manager
-        ret |= sysmgr->CreateService(std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications), sysmgr.get());
+        ret |= sysmgr->CreateService(
+            std::make_shared<sapm::ApplicationManager>("ApplicationManager", sysmgr.get(), applications), sysmgr.get());
 
         if (ret) {
             return 0;
         }
 
-
-
-
         return 0;
-
-
     });
 
     cpp_freertos::Thread::StartScheduler();
