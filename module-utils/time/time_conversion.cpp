@@ -7,13 +7,15 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <time.h>
+#include <ctime>
 #include <iomanip>
 #include <locale>
 #include <i18/i18.hpp>
 
+#include <log/log.hpp>
 #include "time_conversion.hpp"
 #include "time_locale.hpp"
+#include <Utils.hpp>
 
 namespace utils
 {
@@ -93,14 +95,18 @@ namespace utils
                 LOG_ERROR("Time::set_time error %s", e.what());
             }
         }
+
+        constexpr uint32_t datasize = 128;
         UTF8 Timestamp::str(std::string format)
         {
             if (format.compare("") != 0)
                 this->format = format;
             UTF8 datetimestr = "";
             replace_specifiers();
-            std::strftime((char *)data, datasize, this->format.c_str(), &timeinfo);
-            datetimestr = data;
+
+            auto data = std::unique_ptr<char[]>(new char[datasize]);
+            std::strftime(data.get(), datasize, this->format.c_str(), &timeinfo);
+            datetimestr = data.get();
             return datetimestr;
         }
 
@@ -123,6 +129,16 @@ namespace utils
                 return get_replacement(Replacements::MonthLong, timeinfo);
             }
         }
+
+        Duration operator-(const Timestamp &lhs, const Timestamp &rhs)
+        {
+            return Duration(lhs.time, rhs.time);
+        };
+
+        Timestamp operator+(const Timestamp &lhs, const Duration &rhs)
+        {
+            return Timestamp(lhs.time + rhs.get());
+        };
 
         void DateTime::before_n_sec(time_t val)
         {
@@ -225,6 +241,58 @@ namespace utils
                 return Timestamp::str(
                     Locale::format(Locale::FormatTime12H)); // @TODO: M.G. FormatLocaleTime which actually works
             }
+        }
+
+        Duration::Duration(time_t duration, DisplayedFields displayedFields)
+            : duration(duration), displayedFields(displayedFields)
+        {
+            days    = this->duration / secondsInDay;
+            hours   = (this->duration % secondsInDay) / secondsInHour;
+            minutes = ((this->duration % secondsInDay) % secondsInHour) / secondsInMinute;
+            seconds = ((this->duration % secondsInDay) % secondsInHour) % secondsInMinute;
+
+            if (verboseConversion) {
+                LOG_DEBUG(
+                    "durtaion %u = %u days %u hours %u minutes %u seconds", duration, days, hours, minutes, seconds);
+            }
+        }
+
+        Duration::Duration(time_t stop, time_t start, DisplayedFields displayedFields)
+            : displayedFields(displayedFields)
+        {
+            auto diff = stop - start;
+            duration  = diff >= 0 ? diff : 0;
+        }
+
+        Duration::Duration(const Timestamp &stop, const Timestamp &start, DisplayedFields displayedFields)
+            : Duration(stop.getTime(), start.getTime(), displayedFields)
+        {}
+
+        void Duration::fillStr(std::string &format) const
+        {
+            utils::findAndReplaceAll(format, "%d", std::to_string(days));
+            utils::findAndReplaceAll(format, "%H", std::to_string(hours));
+            utils::findAndReplaceAll(format, "%M", std::to_string(minutes));
+            utils::findAndReplaceAll(format, "%S", std::to_string(seconds));
+        }
+
+        UTF8 Duration::str() const
+        {
+            auto data = displayedFields == DisplayedFields::three ? utils::localize.get(durationFormatHMS)
+                                                                  : utils::localize.get(durationFormatMS);
+
+            if (days != 0) {
+                data = displayedFields == DisplayedFields::three ? utils::localize.get(durationFormatDHM)
+                                                                 : utils::localize.get(durationFormatDH);
+            }
+            else if (hours != 0) {
+                data = displayedFields == DisplayedFields::three ? utils::localize.get(durationFormatHMS)
+                                                                 : utils::localize.get(durationFormatHM);
+            }
+
+            fillStr(data);
+
+            return data;
         }
 
     }; // namespace time

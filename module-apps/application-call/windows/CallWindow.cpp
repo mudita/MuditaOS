@@ -260,6 +260,7 @@ namespace gui
     void CallWindow::setCallNumber(std::string)
     {}
 
+    // TODO: rewrtie
     void CallWindow::updateDuration(time_t duration)
     {
         uint32_t seconds = 0;

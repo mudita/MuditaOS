@@ -35,18 +35,18 @@ namespace app
     {}
 
     //  number of seconds after end call to siwtch back to previous application
-    constexpr auto delayToSwitchToPreviousApp = 3;
+    constexpr time_t delayToSwitchToPreviousApp = 3;
 
     void ApplicationCall::timerCallCallback()
     {
-        callDuration = utils::time::Timestamp().getTime() - callStartTime;
+        callDuration = utils::time::Timestamp() - callStartTime;
 
         auto it = windows.find(window::name_call);
         if (getCurrentWindow() == it->second) {
             auto callWindow = dynamic_cast<gui::CallWindow *>(getCurrentWindow());
 
             if (callWindow && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS) {
-                callWindow->updateDuration(callDuration);
+                callWindow->updateDuration(callDuration.get());
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
@@ -227,8 +227,8 @@ namespace app
 
     void ApplicationCall::runCallTimer()
     {
-        callStartTime       = utils::time::Timestamp().getTime();
-        callDuration        = std::numeric_limits<time_t>::min();
+        callStartTime       = utils::time::Timestamp();
+        callDuration        = 0;
         callDelayedDuration = std::numeric_limits<time_t>::max();
         timerCall.restart();
     }

@@ -14,6 +14,12 @@ namespace utils
     namespace time
     {
 
+        constexpr auto secondsInMinute = 60;
+        constexpr auto minutesInHour   = 60;
+        constexpr auto hoursInday      = 24;
+        constexpr auto secondsInHour   = minutesInHour * secondsInMinute;
+        constexpr auto secondsInDay    = hoursInday * secondsInHour;
+
         enum class GetParameters
         {
             Hour,
@@ -26,13 +32,13 @@ namespace utils
         // helper class to not put everything in time
         struct Localer
         {
-            const unsigned int abbrev_len = 3;
+            const inline static unsigned int abbrev_len = 3;
             /// order matters, it's used in replace_locale with enum Replacements
-            const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
-                                                                     "%A",  // day long
-                                                                     "%b",  // month abbrew
-                                                                     "%B",  // month long
-                                                                     "%Z"}; // timezone
+            const inline static std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
+                                                                                   "%A",  // day long
+                                                                                   "%b",  // month abbrew
+                                                                                   "%B",  // month long
+                                                                                   "%Z"}; // timezone
             /// see specifiers_replacements description above
             enum Replacements
             {
@@ -46,6 +52,8 @@ namespace utils
             UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
         };
 
+        class Duration; // fw decl
+
         class Timestamp : protected Localer
         {
           protected:
@@ -58,9 +66,6 @@ namespace utils
             {
                 return nullptr;
             }
-
-            static const uint32_t datasize = 128;
-            char data[datasize];
 
             /// replace day mon specifiers (first 2 characters)
             /// cant use std::replace -> due to fact that it doesn't support multiple element replace (or i cant find
@@ -101,6 +106,8 @@ namespace utils
                 os << t.str();
                 return os;
             }
+            friend Duration operator-(const Timestamp &lhs, const Timestamp &rhs);
+            friend Timestamp operator+(const Timestamp &lhs, const Duration &rhs);
 
             /// get Time in any format possible via strftime
             virtual UTF8 str(std::string format = "");
@@ -112,7 +119,7 @@ namespace utils
             UTF8 month(bool abbrev = false);
 
             // get timestamp value
-            time_t getTime(void)
+            time_t getTime() const
             {
                 return time;
             };
@@ -167,5 +174,95 @@ namespace utils
             Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
             virtual UTF8 str(std::string format = "") final;
         };
-    }; // namespace time
-};     // namespace utils
+
+        class Duration
+        {
+          public:
+            enum class DisplayedFields : bool
+            {
+                two,
+                three
+            };
+
+            Duration(time_t duration = 0, DisplayedFields displayedFields = DisplayedFields::two);
+            Duration(time_t stop, time_t start, DisplayedFields displayedFields = DisplayedFields::two);
+            Duration(const Timestamp &stop,
+                     const Timestamp &start,
+                     DisplayedFields displayedFields = DisplayedFields::two);
+
+            time_t get() const
+            {
+                return duration;
+            }
+
+            UTF8 str() const;
+            operator UTF8() const
+            {
+                return str();
+            }
+
+            friend inline std::ostream &operator<<(std::ostream &os, Duration t)
+            {
+                os << t.str();
+                return os;
+            }
+            friend inline Duration operator+(const Duration &lhs, const Duration &rhs)
+            {
+                return Duration(lhs.duration + rhs.duration);
+            }
+            friend inline Duration operator+(const Duration &lhs, const time_t &rhs)
+            {
+                return Duration(lhs.duration + rhs);
+            }
+            friend inline Duration operator-(const Duration &lhs, const Duration &rhs)
+            {
+                return rhs.duration < lhs.duration ? Duration(rhs.duration - lhs.duration) : 0;
+            }
+            friend inline Duration operator-(const Duration &lhs, const time_t &rhs)
+            {
+                return rhs < lhs.duration ? Duration(rhs - lhs.duration) : 0;
+            }
+            friend inline bool operator==(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration == rhs.duration;
+            }
+            friend inline bool operator!=(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration != rhs.duration;
+            }
+            friend inline bool operator<(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration < rhs.duration;
+            }
+            friend inline bool operator>(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration > rhs.duration;
+            }
+            friend inline bool operator<=(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration <= rhs.duration;
+            }
+            friend inline bool operator>=(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration >= rhs.duration;
+            }
+
+          private:
+            static constexpr bool verboseConversion = false;
+            static constexpr auto durationFormatHMS = "duration_hour_min_sec";
+            static constexpr auto durationFormatDHM = "duration_day_hour_min";
+            static constexpr auto durationFormatMS  = "duration_min_sec";
+            static constexpr auto durationFormatHM  = "duration_hour_min";
+            static constexpr auto durationFormatDH  = "duration_day_hour";
+
+            void fillStr(std::string &format) const;
+            time_t duration;
+            unsigned long days              = 0;
+            unsigned long hours             = 0;
+            unsigned long minutes           = 0;
+            unsigned long seconds           = 0;
+            DisplayedFields displayedFields = DisplayedFields::two;
+        };
+
+    } // namespace time
+} // namespace utils

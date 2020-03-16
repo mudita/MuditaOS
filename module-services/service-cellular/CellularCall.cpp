@@ -6,6 +6,7 @@
 
 #include "bsp/rtc/rtc.hpp"
 #include <sstream>
+#include <time/time_conversion.hpp>
 
 namespace ModemCall
 {
@@ -61,22 +62,6 @@ namespace ModemCall
     }
 } // namespace ModemCall
 
-namespace
-{
-    // TODO: alek: possibly make a new general API for this
-    time_t getCurrentTimeStamp()
-    {
-        time_t timestamp;
-        RtcBspError_e rtcErr = bsp::rtc_GetCurrentTimestamp(&timestamp);
-        if (rtcErr != RtcBspError_e::RtcBspOK) {
-            LOG_ERROR("rtc_GetCurrentTimestamp failed with %d error", rtcErr);
-            timestamp = 0;
-        }
-
-        return timestamp;
-    }
-} // namespace
-
 namespace CellularCall
 {
     bool CellularCall::startCall(const UTF8 &number, const CallType type)
@@ -89,11 +74,12 @@ namespace CellularCall
         clear();
         CalllogRecord callRec;
         callRec.number = number;
-        callRec.type   = type;
-        callRec.date   = getCurrentTimeStamp();
-        callRec.name   = number; // temporary set name as number
-        call           = startCallAction ? startCallAction(callRec) : CalllogRecord();
-        if (call.ID == DB_ID_NONE) {
+        callRec.type = type;
+        callRec.date   = utils::time::Timestamp().getTime();
+        callRec.name = number; // temporary set name as number
+        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        if (call.ID == DB_ID_NONE)
+        {
             LOG_ERROR("startCallAction failed");
             clear();
             return false;
@@ -104,9 +90,10 @@ namespace CellularCall
 
     bool CellularCall::setActive()
     {
-        if (isValid()) {
-            startActiveTime = getCurrentTimeStamp();
-            isActiveCall    = true;
+        if (isValid())
+        {
+            startActiveTime = utils::time::Timestamp();
+            isActiveCall = true;
             return true;
         }
         return false;
@@ -119,9 +106,10 @@ namespace CellularCall
             return false;
         }
 
-        if (isActiveCall) {
-            time_t endTime = getCurrentTimeStamp();
-            call.duration  = endTime > startActiveTime ? endTime - startActiveTime : 0;
+        if (isActiveCall)
+        {
+            auto endTime  = utils::time::Timestamp();
+            call.duration = (endTime - startActiveTime).get();
         }
         else {
             auto callType = call.type;
