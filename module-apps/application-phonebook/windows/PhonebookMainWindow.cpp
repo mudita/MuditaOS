@@ -38,7 +38,7 @@ void PhonebookMainWindow::buildInterface()
     newContactImage = new gui::Image(this, 50, 55, 24, 24, "cross");
     searchImage = new gui::Image(this, 480 - 30 - 11 - 8 - 26, 55, 26, 26, "search");
 
-    list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
+    list = new gui::PhonebookListView(this, 30, 105 + 6, 480 - 30 - 30, 600 - 105 + 6 - 50);
     list->setMaxElements(7);
     list->setPageSize(7);
     list->setPenFocusWidth(0);
