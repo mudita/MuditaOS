@@ -138,7 +138,6 @@ Additional information:
  **********************************************************************
  */
 
-#include "../module-utils/log/segger/SEGGER_RTT.h"
 #include "SEGGER_SYSVIEW_Int.h"
 #include <stdarg.h>
 #include <stdlib.h>
@@ -157,10 +156,10 @@ Additional information:
 #endif
 
 #if SEGGER_SYSVIEW_RTT_CHANNEL > 0
-#define CHANNEL_ID_UP SEGGER_SYSVIEW_RTT_CHANNEL
+#define CHANNEL_ID_UP   SEGGER_SYSVIEW_RTT_CHANNEL
 #define CHANNEL_ID_DOWN SEGGER_SYSVIEW_RTT_CHANNEL
 #else
-#define CHANNEL_ID_UP _SYSVIEW_Globals.UpChannel
+#define CHANNEL_ID_UP   _SYSVIEW_Globals.UpChannel
 #define CHANNEL_ID_DOWN _SYSVIEW_Globals.DownChannel
 #endif
 
@@ -176,8 +175,8 @@ Additional information:
 // SysTick might be scaled down to reduce bandwith
 // or a 16-bit hardware time might be used.
 #if SEGGER_SYSVIEW_TIMESTAMP_BITS < 32 // Eliminate unused bits in case hardware timestamps are less than 32 bits
-#define MAKE_DELTA_32BIT(Delta)                                                                                                                                \
-    Delta <<= 32 - SEGGER_SYSVIEW_TIMESTAMP_BITS;                                                                                                              \
+#define MAKE_DELTA_32BIT(Delta)                                                                                        \
+    Delta <<= 32 - SEGGER_SYSVIEW_TIMESTAMP_BITS;                                                                      \
     Delta >>= 32 - SEGGER_SYSVIEW_TIMESTAMP_BITS;
 #else
 #define MAKE_DELTA_32BIT(Delta)
@@ -189,14 +188,14 @@ Additional information:
  *
  **********************************************************************
  */
-#define ENABLE_STATE_OFF 0
-#define ENABLE_STATE_ON 1
+#define ENABLE_STATE_OFF      0
+#define ENABLE_STATE_ON       1
 #define ENABLE_STATE_DROPPING 2
 
 #define FORMAT_FLAG_LEFT_JUSTIFY (1u << 0)
-#define FORMAT_FLAG_PAD_ZERO (1u << 1)
-#define FORMAT_FLAG_PRINT_SIGN (1u << 2)
-#define FORMAT_FLAG_ALTERNATE (1u << 3)
+#define FORMAT_FLAG_PAD_ZERO     (1u << 1)
+#define FORMAT_FLAG_PRINT_SIGN   (1u << 2)
+#define FORMAT_FLAG_ALTERNATE    (1u << 3)
 
 #define MODULE_EVENT_OFFSET (512)
 
@@ -255,7 +254,8 @@ static const U8 _abSync[10] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0
 #if (defined __GNUC__)
 __attribute__((section(SEGGER_SYSVIEW_SECTION))) static char _UpBuffer[SEGGER_SYSVIEW_RTT_BUFFER_SIZE];
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE != 1)
-__attribute__((section(SEGGER_SYSVIEW_SECTION))) static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
+__attribute__((
+    section(SEGGER_SYSVIEW_SECTION))) static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
 #endif
 #elif (defined __ICCARM__) || (defined __ICCRX__)
 #pragma location = SEGGER_SYSVIEW_SECTION
@@ -265,7 +265,8 @@ static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
 #elif (defined __CC_ARM)
 __attribute__((section(SEGGER_SYSVIEW_SECTION), zero_init)) static char _UpBuffer[SEGGER_SYSVIEW_RTT_BUFFER_SIZE];
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE != 1)
-__attribute__((section(SEGGER_SYSVIEW_SECTION), zero_init)) static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
+__attribute__((section(SEGGER_SYSVIEW_SECTION),
+               zero_init)) static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
 #endif
 #else
 static char _UpBuffer[SEGGER_SYSVIEW_RTT_BUFFER_SIZE];
@@ -276,7 +277,7 @@ static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
 #else
 static char _UpBuffer[SEGGER_SYSVIEW_RTT_BUFFER_SIZE];
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE != 1)
-static char _DownBuffer[8]; // Small, fixed-size buffer, for back-channel comms
+static char _DownBuffer[8];                  // Small, fixed-size buffer, for back-channel comms
 #endif
 #endif
 
@@ -292,34 +293,33 @@ static U8 _NumModules;
  **********************************************************************
  */
 
-#define ENCODE_U32(pDest, Value)                                                                                                                               \
-    {                                                                                                                                                          \
-        U8 *pSysviewPointer;                                                                                                                                   \
-        U32 SysViewData;                                                                                                                                       \
-        pSysviewPointer = pDest;                                                                                                                               \
-        SysViewData = Value;                                                                                                                                   \
-        while (SysViewData > 0x7F)                                                                                                                             \
-        {                                                                                                                                                      \
-            *pSysviewPointer++ = (U8)(SysViewData | 0x80);                                                                                                     \
-            SysViewData >>= 7;                                                                                                                                 \
-        };                                                                                                                                                     \
-        *pSysviewPointer++ = (U8)SysViewData;                                                                                                                  \
-        pDest = pSysviewPointer;                                                                                                                               \
+#define ENCODE_U32(pDest, Value)                                                                                       \
+    {                                                                                                                  \
+        U8 *pSysviewPointer;                                                                                           \
+        U32 SysViewData;                                                                                               \
+        pSysviewPointer = pDest;                                                                                       \
+        SysViewData     = Value;                                                                                       \
+        while (SysViewData > 0x7F) {                                                                                   \
+            *pSysviewPointer++ = (U8)(SysViewData | 0x80);                                                             \
+            SysViewData >>= 7;                                                                                         \
+        };                                                                                                             \
+        *pSysviewPointer++ = (U8)SysViewData;                                                                          \
+        pDest              = pSysviewPointer;                                                                          \
     };
 
 #if (SEGGER_SYSVIEW_USE_STATIC_BUFFER == 1)
 static U8 _aPacket[SEGGER_SYSVIEW_MAX_PACKET_SIZE];
 
-#define RECORD_START(PacketSize)                                                                                                                               \
-    SEGGER_SYSVIEW_LOCK();                                                                                                                                     \
+#define RECORD_START(PacketSize)                                                                                       \
+    SEGGER_SYSVIEW_LOCK();                                                                                             \
     pPayloadStart = _PreparePacket(_aPacket);
 
 #define RECORD_END() SEGGER_SYSVIEW_UNLOCK()
 
 #else
 
-#define RECORD_START(PacketSize)                                                                                                                               \
-    U8 aPacket[(PacketSize)];                                                                                                                                  \
+#define RECORD_START(PacketSize)                                                                                       \
+    U8 aPacket[(PacketSize)];                                                                                          \
     pPayloadStart = _PreparePacket(aPacket);
 
 #define RECORD_END()
@@ -352,10 +352,9 @@ static U8 *_EncodeData(U8 *pPayload, const char *pSrc, unsigned int NumBytes)
 {
     unsigned int n;
     //
-    n = 0;
+    n           = 0;
     *pPayload++ = NumBytes;
-    while (n < NumBytes)
-    {
+    while (n < NumBytes) {
         *pPayload++ = *pSrc++;
         n++;
     }
@@ -392,23 +391,19 @@ static U8 *_EncodeStr(U8 *pPayload, const char *pText, unsigned int Limit)
     // Compute string len
     //
     Len = 0;
-    while (*(pText + Len) != 0)
-    {
+    while (*(pText + Len) != 0) {
         Len++;
     }
-    if (Len > Limit)
-    {
+    if (Len > Limit) {
         Len = Limit;
     }
     //
     // Write Len
     //
-    if (Len < 255)
-    {
+    if (Len < 255) {
         *pPayload++ = Len;
     }
-    else
-    {
+    else {
         *pPayload++ = 255;
         *pPayload++ = (Len & 255);
         *pPayload++ = ((Len >> 8) & 255);
@@ -417,8 +412,7 @@ static U8 *_EncodeStr(U8 *pPayload, const char *pText, unsigned int Limit)
     // copy string
     //
     n = 0;
-    while (n < Len)
-    {
+    while (n < Len) {
         *pPayload++ = *pText++;
         n++;
     }
@@ -467,10 +461,8 @@ static void _HandleIncomingPacket(void)
     int Status;
     //
     Status = SEGGER_RTT_ReadNoLock(CHANNEL_ID_DOWN, &Cmd, 1);
-    if (Status > 0)
-    {
-        switch (Cmd)
-        {
+    if (Status > 0) {
+        switch (Cmd) {
         case SEGGER_SYSVIEW_COMMAND_ID_START:
             SEGGER_SYSVIEW_Start();
             break;
@@ -494,14 +486,12 @@ static void _HandleIncomingPacket(void)
             break;
         case SEGGER_SYSVIEW_COMMAND_ID_GET_MODULE:
             Status = SEGGER_RTT_ReadNoLock(CHANNEL_ID_DOWN, &Cmd, 1);
-            if (Status > 0)
-            {
+            if (Status > 0) {
                 SEGGER_SYSVIEW_SendModule(Cmd);
             }
             break;
         default:
-            if (Cmd >= 128)
-            { // Unknown extended command. Dummy read its parameter.
+            if (Cmd >= 128) { // Unknown extended command. Dummy read its parameter.
                 SEGGER_RTT_ReadNoLock(CHANNEL_ID_DOWN, &Cmd, 1);
             }
             break;
@@ -540,13 +530,13 @@ static int _TrySendOverflowPacket(void)
     U8 *pPayload;
 
     aPacket[0] = SYSVIEW_EVTID_OVERFLOW; // 1
-    pPayload = &aPacket[1];
+    pPayload   = &aPacket[1];
     ENCODE_U32(pPayload, _SYSVIEW_Globals.DropCount);
     //
     // Compute time stamp delta and append it to packet.
     //
     TimeStamp = SEGGER_SYSVIEW_GET_TIMESTAMP();
-    Delta = TimeStamp - _SYSVIEW_Globals.LastTxTimeStamp;
+    Delta     = TimeStamp - _SYSVIEW_Globals.LastTxTimeStamp;
     MAKE_DELTA_32BIT(Delta);
     ENCODE_U32(pPayload, Delta);
     //
@@ -554,13 +544,11 @@ static int _TrySendOverflowPacket(void)
     //
     Status = SEGGER_RTT_WriteSkipNoLock(CHANNEL_ID_UP, aPacket, pPayload - aPacket);
     SEGGER_SYSVIEW_ON_EVENT_RECORDED(pPayload - aPacket);
-    if (Status)
-    {
+    if (Status) {
         _SYSVIEW_Globals.LastTxTimeStamp = TimeStamp;
         _SYSVIEW_Globals.EnableState--; // EnableState has been 2, will be 1. Always.
     }
-    else
-    {
+    else {
         _SYSVIEW_Globals.DropCount++;
     }
     //
@@ -606,18 +594,15 @@ static void _SendSyncInfo(void)
         _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_INIT);
         RECORD_END();
     }
-    if (_SYSVIEW_Globals.pfSendSysDesc)
-    {
+    if (_SYSVIEW_Globals.pfSendSysDesc) {
         _SYSVIEW_Globals.pfSendSysDesc();
     }
     SEGGER_SYSVIEW_RecordSystime();
     SEGGER_SYSVIEW_SendTaskList();
-    if (_NumModules > 0)
-    {
+    if (_NumModules > 0) {
         int n;
         SEGGER_SYSVIEW_SendNumModules();
-        for (n = 0; n < _NumModules; n++)
-        {
+        for (n = 0; n < _NumModules; n++) {
             SEGGER_SYSVIEW_SendModule(n);
         }
         SEGGER_SYSVIEW_SendModuleDescription();
@@ -658,17 +643,14 @@ static void _SendPacket(U8 *pStartPacket, U8 *pEndPacket, unsigned int EventId)
 #endif
 
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE == 1)
-    if (_SYSVIEW_Globals.EnableState == 0)
-    {
+    if (_SYSVIEW_Globals.EnableState == 0) {
         goto SendDone;
     }
 #else
-    if (_SYSVIEW_Globals.EnableState == 1)
-    { // Enabled, no dropped packets remaining
+    if (_SYSVIEW_Globals.EnableState == 1) { // Enabled, no dropped packets remaining
         goto Send;
     }
-    if (_SYSVIEW_Globals.EnableState == 0)
-    {
+    if (_SYSVIEW_Globals.EnableState == 0) {
         goto SendDone;
     }
     //
@@ -676,11 +658,9 @@ static void _SendPacket(U8 *pStartPacket, U8 *pEndPacket, unsigned int EventId)
     // Have packets been dropped before because buffer was full?
     // In this case try to send and overflow packet.
     //
-    if (_SYSVIEW_Globals.EnableState == 2)
-    {
+    if (_SYSVIEW_Globals.EnableState == 2) {
         _TrySendOverflowPacket();
-        if (_SYSVIEW_Globals.EnableState != 1)
-        {
+        if (_SYSVIEW_Globals.EnableState != 1) {
             goto SendDone;
         }
     }
@@ -689,10 +669,8 @@ Send:
     //
     // Check if event is disabled from being recorded.
     //
-    if (EventId < 32)
-    {
-        if (_SYSVIEW_Globals.DisabledEvents & ((U32)1u << EventId))
-        {
+    if (EventId < 32) {
+        if (_SYSVIEW_Globals.DisabledEvents & ((U32)1u << EventId)) {
             goto SendDone;
         }
     }
@@ -701,29 +679,23 @@ Send:
     // If it is a known packet, prepend eventId only,
     // otherwise prepend packet length and eventId.
     //
-    if (EventId < 24)
-    {
+    if (EventId < 24) {
         *--pStartPacket = EventId;
     }
-    else
-    {
+    else {
         NumBytes = pEndPacket - pStartPacket;
-        if (NumBytes > 127)
-        {
+        if (NumBytes > 127) {
             *--pStartPacket = (NumBytes >> 7);
             *--pStartPacket = NumBytes | 0x80;
         }
-        else
-        {
+        else {
             *--pStartPacket = NumBytes;
         }
-        if (EventId > 127)
-        {
+        if (EventId > 127) {
             *--pStartPacket = (EventId >> 7);
             *--pStartPacket = EventId | 0x80;
         }
-        else
-        {
+        else {
             *--pStartPacket = EventId;
         }
     }
@@ -731,7 +703,7 @@ Send:
     // Compute time stamp delta and append it to packet.
     //
     TimeStamp = SEGGER_SYSVIEW_GET_TIMESTAMP();
-    Delta = TimeStamp - _SYSVIEW_Globals.LastTxTimeStamp;
+    Delta     = TimeStamp - _SYSVIEW_Globals.LastTxTimeStamp;
     MAKE_DELTA_32BIT(Delta);
     ENCODE_U32(pEndPacket, Delta);
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE == 1)
@@ -747,12 +719,10 @@ Send:
     //
     Status = SEGGER_RTT_WriteSkipNoLock(CHANNEL_ID_UP, pStartPacket, pEndPacket - pStartPacket);
     SEGGER_SYSVIEW_ON_EVENT_RECORDED(pEndPacket - pStartPacket);
-    if (Status)
-    {
+    if (Status) {
         _SYSVIEW_Globals.LastTxTimeStamp = TimeStamp;
     }
-    else
-    {
+    else {
         _SYSVIEW_Globals.EnableState++; // EnableState has been 1, will be 2. Always.
     }
 #endif
@@ -761,11 +731,10 @@ Send:
     //
     // Add sync and system information periodically if we are in post mortem mode
     //
-    if (_SYSVIEW_Globals.RecursionCnt == 0)
-    { // Avoid uncontrolled nesting. This way, this routine can call itself once, but no more often than that.
+    if (_SYSVIEW_Globals.RecursionCnt ==
+        0) { // Avoid uncontrolled nesting. This way, this routine can call itself once, but no more often than that.
         _SYSVIEW_Globals.RecursionCnt = 1;
-        if (_SYSVIEW_Globals.PacketCount++ & (1 << SEGGER_SYSVIEW_SYNC_PERIOD_SHIFT))
-        {
+        if (_SYSVIEW_Globals.PacketCount++ & (1 << SEGGER_SYSVIEW_SYNC_PERIOD_SHIFT)) {
             _SendSyncInfo();
             _SYSVIEW_Globals.PacketCount = 0;
         }
@@ -779,10 +748,9 @@ SendDone:
     // Note that since this code is called for every packet, it is very time critical, so we do
     // only what is really needed here, which is checking if there is any data
     //
-    if (SEGGER_RTT_HASDATA(CHANNEL_ID_DOWN))
-    {
-        if (_SYSVIEW_Globals.RecursionCnt == 0)
-        { // Avoid uncontrolled nesting. This way, this routine can call itself once, but no more often than that.
+    if (SEGGER_RTT_HASDATA(CHANNEL_ID_DOWN)) {
+        if (_SYSVIEW_Globals.RecursionCnt == 0) { // Avoid uncontrolled nesting. This way, this routine can call itself
+                                                  // once, but no more often than that.
             _SYSVIEW_Globals.RecursionCnt = 1;
             _HandleIncomingPacket();
             _SYSVIEW_Globals.RecursionCnt = 0;
@@ -826,35 +794,28 @@ static int _VPrintHost(const char *s, U32 Options, va_list *pParamList)
     // Count number of arguments by counting '%' characters in string.
     // If enabled, check for non-scalar modifier flags to format string on the target.
     //
-    p = s;
+    p            = s;
     NumArguments = 0;
-    for (;;)
-    {
+    for (;;) {
         c = *p++;
-        if (c == 0)
-        {
+        if (c == 0) {
             break;
         }
-        if (c == '%')
-        {
+        if (c == '%') {
             c = *p;
 #if SEGGER_SYSVIEW_PRINTF_IMPLICIT_FORMAT == 0
             aParas[NumArguments++] = va_arg(*pParamList, int);
-            if (NumArguments == SEGGER_SYSVIEW_MAX_ARGUMENTS)
-            {
+            if (NumArguments == SEGGER_SYSVIEW_MAX_ARGUMENTS) {
                 break;
             }
 #else
-            if (c == 's')
-            {
+            if (c == 's') {
                 HasNonScalar = 1;
                 break;
             }
-            else
-            {
+            else {
                 aParas[NumArguments++] = va_arg(*pParamList, int);
-                if (NumArguments == SEGGER_SYSVIEW_MAX_ARGUMENTS)
-                {
+                if (NumArguments == SEGGER_SYSVIEW_MAX_ARGUMENTS) {
                     break;
                 }
             }
@@ -863,8 +824,7 @@ static int _VPrintHost(const char *s, U32 Options, va_list *pParamList)
     }
 
 #if SEGGER_SYSVIEW_PRINTF_IMPLICIT_FORMAT
-    if (HasNonScalar)
-    {
+    if (HasNonScalar) {
         return -1;
     }
 #endif
@@ -878,8 +838,7 @@ static int _VPrintHost(const char *s, U32 Options, va_list *pParamList)
         ENCODE_U32(pPayload, Options);
         ENCODE_U32(pPayload, NumArguments);
         pParas = aParas;
-        while (NumArguments--)
-        {
+        while (NumArguments--) {
             ENCODE_U32(pPayload, (*pParas));
             pParas++;
         }
@@ -908,25 +867,23 @@ static void _StoreChar(SEGGER_SYSVIEW_PRINTF_DESC *p, char c)
     U32 Options;
 
     Cnt = p->Cnt;
-    if ((Cnt + 1u) <= SEGGER_SYSVIEW_MAX_STRING_LEN)
-    {
+    if ((Cnt + 1u) <= SEGGER_SYSVIEW_MAX_STRING_LEN) {
         *(p->pPayload++) = c;
-        p->Cnt = Cnt + 1u;
+        p->Cnt           = Cnt + 1u;
     }
     //
     // Write part of string, when the buffer is full
     //
-    if (p->Cnt == SEGGER_SYSVIEW_MAX_STRING_LEN)
-    {
+    if (p->Cnt == SEGGER_SYSVIEW_MAX_STRING_LEN) {
         *(p->pPayloadStart) = p->Cnt;
-        pPayload = p->pPayload;
-        Options = p->Options;
+        pPayload            = p->pPayload;
+        Options             = p->Options;
         ENCODE_U32(pPayload, Options);
         ENCODE_U32(pPayload, 0);
         _SendPacket(p->pPayloadStart, pPayload, SYSVIEW_EVTID_PRINT_FORMATTED);
         p->pPayloadStart = _PreparePacket(p->pBuffer);
-        p->pPayload = p->pPayloadStart + 1u;
-        p->Cnt = 0u;
+        p->pPayload      = p->pPayloadStart + 1u;
+        p->Cnt           = 0u;
     }
 }
 
@@ -946,7 +903,11 @@ static void _StoreChar(SEGGER_SYSVIEW_PRINTF_DESC *p, char c)
  *    FieldWidth   Width of the printed field.
  *    FormatFlags  Flags for formatting the value.
  */
-static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, unsigned int v, unsigned int Base, unsigned int NumDigits, unsigned int FieldWidth,
+static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc,
+                           unsigned int v,
+                           unsigned int Base,
+                           unsigned int NumDigits,
+                           unsigned int FieldWidth,
                            unsigned int FormatFlags)
 {
     static const char _aV2C[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
@@ -957,37 +918,30 @@ static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, unsigned int
     char c;
 
     Number = v;
-    Digit = 1u;
+    Digit  = 1u;
     //
     // Get actual field width
     //
     Width = 1u;
-    while (Number >= Base)
-    {
+    while (Number >= Base) {
         Number = (Number / Base);
         Width++;
     }
-    if (NumDigits > Width)
-    {
+    if (NumDigits > Width) {
         Width = NumDigits;
     }
     //
     // Print leading chars if necessary
     //
-    if ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == 0u)
-    {
-        if (FieldWidth != 0u)
-        {
-            if (((FormatFlags & FORMAT_FLAG_PAD_ZERO) == FORMAT_FLAG_PAD_ZERO) && (NumDigits == 0u))
-            {
+    if ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == 0u) {
+        if (FieldWidth != 0u) {
+            if (((FormatFlags & FORMAT_FLAG_PAD_ZERO) == FORMAT_FLAG_PAD_ZERO) && (NumDigits == 0u)) {
                 c = '0';
             }
-            else
-            {
+            else {
                 c = ' ';
             }
-            while ((FieldWidth != 0u) && (Width < FieldWidth))
-            {
+            while ((FieldWidth != 0u) && (Width < FieldWidth)) {
                 FieldWidth--;
                 _StoreChar(pBufferDesc, c);
             }
@@ -998,18 +952,15 @@ static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, unsigned int
     // Loop until Digit has the value of the highest digit required.
     // Example: If the output is 345 (Base 10), loop 2 times until Digit is 100.
     //
-    while (1)
-    {
-        if (NumDigits > 1u)
-        { // User specified a min number of digits to print? => Make sure we loop at least that often, before checking anything else (> 1 check avoids problems
-          // with NumDigits being signed / unsigned)
+    while (1) {
+        if (NumDigits >
+            1u) { // User specified a min number of digits to print? => Make sure we loop at least that often, before
+                  // checking anything else (> 1 check avoids problems with NumDigits being signed / unsigned)
             NumDigits--;
         }
-        else
-        {
+        else {
             Div = v / Digit;
-            if (Div < Base)
-            { // Is our divider big enough to extract the highest digit from value? => Done
+            if (Div < Base) { // Is our divider big enough to extract the highest digit from value? => Done
                 break;
             }
         }
@@ -1018,8 +969,7 @@ static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, unsigned int
     //
     // Output digits
     //
-    do
-    {
+    do {
         Div = v / Digit;
         v -= Div * Digit;
         _StoreChar(pBufferDesc, _aV2C[Div]);
@@ -1028,12 +978,9 @@ static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, unsigned int
     //
     // Print trailing spaces if necessary
     //
-    if ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == FORMAT_FLAG_LEFT_JUSTIFY)
-    {
-        if (FieldWidth != 0u)
-        {
-            while ((FieldWidth != 0u) && (Width < FieldWidth))
-            {
+    if ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == FORMAT_FLAG_LEFT_JUSTIFY) {
+        if (FieldWidth != 0u) {
+            while ((FieldWidth != 0u) && (Width < FieldWidth)) {
                 FieldWidth--;
                 _StoreChar(pBufferDesc, ' ');
             }
@@ -1057,7 +1004,11 @@ static void _PrintUnsigned(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, unsigned int
  *    FieldWidth   Width of the printed field.
  *    FormatFlags  Flags for formatting the value.
  */
-static void _PrintInt(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, int v, unsigned int Base, unsigned int NumDigits, unsigned int FieldWidth,
+static void _PrintInt(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc,
+                      int v,
+                      unsigned int Base,
+                      unsigned int NumDigits,
+                      unsigned int FieldWidth,
                       unsigned int FormatFlags)
 {
     unsigned int Width;
@@ -1069,29 +1020,24 @@ static void _PrintInt(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, int v, unsigned i
     // Get actual field width
     //
     Width = 1u;
-    while (Number >= (int)Base)
-    {
+    while (Number >= (int)Base) {
         Number = (Number / (int)Base);
         Width++;
     }
-    if (NumDigits > Width)
-    {
+    if (NumDigits > Width) {
         Width = NumDigits;
     }
-    if ((FieldWidth > 0u) && ((v < 0) || ((FormatFlags & FORMAT_FLAG_PRINT_SIGN) == FORMAT_FLAG_PRINT_SIGN)))
-    {
+    if ((FieldWidth > 0u) && ((v < 0) || ((FormatFlags & FORMAT_FLAG_PRINT_SIGN) == FORMAT_FLAG_PRINT_SIGN))) {
         FieldWidth--;
     }
 
     //
     // Print leading spaces if necessary
     //
-    if ((((FormatFlags & FORMAT_FLAG_PAD_ZERO) == 0u) || (NumDigits != 0u)) && ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == 0u))
-    {
-        if (FieldWidth != 0u)
-        {
-            while ((FieldWidth != 0u) && (Width < FieldWidth))
-            {
+    if ((((FormatFlags & FORMAT_FLAG_PAD_ZERO) == 0u) || (NumDigits != 0u)) &&
+        ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == 0u)) {
+        if (FieldWidth != 0u) {
+            while ((FieldWidth != 0u) && (Width < FieldWidth)) {
                 FieldWidth--;
                 _StoreChar(pBufferDesc, ' ');
             }
@@ -1100,27 +1046,22 @@ static void _PrintInt(SEGGER_SYSVIEW_PRINTF_DESC *pBufferDesc, int v, unsigned i
     //
     // Print sign if necessary
     //
-    if (v < 0)
-    {
+    if (v < 0) {
         v = -v;
         _StoreChar(pBufferDesc, '-');
     }
-    else if ((FormatFlags & FORMAT_FLAG_PRINT_SIGN) == FORMAT_FLAG_PRINT_SIGN)
-    {
+    else if ((FormatFlags & FORMAT_FLAG_PRINT_SIGN) == FORMAT_FLAG_PRINT_SIGN) {
         _StoreChar(pBufferDesc, '+');
     }
-    else
-    {
+    else {
     }
     //
     // Print leading zeros if necessary
     //
-    if (((FormatFlags & FORMAT_FLAG_PAD_ZERO) == FORMAT_FLAG_PAD_ZERO) && ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == 0u) && (NumDigits == 0u))
-    {
-        if (FieldWidth != 0u)
-        {
-            while ((FieldWidth != 0u) && (Width < FieldWidth))
-            {
+    if (((FormatFlags & FORMAT_FLAG_PAD_ZERO) == FORMAT_FLAG_PAD_ZERO) &&
+        ((FormatFlags & FORMAT_FLAG_LEFT_JUSTIFY) == 0u) && (NumDigits == 0u)) {
+        if (FieldWidth != 0u) {
+            while ((FieldWidth != 0u) && (Width < FieldWidth)) {
                 FieldWidth--;
                 _StoreChar(pBufferDesc, '0');
             }
@@ -1166,31 +1107,26 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
 #else
     BufferDesc.pBuffer = _aPacket;
 #endif
-    BufferDesc.Cnt = 0u;
+    BufferDesc.Cnt           = 0u;
     BufferDesc.pPayloadStart = pPayloadStart;
-    BufferDesc.pPayload = BufferDesc.pPayloadStart + 1u;
-    BufferDesc.Options = Options;
+    BufferDesc.pPayload      = BufferDesc.pPayloadStart + 1u;
+    BufferDesc.Options       = Options;
 
-    do
-    {
+    do {
         c = *sFormat;
         sFormat++;
-        if (c == 0u)
-        {
+        if (c == 0u) {
             break;
         }
-        if (c == '%')
-        {
+        if (c == '%') {
             //
             // Filter out flags
             //
             FormatFlags = 0u;
-            v = 1;
-            do
-            {
+            v           = 1;
+            do {
                 c = *sFormat;
-                switch (c)
-                {
+                switch (c) {
                 case '-':
                     FormatFlags |= FORMAT_FLAG_LEFT_JUSTIFY;
                     sFormat++;
@@ -1216,11 +1152,9 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
             // filter out field with
             //
             FieldWidth = 0u;
-            do
-            {
+            do {
                 c = *sFormat;
-                if ((c < '0') || (c > '9'))
-                {
+                if ((c < '0') || (c > '9')) {
                     break;
                 }
                 sFormat++;
@@ -1231,15 +1165,12 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
             // Filter out precision (number of digits to display)
             //
             NumDigits = 0u;
-            c = *sFormat;
-            if (c == '.')
-            {
+            c         = *sFormat;
+            if (c == '.') {
                 sFormat++;
-                do
-                {
+                do {
                     c = *sFormat;
-                    if ((c < '0') || (c > '9'))
-                    {
+                    if ((c < '0') || (c > '9')) {
                         break;
                     }
                     sFormat++;
@@ -1250,26 +1181,22 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
             // Filter out length modifier
             //
             c = *sFormat;
-            do
-            {
-                if ((c == 'l') || (c == 'h'))
-                {
+            do {
+                if ((c == 'l') || (c == 'h')) {
                     c = *sFormat;
                     sFormat++;
                 }
-                else
-                {
+                else {
                     break;
                 }
             } while (1);
             //
             // Handle specifiers
             //
-            switch (c)
-            {
+            switch (c) {
             case 'c': {
                 char c0;
-                v = va_arg(*pParamList, int);
+                v  = va_arg(*pParamList, int);
                 c0 = (char)v;
                 _StoreChar(&BufferDesc, c0);
                 break;
@@ -1299,8 +1226,7 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
             }
             sFormat++;
         }
-        else
-        {
+        else {
             _StoreChar(&BufferDesc, c);
         }
     } while (*sFormat);
@@ -1308,8 +1234,7 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
     //
     // Write remaining data, if any
     //
-    if (BufferDesc.Cnt != 0u)
-    {
+    if (BufferDesc.Cnt != 0u) {
         *(BufferDesc.pPayloadStart) = BufferDesc.Cnt;
         ENCODE_U32(BufferDesc.pPayload, BufferDesc.Options);
         ENCODE_U32(BufferDesc.pPayload, 0);
@@ -1354,7 +1279,10 @@ static void _VPrintTarget(const char *sFormat, U32 Options, va_list *pParamList)
  *
  *    The channel is configured with the macro SEGGER_SYSVIEW_RTT_CHANNEL.
  */
-void SEGGER_SYSVIEW_Init(U32 SysFreq, U32 CPUFreq, const SEGGER_SYSVIEW_OS_API *pOSAPI, SEGGER_SYSVIEW_SEND_SYS_DESC_FUNC pfSendSysDesc)
+void SEGGER_SYSVIEW_Init(U32 SysFreq,
+                         U32 CPUFreq,
+                         const SEGGER_SYSVIEW_OS_API *pOSAPI,
+                         SEGGER_SYSVIEW_SEND_SYS_DESC_FUNC pfSendSysDesc)
 {
 #ifdef SEGGER_RTT_SECTION
     //
@@ -1364,26 +1292,32 @@ void SEGGER_SYSVIEW_Init(U32 SysFreq, U32 CPUFreq, const SEGGER_SYSVIEW_OS_API *
 #endif
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE == 1)
 #if SEGGER_SYSVIEW_RTT_CHANNEL > 0
-    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    SEGGER_RTT_ConfigUpBuffer(
+        SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 #else
-    _SYSVIEW_Globals.UpChannel = SEGGER_RTT_AllocUpBuffer("SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    _SYSVIEW_Globals.UpChannel =
+        SEGGER_RTT_AllocUpBuffer("SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 #endif
-    _SYSVIEW_Globals.RAMBaseAddress = SEGGER_SYSVIEW_ID_BASE;
+    _SYSVIEW_Globals.RAMBaseAddress  = SEGGER_SYSVIEW_ID_BASE;
     _SYSVIEW_Globals.LastTxTimeStamp = SEGGER_SYSVIEW_GET_TIMESTAMP();
-    _SYSVIEW_Globals.pOSAPI = pOSAPI;
-    _SYSVIEW_Globals.SysFreq = SysFreq;
-    _SYSVIEW_Globals.CPUFreq = CPUFreq;
-    _SYSVIEW_Globals.pfSendSysDesc = pfSendSysDesc;
-    _SYSVIEW_Globals.EnableState = 0;
-    _SYSVIEW_Globals.PacketCount = 0;
+    _SYSVIEW_Globals.pOSAPI          = pOSAPI;
+    _SYSVIEW_Globals.SysFreq         = SysFreq;
+    _SYSVIEW_Globals.CPUFreq         = CPUFreq;
+    _SYSVIEW_Globals.pfSendSysDesc   = pfSendSysDesc;
+    _SYSVIEW_Globals.EnableState     = 0;
+    _SYSVIEW_Globals.PacketCount     = 0;
 #else // (SEGGER_SYSVIEW_POST_MORTEM_MODE == 1)
 #if SEGGER_SYSVIEW_RTT_CHANNEL > 0
-    SEGGER_RTT_ConfigUpBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
-    SEGGER_RTT_ConfigDownBuffer(SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", &_DownBuffer[0], sizeof(_DownBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    SEGGER_RTT_ConfigUpBuffer(
+        SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    SEGGER_RTT_ConfigDownBuffer(
+        SEGGER_SYSVIEW_RTT_CHANNEL, "SysView", &_DownBuffer[0], sizeof(_DownBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 #else
-    _SYSVIEW_Globals.UpChannel = SEGGER_RTT_AllocUpBuffer("SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    _SYSVIEW_Globals.UpChannel =
+        SEGGER_RTT_AllocUpBuffer("SysView", &_UpBuffer[0], sizeof(_UpBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
     _SYSVIEW_Globals.DownChannel = _SYSVIEW_Globals.UpChannel;
-    SEGGER_RTT_ConfigDownBuffer(_SYSVIEW_Globals.DownChannel, "SysView", &_DownBuffer[0], sizeof(_DownBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+    SEGGER_RTT_ConfigDownBuffer(
+        _SYSVIEW_Globals.DownChannel, "SysView", &_DownBuffer[0], sizeof(_DownBuffer), SEGGER_RTT_MODE_NO_BLOCK_SKIP);
 #endif
     _SYSVIEW_Globals.RAMBaseAddress = SEGGER_SYSVIEW_ID_BASE;
     _SYSVIEW_Globals.LastTxTimeStamp = SEGGER_SYSVIEW_GET_TIMESTAMP();
@@ -1616,7 +1550,8 @@ void SEGGER_SYSVIEW_RecordU32x6(unsigned int EventID, U32 Para0, U32 Para1, U32 
  *    Para5   - The 32-bit parameter encoded to SystemView packet payload.
  *    Para6   - The 32-bit parameter encoded to SystemView packet payload.
  */
-void SEGGER_SYSVIEW_RecordU32x7(unsigned int EventID, U32 Para0, U32 Para1, U32 Para2, U32 Para3, U32 Para4, U32 Para5, U32 Para6)
+void SEGGER_SYSVIEW_RecordU32x7(
+    unsigned int EventID, U32 Para0, U32 Para1, U32 Para2, U32 Para3, U32 Para4, U32 Para5, U32 Para6)
 {
     U8 *pPayload;
     U8 *pPayloadStart;
@@ -1652,7 +1587,8 @@ void SEGGER_SYSVIEW_RecordU32x7(unsigned int EventID, U32 Para0, U32 Para1, U32 
  *    Para6   - The 32-bit parameter encoded to SystemView packet payload.
  *    Para7   - The 32-bit parameter encoded to SystemView packet payload.
  */
-void SEGGER_SYSVIEW_RecordU32x8(unsigned int EventID, U32 Para0, U32 Para1, U32 Para2, U32 Para3, U32 Para4, U32 Para5, U32 Para6, U32 Para7)
+void SEGGER_SYSVIEW_RecordU32x8(
+    unsigned int EventID, U32 Para0, U32 Para1, U32 Para2, U32 Para3, U32 Para4, U32 Para5, U32 Para6, U32 Para7)
 {
     U8 *pPayload;
     U8 *pPayloadStart;
@@ -1690,7 +1626,16 @@ void SEGGER_SYSVIEW_RecordU32x8(unsigned int EventID, U32 Para0, U32 Para1, U32 
  *    Para7   - The 32-bit parameter encoded to SystemView packet payload.
  *    Para8   - The 32-bit parameter encoded to SystemView packet payload.
  */
-void SEGGER_SYSVIEW_RecordU32x9(unsigned int EventID, U32 Para0, U32 Para1, U32 Para2, U32 Para3, U32 Para4, U32 Para5, U32 Para6, U32 Para7, U32 Para8)
+void SEGGER_SYSVIEW_RecordU32x9(unsigned int EventID,
+                                U32 Para0,
+                                U32 Para1,
+                                U32 Para2,
+                                U32 Para3,
+                                U32 Para4,
+                                U32 Para5,
+                                U32 Para6,
+                                U32 Para7,
+                                U32 Para8)
 {
     U8 *pPayload;
     U8 *pPayloadStart;
@@ -1730,7 +1675,16 @@ void SEGGER_SYSVIEW_RecordU32x9(unsigned int EventID, U32 Para0, U32 Para1, U32 
  *    Para8   - The 32-bit parameter encoded to SystemView packet payload.
  *    Para9   - The 32-bit parameter encoded to SystemView packet payload.
  */
-void SEGGER_SYSVIEW_RecordU32x10(unsigned int EventID, U32 Para0, U32 Para1, U32 Para2, U32 Para3, U32 Para4, U32 Para5, U32 Para6, U32 Para7, U32 Para8,
+void SEGGER_SYSVIEW_RecordU32x10(unsigned int EventID,
+                                 U32 Para0,
+                                 U32 Para1,
+                                 U32 Para2,
+                                 U32 Para3,
+                                 U32 Para4,
+                                 U32 Para5,
+                                 U32 Para6,
+                                 U32 Para7,
+                                 U32 Para8,
                                  U32 Para9)
 {
     U8 *pPayload;
@@ -1807,8 +1761,7 @@ void SEGGER_SYSVIEW_RecordString(unsigned int EventID, const char *pString)
 void SEGGER_SYSVIEW_Start(void)
 {
 #if (SEGGER_SYSVIEW_CAN_RESTART == 0)
-    if (_SYSVIEW_Globals.EnableState == 0)
-    {
+    if (_SYSVIEW_Globals.EnableState == 0) {
 #endif
         _SYSVIEW_Globals.EnableState = 1;
 #if (SEGGER_SYSVIEW_POST_MORTEM_MODE == 1)
@@ -1832,8 +1785,7 @@ void SEGGER_SYSVIEW_Start(void)
         _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_INIT);
         RECORD_END();
     }
-    if (_SYSVIEW_Globals.pfSendSysDesc)
-    {
+    if (_SYSVIEW_Globals.pfSendSysDesc) {
         _SYSVIEW_Globals.pfSendSysDesc();
     }
     SEGGER_SYSVIEW_RecordSystime();
@@ -1867,8 +1819,7 @@ void SEGGER_SYSVIEW_Stop(void)
     U8 *pPayloadStart;
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE);
     //
-    if (_SYSVIEW_Globals.EnableState)
-    {
+    if (_SYSVIEW_Globals.EnableState) {
         _SendPacket(pPayloadStart, pPayloadStart, SYSVIEW_EVTID_TRACE_STOP);
         _SYSVIEW_Globals.EnableState = 0;
     }
@@ -1908,8 +1859,7 @@ void SEGGER_SYSVIEW_GetSysDesc(void)
     ENCODE_U32(pPayload, SEGGER_SYSVIEW_ID_SHIFT);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_INIT);
     RECORD_END();
-    if (_SYSVIEW_Globals.pfSendSysDesc)
-    {
+    if (_SYSVIEW_Globals.pfSendSysDesc) {
         _SYSVIEW_Globals.pfSendSysDesc();
     }
 }
@@ -1955,8 +1905,7 @@ void SEGGER_SYSVIEW_SendTaskInfo(const SEGGER_SYSVIEW_TASKINFO *pInfo)
  */
 void SEGGER_SYSVIEW_SendTaskList(void)
 {
-    if (_SYSVIEW_Globals.pOSAPI && _SYSVIEW_Globals.pOSAPI->pfSendTaskList)
-    {
+    if (_SYSVIEW_Globals.pOSAPI && _SYSVIEW_Globals.pOSAPI->pfSendTaskList) {
         _SYSVIEW_Globals.pOSAPI->pfSendTaskList();
     }
 }
@@ -2008,13 +1957,11 @@ void SEGGER_SYSVIEW_RecordSystime(void)
 {
     U64 Systime;
 
-    if (_SYSVIEW_Globals.pOSAPI && _SYSVIEW_Globals.pOSAPI->pfGetTime)
-    {
+    if (_SYSVIEW_Globals.pOSAPI && _SYSVIEW_Globals.pOSAPI->pfGetTime) {
         Systime = _SYSVIEW_Globals.pOSAPI->pfGetTime();
         SEGGER_SYSVIEW_RecordU32x2(SYSVIEW_EVTID_SYSTIME_US, (U32)(Systime), (U32)(Systime >> 32));
     }
-    else
-    {
+    else {
         SEGGER_SYSVIEW_RecordU32(SYSVIEW_EVTID_SYSTIME_CYCLES, SEGGER_SYSVIEW_GET_TIMESTAMP());
     }
 }
@@ -2038,7 +1985,7 @@ void SEGGER_SYSVIEW_RecordEnterISR(void)
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_QUANTA_U32);
     //
     pPayload = pPayloadStart;
-    v = SEGGER_SYSVIEW_GET_INTERRUPT_ID();
+    v        = SEGGER_SYSVIEW_GET_INTERRUPT_ID();
     ENCODE_U32(pPayload, v);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_ISR_ENTER);
     RECORD_END();
@@ -2208,7 +2155,7 @@ void SEGGER_SYSVIEW_OnTaskCreate(U32 TaskId)
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_QUANTA_U32);
     //
     pPayload = pPayloadStart;
-    TaskId = SHRINK_ID(TaskId);
+    TaskId   = SHRINK_ID(TaskId);
     ENCODE_U32(pPayload, TaskId);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_TASK_CREATE);
     RECORD_END();
@@ -2234,7 +2181,7 @@ void SEGGER_SYSVIEW_OnTaskTerminate(U32 TaskId)
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_QUANTA_U32);
     //
     pPayload = pPayloadStart;
-    TaskId = SHRINK_ID(TaskId);
+    TaskId   = SHRINK_ID(TaskId);
     ENCODE_U32(pPayload, TaskId);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_TASK_TERMINATE);
     RECORD_END();
@@ -2259,7 +2206,7 @@ void SEGGER_SYSVIEW_OnTaskStartExec(U32 TaskId)
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_QUANTA_U32);
     //
     pPayload = pPayloadStart;
-    TaskId = SHRINK_ID(TaskId);
+    TaskId   = SHRINK_ID(TaskId);
     ENCODE_U32(pPayload, TaskId);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_TASK_START_EXEC);
     RECORD_END();
@@ -2299,7 +2246,7 @@ void SEGGER_SYSVIEW_OnTaskStartReady(U32 TaskId)
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_QUANTA_U32);
     //
     pPayload = pPayloadStart;
-    TaskId = SHRINK_ID(TaskId);
+    TaskId   = SHRINK_ID(TaskId);
     ENCODE_U32(pPayload, TaskId);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_TASK_START_READY);
     RECORD_END();
@@ -2323,7 +2270,7 @@ void SEGGER_SYSVIEW_OnTaskStopReady(U32 TaskId, unsigned int Cause)
     RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + 2 * SEGGER_SYSVIEW_QUANTA_U32);
     //
     pPayload = pPayloadStart;
-    TaskId = SHRINK_ID(TaskId);
+    TaskId   = SHRINK_ID(TaskId);
     ENCODE_U32(pPayload, TaskId);
     ENCODE_U32(pPayload, Cause);
     _SendPacket(pPayloadStart, pPayload, SYSVIEW_EVTID_TASK_STOP_READY);
@@ -2631,40 +2578,38 @@ U32 SEGGER_SYSVIEW_ShrinkId(U32 Id)
  *    SEGGER_SYSVIEW_MODULE elements:
  *      sDescription      - Pointer to a string containing the module name and optionally the module event description.
  *      NumEvents         - Number of events the module wants to register.
- *      EventOffset       - Offset to be added to the event Ids. Out parameter, set by this function. Do not modify after calling this function.
- *      pfSendModuleDesc  - Callback function pointer to send more detailed module description to SystemView Application.
- *      pNext             - Pointer to next registered module. Out parameter, set by this function. Do not modify after calling this function.
+ *      EventOffset       - Offset to be added to the event Ids. Out parameter, set by this function. Do not modify
+ * after calling this function. pfSendModuleDesc  - Callback function pointer to send more detailed module description
+ * to SystemView Application. pNext             - Pointer to next registered module. Out parameter, set by this
+ * function. Do not modify after calling this function.
  */
 void SEGGER_SYSVIEW_RegisterModule(SEGGER_SYSVIEW_MODULE *pModule)
 {
     SEGGER_SYSVIEW_LOCK();
-    if (_pFirstModule == 0)
-    {
+    if (_pFirstModule == 0) {
         //
         // No module registered, yet.
         // Start list with new module.
         // EventOffset is the base offset for modules
         //
         pModule->EventOffset = MODULE_EVENT_OFFSET;
-        pModule->pNext = 0;
-        _pFirstModule = pModule;
-        _NumModules = 1;
+        pModule->pNext       = 0;
+        _pFirstModule        = pModule;
+        _NumModules          = 1;
     }
-    else
-    {
+    else {
         //
         // Registreded module(s) present.
         // Prepend new module in list.
         // EventOffset set from number of events and offset of previous module.
         //
         pModule->EventOffset = _pFirstModule->EventOffset + _pFirstModule->NumEvents;
-        pModule->pNext = _pFirstModule;
-        _pFirstModule = pModule;
+        pModule->pNext       = _pFirstModule;
+        _pFirstModule        = pModule;
         _NumModules++;
     }
     SEGGER_SYSVIEW_SendModule(0);
-    if (pModule->pfSendModuleDesc)
-    {
+    if (pModule->pfSendModuleDesc) {
         pModule->pfSendModuleDesc();
     }
     SEGGER_SYSVIEW_UNLOCK();
@@ -2686,12 +2631,10 @@ void SEGGER_SYSVIEW_RecordModuleDescription(const SEGGER_SYSVIEW_MODULE *pModule
     U8 ModuleId;
     SEGGER_SYSVIEW_MODULE *p;
 
-    p = _pFirstModule;
+    p        = _pFirstModule;
     ModuleId = 0;
-    do
-    {
-        if (p == pModule)
-        {
+    do {
+        if (p == pModule) {
             break;
         }
         ModuleId++;
@@ -2730,19 +2673,15 @@ void SEGGER_SYSVIEW_SendModule(U8 ModuleId)
     SEGGER_SYSVIEW_MODULE *pModule;
     U32 n;
 
-    if (_pFirstModule != 0)
-    {
+    if (_pFirstModule != 0) {
         pModule = _pFirstModule;
-        for (n = 0; n < ModuleId; n++)
-        {
+        for (n = 0; n < ModuleId; n++) {
             pModule = pModule->pNext;
-            if (pModule == 0)
-            {
+            if (pModule == 0) {
                 break;
             }
         }
-        if (pModule != 0)
-        {
+        if (pModule != 0) {
             U8 *pPayload;
             U8 *pPayloadStart;
             RECORD_START(SEGGER_SYSVIEW_INFO_SIZE + 2 * SEGGER_SYSVIEW_QUANTA_U32 + 1 + SEGGER_SYSVIEW_MAX_STRING_LEN);
@@ -2773,13 +2712,10 @@ void SEGGER_SYSVIEW_SendModuleDescription(void)
 {
     SEGGER_SYSVIEW_MODULE *pModule;
 
-    if (_pFirstModule != 0)
-    {
+    if (_pFirstModule != 0) {
         pModule = _pFirstModule;
-        do
-        {
-            if (pModule->pfSendModuleDesc)
-            {
+        do {
+            if (pModule->pfSendModuleDesc) {
                 pModule->pfSendModuleDesc();
             }
             pModule = pModule->pNext;
@@ -2832,8 +2768,7 @@ void SEGGER_SYSVIEW_PrintfHostEx(const char *s, U32 Options, ...)
     r = _VPrintHost(s, Options, &ParamList);
     va_end(ParamList);
 
-    if (r == -1)
-    {
+    if (r == -1) {
         va_start(ParamList, Options);
         _VPrintTarget(s, Options, &ParamList);
         va_end(ParamList);
@@ -2868,8 +2803,7 @@ void SEGGER_SYSVIEW_PrintfHost(const char *s, ...)
     r = _VPrintHost(s, SEGGER_SYSVIEW_LOG, &ParamList);
     va_end(ParamList);
 
-    if (r == -1)
-    {
+    if (r == -1) {
         va_start(ParamList, s);
         _VPrintTarget(s, SEGGER_SYSVIEW_LOG, &ParamList);
         va_end(ParamList);
@@ -2905,8 +2839,7 @@ void SEGGER_SYSVIEW_WarnfHost(const char *s, ...)
     r = _VPrintHost(s, SEGGER_SYSVIEW_WARNING, &ParamList);
     va_end(ParamList);
 
-    if (r == -1)
-    {
+    if (r == -1) {
         va_start(ParamList, s);
         _VPrintTarget(s, SEGGER_SYSVIEW_WARNING, &ParamList);
         va_end(ParamList);
@@ -2942,8 +2875,7 @@ void SEGGER_SYSVIEW_ErrorfHost(const char *s, ...)
     r = _VPrintHost(s, SEGGER_SYSVIEW_ERROR, &ParamList);
     va_end(ParamList);
 
-    if (r == -1)
-    {
+    if (r == -1) {
         va_start(ParamList, s);
         _VPrintTarget(s, SEGGER_SYSVIEW_ERROR, &ParamList);
         va_end(ParamList);
@@ -3153,10 +3085,9 @@ int SEGGER_SYSVIEW_IsStarted(void)
     //
     // Check if host is sending data which needs to be processed.
     //
-    if (SEGGER_RTT_HASDATA(CHANNEL_ID_DOWN))
-    {
-        if (_SYSVIEW_Globals.RecursionCnt == 0)
-        { // Avoid uncontrolled nesting. This way, this routine can call itself once, but no more often than that.
+    if (SEGGER_RTT_HASDATA(CHANNEL_ID_DOWN)) {
+        if (_SYSVIEW_Globals.RecursionCnt == 0) { // Avoid uncontrolled nesting. This way, this routine can call itself
+                                                  // once, but no more often than that.
             _SYSVIEW_Globals.RecursionCnt = 1;
             _HandleIncomingPacket();
             _SYSVIEW_Globals.RecursionCnt = 0;
@@ -3172,13 +3103,10 @@ int SEGGER_SYSVIEW_IsStarted(void)
  *
  *  Function description
  *    Wait endless when SystemView APP will be connected
- *
- *  Additional information
  */
 void SEGGER_SYSVIEW_WaitForConnection(void)
 {
-    do
-    {
+    do {
         _HandleIncomingPacket();
     } while (0 == _SYSVIEW_Globals.EnableState);
 }

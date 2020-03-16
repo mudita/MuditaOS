@@ -20,16 +20,16 @@
 #include "fsl_lpuart.h"
 #endif
 
-namespace bsp {
+namespace bsp
+{
 
 #if LOG_REDIRECT == 1
     static lpuart_handle_t g_lpuartHandle;
 #endif
 
-
-/* Get debug console frequency. */
-    __attribute__((unused))
-    static uint32_t BOARD_DebugConsoleSrcFreq(void) {
+    /* Get debug console frequency. */
+    __attribute__((unused)) static uint32_t BOARD_DebugConsoleSrcFreq(void)
+    {
         uint32_t freq;
 
         /* To make it simple, we assume default PLL and divider settings, and the only variable
@@ -37,17 +37,17 @@ namespace bsp {
         if (CLOCK_GetMux(kCLOCK_UartMux) == 0) /* PLL3 div6 80M */
         {
             freq = (CLOCK_GetPllFreq(kCLOCK_PllUsb1) / 6U) / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
-        } else {
+        }
+        else {
             freq = CLOCK_GetOscFreq() / (CLOCK_GetDiv(kCLOCK_UartDiv) + 1U);
         }
 
         return freq;
     }
 
-
-
-/* Initialize debug console. */
-    static void BOARD_InitDebugConsole(void) {
+    /* Initialize debug console. */
+    static void BOARD_InitDebugConsole(void)
+    {
 #if LOG_REDIRECT == 1
         /* The user initialization should be placed here */
         lpuart_config_t lpuartConfig;
@@ -64,8 +64,8 @@ namespace bsp {
          */
         LPUART_GetDefaultConfig(&lpuartConfig);
         lpuartConfig.baudRate_Bps = 115200;
-        lpuartConfig.enableTx = true;
-        lpuartConfig.enableRx = true;
+        lpuartConfig.enableTx     = true;
+        lpuartConfig.enableRx     = true;
 
         LPUART_TransferCreateHandle(LPUART3, &g_lpuartHandle, NULL, NULL);
 
@@ -75,9 +75,9 @@ namespace bsp {
 #endif
     }
 
-
-/* MPU configuration. */
-    static void BOARD_ConfigMPU(void) {
+    /* MPU configuration. */
+    static void BOARD_ConfigMPU(void)
+    {
         /* Disable I cache and D cache */
         if (SCB_CCR_IC_Msk == (SCB_CCR_IC_Msk & SCB->CCR)) {
             SCB_DisableICache();
@@ -129,8 +129,8 @@ namespace bsp {
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_512MB);
 #else
         /* Setting Memory with Device type, not shareable, non-cacheable. */
-        //TODO: MPU->RBAR = ARM_MPU_RBAR(2, 0x60000000U);
-        //TODO: MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_512MB);
+        // TODO: MPU->RBAR = ARM_MPU_RBAR(2, 0x60000000U);
+        // TODO: MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_512MB);
 #endif
 
         /* Region 3 setting: Memory with Device type, not shareable, non-cacheable. */
@@ -151,13 +151,11 @@ namespace bsp {
         MPU->RBAR = ARM_MPU_RBAR(6, 0x20200000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 1, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_64KB);
 
-
         /* Region 7 setting: Memory with Normal type, not shareable, outer/inner write back
          * BOARD_SDRAM_TEXT
          */
         MPU->RBAR = ARM_MPU_RBAR(7, 0x80000000U);
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
-
 
         /* The define sets the cacheable memory to shareable,
          * this suggestion is referred from chapter 2.2.1 Memory regions,
@@ -174,7 +172,6 @@ namespace bsp {
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
 #endif
 
-
         /* Enable MPU */
         ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 
@@ -183,7 +180,8 @@ namespace bsp {
         SCB_EnableICache();
     }
 
-    void BoardInit(){
+    void BoardInit()
+    {
 
         PINMUX_InitBootPins();
         gpio_pin_config_t gpio_config = {kGPIO_DigitalOutput, 0, kGPIO_NoIntmode};
@@ -203,5 +201,4 @@ namespace bsp {
         PrintSystemClocks();
     }
 
-
-}
+} // namespace bsp

@@ -60,7 +60,6 @@ Revision: $Rev: 9599 $
  *
  **********************************************************************
  */
-
 #include "../Config/SEGGER_SYSVIEW_Conf.h"
 #include "SEGGER_SYSVIEW.h"
 #include "SEGGER_SYSVIEW_ConfDefaults.h"
