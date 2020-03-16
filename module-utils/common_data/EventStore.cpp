@@ -1,5 +1,6 @@
 #include "EventStore.hpp"
 #include <log/log.hpp>
+#include <memory>
 #include <mutex.hpp>
 
 namespace Store
@@ -22,12 +23,7 @@ namespace Store
 
     GSM *GSM::get()
     {
-        cpp_freertos::LockGuard lock(mutex);
-        static GSM *ptr = nullptr;
-        if (ptr == nullptr)
-        {
-            ptr = new GSM();
-        }
+        static auto ptr = new GSM();
         return ptr;
     }
 
