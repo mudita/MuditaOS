@@ -1,0 +1,142 @@
+#!/bin/bash
+# taken from: https://raw.githubusercontent.com/andrewseidl/githook-clang-format/master/clang-format.hook
+# - with just added check for cpp file & check for proper version of clang-format
+# - with use of clang-format diff.py - for changed chunk changes only
+# might be worth to consider: https://github.com/Sarcasm/run-clang-format
+
+
+L_GIT_DIR=$(git rev-parse --show-toplevel)
+source $L_GIT_DIR/config/format-config.sh
+
+# if autoformatting was disabled by user - then ignore this commit hook
+if [[ $DISABLE_AUTO_FORMATTING ]]; then
+    [[ $VERBOSE ]] && echo "auto formatting is disabled"
+    exit 0
+fi
+
+# check if clang-format in path is in proper version, version is 3rd column in `clang-format --version`
+CVER=$( [[ $(which clang-format) ]] && echo $(clang-format --version | cut -d ' ' -f 3 | cut -d '.' -f 1) || echo "0")
+# check for either clang-format or clang-format-9
+if [[ $CVER -lt 9 && ! $(which clang-format-9) ]]; then
+    cat << EOF > 1
+Either install:
+    clang-format in at least version 9 and set as default"
+    or
+    clang-format-9
+
+    Your clang format version in path used:
+        $(clang-format --version)
+        $(clang-format-9 --version)
+    git commit aborted"
+EOF
+    exit 1
+fi
+
+get_clang_format_script() {
+    local declare searchpaths=(
+        $(which "clang-format-diff.py")                                 # clang-format-diff in path
+        "/usr/share/clang/clang-format-9/clang-format-diff.py"          # clang-format-diff location for clang format 9 Ubuntu/Debian 18.04
+        "/usr/share/clang/clang-format-${CVER}/clang-format-diff.py"    # clang-format-diff location on Ubuntu/Debian
+        "/usr/share/clang/clang-format-diff.py"                         # clang-format_diff location on Arch last resort
+    )
+    local tool=""
+    for el in ${searchpaths[@]}; do
+        if [[ -f ${el} ]]; then
+            tool=${el}
+            break
+        fi
+    done
+    if [[ ${tool} == "" ]]; then
+        echo clang-format-diff not found in path and: ${sarchpaths[@]} >2
+    fi
+    echo "${tool}"
+}
+
+L_CLANG_DIFF_TOOL=$(get_clang_format_script)
+if ! [[ $L_CLANG_DIFF_TOOL ]] || [[ $L_CLANG_DIFF_TOOL == "" ]]; then
+    exit 1
+fi
+
+format_file() {
+  file="${1}"
+  if [ -f $file ]; then
+    [[ $VERBOSE ]] && echo "Format: ${1} diff"
+    git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 -i
+    git add ${1}
+  fi
+}
+
+check_file() {
+  file="${1}"
+  last_commit="${2}"
+  if [ -f $file ]; then
+    [[ $VERBOSE ]] && echo -en "Checking: \e[33m${1}\e[0m :\t"
+    if [[ -z ${last_commit} ]]; then
+        OUT=$(git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+    else
+        OUT=$(git diff -U0 --no-color HEAD^..HEAD ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+    fi
+    if [ -z "$OUT" ]; then
+        [[ ${VERBOSE} ]] && echo "OK"
+        return 0
+    else
+        [[ ${VERBOSE} ]] && echo "error"
+        return 1
+    fi
+  fi
+}
+
+# bash function using above config function
+shouldnt_ignore() {
+    # change full name path to path relative to root git dir
+    local fname=${1/"$L_GIT_DIR"/"./"}
+    for el in ${ignore_paths[@]}; do
+        if [[ ./${fname}  =~ ^${el}.* ]]; then
+            [[ $VERBOSE ]] && echo "Ignore: ${fname} formatting due to: $el match!"
+            return 1
+        fi
+    done
+    return 0
+}
+
+case "${1}" in
+  --about )
+    echo "Runs clang-format on source files"
+    FILES=''
+    LAST=""
+    ;;
+  --last)
+    FILES=$(git diff --name-only HEAD^..HEAD)
+    LAST="True"
+    ;;
+  * )
+    FILES=$(git diff-index --cached --name-only HEAD)
+    ;;
+esac
+
+EXIT_CODE=0
+error_files=()
+for file in ${FILES}; do
+    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
+        check_file "${file}" ${LAST}
+        RESULT=$?
+        if [[ ${RESULT} -eq 1 ]]; then
+            error_files+=(${file})
+            EXIT_CODE=1
+        fi
+    fi
+done
+
+if [[ ${EXIT_CODE} -eq 1 ]]; then
+    echo -e "before commit please run:\n\t git clang-format\n "
+    echo -e "Files containing style errors:"
+    I=0
+    while [[ ${I} -lt ${#error_files[@]} ]]; do
+        echo -e "\t${error_files[${I}]}"
+        I=$(( ${I} + 1 ))
+    done
+    exit 1
+else
+    exit 0
+fi
+
