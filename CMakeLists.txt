@@ -19,7 +19,6 @@ message("TARGET_LINKER_FLAGS: ${TARGET_LINKER_FLAGS}")
 
 add_executable(${PROJECT_NAME} "")
 
-
 # setting build flags
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
