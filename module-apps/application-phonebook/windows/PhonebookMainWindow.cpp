@@ -13,6 +13,8 @@
 #include <functional>
 #include <log/log.hpp>
 #include <memory>
+#include <application-phonebook/data/PhonebookStyle.hpp>
+
 
 namespace gui
 {
@@ -33,16 +35,16 @@ void PhonebookMainWindow::buildInterface()
 
     topBar->setActive(TopBar::Elements::TIME, true);
     setTitle(utils::localize.get("app_phonebook_title_main"));
-    leftArrowImage = new gui::Image(this, 30, 62, 11, 13, "arrow_left");
-    rightArrowImage = new gui::Image(this, 480 - 30 - 11, 62, 11, 13, "arrow_right");
-    newContactImage = new gui::Image(this, 50, 55, 24, 24, "cross");
-    searchImage = new gui::Image(this, 480 - 30 - 11 - 8 - 26, 55, 26, 26, "search");
+    leftArrowImage = new gui::Image(this, phonebookStyle::mainWindow::leftArrowImage::x, phonebookStyle::mainWindow::leftArrowImage::y, phonebookStyle::mainWindow::leftArrowImage::w, phonebookStyle::mainWindow::leftArrowImage::h, "arrow_left");
+    rightArrowImage = new gui::Image(this, phonebookStyle::mainWindow::rightArrowImage::x, phonebookStyle::mainWindow::rightArrowImage::y, phonebookStyle::mainWindow::rightArrowImage::w, phonebookStyle::mainWindow::rightArrowImage::h, "arrow_right");
+    newContactImage = new gui::Image(this, phonebookStyle::mainWindow::newContactImage::x, phonebookStyle::mainWindow::newContactImage::y, phonebookStyle::mainWindow::newContactImage::w, phonebookStyle::mainWindow::newContactImage::h, "cross");
+    searchImage = new gui::Image(this, phonebookStyle::mainWindow::searchImage::x, phonebookStyle::mainWindow::searchImage::y, phonebookStyle::mainWindow::searchImage::w, phonebookStyle::mainWindow::searchImage::h, "search");
 
-    contactsList = new gui::PhonebookListView(this, 30, 105 + 6, 480 - 30 - 30, 600 - 105 + 6 - 50);
-    contactsList->setMaxElements(7);
-    contactsList->setPageSize(7);
-    contactsList->setPenFocusWidth(0);
-    contactsList->setPenWidth(0);
+    contactsList = new gui::PhonebookListView(this, phonebookStyle::mainWindow::contactsList::x, phonebookStyle::mainWindow::contactsList::y, phonebookStyle::mainWindow::contactsList::w, phonebookStyle::mainWindow::contactsList::h);
+    contactsList->setMaxElements(phonebookStyle::mainWindow::contactsList::maxElements);
+    contactsList->setPageSize(phonebookStyle::mainWindow::contactsList::pageSize);
+    contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
+    contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
     contactsList->setProvider(phonebookModel);
     contactsList->setApplication(application);
 
