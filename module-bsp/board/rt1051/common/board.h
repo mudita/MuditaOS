@@ -325,6 +325,13 @@
 #define BOARD_ALS_GB2_PIN           27
 #define BOARD_ALS_GB2_PAD           GPIO_AD_B1_11
 
+/**
+ * BOARD VIBRATOR MOTOR DEFINITIONS
+ */
+
+#define BOARD_VIBRATOR_EN_PORT GPIO1
+#define BOARD_VIBRATOR_EN_PIN  0U
+
 #if defined(__cplusplus)
 extern "C"
 {

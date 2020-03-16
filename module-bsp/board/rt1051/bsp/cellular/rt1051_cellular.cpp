@@ -114,6 +114,7 @@ namespace bsp
 
         EnableRx();
         isInitialized = true;
+
     }
 
     void RT1051Cellular::SetSpeed(uint32_t portSpeed)
