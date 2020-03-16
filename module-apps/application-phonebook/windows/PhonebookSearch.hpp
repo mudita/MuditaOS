@@ -3,14 +3,7 @@
 #include "../data/PhonebookItemData.hpp"
 #include "../models/PhonebookModel.hpp"
 #include "../widgets/PhonebookListView.hpp"
-#include "AppWindow.hpp"
-#include "ContactRecord.hpp"
-#include "Label.hpp"
-#include "Style.hpp"
 #include "Text.hpp"
-#include <memory>
-#include <string>
-#include <widgets/BoxLayout.hpp>
 
 namespace gui
 {
