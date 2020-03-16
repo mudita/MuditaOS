@@ -11,12 +11,13 @@ VERBOSE=1
 # ignore_paths for formatter - these are regex matched with filenames to be formated
 # if you don't wish to format i.e one file - just pass whole path to this file from git root directory
 declare ignore_paths=(
-    './module-os/board/'
+    './module-os/'
+    './board/'
     './module-bsp/bsp/'
     './module-vfs/board/cross/freeRTOS_FAT/'
-    './module-db/Database/sqlite3.h'
-    './module-db/Database/sqlite3.c'
-    './module-db/Database/config.h'
+    './module-db/[Dd]atabase/sqlite3.h'
+    './module-db/[Dd]atabase/sqlite3.c'
+    './module-db/[Dd]atabase/config.h'
     './module-bluetooth/lib/btstack/'
     './module-lwip/lib/lwip/'
     './module-utils/tinyfsm/'
