@@ -22,11 +22,11 @@ namespace gui
         };
     }; // namespace name
 
-    class PhonebookSearchResults : public AppWindow
-    {
-      protected:
-        PhonebookListView *searchResultList    = nullptr;
-        SearchResultsModel *searchResultsModel = nullptr;
+class PhonebookSearchResults : public AppWindow
+{
+  protected:
+    SearchResultsModel *searchResultsModel = nullptr;
+    PhonebookListView *searchResultList = nullptr;
 
         Image *newContactImage = nullptr;
 

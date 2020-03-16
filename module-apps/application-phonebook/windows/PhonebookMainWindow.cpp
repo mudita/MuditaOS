@@ -38,13 +38,13 @@ void PhonebookMainWindow::buildInterface()
     newContactImage = new gui::Image(this, 50, 55, 24, 24, "cross");
     searchImage = new gui::Image(this, 480 - 30 - 11 - 8 - 26, 55, 26, 26, "search");
 
-    list = new gui::PhonebookListView(this, 30, 105 + 6, 480 - 30 - 30, 600 - 105 + 6 - 50);
-    list->setMaxElements(7);
-    list->setPageSize(7);
-    list->setPenFocusWidth(0);
-    list->setPenWidth(0);
-    list->setProvider(phonebookModel);
-    list->setApplication(application);
+    contactsList = new gui::PhonebookListView(this, 30, 105 + 6, 480 - 30 - 30, 600 - 105 + 6 - 50);
+    contactsList->setMaxElements(7);
+    contactsList->setPageSize(7);
+    contactsList->setPenFocusWidth(0);
+    contactsList->setPenWidth(0);
+    contactsList->setProvider(phonebookModel);
+    contactsList->setApplication(application);
 
     bottomBar->setActive(BottomBar::Side::LEFT, true);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -59,9 +59,9 @@ void PhonebookMainWindow::destroyInterface()
 {
     AppWindow::destroyInterface();
 
-    void PhonebookMainWindow::destroyInterface()
-    {
-        AppWindow::destroyInterface();
+    removeWidget(contactsList);
+    delete contactsList;
+    contactsList = nullptr;
 
         removeWidget(list);
         delete list;
@@ -87,18 +87,24 @@ void PhonebookMainWindow::destroyInterface()
         delete phonebookModel;
     }
 
+<<<<<<< HEAD
     PhonebookMainWindow::~PhonebookMainWindow()
     {
         destroyInterface();
     }
-
+=======
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
         setFocusItem(list);
-
+<<<<<<< HEAD
         phonebookModel->clear();
         phonebookModel->requestRecordsCount();
+=======
+    contactsList->clear();
+    contactsList->setElementsCount(phonebookModel->getItemCount());
+}
+>>>>>>> [EGD-2932] Add PhonebookMAinWindow styles to PhonebookStyle.hpp
 
         list->clear();
         list->setElementsCount(phonebookModel->getItemCount());
