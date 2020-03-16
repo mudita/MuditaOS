@@ -55,8 +55,8 @@ Revision: $Rev: 18102 $
 #ifndef SEGGER_H // Guard against multiple inclusion
 #define SEGGER_H
 
-#include "../Config/Global.h" // Type definitions: U8, U16, U32, I8, I16, I32
-#include <stdarg.h>           // For va_list.
+#include <stdarg.h> // For va_list.
+#include "Global.h" // Type definitions: U8, U16, U32, I8, I16, I32
 
 #if defined(__cplusplus)
 extern "C"
@@ -110,17 +110,19 @@ extern "C"
      */
 
 #define SEGGER_COUNTOF(a) (sizeof((a)) / sizeof((a)[0]))
-#define SEGGER_MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define SEGGER_MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define SEGGER_MIN(a, b)  (((a) < (b)) ? (a) : (b))
+#define SEGGER_MAX(a, b)  (((a) > (b)) ? (a) : (b))
 
 #ifndef SEGGER_USE_PARA                  // Some compiler complain about unused parameters.
 #define SEGGER_USE_PARA(Para) (void)Para // This works for most compilers.
 #endif
 
-#define SEGGER_ADDR2PTR(Type, Addr) (/*lint -e(923) -e(9078)*/ ((Type *)((PTR_ADDR)(Addr)))) // Allow cast from address to pointer.
-#define SEGGER_PTR2ADDR(p) (/*lint -e(923) -e(9078)*/ ((PTR_ADDR)(p)))                       // Allow cast from pointer to address.
-#define SEGGER_PTR2PTR(Type, p)                                                                                                                                \
-    (/*lint -e(740) -e(826) -e(9079) -e(9087)*/ ((Type *)(p))) // Allow cast from one pointer type to another (ignore different size).
+#define SEGGER_ADDR2PTR(Type, Addr)                                                                                    \
+    (/*lint -e(923) -e(9078)*/ ((Type *)((PTR_ADDR)(Addr))))           // Allow cast from address to pointer.
+#define SEGGER_PTR2ADDR(p) (/*lint -e(923) -e(9078)*/ ((PTR_ADDR)(p))) // Allow cast from pointer to address.
+#define SEGGER_PTR2PTR(Type, p)                                                                                        \
+    (/*lint -e(740) -e(826) -e(9079) -e(9087)*/ (                                                                      \
+        (Type *)(p))) // Allow cast from one pointer type to another (ignore different size).
 #define SEGGER_PTR_DISTANCE(p0, p1) (SEGGER_PTR2ADDR(p0) - SEGGER_PTR2ADDR(p1))
 
     /*********************************************************************
@@ -130,12 +132,12 @@ extern "C"
      **********************************************************************
      */
 
-#define SEGGER_PRINTF_FLAG_ADJLEFT (1 << 0)
+#define SEGGER_PRINTF_FLAG_ADJLEFT   (1 << 0)
 #define SEGGER_PRINTF_FLAG_SIGNFORCE (1 << 1)
 #define SEGGER_PRINTF_FLAG_SIGNSPACE (1 << 2)
-#define SEGGER_PRINTF_FLAG_PRECEED (1 << 3)
-#define SEGGER_PRINTF_FLAG_ZEROPAD (1 << 4)
-#define SEGGER_PRINTF_FLAG_NEGATIVE (1 << 5)
+#define SEGGER_PRINTF_FLAG_PRECEED   (1 << 3)
+#define SEGGER_PRINTF_FLAG_ZEROPAD   (1 << 4)
+#define SEGGER_PRINTF_FLAG_NEGATIVE  (1 << 5)
 
     /*********************************************************************
      *
@@ -153,9 +155,10 @@ extern "C"
 
     typedef struct
     {
-        unsigned int CacheLineSize;                       // 0: No Cache. Most Systems such as ARM9 use a 32 bytes cache line size.
-        void (*pfDMB)(void);                              // Optional DMB function for Data Memory Barrier to make sure all memory operations are completed.
-        void (*pfClean)(void *p, unsigned long NumBytes); // Optional clean function for cached memory.
+        unsigned int CacheLineSize; // 0: No Cache. Most Systems such as ARM9 use a 32 bytes cache line size.
+        void (*pfDMB)(
+            void); // Optional DMB function for Data Memory Barrier to make sure all memory operations are completed.
+        void (*pfClean)(void *p, unsigned long NumBytes);      // Optional clean function for cached memory.
         void (*pfInvalidate)(void *p, unsigned long NumBytes); // Optional invalidate function for cached memory.
     } SEGGER_CACHE_CONFIG;
 
@@ -163,21 +166,38 @@ extern "C"
 
     struct SEGGER_SNPRINTF_CONTEXT_struct
     {
-        void *pContext;                  // Application specific context.
-        SEGGER_BUFFER_DESC *pBufferDesc; // Buffer descriptor to use for output.
-        void (*pfFlush)(
-            SEGGER_SNPRINTF_CONTEXT *pContext); // Callback executed once the buffer is full. Callback decides if the buffer gets cleared to store more or not.
+        void *pContext;                                     // Application specific context.
+        SEGGER_BUFFER_DESC *pBufferDesc;                    // Buffer descriptor to use for output.
+        void (*pfFlush)(SEGGER_SNPRINTF_CONTEXT *pContext); // Callback executed once the buffer is full. Callback
+                                                            // decides if the buffer gets cleared to store more or not.
     };
 
     typedef struct
     {
         void (*pfStoreChar)(SEGGER_BUFFER_DESC *pBufferDesc, SEGGER_SNPRINTF_CONTEXT *pContext, char c);
-        int (*pfPrintUnsigned)(SEGGER_BUFFER_DESC *pBufferDesc, SEGGER_SNPRINTF_CONTEXT *pContext, U32 v, unsigned Base, char Flags, int Width, int Precision);
-        int (*pfPrintInt)(SEGGER_BUFFER_DESC *pBufferDesc, SEGGER_SNPRINTF_CONTEXT *pContext, I32 v, unsigned Base, char Flags, int Width, int Precision);
+        int (*pfPrintUnsigned)(SEGGER_BUFFER_DESC *pBufferDesc,
+                               SEGGER_SNPRINTF_CONTEXT *pContext,
+                               U32 v,
+                               unsigned Base,
+                               char Flags,
+                               int Width,
+                               int Precision);
+        int (*pfPrintInt)(SEGGER_BUFFER_DESC *pBufferDesc,
+                          SEGGER_SNPRINTF_CONTEXT *pContext,
+                          I32 v,
+                          unsigned Base,
+                          char Flags,
+                          int Width,
+                          int Precision);
     } SEGGER_PRINTF_API;
 
-    typedef void (*SEGGER_pFormatter)(SEGGER_BUFFER_DESC *pBufferDesc, SEGGER_SNPRINTF_CONTEXT *pContext, const SEGGER_PRINTF_API *pApi, va_list *pParamList,
-                                      char Lead, int Width, int Precision);
+    typedef void (*SEGGER_pFormatter)(SEGGER_BUFFER_DESC *pBufferDesc,
+                                      SEGGER_SNPRINTF_CONTEXT *pContext,
+                                      const SEGGER_PRINTF_API *pApi,
+                                      va_list *pParamList,
+                                      char Lead,
+                                      int Width,
+                                      int Precision);
 
     typedef struct SEGGER_PRINTF_FORMATTER
     {
