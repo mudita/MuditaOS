@@ -16,47 +16,47 @@ using namespace gui;
 namespace ErrorWindows
 {
 
-class NoResults : public AppWindow
-{
-  protected:
-    /** labels */
-    Label *topSeparatorLabel = nullptr;
-    Text *informationLabel = nullptr;
-    Image *searchCenter;
-    std::string searchQuery;
+    class NoResults : public AppWindow
+    {
+      protected:
+        /** labels */
+        Label *topSeparatorLabel = nullptr;
+        Text *informationLabel   = nullptr;
+        Image *searchCenter;
+        std::string searchQuery;
 
-  public:
-    NoResults(app::Application *app);
-    virtual ~NoResults();
-    bool onInput(const InputEvent &inputEvent) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
+      public:
+        NoResults(app::Application *app);
+        virtual ~NoResults();
+        bool onInput(const InputEvent &inputEvent) override;
+        bool handleSwitchData(SwitchData *data) override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
 
-  private:
-    void setContactData();
-};
+      private:
+        void setContactData();
+    };
 
-class ContactBlocked : public AppWindow
-{
-  protected:
-    /** labels */
-    Label *topSeparatorLabel = nullptr;
-    Text *informationLabel = nullptr;
-    Image *searchCenter;
-    std::string searchQuery;
+    class ContactBlocked : public AppWindow
+    {
+      protected:
+        /** labels */
+        Label *topSeparatorLabel = nullptr;
+        Text *informationLabel   = nullptr;
+        Image *searchCenter;
+        std::string searchQuery;
 
-  public:
-    ContactBlocked(app::Application *app);
-    virtual ~ContactBlocked();
-    bool onInput(const InputEvent &inputEvent) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
+      public:
+        ContactBlocked(app::Application *app);
+        virtual ~ContactBlocked();
+        bool onInput(const InputEvent &inputEvent) override;
+        bool handleSwitchData(SwitchData *data) override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
 
-  private:
-    void setContactData();
-};
+      private:
+        void setContactData();
+    };
 }; // namespace ErrorWindows

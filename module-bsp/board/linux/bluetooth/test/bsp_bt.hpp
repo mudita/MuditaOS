@@ -7,17 +7,17 @@
 
 #include <memory>
 
-
-namespace bsp {
-class BluetopiaHW : public Bluetopia
+namespace bsp
 {
-    public:
-        BluetopiaHW(LogLvl lvl=LogError);
+    class BluetopiaHW : public Bluetopia
+    {
+      public:
+        BluetopiaHW(LogLvl lvl = LogError);
         virtual ~BluetopiaHW();
         static Bluetopia *getInstance();
-        static const ssize_t baudrate =115200;
-        static const ssize_t off_threshold =16;
-        static const ssize_t on_threshold =32;
+        static const ssize_t baudrate      = 115200;
+        static const ssize_t off_threshold = 16;
+        static const ssize_t on_threshold  = 32;
 
         // without them it doesnt see inherited functs o_o
         virtual void open() override;
@@ -34,5 +34,5 @@ class BluetopiaHW : public Bluetopia
         virtual void set_irq(bool enable);
         virtual void wait_data();
         virtual void set_data();
-};
-};
+    };
+}; // namespace bsp

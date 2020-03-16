@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -33,15 +32,15 @@ TEST_CASE("Contacts Table tests")
 
     ContactsDB contactsdb;
 
-    ContactsTableRow testRow1 = {.ID=0,
-            .nameID=0,
-            .numbersID="0 1 2 3 4",
-            .ringID=0,
-            .addressIDs="5 6 7 8",
-            .isOnWhitelist=true,
-            .isOnBlacklist=true,
-            .isOnFavourites=false,
-            .speedDial = 666
+    ContactsTableRow testRow1 = {.ID             = 0,
+                                 .nameID         = 0,
+                                 .numbersID      = "0 1 2 3 4",
+                                 .ringID         = 0,
+                                 .addressIDs     = "5 6 7 8",
+                                 .isOnWhitelist  = true,
+                                 .isOnBlacklist  = true,
+                                 .isOnFavourites = false,
+                                 .speedDial      = 666
 
     };
 
@@ -55,7 +54,7 @@ TEST_CASE("Contacts Table tests")
     REQUIRE(contactsdb.contacts.GetCount() == 4);
 
     // Update existing element in table
-    testRow1.ID = 4;
+    testRow1.ID        = 4;
     testRow1.speedDial = 777;
     REQUIRE(contactsdb.contacts.Update(testRow1));
 
@@ -65,30 +64,28 @@ TEST_CASE("Contacts Table tests")
 
     // Get table row using invalid ID(should return empty contactsdb.contactsRow)
     auto smsFailed = contactsdb.contacts.GetByID(100);
-    REQUIRE(smsFailed.speedDial  == 0);
+    REQUIRE(smsFailed.speedDial == 0);
 
     // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = contactsdb.contacts.GetLimitOffset(0,4);
+    auto retOffsetLimit = contactsdb.contacts.GetLimitOffset(0, 4);
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.contacts.GetLimitOffsetByField(0,4,ContactTableFields::SpeedDial,"666").size() == 3);
-
+    REQUIRE(contactsdb.contacts.GetLimitOffsetByField(0, 4, ContactTableFields::SpeedDial, "666").size() == 3);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = contactsdb.contacts.GetLimitOffset(0,100);
+    auto retOffsetLimitBigger = contactsdb.contacts.GetLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = contactsdb.contacts.GetLimitOffset(5,4);
+    auto retOffsetLimitFailed = contactsdb.contacts.GetLimitOffset(5, 4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get count of elements by field's ID
-    REQUIRE(contactsdb.contacts.GetCountByFieldID("ring_id",0) == 4);
+    REQUIRE(contactsdb.contacts.GetCountByFieldID("ring_id", 0) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(contactsdb.contacts.GetCountByFieldID("invalid_field",0) == 0);
-
+    REQUIRE(contactsdb.contacts.GetCountByFieldID("invalid_field", 0) == 0);
 
     REQUIRE(contactsdb.contacts.RemoveByID(2));
 

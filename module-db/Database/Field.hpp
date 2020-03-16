@@ -17,13 +17,11 @@ class Field
 {
   public:
     Field() : mValue(nullptr)
-    {
-    }
+    {}
 
     Field(const char *value)
     {
-        if (value)
-        {
+        if (value) {
             mValue = value;
         }
     }
@@ -32,11 +30,13 @@ class Field
     // Field& operator=(Field const&);
 
     ~Field()
-    {
-    }
+    {}
 
     const char *GetCString() const;
-    std::string GetString() const { return mValue; }
+    std::string GetString() const
+    {
+        return mValue;
+    }
     float GetFloat() const;
     bool GetBool() const;
     double GetDouble() const;

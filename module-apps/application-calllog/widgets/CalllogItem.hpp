@@ -14,35 +14,36 @@
 #include "../data/CallLogInternals.hpp"
 #include "../CalllogModel.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- * @brief Widget used to display information about calllog entry in the calllog list view.
- */
-class CalllogItem: public ListItem {
-	CalllogModel* model = nullptr;
-	//pointer to the calls record
-	std::shared_ptr<CalllogRecord> call = nullptr;
-	//this is timestamp in the mode defined in settings
-	gui::Label* timestamp = nullptr;
-	gui::Image* imageCallType[calllog::CallLogCallType::NUM_OF_CALL_TYPES] = {nullptr,nullptr,nullptr};
-	gui::Label* text = nullptr;
-	//flag that defines if time should be displayed in 24h mode
-	bool mode24H = false;
+    /*
+     * @brief Widget used to display information about calllog entry in the calllog list view.
+     */
+    class CalllogItem : public ListItem
+    {
+        CalllogModel *model = nullptr;
+        // pointer to the calls record
+        std::shared_ptr<CalllogRecord> call = nullptr;
+        // this is timestamp in the mode defined in settings
+        gui::Label *timestamp                                                  = nullptr;
+        gui::Image *imageCallType[calllog::CallLogCallType::NUM_OF_CALL_TYPES] = {nullptr, nullptr, nullptr};
+        gui::Label *text                                                       = nullptr;
+        // flag that defines if time should be displayed in 24h mode
+        bool mode24H = false;
 
-	public:
-		CalllogItem( CalllogModel* model, bool mode24H );
-		virtual ~CalllogItem();
-		//sets copy of alarm's
-		void setCall( std::shared_ptr<CalllogRecord>&  );
+      public:
+        CalllogItem(CalllogModel *model, bool mode24H);
+        virtual ~CalllogItem();
+        // sets copy of alarm's
+        void setCall(std::shared_ptr<CalllogRecord> &);
         CalllogRecord getCall() const
         {
             return *call;
         };
 
         // virtual methods from Item
-        bool onDimensionChanged( const BoundingBox& oldDim, const BoundingBox& newDim) override;
-};
+        bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim) override;
+    };
 
 } /* namespace gui */
-

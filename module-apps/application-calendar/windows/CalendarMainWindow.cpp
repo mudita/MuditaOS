@@ -12,24 +12,28 @@
 #include "gui/widgets/BoxLayout.hpp"
 #include "CalendarMainWindow.hpp"
 
-namespace app {
+namespace app
+{
 
-CalendarMainWindow::CalendarMainWindow( app::Application* app, std::string name ) : AppWindow( app, name ) {
-	buildInterface();
-}
+    CalendarMainWindow::CalendarMainWindow(app::Application *app, std::string name) : AppWindow(app, name)
+    {
+        buildInterface();
+    }
 
-void CalendarMainWindow::rebuild() {
+    void CalendarMainWindow::rebuild()
+    {}
+    void CalendarMainWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+    }
+    void CalendarMainWindow::destroyInterface()
+    {
+        AppWindow::destroyInterface();
+    }
 
-}
-void CalendarMainWindow::buildInterface() {
-	AppWindow::buildInterface();
-}
-void CalendarMainWindow::destroyInterface() {
-	AppWindow::destroyInterface();
-}
-
-CalendarMainWindow::~CalendarMainWindow() {
-	destroyInterface();
-}
+    CalendarMainWindow::~CalendarMainWindow()
+    {
+        destroyInterface();
+    }
 
 } /* namespace app */

@@ -29,84 +29,97 @@
 using namespace style;
 using namespace callLogStyle;
 
-namespace gui {
+namespace gui
+{
 
-CallLogMainWindow::CallLogMainWindow( app::Application* app ) :
-	AppWindow( app, calllog::settings::MainWindowStr ), calllogModel{ new CalllogModel( app ) } {
+    CallLogMainWindow::CallLogMainWindow(app::Application *app)
+        : AppWindow(app, calllog::settings::MainWindowStr), calllogModel{new CalllogModel(app)}
+    {
 
-	buildInterface();
-}
+        buildInterface();
+    }
 
-void CallLogMainWindow::rebuild() {
-	destroyInterface();
-	buildInterface();
-}
-void CallLogMainWindow::buildInterface() {
-	AppWindow::buildInterface();
+    void CallLogMainWindow::rebuild()
+    {
+        destroyInterface();
+        buildInterface();
+    }
+    void CallLogMainWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
 
-	setTitle(utils::localize.get("app_calllog_title_main"));
+        setTitle(utils::localize.get("app_calllog_title_main"));
 
-	bottomBar->setText( BottomBar::Side::LEFT, utils::localize.get("common_call") );
-	bottomBar->setText( BottomBar::Side::CENTER, utils::localize.get("common_open") );
-	bottomBar->setText( BottomBar::Side::RIGHT, utils::localize.get("common_back") );
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_call"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-	topBar->setActive( TopBar::Elements::TIME, true );
+        topBar->setActive(TopBar::Elements::TIME, true);
 
-    list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h);
-    list->setMaxElements(calllog::settings::pageSize);
-    list->setPageSize(calllog::settings::pageSize);
-	list->setProvider(calllogModel);
+        list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h);
+        list->setMaxElements(calllog::settings::pageSize);
+        list->setPageSize(calllog::settings::pageSize);
+        list->setProvider(calllogModel);
 
-	setFocusItem( list );
-}
-void CallLogMainWindow::destroyInterface() {
-	AppWindow::destroyInterface();
+        setFocusItem(list);
+    }
+    void CallLogMainWindow::destroyInterface()
+    {
+        AppWindow::destroyInterface();
 
-	if( list ) { removeWidget(list); delete list; list= nullptr; };
+        if (list) {
+            removeWidget(list);
+            delete list;
+            list = nullptr;
+        };
 
-	children.clear();
-	delete calllogModel;
-}
+        children.clear();
+        delete calllogModel;
+    }
 
-CallLogMainWindow::~CallLogMainWindow() {
-	destroyInterface();
-}
+    CallLogMainWindow::~CallLogMainWindow()
+    {
+        destroyInterface();
+    }
 
-void CallLogMainWindow::onBeforeShow( ShowMode mode, SwitchData* data ) {
-	if( mode == ShowMode::GUI_SHOW_INIT ){ 
-		calllogModel->clear();
-		calllogModel->requestRecordsCount();
-		list->clear();
-		list->setElementsCount( calllogModel->getItemCount() );
-	}
-}
-
-bool CallLogMainWindow::onInput( const InputEvent& inputEvent ) {
-	//process only if key is released
-	if(( inputEvent.state != InputEvent::State::keyReleasedShort ) || ( inputEvent.state != InputEvent::State::keyReleasedLong )) {
-		if( inputEvent.keyCode == KeyCode::KEY_LF ) {
-            LOG_DEBUG("calling");
-            auto it = dynamic_cast<CalllogItem *>(list->getSelectedItem());
-            if (it == nullptr)
-            {
-                LOG_ERROR("wrong item type");
-                assert(0);
-                return false;
-            }
-            return app::call(application, app::CallOperation::ExecuteCall, it->getCall().number);
+    void CallLogMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (mode == ShowMode::GUI_SHOW_INIT) {
+            calllogModel->clear();
+            calllogModel->requestRecordsCount();
+            list->clear();
+            list->setElementsCount(calllogModel->getItemCount());
         }
-	}
+    }
 
-	return AppWindow::onInput( inputEvent );
-}
+    bool CallLogMainWindow::onInput(const InputEvent &inputEvent)
+    {
+        // process only if key is released
+        if ((inputEvent.state != InputEvent::State::keyReleasedShort) ||
+            (inputEvent.state != InputEvent::State::keyReleasedLong)) {
+            if (inputEvent.keyCode == KeyCode::KEY_LF) {
+                LOG_DEBUG("calling");
+                auto it = dynamic_cast<CalllogItem *>(list->getSelectedItem());
+                if (it == nullptr) {
+                    LOG_ERROR("wrong item type");
+                    assert(0);
+                    return false;
+                }
+                return app::call(application, app::CallOperation::ExecuteCall, it->getCall().number);
+            }
+        }
 
-bool CallLogMainWindow::onDatabaseMessage( sys::Message* msgl ) {
-	DBCalllogResponseMessage* msg = reinterpret_cast<DBCalllogResponseMessage*>( msgl );
-	if( calllogModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count ) ) {
-		return true;
-	}
+        return AppWindow::onInput(inputEvent);
+    }
 
-	return false;
-}
+    bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)
+    {
+        DBCalllogResponseMessage *msg = reinterpret_cast<DBCalllogResponseMessage *>(msgl);
+        if (calllogModel->updateRecords(std::move(msg->records), msg->offset, msg->limit, msg->count)) {
+            return true;
+        }
+
+        return false;
+    }
 
 } /* namespace gui */

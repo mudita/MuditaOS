@@ -20,8 +20,7 @@ class StateDecodeJson : public EndpointFsm
         std::string errorString;
 
         json11::Json msgJson = json11::Json::parse(ParserFsm::msgPayload, errorString);
-        if (msgJson.is_null())
-        {
+        if (msgJson.is_null()) {
             LOG_ERROR("Can't parse data as JSON [%s]", errorString.c_str());
             return;
         }
@@ -31,15 +30,13 @@ class StateDecodeJson : public EndpointFsm
         body         = msgJson[parserutils::json::body];
         ownerService = msg.ownerService;
 
-        if (!parserutils::http::isMethodValid(method))
-        {
+        if (!parserutils::http::isMethodValid(method)) {
             return;
         }
 
         endpoint = static_cast<parserutils::Endpoint>(msgJson[parserutils::json::endpoint].number_value());
 
-        switch (endpoint)
-        {
+        switch (endpoint) {
         case parserutils::Endpoint::update:
             transit<StateEndpointUpdate>();
             break;
@@ -97,14 +94,12 @@ void EndpointFsm::react(EndpointEvt const &)
 
 bool EndpointFsm::putToSendQueue(std::string sendMsg)
 {
-    if (uxQueueSpacesAvailable(sendQueue) != 0)
-    {
+    if (uxQueueSpacesAvailable(sendQueue) != 0) {
         std::string *responseString = new std::string(sendMsg);
         xQueueSend(sendQueue, &responseString, portMAX_DELAY);
         return true;
     }
-    else
-    {
+    else {
         LOG_DEBUG("Endpoint Send Queue full, response lost");
         return false;
     }

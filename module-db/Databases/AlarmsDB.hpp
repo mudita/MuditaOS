@@ -10,16 +10,19 @@
 #include "../Tables/AlarmsTable.hpp"
 #include "../Tables/ThreadsTable.hpp"
 
-class AlarmsDB : public Database {
-public:
+class AlarmsDB : public Database
+{
+  public:
     AlarmsDB();
     ~AlarmsDB();
 
     AlarmsTable alarms;
 
-    static const char* GetDBName(){return dbName;}
+    static const char *GetDBName()
+    {
+        return dbName;
+    }
 
-private:
-
+  private:
     static const char *dbName;
 };

@@ -3,7 +3,7 @@
  * Copyright 2017 NXP
  * All rights reserved.
  *
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -60,7 +60,7 @@ static uint32_t FLEXRAM_GetInstance(FLEXRAM_Type *base);
  *
  * @param tcmBankNum tcm banknumber
  * @retval register value correspond to the tcm size
-  */
+ */
 static uint8_t FLEXRAM_MapTcmSizeToRegister(uint8_t tcmBankNum);
 
 /*!
@@ -69,7 +69,7 @@ static uint8_t FLEXRAM_MapTcmSizeToRegister(uint8_t tcmBankNum);
  * raised by core.
  * @param itcmBankNum itcm bank number to allocate
  * @param dtcmBankNum dtcm bank number to allocate
-  */
+ */
 static status_t FLEXRAM_SetTCMSize(uint8_t itcmBankNum, uint8_t dtcmBankNum);
 
 /*******************************************************************************
@@ -91,10 +91,8 @@ static uint32_t FLEXRAM_GetInstance(FLEXRAM_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_flexramBases); instance++)
-    {
-        if (s_flexramBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_flexramBases); instance++) {
+        if (s_flexramBases[instance] == base) {
             break;
         }
     }
@@ -131,30 +129,29 @@ static uint8_t FLEXRAM_MapTcmSizeToRegister(uint8_t tcmBankNum)
 {
     uint8_t tcmSizeConfig = 0U;
 
-    switch (tcmBankNum * FSL_FEATURE_FLEXRAM_INTERNAL_RAM_BANK_SIZE)
-    {
-        case kFLEXRAM_TCMSize32KB:
-            tcmSizeConfig = 6U;
-            break;
+    switch (tcmBankNum * FSL_FEATURE_FLEXRAM_INTERNAL_RAM_BANK_SIZE) {
+    case kFLEXRAM_TCMSize32KB:
+        tcmSizeConfig = 6U;
+        break;
 
-        case kFLEXRAM_TCMSize64KB:
-            tcmSizeConfig = 7U;
-            break;
+    case kFLEXRAM_TCMSize64KB:
+        tcmSizeConfig = 7U;
+        break;
 
-        case kFLEXRAM_TCMSize128KB:
-            tcmSizeConfig = 8U;
-            break;
+    case kFLEXRAM_TCMSize128KB:
+        tcmSizeConfig = 8U;
+        break;
 
-        case kFLEXRAM_TCMSize256KB:
-            tcmSizeConfig = 9U;
-            break;
+    case kFLEXRAM_TCMSize256KB:
+        tcmSizeConfig = 9U;
+        break;
 
-        case kFLEXRAM_TCMSize512KB:
-            tcmSizeConfig = 10U;
-            break;
+    case kFLEXRAM_TCMSize512KB:
+        tcmSizeConfig = 10U;
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 
     return tcmSizeConfig;
@@ -163,25 +160,21 @@ static uint8_t FLEXRAM_MapTcmSizeToRegister(uint8_t tcmBankNum)
 static status_t FLEXRAM_SetTCMSize(uint8_t itcmBankNum, uint8_t dtcmBankNum)
 {
     /* dtcm configuration */
-    if (dtcmBankNum != 0U)
-    {
+    if (dtcmBankNum != 0U) {
         IOMUXC_GPR->GPR14 &= ~IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ_MASK;
         IOMUXC_GPR->GPR14 |= IOMUXC_GPR_GPR14_CM7_CFGDTCMSZ(FLEXRAM_MapTcmSizeToRegister(dtcmBankNum));
         IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK;
     }
-    else
-    {
+    else {
         IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_INIT_DTCM_EN_MASK;
     }
     /* itcm configuration */
-    if (itcmBankNum != 0U)
-    {
+    if (itcmBankNum != 0U) {
         IOMUXC_GPR->GPR14 &= ~IOMUXC_GPR_GPR14_CM7_CFGITCMSZ_MASK;
         IOMUXC_GPR->GPR14 |= IOMUXC_GPR_GPR14_CM7_CFGITCMSZ(FLEXRAM_MapTcmSizeToRegister(itcmBankNum));
         IOMUXC_GPR->GPR16 |= IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK;
     }
-    else
-    {
+    else {
         IOMUXC_GPR->GPR16 &= ~IOMUXC_GPR_GPR16_INIT_ITCM_EN_MASK;
     }
 
@@ -190,35 +183,30 @@ static status_t FLEXRAM_SetTCMSize(uint8_t itcmBankNum, uint8_t dtcmBankNum)
 
 status_t FLEXRAM_AllocateRam(flexram_allocate_ram_t *config)
 {
-    uint8_t dtcmBankNum = config->dtcmBankNum;
-    uint8_t itcmBankNum = config->itcmBankNum;
+    uint8_t dtcmBankNum  = config->dtcmBankNum;
+    uint8_t itcmBankNum  = config->itcmBankNum;
     uint8_t ocramBankNum = config->ocramBankNum;
     uint32_t bankCfg = 0U, i = 0U;
 
     /* check the arguments */
     if ((FSL_FEATURE_FLEXRAM_INTERNAL_RAM_TOTAL_BANK_NUMBERS < (dtcmBankNum + itcmBankNum + ocramBankNum)) ||
         ((dtcmBankNum != 0U) && ((dtcmBankNum & (dtcmBankNum - 1u)) != 0U)) ||
-        ((itcmBankNum != 0U) && ((itcmBankNum & (itcmBankNum - 1u)) != 0U)))
-    {
+        ((itcmBankNum != 0U) && ((itcmBankNum & (itcmBankNum - 1u)) != 0U))) {
         return kStatus_InvalidArgument;
     }
     /* flexram bank config value */
-    for (i = 0U; i < FSL_FEATURE_FLEXRAM_INTERNAL_RAM_TOTAL_BANK_NUMBERS; i++)
-    {
-        if (i < ocramBankNum)
-        {
+    for (i = 0U; i < FSL_FEATURE_FLEXRAM_INTERNAL_RAM_TOTAL_BANK_NUMBERS; i++) {
+        if (i < ocramBankNum) {
             bankCfg |= ((uint32_t)kFLEXRAM_BankOCRAM) << (i * 2);
             continue;
         }
 
-        if (i < (dtcmBankNum + ocramBankNum))
-        {
+        if (i < (dtcmBankNum + ocramBankNum)) {
             bankCfg |= ((uint32_t)kFLEXRAM_BankDTCM) << (i * 2);
             continue;
         }
 
-        if (i < (dtcmBankNum + ocramBankNum + itcmBankNum))
-        {
+        if (i < (dtcmBankNum + ocramBankNum + itcmBankNum)) {
             bankCfg |= ((uint32_t)kFLEXRAM_BankITCM) << (i * 2);
             continue;
         }

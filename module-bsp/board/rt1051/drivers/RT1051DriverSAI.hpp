@@ -2,12 +2,10 @@
  *  @file RT1051DriverSAI.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 09.08.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_RT1051DRIVERSAI_HPP
 #define PUREPHONE_RT1051DRIVERSAI_HPP
@@ -19,16 +17,17 @@
 #include "../fsl_drivers/fsl_sai.h"
 #include "../fsl_drivers/fsl_sai_edma.h"
 
-namespace drivers {
+namespace drivers
+{
 
     void txAudioCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
     void rxAudioCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
-    class RT1051DriverSAI : public DriverSAI {
+    class RT1051DriverSAI : public DriverSAI
+    {
 
-    public:
-
+      public:
         friend void txAudioCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
 
         friend void rxAudioCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData);
@@ -49,14 +48,12 @@ namespace drivers {
 
         int32_t SetInTransferEndCallback(std::function<int32_t()> callback) override final;
 
-
-    private:
-
-        enum class TransferState {
+      private:
+        enum class TransferState
+        {
             HalfTransfer,
             FullTransfer
         };
-
 
         I2S_Type *base = nullptr;
         SAIInstances instances;
@@ -78,11 +75,9 @@ namespace drivers {
         TransferParams txParams;
         TransferParams rxParams;
 
-        uint32_t txDMASource=0;
-        uint32_t rxDMASource=0;
-
+        uint32_t txDMASource = 0;
+        uint32_t rxDMASource = 0;
     };
-}
+} // namespace drivers
 
-
-#endif //PUREPHONE_RT1051DRIVERSAI_HPP
+#endif // PUREPHONE_RT1051DRIVERSAI_HPP

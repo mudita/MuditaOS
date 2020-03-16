@@ -16,7 +16,8 @@
 
 #include "../Common.hpp"
 
-namespace gui {
+namespace gui
+{
 
     /// Pixel map item (*.mpi extension) loaded by `ImageManager::loadVecMap`
     class PixMap : public ImageMap

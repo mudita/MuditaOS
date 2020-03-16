@@ -23,13 +23,15 @@ namespace gui
         std::vector<gui::Label *> buttons;
         gui::Text *operators;
 
-        gui::Label *addLabel(const UTF8 &title, std::function<bool(Item &)> activatedCallback, bool visibleBorder = true);
+        gui::Label *addLabel(const UTF8 &title,
+                             std::function<bool(Item &)> activatedCallback,
+                             bool visibleBorder = true);
         const std::string titlesText[4] = {"CSQ: ", "Status: ", "Band: ", "Operators: "};
         enum class labelDescripion
         {
-            csq = 0,
-            status = 1,
-            band = 2,
+            csq       = 0,
+            status    = 1,
+            band      = 2,
             operators = 3
         };
 

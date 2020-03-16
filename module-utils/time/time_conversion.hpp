@@ -9,151 +9,163 @@
 #include <string>
 #include <log/log.hpp>
 
-namespace utils {
-namespace time {
-
-    enum class GetParameters
+namespace utils
+{
+    namespace time
     {
-        Hour,
-        Minute,
-        Day,
-        Month,
-        Year
-    };
 
-    // helper class to not put everything in time
-    struct Localer
-    {
-        const unsigned int abbrev_len = 3;
-        /// order matters, it's used in replace_locale with enum Replacements
-        const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
-                                                                 "%A",  // day long
-                                                                 "%b",  // month abbrew
-                                                                 "%B",  // month long
-                                                                 "%Z"}; // timezone
-        /// see specifiers_replacements description above
-        enum Replacements
+        enum class GetParameters
         {
-            DayAbbrev,
-            DayLong,
-            MonthAbbrev,
-            MonthLong,
-            Timezone,
+            Hour,
+            Minute,
+            Day,
+            Month,
+            Year
         };
 
-        UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
-};
+        // helper class to not put everything in time
+        struct Localer
+        {
+            const unsigned int abbrev_len = 3;
+            /// order matters, it's used in replace_locale with enum Replacements
+            const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
+                                                                     "%A",  // day long
+                                                                     "%b",  // month abbrew
+                                                                     "%B",  // month long
+                                                                     "%Z"}; // timezone
+            /// see specifiers_replacements description above
+            enum Replacements
+            {
+                DayAbbrev,
+                DayLong,
+                MonthAbbrev,
+                MonthLong,
+                Timezone,
+            };
 
-class Timestamp : protected Localer
-{
-  protected:
-    time_t time = 0;
-    struct tm timeinfo;
-    /// only reformat on: new format
-    std::string format = "";
+            UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
+        };
 
-    explicit operator UTF8 *() const { return nullptr; }
+        class Timestamp : protected Localer
+        {
+          protected:
+            time_t time = 0;
+            struct tm timeinfo;
+            /// only reformat on: new format
+            std::string format = "";
 
-    static const uint32_t datasize = 128;
-    char data[datasize];
+            explicit operator UTF8 *() const
+            {
+                return nullptr;
+            }
 
-    /// replace day mon specifiers (first 2 characters)
-    /// cant use std::replace -> due to fact that it doesn't support multiple element replace (or i cant find it)
-    /// cant use string::replace -> expcetion out_of_range on size when replacing with bigger (our case)
-    /// please be vary when using begin_pos/found_pos (as format in next loops might be in totally different place)
-    void replace_specifiers();
+            static const uint32_t datasize = 128;
+            char data[datasize];
 
-  public:
-    Timestamp()
-    {
-        auto err = bsp::rtc_GetCurrentTimestamp(&time);
-        if(err) {
-            LOG_ERROR("rtc_GetCurrentTimestamp failure!");
-        }
-        timeinfo = *localtime(&time);
-    }
-    Timestamp(time_t newtime) : time(newtime)
-    {
-        timeinfo = *localtime(&time);
-    }
+            /// replace day mon specifiers (first 2 characters)
+            /// cant use std::replace -> due to fact that it doesn't support multiple element replace (or i cant find
+            /// it) cant use string::replace -> expcetion out_of_range on size when replacing with bigger (our case)
+            /// please be vary when using begin_pos/found_pos (as format in next loops might be in totally different
+            /// place)
+            void replace_specifiers();
 
-    /// set Time time_t value held (set timestamp)
-    void set_time(time_t newtime);
-    /// set Time from string
-    void set_time(std::string time, const char* format);
-    void set_format(std::string format) { this->format = format;}
+          public:
+            Timestamp()
+            {
+                auto err = bsp::rtc_GetCurrentTimestamp(&time);
+                if (err) {
+                    LOG_ERROR("rtc_GetCurrentTimestamp failure!");
+                }
+                timeinfo = *localtime(&time);
+            }
+            Timestamp(time_t newtime) : time(newtime)
+            {
+                timeinfo = *localtime(&time);
+            }
 
-    operator UTF8() { return str(); }
-    friend std::ostream &operator<<(std::ostream &os, Timestamp t)
-    {
-        os << t.str();
-        return os;
-    }
+            /// set Time time_t value held (set timestamp)
+            void set_time(time_t newtime);
+            /// set Time from string
+            void set_time(std::string time, const char *format);
+            void set_format(std::string format)
+            {
+                this->format = format;
+            }
 
-    /// get Time in any format possible via strftime
-    virtual UTF8 str(std::string format="");
+            operator UTF8()
+            {
+                return str();
+            }
+            friend std::ostream &operator<<(std::ostream &os, Timestamp t)
+            {
+                os << t.str();
+                return os;
+            }
 
-    /// get day UTF8 value
-    UTF8 day(bool abbrev = false);
+            /// get Time in any format possible via strftime
+            virtual UTF8 str(std::string format = "");
 
-    /// get month UTF8 value
-    UTF8 month(bool abbrev = false);
+            /// get day UTF8 value
+            UTF8 day(bool abbrev = false);
 
-    // get timestamp value
-    time_t getTime(void)
-    {
-        return time;
-    };
+            /// get month UTF8 value
+            UTF8 month(bool abbrev = false);
 
-    UTF8 get_date_time_substr(GetParameters param);
-    uint32_t get_date_time_sub_value(GetParameters param);
-};
+            // get timestamp value
+            time_t getTime(void)
+            {
+                return time;
+            };
 
-/// helper class to operate on time now
-/// takes timestamp and can show time in past
-class DateTime : public Timestamp
-{
-    time_t local_time = 0;
+            UTF8 get_date_time_substr(GetParameters param);
+            uint32_t get_date_time_sub_value(GetParameters param);
+        };
 
-  public:
-    bool show_textual_past = true;
-    bool date_format_long = true;
-    std::string today_format = "%H:%M";
-    std::string long_ago_format = "%d.%m.%y";
+        /// helper class to operate on time now
+        /// takes timestamp and can show time in past
+        class DateTime : public Timestamp
+        {
+            time_t local_time = 0;
 
-    /// shows time in past: time_now - val in seconds
-    DateTime(time_t val = 0, bool date_format_long = true) : date_format_long(date_format_long)
-    {
-        before_n_sec(val);
-    }
+          public:
+            bool show_textual_past      = true;
+            bool date_format_long       = true;
+            std::string today_format    = "%H:%M";
+            std::string long_ago_format = "%d.%m.%y";
 
-    friend std::ostream &operator<<(std::ostream &os, DateTime t)
-    {
-        os << t.str();
-        return os;
-    }
+            /// shows time in past: time_now - val in seconds
+            DateTime(time_t val = 0, bool date_format_long = true) : date_format_long(date_format_long)
+            {
+                before_n_sec(val);
+            }
 
-    /// converter -> returns time in past: (val) and stores localtime in ref_time
-    void before_n_sec(time_t val);
+            friend std::ostream &operator<<(std::ostream &os, DateTime t)
+            {
+                os << t.str();
+                return os;
+            }
 
-    /// Time have str(std::string ) this one uses presets
-    virtual UTF8 str(std::string format = "");
-    bool isToday();
-    bool isYesterday();
-};
+            /// converter -> returns time in past: (val) and stores localtime in ref_time
+            void before_n_sec(time_t val);
 
-class Date : public DateTime
-{
-  public:
-    Date(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
-    virtual UTF8 str(std::string format = "") final;
-};
+            /// Time have str(std::string ) this one uses presets
+            virtual UTF8 str(std::string format = "");
+            bool isToday();
+            bool isYesterday();
+        };
 
-class Time : public DateTime
-{
-  public:
-    Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
-    virtual UTF8 str(std::string format = "") final;
-};
-};
-};
+        class Date : public DateTime
+        {
+          public:
+            Date(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
+            virtual UTF8 str(std::string format = "") final;
+        };
+
+        class Time : public DateTime
+        {
+          public:
+            Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
+            virtual UTF8 str(std::string format = "") final;
+        };
+    }; // namespace time
+};     // namespace utils

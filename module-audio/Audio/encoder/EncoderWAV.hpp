@@ -2,30 +2,31 @@
  *  @file EncoderWAV.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 24.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_ENCODERWAV_HPP
 #define PUREPHONE_ENCODERWAV_HPP
 
 #include "Encoder.hpp"
 
-namespace audio {
+namespace audio
+{
 
-    class EncoderWAV : public Encoder {
-    public:
+    class EncoderWAV : public Encoder
+    {
+      public:
         EncoderWAV(const char *fileName, const Encoder::Format &frmt);
 
         ~EncoderWAV();
 
         uint32_t Encode(uint32_t samplesToWrite, int16_t *pcmData) override final;
 
-    private:
-        using WAVE_FormatTypeDef =  struct {
+      private:
+        using WAVE_FormatTypeDef = struct
+        {
             uint32_t ChunkID;       /* 0 */
             uint32_t FileSize;      /* 4 */
             uint32_t FileFormat;    /* 8 */
@@ -46,12 +47,9 @@ namespace audio {
 
         void HeaderUpdate();
 
-
         uint8_t pHeaderBuff[44] = {0};
-
     };
 
-}
+} // namespace audio
 
-
-#endif //PUREPHONE_ENCODERWAV_HPP
+#endif // PUREPHONE_ENCODERWAV_HPP

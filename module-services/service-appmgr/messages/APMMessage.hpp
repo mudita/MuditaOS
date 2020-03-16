@@ -16,127 +16,165 @@
 
 #include "i18/i18.hpp"
 
-namespace sapm {
+namespace sapm
+{
 
-/*
- * @brief Template for all messages that go to application manager
- */
-class APMMessage: public sys::DataMessage {
-protected:
-	//name of the application that is sending message to application manager.
-	std::string senderName;
-public:
-  APMMessage(MessageType messageType, const std::string &senderName) : sys::DataMessage(messageType), senderName{senderName} {};
-  virtual ~APMMessage(){};
+    /*
+     * @brief Template for all messages that go to application manager
+     */
+    class APMMessage : public sys::DataMessage
+    {
+      protected:
+        // name of the application that is sending message to application manager.
+        std::string senderName;
 
-  std::string getSenderName()
-  {
-      return senderName;
-  }
-};
+      public:
+        APMMessage(MessageType messageType, const std::string &senderName)
+            : sys::DataMessage(messageType), senderName{senderName} {};
+        virtual ~APMMessage(){};
 
+        std::string getSenderName()
+        {
+            return senderName;
+        }
+    };
 
-//	APMSwitch, //request to switch to given application, optionally also to specified window
-//	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
-//	APMSwitchPrevApp, //Request to switch to previous application.
-//	APMConfirmSwitch, //Used when application confirms that it is loosing focus and also when application confirms that is has gained focus
-//	APMConfirmClose, //Sent by application to confirm completion of the close procedure
+    //	APMSwitch, //request to switch to given application, optionally also to specified window
+    //	APMSwitchData, //request to switch to given application, optionally also to specified window with provided data.
+    //	APMSwitchPrevApp, //Request to switch to previous application.
+    //	APMConfirmSwitch, //Used when application confirms that it is loosing focus and also when application confirms
+    //that is has gained focus 	APMConfirmClose, //Sent by application to confirm completion of the close procedure
 
-class APMSwitch : public APMMessage {
-	std::string application;
-	std::string window;
-	std::unique_ptr<gui::SwitchData> data;
-public:
-	APMSwitch( const std::string& senderName, const std::string& applicationName, const std::string& windowName, std::unique_ptr<gui::SwitchData> data ) :
-		APMMessage( MessageType::APMSwitch, senderName ),
-		application{ applicationName },
-		window{ windowName },
-		data{ std::move(data) }{
-	}
-	const std::string& getName() const { return application; };
-	const std::string& getWindow() const { return window; };
-	std::unique_ptr<gui::SwitchData>& getData() { return data; };
-};
+    class APMSwitch : public APMMessage
+    {
+        std::string application;
+        std::string window;
+        std::unique_ptr<gui::SwitchData> data;
 
-class APMSwitchPrevApp : public APMMessage {
-	std::unique_ptr<gui::SwitchData> data;
-public:
-	APMSwitchPrevApp( const std::string& name, std::unique_ptr<gui::SwitchData> data = nullptr) :
-		APMMessage( MessageType::APMSwitchPrevApp, name ),
-		data{ std::move(data) } {}
-	std::unique_ptr<gui::SwitchData>& getData() { return data; };
-};
+      public:
+        APMSwitch(const std::string &senderName,
+                  const std::string &applicationName,
+                  const std::string &windowName,
+                  std::unique_ptr<gui::SwitchData> data)
+            : APMMessage(MessageType::APMSwitch, senderName),
+              application{applicationName}, window{windowName}, data{std::move(data)}
+        {}
+        const std::string &getName() const
+        {
+            return application;
+        };
+        const std::string &getWindow() const
+        {
+            return window;
+        };
+        std::unique_ptr<gui::SwitchData> &getData()
+        {
+            return data;
+        };
+    };
 
-class APMConfirmSwitch : public APMMessage {
-public:
-	APMConfirmSwitch( const std::string& name ) : APMMessage( MessageType::APMConfirmSwitch, name ) {}
-};
+    class APMSwitchPrevApp : public APMMessage
+    {
+        std::unique_ptr<gui::SwitchData> data;
 
-class APMConfirmClose: public APMMessage {
-public:
-	APMConfirmClose( const std::string& name ) :
-		APMMessage( MessageType::APMConfirmClose, name ) {}
-};
+      public:
+        APMSwitchPrevApp(const std::string &name, std::unique_ptr<gui::SwitchData> data = nullptr)
+            : APMMessage(MessageType::APMSwitchPrevApp, name), data{std::move(data)}
+        {}
+        std::unique_ptr<gui::SwitchData> &getData()
+        {
+            return data;
+        };
+    };
 
-class APMRegister: public APMMessage {
-protected:
-	bool status;
-	bool startBackground;
-public:
-	APMRegister( const std::string& senderName, const bool& status, const bool& startBackground  ) :
-	APMMessage( MessageType::APMRegister, senderName ),
-	status{ status },
-	startBackground{ startBackground }{}
+    class APMConfirmSwitch : public APMMessage
+    {
+      public:
+        APMConfirmSwitch(const std::string &name) : APMMessage(MessageType::APMConfirmSwitch, name)
+        {}
+    };
 
-	const bool& getStatus() { return status; };
-	const bool& getStartBackground() { return startBackground; };
-};
+    class APMConfirmClose : public APMMessage
+    {
+      public:
+        APMConfirmClose(const std::string &name) : APMMessage(MessageType::APMConfirmClose, name)
+        {}
+    };
 
-class APMDelayedClose: public APMMessage {
-protected:
-	std::string application;
-public:
-	APMDelayedClose( const std::string& senderName, std::string application  ) :
-	APMMessage( MessageType::APMDeleydClose, senderName ),
-	application{ application } {}
+    class APMRegister : public APMMessage
+    {
+      protected:
+        bool status;
+        bool startBackground;
 
-	const std::string& getApplication() { return application; };
-};
+      public:
+        APMRegister(const std::string &senderName, const bool &status, const bool &startBackground)
+            : APMMessage(MessageType::APMRegister, senderName), status{status}, startBackground{startBackground}
+        {}
 
-class APMChangeLanguage: public APMMessage {
-protected:
-	utils::Lang language;
-public:
-	APMChangeLanguage( const std::string& senderName, utils::Lang language ) :
-	APMMessage( MessageType::APMChangeLanguage, senderName ),
-	language{ language } {}
+        const bool &getStatus()
+        {
+            return status;
+        };
+        const bool &getStartBackground()
+        {
+            return startBackground;
+        };
+    };
 
-	const utils::Lang& getLanguage() { return language; };
-};
+    class APMDelayedClose : public APMMessage
+    {
+      protected:
+        std::string application;
 
-class APMClose: public APMMessage {
-public:
-	APMClose( const std::string& senderName) :
-	APMMessage( MessageType::APMClose, senderName )
-	{}
-};
+      public:
+        APMDelayedClose(const std::string &senderName, std::string application)
+            : APMMessage(MessageType::APMDeleydClose, senderName), application{application}
+        {}
 
-class APMPreventBlocking: public APMMessage {
-public:
-	APMPreventBlocking( const std::string& senderName) :
-	APMMessage( MessageType::APMPreventBlocking, senderName )
-	{}
-};
+        const std::string &getApplication()
+        {
+            return application;
+        };
+    };
 
-class APMInitPowerSaveMode: public APMMessage {
-public:
-	APMInitPowerSaveMode( const std::string& senderName) :
-	APMMessage( MessageType::APMInitPowerSaveMode, senderName )
-	{}
-};
+    class APMChangeLanguage : public APMMessage
+    {
+      protected:
+        utils::Lang language;
+
+      public:
+        APMChangeLanguage(const std::string &senderName, utils::Lang language)
+            : APMMessage(MessageType::APMChangeLanguage, senderName), language{language}
+        {}
+
+        const utils::Lang &getLanguage()
+        {
+            return language;
+        };
+    };
+
+    class APMClose : public APMMessage
+    {
+      public:
+        APMClose(const std::string &senderName) : APMMessage(MessageType::APMClose, senderName)
+        {}
+    };
+
+    class APMPreventBlocking : public APMMessage
+    {
+      public:
+        APMPreventBlocking(const std::string &senderName) : APMMessage(MessageType::APMPreventBlocking, senderName)
+        {}
+    };
+
+    class APMInitPowerSaveMode : public APMMessage
+    {
+      public:
+        APMInitPowerSaveMode(const std::string &senderName) : APMMessage(MessageType::APMInitPowerSaveMode, senderName)
+        {}
+    };
 
 } /* namespace sapm */
-
-
 
 #endif /* MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_ */

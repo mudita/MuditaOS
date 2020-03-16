@@ -8,23 +8,18 @@
  * @details
  */
 
-
 #include "SettingsTable.hpp"
 
+SettingsTable::SettingsTable(Database *db) : Table(db)
+{}
 
-SettingsTable::SettingsTable(Database *db):Table(db) {
+SettingsTable::~SettingsTable()
+{}
 
-}
-
-SettingsTable::~SettingsTable() {
-
-}
-
-
-
-bool SettingsTable::Create() {
+bool SettingsTable::Create()
+{
     bool ret = true;
-    ret = db->Execute(createTableQuery);
+    ret      = db->Execute(createTableQuery);
     if (!ret) {
         return false;
     }
@@ -33,11 +28,12 @@ bool SettingsTable::Create() {
     return ret;
 }
 
-SettingsTableRow SettingsTable::GetByID(uint32_t id) {
+SettingsTableRow SettingsTable::GetByID(uint32_t id)
+{
 
     auto retQuery = db->Query("SELECT * FROM settings WHERE _id= 1;");
 
-    if ( (retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return SettingsTableRow();
     }
 
@@ -63,38 +59,61 @@ SettingsTableRow SettingsTable::GetByID(uint32_t id) {
     };
 }
 
-bool SettingsTable::Update(SettingsTableRow entry) {
-    return db->Execute("UPDATE settings SET time_format_12 = %lu, time_auto = %lu, time_date_format = %lu ,brightness_auto = %lu, brightness_level = %lu, "
-                       "bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%s', pin2_string = '%s', active_sim = %lu, "
+bool SettingsTable::Update(SettingsTableRow entry)
+{
+    return db->Execute("UPDATE settings SET time_format_12 = %lu, time_auto = %lu, time_date_format = %lu "
+                       ",brightness_auto = %lu, brightness_level = %lu, "
+                       "bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%s', "
+                       "pin2_string = '%s', active_sim = %lu, "
                        "network_operator = '%s', lock_pass_hash = %lu, lock_time = %lu, language = %lu WHERE _id=1;",
-                       entry.timeFormat12, entry.timeAuto, entry.timeDateFormat, entry.brightnessAuto, entry.brightnessLevel, entry.fontSize, entry.pinMode,
-                       entry.pinDays, entry.pinDaysLeft, entry.pin1.c_str(), entry.pin2.c_str(), entry.activeSIM, entry.networkOperator.c_str(),
-                       entry.lockPassHash, entry.lockTime, entry.language);
+                       entry.timeFormat12,
+                       entry.timeAuto,
+                       entry.timeDateFormat,
+                       entry.brightnessAuto,
+                       entry.brightnessLevel,
+                       entry.fontSize,
+                       entry.pinMode,
+                       entry.pinDays,
+                       entry.pinDaysLeft,
+                       entry.pin1.c_str(),
+                       entry.pin2.c_str(),
+                       entry.activeSIM,
+                       entry.networkOperator.c_str(),
+                       entry.lockPassHash,
+                       entry.lockTime,
+                       entry.language);
 }
 
-bool SettingsTable::Add(SettingsTableRow entry) {
-    //dummy
+bool SettingsTable::Add(SettingsTableRow entry)
+{
+    // dummy
     return true;
 }
 
-bool SettingsTable::RemoveByID(uint32_t id) {
+bool SettingsTable::RemoveByID(uint32_t id)
+{
     return true;
 }
 
-std::vector<SettingsTableRow> SettingsTable::GetLimitOffset(uint32_t offset, uint32_t limit) {
+std::vector<SettingsTableRow> SettingsTable::GetLimitOffset(uint32_t offset, uint32_t limit)
+{
     return std::vector<SettingsTableRow>{};
 }
 
-std::vector<SettingsTableRow> SettingsTable::GetLimitOffsetByField(uint32_t offset, uint32_t limit,
-                                                                   SettingsTableFields field, const char *str) {
+std::vector<SettingsTableRow> SettingsTable::GetLimitOffsetByField(uint32_t offset,
+                                                                   uint32_t limit,
+                                                                   SettingsTableFields field,
+                                                                   const char *str)
+{
     return std::vector<SettingsTableRow>{};
-
 }
 
-uint32_t SettingsTable::GetCount() {
+uint32_t SettingsTable::GetCount()
+{
     return 0;
 }
 
-uint32_t SettingsTable::GetCountByFieldID(const char *field, uint32_t id) {
+uint32_t SettingsTable::GetCountByFieldID(const char *field, uint32_t id)
+{
     return 0;
 }

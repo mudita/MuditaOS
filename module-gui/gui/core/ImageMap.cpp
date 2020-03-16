@@ -8,16 +8,19 @@
  */
 #include "ImageMap.hpp"
 
-namespace gui {
+namespace gui
+{
 
-ImageMap::ImageMap() : id{0},  width{ 0 }, height{0}, data{nullptr}, name{""} {}
+    ImageMap::ImageMap() : id{0}, width{0}, height{0}, data{nullptr}, name{""}
+    {}
 
-ImageMap::ImageMap( uint16_t w, uint16_t h, uint8_t* data ) : id{0}, width{ w }, height{ h }, name{""} {
-}
+    ImageMap::ImageMap(uint16_t w, uint16_t h, uint8_t *data) : id{0}, width{w}, height{h}, name{""}
+    {}
 
-ImageMap::~ImageMap() {
-	if( data )
-		delete []data;
-	data = nullptr;
-}
+    ImageMap::~ImageMap()
+    {
+        if (data)
+            delete[] data;
+        data = nullptr;
+    }
 } /* namespace gui */

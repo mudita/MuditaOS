@@ -16,10 +16,10 @@
  * Definitions
  ******************************************************************************/
 #define USB_OSA_BM_EVENT_COUNT (4U)
-#define USB_OSA_BM_SEM_COUNT (1U)
-#define USB_OSA_BM_MSGQ_COUNT (1U)
-#define USB_OSA_BM_MSG_COUNT (8U)
-#define USB_OSA_BM_MSG_SIZE (4U)
+#define USB_OSA_BM_SEM_COUNT   (1U)
+#define USB_OSA_BM_MSGQ_COUNT  (1U)
+#define USB_OSA_BM_MSG_COUNT   (8U)
+#define USB_OSA_BM_MSG_SIZE    (4U)
 
 /* BM Event status structure */
 typedef struct _usb_osa_event_struct
@@ -62,9 +62,12 @@ typedef struct _usb_osa_msgq_struct
  * Variables
  ******************************************************************************/
 
-USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_sem_struct_t s_UsbBmSemStruct[USB_OSA_BM_SEM_COUNT];
-USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_event_struct_t s_UsbBmEventStruct[USB_OSA_BM_EVENT_COUNT];
-USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_msgq_struct_t s_UsbBmMsgqStruct[USB_OSA_BM_MSGQ_COUNT];
+USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_sem_struct_t
+    s_UsbBmSemStruct[USB_OSA_BM_SEM_COUNT];
+USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_event_struct_t
+    s_UsbBmEventStruct[USB_OSA_BM_EVENT_COUNT];
+USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_msgq_struct_t
+    s_UsbBmMsgqStruct[USB_OSA_BM_MSGQ_COUNT];
 
 /*******************************************************************************
  * Code
@@ -72,12 +75,10 @@ USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static usb_osa_msgq_st
 
 void *USB_OsaMemoryAllocate(uint32_t length)
 {
-    void *p = (void *)malloc(length);
+    void *p       = (void *)malloc(length);
     uint8_t *temp = (uint8_t *)p;
-    if (p)
-    {
-        for (uint32_t count = 0U; count < length; count++)
-        {
+    if (p) {
+        for (uint32_t count = 0U; count < length; count++) {
             temp[count] = 0U;
         }
     }
@@ -106,31 +107,27 @@ usb_osa_status_t USB_OsaEventCreate(usb_osa_event_handle *handle, uint32_t flag)
     usb_osa_event_struct_t *event = NULL;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
 
     USB_OSA_ENTER_CRITICAL();
-    for (uint32_t i = 0; i < USB_OSA_BM_EVENT_COUNT; i++)
-    {
-        if (0 == s_UsbBmEventStruct[i].isUsed)
-        {
+    for (uint32_t i = 0; i < USB_OSA_BM_EVENT_COUNT; i++) {
+        if (0 == s_UsbBmEventStruct[i].isUsed) {
             event = &s_UsbBmEventStruct[i];
             break;
         }
     }
 
-    if (NULL == event)
-    {
+    if (NULL == event) {
         USB_OSA_EXIT_CRITICAL();
         return kStatus_USB_OSA_Error;
     }
 
-    event->value = 0U;
-    event->flag = flag;
+    event->value  = 0U;
+    event->flag   = flag;
     event->isUsed = 1;
-    *handle = event;
+    *handle       = event;
     USB_OSA_EXIT_CRITICAL();
     return kStatus_USB_OSA_Success;
 }
@@ -140,8 +137,7 @@ usb_osa_status_t USB_OsaEventDestroy(usb_osa_event_handle handle)
     usb_osa_event_struct_t *event = (usb_osa_event_struct_t *)handle;
     USB_OSA_SR_ALLOC();
 
-    if (handle)
-    {
+    if (handle) {
         USB_OSA_ENTER_CRITICAL();
         event->isUsed = 0;
         USB_OSA_EXIT_CRITICAL();
@@ -155,8 +151,7 @@ usb_osa_status_t USB_OsaEventSet(usb_osa_event_handle handle, uint32_t bitMask)
     usb_osa_event_struct_t *event = (usb_osa_event_struct_t *)handle;
     USB_OSA_SR_ALLOC();
 
-    if (handle)
-    {
+    if (handle) {
         USB_OSA_ENTER_CRITICAL();
         event->value |= bitMask;
         USB_OSA_EXIT_CRITICAL();
@@ -165,38 +160,32 @@ usb_osa_status_t USB_OsaEventSet(usb_osa_event_handle handle, uint32_t bitMask)
     return kStatus_USB_OSA_Error;
 }
 
-usb_osa_status_t USB_OsaEventWait(usb_osa_event_handle handle, uint32_t bitMask, uint32_t flag, uint32_t timeout, uint32_t *bitSet)
+usb_osa_status_t USB_OsaEventWait(
+    usb_osa_event_handle handle, uint32_t bitMask, uint32_t flag, uint32_t timeout, uint32_t *bitSet)
 {
     usb_osa_event_struct_t *event = (usb_osa_event_struct_t *)handle;
     uint32_t bits;
     USB_OSA_SR_ALLOC();
 
-    if (handle)
-    {
+    if (handle) {
         USB_OSA_ENTER_CRITICAL();
         bits = event->value & bitMask;
-        if (flag)
-        {
-            if (bits != bitMask)
-            {
+        if (flag) {
+            if (bits != bitMask) {
                 USB_OSA_EXIT_CRITICAL();
                 return kStatus_USB_OSA_TimeOut;
             }
         }
-        else
-        {
-            if (!bits)
-            {
+        else {
+            if (!bits) {
                 USB_OSA_EXIT_CRITICAL();
                 return kStatus_USB_OSA_TimeOut;
             }
         }
-        if (bitSet)
-        {
+        if (bitSet) {
             *bitSet = bits;
         }
-        if (event->flag)
-        {
+        if (event->flag) {
             event->value &= ~bits;
         }
         USB_OSA_EXIT_CRITICAL();
@@ -211,19 +200,16 @@ usb_osa_status_t USB_OsaEventCheck(usb_osa_event_handle handle, uint32_t bitMask
     uint32_t bits;
     USB_OSA_SR_ALLOC();
 
-    if (handle)
-    {
+    if (handle) {
         USB_OSA_ENTER_CRITICAL();
         bits = event->value & bitMask;
 
-        if (!bits)
-        {
+        if (!bits) {
             USB_OSA_EXIT_CRITICAL();
             return kStatus_USB_OSA_Error;
         }
 
-        if (bitSet)
-        {
+        if (bitSet) {
             *bitSet = bits;
         }
         USB_OSA_EXIT_CRITICAL();
@@ -238,8 +224,7 @@ usb_osa_status_t USB_OsaEventClear(usb_osa_event_handle handle, uint32_t bitMask
     uint32_t bits;
     USB_OSA_SR_ALLOC();
 
-    if (handle)
-    {
+    if (handle) {
         USB_OSA_ENTER_CRITICAL();
         bits = event->value & bitMask;
         event->value &= ~bits;
@@ -254,29 +239,25 @@ usb_osa_status_t USB_OsaSemCreate(usb_osa_sem_handle *handle, uint32_t count)
     usb_osa_sem_struct_t *sem = NULL;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
 
     USB_OSA_ENTER_CRITICAL();
-    for (uint32_t i = 0; i < USB_OSA_BM_SEM_COUNT; i++)
-    {
-        if (0 == s_UsbBmSemStruct[i].isUsed)
-        {
+    for (uint32_t i = 0; i < USB_OSA_BM_SEM_COUNT; i++) {
+        if (0 == s_UsbBmSemStruct[i].isUsed) {
             sem = &s_UsbBmSemStruct[i];
             break;
         }
     }
-    if (NULL == sem)
-    {
+    if (NULL == sem) {
         USB_OSA_EXIT_CRITICAL();
         return kStatus_USB_OSA_Error;
     }
 
-    sem->value = count;
+    sem->value  = count;
     sem->isUsed = 1;
-    *handle = sem;
+    *handle     = sem;
     USB_OSA_EXIT_CRITICAL();
     return kStatus_USB_OSA_Success;
 }
@@ -286,8 +267,7 @@ usb_osa_status_t USB_OsaSemDestroy(usb_osa_sem_handle handle)
     usb_osa_sem_struct_t *sem = (usb_osa_sem_struct_t *)handle;
     USB_OSA_SR_ALLOC();
 
-    if (handle)
-    {
+    if (handle) {
         USB_OSA_ENTER_CRITICAL();
         sem->isUsed = 0;
         USB_OSA_EXIT_CRITICAL();
@@ -301,8 +281,7 @@ usb_osa_status_t USB_OsaSemPost(usb_osa_sem_handle handle)
     usb_osa_sem_struct_t *sem = (usb_osa_sem_struct_t *)handle;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
 
@@ -317,18 +296,15 @@ usb_osa_status_t USB_OsaSemWait(usb_osa_sem_handle handle, uint32_t timeout)
     usb_osa_sem_struct_t *sem = (usb_osa_sem_struct_t *)handle;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
 
     USB_OSA_ENTER_CRITICAL();
-    if (sem->value)
-    {
+    if (sem->value) {
         sem->value--;
     }
-    else
-    {
+    else {
         USB_OSA_EXIT_CRITICAL();
         return kStatus_USB_OSA_TimeOut;
     }
@@ -338,8 +314,7 @@ usb_osa_status_t USB_OsaSemWait(usb_osa_sem_handle handle, uint32_t timeout)
 
 usb_osa_status_t USB_OsaMutexCreate(usb_osa_mutex_handle *handle)
 {
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
     *handle = (usb_osa_mutex_handle)0xFFFF0000U;
@@ -364,32 +339,28 @@ usb_osa_status_t USB_OsaMsgqCreate(usb_osa_msgq_handle *handle, uint32_t count, 
     usb_osa_msgq_struct_t *msgq = NULL;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
     USB_OSA_ENTER_CRITICAL();
 
-    for (uint32_t i = 0; i < USB_OSA_BM_MSGQ_COUNT; i++)
-    {
-        if (0 == s_UsbBmMsgqStruct[i].isUsed)
-        {
+    for (uint32_t i = 0; i < USB_OSA_BM_MSGQ_COUNT; i++) {
+        if (0 == s_UsbBmMsgqStruct[i].isUsed) {
             msgq = &s_UsbBmMsgqStruct[i];
             break;
         }
     }
-    if ((NULL == msgq) || (count > USB_OSA_BM_MSG_COUNT) || (size > USB_OSA_BM_MSG_SIZE))
-    {
+    if ((NULL == msgq) || (count > USB_OSA_BM_MSG_COUNT) || (size > USB_OSA_BM_MSG_SIZE)) {
         USB_OSA_EXIT_CRITICAL();
         return kStatus_USB_OSA_Error;
     }
-    msgq->count = count;
-    msgq->msgSize = size;
+    msgq->count    = count;
+    msgq->msgSize  = size;
     msgq->msgCount = 0U;
-    msgq->index = 0U;
-    msgq->current = 0U;
-    msgq->isUsed = 1;
-    *handle = msgq;
+    msgq->index    = 0U;
+    msgq->current  = 0U;
+    msgq->isUsed   = 1;
+    *handle        = msgq;
     USB_OSA_EXIT_CRITICAL();
     return kStatus_USB_OSA_Success;
 }
@@ -399,8 +370,7 @@ usb_osa_status_t USB_OsaMsgqDestroy(usb_osa_msgq_handle handle)
     usb_osa_msgq_struct_t *msgq = (usb_osa_msgq_struct_t *)handle;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
     USB_OSA_ENTER_CRITICAL();
@@ -418,28 +388,24 @@ usb_osa_status_t USB_OsaMsgqSend(usb_osa_msgq_handle handle, void *msg)
     uint32_t count;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
     USB_OSA_ENTER_CRITICAL();
-    if (msgq->msgCount >= msgq->count)
-    {
+    if (msgq->msgCount >= msgq->count) {
         USB_OSA_EXIT_CRITICAL();
         return kStatus_USB_OSA_Error;
     }
 
     msgEntity = &msgq->msgs[msgq->index];
-    p = (uint32_t *)&msgEntity->msg[0];
-    q = (uint32_t *)msg;
+    p         = (uint32_t *)&msgEntity->msg[0];
+    q         = (uint32_t *)msg;
 
-    for (count = 0U; count < msgq->msgSize; count++)
-    {
+    for (count = 0U; count < msgq->msgSize; count++) {
         p[count] = q[count];
     }
 
-    if (0U == msgq->msgCount)
-    {
+    if (0U == msgq->msgCount) {
         msgq->current = msgq->index;
     }
 
@@ -461,23 +427,20 @@ usb_osa_status_t USB_OsaMsgqRecv(usb_osa_msgq_handle handle, void *msg, uint32_t
     uint32_t count;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
     USB_OSA_ENTER_CRITICAL();
-    if (msgq->msgCount < 1U)
-    {
+    if (msgq->msgCount < 1U) {
         USB_OSA_EXIT_CRITICAL();
         return kStatus_USB_OSA_TimeOut;
     }
 
     msgEntity = &msgq->msgs[msgq->current];
-    q = (uint32_t *)&msgEntity->msg[0];
-    p = (uint32_t *)msg;
+    q         = (uint32_t *)&msgEntity->msg[0];
+    p         = (uint32_t *)msg;
 
-    for (count = 0U; count < msgq->msgSize; count++)
-    {
+    for (count = 0U; count < msgq->msgSize; count++) {
         p[count] = q[count];
     }
 
@@ -496,8 +459,7 @@ usb_osa_status_t USB_OsaMsgqCheck(usb_osa_msgq_handle handle, void *msg)
     uint32_t msgCount;
     USB_OSA_SR_ALLOC();
 
-    if (!handle)
-    {
+    if (!handle) {
         return kStatus_USB_OSA_Error;
     }
 
@@ -505,10 +467,8 @@ usb_osa_status_t USB_OsaMsgqCheck(usb_osa_msgq_handle handle, void *msg)
     msgCount = msgq->msgCount;
     USB_OSA_EXIT_CRITICAL();
 
-    if (msgCount)
-    {
-        if (kStatus_USB_OSA_Success == USB_OsaMsgqRecv(msgq, msg, 0U))
-        {
+    if (msgCount) {
+        if (kStatus_USB_OSA_Success == USB_OsaMsgqRecv(msgq, msg, 0U)) {
             return kStatus_USB_OSA_Success;
         }
     }

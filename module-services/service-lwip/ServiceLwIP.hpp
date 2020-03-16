@@ -5,9 +5,11 @@
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 
-class LwIP_message : public sys::DataMessage {
-   public:
-    enum Request {
+class LwIP_message : public sys::DataMessage
+{
+  public:
+    enum Request
+    {
         None,
         Start,
         Stop,
@@ -19,8 +21,9 @@ class LwIP_message : public sys::DataMessage {
 
 sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req);
 
-class ServiceLwIP : public sys::Service {
-   public:
+class ServiceLwIP : public sys::Service
+{
+  public:
     ServiceLwIP();
     ~ServiceLwIP() = default;
 
@@ -30,7 +33,7 @@ class ServiceLwIP : public sys::Service {
     sys::ReturnCodes DeinitHandler() override;
     virtual sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
-   private:
+  private:
     static const char *serviceName;
     uint32_t testTimerID;
 };

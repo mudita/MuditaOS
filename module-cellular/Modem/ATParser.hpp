@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #ifndef PUREPHONE_ATPARSER_HPP
 #define PUREPHONE_ATPARSER_HPP
 
@@ -20,7 +19,8 @@
 #include <task.h>
 #include <vector>
 
-namespace bsp{
+namespace bsp
+{
     class Cellular;
 }
 
@@ -37,7 +37,7 @@ class ATParser : public at::Chanel
         NotHandled,
     };
 
-    ATParser(bsp::Cellular* cellular);
+    ATParser(bsp::Cellular *cellular);
 
     int ProcessNewData(sys::Service *service);
 
@@ -47,12 +47,11 @@ class ATParser : public at::Chanel
     virtual void cmd_post() override final;
 
   private:
-
     std::vector<Urc> ParseURC();
-    bsp::Cellular* cellular = nullptr;
+    bsp::Cellular *cellular = nullptr;
     std::string responseBuffer;
     std::vector<ATParser::Urc> urcs;
     bool isInitialized = false;
 };
 
-#endif //PUREPHONE_ATPARSER_HPP
+#endif // PUREPHONE_ATPARSER_HPP

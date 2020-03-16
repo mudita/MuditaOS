@@ -7,22 +7,16 @@
 
 #include "AlarmsDB.hpp"
 
-
 const char *AlarmsDB::dbName = "sys/alarms.db";
 
-AlarmsDB::AlarmsDB() :
-        Database(dbName),
-        alarms(this){
+AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
+{
 
-        if(alarms.Create() == false) return;
+    if (alarms.Create() == false)
+        return;
 
-
-        isInitialized = true;
-
+    isInitialized = true;
 }
 
-AlarmsDB::~AlarmsDB() {
-
-}
-
-
+AlarmsDB::~AlarmsDB()
+{}

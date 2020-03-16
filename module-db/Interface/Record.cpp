@@ -8,5 +8,4 @@
  * @details
  */
 
-
 #include "Record.hpp"

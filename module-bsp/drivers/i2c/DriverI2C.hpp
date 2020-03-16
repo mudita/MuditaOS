@@ -2,47 +2,49 @@
  *  @file DriverI2C.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 29.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_DRIVERI2C_HPP
 #define PUREPHONE_DRIVERI2C_HPP
 
 #include <memory>
 
-namespace drivers {
+namespace drivers
+{
 
-
-    enum class I2CInstances {
+    enum class I2CInstances
+    {
         I2C1,
         I2C2,
         COUNT
     };
 
-    struct DriverI2CParams {
+    struct DriverI2CParams
+    {
         uint32_t baudrate;
-        //TODO:M.P add slave conf
+        // TODO:M.P add slave conf
     };
 
-    struct I2CAddress {
+    struct I2CAddress
+    {
         uint32_t deviceAddress;
         uint32_t subAddress;
         size_t subAddressSize;
     };
 
-
-    class DriverI2C {
-    public:
-
+    class DriverI2C
+    {
+      public:
         static std::shared_ptr<DriverI2C> Create(const I2CInstances inst, const DriverI2CParams &params);
 
-        DriverI2C(const DriverI2CParams& params,const I2CInstances inst): parameters(params),instance(inst) {}
+        DriverI2C(const DriverI2CParams &params, const I2CInstances inst) : parameters(params), instance(inst)
+        {}
 
-        virtual ~DriverI2C() {}
+        virtual ~DriverI2C()
+        {}
 
         virtual ssize_t Write(const I2CAddress &addr, const uint8_t *txBuff, const size_t size) = 0;
 
@@ -50,16 +52,14 @@ namespace drivers {
 
         virtual ssize_t Modify(const I2CAddress &addr, const uint32_t mask, bool setClr, const size_t size) = 0;
 
-    protected:
+      protected:
         I2CInstances instance;
         const DriverI2CParams parameters;
 
-    private:
-        static std::weak_ptr<DriverI2C> singleton[static_cast<uint32_t >(I2CInstances ::COUNT)];
-
+      private:
+        static std::weak_ptr<DriverI2C> singleton[static_cast<uint32_t>(I2CInstances ::COUNT)];
     };
 
-}
+} // namespace drivers
 
-
-#endif //PUREPHONE_DRIVERI2C_HPP
+#endif // PUREPHONE_DRIVERI2C_HPP

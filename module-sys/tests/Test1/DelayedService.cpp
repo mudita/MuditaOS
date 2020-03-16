@@ -4,7 +4,5 @@
 
 #include "DelayedService.hpp"
 
-
-
-uint32_t DelayedService::DelayerServiceInstanceCount=0;
-uint32_t DelayedService::DelayerServiceDataMessageReceivedCount=0;
+uint32_t DelayedService::DelayerServiceInstanceCount            = 0;
+uint32_t DelayedService::DelayerServiceDataMessageReceivedCount = 0;

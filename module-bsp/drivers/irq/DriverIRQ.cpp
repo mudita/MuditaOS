@@ -8,5 +8,4 @@
  * @details
  */
 
-
 #include "DriverIRQ.hpp"

@@ -11,16 +11,19 @@ namespace gui::options
     {
         assert(app != nullptr);
         return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
-                [app, contact, callOperation](gui::Item &item) { return app::call(app, callOperation, contact); }, gui::Arrow::Enabled};
+                [app, contact, callOperation](gui::Item &item) { return app::call(app, callOperation, contact); },
+                gui::Arrow::Enabled};
     }
 
-    Option contact(Application *app, ContactOperation contactOperation, const ContactRecord &contactRec, gui::Arrow arrow)
+    Option contact(Application *app,
+                   ContactOperation contactOperation,
+                   const ContactRecord &contactRec,
+                   gui::Arrow arrow)
     {
         assert(app != nullptr);
 
         std::string str;
-        switch (contactOperation)
-        {
+        switch (contactOperation) {
         case ContactOperation::Details:
             str = utils::localize.get("app_options_contact_details");
             break;

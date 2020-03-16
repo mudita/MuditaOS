@@ -2,12 +2,10 @@
  *  @file DriverSAI.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 09.08.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_DRIVERSAI_HPP
 #define PUREPHONE_DRIVERSAI_HPP
@@ -18,19 +16,21 @@
 #include "drivers/dmamux/DriverDMAMux.hpp"
 #include "drivers/pll/DriverPLL.hpp"
 
+namespace drivers
+{
 
-namespace drivers {
-
-
-    enum class SAIInstances {
+    enum class SAIInstances
+    {
         SAI_1,
         SAI_2,
         SAI_3
     };
 
-    struct DriverSAIParams {
+    struct DriverSAIParams
+    {
 
-        enum class Protocol {
+        enum class Protocol
+        {
             LeftJustified,
             RightJusstified,
             I2S,
@@ -38,13 +38,15 @@ namespace drivers {
             PCMB
         };
 
-        enum class MonoStereo {
+        enum class MonoStereo
+        {
             Stereo = 0,
             MonoRight,
             MonoLeft
         };
 
-        enum class MasterSlave{
+        enum class MasterSlave
+        {
             Master,
             Slave
         };
@@ -58,27 +60,27 @@ namespace drivers {
         MasterSlave masterslave;
         uint32_t rxDMAChannel;
         uint32_t txDMAChannel;
-
-
     };
 
-    struct TransferParams {
+    struct TransferParams
+    {
         uint8_t *data;
         size_t size;
     };
 
-    struct TransferFormat {
+    struct TransferFormat
+    {};
 
-    };
-
-    class DriverSAI {
-    public:
-
+    class DriverSAI
+    {
+      public:
         static std::shared_ptr<DriverSAI> Create(const SAIInstances inst, const DriverSAIParams &params);
 
-        DriverSAI(const DriverSAIParams &params) : parameters(params) {}
+        DriverSAI(const DriverSAIParams &params) : parameters(params)
+        {}
 
-        virtual ~DriverSAI() {}
+        virtual ~DriverSAI()
+        {}
 
         virtual int32_t StartOutTransfer(const TransferParams &tx) = 0;
 
@@ -92,13 +94,10 @@ namespace drivers {
 
         virtual int32_t SetInTransferEndCallback(std::function<int32_t()> callback) = 0;
 
-
-    protected:
+      protected:
         const DriverSAIParams parameters;
-
     };
 
-}
+} // namespace drivers
 
-
-#endif //PUREPHONE_DRIVERSAI_HPP
+#endif // PUREPHONE_DRIVERSAI_HPP

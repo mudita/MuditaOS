@@ -2,7 +2,7 @@
  *  @file Audio_tests.cpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 29.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
@@ -13,7 +13,6 @@
 #include <cstring>
 #include <unistd.h>
 
-
 #include "catch.hpp"
 
 #include "Audio/Audio.hpp"
@@ -23,12 +22,12 @@ using namespace audio;
 namespace fs = std::filesystem;
 static std::string testOutPath{};
 
-TEST_CASE( "Audio API tests" ) {
+TEST_CASE("Audio API tests")
+{
 
     auto cwd = vfs.getcurrdir();
-    cwd = cwd.substr(0,cwd.find_last_of("/\\"));
-    cwd = cwd.append("/module-audio/tests/samples");
-
+    cwd      = cwd.substr(0, cwd.find_last_of("/\\"));
+    cwd      = cwd.append("/module-audio/tests/samples");
 
 #if 0
     SECTION("INIT"){
@@ -59,19 +58,20 @@ TEST_CASE( "Audio API tests" ) {
         fs::remove("rec1.wav");
     }
 #endif
-    SECTION("Switch: Idle->Routing->Idle"){
+    SECTION("Switch: Idle->Routing->Idle")
+    {
 
-        Audio audioTest([](AudioEvents events)->int32_t{std::cout << "End of file\n"; return 0;});
+        Audio audioTest([](AudioEvents events) -> int32_t {
+            std::cout << "End of file\n";
+            return 0;
+        });
 
-        REQUIRE(audioTest.Start(Operation::Type::Router,"") == static_cast<int32_t >(RetCode::Success));
+        REQUIRE(audioTest.Start(Operation::Type::Router, "") == static_cast<int32_t>(RetCode::Success));
         REQUIRE(audioTest.GetCurrentState() == Audio::State::Routing);
         sleep(1);
-        REQUIRE(audioTest.Stop() == static_cast<int32_t >(RetCode::Success));
+        REQUIRE(audioTest.Stop() == static_cast<int32_t>(RetCode::Success));
         REQUIRE(audioTest.GetCurrentState() == Audio::State::Idle);
 
         fs::remove("rec1.wav");
     }
-
-
 }
-

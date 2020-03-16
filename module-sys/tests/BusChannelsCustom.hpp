@@ -6,7 +6,6 @@
 #define MODULE_CORE_BUSCHANNELSCUSTOM_HPP
 
 // Custom Bus channels
-CommandsServiceRequests,
-TestServiceRequests
+CommandsServiceRequests, TestServiceRequests
 
-#endif //MODULE_CORE_BUSCHANNELSCUSTOM_HPP
+#endif // MODULE_CORE_BUSCHANNELSCUSTOM_HPP

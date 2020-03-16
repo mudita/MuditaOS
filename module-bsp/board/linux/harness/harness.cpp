@@ -24,5 +24,4 @@ bool hwGpioRead(enum Pin el)
     return false;
 }
 void hwGpioWrite(enum Pin el, uint32_t state)
-{
-}
+{}

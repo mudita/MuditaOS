@@ -2,12 +2,10 @@
  *  @file Encoder.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 23.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_ENCODER_HPP
 #define PUREPHONE_ENCODER_HPP
@@ -15,12 +13,14 @@
 #include <memory>
 #include "vfs.hpp"
 
-namespace audio {
+namespace audio
+{
 
-    class Encoder {
-    public:
-
-        struct Format {
+    class Encoder
+    {
+      public:
+        struct Format
+        {
             uint32_t chanNr;
             uint32_t sampleRate;
         };
@@ -33,24 +33,27 @@ namespace audio {
 
         virtual uint32_t Encode(uint32_t samplesToWrite, int16_t *pcmData) = 0;
 
-        float getCurrentPosition() {
+        float getCurrentPosition()
+        {
             return position;
         }
 
-        uint32_t GetFileSize() { return fileSize; }
+        uint32_t GetFileSize()
+        {
+            return fileSize;
+        }
 
         const Format format;
-    protected:
 
-        float position = 0;
-        vfs::FILE *fd = nullptr;
+      protected:
+        float position    = 0;
+        vfs::FILE *fd     = nullptr;
         uint32_t fileSize = 0;
         std::string filePath;
 
         bool isInitialized = false;
     };
 
-}
+} // namespace audio
 
-
-#endif //PUREPHONE_ENCODER_HPP
+#endif // PUREPHONE_ENCODER_HPP

@@ -14,7 +14,8 @@
 #include "Rect.hpp"
 #include <Alignment.hpp>
 
-namespace gui {
+namespace gui
+{
 
     class BoxLayout : public Rect
     {
@@ -33,7 +34,9 @@ namespace gui {
         template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Normal)
         {
             uint32_t sum = 0;
-            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) { sum += el->visible ? el->area(area).size(axis) : 0; });
+            std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
+                sum += el->visible ? el->area(area).size(axis) : 0;
+            });
             return sum;
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
@@ -79,23 +82,25 @@ namespace gui {
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
     };
 
-class HBox : public BoxLayout {
-public:
-  void resizeItems() override;
-  HBox();
-  HBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
-  virtual ~HBox() = default;
-  virtual void addWidget(Item *item) override;
-};
+    class HBox : public BoxLayout
+    {
+      public:
+        void resizeItems() override;
+        HBox();
+        HBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
+        virtual ~HBox() = default;
+        virtual void addWidget(Item *item) override;
+    };
 
-class VBox : public BoxLayout {
-public:
-	void resizeItems() override;
-	VBox();
-	VBox( Item* parent, const uint32_t& x, const uint32_t& y, const uint32_t& w, const uint32_t& h);
-	virtual ~VBox() = default;
-    virtual void addWidget(Item *item) override;
-};
+    class VBox : public BoxLayout
+    {
+      public:
+        void resizeItems() override;
+        VBox();
+        VBox(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
+        virtual ~VBox() = default;
+        virtual void addWidget(Item *item) override;
+    };
 
 } /* namespace gui */
 

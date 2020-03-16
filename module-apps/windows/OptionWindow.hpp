@@ -17,17 +17,20 @@ namespace gui
 
     struct Option
     {
-        const UTF8 text = "";
+        const UTF8 text                               = "";
         std::function<bool(Item &)> activatedCallback = nullptr;
-        Arrow arrow = Arrow::Enabled;
-        Option(const UTF8 &text, std::function<bool(Item &)> cb, Arrow arrow) : text(text), activatedCallback(cb), arrow(arrow)
+        Arrow arrow                                   = Arrow::Enabled;
+        Option(const UTF8 &text, std::function<bool(Item &)> cb, Arrow arrow)
+            : text(text), activatedCallback(cb), arrow(arrow)
         {
             LOG_INFO("text: %s", text.c_str());
         }
     };
 
     /// creates new `option` label on heap with text description and on activated callback connected
-    Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow = Arrow::Disabled);
+    Item *newOptionLabel(const UTF8 &text,
+                         std::function<bool(Item &)> activatedCallback,
+                         Arrow arrow = Arrow::Disabled);
     Item *newOptionLabel(const Option &option);
 
     class OptionWindow : public AppWindow

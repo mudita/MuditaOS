@@ -21,9 +21,9 @@ namespace parserutils
         enum class Type
         {
             endpoint = '#',
-            rawData = '$'
+            rawData  = '$'
         };
-    }     // namespace message
+    } // namespace message
 
     namespace http
     {
@@ -31,8 +31,8 @@ namespace parserutils
          */
         enum class Code
         {
-            OK = 200,
-            BadRequest = 400,
+            OK                  = 200,
+            BadRequest          = 400,
             InternalServerError = 500
         };
 
@@ -51,22 +51,22 @@ namespace parserutils
 
     namespace json
     {
-        const inline std::string method = "method";
+        const inline std::string method   = "method";
         const inline std::string endpoint = "endpoint";
-        const inline std::string uuid = "uuid";
-        const inline std::string status = "status";
-        const inline std::string body = "body";
+        const inline std::string uuid     = "uuid";
+        const inline std::string status   = "status";
+        const inline std::string body     = "body";
 
-        const inline std::string batteryLevel = "batteryLevel";
-        const inline std::string batteryState = "batteryState";
-        const inline std::string selectedSim  = "selectedSim";
-        const inline std::string trayState   = "trayState";
-        const inline std::string fsTotal   = "fsTotal";
-        const inline std::string fsFreePercent   = "fsFreePercent";
-        const inline std::string fsFree   = "fsFree";
-        const inline std::string gitRevision   = "gitRevision";
-        const inline std::string gitBranch   = "gitBranch";
-        const inline std::string gitTag   = "gitTag";
+        const inline std::string batteryLevel   = "batteryLevel";
+        const inline std::string batteryState   = "batteryState";
+        const inline std::string selectedSim    = "selectedSim";
+        const inline std::string trayState      = "trayState";
+        const inline std::string fsTotal        = "fsTotal";
+        const inline std::string fsFreePercent  = "fsFreePercent";
+        const inline std::string fsFree         = "fsFree";
+        const inline std::string gitRevision    = "gitRevision";
+        const inline std::string gitBranch      = "gitBranch";
+        const inline std::string gitTag         = "gitTag";
         const inline std::string currentRTCTime = "currentRTCTime";
 
     } // namespace json

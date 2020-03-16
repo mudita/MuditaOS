@@ -2,12 +2,10 @@
  *  @file Operation.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 24.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_OPERATION_HPP
 #define PUREPHONE_OPERATION_HPP
@@ -21,31 +19,36 @@
 #include "Audio/encoder/Encoder.hpp"
 #include "Audio/Profiles/Profile.hpp"
 
-namespace audio {
+namespace audio
+{
 
-    class EventData {
-    public:
-        ~EventData() {}
-
+    class EventData
+    {
+      public:
+        ~EventData()
+        {}
     };
 
-    class Operation {
-    public:
-
-        enum class State {
+    class Operation
+    {
+      public:
+        enum class State
+        {
             Idle,
             Active,
             Paused
         };
 
-        enum class Type {
+        enum class Type
+        {
             Idle,
             Playback,
             Recorder,
             Router
         };
 
-        enum class Event {
+        enum class Event
+        {
             HeadphonesPlugin,
             HeadphonesUnplug,
             BTHeadsetOn,
@@ -60,10 +63,10 @@ namespace audio {
             CallSpeakerphoneOff,
         };
 
-        virtual ~Operation() {}
+        virtual ~Operation()
+        {}
 
-        static std::optional<std::unique_ptr<Operation>>
-        Create(Type t, const char *fileName);
+        static std::optional<std::unique_ptr<Operation>> Create(Type t, const char *fileName);
 
         virtual int32_t Start(std::function<int32_t(AudioEvents event)> callback) = 0;
 
@@ -73,7 +76,7 @@ namespace audio {
 
         virtual int32_t Resume() = 0;
 
-        virtual int32_t SendEvent(const Event evt, const EventData *data=nullptr) = 0;
+        virtual int32_t SendEvent(const Event evt, const EventData *data = nullptr) = 0;
 
         virtual int32_t SetOutputVolume(float vol) = 0;
 
@@ -81,19 +84,30 @@ namespace audio {
 
         virtual Position GetPosition() = 0;
 
-        Volume GetOutputVolume() { return currentProfile->GetOutputVolume(); }
+        Volume GetOutputVolume()
+        {
+            return currentProfile->GetOutputVolume();
+        }
 
-        Gain GetInputGain() { return currentProfile->GetInputGain(); }
+        Gain GetInputGain()
+        {
+            return currentProfile->GetInputGain();
+        }
 
-        State GetState() { return state; }
+        State GetState()
+        {
+            return state;
+        }
 
-        const Profile *GetProfile() { return currentProfile; }
+        const Profile *GetProfile()
+        {
+            return currentProfile;
+        }
 
-    protected:
-
+      protected:
         Profile *currentProfile;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
-        State state = State::Idle;
+        State state                                             = State::Idle;
         std::function<int32_t(AudioEvents event)> eventCallback = nullptr;
 
         bool isInitialized = false;
@@ -102,12 +116,10 @@ namespace audio {
 
         std::optional<Profile *> GetProfile(const Profile::Type type);
 
-        std::function<int32_t(const void *inputBuffer,
-                              void *outputBuffer,
-                              unsigned long framesPerBuffer)> audioCallback = nullptr;
-
+        std::function<int32_t(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer)>
+            audioCallback = nullptr;
     };
 
-}
+} // namespace audio
 
-#endif //PUREPHONE_OPERATION_HPP
+#endif // PUREPHONE_OPERATION_HPP

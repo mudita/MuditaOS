@@ -17,20 +17,23 @@
 #include "../Tables/ContactsRingtonesTable.hpp"
 #include "../Tables/ContactsAddressTable.hpp"
 
-class ContactsDB : public Database {
-public:
+class ContactsDB : public Database
+{
+  public:
     ContactsDB();
     ~ContactsDB();
 
-    static const char* GetDBName(){return dbName;}
+    static const char *GetDBName()
+    {
+        return dbName;
+    }
 
     ContactsTable contacts;
     ContactsNameTable name;
     ContactsNumberTable number;
     ContactsRingtonesTable ringtones;
-    ContactsAddressTable    address;
+    ContactsAddressTable address;
 
-private:
+  private:
     static const char *dbName;
 };
-

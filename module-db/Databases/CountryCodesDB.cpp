@@ -10,5 +10,4 @@ CountryCodesDB::CountryCodesDB() : Database(dbName), countryCodes(this)
 }
 
 CountryCodesDB::~CountryCodesDB()
-{
-}
+{}

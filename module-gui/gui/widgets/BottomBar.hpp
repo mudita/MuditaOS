@@ -12,7 +12,8 @@
 #include "Label.hpp"
 #include "utf8/UTF8.hpp"
 
-namespace gui {
+namespace gui
+{
 
     /// Footer for most design windows
     ///

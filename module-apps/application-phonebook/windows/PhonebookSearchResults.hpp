@@ -22,25 +22,25 @@ namespace gui
         };
     }; // namespace name
 
-class PhonebookSearchResults : public AppWindow
-{
-  protected:
-    PhonebookListView *searchResultList = nullptr;
-    SearchResultsModel *searchResultsModel = nullptr;
+    class PhonebookSearchResults : public AppWindow
+    {
+      protected:
+        PhonebookListView *searchResultList    = nullptr;
+        SearchResultsModel *searchResultsModel = nullptr;
 
-    Image *newContactImage = nullptr;
+        Image *newContactImage = nullptr;
 
-  public:
-    PhonebookSearchResults(app::Application *app);
-    virtual ~PhonebookSearchResults();
+      public:
+        PhonebookSearchResults(app::Application *app);
+        virtual ~PhonebookSearchResults();
 
-    // virtual methods
-    bool onInput(const InputEvent &inputEvent) override;
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    bool handleSwitchData(SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
-};
+        // virtual methods
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool handleSwitchData(SwitchData *data) override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */

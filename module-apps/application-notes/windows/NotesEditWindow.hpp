@@ -21,22 +21,25 @@
 #include "gui/widgets/TopBar.hpp"
 #include "gui/widgets/ListView.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class NotesEditWindow: public AppWindow {
-	Text* text = nullptr;
-	Label* title = nullptr;
-public:
-	NotesEditWindow( app::Application* app );
-	virtual ~NotesEditWindow();
+    class NotesEditWindow : public AppWindow
+    {
+        Text *text   = nullptr;
+        Label *title = nullptr;
 
-	//virtual methods
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
+      public:
+        NotesEditWindow(app::Application *app);
+        virtual ~NotesEditWindow();
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+        // virtual methods
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
 

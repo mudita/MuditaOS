@@ -12,8 +12,7 @@ const std::map<InputMode::Mode, std::string> input_mode = {
 
 static std::string getInputName(InputMode::Mode m)
 {
-    switch (m)
-    {
+    switch (m) {
     case InputMode::digit:
         return "123";
     case InputMode::ABC:
@@ -27,13 +26,14 @@ static std::string getInputName(InputMode::Mode m)
     }
 }
 
-InputMode::InputMode(std::list<InputMode::Mode> mode_list, std::function<void(const UTF8 &text)> show_type_cb, std::function<void()> show_special_char_selector,
+InputMode::InputMode(std::list<InputMode::Mode> mode_list,
+                     std::function<void(const UTF8 &text)> show_type_cb,
+                     std::function<void()> show_special_char_selector,
                      const UTF8 &prev_text)
     : input_mode_list(mode_list), show_type_cb(show_type_cb), show_special_char_selector(show_special_char_selector)
 {
     // failsafe
-    if (input_mode_list.size() == 0)
-    {
+    if (input_mode_list.size() == 0) {
         input_mode_list.push_back(Mode::digit);
     }
 }
@@ -47,8 +47,7 @@ InputMode::Mode InputMode::modeNow()
 void InputMode::next()
 {
     ++input_mode_list_pos;
-    if (input_mode_list_pos == input_mode_list.size())
-    {
+    if (input_mode_list_pos == input_mode_list.size()) {
         input_mode_list_pos = 0;
     }
     LOG_INFO("%d", input_mode_list_pos);
@@ -63,16 +62,14 @@ const std::string &InputMode::get()
 void InputMode::show_input_type()
 {
     LOG_INFO("Mode: %d", modeNow());
-    if (show_type_cb)
-    {
+    if (show_type_cb) {
         show_type_cb(getInputName(modeNow()));
     }
 }
 
 void InputMode::show_restore()
 {
-    if (show_type_cb)
-    {
+    if (show_type_cb) {
         show_type_cb(restore_text);
     }
 }
@@ -80,8 +77,7 @@ void InputMode::show_restore()
 void InputMode::select_special_char()
 {
     LOG_INFO("Special character selector");
-    if (show_special_char_selector)
-    {
+    if (show_special_char_selector) {
         show_special_char_selector();
     }
 }

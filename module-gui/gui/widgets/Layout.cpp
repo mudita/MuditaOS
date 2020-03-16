@@ -7,15 +7,17 @@
 
 #include "Layout.hpp"
 
-namespace gui {
+namespace gui
+{
 
-Layout::Layout() {
-	// TODO Auto-generated constructor stub
+    Layout::Layout()
+    {
+        // TODO Auto-generated constructor stub
+    }
 
-}
-
-Layout::~Layout() {
-	// TODO Auto-generated destructor stub
-}
+    Layout::~Layout()
+    {
+        // TODO Auto-generated destructor stub
+    }
 
 } /* namespace gui */

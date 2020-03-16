@@ -16,31 +16,35 @@
 #include "Service/Worker.hpp"
 #include "gui/core/Renderer.hpp"
 
-namespace sgui {
+namespace sgui
+{
 
-class ServiceGUI;
+    class ServiceGUI;
 
-enum class WorkerGUICommands {
-	Finish,
-	Render,
-//	RenderSuspend
-};
+    enum class WorkerGUICommands
+    {
+        Finish,
+        Render,
+        //	RenderSuspend
+    };
 
-/*
- *
- */
-class WorkerGUI: public sys::Worker {
-	//object responsible for rendering images to context
-	gui::Renderer renderer;
-public:
-	WorkerGUI( ServiceGUI* service );
-	virtual ~WorkerGUI();
+    /*
+     *
+     */
+    class WorkerGUI : public sys::Worker
+    {
+        // object responsible for rendering images to context
+        gui::Renderer renderer;
 
-	/**
-	 * virtual method responsible for finishing the worker and handling rendering commands
-	 */
-	bool handleMessage( uint32_t queueID ) override;
-};
+      public:
+        WorkerGUI(ServiceGUI *service);
+        virtual ~WorkerGUI();
+
+        /**
+         * virtual method responsible for finishing the worker and handling rendering commands
+         */
+        bool handleMessage(uint32_t queueID) override;
+    };
 
 } /* namespace sgui */
 

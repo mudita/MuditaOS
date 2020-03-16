@@ -12,29 +12,33 @@
 #include <CalllogRecord.hpp>
 #include <OptionWindow.hpp>
 
-namespace app {
+namespace app
+{
 
-const inline std::string CallLogAppStr = "ApplicationCallLog";
+    const inline std::string CallLogAppStr = "ApplicationCallLog";
 
-class ApplicationCallLog: public Application {
-protected:
-public:
-	ApplicationCallLog( std::string name=CallLogAppStr, std::string parent = "", bool startBackgound = false);
-	virtual ~ApplicationCallLog();
+    class ApplicationCallLog : public Application
+    {
+      protected:
+      public:
+        ApplicationCallLog(std::string name = CallLogAppStr, std::string parent = "", bool startBackgound = false);
+        virtual ~ApplicationCallLog();
 
-    gui::OptionWindow *windowOptions = nullptr;
+        gui::OptionWindow *windowOptions = nullptr;
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-	sys::ReturnCodes InitHandler() override;
-	sys::ReturnCodes DeinitHandler() override;
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        sys::ReturnCodes InitHandler() override;
+        sys::ReturnCodes DeinitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final {return sys::ReturnCodes::Success;}
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        {
+            return sys::ReturnCodes::Success;
+        }
 
-	void createUserInterface() final;
-	void destroyUserInterface() final;
+        void createUserInterface() final;
+        void destroyUserInterface() final;
 
-    bool removeCalllogEntry(const CalllogRecord &record);
-};
+        bool removeCalllogEntry(const CalllogRecord &record);
+    };
 
 } /* namespace app */
-

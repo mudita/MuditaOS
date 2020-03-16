@@ -2,7 +2,7 @@
  *  @file decoderFLAC.h
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 06.04.19
- *  @brief 
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
@@ -14,11 +14,13 @@
 
 #include "dr_flac.h"
 
-namespace audio {
+namespace audio
+{
 
-    class decoderFLAC : public decoder {
+    class decoderFLAC : public decoder
+    {
 
-    public:
+      public:
         decoderFLAC(const char *fileName);
 
         ~decoderFLAC();
@@ -29,14 +31,12 @@ namespace audio {
 
         void setPosition(float pos) override;
 
-
-    private:
+      private:
         std::unique_ptr<Tags> tags;
 
         drflac *flac = nullptr;
 
         uint32_t totalSamplesCount = 0;
-
 
         /* Data encoded in UTF-8 */
         void flac_parse_text(uint8_t *in, uint32_t taglen, uint32_t datalen, uint8_t *out, uint32_t outlen);
@@ -49,8 +49,8 @@ namespace audio {
         //
         // Returns the number of bytes actually read.
         //
-        // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback until
-        // either the entire bytesToRead is filled or you have reached the end of the stream.
+        // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
+        // until either the entire bytesToRead is filled or you have reached the end of the stream.
         static size_t drflac_read(void *pUserData, void *pBufferOut, size_t bytesToRead);
 
         // Callback for when data needs to be seeked.
@@ -61,16 +61,15 @@ namespace audio {
         //
         // Returns whether or not the seek was successful.
         //
-        // The offset will never be negative. Whether or not it is relative to the beginning or current position is determined
-        // by the "origin" parameter which will be either drflac_seek_origin_start or drflac_seek_origin_current.
+        // The offset will never be negative. Whether or not it is relative to the beginning or current position is
+        // determined by the "origin" parameter which will be either drflac_seek_origin_start or
+        // drflac_seek_origin_current.
         static drflac_bool32 drflac_seek(void *pUserData, int offset, drflac_seek_origin origin);
 
         // Use pMetadata->type to determine which metadata block is being handled and how to read the data.
         static void drflac_meta(void *pUserData, drflac_metadata *pMetadata);
-
     };
 
-}
+} // namespace audio
 
-
-#endif //UNTITLED1_DECODERFLAC_HPP
+#endif // UNTITLED1_DECODERFLAC_HPP

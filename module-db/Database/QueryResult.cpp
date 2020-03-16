@@ -8,28 +8,25 @@
  * @details
  */
 
-
 #include "QueryResult.hpp"
 
+QueryResult::QueryResult() : currentRow(0), fieldCount(0), rowCount(0)
+{}
 
-QueryResult::QueryResult() :
-        currentRow(0),
-        fieldCount(0),
-        rowCount(0) {
-
-}
-
-void QueryResult::AddRow(const std::vector<Field> &row) {
+void QueryResult::AddRow(const std::vector<Field> &row)
+{
     rows.push_back(row);
     rowCount++;
     fieldCount = row.size();
 }
 
-bool QueryResult::NextRow() {
+bool QueryResult::NextRow()
+{
     if (currentRow < (rowCount - 1)) {
         currentRow++;
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }

@@ -15,27 +15,27 @@
 
 namespace gui
 {
-class PhonebookItem;
-class PhonebookListView : public ListView
-{
-    /**
-     * Pointer to application that owns the model
-     */
-    app::Application *application = nullptr;
+    class PhonebookItem;
+    class PhonebookListView : public ListView
+    {
+        /**
+         * Pointer to application that owns the model
+         */
+        app::Application *application = nullptr;
 
-  public:
-    PhonebookListView();
-    PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-    virtual ~PhonebookListView();
-    void setApplication(app::Application *app);
-    gui::PhonebookItem *getSelectedPhonebookItem();
+      public:
+        PhonebookListView();
+        PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        virtual ~PhonebookListView();
+        void setApplication(app::Application *app);
+        gui::PhonebookItem *getSelectedPhonebookItem();
 
-    bool onInput(const InputEvent &inputEvent) override;
-    void updatePageItems() override;
+        bool onInput(const InputEvent &inputEvent) override;
+        void updatePageItems() override;
 
-    // onClick callback to register
-    std::function<bool(gui::PhonebookItem *item)> cb_ENTER = nullptr;
-};
+        // onClick callback to register
+        std::function<bool(gui::PhonebookItem *item)> cb_ENTER = nullptr;
+    };
 
 } /* namespace gui */
 

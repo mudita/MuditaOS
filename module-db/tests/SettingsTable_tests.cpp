@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -38,11 +37,11 @@ TEST_CASE("Settings Table tests")
         auto settingsRow = settingsDb.settings.GetByID(1);
         REQUIRE(settingsRow.ID == 1);
 
-        settingsRow.timeFormat12 = false;
+        settingsRow.timeFormat12   = false;
         settingsRow.timeDateFormat = false;
-        settingsRow.pin1 = "4321";
-        settingsRow.pin2 = "5432";
-        settingsRow.language = SettingsLanguage ::POLISH;
+        settingsRow.pin1           = "4321";
+        settingsRow.pin2           = "5432";
+        settingsRow.language       = SettingsLanguage ::POLISH;
         REQUIRE(settingsDb.settings.Update(settingsRow));
 
         settingsRow = settingsDb.settings.GetByID(1);
@@ -65,8 +64,6 @@ TEST_CASE("Settings Table tests")
         REQUIRE(settingsRow.pin2 == "5432");
         REQUIRE(settingsRow.language == SettingsLanguage ::POLISH);
     }
-
-
 
     Database::Deinitialize();
 }

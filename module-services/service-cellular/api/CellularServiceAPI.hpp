@@ -2,12 +2,10 @@
  *  @file CellularServiceAPI.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 09.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_CELLULARSERVICEAPI_HPP
 #define PUREPHONE_CELLULARSERVICEAPI_HPP
@@ -54,4 +52,4 @@ namespace CellularServiceAPI
     bool SelectAntenna(sys::Service *serv, uint8_t antenna);
 }; // namespace CellularServiceAPI
 
-#endif //PUREPHONE_CELLULARSERVICEAPI_HPP
+#endif // PUREPHONE_CELLULARSERVICEAPI_HPP

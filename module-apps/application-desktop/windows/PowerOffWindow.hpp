@@ -15,39 +15,41 @@
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/BottomBar.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- * Class that defines look and functions for power down window.
- */
-class PowerOffWindow: public AppWindow {
+    /*
+     * Class that defines look and functions for power down window.
+     */
+    class PowerOffWindow : public AppWindow
+    {
 
-enum class State {
-		PowerDown,
-		Return,
-	};
+        enum class State
+        {
+            PowerDown,
+            Return,
+        };
 
-	gui::Label* titleLabel = nullptr;
-	gui::Label* infoLabel = nullptr;
+        gui::Label *titleLabel = nullptr;
+        gui::Label *infoLabel  = nullptr;
 
-	std::vector<gui::Label*> selectionLabels;
-	//TODO remove this label after power manager is finished.
-	gui::Label* eventMgrLabel = nullptr;
-	gui::Image* powerImage = nullptr;
-	gui::Image* powerDownImage = nullptr;
-	State state = State::Return;
+        std::vector<gui::Label *> selectionLabels;
+        // TODO remove this label after power manager is finished.
+        gui::Label *eventMgrLabel  = nullptr;
+        gui::Image *powerImage     = nullptr;
+        gui::Image *powerDownImage = nullptr;
+        State state                = State::Return;
 
-public:
-	PowerOffWindow( app::Application* app );
-	virtual ~PowerOffWindow();
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
-	bool onInput( const InputEvent& inputEvent ) override;
+      public:
+        PowerOffWindow(app::Application *app);
+        virtual ~PowerOffWindow();
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        bool onInput(const InputEvent &inputEvent) override;
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
 

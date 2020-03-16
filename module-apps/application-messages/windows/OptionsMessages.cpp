@@ -16,7 +16,7 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     box->setPenWidth(0);
     box->setPenFocusWidth(0);
     auto text_len = 200; // Dumb text size - this won't be needed when Text(...) widget will be refactored
-    auto l = new gui::Label(box, 0, 0, text_len, label::big_h);
+    auto l        = new gui::Label(box, 0, 0, text_len, label::big_h);
     l->area(gui::Item::Area::Max).w = box->area().w; // let box layout resize
     decorate(l);
     l->setText(contact.primaryName);
@@ -51,8 +51,12 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
 
 gui::Item *placeholder(const UTF8 &text)
 {
-    auto ret = new gui::Rect(nullptr, default_left_margin, 0, style::window_width - default_left_margin - default_right_margin, label::small_h);
-    auto t = new gui::Label(ret, 0, 0, 0, 0, text);
+    auto ret = new gui::Rect(nullptr,
+                             default_left_margin,
+                             0,
+                             style::window_width - default_left_margin - default_right_margin,
+                             label::small_h);
+    auto t   = new gui::Label(ret, 0, 0, 0, 0, text);
 
     auto width = t->getTextNeedSpace() + 20;
     t->setSize(width, label::small_h);
@@ -73,10 +77,16 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         gui::newOptionLabel(gui::options::contact(app, app::ContactOperation::Details, contact)),
 
         // TODO
-        gui::newOptionLabel(
-            {UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")), [=](gui::Item &item) { return false; }, gui::Arrow::Disabled}),
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_copy")), [=](gui::Item &item) { return false; }, gui::Arrow::Disabled}),
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")), [=](gui::Item &item) { return false; }, gui::Arrow::Disabled}),
-        placeholder(utils::localize.get("sms_from_this_sms")), newCombo(app, contact) // contact.numbers[0].numberE164)
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_forvard_message")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_copy")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_delete_message")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+        placeholder(utils::localize.get("sms_from_this_sms")),
+        newCombo(app, contact) // contact.numbers[0].numberE164)
     };
 }

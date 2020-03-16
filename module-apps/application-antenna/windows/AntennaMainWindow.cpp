@@ -16,7 +16,6 @@
 #include "../ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
-
 namespace gui
 {
 
@@ -47,15 +46,13 @@ namespace gui
 
         setTitle(utils::localize.get("app_desktop_tools_antenna"));
 
-        for (auto title : titlesText)
-        {
+        for (auto title : titlesText) {
             titles.push_back(addLabel(title, [=](gui::Item &item) { return true; }));
         }
         titles[3]->setPenWidth(0);
 
         uint32_t posY = 110;
-        for (uint32_t i = 0; i < titles.size(); i++)
-        {
+        for (uint32_t i = 0; i < titles.size(); i++) {
             titles[i]->setPosition(40, posY);
             posY += 33 + 5;
         }
@@ -78,18 +75,17 @@ namespace gui
             CellularServiceAPI::StartOperatorsScan(this->application);
             this->application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             auto app = dynamic_cast<app::ApplicationAntenna *>(this->application);
-            if (app != nullptr)
-            {
+            if (app != nullptr) {
                 app->setScanInProgress(true);
             }
             return true;
         }));
         uint32_t posX = 40;
-        for (uint32_t i = 0; i < buttons.size(); i++)
-        {
+        for (uint32_t i = 0; i < buttons.size(); i++) {
             buttons[i]->setFont(style::window::font::medium);
             buttons[i]->setPosition(posX, 500);
-            buttons[i]->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+            buttons[i]->setAlignement(
+                gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
             posX += 240;
         }
 
@@ -135,36 +131,35 @@ namespace gui
     }
 
     void AntennaMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-    }
+    {}
 
     bool AntennaMainWindow::onInput(const InputEvent &inputEvent)
     {
         bool ret = AppWindow::onInput(inputEvent);
-        if (ret)
-        {
+        if (ret) {
             application->render(RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
         return false;
     }
 
-    gui::Label *AntennaMainWindow::addLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, bool visibleBorder)
+    gui::Label *AntennaMainWindow::addLabel(const UTF8 &text,
+                                            std::function<bool(Item &)> activatedCallback,
+                                            bool visibleBorder)
     {
         gui::Label *label = new gui::Label(this, 40, 500, 400, 33, text);
         label->setMargins(gui::Margins(16, 0, 0, 0));
         label->setFilled(false);
         label->setPenFocusWidth(3);
-        if (visibleBorder)
-        {
+        if (visibleBorder) {
             label->setPenWidth(1);
         }
-        else
-        {
+        else {
             label->setPenWidth(0);
         }
         label->setFont(style::window::font::verysmall);
-        label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignement(
+            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
         label->setRadius(11);
         label->activatedCallback = activatedCallback;
 
@@ -174,11 +169,13 @@ namespace gui
     void AntennaMainWindow::updateDebugInfo(std::vector<std::string> &data)
     {
         LOG_INFO("AntennaMainWindow::updateDebugInfo vector size %d", data.size());
-        if (data.size() == 3)
-        {
-            titles[static_cast<uint32_t>(labelDescripion::csq)]->setText(titlesText[static_cast<uint32_t>(labelDescripion::csq)] + data[0]);
-            titles[static_cast<uint32_t>(labelDescripion::status)]->setText(titlesText[static_cast<uint32_t>(labelDescripion::status)] + data[1]);
-            titles[static_cast<uint32_t>(labelDescripion::band)]->setText(titlesText[static_cast<uint32_t>(labelDescripion::band)] + data[2]);
+        if (data.size() == 3) {
+            titles[static_cast<uint32_t>(labelDescripion::csq)]->setText(
+                titlesText[static_cast<uint32_t>(labelDescripion::csq)] + data[0]);
+            titles[static_cast<uint32_t>(labelDescripion::status)]->setText(
+                titlesText[static_cast<uint32_t>(labelDescripion::status)] + data[1]);
+            titles[static_cast<uint32_t>(labelDescripion::band)]->setText(
+                titlesText[static_cast<uint32_t>(labelDescripion::band)] + data[2]);
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
     }
@@ -186,8 +183,7 @@ namespace gui
     {
         buttons[2]->setText("Start operators scan");
         std::string formattedString;
-        for (auto element : data)
-        {
+        for (auto element : data) {
             formattedString += element + "\n";
         }
         std::replace(formattedString.begin(), formattedString.end(), '\"', ' ');
