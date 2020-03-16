@@ -7,35 +7,41 @@
 
 #include "Service/Service.hpp"
 
+class SchedulerKiller : public sys::Service
+{
 
-class SchedulerKiller : public sys::Service {
+  public:
+    SchedulerKiller(const std::string &name);
 
-public:
-    SchedulerKiller(const std::string& name);
-
-    ~SchedulerKiller(){
+    ~SchedulerKiller()
+    {
         LogOutput::Output(GetName() + ":destructor");
     }
 
     // Invoked when service received data message
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override;
 
     // Invoked during initialization
-    sys::ReturnCodes InitHandler() override{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes InitHandler() override
+    {
+        return sys::ReturnCodes::Success;
+    }
 
-    sys::ReturnCodes DeinitHandler() override{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes DeinitHandler() override
+    {
+        return sys::ReturnCodes::Success;
+    }
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final{return sys::ReturnCodes::Success;}
+    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+    {
+        return sys::ReturnCodes::Success;
+    }
 
-
-private:
-
+  private:
     uint32_t timer_id;
-
 };
 
-
-#endif //ACTORS_SCHEDULERKILLER_HPP
+#endif // ACTORS_SCHEDULERKILLER_HPP

@@ -55,54 +55,53 @@ namespace gui
         utils::time::Timestamp time;
 
         SettingsRecord appSettings = application->getSettings();
-        timeFormat12h = appSettings.timeFormat12;
-        timeDateFormat = appSettings.timeDateFormat;
+        timeFormat12h              = appSettings.timeFormat12;
+        timeDateFormat             = appSettings.timeDateFormat;
 
         // create date widgets
         dateBody = new gui::HBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
-        auto item = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_day"), time.get_date_time_substr(utils::time::GetParameters::Day));
+        auto item = addDateTimeItem(nullptr,
+                                    utils::localize.get("app_settings_title_day"),
+                                    time.get_date_time_substr(utils::time::GetParameters::Day));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Day, item));
 
-        item = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_month"), time.get_date_time_substr(utils::time::GetParameters::Month));
+        item = addDateTimeItem(nullptr,
+                               utils::localize.get("app_settings_title_month"),
+                               time.get_date_time_substr(utils::time::GetParameters::Month));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Month, item));
 
-        item = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_year"), time.get_date_time_substr(utils::time::GetParameters::Year));
+        item = addDateTimeItem(nullptr,
+                               utils::localize.get("app_settings_title_year"),
+                               time.get_date_time_substr(utils::time::GetParameters::Year));
         dateItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Year, item));
 
-        if (timeDateFormat)
-        {
+        if (timeDateFormat) {
             auto toAdd = dateItems.find(DateTimeItems::Day);
-            if (toAdd != dateItems.end())
-            {
+            if (toAdd != dateItems.end()) {
                 dateBody->addWidget(toAdd->second);
                 dateBody->addWidget(addSpacer(""));
             }
             toAdd = dateItems.find(DateTimeItems::Month);
-            if (toAdd != dateItems.end())
-            {
+            if (toAdd != dateItems.end()) {
                 dateBody->addWidget(toAdd->second);
             }
         }
-        else
-        {
+        else {
             auto toAdd = dateItems.find(DateTimeItems::Month);
-            if (toAdd != dateItems.end())
-            {
+            if (toAdd != dateItems.end()) {
                 dateBody->addWidget(toAdd->second);
                 dateBody->addWidget(addSpacer(""));
             }
             toAdd = dateItems.find(DateTimeItems::Day);
-            if (toAdd != dateItems.end())
-            {
+            if (toAdd != dateItems.end()) {
                 dateBody->addWidget(toAdd->second);
             }
         }
         dateBody->addWidget(addSpacer(""));
 
         auto toAdd = dateItems.find(DateTimeItems::Year);
-        if (toAdd != dateItems.end())
-        {
+        if (toAdd != dateItems.end()) {
             dateBody->addWidget(toAdd->second);
         }
 
@@ -112,17 +111,15 @@ namespace gui
 
         auto hourValue = time.get_date_time_sub_value(utils::time::GetParameters::Hour);
 
-        if (timeFormat12h)
-        {
-            if (hourValue > 12)
-            {
+        if (timeFormat12h) {
+            if (hourValue > 12) {
                 hourValue -= 12;
                 dayPeriod = true;
             }
         }
 
         timeBody = new gui::HBox(this, style::window::default_left_margin, (uint32_t)title->offset_h() * 2, w, h);
-        item = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_time"), std::to_string(hourValue));
+        item     = addDateTimeItem(nullptr, utils::localize.get("app_settings_title_time"), std::to_string(hourValue));
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
         timeBody->addWidget(item);
         timeBody->addWidget(addSpacer(":"));
@@ -133,19 +130,15 @@ namespace gui
         timeBody->addWidget(addSpacer(""));
 
         item = addDateTimeItem(nullptr, (""), (""));
-        if (timeFormat12h)
-        {
-            if (dayPeriod)
-            {
+        if (timeFormat12h) {
+            if (dayPeriod) {
                 item->setText("PM");
             }
-            else
-            {
+            else {
                 item->setText("AM");
             }
         }
-        else
-        {
+        else {
             item->setVisible(false);
         }
         timeItems.insert(std::pair<DateTimeItems, Item *>(DateTimeItems::Hour, item));
@@ -168,8 +161,7 @@ namespace gui
     }
 
     DateTimeWindow::~DateTimeWindow()
-    {
-    }
+    {}
 
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
@@ -178,11 +170,13 @@ namespace gui
 
     gui::Label *DateTimeWindow::addSpacer(const UTF8 &text)
     {
-        auto label = new gui::Label(nullptr, 0, 0, style::settings::date::date_time_spacer_width, style::settings::date::date_time_item_height);
+        auto label = new gui::Label(
+            nullptr, 0, 0, style::settings::date::date_time_spacer_width, style::settings::date::date_time_item_height);
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         label->setText(text);
         label->setFont(style::window::font::verybig);
-        label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignement(
+            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
         label->activeItem = false;
         label->setVisible(true);
         return label;
@@ -191,14 +185,18 @@ namespace gui
     gui::Label *DateTimeWindow::addDateTimeItem(Item *parent, const UTF8 &itemTitle, const UTF8 &value)
     {
 
-        gui::Label *label = new gui::Label(this, style::settings::date::date_time_x_offset, 0, style::settings::date::date_time_item_width,
+        gui::Label *label = new gui::Label(this,
+                                           style::settings::date::date_time_x_offset,
+                                           0,
+                                           style::settings::date::date_time_item_width,
                                            style::settings::date::date_time_item_height);
         label->setMargins(gui::Margins(16, 0, 0, 0));
         label->setFilled(false);
         label->setPenFocusWidth(3);
         label->setPenWidth(1);
         label->setFont(style::window::font::verybig);
-        label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        label->setAlignement(
+            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         label->activatedCallback = [=](gui::Item &) {
             this->setRTC();
@@ -207,7 +205,11 @@ namespace gui
         };
         label->setText(value);
 
-        Label *title = new gui::Label(label, 0, 0, style::settings::date::date_time_item_width, style::settings::date::date_time_item_title_height);
+        Label *title = new gui::Label(label,
+                                      0,
+                                      0,
+                                      style::settings::date::date_time_item_width,
+                                      style::settings::date::date_time_item_title_height);
         title->setText(itemTitle);
         title->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         title->setFont(style::window::font::verysmall);
@@ -217,41 +219,31 @@ namespace gui
     bool DateTimeWindow::onInput(const InputEvent &inputEvent)
     {
         bool ret = false;
-        if (AppWindow::onInput(inputEvent))
-        {
+        if (AppWindow::onInput(inputEvent)) {
 
             return true;
         }
-        else
-        {
-            if (inputEvent.state == gui::InputEvent::State::keyReleasedShort)
-            {
-                auto key = std::to_string(gui::toNumeric(inputEvent.keyCode));
+        else {
+            if (inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
+                auto key   = std::to_string(gui::toNumeric(inputEvent.keyCode));
                 auto value = gui::toNumeric(inputEvent.keyCode);
                 // handle numeric keys
-                if (value >= 0)
-                {
-                    if (focusItem == dateBody)
-                    {
+                if (value >= 0) {
+                    if (focusItem == dateBody) {
                         setDate(value);
                     }
-                    else if (focusItem == timeBody)
-                    {
+                    else if (focusItem == timeBody) {
                         setTime(value);
                     }
                     ret = true;
                 }
-                else if (inputEvent.keyCode == gui::KeyCode::KEY_PND)
-                {
-                    if (focusItem == dateBody || focusItem == timeBody)
-                    {
+                else if (inputEvent.keyCode == gui::KeyCode::KEY_PND) {
+                    if (focusItem == dateBody || focusItem == timeBody) {
                         auto item = dynamic_cast<gui::Label *>(focusItem->focusItem);
-                        if (item != nullptr)
-                        {
+                        if (item != nullptr) {
                             auto itemValue = item->getText();
-                            auto len = itemValue.length();
-                            if (len > 0)
-                            {
+                            auto len       = itemValue.length();
+                            if (len > 0) {
                                 itemValue.removeChar(len - 1);
                                 item->setText(itemValue);
                                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
@@ -269,26 +261,20 @@ namespace gui
 
         std::string ret;
 
-        if (itemType == DateTimeItems::Day || itemType == DateTimeItems::Month || itemType == DateTimeItems::Year)
-        {
+        if (itemType == DateTimeItems::Day || itemType == DateTimeItems::Month || itemType == DateTimeItems::Year) {
             auto selected = dateItems.find(itemType);
-            if (selected != dateItems.end())
-            {
+            if (selected != dateItems.end()) {
                 auto item = dynamic_cast<gui::Label *>(selected->second);
-                if (item != nullptr)
-                {
+                if (item != nullptr) {
                     ret = item->getText();
                 }
             }
         }
-        if (itemType == DateTimeItems::Hour || itemType == DateTimeItems::Minute)
-        {
+        if (itemType == DateTimeItems::Hour || itemType == DateTimeItems::Minute) {
             auto selected = timeItems.find(itemType);
-            if (selected != timeItems.end())
-            {
+            if (selected != timeItems.end()) {
                 auto item = dynamic_cast<gui::Label *>(selected->second);
-                if (item != nullptr)
-                {
+                if (item != nullptr) {
                     ret = item->getText();
                 }
             }
@@ -300,20 +286,18 @@ namespace gui
     {
         auto item = dynamic_cast<gui::Label *>(focusItem->focusItem);
 
-        if (item != nullptr)
-        {
+        if (item != nullptr) {
             auto itemValue = item->getText();
-            auto key = std::to_string(keyValue);
+            auto key       = std::to_string(keyValue);
             itemValue += key;
             item->setText(itemValue);
 
-            if (utils::time::validateDate(getDateTimeItemValue(DateTimeItems::Day), getDateTimeItemValue(DateTimeItems::Month),
-                                          getDateTimeItemValue(DateTimeItems::Year)))
-            {
+            if (utils::time::validateDate(getDateTimeItemValue(DateTimeItems::Day),
+                                          getDateTimeItemValue(DateTimeItems::Month),
+                                          getDateTimeItemValue(DateTimeItems::Year))) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
-            else
-            {
+            else {
                 item->setText(key);
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
@@ -325,26 +309,23 @@ namespace gui
     {
         auto item = dynamic_cast<gui::Label *>(focusItem->focusItem);
 
-        if (item != nullptr)
-        {
+        if (item != nullptr) {
             auto itemValue = item->getText();
-            auto key = std::to_string(keyValue);
-            if (itemValue == "0")
-            {
+            auto key       = std::to_string(keyValue);
+            if (itemValue == "0") {
                 itemValue = key;
             }
-            else
-            {
+            else {
                 itemValue += key;
             }
             item->setText(itemValue);
 
-            if (utils::time::validateTime(getDateTimeItemValue(DateTimeItems::Hour), getDateTimeItemValue(DateTimeItems::Minute), timeFormat12h))
-            {
+            if (utils::time::validateTime(getDateTimeItemValue(DateTimeItems::Hour),
+                                          getDateTimeItemValue(DateTimeItems::Minute),
+                                          timeFormat12h)) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
-            else
-            {
+            else {
                 item->setText(key);
                 application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
             }
@@ -357,25 +338,21 @@ namespace gui
     {
         struct tm timeinfo = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        try
-        {
+        try {
             timeinfo.tm_year = std::stoi(getDateTimeItemValue(DateTimeItems::Year)) - 1900;
-            timeinfo.tm_mon = std::stoi(getDateTimeItemValue(DateTimeItems::Month)) - 1;
+            timeinfo.tm_mon  = std::stoi(getDateTimeItemValue(DateTimeItems::Month)) - 1;
             timeinfo.tm_mday = std::stoi(getDateTimeItemValue(DateTimeItems::Day));
 
             auto hourValue = std::stoi(getDateTimeItemValue(DateTimeItems::Hour));
-            if (timeFormat12h)
-            {
-                if (dayPeriod)
-                {
+            if (timeFormat12h) {
+                if (dayPeriod) {
                     hourValue += 12;
                 }
             }
             timeinfo.tm_hour = hourValue;
-            timeinfo.tm_min = std::stoi(getDateTimeItemValue(DateTimeItems::Minute));
+            timeinfo.tm_min  = std::stoi(getDateTimeItemValue(DateTimeItems::Minute));
         }
-        catch (std::exception &e)
-        {
+        catch (std::exception &e) {
             LOG_ERROR("ServiceCellular::getIMSI exception: %s", e.what());
         }
 

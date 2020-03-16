@@ -13,50 +13,47 @@
 #include <log/log.hpp>
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
-{
-}
+{}
 
 ContactRecordInterface::~ContactRecordInterface()
-{
-}
+{}
 
 bool ContactRecordInterface::Add(const ContactRecord &rec)
 {
 
-    bool ret = contactDB->contacts.Add(ContactsTableRow{
-    													.type = rec.contactType,
-                                                        .isOnWhitelist = rec.isOnBlacklist,
-                                                        .isOnBlacklist = rec.isOnBlacklist,
+    bool ret = contactDB->contacts.Add(ContactsTableRow{.type           = rec.contactType,
+                                                        .isOnWhitelist  = rec.isOnBlacklist,
+                                                        .isOnBlacklist  = rec.isOnBlacklist,
                                                         .isOnFavourites = rec.isOnFavourites,
-                                                        .speedDial = rec.speeddial,
-														.namePrimary = rec.primaryName});
+                                                        .speedDial      = rec.speeddial,
+                                                        .namePrimary    = rec.primaryName});
 
-    if (!ret)
-    {
+    if (!ret) {
         return ret;
     }
 
     uint32_t contactID = contactDB->GetLastInsertRowID();
     LOG_DEBUG("New contact with ID %u created", contactID);
 
-    ret = contactDB->name.Add(
-        ContactsNameTableRow{.contactID = contactID, .namePrimary = rec.primaryName, .nameAlternative = rec.alternativeName, .favourite = rec.isOnFavourites});
+    ret = contactDB->name.Add(ContactsNameTableRow{.contactID       = contactID,
+                                                   .namePrimary     = rec.primaryName,
+                                                   .nameAlternative = rec.alternativeName,
+                                                   .favourite       = rec.isOnFavourites});
 
-    if (!ret)
-    {
+    if (!ret) {
         return ret;
     }
 
     auto contactNameID = contactDB->GetLastInsertRowID();
 
-    for (auto a : rec.numbers)
-    {
-        ret = contactDB->number.Add(
-            ContactsNumberTableRow{.contactID = contactID, .numberUser = a.numberUser.c_str(), .numbere164 = a.numberE164.c_str(), .type = a.numberType});
+    for (auto a : rec.numbers) {
+        ret = contactDB->number.Add(ContactsNumberTableRow{.contactID  = contactID,
+                                                           .numberUser = a.numberUser.c_str(),
+                                                           .numbere164 = a.numberE164.c_str(),
+                                                           .type       = a.numberType});
     }
 
-    if (!ret)
-    {
+    if (!ret) {
         return ret;
     }
 
@@ -64,8 +61,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     ret = contactDB->ringtones.Add(ContactsRingtonesTableRow{.contactID = contactID, .assetPath = rec.assetPath});
 
-    if (!ret)
-    {
+    if (!ret) {
         return ret;
     }
 
@@ -73,32 +69,31 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     // TODO: add missing feature: multiple addresses per contact
     ret = contactDB->address.Add(ContactsAddressTableRow{.contactID = contactID,
-                                                         .country = rec.country,
-                                                         .city = rec.city,
-                                                         .street = rec.street,
-                                                         .number = rec.number,
-                                                         .type = rec.addressType,
-                                                         .note = rec.note,
-                                                         .mail = rec.mail});
+                                                         .country   = rec.country,
+                                                         .city      = rec.city,
+                                                         .street    = rec.street,
+                                                         .number    = rec.number,
+                                                         .type      = rec.addressType,
+                                                         .note      = rec.note,
+                                                         .mail      = rec.mail});
 
-    if (!ret)
-    {
+    if (!ret) {
         return ret;
     }
 
     auto contactAddressID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->contacts.Update(ContactsTableRow{.ID = contactID,
-                                                      .nameID = contactNameID,
-                                                      .numbersID = std::to_string(contactNumberID),
-                                                      .ringID = contactRingID,
+    ret = contactDB->contacts.Update(ContactsTableRow{.ID         = contactID,
+                                                      .nameID     = contactNameID,
+                                                      .numbersID  = std::to_string(contactNumberID),
+                                                      .ringID     = contactRingID,
                                                       .addressIDs = std::to_string(contactAddressID),
 
-                                                      .type = rec.contactType,
-                                                      .isOnWhitelist = rec.isOnBlacklist,
-                                                      .isOnBlacklist = rec.isOnBlacklist,
+                                                      .type           = rec.contactType,
+                                                      .isOnWhitelist  = rec.isOnBlacklist,
+                                                      .isOnBlacklist  = rec.isOnBlacklist,
                                                       .isOnFavourites = rec.isOnFavourites,
-                                                      .speedDial = rec.speeddial});
+                                                      .speedDial      = rec.speeddial});
 
     return ret;
 }
@@ -112,33 +107,27 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
 {
 
     auto contact = contactDB->contacts.GetByID(id);
-    if (contact.ID == 0)
-    {
+    if (contact.ID == 0) {
         return false;
     }
 
-    if (contactDB->name.RemoveByID(contact.nameID) == false)
-    {
+    if (contactDB->name.RemoveByID(contact.nameID) == false) {
         return false;
     }
 
-    if (contactDB->address.RemoveByID(std::stoul(contact.addressIDs)) == false)
-    {
+    if (contactDB->address.RemoveByID(std::stoul(contact.addressIDs)) == false) {
         return false;
     }
 
-    if (contactDB->number.RemoveByID(std::stoul(contact.numbersID)) == false)
-    {
+    if (contactDB->number.RemoveByID(std::stoul(contact.numbersID)) == false) {
         return false;
     }
 
-    if (contactDB->ringtones.RemoveByID(contact.ringID) == false)
-    {
+    if (contactDB->ringtones.RemoveByID(contact.ringID) == false) {
         return false;
     }
 
-    if (contactDB->contacts.RemoveByID(id) == false)
-    {
+    if (contactDB->contacts.RemoveByID(id) == false) {
         return false;
     }
 
@@ -157,51 +146,46 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     ContactRecord rec = ContactRecord();
 
     auto contact = contactDB->contacts.GetByID(id);
-    if (contact.ID == 0)
-    {
+    if (contact.ID == 0) {
         return rec;
     }
 
     std::vector<ContactRecord::Number> nrs = getNumbers(contact.numbersID);
-    if (nrs.size() == 0)
-    {
+    if (nrs.size() == 0) {
         return rec;
     }
     auto ring = contactDB->ringtones.GetByID(contact.ringID);
-    if (ring.ID == 0)
-    {
+    if (ring.ID == 0) {
         return rec;
     }
 
     auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-    if (address.ID == 0)
-    {
+    if (address.ID == 0) {
         return rec;
     }
 
     auto name = contactDB->name.GetByID(contact.nameID);
-    if (name.ID == 0)
-    {
+    if (name.ID == 0) {
         return rec;
     }
 
-    rec.dbID = contact.ID;
-    rec.primaryName = name.namePrimary;
+    rec.dbID            = contact.ID;
+    rec.primaryName     = name.namePrimary;
     rec.alternativeName = name.nameAlternative;
-    rec.numbers = nrs;
-    rec.contactType = contact.type;
-    rec.country = address.country;
-    rec.city = address.city;
-    rec.street = address.street;
-    rec.number = address.number;
-    rec.note = address.note;
-    rec.mail = address.mail;
-    rec.addressType = address.type;
-    rec.assetPath = ring.assetPath;
-    rec.isOnWhitelist = contact.isOnWhitelist;
-    rec.isOnBlacklist = contact.isOnBlacklist;
-    rec.isOnFavourites = contact.isOnFavourites;
-    rec.speeddial = contact.speedDial;
+    rec.numbers         = nrs;
+    rec.contactType     = contact.type;
+    rec.country         = address.country;
+    rec.city            = address.city;
+    rec.street          = address.street;
+    rec.number          = address.number;
+    rec.note            = address.note;
+    rec.mail            = address.mail;
+    rec.addressType     = address.type;
+    rec.assetPath       = ring.assetPath;
+    rec.isOnWhitelist   = contact.isOnWhitelist;
+    rec.isOnBlacklist   = contact.isOnBlacklist;
+    rec.isOnFavourites  = contact.isOnFavourites;
+    rec.speeddial       = contact.speedDial;
 
     return rec;
 }
@@ -223,115 +207,105 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
 
     auto ret = contactDB->name.GetLimitOffset(offset, limit);
 
-    for (const auto &w : ret)
-    {
+    for (const auto &w : ret) {
 
         auto contact = contactDB->contacts.GetByID(w.ID);
-        if (contact.ID == 0)
-        {
+        if (contact.ID == 0) {
             return records;
         }
 
         auto name = contactDB->name.GetByID(contact.nameID);
-        if (name.ID == 0)
-        {
+        if (name.ID == 0) {
             return records;
         }
 
         auto nrs = getNumbers(contact.numbersID);
-        if (nrs.size() == 0)
-        {
+        if (nrs.size() == 0) {
             return records;
         }
 
         auto ring = contactDB->ringtones.GetByID(contact.ringID);
-        if (ring.ID == 0)
-        {
+        if (ring.ID == 0) {
             return records;
         }
 
         auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-        if (address.ID == 0)
-        {
+        if (address.ID == 0) {
             return records;
         }
 
-        records->push_back(ContactRecord{.dbID = contact.ID,
-                                         .primaryName = name.namePrimary,
+        records->push_back(ContactRecord{.dbID            = contact.ID,
+                                         .primaryName     = name.namePrimary,
                                          .alternativeName = name.nameAlternative,
-                                         .contactType = contact.type,
-                                         .numbers = nrs,
-                                         .country = address.country,
-                                         .city = address.city,
-                                         .street = address.street,
-                                         .number = address.number,
-                                         .note = address.note,
-                                         .mail = address.mail,
-                                         .addressType = address.type,
-                                         .assetPath = ring.assetPath,
-                                         .isOnWhitelist = contact.isOnWhitelist,
-                                         .isOnBlacklist = contact.isOnBlacklist,
-                                         .isOnFavourites = contact.isOnFavourites,
-                                         .speeddial = static_cast<uint8_t>(contact.speedDial)});
+                                         .contactType     = contact.type,
+                                         .numbers         = nrs,
+                                         .country         = address.country,
+                                         .city            = address.city,
+                                         .street          = address.street,
+                                         .number          = address.number,
+                                         .note            = address.note,
+                                         .mail            = address.mail,
+                                         .addressType     = address.type,
+                                         .assetPath       = ring.assetPath,
+                                         .isOnWhitelist   = contact.isOnWhitelist,
+                                         .isOnBlacklist   = contact.isOnBlacklist,
+                                         .isOnFavourites  = contact.isOnFavourites,
+                                         .speeddial       = static_cast<uint8_t>(contact.speedDial)});
     }
 
     return records;
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRecordField field,
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffsetByField(uint32_t offset,
+                                                                                          uint32_t limit,
+                                                                                          ContactRecordField field,
                                                                                           const char *str)
 {
     auto records = std::make_unique<std::vector<ContactRecord>>();
 
-    switch (field)
-    {
+    switch (field) {
     case ContactRecordField ::PrimaryName: {
         auto ret = contactDB->name.GetLimitOffsetByField(offset, limit, ContactNameTableFields::NamePrimary, str);
 
-        for (const auto &w : ret)
-        {
+        for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.contactID);
-            if (contact.ID == 0)
-            {
+            if (contact.ID == 0) {
                 return records;
             }
 
             auto nrs = getNumbers(contact.numbersID);
-            if (nrs.size() == 0)
-            {
+            if (nrs.size() == 0) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0)
-            {
+            if (ring.ID == 0) {
                 return records;
             }
 
             auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0)
-            {
+            if (address.ID == 0) {
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID = w.ID,
-                                             .primaryName = w.namePrimary,
+            records->push_back(ContactRecord{.dbID            = w.ID,
+                                             .primaryName     = w.namePrimary,
                                              .alternativeName = w.nameAlternative,
-                                             .contactType = contact.type,
-                                             .numbers = nrs,
-                                             .country = address.country,
-                                             .city = address.city,
-                                             .street = address.street,
-                                             .number = address.number,
-                                             .note = address.note,
-                                             .mail = address.mail,
-                                             .addressType = address.type,
-                                             .assetPath = ring.assetPath,
-                                             .isOnWhitelist = contact.isOnWhitelist,
-                                             .isOnBlacklist = contact.isOnBlacklist,
-                                             .isOnFavourites = contact.isOnFavourites,
-                                             .speeddial = static_cast<uint8_t>(contact.speedDial)});
+                                             .contactType     = contact.type,
+                                             .numbers         = nrs,
+                                             .country         = address.country,
+                                             .city            = address.city,
+                                             .street          = address.street,
+                                             .number          = address.number,
+                                             .note            = address.note,
+                                             .mail            = address.mail,
+                                             .addressType     = address.type,
+                                             .assetPath       = ring.assetPath,
+                                             .isOnWhitelist   = contact.isOnWhitelist,
+                                             .isOnBlacklist   = contact.isOnBlacklist,
+                                             .isOnFavourites  = contact.isOnFavourites,
+                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)});
         }
     }
 
@@ -340,174 +314,153 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     case ContactRecordField ::NumberE164: {
         auto ret = contactDB->number.GetLimitOffsetByField(offset, limit, ContactNumberTableFields ::NumberE164, str);
 
-        for (const auto &w : ret)
-        {
+        for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.contactID);
-            if (contact.ID == 0)
-            {
+            if (contact.ID == 0) {
                 return records;
             }
 
             auto nrs = getNumbers(contact.numbersID);
-            if (nrs.size() == 0)
-            {
+            if (nrs.size() == 0) {
                 return records;
             }
 
             auto name = contactDB->name.GetByID(contact.nameID);
-            if (name.ID == 0)
-            {
+            if (name.ID == 0) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0)
-            {
+            if (ring.ID == 0) {
                 return records;
             }
 
             auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0)
-            {
+            if (address.ID == 0) {
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID = w.ID,
-                                             .primaryName = name.namePrimary,
+            records->push_back(ContactRecord{.dbID            = w.ID,
+                                             .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
-                                             .contactType = contact.type,
-                                             .numbers = nrs,
-                                             .country = address.country,
-                                             .city = address.city,
-                                             .street = address.street,
-                                             .number = address.number,
-                                             .note = address.note,
-                                             .mail = address.mail,
-                                             .addressType = address.type,
-                                             .assetPath = ring.assetPath,
-                                             .isOnWhitelist = contact.isOnWhitelist,
-                                             .isOnBlacklist = contact.isOnBlacklist,
-                                             .isOnFavourites = contact.isOnFavourites,
-                                             .speeddial = static_cast<uint8_t>(contact.speedDial)
+                                             .contactType     = contact.type,
+                                             .numbers         = nrs,
+                                             .country         = address.country,
+                                             .city            = address.city,
+                                             .street          = address.street,
+                                             .number          = address.number,
+                                             .note            = address.note,
+                                             .mail            = address.mail,
+                                             .addressType     = address.type,
+                                             .assetPath       = ring.assetPath,
+                                             .isOnWhitelist   = contact.isOnWhitelist,
+                                             .isOnBlacklist   = contact.isOnBlacklist,
+                                             .isOnFavourites  = contact.isOnFavourites,
+                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)
 
             });
         }
-    }
-    break;
+    } break;
     case ContactRecordField::SpeedDial: {
         auto ret = contactDB->contacts.GetLimitOffsetByField(0, 1, ContactTableFields::SpeedDial, str);
 
-        for (const auto &w : ret)
-        {
+        for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.ID);
-            if (contact.ID == 0)
-            {
+            if (contact.ID == 0) {
                 return records;
             }
 
             auto name = contactDB->name.GetByID(contact.nameID);
-            if (name.ID == 0)
-            {
+            if (name.ID == 0) {
                 return records;
             }
 
             auto nrs = getNumbers(contact.numbersID);
-            if (nrs.size() == 0)
-            {
+            if (nrs.size() == 0) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0)
-            {
+            if (ring.ID == 0) {
                 return records;
             }
 
             auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0)
-            {
+            if (address.ID == 0) {
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID = contact.ID,
-                                             .primaryName = name.namePrimary,
+            records->push_back(ContactRecord{.dbID            = contact.ID,
+                                             .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
-                                             .contactType = contact.type,
-                                             .numbers = nrs,
-                                             .country = address.country,
-                                             .city = address.city,
-                                             .street = address.street,
-                                             .number = address.number,
-                                             .note = address.note,
-                                             .mail = address.mail,
-                                             .addressType = address.type,
-                                             .assetPath = ring.assetPath,
-                                             .isOnWhitelist = contact.isOnWhitelist,
-                                             .isOnBlacklist = contact.isOnBlacklist,
-                                             .isOnFavourites = contact.isOnFavourites,
-                                             .speeddial = static_cast<uint8_t>(contact.speedDial)});
+                                             .contactType     = contact.type,
+                                             .numbers         = nrs,
+                                             .country         = address.country,
+                                             .city            = address.city,
+                                             .street          = address.street,
+                                             .number          = address.number,
+                                             .note            = address.note,
+                                             .mail            = address.mail,
+                                             .addressType     = address.type,
+                                             .assetPath       = ring.assetPath,
+                                             .isOnWhitelist   = contact.isOnWhitelist,
+                                             .isOnBlacklist   = contact.isOnBlacklist,
+                                             .isOnFavourites  = contact.isOnFavourites,
+                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)});
         }
-    }
-    break;
+    } break;
 
     case ContactRecordField::Favourite: {
         auto ret = contactDB->name.GetLimitOffsetByField(offset, limit, ContactNameTableFields::Favourite, str);
 
-        for (const auto &w : ret)
-        {
+        for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.ID);
-            if (contact.ID == 0)
-            {
+            if (contact.ID == 0) {
                 return records;
             }
 
             auto name = contactDB->name.GetByID(contact.nameID);
-            if (name.ID == 0)
-            {
+            if (name.ID == 0) {
                 return records;
             }
 
             auto nrs = getNumbers(contact.numbersID);
-            if (nrs.size() == 0)
-            {
+            if (nrs.size() == 0) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0)
-            {
+            if (ring.ID == 0) {
                 return records;
             }
 
             auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0)
-            {
+            if (address.ID == 0) {
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID = contact.ID,
-                                             .primaryName = name.namePrimary,
+            records->push_back(ContactRecord{.dbID            = contact.ID,
+                                             .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
-                                             .contactType = contact.type,
-                                             .numbers = nrs,
-                                             .country = address.country,
-                                             .city = address.city,
-                                             .street = address.street,
-                                             .number = address.number,
-                                             .note = address.note,
-                                             .mail = address.mail,
-                                             .addressType = address.type,
-                                             .assetPath = ring.assetPath,
-                                             .isOnWhitelist = contact.isOnWhitelist,
-                                             .isOnBlacklist = contact.isOnBlacklist,
-                                             .isOnFavourites = contact.isOnFavourites,
-                                             .speeddial = static_cast<uint8_t>(contact.speedDial)});
+                                             .contactType     = contact.type,
+                                             .numbers         = nrs,
+                                             .country         = address.country,
+                                             .city            = address.city,
+                                             .street          = address.street,
+                                             .number          = address.number,
+                                             .note            = address.note,
+                                             .mail            = address.mail,
+                                             .addressType     = address.type,
+                                             .assetPath       = ring.assetPath,
+                                             .isOnWhitelist   = contact.isOnWhitelist,
+                                             .isOnBlacklist   = contact.isOnBlacklist,
+                                             .isOnFavourites  = contact.isOnFavourites,
+                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)});
         }
-    }
-    break;
+    } break;
     }
 
     return records;
@@ -520,104 +473,96 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
 
     auto ret = contactDB->name.GetByName(primaryName.c_str(), alternativeName.c_str());
 
-    for (const auto &w : ret)
-    {
+    for (const auto &w : ret) {
 
         auto contact = contactDB->contacts.GetByID(w.contactID);
-        if (contact.ID == 0)
-        {
+        if (contact.ID == 0) {
             return records;
         }
 
         auto nrs = getNumbers(contact.numbersID);
-        if (nrs.size() == 0)
-        {
+        if (nrs.size() == 0) {
             return records;
         }
 
         auto ring = contactDB->ringtones.GetByID(contact.ringID);
-        if (ring.ID == 0)
-        {
+        if (ring.ID == 0) {
             return records;
         }
 
         auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-        if (address.ID == 0)
-        {
+        if (address.ID == 0) {
             return records;
         }
 
-        records->push_back(ContactRecord{.dbID = w.ID,
-                                         .primaryName = w.namePrimary,
+        records->push_back(ContactRecord{.dbID            = w.ID,
+                                         .primaryName     = w.namePrimary,
                                          .alternativeName = w.nameAlternative,
-                                         .contactType = contact.type,
-                                         .numbers = nrs,
-                                         .country = address.country,
-                                         .city = address.city,
-                                         .street = address.street,
-                                         .number = address.number,
-                                         .note = address.note,
-                                         .mail = address.mail,
-                                         .addressType = address.type,
-                                         .assetPath = ring.assetPath,
-                                         .isOnWhitelist = contact.isOnWhitelist,
-                                         .isOnBlacklist = contact.isOnBlacklist,
-                                         .isOnFavourites = contact.isOnFavourites,
-                                         .speeddial = static_cast<uint8_t>(contact.speedDial)});
+                                         .contactType     = contact.type,
+                                         .numbers         = nrs,
+                                         .country         = address.country,
+                                         .city            = address.city,
+                                         .street          = address.street,
+                                         .number          = address.number,
+                                         .note            = address.note,
+                                         .mail            = address.mail,
+                                         .addressType     = address.type,
+                                         .assetPath       = ring.assetPath,
+                                         .isOnWhitelist   = contact.isOnWhitelist,
+                                         .isOnBlacklist   = contact.isOnBlacklist,
+                                         .isOnFavourites  = contact.isOnFavourites,
+                                         .speeddial       = static_cast<uint8_t>(contact.speedDial)});
     }
 
     return records;
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const char *primaryName, const char *alternativeName, const char *number)
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const char *primaryName,
+                                                                           const char *alternativeName,
+                                                                           const char *number)
 {
     auto records = std::make_unique<std::vector<ContactRecord>>();
 
     auto ret = contactDB->contacts.Search(primaryName, alternativeName, number);
 
-    for (const auto &w : ret)
-    {
+    for (const auto &w : ret) {
         auto contact = contactDB->contacts.GetByID(w.ID);
-        if (contact.ID == 0)
-        {
+        if (contact.ID == 0) {
             return records;
         }
 
         auto nrs = getNumbers(contact.numbersID);
-        if (nrs.size() == 0)
-        {
+        if (nrs.size() == 0) {
             return records;
         }
 
         auto ring = contactDB->ringtones.GetByID(contact.ringID);
-        if (ring.ID == 0)
-        {
+        if (ring.ID == 0) {
             return records;
         }
 
         auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-        if (address.ID == 0)
-        {
+        if (address.ID == 0) {
             return records;
         }
 
-        records->push_back(ContactRecord{.dbID = w.ID,
-                                         .primaryName = w.namePrimary,
+        records->push_back(ContactRecord{.dbID            = w.ID,
+                                         .primaryName     = w.namePrimary,
                                          .alternativeName = w.nameAlternative,
-                                         .contactType = contact.type,
-                                         .numbers = nrs,
-                                         .country = address.country,
-                                         .city = address.city,
-                                         .street = address.street,
-                                         .number = address.number,
-                                         .note = address.note,
-                                         .mail = address.mail,
-                                         .addressType = address.type,
-                                         .assetPath = ring.assetPath,
-                                         .isOnWhitelist = contact.isOnWhitelist,
-                                         .isOnBlacklist = contact.isOnBlacklist,
-                                         .isOnFavourites = contact.isOnFavourites,
-                                         .speeddial = static_cast<uint8_t>(contact.speedDial)});
+                                         .contactType     = contact.type,
+                                         .numbers         = nrs,
+                                         .country         = address.country,
+                                         .city            = address.city,
+                                         .street          = address.street,
+                                         .number          = address.number,
+                                         .note            = address.note,
+                                         .mail            = address.mail,
+                                         .addressType     = address.type,
+                                         .assetPath       = ring.assetPath,
+                                         .isOnWhitelist   = contact.isOnWhitelist,
+                                         .isOnBlacklist   = contact.isOnBlacklist,
+                                         .isOnFavourites  = contact.isOnFavourites,
+                                         .speeddial       = static_cast<uint8_t>(contact.speedDial)});
     }
 
     return records;
@@ -628,23 +573,21 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetContactBy
     return GetLimitOffsetByField(0, 1, ContactRecordField::NumberE164, number.c_str());
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number, CreateTempContact createTempContact)
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(const UTF8 &number,
+                                                                                CreateTempContact createTempContact)
 {
     auto ret = GetContactByNumber(number);
-    if (ret->size() > 0)
-    {
+    if (ret->size() > 0) {
         return ret;
     }
 
     // Contact not found, create temporary one
-    if (createTempContact == CreateTempContact::True)
-    {
+    if (createTempContact == CreateTempContact::True) {
         LOG_INFO("Cannot find contact for number %s, creating temporary one", number.c_str());
         if (!Add(ContactRecord{
                 .contactType = ContactType::TEMPORARY,
                 .numbers = std::vector<ContactRecord::Number>{ContactRecord::Number(number.c_str(), number.c_str())},
-            }))
-        {
+            })) {
             LOG_ERROR("Cannot add contact record");
             return ret;
         }
@@ -663,11 +606,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDi
 std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)
 {
     std::vector<ContactRecord::Number> nrs;
-    for (auto nr_str : utils::split(numbers_id, ' '))
-    {
+    for (auto nr_str : utils::split(numbers_id, ' ')) {
         auto nr = contactDB->number.GetByID(std::stol(nr_str));
-        if (nr.ID == 0)
-        {
+        if (nr.ID == 0) {
             return nrs;
         }
         nrs.push_back(ContactRecord::Number(nr.numberUser, nr.numbere164, nr.type));

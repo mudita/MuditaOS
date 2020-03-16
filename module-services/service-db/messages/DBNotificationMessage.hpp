@@ -13,7 +13,8 @@
 #include "Service/Message.hpp"
 #include <memory>
 
-namespace DB{
+namespace DB
+{
     enum class NotificationType
     {
         Updated,
@@ -29,16 +30,16 @@ namespace DB{
         SettingsDB,
         SmsDB
     };
-}
+} // namespace DB
 class DBNotificationMessage : public sys::DataMessage
 {
-public:
-  DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType)
-      : sys::DataMessage(messageType), notificationType(notificationType), baseType(baseType){};
-  ~DBNotificationMessage() override = default;
+  public:
+    DBNotificationMessage(MessageType messageType, DB::NotificationType notificationType, DB::BaseType baseType)
+        : sys::DataMessage(messageType), notificationType(notificationType), baseType(baseType){};
+    ~DBNotificationMessage() override = default;
 
-  DB::NotificationType notificationType;
-  DB::BaseType baseType;
+    DB::NotificationType notificationType;
+    DB::BaseType baseType;
 };
 
 class DBNotificationResponseMessage : public sys::ResponseMessage

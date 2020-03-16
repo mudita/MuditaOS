@@ -11,7 +11,8 @@
 
 #include "ImageMap.hpp"
 
-namespace gui {
+namespace gui
+{
 
     /// Vector map item (*.vpi extension) loaded by `ImageManager::loadVecMap`
     class VecMap : public ImageMap

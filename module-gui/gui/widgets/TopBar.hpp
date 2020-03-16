@@ -15,10 +15,11 @@
 #include "TopBar/SIM.hpp"
 #include <common_data/EventStore.hpp>
 
-namespace gui {
+namespace gui
+{
 
     static const uint32_t batteryLevelCount = 6;
-    static const uint32_t signalImgCount = 6;
+    static const uint32_t signalImgCount    = 6;
 
     /// Header of most of design Windows
     ///
@@ -58,8 +59,8 @@ namespace gui {
         Image *signal[static_cast<size_t>(Store::RssiBar::noOfSupprtedBars)];
         Image *lock;
         std::array<Image *, batteryLevelCount> battery = {nullptr};
-        Label *charging = nullptr;
-        gui::SIM *sim = nullptr;
+        Label *charging                                = nullptr;
+        gui::SIM *sim                                  = nullptr;
         void prepareWidget();
         static TimeMode timeMode;
 
@@ -93,7 +94,8 @@ namespace gui {
         void setActive(TopBar::Elements element, bool active);
         void setActive(std::list<std::pair<TopBar::Elements, bool>> elements);
         /**
-         * @brief Sets charge level of the battery based on percent value. This will cause appropriate image to be displayed.
+         * @brief Sets charge level of the battery based on percent value. This will cause appropriate image to be
+         * displayed.
          * @return if display should be refreshed or not
          */
         bool setBatteryLevel(uint32_t percent);
@@ -116,7 +118,7 @@ namespace gui {
 
         // virtual methods from Item
         std::list<DrawCommand *> buildDrawList() override;
-};
+    };
 
 } /* namespace gui */
 

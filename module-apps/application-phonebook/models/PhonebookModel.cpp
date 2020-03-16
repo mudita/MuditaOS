@@ -13,8 +13,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 
 PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel(app, 14)
-{
-}
+{}
 
 void PhonebookModel::requestRecordsCount()
 {
@@ -34,28 +33,27 @@ void PhonebookModel::requestRecordsCount()
 void PhonebookModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {
 
-    if (offset < favouriteCount)
-    {
+    if (offset < favouriteCount) {
         // if it's needed to request only favorite
-        if (offset + limit < favouriteCount)
-        {
+        if (offset + limit < favouriteCount) {
             DBServiceAPI::ContactGetLimitOffset(application, offset, limit, true);
         }
-        else
-        {
+        else {
             uint32_t count = favouriteCount - offset;
             DBServiceAPI::ContactGetLimitOffset(application, offset, count, true);
             DBServiceAPI::ContactGetLimitOffset(application, 0, limit - count, false);
         }
     }
     // request normal contacts
-    else
-    {
+    else {
         DBServiceAPI::ContactGetLimitOffset(application, offset - favouriteCount, limit, false);
     }
 }
 
-bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count,
+bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
+                                   const uint32_t offset,
+                                   const uint32_t limit,
+                                   uint32_t count,
                                    bool favourite)
 {
 
@@ -67,9 +65,11 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
     return true;
 }
 
-gui::ListItem *PhonebookModel::getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
+gui::ListItem *PhonebookModel::getItem(
+    int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-    // LOG_INFO("index: %d, first:%d prev: %d, count: %d, rem: %d, topDown: %d", index, firstElement, prevIndex, count, remaining, topDown);
+    // LOG_INFO("index: %d, first:%d prev: %d, count: %d, rem: %d, topDown: %d", index, firstElement, prevIndex, count,
+    // remaining, topDown);
     bool download = false;
     if (index > firstIndex + pageSize / 2)
         download = true;
@@ -80,106 +80,85 @@ gui::ListItem *PhonebookModel::getItem(int index, int firstElement, int prevInde
     if (contact == nullptr)
         return nullptr;
 
-    if (topDown)
-    {
+    if (topDown) {
         // return item from favorite part of contacts
-        if (static_cast<uint32_t>(index) < favouriteCount)
-        {
+        if (static_cast<uint32_t>(index) < favouriteCount) {
             gui::PhonebookItem *item = new gui::PhonebookItem();
 
-            if ((index == firstElement) && (index != prevIndex))
-            {
+            if ((index == firstElement) && (index != prevIndex)) {
                 item->setValue(utils::localize.get("app_phonebook_list_favourites"));
             }
-            else
-            {
+            else {
                 item->markFavourite(true);
                 item->setContact(contact);
                 item->setID(index);
             }
             return item;
         }
-        else
-        {
+        else {
             gui::PhonebookItem *item = new gui::PhonebookItem();
             // on top the page or if element next after last favourite contact is requested
-            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex))
-            {
+            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex)) {
 
                 item->setValue(contact->primaryName.substr(0, 1));
             }
-            else
-            {
+            else {
                 std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
-                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))
-                {
+                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
                     item->setContact(contact);
                     item->setID(index);
                 }
-                else
-                {
+                else {
                     item->setValue(contact->primaryName.substr(0, 1));
                 }
             }
             return item;
         }
     }
-    else
-    {
-        if (static_cast<uint32_t>(index) < favouriteCount - 1)
-        {
+    else {
+        if (static_cast<uint32_t>(index) < favouriteCount - 1) {
             gui::PhonebookItem *item = new gui::PhonebookItem();
-            if (remaining == 0)
-            {
+            if (remaining == 0) {
                 item->setValue(utils::localize.get("app_phonebook_list_favourites"));
             }
-            else
-            {
+            else {
                 item->markFavourite(true);
                 item->setContact(contact);
                 item->setID(index);
             }
             return item;
         }
-        else
-        {
+        else {
             gui::PhonebookItem *item = new gui::PhonebookItem();
 
             // leaving normal contacts list and entering favourite area but character is already placed
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex))
-            {
+            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex)) {
                 item->markFavourite(true);
                 item->setContact(contact);
                 item->setID(index);
             }
             // leaving normal contacts list and entering favourite area - return character
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex))
-            {
+            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex)) {
                 item->setValue(contact->primaryName.substr(0, 1));
             }
-            else
-            {
+            else {
                 std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
-                if (remaining == 0)
-                {
+                if (remaining == 0) {
                     // previous element has the same first character of alternative name so display first character
-                    if (index == prevIndex)
-                    {
+                    if (index == prevIndex) {
                         item->setContact(contact);
                         item->setID(index);
                     }
-                    else
-                    {
+                    else {
                         item->setValue(prevContact->primaryName.substr(0, 1));
                     }
                 }
-                else if (((index == firstElement) || (index == prevIndex) || (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))))
-                {
+                else if (((index == firstElement) || (index == prevIndex) ||
+                          (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)))) {
                     item->setContact(contact);
                     item->setID(index);
                 }
-                else
-                {
+                else {
                     item->setValue(prevContact->primaryName.substr(0, 1));
                 }
             }

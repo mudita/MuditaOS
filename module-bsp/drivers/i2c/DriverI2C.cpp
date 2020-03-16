@@ -2,12 +2,10 @@
  *  @file DriverI2C.cpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 29.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #include "DriverI2C.hpp"
 
@@ -22,33 +20,34 @@
 #error "Unsupported target"
 #endif
 
-namespace drivers {
+namespace drivers
+{
 
-    std::weak_ptr<DriverI2C> DriverI2C::singleton[static_cast<uint32_t >(I2CInstances ::COUNT)];
+    std::weak_ptr<DriverI2C> DriverI2C::singleton[static_cast<uint32_t>(I2CInstances ::COUNT)];
 
     std::shared_ptr<DriverI2C> DriverI2C::Create(const drivers::I2CInstances instance,
-                                                 const drivers::DriverI2CParams &params) {
+                                                 const drivers::DriverI2CParams &params)
+    {
         {
 
             cpp_freertos::CriticalSection::Enter();
-            std::shared_ptr<DriverI2C> inst = singleton[static_cast<uint32_t >(instance)].lock();
+            std::shared_ptr<DriverI2C> inst = singleton[static_cast<uint32_t>(instance)].lock();
 
             if (!inst) {
 #if defined(TARGET_RT1051)
-                inst = std::make_shared<RT1051DriverI2C>(instance,params);
+                inst = std::make_shared<RT1051DriverI2C>(instance, params);
 #elif defined(TARGET_Linux)
-                #else
+#else
 #error "Unsupported target"
 #endif
 
-                singleton[static_cast<uint32_t >(instance)] = inst;
+                singleton[static_cast<uint32_t>(instance)] = inst;
             }
 
             cpp_freertos::CriticalSection::Exit();
 
             return inst;
-
         }
     }
 
-}
+} // namespace drivers

@@ -13,41 +13,47 @@
 #include "i18/i18.hpp"
 #include "EmergencyCallWindow.hpp"
 
-namespace gui {
+namespace gui
+{
 
-    EmergencyCallWindow::EmergencyCallWindow(app::Application *app) : EnterNumberWindow(app, app::window::name_emergencyCall)
+    EmergencyCallWindow::EmergencyCallWindow(app::Application *app)
+        : EnterNumberWindow(app, app::window::name_emergencyCall)
     {
 
         numberLabel->setText(utils::localize.get("app_call_emergency"));
     }
 
-void EmergencyCallWindow::rebuild() {
+    void EmergencyCallWindow::rebuild()
+    {}
+    void EmergencyCallWindow::buildInterface()
+    {
+        AppWindow::buildInterface();
+    }
+    void EmergencyCallWindow::destroyInterface()
+    {
+        AppWindow::destroyInterface();
+    }
 
-}
-void EmergencyCallWindow::buildInterface() {
-	AppWindow::buildInterface();
-}
-void EmergencyCallWindow::destroyInterface() {
-	AppWindow::destroyInterface();
-}
+    EmergencyCallWindow::~EmergencyCallWindow()
+    {
+        // TODO Auto-generated destructor stub
+    }
 
-EmergencyCallWindow::~EmergencyCallWindow() {
-	// TODO Auto-generated destructor stub
-}
+    bool EmergencyCallWindow::onInput(const InputEvent &inputEvent)
+    {
+        bool ret = EnterNumberWindow::onInput(inputEvent);
 
-bool EmergencyCallWindow::onInput( const InputEvent& inputEvent ) {
-	bool ret = EnterNumberWindow::onInput( inputEvent );
+        //	if( number.empty() ) {
+        //		numberLabel->setText( utils::localize.get("app_call_emergency") );
+        //	}
 
-//	if( number.empty() ) {
-//		numberLabel->setText( utils::localize.get("app_call_emergency") );
-//	}
+        return ret;
+    }
+    bool EmergencyCallWindow::handleSwitchData(SwitchData *data)
+    {
+        bool ret = EnterNumberWindow::handleSwitchData(data);
 
-	return ret;
-}
-bool EmergencyCallWindow::handleSwitchData( SwitchData* data ) {
-	bool ret = EnterNumberWindow::handleSwitchData( data );
-
-	return ret;
-}
+        return ret;
+    }
 
 } /* namespace gui */

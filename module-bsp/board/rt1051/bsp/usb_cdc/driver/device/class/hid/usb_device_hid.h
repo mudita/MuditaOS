@@ -22,9 +22,9 @@
 #define USB_DEVICE_CONFIG_HID_CLASS_CODE (0x03U)
 
 /*! @brief Request code to get report of HID class. */
-#define USB_DEVICE_HID_REQUEST_GET_REPORT (0x01U)
-#define USB_DEVICE_HID_REQUEST_GET_REPORT_TYPE_INPUT (0x01U)
-#define USB_DEVICE_HID_REQUEST_GET_REPORT_TYPE_OUPUT (0x02U)
+#define USB_DEVICE_HID_REQUEST_GET_REPORT              (0x01U)
+#define USB_DEVICE_HID_REQUEST_GET_REPORT_TYPE_INPUT   (0x01U)
+#define USB_DEVICE_HID_REQUEST_GET_REPORT_TYPE_OUPUT   (0x02U)
 #define USB_DEVICE_HID_REQUEST_GET_REPORT_TYPE_FEATURE (0x03U)
 /*! @brief Request code to get idle of HID class. */
 #define USB_DEVICE_HID_REQUEST_GET_IDLE (0x02U)
@@ -162,7 +162,9 @@ extern "C"
      *
      * @return A USB error code or kStatus_USB_Success.
      */
-    extern usb_status_t USB_DeviceHidInit(uint8_t controllerId, usb_device_class_config_struct_t *config, class_handle_t *handle);
+    extern usb_status_t USB_DeviceHidInit(uint8_t controllerId,
+                                          usb_device_class_config_struct_t *config,
+                                          class_handle_t *handle);
 
     /*!
      * @brief Deinitializes the device HID class.
@@ -178,7 +180,8 @@ extern "C"
     /*!
      * @brief Handles the event passed to the HID class.
      *
-     * This function handles the event passed to the HID class. This function only can be called by #USB_DeviceClassEvent.
+     * This function handles the event passed to the HID class. This function only can be called by
+     * #USB_DeviceClassEvent.
      *
      * @param[in] handle          The HID class handle received from the usb_device_class_config_struct_t::classHandle.
      * @param[in] event           The event codes. See the enumeration usb_device_class_event_t.
@@ -211,9 +214,8 @@ extern "C"
      *
      * @note The function can only be called in the same context.
      *
-     * @note The return value indicates whether the sending request is successful or not. The transfer done is notified by
-     * usb_device_hid_interrupt_in.
-     * Currently, only one transfer request can be supported for one specific endpoint.
+     * @note The return value indicates whether the sending request is successful or not. The transfer done is notified
+     * by usb_device_hid_interrupt_in. Currently, only one transfer request can be supported for one specific endpoint.
      * If there is a specific requirement to support multiple transfer requests for a specific endpoint, the application
      * should implement a queue in the application level.
      * The subsequent transfer can begin only when the previous transfer is done (a notification is received through the
@@ -237,14 +239,11 @@ extern "C"
      *
      * @note The function can only be called in the same context.
      *
-     * @note The return value indicates whether the receiving request is successful or not. The transfer done is notified by
-     * usb_device_hid_interrupt_out.
-     * Currently, only one transfer request can be supported for a specific endpoint.
-     * If there is a specific requirement to support multiple transfer requests for a specific endpoint, the application
-     * should implement a queue in the application level.
-     * The subsequent transfer can begin only when the previous transfer is done (a notification is received through the
-     * endpoint
-     * callback).
+     * @note The return value indicates whether the receiving request is successful or not. The transfer done is
+     * notified by usb_device_hid_interrupt_out. Currently, only one transfer request can be supported for a specific
+     * endpoint. If there is a specific requirement to support multiple transfer requests for a specific endpoint, the
+     * application should implement a queue in the application level. The subsequent transfer can begin only when the
+     * previous transfer is done (a notification is received through the endpoint callback).
      */
     extern usb_status_t USB_DeviceHidRecv(class_handle_t handle, uint8_t ep, uint8_t *buffer, uint32_t length);
 

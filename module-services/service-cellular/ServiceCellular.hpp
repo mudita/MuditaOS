@@ -2,12 +2,10 @@
  *  @file ServiceCellular.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 03.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_SERVICECELLULAR_HPP
 #define PUREPHONE_SERVICECELLULAR_HPP
@@ -29,12 +27,13 @@ namespace cellular
         enum class ST
         {
             Idle,              /// start mode of cellular - does nothing
-            PowerUpInProgress, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state bases on URC without much thinking
+            PowerUpInProgress, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state
+                               /// bases on URC without much thinking
             ModemConfigurationInProgress, /// modem basic, non sim related configuration
             AudioConfigurationInProgress, /// audio configuration for modem (could be in ModemConfiguration)
-            ModemOn,                      /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
-            SimInitInProgress,            /// initialize SIM - triggers sim ON in, ( **changed on URC** )
-            FullyFunctional,              /// modem is on, sim is initialized
+            ModemOn, /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
+            SimInitInProgress, /// initialize SIM - triggers sim ON in, ( **changed on URC** )
+            FullyFunctional,   /// modem is on, sim is initialized
             Failed
         };
 
@@ -48,15 +47,15 @@ namespace cellular
     };
 } // namespace cellular
 
-class ServiceCellular : public sys::Service {
+class ServiceCellular : public sys::Service
+{
 
-public:
-
+  public:
     ServiceCellular();
 
     ~ServiceCellular();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl,sys::ResponseMessage* resp=nullptr) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
 
     // Invoked when timer ticked
     void TickHandler(uint32_t id) override;
@@ -66,10 +65,9 @@ public:
     sys::ReturnCodes DeinitHandler() override;
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
-
     static const char *serviceName;
 
-    bool sendSMS(UTF8& number, UTF8& text);
+    bool sendSMS(UTF8 &number, UTF8 &text);
     bool sendSMS(void);
     bool receiveSMS(std::string messageNumber);
     /**
@@ -80,7 +78,8 @@ public:
     bool getOwnNumber(std::string &destination);
     /**
      * @brief Its getting IMSI from selected SIM card.
-     * @param fullNumber Its returning full IMSI number when fullNumber is true, otherwise its returning only country identification number
+     * @param fullNumber Its returning full IMSI number when fullNumber is true, otherwise its returning only country
+     * identification number
      * @param destination Reference to destination string.
      * @return true when succeed, false when fails
      */
@@ -89,8 +88,7 @@ public:
     std::vector<std::string> scanOperators(void);
 
   private:
-
-    //std::unique_ptr<MuxDaemon> muxdaemon;
+    // std::unique_ptr<MuxDaemon> muxdaemon;
     TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
     // used for polling for call state
     uint32_t callStateTimerId = 0;
@@ -113,4 +111,4 @@ public:
     bool init_sim();
 };
 
-#endif //PUREPHONE_SERVICECELLULAR_HPP
+#endif // PUREPHONE_SERVICECELLULAR_HPP

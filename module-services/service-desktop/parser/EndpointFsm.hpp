@@ -16,7 +16,7 @@ extern "C"
 // Event declarations
 //
 
-struct EndpointEvt: tinyfsm::Event
+struct EndpointEvt : tinyfsm::Event
 {
     EndpointEvt(sys::Service *ownerServicePtr) : ownerService(ownerServicePtr){};
     sys::Service *ownerService;
@@ -25,8 +25,7 @@ struct EndpointEvt: tinyfsm::Event
 // ----------------------------------------------------------------------------
 // EndpointFsm (FSM base class) declaration
 //
-class EndpointFsm
-: public tinyfsm::Fsm<EndpointFsm>
+class EndpointFsm : public tinyfsm::Fsm<EndpointFsm>
 {
     friend class Fsm;
 

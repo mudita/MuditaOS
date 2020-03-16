@@ -39,7 +39,6 @@
 #define FSL_COMPONENT_ID "platform.drivers.igpio"
 #endif
 
-
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -53,15 +52,15 @@ static const clock_ip_name_t s_gpioClock[] = GPIO_CLOCKS;
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
 /*******************************************************************************
-* Prototypes
-******************************************************************************/
+ * Prototypes
+ ******************************************************************************/
 
 /*!
-* @brief Gets the GPIO instance according to the GPIO base
-*
-* @param base    GPIO peripheral base pointer(PTA, PTB, PTC, etc.)
-* @retval GPIO instance
-*/
+ * @brief Gets the GPIO instance according to the GPIO base
+ *
+ * @param base    GPIO peripheral base pointer(PTA, PTB, PTC, etc.)
+ * @retval GPIO instance
+ */
 static uint32_t GPIO_GetInstance(GPIO_Type *base);
 
 /*******************************************************************************
@@ -73,10 +72,8 @@ static uint32_t GPIO_GetInstance(GPIO_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_gpioBases); instance++)
-    {
-        if (s_gpioBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_gpioBases); instance++) {
+        if (s_gpioBases[instance] == base) {
             break;
         }
     }
@@ -97,12 +94,10 @@ void GPIO_PinInit(GPIO_Type *base, uint32_t pin, const gpio_pin_config_t *Config
     base->IMR &= ~(1U << pin);
 
     /* Configure GPIO pin direction */
-    if (Config->direction == kGPIO_DigitalInput)
-    {
+    if (Config->direction == kGPIO_DigitalInput) {
         base->GDIR &= ~(1U << pin);
     }
-    else
-    {
+    else {
         GPIO_PinWrite(base, pin, Config->outputLogic);
         base->GDIR |= (1U << pin);
     }
@@ -111,19 +106,18 @@ void GPIO_PinInit(GPIO_Type *base, uint32_t pin, const gpio_pin_config_t *Config
     GPIO_SetPinInterruptConfig(base, pin, Config->interruptMode);
 }
 
-void GPIO_Deinit(GPIO_Type *base){
+void GPIO_Deinit(GPIO_Type *base)
+{
     CLOCK_DisableClock(s_gpioClock[GPIO_GetInstance(base)]);
 }
 
 void GPIO_PinWrite(GPIO_Type *base, uint32_t pin, uint8_t output)
 {
     assert(pin < 32);
-    if (output == 0U)
-    {
+    if (output == 0U) {
         base->DR &= ~(1U << pin); /* Set pin output to low level.*/
     }
-    else
-    {
+    else {
         base->DR |= (1U << pin); /* Set pin output to high level.*/
     }
 }
@@ -138,33 +132,30 @@ void GPIO_PinSetInterruptConfig(GPIO_Type *base, uint32_t pin, gpio_interrupt_mo
     /* Register reset to default value */
     base->EDGE_SEL &= ~(1U << pin);
 
-    if (pin < 16)
-    {
+    if (pin < 16) {
         icr = &(base->ICR1);
     }
-    else
-    {
+    else {
         icr = &(base->ICR2);
         icrShift -= 16;
     }
-    switch (pinInterruptMode)
-    {
-        case (kGPIO_IntLowLevel):
-            *icr &= ~(3U << (2 * icrShift));
-            break;
-        case (kGPIO_IntHighLevel):
-            *icr = (*icr & (~(3U << (2 * icrShift)))) | (1U << (2 * icrShift));
-            break;
-        case (kGPIO_IntRisingEdge):
-            *icr = (*icr & (~(3U << (2 * icrShift)))) | (2U << (2 * icrShift));
-            break;
-        case (kGPIO_IntFallingEdge):
-            *icr |= (3U << (2 * icrShift));
-            break;
-        case (kGPIO_IntRisingOrFallingEdge):
-            base->EDGE_SEL |= (1U << pin);
-            break;
-        default:
-            break;
+    switch (pinInterruptMode) {
+    case (kGPIO_IntLowLevel):
+        *icr &= ~(3U << (2 * icrShift));
+        break;
+    case (kGPIO_IntHighLevel):
+        *icr = (*icr & (~(3U << (2 * icrShift)))) | (1U << (2 * icrShift));
+        break;
+    case (kGPIO_IntRisingEdge):
+        *icr = (*icr & (~(3U << (2 * icrShift)))) | (2U << (2 * icrShift));
+        break;
+    case (kGPIO_IntFallingEdge):
+        *icr |= (3U << (2 * icrShift));
+        break;
+    case (kGPIO_IntRisingOrFallingEdge):
+        base->EDGE_SEL |= (1U << pin);
+        break;
+    default:
+        break;
     }
 }

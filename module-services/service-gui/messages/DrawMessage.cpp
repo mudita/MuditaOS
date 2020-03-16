@@ -10,20 +10,21 @@
 #include "DrawMessage.hpp"
 #include "MessageType.hpp"
 
-namespace sgui {
+namespace sgui
+{
 
-DrawMessage::DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode, DrawCommand cmd ) :
-	GUIMessage(MessageType::GUICommands),
-	command{ cmd } {
+    DrawMessage::DrawMessage(const std::list<gui::DrawCommand *> &commandsList, gui::RefreshModes mode, DrawCommand cmd)
+        : GUIMessage(MessageType::GUICommands), command{cmd}
+    {
 
-	this->mode = mode;
-	for( auto cmd : commandsList ) {
-		if( cmd )
-			commands.push_back( std::unique_ptr<gui::DrawCommand>(cmd));
-	}
-}
+        this->mode = mode;
+        for (auto cmd : commandsList) {
+            if (cmd)
+                commands.push_back(std::unique_ptr<gui::DrawCommand>(cmd));
+        }
+    }
 
-DrawMessage::~DrawMessage() {
-}
+    DrawMessage::~DrawMessage()
+    {}
 
 } /* namespace sgui */

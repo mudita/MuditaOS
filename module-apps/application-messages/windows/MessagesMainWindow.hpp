@@ -19,35 +19,37 @@
 #include "ListView.hpp"
 #include "../widgets/ThreadModel.hpp"
 
-namespace gui {
+namespace gui
+{
 
-class MessagesMainWindow: public AppWindow {
-protected:
-//    PhonebookListView* list;
-//    PhonebookModel* phonebookModel = nullptr;
+    class MessagesMainWindow : public AppWindow
+    {
+      protected:
+        //    PhonebookListView* list;
+        //    PhonebookModel* phonebookModel = nullptr;
 
-	Image *leftArrowImage = nullptr;
-	Image *rightArrowImage = nullptr;
-	Image *newMessageImage = nullptr;
-	Image *searchImage = nullptr;
+        Image *leftArrowImage  = nullptr;
+        Image *rightArrowImage = nullptr;
+        Image *newMessageImage = nullptr;
+        Image *searchImage     = nullptr;
 
-	ThreadModel *threadModel = nullptr;
-	gui::ListView *list = nullptr;
+        ThreadModel *threadModel = nullptr;
+        gui::ListView *list      = nullptr;
 
-public:
-	MessagesMainWindow(app::Application *app);
-	virtual ~MessagesMainWindow();
+      public:
+        MessagesMainWindow(app::Application *app);
+        virtual ~MessagesMainWindow();
 
-	// virtual methods
-	bool onInput(const InputEvent &inputEvent) override;
-	void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        // virtual methods
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-	bool onDatabaseMessage(sys::Message *msgl);
+        bool onDatabaseMessage(sys::Message *msgl);
 
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace gui */
 

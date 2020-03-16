@@ -15,15 +15,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-
 //#define userprintf(...) SEGGER_RTT_printf(0, __VA_ARGS__)
 
 //! Test if in interrupt mode
 static inline bool isIRQ()
 {
-    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0 ;
+    return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
 }
-
-
 
 #endif /* CHIP_H_ */

@@ -16,17 +16,16 @@ namespace gui
     }
 
     void OptionWindow::rebuild()
-    {
-    }
+    {}
 
     Item *newOptionLabel(const UTF8 &text, std::function<bool(Item &)> activatedCallback, Arrow arrow)
     {
         // TODO fix elements positioning with styles ready, right now moved from Settings main window as it is
-        gui::Label *label = new gui::Label(nullptr, 20, 0, style::window_width - 2 * 20, style::window::label::big_h, text);
+        gui::Label *label =
+            new gui::Label(nullptr, 20, 0, style::window_width - 2 * 20, style::window::label::big_h, text);
         style::window::decorateOption(label);
         label->activatedCallback = activatedCallback;
-        if (arrow == Arrow::Enabled)
-        {
+        if (arrow == Arrow::Enabled) {
             new gui::Image(label, 425 - 17, 24, 0, 0, "right_label_arrow");
         }
         return label;
@@ -44,8 +43,7 @@ namespace gui
 
     void OptionWindow::addOptions(std::list<Option> options)
     {
-        for (auto &el : options)
-        {
+        for (auto &el : options) {
             LOG_INFO("adding option: %s", el.text.c_str());
             addOptionLabel(el.text, el.activatedCallback, el.arrow);
         }
@@ -54,8 +52,7 @@ namespace gui
 
     void OptionWindow::addOptions(std::list<Item *> items)
     {
-        for (auto &el : items)
-        {
+        for (auto &el : items) {
             body->addWidget(el);
         }
         body->switchPage(0);
@@ -64,8 +61,7 @@ namespace gui
     void OptionWindow::clearOptions()
     {
 
-        for (auto el : body->children)
-        {
+        for (auto el : body->children) {
             delete el;
         }
         body->children.clear();
@@ -86,8 +82,11 @@ namespace gui
         // magical offset on designs
         int32_t offset_h = 8;
 
-        body = new gui::PageLayout(
-            this, {0, title->offset_h() + offset_h, this->getWidth(), this->getHeight() - offset_h - this->title->offset_h() - bottomBar->getHeight()});
+        body = new gui::PageLayout(this,
+                                   {0,
+                                    title->offset_h() + offset_h,
+                                    this->getWidth(),
+                                    this->getHeight() - offset_h - this->title->offset_h() - bottomBar->getHeight()});
 
         setFocusItem(body);
     }
@@ -104,13 +103,11 @@ namespace gui
     }
 
     void OptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-    }
+    {}
 
     OptionWindow *newOptionWindow(app::Application *app, std::string name, std::list<Option> options)
     {
-        if (name == "")
-        {
+        if (name == "") {
             LOG_DEBUG("no name for window - take default");
             name = utils::localize.get("app_phonebook_options_title");
         }

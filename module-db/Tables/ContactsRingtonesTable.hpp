@@ -47,7 +47,9 @@ class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow, ContactRi
 
     std::vector<ContactsRingtonesTableRow> GetLimitOffset(uint32_t offset, uint32_t limit) override final;
 
-    std::vector<ContactsRingtonesTableRow> GetLimitOffsetByField(uint32_t offset, uint32_t limit, ContactRingtonesTableFields field,
+    std::vector<ContactsRingtonesTableRow> GetLimitOffsetByField(uint32_t offset,
+                                                                 uint32_t limit,
+                                                                 ContactRingtonesTableFields field,
                                                                  const char *str) override final;
 
     uint32_t GetCount() override final;
@@ -62,4 +64,3 @@ class ContactsRingtonesTable : public Table<ContactsRingtonesTableRow, ContactRi
                                    "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
                                    ");";
 };
-

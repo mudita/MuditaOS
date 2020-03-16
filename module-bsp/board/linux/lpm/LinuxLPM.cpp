@@ -4,17 +4,18 @@
 
 #include "LinuxLPM.h"
 
+namespace bsp
+{
 
-namespace bsp{
-
-
-    int32_t LinuxLPM::Switch(const bsp::LowPowerMode::Mode mode) {
+    int32_t LinuxLPM::Switch(const bsp::LowPowerMode::Mode mode)
+    {
         currentMode = mode;
         return 0;
     }
 
-    int32_t LinuxLPM::PowerOff() {
+    int32_t LinuxLPM::PowerOff()
+    {
         return 0;
     }
 
-}
+} // namespace bsp

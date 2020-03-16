@@ -11,16 +11,19 @@
 #include "Database/Database.hpp"
 #include "../Tables/CalllogTable.hpp"
 
-class CalllogDB : public Database {
-public:
-	CalllogDB();
+class CalllogDB : public Database
+{
+  public:
+    CalllogDB();
     virtual ~CalllogDB();
 
     CalllogTable calls;
 
-    static const char* GetDBName(){return dbName;}
+    static const char *GetDBName()
+    {
+        return dbName;
+    }
 
-private:
-
+  private:
     static const char *dbName;
 };

@@ -30,9 +30,9 @@ class DBMessage : public sys::DataMessage
     DBMessage(MessageType messageType) : sys::DataMessage(messageType){};
     virtual ~DBMessage(){};
 
-    uint32_t id = 0;
+    uint32_t id     = 0;
     uint32_t offset = 0;
-    uint32_t limit = 0;
+    uint32_t limit  = 0;
 };
 
 class DBResponseMessage : public sys::ResponseMessage
@@ -49,12 +49,11 @@ class DBResponseMessage : public sys::ResponseMessage
 class DBSettingsMessage : public DBMessage
 {
   public:
-    DBSettingsMessage(MessageType messageType, const SettingsRecord &rec = SettingsRecord{}) : DBMessage(messageType), record(rec)
-    {
-    }
+    DBSettingsMessage(MessageType messageType, const SettingsRecord &rec = SettingsRecord{})
+        : DBMessage(messageType), record(rec)
+    {}
     virtual ~DBSettingsMessage()
-    {
-    }
+    {}
 
     SettingsRecord record;
 };
@@ -62,7 +61,10 @@ class DBSettingsMessage : public DBMessage
 class DBSettingsResponseMessage : public DBResponseMessage
 {
   public:
-    DBSettingsResponseMessage(const SettingsRecord &rec, uint32_t retCode = 0, uint32_t count = 0, MessageType respTo = MessageType::MessageTypeUninitialized)
+    DBSettingsResponseMessage(const SettingsRecord &rec,
+                              uint32_t retCode   = 0,
+                              uint32_t count     = 0,
+                              MessageType respTo = MessageType::MessageTypeUninitialized)
         : DBResponseMessage(retCode, count, respTo), record(rec){};
     virtual ~DBSettingsResponseMessage(){};
 
@@ -73,11 +75,9 @@ class DBSMSMessage : public DBMessage
 {
   public:
     DBSMSMessage(MessageType messageType, const SMSRecord &rec = SMSRecord{}) : DBMessage(messageType), record(rec)
-    {
-    }
+    {}
     virtual ~DBSMSMessage()
-    {
-    }
+    {}
 
     SMSRecord record;
 };
@@ -87,14 +87,15 @@ class DBSMSGetCount : public DBSMSMessage
   public:
     EntryState state;
     DBSMSGetCount(EntryState state = EntryState::ALL) : DBSMSMessage(MessageType::DBSMSGetCount), state(state)
-    {
-    }
+    {}
 };
 
 class DBSMSResponseMessage : public DBResponseMessage
 {
   public:
-    DBSMSResponseMessage(std::unique_ptr<std::vector<SMSRecord>> rec, uint32_t retCode = 0, uint32_t count = 0,
+    DBSMSResponseMessage(std::unique_ptr<std::vector<SMSRecord>> rec,
+                         uint32_t retCode   = 0,
+                         uint32_t count     = 0,
                          MessageType respTo = MessageType::MessageTypeUninitialized)
         : DBResponseMessage(retCode, count, respTo), records(std::move(rec)){};
     virtual ~DBSMSResponseMessage(){};
@@ -105,12 +106,11 @@ class DBSMSResponseMessage : public DBResponseMessage
 class DBThreadMessage : public DBMessage
 {
   public:
-    DBThreadMessage(MessageType messageType, const ThreadRecord &rec = ThreadRecord{}) : DBMessage(messageType), record(rec)
-    {
-    }
+    DBThreadMessage(MessageType messageType, const ThreadRecord &rec = ThreadRecord{})
+        : DBMessage(messageType), record(rec)
+    {}
     virtual ~DBThreadMessage()
-    {
-    }
+    {}
 
     ThreadRecord record;
 };
@@ -119,8 +119,7 @@ class DBThreadMessageGet : public DBMessage
 {
   public:
     DBThreadMessageGet(MessageType messageType, uint32_t contactID) : DBMessage(messageType), contactID(contactID)
-    {
-    }
+    {}
     virtual ~DBThreadMessageGet() = default;
 
     ThreadRecord record = {};
@@ -130,7 +129,11 @@ class DBThreadMessageGet : public DBMessage
 class DBThreadResponseMessage : public DBResponseMessage
 {
   public:
-    DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec, uint32_t retCode = 0, uint32_t limit = 0, uint32_t offset = 0, uint32_t count = 0,
+    DBThreadResponseMessage(std::unique_ptr<std::vector<ThreadRecord>> rec,
+                            uint32_t retCode   = 0,
+                            uint32_t limit     = 0,
+                            uint32_t offset    = 0,
+                            uint32_t count     = 0,
                             MessageType respTo = MessageType::MessageTypeUninitialized)
         : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset)
     {
@@ -139,7 +142,7 @@ class DBThreadResponseMessage : public DBResponseMessage
     virtual ~DBThreadResponseMessage(){};
 
     std::unique_ptr<std::vector<ThreadRecord>> records;
-    uint32_t limit = 0;
+    uint32_t limit  = 0;
     uint32_t offset = 0;
 };
 
@@ -148,11 +151,9 @@ class DBContactMessage : public DBMessage
   public:
     DBContactMessage(MessageType messageType, const ContactRecord &rec = ContactRecord{}, bool favourite = false)
         : DBMessage(messageType), record(rec), favourite{favourite}
-    {
-    }
+    {}
     virtual ~DBContactMessage()
-    {
-    }
+    {}
 
     ContactRecord record;
     bool favourite = false;
@@ -163,11 +164,9 @@ class DBContactBlock : public DBMessage
   public:
     DBContactBlock(MessageType messageType, const uint32_t _id, bool _shouldBeBlocked)
         : DBMessage(messageType), id(_id), shouldBeBlocked(_shouldBeBlocked)
-    {
-    }
+    {}
     virtual ~DBContactBlock()
-    {
-    }
+    {}
 
     uint32_t id;
     bool shouldBeBlocked;
@@ -176,15 +175,15 @@ class DBContactBlock : public DBMessage
 class DBContactSearchMessage : public DBMessage
 {
   public:
-    DBContactSearchMessage(MessageType messageType, const char *_primaryName, const char *_alternativeName,
+    DBContactSearchMessage(MessageType messageType,
+                           const char *_primaryName,
+                           const char *_alternativeName,
                            const char *_number)
         : DBMessage(messageType), primaryName(_primaryName), alternativeName(_alternativeName), number(_number)
-    {
-    }
+    {}
 
     virtual ~DBContactSearchMessage()
-    {
-    }
+    {}
 
     const char *primaryName;
     const char *alternativeName;
@@ -194,23 +193,29 @@ class DBContactSearchMessage : public DBMessage
 class DBContactResponseMessage : public DBResponseMessage
 {
   public:
-    DBContactResponseMessage(std::unique_ptr<std::vector<ContactRecord>> rec, uint32_t retCode = 0, uint32_t limit = 0, uint32_t offset = 0,
-                             bool favourite = false, uint32_t count = 0, MessageType respTo = MessageType::MessageTypeUninitialized)
-        : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), favourite{favourite}, limit{limit}, offset{offset} {};
+    DBContactResponseMessage(std::unique_ptr<std::vector<ContactRecord>> rec,
+                             uint32_t retCode   = 0,
+                             uint32_t limit     = 0,
+                             uint32_t offset    = 0,
+                             bool favourite     = false,
+                             uint32_t count     = 0,
+                             MessageType respTo = MessageType::MessageTypeUninitialized)
+        : DBResponseMessage(retCode, count, respTo),
+          records(std::move(rec)), favourite{favourite}, limit{limit}, offset{offset} {};
     virtual ~DBContactResponseMessage(){};
 
     std::unique_ptr<std::vector<ContactRecord>> records;
-    bool favourite = false;
-    uint32_t limit = 0;
+    bool favourite  = false;
+    uint32_t limit  = 0;
     uint32_t offset = 0;
 };
 
 class DBAlarmMessage : public DBMessage
 {
   public:
-    DBAlarmMessage(MessageType messageType, const AlarmsRecord &rec = AlarmsRecord{}) : DBMessage(messageType), record(rec)
-    {
-    }
+    DBAlarmMessage(MessageType messageType, const AlarmsRecord &rec = AlarmsRecord{})
+        : DBMessage(messageType), record(rec)
+    {}
     virtual ~DBAlarmMessage(){};
     AlarmsRecord record;
     time_t time = 0;
@@ -219,7 +224,9 @@ class DBAlarmMessage : public DBMessage
 class DBAlarmResponseMessage : public DBResponseMessage
 {
   public:
-    DBAlarmResponseMessage(std::unique_ptr<std::vector<AlarmsRecord>> rec, uint32_t retCode = 0, uint32_t count = 0,
+    DBAlarmResponseMessage(std::unique_ptr<std::vector<AlarmsRecord>> rec,
+                           uint32_t retCode   = 0,
+                           uint32_t count     = 0,
                            MessageType respTo = MessageType::MessageTypeUninitialized)
         : DBResponseMessage(retCode, count, respTo), records(std::move(rec)){};
     virtual ~DBAlarmResponseMessage(){};
@@ -230,12 +237,11 @@ class DBAlarmResponseMessage : public DBResponseMessage
 class DBNotesMessage : public DBMessage
 {
   public:
-    DBNotesMessage(MessageType messageType, const NotesRecord &rec = NotesRecord{}) : DBMessage(messageType), record(rec)
-    {
-    }
+    DBNotesMessage(MessageType messageType, const NotesRecord &rec = NotesRecord{})
+        : DBMessage(messageType), record(rec)
+    {}
     virtual ~DBNotesMessage()
-    {
-    }
+    {}
 
     NotesRecord record;
 };
@@ -243,7 +249,11 @@ class DBNotesMessage : public DBMessage
 class DBNotesResponseMessage : public DBResponseMessage
 {
   public:
-    DBNotesResponseMessage(std::unique_ptr<std::vector<NotesRecord>> rec, uint32_t retCode = 0, uint32_t limit = 0, uint32_t offset = 0, uint32_t count = 0,
+    DBNotesResponseMessage(std::unique_ptr<std::vector<NotesRecord>> rec,
+                           uint32_t retCode   = 0,
+                           uint32_t limit     = 0,
+                           uint32_t offset    = 0,
+                           uint32_t count     = 0,
                            MessageType respTo = MessageType::MessageTypeUninitialized)
         : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset)
     {
@@ -252,19 +262,18 @@ class DBNotesResponseMessage : public DBResponseMessage
     virtual ~DBNotesResponseMessage(){};
 
     std::unique_ptr<std::vector<NotesRecord>> records;
-    uint32_t limit = 0;
+    uint32_t limit  = 0;
     uint32_t offset = 0;
 };
 
 class DBCalllogMessage : public DBMessage
 {
   public:
-    DBCalllogMessage(MessageType messageType, const CalllogRecord &rec = CalllogRecord{}) : DBMessage(messageType), record(rec)
-    {
-    }
+    DBCalllogMessage(MessageType messageType, const CalllogRecord &rec = CalllogRecord{})
+        : DBMessage(messageType), record(rec)
+    {}
     virtual ~DBCalllogMessage()
-    {
-    }
+    {}
 
     CalllogRecord record;
 };
@@ -274,14 +283,17 @@ class DBCalllogGetCount : public DBCalllogMessage
   public:
     EntryState state;
     DBCalllogGetCount(EntryState state) : DBCalllogMessage(MessageType::DBCalllogGetCount), state(state)
-    {
-    }
+    {}
 };
 
 class DBCalllogResponseMessage : public DBResponseMessage
 {
   public:
-    DBCalllogResponseMessage(std::unique_ptr<std::vector<CalllogRecord>> rec, uint32_t retCode, uint32_t limit = 0, uint32_t offset = 0, uint32_t count = 0,
+    DBCalllogResponseMessage(std::unique_ptr<std::vector<CalllogRecord>> rec,
+                             uint32_t retCode,
+                             uint32_t limit     = 0,
+                             uint32_t offset    = 0,
+                             uint32_t count     = 0,
                              MessageType respTo = MessageType::MessageTypeUninitialized)
         : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset)
     {
@@ -290,7 +302,7 @@ class DBCalllogResponseMessage : public DBResponseMessage
     virtual ~DBCalllogResponseMessage(){};
 
     std::unique_ptr<std::vector<CalllogRecord>> records;
-    uint32_t limit = 0;
+    uint32_t limit  = 0;
     uint32_t offset = 0;
 };
 
@@ -299,11 +311,9 @@ class DBCountryCodeMessage : public DBMessage
   public:
     DBCountryCodeMessage(MessageType messageType, const uint32_t _mcc, const uint32_t _country_code)
         : DBMessage(messageType), mcc(_mcc), country_code(_country_code)
-    {
-    }
+    {}
     virtual ~DBCountryCodeMessage()
-    {
-    }
+    {}
 
     uint32_t mcc;
     uint32_t country_code;
@@ -312,8 +322,11 @@ class DBCountryCodeMessage : public DBMessage
 class DBCountryCodeResponseMessage : public DBResponseMessage
 {
   public:
-    DBCountryCodeResponseMessage(const CodesTableRow _row, bool retCode = true, int count = 0, MessageType respTo = MessageType::MessageTypeUninitialized)
-    : DBResponseMessage(retCode, count, respTo), row(_row) {};
+    DBCountryCodeResponseMessage(const CodesTableRow _row,
+                                 bool retCode       = true,
+                                 int count          = 0,
+                                 MessageType respTo = MessageType::MessageTypeUninitialized)
+        : DBResponseMessage(retCode, count, respTo), row(_row){};
     virtual ~DBCountryCodeResponseMessage(){};
 
     CodesTableRow row;

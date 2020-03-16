@@ -32,11 +32,16 @@ class PhonebookModel : public gui::ListItemProvider, public app::DatabaseModel<C
 
     // virtual methods from DatabaseModel
     void requestRecordsCount() override;
-    bool updateRecords(std::unique_ptr<std::vector<ContactRecord>> records, const uint32_t offset, const uint32_t limit, uint32_t count, bool favourite);
+    bool updateRecords(std::unique_ptr<std::vector<ContactRecord>> records,
+                       const uint32_t offset,
+                       const uint32_t limit,
+                       uint32_t count,
+                       bool favourite);
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    gui::ListItem *getItem(int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
+    gui::ListItem *getItem(
+        int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
     int getItemCount() const override
     {
         return recordsCount;

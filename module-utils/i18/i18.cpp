@@ -9,14 +9,9 @@
 
 #include "i18.hpp"
 
-
 namespace utils
 {
 
-i18 localize;
+    i18 localize;
 
 }
-
-
-
-

@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -31,10 +30,7 @@ TEST_CASE("Contacts Ringtones Table tests")
 
     ContactsDB contactsdb;
 
-    ContactsRingtonesTableRow testRow1 = {.ID=0,
-            .contactID=0,
-            .assetPath="/test/assets/path/ringtone.wr"
-    };
+    ContactsRingtonesTableRow testRow1 = {.ID = 0, .contactID = 0, .assetPath = "/test/assets/path/ringtone.wr"};
 
     // Add 4 elements into table
     REQUIRE(contactsdb.ringtones.Add(testRow1));
@@ -46,7 +42,7 @@ TEST_CASE("Contacts Ringtones Table tests")
     REQUIRE(contactsdb.ringtones.GetCount() == 4);
 
     // Update existing element in table
-    testRow1.ID = 4;
+    testRow1.ID        = 4;
     testRow1.assetPath = "/testnew/assets/path/ringtone2.wr";
     REQUIRE(contactsdb.ringtones.Update(testRow1));
 
@@ -56,30 +52,30 @@ TEST_CASE("Contacts Ringtones Table tests")
 
     // Get table row using invalid ID(should return empty contactsdb.ringtonesRow)
     auto smsFailed = contactsdb.ringtones.GetByID(100);
-    REQUIRE(smsFailed.assetPath  == "");
+    REQUIRE(smsFailed.assetPath == "");
 
     // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = contactsdb.ringtones.GetLimitOffset(0,4);
+    auto retOffsetLimit = contactsdb.ringtones.GetLimitOffset(0, 4);
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.ringtones.GetLimitOffsetByField(0,4,ContactRingtonesTableFields::AssetPath,"/test/assets/path/ringtone.wr").size() == 3);
-
+    REQUIRE(contactsdb.ringtones
+                .GetLimitOffsetByField(0, 4, ContactRingtonesTableFields::AssetPath, "/test/assets/path/ringtone.wr")
+                .size() == 3);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = contactsdb.ringtones.GetLimitOffset(0,100);
+    auto retOffsetLimitBigger = contactsdb.ringtones.GetLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = contactsdb.ringtones.GetLimitOffset(5,4);
+    auto retOffsetLimitFailed = contactsdb.ringtones.GetLimitOffset(5, 4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get count of elements by field's ID
-    REQUIRE(contactsdb.ringtones.GetCountByFieldID("contact_id",0) == 4);
+    REQUIRE(contactsdb.ringtones.GetCountByFieldID("contact_id", 0) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(contactsdb.ringtones.GetCountByFieldID("invalid_field",0) == 0);
-
+    REQUIRE(contactsdb.ringtones.GetCountByFieldID("invalid_field", 0) == 0);
 
     REQUIRE(contactsdb.ringtones.RemoveByID(2));
 

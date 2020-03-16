@@ -13,8 +13,7 @@ namespace harness
         virtual std::string encode() final;
         std::vector<std::string> resp;
         AtResponse(const std::vector<std::string> response) : resp(response)
-        {
-        }
+        {}
     };
 
 }; // namespace harness

@@ -15,30 +15,36 @@
 #include <memory>
 #include "Field.hpp"
 
-class QueryResult {
+class QueryResult
+{
 
-public:
+  public:
     QueryResult();
 
-    virtual ~QueryResult() {};
+    virtual ~QueryResult(){};
 
-
-    const Field &operator[](int index) const { return rows[currentRow][index]; }
+    const Field &operator[](int index) const
+    {
+        return rows[currentRow][index];
+    }
 
     bool NextRow();
 
     void AddRow(const std::vector<Field> &row);
 
-    uint32_t GetFieldCount() const { return fieldCount; }
+    uint32_t GetFieldCount() const
+    {
+        return fieldCount;
+    }
 
-    uint32_t GetRowCount() const { return rowCount; }
+    uint32_t GetRowCount() const
+    {
+        return rowCount;
+    }
 
-
-private:
+  private:
     uint32_t currentRow;
     std::vector<std::vector<Field>> rows;
     uint32_t fieldCount;
     uint32_t rowCount;
-
 };
-

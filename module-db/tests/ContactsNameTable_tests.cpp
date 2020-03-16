@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -23,7 +22,6 @@
 #include "../Database/Database.hpp"
 #include "../Databases/ContactsDB.hpp"
 
-
 TEST_CASE("Contacts Name Table tests")
 {
     Database::Initialize();
@@ -32,11 +30,7 @@ TEST_CASE("Contacts Name Table tests")
 
     ContactsDB contactsdb;
 
-    ContactsNameTableRow testRow1 = {.ID=0,
-            .contactID=0,
-            .namePrimary="Mateusz",
-            .nameAlternative="Pati"
-    };
+    ContactsNameTableRow testRow1 = {.ID = 0, .contactID = 0, .namePrimary = "Mateusz", .nameAlternative = "Pati"};
 
     // Add 4 elements into table
     REQUIRE(contactsdb.name.Add(testRow1));
@@ -48,7 +42,7 @@ TEST_CASE("Contacts Name Table tests")
     REQUIRE(contactsdb.name.GetCount() == 4);
 
     // Update existing element in table
-    testRow1.ID = 4;
+    testRow1.ID              = 4;
     testRow1.nameAlternative = "Pateusz";
     REQUIRE(contactsdb.name.Update(testRow1));
 
@@ -58,29 +52,28 @@ TEST_CASE("Contacts Name Table tests")
 
     // Get table row using invalid ID(should return empty contactsdb.nameRow)
     auto smsFailed = contactsdb.name.GetByID(100);
-    REQUIRE(smsFailed.nameAlternative  == "");
+    REQUIRE(smsFailed.nameAlternative == "");
 
     // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = contactsdb.name.GetLimitOffset(0,4);
+    auto retOffsetLimit = contactsdb.name.GetLimitOffset(0, 4);
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.name.GetLimitOffsetByField(0,4,ContactNameTableFields::NamePrimary,"Mateusz").size() == 4);
+    REQUIRE(contactsdb.name.GetLimitOffsetByField(0, 4, ContactNameTableFields::NamePrimary, "Mateusz").size() == 4);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = contactsdb.name.GetLimitOffset(0,100);
+    auto retOffsetLimitBigger = contactsdb.name.GetLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = contactsdb.name.GetLimitOffset(5,4);
+    auto retOffsetLimitFailed = contactsdb.name.GetLimitOffset(5, 4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get count of elements by field's ID
-    REQUIRE(contactsdb.name.GetCountByFieldID("contact_id",0) == 4);
+    REQUIRE(contactsdb.name.GetCountByFieldID("contact_id", 0) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(contactsdb.name.GetCountByFieldID("invalid_field",0) == 0);
-
+    REQUIRE(contactsdb.name.GetCountByFieldID("invalid_field", 0) == 0);
 
     REQUIRE(contactsdb.name.RemoveByID(2));
 

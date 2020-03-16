@@ -4,7 +4,8 @@
 
 namespace gui
 {
-    PageLayout::PageLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h) : BoxLayout(parent, x, y, w, h)
+    PageLayout::PageLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
+        : BoxLayout(parent, x, y, w, h)
     {
         setPenWidth(style::window::default_border_no_focus_w);
         setPenFocusWidth(style::window::default_border_no_focus_w);
@@ -13,31 +14,24 @@ namespace gui
             int position = 0;
             bool handled = false;
             // first try with children and find position in pages
-            for (auto &el : children)
-            {
-                if (el->visible)
-                {
+            for (auto &el : children) {
+                if (el->visible) {
                     handled = el->onInput(inputEvent);
-                    if (handled)
-                    {
+                    if (handled) {
                         return true;
                     }
                     break;
                 }
                 ++position;
             }
-            if (inputEvent.state != InputEvent::State::keyReleasedShort)
-            {
+            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (!handled)
-            { // children didn't handle -> handle next/prev page with position
-                if (inputEvent.keyCode == gui::KeyCode::KEY_UP && position != 0)
-                {
+            if (!handled) { // children didn't handle -> handle next/prev page with position
+                if (inputEvent.keyCode == gui::KeyCode::KEY_UP && position != 0) {
                     return switchPage(position - 1, true);
                 }
-                if (inputEvent.keyCode == gui::KeyCode::KEY_DOWN && position < children.size() - 1)
-                {
+                if (inputEvent.keyCode == gui::KeyCode::KEY_DOWN && position < children.size() - 1) {
                     return switchPage(position + 1);
                 }
             }
@@ -46,8 +40,7 @@ namespace gui
     }
 
     PageLayout::PageLayout(Item *parent, const BoundingBox &box) : PageLayout(parent, box.x, box.y, box.w, box.h)
-    {
-    }
+    {}
 
     VBox *PageLayout::addPage()
     {
@@ -58,35 +51,29 @@ namespace gui
         el->setRadius(0);
         // if new element fits && To avoid cyclic addWidget -> call parent addWidget
         BoxLayout::addWidget(el);
-        if (el->visible)
-        {
+        if (el->visible) {
             return el;
         }
-        else
-        {
+        else {
             return nullptr;
         }
     }
 
     void PageLayout::addWidget(Item *item)
     {
-        if (this->children.size() == 0)
-        {
+        if (this->children.size() == 0) {
             // cant add this element to this paged view at all
-            if (addPage() == nullptr)
-            {
+            if (addPage() == nullptr) {
                 return;
             }
         }
         auto el = dynamic_cast<VBox *>(children.back());
         el->addWidget(item);
-        if (!item->visible)
-        {
+        if (!item->visible) {
             el->removeWidget(item);
             item->visible = true;
             // add next page and try again - first set last box to not visible to avoid it's rebuild
-            if (!addPage())
-            {
+            if (!addPage()) {
                 return;
             }
             // set new (next) page invisible
@@ -94,8 +81,7 @@ namespace gui
             /// to not recure on addWidget
             auto el = dynamic_cast<VBox *>(children.back());
             el->addWidget(item);
-            if (!el->visible)
-            {
+            if (!el->visible) {
                 LOG_ERROR("Child not added on 2nd try, check sizes of Page and children u try to add!");
             }
         }
@@ -104,24 +90,19 @@ namespace gui
 
     bool PageLayout::switchPage(unsigned int n, bool previous)
     {
-        if (children.size() == 0 || n >= children.size())
-        {
+        if (children.size() == 0 || n >= children.size()) {
             LOG_ERROR("Cant switch to page %d, num of pages: %d", n, children.size());
             return false;
         }
         unsigned int i = 0;
-        for (auto &el : children)
-        {
-            if (i == n)
-            {
+        for (auto &el : children) {
+            if (i == n) {
                 auto ell = dynamic_cast<VBox *>(el);
-                if (ell)
-                {
+                if (ell) {
                     ell->setVisible(true, previous);
                 }
             }
-            else
-            {
+            else {
                 el->setVisible(false);
             }
             ++i;

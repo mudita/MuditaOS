@@ -11,42 +11,49 @@
 #include "windows/CalendarMainWindow.hpp"
 #include "ApplicationCalendar.hpp"
 
-namespace app {
+namespace app
+{
 
-ApplicationCalendar::ApplicationCalendar(std::string name,std::string parent,uint32_t stackDepth,sys::ServicePriority priority) :
-	Application( name, parent, false, stackDepth, priority ) {
-}
+    ApplicationCalendar::ApplicationCalendar(std::string name,
+                                             std::string parent,
+                                             uint32_t stackDepth,
+                                             sys::ServicePriority priority)
+        : Application(name, parent, false, stackDepth, priority)
+    {}
 
-ApplicationCalendar::~ApplicationCalendar() {
-}
+    ApplicationCalendar::~ApplicationCalendar()
+    {}
 
-// Invoked upon receiving data message
-sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
-	return std::make_shared<sys::ResponseMessage>( );
-}
+    // Invoked upon receiving data message
+    sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    {
+        return std::make_shared<sys::ResponseMessage>();
+    }
 
-// Invoked during initialization
-sys::ReturnCodes ApplicationCalendar::InitHandler() {
+    // Invoked during initialization
+    sys::ReturnCodes ApplicationCalendar::InitHandler()
+    {
 
-	createUserInterface();
+        createUserInterface();
 
-	setActiveWindow("Main");
+        setActiveWindow("Main");
 
-	return sys::ReturnCodes::Success;
-}
+        return sys::ReturnCodes::Success;
+    }
 
-sys::ReturnCodes ApplicationCalendar::DeinitHandler() {
-	return sys::ReturnCodes::Success;
-}
+    sys::ReturnCodes ApplicationCalendar::DeinitHandler()
+    {
+        return sys::ReturnCodes::Success;
+    }
 
+    void ApplicationCalendar::createUserInterface()
+    {
 
-void ApplicationCalendar::createUserInterface() {
+        gui::AppWindow *win = new CalendarMainWindow(this, "Main");
+        windows.insert(std::pair<std::string, gui::AppWindow *>(win->getName(), win));
+    }
 
-	gui::AppWindow* win = new CalendarMainWindow(this, "Main");
-	windows.insert( std::pair<std::string,gui::AppWindow*>(win->getName(), win));
-}
-
-void ApplicationCalendar::destroyUserInterface() {
-}
+    void ApplicationCalendar::destroyUserInterface()
+    {}
 
 } /* namespace app */

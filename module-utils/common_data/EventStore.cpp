@@ -30,7 +30,10 @@ namespace Store
     void GSM::setSignalStrength(const SignalStrength &signalStrength)
     {
         cpp_freertos::LockGuard lock(mutex);
-        LOG_INFO("Setting signal strenth to rssi = %d dBm (%d) : %u bars", signalStrength.rssidBm, signalStrength.rssi, signalStrength.rssiBar);
+        LOG_INFO("Setting signal strenth to rssi = %d dBm (%d) : %u bars",
+                 signalStrength.rssidBm,
+                 signalStrength.rssi,
+                 signalStrength.rssiBar);
 
         get()->signalStrength = signalStrength;
     }

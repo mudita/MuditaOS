@@ -8,7 +8,6 @@
 #ifndef MODULE_APPS_APPLICATION_SETTINGS_WINDOWS_TESTMESSAGEWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_SETTINGS_WINDOWS_TESTMESSAGEWINDOW_HPP_
 
-
 #include <string>
 #include <functional>
 
@@ -20,42 +19,42 @@
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 
-namespace gui {
+namespace gui
+{
 
-/*
- *
- */
-class TestMessageWindow: public AppWindow {
-protected:
-	gui::Label* sendLabel;
-	gui::Label* sendButton;
+    /*
+     *
+     */
+    class TestMessageWindow : public AppWindow
+    {
+      protected:
+        gui::Label *sendLabel;
+        gui::Label *sendButton;
 
-	gui::Label* receivedLabel;
+        gui::Label *receivedLabel;
 
-	gui::Label* SendNumberLabel;
-	gui::Label* SendMessageLabel;
-	gui::Text* sendNumber;
-	gui::Text* sendMessage;
+        gui::Label *SendNumberLabel;
+        gui::Label *SendMessageLabel;
+        gui::Text *sendNumber;
+        gui::Text *sendMessage;
 
-	gui::Label* RecNumberLabel;
-	gui::Label* RecMessageLabel;
-	gui::Label* receiveNumber;
-	gui::Text* receiveMessage;
+        gui::Label *RecNumberLabel;
+        gui::Label *RecMessageLabel;
+        gui::Label *receiveNumber;
+        gui::Text *receiveMessage;
 
+      public:
+        TestMessageWindow(app::Application *app);
+        virtual ~TestMessageWindow();
 
-public:
-	TestMessageWindow( app::Application* app );
-	virtual ~TestMessageWindow();
+        // virtual methods
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-	//virtual methods
-	void onBeforeShow( ShowMode mode, SwitchData* data ) override;
-
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-	void cellularMessageCallback(UTF8& number, UTF8& message);
-};
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+        void cellularMessageCallback(UTF8 &number, UTF8 &message);
+    };
 } /* namespace gui */
-
 
 #endif /* MODULE_APPS_APPLICATION_SETTINGS_WINDOWS_TESTMESSAGEWINDOW_HPP_ */

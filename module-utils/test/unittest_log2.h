@@ -10,6 +10,4 @@
 
 int log_test_function();
 
-
-
 #endif /* TEST_UNITTEST_LOG2_H_ */

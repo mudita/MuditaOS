@@ -3,14 +3,15 @@
 
 #include <string>
 
-namespace atag {
-
-enum class genre
+namespace atag
 {
-    // TODO
-};
 
-constexpr const char* genre_to_string(const genre g);
+    enum class genre
+    {
+        // TODO
+    };
+
+    constexpr const char *genre_to_string(const genre g);
 
 } // namespace atag
 

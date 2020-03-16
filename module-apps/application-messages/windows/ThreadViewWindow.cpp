@@ -32,9 +32,7 @@
 #include "service-db/api/DBServiceAPI.hpp"
 
 namespace style
-{
-
-}; // namespace style
+{}; // namespace style
 
 namespace gui
 {
@@ -50,24 +48,24 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
-        body = new gui::VBox(this, style::window::default_left_margin, title->offset_h(), elements_width, bottomBar->getY() - title->offset_h());
+        body = new gui::VBox(this,
+                             style::window::default_left_margin,
+                             title->offset_h(),
+                             elements_width,
+                             bottomBar->getY() - title->offset_h());
         body->setPenWidth(style::window::default_border_no_focus_w);
         body->setPenFocusWidth(style::window::default_border_no_focus_w);
         body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
-            if (inputEvent.state != InputEvent::State::keyReleasedShort)
-            {
+            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
-            if (inputEvent.keyCode == KeyCode::KEY_UP)
-            {
+            if (inputEvent.keyCode == KeyCode::KEY_UP) {
                 return this->showMessages(Action::Next);
             }
-            else if (inputEvent.keyCode == KeyCode::KEY_DOWN)
-            {
+            else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
                 return this->showMessages(Action::Previous);
             }
-            else
-            {
+            else {
                 return false;
             }
         };
@@ -81,28 +79,29 @@ namespace gui
 
     void ThreadViewWindow::rebuildText()
     {
-        if (text)
-        {
+        if (text) {
             body->removeWidget(text);
         }
-        text = new gui::Text(nullptr, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
+        text = new gui::Text(
+            nullptr, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc}, [=](const UTF8 &text) { textModeShowCB(text); }, [=]() { textSelectSpecialCB(); }));
+            {InputMode::ABC, InputMode::abc},
+            [=](const UTF8 &text) { textModeShowCB(text); },
+            [=]() { textSelectSpecialCB(); }));
         text->setPenFocusWidth(style::window::default_border_focucs_w);
         text->setPenWidth(style::window::default_border_focucs_w);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         text->activatedCallback = [&](gui::Item &item) {
-            if (text->getText().length() == 0)
-            {
+            if (text->getText().length() == 0) {
                 LOG_DEBUG("No text to send in SMS");
                 return true;
             }
             SMSRecord record;
             record.number = title->getText();
-            record.body = text->getText();
-            record.type = SMSType::QUEUED;
-            auto time = utils::time::Timestamp();
-            record.date = time.getTime();
+            record.body   = text->getText();
+            record.type   = SMSType::QUEUED;
+            auto time     = utils::time::Timestamp();
+            record.date   = time.getTime();
             DBServiceAPI::SMSAdd(this->application, record);
 
             return true;
@@ -119,8 +118,7 @@ namespace gui
 
     bool ThreadViewWindow::showMessages(ThreadViewWindow::Action what)
     {
-        if (SMS.thread <= 0)
-        {
+        if (SMS.thread <= 0) {
             LOG_ERROR("threadID not set!");
             return false;
         }
@@ -136,39 +134,31 @@ namespace gui
         // 1. load elements to tmp vector
         SMS.dbsize = DBServiceAPI::SMSGetCount(this->application);
         LOG_DEBUG("start: %d end: %d db: %d", SMS.start, SMS.end, SMS.dbsize);
-        if (what == Action::Start)
-        {
+        if (what == Action::Start) {
             SMS.start = 0;
-            SMS.end = maxsmsinwindow;
+            SMS.end   = maxsmsinwindow;
             rebuildText();
         }
 
         // TODO 2. check how many of these will fit in box
         //         update begin / end in `SMS`
-        if (what == Action::Next)
-        {
-            if (SMS.end != SMS.dbsize)
-            {
+        if (what == Action::Next) {
+            if (SMS.end != SMS.dbsize) {
                 SMS.start = SMS.end;
             }
-            else
-            {
+            else {
                 LOG_INFO("All sms shown");
                 return;
             }
         }
-        else if (what == Action::Previous)
-        {
-            if (SMS.start == 0)
-            {
+        else if (what == Action::Previous) {
+            if (SMS.start == 0) {
                 return;
             }
-            else if (SMS.start - maxsmsinwindow < 0)
-            {
+            else if (SMS.start - maxsmsinwindow < 0) {
                 SMS.start = 0;
             }
-            else
-            {
+            else {
                 SMS.start -= maxsmsinwindow;
             }
             LOG_DEBUG("in progress %d", SMS.start);
@@ -178,25 +168,21 @@ namespace gui
         // 3. add them to box
         this->cleanView();
         // if we are going from 0 then we want to show text prompt
-        if (SMS.start == 0)
-        {
+        if (SMS.start == 0) {
             body->addWidget(text);
         }
 
         SMS.end = SMS.start;
-        for (auto &el : *SMS.sms)
-        {
+        for (auto &el : *SMS.sms) {
             LOG_DEBUG("...");
-            if (!smsBuild(el, false))
-            {
+            if (!smsBuild(el, false)) {
                 break;
             }
             ++SMS.end;
         }
         body->setNavigation();
         setFocusItem(body);
-        if (Action::Previous == what)
-        {
+        if (Action::Previous == what) {
             body->setVisible(true, true);
         }
         LOG_DEBUG("sms built");
@@ -211,17 +197,19 @@ namespace gui
         labelSpan->setSize(elements_width, smsBubble->getHeight());
         labelSpan->addWidget(smsBubble);
 
-        auto timeLabel = new gui::Label(nullptr, 0, 0, 0, smsBubble->getHeight());
+        auto timeLabel        = new gui::Label(nullptr, 0, 0, 0, smsBubble->getHeight());
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
         timeLabel->setText(utils::time::Time(timestamp));
         timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
         timeLabel->setPenWidth(style::window::default_border_no_focus_w);
         timeLabel->setVisible(false);
-        timeLabel->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        timeLabel->setAlignement(
+            gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-        uint16_t dateLabelSpacerWidth = (elements_width - smsBubble->getWidth() - timeLabel->getWidth() - smsBubble->yapSize);
-        auto timeLabelSpacer = new gui::Label(nullptr, 0, 0, dateLabelSpacerWidth, smsBubble->getHeight());
+        uint16_t dateLabelSpacerWidth =
+            (elements_width - smsBubble->getWidth() - timeLabel->getWidth() - smsBubble->yapSize);
+        auto timeLabelSpacer        = new gui::Label(nullptr, 0, 0, dateLabelSpacerWidth, smsBubble->getHeight());
         timeLabelSpacer->activeItem = false;
         timeLabelSpacer->setPenWidth(0);
 
@@ -235,8 +223,7 @@ namespace gui
             return true;
         };
 
-        if (!smsBubble->visible)
-        {
+        if (!smsBubble->visible) {
             delete labelSpan; // total fail
             labelSpan = nullptr;
         }
@@ -257,19 +244,19 @@ namespace gui
         label->expandMode = Text::ExpandMode::EXPAND_DOWN;
         label->buildDrawList();
         label->setText(el.body.length() ? el.body : " "); // text doesn't really like being empty//
-        label->setMargins(gui::Margins(style::window::messages::sms_h_padding, style::window::messages::sms_v_padding, style::window::messages::sms_h_padding,
+        label->setMargins(gui::Margins(style::window::messages::sms_h_padding,
+                                       style::window::messages::sms_v_padding,
+                                       style::window::messages::sms_h_padding,
                                        style::window::messages::sms_v_padding));
 
         label->activatedCallback = [=](Item &) {
             LOG_INFO("Message activated!");
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
-            if (app == nullptr)
-            {
+            if (app == nullptr) {
                 LOG_ERROR("Something went horribly wrong");
                 return false;
             }
-            if (app->windowOptions != nullptr)
-            {
+            if (app->windowOptions != nullptr) {
                 app->windowOptions->clearOptions();
                 app->windowOptions->addOptions(smsWindowOptions(app, el));
                 app->switchWindow(app->windowOptions->getName(), nullptr);
@@ -282,8 +269,7 @@ namespace gui
 
         // TODO dashed (dotted) outline
         LOG_DEBUG("ADD SMS TYPE: %d", el.type);
-        switch (el.type)
-        {
+        switch (el.type) {
         case SMSType::OUTBOX:
             label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
             label->setX(body->getWidth() - label->getWidth());
@@ -297,12 +283,12 @@ namespace gui
             break;
         }
 
-        if (labelSpan == nullptr)
-        {
+        if (labelSpan == nullptr) {
             return false;
         }
 
-        auto verticalSpacer = new gui::Rect(nullptr, 0, 0, elements_width, style::window::messages::sms_vertical_spacer);
+        auto verticalSpacer =
+            new gui::Rect(nullptr, 0, 0, elements_width, style::window::messages::sms_vertical_spacer);
         verticalSpacer->activeItem = false;
         verticalSpacer->setPenWidth(style::window::default_border_no_focus_w);
         body->addWidget(verticalSpacer);
@@ -318,8 +304,7 @@ namespace gui
     }
 
     void ThreadViewWindow::buildInterface()
-    {
-    }
+    {}
 
     void ThreadViewWindow::destroyInterface()
     {
@@ -336,8 +321,7 @@ namespace gui
     {
         {
             auto pdata = dynamic_cast<SMSThreadData *>(data);
-            if (pdata)
-            {
+            if (pdata) {
                 LOG_INFO("We have it! %d", pdata->thread->dbID);
                 cleanView();
                 SMS.thread = pdata->thread->dbID;
@@ -350,19 +334,20 @@ namespace gui
         }
         {
             auto pdata = dynamic_cast<SMSSendRequest *>(data);
-            if (pdata)
-            {
+            if (pdata) {
                 LOG_INFO("Phonebook sms send request!");
                 // TODO agree what should be used and how. Now Request have only contact,
                 // maybe it should have additional info - which nr to use and how to show it
-                if (pdata->contact->numbers.size() != 0)
-                {
-                    LOG_DEBUG("SEND SMS TO: %s %s %s %s %s", pdata->contact->number.c_str(), pdata->contact->numbers[0].numberE164.c_str(),
-                              pdata->contact->numbers[0].numberUser.c_str(), pdata->contact->primaryName.c_str(), pdata->contact->alternativeName.c_str());
+                if (pdata->contact->numbers.size() != 0) {
+                    LOG_DEBUG("SEND SMS TO: %s %s %s %s %s",
+                              pdata->contact->number.c_str(),
+                              pdata->contact->numbers[0].numberE164.c_str(),
+                              pdata->contact->numbers[0].numberUser.c_str(),
+                              pdata->contact->primaryName.c_str(),
+                              pdata->contact->alternativeName.c_str());
                     setTitle(pdata->contact->numbers[0].numberUser);
                 }
-                else
-                {
+                else {
                     // TODO handle error better
                     setTitle("NO CONTACT");
                 }
@@ -378,8 +363,8 @@ namespace gui
     bool ThreadViewWindow::onDatabaseMessage(sys::Message *msgl)
     {
         //	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
-        //	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count, msg->favourite ) )
-        //		return true;
+        //	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count,
+        //msg->favourite ) ) 		return true;
 
         return false;
     }

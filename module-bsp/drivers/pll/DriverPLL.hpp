@@ -2,22 +2,21 @@
  *  @file DriverPLL.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 09.08.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_DRIVERPLL_HPP
 #define PUREPHONE_DRIVERPLL_HPP
 
 #include <memory>
 
-namespace drivers {
+namespace drivers
+{
 
-
-    enum class PLLInstances {
+    enum class PLLInstances
+    {
         OSC_24M,
         PLL1_ARM,
         PLL2_PFD2,
@@ -29,27 +28,27 @@ namespace drivers {
         COUNT
     };
 
-    struct DriverPLLParams {
+    struct DriverPLLParams
+    {};
 
-    };
-
-    class DriverPLL {
-    public:
-
+    class DriverPLL
+    {
+      public:
         static std::shared_ptr<DriverPLL> Create(const PLLInstances inst, const DriverPLLParams &params);
 
-        DriverPLL(const DriverPLLParams& params): parameters(params) {}
+        DriverPLL(const DriverPLLParams &params) : parameters(params)
+        {}
 
-        virtual ~DriverPLL() {}
+        virtual ~DriverPLL()
+        {}
 
-    protected:
+      protected:
         const DriverPLLParams parameters;
-    private:
-        static std::weak_ptr<DriverPLL> singleton[static_cast<uint32_t >(PLLInstances ::COUNT)];
 
+      private:
+        static std::weak_ptr<DriverPLL> singleton[static_cast<uint32_t>(PLLInstances ::COUNT)];
     };
 
-}
+} // namespace drivers
 
-
-#endif //PUREPHONE_DRIVERPLL_HPP
+#endif // PUREPHONE_DRIVERPLL_HPP

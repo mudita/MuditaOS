@@ -23,13 +23,20 @@ namespace gui
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         setTitle("UI TEST");
-        text = new gui::Text(this, style::window::default_left_margin, title->offset_h(), style::window_width - 2 * style::window::default_left_margin, 300,
-                             "Add text, long press * adds special char, long press # changes input (and shows it in bottom bar) arrows walk, 1 in text mode "
+        text = new gui::Text(this,
+                             style::window::default_left_margin,
+                             title->offset_h(),
+                             style::window_width - 2 * style::window::default_left_margin,
+                             300,
+                             "Add text, long press * adds special char, long press # changes input (and shows it in "
+                             "bottom bar) arrows walk, 1 in text mode "
                              "adds special chars too");
         text->setEditMode(gui::Text::EditMode::EDIT);
         text->setFont(style::window::font::medium);
         text->setInputMode(new InputMode(
-            {InputMode::ABC, InputMode::abc, InputMode::digit}, [=](const UTF8 &text) { textModeShowCB(text); }, [=]() { textSelectSpecialCB(); }));
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) { textModeShowCB(text); },
+            [=]() { textSelectSpecialCB(); }));
         text->setPenFocusWidth(0);
         setFocusItem(text);
     }
@@ -40,8 +47,7 @@ namespace gui
     }
 
     void UiTestWindow::buildInterface()
-    {
-    }
+    {}
 
     void UiTestWindow::destroyInterface()
     {
@@ -55,7 +61,6 @@ namespace gui
     }
 
     void UiTestWindow::onBeforeShow(ShowMode mode, SwitchData *data)
-    {
-    }
+    {}
 
 } // namespace gui

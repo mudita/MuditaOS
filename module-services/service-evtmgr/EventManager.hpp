@@ -18,34 +18,36 @@
 
 class WorkerEvent;
 
-class EventManager: public sys::Service {
-private:
-	void HandleAlarmTrigger(sys::DataMessage* msgl);
-	void GetNextAlarmTimestamp(time_t timestamp);
+class EventManager : public sys::Service
+{
+  private:
+    void HandleAlarmTrigger(sys::DataMessage *msgl);
+    void GetNextAlarmTimestamp(time_t timestamp);
     uint32_t pollTimerID = 0;
 
   protected:
-	std::unique_ptr<WorkerEvent> EventWorker;
-	//application where key events are sent. This is also only application that is allowed to change keyboard long press settings.
-	std::string targetApplication;
-	//alarm timestamp in seconds from midnight
-	uint32_t alarmTimestamp;
-	//ID of alarm waiting to trigger
-	uint32_t alarmID;
-	//flag set when there is no alarm to trigger in current day
-	bool alarmDBEmpty = false;
-	//flag set when there is alarm to handle
-	bool alarmIsValid = false;
-	//flag informs about suspend/resume status
-	bool suspended = false;
+    std::unique_ptr<WorkerEvent> EventWorker;
+    // application where key events are sent. This is also only application that is allowed to change keyboard long
+    // press settings.
+    std::string targetApplication;
+    // alarm timestamp in seconds from midnight
+    uint32_t alarmTimestamp;
+    // ID of alarm waiting to trigger
+    uint32_t alarmID;
+    // flag set when there is no alarm to trigger in current day
+    bool alarmDBEmpty = false;
+    // flag set when there is alarm to handle
+    bool alarmIsValid = false;
+    // flag informs about suspend/resume status
+    bool suspended = false;
     /// to periodically check and update battery state, to be removed when battery charger will work fine
     void handleBatPolling();
 
   public:
-	EventManager(const std::string& name);
+    EventManager(const std::string &name);
     ~EventManager();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
+    sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     void TickHandler(uint32_t id) override;
 
@@ -56,11 +58,11 @@ private:
 
     sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
-
     /**
-	* @brief Sends request to application manager to switch from current application to specific window in application with specified name .
-	*/
-    static bool messageSetApplication( sys::Service* sender, const std::string& applicationName );
+     * @brief Sends request to application manager to switch from current application to specific window in application
+     * with specified name .
+     */
+    static bool messageSetApplication(sys::Service *sender, const std::string &applicationName);
 };
 
 #endif /* MODULE_SERVICES_SERVICE_KBD_EventManager_HPP_ */

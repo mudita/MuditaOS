@@ -1,12 +1,10 @@
 #include "CountryCodesTable.hpp"
 
 CountryCodesTable::CountryCodesTable(Database *db) : Table(db)
-{
-}
+{}
 
 CountryCodesTable::~CountryCodesTable()
-{
-}
+{}
 
 bool CountryCodesTable::Create()
 {
@@ -17,8 +15,7 @@ CodesTableRow CountryCodesTable::GetByMCC(uint32_t mcc)
 {
     auto retQuery = db->Query("SELECT * FROM codes WHERE mcc= %lu LIMIT 1;", mcc);
 
-    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0))
-    {
+    if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return CodesTableRow();
     }
 
@@ -37,8 +34,7 @@ uint32_t CountryCodesTable::GetCount()
 {
     auto queryRet = db->Query("SELECT COUNT(*) FROM codes;");
 
-    if (queryRet->GetRowCount() == 0)
-    {
+    if (queryRet->GetRowCount() == 0) {
         return 0;
     }
 

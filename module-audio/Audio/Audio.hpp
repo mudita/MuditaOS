@@ -2,12 +2,10 @@
  *  @file Audio.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 22.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_AUDIO_HPP
 #define PUREPHONE_AUDIO_HPP
@@ -20,12 +18,14 @@
 #include "Operation/Operation.hpp"
 #include "decoder/decoder.hpp"
 
-namespace audio {
+namespace audio
+{
 
-    class Audio {
-    public:
-
-        enum class State {
+    class Audio
+    {
+      public:
+        enum class State
+        {
             Idle,
             Playback,
             Recording,
@@ -34,30 +34,39 @@ namespace audio {
 
         Audio(std::function<int32_t(AudioEvents event)> asyncCallback);
 
-        //Events
-        int32_t SendEvent(const Operation::Event evt, const EventData *data=nullptr);
+        // Events
+        int32_t SendEvent(const Operation::Event evt, const EventData *data = nullptr);
 
-        //utilities
+        // utilities
         Position GetPosition();
 
-        State GetCurrentState() const { return currentState; }
+        State GetCurrentState() const
+        {
+            return currentState;
+        }
 
         std::optional<Tags> GetFileTags(const char *filename);
 
-        //Range 0-1
+        // Range 0-1
         int32_t SetOutputVolume(Volume vol);
 
-        //Range 0-10
+        // Range 0-10
         int32_t SetInputGain(Gain gain);
 
-        Volume GetOutputVolume() { return currentOperation->GetOutputVolume(); }
+        Volume GetOutputVolume()
+        {
+            return currentOperation->GetOutputVolume();
+        }
 
-        Gain GetInputGain() { return currentOperation->GetInputGain(); }
+        Gain GetInputGain()
+        {
+            return currentOperation->GetInputGain();
+        }
 
-        //TODO:M.P Set/Get inputGain/outputVolume for each profile
+        // TODO:M.P Set/Get inputGain/outputVolume for each profile
 
-        //Operations
-        int32_t Start(Operation::Type op, const char *fileName="");
+        // Operations
+        int32_t Start(Operation::Type op, const char *fileName = "");
 
         int32_t Stop();
 
@@ -65,18 +74,13 @@ namespace audio {
 
         int32_t Resume();
 
-
-    private:
-
+      private:
         State currentState = State::Idle;
         std::unique_ptr<Operation> currentOperation;
 
         std::function<int32_t(AudioEvents event)> asyncCallback = nullptr;
-
-
     };
 
-}
+} // namespace audio
 
-
-#endif //PUREPHONE_AUDIO_HPP
+#endif // PUREPHONE_AUDIO_HPP

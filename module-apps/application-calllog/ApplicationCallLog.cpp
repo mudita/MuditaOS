@@ -21,122 +21,125 @@
 
 using namespace calllog;
 
-namespace app {
-
-ApplicationCallLog::ApplicationCallLog(std::string name, std::string parent, bool startBackgound) :
-	Application( name, parent, startBackgound, 4096 ) {
-}
-
-ApplicationCallLog::~ApplicationCallLog() {
-	LOG_INFO("ApplicationCallLog::destroy");
-}
-
-// Invoked upon receiving data message
-sys::Message_t ApplicationCallLog::DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) {
-
-	auto retMsg = Application::DataReceivedHandler(msgl);
-	//if message was handled by application's template there is no need to process further.
-	if( (reinterpret_cast<sys::ResponseMessage*>( retMsg.get() )->retCode == sys::ReturnCodes::Success ) ){
-		return retMsg;
-	}
-
-	auto handled = false;
-
-	//handle database response
-	if( resp != nullptr ) {
-		handled = true;
-        switch (resp->responseTo)
-        {
-        case MessageType::DBCalllogGetLimitOffset: {
-            if (getCurrentWindow()->onDatabaseMessage(resp))
-            {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-	if( handled ) {
-		return std::make_shared<sys::ResponseMessage>();
-	}
-	else {
-		return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-	}
-}
-
-// Invoked during initialization
-sys::ReturnCodes ApplicationCallLog::InitHandler() {
-	auto ret = Application::InitHandler();
-	if(ret != sys::ReturnCodes::Success) return ret;
-
-	createUserInterface();
-
-	setActiveWindow(calllog::settings::MainWindowStr);
-
-	return ret;
-}
-
-sys::ReturnCodes ApplicationCallLog::DeinitHandler() {
-	return sys::ReturnCodes::Success;
-}
-
-void ApplicationCallLog::createUserInterface() {
-
-	gui::AppWindow* window = nullptr;
-
-	window = new gui::CallLogMainWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
-	window = new gui::CallLogDetailsWindow(this);
-	windows.insert(std::pair<std::string,gui::AppWindow*>(window->getName(), window));
-
-    windowOptions = gui::newOptionWindow(this);
-    windows.insert(std::pair<std::string, gui::AppWindow *>(windowOptions->getName(), windowOptions));
-
-    window = new gui::Dialog(this, calllog::settings::CallDeleteWindowStr,
-                             {
-                                 .title = "",
-                                 .icon = "phonebook_contact_delete_trashcan",
-                                 .text = utils::localize.get("app_calllog_delete_call_confirmation"),
-                                 .action = []() -> bool {
-                                     LOG_INFO("!");
-                                     return true;
-                                 },
-                             });
-    windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-}
-
-void ApplicationCallLog::destroyUserInterface() {
-}
-
-bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
+namespace app
 {
-    LOG_DEBUG("Removing CalllogRecord: %d", record.ID);
-    auto dialog = dynamic_cast<gui::Dialog *>(windows[calllog::settings::CallDeleteWindowStr]);
-    if (dialog != nullptr)
+
+    ApplicationCallLog::ApplicationCallLog(std::string name, std::string parent, bool startBackgound)
+        : Application(name, parent, startBackgound, 4096)
+    {}
+
+    ApplicationCallLog::~ApplicationCallLog()
     {
-        auto meta = dialog->meta;
-        meta.action = [=]() -> bool {
-            if (DBServiceAPI::CalllogRemove(this, record.ID) == false)
-            {
-                LOG_ERROR("CalllogRemove id=%u failed", record.ID);
-                return false;
+        LOG_INFO("ApplicationCallLog::destroy");
+    }
+
+    // Invoked upon receiving data message
+    sys::Message_t ApplicationCallLog::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+    {
+
+        auto retMsg = Application::DataReceivedHandler(msgl);
+        // if message was handled by application's template there is no need to process further.
+        if ((reinterpret_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
+            return retMsg;
+        }
+
+        auto handled = false;
+
+        // handle database response
+        if (resp != nullptr) {
+            handled = true;
+            switch (resp->responseTo) {
+            case MessageType::DBCalllogGetLimitOffset: {
+                if (getCurrentWindow()->onDatabaseMessage(resp)) {
+                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
+                break;
             }
-            this->switchWindow(calllog::settings::MainWindowStr);
-            return true;
-        };
-        meta.title = record.name;
-        dialog->update(meta);
-        return switchWindow(calllog::settings::CallDeleteWindowStr, nullptr);
+            default:
+                break;
+            }
+        }
+
+        if (handled) {
+            return std::make_shared<sys::ResponseMessage>();
+        }
+        else {
+            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        }
     }
-    else
+
+    // Invoked during initialization
+    sys::ReturnCodes ApplicationCallLog::InitHandler()
     {
-        LOG_ERROR("Dialog bad type!");
-        return false;
+        auto ret = Application::InitHandler();
+        if (ret != sys::ReturnCodes::Success)
+            return ret;
+
+        createUserInterface();
+
+        setActiveWindow(calllog::settings::MainWindowStr);
+
+        return ret;
     }
-}
+
+    sys::ReturnCodes ApplicationCallLog::DeinitHandler()
+    {
+        return sys::ReturnCodes::Success;
+    }
+
+    void ApplicationCallLog::createUserInterface()
+    {
+
+        gui::AppWindow *window = nullptr;
+
+        window = new gui::CallLogMainWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::CallLogDetailsWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        windowOptions = gui::newOptionWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(windowOptions->getName(), windowOptions));
+
+        window = new gui::Dialog(this,
+                                 calllog::settings::CallDeleteWindowStr,
+                                 {
+                                     .title  = "",
+                                     .icon   = "phonebook_contact_delete_trashcan",
+                                     .text   = utils::localize.get("app_calllog_delete_call_confirmation"),
+                                     .action = []() -> bool {
+                                         LOG_INFO("!");
+                                         return true;
+                                     },
+                                 });
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+    }
+
+    void ApplicationCallLog::destroyUserInterface()
+    {}
+
+    bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
+    {
+        LOG_DEBUG("Removing CalllogRecord: %d", record.ID);
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[calllog::settings::CallDeleteWindowStr]);
+        if (dialog != nullptr) {
+            auto meta   = dialog->meta;
+            meta.action = [=]() -> bool {
+                if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
+                    LOG_ERROR("CalllogRemove id=%u failed", record.ID);
+                    return false;
+                }
+                this->switchWindow(calllog::settings::MainWindowStr);
+                return true;
+            };
+            meta.title = record.name;
+            dialog->update(meta);
+            return switchWindow(calllog::settings::CallDeleteWindowStr, nullptr);
+        }
+        else {
+            LOG_ERROR("Dialog bad type!");
+            return false;
+        }
+    }
 
 } /* namespace app */

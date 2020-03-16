@@ -35,8 +35,8 @@
 #include "fsl_lpspi.h"
 
 /*******************************************************************************
-* Definitions
-******************************************************************************/
+ * Definitions
+ ******************************************************************************/
 
 /* Component ID definition, used by tools. */
 #ifndef FSL_COMPONENT_ID
@@ -61,73 +61,73 @@ typedef void (*lpspi_master_isr_t)(LPSPI_Type *base, lpspi_master_handle_t *hand
 typedef void (*lpspi_slave_isr_t)(LPSPI_Type *base, lpspi_slave_handle_t *handle);
 
 /*******************************************************************************
-* Prototypes
-******************************************************************************/
+ * Prototypes
+ ******************************************************************************/
 
 /*!
-* @brief Configures the LPSPI peripheral chip select polarity.
-*
-* This function  takes in the desired peripheral chip select (Pcs) and it's corresponding desired polarity and
-* configures the Pcs signal to operate with the desired characteristic.
-*
-* @param base LPSPI peripheral address.
-* @param pcs The particular peripheral chip select (parameter value is of type lpspi_which_pcs_t) for which we wish to
-*            apply the active high or active low characteristic.
-* @param activeLowOrHigh The setting for either "active high, inactive low (0)"  or "active low, inactive high(1)" of
-*                        type lpspi_pcs_polarity_config_t.
-*/
+ * @brief Configures the LPSPI peripheral chip select polarity.
+ *
+ * This function  takes in the desired peripheral chip select (Pcs) and it's corresponding desired polarity and
+ * configures the Pcs signal to operate with the desired characteristic.
+ *
+ * @param base LPSPI peripheral address.
+ * @param pcs The particular peripheral chip select (parameter value is of type lpspi_which_pcs_t) for which we wish to
+ *            apply the active high or active low characteristic.
+ * @param activeLowOrHigh The setting for either "active high, inactive low (0)"  or "active low, inactive high(1)" of
+ *                        type lpspi_pcs_polarity_config_t.
+ */
 static void LPSPI_SetOnePcsPolarity(LPSPI_Type *base,
                                     lpspi_which_pcs_t pcs,
                                     lpspi_pcs_polarity_config_t activeLowOrHigh);
 
 /*!
-* @brief Combine the write data for 1 byte to 4 bytes.
-* This is not a public API.
-*/
+ * @brief Combine the write data for 1 byte to 4 bytes.
+ * This is not a public API.
+ */
 static uint32_t LPSPI_CombineWriteData(uint8_t *txData, uint32_t bytesEachWrite, bool isByteSwap);
 
 /*!
-* @brief Separate the read data for 1 byte to 4 bytes.
-* This is not a public API.
-*/
+ * @brief Separate the read data for 1 byte to 4 bytes.
+ * This is not a public API.
+ */
 static void LPSPI_SeparateReadData(uint8_t *rxData, uint32_t readData, uint32_t bytesEachRead, bool isByteSwap);
 
 /*!
-* @brief Master fill up the TX FIFO with data.
-* This is not a public API.
-*/
+ * @brief Master fill up the TX FIFO with data.
+ * This is not a public API.
+ */
 static void LPSPI_MasterTransferFillUpTxFifo(LPSPI_Type *base, lpspi_master_handle_t *handle);
 
 /*!
-* @brief Master finish up a transfer.
-* It would call back if there is callback function and set the state to idle.
-* This is not a public API.
-*/
+ * @brief Master finish up a transfer.
+ * It would call back if there is callback function and set the state to idle.
+ * This is not a public API.
+ */
 static void LPSPI_MasterTransferComplete(LPSPI_Type *base, lpspi_master_handle_t *handle);
 
 /*!
-* @brief Slave fill up the TX FIFO with data.
-* This is not a public API.
-*/
+ * @brief Slave fill up the TX FIFO with data.
+ * This is not a public API.
+ */
 static void LPSPI_SlaveTransferFillUpTxFifo(LPSPI_Type *base, lpspi_slave_handle_t *handle);
 
 /*!
-* @brief Slave finish up a transfer.
-* It would call back if there is callback function and set the state to idle.
-* This is not a public API.
-*/
+ * @brief Slave finish up a transfer.
+ * It would call back if there is callback function and set the state to idle.
+ * This is not a public API.
+ */
 static void LPSPI_SlaveTransferComplete(LPSPI_Type *base, lpspi_slave_handle_t *handle);
 
 /*!
-* @brief LPSPI common interrupt handler.
-*
-* @param handle pointer to s_lpspiHandle which stores the transfer state.
-*/
+ * @brief LPSPI common interrupt handler.
+ *
+ * @param handle pointer to s_lpspiHandle which stores the transfer state.
+ */
 static void LPSPI_CommonIRQHandler(LPSPI_Type *base, void *param);
 
 /*******************************************************************************
-* Variables
-******************************************************************************/
+ * Variables
+ ******************************************************************************/
 
 /* Defines constant value arrays for the baud rate pre-scalar and scalar divider values.*/
 static const uint8_t s_baudratePrescaler[] = {1, 2, 4, 8, 16, 32, 64, 128};
@@ -158,17 +158,15 @@ static lpspi_slave_isr_t s_lpspiSlaveIsr;
 /* @brief Dummy data for each instance. This data is used when user's tx buffer is NULL*/
 volatile uint8_t g_lpspiDummyData[ARRAY_SIZE(s_lpspiBases)] = {0};
 /**********************************************************************************************************************
-* Code
-*********************************************************************************************************************/
+ * Code
+ *********************************************************************************************************************/
 uint32_t LPSPI_GetInstance(LPSPI_Type *base)
 {
     uint8_t instance = 0;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_lpspiBases); instance++)
-    {
-        if (s_lpspiBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_lpspiBases); instance++) {
+        if (s_lpspiBases[instance] == base) {
             break;
         }
     }
@@ -180,7 +178,7 @@ uint32_t LPSPI_GetInstance(LPSPI_Type *base)
 
 void LPSPI_SetDummyData(LPSPI_Type *base, uint8_t dummyData)
 {
-    uint32_t instance = LPSPI_GetInstance(base);
+    uint32_t instance          = LPSPI_GetInstance(base);
     g_lpspiDummyData[instance] = dummyData;
 }
 
@@ -240,20 +238,20 @@ void LPSPI_MasterGetDefaultConfig(lpspi_master_config_t *masterConfig)
 {
     assert(masterConfig);
 
-    masterConfig->baudRate = 500000;
+    masterConfig->baudRate     = 500000;
     masterConfig->bitsPerFrame = 8;
-    masterConfig->cpol = kLPSPI_ClockPolarityActiveHigh;
-    masterConfig->cpha = kLPSPI_ClockPhaseFirstEdge;
-    masterConfig->direction = kLPSPI_MsbFirst;
+    masterConfig->cpol         = kLPSPI_ClockPolarityActiveHigh;
+    masterConfig->cpha         = kLPSPI_ClockPhaseFirstEdge;
+    masterConfig->direction    = kLPSPI_MsbFirst;
 
-    masterConfig->pcsToSckDelayInNanoSec = 1000000000 / masterConfig->baudRate * 2;
-    masterConfig->lastSckToPcsDelayInNanoSec = 1000000000 / masterConfig->baudRate * 2;
+    masterConfig->pcsToSckDelayInNanoSec        = 1000000000 / masterConfig->baudRate * 2;
+    masterConfig->lastSckToPcsDelayInNanoSec    = 1000000000 / masterConfig->baudRate * 2;
     masterConfig->betweenTransferDelayInNanoSec = 1000000000 / masterConfig->baudRate * 2;
 
-    masterConfig->whichPcs = kLPSPI_Pcs0;
+    masterConfig->whichPcs           = kLPSPI_Pcs0;
     masterConfig->pcsActiveHighOrLow = kLPSPI_PcsActiveLow;
 
-    masterConfig->pinCfg = kLPSPI_SdiInSdoOut;
+    masterConfig->pinCfg        = kLPSPI_SdiInSdoOut;
     masterConfig->dataOutConfig = kLpspiDataOutRetained;
 }
 
@@ -298,15 +296,15 @@ void LPSPI_SlaveGetDefaultConfig(lpspi_slave_config_t *slaveConfig)
 {
     assert(slaveConfig);
 
-    slaveConfig->bitsPerFrame = 8;                      /*!< Bits per frame, minimum 8, maximum 4096.*/
-    slaveConfig->cpol = kLPSPI_ClockPolarityActiveHigh; /*!< Clock polarity. */
-    slaveConfig->cpha = kLPSPI_ClockPhaseFirstEdge;     /*!< Clock phase. */
-    slaveConfig->direction = kLPSPI_MsbFirst;           /*!< MSB or LSB data shift direction. */
+    slaveConfig->bitsPerFrame = 8;                              /*!< Bits per frame, minimum 8, maximum 4096.*/
+    slaveConfig->cpol         = kLPSPI_ClockPolarityActiveHigh; /*!< Clock polarity. */
+    slaveConfig->cpha         = kLPSPI_ClockPhaseFirstEdge;     /*!< Clock phase. */
+    slaveConfig->direction    = kLPSPI_MsbFirst;                /*!< MSB or LSB data shift direction. */
 
-    slaveConfig->whichPcs = kLPSPI_Pcs0;                   /*!< Desired Peripheral Chip Select (pcs) */
+    slaveConfig->whichPcs           = kLPSPI_Pcs0;         /*!< Desired Peripheral Chip Select (pcs) */
     slaveConfig->pcsActiveHighOrLow = kLPSPI_PcsActiveLow; /*!< Desired PCS active high or low */
 
-    slaveConfig->pinCfg = kLPSPI_SdiInSdoOut;
+    slaveConfig->pinCfg        = kLPSPI_SdiInSdoOut;
     slaveConfig->dataOutConfig = kLpspiDataOutRetained;
 }
 
@@ -360,10 +358,9 @@ uint32_t LPSPI_MasterSetBaudRate(LPSPI_Type *base,
     assert(tcrPrescaleValue);
 
     /* For master mode configuration only, if slave mode detected, return 0.
-    * Also, the LPSPI module needs to be disabled first, if enabled, return 0
-    */
-    if ((!LPSPI_IsMaster(base)) || (base->CR & LPSPI_CR_MEN_MASK))
-    {
+     * Also, the LPSPI module needs to be disabled first, if enabled, return 0
+     */
+    if ((!LPSPI_IsMaster(base)) || (base->CR & LPSPI_CR_MEN_MASK)) {
         return 0;
     }
 
@@ -374,49 +371,45 @@ uint32_t LPSPI_MasterSetBaudRate(LPSPI_Type *base,
     uint32_t desiredBaudrate = baudRate_Bps;
 
     /* find combination of prescaler and scaler resulting in baudrate closest to the
-    * requested value
-    */
+     * requested value
+     */
     min_diff = 0xFFFFFFFFU;
 
     /* Set to maximum divisor value bit settings so that if baud rate passed in is less
-    * than the minimum possible baud rate, then the SPI will be configured to the lowest
-    * possible baud rate
-    */
+     * than the minimum possible baud rate, then the SPI will be configured to the lowest
+     * possible baud rate
+     */
     bestPrescaler = 7;
-    bestScaler = 255;
+    bestScaler    = 255;
 
     bestBaudrate = 0; /* required to avoid compilation warning */
 
     /* In all for loops, if min_diff = 0, the exit for loop*/
-    for (prescaler = 0; (prescaler < 8) && min_diff; prescaler++)
-    {
-        for (scaler = 0; (scaler < 256) && min_diff; scaler++)
-        {
+    for (prescaler = 0; (prescaler < 8) && min_diff; prescaler++) {
+        for (scaler = 0; (scaler < 256) && min_diff; scaler++) {
             realBaudrate = (srcClock_Hz / (s_baudratePrescaler[prescaler] * (scaler + 2U)));
 
             /* calculate the baud rate difference based on the conditional statement
-            * that states that the calculated baud rate must not exceed the desired baud rate
-            */
-            if (desiredBaudrate >= realBaudrate)
-            {
+             * that states that the calculated baud rate must not exceed the desired baud rate
+             */
+            if (desiredBaudrate >= realBaudrate) {
                 diff = desiredBaudrate - realBaudrate;
-                if (min_diff > diff)
-                {
+                if (min_diff > diff) {
                     /* a better match found */
-                    min_diff = diff;
+                    min_diff      = diff;
                     bestPrescaler = prescaler;
-                    bestScaler = scaler;
-                    bestBaudrate = realBaudrate;
+                    bestScaler    = scaler;
+                    bestBaudrate  = realBaudrate;
                 }
             }
         }
     }
 
     /* Write the best baud rate scalar to the CCR.
-    * Note, no need to check for error since we've already checked to make sure the module is
-    * disabled and in master mode. Also, there is a limit on the maximum divider so we will not
-    * exceed this.
-    */
+     * Note, no need to check for error since we've already checked to make sure the module is
+     * disabled and in master mode. Also, there is a limit on the maximum divider so we will not
+     * exceed this.
+     */
     base->CCR = (base->CCR & ~LPSPI_CCR_SCKDIV_MASK) | LPSPI_CCR_SCKDIV(bestScaler);
 
     /* return the best prescaler value for user to use later */
@@ -429,23 +422,22 @@ uint32_t LPSPI_MasterSetBaudRate(LPSPI_Type *base,
 void LPSPI_MasterSetDelayScaler(LPSPI_Type *base, uint32_t scaler, lpspi_delay_type_t whichDelay)
 {
     /*These settings are only relevant in master mode */
-    switch (whichDelay)
-    {
-        case kLPSPI_PcsToSck:
-            base->CCR = (base->CCR & (~LPSPI_CCR_PCSSCK_MASK)) | LPSPI_CCR_PCSSCK(scaler);
+    switch (whichDelay) {
+    case kLPSPI_PcsToSck:
+        base->CCR = (base->CCR & (~LPSPI_CCR_PCSSCK_MASK)) | LPSPI_CCR_PCSSCK(scaler);
 
-            break;
-        case kLPSPI_LastSckToPcs:
-            base->CCR = (base->CCR & (~LPSPI_CCR_SCKPCS_MASK)) | LPSPI_CCR_SCKPCS(scaler);
+        break;
+    case kLPSPI_LastSckToPcs:
+        base->CCR = (base->CCR & (~LPSPI_CCR_SCKPCS_MASK)) | LPSPI_CCR_SCKPCS(scaler);
 
-            break;
-        case kLPSPI_BetweenTransfer:
-            base->CCR = (base->CCR & (~LPSPI_CCR_DBT_MASK)) | LPSPI_CCR_DBT(scaler);
+        break;
+    case kLPSPI_BetweenTransfer:
+        base->CCR = (base->CCR & (~LPSPI_CCR_DBT_MASK)) | LPSPI_CCR_DBT(scaler);
 
-            break;
-        default:
-            assert(false);
-            break;
+        break;
+    default:
+        assert(false);
+        break;
     }
 }
 
@@ -475,10 +467,9 @@ uint32_t LPSPI_MasterSetDelayTimes(LPSPI_Type *base,
     bestScaler = 0xFFU;
 
     /* Calculate the initial (min) delay and maximum possible delay based on the specific delay as
-    * the delay divisors are slightly different based on which delay we are configuring.
-    */
-    if (whichDelay == kLPSPI_BetweenTransfer)
-    {
+     * the delay divisors are slightly different based on which delay we are configuring.
+     */
+    if (whichDelay == kLPSPI_BetweenTransfer) {
         /* First calculate the initial, default delay, note min delay is 2 clock cycles. Due to large size of
          calculated values (uint64_t), we need to break up the calculation into several steps to ensure
          accurate calculated results
@@ -494,8 +485,7 @@ uint32_t LPSPI_MasterSetDelayTimes(LPSPI_Type *base,
 
         additionalScaler = 1U;
     }
-    else
-    {
+    else {
         /* First calculate the initial, default delay, min delay is 1 clock cycle. Due to large size of calculated
         values (uint64_t), we need to break up the calculation into several steps to ensure accurate calculated
         results.
@@ -512,18 +502,16 @@ uint32_t LPSPI_MasterSetDelayTimes(LPSPI_Type *base,
     }
 
     /* If the initial, default delay is already greater than the desired delay, then
-    * set the delay to their initial value (0) and return the delay. In other words,
-    * there is no way to decrease the delay value further.
-    */
-    if (initialDelayNanoSec >= delayTimeInNanoSec)
-    {
+     * set the delay to their initial value (0) and return the delay. In other words,
+     * there is no way to decrease the delay value further.
+     */
+    if (initialDelayNanoSec >= delayTimeInNanoSec) {
         LPSPI_MasterSetDelayScaler(base, 0, whichDelay);
         return initialDelayNanoSec;
     }
 
     /* If min_diff = 0, the exit for loop */
-    for (scaler = 0; (scaler < 256U) && min_diff; scaler++)
-    {
+    for (scaler = 0; (scaler < 256U) && min_diff; scaler++) {
         /* Calculate the real delay value as we cycle through the scaler values.
         Due to large size of calculated values (uint64_t), we need to break up the
         calculation into several steps to ensure accurate calculated results
@@ -533,17 +521,15 @@ uint32_t LPSPI_MasterSetDelayTimes(LPSPI_Type *base,
         realDelay /= clockDividedPrescaler;
 
         /* calculate the delay difference based on the conditional statement
-        * that states that the calculated delay must not be less then the desired delay
-        */
-        if (realDelay >= delayTimeInNanoSec)
-        {
+         * that states that the calculated delay must not be less then the desired delay
+         */
+        if (realDelay >= delayTimeInNanoSec) {
             diff = realDelay - delayTimeInNanoSec;
-            if (min_diff > diff)
-            {
+            if (min_diff > diff) {
                 /* a better match found */
-                min_diff = diff;
+                min_diff   = diff;
                 bestScaler = scaler;
-                bestDelay = realDelay;
+                bestDelay  = realDelay;
             }
         }
     }
@@ -581,14 +567,12 @@ bool LPSPI_CheckTransferArgument(lpspi_transfer_t *transfer, uint32_t bitsPerFra
     assert(transfer);
 
     /* If the transfer count is zero, then return immediately.*/
-    if (transfer->dataSize == 0)
-    {
+    if (transfer->dataSize == 0) {
         return false;
     }
 
     /* If both send buffer and receive buffer is null */
-    if ((!(transfer->txData)) && (!(transfer->rxData)))
-    {
+    if ((!(transfer->txData)) && (!(transfer->rxData))) {
         return false;
     }
 
@@ -597,26 +581,19 @@ bool LPSPI_CheckTransferArgument(lpspi_transfer_t *transfer, uint32_t bitsPerFra
      *the transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not integer multiples of 4 ,
      *otherwise , the transfer data size can be integer multiples of bytesPerFrame.
      */
-    if (bytesPerFrame <= 4)
-    {
-        if ((transfer->dataSize % bytesPerFrame) != 0)
-        {
+    if (bytesPerFrame <= 4) {
+        if ((transfer->dataSize % bytesPerFrame) != 0) {
             return false;
         }
     }
-    else
-    {
-        if ((bytesPerFrame % 4U) != 0)
-        {
-            if (transfer->dataSize != bytesPerFrame)
-            {
+    else {
+        if ((bytesPerFrame % 4U) != 0) {
+            if (transfer->dataSize != bytesPerFrame) {
                 return false;
             }
         }
-        else
-        {
-            if ((transfer->dataSize % bytesPerFrame) != 0)
-            {
+        else {
+            if ((transfer->dataSize % bytesPerFrame) != 0) {
                 return false;
             }
         }
@@ -629,24 +606,22 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
 {
     assert(transfer);
 
-    uint32_t bitsPerFrame = ((base->TCR & LPSPI_TCR_FRAMESZ_MASK) >> LPSPI_TCR_FRAMESZ_SHIFT) + 1;
+    uint32_t bitsPerFrame  = ((base->TCR & LPSPI_TCR_FRAMESZ_MASK) >> LPSPI_TCR_FRAMESZ_SHIFT) + 1;
     uint32_t bytesPerFrame = (bitsPerFrame + 7) / 8;
-    uint32_t temp = 0U;
-    uint8_t dummyData = g_lpspiDummyData[LPSPI_GetInstance(base)];
+    uint32_t temp          = 0U;
+    uint8_t dummyData      = g_lpspiDummyData[LPSPI_GetInstance(base)];
 
-    if (!LPSPI_CheckTransferArgument(transfer, bitsPerFrame, bytesPerFrame))
-    {
+    if (!LPSPI_CheckTransferArgument(transfer, bitsPerFrame, bytesPerFrame)) {
         return kStatus_InvalidArgument;
     }
 
     /* Check that LPSPI is not busy.*/
-    if (LPSPI_GetStatusFlags(base) & kLPSPI_ModuleBusyFlag)
-    {
+    if (LPSPI_GetStatusFlags(base) & kLPSPI_ModuleBusyFlag) {
         return kStatus_LPSPI_Busy;
     }
 
-    uint8_t *txData = transfer->txData;
-    uint8_t *rxData = transfer->rxData;
+    uint8_t *txData               = transfer->txData;
+    uint8_t *rxData               = transfer->rxData;
     uint32_t txRemainingByteCount = transfer->dataSize;
     uint32_t rxRemainingByteCount = transfer->dataSize;
 
@@ -663,14 +638,13 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
     uint32_t whichPcs = (transfer->configFlags & LPSPI_MASTER_PCS_MASK) >> LPSPI_MASTER_PCS_SHIFT;
 
     bool isPcsContinuous = (bool)(transfer->configFlags & kLPSPI_MasterPcsContinuous);
-    bool isRxMask = false;
-    bool isByteSwap = (bool)(transfer->configFlags & kLPSPI_MasterByteSwap);
+    bool isRxMask        = false;
+    bool isByteSwap      = (bool)(transfer->configFlags & kLPSPI_MasterByteSwap);
 
     LPSPI_FlushFifo(base, true, true);
     LPSPI_ClearStatusFlags(base, kLPSPI_AllStatusFlag);
 
-    if (!rxData)
-    {
+    if (!rxData) {
         isRxMask = true;
     }
 
@@ -679,15 +653,12 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
     /* Check if using 3-wire mode and the txData is NULL, set the output pin to tristated. */
     temp = base->CFGR1;
     temp &= LPSPI_CFGR1_PINCFG_MASK;
-    if ((temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdiInSdiOut)) || (temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdoInSdoOut)))
-    {
-        if (!txData)
-        {
+    if ((temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdiInSdiOut)) || (temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdoInSdoOut))) {
+        if (!txData) {
             base->CFGR1 |= LPSPI_CFGR1_OUTCFG_MASK;
         }
         /* The 3-wire mode can't send and receive data at the same time. */
-        if ((txData) && (rxData))
-        {
+        if ((txData) && (rxData)) {
             return kStatus_InvalidArgument;
         }
     }
@@ -697,32 +668,25 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
         (base->TCR & ~(LPSPI_TCR_CONT_MASK | LPSPI_TCR_CONTC_MASK | LPSPI_TCR_RXMSK_MASK | LPSPI_TCR_PCS_MASK)) |
         LPSPI_TCR_CONT(isPcsContinuous) | LPSPI_TCR_CONTC(0) | LPSPI_TCR_RXMSK(isRxMask) | LPSPI_TCR_PCS(whichPcs);
 
-    if (bytesPerFrame <= 4)
-    {
+    if (bytesPerFrame <= 4) {
         bytesEachWrite = bytesPerFrame;
-        bytesEachRead = bytesPerFrame;
+        bytesEachRead  = bytesPerFrame;
     }
-    else
-    {
+    else {
         bytesEachWrite = 4;
-        bytesEachRead = 4;
+        bytesEachRead  = 4;
     }
 
     /*Write the TX data until txRemainingByteCount is equal to 0 */
-    while (txRemainingByteCount > 0)
-    {
-        if (txRemainingByteCount < bytesEachWrite)
-        {
+    while (txRemainingByteCount > 0) {
+        if (txRemainingByteCount < bytesEachWrite) {
             bytesEachWrite = txRemainingByteCount;
         }
 
         /*Wait until TX FIFO is not full*/
-        while (LPSPI_GetTxFifoCount(base) == fifoSize)
-        {
-        }
+        while (LPSPI_GetTxFifoCount(base) == fifoSize) {}
 
-        if (txData)
-        {
+        if (txData) {
             wordToSend = LPSPI_CombineWriteData(txData, bytesEachWrite, isByteSwap);
             txData += bytesEachWrite;
         }
@@ -731,13 +695,10 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
         txRemainingByteCount -= bytesEachWrite;
 
         /*Check whether there is RX data in RX FIFO . Read out the RX data so that the RX FIFO would not overrun.*/
-        if (rxData)
-        {
-            while (LPSPI_GetRxFifoCount(base))
-            {
+        if (rxData) {
+            while (LPSPI_GetRxFifoCount(base)) {
                 readData = LPSPI_ReadData(base);
-                if (rxRemainingByteCount < bytesEachRead)
-                {
+                if (rxRemainingByteCount < bytesEachRead) {
                     bytesEachRead = rxRemainingByteCount;
                 }
 
@@ -752,22 +713,16 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
     /* After write all the data in TX FIFO , should write the TCR_CONTC to 0 to de-assert the PCS. Note that TCR
      * register also use the TX FIFO.
      */
-    while ((LPSPI_GetTxFifoCount(base) == fifoSize))
-    {
-    }
+    while ((LPSPI_GetTxFifoCount(base) == fifoSize)) {}
     base->TCR = (base->TCR & ~(LPSPI_TCR_CONTC_MASK));
 
     /*Read out the RX data in FIFO*/
-    if (rxData)
-    {
-        while (rxRemainingByteCount > 0)
-        {
-            while (LPSPI_GetRxFifoCount(base))
-            {
+    if (rxData) {
+        while (rxRemainingByteCount > 0) {
+            while (LPSPI_GetRxFifoCount(base)) {
                 readData = LPSPI_ReadData(base);
 
-                if (rxRemainingByteCount < bytesEachRead)
-                {
+                if (rxRemainingByteCount < bytesEachRead) {
                     bytesEachRead = rxRemainingByteCount;
                 }
 
@@ -778,12 +733,9 @@ status_t LPSPI_MasterTransferBlocking(LPSPI_Type *base, lpspi_transfer_t *transf
             }
         }
     }
-    else
-    {
+    else {
         /* If no RX buffer, then transfer is not complete until transfer complete flag sets */
-        while (!(LPSPI_GetStatusFlags(base) & kLPSPI_TransferCompleteFlag))
-        {
-        }
+        while (!(LPSPI_GetStatusFlags(base) & kLPSPI_TransferCompleteFlag)) {}
     }
 
     return kStatus_Success;
@@ -794,19 +746,17 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
     assert(handle);
     assert(transfer);
 
-    uint32_t bitsPerFrame = ((base->TCR & LPSPI_TCR_FRAMESZ_MASK) >> LPSPI_TCR_FRAMESZ_SHIFT) + 1;
+    uint32_t bitsPerFrame  = ((base->TCR & LPSPI_TCR_FRAMESZ_MASK) >> LPSPI_TCR_FRAMESZ_SHIFT) + 1;
     uint32_t bytesPerFrame = (bitsPerFrame + 7) / 8;
-    uint32_t temp = 0U;
-    uint8_t dummyData = g_lpspiDummyData[LPSPI_GetInstance(base)];
+    uint32_t temp          = 0U;
+    uint8_t dummyData      = g_lpspiDummyData[LPSPI_GetInstance(base)];
 
-    if (!LPSPI_CheckTransferArgument(transfer, bitsPerFrame, bytesPerFrame))
-    {
+    if (!LPSPI_CheckTransferArgument(transfer, bitsPerFrame, bytesPerFrame)) {
         return kStatus_InvalidArgument;
     }
 
     /* Check that we're not busy.*/
-    if (handle->state == kLPSPI_Busy)
-    {
+    if (handle->state == kLPSPI_Busy) {
         return kStatus_LPSPI_Busy;
     }
 
@@ -818,16 +768,16 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
 
     uint32_t whichPcs = (transfer->configFlags & LPSPI_MASTER_PCS_MASK) >> LPSPI_MASTER_PCS_SHIFT;
 
-    handle->txData = transfer->txData;
-    handle->rxData = transfer->rxData;
+    handle->txData               = transfer->txData;
+    handle->rxData               = transfer->rxData;
     handle->txRemainingByteCount = transfer->dataSize;
     handle->rxRemainingByteCount = transfer->dataSize;
-    handle->totalByteCount = transfer->dataSize;
+    handle->totalByteCount       = transfer->dataSize;
 
     handle->writeTcrInIsr = false;
 
     handle->writeRegRemainingTimes = (transfer->dataSize / bytesPerFrame) * ((bytesPerFrame + 3) / 4);
-    handle->readRegRemainingTimes = handle->writeRegRemainingTimes;
+    handle->readRegRemainingTimes  = handle->writeRegRemainingTimes;
 
     handle->txBuffIfNull =
         ((uint32_t)dummyData) | ((uint32_t)dummyData << 8) | ((uint32_t)dummyData << 16) | ((uint32_t)dummyData << 24);
@@ -836,17 +786,15 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
     handle->fifoSize = LPSPI_GetRxFifoSize(base);
 
     handle->isPcsContinuous = (bool)(transfer->configFlags & kLPSPI_MasterPcsContinuous);
-    handle->isByteSwap = (bool)(transfer->configFlags & kLPSPI_MasterByteSwap);
+    handle->isByteSwap      = (bool)(transfer->configFlags & kLPSPI_MasterByteSwap);
 
     /*Set the RX and TX watermarks to reduce the ISR times.*/
-    if (handle->fifoSize > 1)
-    {
-        txWatermark = 1;
+    if (handle->fifoSize > 1) {
+        txWatermark         = 1;
         handle->rxWatermark = handle->fifoSize - 2;
     }
-    else
-    {
-        txWatermark = 0;
+    else {
+        txWatermark         = 0;
         handle->rxWatermark = 0;
     }
 
@@ -858,15 +806,12 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
     /* Check if using 3-wire mode and the txData is NULL, set the output pin to tristated. */
     temp = base->CFGR1;
     temp &= LPSPI_CFGR1_PINCFG_MASK;
-    if ((temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdiInSdiOut)) || (temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdoInSdoOut)))
-    {
-        if (!handle->txData)
-        {
+    if ((temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdiInSdiOut)) || (temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdoInSdoOut))) {
+        if (!handle->txData) {
             base->CFGR1 |= LPSPI_CFGR1_OUTCFG_MASK;
         }
         /* The 3-wire mode can't send and receive data at the same time. */
-        if ((handle->txData) && (handle->rxData))
-        {
+        if ((handle->txData) && (handle->rxData)) {
             return kStatus_InvalidArgument;
         }
     }
@@ -880,9 +825,8 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
     /* If there is not rxData , can mask the receive data (receive data is not stored in receive FIFO).
      * For master transfer , we'd better not masked the transmit data in TCR since the transfer flow is hard to
      * controlled by software.*/
-    if (handle->rxData == NULL)
-    {
-        isRxMask = true;
+    if (handle->rxData == NULL) {
+        isRxMask                     = true;
         handle->rxRemainingByteCount = 0;
     }
 
@@ -892,15 +836,13 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
         LPSPI_TCR_PCS(whichPcs);
 
     /*Calculate the bytes for write/read the TX/RX register each time*/
-    if (bytesPerFrame <= 4)
-    {
+    if (bytesPerFrame <= 4) {
         handle->bytesEachWrite = bytesPerFrame;
-        handle->bytesEachRead = bytesPerFrame;
+        handle->bytesEachRead  = bytesPerFrame;
     }
-    else
-    {
+    else {
         handle->bytesEachWrite = 4;
-        handle->bytesEachRead = 4;
+        handle->bytesEachRead  = 4;
     }
 
     /* Enable the NVIC for LPSPI peripheral. Note that below code is useless if the LPSPI interrupt is in INTMUX ,
@@ -909,29 +851,24 @@ status_t LPSPI_MasterTransferNonBlocking(LPSPI_Type *base, lpspi_master_handle_t
     EnableIRQ(s_lpspiIRQ[LPSPI_GetInstance(base)]);
 
     /*TCR is also shared the FIFO , so wait for TCR written.*/
-    while (LPSPI_GetTxFifoCount(base) != 0)
-    {
-    }
+    while (LPSPI_GetTxFifoCount(base) != 0) {}
     /*Fill up the TX data in FIFO */
     LPSPI_MasterTransferFillUpTxFifo(base, handle);
 
     /* Since SPI is a synchronous interface, we only need to enable the RX interrupt if there is RX data.
      * The IRQ handler will get the status of RX and TX interrupt flags.
      */
-    if (handle->rxData)
-    {
+    if (handle->rxData) {
         /*Set rxWatermark to (readRegRemainingTimes-1) if readRegRemainingTimes less than rxWatermark. Otherwise there
          *is not RX interrupt for the last datas because the RX count is not greater than rxWatermark.
          */
-        if ((handle->readRegRemainingTimes) <= handle->rxWatermark)
-        {
+        if ((handle->readRegRemainingTimes) <= handle->rxWatermark) {
             base->FCR = (base->FCR & (~LPSPI_FCR_RXWATER_MASK)) | LPSPI_FCR_RXWATER(handle->readRegRemainingTimes - 1);
         }
 
         LPSPI_EnableInterrupts(base, kLPSPI_RxInterruptEnable);
     }
-    else
-    {
+    else {
         LPSPI_EnableInterrupts(base, kLPSPI_TxInterruptEnable);
     }
 
@@ -945,25 +882,21 @@ static void LPSPI_MasterTransferFillUpTxFifo(LPSPI_Type *base, lpspi_master_hand
     uint32_t wordToSend = 0;
 
     /* Make sure the difference in remaining TX and RX byte counts does not exceed FIFO depth
-    * and that the number of TX FIFO entries does not exceed the FIFO depth.
-    * But no need to make the protection if there is no rxData.
-    */
+     * and that the number of TX FIFO entries does not exceed the FIFO depth.
+     * But no need to make the protection if there is no rxData.
+     */
     while ((LPSPI_GetTxFifoCount(base) < (handle->fifoSize)) &&
            (((handle->readRegRemainingTimes - handle->writeRegRemainingTimes) < handle->fifoSize) ||
-            (handle->rxData == NULL)))
-    {
-        if (handle->txRemainingByteCount < handle->bytesEachWrite)
-        {
+            (handle->rxData == NULL))) {
+        if (handle->txRemainingByteCount < handle->bytesEachWrite) {
             handle->bytesEachWrite = handle->txRemainingByteCount;
         }
 
-        if (handle->txData)
-        {
+        if (handle->txData) {
             wordToSend = LPSPI_CombineWriteData(handle->txData, handle->bytesEachWrite, handle->isByteSwap);
             handle->txData += handle->bytesEachWrite;
         }
-        else
-        {
+        else {
             wordToSend = handle->txBuffIfNull;
         }
 
@@ -976,20 +909,16 @@ static void LPSPI_MasterTransferFillUpTxFifo(LPSPI_Type *base, lpspi_master_hand
         /*Decrease the remaining TX byte count.*/
         handle->txRemainingByteCount -= handle->bytesEachWrite;
 
-        if (handle->txRemainingByteCount == 0)
-        {
+        if (handle->txRemainingByteCount == 0) {
             /* If PCS is continuous, update TCR to de-assert PCS */
-            if (handle->isPcsContinuous)
-            {
+            if (handle->isPcsContinuous) {
                 /* Only write to the TCR if the FIFO has room */
-                if ((LPSPI_GetTxFifoCount(base) < (handle->fifoSize)))
-                {
-                    base->TCR = (base->TCR & ~(LPSPI_TCR_CONTC_MASK));
+                if ((LPSPI_GetTxFifoCount(base) < (handle->fifoSize))) {
+                    base->TCR             = (base->TCR & ~(LPSPI_TCR_CONTC_MASK));
                     handle->writeTcrInIsr = false;
                 }
                 /* Else, set a global flag to tell the ISR to do write to the TCR */
-                else
-                {
+                else {
                     handle->writeTcrInIsr = true;
                 }
             }
@@ -1007,8 +936,7 @@ static void LPSPI_MasterTransferComplete(LPSPI_Type *base, lpspi_master_handle_t
 
     handle->state = kLPSPI_Idle;
 
-    if (handle->callback)
-    {
+    if (handle->callback) {
         handle->callback(base, handle, kStatus_Success, handle->userData);
     }
 }
@@ -1017,26 +945,22 @@ status_t LPSPI_MasterTransferGetCount(LPSPI_Type *base, lpspi_master_handle_t *h
 {
     assert(handle);
 
-    if (!count)
-    {
+    if (!count) {
         return kStatus_InvalidArgument;
     }
 
     /* Catch when there is not an active transfer. */
-    if (handle->state != kLPSPI_Busy)
-    {
+    if (handle->state != kLPSPI_Busy) {
         *count = 0;
         return kStatus_NoTransferInProgress;
     }
 
     size_t remainingByte;
 
-    if (handle->rxData)
-    {
+    if (handle->rxData) {
         remainingByte = handle->rxRemainingByteCount;
     }
-    else
-    {
+    else {
         remainingByte = handle->txRemainingByteCount;
     }
 
@@ -1054,7 +978,7 @@ void LPSPI_MasterTransferAbort(LPSPI_Type *base, lpspi_master_handle_t *handle)
 
     LPSPI_Reset(base);
 
-    handle->state = kLPSPI_Idle;
+    handle->state                = kLPSPI_Idle;
     handle->txRemainingByteCount = 0;
     handle->rxRemainingByteCount = 0;
 }
@@ -1065,26 +989,22 @@ void LPSPI_MasterTransferHandleIRQ(LPSPI_Type *base, lpspi_master_handle_t *hand
 
     uint32_t readData;
 
-    if (handle->rxData != NULL)
-    {
-        if (handle->rxRemainingByteCount)
-        {
+    if (handle->rxData != NULL) {
+        if (handle->rxRemainingByteCount) {
             /* First, disable the interrupts to avoid potentially triggering another interrupt
-            * while reading out the RX FIFO as more data may be coming into the RX FIFO. We'll
-            * re-enable the interrupts based on the LPSPI state after reading out the FIFO.
-            */
+             * while reading out the RX FIFO as more data may be coming into the RX FIFO. We'll
+             * re-enable the interrupts based on the LPSPI state after reading out the FIFO.
+             */
             LPSPI_DisableInterrupts(base, kLPSPI_RxInterruptEnable);
 
-            while ((LPSPI_GetRxFifoCount(base)) && (handle->rxRemainingByteCount))
-            {
+            while ((LPSPI_GetRxFifoCount(base)) && (handle->rxRemainingByteCount)) {
                 /*Read out the data*/
                 readData = LPSPI_ReadData(base);
 
                 /*Decrease the read RX register times.*/
                 --handle->readRegRemainingTimes;
 
-                if (handle->rxRemainingByteCount < handle->bytesEachRead)
-                {
+                if (handle->rxRemainingByteCount < handle->bytesEachRead) {
                     handle->bytesEachRead = handle->rxRemainingByteCount;
                 }
 
@@ -1096,10 +1016,9 @@ void LPSPI_MasterTransferHandleIRQ(LPSPI_Type *base, lpspi_master_handle_t *hand
             }
 
             /* Re-enable the interrupts only if rxCount indicates there is more data to receive,
-            * else we may get a spurious interrupt.
-            * */
-            if (handle->rxRemainingByteCount)
-            {
+             * else we may get a spurious interrupt.
+             * */
+            if (handle->rxRemainingByteCount) {
                 /* Set the TDF and RDF interrupt enables simultaneously to avoid race conditions */
                 LPSPI_EnableInterrupts(base, kLPSPI_RxInterruptEnable);
             }
@@ -1108,48 +1027,38 @@ void LPSPI_MasterTransferHandleIRQ(LPSPI_Type *base, lpspi_master_handle_t *hand
         /*Set rxWatermark to (readRegRemainingTimes-1) if readRegRemainingTimes less than rxWatermark. Otherwise there
          *is not RX interrupt for the last datas because the RX count is not greater than rxWatermark.
          */
-        if ((handle->readRegRemainingTimes) <= (handle->rxWatermark))
-        {
+        if ((handle->readRegRemainingTimes) <= (handle->rxWatermark)) {
             base->FCR =
                 (base->FCR & (~LPSPI_FCR_RXWATER_MASK)) |
                 LPSPI_FCR_RXWATER((handle->readRegRemainingTimes > 1) ? (handle->readRegRemainingTimes - 1U) : (0U));
         }
     }
 
-    if (handle->txRemainingByteCount)
-    {
+    if (handle->txRemainingByteCount) {
         LPSPI_MasterTransferFillUpTxFifo(base, handle);
     }
-    else
-    {
-        if ((LPSPI_GetTxFifoCount(base) < (handle->fifoSize)))
-        {
-            if ((handle->isPcsContinuous) && (handle->writeTcrInIsr))
-            {
-                base->TCR = (base->TCR & ~(LPSPI_TCR_CONTC_MASK));
+    else {
+        if ((LPSPI_GetTxFifoCount(base) < (handle->fifoSize))) {
+            if ((handle->isPcsContinuous) && (handle->writeTcrInIsr)) {
+                base->TCR             = (base->TCR & ~(LPSPI_TCR_CONTC_MASK));
                 handle->writeTcrInIsr = false;
             }
         }
     }
 
-    if ((handle->txRemainingByteCount == 0) && (handle->rxRemainingByteCount == 0) && (!handle->writeTcrInIsr))
-    {
+    if ((handle->txRemainingByteCount == 0) && (handle->rxRemainingByteCount == 0) && (!handle->writeTcrInIsr)) {
         /* If no RX buffer, then transfer is not complete until transfer complete flag sets */
-        if (handle->rxData == NULL)
-        {
-            if (LPSPI_GetStatusFlags(base) & kLPSPI_TransferCompleteFlag)
-            {
+        if (handle->rxData == NULL) {
+            if (LPSPI_GetStatusFlags(base) & kLPSPI_TransferCompleteFlag) {
                 /* Complete the transfer and disable the interrupts */
                 LPSPI_MasterTransferComplete(base, handle);
             }
-            else
-            {
+            else {
                 LPSPI_EnableInterrupts(base, kLPSPI_TransferCompleteInterruptEnable);
                 LPSPI_DisableInterrupts(base, kLPSPI_TxInterruptEnable | kLPSPI_RxInterruptEnable);
             }
         }
-        else
-        {
+        else {
             /* Complete the transfer and disable the interrupts */
             LPSPI_MasterTransferComplete(base, handle);
         }
@@ -1181,18 +1090,16 @@ status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *
     assert(handle);
     assert(transfer);
 
-    uint32_t bitsPerFrame = ((base->TCR & LPSPI_TCR_FRAMESZ_MASK) >> LPSPI_TCR_FRAMESZ_SHIFT) + 1;
+    uint32_t bitsPerFrame  = ((base->TCR & LPSPI_TCR_FRAMESZ_MASK) >> LPSPI_TCR_FRAMESZ_SHIFT) + 1;
     uint32_t bytesPerFrame = (bitsPerFrame + 7) / 8;
-    uint32_t temp = 0U;
+    uint32_t temp          = 0U;
 
-    if (!LPSPI_CheckTransferArgument(transfer, bitsPerFrame, bytesPerFrame))
-    {
+    if (!LPSPI_CheckTransferArgument(transfer, bitsPerFrame, bytesPerFrame)) {
         return kStatus_InvalidArgument;
     }
 
     /* Check that we're not busy.*/
-    if (handle->state == kLPSPI_Busy)
-    {
+    if (handle->state == kLPSPI_Busy) {
         return kStatus_LPSPI_Busy;
     }
     handle->state = kLPSPI_Busy;
@@ -1202,14 +1109,14 @@ status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *
 
     uint32_t whichPcs = (transfer->configFlags & LPSPI_SLAVE_PCS_MASK) >> LPSPI_SLAVE_PCS_SHIFT;
 
-    handle->txData = transfer->txData;
-    handle->rxData = transfer->rxData;
+    handle->txData               = transfer->txData;
+    handle->rxData               = transfer->rxData;
     handle->txRemainingByteCount = transfer->dataSize;
     handle->rxRemainingByteCount = transfer->dataSize;
-    handle->totalByteCount = transfer->dataSize;
+    handle->totalByteCount       = transfer->dataSize;
 
     handle->writeRegRemainingTimes = (transfer->dataSize / bytesPerFrame) * ((bytesPerFrame + 3) / 4);
-    handle->readRegRemainingTimes = handle->writeRegRemainingTimes;
+    handle->readRegRemainingTimes  = handle->writeRegRemainingTimes;
 
     /*The TX and RX FIFO sizes are always the same*/
     handle->fifoSize = LPSPI_GetRxFifoSize(base);
@@ -1218,14 +1125,12 @@ status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *
 
     /*Set the RX and TX watermarks to reduce the ISR times.*/
     uint8_t txWatermark;
-    if (handle->fifoSize > 1)
-    {
-        txWatermark = 1;
+    if (handle->fifoSize > 1) {
+        txWatermark         = 1;
         handle->rxWatermark = handle->fifoSize - 2;
     }
-    else
-    {
-        txWatermark = 0;
+    else {
+        txWatermark         = 0;
         handle->rxWatermark = 0;
     }
     LPSPI_SetFifoWatermarks(base, txWatermark, handle->rxWatermark);
@@ -1233,17 +1138,14 @@ status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *
     /* Check if using 3-wire mode and the txData is NULL, set the output pin to tristated. */
     temp = base->CFGR1;
     temp &= LPSPI_CFGR1_PINCFG_MASK;
-    if ((temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdiInSdiOut)) || (temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdoInSdoOut)))
-    {
-        if (!handle->txData)
-        {
+    if ((temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdiInSdiOut)) || (temp == LPSPI_CFGR1_PINCFG(kLPSPI_SdoInSdoOut))) {
+        if (!handle->txData) {
             LPSPI_Enable(base, false);
             base->CFGR1 |= LPSPI_CFGR1_OUTCFG_MASK;
             LPSPI_Enable(base, true);
         }
         /* The 3-wire mode can't send and receive data at the same time. */
-        if ((handle->txData) && (handle->rxData))
-        {
+        if ((handle->txData) && (handle->rxData)) {
             return kStatus_InvalidArgument;
         }
     }
@@ -1254,37 +1156,32 @@ status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *
     LPSPI_DisableInterrupts(base, kLPSPI_AllInterruptEnable);
 
     /*If there is not rxData , can mask the receive data (receive data is not stored in receive FIFO).*/
-    if (handle->rxData == NULL)
-    {
-        isRxMask = true;
+    if (handle->rxData == NULL) {
+        isRxMask                     = true;
         handle->rxRemainingByteCount = 0;
     }
 
     /*If there is not txData , can mask the transmit data (no data is loaded from transmit FIFO and output pin
      * is tristated).
      */
-    if (handle->txData == NULL)
-    {
-        isTxMask = true;
+    if (handle->txData == NULL) {
+        isTxMask                     = true;
         handle->txRemainingByteCount = 0;
     }
 
-    base->TCR = (base->TCR &
-                 ~(LPSPI_TCR_CONT_MASK | LPSPI_TCR_CONTC_MASK | LPSPI_TCR_RXMSK_MASK | LPSPI_TCR_TXMSK_MASK |
-                   LPSPI_TCR_PCS_MASK)) |
+    base->TCR = (base->TCR & ~(LPSPI_TCR_CONT_MASK | LPSPI_TCR_CONTC_MASK | LPSPI_TCR_RXMSK_MASK |
+                               LPSPI_TCR_TXMSK_MASK | LPSPI_TCR_PCS_MASK)) |
                 LPSPI_TCR_CONT(0) | LPSPI_TCR_CONTC(0) | LPSPI_TCR_RXMSK(isRxMask) | LPSPI_TCR_TXMSK(isTxMask) |
                 LPSPI_TCR_PCS(whichPcs);
 
     /*Calculate the bytes for write/read the TX/RX register each time*/
-    if (bytesPerFrame <= 4)
-    {
+    if (bytesPerFrame <= 4) {
         handle->bytesEachWrite = bytesPerFrame;
-        handle->bytesEachRead = bytesPerFrame;
+        handle->bytesEachRead  = bytesPerFrame;
     }
-    else
-    {
+    else {
         handle->bytesEachWrite = 4;
-        handle->bytesEachRead = 4;
+        handle->bytesEachRead  = 4;
     }
 
     /* Enable the NVIC for LPSPI peripheral. Note that below code is useless if the LPSPI interrupt is in INTMUX ,
@@ -1293,43 +1190,35 @@ status_t LPSPI_SlaveTransferNonBlocking(LPSPI_Type *base, lpspi_slave_handle_t *
     EnableIRQ(s_lpspiIRQ[LPSPI_GetInstance(base)]);
 
     /*TCR is also shared the FIFO , so wait for TCR written.*/
-    while (LPSPI_GetTxFifoCount(base) != 0)
-    {
-    }
+    while (LPSPI_GetTxFifoCount(base) != 0) {}
 
     /*Fill up the TX data in FIFO */
-    if (handle->txData)
-    {
+    if (handle->txData) {
         LPSPI_SlaveTransferFillUpTxFifo(base, handle);
     }
 
     /* Since SPI is a synchronous interface, we only need to enable the RX interrupt if there is RX data.
      * The IRQ handler will get the status of RX and TX interrupt flags.
      */
-    if (handle->rxData)
-    {
+    if (handle->rxData) {
         /*Set rxWatermark to (readRegRemainingTimes-1) if readRegRemainingTimes less than rxWatermark. Otherwise there
          *is not RX interrupt for the last datas because the RX count is not greater than rxWatermark.
          */
-        if ((handle->readRegRemainingTimes) <= handle->rxWatermark)
-        {
+        if ((handle->readRegRemainingTimes) <= handle->rxWatermark) {
             base->FCR = (base->FCR & (~LPSPI_FCR_RXWATER_MASK)) | LPSPI_FCR_RXWATER(handle->readRegRemainingTimes - 1);
         }
 
         LPSPI_EnableInterrupts(base, kLPSPI_RxInterruptEnable);
     }
-    else
-    {
+    else {
         LPSPI_EnableInterrupts(base, kLPSPI_TxInterruptEnable);
     }
 
-    if (handle->rxData)
-    {
+    if (handle->rxData) {
         /* RX FIFO overflow request enable */
         LPSPI_EnableInterrupts(base, kLPSPI_ReceiveErrorInterruptEnable);
     }
-    if (handle->txData)
-    {
+    if (handle->txData) {
         /* TX FIFO underflow request enable */
         LPSPI_EnableInterrupts(base, kLPSPI_TransmitErrorInterruptEnable);
     }
@@ -1343,10 +1232,8 @@ static void LPSPI_SlaveTransferFillUpTxFifo(LPSPI_Type *base, lpspi_slave_handle
 
     uint32_t wordToSend = 0;
 
-    while (LPSPI_GetTxFifoCount(base) < (handle->fifoSize))
-    {
-        if (handle->txRemainingByteCount < handle->bytesEachWrite)
-        {
+    while (LPSPI_GetTxFifoCount(base) < (handle->fifoSize)) {
+        if (handle->txRemainingByteCount < handle->bytesEachWrite) {
             handle->bytesEachWrite = handle->txRemainingByteCount;
         }
 
@@ -1359,8 +1246,7 @@ static void LPSPI_SlaveTransferFillUpTxFifo(LPSPI_Type *base, lpspi_slave_handle
         /*Write the word to TX register*/
         LPSPI_WriteData(base, wordToSend);
 
-        if (handle->txRemainingByteCount == 0)
-        {
+        if (handle->txRemainingByteCount == 0) {
             break;
         }
     }
@@ -1375,19 +1261,16 @@ static void LPSPI_SlaveTransferComplete(LPSPI_Type *base, lpspi_slave_handle_t *
     /* Disable interrupt requests*/
     LPSPI_DisableInterrupts(base, kLPSPI_AllInterruptEnable);
 
-    if (handle->state == kLPSPI_Error)
-    {
+    if (handle->state == kLPSPI_Error) {
         status = kStatus_LPSPI_Error;
     }
-    else
-    {
+    else {
         status = kStatus_Success;
     }
 
     handle->state = kLPSPI_Idle;
 
-    if (handle->callback)
-    {
+    if (handle->callback) {
         handle->callback(base, handle, status, handle->userData);
     }
 }
@@ -1396,26 +1279,22 @@ status_t LPSPI_SlaveTransferGetCount(LPSPI_Type *base, lpspi_slave_handle_t *han
 {
     assert(handle);
 
-    if (!count)
-    {
+    if (!count) {
         return kStatus_InvalidArgument;
     }
 
     /* Catch when there is not an active transfer. */
-    if (handle->state != kLPSPI_Busy)
-    {
+    if (handle->state != kLPSPI_Busy) {
         *count = 0;
         return kStatus_NoTransferInProgress;
     }
 
     size_t remainingByte;
 
-    if (handle->rxData)
-    {
+    if (handle->rxData) {
         remainingByte = handle->rxRemainingByteCount;
     }
-    else
-    {
+    else {
         remainingByte = handle->txRemainingByteCount;
     }
 
@@ -1433,7 +1312,7 @@ void LPSPI_SlaveTransferAbort(LPSPI_Type *base, lpspi_slave_handle_t *handle)
 
     LPSPI_Reset(base);
 
-    handle->state = kLPSPI_Idle;
+    handle->state                = kLPSPI_Idle;
     handle->txRemainingByteCount = 0;
     handle->rxRemainingByteCount = 0;
 }
@@ -1445,20 +1324,16 @@ void LPSPI_SlaveTransferHandleIRQ(LPSPI_Type *base, lpspi_slave_handle_t *handle
     uint32_t readData;   /* variable to store word read from RX FIFO */
     uint32_t wordToSend; /* variable to store word to write to TX FIFO */
 
-    if (handle->rxData != NULL)
-    {
-        if (handle->rxRemainingByteCount > 0)
-        {
-            while (LPSPI_GetRxFifoCount(base))
-            {
+    if (handle->rxData != NULL) {
+        if (handle->rxRemainingByteCount > 0) {
+            while (LPSPI_GetRxFifoCount(base)) {
                 /*Read out the data*/
                 readData = LPSPI_ReadData(base);
 
                 /*Decrease the read RX register times.*/
                 --handle->readRegRemainingTimes;
 
-                if (handle->rxRemainingByteCount < handle->bytesEachRead)
-                {
+                if (handle->rxRemainingByteCount < handle->bytesEachRead) {
                     handle->bytesEachRead = handle->rxRemainingByteCount;
                 }
 
@@ -1468,10 +1343,8 @@ void LPSPI_SlaveTransferHandleIRQ(LPSPI_Type *base, lpspi_slave_handle_t *handle
                 /*Decrease the remaining RX byte count.*/
                 handle->rxRemainingByteCount -= handle->bytesEachRead;
 
-                if ((handle->txRemainingByteCount > 0) && (handle->txData != NULL))
-                {
-                    if (handle->txRemainingByteCount < handle->bytesEachWrite)
-                    {
+                if ((handle->txRemainingByteCount > 0) && (handle->txData != NULL)) {
+                    if (handle->txRemainingByteCount < handle->bytesEachWrite) {
                         handle->bytesEachWrite = handle->txRemainingByteCount;
                     }
 
@@ -1485,8 +1358,7 @@ void LPSPI_SlaveTransferHandleIRQ(LPSPI_Type *base, lpspi_slave_handle_t *handle
                     LPSPI_WriteData(base, wordToSend);
                 }
 
-                if (handle->rxRemainingByteCount == 0)
-                {
+                if (handle->rxRemainingByteCount == 0) {
                     break;
                 }
             }
@@ -1495,64 +1367,52 @@ void LPSPI_SlaveTransferHandleIRQ(LPSPI_Type *base, lpspi_slave_handle_t *handle
         /*Set rxWatermark to (readRegRemainingTimes-1) if readRegRemainingTimes less than rxWatermark. Otherwise there
          *is not RX interrupt for the last datas because the RX count is not greater than rxWatermark.
          */
-        if ((handle->readRegRemainingTimes) <= (handle->rxWatermark))
-        {
+        if ((handle->readRegRemainingTimes) <= (handle->rxWatermark)) {
             base->FCR =
                 (base->FCR & (~LPSPI_FCR_RXWATER_MASK)) |
                 LPSPI_FCR_RXWATER((handle->readRegRemainingTimes > 1) ? (handle->readRegRemainingTimes - 1U) : (0U));
         }
     }
-    else if ((handle->txRemainingByteCount) && (handle->txData != NULL))
-    {
+    else if ((handle->txRemainingByteCount) && (handle->txData != NULL)) {
         LPSPI_SlaveTransferFillUpTxFifo(base, handle);
     }
-    else
-    {
+    else {
         __NOP();
     }
 
-    if ((handle->txRemainingByteCount == 0) && (handle->rxRemainingByteCount == 0))
-    {
+    if ((handle->txRemainingByteCount == 0) && (handle->rxRemainingByteCount == 0)) {
         /* If no RX buffer, then transfer is not complete until transfer complete flag sets and the TX FIFO empty*/
-        if (handle->rxData == NULL)
-        {
-            if ((LPSPI_GetStatusFlags(base) & kLPSPI_FrameCompleteFlag) && (LPSPI_GetTxFifoCount(base) == 0))
-            {
+        if (handle->rxData == NULL) {
+            if ((LPSPI_GetStatusFlags(base) & kLPSPI_FrameCompleteFlag) && (LPSPI_GetTxFifoCount(base) == 0)) {
                 /* Complete the transfer and disable the interrupts */
                 LPSPI_SlaveTransferComplete(base, handle);
             }
-            else
-            {
+            else {
                 LPSPI_ClearStatusFlags(base, kLPSPI_FrameCompleteFlag);
                 LPSPI_EnableInterrupts(base, kLPSPI_FrameCompleteInterruptEnable);
                 LPSPI_DisableInterrupts(base, kLPSPI_TxInterruptEnable | kLPSPI_RxInterruptEnable);
             }
         }
-        else
-        {
+        else {
             /* Complete the transfer and disable the interrupts */
             LPSPI_SlaveTransferComplete(base, handle);
         }
     }
 
     /* Catch tx fifo underflow conditions, service only if tx under flow interrupt enabled */
-    if ((LPSPI_GetStatusFlags(base) & kLPSPI_TransmitErrorFlag) && (base->IER & LPSPI_IER_TEIE_MASK))
-    {
+    if ((LPSPI_GetStatusFlags(base) & kLPSPI_TransmitErrorFlag) && (base->IER & LPSPI_IER_TEIE_MASK)) {
         LPSPI_ClearStatusFlags(base, kLPSPI_TransmitErrorFlag);
         /* Change state to error and clear flag */
-        if (handle->txData)
-        {
+        if (handle->txData) {
             handle->state = kLPSPI_Error;
         }
         handle->errorCount++;
     }
     /* Catch rx fifo overflow conditions, service only if rx over flow interrupt enabled */
-    if ((LPSPI_GetStatusFlags(base) & kLPSPI_ReceiveErrorFlag) && (base->IER & LPSPI_IER_REIE_MASK))
-    {
+    if ((LPSPI_GetStatusFlags(base) & kLPSPI_ReceiveErrorFlag) && (base->IER & LPSPI_IER_REIE_MASK)) {
         LPSPI_ClearStatusFlags(base, kLPSPI_ReceiveErrorFlag);
         /* Change state to error and clear flag */
-        if (handle->txData)
-        {
+        if (handle->txData) {
             handle->state = kLPSPI_Error;
         }
         handle->errorCount++;
@@ -1565,80 +1425,73 @@ static uint32_t LPSPI_CombineWriteData(uint8_t *txData, uint32_t bytesEachWrite,
 
     uint32_t wordToSend = 0;
 
-    switch (bytesEachWrite)
-    {
-        case 1:
+    switch (bytesEachWrite) {
+    case 1:
+        wordToSend = *txData;
+        ++txData;
+        break;
+
+    case 2:
+        if (!isByteSwap) {
             wordToSend = *txData;
             ++txData;
-            break;
+            wordToSend |= (unsigned)(*txData) << 8U;
+            ++txData;
+        }
+        else {
+            wordToSend = (unsigned)(*txData) << 8U;
+            ++txData;
+            wordToSend |= *txData;
+            ++txData;
+        }
 
-        case 2:
-            if (!isByteSwap)
-            {
-                wordToSend = *txData;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 8U;
-                ++txData;
-            }
-            else
-            {
-                wordToSend = (unsigned)(*txData) << 8U;
-                ++txData;
-                wordToSend |= *txData;
-                ++txData;
-            }
+        break;
 
-            break;
+    case 3:
+        if (!isByteSwap) {
+            wordToSend = *txData;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 8U;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 16U;
+            ++txData;
+        }
+        else {
+            wordToSend = (unsigned)(*txData) << 16U;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 8U;
+            ++txData;
+            wordToSend |= *txData;
+            ++txData;
+        }
+        break;
 
-        case 3:
-            if (!isByteSwap)
-            {
-                wordToSend = *txData;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 8U;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 16U;
-                ++txData;
-            }
-            else
-            {
-                wordToSend = (unsigned)(*txData) << 16U;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 8U;
-                ++txData;
-                wordToSend |= *txData;
-                ++txData;
-            }
-            break;
+    case 4:
+        if (!isByteSwap) {
+            wordToSend = *txData;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 8U;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 16U;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 24U;
+            ++txData;
+        }
+        else {
+            wordToSend = (unsigned)(*txData) << 24U;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 16U;
+            ++txData;
+            wordToSend |= (unsigned)(*txData) << 8U;
+            ++txData;
+            wordToSend |= *txData;
+            ++txData;
+        }
+        break;
 
-        case 4:
-            if (!isByteSwap)
-            {
-                wordToSend = *txData;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 8U;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 16U;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 24U;
-                ++txData;
-            }
-            else
-            {
-                wordToSend = (unsigned)(*txData) << 24U;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 16U;
-                ++txData;
-                wordToSend |= (unsigned)(*txData) << 8U;
-                ++txData;
-                wordToSend |= *txData;
-                ++txData;
-            }
-            break;
-
-        default:
-            assert(false);
-            break;
+    default:
+        assert(false);
+        break;
     }
     return wordToSend;
 }
@@ -1647,90 +1500,81 @@ static void LPSPI_SeparateReadData(uint8_t *rxData, uint32_t readData, uint32_t 
 {
     assert(rxData);
 
-    switch (bytesEachRead)
-    {
-        case 1:
+    switch (bytesEachRead) {
+    case 1:
+        *rxData = readData;
+        ++rxData;
+        break;
+
+    case 2:
+        if (!isByteSwap) {
             *rxData = readData;
             ++rxData;
-            break;
+            *rxData = readData >> 8;
+            ++rxData;
+        }
+        else {
+            *rxData = readData >> 8;
+            ++rxData;
+            *rxData = readData;
+            ++rxData;
+        }
+        break;
 
-        case 2:
-            if (!isByteSwap)
-            {
-                *rxData = readData;
-                ++rxData;
-                *rxData = readData >> 8;
-                ++rxData;
-            }
-            else
-            {
-                *rxData = readData >> 8;
-                ++rxData;
-                *rxData = readData;
-                ++rxData;
-            }
-            break;
+    case 3:
+        if (!isByteSwap) {
+            *rxData = readData;
+            ++rxData;
+            *rxData = readData >> 8;
+            ++rxData;
+            *rxData = readData >> 16;
+            ++rxData;
+        }
+        else {
+            *rxData = readData >> 16;
+            ++rxData;
+            *rxData = readData >> 8;
+            ++rxData;
+            *rxData = readData;
+            ++rxData;
+        }
+        break;
 
-        case 3:
-            if (!isByteSwap)
-            {
-                *rxData = readData;
-                ++rxData;
-                *rxData = readData >> 8;
-                ++rxData;
-                *rxData = readData >> 16;
-                ++rxData;
-            }
-            else
-            {
-                *rxData = readData >> 16;
-                ++rxData;
-                *rxData = readData >> 8;
-                ++rxData;
-                *rxData = readData;
-                ++rxData;
-            }
-            break;
+    case 4:
+        if (!isByteSwap) {
+            *rxData = readData;
+            ++rxData;
+            *rxData = readData >> 8;
+            ++rxData;
+            *rxData = readData >> 16;
+            ++rxData;
+            *rxData = readData >> 24;
+            ++rxData;
+        }
+        else {
+            *rxData = readData >> 24;
+            ++rxData;
+            *rxData = readData >> 16;
+            ++rxData;
+            *rxData = readData >> 8;
+            ++rxData;
+            *rxData = readData;
+            ++rxData;
+        }
+        break;
 
-        case 4:
-            if (!isByteSwap)
-            {
-                *rxData = readData;
-                ++rxData;
-                *rxData = readData >> 8;
-                ++rxData;
-                *rxData = readData >> 16;
-                ++rxData;
-                *rxData = readData >> 24;
-                ++rxData;
-            }
-            else
-            {
-                *rxData = readData >> 24;
-                ++rxData;
-                *rxData = readData >> 16;
-                ++rxData;
-                *rxData = readData >> 8;
-                ++rxData;
-                *rxData = readData;
-                ++rxData;
-            }
-            break;
-
-        default:
-            assert(false);
-            break;
+    default:
+        assert(false);
+        break;
     }
 }
 
 static void LPSPI_CommonIRQHandler(LPSPI_Type *base, void *param)
 {
-    if (LPSPI_IsMaster(base))
-    {
+    if (LPSPI_IsMaster(base)) {
         s_lpspiMasterIsr(base, (lpspi_master_handle_t *)param);
     }
-    else
-    {
+    else {
         s_lpspiSlaveIsr(base, (lpspi_slave_handle_t *)param);
     }
 /* Add for ARM errata 838869, affects Cortex-M4, Cortex-M4F Store immediate overlapping

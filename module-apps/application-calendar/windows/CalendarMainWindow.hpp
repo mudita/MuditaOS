@@ -12,22 +12,24 @@
 #include "windows/AppWindow.hpp"
 #include "Application.hpp"
 
-namespace app {
+namespace app
+{
 
-/*
- *
- */
-class CalendarMainWindow: public gui::AppWindow {
-protected:
-	//labels with names of the days
-//	gui::Label days;
-public:
-	CalendarMainWindow( Application* app, std::string name );
-	virtual ~CalendarMainWindow();
-	void rebuild() override;
-	void buildInterface() override;
-	void destroyInterface() override;
-};
+    /*
+     *
+     */
+    class CalendarMainWindow : public gui::AppWindow
+    {
+      protected:
+        // labels with names of the days
+        //	gui::Label days;
+      public:
+        CalendarMainWindow(Application *app, std::string name);
+        virtual ~CalendarMainWindow();
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+    };
 
 } /* namespace app */
 

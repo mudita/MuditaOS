@@ -15,7 +15,7 @@ namespace Store
         {
             Discharging,
             Charging,
-        } state = State::Discharging;
+        } state            = State::Discharging;
         unsigned int level = 0;
 
         static const Battery &get();
@@ -24,19 +24,19 @@ namespace Store
 
     enum class RssiBar : size_t
     {
-        zero = 0,
-        one = 1,
-        two = 2,
+        zero  = 0,
+        one   = 1,
+        two   = 2,
         three = 3,
-        four = 4,
-        five = 5,
+        four  = 4,
+        five  = 5,
         noOfSupprtedBars
     };
 
     struct SignalStrength
     {
-        int rssi = 0;
-        int rssidBm = 0;
+        int rssi        = 0;
+        int rssidBm     = 0;
         RssiBar rssiBar = RssiBar::zero;
     };
 
@@ -61,7 +61,7 @@ namespace Store
             SIM_FAIL,
             SIM_UNKNOWN,
             NONE,
-        } sim = SIM::SIM_UNKNOWN,
+        } sim      = SIM::SIM_UNKNOWN,
           selected = SIM::SIM1;
 
         /// state of modem

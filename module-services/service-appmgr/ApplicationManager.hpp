@@ -19,26 +19,24 @@
 #include "messages/APMMessage.hpp"
 #include "i18/i18.hpp"
 
-inline uint32_t default_application_locktime=30000;
+inline uint32_t default_application_locktime = 30000;
 
-namespace sapm {
+namespace sapm
+{
 
     class ApplicationDescription
     {
       public:
         ApplicationDescription(std::unique_ptr<app::ApplicationLauncher> launcher);
         virtual ~ApplicationDescription()
-        {
-        }
+        {}
         // name of the application. It's used to find proper application during switching
         std::string name()
         {
-            if (launcher)
-            {
+            if (launcher) {
                 return launcher->getName();
             }
-            else
-            {
+            else {
                 return "NONE";
             }
         }
@@ -46,21 +44,20 @@ namespace sapm {
         std::unique_ptr<app::ApplicationLauncher> launcher = nullptr;
         // informs application manager that this application temporary musn't be closed.
         // This flag is used to prevent application closing when application is closeable and there is incoming call.
-        // This flag is also used when closeable application is on front and there is a timeout to block the applicatioin.
+        // This flag is also used when closeable application is on front and there is a timeout to block the
+        // applicatioin.
         bool blockClosing = false;
         // switching data stored when application manager had to run init function
         std::unique_ptr<gui::SwitchData> switchData = nullptr;
-        std::string switchWindow = "";
+        std::string switchWindow                    = "";
 
         // prevents from blocking the system
         bool preventsLocking()
         {
-            if (launcher != nullptr)
-            {
+            if (launcher != nullptr) {
                 return launcher->isBlocking();
             }
-            else
-            {
+            else {
                 return false;
             }
         }
@@ -68,8 +65,7 @@ namespace sapm {
         // informs if it is possible to close application when it looses focus.
         bool closeable()
         {
-            if (launcher != nullptr)
-            {
+            if (launcher != nullptr) {
                 return launcher->isCloseable();
             }
             return false;
@@ -77,30 +73,26 @@ namespace sapm {
 
         app::Application::State getState()
         {
-            if ((launcher == nullptr) || (launcher->handle == nullptr))
-            {
+            if ((launcher == nullptr) || (launcher->handle == nullptr)) {
                 return app::Application::State::NONE;
             }
-            else
-            {
+            else {
                 return launcher->handle->getState();
             }
         }
 
         void setState(app::Application::State st)
         {
-            if ((launcher == nullptr) || (launcher->handle == nullptr))
-            {
+            if ((launcher == nullptr) || (launcher->handle == nullptr)) {
                 LOG_ERROR("No %s", launcher == nullptr ? "launcher" : "handle");
             }
-            else
-            {
+            else {
                 launcher->handle->setState(st);
             }
         }
     };
 
-/// this is only to force usage of get/set methods in ApplicatioManager
+    /// this is only to force usage of get/set methods in ApplicatioManager
     class VirtualAppManager
     {
       public:
@@ -140,104 +132,117 @@ namespace sapm {
         void debug_log_app_list();
     };
 
-class ApplicationManager: public sys::Service, public VirtualAppManager {
+    class ApplicationManager : public sys::Service, public VirtualAppManager
+    {
 
-	SettingsRecord settings;
+        SettingsRecord settings;
 
-    sys::SystemManager* systemManager;
+        sys::SystemManager *systemManager;
 
-	//
-	std::unique_ptr<utils::i18> i18;
+        //
+        std::unique_ptr<utils::i18> i18;
 
-	//application that currently has focus. This means that is has rights to display screens and receive keyboard events.
-	std::string focusApplicationName = "";
-	//after loosing focus application becomes previous application and this is its name
-	std::string previousApplicationName = "";
-	//name of the application scheduled for launching
-	std::string launchApplicationName = "";
-	//timer to count time from last user's activity. If it reaches time defined in settings database application manager is sending signal
-	//to power manager and changing window to the desktop window in the blocked state.
-	uint32_t blockingTimerID = 0;
+        // application that currently has focus. This means that is has rights to display screens and receive keyboard
+        // events.
+        std::string focusApplicationName = "";
+        // after loosing focus application becomes previous application and this is its name
+        std::string previousApplicationName = "";
+        // name of the application scheduled for launching
+        std::string launchApplicationName = "";
+        // timer to count time from last user's activity. If it reaches time defined in settings database application
+        // manager is sending signal to power manager and changing window to the desktop window in the blocked state.
+        uint32_t blockingTimerID = 0;
 
-	//tries to switch the application
-	bool handleSwitchApplication( APMSwitch* msg);
-//	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
-	bool handleCloseConfirmation( APMConfirmClose* msg );
-	bool handleSwitchConfirmation( APMConfirmSwitch* msg );
-	bool handleSwitchPrevApplication( APMSwitchPrevApp* msg );
-	bool handleRegisterApplication( APMRegister* msg );
-	bool handleLanguageChange( sapm::APMChangeLanguage* msg );
-	bool handlePowerSavingModeInit();
-	/**
-	 * @brief Closes all running applications.
-	 */
-	bool startApplication( const std::string& appName );
-	/**
-	 * @brief Closes eink and gui services.
-	 */
-	bool closeApplications();
-	bool closeServices();
-public:
-    ApplicationManager( const std::string& name, sys::SystemManager* sysmgr, std::vector< std::unique_ptr<app::ApplicationLauncher> >& launchers );
-    virtual ~ApplicationManager();
+        // tries to switch the application
+        bool handleSwitchApplication(APMSwitch *msg);
+        //	bool handleSwitchApplicationWithData( APMSwitchWithData* msg);
+        bool handleCloseConfirmation(APMConfirmClose *msg);
+        bool handleSwitchConfirmation(APMConfirmSwitch *msg);
+        bool handleSwitchPrevApplication(APMSwitchPrevApp *msg);
+        bool handleRegisterApplication(APMRegister *msg);
+        bool handleLanguageChange(sapm::APMChangeLanguage *msg);
+        bool handlePowerSavingModeInit();
+        /**
+         * @brief Closes all running applications.
+         */
+        bool startApplication(const std::string &appName);
+        /**
+         * @brief Closes eink and gui services.
+         */
+        bool closeApplications();
+        bool closeServices();
 
-    sys::Message_t DataReceivedHandler(sys::DataMessage* msgl,sys::ResponseMessage* resp) override;
-    // Invoked when timer ticked
-    void TickHandler(uint32_t id) override;
+      public:
+        ApplicationManager(const std::string &name,
+                           sys::SystemManager *sysmgr,
+                           std::vector<std::unique_ptr<app::ApplicationLauncher>> &launchers);
+        virtual ~ApplicationManager();
 
-    // Invoked during initialization
-    sys::ReturnCodes InitHandler() override;
+        sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
+        // Invoked when timer ticked
+        void TickHandler(uint32_t id) override;
 
-    sys::ReturnCodes DeinitHandler() override;
+        // Invoked during initialization
+        sys::ReturnCodes InitHandler() override;
 
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+        sys::ReturnCodes DeinitHandler() override;
 
-    /**
-     * @brief Sends request to application manager to switch from current application to specific window in application with specified name .
-     */
-    static bool messageSwitchApplication(sys::Service *sender, const std::string &applicationName, const std::string &windowName,
-                                         std::unique_ptr<gui::SwitchData> data);
+        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
 
-    static bool messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data);
-    /**
-	 * @brief Sends request to application manager to switch from current application to specific window in application with specified name.
-	 * Allows sending data to destination application.
-	 */
-//    static bool messageSwitchApplicationWithData( sys::Service* sender, const std::string& applicationName, const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
-    /**
-     * @Brief Function allows sending confirmation to the switch request. This is sent both by application that gains and looses focus.
-     */
-	static bool messageConfirmSwitch( sys::Service* sender);
-	/**
-	 * @brief Function allows application to confirm close request.
-	 */
-    static bool messageConfirmClose( sys::Service* sender);
-    /**
-     * @brief Allows requesting Application Manager to run previous application.
-     */
-    static bool messageSwitchPreviousApplication(sys::Service *sender, std::unique_ptr<APMSwitchPrevApp> msg = nullptr);
-    /**
-	* @brief Sends information from application to manager about result of application's init function.
-	* If successful message will contain name and true value, otherwise false value will be transmitted.
-	*/
-   static bool messageRegisterApplication( sys::Service* sender, const bool& status,const bool& startBackground );
-   /**
-    * @brief Sends message to application manager to inform it about change of the phone's language performed by the user.
-    */
-   static bool messageChangeLanguage( sys::Service* sender, utils::Lang language );
-   /**
-    * @brief Sends message to application manager that it should close itself and as a result.
-    */
-   static bool messageCloseApplicationManager( sys::Service* sender );
-   /**
-    * @brief Sends message to inform Application Manager to reset timer responsible for blocking phone
-    */
-   static bool messagePreventBlocking( sys::Service* sender );
-   /**
-    * @brief Sends message to Application Manager. This will initialize procedure of switching to power saving mode.
-    */
-   static bool messageInitPowerSaveMode( sys::Service* sender );
-};
+        /**
+         * @brief Sends request to application manager to switch from current application to specific window in
+         * application with specified name .
+         */
+        static bool messageSwitchApplication(sys::Service *sender,
+                                             const std::string &applicationName,
+                                             const std::string &windowName,
+                                             std::unique_ptr<gui::SwitchData> data);
+
+        static bool messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data);
+        /**
+         * @brief Sends request to application manager to switch from current application to specific window in
+         * application with specified name. Allows sending data to destination application.
+         */
+        //    static bool messageSwitchApplicationWithData( sys::Service* sender, const std::string& applicationName,
+        //    const std::string& windowName, std::unique_ptr<app::SwitchData>& switchData );
+        /**
+         * @Brief Function allows sending confirmation to the switch request. This is sent both by application that
+         * gains and looses focus.
+         */
+        static bool messageConfirmSwitch(sys::Service *sender);
+        /**
+         * @brief Function allows application to confirm close request.
+         */
+        static bool messageConfirmClose(sys::Service *sender);
+        /**
+         * @brief Allows requesting Application Manager to run previous application.
+         */
+        static bool messageSwitchPreviousApplication(sys::Service *sender,
+                                                     std::unique_ptr<APMSwitchPrevApp> msg = nullptr);
+        /**
+         * @brief Sends information from application to manager about result of application's init function.
+         * If successful message will contain name and true value, otherwise false value will be transmitted.
+         */
+        static bool messageRegisterApplication(sys::Service *sender, const bool &status, const bool &startBackground);
+        /**
+         * @brief Sends message to application manager to inform it about change of the phone's language performed by
+         * the user.
+         */
+        static bool messageChangeLanguage(sys::Service *sender, utils::Lang language);
+        /**
+         * @brief Sends message to application manager that it should close itself and as a result.
+         */
+        static bool messageCloseApplicationManager(sys::Service *sender);
+        /**
+         * @brief Sends message to inform Application Manager to reset timer responsible for blocking phone
+         */
+        static bool messagePreventBlocking(sys::Service *sender);
+        /**
+         * @brief Sends message to Application Manager. This will initialize procedure of switching to power saving
+         * mode.
+         */
+        static bool messageInitPowerSaveMode(sys::Service *sender);
+    };
 
 } /* namespace sapm */
 

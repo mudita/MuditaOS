@@ -34,6 +34,12 @@ class ServiceDesktop : public sys::Service
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
 
-    void updateOs(bool update = false) { isOsUpdating = update; }
-    bool isUpdating() { return (isOsUpdating); }
+    void updateOs(bool update = false)
+    {
+        isOsUpdating = update;
+    }
+    bool isUpdating()
+    {
+        return (isOsUpdating);
+    }
 };

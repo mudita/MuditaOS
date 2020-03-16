@@ -11,12 +11,10 @@ namespace gui
 
     void SIM::show(Store::GSM::SIM state)
     {
-        if (state == current)
-        {
+        if (state == current) {
             return;
         }
-        switch (state)
-        {
+        switch (state) {
         case GSM::SIM::SIM1:
             set(sim1);
             break;

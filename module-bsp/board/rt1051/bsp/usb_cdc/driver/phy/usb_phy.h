@@ -57,7 +57,8 @@ extern "C"
      *
      * @param[in] controllerId   ehci controller id, please reference to #usb_controller_index_t.
      * @param[in] freq            the external input clock.
-     *                            for example: if the external input clock is 16M, the parameter freq should be 16000000.
+     *                            for example: if the external input clock is 16M, the parameter freq should be
+     * 16000000.
      *
      * @retval kStatus_USB_Success      cancel successfully.
      * @retval kStatus_USB_Error        the freq value is incorrect.

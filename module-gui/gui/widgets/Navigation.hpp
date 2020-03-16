@@ -11,8 +11,8 @@
 #include "../Common.hpp"
 #include "Item.hpp"
 
-
-namespace gui {
+namespace gui
+{
 
     class Item;
     /**

@@ -47,7 +47,10 @@ class CountryCodesTable : public Table<CodesTableRow, CodesTableFields>
     {
         return std::vector<CodesTableRow>();
     }
-    std::vector<CodesTableRow> GetLimitOffsetByField(uint32_t offset, uint32_t limit, CodesTableFields field, const char *str) override final
+    std::vector<CodesTableRow> GetLimitOffsetByField(uint32_t offset,
+                                                     uint32_t limit,
+                                                     CodesTableFields field,
+                                                     const char *str) override final
     {
         return std::vector<CodesTableRow>();
     }

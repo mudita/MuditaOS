@@ -4,7 +4,8 @@
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 
-extern "C" {
+extern "C"
+{
 #include "dhcp-server/dhserver.h"
 #include "lwip/apps/httpd.h"
 #include "lwip/init.h"
@@ -12,26 +13,24 @@ extern "C" {
 #include "lwip/tcpip.h"
 };
 
-
 #define NUM_DHCP_ENTRY 3
 
-extern "C" {
-static dhcp_entry_t entries[NUM_DHCP_ENTRY] =
+extern "C"
 {
-    /* mac    ip address        subnet mask        lease time */
-    { {0}, {192, 168, 7, 2}, {255, 255, 255, 0}, 24 * 60 * 60 },
-    { {0}, {192, 168, 7, 3}, {255, 255, 255, 0}, 24 * 60 * 60 },
-    { {0}, {192, 168, 7, 4}, {255, 255, 255, 0}, 24 * 60 * 60 }
-};
+    static dhcp_entry_t entries[NUM_DHCP_ENTRY] = {
+        /* mac    ip address        subnet mask        lease time */
+        {{0}, {192, 168, 7, 2}, {255, 255, 255, 0}, 24 * 60 * 60},
+        {{0}, {192, 168, 7, 3}, {255, 255, 255, 0}, 24 * 60 * 60},
+        {{0}, {192, 168, 7, 4}, {255, 255, 255, 0}, 24 * 60 * 60}};
 
-static dhcp_config_t dhcp_config =
-{
-    {192, 168, 7, 1}, 67, /* server address, port */
-    {0, 0, 0, 0},         /* dns server */
-    NULL,                /* dns suffix */
-    NUM_DHCP_ENTRY,       /* num entry */
-    entries               /* entries */
-};
+    static dhcp_config_t dhcp_config = {
+        {192, 168, 7, 1},
+        67,             /* server address, port */
+        {0, 0, 0, 0},   /* dns server */
+        NULL,           /* dns suffix */
+        NUM_DHCP_ENTRY, /* num entry */
+        entries         /* entries */
+    };
 };
 
 sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req)
@@ -53,14 +52,14 @@ ServiceLwIP::ServiceLwIP() : sys::Service(serviceName)
     ReloadTimer(testTimerID);
 
     LOG_INFO("Start lwip!");
-                tcpip_init(nullptr,nullptr);
-                // lwip_init();
-                dhserv_init(&dhcp_config);
-                httpd_init();
-
+    tcpip_init(nullptr, nullptr);
+    // lwip_init();
+    dhserv_init(&dhcp_config);
+    httpd_init();
 }
 
-void ServiceLwIP::TickHandler(uint32_t id) {}
+void ServiceLwIP::TickHandler(uint32_t id)
+{}
 
 sys::ReturnCodes ServiceLwIP::InitHandler()
 {
@@ -74,7 +73,6 @@ sys::ReturnCodes ServiceLwIP::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-
 sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp)
 {
     LOG_ERROR("TRY START LWIP");
@@ -85,7 +83,7 @@ sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::Resp
             switch (lmsg->req) {
             case LwIP_message::Request::Start:
                 LOG_ERROR("START LWIP");
-                tcpip_init(nullptr,nullptr);
+                tcpip_init(nullptr, nullptr);
                 // lwip_init();
                 dhserv_init(&dhcp_config);
                 httpd_init();

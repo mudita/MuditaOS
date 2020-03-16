@@ -23,7 +23,7 @@ namespace gui
 
         uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
         uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
-        auto body = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
+        auto body  = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
         auto label = new Label(body, 0, 0, body->getWidth(), 40);
         label->setText(utils::localize.get("sms_add_rec_num"));
@@ -38,10 +38,11 @@ namespace gui
             std::shared_ptr<std::vector<ContactRecord>> searchResults =
                 DBServiceAPI::ContactSearch(application, text->getText(), text->getText(), text->getText());
             LOG_INFO("Get contact from another app, contacts matching num: %d", searchResults.get()->size());
-            if (searchResults.get()->size() > 0)
-            {
-                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>(text->getText(), searchResults);
-                return sapm::ApplicationManager::messageSwitchApplication(application, app::name_phonebook, name::window::search_results, std::move(data));
+            if (searchResults.get()->size() > 0) {
+                std::unique_ptr<PhonebookSearchReuqest> data =
+                    std::make_unique<PhonebookSearchReuqest>(text->getText(), searchResults);
+                return sapm::ApplicationManager::messageSwitchApplication(
+                    application, app::name_phonebook, name::window::search_results, std::move(data));
             }
             return true;
         };
@@ -60,22 +61,18 @@ namespace gui
 
     void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (dynamic_cast<PhonebookSearchReuqest *>(data))
-        {
+        if (dynamic_cast<PhonebookSearchReuqest *>(data)) {
             LOG_INFO("SUCCESS!");
             application->switchWindow(gui::name::window::thread_view, std::make_unique<SwitchData>(*data));
         }
     }
 
     void NewSMS_Window::rebuild()
-    {
-    }
+    {}
 
     void NewSMS_Window::buildInterface()
-    {
-    }
+    {}
 
     void NewSMS_Window::destroyInterface()
-    {
-    }
+    {}
 }; // namespace gui

@@ -31,15 +31,12 @@ class CountryCodeRecordInterface : public RecordInterface<CountryCodeRecord, Cou
 
   public:
     CountryCodeRecordInterface(CountryCodesDB *db) : codesDB(db)
-    {
-    }
+    {}
     ~CountryCodeRecordInterface()
-    {
-    }
+    {}
     CodesTableRow GetByMCC(uint32_t mcc)
     {
-        if (codesDB)
-        {
+        if (codesDB) {
             return (codesDB->countryCodes.GetByMCC(mcc));
         }
 

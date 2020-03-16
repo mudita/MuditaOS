@@ -1,7 +1,6 @@
 #include "log/log.hpp"
 #include "RawDataFsm.hpp"
 
-
 // ----------------------------------------------------------------------------
 // Raw Data FSM states
 //
@@ -22,7 +21,6 @@ class StateRawDataPayload : public RawDataFsm
     };
 };
 
-
 // ----------------------------------------------------------------------------
 // Base State: default implementations
 //
@@ -39,8 +37,6 @@ void RawDataFsm::react(RawDataMallocEvt const &evt)
 
 int RawDataFsm::type{0};
 int RawDataFsm::payload{0};
-
-
 
 // ----------------------------------------------------------------------------
 // Initial state definition

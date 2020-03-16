@@ -17,30 +17,36 @@
 #include "GUIMessage.hpp"
 #include "gui/Common.hpp"
 
-namespace sgui {
+namespace sgui
+{
 
-/*
- *
- */
-class DrawMessage: public GUIMessage {
-public:
-	enum class DrawCommand {
-		NORMAL,
-		SUSPEND,
-		SHUTDOWN
-	};
-public:
-	gui::RefreshModes mode;
-	std::list< std::unique_ptr< gui::DrawCommand > > commands;
+    /*
+     *
+     */
+    class DrawMessage : public GUIMessage
+    {
+      public:
+        enum class DrawCommand
+        {
+            NORMAL,
+            SUSPEND,
+            SHUTDOWN
+        };
 
-	/**
-	 * flag that informs that this is last rendering before suspending system.
-	 */
-	DrawCommand command = DrawCommand::NORMAL;
+      public:
+        gui::RefreshModes mode;
+        std::list<std::unique_ptr<gui::DrawCommand>> commands;
 
-	DrawMessage( const std::list< gui::DrawCommand* >& commandsList, gui::RefreshModes mode, DrawCommand cmd = DrawCommand::NORMAL );
-	virtual ~DrawMessage();
-};
+        /**
+         * flag that informs that this is last rendering before suspending system.
+         */
+        DrawCommand command = DrawCommand::NORMAL;
+
+        DrawMessage(const std::list<gui::DrawCommand *> &commandsList,
+                    gui::RefreshModes mode,
+                    DrawCommand cmd = DrawCommand::NORMAL);
+        virtual ~DrawMessage();
+    };
 
 } /* namespace sgui */
 

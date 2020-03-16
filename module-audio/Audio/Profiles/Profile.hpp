@@ -2,12 +2,10 @@
  *  @file Profile.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 23.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_PROFILE_HPP
 #define PUREPHONE_PROFILE_HPP
@@ -17,12 +15,14 @@
 
 #include "bsp/audio/bsp_audio.hpp"
 
-namespace audio {
+namespace audio
+{
 
-    class Profile {
-    public:
-
-        enum class Type {
+    class Profile
+    {
+      public:
+        enum class Type
+        {
             // Profiles used only during call
             RoutingSpeakerphone,
             RoutingHeadset,
@@ -31,17 +31,17 @@ namespace audio {
             RoutingEarspeaker,
 
             // Recording profiles
-                    RecordingBuiltInMic,
+            RecordingBuiltInMic,
             RecordingHeadset,
             RecordingBTHeadset,
 
             // Profiles used by music player
-                    PlaybackLoudspeaker,
+            PlaybackLoudspeaker,
             PlaybackHeadphones,
             PlaybackBTA2DP,
 
             // Profiles used by system sounds
-                    SystemSoundLoudspeaker,
+            SystemSoundLoudspeaker,
             SystemSoundHeadphones,
             SystemSoundBTA2DP,
 
@@ -49,12 +49,17 @@ namespace audio {
 
         };
 
-        static std::unique_ptr<Profile>
-        Create(const Type t, std::function<int32_t()> callback = nullptr, float vol = 0, float gain = 0.0);
+        static std::unique_ptr<Profile> Create(const Type t,
+                                               std::function<int32_t()> callback = nullptr,
+                                               float vol                         = 0,
+                                               float gain                        = 0.0);
 
-        Profile() {}
+        Profile()
+        {}
 
-        Profile(const std::string &name, const Type type, const bsp::AudioDevice::Format &fmt,
+        Profile(const std::string &name,
+                const Type type,
+                const bsp::AudioDevice::Format &fmt,
                 bsp::AudioDevice::Type devType,
                 std::function<int32_t()> callback);
 
@@ -70,28 +75,57 @@ namespace audio {
 
         void SetInputPath(bsp::AudioDevice::InputPath path);
 
-        float GetOutputVolume() const { return audioFormat.outputVolume; }
+        float GetOutputVolume() const
+        {
+            return audioFormat.outputVolume;
+        }
 
-        float GetInputGain() const { return audioFormat.inputGain; }
+        float GetInputGain() const
+        {
+            return audioFormat.inputGain;
+        }
 
-        uint32_t GetSampleRate(){return audioFormat.sampleRate_Hz;}
+        uint32_t GetSampleRate()
+        {
+            return audioFormat.sampleRate_Hz;
+        }
 
-        uint32_t GetInOutFlags(){return audioFormat.flags;}
+        uint32_t GetInOutFlags()
+        {
+            return audioFormat.flags;
+        }
 
-        bsp::AudioDevice::OutputPath GetOutputPath() const { return audioFormat.outputPath; }
+        bsp::AudioDevice::OutputPath GetOutputPath() const
+        {
+            return audioFormat.outputPath;
+        }
 
-        bsp::AudioDevice::InputPath GetInputPath() const { return audioFormat.inputPath; }
+        bsp::AudioDevice::InputPath GetInputPath() const
+        {
+            return audioFormat.inputPath;
+        }
 
-        bsp::AudioDevice::Type GetAudioDeviceType() const { return audioDeviceType; }
+        bsp::AudioDevice::Type GetAudioDeviceType() const
+        {
+            return audioDeviceType;
+        }
 
-        bsp::AudioDevice::Format GetAudioFormat(){return audioFormat;}
+        bsp::AudioDevice::Format GetAudioFormat()
+        {
+            return audioFormat;
+        }
 
-        const std::string &GetName() const { return name; }
+        const std::string &GetName() const
+        {
+            return name;
+        }
 
-        Type GetType() { return type; }
+        Type GetType()
+        {
+            return type;
+        }
 
-
-    protected:
+      protected:
         bsp::AudioDevice::Format audioFormat;
         bsp::AudioDevice::Type audioDeviceType = bsp::AudioDevice::Type::Audiocodec;
 
@@ -99,10 +133,8 @@ namespace audio {
         Type type = Type::Idle;
 
         std::function<int32_t()> dbAccessCallback = nullptr;
-
-
     };
 
-}
+} // namespace audio
 
-#endif //PUREPHONE_PROFILE_HPP
+#endif // PUREPHONE_PROFILE_HPP

@@ -3,7 +3,7 @@
  * Copyright (c) 2016, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -48,63 +48,63 @@
  * API
  ******************************************************************************/
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
-/*!
- * @name Event Function
- * @{
- */
+    /*!
+     * @name Event Function
+     * @{
+     */
 
-/*!
- * @brief Initialize timer to implement wait event timeout.
- */
-void SDMMCEVENT_InitTimer(void);
+    /*!
+     * @brief Initialize timer to implement wait event timeout.
+     */
+    void SDMMCEVENT_InitTimer(void);
 
-/* Callback function for SDHC */
+    /* Callback function for SDHC */
 
-/*!
- * @brief Create event.
- * @param eventType The event type
- * @retval true Create event successfully.
- * @retval false Create event failed.
- */
-bool SDMMCEVENT_Create(void);
+    /*!
+     * @brief Create event.
+     * @param eventType The event type
+     * @retval true Create event successfully.
+     * @retval false Create event failed.
+     */
+    bool SDMMCEVENT_Create(void);
 
-/*!
- * @brief Wait event.
- *
- * @param eventType The event type
- * @param timeoutMilliseconds Timeout time in milliseconds.
- * @retval true Wait event successfully.
- * @retval false Wait event failed.
- */
-bool SDMMCEVENT_Wait(uint32_t timeoutMilliseconds);
+    /*!
+     * @brief Wait event.
+     *
+     * @param eventType The event type
+     * @param timeoutMilliseconds Timeout time in milliseconds.
+     * @retval true Wait event successfully.
+     * @retval false Wait event failed.
+     */
+    bool SDMMCEVENT_Wait(uint32_t timeoutMilliseconds);
 
-/*!
- * @brief Notify event.
- * @param status Transfer status
- * @retval true Notify event successfully.
- * @retval false Notify event failed.
- */
-BaseType_t SDMMCEVENT_Notify(status_t status);
+    /*!
+     * @brief Notify event.
+     * @param status Transfer status
+     * @retval true Notify event successfully.
+     * @retval false Notify event failed.
+     */
+    BaseType_t SDMMCEVENT_Notify(status_t status);
 
-/*!
- * @brief Delete event.
- * @param eventType The event type
- */
-void SDMMCEVENT_Delete(void);
+    /*!
+     * @brief Delete event.
+     * @param eventType The event type
+     */
+    void SDMMCEVENT_Delete(void);
 
-/*!
- * @brief sdmmc delay.
- * @param milliseconds time to delay
- */
-void SDMMCEVENT_Delay(uint32_t milliseconds);
+    /*!
+     * @brief sdmmc delay.
+     * @param milliseconds time to delay
+     */
+    void SDMMCEVENT_Delay(uint32_t milliseconds);
 
-
-bool SDMMCEVENT_Unlock(void);
-bool SDMMCEVENT_Lock(uint32_t timeoutMilliseconds);
-/* @} */
+    bool SDMMCEVENT_Unlock(void);
+    bool SDMMCEVENT_Lock(uint32_t timeoutMilliseconds);
+    /* @} */
 
 #if defined(__cplusplus)
 }

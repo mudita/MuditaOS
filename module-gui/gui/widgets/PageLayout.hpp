@@ -9,7 +9,7 @@ namespace gui
     class PageLayout : public BoxLayout
     {
       public:
-        PageLayout() = default;
+        PageLayout()          = default;
         virtual ~PageLayout() = default;
         PageLayout(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
         PageLayout(Item *parent, const BoundingBox &box);

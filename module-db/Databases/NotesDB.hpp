@@ -11,17 +11,19 @@
 #include "Database/Database.hpp"
 #include "../Tables/NotesTable.hpp"
 
-class NotesDB : public Database {
-public:
-	NotesDB();
+class NotesDB : public Database
+{
+  public:
+    NotesDB();
     virtual ~NotesDB();
 
     NotesTable notes;
 
-    static const char* GetDBName(){return dbName;}
+    static const char *GetDBName()
+    {
+        return dbName;
+    }
 
-private:
-
+  private:
     static const char *dbName;
 };
-

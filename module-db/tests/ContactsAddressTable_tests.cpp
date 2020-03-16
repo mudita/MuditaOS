@@ -8,7 +8,6 @@
  * @details
  */
 
-
 #include "vfs.hpp"
 
 #include "catch.hpp"
@@ -23,7 +22,6 @@
 #include "../Database/Database.hpp"
 #include "../Databases/ContactsDB.hpp"
 
-
 TEST_CASE("Contacts Address Table tests")
 {
     Database::Initialize();
@@ -32,16 +30,15 @@ TEST_CASE("Contacts Address Table tests")
 
     ContactsDB contactsdb;
 
-    ContactsAddressTableRow testRow1 = {.ID=0,
-            .contactID=0,
-            .country="Poland",
-            .city="Warsaw",
-            .street="Czeczota",
-            .number="9",
-            .type=ContactAddressType ::WORK,
-            .note = "Test note",
-            .mail="test@mudita.com"
-    };
+    ContactsAddressTableRow testRow1 = {.ID        = 0,
+                                        .contactID = 0,
+                                        .country   = "Poland",
+                                        .city      = "Warsaw",
+                                        .street    = "Czeczota",
+                                        .number    = "9",
+                                        .type      = ContactAddressType ::WORK,
+                                        .note      = "Test note",
+                                        .mail      = "test@mudita.com"};
 
     // Add 4 elements into table
     REQUIRE(contactsdb.address.Add(testRow1));
@@ -53,7 +50,7 @@ TEST_CASE("Contacts Address Table tests")
     REQUIRE(contactsdb.address.GetCount() == 4);
 
     // Update existing element in table
-    testRow1.ID = 4;
+    testRow1.ID   = 4;
     testRow1.note = "Modified test note";
     REQUIRE(contactsdb.address.Update(testRow1));
 
@@ -63,29 +60,28 @@ TEST_CASE("Contacts Address Table tests")
 
     // Get table row using invalid ID(should return empty contactsdb.addressRow)
     auto smsFailed = contactsdb.address.GetByID(100);
-    REQUIRE(smsFailed.note  == "");
+    REQUIRE(smsFailed.note == "");
 
     // Get table rows using valid offset/limit parameters
-    auto retOffsetLimit = contactsdb.address.GetLimitOffset(0,4);
+    auto retOffsetLimit = contactsdb.address.GetLimitOffset(0, 4);
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.address.GetLimitOffsetByField(0,4,ContactAddressTableFields::Number,"9").size() == 4);
+    REQUIRE(contactsdb.address.GetLimitOffsetByField(0, 4, ContactAddressTableFields::Number, "9").size() == 4);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
-    auto retOffsetLimitBigger = contactsdb.address.GetLimitOffset(0,100);
+    auto retOffsetLimitBigger = contactsdb.address.GetLimitOffset(0, 100);
     REQUIRE(retOffsetLimitBigger.size() == 4);
 
     // Get table rows using invalid offset/limit parameters(should return empty object)
-    auto retOffsetLimitFailed = contactsdb.address.GetLimitOffset(5,4);
+    auto retOffsetLimitFailed = contactsdb.address.GetLimitOffset(5, 4);
     REQUIRE(retOffsetLimitFailed.size() == 0);
 
     // Get count of elements by field's ID
-    REQUIRE(contactsdb.address.GetCountByFieldID("contact_id",0) == 4);
+    REQUIRE(contactsdb.address.GetCountByFieldID("contact_id", 0) == 4);
 
     // Get count of elements by invalid field's ID
-    REQUIRE(contactsdb.address.GetCountByFieldID("invalid_field",0) == 0);
-
+    REQUIRE(contactsdb.address.GetCountByFieldID("invalid_field", 0) == 0);
 
     REQUIRE(contactsdb.address.RemoveByID(2));
 

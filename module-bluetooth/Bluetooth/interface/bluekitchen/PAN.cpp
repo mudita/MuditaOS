@@ -1,6 +1,7 @@
 #include <log/log.hpp>
 
-extern "C" {
+extern "C"
+{
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,14 +19,13 @@ extern "C" {
 #include <hci.h>
 #include <hci_dump.h>
 #include <btstack_stdin.h>
-// #include <btstack_tlv_posix.h>
+    // #include <btstack_tlv_posix.h>
 
 #include <btstack_chipset_cc256x.h>
 #include <pan.h>
 #include <sdp_util.h>
 #include <bnep_lwip.h>
-#include<bluetooth_sdp.h>
-
+#include <bluetooth_sdp.h>
 };
 
 #include <BtCommand.hpp>
@@ -36,13 +36,14 @@ extern "C" {
 
 static btstack_packet_callback_registration_t hci_event_callback_registration;
 
-#define NETWORK_TYPE_IPv4       0x0800
-#define NETWORK_TYPE_ARP        0x0806
-#define NETWORK_TYPE_IPv6       0x86DD
+#define NETWORK_TYPE_IPv4 0x0800
+#define NETWORK_TYPE_ARP  0x0806
+#define NETWORK_TYPE_IPv6 0x86DD
 
 static uint8_t pan_sdp_record[220];
 
-static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size){
+static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size)
+{
     /* LISTING_PAUSE */
     UNUSED(channel);
     UNUSED(size);
@@ -50,109 +51,127 @@ static void packet_handler (uint8_t packet_type, uint16_t channel, uint8_t *pack
     bd_addr_t event_addr;
 
     switch (packet_type) {
-        case HCI_EVENT_PACKET:
-            switch (hci_event_packet_get_type(packet)) {
+    case HCI_EVENT_PACKET:
+        switch (hci_event_packet_get_type(packet)) {
 
-                case HCI_EVENT_PIN_CODE_REQUEST:
-                    // inform about pin code request
-                    LOG_INFO("Pin code request - using '0000'");
-                    hci_event_pin_code_request_get_bd_addr(packet, event_addr);
-                    gap_pin_code_response(event_addr, "0000");
-                    break;
+        case HCI_EVENT_PIN_CODE_REQUEST:
+            // inform about pin code request
+            LOG_INFO("Pin code request - using '0000'");
+            hci_event_pin_code_request_get_bd_addr(packet, event_addr);
+            gap_pin_code_response(event_addr, "0000");
+            break;
 
-                case HCI_EVENT_USER_CONFIRMATION_REQUEST:
-                    // inform about user confirmation request
-                    LOG_INFO("SSP User Confirmation Auto accept");
-                    hci_event_user_confirmation_request_get_bd_addr(packet, event_addr);
-                    break;
+        case HCI_EVENT_USER_CONFIRMATION_REQUEST:
+            // inform about user confirmation request
+            LOG_INFO("SSP User Confirmation Auto accept");
+            hci_event_user_confirmation_request_get_bd_addr(packet, event_addr);
+            break;
 
-                /* @text BNEP_EVENT_CHANNEL_OPENED is received after a BNEP connection was established or
-                 * or when the connection fails. The status field returns the error code.
-                 */
-                case BNEP_EVENT_CHANNEL_OPENED:
-                    if (bnep_event_channel_opened_get_status(packet)) {
-                        LOG_INFO("BNEP channel open failed, status %02x", bnep_event_channel_opened_get_status(packet));
-                    } else {
-                        uint16_t uuid_source = bnep_event_channel_opened_get_source_uuid(packet);
-                        uint16_t uuid_dest   = bnep_event_channel_opened_get_destination_uuid(packet);
-                        uint16_t mtu         = bnep_event_channel_opened_get_mtu(packet);
-                        bnep_event_channel_opened_get_remote_address(packet, event_addr);
-                        LOG_INFO("BNEP connection open succeeded to %s source UUID 0x%04x dest UUID: 0x%04x, max frame size %u", bd_addr_to_str(event_addr), uuid_source, uuid_dest, mtu);
-                        LOG_INFO("Please open 'http://192.168.7.1' in your web browser: ");
-                    }
-                    break;
-
-                /* @text BNEP_EVENT_CHANNEL_CLOSED is received when the connection gets closed.
-                 */
-                case BNEP_EVENT_CHANNEL_CLOSED:
-                    LOG_INFO("BNEP channel closed");
-                    break;
-
-                default:
-                    break;
+        /* @text BNEP_EVENT_CHANNEL_OPENED is received after a BNEP connection was established or
+         * or when the connection fails. The status field returns the error code.
+         */
+        case BNEP_EVENT_CHANNEL_OPENED:
+            if (bnep_event_channel_opened_get_status(packet)) {
+                LOG_INFO("BNEP channel open failed, status %02x", bnep_event_channel_opened_get_status(packet));
+            }
+            else {
+                uint16_t uuid_source = bnep_event_channel_opened_get_source_uuid(packet);
+                uint16_t uuid_dest   = bnep_event_channel_opened_get_destination_uuid(packet);
+                uint16_t mtu         = bnep_event_channel_opened_get_mtu(packet);
+                bnep_event_channel_opened_get_remote_address(packet, event_addr);
+                LOG_INFO("BNEP connection open succeeded to %s source UUID 0x%04x dest UUID: 0x%04x, max frame size %u",
+                         bd_addr_to_str(event_addr),
+                         uuid_source,
+                         uuid_dest,
+                         mtu);
+                LOG_INFO("Please open 'http://192.168.7.1' in your web browser: ");
             }
             break;
+
+        /* @text BNEP_EVENT_CHANNEL_CLOSED is received when the connection gets closed.
+         */
+        case BNEP_EVENT_CHANNEL_CLOSED:
+            LOG_INFO("BNEP channel closed");
+            break;
+
         default:
             break;
+        }
+        break;
+    default:
+        break;
     }
 }
 
-namespace Bt {
-
-// TODO - in config...
-// TODO - set it settable...
-// Set local name with a template Bluetooth address, that will be automatically
-// replaced with a actual address once it is available, i.e. when BTstack boots
-Error set_name(std::string &name) {
-    // name has to have storage
-    constexpr uint32_t size = 64;
-    static char lname[size] = {0};
-    snprintf(lname, size,"%s %s", name.c_str(), "00:00:00:00:00:00");
-    LOG_INFO("Setting local name: %s", lname);
-    gap_set_local_name(lname);
-    return Error();
-}
-namespace PAN {
-
-Error bnep_setup()
+namespace Bt
 {
-    BluetoothWorker::Error  err = BluetoothWorker::Error::SuccessBt;
-    // Discoverable
-    // up and starts talking to a Bluetooth module.
-    gap_discoverable_control(1);
 
-    // register for HCI events
-    hci_event_callback_registration.callback = &packet_handler;
-    hci_add_event_handler(&hci_event_callback_registration);
+    // TODO - in config...
+    // TODO - set it settable...
+    // Set local name with a template Bluetooth address, that will be automatically
+    // replaced with a actual address once it is available, i.e. when BTstack boots
+    Error set_name(std::string &name)
+    {
+        // name has to have storage
+        constexpr uint32_t size = 64;
+        static char lname[size] = {0};
+        snprintf(lname, size, "%s %s", name.c_str(), "00:00:00:00:00:00");
+        LOG_INFO("Setting local name: %s", lname);
+        gap_set_local_name(lname);
+        return Error();
+    }
+    namespace PAN
+    {
 
-    // Initialize L2CAP
-    l2cap_init();
+        Error bnep_setup()
+        {
+            BluetoothWorker::Error err = BluetoothWorker::Error::SuccessBt;
+            // Discoverable
+            // up and starts talking to a Bluetooth module.
+            gap_discoverable_control(1);
 
-    // Initialize BNEP
-    bnep_init();
+            // register for HCI events
+            hci_event_callback_registration.callback = &packet_handler;
+            hci_add_event_handler(&hci_event_callback_registration);
 
-    // Init SDP
-    sdp_init();
-    memset(pan_sdp_record, 0, sizeof(pan_sdp_record));
-    uint16_t network_packet_types[] = { NETWORK_TYPE_IPv4, NETWORK_TYPE_ARP, 0};    // 0 as end of list
+            // Initialize L2CAP
+            l2cap_init();
 
-    // NAP Network Access Type: Other, 1 MB/s
-    pan_create_nap_sdp_record(pan_sdp_record, sdp_create_service_record_handle(), network_packet_types, NULL, NULL, BNEP_SECURITY_NONE, PAN_NET_ACCESS_TYPE_OTHER, 1000000, NULL, NULL);
-    sdp_register_service(pan_sdp_record);
-    LOG_INFO("SDP service record size: %u", de_get_len((uint8_t*) pan_sdp_record));
-    return Error();
-}
+            // Initialize BNEP
+            bnep_init();
 
-Error bnep_start() {
-    bnep_lwip_init();
+            // Init SDP
+            sdp_init();
+            memset(pan_sdp_record, 0, sizeof(pan_sdp_record));
+            uint16_t network_packet_types[] = {NETWORK_TYPE_IPv4, NETWORK_TYPE_ARP, 0}; // 0 as end of list
 
-    // Setup NAP Service via BENP lwIP adapter
-    bnep_lwip_register_service(BLUETOOTH_SERVICE_CLASS_NAP, 1691);
+            // NAP Network Access Type: Other, 1 MB/s
+            pan_create_nap_sdp_record(pan_sdp_record,
+                                      sdp_create_service_record_handle(),
+                                      network_packet_types,
+                                      NULL,
+                                      NULL,
+                                      BNEP_SECURITY_NONE,
+                                      PAN_NET_ACCESS_TYPE_OTHER,
+                                      1000000,
+                                      NULL,
+                                      NULL);
+            sdp_register_service(pan_sdp_record);
+            LOG_INFO("SDP service record size: %u", de_get_len((uint8_t *)pan_sdp_record));
+            return Error();
+        }
 
-    // register callback - to print state
-    bnep_lwip_register_packet_handler(packet_handler);
-    return Error();
-}
+        Error bnep_start()
+        {
+            bnep_lwip_init();
 
-}
-}
+            // Setup NAP Service via BENP lwIP adapter
+            bnep_lwip_register_service(BLUETOOTH_SERVICE_CLASS_NAP, 1691);
+
+            // register callback - to print state
+            bnep_lwip_register_packet_handler(packet_handler);
+            return Error();
+        }
+
+    } // namespace PAN
+} // namespace Bt

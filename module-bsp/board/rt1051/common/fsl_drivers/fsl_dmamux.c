@@ -3,7 +3,7 @@
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
  * Copyright 2016-2017 NXP
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided
  *  that the following conditions are met:
@@ -43,7 +43,6 @@
 #define FSL_COMPONENT_ID "platform.drivers.dmamux"
 #endif
 
-
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
@@ -75,10 +74,8 @@ static uint32_t DMAMUX_GetInstance(DMAMUX_Type *base)
     uint32_t instance;
 
     /* Find the instance index from base address mappings. */
-    for (instance = 0; instance < ARRAY_SIZE(s_dmamuxBases); instance++)
-    {
-        if (s_dmamuxBases[instance] == base)
-        {
+    for (instance = 0; instance < ARRAY_SIZE(s_dmamuxBases); instance++) {
+        if (s_dmamuxBases[instance] == base) {
             break;
         }
     }

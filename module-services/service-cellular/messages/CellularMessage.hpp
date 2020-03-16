@@ -2,12 +2,10 @@
  *  @file CellularMessage.hpp
  *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
  *  @date 03.07.19
- *  @brief  
+ *  @brief
  *  @copyright Copyright (C) 2019 mudita.com
  *  @details
  */
-
-
 
 #ifndef PUREPHONE_CELLULARMESSAGE_HPP
 #define PUREPHONE_CELLULARMESSAGE_HPP
@@ -19,61 +17,68 @@
 #include <memory>
 #include <variant>
 
-class CellularMessage : public sys::DataMessage {
-public:
-  CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
-  virtual ~CellularMessage(){};
+class CellularMessage : public sys::DataMessage
+{
+  public:
+    CellularMessage(MessageType messageType) : sys::DataMessage(messageType){};
+    virtual ~CellularMessage(){};
 };
 
-class CellularNotificationMessage : public CellularMessage {
-public:
-  enum class Type
-  {
-      IncomingCall,             // device receives connection from other device.
-      CallAborted,              // user tried to call other device but receiving side dropped call or call unsuccessful
-      CallActive,               // call is in progress both if call was initialized by user and when user received incoming call.
-      Ringing,                  // user provided number to call to and service initialized calling procedure.
-      NewIncomingSMS,           // device received new sms from network. (what about sms delivery reports?).
-      SignalStrengthUpdate,     // update of the strength of the network's signal.
-      ServiceReady,             // Idle state of the service. This is a start state before any call is initialized by user or by network.
-                                // service returns to this state when call is finished.
-      PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and cold start)
-      SIM,                      // change on SIM from URC
-      ModemOn,                  // Modem initialized
-      RawCommand,               // send raw command to modem -> returns raw, tokenised result
-      None
-  };
+class CellularNotificationMessage : public CellularMessage
+{
+  public:
+    enum class Type
+    {
+        IncomingCall, // device receives connection from other device.
+        CallAborted,  // user tried to call other device but receiving side dropped call or call unsuccessful
+        CallActive,   // call is in progress both if call was initialized by user and when user received incoming call.
+        Ringing,      // user provided number to call to and service initialized calling procedure.
+        NewIncomingSMS,       // device received new sms from network. (what about sms delivery reports?).
+        SignalStrengthUpdate, // update of the strength of the network's signal.
+        ServiceReady, // Idle state of the service. This is a start state before any call is initialized by user or by
+                      // network. service returns to this state when call is finished.
+        PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
+                                  // cold start)
+        SIM,                      // change on SIM from URC
+        ModemOn,                  // Modem initialized
+        RawCommand,               // send raw command to modem -> returns raw, tokenised result
+        None
+    };
 
-  // TODO check and fix all CellularNotificationMessage constructors
+    // TODO check and fix all CellularNotificationMessage constructors
 
-  CellularNotificationMessage() = delete;
-  CellularNotificationMessage(Type type, const std::string &data = "") : CellularMessage(MessageType::CellularNotification), type(type), data(data)
-  {
-  }
+    CellularNotificationMessage() = delete;
+    CellularNotificationMessage(Type type, const std::string &data = "")
+        : CellularMessage(MessageType::CellularNotification), type(type), data(data)
+    {}
 
     virtual ~CellularNotificationMessage() = default;
 
-    Type type=Type::None;
+    Type type = Type::None;
 
     std::string data;
 };
 
-class CellularRequestMessage : public CellularMessage{
-public:
-
-    CellularRequestMessage(MessageType messageType):CellularMessage(messageType){}
-    ~CellularRequestMessage() {}
+class CellularRequestMessage : public CellularMessage
+{
+  public:
+    CellularRequestMessage(MessageType messageType) : CellularMessage(messageType)
+    {}
+    ~CellularRequestMessage()
+    {}
 
     std::string data;
-
 };
 
 class CellularResponseMessage : public sys::ResponseMessage
 {
   public:
-    CellularResponseMessage(bool retCode, std::string retdata = std::string(), MessageType responseTo = MessageType::MessageTypeUninitialized)
+    CellularResponseMessage(bool retCode,
+                            std::string retdata    = std::string(),
+                            MessageType responseTo = MessageType::MessageTypeUninitialized)
         : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode), data(retdata){};
-    CellularResponseMessage(bool retCode, MessageType responseTo) : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+    CellularResponseMessage(bool retCode, MessageType responseTo)
+        : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
     virtual ~CellularResponseMessage(){};
 
     bool retCode;
@@ -110,4 +115,4 @@ namespace cellular
 
 } // namespace cellular
 
-#endif //PUREPHONE_CELLULARMESSAGE_HPP
+#endif // PUREPHONE_CELLULARMESSAGE_HPP

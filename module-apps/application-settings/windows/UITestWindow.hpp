@@ -13,19 +13,20 @@
 namespace gui
 {
 
-class UiTestWindow : public AppWindow
-{
-  protected:
-      gui::Text* text = nullptr;
-  public:
-    UiTestWindow(app::Application *app);
-    virtual ~UiTestWindow();
+    class UiTestWindow : public AppWindow
+    {
+      protected:
+        gui::Text *text = nullptr;
 
-    // virtual methods
-    void onBeforeShow(ShowMode mode, SwitchData *data) override;
-    void rebuild() override;
-    void buildInterface() override;
-    void destroyInterface() override;
-    void set_navigation();
-};
+      public:
+        UiTestWindow(app::Application *app);
+        virtual ~UiTestWindow();
+
+        // virtual methods
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        void rebuild() override;
+        void buildInterface() override;
+        void destroyInterface() override;
+        void set_navigation();
+    };
 } // namespace gui
