@@ -306,6 +306,7 @@ void PINMUX_InitBootPins(void)
     PINMUX_InitALS();
     PINMUX_InitPowerSW();
     PINMUX_InitJACKDET();
+    PINMUX_InitVibrator();
 }
 
 /*
@@ -1450,6 +1451,16 @@ void PINMUX_InitPowerSW(void)
                         PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
                             PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_PULL | PAD_CONFIG_PULL_DOWN_100kOhm |
                             PAD_CONFIG_HYSTERESIS_DISABLED);
+}
+
+void PINMUX_InitVibrator(void)
+{
+    CLOCK_EnableClock(kCLOCK_Iomuxc); /* iomuxc clock (iomuxc_clk_enable): 0x03u */
+
+    IOMUXC_SetPinMux(PINMUX_VIBRATOR_EN_PIN, 0U);
+    IOMUXC_SetPinConfig(PINMUX_VIBRATOR_EN_PIN,
+                        PAD_CONFIG_SLEW_RATE_SLOW | PAD_CONFIG_DRIVER_STRENGTH_LVL_1 | PAD_CONFIG_SPEED_SLOW_50MHz |
+                            PAD_CONFIG_PULL_KEEPER_ENABLED | PAD_CONFIG_SELECT_KEEPER | PAD_CONFIG_HYSTERESIS_DISABLED);
 }
 
 /***********************************************************************************************************************

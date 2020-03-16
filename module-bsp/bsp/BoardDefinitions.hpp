@@ -82,7 +82,8 @@ enum class BoardDefinitions{
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::PLL4_Audio),
 
-
+    VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1), // GPIO_AD_B0_00
+    VIBRATOR_EN = 0,
 
 };
 

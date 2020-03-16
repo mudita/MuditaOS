@@ -5,6 +5,7 @@
  *      Author: kuba
  */
 
+#include <board/rt1051/bsp/vibrator/vibrator.hpp>
 #include <string.h>
 
 extern "C"
@@ -139,6 +140,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
 {
     Worker::init(queues);
     std::vector<xQueueHandle> qhandles = this->queues;
+    bsp::vibrator::init();
     bsp::keyboard_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]);
     bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
