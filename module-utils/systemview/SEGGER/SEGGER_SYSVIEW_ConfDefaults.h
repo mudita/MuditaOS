@@ -141,8 +141,9 @@ extern "C"
 
 // Maximum packet size used by SystemView for the static buffer
 #ifndef SEGGER_SYSVIEW_MAX_PACKET_SIZE
-#define SEGGER_SYSVIEW_MAX_PACKET_SIZE                                                                                                                         \
-    SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_MAX_STRING_LEN + 2 * SEGGER_SYSVIEW_QUANTA_U32 + SEGGER_SYSVIEW_MAX_ARGUMENTS *SEGGER_SYSVIEW_QUANTA_U32
+#define SEGGER_SYSVIEW_MAX_PACKET_SIZE                                                                                 \
+    SEGGER_SYSVIEW_INFO_SIZE + SEGGER_SYSVIEW_MAX_STRING_LEN + 2 * SEGGER_SYSVIEW_QUANTA_U32 +                         \
+        SEGGER_SYSVIEW_MAX_ARGUMENTS *SEGGER_SYSVIEW_QUANTA_U32
 #endif
 
 // Use post-mortem analysis instead of real-time analysis
