@@ -11,39 +11,35 @@ namespace gui
 };
 
 /// one place to gather all common magical numbers from design
-namespace style
-{
-    const inline uint32_t window_height = 600;
-    const inline uint32_t window_width  = 480;
-    namespace header
-    {
-        namespace font
-        {
-            const inline std::string time  = "gt_pressura_regular_24";
-            const inline std::string title = "gt_pressura_bold_32";
-        }; // namespace font
-    };     // namespace header
-    namespace window
-    {
-        const inline uint32_t default_left_margin       = 30;
-        const inline uint32_t default_right_margin      = 30;
-        const inline uint32_t default_border_focucs_w   = 2;
-        const inline uint32_t default_border_no_focus_w = 0;
-        namespace font
-        {
-            const inline std::string supersizeme = "gt_pressura_light_90";
-            const inline std::string verybig     = "gt_pressura_light_46";
-            const inline std::string bigbold     = "gt_pressura_bold_30";
-            const inline std::string big         = "gt_pressura_regular_30";
-            const inline std::string biglight    = "gt_pressura_light_30";
-            const inline std::string mediumbold  = "gt_pressura_bold_27";
-            const inline std::string medium      = "gt_pressura_regular_27";
-            const inline std::string small       = "gt_pressura_regular_24";
-            const inline std::string verysmall   = "gt_pressura_regular_20";
-            const inline std::string tiny        = "gt_pressura_regular_16";
-            const inline std::string tinybold    = "gt_pressura_bold_16";
-            const inline std::string tinylight   = "gt_pressura_light_16";
-        }; // namespace font
+namespace style {
+const inline uint32_t window_height = 600;
+const inline uint32_t window_width  = 480;
+namespace header {
+    const inline uint32_t height  = 105;
+namespace font {
+const inline std::string time  = "gt_pressura_regular_24";
+const inline std::string title = "gt_pressura_bold_32";
+};  // namespace font
+};  // namespace header
+namespace window {
+const inline uint32_t default_left_margin = 30;
+const inline uint32_t default_right_margin = 30;
+const inline uint32_t default_border_focucs_w   = 2;
+const inline uint32_t default_border_no_focus_w = 0;
+namespace font {
+    const inline std::string supersizeme = "gt_pressura_light_90";
+    const inline std::string verybig = "gt_pressura_light_46";
+    const inline std::string bigbold = "gt_pressura_bold_30";
+    const inline std::string big = "gt_pressura_regular_30";
+    const inline std::string biglight = "gt_pressura_light_30";
+    const inline std::string mediumbold = "gt_pressura_bold_27";
+    const inline std::string medium = "gt_pressura_regular_27";
+    const inline std::string small = "gt_pressura_regular_24";
+    const inline std::string verysmall = "gt_pressura_regular_20";
+    const inline std::string tiny = "gt_pressura_regular_16";
+    const inline std::string tinybold = "gt_pressura_bold_16";
+    const inline std::string tinylight = "gt_pressura_light_16";
+};  // namespace font
 
         const inline uint32_t list_offset_default = 12;
         namespace label
