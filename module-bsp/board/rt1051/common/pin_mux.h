@@ -208,6 +208,9 @@ extern "C"
 #define PINMUX_POWER_HOLD IOMUXC_GPIO_B0_07_GPIO2_IO07
     void PINMUX_InitPowerSW(void);
 
+#define PINMUX_VIBRATOR_EN_PIN IOMUXC_GPIO_AD_B0_00_GPIO1_IO00
+    void PINMUX_InitVibrator(void);
+
 #if defined(__cplusplus)
 }
 #endif
