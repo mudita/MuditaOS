@@ -1,15 +1,7 @@
 #pragma once
-#include <functional>
-#include <string>
 
 #include "../models/PhonebookModel.hpp"
 #include "../widgets/PhonebookListView.hpp"
-#include "AppWindow.hpp"
-#include "ListView.hpp"
-#include "Style.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
 
 namespace gui
 {

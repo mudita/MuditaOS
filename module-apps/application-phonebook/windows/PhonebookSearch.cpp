@@ -1,12 +1,6 @@
 #include "PhonebookSearch.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "InputEvent.hpp"
-#include "Label.hpp"
-#include "PhonebookContact.hpp"
 #include "../data/PhonebookStyle.hpp"
-#include "Text.hpp"
 #include "Utils.hpp"
-#include "application-call/data/CallSwitchData.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
 namespace gui

@@ -1,20 +1,8 @@
 #include "PhonebookMainWindow.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "Label.hpp"
-#include "ListView.hpp"
-#include "Margins.hpp"
 #include "PhonebookNewContact.hpp"
-#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBMessage.hpp"
-#include <Style.hpp>
-#include <functional>
-#include <log/log.hpp>
-#include <memory>
 #include <application-phonebook/data/PhonebookStyle.hpp>
-
 
 namespace gui
 {
