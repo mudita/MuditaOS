@@ -33,7 +33,7 @@ namespace mainWindow {
     } // namespace searchImage
     namespace contactsList {
         constexpr uint32_t x = style::window::default_left_margin;
-        constexpr uint32_t y = 105 + 6;
+        constexpr uint32_t y = style::header::height + 6;
         constexpr uint32_t w = style::window_width - style::window::default_left_margin - style::window::default_right_margin;
         constexpr uint32_t h = style::window_height - y - 50;
         constexpr uint32_t maxElements = 7;
@@ -83,7 +83,7 @@ namespace search {
             style::window_width - style::window::default_left_margin - style::window::default_right_margin;
     namespace searchResultList {
         constexpr uint32_t x = style::window::default_left_margin;
-        constexpr uint32_t y = 105 + 6;
+        constexpr uint32_t y = style::header::height + 6;
         constexpr uint32_t w = style::window_width - style::window::default_left_margin - style::window::default_right_margin;
         constexpr uint32_t h = style::window_height - y - 50;
         constexpr uint32_t maxElements = 7;
