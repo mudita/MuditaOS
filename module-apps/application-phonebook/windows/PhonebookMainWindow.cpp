@@ -53,10 +53,6 @@ void PhonebookMainWindow::destroyInterface()
     delete contactsList;
     contactsList = nullptr;
 
-        removeWidget(list);
-        delete list;
-        list = nullptr;
-
         removeWidget(leftArrowImage);
         delete leftArrowImage;
         leftArrowImage = nullptr;
@@ -75,29 +71,23 @@ void PhonebookMainWindow::destroyInterface()
 
         children.clear();
         delete phonebookModel;
-    }
+}
 
-<<<<<<< HEAD
     PhonebookMainWindow::~PhonebookMainWindow()
     {
         destroyInterface();
     }
-=======
+
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
-        setFocusItem(list);
-<<<<<<< HEAD
+        setFocusItem(contactsList);
+
         phonebookModel->clear();
         phonebookModel->requestRecordsCount();
-=======
+
     contactsList->clear();
     contactsList->setElementsCount(phonebookModel->getItemCount());
-}
->>>>>>> [EGD-2932] Add PhonebookMAinWindow styles to PhonebookStyle.hpp
-
-        list->clear();
-        list->setElementsCount(phonebookModel->getItemCount());
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
