@@ -23,12 +23,18 @@ enum class BoardDefinitions{
     POWER_SWITCH_HOLD_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
     POWER_SWITCH_HOLD_BUTTON = 7,
 
+    USB_FUNCTION_MUX_SELECT = 25, // GPIO_AD_B1_09, USB_MUX_SEL0
+    USB_POWER_ACK = 3, // GPIO_B0_03  Note: pull-up in order to read
+
     AUDIOCODEC_I2C_BAUDRATE = 100000,
     AUDIOCODEC_I2C = static_cast<int >(drivers::I2CInstances ::I2C2),
     AUDIOCODEC_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
     AUDIOCODEC_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     AUDIOCODEC_TX_DMA_CHANNEL = 6,
     AUDIOCODEC_RX_DMA_CHANNEL = 7,
+
+    MIC_BIAS_DRIVER_GPIO = static_cast<int >(drivers::GPIOInstances ::GPIO_2),
+    MIC_BIAS_DRIVER_EN = 19, // GPIO_B1_03 MIC_LDO_EN
 
     CELLULAR_AUDIO_DMAMUX = AUDIOCODEC_DMAMUX,
     CELLULAR_AUDIO_DMA = AUDIOCODEC_DMA,
@@ -65,8 +71,10 @@ enum class BoardDefinitions{
     CELLULAR_GPIO_2_WAKEUP_PIN = 19,
     CELLULAR_GPIO_2_SIMCARD_1_INSERTED_PIN = 11,
     CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN = 9,
-    CELLULAR_GPIO_2_SIMSEL_PIN = 20, // GPIO_B1_04
-    CELLULAR_GPIO_2_ANTSEL_PIN = 2,
+    CELLULAR_GPIO_2_SIMSEL_PIN = 20,
+	CELLULAR_GPIO_2_ANTSEL_PIN = 2,
+	CELLULAR_GPIO_1_STATUS_PIN = 2, // GPIO_AD_B0_02
+    CELLULAR_GPIO_2_USB_BOOT_PIN = 24, // GPIO_B1_08, output
 
     EINK_DMA = static_cast<int >(drivers::DMAInstances ::DMA_0),
     EINK_DMAMUX = static_cast<int >(drivers::DMAMuxInstances ::DMAMUX0),
@@ -82,8 +90,14 @@ enum class BoardDefinitions{
 
     AUDIO_PLL = static_cast<int >(drivers::PLLInstances::PLL4_Audio),
 
-    VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1), // GPIO_AD_B0_00
-    VIBRATOR_EN = 0,
+    VIBRATOR_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
+    VIBRATOR_EN = 0, // GPIO_AD_B0_00
+
+    TORCH_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
+    TORCH_EN = 21, // GPIO_AD_B1_05
+
+    MAGNETOMETER_GPIO = static_cast<int>(drivers::GPIOInstances::GPIO_1),
+    MAGNETOMETER_IRQ = 20, // GPIO_AD_B1_04
 
 };
 
