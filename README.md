@@ -26,7 +26,13 @@ cd <build-dir>                                                              # bu
 make -j                                                                     # build
 ./PurePhone                                                                 # run PurePhone - emulator screen will pop up
 ```
-
+## Super quick and dirty to run UT
+build the app (as in previous point)
+```bash
+./configure.sh linux debug
+cd <build-dir>
+make check
+```
 ## Super quick and dirty to run app on Phone
 
 Prior to all - install JLink driver (see `## Install JLink driver`)

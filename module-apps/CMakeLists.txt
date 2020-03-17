@@ -89,8 +89,3 @@ target_compile_features(${PROJECT_NAME} PUBLIC
         cxx_std_14
 )
 
-# Host target configuration(mainly used for unit testing)
-if(DEFINED BUILD_UNIT_TESTS)
-
-endif()
-

@@ -7,8 +7,7 @@ project(unittest_module-audio VERSION 1.0
 
 
 
-add_executable( ${PROJECT_NAME}
-
+add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
         "${CMAKE_CURRENT_SOURCE_DIR}/tests-main.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/Playback_tests.cpp"
         #"${CMAKE_CURRENT_SOURCE_DIR}/Recorder_tests.cpp"
@@ -18,3 +17,9 @@ add_executable( ${PROJECT_NAME}
 
 target_link_libraries( ${PROJECT_NAME} PRIVATE module-audio portaudio )
 
+add_test(NAME ${PROJECT_NAME}
+         COMMAND ${PROJECT_NAME}
+         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+         )
+
+add_dependencies(check ${PROJECT_NAME})
