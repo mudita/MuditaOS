@@ -43,22 +43,5 @@ target_include_directories(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC )
 
-# Host target configuration(mainly used for unit testing)
-
-if(DEFINED BUILD_UNIT_TESTS)
-
-	project("unittest_gui" VERSION 1.0
-        DESCRIPTION "GUI tests.")
-
-	add_executable( "unittest_gui" "${CMAKE_CURRENT_LIST_DIR}/test/unittest_gui.cpp")
-	target_include_directories( "unittest_gui" 
-	PUBLIC
-		"${CMAKE_CURRENT_LIST_DIR}/" 
-		"${CMAKE_CURRENT_LIST_DIR}/../module-utils"
-		"${CMAKE_CURRENT_LIST_DIR}/../module-vfs"
-	)
-	message(" GUI TEST LIB DIR: ${PROJECT_LIB_DIRECTORY}")
-	target_link_directories("unittest_gui"  PUBLIC "${PROJECT_LIB_DIRECTORY}" )
-	target_link_libraries("unittest_gui" PUBLIC module-vfs module-utils module-gui )
-
-endif()
+message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: tps://appnroll.atlassian.net/browse/EGD-2987")
+#add_subdirectory(test)
