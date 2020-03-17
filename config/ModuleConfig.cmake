@@ -14,8 +14,3 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/targets/Target_Linux.cmake)
         include(${CMAKE_CURRENT_SOURCE_DIR}/targets/Target_Linux.cmake)
     endif()
 endif()
-
-# add unittests
-if(DEFINED BUILD_UNIT_TESTS)
-    add_subdirectory(tests)
-endif()
