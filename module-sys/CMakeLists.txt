@@ -40,50 +40,12 @@ target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 
 target_include_directories(${PROJECT_NAME}
-
         PUBLIC
-
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-
-target_compile_definitions(${PROJECT_NAME}
-
-        PUBLIC
-        )
-
 # Host target configuration(mainly used for unit testing)
 
-if(DEFINED BUILD_UNIT_TESTS)
-
-       add_executable(unittest_${PROJECT_NAME}
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Test1/TestService1.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Test1/CommandsService.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Test1/DelayedService.cpp
-
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/tests.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/tests-main.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/tests/Common/SchedulerKiller.cpp
-        )
-
-           target_compile_definitions(${PROJECT_NAME} PUBLIC UNIT_TESTS)
-
-           target_include_directories(unittest_${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/tests )
-
-           target_compile_definitions(unittest_${PROJECT_NAME} PUBLIC COMPILE_HOST)
-
-           target_compile_definitions(unittest_${PROJECT_NAME} PUBLIC LINUX_PORT_DEBUG)
-
-           target_compile_definitions(unittest_${PROJECT_NAME} PUBLIC MODULE_CORE_CUSTOM_BUS)
-
-           target_compile_options(unittest_${PROJECT_NAME} PUBLIC -fsanitize=address )
-
-
-
-           target_link_libraries(unittest_${PROJECT_NAME} PRIVATE pthread ${PROJECT_NAME})
-
-           target_link_options(unittest_${PROJECT_NAME} PUBLIC -fsanitize=address)
-
-
-endif()
+message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2988")
+#add_subdirectory(tests)
 

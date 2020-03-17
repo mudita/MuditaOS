@@ -50,9 +50,5 @@ if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
     target_link_libraries(${PROJECT_NAME} -lstdc++fs)
 endif()
 
-# Host target configuration(mainly used for unit testing)
-
-if(DEFINED BUILD_UNIT_TESTS)
-    add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
 

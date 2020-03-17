@@ -72,10 +72,4 @@ target_include_directories(${PROJECT_NAME}
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
     add_subdirectory(systemview)
 endif()
-
-if(DEFINED BUILD_UNIT_TESTS)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC BUILD_GTEST_TESTS)
-	add_subdirectory( test )
-endif()
-
-
+add_subdirectory( test )
