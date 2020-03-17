@@ -22,4 +22,8 @@ namespace gui
         label->setFont(style::window::font::verysmall);
     }
 
+    void Icon::setImg(const std::string &imageName)
+    {
+        img->set(imageName);
+    }
 } // namespace gui

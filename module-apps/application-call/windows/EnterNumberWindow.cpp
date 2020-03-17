@@ -13,6 +13,7 @@
 #include "../data/CallSwitchData.hpp"
 #include "InputMode.hpp"
 #include "UiCommonActions.hpp"
+#include "application-call/widgets/AddContactIcon.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
@@ -71,8 +72,7 @@ namespace gui
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         numberLabel->setDotsMode(true, false);
 
-        newContactIcon =
-            new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
+        newContactIcon                    = new gui::AddContactIcon(this, newContactIcon::x, newContactIcon::y);
         newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };
         setFocusItem(newContactIcon);
     }

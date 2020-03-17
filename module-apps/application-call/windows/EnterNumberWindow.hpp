@@ -9,8 +9,8 @@
 #pragma once
 
 #include "../ApplicationCall.hpp"
-#include "../widgets/Icon.hpp"
 #include "AppWindow.hpp"
+#include "application-call/widgets/AddContactIcon.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"
@@ -28,7 +28,7 @@ namespace gui
     {
       protected:
         gui::Label *numberLabel   = nullptr;
-        gui::Icon *newContactIcon = nullptr;
+        gui::AddContactIcon *newContactIcon = nullptr;
 
         void setNumberLabel(const std::string num);
 
