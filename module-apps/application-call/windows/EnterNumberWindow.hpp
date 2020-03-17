@@ -10,7 +10,7 @@
 
 #include "../ApplicationCall.hpp"
 #include "AppWindow.hpp"
-#include "application-call/widgets/AddContactIcon.hpp"
+#include "application-call/widgets/Icons.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/Image.hpp"
 #include "gui/widgets/Label.hpp"

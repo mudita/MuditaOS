@@ -13,7 +13,6 @@
 #include "../data/CallSwitchData.hpp"
 #include "InputMode.hpp"
 #include "UiCommonActions.hpp"
-#include "application-call/widgets/AddContactIcon.hpp"
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"

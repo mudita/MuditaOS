@@ -22,7 +22,7 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/EmergencyCallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallWindow.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/Icon.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/widgets/AddContactIcon.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/Icons.cpp"
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationCall.hpp"
 		"${CMAKE_CURRENT_LIST_DIR}/windows/CallMainWindow.hpp"
