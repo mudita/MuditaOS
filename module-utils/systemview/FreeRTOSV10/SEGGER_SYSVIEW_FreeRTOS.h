@@ -270,7 +270,9 @@ QUEUE_TYPE_RECURSIVE_MUTEX		4
                                SEGGER_SYSVIEW_ShrinkId((U32)pvBuffer))
 
 #define traceQUEUE_RECEIVE(pxQueue)                                                                                    \
+    if (pxQueue->ucQueueType <= traceQueueSendReceive_LVL)                                                             \
     SEGGER_SYSVIEW_RecordU32(apiID_OFFSET + apiID_XQUEUEGENERICRECEIVE, SEGGER_SYSVIEW_ShrinkId((U32)pxQueue))
+
 /*
  #define traceQUEUE_RECEIVE(pxQueue) \
 SEGGER_SYSVIEW_RecordU32x4(apiID_OFFSET + apiID_XQUEUEGENERICRECEIVE, SEGGER_SYSVIEW_ShrinkId((U32)pxQueue),
@@ -288,11 +290,14 @@ SEGGER_SYSVIEW_ShrinkId((U32)0),              \ xTicksToWait, 1)
                                SEGGER_SYSVIEW_ShrinkId((U32)0),                                                        \
                                xTicksToWait,                                                                           \
                                0)
+
 #define traceQUEUE_RECEIVE_FROM_ISR(pxQueue)                                                                           \
+    if (pxQueue->ucQueueType <= traceQueueSendReceive_LVL)                                                             \
     SEGGER_SYSVIEW_RecordU32x3(apiID_OFFSET + apiID_XQUEUERECEIVEFROMISR,                                              \
                                SEGGER_SYSVIEW_ShrinkId((U32)pxQueue),                                                  \
                                SEGGER_SYSVIEW_ShrinkId((U32)pvBuffer),                                                 \
                                (U32)pxHigherPriorityTaskWoken)
+
 #define traceQUEUE_RECEIVE_FROM_ISR_FAILED(pxQueue)                                                                    \
     SEGGER_SYSVIEW_RecordU32x3(apiID_OFFSET + apiID_XQUEUERECEIVEFROMISR,                                              \
                                SEGGER_SYSVIEW_ShrinkId((U32)pxQueue),                                                  \
@@ -312,7 +317,9 @@ SEGGER_SYSVIEW_ShrinkId((U32)0),              \ xTicksToWait, 1)
 #else
 
 #define traceQUEUE_SEND(pxQueue)                                                                                       \
+    if (pxQueue->ucQueueType <= traceQueueSendReceive_LVL)                                                             \
     SEGGER_SYSVIEW_RecordU32(apiID_OFFSET + apiID_XQUEUEGENERICSEND, SEGGER_SYSVIEW_ShrinkId((U32)pxQueue))
+
 /*
 #define traceQUEUE_SEND(pxQueue) \ SEGGER_SYSVIEW_RecordU32x4(apiID_OFFSET + apiID_XQUEUEGENERICSEND,
 SEGGER_SYSVIEW_ShrinkId((U32)pxQueue), 0u, 0u, xCopyPosition)
@@ -325,10 +332,13 @@ SEGGER_SYSVIEW_ShrinkId((U32)pxQueue), 0u, 0u, xCopyPosition)
                                (U32)pvItemToQueue,                                                                     \
                                xTicksToWait,                                                                           \
                                xCopyPosition)
+
 #define traceQUEUE_SEND_FROM_ISR(pxQueue)                                                                              \
+    if (pxQueue->ucQueueType <= traceQueueSendReceive_LVL)                                                             \
     SEGGER_SYSVIEW_RecordU32x2(apiID_OFFSET + apiID_XQUEUEGENERICSENDFROMISR,                                          \
                                SEGGER_SYSVIEW_ShrinkId((U32)pxQueue),                                                  \
                                (U32)pxHigherPriorityTaskWoken)
+
 #define traceQUEUE_SEND_FROM_ISR_FAILED(pxQueue)                                                                       \
     SEGGER_SYSVIEW_RecordU32x2(apiID_OFFSET + apiID_XQUEUEGENERICSENDFROMISR,                                          \
                                SEGGER_SYSVIEW_ShrinkId((U32)pxQueue),                                                  \
