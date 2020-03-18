@@ -45,11 +45,6 @@
 // module-sys
 #include "SystemManager/SystemManager.hpp"
 
-// SystemView include if enabled
-#ifdef SYSTEM_VIEW_ENABLED
-#include "module-utils/systemview/SEGGER/SEGGER_SYSVIEW.h"
-#endif
-
 class vfs vfs;
 
 class BlinkyService : public sys::Service
@@ -141,7 +136,7 @@ class BlinkyService : public sys::Service
 int main()
 {
 
-#ifdef SYSTEM_VIEW_ENABLED
+#if SYSTEM_VIEW_ENABLED
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_DisableEvents(SYSVIEW_EVTMASK_ISR_ENTER);
     SEGGER_SYSVIEW_DisableEvents(SYSVIEW_EVTMASK_ISR_EXIT);
