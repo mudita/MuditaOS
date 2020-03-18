@@ -19,17 +19,17 @@ namespace gui
         ~AddContactIcon() override = default;
     };
 
-    class sendSmsIcon : public Icon
+    class SendSmsIcon : public Icon
     {
       protected:
         static const inline std::string messageImg  = "mail";
         static const inline std::string sendSmstStr = "app_call_message";
 
       public:
-        sendSmsIcon() = delete;
-        sendSmsIcon(Item *parent, const uint32_t &x, const uint32_t &y)
+        SendSmsIcon() = delete;
+        SendSmsIcon(Item *parent, const uint32_t &x, const uint32_t &y)
             : Icon(parent, x, y, messageImg, utils::localize.get(sendSmstStr))
         {}
-        ~sendSmsIcon() override = default;
+        ~SendSmsIcon() override = default;
     };
 } // namespace gui

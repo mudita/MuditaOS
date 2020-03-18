@@ -6,15 +6,17 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include "CallWindow.hpp"
 #include <memory>
 #include <functional>
 #include <sstream>
 #include <iomanip>
 
+#include "application-call/widgets/Icons.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 
-#include "../ApplicationCall.hpp"
-#include "../data/CallSwitchData.hpp"
+#include "application-call/ApplicationCall.hpp"
+#include "application-call/data/CallSwitchData.hpp"
 
 #include "i18/i18.hpp"
 
@@ -24,11 +26,11 @@
 
 #include "Label.hpp"
 #include "Margins.hpp"
-#include "CallWindow.hpp"
-#include <Style.hpp>
+#include "application-call/data/CallAppStyle.hpp"
 
 namespace gui
 {
+    using namespace callAppStyle::callWindow;
 
     CallWindow::CallWindow(app::Application *app, std::string windowName) : AppWindow(app, windowName)
     {
@@ -74,7 +76,16 @@ namespace gui
         imageSpeaker[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
         imageSpeaker[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
 
-        //	imageMessage = new gui::Image( this, 200, 60-177, 0,0, "call_message" );
+        sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
+        sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
+            LOG_INFO("Send message gets focus");
+            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message"));
+            return true;
+        };
+        sendSmsIcon->activatedCallback = [=](gui::Item &item) {
+            LOG_ERROR("TODO: Reject call and send message template");
+            return true;
+        };
 
         imageMicrophone[static_cast<uint32_t>(AudioState::ON)] =
             new gui::Image(rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0, 0, "microphone_on");
@@ -183,11 +194,10 @@ namespace gui
             rects[1] = nullptr;
         }
 
-        if (imageMessage) {
-            removeWidget(imageMessage);
-            delete imageMessage;
-            imageMessage = nullptr;
-        }
+        removeWidget(sendSmsIcon);
+        delete sendSmsIcon;
+        sendSmsIcon = nullptr;
+
         if (imageCircleTop) {
             removeWidget(imageCircleTop);
             delete imageCircleTop;
@@ -219,7 +229,7 @@ namespace gui
     void CallWindow::setVisibleState()
     {
 
-        //	imageMessage->setVisible(false);
+        sendSmsIcon->setVisible(false);
         rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(false);
         rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(false);
         durationLabel->setVisible(false);
@@ -242,11 +252,11 @@ namespace gui
             bottomBar->setActive(gui::BottomBar::Side::CENTER, true);
             bottomBar->setActive(gui::BottomBar::Side::RIGHT, true);
             bottomBar->setText(gui::BottomBar::Side::LEFT, utils::localize.get("app_call_answer"));
-            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message"));
             bottomBar->setText(gui::BottomBar::Side::RIGHT, utils::localize.get("app_call_reject"));
             durationLabel->setText(utils::localize.get("app_call_is_calling"));
             durationLabel->setVisible(true);
-            //			imageMessage->setVisible(true);
+            sendSmsIcon->setVisible(true);
+            setFocusItem(sendSmsIcon);
         } break;
         case State::CALL_ENDED: {
             bottomBar->setActive(gui::BottomBar::Side::LEFT, false);
@@ -389,15 +399,6 @@ namespace gui
         return false;
     }
 
-    bool CallWindow::handleCenterButton()
-    {
-        if (state == State::INCOMING_CALL) {
-            LOG_ERROR("TODO: Reject call and send message template");
-            return true;
-        }
-        return false;
-    }
-
     bool CallWindow::handleRightButton()
     {
         switch (state) {
@@ -428,9 +429,6 @@ namespace gui
         if (inputEvent.state == InputEvent::State::keyReleasedShort ||
             inputEvent.state == InputEvent::State::keyReleasedLong) {
             switch (inputEvent.keyCode) {
-            case KeyCode::KEY_ENTER:
-                handled = handleCenterButton();
-                break;
             case KeyCode::KEY_LF:
                 handled = handleLeftButton();
                 break;

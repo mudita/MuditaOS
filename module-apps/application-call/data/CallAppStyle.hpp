@@ -42,4 +42,13 @@ namespace callAppStyle
             constexpr uint32_t y = 411;
         } // namespace newContactIcon
     }     // namespace enterNumberWindow
+
+    namespace callWindow
+    {
+        namespace sendMessageIcon
+        {
+            constexpr uint32_t x = 190;
+            constexpr uint32_t y = 411;
+        } // namespace sendMessageIcon
+    }     // namespace callWindow
 } // namespace callAppStyle

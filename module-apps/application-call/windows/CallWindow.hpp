@@ -9,9 +9,11 @@
 #ifndef MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
 #define MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
 
+#include "application-call/ApplicationCall.hpp"
 #include "AppWindow.hpp"
 #include "Rect.hpp"
 #include "Image.hpp"
+#include "application-call/widgets/Icons.hpp"
 
 namespace gui
 {
@@ -52,7 +54,7 @@ namespace gui
         gui::Image *imageSpeaker[2]    = {nullptr, nullptr};
         gui::Image *imageMicrophone[2] = {nullptr, nullptr};
         gui::Rect *rects[2]            = {nullptr};
-        gui::Image *imageMessage       = nullptr;
+        gui::SendSmsIcon *sendSmsIcon  = nullptr;
         gui::Image *imageCircleTop     = nullptr;
         gui::Image *imageCircleBottom  = nullptr;
 
@@ -65,7 +67,6 @@ namespace gui
          */
         void setVisibleState();
         bool handleLeftButton();
-        bool handleCenterButton();
         bool handleRightButton();
 
       public:
