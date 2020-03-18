@@ -63,8 +63,8 @@ enum class MuxDefines
     GSM0710_TYPE_UA   = 0x63, // 99 Unnumbered Acknowledgement
     GSM0710_TYPE_DM   = 0x0F, // 15 Disconnected Mode
     GSM0710_TYPE_DISC = 0x43, // 67 Disconnect
-    GSM0710_TYPE_UIH = 0xEF,  // 239 Unnumbered information with header check
-    GSM0710_TYPE_UI  = 0x03,  // 3 Unnumbered Acknowledgement
+    GSM0710_TYPE_UIH  = 0xEF, // 239 Unnumbered information with header check
+    GSM0710_TYPE_UI   = 0x03, // 3 Unnumbered Acknowledgement
     // control channel commands
     GSM0710_CONTROL_PN   = (0x80 | GSM0710_EA), //?? DLC parameter negotiation
     GSM0710_CONTROL_CLD  = (0xC0 | GSM0710_EA), // 193 Multiplexer close down
