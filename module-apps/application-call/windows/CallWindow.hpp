@@ -1,13 +1,4 @@
-/*
- * @file CallWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 12 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
+#pragma once
 
 #include "application-call/ApplicationCall.hpp"
 #include "AppWindow.hpp"
@@ -17,10 +8,6 @@
 
 namespace gui
 {
-
-    /*
-     *
-     */
     class CallWindow : public AppWindow
     {
       public:
@@ -91,5 +78,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_ */

@@ -4,27 +4,6 @@
 
 namespace callAppStyle
 {
-    // ICON
-    namespace icon
-    {
-        constexpr uint32_t w = 100;
-        constexpr uint32_t h = 100;
-        namespace label
-        {
-            constexpr uint32_t x = 9;
-            constexpr uint32_t y = 58;
-            constexpr uint32_t w = 82;
-            constexpr uint32_t h = 20;
-        } // namespace label
-        namespace img
-        {
-            constexpr uint32_t x = 34;
-            constexpr uint32_t y = 15;
-            constexpr uint32_t w = 32;
-            constexpr uint32_t h = 32;
-        } // namespace img
-    }     // namespace icon
-
     // ENTER NUMBER WINDOW
     namespace enterNumberWindow
     {
