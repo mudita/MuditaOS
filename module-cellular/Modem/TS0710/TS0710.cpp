@@ -62,7 +62,7 @@ TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
 
     BaseType_t task_error = xTaskCreate(workerTaskFunction,
                                         "TS0710Worker",
-                                        512, // in words
+                                        1024, // in words
                                         this,
                                         taskPriority,
                                         &taskHandle);
@@ -215,42 +215,6 @@ TS0710::ConfState TS0710::ConfProcedure()
             sec)); // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
     }
 
-    bool reboot_needed = false;
-
-    ret = parser->cmd(at::AT::SIM_DET);
-    if (!ret) {
-        LOG_FATAL("Cant check sim detection status!");
-    }
-    else {
-        if (ret.response[0].find("+QSIMDET: 1,0") != std::string::npos) {
-            LOG_DEBUG("SIM detecition enabled!");
-        }
-        else {
-            LOG_FATAL("SIM detection failure - trying to enable! %s", ret.response[0].c_str());
-            reboot_needed = true;
-        }
-    }
-    ret = parser->cmd(at::AT::QSIMSTAT);
-    if (!ret) {
-        LOG_FATAL("Cant check sim stat status");
-    }
-    else {
-        if (ret.response[0].find("+QSIMSTAT: 1,1") != std::string::npos) {
-            LOG_DEBUG("SIM swap enabled!");
-        }
-        else {
-            LOG_FATAL("SIM swap status failure! %s", ret.response[0].c_str());
-            reboot_needed = true;
-        }
-    }
-
-    // try to force set sim detection and sim stat
-    if (reboot_needed == true) {
-        ret = parser->cmd(at::AT::SIM_DET_ON);
-        ret = parser->cmd(at::AT::SIMSTAT_ON);
-        LOG_FATAL("Please full reboot phone!");
-    }
-
     return ConfState ::Success;
 }
 
@@ -372,15 +336,15 @@ TS0710::ConfState TS0710::StartMultiplexer()
     // channels[0]->setCallback(controlCallback);
 
     // TODO: Open remaining channels
-    OpenChannel(1, "Commands");
-    OpenChannel(2, "Notifications");
-    OpenChannel(3, "Data");
+    OpenChannel(Channel::Commands);
+    OpenChannel(Channel::Notifications);
+    OpenChannel(Channel::Data);
 
     mode = Mode::CMUX;
 
-    // Route URCs to second (Notifications) MUX channel
-    DLC_channel *c = GetChannel("Commands");
+    DLC_channel *c = get(Channel::Commands);
     if (c != nullptr) {
+        // Route URCs to second (Notifications) MUX channel
         c->cmd(at::AT::SET_URC_CHANNEL);
         LOG_DEBUG("Sending test ATI");
         auto res = c->cmd(at::AT::SW_INFO);

@@ -20,6 +20,8 @@
 #include <application-settings/ApplicationSettings.hpp>
 #include <cassert>
 #include <service-appmgr/ApplicationManager.hpp>
+#include <service-cellular/ServiceCellular.hpp>
+#include "windows/Reboot.hpp"
 
 namespace app
 {
@@ -69,8 +71,8 @@ namespace app
             (msg->notificationType == DB::NotificationType::Added)) {
             notifications.notSeenCalls = DBServiceAPI::CalllogGetCount(this, EntryState::UNREAD);
             notifications.notSeenSMS   = DBServiceAPI::SMSGetCount(this, EntryState::UNREAD);
-            this->windows[app::name::window::desktop_menu]->rebuild();
-            this->windows[app::name::window::desktop_lockscreen]->rebuild();
+            windows[app::window::name::desktop_menu]->rebuild();
+            windows[app::window::name::desktop_main_window]->rebuild();
             return true;
         }
         return false;
@@ -79,17 +81,21 @@ namespace app
     auto ApplicationDesktop::handle(CellularNotificationMessage *msg) -> bool
     {
         assert(msg);
-        if (msg->type == CellularNotificationMessage::Type::ModemOn &&
-            Store::GSM::get()->sim != Store::GSM::SIM::SIM1 && Store::GSM::get()->sim != Store::GSM::SIM::SIM1) {
-            if (screenLocked) {
-                need_sim_select = true;
-            }
-            else {
-                need_sim_select = false;
+        if (msg->type == CellularNotificationMessage::Type::ModemOn) {
+            if (need_sim_select && !screenLocked) {
                 sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
+                return true;
             }
-            return true;
+            else if (need_sim_select == false) {
+                sys::Bus::SendUnicast(std::make_shared<CellularRequestMessage>(MessageType::CellularSimProcedure),
+                                      ServiceCellular::serviceName,
+                                      this);
+            }
         }
+        if (msg->type == CellularNotificationMessage::Type::ModemFatalFailure) {
+            switchWindow(app::window::name::desktop_reboot);
+        }
+
         return false;
     }
 
@@ -102,8 +108,21 @@ namespace app
             return ret;
 
         // if value of the pin hash is different than 0 it means that home screen is pin protected
-        if (settings.lockPassHash) {
+        if (settings.lockPassHash != 0) {
             pinLocked = true;
+        }
+
+        switch (settings.activeSIM) {
+        case SettingsRecord::ActiveSim::NONE:
+            Store::GSM::get()->selected = Store::GSM::SIM::NONE;
+            need_sim_select             = true;
+            break;
+        case SettingsRecord::ActiveSim::SIM1:
+            Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
+            break;
+        case SettingsRecord::ActiveSim::SIM2:
+            Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
+            break;
         }
 
         screenLocked = true;
@@ -126,20 +145,12 @@ namespace app
 
     void ApplicationDesktop::createUserInterface()
     {
-
-        gui::AppWindow *window = nullptr;
-
-        window = new gui::DesktopMainWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::PinLockWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::MenuWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-
-        window = new gui::PowerOffWindow(this);
-        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+        using namespace app::window::name;
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_main_window, new gui::DesktopMainWindow(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_pin_lock, new gui::PinLockWindow(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_menu, new gui::MenuWindow(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_poweroff, new gui::PowerOffWindow(this)));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(desktop_reboot, new gui::RebootWindow(this)));
     }
 
     bool ApplicationDesktop::getScreenLocked()

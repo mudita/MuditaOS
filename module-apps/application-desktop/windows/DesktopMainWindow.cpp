@@ -82,7 +82,7 @@ namespace gui
         children.clear();
     }
 
-    DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, gui::name::window::main_window)
+    DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
         buildInterface();
     }

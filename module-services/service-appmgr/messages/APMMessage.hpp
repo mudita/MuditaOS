@@ -175,6 +175,16 @@ namespace sapm
         {}
     };
 
+    class APMCheckApp : public APMMessage
+    {
+      public:
+        APMCheckApp(const std::string &senderName, const std::string &appNameToCheck)
+            : APMMessage(MessageType::APMCheckAppRunning, senderName), appNameToCheck(appNameToCheck)
+        {}
+        const std::string appNameToCheck;
+        bool isRunning = false;
+    };
+
 } /* namespace sapm */
 
 #endif /* MODULE_SERVICES_SERVICE_APPMGR_MESSAGES_APMMESSAGE_HPP_ */

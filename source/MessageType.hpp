@@ -14,10 +14,10 @@ enum class MessageType
 
     MessageTypeUninitialized = 0,
     // eink messages
-    EinkStateRequest, // message is used to pull status of the eink. If eink is ready to display image
-    EinkImageData,    // message with pointer to the image data for displaying
-    EinkDMATransfer,  // this message is internally sent from wink service to eink service. This will trigger DMA
-                     // transfer to Eink's controller. After tranfer gui service wil lbewill be notified
+    EinkStateRequest,      // message is used to pull status of the eink. If eink is ready to display image
+    EinkImageData,         // message with pointer to the image data for displaying
+    EinkDMATransfer,       // this message is internally sent from wink service to eink service. This will trigger DMA
+                           // transfer to Eink's controller. After tranfer gui service wil lbewill be notified
     EinkTemperatureUpdate, // message sent from timer handler. Message forces service to update temperature measured by
                            // the eink.
 
@@ -77,9 +77,11 @@ enum class MessageType
     CellularHangupCall,         // Hang up call
 
     CellularListCurrentCalls,
+    CellularAwaitDesktop,
     CellularStartPowerUpProcedure,
     CellularStartConfProcedure,
     CellularStartAudioConfProcedure,
+    CellularSanityCheck,
     CellularSimProcedure,
     CellularGetOwnNumber,
     CellularGetIMSI,
@@ -119,8 +121,9 @@ enum class MessageType
     AudioGetFileTags,
 
     // application manager
-    APMSwitch,        // request to switch to given application, optionally also to specified window
-    APMSwitchPrevApp, // Request to switch to previous application.
+    APMCheckAppRunning, // check if application is running in application manager
+    APMSwitch,          // request to switch to given application, optionally also to specified window
+    APMSwitchPrevApp,   // Request to switch to previous application.
     APMConfirmSwitch, // Used when application confirms that it is loosing focus and also when application confirms that
                       // is has gained focus
     APMConfirmClose,  // Sent by application to confirm completion of the close procedure

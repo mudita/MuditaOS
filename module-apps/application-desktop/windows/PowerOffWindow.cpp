@@ -25,7 +25,7 @@
 namespace gui
 {
 
-    PowerOffWindow::PowerOffWindow(app::Application *app) : AppWindow(app, "PowerOffWindow")
+    PowerOffWindow::PowerOffWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_poweroff)
     {
         buildInterface();
     }

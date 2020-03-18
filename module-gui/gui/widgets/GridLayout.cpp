@@ -24,9 +24,13 @@ void GridLayout::resizeItems()
     uint32_t strech_x     = 0;
     uint32_t strech_y     = 0;
     uint32_t max_elements = el_in_x * el_in_y;
+    /// cant show elements when size is not set
+    if (area().w == 0 || area().h == 0) {
+        return;
+    }
 
     if (children.size() > max_elements) {
-        LOG_ERROR("More children than possible to show");
+        LOG_ERROR("More children than possible to show: %d > %d", children.size() > max_elements);
         return;
     }
     if (el_in_x > 2)
