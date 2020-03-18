@@ -42,7 +42,7 @@ jobs:
       uses: textbook/git-checkout-submodule-action@2.0.0
     - name: Run UT
       run: |
-        ./configure.sh linux Debug && make check -C build-linux-Debug -j4
+        ./configure.sh linux Debug && make check -C build-linux-Debug -j4 VERBOSE=1
     - name: Build rt1051
       run: |
         sudo apt-get -q -y remove cmake
