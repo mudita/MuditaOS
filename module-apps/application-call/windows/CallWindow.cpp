@@ -57,43 +57,6 @@ namespace gui
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         bottomBar->setText(gui::BottomBar::Side::CENTER, "Message");
 
-        // create circles to hold images inside
-        for (uint32_t i = 0; i < 2; ++i) {
-            rects[i] = new gui::Rect(this, 0, 0, 80, 80);
-            rects[i]->setFilled(false);
-            rects[i]->setRadius(40);
-            rects[i]->setPenFocusWidth(3);
-            rects[i]->setPenWidth(1);
-        }
-
-        rects[static_cast<uint32_t>(FocusRects::Speaker)]->setPosition(150, 400);
-        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setPosition(250, 400);
-
-        imageSpeaker[static_cast<uint32_t>(AudioState::ON)] =
-            new gui::Image(rects[static_cast<uint32_t>(FocusRects::Speaker)], 20, 20, 0, 0, "speaker_on");
-        imageSpeaker[static_cast<uint32_t>(AudioState::OFF)] =
-            new gui::Image(rects[static_cast<uint32_t>(FocusRects::Speaker)], 20, 20, 0, 0, "speaker_off");
-        imageSpeaker[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
-        imageSpeaker[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
-
-        sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
-        sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
-            LOG_INFO("Send message gets focus");
-            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message"));
-            return true;
-        };
-        sendSmsIcon->activatedCallback = [=](gui::Item &item) {
-            LOG_ERROR("TODO: Reject call and send message template");
-            return true;
-        };
-
-        imageMicrophone[static_cast<uint32_t>(AudioState::ON)] =
-            new gui::Image(rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0, 0, "microphone_on");
-        imageMicrophone[static_cast<uint32_t>(AudioState::OFF)] =
-            new gui::Image(rects[static_cast<uint32_t>(FocusRects::Micrphone)], 20, 20, 0, 0, "microphone_off");
-        imageMicrophone[static_cast<uint32_t>(AudioState::ON)]->setVisible(false);
-        imageMicrophone[static_cast<uint32_t>(AudioState::OFF)]->setVisible(false);
-
         // top circle image
         imageCircleTop    = new gui::Image(this, 116, 82, 0, 0, "circle_top");
         imageCircleBottom = new gui::Image(this, 106, 266, 0, 0, "circle_bottom");
@@ -112,61 +75,66 @@ namespace gui
         numberLabel->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        // define navigation between labels
-        rects[static_cast<uint32_t>(FocusRects::Speaker)]->setNavigationItem(
-            NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Micrphone)]);
-        rects[static_cast<uint32_t>(FocusRects::Speaker)]->setNavigationItem(
-            NavigationDirection::RIGHT, rects[static_cast<uint32_t>(FocusRects::Micrphone)]);
-
-        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setNavigationItem(
-            NavigationDirection::LEFT, rects[static_cast<uint32_t>(FocusRects::Speaker)]);
-        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setNavigationItem(
-            NavigationDirection::RIGHT, rects[static_cast<uint32_t>(FocusRects::Speaker)]);
-
-        // focus callbacks
-        rects[static_cast<uint32_t>(FocusRects::Speaker)]->focusChangedCallback = [=](gui::Item &item) {
-            LOG_INFO("Speaker gets focus");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_speaker"));
+        speakerIcon                       = new SpeakerIcon(this, 260, 411);
+        speakerIcon->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_switch"));
             return true;
         };
-
-        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->focusChangedCallback = [=](gui::Item &item) {
-            LOG_INFO("Mute gets focus");
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_mute"));
-            return true;
-        };
-
-        // activation callbacks
-        rects[static_cast<uint32_t>(FocusRects::Speaker)]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("Speaker activated");
-            // update icon
-            imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(false);
-            speakerState = (speakerState == AudioState::ON) ? AudioState::OFF : AudioState::ON;
-            imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
-
+        speakerIcon->activatedCallback = [=](gui::Item &item) {
+            speakerIcon->setNext();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            LOG_INFO("Speaker activated %d", static_cast<int>(speakerIcon->get()));
 
-            (speakerState == AudioState::ON) ? AudioServiceAPI::RoutingSpeakerPhone(this->application, true)
-                                             : AudioServiceAPI::RoutingSpeakerPhone(this->application, false);
+            switch (speakerIcon->get()) {
+            case SpeakerIconState::SPEAKER: {
+                AudioServiceAPI::RoutingSpeakerPhone(this->application, false);
+            } break;
+            case SpeakerIconState::SPEAKERON: {
+                AudioServiceAPI::RoutingSpeakerPhone(this->application, true);
+            } break;
+            // case SpeakerIconState::BLUETOOTH: {
+            //     // TODO: need implementation
+            // } break;
+            default:
+                break;
+            }
 
             return true;
         };
 
-        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("Mute activated");
-
-            // update icon
-            imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(false);
-            microphoneState = (microphoneState == AudioState::ON) ? AudioState::OFF : AudioState::ON;
-            imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
-
+        microphoneIcon                       = new MicrophoneIcon(this, 120, 411);
+        microphoneIcon->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_switch"));
+            return true;
+        };
+        microphoneIcon->activatedCallback = [=](gui::Item &item) {
+            microphoneIcon->setNext();
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+            LOG_INFO("Mic activated activated %d", static_cast<int>(microphoneIcon->get()));
 
-            (microphoneState == AudioState::ON) ? AudioServiceAPI::RoutingMute(this->application, false)
-                                                : AudioServiceAPI::RoutingMute(this->application, true);
+            microphoneIcon->get() == MicrophoneIconState::MUTED ? AudioServiceAPI::RoutingMute(this->application, false)
+                                                                : AudioServiceAPI::RoutingMute(this->application, true);
 
             return true;
         };
+
+        sendSmsIcon                       = new gui::SendSmsIcon(this, sendMessageIcon::x, sendMessageIcon::y);
+        sendSmsIcon->focusChangedCallback = [=](gui::Item &item) {
+            LOG_INFO("Send message gets focus");
+            bottomBar->setText(gui::BottomBar::Side::CENTER, utils::localize.get("app_call_message"));
+            return true;
+        };
+        sendSmsIcon->activatedCallback = [=](gui::Item &item) {
+            LOG_ERROR("TODO: Reject call and send message template");
+            return true;
+        };
+
+        // define navigation between icons
+        microphoneIcon->setNavigationItem(NavigationDirection::LEFT, speakerIcon);
+        microphoneIcon->setNavigationItem(NavigationDirection::RIGHT, speakerIcon);
+
+        speakerIcon->setNavigationItem(NavigationDirection::LEFT, microphoneIcon);
+        speakerIcon->setNavigationItem(NavigationDirection::RIGHT, microphoneIcon);
     }
 
     void CallWindow::destroyInterface()
@@ -183,16 +151,14 @@ namespace gui
             delete durationLabel;
             durationLabel = nullptr;
         }
-        if (rects[0]) {
-            removeWidget(rects[0]);
-            delete rects[0];
-            rects[0] = nullptr;
-        }
-        if (rects[1]) {
-            removeWidget(rects[1]);
-            delete rects[1];
-            rects[1] = nullptr;
-        }
+
+        removeWidget(microphoneIcon);
+        delete microphoneIcon;
+        microphoneIcon = nullptr;
+
+        removeWidget(speakerIcon);
+        delete speakerIcon;
+        speakerIcon = nullptr;
 
         removeWidget(sendSmsIcon);
         delete sendSmsIcon;
@@ -228,21 +194,17 @@ namespace gui
 
     void CallWindow::setVisibleState()
     {
-
         sendSmsIcon->setVisible(false);
-        rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(false);
-        rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(false);
+        speakerIcon->setVisible(false);
+        microphoneIcon->setVisible(false);
         durationLabel->setVisible(false);
         setFocusItem(nullptr);
 
         auto showIconsLambda = [=]() {
-            rects[static_cast<uint32_t>(FocusRects::Speaker)]->setVisible(true);
-            rects[static_cast<uint32_t>(FocusRects::Micrphone)]->setVisible(true);
+            speakerIcon->setVisible(true);
+            microphoneIcon->setVisible(true);
 
-            imageSpeaker[static_cast<uint32_t>(speakerState)]->setVisible(true);
-            imageMicrophone[static_cast<uint32_t>(microphoneState)]->setVisible(true);
-
-            setFocusItem(rects[static_cast<uint32_t>(FocusRects::Speaker)]);
+            setFocusItem(microphoneIcon);
         };
 
         // show state of the window

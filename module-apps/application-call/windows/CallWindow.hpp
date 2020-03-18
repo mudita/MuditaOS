@@ -38,15 +38,11 @@ namespace gui
         // used to inform user about call state of call and display duration of call
         gui::Label *durationLabel = nullptr;
 
-        gui::Image *imageSpeaker[2]    = {nullptr, nullptr};
-        gui::Image *imageMicrophone[2] = {nullptr, nullptr};
-        gui::Rect *rects[2]            = {nullptr};
         gui::SendSmsIcon *sendSmsIcon  = nullptr;
+        gui::MicrophoneIcon *microphoneIcon = nullptr;
+        gui::SpeakerIcon *speakerIcon       = nullptr;
         gui::Image *imageCircleTop     = nullptr;
         gui::Image *imageCircleBottom  = nullptr;
-
-        AudioState microphoneState = AudioState::ON;
-        AudioState speakerState    = AudioState::OFF;
 
         State state = State::IDLE;
         /**

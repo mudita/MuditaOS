@@ -53,8 +53,8 @@ namespace gui
       protected:
         static const inline std::string muteImg   = "microphone_on";
         static const inline std::string mutedImg  = "microphone_off";
-        static const inline std::string muteStr   = "app_call_message";
-        static const inline std::string mutedStr  = "app_call_message";
+        static const inline std::string muteStr   = "app_call_mute";
+        static const inline std::string mutedStr  = "app_call_muted";
         static const inline Icon::IconMap iconMap = {{MicrophoneIconState::MUTE, {muteImg, muteStr}},
                                                      {MicrophoneIconState::MUTED, {mutedImg, mutedStr}}};
 
@@ -70,21 +70,23 @@ namespace gui
     {
         SPEAKER,
         SPEAKERON,
-        BLUETOOTH
+        // BLUETOOTH
     };
 
     class SpeakerIcon : public Icon<SpeakerIconState>
     {
       protected:
-        static const inline std::string speakerImg   = "app_call_speaker";
-        static const inline std::string speakerOnImg = "app_call_speaker_on";
-        static const inline std::string bluetoothImg = "app_call_bluetooth";
+        static const inline std::string speakerImg   = "speaker_on";
+        static const inline std::string speakerOnImg = "speaker_off";
+        // static const inline std::string bluetoothImg = "app_call_bluetooth";
         static const inline std::string speakerStr   = "app_call_speaker";
         static const inline std::string speakerOnStr = "app_call_speaker_on";
-        static const inline std::string bluetoothStr = "app_call_bluetooth";
-        static const inline Icon::IconMap iconMap    = {{SpeakerIconState::SPEAKER, {speakerImg, speakerStr}},
-                                                     {SpeakerIconState::SPEAKERON, {speakerOnImg, speakerOnStr}},
-                                                     {SpeakerIconState::BLUETOOTH, {bluetoothImg, bluetoothStr}}};
+        // static const inline std::string bluetoothStr = "app_call_bluetooth";
+        static const inline Icon::IconMap iconMap = {
+            {SpeakerIconState::SPEAKER, {speakerImg, speakerStr}},
+            {SpeakerIconState::SPEAKERON, {speakerOnImg, speakerOnStr}},
+            //{SpeakerIconState::BLUETOOTH, {bluetoothImg, bluetoothStr}}
+        };
 
       public:
         SpeakerIcon() = delete;

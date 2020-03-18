@@ -64,9 +64,27 @@ namespace gui
 
         virtual void set(const T &state)
         {
+            LOG_ERROR("set %d", static_cast<int>(state));
             this->state = state;
             img->set(data.at(state).first);
             label->setText(utils::localize.get(data.at(state).second));
+        }
+
+        virtual T get()
+        {
+            return state;
+        }
+
+        void setNext()
+        {
+            auto it = data.find(state);
+            it++;
+            if (it != data.end()) {
+                set(it->first);
+            }
+            else {
+                set(data.begin()->first);
+            }
         }
 
       protected:
