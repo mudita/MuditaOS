@@ -96,7 +96,7 @@
 
 /* Configuration, interface and endpoint. */
 #define USB_DEVICE_CONFIGURATION_COUNT (1)
-#define USB_DEVICE_STRING_COUNT        (3)
+#define USB_DEVICE_STRING_COUNT        (4)
 #define USB_DEVICE_LANGUAGE_COUNT      (1)
 
 #define USB_CDC_VCOM_CONFIGURE_INDEX (1)
