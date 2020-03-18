@@ -306,8 +306,8 @@ namespace app
         }
 
         else if (msgl->messageType == MessageType::AppSwitch) {
-            LOG_DEBUG("AppSwitch");
             AppSwitchMessage *msg = reinterpret_cast<AppSwitchMessage *>(msgl);
+            LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
             // Application is starting or it is in the background. Upon switch command if name if correct it goes
             // foreground
             if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
@@ -315,7 +315,7 @@ namespace app
                 if (msg->getTargetApplicationName() == this->GetName()) {
                     setState(State::ACTIVE_FORGROUND);
                     if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
-                        LOG_INFO("%s : %s",
+                        LOG_INFO("target Window: %s : target description: %s",
                                  msg->getTargetWindowName().c_str(),
                                  msg->getData() ? msg->getData()->getDescription().c_str() : "");
                         switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));

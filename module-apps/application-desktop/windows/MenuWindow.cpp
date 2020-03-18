@@ -79,7 +79,7 @@ namespace gui
         }
     }
 
-    MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::name::window::desktop_menu)
+    MenuWindow::MenuWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_menu)
     {
         buildInterface();
     }
