@@ -24,6 +24,8 @@ sys::ReturnCodes EndpointHandler::deviceInfo(
              {parserutils::json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
              {parserutils::json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
              {parserutils::json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))},
+             {parserutils::json::signalStrength,
+              std::to_string(static_cast<int>(Store::GSM::get()->getSignalStrength().rssiBar))},
              {parserutils::json::fsTotal, std::to_string(fsStats.totalMbytes)},
              {parserutils::json::fsFree, std::to_string(fsStats.freeMbytes)},
              {parserutils::json::fsFreePercent, std::to_string(fsStats.freePercent)},
