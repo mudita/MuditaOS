@@ -13,6 +13,7 @@ jobs:
         token: ${{ secrets.GitHub_PAT }}
         submodules: true
     - name: Bootstrap
+        run: |
         sudo apt-get update && apt-get install -y pkg-config gtkmm-3.0 portaudio19-dev clang-format-9
     - name: Style Linter Setup
       run: |
