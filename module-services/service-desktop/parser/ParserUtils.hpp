@@ -61,6 +61,7 @@ namespace parserutils
         const inline std::string batteryState   = "batteryState";
         const inline std::string selectedSim    = "selectedSim";
         const inline std::string trayState      = "trayState";
+        const inline std::string signalStrength = "signalStrength";
         const inline std::string fsTotal        = "fsTotal";
         const inline std::string fsFreePercent  = "fsFreePercent";
         const inline std::string fsFree         = "fsFree";
