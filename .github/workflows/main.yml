@@ -14,7 +14,7 @@ jobs:
         submodules: true
     - name: Get Dependences
       run: |
-        sudo apt-get update sudo apt-get install -y pkg-config gtkmm-3.0 portaudio19-dev clang-format-9
+        sudo apt-get update && sudo apt-get install -y pkg-config gtkmm-3.0 portaudio19-dev clang-format-9
     - name: Style Check
       run: |
         ./config/pre-commit-check-only.hook --last
