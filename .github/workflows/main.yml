@@ -37,7 +37,7 @@ jobs:
         echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
         echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
         echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
-        
+        echo 'set(TOOLCHAIN_PATH "/home/runner/gcc-arm-none-eabi-8-2019-q3-update" CACHE INTERNAL "")' > ./env.cmake
     - name: Checkout submodules
       uses: textbook/git-checkout-submodule-action@2.0.0
     - name: Run UT
@@ -45,7 +45,6 @@ jobs:
         ./configure.sh linux Debug && make check -C build-linux-Debug -j4
     - name: Build rt1051
       run: |
-        echo 'set(TOOLCHAIN_PATH "/home/runner/gcc-arm-none-eabi-8-2019-q3-update" CACHE INTERNAL "")' > ./env.cmake
         sudo apt-get -q -y remove cmake
         ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
 
