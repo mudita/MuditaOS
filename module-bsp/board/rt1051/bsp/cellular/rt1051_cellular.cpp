@@ -358,7 +358,7 @@ namespace bsp
         gpio_2->ConfPin(
             DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Output,
                                 .irqMode  = DriverGPIOPinParams::InterruptMode::NoIntmode,
-                                .defLogic = 1,
+                                .defLogic = 0,
                                 .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIMCARD_PRESENCE_PIN)});
 
         gpio_2->ConfPin(
@@ -483,7 +483,7 @@ namespace bsp
         void hotswap_trigger()
         {
             GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 1);
-            ulTaskNotifyTake(pdTRUE, 100); // sleep for 100 ms...
+            vTaskDelay(100); // sleep for 100 ms...
             GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
         }
 

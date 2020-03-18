@@ -40,8 +40,11 @@ class CellularNotificationMessage : public CellularMessage
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
         SIM,                      // change on SIM from URC
-        ModemOn,                  // Modem initialized
-        RawCommand,               // send raw command to modem -> returns raw, tokenised result
+        SanityCheck,
+        ModemOn,           // Modem initialized
+        ModemFatalFailure, // Modem messed up beyond recognition, needs reboot (ie. QSIMSEL not set, or just returns
+                           // `OK` without message body (which happens sometimes...), or stopped totally responding
+        RawCommand,        // send raw command to modem -> returns raw, tokenised result
         None
     };
 

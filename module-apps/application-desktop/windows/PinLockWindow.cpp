@@ -25,7 +25,7 @@
 namespace gui
 {
 
-    PinLockWindow::PinLockWindow(app::Application *app) : AppWindow(app, "PinLockWindow")
+    PinLockWindow::PinLockWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_pin_lock)
     {
         buildInterface();
     }

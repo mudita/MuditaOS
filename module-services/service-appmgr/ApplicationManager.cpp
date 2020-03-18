@@ -35,6 +35,7 @@
 // module-utils
 #include "log/log.hpp"
 #include "i18/i18.hpp"
+#include <cassert>
 
 namespace sapm
 {
@@ -218,6 +219,18 @@ namespace sapm
         auto msgType = msgl->messageType;
 
         switch (msgType) {
+        case MessageType::APMCheckAppRunning: {
+            auto appcheck = dynamic_cast<sapm::APMCheckApp *>(msgl);
+            assert(appcheck);
+            auto ret = std::make_shared<APMCheckApp>(this->GetName(), appcheck->appNameToCheck);
+            if (appGet(appcheck->appNameToCheck) != nullptr) {
+                ret->isRunning = true;
+            }
+            else {
+                ret->isRunning = false;
+            }
+            return ret;
+        } break;
         case MessageType::APMInitPowerSaveMode: {
             handlePowerSavingModeInit();
         } break;
@@ -599,6 +612,7 @@ namespace sapm
             LOG_ERROR("can't register: %s no such app in `applicationsk`", msg->getSenderName().c_str());
             return false;
         }
+        LOG_DEBUG("Register ---------> %s", msg->getSenderName().c_str());
 
         if (msg->getSenderName() == launchApplicationName) {
             // application starts in background
@@ -619,6 +633,11 @@ namespace sapm
         else {
             app->setState(app::Application::State::ACTIVE_BACKGROUND);
         }
+
+        LOG_DEBUG("NOTIFICATION NOTIFICATION NOTIFICATION NOTIFICATION NOTIFICATION NOTIFICATION");
+        auto notification = std::make_shared<APMCheckApp>(this->GetName(), msg->getSenderName());
+        sys::Bus::SendMulticast(notification, sys::BusChannels::AppManagerNotifications, this);
+
         return true;
     }
 
@@ -838,6 +857,21 @@ namespace sapm
         auto msg = std::make_shared<sapm::APMInitPowerSaveMode>(sender->GetName());
         sys::Bus::SendUnicast(msg, "ApplicationManager", sender);
         return true;
+    }
+
+    bool ApplicationManager::appRunning(sys::Service *sender, const std::string &name)
+    {
+        auto msg     = std::make_shared<sapm::APMCheckApp>(sender->GetName(), name);
+        auto msg_ret = sys::Bus::SendUnicast(msg, "ApplicationManager", sender, 5000);
+        if (msg_ret.first != sys::ReturnCodes::Success) {
+            LOG_ERROR("Cant send message!");
+        }
+        auto ret = dynamic_cast<sapm::APMCheckApp *>(msg_ret.second.get());
+        if (ret != nullptr && ret->isRunning) {
+            return true;
+        }
+        return false;
+        // return true;
     }
 
 } /* namespace sapm */

@@ -242,6 +242,13 @@ namespace sapm
          * mode.
          */
         static bool messageInitPowerSaveMode(sys::Service *sender);
+
+        /**
+         * @brief Sends message to Application Manager.
+         *
+         * \returns true if app manager running and app is registered == running, false othervise
+         */
+        static bool appRunning(sys::Service *sender, const std::string &name);
     };
 
 } /* namespace sapm */

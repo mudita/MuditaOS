@@ -32,6 +32,8 @@
 
 #include "log/log.hpp"
 
+#include "service-appmgr/ApplicationManager.hpp"
+#include "service-appmgr/messages/APMMessage.hpp"
 #include "service-cellular/SignalStrength.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"
 #include "ucs2/UCS2.hpp"
@@ -46,7 +48,7 @@
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
-inline const auto cellularStack = 16384UL;
+inline const auto cellularStack = 24000UL;
 
 using namespace cellular;
 
@@ -69,6 +71,10 @@ const char *State::c_str(State::ST state) const
         return "FullyFunctional";
     case ST::Failed:
         return "Failed";
+    case ST::SanityCheck:
+        return "SanityCheck";
+    case ST::ModemFatalFailure:
+        return "ModemFatalFailure";
     }
     return "";
 }
@@ -242,7 +248,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             }
             case CellularNotificationMessage::Type::RawCommand: {
                 auto m       = dynamic_cast<cellular::RawCommand *>(msgl);
-                auto channel = cmux->GetChannel("Commands");
+                auto channel = cmux->get(TS0710::Channel::Commands);
                 if (!m || !channel) {
                     LOG_ERROR("RawCommand error: %s %s", m == nullptr ? "" : "bad cmd", !channel ? "no channel" : "");
                     break;
@@ -320,26 +326,22 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
                 LOG_DEBUG("[ServiceCellular] Modem is fully operational");
 
-                DLC_channel *notificationsChannel = cmux->GetChannel("Notifications"); // open channel - notifications
+                DLC_channel *notificationsChannel =
+                    cmux->get(TS0710::Channel::Notifications); // open channel - notifications
                 if (notificationsChannel) {
                     LOG_DEBUG("Setting up notifications callback");
                     notificationsChannel->setCallback(notificationCallback);
                 }
 
-                state.set(State::ST::ModemOn);
-                if (select_sim()) {
-                    bsp::cellular::sim::sim_sel();
-                    bsp::cellular::sim::hotswap_trigger();
-                }
-                auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemOn);
-                sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
+                state.set(State::ST::SanityCheck);
+                sys::Bus::SendUnicast(
+                    std::make_shared<CellularRequestMessage>(MessageType::CellularSanityCheck), GetName(), this);
             }
             else {
                 LOG_DEBUG("[ServiceCellular] Modem FAILED");
                 state.set(State::ST::Failed);
             }
 
-            state.set(State::ST::ModemOn);
             // Propagate "ServiceReady" notification into system
             sys::Bus::SendMulticast(
                 std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ServiceReady),
@@ -354,13 +356,34 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         else {
             // Reset procedure started, do nothing here
-            state.set(State::ST::PowerUpInProgress);
+            state.set(State::ST::Idle);
         }
+    } break;
+
+    case MessageType::CellularSanityCheck: {
+        auto ret = sim_sanity_check();
+        if (ret) {
+            state.set(State::ST::ModemOn);
+            auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemOn);
+            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
+        }
+        else {
+            LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
+            state.set(State::ST::ModemFatalFailure);
+            sys::Bus::SendMulticast(
+                std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemFatalFailure),
+                sys::BusChannels::ServiceCellularNotifications,
+                this);
+        }
+    } break;
+
+    case MessageType::CellularSimProcedure: {
+        select_sim();
     } break;
 
     case MessageType::CellularListCurrentCalls: {
         constexpr size_t numberOfExpectedTokens = 3;
-        auto ret                                = cmux->GetChannel("Commands")->cmd(at::AT::CLCC);
+        auto ret                                = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CLCC);
         if (ret && ret.response.size() == numberOfExpectedTokens) {
             // TODO: alek: add case when more status calls is returned
             // TODO: alek: add cellular call validation and check it with modemcall
@@ -395,7 +418,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     } break;
 
     case MessageType::CellularHangupCall: {
-        auto channel = cmux->GetChannel("Commands");
+        auto channel = cmux->get(TS0710::Channel::Commands);
         LOG_INFO("CellularHangupCall");
         if (channel) {
             if (channel->cmd(at::AT::ATH)) {
@@ -415,7 +438,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     } break;
 
     case MessageType::CellularAnswerIncomingCall: {
-        auto channel = cmux->GetChannel("Commands");
+        auto channel = cmux->get(TS0710::Channel::Commands);
         auto ret     = false;
         if (channel) {
             // TODO alek: check if your request isn't for 5 sec when you wait in command for 90000, it's exclusivelly
@@ -435,7 +458,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     case MessageType::CellularDialNumber: {
         CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-        auto channel                = cmux->GetChannel("Commands");
+        auto channel                = cmux->get(TS0710::Channel::Commands);
         if (channel) {
             auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->data + ";\r");
             if (ret) {
@@ -642,13 +665,13 @@ bool ServiceCellular::sendSMS(void)
     if (textLen < singleMessageLen) {
 
         if (cmux->CheckATCommandPrompt(
-                cmux->GetChannel("Commands")
+                cmux->get(TS0710::Channel::Commands)
                     ->SendCommandPrompt(
                         (std::string(at::factory(at::AT::CMGS)) + UCS2(record.number).modemStr() + "\"\r").c_str(),
                         1,
                         1000))) {
 
-            if (cmux->GetChannel("Commands")->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
+            if (cmux->get(TS0710::Channel::Commands)->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                 result = true;
             }
             else {
@@ -680,9 +703,11 @@ bool ServiceCellular::sendSMS(void)
             std::string command(at::factory(at::AT::QCMGS) + UCS2(record.number).modemStr() + "\",120," +
                                 std::to_string(i + 1) + "," + std::to_string(messagePartsCount) + "\r");
 
-            if (cmux->CheckATCommandPrompt(cmux->GetChannel("Commands")->SendCommandPrompt(command.c_str(), 1, 5000))) {
+            if (cmux->CheckATCommandPrompt(
+                    cmux->get(TS0710::Channel::Commands)->SendCommandPrompt(command.c_str(), 1, 5000))) {
                 // prompt sign received, send data ended by "Ctrl+Z"
-                if (cmux->GetChannel("Commands")->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)) {
+                if (cmux->get(TS0710::Channel::Commands)
+                        ->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)) {
                     result = true;
                 }
                 else {
@@ -704,7 +729,7 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
 {
 
     auto cmd = at::factory(at::AT::QCMGR);
-    auto ret = cmux->GetChannel("Commands")->cmd(cmd + messageNumber + "\r", cmd.timeout);
+    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(cmd + messageNumber + "\r", cmd.timeout);
 
     bool messageParsed = false;
 
@@ -793,13 +818,13 @@ bool ServiceCellular::receiveSMS(std::string messageNumber)
         }
     }
     // delete message from modem memory
-    cmux->GetChannel("Commands")->cmd(at::factory(at::AT::CMGD) + messageNumber);
+    cmux->get(TS0710::Channel::Commands)->cmd(at::factory(at::AT::CMGD) + messageNumber);
     return true;
 }
 
 bool ServiceCellular::getOwnNumber(std::string &destination)
 {
-    auto ret = cmux->GetChannel("Commands")->cmd(at::AT::CNUM);
+    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CNUM);
 
     if (ret) {
         auto begin = ret.response[0].find(',');
@@ -826,7 +851,7 @@ bool ServiceCellular::getOwnNumber(std::string &destination)
 
 bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
 {
-    auto ret = cmux->GetChannel("Commands")->cmd(at::AT::CIMI);
+    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::CIMI);
 
     if (ret) {
         if (fullNumber) {
@@ -849,7 +874,7 @@ bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
 std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 {
     std::vector<std::string> data;
-    auto channel = cmux->GetChannel("Commands");
+    auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel) {
         auto resp = channel->cmd(at::AT::CSQ);
         if (resp.code == at::Result::Code::OK) {
@@ -922,7 +947,7 @@ std::vector<std::string> ServiceCellular::getNetworkInfo(void)
 }
 std::vector<std::string> ServiceCellular::scanOperators(void)
 {
-    auto channel = cmux->GetChannel("Commands");
+    auto channel = cmux->get(TS0710::Channel::Commands);
     std::vector<std::string> result;
     if (channel) {
         auto resp = channel->cmd("AT+COPS=?\r", 180000, 2);
@@ -951,27 +976,75 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
     return result;
 }
 
+bool ServiceCellular::sim_sanity_check()
+{
+    auto chanel        = cmux->get(TS0710::Channel::Commands);
+    bool reboot_needed = false;
+    auto ret           = chanel->cmd(at::AT::SIM_DET);
+    if (!ret) {
+        LOG_FATAL("Cant check sim detection status!");
+    }
+    else {
+        if (ret.response[0].find("+QSIMDET: 1") != std::string::npos) {
+            LOG_DEBUG("SIM detecition enabled!");
+        }
+        else {
+            LOG_FATAL("SIM detection failure - trying to enable! %s", ret.response[0].c_str());
+            reboot_needed = true;
+        }
+    }
+    ret = chanel->cmd(at::AT::QSIMSTAT);
+    if (!ret) {
+        LOG_FATAL("Cant check sim stat status");
+    }
+    else {
+        if (ret.response[0].find("+QSIMSTAT: 1") != std::string::npos) {
+            LOG_DEBUG("SIM swap enabled!");
+        }
+        else {
+            LOG_FATAL("SIM swap status failure! %s", ret.response[0].c_str());
+            reboot_needed = true;
+        }
+    }
+
+    // try to force set sim detection and sim stat
+    if (reboot_needed == true) {
+        ret = chanel->cmd(at::AT::SIM_DET_ON);
+        ret = chanel->cmd(at::AT::SIMSTAT_ON);
+        LOG_FATAL("Please full reboot phone!");
+    }
+    return !reboot_needed;
+}
+
 bool ServiceCellular::select_sim()
 {
-    auto settings = DBServiceAPI::SettingsGet(this);
-    switch (settings.activeSIM) {
-    case SettingsRecord::ActiveSim::NONE:
-        Store::GSM::get()->selected = Store::GSM::SIM::NONE;
-        return false;
-    case SettingsRecord::ActiveSim::SIM1:
-        Store::GSM::get()->selected = Store::GSM::SIM::SIM1;
-        return true;
-    case SettingsRecord::ActiveSim::SIM2:
-        Store::GSM::get()->selected = Store::GSM::SIM::SIM2;
-        return true;
+
+    bsp::cellular::sim::sim_sel();
+    bsp::cellular::sim::hotswap_trigger();
+#if defined(TARGET_Linux)
+    auto ret = cmux->get(TS0710::Channel::Commands)->cmd(at::AT::QSIMSTAT);
+    if (!ret) {
+        LOG_FATAL("Cant check sim stat status");
     }
-    return false;
+    else {
+        if (ret.response[0].find("+QSIMSTAT: 1,1") != std::string::npos) {
+            // SIM IN - only sim1 mocup
+            Store::GSM::get()->sim = Store::GSM::SIM::SIM1;
+        }
+        else {
+            // NO SIM IN
+            Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
+        }
+        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), "EventManager", this);
+    }
+#endif
+    return true;
 }
 
 bool ServiceCellular::init_sim()
 {
-    auto channel = cmux->GetChannel("Commands");
-    if (!channel) {
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel == nullptr) {
         LOG_ERROR("Cant configure sim! no Commands channel!");
         return false;
     }

@@ -31,7 +31,9 @@ namespace cellular
                                /// bases on URC without much thinking
             ModemConfigurationInProgress, /// modem basic, non sim related configuration
             AudioConfigurationInProgress, /// audio configuration for modem (could be in ModemConfiguration)
+            SanityCheck,                  /// prior to ModemOn last sanity checks for one time configurations etc
             ModemOn, /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
+            ModemFatalFailure, /// modem full shutdown need
             SimInitInProgress, /// initialize SIM - triggers sim ON in, ( **changed on URC** )
             FullyFunctional,   /// modem is on, sim is initialized
             Failed
@@ -42,6 +44,8 @@ namespace cellular
 
       public:
         const char *c_str(ST state) const;
+        /// 1. sets state of ServiceCellular
+        /// 2. TODO sends Multicast notification of ServiceCellular state
         void set(ST state);
         ST get() const;
     };
@@ -105,6 +109,9 @@ class ServiceCellular : public sys::Service
 
     CellularCall::CellularCall ongoingCall;
 
+    /// check one time modem configuration for sim (hot swap)
+    /// if hot swap is not eanbled full modem restart is needed (right now at best reboot)
+    bool sim_sanity_check();
     /// select sim from settings
     bool select_sim();
     /// initialize sim (GSM commands for initialization)

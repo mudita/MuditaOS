@@ -13,15 +13,11 @@
 #include "Service/Message.hpp"
 #include "service-cellular/messages/CellularMessage.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
+#include "windows/Names.hpp"
 
 namespace app
 {
 
-    namespace name::window
-    {
-        inline const std::string desktop_menu       = "MenuWindow";
-        inline const std::string desktop_lockscreen = gui::name::window::main_window;
-    }; // namespace name::window
 
     inline const std::string name_desktop = "ApplicationDesktop";
 

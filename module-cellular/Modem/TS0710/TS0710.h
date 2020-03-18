@@ -223,6 +223,26 @@ void workerTaskFunction(void *ptr);
 
 class TS0710
 {
+  public:
+    enum class Channel
+    {
+        Commands      = 1,
+        Notifications = 2,
+        Data          = 3,
+    };
+    std::string name(enum Channel name)
+    {
+        switch (name) {
+        case Channel::Commands:
+            return "Commands";
+        case Channel::Notifications:
+            return "Notifications";
+        case Channel::Data:
+            return "Data";
+        }
+        return "";
+    }
+
   private:
     std::vector<DLC_channel *> channels;
     friend void workerTaskFunction(void *ptr);
@@ -268,35 +288,23 @@ class TS0710
         PowerUp
     };
 
-    /// @brief Get Channel by index
-    /// @note channel 0 is mandatory - Control
-    /// @param index - index
-    /// @return pointer to channel or nullptr if such channel doesn't exist
-    DLC_channel *GetChannel(const size_t index)
+    /// @brief get Channel by index
+    /// @param channel enum Channel
+    /// @return pointer to channel or nullptr if such channel doesn't exist (nullptr return should never happen how -
+    /// because all channels are opened once on start)
+    DLC_channel *get(Channel chanel_enum)
     {
-        if (index >= channels.size()) {
-            LOG_ERROR("No channel with index %d", index);
-            return nullptr;
+        for (auto channel : channels) {
+            if (channel != nullptr && static_cast<Channel>(channel->getDLCI()) == chanel_enum) {
+                return channel;
+            }
         }
-        return channels[index];
-    }
-
-    /// @brief Get Channel by name
-    /// @param name - channel name
-    /// @return pointer to channel or nullptr if such channel doesn't exist
-    DLC_channel *GetChannel(const std::string &name)
-    {
-        for (auto it : channels) {
-            if (it->getName() == name)
-                return it;
-        }
-        LOG_ERROR("Channel %s doesn't exist", name.c_str());
         return nullptr;
     }
 
-    DLC_channel *OpenChannel(DLCI_t DLCI, const std::string &name)
+    DLC_channel *OpenChannel(Channel chanel_val)
     {
-        DLC_channel *channel = new DLC_channel(DLCI, name, pv_cellular.get());
+        DLC_channel *channel = new DLC_channel(static_cast<DLCI_t>(chanel_val), name(chanel_val), pv_cellular.get());
         channels.push_back(channel);
         return channels.back();
     }
