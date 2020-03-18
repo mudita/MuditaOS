@@ -21,7 +21,7 @@
 
 namespace gui
 {
-
+    using namespace callAppStyle;
     using namespace callAppStyle::enterNumberWindow;
 
     EnterNumberWindow::EnterNumberWindow(app::Application *app, std::string windowName) : AppWindow(app, windowName)

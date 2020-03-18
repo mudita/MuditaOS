@@ -2,6 +2,7 @@
 
 #include "Icon.hpp"
 #include "i18/i18.hpp"
+#include "application-call/data/CallAppStyle.hpp"
 
 namespace gui
 {
@@ -19,7 +20,7 @@ namespace gui
       public:
         AddContactIcon() = delete;
         AddContactIcon(Item *parent, const uint32_t &x, const uint32_t &y)
-            : Icon(parent, x, y, AddContactIconState::ADD_CONTACT, iconMap)
+            : Icon(parent, x, y, callAppStyle::icon::x_margin, AddContactIconState::ADD_CONTACT, iconMap)
         {}
         ~AddContactIcon() override = default;
     };
@@ -38,7 +39,7 @@ namespace gui
       public:
         SendSmsIcon() = delete;
         SendSmsIcon(Item *parent, const uint32_t &x, const uint32_t &y)
-            : Icon(parent, x, y, SendSmsIconState::SEND_SMS, iconMap)
+            : Icon(parent, x, y, callAppStyle::icon::x_margin, SendSmsIconState::SEND_SMS, iconMap)
         {}
         ~SendSmsIcon() override = default;
     };
@@ -61,7 +62,7 @@ namespace gui
       public:
         MicrophoneIcon() = delete;
         MicrophoneIcon(Item *parent, const uint32_t &x, const uint32_t &y)
-            : Icon(parent, x, y, MicrophoneIconState::MUTE, iconMap)
+            : Icon(parent, x, y, callAppStyle::icon::x_margin, MicrophoneIconState::MUTE, iconMap)
         {}
         ~MicrophoneIcon() override = default;
     };
@@ -91,7 +92,7 @@ namespace gui
       public:
         SpeakerIcon() = delete;
         SpeakerIcon(Item *parent, const uint32_t &x, const uint32_t &y)
-            : Icon(parent, x, y, SpeakerIconState::SPEAKER, iconMap)
+            : Icon(parent, x, y, callAppStyle::icon::x_margin, SpeakerIconState::SPEAKER, iconMap)
         {}
         ~SpeakerIcon() override = default;
     };

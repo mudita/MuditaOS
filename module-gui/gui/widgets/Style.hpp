@@ -102,4 +102,46 @@ namespace style
         const inline gui::Alignment defaultTextAlignment =
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM);
     };
+
+    namespace strings
+    {
+        namespace common
+        {
+            const inline std::string open        = "common_open";
+            const inline std::string call        = "common_call";
+            const inline std::string send        = "common_send";
+            const inline std::string confirm     = "common_confirm";
+            const inline std::string select      = "common_select";
+            const inline std::string ok          = "common_ok";
+            const inline std::string back        = "common_back";
+            const inline std::string set         = "common_set";
+            const inline std::string yes         = "common_yes";
+            const inline std::string no          = "common_no";
+            const inline std::string Switch      = "common_switch";
+            const inline std::string options     = "common_options";
+            const inline std::string information = "common_information";
+            // days
+            const inline std::string Monday    = "common_monday";
+            const inline std::string Tuesday   = "common_tuesday";
+            const inline std::string Wednesday = "common_wendesday";
+            const inline std::string Thursday  = "common_thursday";
+            const inline std::string Friday    = "common_friday";
+            const inline std::string Saturday  = "common_saturday";
+            const inline std::string Sunday    = "common_sunday";
+            // months
+            const inline std::string January   = "common_january";
+            const inline std::string February  = "common_february";
+            const inline std::string March     = "common_march";
+            const inline std::string April     = "common_april";
+            const inline std::string May       = "common_may";
+            const inline std::string June      = "common_june";
+            const inline std::string July      = "common_july";
+            const inline std::string August    = "common_august";
+            const inline std::string September = "common_september";
+            const inline std::string October   = "common_october";
+            const inline std::string November  = "common_november";
+            const inline std::string December  = "common_december";
+            const inline std::string Yesterday = "common_yesterday";
+        } // namespace common
+    }     // namespace strings
 }; // namespace style

@@ -21,18 +21,6 @@ namespace gui
         };
 
       protected:
-        enum class FocusRects
-        {
-            Speaker,
-            Micrphone,
-        };
-
-        enum class AudioState
-        {
-            ON,
-            OFF
-        };
-        //	gui::Label* titleLabel = nullptr;
         // used to display both nnumber and name of contact
         gui::Label *numberLabel = nullptr;
         // used to inform user about call state of call and display duration of call

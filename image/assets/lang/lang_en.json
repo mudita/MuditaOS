@@ -16,6 +16,8 @@
     "common_no": "No",
     "common_switch": "SWITCH",
     "common_options": "OPTIONS",
+    "common_information": "Information",
+
     "common_monday": "Monday",
     "common_tuesday": "Tuesday",
     "common_wendesday": "Wendesday",
@@ -24,8 +26,6 @@
     "common_saturday": "Saturday",
     "common_sunday": "Sunday",
     
-    "common_information": "Information",
-
     "common_january": "January",
     "common_february": "February",
     "common_march": "March",
@@ -39,6 +39,7 @@
     "common_november": "November",
     "common_december": "December",
     "common_yesterday" : "Yesterday",
+
     "locale_12hour_min" : "%I:%M %p",
     "locale_24hour_min" : "%H:%M",
     "locale_date_full" : "%m/%d/%y",
@@ -105,7 +106,6 @@
     "app_call_reject": "REJECT",
     "app_call_answer": "ANSWER",
     "app_call_message": "MESSAGE",
-    "app_call_return": "RETURN",
     "app_call_end_call": "END CALL",
     "app_call_emergency": "Emergency call",
     "app_call_is_calling": "is calling",
