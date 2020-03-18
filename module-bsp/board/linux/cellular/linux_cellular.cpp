@@ -211,22 +211,30 @@ namespace bsp
         return 0;
     }
 
-    namespace cellular::sim
+    namespace cellular
     {
-        auto init(QueueHandle_t qHandle) -> int
+        bool getStatus()
         {
-            return 0;
+            return true;
         }
-
-        auto trayIRQ_handler() -> BaseType_t
+        namespace sim
         {
-            return BaseType_t();
-        }
 
-        void hotswap_trigger()
-        {}
+            auto init(QueueHandle_t qHandle) -> int
+            {
+                return 0;
+            }
 
-        void sim_sel()
-        {}
-    } // namespace cellular::sim
+            auto trayIRQ_handler() -> BaseType_t
+            {
+                return BaseType_t();
+            }
+
+            void hotswap_trigger()
+            {}
+
+            void sim_sel()
+            {}
+        } // namespace sim
+    }     // namespace cellular
 } // namespace bsp

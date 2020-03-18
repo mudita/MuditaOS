@@ -53,27 +53,30 @@ namespace bsp {
         virtual void SetSpeed(uint32_t portSpeed) = 0;
 
         virtual void SetSendingAllowed(bool state) = 0;
-        virtual bool GetSendingAllowed() = 0;
+        virtual bool GetSendingAllowed()           = 0;
 
         virtual void SelectAntenna(uint8_t antenna) = 0;
         virtual uint8_t GetAntenna() = 0;
 
       protected:
         bool isInitialized = false;
-
     };
 
-    namespace cellular::sim {
-        /// initialize SIM queue directed to EventWorker
-        int init(xQueueHandle qHandle);
-        /// handler for SIM tray which is connected to phone, not GSM
-        BaseType_t trayIRQ_handler();
-        /// trigger swap pin on gsm so that it would reload sim card in tray
-        /// after that +QPIN urc should come
-        void hotswap_trigger();
-        void sim_sel();
-    };
+    namespace cellular
+    {
+        bool getStatus();
+        namespace sim
+        {
+            /// initialize SIM queue directed to EventWorker
+            int init(xQueueHandle qHandle);
+            /// handler for SIM tray which is connected to phone, not GSM
+            BaseType_t trayIRQ_handler();
+            /// trigger swap pin on gsm so that it would reload sim card in tray
+            /// after that +QPIN urc should come
+            void hotswap_trigger();
+            void sim_sel();
+        } // namespace sim
+    }     // namespace cellular
+};        // namespace bsp
 
-}
-
-#endif //PUREPHONE_BSP_CELLULAR_HPP
+#endif // PUREPHONE_BSP_CELLULAR_HPP

@@ -322,7 +322,7 @@ namespace bsp
 
         gpio_1->ConfPin(
             DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+                                .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
                                 .defLogic = 1,
                                 .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN)});
 
@@ -478,9 +478,20 @@ namespace bsp
 
     namespace cellular
     {
+        static xQueueHandle qhandle = nullptr;
+
+        bool getStatus()
+        {
+            auto gpio_1 =
+                DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_1), DriverGPIOParams{});
+            bool state = gpio_1->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN));
+
+            // Open drain. Ground if status OK.
+            return !state;
+        }
+
         namespace sim
         {
-            static xQueueHandle qhandle = nullptr;
 
             auto init(QueueHandle_t qHandle) -> int
             {
@@ -490,16 +501,16 @@ namespace bsp
 
             auto trayIRQ_handler() -> BaseType_t
             {
-            BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-            Store::GSM::get()->tray             = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0
-                                          ? Store::GSM::Tray::IN
-                                          : Store::GSM::Tray::OUT;
-            if (qhandle) {
-                int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN);
-                xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+                Store::GSM::get()->tray             = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0
+                                              ? Store::GSM::Tray::IN
+                                              : Store::GSM::Tray::OUT;
+                if (qhandle) {
+                    int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN);
+                    xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
+                }
+                return xHigherPriorityTaskWoken;
             }
-            return xHigherPriorityTaskWoken;
-        }
 
         void hotswap_trigger()
         {
@@ -508,15 +519,15 @@ namespace bsp
             GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
         }
 
-        void sim_sel()
-        {
-            if (Store::GSM::get()->selected == Store::GSM::SIM::SIM2) {
-                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 1);
+            void sim_sel()
+            {
+                if (Store::GSM::get()->selected == Store::GSM::SIM::SIM2) {
+                    GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 1);
+                }
+                else {
+                    GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 0);
+                }
             }
-            else {
-                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIMSEL_PIN, 0);
-            }
-        }
         } // namespace sim
-    } // namespace cellular::sim
+    }     // namespace cellular
 } // namespace bsp
