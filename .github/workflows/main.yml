@@ -15,8 +15,6 @@ jobs:
     - name: Bootstrap
         run: |
         sudo apt-get update && apt-get install -y pkg-config gtkmm-3.0 portaudio19-dev clang-format-9
-    - name: Style Linter Setup
-      run: |
     - name: Style Check
       run: |
         ./config/pre-commit-check-only.hook --last
@@ -50,5 +48,4 @@ jobs:
         echo 'set(TOOLCHAIN_PATH "/home/runner/gcc-arm-none-eabi-8-2019-q3-update" CACHE INTERNAL "")' > ./env.cmake
         sudo apt-get -q -y remove cmake
         ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
-
 
