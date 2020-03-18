@@ -80,7 +80,7 @@ namespace bsp
                 xHigherPriorityTaskWoken |= BSP_BatteryChargerINTB_IRQHandler();
             }
 
-            if (irq_mask & (1 << BSP_CELLULAR_SIM_CARD_1_INSERTED_PIN)) {
+            if (irq_mask & (1 << BSP_CELLULAR_SIM_TRAY_INSERTED_PIN)) {
                 xHigherPriorityTaskWoken |= bsp::cellular::sim::trayIRQ_handler();
             }
 
