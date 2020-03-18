@@ -1,16 +1,7 @@
 #include "PhonebookSearchResults.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "ContactRecord.hpp"
-#include "ListView.hpp"
 #include "PhonebookNewContact.hpp"
-#include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include <Style.hpp>
-#include <functional>
-#include <log/log.hpp>
-#include <memory>
 #include <application-phonebook/data/PhonebookStyle.hpp>
-
 #include "../widgets/PhonebookItem.hpp"
 
 namespace gui

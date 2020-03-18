@@ -1,22 +1,11 @@
 #include "PhonebookMainWindow.hpp"
-#include "../ApplicationPhonebook.hpp"
-#include "Label.hpp"
-#include "ListView.hpp"
-#include "Margins.hpp"
 #include "PhonebookNewContact.hpp"
-#include "application-phonebook/data/PhonebookItemData.hpp"
 #include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBMessage.hpp"
-#include <Style.hpp>
-#include <functional>
-#include <log/log.hpp>
-#include <memory>
+#include <application-phonebook/data/PhonebookStyle.hpp>
 
 namespace gui
 {
-
     PhonebookMainWindow::PhonebookMainWindow(app::Application *app)
         : AppWindow(app, gui::name::window::main_window), phonebookModel{new PhonebookModel(app)}
     {
@@ -33,13 +22,44 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        list = new gui::PhonebookListView(this, 11, 105, 480 - 22, 600 - 105 - 50);
-        list->setMaxElements(7);
-        list->setPageSize(7);
-        list->setPenFocusWidth(0);
-        list->setPenWidth(0);
-        list->setProvider(phonebookModel);
-        list->setApplication(application);
+        topBar->setActive(TopBar::Elements::TIME, true);
+        setTitle(utils::localize.get("app_phonebook_title_main"));
+        leftArrowImage  = new gui::Image(this,
+                                        phonebookStyle::mainWindow::leftArrowImage::x,
+                                        phonebookStyle::mainWindow::leftArrowImage::y,
+                                        phonebookStyle::mainWindow::leftArrowImage::w,
+                                        phonebookStyle::mainWindow::leftArrowImage::h,
+                                        "arrow_left");
+        rightArrowImage = new gui::Image(this,
+                                         phonebookStyle::mainWindow::rightArrowImage::x,
+                                         phonebookStyle::mainWindow::rightArrowImage::y,
+                                         phonebookStyle::mainWindow::rightArrowImage::w,
+                                         phonebookStyle::mainWindow::rightArrowImage::h,
+                                         "arrow_right");
+        newContactImage = new gui::Image(this,
+                                         phonebookStyle::mainWindow::newContactImage::x,
+                                         phonebookStyle::mainWindow::newContactImage::y,
+                                         phonebookStyle::mainWindow::newContactImage::w,
+                                         phonebookStyle::mainWindow::newContactImage::h,
+                                         "cross");
+        searchImage     = new gui::Image(this,
+                                     phonebookStyle::mainWindow::searchImage::x,
+                                     phonebookStyle::mainWindow::searchImage::y,
+                                     phonebookStyle::mainWindow::searchImage::w,
+                                     phonebookStyle::mainWindow::searchImage::h,
+                                     "search");
+
+        contactsList = new gui::PhonebookListView(this,
+                                                  phonebookStyle::mainWindow::contactsList::x,
+                                                  phonebookStyle::mainWindow::contactsList::y,
+                                                  phonebookStyle::mainWindow::contactsList::w,
+                                                  phonebookStyle::mainWindow::contactsList::h);
+        contactsList->setMaxElements(phonebookStyle::mainWindow::contactsList::maxElements);
+        contactsList->setPageSize(phonebookStyle::mainWindow::contactsList::pageSize);
+        contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
+        contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
+        contactsList->setProvider(phonebookModel);
+        contactsList->setApplication(application);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -47,24 +67,15 @@ namespace gui
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("app_phonebook_call"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_open"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
-
-        topBar->setActive(TopBar::Elements::TIME, true);
-
-        setTitle(utils::localize.get("app_phonebook_title_main"));
-
-        leftArrowImage  = new gui::Image(this, 30, 62, 0, 0, "arrow_left");
-        rightArrowImage = new gui::Image(this, 480 - 30 - 13, 62, 0, 0, "arrow_right");
-        newContactImage = new gui::Image(this, 48, 55, 0, 0, "cross");
-        searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
     }
 
     void PhonebookMainWindow::destroyInterface()
     {
         AppWindow::destroyInterface();
 
-        removeWidget(list);
-        delete list;
-        list = nullptr;
+        removeWidget(contactsList);
+        delete contactsList;
+        contactsList = nullptr;
 
         removeWidget(leftArrowImage);
         delete leftArrowImage;
@@ -94,13 +105,13 @@ namespace gui
     void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         LOG_INFO("onBeforeShow");
-        setFocusItem(list);
+        setFocusItem(contactsList);
 
         phonebookModel->clear();
         phonebookModel->requestRecordsCount();
 
-        list->clear();
-        list->setElementsCount(phonebookModel->getItemCount());
+        contactsList->clear();
+        contactsList->setElementsCount(phonebookModel->getItemCount());
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)

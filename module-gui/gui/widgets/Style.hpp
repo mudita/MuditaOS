@@ -17,6 +17,7 @@ namespace style
     const inline uint32_t window_width  = 480;
     namespace header
     {
+        const inline uint32_t height = 105;
         namespace font
         {
             const inline std::string time  = "gt_pressura_regular_24";

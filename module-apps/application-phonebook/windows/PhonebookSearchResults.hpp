@@ -1,16 +1,8 @@
 #pragma once
-#include <functional>
-#include <string>
 
 #include "../data/PhonebookItemData.hpp"
 #include "../models/SearchResultsModel.hpp"
 #include "../widgets/PhonebookListView.hpp"
-#include "AppWindow.hpp"
-#include "ListView.hpp"
-#include "Style.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
 
 namespace gui
 {
@@ -22,11 +14,11 @@ namespace gui
         };
     }; // namespace name
 
-    class PhonebookSearchResults : public AppWindow
-    {
-      protected:
-        PhonebookListView *searchResultList    = nullptr;
-        SearchResultsModel *searchResultsModel = nullptr;
+class PhonebookSearchResults : public AppWindow
+{
+  protected:
+    SearchResultsModel *searchResultsModel = nullptr;
+    PhonebookListView *searchResultList = nullptr;
 
         Image *newContactImage = nullptr;
 
