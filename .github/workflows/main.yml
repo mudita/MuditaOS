@@ -47,6 +47,7 @@ jobs:
         ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
     - name: Run UT
       run: |
+        sudo apt-get install -y pkg-config gtkmm-3.0 portaudio19-dev
         ./configure.sh linux Debug && make check -C built-linux-Debug -j4
 
 
