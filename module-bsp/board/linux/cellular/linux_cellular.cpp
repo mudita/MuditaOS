@@ -206,8 +206,10 @@ namespace bsp
     void LinuxCellular::SelectAntenna(uint8_t antenna)
     {}
 
-    bool GetAntenna()
-    {}
+    uint8_t LinuxCellular::GetAntenna()
+    {
+        return 0;
+    }
 
     namespace cellular::sim
     {

@@ -64,6 +64,8 @@ namespace bsp
 
         void SelectAntenna(uint8_t antenna) override final;
 
+        uint8_t GetAntenna() override final;
+
       private:
         static constexpr speed_t baud_bits[] = {0,
                                                 B9600,
