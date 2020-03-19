@@ -46,7 +46,6 @@ namespace gui
 
     void RebootWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        LOG_FATAL("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
     bool RebootWindow::onInput(const InputEvent &inputEvent)
