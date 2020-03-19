@@ -56,7 +56,9 @@ namespace bsp {
         virtual bool GetSendingAllowed() = 0;
 
         virtual void SelectAntenna(uint8_t antenna) = 0;
-    protected:
+        virtual uint8_t GetAntenna() = 0;
+
+      protected:
         bool isInitialized = false;
 
     };

@@ -514,7 +514,10 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 LOG_INFO("Service cellular CellularSelectAntenna exception occured: %s", e.what());
             }
             cmux->SelectAntenna(value);
-            responseMsg = std::make_shared<CellularResponseMessage>(true);
+            vTaskDelay(50); // sleep for 50 ms...
+            uint8_t actualAntenna = cmux->GetAntenna();
+            bool changedAntenna   = (actualAntenna == value);
+            responseMsg           = std::make_shared<CellularResponseMessage>(changedAntenna);
         }
         else {
             responseMsg = std::make_shared<CellularResponseMessage>(false);

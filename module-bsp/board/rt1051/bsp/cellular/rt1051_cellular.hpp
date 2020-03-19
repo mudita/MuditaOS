@@ -69,6 +69,7 @@ namespace bsp
         static TimerHandle_t rxTimeoutTimer;
 
         void SelectAntenna(uint8_t antenna) override final;
+        uint8_t GetAntenna() override final;
 
       private:
         void MSPInit();
