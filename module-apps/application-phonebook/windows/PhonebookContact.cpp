@@ -76,7 +76,7 @@ namespace gui
                                    89,
                                    20,
                                    utils::localize.get("app_phonebook_contact_favourites_upper"),
-                                   style::window::font::tinybold,
+                                   style::window::font::smallbold,
                                    RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                    Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
@@ -96,7 +96,7 @@ namespace gui
                                   89,
                                   20,
                                   utils::localize.get("app_phonebook_contact_speed_dial_upper"),
-                                  style::window::font::tinybold,
+                                  style::window::font::smallbold,
                                   RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                   Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
@@ -107,7 +107,7 @@ namespace gui
                                 75,
                                 20,
                                 utils::localize.get("app_phonebook_contact_speed_blocked_uppper"),
-                                style::window::font::tinybold,
+                                style::window::font::smallbold,
                                 RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                                 Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
