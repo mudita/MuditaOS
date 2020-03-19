@@ -239,7 +239,7 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
     dialValue->setFilled(false);
     dialValue->setBorderColor(ColorFullBlack);
     dialValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    dialValue->setFont(style::window::font::veryverybiglight);
+    dialValue->setFont(style::window::font::largelight);
     dialValue->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {

@@ -174,7 +174,7 @@ namespace gui
             nullptr, 0, 0, style::settings::date::date_time_spacer_width, style::settings::date::date_time_item_height);
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         label->setText(text);
-        label->setFont(style::window::font::veryverybiglight);
+        label->setFont(style::window::font::largelight);
         label->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
         label->activeItem = false;
@@ -194,7 +194,7 @@ namespace gui
         label->setFilled(false);
         label->setPenFocusWidth(3);
         label->setPenWidth(1);
-        label->setFont(style::window::font::veryverybiglight);
+        label->setFont(style::window::font::largelight);
         label->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);

@@ -33,7 +33,7 @@ namespace style
         namespace font
         {
             const inline std::string supersizemelight = "gt_pressura_light_90";
-            const inline std::string veryverybiglight = "gt_pressura_light_46";
+            const inline std::string largelight       = "gt_pressura_light_46";
             const inline std::string verybigbold      = "gt_pressura_bold_32";
             const inline std::string bigbold          = "gt_pressura_bold_30";
             const inline std::string big              = "gt_pressura_regular_30";
