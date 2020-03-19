@@ -75,7 +75,7 @@ namespace gui
             label->setFilled(false);
             label->setBorderColor(gui::ColorFullBlack);
             label->setPenWidth(2);
-            label->setFont(style::window::font::verybig);
+            label->setFont(style::window::font::largelight);
             label->setText("*");
             label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
             label->setAlignement(

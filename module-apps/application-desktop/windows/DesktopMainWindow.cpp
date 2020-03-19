@@ -59,7 +59,7 @@ namespace gui
         time = new gui::Label(this, 0, style::design_time_offset, style::window_width, style::design_time_h);
         time->setFilled(false);
         time->setBorderColor(gui::ColorNoColor);
-        time->setFont(style::window::font::supersizeme);
+        time->setFont(style::window::font::supersizemelight);
         time->setText(ttime);
         time->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
 

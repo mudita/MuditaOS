@@ -30,7 +30,7 @@ namespace gui
         hourLabel = new gui::Label(this, 100 + xOffset, 300 - 160 + yOffset, 280, 150);
         hourLabel->setFilled(false);
         hourLabel->setBorderColor(gui::ColorNoColor);
-        hourLabel->setFont(style::window::font::verybig);
+        hourLabel->setFont(style::window::font::largelight);
         hourLabel->setText("00");
         hourLabel->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
@@ -38,7 +38,7 @@ namespace gui
         minuteLabel = new gui::Label(this, 100 + xOffset, 310 + yOffset, 280, 150);
         minuteLabel->setFilled(false);
         minuteLabel->setBorderColor(gui::ColorFullBlack);
-        minuteLabel->setFont(style::window::font::verybig);
+        minuteLabel->setFont(style::window::font::largelight);
         minuteLabel->setText("00");
         minuteLabel->setRadius(20);
         minuteLabel->setPenWidth(1);
