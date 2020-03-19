@@ -205,6 +205,10 @@ namespace bsp
 
     void LinuxCellular::SelectAntenna(uint8_t antenna)
     {}
+
+    bool GetAntenna()
+    {}
+
     namespace cellular::sim
     {
         auto init(QueueHandle_t qHandle) -> int

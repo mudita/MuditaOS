@@ -450,6 +450,13 @@ namespace bsp
         }
     }
 
+    uint8_t RT1051Cellular::GetAntenna()
+    {
+        // make sure ANTSEL pin has Software Input On Field set
+        bool whichAntenna = gpio_2->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_2_ANTSEL_PIN));
+        return (whichAntenna == CELLULAR_BSP_ANTSEL_PIN_A_STATE ? 0 : 1);
+    }
+
     namespace cellular::sim
     {
         static xQueueHandle qhandle = nullptr;
