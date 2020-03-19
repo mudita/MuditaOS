@@ -32,18 +32,19 @@ namespace style
         const inline uint32_t default_border_no_focus_w = 0;
         namespace font
         {
-            const inline std::string supersizeme = "gt_pressura_light_90";
-            const inline std::string verybig     = "gt_pressura_light_46";
-            const inline std::string bigbold     = "gt_pressura_bold_30";
-            const inline std::string big         = "gt_pressura_regular_30";
-            const inline std::string biglight    = "gt_pressura_light_30";
-            const inline std::string mediumbold  = "gt_pressura_bold_27";
-            const inline std::string medium      = "gt_pressura_regular_27";
-            const inline std::string small       = "gt_pressura_regular_24";
-            const inline std::string verysmall   = "gt_pressura_regular_20";
-            const inline std::string tiny        = "gt_pressura_regular_16";
-            const inline std::string tinybold    = "gt_pressura_bold_16";
-            const inline std::string tinylight   = "gt_pressura_light_16";
+            const inline std::string supersizemelight = "gt_pressura_light_90";
+            const inline std::string veryverybiglight = "gt_pressura_light_46";
+            const inline std::string verybigbold      = "gt_pressura_bold_32";
+            const inline std::string bigbold          = "gt_pressura_bold_30";
+            const inline std::string big              = "gt_pressura_regular_30";
+            const inline std::string biglight         = "gt_pressura_light_30";
+            const inline std::string mediumbold       = "gt_pressura_bold_27";
+            const inline std::string medium           = "gt_pressura_regular_27";
+            const inline std::string mediumlight      = "gt_pressura_light_27";
+            const inline std::string smallbold        = "gt_pressura_bold_24";
+            const inline std::string small            = "gt_pressura_regular_24";
+            const inline std::string verysmallbold    = "gt_pressura_bold_20";
+            const inline std::string verysmall        = "gt_pressura_regular_20";
         }; // namespace font
 
         const inline uint32_t list_offset_default = 12;

@@ -90,7 +90,7 @@ namespace gui
         durationLabel = new gui::Label(this, 0, 220, 480, 80);
         durationLabel->setFilled(false);
         durationLabel->setBorderColor(gui::ColorNoColor);
-        durationLabel->setFont(style::window::font::verybig);
+        durationLabel->setFont(style::window::font::veryverybiglight);
         durationLabel->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
