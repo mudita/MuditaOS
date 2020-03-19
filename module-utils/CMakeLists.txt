@@ -69,7 +69,7 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 
-if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (PROJECT_CONFIG_DEFINITIONS ${SYSTEM_VIEW_ENABLED}))
+if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
     add_subdirectory(systemview)
 endif()
 

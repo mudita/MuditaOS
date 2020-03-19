@@ -37,6 +37,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RTT_LUART RTT_LUART
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -60,6 +62,7 @@ extern "C"
     void log_Log(logger_level level, const char *file, int line, const char *function, const char *fmt, ...);
     void log_SetLevel(logger_level level);
     void log_Printf(const char *fmt, ...);
+    void log_WriteToDevice(const uint8_t *pBuffer, unsigned NumBytes);
 
 /**
  * Log functions (one per level).

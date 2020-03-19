@@ -20,9 +20,6 @@ extern "C"
  * It should be refactored i.e serial terminal BSP created and used here instead of using RT1051's low-level routines
  * directly.
  */
-#if LOG_REDIRECT == 1
-#include "fsl_lpuart.h"
-#endif
 
 #define LOGGER_BUFFER_SIZE 4096
 
@@ -154,13 +151,7 @@ void log_Printf(const char *fmt, ...)
     ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
     va_end(args);
 
-#if LOG_REDIRECT == 1
-    LPUART_WriteBlocking(LPUART3, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
-#elif LOG_REDIRECT == 2
-    SEGGER_SYSVIEW_PrintfHost(loggerBuffer);
-#else
-    SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
-#endif
+    log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
 
     logger.logUnlock();
 }
@@ -208,13 +199,7 @@ static void _log_Log(
     ptr += vsnprintf(ptr, &loggerBuffer[LOGGER_BUFFER_SIZE] - ptr, fmt, args);
     ptr += sprintf(ptr, "\r\n");
 
-#if LOG_REDIRECT == 1
-    LPUART_WriteBlocking(LPUART3, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
-#elif LOG_REDIRECT == 2
-    SEGGER_SYSVIEW_PrintfHost(loggerBuffer);
-#else
-    SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
-#endif
+    log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
 
     /* Release lock */
     logger.logUnlock();
@@ -311,11 +296,8 @@ extern "C"
         va_end(args);
 
         unsigned int numBytes = ptr - loggerBuffer;
-#if LOG_REDIRECT == 1
-        LPUART_WriteBlocking(LPUART3, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
-#else
-        SEGGER_RTT_Write(0, (uint8_t *)loggerBuffer, ptr - loggerBuffer);
-#endif
+
+        log_WriteToDevice((uint8_t *)loggerBuffer, ptr - loggerBuffer);
 
         /* Release lock */
         logger.logUnlock();

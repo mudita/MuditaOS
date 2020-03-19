@@ -10,9 +10,9 @@ Configs description
 
 | LOG_REDIRECT | Result |
 |---:|---:|
-| 0 | RTT log on serial (default read with JLinkRTTClient) |
-| 1 | RTT log on usb device | 
-| 2 | RTT log on SystemView | 
+| 0 | RTT log via JLINK on serial|
+| 1 | RTT log via RT1051 UART on serial| 
+| 2 | RTT log via JLINK on SystemView | 
 
 | SYSTEM_VIEW_ENABLED | Result |
 |---:|---:|

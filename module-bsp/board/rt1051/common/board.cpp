@@ -16,14 +16,14 @@
 
 #include "irq/irq_gpio.hpp"
 
-#if LOG_REDIRECT == 1
+#if LOG_REDIRECT == RTT_LUART
 #include "fsl_lpuart.h"
 #endif
 
 namespace bsp
 {
 
-#if LOG_REDIRECT == 1
+#if LOG_REDIRECT == RTT_LUART
     static lpuart_handle_t g_lpuartHandle;
 #endif
 
@@ -48,7 +48,7 @@ namespace bsp
     /* Initialize debug console. */
     static void BOARD_InitDebugConsole(void)
     {
-#if LOG_REDIRECT == 1
+#if LOG_REDIRECT == RTT_LUART
         /* The user initialization should be placed here */
         lpuart_config_t lpuartConfig;
 
