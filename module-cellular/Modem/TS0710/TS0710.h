@@ -416,6 +416,7 @@ class TS0710
     TS0710() = delete;
     ~TS0710();
     void SelectAntenna(uint8_t antenna);
+    uint8_t GetAntenna();
     // Add error handling - only for Advanced mode. Leave for now
     // Add callback for received frame (after error handling)
     // Add frame routing to different channels

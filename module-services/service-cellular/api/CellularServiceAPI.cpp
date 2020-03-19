@@ -115,7 +115,7 @@ void CellularServiceAPI::StartOperatorsScan(sys::Service *serv)
 bool CellularServiceAPI::SelectAntenna(sys::Service *serv, uint8_t antenna)
 {
     std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularGetNetworkInfo);
+        std::make_shared<CellularRequestMessage>(MessageType::CellularSelectAntenna);
     msg->data = std::to_string(antenna);
     auto ret  = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
 

@@ -503,3 +503,8 @@ void TS0710::SelectAntenna(uint8_t antenna)
         pv_cellular->SelectAntenna(antenna);
     }
 }
+
+uint8_t TS0710::GetAntenna()
+{
+    return pv_cellular->GetAntenna();
+}

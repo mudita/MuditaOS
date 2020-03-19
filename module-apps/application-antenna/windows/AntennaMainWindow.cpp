@@ -58,15 +58,19 @@ namespace gui
         }
 
         buttons.push_back(addLabel("Antenna A", [=](gui::Item &) {
-            buttons[0]->setFont(style::window::font::mediumbold);
-            buttons[1]->setFont(style::window::font::medium);
-            CellularServiceAPI::SelectAntenna(application, 0);
+            bool changed = CellularServiceAPI::SelectAntenna(application, 0);
+            if (changed) {
+                buttons[0]->setFont(style::window::font::mediumbold);
+                buttons[1]->setFont(style::window::font::medium);
+            }
             return true;
         }));
         buttons.push_back(addLabel("Antenna B", [=](gui::Item &) {
-            buttons[0]->setFont(style::window::font::medium);
-            buttons[1]->setFont(style::window::font::mediumbold);
-            CellularServiceAPI::SelectAntenna(application, 1);
+            bool changed = CellularServiceAPI::SelectAntenna(application, 1);
+            if (changed) {
+                buttons[0]->setFont(style::window::font::medium);
+                buttons[1]->setFont(style::window::font::mediumbold);
+            }
             return true;
         }));
 
