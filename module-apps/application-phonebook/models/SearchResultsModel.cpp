@@ -25,7 +25,14 @@ void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t li
 gui::ListItem *SearchResultsModel::getItem(
     int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
+    if (index < 0)
+    {
+        LOG_ERROR("getItem error: index < 0");
+        return nullptr;
+    }
+
     auto o = *results.get();
+
     if (index >= (int)o.size()) {
         LOG_ERROR("getItem error: index %d >= results size %d", index, o.size());
         return nullptr;
