@@ -9,13 +9,16 @@ fi
 function help() {
     echo -e "Use this script for faster configuring build types"
     echo -e "ussage:"
-    echo -e "\t$0 <target> <build_type>"
-    echo -e "available targests ar:"
+    echo -e "\t$0 <target> <build_type> [systemview]"
+    echo -e "available targets are:"
     echo -e "\t\t\tlinux\n\t\t\trt1051"
     echo -e "available build types:"
-    echo -e "\t\t\t\tDebug\t\t- standard debug build"
-    echo -e "\t\t\t\tRelease\t\t- release build (not for debugging)"
-    echo -e "\t\t\t\tRelWithDebInfo\t - release with debug info in separate file"
+    echo -e "\t\t\tDebug\t\t- standard debug build"
+    echo -e "\t\t\tRelease\t\t- release build (not for debugging)"
+    echo -e "\t\t\tRelWithDebInfo\t - release with debug info in separate file"
+    echo -e "available systemview options:"
+    echo -e "\t\t\tSYSTEMVIEW_OFF\t\t- default - disabled"
+    echo -e "\t\t\tSYSTEMVIEW_ON\t\t- enabled"
     echo -e "\n\e[1m\e[31mThis script will delete previous build dir!\e[0m"
 }
 
@@ -58,9 +61,22 @@ function check_build_type() {
     esac
 }
 
+function check_systemview() {
+    case ${SYSTEMVIEW,,} in
+        systemview_off)
+            SYSTEMVIEW="OFF"
+            return 0;;
+        systemview_on)
+            SYSTEMVIEW="ON"
+            return 0;;
+        *)
+            echo "wrong systemview option \"${SYSTEMVIEW}\" using default OFF"
+            SYSTEMVIEW="OFF"
+            return 0;;
+    esac
+}
 
-
-if [[ $# -ne 2 ]]; then
+if [[ ($# -lt 2) || ($# -gt 3)]]; then
     help
     exit 1
 fi
@@ -68,8 +84,10 @@ test_env.cmake
 
 TARGET=$1
 BUILD_TYPE=$2
+SYSTEMVIEW=$3
 
-if check_target && check_build_type ; then 
+if check_target && check_build_type ; then
+    check_systemview
     BUILD_DIR="build-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
     SRC_DIR=`pwd`
@@ -85,7 +103,8 @@ if check_target && check_build_type ; then
         CMAKE_CMD="cmake \
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
-                    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${SRC_DIR}"
+                    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${SRC_DIR} \
+                    -DSYSTEMVIEW=${SYSTEMVIEW} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
         if $CMAKE_CMD; then
             echo -e "\e[32mcd ${BUILD_DIR} && make -j\e[0m"
