@@ -23,7 +23,7 @@ namespace gui
     {
       protected:
         /// internal representation of the image
-        ImageMap *imageMap;
+        ImageMap *imageMap = nullptr;
 
       public:
         Image();

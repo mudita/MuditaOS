@@ -1,24 +1,13 @@
-/*
- * @file CallWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 12 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_
+#pragma once
 
+#include "application-call/ApplicationCall.hpp"
 #include "AppWindow.hpp"
 #include "Rect.hpp"
 #include "Image.hpp"
+#include "application-call/widgets/Icons.hpp"
 
 namespace gui
 {
-
-    /*
-     *
-     */
     class CallWindow : public AppWindow
     {
       public:
@@ -32,32 +21,16 @@ namespace gui
         };
 
       protected:
-        enum class FocusRects
-        {
-            Speaker,
-            Micrphone,
-        };
-
-        enum class AudioState
-        {
-            ON,
-            OFF
-        };
-        //	gui::Label* titleLabel = nullptr;
         // used to display both nnumber and name of contact
         gui::Label *numberLabel = nullptr;
         // used to inform user about call state of call and display duration of call
         gui::Label *durationLabel = nullptr;
 
-        gui::Image *imageSpeaker[2]    = {nullptr, nullptr};
-        gui::Image *imageMicrophone[2] = {nullptr, nullptr};
-        gui::Rect *rects[2]            = {nullptr};
-        gui::Image *imageMessage       = nullptr;
+        gui::SendSmsIcon *sendSmsIcon  = nullptr;
+        gui::MicrophoneIcon *microphoneIcon = nullptr;
+        gui::SpeakerIcon *speakerIcon       = nullptr;
         gui::Image *imageCircleTop     = nullptr;
         gui::Image *imageCircleBottom  = nullptr;
-
-        AudioState microphoneState = AudioState::ON;
-        AudioState speakerState    = AudioState::OFF;
 
         State state = State::IDLE;
         /**
@@ -65,7 +38,6 @@ namespace gui
          */
         void setVisibleState();
         bool handleLeftButton();
-        bool handleCenterButton();
         bool handleRightButton();
 
       public:
@@ -90,5 +62,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_CALL_WINDOWS_CALLWINDOW_HPP_ */
