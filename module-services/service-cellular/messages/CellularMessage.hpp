@@ -11,11 +11,12 @@
 #define PUREPHONE_CELLULARMESSAGE_HPP
 
 #include "../SignalStrength.hpp"
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "utf8/UTF8.hpp"
+#include <MessageType.hpp>
+#include <Service/Message.hpp>
+#include <utf8/UTF8.hpp>
 #include <memory>
 #include <variant>
+#include "../State.hpp"
 
 class CellularMessage : public sys::DataMessage
 {
@@ -40,10 +41,6 @@ class CellularNotificationMessage : public CellularMessage
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
         SIM,                      // change on SIM from URC
-        SanityCheck,
-        ModemOn,           // Modem initialized
-        ModemFatalFailure, // Modem messed up beyond recognition, needs reboot (ie. QSIMSEL not set, or just returns
-                           // `OK` without message body (which happens sometimes...), or stopped totally responding
         RawCommand,        // send raw command to modem -> returns raw, tokenised result
         None
     };
@@ -90,6 +87,14 @@ class CellularResponseMessage : public sys::ResponseMessage
 
 namespace cellular
 {
+
+    class StateChange : public CellularMessage
+    {
+      public:
+        const State::ST request;
+        StateChange(const State::ST request) : CellularMessage(MessageType::CellularStateRequest), request(request)
+        {}
+    };
 
     class RawCommand : public CellularNotificationMessage
     {

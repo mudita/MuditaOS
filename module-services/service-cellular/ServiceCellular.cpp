@@ -52,36 +52,37 @@ inline const auto cellularStack = 24000UL;
 
 using namespace cellular;
 
-const char *State::c_str(State::ST state) const
+const char *State::c_str(State::ST state)
 {
     switch (state) {
     case ST::Idle:
+        return "Idle";
     case ST::PowerUpInProgress:
         return "PowerUpInProgress";
-    case ST::ModemConfigurationInProgress:
-        return "ModemConfigurationInProgress";
-    case ST::AudioConfigurationInProgress:
-        return "AudioConfigurationInProgress";
+    case ST::AudioConfigurationProcedure:
+        return "AudioConfigurationProcedure";
     case ST::ModemOn:
         return "ModemOn";
-    case ST::SimInitInProgress:
-        return "SimInit";
-    case ST::FullyFunctional:
-        return "FullyFunctional";
+    case ST::SimSelect:
+        return "SimSelect";
     case ST::Failed:
         return "Failed";
     case ST::SanityCheck:
         return "SanityCheck";
     case ST::ModemFatalFailure:
         return "ModemFatalFailure";
+    case ST::CellularStartConfProcedure:
+        return "CellularStartConfProcedure";
     }
     return "";
 }
 
-void State::set(ST state)
+void State::set(ServiceCellular *owner, ST state)
 {
     LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
     this->state = state;
+    auto msg    = std::make_shared<StateChange>(state);
+    sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, owner);
 }
 
 State::ST State::get() const
@@ -151,26 +152,10 @@ void ServiceCellular::TickHandler(uint32_t id)
     }
 }
 
-// Invoked during initialization
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-
     // cmux = new TS0710(PortSpeed_e::PS460800, this);
-
-    // Start procedure is as follow:
-    /*
-     * 1) Power-up
-     * 2) Init configuration of GSM modem
-     * 3) Audio configuration
-     * 4) Start multiplexer
-     * 5) Modem fully-operational
-     */
-
-    // Start power-up procedure
-    sys::Bus::SendUnicast(
-        std::make_shared<CellularRequestMessage>(MessageType::CellularStartPowerUpProcedure), GetName(), this);
-    state.set(State::ST::PowerUpInProgress);
-
+    state.set(this, State::ST::PowerUpInProgress);
     return sys::ReturnCodes::Success;
 }
 
@@ -198,11 +183,125 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
     return sys::ReturnCodes::Success;
 }
 
+void ServiceCellular::change_state(cellular::StateChange *msg)
+{
+    assert(msg);
+    switch(msg->request) {
+        case State::ST::Idle:
+            idle();
+            break;
+        case State::ST::PowerUpInProgress:
+            power_up_procedure();
+            break;
+        case State::ST::AudioConfigurationProcedure:
+            audio_conf_procedure();
+            break;
+        case State::ST::CellularStartConfProcedure:
+            start_conf_procedure();
+            break;
+        case State::ST::SanityCheck:
+            sim_sanity_check();
+            break;
+        case State::ST::SimSelect:
+            select_sim();
+            break;
+        case State::ST::ModemOn:
+            modem_on();
+            break;
+        case State::ST::ModemFatalFailure:
+            fatal_failure();
+            break;
+        case State::ST::Failed:
+            failure();
+            break;
+        };
+}
+
+bool ServiceCellular::idle()
+{
+    LOG_DEBUG("Idle");
+    return true;
+}
+
+bool ServiceCellular::power_up_procedure()
+{
+    auto ret = cmux->PowerUpProcedure();
+    if (ret == TS0710::ConfState::Success) {
+        state.set(this, State::ST::CellularStartConfProcedure);
+        return true;
+    }
+    else if (ret == TS0710::ConfState::PowerUp) {
+        state.set(this, State::ST::Idle);
+        return true;
+    }
+    state.set(this, State::ST::Failed);
+    return false;
+}
+
+bool ServiceCellular::start_conf_procedure()
+{
+    // Start configuration procedure, if it's first run modem will be restarted
+    auto confRet = cmux->ConfProcedure();
+    if (confRet == TS0710::ConfState::Success) {
+        state.set(this, State::ST::AudioConfigurationProcedure);
+        return true;
+    }
+    state.set(this, State::ST::Failed);
+    return false;
+}
+
+bool ServiceCellular::audio_conf_procedure()
+{
+    auto audioRet = cmux->AudioConfProcedure();
+    if (audioRet == TS0710::ConfState::Success) {
+        auto cmd =
+            at::factory(at::AT::IPR) + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
+        LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+        if (!cmux->getParser()->cmd(cmd)) {
+            LOG_ERROR("Baudrate setup error");
+            state.set(this, State::ST::Failed);
+            return false;
+        }
+        cmux->getCellular()->SetSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
+        vTaskDelay(1000);
+
+        if (cmux->StartMultiplexer() == TS0710::ConfState::Success) {
+
+            LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+
+            // open channel - notifications
+            DLC_channel *notificationsChannel = cmux->get(TS0710::Channel::Notifications);
+            if (notificationsChannel != nullptr) {
+                LOG_DEBUG("Setting up notifications callback");
+                notificationsChannel->setCallback(notificationCallback);
+            }
+            state.set(this, State::ST::SanityCheck);
+            return true;
+        }
+        else {
+            state.set(this, State::ST::Failed);
+            return false;
+        }
+    }
+    else if (audioRet == TS0710::ConfState::Failure) {
+        /// restart
+        state.set(this, State::ST::AudioConfigurationProcedure);
+        return true;
+    }
+    // Reset procedure started, do nothing here
+    state.set(this, State::ST::Idle);
+    return true;
+}
+
 sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
     switch (static_cast<MessageType>(msgl->messageType)) {
+    case MessageType::CellularStateRequest: {
+        change_state(dynamic_cast<cellular::StateChange *>(msgl));
+        responseMsg = std::make_shared<CellularResponseMessage>(true);
+    } break;
     // Incoming notifications from Notification Virtual Channel
     case MessageType::CellularNotification: {
         CellularNotificationMessage *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
@@ -234,10 +333,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
+            /// TODO this should be removed with T4
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
-                sys::Bus::SendUnicast(
-                    std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure), GetName(), this);
-                state.set(State::ST::ModemConfigurationInProgress);
+                state.set(this, State::ST::CellularStartConfProcedure);
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
@@ -275,109 +373,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
     } break;
 
-    case MessageType::CellularStartPowerUpProcedure: {
-        auto powerRet = cmux->PowerUpProcedure();
-        if (powerRet == TS0710::ConfState::Success) {
-            sys::Bus::SendUnicast(
-                std::make_shared<CellularRequestMessage>(MessageType::CellularStartConfProcedure), GetName(), this);
-        }
-        else if (powerRet == TS0710::ConfState::PowerUp) {
-            state.set(State::ST::PowerUpInProgress);
-        }
-        else {
-            LOG_FATAL("[ServiceCellular] PowerUp procedure failed");
-            state.set(State::ST::Failed);
-        }
-    } break;
-
-    case MessageType::CellularStartConfProcedure: {
-        // Start configuration procedure, if it's first run modem will be restarted
-        auto confRet = cmux->ConfProcedure();
-        if (confRet == TS0710::ConfState::Success) {
-            sys::Bus::SendUnicast(
-                std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
-                GetName(),
-                this);
-            state.set(State::ST::AudioConfigurationInProgress);
-        }
-        else {
-            LOG_FATAL("[ServiceCellular] Initialization failed, not ready");
-            state.set(State::ST::Failed);
-        }
-    } break;
-
-    case MessageType ::CellularStartAudioConfProcedure: {
-        auto audioRet = cmux->AudioConfProcedure();
-        if (audioRet == TS0710::ConfState::Success) {
-            auto cmd =
-                at::factory(at::AT::IPR) + std::to_string(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]) + "\r";
-            LOG_DEBUG("Setting baudrate %i baud", ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
-            if (!cmux->getParser()->cmd(cmd)) {
-                LOG_ERROR("Baudrate setup error");
-                state.set(State::ST::Failed);
-                break;
-            }
-            cmux->getCellular()->SetSpeed(ATPortSpeeds_text[cmux->getStartParams().PortSpeed]);
-
-            vTaskDelay(1000);
-
-            if (cmux->StartMultiplexer() == TS0710::ConfState::Success) {
-
-                LOG_DEBUG("[ServiceCellular] Modem is fully operational");
-
-                DLC_channel *notificationsChannel =
-                    cmux->get(TS0710::Channel::Notifications); // open channel - notifications
-                if (notificationsChannel) {
-                    LOG_DEBUG("Setting up notifications callback");
-                    notificationsChannel->setCallback(notificationCallback);
-                }
-
-                state.set(State::ST::SanityCheck);
-                sys::Bus::SendUnicast(
-                    std::make_shared<CellularRequestMessage>(MessageType::CellularSanityCheck), GetName(), this);
-            }
-            else {
-                LOG_DEBUG("[ServiceCellular] Modem FAILED");
-                state.set(State::ST::Failed);
-            }
-
-            // Propagate "ServiceReady" notification into system
-            sys::Bus::SendMulticast(
-                std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ServiceReady),
-                sys::BusChannels::ServiceCellularNotifications,
-                this);
-        }
-        else if (audioRet == TS0710::ConfState::Failure) {
-            sys::Bus::SendUnicast(
-                std::make_shared<CellularRequestMessage>(MessageType::CellularStartAudioConfProcedure),
-                GetName(),
-                this);
-        }
-        else {
-            // Reset procedure started, do nothing here
-            state.set(State::ST::Idle);
-        }
-    } break;
-
-    case MessageType::CellularSanityCheck: {
-        auto ret = sim_sanity_check();
-        if (ret) {
-            state.set(State::ST::ModemOn);
-            auto msg = std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemOn);
-            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
-        }
-        else {
-            LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
-            state.set(State::ST::ModemFatalFailure);
-            sys::Bus::SendMulticast(
-                std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::ModemFatalFailure),
-                sys::BusChannels::ServiceCellularNotifications,
-                this);
-        }
-    } break;
-
     case MessageType::CellularSimProcedure: {
-        select_sim();
+        state.set(this, State::ST::SimSelect);
     } break;
 
     case MessageType::CellularListCurrentCalls: {
@@ -975,9 +972,9 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
     return result;
 }
 
-bool ServiceCellular::sim_sanity_check()
+bool sim_check_hot_swap(DLC_channel *chanel)
 {
-    auto chanel        = cmux->get(TS0710::Channel::Commands);
+    assert(chanel);
     bool reboot_needed = false;
     auto ret           = chanel->cmd(at::AT::SIM_DET);
     if (!ret) {
@@ -1015,6 +1012,19 @@ bool ServiceCellular::sim_sanity_check()
     return !reboot_needed;
 }
 
+bool ServiceCellular::sim_sanity_check()
+{
+    auto ret = sim_check_hot_swap(cmux->get(TS0710::Channel::Commands));
+    if (ret) {
+        state.set(this, State::ST::ModemOn);
+    }
+    else {
+        LOG_ERROR("Sanity check failure - user will be promped about full shutdown");
+        state.set(this, State::ST::ModemFatalFailure);
+    }
+    return ret;
+}
+
 bool ServiceCellular::select_sim()
 {
 
@@ -1040,6 +1050,12 @@ bool ServiceCellular::select_sim()
     return true;
 }
 
+bool ServiceCellular::modem_on()
+{
+    state.set(this, State::ST::Idle);
+    return true;
+}
+
 bool ServiceCellular::init_sim()
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
@@ -1053,6 +1069,20 @@ bool ServiceCellular::init_sim()
     success      = channel->cmd(at::AT::SMS_UCSC2) && success;
     success      = channel->cmd(at::AT::SMS_STORAGE) && success;
     success      = channel->cmd(at::AT::CRC_ON) && success;
-    state.set(State::ST::FullyFunctional);
+    state.set(this, State::ST::Idle);
     return success;
+}
+
+bool ServiceCellular::failure()
+{
+    state.set(this, State::ST::Idle);
+    return true;
+}
+
+bool ServiceCellular::fatal_failure()
+{
+    LOG_FATAL("Await for death!");
+    while (true) {
+        vTaskDelay(500);
+    }
 }

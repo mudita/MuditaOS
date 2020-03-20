@@ -51,7 +51,7 @@ namespace app
         if (auto msg = dynamic_cast<DBNotificationMessage *>(msgl)) {
             handled = handle(msg);
         }
-        else if (auto msg = dynamic_cast<CellularNotificationMessage *>(msgl)) {
+        else if (auto msg = dynamic_cast<cellular::StateChange *>(msgl)) {
             handled = handle(msg);
         }
 
@@ -78,10 +78,10 @@ namespace app
         return false;
     }
 
-    auto ApplicationDesktop::handle(CellularNotificationMessage *msg) -> bool
+    auto ApplicationDesktop::handle(cellular::StateChange *msg) -> bool
     {
         assert(msg);
-        if (msg->type == CellularNotificationMessage::Type::ModemOn) {
+        if (msg->request == cellular::State::ST::ModemOn) {
             if (need_sim_select && !screenLocked) {
                 sapm::ApplicationManager::messageSwitchApplication(this, app::name_settings, app::sim_select, nullptr);
                 return true;
@@ -92,7 +92,7 @@ namespace app
                                       this);
             }
         }
-        if (msg->type == CellularNotificationMessage::Type::ModemFatalFailure) {
+        if (msg->request == cellular::State::ST::ModemFatalFailure) {
             switchWindow(app::window::name::desktop_reboot);
         }
 
