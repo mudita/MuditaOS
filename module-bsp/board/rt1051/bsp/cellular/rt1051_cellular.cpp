@@ -490,6 +490,10 @@ namespace bsp
             return !state;
         }
 
+        void statusIRQhandler(){
+
+        }
+
         namespace sim
         {
 
