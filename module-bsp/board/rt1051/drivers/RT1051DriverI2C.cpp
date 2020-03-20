@@ -8,7 +8,7 @@
  */
 
 #include "RT1051DriverI2C.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "../board.h"
 
 namespace drivers

@@ -2,8 +2,8 @@
 // Created by mati on 08.05.19.
 //
 
-#include "../../log/log.hpp"
-#include "../../log/segger/SEGGER_RTT.h"
+#include "../../segger/log/log.hpp"
+#include "../../segger/log/rtt/SEGGER_RTT.h"
 #include <ticks.hpp>
 extern "C"
 {

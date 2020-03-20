@@ -3,7 +3,7 @@
 #include <array>
 #include <utf8/UTF8.hpp>
 #include <i18/i18.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 namespace utils
 {

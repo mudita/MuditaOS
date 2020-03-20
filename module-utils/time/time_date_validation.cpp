@@ -5,7 +5,7 @@
  *      Author: kuba
  */
 #include "time_date_validation.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 namespace utils
 {
     namespace time

@@ -13,7 +13,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "mutex.hpp"
 #include <common_data/EventStore.hpp>
 #include <fcntl.h>

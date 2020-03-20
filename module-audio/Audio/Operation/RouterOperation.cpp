@@ -13,7 +13,7 @@
 #include "../Profiles/ProfileRoutingHeadset.hpp"
 #include "../Profiles/ProfileRoutingSpeakerphone.hpp"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 namespace audio
 {

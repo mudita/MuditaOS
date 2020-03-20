@@ -8,7 +8,7 @@
  */
 
 #include "RT1051DriverPLL.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "../common/clock_config.h"
 
 namespace drivers

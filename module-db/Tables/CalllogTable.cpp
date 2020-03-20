@@ -7,7 +7,7 @@
  * @details
  */
 #include "CalllogTable.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include <Utils.hpp>
 
 CalllogTable::CalllogTable(Database *db) : Table(db)

@@ -9,7 +9,7 @@
 #include "Margins.hpp"
 #include "utf8/UTF8.hpp"
 #include <Style.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 namespace gui
 {

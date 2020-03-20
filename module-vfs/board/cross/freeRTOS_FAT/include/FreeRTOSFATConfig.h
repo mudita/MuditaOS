@@ -313,7 +313,7 @@ use of the +FAT library. In some API's, a character buffer of size
 #define ffconfigSDIO_DRIVER_USES_INTERRUPT 1
 
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #define FF_PRINTF LOG_PRINTF
 
 /* Include the recursive function ff_deltree().  The use of recursion does not

@@ -4,7 +4,7 @@
 
 #include "TS0710_START.h"
 #include "DLC_channel.h"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 /**
  * TS0710_START implementation

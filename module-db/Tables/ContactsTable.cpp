@@ -9,7 +9,7 @@
  */
 
 #include "ContactsTable.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 ContactsTable::ContactsTable(Database *db) : Table(db)
 {}
