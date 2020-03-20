@@ -21,7 +21,7 @@
 
 namespace gui
 {
-
+    using namespace callAppStyle;
     using namespace callAppStyle::enterNumberWindow;
 
     EnterNumberWindow::EnterNumberWindow(app::Application *app, std::string windowName) : AppWindow(app, windowName)
@@ -71,8 +71,7 @@ namespace gui
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         numberLabel->setDotsMode(true, false);
 
-        newContactIcon =
-            new gui::Icon(this, newContactIcon::x, newContactIcon::y, "cross", utils::localize.get("app_call_contact"));
+        newContactIcon                    = new gui::AddContactIcon(this, newContactIcon::x, newContactIcon::y);
         newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };
         setFocusItem(newContactIcon);
     }
