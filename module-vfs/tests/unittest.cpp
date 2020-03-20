@@ -46,11 +46,14 @@ TEST_CASE("Test case 1")
 
     auto cwd = vfs.getcurrdir();
 
-    auto path = cwd.substr(0, cwd.find_last_of("/\\"));
-
-    auto dirList = vfs.listdir((path + "/module-vfs/tests/test_dir").c_str());
+    auto dirList = vfs.listdir((cwd + "/module-vfs/test_dir").c_str());
     REQUIRE(dirList.size() == 3);
-    REQUIRE(dirList[0].attributes == vfs::FileAttributes::Directory);
-    REQUIRE(dirList[0].fileName == "test_dir2");
-    REQUIRE(dirList[1].attributes == vfs::FileAttributes::Writable);
+    for (auto &dir : dirList) {
+        if (dir.fileName == "test_dir2") {
+            REQUIRE(dir.attributes == vfs::FileAttributes::Directory);
+        }
+        if (dir.fileName == "test1.txt" || dir.fileName == "test2.txt") {
+            REQUIRE(dir.attributes == vfs::FileAttributes::Writable);
+        }
+    }
 }
