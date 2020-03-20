@@ -10,9 +10,9 @@ Configs description
 
 | LOG_REDIRECT | Result |
 |---:|---:|
-| 0 | RTT log via JLINK on serial|
-| 1 | RTT log via RT1051 UART on serial| 
-| 2 | RTT log via JLINK on SystemView | 
+| RTT_JLINK | RTT log via JLINK on serial|
+| RTT_LUART | RTT log via RT1051 UART on serial| 
+| RTT_SYSTEMVIEW | RTT log via JLINK on SystemView | 
 
 | SYSTEM_VIEW_ENABLED | Result |
 |---:|---:|
