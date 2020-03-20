@@ -71,17 +71,13 @@ enum class MessageType
     DBCountryCode,
 
     // Cellular messages
+    CellularStateRequest,       /// cellular change state request, only for use by cellular
     CellularNotification,       // Async notification message
     CellularDialNumber,         // Dial number
     CellularAnswerIncomingCall, // Answer incoming call
     CellularHangupCall,         // Hang up call
 
     CellularListCurrentCalls,
-    CellularAwaitDesktop,
-    CellularStartPowerUpProcedure,
-    CellularStartConfProcedure,
-    CellularStartAudioConfProcedure,
-    CellularSanityCheck,
     CellularSimProcedure,
     CellularGetOwnNumber,
     CellularGetIMSI,
