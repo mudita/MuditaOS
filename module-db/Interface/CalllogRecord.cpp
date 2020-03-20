@@ -11,7 +11,7 @@
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
 #include <cassert>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <sstream>
 
 CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name)

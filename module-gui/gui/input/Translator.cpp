@@ -1,5 +1,5 @@
 #include "Translator.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "vfs.hpp"
 #include <algorithm>
 

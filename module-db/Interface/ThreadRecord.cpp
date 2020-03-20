@@ -11,7 +11,7 @@
 #include "ThreadRecord.hpp"
 #include "SMSRecord.hpp"
 #include <cassert>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 ThreadRecordInterface::ThreadRecordInterface(SmsDB *smsDb, ContactsDB *contactsDb)
     : smsDB(smsDb), contactsDB(contactsDb)

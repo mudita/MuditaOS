@@ -14,7 +14,7 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 namespace gui
 {

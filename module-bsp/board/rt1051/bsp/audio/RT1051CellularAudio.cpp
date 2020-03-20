@@ -11,7 +11,7 @@
 #include "board.h"
 #include "dma_config.h"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #include "bsp/BoardDefinitions.hpp"
 

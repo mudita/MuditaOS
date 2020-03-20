@@ -9,7 +9,7 @@
  */
 
 #include "Database.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "vfs.hpp"
 #include <assert.h>
 #include <memory>

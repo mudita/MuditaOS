@@ -3,7 +3,7 @@
 /// This file goal is to provide one place to store all at commands, with their respectable timeouts if these have
 
 #include "Result.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <map>
 #include <memory>
 #include <string>

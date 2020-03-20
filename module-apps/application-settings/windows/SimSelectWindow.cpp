@@ -2,7 +2,7 @@
 #include "Info.hpp"
 #include "SettingsMainWindow.hpp"
 #include "i18/i18.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <common_data/EventStore.hpp>
 #include <service-db/api/DBServiceAPI.hpp>

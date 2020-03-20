@@ -12,3 +12,6 @@
 [submodule "module-utils/microtar"]
 	path = module-utils/microtar
 	url = ../microtar.git
+[submodule "module-utils/segger"]
+	path = module-utils/segger
+	url = ../segger-utils.git

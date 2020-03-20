@@ -1,6 +1,6 @@
 #include "PageLayout.hpp"
 #include "Style.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 namespace gui
 {

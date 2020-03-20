@@ -1,7 +1,7 @@
 #include "CellularCall.hpp"
 #include <Modem/ATParser.hpp>
 #include <Utils.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <vector>
 
 #include "bsp/rtc/rtc.hpp"

@@ -15,7 +15,7 @@ extern "C"
 #include "semphr.h"
 }
 // module-utils
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 // module-vfs
 #include "vfs.hpp"
 #include "EinkIncludes.hpp"

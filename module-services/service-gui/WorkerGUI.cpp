@@ -20,7 +20,7 @@ extern "C"
 #include "MessageType.hpp"
 #include "WorkerGUI.hpp"
 // module-utils
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 namespace sgui
 {

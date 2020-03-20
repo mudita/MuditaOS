@@ -11,7 +11,7 @@
 #include "SMSRecord.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const UTF8 &num)
 {

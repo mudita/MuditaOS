@@ -18,7 +18,7 @@
 
 #include "Database/Database.hpp"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #include <cassert>
 #include <time/ScopedTime.hpp>

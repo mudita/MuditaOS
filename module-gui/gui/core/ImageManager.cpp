@@ -12,7 +12,7 @@
 
 #include "ImageManager.hpp"
 #include "utf8/UTF8.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 // module-gui
 #include "ImageMap.hpp"
 #include "VecMap.hpp"

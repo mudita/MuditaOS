@@ -38,7 +38,7 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 #include <stdint.h>
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 //TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus
@@ -163,7 +163,7 @@ standard names. */
 #define configGPT_CLOCK_HZ                    (32768U)
 
 #if SYSTEM_VIEW_ENABLED
-#include "../module-utils/systemview/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.h"
+#include "../module-utils/segger/systemview/FreeRTOSV10/SEGGER_SYSVIEW_FreeRTOS.h"
 #endif
 
 #endif /* FREERTOS_CONFIG_H */

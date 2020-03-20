@@ -9,7 +9,7 @@
  */
 
 #include "RT1051DriverGPIO.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 namespace drivers
 {

@@ -12,7 +12,7 @@
 #include "Font.hpp"
 
 #include "utf8/UTF8.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 // for loading files
 #include "Context.hpp"
 #include "DrawCommand.hpp"
