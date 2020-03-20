@@ -3,6 +3,7 @@
 #include <algorithm> // std::find_if_not
 #include <log/log.hpp>
 #include <sstream>
+#include <iomanip>
 
 namespace utils
 {
@@ -80,10 +81,10 @@ namespace utils
         return rtrim(ltrim(s));
     }
 
-    template <typename T> std::string to_string(T Number)
+    template <typename T> std::string to_string(T t, size_t stringLength = 0)
     {
         std::ostringstream ss;
-        ss << Number;
+        ss << std::setfill('0') << std::setw(stringLength) << t;
         return ss.str();
     }
 

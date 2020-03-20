@@ -246,14 +246,18 @@ namespace utils
         Duration::Duration(time_t duration, DisplayedFields displayedFields)
             : duration(duration), displayedFields(displayedFields)
         {
-            days    = this->duration / secondsInDay;
-            hours   = (this->duration % secondsInDay) / secondsInHour;
-            minutes = ((this->duration % secondsInDay) % secondsInHour) / secondsInMinute;
-            seconds = ((this->duration % secondsInDay) % secondsInHour) % secondsInMinute;
+            if (displayedFields == DisplayedFields::two0M0S) {
+                hours   = 0;
+                minutes = this->duration / secondsInMinute;
+            }
+            else {
+                hours   = this->duration / secondsInHour;
+                minutes = (this->duration % secondsInHour) / secondsInMinute;
+            }
+            seconds = (this->duration % secondsInHour) % secondsInMinute;
 
             if (verboseConversion) {
-                LOG_DEBUG(
-                    "durtaion %u = %u days %u hours %u minutes %u seconds", duration, days, hours, minutes, seconds);
+                LOG_DEBUG("durtaion %u - %u hours %u minutes %u seconds", duration, hours, minutes, seconds);
             }
         }
 
@@ -270,24 +274,22 @@ namespace utils
 
         void Duration::fillStr(std::string &format) const
         {
-            utils::findAndReplaceAll(format, "%d", std::to_string(days));
-            utils::findAndReplaceAll(format, "%H", std::to_string(hours));
-            utils::findAndReplaceAll(format, "%M", std::to_string(minutes));
-            utils::findAndReplaceAll(format, "%S", std::to_string(seconds));
+            utils::findAndReplaceAll(format, "%H", utils::to_string(hours));
+            utils::findAndReplaceAll(format, "%M", utils::to_string(minutes));
+            utils::findAndReplaceAll(format, "%S", utils::to_string(seconds));
+            utils::findAndReplaceAll(format, "%0H", utils::to_string(hours, 2));
+            utils::findAndReplaceAll(format, "%0M", utils::to_string(minutes, 2));
+            utils::findAndReplaceAll(format, "%0S", utils::to_string(seconds, 2));
         }
 
         UTF8 Duration::str() const
         {
-            auto data = displayedFields == DisplayedFields::three ? utils::localize.get(durationFormatHMS)
-                                                                  : utils::localize.get(durationFormatMS);
-
-            if (days != 0) {
-                data = displayedFields == DisplayedFields::three ? utils::localize.get(durationFormatDHM)
-                                                                 : utils::localize.get(durationFormatDH);
+            std::string data;
+            if (displayedFields == DisplayedFields::automatic) {
+                data = utils::localize.get(hours != 0 ? durationFormatH0M0S : durationFormat0M0S);
             }
-            else if (hours != 0) {
-                data = displayedFields == DisplayedFields::three ? utils::localize.get(durationFormatHMS)
-                                                                 : utils::localize.get(durationFormatHM);
+            else {
+                data = utils::localize.get(formatMap.at(displayedFields));
             }
 
             fillStr(data);

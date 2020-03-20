@@ -178,17 +178,20 @@ namespace utils
         class Duration
         {
           public:
-            enum class DisplayedFields : bool
+            enum class DisplayedFields
             {
-                two,
-                three
+                twoM0S,
+                two0M0S,
+                two0H0M,
+                threeH0M0S,
+                automatic
             };
 
-            Duration(time_t duration = 0, DisplayedFields displayedFields = DisplayedFields::two);
-            Duration(time_t stop, time_t start, DisplayedFields displayedFields = DisplayedFields::two);
+            Duration(time_t duration = 0, DisplayedFields displayedFields = DisplayedFields::automatic);
+            Duration(time_t stop, time_t start, DisplayedFields displayedFields = DisplayedFields::automatic);
             Duration(const Timestamp &stop,
                      const Timestamp &start,
-                     DisplayedFields displayedFields = DisplayedFields::two);
+                     DisplayedFields displayedFields = DisplayedFields::automatic);
 
             time_t get() const
             {
@@ -248,20 +251,24 @@ namespace utils
             }
 
           private:
-            static constexpr bool verboseConversion = false;
-            static constexpr auto durationFormatHMS = "duration_hour_min_sec";
-            static constexpr auto durationFormatDHM = "duration_day_hour_min";
-            static constexpr auto durationFormatMS  = "duration_min_sec";
-            static constexpr auto durationFormatHM  = "duration_hour_min";
-            static constexpr auto durationFormatDH  = "duration_day_hour";
+            static constexpr bool verboseConversion             = false; // debug switch
+            static const inline std::string durationFormatH0M0S = "duration_hour_0min_0sec";
+            static const inline std::string durationFormat0H0M  = "duration_0hour_0sec";
+            static const inline std::string durationFormat0M0S  = "duration_0min_0sec";
+            static const inline std::string durationFormatM0S   = "duration_min_0sec";
 
-            void fillStr(std::string &format) const;
+            static const inline std::map<const DisplayedFields, const std::string> formatMap = {
+                {DisplayedFields::twoM0S, durationFormatM0S},
+                {DisplayedFields::two0M0S, durationFormatH0M0S},
+                {DisplayedFields::two0H0M, durationFormat0H0M},
+                {DisplayedFields::threeH0M0S, durationFormatH0M0S}};
+
+            void fillStr(std::string &formatlong) const;
             time_t duration;
-            unsigned long days              = 0;
             unsigned long hours             = 0;
             unsigned long minutes           = 0;
             unsigned long seconds           = 0;
-            DisplayedFields displayedFields = DisplayedFields::two;
+            DisplayedFields displayedFields = DisplayedFields::automatic;
         };
 
     } // namespace time

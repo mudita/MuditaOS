@@ -276,7 +276,8 @@ namespace gui
             }
             typeData->setText(callTypeStr);
 
-            durationData->setText(utils::time::Duration(record.duration).str());
+            durationData->setText(
+                utils::time::Duration(record.duration, utils::time::Duration::DisplayedFields::two0M0S).str());
 
             utils::time::Timestamp t(record.date);
             dateDay->setText(t.day() + ",");
