@@ -122,13 +122,22 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
         }
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueSIM)) {
-        uint8_t pinstate;
-        if (xQueueReceive(queue, &pinstate, 0) != pdTRUE) {
+    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueCellular)) {
+        uint8_t notification;
+        if (xQueueReceive(queue, &notification, 0) != pdTRUE) {
             return false;
         }
-        LOG_DEBUG("SIM state change: %d", pinstate);
-        bsp::cellular::sim::hotswap_trigger();
+
+        if (notification == bsp::cellular::statusPin) {
+            auto GSMstatus = bsp::cellular::status::getStatus();
+            LOG_DEBUG("GSM Status pin change: %s", (GSMstatus == bsp::cellular::status::value::GOOD ? "GOOD" : "BAD"));
+        }
+
+        if (notification == bsp::cellular::trayPin) {
+            Store::GSM::Tray pinstate = bsp::cellular::sim::getTray();
+            LOG_DEBUG("SIM state change: %d", pinstate);
+            bsp::cellular::sim::hotswap_trigger();
+        }
     }
 
     return true;
@@ -145,7 +154,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::battery_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueBattery)]);
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
-    bsp::cellular::sim::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueSIM)]);
+    bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
 
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);

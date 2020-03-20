@@ -213,24 +213,35 @@ namespace bsp
 
     namespace cellular
     {
-        bool getStatus()
+        auto init(QueueHandle_t qHandle) -> int
         {
-            return true;
+            return 0;
         }
 
-        void statusIRQhandler(){}
-
-        namespace sim
+        namespace status
         {
 
-            auto init(QueueHandle_t qHandle) -> int
+            bsp::cellular::status::value getStatus()
             {
-                return 0;
+                return bsp::cellular::status::value::GOOD;
             }
+
+            BaseType_t statusIRQhandler()
+            {
+                return pdFALSE;
+            }
+        }
+        namespace sim
+        {
 
             auto trayIRQ_handler() -> BaseType_t
             {
                 return BaseType_t();
+            }
+
+            auto getTray() -> Store::GSM::Tray
+            {
+                return Store::GSM::Tray::IN;
             }
 
             void hotswap_trigger()
