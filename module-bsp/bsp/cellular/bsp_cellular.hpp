@@ -65,6 +65,8 @@ namespace bsp {
     namespace cellular
     {
         bool getStatus();
+        void statusIRQhandler();
+
         namespace sim
         {
             /// initialize SIM queue directed to EventWorker

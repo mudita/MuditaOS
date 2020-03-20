@@ -217,6 +217,9 @@ namespace bsp
         {
             return true;
         }
+
+        void statusIRQhandler(){}
+
         namespace sim
         {
 
