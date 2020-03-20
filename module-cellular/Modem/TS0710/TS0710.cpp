@@ -42,7 +42,7 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text          = {{PortSpeed_e::PS9600, 9
 #define SERIAL_PORT "/dev/null"
 #endif
 
-#define USE_DAEFAULT_BAUDRATE 0
+#define USE_DAEFAULT_BAUDRATE 1
 
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
 {
