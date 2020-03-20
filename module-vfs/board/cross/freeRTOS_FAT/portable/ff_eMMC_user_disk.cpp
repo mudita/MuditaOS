@@ -29,7 +29,7 @@
 #include "fsl_cache.h"
 #include "macros.h"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #define eMMCHIDDEN_SECTOR_COUNT		8
 #define eMMCPRIMARY_PARTITIONS		1

@@ -1,6 +1,6 @@
 #include "board.h"
 #include "fsl_gpio.h"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "rt1051_harness.hpp"
 
 using namespace bsp::harness::gpio;

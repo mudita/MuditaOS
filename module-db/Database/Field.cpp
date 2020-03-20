@@ -1,5 +1,5 @@
 #include "Field.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <functional>
 
 const char *Field::GetCString() const

@@ -10,7 +10,7 @@
 #include "RT1051LPM.hpp"
 
 #include "board.h"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "bsp/BoardDefinitions.hpp"
 
 namespace bsp

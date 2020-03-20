@@ -5,7 +5,7 @@
  *      Author: robert
  */
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #include <iostream>
 #include <string>

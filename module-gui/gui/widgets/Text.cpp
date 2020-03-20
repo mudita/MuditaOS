@@ -10,7 +10,7 @@
 
 #include "../core/Font.hpp"
 #include "Text.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
 #include <Style.hpp>

@@ -7,7 +7,7 @@
 
 #include "EventManager.hpp"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #include "bsp/keyboard/keyboard.hpp"
 #include "WorkerEvent.hpp"

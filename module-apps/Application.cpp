@@ -9,7 +9,7 @@
 #include <sstream>
 #include <iomanip>
 // module-utils
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 // module-services
 #include "service-gui/messages/DrawMessage.hpp"
 #include "service-appmgr/messages/APMMessage.hpp"

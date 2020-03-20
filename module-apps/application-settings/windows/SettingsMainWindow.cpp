@@ -2,7 +2,7 @@
 #include "../ApplicationSettings.hpp"
 #include "Info.hpp"
 #include "i18/i18.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 std::list<gui::Option> mainWindowOptions(app::Application *app)
 {

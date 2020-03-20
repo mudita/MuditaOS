@@ -1,4 +1,4 @@
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 // #define __BTSTACK_FILE__ ".c"
 

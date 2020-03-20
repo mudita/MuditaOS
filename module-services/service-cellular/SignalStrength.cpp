@@ -1,5 +1,5 @@
 #include "SignalStrength.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 SignalStrength::SignalStrength(int rssi)
 {

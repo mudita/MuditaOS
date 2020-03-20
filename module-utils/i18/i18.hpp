@@ -13,7 +13,7 @@
 #include "json/json11.hpp"
 #include <string>
 #include "vfs.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #include "thread.hpp"
 

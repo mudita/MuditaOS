@@ -1,5 +1,5 @@
-#include "../../log/log.hpp"
-#include "../../log/segger/SEGGER_RTT.h"
+#include "../../segger/log/log.hpp"
+#include "../../segger/log/rtt/SEGGER_RTT.h"
 
 #define LOG_RTT_BUFF_INDEX 0
 

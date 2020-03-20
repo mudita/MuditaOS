@@ -1,5 +1,5 @@
 #include "../URC_QIND.hpp"
-#include <log/debug.hpp>
+#include <segger/log/debug.hpp>
 
 using namespace at::urc;
 

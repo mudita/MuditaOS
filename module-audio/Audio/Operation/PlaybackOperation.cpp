@@ -15,7 +15,7 @@
 #include "Audio/Profiles/ProfilePlaybackHeadphones.hpp"
 #include "Audio/AudioCommon.hpp"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "FreeRTOS.h"
 #include "task.h"
 

@@ -1,7 +1,7 @@
 #include "EndpointFsm.hpp"
 #include "EndpointHandler.hpp"
 #include "ParserFsm.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 class StateEndpointBattery;
 class StateEndpointUpdate;

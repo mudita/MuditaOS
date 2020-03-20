@@ -1,4 +1,4 @@
-#include "../../log/log.hpp"
+#include "../../segger/log/log.hpp"
 #include "fsl_lpuart.h"
 
 #define LOG_UART_DEV LPUART3
