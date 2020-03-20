@@ -76,7 +76,7 @@ function check_systemview() {
     esac
 }
 
-if [[ ($# -lt 2) || ($# -gt 3)]]; then
+if [[ $# > 3 || $# < 2 ]]; then
     help
     exit 1
 fi

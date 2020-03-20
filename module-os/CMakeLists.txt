@@ -25,11 +25,24 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/list.c
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/queue.c
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/stream_buffer.c
-        ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/tasks.c
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/timers.c
 
         ${CMAKE_CURRENT_SOURCE_DIR}/memory/usermem.c
         )
+
+#Substitute FreeRTOS SystemvView sources if enabled
+if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
+    set(SOURCES ${SOURCES}
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/systemviewPatch/tasks.c
+            )
+else()
+    set(SOURCES ${SOURCES}
+
+            ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS/tasks.c
+            )
+endif()
+
 
 if(${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
     include(targets/Target_RT1051.cmake)
@@ -69,7 +82,17 @@ target_include_directories(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS
         ${CMAKE_CURRENT_SOURCE_DIR}/RTOSWrapper/include
 
-)
+        )
+
+#Add FreeRTOS SystemvView headers if enabled
+if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
+    target_include_directories(${PROJECT_NAME}
+
+            PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/systemviewPatch
+            )
+endif()
+
 
 target_link_libraries(${PROJECT_NAME} module-bsp module-utils)
 
@@ -79,4 +102,3 @@ if(DEFINED BUILD_UNIT_TESTS)
 
     target_compile_definitions(${PROJECT_NAME} PUBLIC LINUX_PORT_DEBUG)
 endif()
-
