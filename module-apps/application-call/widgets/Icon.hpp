@@ -12,7 +12,7 @@ namespace gui
     {
         constexpr uint32_t w = 100;
         constexpr uint32_t h = 100;
-        
+
         namespace label
         {
             constexpr uint32_t x = 0;
@@ -25,7 +25,7 @@ namespace gui
             constexpr uint32_t x = 34;
             constexpr uint32_t y = 15;
         } // namespace img
-    }     // namespace style::icon
+    }     // namespace icon
 
     /// @brief Icon widget with custom predefined images and strings
     /// images and strings are stored in predefined map passed to the class during construction
@@ -38,7 +38,7 @@ namespace gui
     {
       public:
         using IconMap = std::map<T, std::pair<const std::string, const std::string>>;
-        Icon() = delete;
+        Icon()        = delete;
         Icon(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w_margin, T state, const IconMap &data)
             : Rect(parent, x, y, icon::w + 2 * w_margin, icon::h), data(data)
         {
@@ -86,7 +86,7 @@ namespace gui
             img->set(data.at(state).first);
             label->setText(utils::localize.get(data.at(state).second));
             using namespace style::window;
-            label->setFont(data.find(state) != data.begin() ? font::verysmallbold : font::verysmall);     
+            label->setFont(data.find(state) != data.begin() ? font::verysmallbold : font::verysmall);
         }
 
         T get() const
@@ -117,8 +117,8 @@ namespace gui
         }
 
       protected:
-        Image *img   = nullptr;
-        Label *label = nullptr;
+        Image *img         = nullptr;
+        Label *label       = nullptr;
         Rect *boundingRect = nullptr;
         T state;
         const IconMap data; // internal map with predefined sets of images and strings to be displayed

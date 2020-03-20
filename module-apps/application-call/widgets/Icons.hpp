@@ -77,8 +77,8 @@ namespace gui
     class SpeakerIcon : public Icon<SpeakerIconState>
     {
       protected:
-        static const inline std::string speakerImg   = "speaker_on";
-        static const inline std::string speakerOnImg = "speaker_off";
+        static const inline std::string speakerImg   = "speaker_off";
+        static const inline std::string speakerOnImg = "speaker_on";
         // static const inline std::string bluetoothImg = "app_call_bluetooth";
         static const inline std::string speakerStr   = "app_call_speaker";
         static const inline std::string speakerOnStr = "app_call_speaker_on";
