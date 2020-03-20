@@ -185,6 +185,9 @@ namespace bsp
     {
 
         PINMUX_InitBootPins();
+        gpio_pin_config_t gpio_config = {kGPIO_DigitalOutput, 0, kGPIO_NoIntmode};
+        GPIO_PinInit(BOARD_VIBRATOR_GPIO, BOARD_VIBRATOR_GPIO_PIN, &gpio_config);
+        GPIO_PinWrite(BOARD_VIBRATOR_GPIO, BOARD_VIBRATOR_GPIO_PIN, 0U);
 
         BOARD_InitBootClocks();
         BOARD_ConfigMPU();
