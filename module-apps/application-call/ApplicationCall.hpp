@@ -15,7 +15,6 @@ namespace app
         inline const std::string name_enterNumber       = "EnterNumberWindow";
         inline const std::string name_emergencyCall     = "EmergencyCallWindow";
         inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
-} // namespace window
     } // namespace window
 
     class ApplicationCall : public Application
@@ -29,7 +28,7 @@ namespace app
       protected:
         std::string phoneNumber;
         AppTimer timerCall;
-        utils::time::Timestamp callStartTime      = std::numeric_limits<time_t>::max();
+        utils::time::Timestamp callStartTime      = 0;
         utils::time::Duration callDuration        = 0;
         utils::time::Duration callDelayedDuration = std::numeric_limits<time_t>::max();
         void timerCallCallback();
