@@ -322,8 +322,8 @@ namespace bsp
 
         gpio_1->ConfPin(
             DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
-                                .irqMode  = DriverGPIOPinParams::InterruptMode::IntFallingEdge,
-                                .defLogic = 1,
+                                .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+                                .defLogic = 0,
                                 .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN)});
 
         gpio_2->ConfPin(DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
@@ -480,48 +480,64 @@ namespace bsp
     {
         static xQueueHandle qhandle = nullptr;
 
-        bool getStatus()
+        auto init(QueueHandle_t qHandle) -> int
         {
-            auto gpio_1 =
-                DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_1), DriverGPIOParams{});
-            bool state = gpio_1->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN));
-
-            // Open drain. Ground if status OK.
-            return !state;
+            qhandle = qHandle;
+            return 0;
         }
 
-        void statusIRQhandler(){
-
-        }
-
-        namespace sim
+        namespace status
         {
-
-            auto init(QueueHandle_t qHandle) -> int
+            bsp::cellular::status::value getStatus()
             {
-                qhandle = qHandle;
-                return 0;
-            }
+                auto gpio_1 = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::CELLULAR_GPIO_1),
+                                                 DriverGPIOParams{});
+                auto state =
+                    gpio_1->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN)) == 0
+                        ? value::GOOD
+                        : value::BAD;
 
-            auto trayIRQ_handler() -> BaseType_t
+                return state;
+            }
+            BaseType_t statusIRQhandler()
             {
                 BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-                Store::GSM::get()->tray             = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0
-                                              ? Store::GSM::Tray::IN
-                                              : Store::GSM::Tray::OUT;
-                if (qhandle) {
-                    int val = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN);
+                if (qhandle != NULL) {
+                    uint8_t val = static_cast<uint8_t>(IRQsource::statusPin);
                     xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
                 }
                 return xHigherPriorityTaskWoken;
             }
 
-        void hotswap_trigger()
+        } // namespace status
+
+        namespace sim
         {
-            GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 1);
-            vTaskDelay(100); // sleep for 100 ms...
-            GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
-        }
+
+            auto trayIRQ_handler() -> BaseType_t
+            {
+                BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+                if (qhandle) {
+                    uint8_t val = static_cast<uint8_t>(IRQsource::trayPin);
+                    xQueueSendFromISR(qhandle, &val, &xHigherPriorityTaskWoken);
+                }
+                return xHigherPriorityTaskWoken;
+            }
+
+            auto getTray() -> Store::GSM::Tray
+            {
+                auto state = GPIO_PinRead(GPIO2, BSP_CELLULAR_SIM_TRAY_INSERTED_PIN) == 0 ? Store::GSM::Tray::IN
+                                                                                          : Store::GSM::Tray::OUT;
+                return state;
+            }
+
+            void hotswap_trigger()
+            {
+                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 1);
+                vTaskDelay(100); // sleep for 100 ms...
+                GPIO_PinWrite(BSP_CELLULAR_SIM_CARD_PRESENCE_PORT, BSP_CELLULAR_SIM_CARD_PRESENCE_PIN, 0);
+            }
 
             void sim_sel()
             {

@@ -21,7 +21,6 @@
 #include "../ApplicationDesktop.hpp"
 #include "../data/LockPhoneData.hpp"
 #include <Style.hpp>
-#include <bsp/cellular/bsp_cellular.hpp>
 
 namespace gui
 {
@@ -192,8 +191,6 @@ namespace gui
 
     bool PinLockWindow::onInput(const InputEvent &inputEvent)
     {
-        LOG_DEBUG("GSM STATUS: %c", (bsp::cellular::getStatus() == true) ? 'V' : 'X');
-
         if (inputEvent.state == gui::InputEvent::State::keyReleasedShort) {
             // accept only LF, enter, RF, #, and numeric values
             if (state == State::EnteringPin) {

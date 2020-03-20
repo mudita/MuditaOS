@@ -19,6 +19,8 @@
 #include <FreeRTOS.h>
 #include <FreeRTOS/include/queue.h>
 
+#include <common_data/EventStore.hpp>
+
 namespace bsp {
 
     class Cellular {
@@ -64,15 +66,30 @@ namespace bsp {
 
     namespace cellular
     {
-        bool getStatus();
-        void statusIRQhandler();
+        enum IRQsource{
+            statusPin,
+            trayPin,
+        };
+
+        /// initialize SIM queue directed to EventWorker
+        int init(xQueueHandle qHandle);
+
+        namespace status{
+            enum class value {
+                GOOD,
+                BAD,
+            };
+            /// returns true if status OK. Open drain pulled up; ground is OK.
+            bsp::cellular::status::value getStatus();
+            BaseType_t statusIRQhandler();
+        }
 
         namespace sim
         {
-            /// initialize SIM queue directed to EventWorker
-            int init(xQueueHandle qHandle);
             /// handler for SIM tray which is connected to phone, not GSM
             BaseType_t trayIRQ_handler();
+
+            Store::GSM::Tray getTray();
             /// trigger swap pin on gsm so that it would reload sim card in tray
             /// after that +QPIN urc should come
             void hotswap_trigger();

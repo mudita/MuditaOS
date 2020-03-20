@@ -31,7 +31,7 @@ enum class WorkerEventQueues
     queueBattery,
     queueRTC,
     queueHarness,
-    queueSIM,
+    queueCellular,
 };
 
 class WorkerEvent : public sys::Worker
