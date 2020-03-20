@@ -62,19 +62,7 @@ namespace gui
 
         virtual ~Icon()
         {
-            removeWidget(img);
-            delete img;
-            img = nullptr;
-
-            removeWidget(label);
-            delete label;
-            label = nullptr;
-
-            removeWidget(boundingRect);
-            delete boundingRect;
-            boundingRect = nullptr;
-
-            children.clear();
+  
         }
 
         /// @brief sets Icon state and display appropriate image and string
