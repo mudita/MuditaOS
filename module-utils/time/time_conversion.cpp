@@ -1,3 +1,4 @@
+#include "time_conversion.hpp"
 #include <algorithm>
 #include <array>
 #include <ctime>
@@ -12,8 +13,6 @@
 #include <locale>
 #include <i18/i18.hpp>
 
-#include <log/log.hpp>
-#include "time_conversion.hpp"
 #include "time_locale.hpp"
 #include <Utils.hpp>
 
@@ -134,11 +133,18 @@ namespace utils
         {
             return Duration(lhs.time, rhs.time);
         };
-
+        Timestamp operator-(const Timestamp &lhs, const Duration &rhs)
+        {
+            return Timestamp(lhs.time < rhs.duration ? 0 : lhs.time - rhs.duration);
+        };
         Timestamp operator+(const Timestamp &lhs, const Duration &rhs)
         {
-            return Timestamp(lhs.time + rhs.get());
+            return Timestamp(lhs.time + rhs.duration);
         };
+        Timestamp operator+(const Duration &lhs, const Timestamp &rhs)
+        {
+            return Timestamp(lhs.duration + rhs.time);
+        }
 
         void DateTime::before_n_sec(time_t val)
         {
@@ -243,55 +249,47 @@ namespace utils
             }
         }
 
-        Duration::Duration(time_t duration, DisplayedFields displayedFields)
-            : duration(duration), displayedFields(displayedFields)
+        Duration::Duration(time_t duration) : duration(duration)
         {
-            if (displayedFields == DisplayedFields::two0M0S) {
-                hours   = 0;
-                minutes = this->duration / secondsInMinute;
-            }
-            else {
-                hours   = this->duration / secondsInHour;
-                minutes = (this->duration % secondsInHour) / secondsInMinute;
-            }
-            seconds = (this->duration % secondsInHour) % secondsInMinute;
+            calculate();
+        }
+
+        Duration::Duration(time_t stop, time_t start) : Duration(stop - start > 0 ? stop - start : 0)
+        {}
+
+        Duration::Duration(const Timestamp &stop, const Timestamp &start) : Duration(stop.getTime(), start.getTime())
+        {}
+
+        void Duration::fillStr(std::string &format) const
+        {
+            constexpr auto numberOfLeadingDigits = 2;
+            utils::findAndReplaceAll(format, "%H", utils::to_string(hours));
+            utils::findAndReplaceAll(format, "%M", utils::to_string(minutes));
+            utils::findAndReplaceAll(format, "%N", utils::to_string(hmminutes));
+            utils::findAndReplaceAll(format, "%S", utils::to_string(seconds));
+            utils::findAndReplaceAll(format, "%0H", utils::to_string(hours, numberOfLeadingDigits));
+            utils::findAndReplaceAll(format, "%0M", utils::to_string(minutes, numberOfLeadingDigits));
+            utils::findAndReplaceAll(format, "%0N", utils::to_string(hmminutes, numberOfLeadingDigits));
+            utils::findAndReplaceAll(format, "%0S", utils::to_string(seconds, numberOfLeadingDigits));
+        }
+
+        void Duration::calculate()
+        {
+            hours     = this->duration / secondsInHour;
+            hmminutes = this->duration / secondsInMinute;
+            minutes   = (this->duration % secondsInHour) / secondsInMinute;
+            seconds   = (this->duration % secondsInHour) % secondsInMinute;
 
             if (verboseConversion) {
                 LOG_DEBUG("durtaion %u - %u hours %u minutes %u seconds", duration, hours, minutes, seconds);
             }
         }
 
-        Duration::Duration(time_t stop, time_t start, DisplayedFields displayedFields)
-            : displayedFields(displayedFields)
+        UTF8 Duration::str(DisplayedFormat displayedFormat)
         {
-            auto diff = stop - start;
-            duration  = diff >= 0 ? diff : 0;
-        }
-
-        Duration::Duration(const Timestamp &stop, const Timestamp &start, DisplayedFields displayedFields)
-            : Duration(stop.getTime(), start.getTime(), displayedFields)
-        {}
-
-        void Duration::fillStr(std::string &format) const
-        {
-            utils::findAndReplaceAll(format, "%H", utils::to_string(hours));
-            utils::findAndReplaceAll(format, "%M", utils::to_string(minutes));
-            utils::findAndReplaceAll(format, "%S", utils::to_string(seconds));
-            utils::findAndReplaceAll(format, "%0H", utils::to_string(hours, 2));
-            utils::findAndReplaceAll(format, "%0M", utils::to_string(minutes, 2));
-            utils::findAndReplaceAll(format, "%0S", utils::to_string(seconds, 2));
-        }
-
-        UTF8 Duration::str() const
-        {
-            std::string data;
-            if (displayedFields == DisplayedFields::automatic) {
-                data = utils::localize.get(hours != 0 ? durationFormatH0M0S : durationFormat0M0S);
-            }
-            else {
-                data = utils::localize.get(formatMap.at(displayedFields));
-            }
-
+            // switch between format low and hig
+            std::string data = utils::localize.get(hours != 0 ? formatMap.at(displayedFormat).highFormat
+                                                              : formatMap.at(displayedFormat).lowFormat);
             fillStr(data);
 
             return data;

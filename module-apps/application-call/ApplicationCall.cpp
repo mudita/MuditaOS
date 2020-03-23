@@ -34,8 +34,8 @@ namespace app
           timerCall(CreateAppTimer(1000, true, [=]() { timerCallCallback(); }))
     {}
 
-    //  number of seconds after end call to siwtch back to previous application
-    constexpr time_t delayToSwitchToPreviousApp = 3;
+    //  number of seconds after end call to switch back to previous application
+    const inline utils::time::Duration delayToSwitchToPreviousApp = 3;
 
     void ApplicationCall::timerCallCallback()
     {
@@ -52,7 +52,7 @@ namespace app
         }
 
         // delayed switch to previous application
-        if (callDuration >= callDelayedDuration) {
+        if (callDelayedStopTime != 0 && utils::time::Timestamp() >= callDelayedStopTime) {
             stopCallTimer();
             sapm::ApplicationManager::messageSwitchPreviousApplication(this);
         }
@@ -65,7 +65,7 @@ namespace app
 
         LOG_INFO("---------------------------------CallAborted");
         AudioServiceAPI::Stop(this);
-        callDelayedDuration = callDuration + delayToSwitchToPreviousApp;
+        callDelayedStopTime = utils::time::Timestamp() + delayToSwitchToPreviousApp;
         callWindow->setState(gui::CallWindow::State::CALL_ENDED);
         refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
@@ -229,15 +229,15 @@ namespace app
     {
         callStartTime       = utils::time::Timestamp();
         callDuration        = 0;
-        callDelayedDuration = std::numeric_limits<time_t>::max();
+        callDelayedStopTime = 0;
         timerCall.restart();
     }
 
     void ApplicationCall::stopCallTimer()
     {
-        callStartTime       = std::numeric_limits<time_t>::max();
-        callDuration        = std::numeric_limits<time_t>::min();
-        callDelayedDuration = std::numeric_limits<time_t>::max();
+        callStartTime       = 0;
+        callDuration        = 0;
+        callDelayedStopTime = 0;
         timerCall.stop();
     }
 

@@ -47,7 +47,7 @@
 
     "duration_min_0sec" : "%M:%0S",
     "duration_0min_0sec" : "%0M:%0S",
-    "duration_0hour_0sec" : "%0H:%0M",
+    "duration_0hmin_0sec" : "%0N:%0S",
     "duration_hour_0min_0sec" : "%H:%0M:%0S",
 
     "app_options_invalid_option": " <Invalid Option> ",

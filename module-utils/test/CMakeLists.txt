@@ -98,3 +98,18 @@ add_test(NAME ${PROJECT_NAME}
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 add_dependencies(check ${PROJECT_NAME})
+
+###########################################
+#Utils unit tests project
+project(unittest_module-utils_duration VERSION 1.0
+       DESCRIPTION "Module-utils duration unit tests")
+add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
+    unittest_duration.cpp
+)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
+target_link_libraries(${PROJECT_NAME} PRIVATE module-utils module-vfs)
+add_test(NAME ${PROJECT_NAME}
+    COMMAND ${PROJECT_NAME}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+add_dependencies(check ${PROJECT_NAME})

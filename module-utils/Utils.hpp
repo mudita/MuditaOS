@@ -81,10 +81,11 @@ namespace utils
         return rtrim(ltrim(s));
     }
 
-    template <typename T> std::string to_string(T t, size_t stringLength = 0)
+    template <typename T> std::string to_string(T t, size_t minStringLength = 0)
     {
+        constexpr auto leadingDigit = '0';
         std::ostringstream ss;
-        ss << std::setfill('0') << std::setw(stringLength) << t;
+        ss << std::setfill(leadingDigit) << std::setw(minStringLength) << t;
         return ss.str();
     }
 

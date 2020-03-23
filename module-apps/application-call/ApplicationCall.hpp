@@ -29,8 +29,8 @@ namespace app
         std::string phoneNumber;
         AppTimer timerCall;
         utils::time::Timestamp callStartTime      = 0;
-        utils::time::Duration callDuration        = 0;
-        utils::time::Duration callDelayedDuration = std::numeric_limits<time_t>::max();
+        utils::time::Duration callDuration         = 0;
+        utils::time::Timestamp callDelayedStopTime = 0;
         void timerCallCallback();
 
       public:
