@@ -331,17 +331,11 @@ namespace bsp
                                             .defLogic = 1,
                                             .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_RI_PIN)});
 
-        gpio_2->ConfPin(DriverGPIOPinParams{
-            .dir      = DriverGPIOPinParams::Direction::Input,
-            .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
-            .defLogic = 1,
-            .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN)});
-
-//        gpio_2->ConfPin(DriverGPIOPinParams{
-//            .dir      = DriverGPIOPinParams::Direction::Input,
-//            .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
-//            .defLogic = 1,
-//            .pin      = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_NC)});
+        gpio_2->ConfPin(
+            DriverGPIOPinParams{.dir      = DriverGPIOPinParams::Direction::Input,
+                                .irqMode  = DriverGPIOPinParams::InterruptMode::IntRisingOrFallingEdge,
+                                .defLogic = 1,
+                                .pin = static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_SIM_TRAY_INSERTED_PIN)});
 
         // OUTPUTS
 
