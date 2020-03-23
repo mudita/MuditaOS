@@ -5,7 +5,6 @@
  *      Author: kuba
  */
 
-#include <board/rt1051/bsp/vibrator/vibrator.hpp>
 #include <string.h>
 
 extern "C"
@@ -27,6 +26,7 @@ extern "C"
 #include "bsp/cellular/bsp_cellular.hpp"
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
+#include "bsp/vibrator/vibrator.hpp"
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
