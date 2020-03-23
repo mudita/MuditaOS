@@ -33,9 +33,6 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
     alarmTimestamp = 0;
     alarmID        = 0;
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
-    // each 30 sec pollTimer execute check - right now polling for battery only
-    pollTimerID = CreateTimer(30000, true);
-    ReloadTimer(pollTimerID);
 }
 
 EventManager::~EventManager()
@@ -153,29 +150,6 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         return std::make_shared<sys::ResponseMessage>();
     else
         return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-}
-
-void EventManager::handleBatPolling()
-{
-    bool charging        = false;
-    uint8_t newLevel     = 0;
-    static uint8_t level = 0;
-    bsp::battery_getBatteryLevel(newLevel);
-    bsp::battery_getChargeStatus(charging);
-    if (level != newLevel && !charging) {
-        LOG_DEBUG("Battery polled state change: %s, battery level: %d", charging ? "charging" : "discharging", level);
-        auto message           = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
-        message->levelPercents = newLevel;
-        sys::Bus::SendUnicast(message, "EventManager", this);
-    }
-    level = newLevel;
-}
-
-void EventManager::TickHandler(uint32_t id)
-{
-    if (id == pollTimerID) {
-        handleBatPolling();
-    }
 }
 
 // Invoked during initialization
