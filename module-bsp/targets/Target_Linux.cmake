@@ -9,7 +9,7 @@ set(BOARD_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/cellular/linux_cellular.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/harness/harness.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/rtc/rtc.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/test/bsp_bt.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/test/bsp_bt.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/lpm/LinuxLPM.cpp"
 
@@ -19,6 +19,8 @@ set(BOARD_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/bluetooth/Bluetooth.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/usb_cdc/usb_cdc.cpp"
+
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/vibrator/vibrator.cpp"
 
         CACHE INTERNAL "")
 
