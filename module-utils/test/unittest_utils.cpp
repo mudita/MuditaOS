@@ -24,7 +24,6 @@ TEST_CASE("Split tests")
     REQUIRE(ret[4] == "");
     REQUIRE(ret[5] == "FINISHED");
     REQUIRE(ret[6] == "");
-    ret.clear();
 
     ret       = utils::split(inputStr1, delimiter);
     REQUIRE(ret.size() == 3);
