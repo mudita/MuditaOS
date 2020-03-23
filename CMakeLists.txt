@@ -67,7 +67,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC
 
 
 # Warnings related flags
-target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
+add_compile_options(-Wall -Wextra -Werror -Wno-unused-parameter)
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>)
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})

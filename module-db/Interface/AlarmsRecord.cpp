@@ -17,9 +17,6 @@ AlarmsRecordInterface::~AlarmsRecordInterface()
 
 bool AlarmsRecordInterface::Add(const AlarmsRecord &rec)
 {
-
-    uint32_t contactID = 0;
-
     // Create alarm
     alarmsDB->alarms.Add(
         AlarmsTableRow{.time = rec.time, .snooze = rec.snooze, .status = rec.status, .path = rec.path});

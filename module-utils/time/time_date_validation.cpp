@@ -72,7 +72,7 @@ namespace utils
         bool validateTime(uint32_t hour, uint32_t minute, bool mode12h)
         {
 
-            auto hourMax = 0;
+            unsigned int hourMax = 0;
             if (mode12h) {
                 hourMax = 12;
             }

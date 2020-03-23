@@ -18,15 +18,15 @@
 
 struct ContactsAddressTableRow
 {
-    uint32_t ID;
-    uint32_t contactID;
-    UTF8 country;
-    UTF8 city;
-    UTF8 street;
-    UTF8 number;
-    ContactAddressType type;
-    UTF8 note;
-    UTF8 mail;
+    uint32_t ID             = 0;
+    uint32_t contactID      = 0;
+    UTF8 country            = "";
+    UTF8 city               = "";
+    UTF8 street             = "";
+    UTF8 number             = "";
+    ContactAddressType type = ContactAddressType::OTHER;
+    UTF8 note               = "";
+    UTF8 mail               = "";
 };
 
 enum class ContactAddressTableFields

@@ -405,7 +405,7 @@ namespace gui
                 page2.imageTick->setVisible(false);
                 page2.favSelected = false;
             }
-            if (contact->speeddial >= 0 && contact->speeddial < 10)
+            if (contact->speeddial < 10)
                 page2.speedValue->setText(std::to_string(contact->speeddial));
             else
                 page2.speedValue->setText("-");

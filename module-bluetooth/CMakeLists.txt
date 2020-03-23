@@ -32,7 +32,16 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC   ${PROJECT_CONFIG_DEFINITIONS
                                                     ${BOARD_DIR_DEFINITIONS}
                                                     )
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_compile_options(${PROJECT_NAME}
+    PUBLIC
+    ${TARGET_COMPILE_OPTIONS}
+    PRIVATE
+    -Wno-error
+    -Wno-sign-compare
+    -Wno-missing-field-initializers
+    -Wno-old-style-declaration
+    -Wno-unused-function
+)
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 

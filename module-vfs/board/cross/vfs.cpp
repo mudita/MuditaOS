@@ -198,14 +198,9 @@ vfs::FilesystemStats vfs::getFilesystemStats()
     uint32_t ulTotalSizeMB, ulFreeSizeMB;
     int iPercentageFree;
     FF_IOManager_t *pxIOManager;
-    const char *pcTypeName = "unknown type";
-    BaseType_t xReturn     = pdPASS;
     vfs::FilesystemStats filesystemStats;
 
-    if (emmcFFDisk == NULL) {
-        xReturn = pdFAIL;
-    }
-    else {
+    if (emmcFFDisk != NULL) {
         pxIOManager = emmcFFDisk->pxIOManager;
 
         switch (pxIOManager->xPartition.ucType) {

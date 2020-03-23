@@ -38,7 +38,7 @@ namespace seink
                      bool shutdown);
         virtual ~ImageMessage();
 
-        uint8_t *const getData()
+        uint8_t *getData()
         {
             return data;
         };

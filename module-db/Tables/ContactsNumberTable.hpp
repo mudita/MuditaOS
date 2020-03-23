@@ -17,11 +17,11 @@
 
 struct ContactsNumberTableRow
 {
-    uint32_t ID;
-    uint32_t contactID;
-    std::string numberUser;
-    std::string numbere164;
-    ContactNumberType type;
+    uint32_t ID            = 0;
+    uint32_t contactID     = 0;
+    std::string numberUser = "";
+    std::string numbere164 = "";
+    ContactNumberType type = ContactNumberType::OTHER;
 };
 
 enum class ContactNumberTableFields
