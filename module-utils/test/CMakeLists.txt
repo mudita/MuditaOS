@@ -86,16 +86,15 @@ message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnr
 
 ###########################################
 #Utils unit tests project
-message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2998")
-#project(unittest_module-utils_utils VERSION 1.0
-#       DESCRIPTION "Module-utils utils unit tests")
-#add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
-#    unittest_utils.cpp
-#)
-#target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
-#target_link_libraries(${PROJECT_NAME} PRIVATE module-utils)
-#add_test(NAME ${PROJECT_NAME}
-#    COMMAND ${PROJECT_NAME}
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-#)
-#add_dependencies(check ${PROJECT_NAME})
+project(unittest_module-utils_utils VERSION 1.0
+       DESCRIPTION "Module-utils utils unit tests")
+add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
+    unittest_utils.cpp
+)
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/..")
+target_link_libraries(${PROJECT_NAME} PRIVATE module-utils)
+add_test(NAME ${PROJECT_NAME}
+    COMMAND ${PROJECT_NAME}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+)
+add_dependencies(check ${PROJECT_NAME})
