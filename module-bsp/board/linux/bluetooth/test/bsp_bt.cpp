@@ -53,7 +53,7 @@ namespace bsp
     {
         log(LogDebug, "flush [%d] %s\n", out.len, out.tail < out.head ? "reverse" : "normal");
         Error err = Success;
-        int i     = 0;
+        unsigned int i = 0;
         for (i = 0; i < default_timeout_ms; ++i) {
             if (read_cts() == 0) {
                 break;
@@ -82,7 +82,7 @@ namespace bsp
     ssize_t BluetopiaHW::write(char *buf, size_t nbytes)
     {
         log(LogDebug, "write %d -> [%.*s]\n", nbytes, nbytes, buf);
-        ssize_t i = 0;
+        size_t i = 0;
         // if CTS set -> ignore return 0, can use threshold_guard here too
         for (i = 0; i < nbytes; ++i) {
             if (out.push(*(buf + i)) != 0) {
@@ -106,7 +106,6 @@ namespace bsp
     {
         log(LogDebug, "Set baudrate: %d", bd);
         Error ret = Success;
-        int err   = 0;
         return ret;
     }
 

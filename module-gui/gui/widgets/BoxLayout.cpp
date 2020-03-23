@@ -141,7 +141,7 @@ namespace gui
             if (el == nullptr) {
                 return;
             }
-            auto left_in_el = el->area(Item::Area::Max).size(axis) - el->area(Item::Area::Normal).size(axis);
+            unsigned int left_in_el = el->area(Item::Area::Max).size(axis) - el->area(Item::Area::Normal).size(axis);
             if (to_split > 0 && left_in_el > 0) {
                 auto resize = left_in_el < to_split ? left_in_el : to_split;
                 el->area(Item::Area::Actual).size(axis) += resize;
@@ -182,7 +182,6 @@ namespace gui
     void BoxLayout::setNavigation()
     {
         auto previous = nextNavigationItem(children.begin()), next = children.end();
-        int i = 0;
         if (type == ItemType::VBOX) {
             while ((previous != children.end()) &&
                    ((next = nextNavigationItem(std::next(previous))) != std::end(children))) {

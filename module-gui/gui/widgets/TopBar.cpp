@@ -51,12 +51,11 @@ namespace gui
 
     void TopBar::batteryShowBars(uint32_t val)
     {
-        int i = 0;
         if (val > battery.size()) {
             LOG_ERROR("Trying to set battery level out of scope");
             val = battery.size();
         }
-        for (int i = 0; i < battery.size(); ++i) {
+        for (unsigned int i = 0; i < battery.size(); ++i) {
             battery[i]->setVisible(val > i);
         }
     }
@@ -227,10 +226,7 @@ namespace gui
 
     void TopBar::setTime(const uint32_t &time, bool mode24H)
     {
-
-        std::time_t t = time;
         setTime(utils::time::Time());
-
         timeMode   = (mode24H ? TimeMode::TIME_24H : TimeMode::TIME_12H);
         this->time = time;
     }

@@ -92,7 +92,7 @@ namespace utils
             // this could return variant<bool, UTF8> -> on error -> false -> visit -> handle defaults
             static const UTF8 get_day(enum Day day)
             {
-                if (day >= num_days || day < 0) {
+                if (day >= num_days) {
                     LOG_ERROR("Bad value: %d", day);
                     return "";
                 }
@@ -103,7 +103,7 @@ namespace utils
 
             static const UTF8 get_month(enum Month mon)
             {
-                if (mon >= num_monts || mon < 0) {
+                if (mon >= num_monts) {
                     LOG_ERROR("Bad value %d", mon);
                     return "";
                 }
@@ -124,7 +124,7 @@ namespace utils
 
             static const std::string format(enum TimeFormat what)
             {
-                if (what >= num_formatters || what < 0) {
+                if (what >= num_formatters) {
                     LOG_ERROR("Bad value: %d", what);
                     return "⌚";
                 }

@@ -89,7 +89,7 @@ namespace bsp
 
         LinuxCellularAudio *ptr = reinterpret_cast<LinuxCellularAudio *>(userData);
 
-        uint32_t framesToFetch = framesPerBuffer;
+        int32_t framesToFetch = framesPerBuffer;
 
         if ((ptr->currentFormat.flags & static_cast<uint32_t>(Flags::OutPutStereo))) {
             framesToFetch = framesPerBuffer * 2;

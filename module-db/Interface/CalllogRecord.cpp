@@ -54,8 +54,6 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         LOG_ERROR("Cannot get contact, for number %s", rec.number.c_str());
         return false;
     }
-    uint32_t contactID = (*contactRec)[0].dbID;
-
     auto localRec      = rec;
     auto contact       = (*contactRec)[0];
     localRec.contactId = std::to_string(contact.dbID);

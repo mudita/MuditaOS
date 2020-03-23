@@ -56,7 +56,6 @@ const char *State::c_str(State::ST state) const
 {
     switch (state) {
     case ST::Idle:
-        return "Idle";
     case ST::PowerUpInProgress:
         return "PowerUpInProgress";
     case ST::ModemConfigurationInProgress:

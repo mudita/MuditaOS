@@ -21,35 +21,35 @@ struct ContactRecord
 {
 
     uint32_t dbID = DB_ID_NONE;
-    UTF8 primaryName;
-    UTF8 alternativeName;
-    ContactType contactType;
+    UTF8 primaryName        = "";
+    UTF8 alternativeName    = "";
+    ContactType contactType = ContactType::TEMPORARY;
 
     struct Number
     {
-        UTF8 numberUser;
-        UTF8 numberE164;
-        ContactNumberType numberType;
+        UTF8 numberUser              = "";
+        UTF8 numberE164              = "";
+        ContactNumberType numberType = ContactNumberType::OTHER;
         Number(UTF8 n_user = "", UTF8 n_e164 = "", ContactNumberType n_type = ContactNumberType::CELL)
             : numberUser(n_user), numberE164(n_e164), numberType(n_type)
         {}
     };
     std::vector<Number> numbers;
 
-    UTF8 country;
-    UTF8 city;
-    UTF8 street;
-    UTF8 number;
-    UTF8 note;
-    UTF8 mail;
-    ContactAddressType addressType;
+    UTF8 country                   = "";
+    UTF8 city                      = "";
+    UTF8 street                    = "";
+    UTF8 number                    = "";
+    UTF8 note                      = "";
+    UTF8 mail                      = "";
+    ContactAddressType addressType = ContactAddressType::OTHER;
 
-    UTF8 assetPath;
+    UTF8 assetPath = "";
 
-    bool isOnWhitelist;
-    bool isOnBlacklist;
-    bool isOnFavourites;
-    uint8_t speeddial;
+    bool isOnWhitelist  = false;
+    bool isOnBlacklist  = false;
+    bool isOnFavourites = false;
+    uint8_t speeddial   = 0;
 
     inline UTF8 getFormattedName()
     {

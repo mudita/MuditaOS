@@ -137,7 +137,7 @@ USB_GLOBAL USB_RAM_ADDRESS_ALIGNMENT(USB_DATA_ALIGN_SIZE) static uint8_t
  */
 static usb_status_t USB_DeviceClassAllocateHandle(uint8_t controllerId, usb_device_common_class_struct_t **handle)
 {
-    int32_t count;
+    uint32_t count;
     USB_OSA_SR_ALLOC();
 
     USB_OSA_ENTER_CRITICAL();
@@ -176,7 +176,7 @@ static usb_status_t USB_DeviceClassAllocateHandle(uint8_t controllerId, usb_devi
  */
 static usb_status_t USB_DeviceClassFreeHandle(uint8_t controllerId)
 {
-    int32_t count = 0U;
+    uint32_t count = 0U;
     USB_OSA_SR_ALLOC();
 
     USB_OSA_ENTER_CRITICAL();

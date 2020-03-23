@@ -90,9 +90,9 @@ namespace gui
             keyReleasedLong  = 0x04,
         };
 
+        RawKey key      = {};                     /// RawKey data
         State state     = State::keyPressed;      /// initial translated key state
         KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
-        RawKey key      = {};                     /// RawKey data
 
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
     };

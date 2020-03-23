@@ -11,7 +11,7 @@ namespace gui
         setPenFocusWidth(style::window::default_border_no_focus_w);
 
         inputCallback = [this](Item &item, const InputEvent &inputEvent) -> bool {
-            int position = 0;
+            unsigned int position = 0;
             bool handled = false;
             // first try with children and find position in pages
             for (auto &el : children) {

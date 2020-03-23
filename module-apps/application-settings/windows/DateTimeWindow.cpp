@@ -336,7 +336,8 @@ namespace gui
 
     void DateTimeWindow::setRTC(void)
     {
-        struct tm timeinfo = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+        struct tm timeinfo;
+        memset(&timeinfo, 0, sizeof(timeinfo));
 
         try {
             timeinfo.tm_year = std::stoi(getDateTimeItemValue(DateTimeItems::Year)) - 1900;

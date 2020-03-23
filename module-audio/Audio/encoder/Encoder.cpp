@@ -18,7 +18,7 @@
 namespace audio
 {
 
-    Encoder::Encoder(const char *fileName, const Format &frmt) : filePath(fileName), format(frmt)
+    Encoder::Encoder(const char *fileName, const Format &frmt) : format(frmt), filePath(fileName)
     {
 
         fd = vfs.fopen(fileName, "w");
