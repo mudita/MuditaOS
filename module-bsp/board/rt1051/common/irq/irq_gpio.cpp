@@ -95,7 +95,7 @@ namespace bsp
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {
-                // TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerWCINOKB_IRQHandler();
+                // M.G this should never occur in T4, as WCIN is not connected!
             }
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
