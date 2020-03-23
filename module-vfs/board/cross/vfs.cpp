@@ -120,7 +120,7 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
     /* The first parameter to ff_findfist() is the directory being searched.  Do
     not add wildcards to the end of the directory name. */
-    if (ff_findfirst(path, pxFindStruct) == 0) {
+    if (ff_findfirst(path, pxFindStruct) == 0 && pxFindStruct != nullptr) {
         do {
             if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_HIDDEN) ||
                 (pxFindStruct->ucAttributes & FF_FAT_ATTR_SYSTEM) || (pxFindStruct->ucAttributes & FF_FAT_ATTR_VOLID) ||
@@ -131,11 +131,11 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
             else if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_DIR) != 0) {
                 attribute = FileAttributes::Directory;
             }
-            else if (pxFindStruct->ucAttributes & FF_FAT_ATTR_READONLY) {
-                attribute = FileAttributes::ReadOnly;
-            }
             else if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_ARCHIVE) || (pxFindStruct->ucAttributes == 0)) {
                 attribute = FileAttributes::Writable;
+            }
+            else {
+                attribute = FileAttributes::ReadOnly;
             }
 
             if (ext.empty()) {

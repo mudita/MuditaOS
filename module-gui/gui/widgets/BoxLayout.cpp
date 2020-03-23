@@ -122,7 +122,7 @@ namespace gui
     template <Axis axis> void BoxLayout::resizeItems()
     {
         // we want to split to interested parties what's left, as much as they can fit
-        auto to_split   = sizeLeft<axis>(this);
+        int32_t to_split = sizeLeft<axis>(this);
         auto pos        = reverse_order ? this->area().size(axis) : 0;
         auto pos_update = [this, &pos](Item *it) {
             if (this->reverse_order) {
@@ -141,9 +141,9 @@ namespace gui
             if (el == nullptr) {
                 return;
             }
-            unsigned int left_in_el = el->area(Item::Area::Max).size(axis) - el->area(Item::Area::Normal).size(axis);
+            int32_t left_in_el = el->area(Item::Area::Max).size(axis) - el->area(Item::Area::Normal).size(axis);
             if (to_split > 0 && left_in_el > 0) {
-                auto resize = left_in_el < to_split ? left_in_el : to_split;
+                int32_t resize = left_in_el < to_split ? left_in_el : to_split;
                 el->area(Item::Area::Actual).size(axis) += resize;
                 to_split -= resize;
             }
