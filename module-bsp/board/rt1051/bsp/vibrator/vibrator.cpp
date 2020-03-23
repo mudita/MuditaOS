@@ -1,4 +1,4 @@
-#include "vibrator.hpp"
+#include "bsp/vibrator/vibrator.hpp"
 
 #include <bsp/BoardDefinitions.hpp>
 #include <drivers/gpio/DriverGPIO.hpp>
