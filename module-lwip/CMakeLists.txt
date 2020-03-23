@@ -2,10 +2,7 @@ project(module-lwip VERSION 1.0 DESCRIPTION "LwIP port layer")
 
 
 # remove -Werror for lwip
-string(REPLACE "-Werror" "" TARGET_COMPILE_OPTIONS "${TARGET_COMPILE_OPTIONS}")
-
-# TODO check me
-set(LWIP_COMPILER_FLAGS ${TARGET_COMPILE_OPTIONS})
+string(REPLACE "-Wno-error=format" "" LWIP_COMPILER_FLAGS "${TARGET_COMPILE_OPTIONS}")
 
 # module-lwip/lib/lwip/src/include/lwip/err.h
 

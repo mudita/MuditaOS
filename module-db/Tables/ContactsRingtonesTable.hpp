@@ -18,9 +18,9 @@
 
 struct ContactsRingtonesTableRow
 {
-    uint32_t ID;
-    uint32_t contactID;
-    UTF8 assetPath;
+    uint32_t ID        = 0;
+    uint32_t contactID = 0;
+    UTF8 assetPath     = "";
 };
 
 enum class ContactRingtonesTableFields

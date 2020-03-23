@@ -17,7 +17,7 @@
 
 struct SMSTableRow
 {
-    uint32_t ID;
+    uint32_t ID = 0;
     uint32_t threadID;
     uint32_t contactID;
     uint32_t date;

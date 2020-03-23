@@ -13,7 +13,7 @@
 
 struct AlarmsTableRow
 {
-    uint32_t ID;
+    uint32_t ID = 0;
     uint32_t time;
     uint32_t snooze;
     uint32_t status;

@@ -12,7 +12,7 @@
 
 SettingsRecord::ActiveSim SettingsRecord::to(const uint32_t sim)
 {
-    if (sim >= static_cast<uint32_t>(ActiveSim::NONE) && sim <= static_cast<uint32_t>(ActiveSim::SIM2)) {
+    if (sim <= static_cast<uint32_t>(ActiveSim::SIM2)) {
         return ActiveSim(sim);
     }
     return ActiveSim::NONE;

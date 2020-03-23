@@ -55,7 +55,7 @@ void RWindow::keyMapInit(void)
 }
 void RWindow::updateDrawBuffer()
 {
-    for (size_t i = 0; i < width * height; i++)
+    for (ssize_t i = 0; i < width * height; i++)
         for (size_t j = 0; j < 3; j++) {
             uint8_t c            = shmMemPtr[i] << 4;
             rgbMemPtr[i * 3 + j] = c;
@@ -119,7 +119,7 @@ bool RWindow::onKeyRelease(GdkEventKey *event)
 }
 
 RWindow::RWindow(char *shmMemory, int fifoKbd, int fifoBatt, int w, int h)
-    : shmMemPtr{shmMemory}, rgbMemPtr{nullptr}, fifoFd{fifoKbd}, fifoFdBatt{fifoBatt}, width{w}, height{h}
+    : shmMemPtr{shmMemory}, rgbMemPtr{nullptr}, width{w}, height{h}, fifoFd{fifoKbd}, fifoFdBatt{fifoBatt}
 {
 
     rgbMemPtr = new char[3 * w * h];

@@ -129,9 +129,11 @@ namespace audio
         eventCallback = callback;
         state         = State::Active;
 
-        int32_t ret = 0;
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
-            ret = audioDevice->Start(currentProfile->GetAudioFormat());
+            auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
+            if (ret != 0) {
+                LOG_ERROR("Start error: %d", ret);
+            }
         }
         else {
             return static_cast<int32_t>(RetCode::InvalidFormat);

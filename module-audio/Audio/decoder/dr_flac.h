@@ -937,7 +937,7 @@ typedef drflac_int32 drflac_result;
 #define drflac_zero_memory DRFLAC_ZERO_MEMORY
 
 // CPU caps.
-static drflac_bool32 drflac__gIsLZCNTSupported = DRFLAC_FALSE;
+// static drflac_bool32 drflac__gIsLZCNTSupported = DRFLAC_FALSE;
 #ifndef DRFLAC_NO_CPUID
 static drflac_bool32 drflac__gIsSSE42Supported = DRFLAC_FALSE;
 static void drflac__init_cpu_caps()
@@ -2007,68 +2007,100 @@ static DRFLAC_INLINE drflac_int32 drflac__calculate_prediction_32(drflac_uint32 
     switch (order) {
     case 32:
         prediction += coefficients[31] * pDecodedSamples[-32];
+        [[fallthrough]];
     case 31:
         prediction += coefficients[30] * pDecodedSamples[-31];
+        [[fallthrough]];
     case 30:
         prediction += coefficients[29] * pDecodedSamples[-30];
+        [[fallthrough]];
     case 29:
         prediction += coefficients[28] * pDecodedSamples[-29];
+        [[fallthrough]];
     case 28:
         prediction += coefficients[27] * pDecodedSamples[-28];
+        [[fallthrough]];
     case 27:
         prediction += coefficients[26] * pDecodedSamples[-27];
+        [[fallthrough]];
     case 26:
         prediction += coefficients[25] * pDecodedSamples[-26];
+        [[fallthrough]];
     case 25:
         prediction += coefficients[24] * pDecodedSamples[-25];
+        [[fallthrough]];
     case 24:
         prediction += coefficients[23] * pDecodedSamples[-24];
+        [[fallthrough]];
     case 23:
         prediction += coefficients[22] * pDecodedSamples[-23];
+        [[fallthrough]];
     case 22:
         prediction += coefficients[21] * pDecodedSamples[-22];
+        [[fallthrough]];
     case 21:
         prediction += coefficients[20] * pDecodedSamples[-21];
+        [[fallthrough]];
     case 20:
         prediction += coefficients[19] * pDecodedSamples[-20];
+        [[fallthrough]];
     case 19:
         prediction += coefficients[18] * pDecodedSamples[-19];
+        [[fallthrough]];
     case 18:
         prediction += coefficients[17] * pDecodedSamples[-18];
+        [[fallthrough]];
     case 17:
         prediction += coefficients[16] * pDecodedSamples[-17];
+        [[fallthrough]];
     case 16:
         prediction += coefficients[15] * pDecodedSamples[-16];
+        [[fallthrough]];
     case 15:
         prediction += coefficients[14] * pDecodedSamples[-15];
+        [[fallthrough]];
     case 14:
         prediction += coefficients[13] * pDecodedSamples[-14];
+        [[fallthrough]];
     case 13:
         prediction += coefficients[12] * pDecodedSamples[-13];
+        [[fallthrough]];
     case 12:
         prediction += coefficients[11] * pDecodedSamples[-12];
+        [[fallthrough]];
     case 11:
         prediction += coefficients[10] * pDecodedSamples[-11];
+        [[fallthrough]];
     case 10:
         prediction += coefficients[9] * pDecodedSamples[-10];
+        [[fallthrough]];
     case 9:
         prediction += coefficients[8] * pDecodedSamples[-9];
+        [[fallthrough]];
     case 8:
         prediction += coefficients[7] * pDecodedSamples[-8];
+        [[fallthrough]];
     case 7:
         prediction += coefficients[6] * pDecodedSamples[-7];
+        [[fallthrough]];
     case 6:
         prediction += coefficients[5] * pDecodedSamples[-6];
+        [[fallthrough]];
     case 5:
         prediction += coefficients[4] * pDecodedSamples[-5];
+        [[fallthrough]];
     case 4:
         prediction += coefficients[3] * pDecodedSamples[-4];
+        [[fallthrough]];
     case 3:
         prediction += coefficients[2] * pDecodedSamples[-3];
+        [[fallthrough]];
     case 2:
         prediction += coefficients[1] * pDecodedSamples[-2];
+        [[fallthrough]];
     case 1:
         prediction += coefficients[0] * pDecodedSamples[-1];
+        [[fallthrough]];
     }
 
     return (drflac_int32)(prediction >> shift);
@@ -3825,6 +3857,7 @@ drflac_bool32 drflac__read_and_decode_metadata(drflac *pFlac)
                 }
             }
         }
+            [[fallthrough]];
 
         default: {
             // It's an unknown chunk, but not necessarily invalid. There's a chance more metadata blocks might be

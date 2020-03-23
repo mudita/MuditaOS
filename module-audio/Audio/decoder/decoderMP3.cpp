@@ -247,7 +247,7 @@ namespace audio
 
     uint32_t decoderMP3::decode(uint32_t samplesToRead, int16_t *pcmData)
     {
-        mp3dec_frame_info_t info = {0};
+        mp3dec_frame_info_t info = {0, 0, 0, 0, 0};
 
         if (!decoderNotFirstRun) {
             decoderBuffer    = std::make_unique<uint8_t[]>(DECODER_BUFFER_SIZE);

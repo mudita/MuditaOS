@@ -174,8 +174,10 @@ void SystemCoreClockUpdate(void)
                      CCM_ANALOG_PLL_SYS_BYPASS_CLK_SRC_SHIFT) == 0U)
                        ? CPU_XTAL_CLK_HZ
                        : CPU_CLK1_HZ;
+            break;
 
         case CCM_CBCMR_PERIPH_CLK2_SEL(3U):
+            __attribute__((fallthrough));
         default:
             freq = 0U;
             break;

@@ -15,7 +15,7 @@
 
 struct NotesTableRow
 {
-    uint32_t ID;
+    uint32_t ID = 0;
     uint32_t date;
     UTF8 snippet; // up to 60 characters
     UTF8 path;

@@ -49,7 +49,16 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES}) #M.P: fix me, should be declared as PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_compile_features(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_FEATURES})
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
+target_compile_options(${PROJECT_NAME}
+    PUBLIC
+    ${TARGET_COMPILE_OPTIONS}
+    PRIVATE
+    -Wno-error
+    -Wno-sign-compare
+    -Wno-missing-field-initializers
+    -Wno-old-style-declaration
+    -Wno-unused-function
+)
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_compile_definitions(${PROJECT_NAME}

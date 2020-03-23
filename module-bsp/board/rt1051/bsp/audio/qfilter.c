@@ -59,6 +59,7 @@ int qfilter_CalculateCoeffs(qfilter_t filter,
         filter_coeff->a1 = -2 * cs;
         filter_coeff->a2 = 1 - alpha;
         a0               = 1 + alpha;
+        break;
 
     case FilterPeak:
         filter_coeff->b0 = 1 + (alpha * gain_abs);
@@ -67,6 +68,7 @@ int qfilter_CalculateCoeffs(qfilter_t filter,
         filter_coeff->a1 = -2 * cs;
         filter_coeff->a2 = 1 - (alpha / gain_abs);
         a0               = 1 + (alpha / gain_abs);
+        break;
     default:
         return 0;
     }

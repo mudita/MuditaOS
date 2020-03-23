@@ -38,6 +38,7 @@ class ATParser : public at::Chanel
     };
 
     ATParser(bsp::Cellular *cellular);
+    virtual ~ATParser() = default;
 
     int ProcessNewData(sys::Service *service);
 

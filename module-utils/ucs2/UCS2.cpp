@@ -35,7 +35,6 @@ UCS2::UCS2(const UTF8 &string)
     this->clear();
 
     for (uint32_t i = 0; i < string.length(); i++) {
-        uint32_t decodedSize;
         uint32_t utfChar = string[i];
 
         //		LOG_INFO("decoded uft %x", ucs2char);

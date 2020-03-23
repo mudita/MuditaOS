@@ -180,10 +180,7 @@ TS0710::ConfState TS0710::PowerUpProcedure()
 // TODO:M.P Fetch configuration from JSON/XML file
 TS0710::ConfState TS0710::ConfProcedure()
 {
-    static char buf[256];
-
     LOG_DEBUG("Configuring modem...");
-
     parser->cmd(at::AT::FACTORY_RESET);
     parser->cmd(at::AT::ECHO_OFF);
     LOG_INFO("GSM modem info:");
@@ -244,8 +241,6 @@ TS0710::ConfState TS0710::AudioConfProcedure()
 
 TS0710::ConfState TS0710::StartMultiplexer()
 {
-    static char buf[128];
-
     LOG_DEBUG("Configuring multiplexer...");
 
     // 1. start CMUX by AT command AT+CMUX=...(with given parameters) & get response
@@ -393,10 +388,11 @@ void workerTaskFunction(void *ptr)
         else if (inst->mode == TS0710::Mode::CMUX) {
             // LOG_DEBUG("[Worker] Processing CMUX response");
             std::vector<uint8_t> data;
-            ssize_t len = inst->ReceiveData(data, static_cast<uint32_t>(inst->startParams.MaxCtrlRespTime));
+            inst->ReceiveData(data, static_cast<uint32_t>(inst->startParams.MaxCtrlRespTime));
             // send data to fifo
-            for (uint8_t c : data)
+            for (uint8_t c : data) {
                 inst->RXFifo.push(c);
+            }
             data.clear();
             // divide message to different frames as Quectel may send them one after another
             std::vector<std::vector<uint8_t>> multipleFrames;

@@ -344,7 +344,6 @@ namespace gui
                         pointsLeft = index;
                         // we don't have a central point. halves are alike
                         index--;
-                        indexOut;
                         middleIndex = index;
                     }
                     int xValue = 0; // Px[index];

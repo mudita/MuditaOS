@@ -19,8 +19,8 @@ struct RawKey
         Released,
     } state                = State::Undefined;
     bsp::KeyCodes key_code = bsp::KeyCodes::Undefined;
-    int time_press         = 0;
-    int time_release       = 0;
+    unsigned int time_press   = 0;
+    unsigned int time_release = 0;
 
     /// set all values to zero, set new key_code and state
     void reset(bsp::KeyCodes key_code = bsp::KeyCodes::Undefined, State state = State::Undefined)
