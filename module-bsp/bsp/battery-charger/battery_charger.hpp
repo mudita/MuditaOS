@@ -115,8 +115,6 @@ namespace bsp{
 
 BaseType_t BSP_BatteryChargerINOKB_IRQHandler();
 
-BaseType_t BSP_BatteryChargerWCINOKB_IRQHandler();
-
 BaseType_t BSP_BatteryChargerINTB_IRQHandler();
 
 
