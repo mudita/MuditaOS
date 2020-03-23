@@ -523,11 +523,6 @@ BaseType_t BSP_BatteryChargerINOKB_IRQHandler()
     return xHigherPriorityTaskWoken;
 }
 
-BaseType_t BSP_BatteryChargerWCINOKB_IRQHandler()
-{
-    return 0;
-}
-
 BaseType_t BSP_BatteryChargerINTB_IRQHandler()
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
