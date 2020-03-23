@@ -56,7 +56,7 @@ target_compile_options(${PROJECT_NAME}
     -Wno-error
     -Wno-sign-compare
     -Wno-missing-field-initializers
-    -Wno-old-style-declaration
+    $<$<COMPILE_LANGUAGE:C>:-Wno-old-style-declaration>
     -Wno-unused-function
 )
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})

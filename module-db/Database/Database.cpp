@@ -72,6 +72,9 @@ Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isIn
 {
 
     auto rc = sqlite3_open(name, &dbConnection);
+    if (rc != SQLITE_OK) {
+        LOG_ERROR("SQLITE INITIALIZATION ERROR!");
+    }
     assert(rc == SQLITE_OK);
 }
 

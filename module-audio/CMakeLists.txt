@@ -45,10 +45,6 @@ target_compile_options(${PROJECT_NAME}
     ${TARGET_COMPILE_OPTIONS}
     PRIVATE
     -Wno-error
-    #    -Wno-sign-compare
-    #    -Wno-missing-field-initializers
-    #    -Wno-old-style-declaration
-    #    -Wno-unused-function
 )
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
