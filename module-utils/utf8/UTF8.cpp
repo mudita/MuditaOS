@@ -609,8 +609,10 @@ bool UTF8::insert(const char *charPtr, const uint32_t &index)
 
     // if index is different than UTF8::npos check if its valid
     auto insertIndex = index;
-    if (insertIndex != UTF8::npos && index > strLength) {
-        return false;
+    if (insertIndex != UTF8::npos) {
+        if (index > strLength) {
+            return false;
+        }
     }
     else
         insertIndex = strLength;
@@ -654,8 +656,10 @@ bool UTF8::insertString(const UTF8 &str, const uint32_t &index)
 
     // if index is different than UTF8::npos check if its valid
     auto insertIndex = index;
-    if (insertIndex != UTF8::npos && index > strLength) {
-        return false;
+    if (insertIndex != UTF8::npos) {
+        if (index > strLength) {
+            return false;
+        }
     }
     else
         insertIndex = strLength;
