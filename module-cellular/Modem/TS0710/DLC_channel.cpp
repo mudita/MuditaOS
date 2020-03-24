@@ -8,7 +8,7 @@
 #include "TS0710_DLC_ESTABL.h"
 #include "TS0710_DLC_RELEASE.h"
 #include "TS0710_Frame.h"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "ticks.hpp"
 #include <Utils.hpp>
 #include <cstdlib>
@@ -107,7 +107,7 @@ std::vector<std::string> DLC_channel::cmd_receive()
     std::vector<uint8_t> rawBuffer;
 
     // get frames from buffer
-    for (int i = 0; i < v.size(); i++) {
+    for (size_t i = 0; i < v.size(); i++) {
         rawBuffer.push_back(v[i]);
         if (/*TS0710_Frame::isComplete(rawBuffer)*/ (rawBuffer.size() > 1) && (rawBuffer[0] == 0xF9) &&
             (rawBuffer[rawBuffer.size() - 1] == 0xF9)) {

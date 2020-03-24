@@ -11,7 +11,7 @@
 
 #include "Operation/Operation.hpp"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 namespace audio
 {
@@ -87,6 +87,8 @@ namespace audio
             case Operation::Type::Router:
                 currentState = State::Routing;
                 break;
+            case Operation::Type::Idle:
+                break;
             }
             currentOperation = std::move(ret.value());
         }
@@ -107,6 +109,9 @@ namespace audio
         }
 
         auto retStop = currentOperation->Stop();
+        if (retStop != 0) {
+            LOG_ERROR("Operation STOP failure: %d see RetCode enum for audio for more information", retStop);
+        }
 
         auto ret = Operation::Create(Operation::Type::Idle, "");
         if (ret) {

@@ -9,7 +9,7 @@
  */
 
 #include "Database.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "vfs.hpp"
 #include <assert.h>
 #include <memory>
@@ -72,6 +72,9 @@ Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isIn
 {
 
     auto rc = sqlite3_open(name, &dbConnection);
+    if (rc != SQLITE_OK) {
+        LOG_ERROR("SQLITE INITIALIZATION ERROR! %d", rc);
+    }
     assert(rc == SQLITE_OK);
 }
 

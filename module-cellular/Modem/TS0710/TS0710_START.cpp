@@ -4,7 +4,7 @@
 
 #include "TS0710_START.h"
 #include "DLC_channel.h"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 /**
  * TS0710_START implementation
@@ -29,7 +29,6 @@ TS0710_START::~TS0710_START()
  */
 void TS0710_START::request(Mode_e mode, START_SystemParameters_t system_parameters)
 {
-    static char buf[256];
     // 1. start CMUX by AT command AT+CMUX=...(with given parameters) & get response
     /*
     AT+CMUX=<mode>[,<subset>[,<portspeed>[,<N1>[,<T1>[,<N2>[,<T2>[,<T3>[,<k>]]]]]]]]

@@ -7,7 +7,7 @@
  * @details
  */
 #include "CalllogTable.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include <Utils.hpp>
 
 CalllogTable::CalllogTable(Database *db) : Table(db)
@@ -59,7 +59,7 @@ bool CalllogTable::Update(CalllogTableRow entry)
                        entry.name.c_str(),
                        entry.contactId.c_str(),
                        entry.isRead,
-                       entry.id);
+                       entry.ID);
 }
 
 CalllogTableRow CalllogTable::GetByID(uint32_t id)

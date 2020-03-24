@@ -1,4 +1,4 @@
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 extern "C"
 {
@@ -125,7 +125,6 @@ namespace Bt
 
         Error bnep_setup()
         {
-            BluetoothWorker::Error err = BluetoothWorker::Error::SuccessBt;
             // Discoverable
             // up and starts talking to a Bluetooth module.
             gap_discoverable_control(1);

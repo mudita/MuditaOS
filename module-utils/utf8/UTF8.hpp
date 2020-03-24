@@ -49,7 +49,7 @@ class UTF8
     UTF8(const char *str);
     UTF8(const std::string &str);
     UTF8(const UTF8 &utf);
-    static const int32_t npos = -1;
+    static const uint32_t npos;
 
     virtual ~UTF8();
 
@@ -111,7 +111,7 @@ class UTF8
      * @note returns npos when substring is not found
      */
 
-    int32_t find(const char *s, uint32_t pos = 0);
+    uint32_t find(const char *s, uint32_t pos = 0);
     /**
      * @brief Finds last occurrence of substring in string
      * @param s string to find
@@ -119,7 +119,7 @@ class UTF8
      * @return index of first matched string
      * @note returns npos when substring is not found.
      */
-    int32_t findLast(const char *s, uint32_t pos);
+    uint32_t findLast(const char *s, uint32_t pos);
     /**
      * @brief splits UTF8 sting into two strings.
      * @param idx index of character from which the division will be made.

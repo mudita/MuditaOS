@@ -1,6 +1,6 @@
 #include "GridLayout.hpp"
 #include "Style.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 using namespace gui;
 
@@ -39,7 +39,7 @@ void GridLayout::resizeItems()
         strech_y = (area().h - grid.y * el_in_y) / (el_in_y - 1);
 
     int row = 0;
-    int col = 0;
+    unsigned int col = 0;
     for (auto it : children) {
         // check if element will fit in
         if (it->area().w > grid.x || it->area().h > grid.y) {
@@ -63,9 +63,9 @@ void GridLayout::setNavigation()
     uint32_t el_in_x      = widgetArea.w / grid.x;
     uint32_t el_in_y      = widgetArea.h / grid.y;
     uint32_t max_elements = el_in_x * el_in_y;
-    int i                 = 0;
+    unsigned int i        = 0;
     int row               = 0;
-    int col               = 0;
+    unsigned int col      = 0;
     if (children.size() == 0) {
         LOG_ERROR("No children to set navigation");
     }

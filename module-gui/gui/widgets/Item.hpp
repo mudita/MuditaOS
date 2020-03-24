@@ -205,19 +205,19 @@ namespace gui
 
         void setX(const uint32_t x);
         void setY(const uint32_t y);
-        [[nodiscard]] const uint32_t getX() const
+        [[nodiscard]] uint32_t getX() const
         {
             return (widgetArea.x);
         }
-        [[nodiscard]] const uint32_t getY() const
+        [[nodiscard]] uint32_t getY() const
         {
             return (widgetArea.y);
         }
-        [[nodiscard]] const uint32_t getWidth() const
+        [[nodiscard]] uint32_t getWidth() const
         {
             return (widgetArea.w);
         }
-        [[nodiscard]] const uint32_t getHeight() const
+        [[nodiscard]] uint32_t getHeight() const
         {
             return (widgetArea.h);
         }

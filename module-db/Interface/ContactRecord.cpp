@@ -10,7 +10,7 @@
 
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
 {}
@@ -59,7 +59,8 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactNumberID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->ringtones.Add(ContactsRingtonesTableRow{.contactID = contactID, .assetPath = rec.assetPath});
+    ret = contactDB->ringtones.Add(
+        ContactsRingtonesTableRow{.ID = DB_ID_NONE, .contactID = contactID, .assetPath = rec.assetPath});
 
     if (!ret) {
         return ret;
@@ -169,7 +170,7 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
         return rec;
     }
 
-    rec.dbID            = contact.ID;
+    rec.ID              = contact.ID;
     rec.primaryName     = name.namePrimary;
     rec.alternativeName = name.nameAlternative;
     rec.numbers         = nrs;
@@ -234,7 +235,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             return records;
         }
 
-        records->push_back(ContactRecord{.dbID            = contact.ID,
+        records->push_back(ContactRecord{.ID              = contact.ID,
                                          .primaryName     = name.namePrimary,
                                          .alternativeName = name.nameAlternative,
                                          .contactType     = contact.type,
@@ -289,7 +290,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID            = w.ID,
+            records->push_back(ContactRecord{.ID              = w.ID,
                                              .primaryName     = w.namePrimary,
                                              .alternativeName = w.nameAlternative,
                                              .contactType     = contact.type,
@@ -341,7 +342,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID            = w.ID,
+            records->push_back(ContactRecord{.ID              = w.ID,
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -392,7 +393,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID            = contact.ID,
+            records->push_back(ContactRecord{.ID              = contact.ID,
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -442,7 +443,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                 return records;
             }
 
-            records->push_back(ContactRecord{.dbID            = contact.ID,
+            records->push_back(ContactRecord{.ID              = contact.ID,
                                              .primaryName     = name.namePrimary,
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
@@ -495,7 +496,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
             return records;
         }
 
-        records->push_back(ContactRecord{.dbID            = w.ID,
+        records->push_back(ContactRecord{.ID              = w.ID,
                                          .primaryName     = w.namePrimary,
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
@@ -546,7 +547,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
             return records;
         }
 
-        records->push_back(ContactRecord{.dbID            = w.ID,
+        records->push_back(ContactRecord{.ID              = w.ID,
                                          .primaryName     = w.namePrimary,
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,

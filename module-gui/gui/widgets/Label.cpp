@@ -4,7 +4,7 @@
  *  Created on: 7 mar 2019
  *      Author: robert
  */
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "utf8/UTF8.hpp"
 
 #include "../core/DrawCommand.hpp"
@@ -48,12 +48,7 @@ namespace gui
 
     void Label::calculateDisplayText()
     {
-
-        // calculate area needed to display text
         uint32_t availableSpace = drawArea.w;
-        if (availableSpace < 0)
-            availableSpace = 0;
-
         // calculate number of chars that can fit available space
         uint32_t spaceConsumed;
         // @TODO spaceConsumed returns value irrelevant of current char

@@ -9,7 +9,7 @@
 
 #include "linux_audiocodec.hpp"
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 namespace bsp
 {
@@ -87,7 +87,7 @@ namespace bsp
 
         LinuxAudiocodec *ptr = reinterpret_cast<LinuxAudiocodec *>(userData);
 
-        uint32_t framesToFetch = framesPerBuffer;
+        int32_t framesToFetch = framesPerBuffer;
 
         if ((ptr->currentFormat.flags & static_cast<uint32_t>(Flags::OutPutStereo))) {
             framesToFetch = framesPerBuffer * 2;

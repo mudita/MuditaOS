@@ -8,7 +8,7 @@
 #include <cstdint>
 
 #include "UTF8.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 static uint8_t UTF8_EXT           = 0x80; // 1000 0000
 static uint8_t UTF8_EXT_MASK      = 0xC0; // 1100 0000
@@ -20,6 +20,8 @@ static uint8_t UTF8_HEADER_3      = 0xE0; // 1110 0000
 static uint8_t UTF8_HEADER_3_MASK = 0xF0; // 1111 0000
 static uint8_t UTF8_HEADER_4      = 0xF0; // 1111 0000
 static uint8_t UTF8_HEADER_4_MASK = 0xF8; // 1111 1000
+
+const uint32_t UTF8::npos = uint32_t(-1);
 
 static bool UTF8_CHAR_IS_1BYTE(const char *pc)
 {
@@ -399,7 +401,7 @@ UTF8 UTF8::substr(const uint32_t begin, const uint32_t length) const
     return retString;
 }
 
-int32_t UTF8::find(const char *s, uint32_t pos)
+uint32_t UTF8::find(const char *s, uint32_t pos)
 {
     uint32_t stringCount;
     uint32_t stringSize;
@@ -424,13 +426,13 @@ int32_t UTF8::find(const char *s, uint32_t pos)
     for (position = pos; position < this->length(); position++) {
 
         if (memcmp(dataPtr, s, stringSize) == 0)
-            return static_cast<int32_t>(position);
+            return position;
         dataPtr += charLength(reinterpret_cast<const char *>(dataPtr));
     }
     return npos;
 }
 
-int32_t UTF8::findLast(const char *s, uint32_t pos)
+uint32_t UTF8::findLast(const char *s, uint32_t pos)
 {
     uint32_t stringCount;
     uint32_t stringSize;
@@ -450,7 +452,7 @@ int32_t UTF8::findLast(const char *s, uint32_t pos)
 
     uint32_t position         = 0;
     uint8_t *dataPtr          = this->data;
-    int32_t lastFoundPosition = npos;
+    uint32_t lastFoundPosition = npos;
 
     // calculate position of last string to compare
     uint32_t positionEnd = pos - stringCount + 1;
@@ -572,7 +574,7 @@ bool UTF8::encode(const uint16_t &code, uint32_t &dest, uint32_t &length)
 
     dest   = 0;
     length = 0;
-    if (((code >= 0xD800) && (code <= 0xDFFF)) || (code > 0x10FFFF))
+    if (((code >= 0xD800) && (code <= 0xDFFF)))
         return false;
 
     if (code < 0x00080) {
@@ -586,16 +588,6 @@ bool UTF8::encode(const uint16_t &code, uint32_t &dest, uint32_t &length)
         dest |= (code & 0x003F);
         // high byte
         dest |= ((code >> 6) & 0x001F) << 8;
-    }
-    else if (code < 0x010000) {
-        length = 3;
-        dest   = 0x00E08080;
-        // low byte
-        dest |= (code & 0x003F);
-        // middle byte
-        dest |= ((code >> 6) & 0x003F) << 8;
-        // high byte
-        dest |= ((code >> 12) & 0x000F) << 16;
     }
     else {
         length = 4;
@@ -616,10 +608,11 @@ bool UTF8::insert(const char *charPtr, const uint32_t &index)
 {
 
     // if index is different than UTF8::npos check if its valid
-    uint32_t insertIndex = index;
+    auto insertIndex = index;
     if (insertIndex != UTF8::npos) {
-        if (insertIndex > strLength)
+        if (index > strLength) {
             return false;
+        }
     }
     else
         insertIndex = strLength;
@@ -635,7 +628,7 @@ bool UTF8::insert(const char *charPtr, const uint32_t &index)
 
     // find pointer where new character should be copied
     uint8_t *beginPtr = this->data;
-    for (uint32_t i = 0; i < insertIndex; i++) {
+    for (unsigned int i = 0; i < insertIndex; i++) {
         beginPtr += charLength(reinterpret_cast<const char *>(beginPtr));
     }
 
@@ -662,10 +655,11 @@ bool UTF8::insertString(const UTF8 &str, const uint32_t &index)
 {
 
     // if index is different than UTF8::npos check if its valid
-    uint32_t insertIndex = index;
+    auto insertIndex = index;
     if (insertIndex != UTF8::npos) {
-        if (insertIndex > strLength)
+        if (index > strLength) {
             return false;
+        }
     }
     else
         insertIndex = strLength;

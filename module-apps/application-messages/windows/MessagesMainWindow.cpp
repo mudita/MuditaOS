@@ -31,7 +31,7 @@
 #include "OptionsWindow.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include <Style.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 #include "time/time_conversion.hpp"
 
@@ -127,7 +127,7 @@ namespace gui
         LOG_INFO("Data: %s", data ? data->getDescription().c_str() : "");
         {
             if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data)) {
-                auto thread = DBServiceAPI::ThreadGetByContact(application, pdata->result->dbID);
+                auto thread = DBServiceAPI::ThreadGetByContact(application, pdata->result->ID);
                 if (thread) {
                     application->switchWindow(gui::name::window::thread_view,
                                               std::make_unique<SMSThreadData>(std::move(thread)));

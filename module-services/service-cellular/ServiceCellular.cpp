@@ -30,7 +30,7 @@
 #include "messages/CellularMessage.hpp"
 #include <ticks.hpp>
 
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-appmgr/messages/APMMessage.hpp"
@@ -56,7 +56,6 @@ const char *State::c_str(State::ST state) const
 {
     switch (state) {
     case ST::Idle:
-        return "Idle";
     case ST::PowerUpInProgress:
         return "PowerUpInProgress";
     case ST::ModemConfigurationInProgress:

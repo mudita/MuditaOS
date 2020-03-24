@@ -7,13 +7,14 @@
 #pragma once
 
 #include "Table.hpp"
+#include "Record.hpp"
 #include "Database/Database.hpp"
 #include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
 
 struct AlarmsTableRow
 {
-    uint32_t ID;
+    uint32_t ID = DB_ID_NONE;
     uint32_t time;
     uint32_t snooze;
     uint32_t status;

@@ -1,5 +1,5 @@
 #include <Bluetooth/Device.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <vector>
 #include <Bluetooth/Error.hpp>
 

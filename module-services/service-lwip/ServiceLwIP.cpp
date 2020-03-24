@@ -1,5 +1,5 @@
 #include "ServiceLwIP.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
@@ -92,7 +92,7 @@ sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::Resp
             default:
                 LOG_ERROR("Not implemented: %d", lmsg->req);
             }
-        }
+        } break;
         default:
             LOG_ERROR("Not handled messageType: %s", msg->messageType);
         }

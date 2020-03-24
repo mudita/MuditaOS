@@ -10,10 +10,11 @@
 
 #include "../core/Font.hpp"
 #include "Text.hpp"
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
 #include <Style.hpp>
+#include <cassert>
 
 namespace gui
 {
@@ -197,12 +198,13 @@ namespace gui
         while (it != textLines.end()) {
 
             auto textLine = (*it);
-            output += (*it)->text;
-            if ((*it)->endType == LineEndType::BREAK) {
+            assert(textLine);
+            output += textLine->text;
+            if (textLine->endType == LineEndType::BREAK) {
                 output.insert("\n");
             }
 
-            if ((*it)->endType == LineEndType::CONTINUE_SPACE) {
+            if (textLine->endType == LineEndType::CONTINUE_SPACE) {
                 output.insert(" ");
             }
 
@@ -290,7 +292,7 @@ namespace gui
             // check if this is not the end of the text
             if (index + charCount == totalLength) {
                 // try to find first enter.
-                uint32_t enterIndex = tmpText.find("\n", 0);
+                auto enterIndex = tmpText.find("\n", 0);
                 if (enterIndex != UTF8::npos) {
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
@@ -316,7 +318,7 @@ namespace gui
                 startIndex = index;
 
                 // try to find first enter.
-                uint32_t enterIndex = tmpText.find("\n", 0);
+                auto enterIndex = tmpText.find("\n", 0);
                 if (enterIndex != UTF8::npos) {
                     endIndex = index + enterIndex;
                     index += enterIndex + 1;
@@ -327,7 +329,7 @@ namespace gui
                 }
                 else {
                     // if there was no enter look for last space in the tmpText and break line on it
-                    uint32_t spaceIndex = tmpText.findLast(" ", tmpText.length() - 1);
+                    auto spaceIndex = tmpText.findLast(" ", tmpText.length() - 1);
 
                     // if there was no space take as many characters as possible and add CONTINUE ending
                     if (spaceIndex == UTF8::npos) {
@@ -372,10 +374,6 @@ namespace gui
                 textLine->endType = LineEndType::EOT;
                 break;
             }
-        }
-
-        for (auto it : textLines) {
-            // LOG_INFO("text: [%s] ending: %d", it->text.c_str(), static_cast<uint32_t>(it->endType));
         }
 
         firstLine = textLines.begin();
@@ -555,7 +553,7 @@ namespace gui
                     }
                 };
                 if (translator.getTimes()) {
-                    for (int i = 0; i < translator.getTimes(); ++i) {
+                    for (unsigned int i = 0; i < translator.getTimes(); ++i) {
                         char_rm(res);
                     }
                 }
@@ -947,7 +945,6 @@ namespace gui
 
         // if sum of the old string and width of the new character are greater than available space run lines rework
         // procedure
-        uint32_t linesCount     = textLines.size();
         uint32_t availableSpace = getAvailableHPixelSpace();
         uint32_t currentWidth   = currentTextLine->pixelLength;
         if (currentWidth + charWidth > availableSpace) {
@@ -978,11 +975,6 @@ namespace gui
             currentTextLine->pixelLength = font->getPixelWidth(currentTextLine->text);
             ++cursorColumn;
         }
-
-        // if number of text lines have increased, text widget is multi-line and expandable change widgets space
-        //	if( linesCount != textLines.size()) {
-        //
-        //	}
 
         recalculateDrawParams();
         // calculate new position of the cursor

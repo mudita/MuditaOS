@@ -2,8 +2,8 @@
 // Created by mati on 08.05.19.
 //
 
-#include "../../log/log.hpp"
-#include "../../log/segger/SEGGER_RTT.h"
+#include "../../segger/log/log.hpp"
+#include "../../segger/log/rtt/SEGGER_RTT.h"
 #include <ticks.hpp>
 extern "C"
 {
@@ -182,7 +182,7 @@ static void _log_Log(
         return;
     }
 
-    ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+    ptr += sprintf(ptr, "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
 
 #if LOG_USE_COLOR == 1
 
@@ -282,7 +282,7 @@ extern "C"
         }
 
         char *ptr = loggerBuffer;
-        ptr += sprintf(ptr, "%d ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
+        ptr += sprintf(ptr, "%lu ms ", cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks()));
         logger_level level = LOGFATAL;
         ptr += sprintf(ptr,
                        "%s%-5s " CONSOLE_ESCAPE_COLOR_MAGENTA "[%-10s] \x1b[31mASSERTION " CONSOLE_ESCAPE_COLOR_RESET,

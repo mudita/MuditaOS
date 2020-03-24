@@ -11,7 +11,7 @@
 #include "SMSRecord.hpp"
 #include "ContactRecord.hpp"
 #include "ThreadRecord.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 SMSRecord::SMSRecord(const SMSTableRow &w, const UTF8 &num)
 {
@@ -41,7 +41,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
         LOG_ERROR("Cannot find contact, for number %s", rec.number.c_str());
         return false;
     }
-    uint32_t contactID = (*contactRec)[0].dbID;
+    uint32_t contactID = (*contactRec)[0].ID;
     // Search for a thread with specified contactID
     uint32_t threadID = 0;
     ThreadRecordInterface threadInterface(smsDB, contactsDB);

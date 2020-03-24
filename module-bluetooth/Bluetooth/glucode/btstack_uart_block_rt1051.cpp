@@ -1,5 +1,5 @@
 #include <bsp/bluetooth/Bluetooth.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 using namespace bsp;
 
@@ -15,21 +15,11 @@ extern "C"
 
     // #define DEBUG_UART
 
-    namespace
-    { // interfacing
-        // static hci_transport_config_uart_t *uart_config;
-        // data source for integration with BTstack Runloop
-        static btstack_data_source_t transport_data_source;
-        // callbacks
-        static void (*block_sent)(void);
-        static void (*block_received)(void);
-    }; // namespace
-
     // and it's hci_transport_config_uart_t which is a bit different...
     static int uart_rt1051_init(const btstack_uart_config_t *config)
     {
         LOG_INFO("Create BlueKitchen interface");
-        BlueKitchen *bt = BlueKitchen::getInstance();
+        BlueKitchen::getInstance();
         return 0;
     }
 

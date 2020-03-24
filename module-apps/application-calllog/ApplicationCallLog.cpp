@@ -17,7 +17,7 @@
 #include <Dialog.hpp>
 #include <OptionWindow.hpp>
 #include <i18/i18.hpp>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 using namespace calllog;
 

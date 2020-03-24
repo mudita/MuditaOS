@@ -2,7 +2,7 @@
 // Created by mati on 08.05.19.
 //
 
-#include "../../log/log.hpp"
+#include "../../segger/log/log.hpp"
 #include <iostream>
 #include <string>
 #include <mutex>

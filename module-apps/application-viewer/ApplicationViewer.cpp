@@ -22,7 +22,7 @@
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/BoxLayout.hpp"
 // module-utils
-#include "log/log.hpp"
+#include "segger/log/log.hpp"
 // module-services
 #include "service-evtmgr/EventManager.hpp"
 #include "service-evtmgr/messages/EVMessages.hpp"

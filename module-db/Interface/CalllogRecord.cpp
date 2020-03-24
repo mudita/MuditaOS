@@ -11,11 +11,11 @@
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
 #include <cassert>
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <sstream>
 
 CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name)
-    : Record{tableRow.id}, number(num), presentation(tableRow.presentation), date(tableRow.date),
+    : Record{tableRow.ID}, number(num), presentation(tableRow.presentation), date(tableRow.date),
       duration(tableRow.duration), type(tableRow.type), name(name), contactId(tableRow.contactId)
 {}
 
@@ -54,15 +54,13 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
         LOG_ERROR("Cannot get contact, for number %s", rec.number.c_str());
         return false;
     }
-    uint32_t contactID = (*contactRec)[0].dbID;
-
     auto localRec      = rec;
     auto contact       = (*contactRec)[0];
-    localRec.contactId = std::to_string(contact.dbID);
+    localRec.contactId = std::to_string(contact.ID);
     localRec.name      = contact.getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
-    return calllogDB->calls.Add(CalllogTableRow{.id           = localRec.ID, // this is only to remove warning
+    return calllogDB->calls.Add(CalllogTableRow{.ID           = localRec.ID, // this is only to remove warning
                                                 .number       = localRec.number,
                                                 .presentation = localRec.presentation,
                                                 .date         = localRec.date,
@@ -108,7 +106,7 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
     for (const auto &c : calls) {
         auto contactRec = GetContactRecordByID(c.contactId);
-        if (contactRec.dbID == DB_ID_NONE) {
+        if (contactRec.ID == DB_ID_NONE) {
             LOG_ERROR("Cannot find contact for ID %s", c.contactId.c_str());
             continue;
         }
@@ -123,11 +121,11 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
 {
 
     auto call = calllogDB->calls.GetByID(rec.ID);
-    if (call.id == 0) {
+    if (call.ID == 0) {
         return false;
     }
 
-    return calllogDB->calls.Update(CalllogTableRow{.id           = rec.ID,
+    return calllogDB->calls.Update(CalllogTableRow{.ID           = rec.ID,
                                                    .number       = rec.number,
                                                    .presentation = rec.presentation,
                                                    .date         = rec.date,
@@ -141,7 +139,7 @@ bool CalllogRecordInterface::RemoveByID(uint32_t id)
 {
 
     auto call = calllogDB->calls.GetByID(id);
-    if (call.id == 0) {
+    if (call.ID == 0) {
         return false;
     }
 
@@ -166,7 +164,7 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
     auto call = calllogDB->calls.GetByID(id);
 
     auto contactRec = GetContactRecordByID(call.contactId);
-    if (contactRec.dbID == DB_ID_NONE) {
+    if (contactRec.ID == DB_ID_NONE) {
         auto contactRec = GetContactRecordByID(call.contactId);
         LOG_ERROR("Cannot find contact for ID %s", call.contactId.c_str());
         return CalllogRecord();

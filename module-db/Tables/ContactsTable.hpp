@@ -11,22 +11,23 @@
 
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
+#include "Record.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
 
 struct ContactsTableRow
 {
-    uint32_t ID;
-    uint32_t nameID;
-    std::string numbersID;
-    uint32_t ringID;
-    std::string addressIDs;
-    ContactType type;
-    bool isOnWhitelist;
-    bool isOnBlacklist;
-    bool isOnFavourites;
-    uint32_t speedDial;
+    uint32_t ID            = DB_ID_NONE;
+    uint32_t nameID        = 0;
+    std::string numbersID  = "";
+    uint32_t ringID        = 0;
+    std::string addressIDs = "";
+    ContactType type       = ContactType::TEMPORARY;
+    bool isOnWhitelist     = false;
+    bool isOnBlacklist     = false;
+    bool isOnFavourites    = false;
+    uint32_t speedDial     = 0;
     UTF8 namePrimary     = "";
     UTF8 nameAlternative = "";
 };

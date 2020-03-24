@@ -12,7 +12,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 
 namespace gui
 {
@@ -405,7 +405,7 @@ namespace gui
                 page2.imageTick->setVisible(false);
                 page2.favSelected = false;
             }
-            if (contact->speeddial >= 0 && contact->speeddial < 10)
+            if (contact->speeddial < 10)
                 page2.speedValue->setText(std::to_string(contact->speeddial));
             else
                 page2.speedValue->setText("-");
@@ -545,7 +545,7 @@ namespace gui
                 return (true);
             }
         }
-        else if (contact->dbID > 0) {
+        else if (contact->ID > 0) {
             if (DBServiceAPI::ContactUpdate(application, record) == false) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return (false);

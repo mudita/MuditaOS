@@ -1,7 +1,7 @@
 #pragma once
 #include "i18/i18.hpp"
 #include <algorithm> // std::find_if_not
-#include <log/log.hpp>
+#include <segger/log/log.hpp>
 #include <sstream>
 
 namespace utils
