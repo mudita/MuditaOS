@@ -125,7 +125,7 @@ namespace app
             contactRec = searchResults->front();
             LOG_INFO("Found contact matching search num %s : contact ID %u - %s %s",
                      number.c_str(),
-                     contactRec.dbID,
+                     contactRec.ID,
                      contactRec.primaryName.c_str(),
                      contactRec.alternativeName.c_str());
 
@@ -142,7 +142,7 @@ namespace app
         else if (searchResults.get()->size() > 1) {
             LOG_FATAL("Found more than one contact for numer %s", number.c_str());
             for (auto i : *searchResults) {
-                LOG_FATAL("ContactID = %u", i.dbID);
+                LOG_FATAL("ContactID = %u", i.ID);
             }
             return false;
         }

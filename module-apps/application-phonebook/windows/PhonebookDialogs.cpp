@@ -115,11 +115,11 @@ void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong))) {
 
-            if (DBServiceAPI::ContactRemove(application, contact->dbID)) {
-                LOG_INFO("contact %d removed, switch to MainWindow", contact->dbID);
+            if (DBServiceAPI::ContactRemove(application, contact->ID)) {
+                LOG_INFO("contact %d removed, switch to MainWindow", contact->ID);
             }
             else {
-                LOG_ERROR("failed to delete contact with id %d", contact->dbID);
+                LOG_ERROR("failed to delete contact with id %d", contact->ID);
             }
 
             application->switchWindow(gui::name::window::main_window, gui::ShowMode::GUI_SHOW_INIT, nullptr);
@@ -144,11 +144,11 @@ void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong))) {
-            if (DBServiceAPI::ContactBlock(application, contact->dbID, false)) {
-                LOG_INFO("contact %d unblocked, switch to MainWindow", contact->dbID);
+            if (DBServiceAPI::ContactBlock(application, contact->ID, false)) {
+                LOG_INFO("contact %d unblocked, switch to MainWindow", contact->ID);
             }
             else {
-                LOG_ERROR("failed to unblock contact with id %d", contact->dbID);
+                LOG_ERROR("failed to unblock contact with id %d", contact->ID);
             }
 
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
@@ -161,11 +161,11 @@ void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
     yesLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
                                                            (inputEvent.state == InputEvent::State::keyReleasedLong))) {
-            if (DBServiceAPI::ContactBlock(application, contact->dbID, true)) {
-                LOG_INFO("contact %d blocked, switch to MainWindow", contact->dbID);
+            if (DBServiceAPI::ContactBlock(application, contact->ID, true)) {
+                LOG_INFO("contact %d blocked, switch to MainWindow", contact->ID);
             }
             else {
-                LOG_ERROR("failed to block contact with id %d", contact->dbID);
+                LOG_ERROR("failed to block contact with id %d", contact->ID);
             }
 
             std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
