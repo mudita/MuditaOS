@@ -17,7 +17,7 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 PhonebookOptions::PhonebookOptions(app::Application *app) : AppWindow(app, "Options")
 {

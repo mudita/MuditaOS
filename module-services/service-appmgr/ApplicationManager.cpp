@@ -33,7 +33,7 @@
 /// #define AUTO_PHONE_LOCK_ENABLED
 
 // module-utils
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "i18/i18.hpp"
 #include <cassert>
 

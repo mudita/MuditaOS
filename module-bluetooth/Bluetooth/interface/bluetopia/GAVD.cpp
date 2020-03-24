@@ -1,6 +1,6 @@
 #include "../../profiles/GAVD.hpp"
 #include "BtDev.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 extern "C"
 {

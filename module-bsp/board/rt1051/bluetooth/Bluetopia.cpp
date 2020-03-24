@@ -1,5 +1,5 @@
 #include "bluetooth/Bluetooth.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "fsl_lpuart.h"
 #include "board.h"
 

@@ -38,7 +38,7 @@
  * See http://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 #include <stdint.h>
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 //TODO: Look at tasks.c: void vTaskStepTick( const TickType_t xTicksToJump ) before upgrading FreeRTOS
 #ifdef __cplusplus

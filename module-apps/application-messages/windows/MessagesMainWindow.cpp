@@ -31,7 +31,7 @@
 #include "OptionsWindow.hpp"
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include <Style.hpp>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 #include "time/time_conversion.hpp"
 

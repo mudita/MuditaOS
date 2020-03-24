@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "MIMXRT1051.h"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 // ----------------------------------------------------------------------------
 
 // Forward declaration

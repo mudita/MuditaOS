@@ -47,7 +47,7 @@ set (SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-include(segger/log/CMakeLists.txt)
+include(segger/rtt/CMakeLists.txt)
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)

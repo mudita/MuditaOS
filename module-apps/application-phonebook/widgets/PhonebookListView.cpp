@@ -12,7 +12,7 @@
 #include "PhonebookItem.hpp"
 #include "UiCommonActions.hpp"
 #include "application-call/ApplicationCall.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 
 namespace gui

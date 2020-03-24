@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Utils.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <string>
 #include <vector>
 

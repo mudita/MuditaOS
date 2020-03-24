@@ -1,6 +1,6 @@
 #include "GPIO.hpp"
 #include "../../messages/EVMessages.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <map>
 
 #include "bsp/harness/bsp_harness.hpp"

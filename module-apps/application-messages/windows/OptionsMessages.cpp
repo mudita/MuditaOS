@@ -1,7 +1,7 @@
 #include "OptionsMessages.hpp"
 #include "Options.hpp"
 #include "i18/i18.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 #include <BoxLayout.hpp>
 

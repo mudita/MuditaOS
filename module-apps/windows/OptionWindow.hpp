@@ -5,7 +5,7 @@
 #include "PageLayout.hpp"
 #include <functional>
 
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 namespace gui
 {
