@@ -31,13 +31,14 @@ gui::ListItem *SearchResultsModel::getItem(
         return nullptr;
     }
 
-    auto o = *results.get();
+    auto searchResults = *results;
+    auto itemCount = getItemCount();
 
-    if (index >= (int)o.size()) {
-        LOG_ERROR("getItem error: index %d >= results size %d", index, o.size());
+    if (index >= itemCount) {
+        LOG_ERROR("getItem error: index %d >= results size %d", index, itemCount);
         return nullptr;
     }
-    auto contact = std::make_shared<ContactRecord>(o[index]);
+    auto contact = std::make_shared<ContactRecord>(searchResults[index]);
 
     if (contact == nullptr)
         return nullptr;
@@ -65,7 +66,14 @@ gui::ListItem *SearchResultsModel::getItem(
                 item->setValue(contact->primaryName.substr(0, 1));
             }
             else {
-                auto prevContact = std::make_shared<ContactRecord>(o[prevIndex]);
+                if (prevIndex < 0)
+                {
+                    LOG_ERROR("getItem error: prevIndex < 0");
+                    return nullptr;
+                }
+                auto prevContact = std::make_shared<ContactRecord>(searchResults[prevIndex]);
+                if (prevContact == nullptr)
+                    return nullptr;
                 if (contact->alternativeName.substr(0, 1) == prevContact->alternativeName.substr(0, 1)) {
                     item->markFavourite(false);
                     item->setContact(contact);
@@ -105,7 +113,11 @@ gui::ListItem *SearchResultsModel::getItem(
                 item->setValue(contact->primaryName.substr(0, 1));
             }
             else {
-                auto prevContact = std::make_shared<ContactRecord>(o[prevIndex]);
+                if(prevIndex < 0)
+                {
+                    prevIndex = index-1;
+                }
+                auto prevContact = std::make_shared<ContactRecord>(searchResults[prevIndex]);
                 if (remaining == 0) {
                     // previous element has the same first character of alternative name so display first character
                     if (index == prevIndex) {
@@ -136,7 +148,7 @@ gui::ListItem *SearchResultsModel::getItem(
 int SearchResultsModel::getItemCount() const
 {
     if (results) {
-        return (results.get()->size());
+        return (results->size());
     }
     else {
         return (0);
