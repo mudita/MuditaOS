@@ -6,7 +6,7 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
 

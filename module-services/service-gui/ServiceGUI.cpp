@@ -27,7 +27,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 
 #include "../gui/core/ImageManager.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 extern "C"
 #include "memory/usermem.h"

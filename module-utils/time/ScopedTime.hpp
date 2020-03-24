@@ -1,7 +1,7 @@
 #pragma once
 
 #include <FreeRTOS.h>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <string>
 #include <ticks.hpp>
 

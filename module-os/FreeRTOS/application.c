@@ -1,6 +1,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 #include <assert.h>
 #include <stdlib.h>

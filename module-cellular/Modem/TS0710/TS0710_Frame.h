@@ -5,7 +5,7 @@
 #include <inttypes.h>
 #include <vector>
 #include <iostream>
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 #define TS0710_FLAG          0xF9
 #define TS0710_FRAME_HDR_LEN 6 // without extended address byte

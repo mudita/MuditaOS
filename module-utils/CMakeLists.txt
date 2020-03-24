@@ -47,7 +47,7 @@ set (SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
-include(segger/log/CMakeLists.txt)
+include(log/CMakeLists.txt)
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
@@ -70,6 +70,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 if((${PROJECT_TARGET} STREQUAL "TARGET_RT1051") AND (${SYSTEM_VIEW_ENABLED}))
-    add_subdirectory(segger/systemview)
+    add_subdirectory(systemview)
 endif()
 add_subdirectory( test )

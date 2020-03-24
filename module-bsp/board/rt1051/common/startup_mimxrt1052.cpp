@@ -453,8 +453,8 @@ extern "C"
 #include "MIMXRT1051.h"
 #include <string.h>
 #include <stdint.h>
-#include <segger/log/log.hpp>
-#include <segger/log/rtt/SEGGER_RTT.h>
+#include <log/log.hpp>
+#include <log/segger/SEGGER_RTT.h>
 #include <stdlib.h>
 
 //*****************************************************************************

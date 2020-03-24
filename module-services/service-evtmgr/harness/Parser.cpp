@@ -5,7 +5,7 @@
 #include "events/KeyPress.hpp"
 #include <Service/Bus.hpp>
 #include <json/json11.hpp>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 namespace harness
 {

@@ -12,7 +12,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include <cassert>
 #include <i18/i18.hpp>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 namespace app
 {

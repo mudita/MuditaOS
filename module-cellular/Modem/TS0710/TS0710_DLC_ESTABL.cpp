@@ -15,7 +15,7 @@ extern "C"
 
 #include "TS0710_Frame.h"
 #include "TS0710_types.h"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "FreeRTOS.h"
 
 /**

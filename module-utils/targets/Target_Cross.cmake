@@ -5,6 +5,8 @@ set(BOARD_SOURCES ${BOARD_SOURCES}
         CACHE INTERNAL ""
         )
 
+message(${LOG_REDIRECT})
+
 if (${LOG_REDIRECT} STREQUAL "RTT_JLINK")
     set(BOARD_SOURCES ${BOARD_SOURCES}
             ${CMAKE_CURRENT_SOURCE_DIR}/board/cross/log_writeRTT.cpp
