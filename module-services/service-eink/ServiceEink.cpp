@@ -168,7 +168,9 @@ void ServiceEink::TickHandler(uint32_t id)
         std::find_if(timersList.begin(), timersList.end(), [id](auto &timer) { return (timer->GetId() == id); });
     if (findID != timersList.end()) {
         LOG_INFO("[ServiceEink] Power down eink after 3 seconds");
+#ifdef TARGET_RT1051
         EinkPowerOff();
+#endif
     }
 }
 
