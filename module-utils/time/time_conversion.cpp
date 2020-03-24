@@ -98,14 +98,15 @@ namespace utils
         constexpr uint32_t datasize = 128;
         UTF8 Timestamp::str(std::string format)
         {
-            if (format.compare("") != 0)
+            if (format.compare("") != 0) {
                 this->format = format;
+            }
             UTF8 datetimestr = "";
             replace_specifiers();
 
             auto data = std::unique_ptr<char[]>(new char[datasize]);
             std::strftime(data.get(), datasize, this->format.c_str(), &timeinfo);
-            datetimestr = data.get();
+            datetimestr = UTF8(data.get());
             return datetimestr;
         }
 
@@ -285,7 +286,7 @@ namespace utils
             }
         }
 
-        UTF8 Duration::str(DisplayedFormat displayedFormat)
+        UTF8 Duration::str(DisplayedFormat displayedFormat) const
         {
             // switch between format low and hig
             std::string data = utils::localize.get(hours != 0 ? formatMap.at(displayedFormat).highFormat

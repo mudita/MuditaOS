@@ -260,33 +260,9 @@ namespace gui
     void CallWindow::setCallNumber(std::string)
     {}
 
-    // TODO: rewrtie
-    void CallWindow::updateDuration(time_t duration)
+    void CallWindow::updateDuration(const utils::time::Duration &duration)
     {
-        uint32_t seconds = 0;
-        uint32_t minutes = 0;
-        uint32_t hours   = 0;
-        uint32_t days    = 0;
-
-        days = duration / 86400;
-        duration -= days * 86400;
-        hours = duration / 3600;
-        duration -= hours * 3600;
-        minutes = duration / 60;
-        duration -= minutes * 60;
-        seconds = duration;
-
-        std::stringstream ss;
-        if (days)
-            ss << days << ":";
-        if (hours)
-            ss << hours << ":";
-        if (hours && minutes < 10)
-            ss << "0";
-        ss << minutes << ":";
-        ss << std::setfill('0') << std::setw(2) << seconds;
-
-        durationLabel->setText(ss.str());
+        durationLabel->setText(duration.str());
     }
 
     bool CallWindow::handleSwitchData(SwitchData *data)

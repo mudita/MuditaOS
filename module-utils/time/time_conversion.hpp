@@ -231,7 +231,7 @@ namespace utils
                 return duration;
             }
 
-            UTF8 str(DisplayedFormat displayedFormat = DisplayedFormat::Auto0M);
+            UTF8 str(DisplayedFormat displayedFormat = DisplayedFormat::Auto0M) const;
 
             // uses default format
             friend inline std::ostream &operator<<(std::ostream &os, Duration t)
@@ -298,7 +298,7 @@ namespace utils
 
             void fillStr(std::string &formatlong) const;
             void calculate();
-            time_t duration;
+            time_t duration         = 0;
             unsigned long hours     = 0;
             unsigned long hmminutes = 0;
             unsigned long minutes   = 0;

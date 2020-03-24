@@ -46,7 +46,7 @@ namespace app
             auto callWindow = dynamic_cast<gui::CallWindow *>(getCurrentWindow());
 
             if (callWindow && callWindow->getState() == gui::CallWindow::State::CALL_IN_PROGRESS) {
-                callWindow->updateDuration(callDuration.get());
+                callWindow->updateDuration(callDuration);
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             }
         }
