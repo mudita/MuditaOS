@@ -25,14 +25,13 @@ void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t li
 gui::ListItem *SearchResultsModel::getItem(
     int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-    if (index < 0)
-    {
+    if (index < 0) {
         LOG_ERROR("getItem error: index < 0");
         return nullptr;
     }
 
     auto searchResults = *results;
-    auto itemCount = getItemCount();
+    auto itemCount     = getItemCount();
 
     if (index >= itemCount) {
         LOG_ERROR("getItem error: index %d >= results size %d", index, itemCount);
@@ -66,8 +65,7 @@ gui::ListItem *SearchResultsModel::getItem(
                 item->setValue(contact->primaryName.substr(0, 1));
             }
             else {
-                if (prevIndex < 0)
-                {
+                if (prevIndex < 0) {
                     LOG_ERROR("getItem error: prevIndex < 0");
                     return nullptr;
                 }
@@ -113,9 +111,8 @@ gui::ListItem *SearchResultsModel::getItem(
                 item->setValue(contact->primaryName.substr(0, 1));
             }
             else {
-                if(prevIndex < 0)
-                {
-                    prevIndex = index-1;
+                if (prevIndex < 0) {
+                    prevIndex = index - 1;
                 }
                 auto prevContact = std::make_shared<ContactRecord>(searchResults[prevIndex]);
                 if (remaining == 0) {
