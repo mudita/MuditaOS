@@ -8,7 +8,7 @@
 #include "TS0710_DLC_ESTABL.h"
 #include "TS0710_DLC_RELEASE.h"
 #include "TS0710_Frame.h"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "ticks.hpp"
 #include <Utils.hpp>
 #include <cstdlib>

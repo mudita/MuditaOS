@@ -11,7 +11,7 @@
 #include <sstream>
 
 #include <iomanip>
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include <iterator>
 
 const uint32_t UCS2::ucs2bufferExt = 16;

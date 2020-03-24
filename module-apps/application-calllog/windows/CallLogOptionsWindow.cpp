@@ -1,6 +1,6 @@
 #include "CallLogOptionsWindow.hpp"
 #include "i18/i18.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include <Options.hpp>
 
 /// below just for apps names...

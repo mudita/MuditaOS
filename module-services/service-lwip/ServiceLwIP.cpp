@@ -1,5 +1,5 @@
 #include "ServiceLwIP.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"

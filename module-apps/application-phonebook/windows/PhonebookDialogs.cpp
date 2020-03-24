@@ -18,7 +18,7 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <sstream>
 
 PhonebookDialog::PhonebookDialog(app::Application *app, const std::string &dialogName) : AppWindow(app, dialogName)

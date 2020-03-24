@@ -1,6 +1,6 @@
 #include "ATCommon.hpp"
 #include <functional>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <string>
 #include <ticks.hpp>
 #include <vector>

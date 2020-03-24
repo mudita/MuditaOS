@@ -11,7 +11,7 @@
 
 #include "Operation/Operation.hpp"
 
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 namespace audio
 {

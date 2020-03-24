@@ -1,5 +1,5 @@
 #include "BluetoothWorker.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "BtCommand.hpp"
 
 using namespace bsp;

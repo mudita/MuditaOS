@@ -7,7 +7,7 @@
 #include <bsp/rtc/rtc.hpp>
 #include <vector>
 #include <string>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 namespace utils
 {

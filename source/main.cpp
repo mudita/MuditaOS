@@ -3,7 +3,7 @@
 #include <list>
 
 #include "../module-gui/gui/core/ImageManager.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "memory/usermem.h"
 #include "ticks.hpp"
 #include "version.hpp"
