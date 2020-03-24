@@ -74,7 +74,7 @@ gui::ListItem *SearchResultsModel::getItem(
                 auto prevContact = std::make_shared<ContactRecord>(searchResults[prevIndex]);
                 if (prevContact == nullptr)
                     return nullptr;
-                if (contact->alternativeName.substr(0, 1) == prevContact->alternativeName.substr(0, 1)) {
+                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
@@ -142,7 +142,6 @@ gui::ListItem *SearchResultsModel::getItem(
             return item;
         }
     }
-    return nullptr;
 }
 
 int SearchResultsModel::getItemCount() const
