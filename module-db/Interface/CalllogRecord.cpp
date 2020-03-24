@@ -56,7 +56,7 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     }
     auto localRec      = rec;
     auto contact       = (*contactRec)[0];
-    localRec.contactId = std::to_string(contact.dbID);
+    localRec.contactId = std::to_string(contact.ID);
     localRec.name      = contact.getFormattedName();
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
@@ -106,7 +106,7 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
     for (const auto &c : calls) {
         auto contactRec = GetContactRecordByID(c.contactId);
-        if (contactRec.dbID == DB_ID_NONE) {
+        if (contactRec.ID == DB_ID_NONE) {
             LOG_ERROR("Cannot find contact for ID %s", c.contactId.c_str());
             continue;
         }
@@ -164,7 +164,7 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
     auto call = calllogDB->calls.GetByID(id);
 
     auto contactRec = GetContactRecordByID(call.contactId);
-    if (contactRec.dbID == DB_ID_NONE) {
+    if (contactRec.ID == DB_ID_NONE) {
         auto contactRec = GetContactRecordByID(call.contactId);
         LOG_ERROR("Cannot find contact for ID %s", call.contactId.c_str());
         return CalllogRecord();

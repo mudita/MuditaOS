@@ -19,8 +19,7 @@
 
 struct ContactRecord
 {
-
-    uint32_t dbID = DB_ID_NONE;
+    uint32_t ID             = DB_ID_NONE;
     UTF8 primaryName        = "";
     UTF8 alternativeName    = "";
     ContactType contactType = ContactType::TEMPORARY;
