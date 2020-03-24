@@ -12,7 +12,7 @@
 
 #include "service-db/messages/DBMessage.hpp"
 
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 #include "ThreadViewWindow.hpp"
 #include <Style.hpp>

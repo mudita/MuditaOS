@@ -1,6 +1,6 @@
 #include "GridLayout.hpp"
 #include "Style.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 using namespace gui;
 

@@ -3,7 +3,7 @@
 #include "Service/Message.hpp"
 #include "MessageType.hpp"
 #include "messages/BluetoothMessage.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <service-lwip/ServiceLwIP.hpp>
 
 const char *ServiceBluetooth::serviceName = "ServiceBluetooth";

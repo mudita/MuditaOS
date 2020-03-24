@@ -9,7 +9,7 @@
  */
 
 #include "SMSTable.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 SMSTable::SMSTable(Database *db) : Table(db)
 {}

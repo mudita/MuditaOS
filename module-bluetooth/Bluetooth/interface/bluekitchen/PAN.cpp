@@ -1,4 +1,4 @@
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 extern "C"
 {

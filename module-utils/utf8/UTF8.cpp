@@ -8,7 +8,7 @@
 #include <cstdint>
 
 #include "UTF8.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 static uint8_t UTF8_EXT           = 0x80; // 1000 0000
 static uint8_t UTF8_EXT_MASK      = 0xC0; // 1100 0000

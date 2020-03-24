@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <sstream>
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
 #include "Profile.hpp"

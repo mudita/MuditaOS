@@ -1,6 +1,6 @@
 #include "ParserFsm.hpp"
 #include "Fsmlist.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 class StateMessageType;
 class StateMessageSize;
