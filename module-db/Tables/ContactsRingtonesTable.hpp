@@ -19,7 +19,7 @@
 
 struct ContactsRingtonesTableRow : public Record
 {
-    uint32_t contactID = 0;
+    uint32_t contactID = DB_ID_NONE;
     UTF8 assetPath     = "";
     ContactsRingtonesTableRow(uint32_t ID = DB_ID_NONE, uint32_t contactID = 0, UTF8 assetPath = "")
         : contactID(contactID), assetPath(assetPath)

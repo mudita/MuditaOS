@@ -13,12 +13,13 @@
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
 #include "Table.hpp"
+#include "Record.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
 
 struct ContactsAddressTableRow
 {
-    uint32_t ID             = 0;
+    uint32_t ID             = DB_ID_NONE;
     uint32_t contactID      = 0;
     UTF8 country            = "";
     UTF8 city               = "";
