@@ -181,7 +181,7 @@ If time support is used, the following function must be supplied:
 	time_t FreeRTOS_time( time_t *pxTime );
 
 FreeRTOS_time has the same semantics as the standard time() function. */
-#define	ffconfigTIME_SUPPORT 0
+#define	ffconfigTIME_SUPPORT 1
 
 /* Set to 1 if the media is removable (such as a memory card).
 
@@ -307,7 +307,7 @@ FAT type. */
 Note that the value of this define is directly related to the maximum stack
 use of the +FAT library. In some API's, a character buffer of size
 'ffconfigMAX_FILENAME' will be declared on stack. */
-#define	ffconfigMAX_FILENAME 64
+#define	ffconfigMAX_FILENAME 128
 
 /* Ensure the SDIO driver uses and interrupt, rather than polled mode. */
 #define ffconfigSDIO_DRIVER_USES_INTERRUPT 1
