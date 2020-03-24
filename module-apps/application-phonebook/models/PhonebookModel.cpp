@@ -170,5 +170,4 @@ gui::ListItem *PhonebookModel::getItem(
             return item;
         }
     }
-    return nullptr;
 }
