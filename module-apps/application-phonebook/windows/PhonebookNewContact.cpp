@@ -545,7 +545,7 @@ namespace gui
                 return (true);
             }
         }
-        else if (contact->dbID > 0) {
+        else if (contact->ID > 0) {
             if (DBServiceAPI::ContactUpdate(application, record) == false) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return (false);
