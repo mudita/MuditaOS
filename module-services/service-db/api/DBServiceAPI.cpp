@@ -255,7 +255,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Service *serv, uint32_t contactID)
 {
     ContactRecord rec;
-    rec.dbID = contactID;
+    rec.ID = contactID;
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByID, rec);
 

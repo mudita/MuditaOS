@@ -125,9 +125,9 @@ namespace gui
         // pointer to the last visible line.
         std::list<TextLine *>::iterator lastLine = textLines.end();
         // row where cursor is located ( 0 - first row from top )
-        int32_t cursorRow = 0;
+        uint32_t cursorRow = 0;
         // column where cursor is located( 0 - position before first character in the line )
-        int32_t cursorColumn = 0;
+        uint32_t cursorColumn = 0;
 
         Rect *cursor = nullptr;
 

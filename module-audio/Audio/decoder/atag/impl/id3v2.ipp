@@ -142,7 +142,7 @@ tag::frame parse_frame_body(const frame_header& header, Ptr s)
 inline bool is_frame_header_valid(const frame_header& header) noexcept
 {
     // TODO
-    return (header.id != -1) && (header.size > 0);
+    return (header.id != std::numeric_limits<char>::max() && (header.size > 0));
 }
 
 template<typename Source>

@@ -35,7 +35,6 @@ UCS2::UCS2(const UTF8 &string)
     this->clear();
 
     for (uint32_t i = 0; i < string.length(); i++) {
-        uint32_t decodedSize;
         uint32_t utfChar = string[i];
 
         //		LOG_INFO("decoded uft %x", ucs2char);
@@ -58,7 +57,7 @@ UCS2::UCS2(const std::string &string)
     length        = 0;
 
     for (unsigned int i = 0; i < string.size() / 4; i++) {
-        uint16_t ucs2char;
+        uint16_t ucs2char = 0;
         try {
             ucs2char = std::stoi(string.substr(i * 4, 4), 0, 16);
         }

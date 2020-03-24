@@ -214,16 +214,16 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 // TODO: map these to <stdint.h>
 
 #ifdef LWIP_DEBUG
-#define U8_F  "c"
-#define S8_F  "c"
-#define X8_F  "02x"
-#define U16_F "u"
-#define S16_F "d"
-#define X16_F "x"
-#define U32_F "u"
-#define S32_F "d"
-#define X32_F "x"
-#define SZT_F "u"
+// #define U8_F  "c"
+// #define S8_F  "c"
+// #define X8_F  "02x"
+// #define U16_F "u"
+// #define S16_F "d"
+// #define X16_F "x"
+// #define U32_F "lu"
+// #define S32_F "ld"
+// #define X32_F "x"
+// #define SZT_F "lu"
 #endif
 
 #if (LWIP_DNS || LWIP_IGMP || LWIP_IPV6) && !defined(LWIP_RAND)

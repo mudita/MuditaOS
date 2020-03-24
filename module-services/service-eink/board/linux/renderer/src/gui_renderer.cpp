@@ -36,13 +36,11 @@ typedef struct
 uint8_t *createSHMBuffer(std::string name)
 {
     shared_memory *shared_mem_ptr;
-    int fd_shm, fd_log;
-    bool initNeeded = true;
+    int fd_shm;
 
     // check if shared memory blok is already created
     if ((fd_shm = shm_open(name.c_str(), O_RDWR | O_CREAT, 0660)) == -1) {
         std::cerr << "shm is already created" << std::endl;
-        initNeeded = false;
     }
     else {
         std::cout << "shm created" << std::endl;
@@ -70,7 +68,6 @@ int createFIFO(void)
         fd = open(myfifo, O_WRONLY);
     }
 
-    int error = errno;
     std::cerr << "mkfifo " << strerror(errno) << " " << myfifo << std::endl;
     //	ENOENT
 
@@ -88,7 +85,6 @@ int createBattFifo(void)
         fd = open(myfifo, O_WRONLY);
     }
 
-    int error = errno;
     std::cerr << "mkfifo " << strerror(errno) << " " << myfifo << std::endl;
     //	ENOENT
 

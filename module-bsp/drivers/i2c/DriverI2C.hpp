@@ -40,7 +40,7 @@ namespace drivers
       public:
         static std::shared_ptr<DriverI2C> Create(const I2CInstances inst, const DriverI2CParams &params);
 
-        DriverI2C(const DriverI2CParams &params, const I2CInstances inst) : parameters(params), instance(inst)
+        DriverI2C(const DriverI2CParams &params, const I2CInstances inst) : instance(inst), parameters(params)
         {}
 
         virtual ~DriverI2C()

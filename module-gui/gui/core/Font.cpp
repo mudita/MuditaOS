@@ -397,7 +397,7 @@ namespace gui
 
         unsupported->data = renderCtx->getData();
 
-        return std::move(unsupported);
+        return unsupported;
     }
 
     FontManager::FontManager()

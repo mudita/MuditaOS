@@ -1,13 +1,14 @@
 #pragma once
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
+#include "Record.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
 
 struct CodesTableRow
 {
-    uint32_t id;
+    uint32_t ID = DB_ID_NONE;
     uint32_t mcc;
     uint32_t mnc;
     std::string iso;

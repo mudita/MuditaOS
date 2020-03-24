@@ -13,16 +13,17 @@
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
 #include "Table.hpp"
+#include "Record.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
 
 struct ContactsNameTableRow
 {
-    uint32_t ID;
-    uint32_t contactID;
-    UTF8 namePrimary;
-    UTF8 nameAlternative;
-    uint32_t favourite;
+    uint32_t ID          = 0;
+    uint32_t contactID   = 0;
+    UTF8 namePrimary     = "";
+    UTF8 nameAlternative = "";
+    uint32_t favourite   = 0;
 };
 
 enum class ContactNameTableFields

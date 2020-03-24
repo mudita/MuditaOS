@@ -16,7 +16,7 @@ namespace audio
     EncoderWAV::EncoderWAV(const char *fileName, const Encoder::Format &frmt) : Encoder(fileName, frmt)
     {
 
-        WAVE_FormatTypeDef WaveFormat = {0};
+        WAVE_FormatTypeDef WaveFormat = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         /* Initialize the encoder structure */
         WaveFormat.SampleRate    = format.sampleRate; /* Audio sampling frequency */

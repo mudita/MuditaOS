@@ -332,7 +332,7 @@ namespace gui
                 // All the perimeter points have already been printed
                 if (x <= y) {
 
-                    int16_t pointsLeft;
+                    int16_t pointsLeft = 0;
                     int indexOut = index;
                     if (x == y) {
                         // we have a central point. it can be drawn with either type of line
@@ -344,7 +344,6 @@ namespace gui
                         pointsLeft = index;
                         // we don't have a central point. halves are alike
                         index--;
-                        indexOut;
                         middleIndex = index;
                     }
                     int xValue = 0; // Px[index];

@@ -17,9 +17,6 @@ NotesRecordInterface::~NotesRecordInterface()
 
 bool NotesRecordInterface::Add(const NotesRecord &rec)
 {
-
-    uint32_t contactID = 0;
-
     // Create SMS
     notesDB->notes.Add(NotesTableRow{.date = rec.date, .snippet = rec.snippet, .path = rec.path});
 

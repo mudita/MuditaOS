@@ -357,7 +357,7 @@ namespace gui
         if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
             setTitle(contact->primaryName + " " + contact->alternativeName);
 
-        if (contact->speeddial >= 0 && contact->speeddial < 10) {
+        if (contact->speeddial < 10) {
             speedDial->setText(std::to_string(contact->speeddial));
         }
         else {

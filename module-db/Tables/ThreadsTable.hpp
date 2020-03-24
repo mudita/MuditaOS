@@ -17,7 +17,7 @@
 
 struct ThreadsTableRow
 {
-    uint32_t ID;
+    uint32_t ID = 0;
     uint32_t date;
     uint32_t msgCount;
     uint32_t msgRead;

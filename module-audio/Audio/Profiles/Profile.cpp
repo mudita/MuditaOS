@@ -60,7 +60,7 @@ namespace audio
                      const bsp::AudioDevice::Format &fmt,
                      bsp::AudioDevice::Type devType,
                      std::function<int32_t()> callback)
-        : name(name), type(type), audioFormat(fmt), audioDeviceType(devType), dbAccessCallback(callback)
+        : audioFormat(fmt), audioDeviceType(devType), name(name), type(type), dbAccessCallback(callback)
     {}
 
     void Profile::SetInputGain(float gain)

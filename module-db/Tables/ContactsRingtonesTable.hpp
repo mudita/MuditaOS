@@ -15,12 +15,19 @@
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
+#include "Record.hpp"
 
-struct ContactsRingtonesTableRow
+struct ContactsRingtonesTableRow : public Record
 {
-    uint32_t ID;
-    uint32_t contactID;
-    UTF8 assetPath;
+    uint32_t contactID = DB_ID_NONE;
+    UTF8 assetPath     = "";
+    ContactsRingtonesTableRow(uint32_t ID = DB_ID_NONE, uint32_t contactID = 0, UTF8 assetPath = "")
+        : contactID(contactID), assetPath(assetPath)
+    {
+        this->ID = ID;
+    }
+    ContactsRingtonesTableRow(uint32_t contactID, UTF8 assetPath) : contactID(contactID), assetPath(assetPath)
+    {}
 };
 
 enum class ContactRingtonesTableFields

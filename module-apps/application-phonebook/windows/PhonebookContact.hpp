@@ -10,17 +10,17 @@
 #include <string>
 #include <widgets/BoxLayout.hpp>
 
-static inline const bool isValidName(const UTF8 name)
+static inline bool isValidName(const UTF8 name)
 {
     return (name.length() > 0);
 }
 
-static inline const bool isValidNumber(const UTF8 number)
+static inline bool isValidNumber(const UTF8 number)
 {
     return (number.length() > 3);
 }
 
-static inline const bool isValidEmail(const UTF8 email)
+static inline bool isValidEmail(const UTF8 email)
 {
     return (email.length() > 4);
 }
