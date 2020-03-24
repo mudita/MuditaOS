@@ -13,6 +13,7 @@
 #include "Common/Common.hpp"
 #include "Database/Database.hpp"
 #include "Table.hpp"
+#include "Record.hpp"
 #include "utf8/UTF8.hpp"
 #include <string>
 

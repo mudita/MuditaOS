@@ -9,13 +9,14 @@
 #pragma once
 
 #include "Table.hpp"
+#include "Record.hpp"
 #include "Database/Database.hpp"
 #include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
 
 struct NotesTableRow
 {
-    uint32_t ID = 0;
+    uint32_t ID = DB_ID_NONE;
     uint32_t date;
     UTF8 snippet; // up to 60 characters
     UTF8 path;
