@@ -104,8 +104,7 @@ gui::ListItem *PhonebookModel::getItem(
             }
             else {
                 std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
-                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))
-                {
+                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
@@ -147,8 +146,7 @@ gui::ListItem *PhonebookModel::getItem(
                 std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
                 if (remaining == 0) {
                     // previous element has the same first character of alternative name so display first character
-                    if (index == prevIndex)
-                    {
+                    if (index == prevIndex) {
                         item->markFavourite(false);
                         item->setContact(contact);
                         item->setID(index);
@@ -157,8 +155,8 @@ gui::ListItem *PhonebookModel::getItem(
                         item->setValue(prevContact->primaryName.substr(0, 1));
                     }
                 }
-                else if (((index == firstElement) || (index == prevIndex) || (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))))
-                {
+                else if (((index == firstElement) || (index == prevIndex) ||
+                          (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)))) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
