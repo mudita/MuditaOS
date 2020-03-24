@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Table.hpp"
+#include "Record.hpp"
 #include "Database/Database.hpp"
 #include "utf8/UTF8.hpp"
 #include "Common/Common.hpp"
@@ -35,7 +36,7 @@ enum class PresentationType
 
 struct CalllogTableRow
 {
-    uint32_t id;
+    uint32_t ID = DB_ID_NONE;
     UTF8 number;
     PresentationType presentation;
     time_t date;
