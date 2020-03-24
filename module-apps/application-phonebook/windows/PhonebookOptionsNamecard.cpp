@@ -16,7 +16,7 @@
 #include "i18/i18.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 PhonebookOptionsNamecard::PhonebookOptionsNamecard(app::Application *app) : AppWindow(app, "OptionsNamecard")
 {

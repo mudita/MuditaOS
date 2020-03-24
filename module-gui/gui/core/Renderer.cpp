@@ -20,7 +20,7 @@ extern "C"
 #include "ImageManager.hpp"
 #include "../Common.hpp"
 // utils
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 #include "PixMap.hpp"
 #include "VecMap.hpp"

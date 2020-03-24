@@ -6,7 +6,7 @@
  */
 
 #include "BoxLayout.hpp"
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 #include <Label.hpp>
 

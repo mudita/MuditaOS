@@ -15,7 +15,7 @@
 #include <fcntl.h>
 
 #include "../gui/core/ImageManager.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "utf8/UTF8.hpp"
 #include "vfs.hpp"
 

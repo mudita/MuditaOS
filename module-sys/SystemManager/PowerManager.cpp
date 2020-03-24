@@ -7,7 +7,7 @@
  *  @details
  */
 
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 
 #include "PowerManager.hpp"
 

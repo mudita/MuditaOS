@@ -11,7 +11,7 @@
 
 #include "linux_audiocodec.hpp"
 
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 namespace bsp
 {

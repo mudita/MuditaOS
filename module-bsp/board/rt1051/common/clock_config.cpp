@@ -51,7 +51,7 @@
 #include "fsl_iomuxc.h"
 #include "fsl_dcdc.h"
 #include "fsl_gpc.h"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 
 /*******************************************************************************
  * Definitions

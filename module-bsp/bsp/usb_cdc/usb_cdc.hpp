@@ -10,7 +10,7 @@ extern "C"
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
-#include <segger/log/log.hpp>
+#include <log/log.hpp>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>

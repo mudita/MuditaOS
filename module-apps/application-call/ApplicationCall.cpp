@@ -11,7 +11,7 @@
 
 #include "MessageType.hpp"
 #include "data/CallSwitchData.hpp"
-#include "segger/log/log.hpp"
+#include "log/log.hpp"
 #include "time/time_conversion.hpp"
 #include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
