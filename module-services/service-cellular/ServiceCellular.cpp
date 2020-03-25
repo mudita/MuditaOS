@@ -57,8 +57,8 @@ const char *State::c_str(State::ST state)
     switch (state) {
     case ST::Idle:
         return "Idle";
-    case ST::PowerUpInProgress:
-        return "PowerUpInProgress";
+    case ST::PowerUpProcedure:
+        return "PowerUpProcedure";
     case ST::AudioConfigurationProcedure:
         return "AudioConfigurationProcedure";
     case ST::ModemOn:
@@ -69,9 +69,11 @@ const char *State::c_str(State::ST state)
         return "Failed";
     case ST::SanityCheck:
         return "SanityCheck";
+    case ST::SimInit:
+        return "SimInit";
     case ST::ModemFatalFailure:
         return "ModemFatalFailure";
-    case ST::CellularStartConfProcedure:
+    case ST::CellularConfProcedure:
         return "CellularStartConfProcedure";
     }
     return "";
@@ -155,7 +157,7 @@ void ServiceCellular::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
     // cmux = new TS0710(PortSpeed_e::PS460800, this);
-    state.set(this, State::ST::PowerUpInProgress);
+    state.set(this, State::ST::PowerUpProcedure);
     return sys::ReturnCodes::Success;
 }
 
@@ -188,46 +190,49 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
     assert(msg);
     switch(msg->request) {
         case State::ST::Idle:
-            idle();
+            handle_idle();
             break;
-        case State::ST::PowerUpInProgress:
-            power_up_procedure();
+        case State::ST::PowerUpProcedure:
+            handle_power_up_procedure();
             break;
         case State::ST::AudioConfigurationProcedure:
-            audio_conf_procedure();
+            handle_audio_conf_procedure();
             break;
-        case State::ST::CellularStartConfProcedure:
-            start_conf_procedure();
+        case State::ST::CellularConfProcedure:
+            handle_start_conf_procedure();
             break;
         case State::ST::SanityCheck:
-            sim_sanity_check();
+            handle_sim_sanity_check();
+            break;
+        case State::ST::SimInit:
+            handle_sim_init();
             break;
         case State::ST::SimSelect:
-            select_sim();
+            handle_select_sim();
             break;
         case State::ST::ModemOn:
-            modem_on();
+            handle_modem_on();
             break;
         case State::ST::ModemFatalFailure:
-            fatal_failure();
+            handle_fatal_failure();
             break;
         case State::ST::Failed:
-            failure();
+            handle_failure();
             break;
         };
 }
 
-bool ServiceCellular::idle()
+bool ServiceCellular::handle_idle()
 {
     LOG_DEBUG("Idle");
     return true;
 }
 
-bool ServiceCellular::power_up_procedure()
+bool ServiceCellular::handle_power_up_procedure()
 {
     auto ret = cmux->PowerUpProcedure();
     if (ret == TS0710::ConfState::Success) {
-        state.set(this, State::ST::CellularStartConfProcedure);
+        state.set(this, State::ST::CellularConfProcedure);
         return true;
     }
     else if (ret == TS0710::ConfState::PowerUp) {
@@ -238,7 +243,7 @@ bool ServiceCellular::power_up_procedure()
     return false;
 }
 
-bool ServiceCellular::start_conf_procedure()
+bool ServiceCellular::handle_start_conf_procedure()
 {
     // Start configuration procedure, if it's first run modem will be restarted
     auto confRet = cmux->ConfProcedure();
@@ -250,7 +255,7 @@ bool ServiceCellular::start_conf_procedure()
     return false;
 }
 
-bool ServiceCellular::audio_conf_procedure()
+bool ServiceCellular::handle_audio_conf_procedure()
 {
     auto audioRet = cmux->AudioConfProcedure();
     if (audioRet == TS0710::ConfState::Success) {
@@ -333,9 +338,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
-            /// TODO this should be removed with T4
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
-                state.set(this, State::ST::CellularStartConfProcedure);
+                state.set(this, State::ST::CellularConfProcedure);
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
@@ -362,8 +366,8 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             } break;
             case CellularNotificationMessage::Type::SIM:
-                if (Store::GSM::get()->tray == Store::GSM::Tray::IN && !init_sim()) {
-                    LOG_ERROR("SIM initialization failure!");
+                if (Store::GSM::get()->tray == Store::GSM::Tray::IN) {
+                    state.set(this, cellular::State::ST::SimInit);
                 }
                 break;
             default: {
@@ -1012,7 +1016,7 @@ bool sim_check_hot_swap(DLC_channel *chanel)
     return !reboot_needed;
 }
 
-bool ServiceCellular::sim_sanity_check()
+bool ServiceCellular::handle_sim_sanity_check()
 {
     auto ret = sim_check_hot_swap(cmux->get(TS0710::Channel::Commands));
     if (ret) {
@@ -1025,7 +1029,7 @@ bool ServiceCellular::sim_sanity_check()
     return ret;
 }
 
-bool ServiceCellular::select_sim()
+bool ServiceCellular::handle_select_sim()
 {
 
     bsp::cellular::sim::sim_sel();
@@ -1050,17 +1054,18 @@ bool ServiceCellular::select_sim()
     return true;
 }
 
-bool ServiceCellular::modem_on()
+bool ServiceCellular::handle_modem_on()
 {
     state.set(this, State::ST::Idle);
     return true;
 }
 
-bool ServiceCellular::init_sim()
+bool ServiceCellular::handle_sim_init()
 {
     auto channel = cmux->get(TS0710::Channel::Commands);
     if (channel == nullptr) {
         LOG_ERROR("Cant configure sim! no Commands channel!");
+        state.set(this, State::ST::Failed);
         return false;
     }
     bool success = true;
@@ -1069,17 +1074,21 @@ bool ServiceCellular::init_sim()
     success      = channel->cmd(at::AT::SMS_UCSC2) && success;
     success      = channel->cmd(at::AT::SMS_STORAGE) && success;
     success      = channel->cmd(at::AT::CRC_ON) && success;
+
+    if (!success) {
+        LOG_ERROR("SIM initialization failure!");
+    }
     state.set(this, State::ST::Idle);
     return success;
 }
 
-bool ServiceCellular::failure()
+bool ServiceCellular::handle_failure()
 {
     state.set(this, State::ST::Idle);
     return true;
 }
 
-bool ServiceCellular::fatal_failure()
+bool ServiceCellular::handle_fatal_failure()
 {
     LOG_FATAL("Await for death!");
     while (true) {

@@ -36,8 +36,6 @@ class CellularNotificationMessage : public CellularMessage
         Ringing,      // user provided number to call to and service initialized calling procedure.
         NewIncomingSMS,       // device received new sms from network. (what about sms delivery reports?).
         SignalStrengthUpdate, // update of the strength of the network's signal.
-        ServiceReady, // Idle state of the service. This is a start state before any call is initialized by user or by
-                      // network. service returns to this state when call is finished.
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
         SIM,                      // change on SIM from URC

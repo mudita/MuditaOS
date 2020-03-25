@@ -85,34 +85,28 @@ class ServiceCellular : public sys::Service
     /// @{
 
     /// idle handler
-    bool idle();
-
+    bool handle_idle();
     /// cellular power up procedure
-    bool power_up_procedure();
-
-    /// TODO docs for that
-    bool start_conf_procedure();
-
-    /// TODO docs for that
-    bool audio_conf_procedure();
-
+    bool handle_power_up_procedure();
+    /// configure basic modem parameters
+    bool handle_start_conf_procedure();
+    /// configure modem audio parameters
+    bool handle_audio_conf_procedure();
     /// modem on event is used in desktop to follow up sim selection
-    bool modem_on();
-
+    bool handle_modem_on();
     /// check one time modem configuration for sim (hot swap)
-    /// if hot swap is not eanbled full modem restart is needed (right now at best reboot)
-    bool sim_sanity_check();
+    /// if hot swap is not enabled full modem restart is needed (right now at best reboot)
+    bool handle_sim_sanity_check();
     /// select sim from settings
-    bool select_sim();
+    bool handle_select_sim();
     /// initialize sim (GSM commands for initialization)
-    bool init_sim();
-
+    bool handle_sim_init();
     /// modem failure handler
-    bool failure();
-
+    bool handle_failure();
     /// fatal failure handler, if we have power switch - we could handle it here
     /// \note some run state should be added to ignore non system messages now...
-    bool fatal_failure();
+    bool handle_fatal_failure();
+
     /// @}
 };
 
