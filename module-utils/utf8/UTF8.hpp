@@ -49,6 +49,7 @@ class UTF8
     UTF8(const char *str);
     UTF8(const std::string &str);
     UTF8(const UTF8 &utf);
+    UTF8(UTF8 &&utf);
     static const uint32_t npos;
 
     virtual ~UTF8();
