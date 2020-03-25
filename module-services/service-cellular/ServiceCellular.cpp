@@ -81,6 +81,7 @@ const char *State::c_str(State::ST state)
 
 void State::set(ServiceCellular *owner, ST state)
 {
+    assert(owner);
     LOG_DEBUG("GSM state: (%s) -> (%s)", c_str(this->state), c_str(state));
     this->state = state;
     auto msg    = std::make_shared<StateChange>(state);
@@ -156,7 +157,6 @@ void ServiceCellular::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-    // cmux = new TS0710(PortSpeed_e::PS460800, this);
     state.set(this, State::ST::PowerUpProcedure);
     return sys::ReturnCodes::Success;
 }
