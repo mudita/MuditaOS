@@ -160,6 +160,13 @@ UTF8::UTF8(const UTF8 &utf)
 #endif
 }
 
+UTF8::UTF8(UTF8 &&utf)
+    : data{utf.data}, sizeAllocated{utf.sizeAllocated}, sizeUsed{utf.sizeUsed}, strLength{utf.strLength}, lastIndex{0},
+      lastIndexData{data}
+{
+    utf.data = nullptr;
+}
+
 UTF8::UTF8(const uint8_t *data, const uint32_t allocated, const uint32_t used, const uint32_t len)
     : sizeAllocated{allocated}, sizeUsed{used}, strLength{len}, lastIndex{0}
 {

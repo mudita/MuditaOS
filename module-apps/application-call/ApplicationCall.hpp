@@ -4,10 +4,10 @@
 #include "Service/Message.hpp"
 #include "SystemManager/SystemManager.hpp"
 #include <service-cellular/api/CellularServiceAPI.hpp>
+#include <time/time_conversion.hpp>
 
 namespace app
 {
-
     inline const std::string name_call = "ApplicationCall";
     namespace window
     {
@@ -16,9 +16,7 @@ namespace app
         inline const std::string name_emergencyCall     = "EmergencyCallWindow";
         inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
     } // namespace window
-    /*
-     *
-     */
+
     class ApplicationCall : public Application
     {
       private:
@@ -30,10 +28,9 @@ namespace app
       protected:
         std::string phoneNumber;
         AppTimer timerCall;
-        time_t callStartTime = std::numeric_limits<time_t>::max();
-        ;
-        time_t callDuration        = 0;
-        time_t callDelayedDuration = std::numeric_limits<time_t>::max();
+        utils::time::Timestamp callStartTime      = 0;
+        utils::time::Duration callDuration;
+        utils::time::Timestamp callDelayedStopTime = 0;
         void timerCallCallback();
 
       public:
@@ -57,5 +54,4 @@ namespace app
         void runCallTimer();
         void stopCallTimer();
     };
-
 } /* namespace app */

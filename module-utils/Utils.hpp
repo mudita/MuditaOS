@@ -3,6 +3,7 @@
 #include <algorithm> // std::find_if_not
 #include <log/log.hpp>
 #include <sstream>
+#include <iomanip>
 
 namespace utils
 {
@@ -80,10 +81,20 @@ namespace utils
         return rtrim(ltrim(s));
     }
 
-    template <typename T> std::string to_string(T Number)
+    template <typename T> std::string to_string(T t, size_t minStringLength = 0)
     {
+        constexpr auto leadingDigit = '0';
         std::ostringstream ss;
-        ss << Number;
+        ss << std::setfill(leadingDigit) << std::setw(minStringLength) << t;
         return ss.str();
+    }
+
+    static inline void findAndReplaceAll(std::string &data, std::string toSearch, std::string replaceStr)
+    {
+        size_t pos = data.find(toSearch);
+        while (pos != std::string::npos) {
+            data.replace(pos, toSearch.size(), replaceStr);
+            pos = data.find(toSearch, pos + replaceStr.size());
+        }
     }
 } // namespace utils

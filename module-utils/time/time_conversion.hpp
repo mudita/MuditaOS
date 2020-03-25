@@ -14,6 +14,12 @@ namespace utils
     namespace time
     {
 
+        constexpr auto secondsInMinute = 60;
+        constexpr auto minutesInHour   = 60;
+        constexpr auto hoursInday      = 24;
+        constexpr auto secondsInHour   = minutesInHour * secondsInMinute;
+        constexpr auto secondsInDay    = hoursInday * secondsInHour;
+
         enum class GetParameters
         {
             Hour,
@@ -26,13 +32,13 @@ namespace utils
         // helper class to not put everything in time
         struct Localer
         {
-            const unsigned int abbrev_len = 3;
+            const inline static unsigned int abbrev_len = 3;
             /// order matters, it's used in replace_locale with enum Replacements
-            const std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
-                                                                     "%A",  // day long
-                                                                     "%b",  // month abbrew
-                                                                     "%B",  // month long
-                                                                     "%Z"}; // timezone
+            const inline static std::vector<std::string> specifiers_replacement = {"%a",  // day abbrew
+                                                                                   "%A",  // day long
+                                                                                   "%b",  // month abbrew
+                                                                                   "%B",  // month long
+                                                                                   "%Z"}; // timezone
             /// see specifiers_replacements description above
             enum Replacements
             {
@@ -46,6 +52,8 @@ namespace utils
             UTF8 get_replacement(Replacements val, const struct tm &timeinfo);
         };
 
+        class Duration; // fw decl
+
         class Timestamp : protected Localer
         {
           protected:
@@ -58,9 +66,6 @@ namespace utils
             {
                 return nullptr;
             }
-
-            static const uint32_t datasize = 128;
-            char data[datasize];
 
             /// replace day mon specifiers (first 2 characters)
             /// cant use std::replace -> due to fact that it doesn't support multiple element replace (or i cant find
@@ -101,6 +106,35 @@ namespace utils
                 os << t.str();
                 return os;
             }
+            friend Duration operator-(const Timestamp &lhs, const Timestamp &rhs);
+            friend Timestamp operator-(const Timestamp &lhs, const Duration &rhs);
+            friend Timestamp operator+(const Timestamp &lhs, const Duration &rhs);
+            friend Timestamp operator+(const Duration &lhs, const Timestamp &rhs);
+
+            friend inline bool operator==(const Timestamp &lhs, const Timestamp &rhs)
+            {
+                return lhs.time == rhs.time;
+            }
+            friend inline bool operator!=(const Timestamp &lhs, const Timestamp &rhs)
+            {
+                return lhs.time != rhs.time;
+            }
+            friend inline bool operator<(const Timestamp &lhs, const Timestamp &rhs)
+            {
+                return lhs.time < rhs.time;
+            }
+            friend inline bool operator>(const Timestamp &lhs, const Timestamp &rhs)
+            {
+                return lhs.time > rhs.time;
+            }
+            friend inline bool operator<=(const Timestamp &lhs, const Timestamp &rhs)
+            {
+                return lhs.time <= rhs.time;
+            }
+            friend inline bool operator>=(const Timestamp &lhs, const Timestamp &rhs)
+            {
+                return lhs.time >= rhs.time;
+            }
 
             /// get Time in any format possible via strftime
             virtual UTF8 str(std::string format = "");
@@ -112,7 +146,7 @@ namespace utils
             UTF8 month(bool abbrev = false);
 
             // get timestamp value
-            time_t getTime(void)
+            time_t getTime() const
             {
                 return time;
             };
@@ -167,5 +201,109 @@ namespace utils
             Time(time_t val = 0, bool date_format_long = true) : DateTime(val, date_format_long){};
             virtual UTF8 str(std::string format = "") final;
         };
-    }; // namespace time
-};     // namespace utils
+
+        class Duration
+        {
+          public:
+            /// Duration display format is generally in a form of hh:mm::ss or mm::ss with and without leading 0s
+            /// @note hh may exceed 24, mm may exceed 60
+            ///
+            /// All the predefined format are stored in language json files.
+            /// They are configurable by string replacement specifiers with (e.g. %0H) and without (e.g. %H) leading 0s.
+            /// * %H / %0H - hours
+            /// * %M / %0M - minutes
+            /// * %N / %0N - hours and minutes (in minutes)
+            /// * %S / %0S - seconds
+            enum class DisplayedFormat
+            {
+                Fixed0M0S,  /// fixed format                          e.g.   00:00,   01:01,   12:12,   89:01,  1643:14
+                FixedH0M0S, /// fixed format                          e.g. 0:00:00, 0:01:01, 0:12:12, 1:29:01, 27:23:14
+                AutoM,      /// auto format without leading 0 in min  e.g.    0:00,    1:01,   12:12, 1:29:01, 27:23:14
+                Auto0M      /// auto format with leading 0 in min     e.g.   00:00,   01:01,   12:12, 1:29:01, 27:23:14
+            };
+
+            Duration(time_t duration = 0);
+            Duration(time_t stop, time_t start);
+            Duration(const Timestamp &stop, const Timestamp &start);
+
+            time_t get() const
+            {
+                return duration;
+            }
+
+            UTF8 str(DisplayedFormat displayedFormat = DisplayedFormat::Auto0M) const;
+
+            // uses default format
+            friend inline std::ostream &operator<<(std::ostream &os, Duration t)
+            {
+                os << t.str();
+                return os;
+            }
+
+            friend Timestamp operator-(const Timestamp &lhs, const Duration &rhs);
+            friend Timestamp operator+(const Timestamp &lhs, const Duration &rhs);
+            friend Timestamp operator+(const Duration &lhs, const Timestamp &rhs);
+
+            friend inline Duration operator+(const Duration &lhs, const Duration &rhs)
+            {
+                return Duration(lhs.duration + rhs.duration);
+            }
+            friend inline Duration operator-(const Duration &lhs, const Duration &rhs)
+            {
+                return Duration(lhs.duration > rhs.duration ? lhs.duration - rhs.duration : 0);
+            }
+            friend inline bool operator==(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration == rhs.duration;
+            }
+            friend inline bool operator!=(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration != rhs.duration;
+            }
+            friend inline bool operator<(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration < rhs.duration;
+            }
+            friend inline bool operator>(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration > rhs.duration;
+            }
+            friend inline bool operator<=(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration <= rhs.duration;
+            }
+            friend inline bool operator>=(const Duration &lhs, const Duration &rhs)
+            {
+                return lhs.duration >= rhs.duration;
+            }
+
+          private:
+            static constexpr bool verboseConversion             = false; // debug switch
+            static const inline std::string durationFormatH0M0S = "duration_hour_0min_0sec";
+            static const inline std::string durationFormat0M0S  = "duration_0min_0sec";
+            static const inline std::string durationFormat0N0S  = "duration_0hmin_0sec";
+            static const inline std::string durationFormatM0S   = "duration_min_0sec";
+
+            struct Format
+            {
+                const std::string lowFormat;  /// format used if duration is below 1 hour
+                const std::string highFormat; /// format used if duration exceeds 1 hour
+            };
+            using FormatMap                         = std::map<const DisplayedFormat, const Format>;
+            static const inline FormatMap formatMap = {
+                {DisplayedFormat::Fixed0M0S, {durationFormat0N0S, durationFormat0N0S}},
+                {DisplayedFormat::FixedH0M0S, {durationFormatH0M0S, durationFormatH0M0S}},
+                {DisplayedFormat::AutoM, {durationFormatM0S, durationFormatH0M0S}},
+                {DisplayedFormat::Auto0M, {durationFormat0M0S, durationFormatH0M0S}}};
+
+            void fillStr(std::string &formatlong) const;
+            void calculate();
+            time_t duration         = 0;
+            unsigned long hours     = 0;
+            unsigned long hmminutes = 0;
+            unsigned long minutes   = 0;
+            unsigned long seconds   = 0;
+        };
+
+    } // namespace time
+} // namespace utils

@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <widgets/BoxLayout.hpp>
+#include <Utils.hpp>
 
 static inline bool isValidName(const UTF8 name)
 {
@@ -30,23 +31,20 @@ static inline const std::string formatContactName(std::shared_ptr<ContactRecord>
     return (contact->primaryName + " " + contact->alternativeName);
 }
 
-static inline void findAndReplaceAll(std::string &data, std::string toSearch, std::string replaceStr)
+static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
 {
-    size_t pos = data.find(toSearch);
-    while (pos != std::string::npos) {
-        data.replace(pos, toSearch.size(), replaceStr);
-        pos = data.find(toSearch, pos + replaceStr.size());
+    if (contact.get() == nullptr) {
+        return false;
     }
-}
-
-static inline void fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
-{
-    findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName);
-    findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
-    findAndReplaceAll(data, "$CONTACT_NAME$", formatContactName(contact));
-    findAndReplaceAll(data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberE164 : "");
-    findAndReplaceAll(data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberE164 : "");
-    findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", std::to_string(contact->speeddial));
+    utils::findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName);
+    utils::findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
+    utils::findAndReplaceAll(data, "$CONTACT_NAME$", formatContactName(contact));
+    utils::findAndReplaceAll(
+        data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberE164 : "");
+    utils::findAndReplaceAll(
+        data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberE164 : "");
+    utils::findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", std::to_string(contact->speeddial));
+    return true;
 }
 
 namespace gui
