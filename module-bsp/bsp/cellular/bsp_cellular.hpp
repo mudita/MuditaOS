@@ -76,8 +76,9 @@ namespace bsp {
 
         namespace status{
             enum class value {
-                GOOD,
-                BAD,
+                /// from the docs: When the module is turned on normally, the STATUS will present the low state.
+                ACTIVE,
+                INACTIVE,
             };
             /// returns true if status OK. Open drain pulled up; ground is OK.
             bsp::cellular::status::value getStatus();
