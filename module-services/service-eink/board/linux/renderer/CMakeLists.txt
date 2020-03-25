@@ -6,7 +6,7 @@ project( service_renderer VERSION 1.0
 
 find_package(PkgConfig REQUIRED)               
 pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
-                   
+
 add_executable( ${PROJECT_NAME} 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui_renderer.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/RArea.cpp
@@ -23,4 +23,5 @@ target_link_libraries( ${PROJECT_NAME} ${LIBRT} rt pthread )
 target_include_directories( ${PROJECT_NAME}  PUBLIC "${CMAKE_SOURCE_DIR}/"  )
 target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-deprecated-declarations")
 target_compile_options(${PROJECT_NAME} PUBLIC "-Wno-unused-result")
-
+message(WARNING "Please restore -Wno-error and -Wall flags with docker with gtk3 >= 3.24")
+target_compile_options(${PROJECT_NAME} PRIVATE -Wno-error -Wno-all)
