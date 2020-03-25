@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Interface/CalllogRecord.hpp"
+#include "time/time_conversion.hpp"
 #include <functional>
 #include <string>
 
@@ -72,7 +73,7 @@ namespace CellularCall
         bool isActiveCall = false;
         std::function<CalllogRecord(const CalllogRecord &rec)> startCallAction;
         std::function<bool(const CalllogRecord &rec)> endCallAction;
-        time_t startActiveTime = 0;
+        utils::time::Timestamp startActiveTime = 0;
 
         void setType(const CallType type)
         {
