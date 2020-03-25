@@ -68,7 +68,7 @@ else()
 endif()
 
 ###########################################
-#time conversion unit tests projeet
+#time conversion unit tests project
 project(unittest_module-utils_time VERSION 1.0
        DESCRIPTION "Module-utils time unit tests")
 
