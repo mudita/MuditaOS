@@ -9,12 +9,13 @@ namespace cellular
       public:
         enum class ST
         {
-            Idle,              /// does nothing
-            PowerUpInProgress, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state
-                               /// bases on URC without much thinking
-            CellularStartConfProcedure,  /// start configuration procedure
+            Idle,             /// does nothing
+            PowerUpProcedure, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state
+                              /// bases on URC without much thinking
+            CellularConfProcedure,       /// configuration procedure
             AudioConfigurationProcedure, /// audio configuration for modem (could be in ModemConfiguration)
             SanityCheck,                 /// prior to ModemOn last sanity checks for one time configurations etc
+            SimInit,                     /// initialize sim card
             ModemOn, /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
             ModemFatalFailure, /// modem full shutdown need
             SimSelect,         /// triggers hw SIM selection (! state now will be **changed on URC** )
