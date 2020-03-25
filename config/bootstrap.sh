@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 #####################################################################
 #
 #                   !!! WARNING !!!
@@ -8,7 +8,41 @@
 #     `sudo apt install ccache`
 # it's support is added to default ccache
 
-function installHooks(){
+# packages settings
+ARM_GCC="gcc-arm-none-eabi-9-2019-q4-major"
+ARM_GCC_PACKAGE_FILE="${ARM_GCC}-x86_64-linux.tar.bz2"
+ARM_GCC_SOURCE_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2?revision=108bd959-44bd-4619-9c19-26187abf5225&la=en&hash=E788CE92E5DFD64B2A8C246BBA91A249CB8E2D2D"
+ARM_GCC_PATH_VAR="${ARM_GCC//-/_}"
+
+CMAKE_DIR="cmake-3.17.0-Linux-x86_64"
+CMAKE_SOURCE_LINK="https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.tar.gz"
+CMAKE_PKG="${CMAKE_DIR}.tar.gz"
+CMAKE_PATH_VAR=${CMAKE_DIR//[-.]/_}
+
+
+
+function printVar(){
+    echo "$1: '${!1}'"
+}
+
+function add_to_path() {
+    echo -e "\e[32m${FUNCNAME[0]} $1 $2\e[0m"
+    TOOL_NAME=$1
+    TOOL_DIR=$2
+    BASH_RC="${HOME}/.bashrc"
+    TOOL_PATH_VAR="${TOOL_NAME}_PATH"
+    check_if_exists="`cat ${BASH_RC} | grep \"${TOOL_PATH_VAR}\"`"
+
+    if [[ -n ${check_if_exists} ]]; then
+        SED_SCRIPT="s%${TOOL_PATH_VAR}=\".*\"%${TOOL_PATH_VAR}=\"${TOOL_DIR}\"%"
+        sed -e "$SED_SCRIPT" -i ${BASH_RC}
+    else
+        echo "export ${TOOL_PATH_VAR}=\"${TOOL_DIR}\"" >> ${BASH_RC}
+        echo "PATH=\"\${${TOOL_PATH_VAR}:+\${${TOOL_PATH_VAR}}:}\${PATH}\"" >> ${BASH_RC}
+    fi
+}
+function install_hooks(){
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     echo -e "Install style checking hooks"
     options=('Automatic style update.'
              'Just notify me about style errors but do not apply it.'
@@ -41,45 +75,105 @@ function installHooks(){
     PS3=$CUR_PS3
 }
 
-function addIgnoreRevsForBlame() {
+function add_ignore_revs_for_blame() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     git config blame.ignoreRevsFile .gitblameignorerevs
 }
 
-echo "Install neccessary packages"
-sudo apt update && sudo apt dist-upgrade -y
-sudo apt install -y binutils wget git make pkg-config gtkmm-3.0 gcc-8 g++-8 portaudio19-dev
-sudo apt install -y --reinstall build-essential
+function setup_gcc_alternatives() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    echo "# set gcc-9 as default alternative (instead of default current in ubuntu)"
+    echo "sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9"
+}
 
-# names taken from catalogs in tar file
-ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
-CMAKEV='cmake-3.15.5-Linux-x86_64'
+function install_ubuntu_packages() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    echo "# Install neccessary packages more or less this should be complete list:"
+    echo binutils wget git make pkg-config gtkmm-3.0 gcc-9 g++-9 portaudio19-dev
+    echo "# for ubutnut 18.04 you can"
+    echo "sudo add-apt-repository ppa:ubuntu-toolchain-r/test"
+    echo "sudo apt update"
+    echo "sudo apt install gcc-9 g++-9"
+    echo "# "
+    echo "# don't forget to update alternatives:"
+    setup_gcc_alternatives
+}
 
-echo "Setup gcc, cmake etc..."
+function setup_arm_toolchain() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    pushd /tmp
+    echo "Download armgcc"
+    [[ ! -f $ARM_GCC ]] &&
+        wget --no-verbose --show-progress -O ${ARM_GCC_PACKAGE_FILE} ${ARM_GCC_SOURCE_LINK}
+    # untar to HOME
+    if [[ ! -d ${HOME}/${ARM_GCC} ]]; then
+        echo "extracting: ${ARM_GCC_PACKAGE_FILE} to ${HOME}"
+        tar -xjf ${ARM_GCC_PACKAGE_FILE} -C ${HOME}/
+    fi
+    echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
+    popd 
+}
 
-echo "Download armgcc"
-[[ ! -f $ARM_GCC ]] &&
-    wget --no-verbose -O ${ARM_GCC}.tgz https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2?revision=c34d758a-be0c-476e-a2de-af8c6e16a8a2?product=GNU%20Arm%20Embedded%20Toolchain,64-bit,,Linux,8-2019-q3-update
-# untar to HOME
-[[ ! -d ${HOME}/${ARM_GCC} ]] &&
-    tar -xf ${ARM_GCC}.tgz -C ${HOME}/
-echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
 
-[[ ! -f ${CMAKEV}.tgz ]] &&
-    wget --no-verbose -O ${CMAKEV}.tgz https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
-[[ ! -d ${HOME}/${CMAKEV} ]] &&
-    tar -xf ${CMAKEV}.tgz -C ${HOME}/
+function setup_cmake() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    pushd /tmp
+    [[ ! -f ${CMAKE_DIR}.tgz ]] &&
+        wget --no-verbose -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
+    [[ ! -d ${HOME}/${CMAKE_DIR} ]] &&
+        tar -xf ${CMAKE_PKG} -C ${HOME}/
+    popd
+    echo "CMAKEV installed to ${HOME}/${CMAKE_DIR} and set in PATH"
+}
 
-echo "Set path for cmake"
-echo 'export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
-export PATH="${HOME}/${CMAKEV}/bin:$PATH"
 
-echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
+BUILD_STEPS=(
+        install_hooks
+        add_ignore_revs_for_blame
+        install_ubuntu_packages
+        setup_arm_toolchain
+        setup_cmake
+        setup_gcc_alternatives
+        "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
+        "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_DIR}/bin"
+        )
 
-echo "set gcc-8 as default alternative (instead of default gcc-7 in ubuntu)"
-sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+if [ $# -eq 1 ]; then 
+    PARAM=$1
+    if [ "${PARAM:$(( ${#PARAM} - 1 )):1}" == "-" ]; then
+        START=${PARAM%*-}
+        END=${#BUILD_STEPS[@]}
+    else
+        START=${PARAM}
+        END=$(( ${PARAM} + 1 ))
+    fi
+else
+    echo "Available build steps:"
+    I=0
+    while [ $I -lt ${#BUILD_STEPS[@]} ]
+    do
+        echo -e "\t$I ${BUILD_STEPS[${I}]}"
+        I=$(( $I + 1 ))
+    done
+    echo -e "call:"
+    echo -e "\t ${0} <build step no>[-]"
+    echo -e "ex.:"
+    echo -e "\t ${0} 1\t\t\t- build step 1 (${BUILD_STEPS[1]})"
+    echo -e "\t ${0} 3\t\t\t- build step 3 (${BUILD_STEPS[3]})"
+    echo -e "\t ${0} 3-\t\t\t- build from step 3 to the end"
+    echo -e "\t ${0} 0-\t\t\t- build everything"
+    exit 1
+fi
+echo "START:${BUILD_STEPS[$START]}(${START})"
+echo "END:${BUILD_STEPS[$END]}(${END})"
 
-installHooks
-addIgnoreRevsForBlame
+I=${START}
+while [ ${I} -lt ${END} ]
+do
+    eval ${BUILD_STEPS[${I}]}
+    echo "${I}" > LAST_STEP
+    I=$(( ${I} + 1 ))
+done
 
-echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
-echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
+#echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
+#echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"

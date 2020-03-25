@@ -1,4 +1,4 @@
-set(TOOLCHAIN_PATH "<HOME>/gcc-arm-none-eabi-8-2019-q3-update/" CACHE INTERNAL "")
+set(TOOLCHAIN_PATH $ENV{gcc_arm_none_eabi_9_2019_q4_major_PATH} CACHE INTERNAL "")
 set(SERIAL_PORT_PATH "SERIAL_PORT=\"/dev/ttyUSB0\"" CACHE INTERNAL "")
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
