@@ -488,8 +488,8 @@ namespace bsp
                                                  DriverGPIOParams{});
                 auto state =
                     gpio_1->ReadPin(magic_enum::enum_integer(BoardDefinitions::CELLULAR_GPIO_1_STATUS_PIN)) == 0
-                        ? value::GOOD
-                        : value::BAD;
+                        ? value::ACTIVE
+                        : value::INACTIVE;
 
                 return state;
             }

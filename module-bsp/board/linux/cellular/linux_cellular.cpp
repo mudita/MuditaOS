@@ -223,7 +223,7 @@ namespace bsp
 
             bsp::cellular::status::value getStatus()
             {
-                return bsp::cellular::status::value::GOOD;
+                return bsp::cellular::status::value::ACTIVE;
             }
 
             BaseType_t statusIRQhandler()
