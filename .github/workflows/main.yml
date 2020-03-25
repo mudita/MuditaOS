@@ -27,8 +27,9 @@ jobs:
     - name: Build
       run: |
         sudo apt-get -q -y remove cmake
-        cat ~/.bashrc
         . ~/.bashrc
+        echo "gcc_arm_none_eabi_9_2019_q4_major_PATH: $gcc_arm_none_eabi_9_2019_q4_major_PATH"
+        export gcc_arm_none_eabi_9_2019_q4_major_PATH="/home/runner/cmake-3.17.0-Linux-x86_64/bin"
         echo "gcc_arm_none_eabi_9_2019_q4_major_PATH: $gcc_arm_none_eabi_9_2019_q4_major_PATH"
         ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
 
