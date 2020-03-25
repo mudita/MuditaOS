@@ -49,7 +49,7 @@ namespace gui
          */
         void setState(State state);
         const State &getState();
-        void updateDuration(time_t duration);
+        void updateDuration(const utils::time::Duration &duration);
         void setCallNumber(std::string);
 
         bool onInput(const InputEvent &inputEvent) override;

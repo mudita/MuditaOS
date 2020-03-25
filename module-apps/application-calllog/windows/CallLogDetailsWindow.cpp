@@ -276,8 +276,7 @@ namespace gui
             }
             typeData->setText(callTypeStr);
 
-            durationData->setText(
-                utils::time::Timestamp(record.duration).str("%Mm %Ss")); // TODO: alek: add duration class
+            durationData->setText(utils::time::Duration(record.duration).str());
 
             utils::time::Timestamp t(record.date);
             dateDay->setText(t.day() + ",");

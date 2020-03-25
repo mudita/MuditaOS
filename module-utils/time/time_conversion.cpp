@@ -1,3 +1,4 @@
+#include "time_conversion.hpp"
 #include <algorithm>
 #include <array>
 #include <ctime>
@@ -7,13 +8,13 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <time.h>
+#include <ctime>
 #include <iomanip>
 #include <locale>
 #include <i18/i18.hpp>
 
-#include "time_conversion.hpp"
 #include "time_locale.hpp"
+#include <Utils.hpp>
 
 namespace utils
 {
@@ -93,14 +94,19 @@ namespace utils
                 LOG_ERROR("Time::set_time error %s", e.what());
             }
         }
+
+        constexpr uint32_t datasize = 128;
         UTF8 Timestamp::str(std::string format)
         {
-            if (format.compare("") != 0)
+            if (format.compare("") != 0) {
                 this->format = format;
+            }
             UTF8 datetimestr = "";
             replace_specifiers();
-            std::strftime((char *)data, datasize, this->format.c_str(), &timeinfo);
-            datetimestr = data;
+
+            auto data = std::unique_ptr<char[]>(new char[datasize]);
+            std::strftime(data.get(), datasize, this->format.c_str(), &timeinfo);
+            datetimestr = UTF8(data.get());
             return datetimestr;
         }
 
@@ -122,6 +128,23 @@ namespace utils
             else {
                 return get_replacement(Replacements::MonthLong, timeinfo);
             }
+        }
+
+        Duration operator-(const Timestamp &lhs, const Timestamp &rhs)
+        {
+            return Duration(lhs.time, rhs.time);
+        };
+        Timestamp operator-(const Timestamp &lhs, const Duration &rhs)
+        {
+            return Timestamp(lhs.time < rhs.duration ? 0 : lhs.time - rhs.duration);
+        };
+        Timestamp operator+(const Timestamp &lhs, const Duration &rhs)
+        {
+            return Timestamp(lhs.time + rhs.duration);
+        };
+        Timestamp operator+(const Duration &lhs, const Timestamp &rhs)
+        {
+            return Timestamp(lhs.duration + rhs.time);
         }
 
         void DateTime::before_n_sec(time_t val)
@@ -225,6 +248,52 @@ namespace utils
                 return Timestamp::str(
                     Locale::format(Locale::FormatTime12H)); // @TODO: M.G. FormatLocaleTime which actually works
             }
+        }
+
+        Duration::Duration(time_t duration) : duration(duration)
+        {
+            calculate();
+        }
+
+        Duration::Duration(time_t stop, time_t start) : Duration(stop - start > 0 ? stop - start : 0)
+        {}
+
+        Duration::Duration(const Timestamp &stop, const Timestamp &start) : Duration(stop.getTime(), start.getTime())
+        {}
+
+        void Duration::fillStr(std::string &format) const
+        {
+            constexpr auto numberOfLeadingDigits = 2;
+            utils::findAndReplaceAll(format, "%H", utils::to_string(hours));
+            utils::findAndReplaceAll(format, "%M", utils::to_string(minutes));
+            utils::findAndReplaceAll(format, "%N", utils::to_string(hmminutes));
+            utils::findAndReplaceAll(format, "%S", utils::to_string(seconds));
+            utils::findAndReplaceAll(format, "%0H", utils::to_string(hours, numberOfLeadingDigits));
+            utils::findAndReplaceAll(format, "%0M", utils::to_string(minutes, numberOfLeadingDigits));
+            utils::findAndReplaceAll(format, "%0N", utils::to_string(hmminutes, numberOfLeadingDigits));
+            utils::findAndReplaceAll(format, "%0S", utils::to_string(seconds, numberOfLeadingDigits));
+        }
+
+        void Duration::calculate()
+        {
+            hours     = this->duration / secondsInHour;
+            hmminutes = this->duration / secondsInMinute;
+            minutes   = (this->duration % secondsInHour) / secondsInMinute;
+            seconds   = (this->duration % secondsInHour) % secondsInMinute;
+
+            if (verboseConversion) {
+                LOG_DEBUG("durtaion %u - %u hours %u minutes %u seconds", duration, hours, minutes, seconds);
+            }
+        }
+
+        UTF8 Duration::str(DisplayedFormat displayedFormat) const
+        {
+            // switch between format low and hig
+            std::string data = utils::localize.get(hours != 0 ? formatMap.at(displayedFormat).highFormat
+                                                              : formatMap.at(displayedFormat).lowFormat);
+            fillStr(data);
+
+            return data;
         }
 
     }; // namespace time

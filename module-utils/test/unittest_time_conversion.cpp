@@ -87,7 +87,7 @@ bool test_time_date_format(std::ostream &outstream, std::string locale_format, s
     bool retval = true;
     // prepare common point in time
     tm sometimetm = *localtime(&time);
-    auto mytime   = SysTime();
+    auto mytime   = Timestamp();
     mytime.set_time(time);
 
     if (!(mytime.str(locale_format) == fromtime(time, format))) {
@@ -105,12 +105,12 @@ bool test_time_format24hour_min(std::ostream &outstream)
     // this just shows usage, test is below
     // as converter uses str() method, this is equal to: constructor->str()->operator UTF8
     outstream << "\t"
-              << "systime:            " << SysTime() << std::endl;
+              << "systime:            " << Timestamp() << std::endl;
 
     time_t sometime = 1569503186;
     bool retval     = test_time_date_format(outstream,
-                                        Locale::format(Locale::TimeFormat::Format24HourMin),
-                                        Locale::format(Locale::TimeFormat::Format24HourMin),
+                                        Locale::format(Locale::TimeFormat::FormatTime24H),
+                                        Locale::format(Locale::TimeFormat::FormatTime24H),
                                         sometime);
 
     outstream << "TEST: " << __FUNCTION__ << " result: " << retval << std::endl;
@@ -122,7 +122,7 @@ bool test_time_day(std::ostream &outstream)
     bool retval     = true;
     time_t sometime = 1569503186;
     tm sometimetm   = *localtime(&sometime);
-    auto mytime     = SysTime();
+    auto mytime     = Timestamp();
     mytime.set_time(sometime);
 
     if (!(mytime.day() == fromtime(sometime, "%A"))) {
@@ -141,7 +141,7 @@ bool test_time_day_abbrew(std::ostream &outstream)
     bool retval     = true;
     time_t sometime = 1569503186;
     tm sometimetm   = *localtime(&sometime);
-    auto mytime     = SysTime();
+    auto mytime     = Timestamp();
     mytime.set_time(sometime);
 
     if (!(mytime.day(true) == fromtime(sometime, "%a"))) {
@@ -161,7 +161,7 @@ bool test_time_day_abbrew(std::ostream &outstream)
 bool test_time_from_before(std::ostream &outstream, time_t before, std::string format_expected)
 {
     auto retval   = true;
-    auto mytime   = SysTime(before);
+    auto mytime   = Timestamp(before);
     tm todaytime  = *localtime(&before);
     char buf[128] = {0};
 
@@ -185,7 +185,7 @@ bool test_time_from_today_200s(std::ostream &outstream)
     time_t timenow;
     bsp::rtc_GetCurrentTimestamp(&timenow);
 
-    return test_time_from_before(outstream, timenow - 200, Locale::format(Locale::Format12HourMin));
+    return test_time_from_before(outstream, timenow - 200, Locale::format(Locale::TimeFormat::FormatTime12H));
 }
 
 bool test_time_from_today_49h(std::ostream &outstream)
@@ -194,7 +194,8 @@ bool test_time_from_today_49h(std::ostream &outstream)
     time_t timenow;
     bsp::rtc_GetCurrentTimestamp(&timenow);
 
-    return test_time_from_before(outstream, timenow - 3600 * 49, Locale::format(Locale::FormatLocaleDateFull));
+    return test_time_from_before(
+        outstream, timenow - 3600 * 49, Locale::format(Locale::TimeFormat::FormatLocaleDateFull));
 }
 
 bool test_time_from_today_24h(std::ostream &outstream)
