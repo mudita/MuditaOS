@@ -5,6 +5,22 @@ PurePhone repository
 
 Prior to any build setup environment, need to be run once. (See: `## Run provisioning`)
 `cd config && ./bootstrap.sh`
+boostrap.sh will show you list of changes that may be required for you.
+If this is new checkout you need to update your git config (step 0 and 1).
+
+### Bootstrap steps:
+* `./config/bootstrap.sh 0`  - install style checking scripts to be automatically run on commit
+* `./config/bootstrap.sh 1`  - `git blame` will ignore style changing commit
+* `./config/bootstrap.sh 2`  - list packages required for builds *but it is not installed*
+* `./config/bootstrap.sh 3`  - setup arm toolchain, download and install in home dir
+* `./config/bootstrap.sh 4`  - setup cmake, download and install in home dir
+* `./config/bootstrap.sh 5`  - list of commands for required for switching default gcc/g++ to version 9
+* `./config/bootstrap.sh 6`  - adds Paths for arm toolchain to your PATH environment variable - this is also used by ./env.cmake
+* `./config/bootstrap.sh 7`  - adds Paths for cmake to your PATH environment variable
+* `./config/bootstrap.sh 8`  - setup cmake.env 
+
+*6 add_to_path gcc_arm... is required because new ./env.cmake uses environment variables set by this target.*
+
 
 ## style git hooks
 During the bootstrap you can install git hooks for style checking.
@@ -18,7 +34,6 @@ in the hooks directory script has to be named *pre-commit*.
 
 ## Super quick and dirty to run app on linux:
 ```
-cat env.cmake.sample | sed "s:<HOME>:$HOME:" > env.cmake                    # set env.cmake
 git submodule update --init --recursive                                     # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                                    # bootstrap requirements
 ./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo                    # configure build

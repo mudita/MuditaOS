@@ -6,7 +6,6 @@ build-*/
 
 lib/
 
-#no env.cmake
 env.cmake
 
 config/config_target\.h
@@ -30,3 +29,5 @@ compile_commands.json
 source/version.hpp
 **/*.pyc
 ./doc/docs-gui/
+
+LAST_STEP
