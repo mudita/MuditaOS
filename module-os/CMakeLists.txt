@@ -102,3 +102,8 @@ message(WARNING "Tests for ${PROJECT_NAME} need update")
 if(DEFINED BUILD_UNIT_TESTS)
     target_compile_definitions(${PROJECT_NAME} PUBLIC LINUX_PORT_DEBUG)
 endif()
+
+if(${PROJECT_TARGET} STREQUAL "TARGET_Linux")
+    message(WARNING "For linux release port.c needs Wall and Werror disabled")
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wno-error)
+endif()

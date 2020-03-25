@@ -113,7 +113,7 @@ static inline bool hasEnding(std::string const &fullString, std::string const &e
 std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::string &ext)
 {
     std::vector<DirectoryEntry> dir_list;
-    FileAttributes attribute;
+    FileAttributes attribute = FileAttributes::ReadOnly;
     size_t fileSize = 0;
 
     for (auto &p : fs::directory_iterator(path)) {
