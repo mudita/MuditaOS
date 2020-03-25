@@ -130,7 +130,8 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         if (notification == bsp::cellular::statusPin) {
             auto GSMstatus = bsp::cellular::status::getStatus();
-            LOG_DEBUG("GSM Status pin change: %s", (GSMstatus == bsp::cellular::status::value::GOOD ? "GOOD" : "BAD"));
+            LOG_DEBUG("GSM Status pin change: %s",
+                      (GSMstatus == bsp::cellular::status::value::ACTIVE ? "NORMAL START-UP" : "ABNORMAL START-UP"));
         }
 
         if (notification == bsp::cellular::trayPin) {
