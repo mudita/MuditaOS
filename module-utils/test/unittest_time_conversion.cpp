@@ -86,7 +86,6 @@ bool test_time_date_format(std::ostream &outstream, std::string locale_format, s
 {
     bool retval = true;
     // prepare common point in time
-    tm sometimetm = *localtime(&time);
     auto mytime   = Timestamp();
     mytime.set_time(time);
 
@@ -121,7 +120,6 @@ bool test_time_day(std::ostream &outstream)
 {
     bool retval     = true;
     time_t sometime = 1569503186;
-    tm sometimetm   = *localtime(&sometime);
     auto mytime     = Timestamp();
     mytime.set_time(sometime);
 
@@ -140,7 +138,6 @@ bool test_time_day_abbrew(std::ostream &outstream)
 {
     bool retval     = true;
     time_t sometime = 1569503186;
-    tm sometimetm   = *localtime(&sometime);
     auto mytime     = Timestamp();
     mytime.set_time(sometime);
 
