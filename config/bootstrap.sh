@@ -116,7 +116,6 @@ function setup_arm_toolchain() {
     popd 
 }
 
-
 function setup_cmake() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     pushd /tmp
@@ -126,6 +125,11 @@ function setup_cmake() {
         tar -xf ${CMAKE_PKG} -C ${HOME}/
     popd
     echo "CMAKEV installed to ${HOME}/${CMAKE_DIR} and set in PATH"
+}
+
+function sedtup_env_cmake() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    cat env.cmake.sample | sed "s:<ARM_GCC_HOME>:${HOME}/${ARM_GCC}/bin:" > env.cmake
 }
 
 
@@ -138,6 +142,7 @@ BUILD_STEPS=(
         setup_gcc_alternatives
         "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
         "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_DIR}/bin"
+        "sedtup_env_cmake"
         )
 
 if [ $# -eq 1 ]; then 

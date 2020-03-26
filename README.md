@@ -17,6 +17,7 @@ If this is new checkout you need to update your git config (step 0 and 1).
 * `./config/bootstrap.sh 5`  - list of commands for required for switching default gcc/g++ to version 9
 * `./config/bootstrap.sh 6`  - adds Paths for arm toolchain to your PATH environment variable - this is also used by ./env.cmake
 * `./config/bootstrap.sh 7`  - adds Paths for cmake to your PATH environment variable
+* `./config/bootstrap.sh 8`  - setup cmake.env 
 
 *6 add_to_path gcc_arm... is required because new ./env.cmake uses environment variables set by this target.*
 
@@ -33,7 +34,6 @@ in the hooks directory script has to be named *pre-commit*.
 
 ## Super quick and dirty to run app on linux:
 ```
-cat env.cmake.sample | sed "s:<HOME>:$HOME:" > env.cmake                    # set env.cmake
 git submodule update --init --recursive                                     # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                                    # bootstrap requirements
 ./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo                    # configure build
