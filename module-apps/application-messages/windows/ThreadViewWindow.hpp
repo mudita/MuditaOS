@@ -38,8 +38,8 @@ namespace gui
         /// return if request was handled
         bool showMessages(Action what);
         void addSMS(Action what);
-        bool smsBuild(const SMSRecord &el, bool top);
-        HBox *smsSpanBuild(Text *smsBubble, const Alignment position, const uint32_t timestamp) const;
+        bool smsBuild(const SMSRecord &smsRecord);
+        HBox *smsSpanBuild(Text *smsBubble, const SMSRecord &el) const;
         const ssize_t maxsmsinwindow = 7;
 
         struct
