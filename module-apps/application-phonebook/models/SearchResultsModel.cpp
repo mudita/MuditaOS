@@ -25,23 +25,26 @@ void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t li
 gui::ListItem *SearchResultsModel::getItem(
     int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-    if (index < 0) {
-        LOG_ERROR("getItem error: index < 0");
-        return nullptr;
-    }
+    auto isInResultsRange = [&](int idx){
+      try {
+          results->at(idx);
+      }
+      catch (const std::out_of_range &oor) {
+          LOG_ERROR("Out of Range error:  %s", oor.what());
+          return false;
+      }
+      return true;
+    };
 
-    if (index >= getItemCount()) {
-        LOG_ERROR("getItem error: index %d >= results size %d", index, getItemCount());
-        return nullptr;
-    }
+    auto compareFirstChar = [](UTF8 nameA, UTF8 nameB){
+      if(nameA.substr(0, 1) == nameB.substr(0, 1)){
+          return true;
+      }
+      else{
+          return false;
+      }};
 
-    try {
-        results->at(index);
-    }
-    catch (const std::out_of_range &oor) {
-        LOG_ERROR("Out of Range error:  %s", oor.what());
-        return nullptr;
-    }
+    if(!isInResultsRange(index)){return nullptr;}
 
     auto contact = std::make_shared<ContactRecord>(results->at(index));
 
@@ -71,14 +74,11 @@ gui::ListItem *SearchResultsModel::getItem(
                 item->setValue(contact->primaryName.substr(0, 1));
             }
             else {
-                if (prevIndex < 0) {
-                    LOG_ERROR("getItem error: prevIndex < 0");
-                    return nullptr;
-                }
+                if(!isInResultsRange(prevIndex)){return nullptr;}
                 auto prevContact = std::make_unique<ContactRecord>(results->at(prevIndex));
                 if (prevContact == nullptr)
                     return nullptr;
-                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
+                if (compareFirstChar(contact->primaryName, prevContact->primaryName)) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
@@ -120,6 +120,7 @@ gui::ListItem *SearchResultsModel::getItem(
                 if (prevIndex < 0) {
                     prevIndex = index - 1;
                 }
+                if(!isInResultsRange(prevIndex)){return nullptr;}
                 auto prevContact = std::make_unique<ContactRecord>(results->at(prevIndex));
                 if (remaining == 0) {
                     // previous element has the same first character of alternative name so display first character
@@ -133,7 +134,7 @@ gui::ListItem *SearchResultsModel::getItem(
                     }
                 }
                 else if (((index == firstElement) || (index == prevIndex) ||
-                          (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)))) {
+                          (compareFirstChar(contact->primaryName, prevContact->primaryName)))) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
