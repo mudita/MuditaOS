@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #####################################################################
 #
 #                   !!! WARNING !!!
@@ -31,7 +31,9 @@ function add_to_path() {
     TOOL_DIR=$2
     BASH_RC="${HOME}/.bashrc"
     TOOL_PATH_VAR="${TOOL_NAME}_PATH"
+    set +e
     check_if_exists="`cat ${BASH_RC} | grep \"${TOOL_PATH_VAR}\"`"
+    set -e
 
     if [[ -n ${check_if_exists} ]]; then
         SED_SCRIPT="s%${TOOL_PATH_VAR}=\".*\"%${TOOL_PATH_VAR}=\"${TOOL_DIR}\"%"
@@ -175,5 +177,3 @@ do
     I=$(( ${I} + 1 ))
 done
 
-#echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
-#echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
