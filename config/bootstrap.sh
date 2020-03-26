@@ -84,20 +84,24 @@ function add_ignore_revs_for_blame() {
 
 function setup_gcc_alternatives() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    echo "# set gcc-9 as default alternative (instead of default current in ubuntu)"
-    echo "sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9"
+    cat <<-MSGEND
+		# set gcc-9 as default alternative (instead of default current in ubuntu)
+		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9
+		MSGEND
 }
 
 function install_ubuntu_packages() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    echo "# Install neccessary packages more or less this should be complete list:"
-    echo binutils wget git make pkg-config gtkmm-3.0 gcc-9 g++-9 portaudio19-dev
-    echo "# for ubutnut 18.04 you can"
-    echo "sudo add-apt-repository ppa:ubuntu-toolchain-r/test"
-    echo "sudo apt update"
-    echo "sudo apt install gcc-9 g++-9"
-    echo "# "
-    echo "# don't forget to update alternatives:"
+    cat <<-MSGEND
+		# Install neccessary packages more or less this should be complete list:
+		binutils wget git make pkg-config gtkmm-3.0 gcc-9 g++-9 portaudio19-dev
+		# for ubutnut 18.04 you can
+		sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+		sudo apt update
+		sudo apt install gcc-9 g++-9
+		# 
+		# don't forget to update alternatives:
+		MSGEND
     setup_gcc_alternatives
 }
 
@@ -127,7 +131,7 @@ function setup_cmake() {
     echo "CMAKEV installed to ${HOME}/${CMAKE_DIR} and set in PATH"
 }
 
-function sedtup_env_cmake() {
+function setup_env_cmake() {
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
     cat env.cmake.sample | sed "s:<ARM_GCC_HOME>:${HOME}/${ARM_GCC}/bin:" > env.cmake
 }
@@ -142,8 +146,10 @@ BUILD_STEPS=(
         setup_gcc_alternatives
         "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
         "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_DIR}/bin"
-        "sedtup_env_cmake"
+        "setup_env_cmake"
         )
+
+
 
 if [ $# -eq 1 ]; then 
     PARAM=$1
@@ -162,14 +168,16 @@ else
         echo -e "\t$I ${BUILD_STEPS[${I}]}"
         I=$(( $I + 1 ))
     done
-    echo -e "call:"
-    echo -e "\t ${0} <build step no>[-]"
-    echo -e "ex.:"
-    echo -e "\t ${0} 1\t\t\t- build step 1 (${BUILD_STEPS[1]})"
-    echo -e "\t ${0} 3\t\t\t- build step 3 (${BUILD_STEPS[3]})"
-    echo -e "\t ${0} 3-\t\t\t- build from step 3 to the end"
-    echo -e "\t ${0} 0-\t\t\t- build everything"
-    exit 1
+    cat <<- MSGEND
+		call:
+			${0} <build step no>[-]
+		ex.:
+			${0} 1       - build step 1 (${BUILD_STEPS[1]})
+			${0} 3       - build step 3 (${BUILD_STEPS[3]})
+			${0} 3-      - build from step 3 to the end
+			${0} 0-      - build everything
+		MSGEND
+    exit 0
 fi
 echo "START:${BUILD_STEPS[$START]}(${START})"
 echo "END:${BUILD_STEPS[$END]}(${END})"
