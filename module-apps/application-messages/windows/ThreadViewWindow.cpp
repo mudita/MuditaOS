@@ -198,51 +198,87 @@ namespace gui
         labelSpan->setFillColor(gui::Color(11, 0));
         labelSpan->addWidget(smsBubble);
 
-        // TODO dashed (dotted) outline
         LOG_DEBUG("ADD SMS TYPE: %d", el.type);
         switch (el.type) {
         case SMSType::OUTBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
             smsBubble->setX(body->getWidth() - smsBubble->getWidth());
             labelSpan->setReverseOrder(true);
+            addTimeLabel(
+                labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
             break;
         case SMSType::INBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
             labelSpan->setReverseOrder(false);
+            addTimeLabel(
+                labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
             break;
+        case SMSType::FAILED:
+            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            smsBubble->setX(body->getWidth() - smsBubble->getWidth());
+            labelSpan->setReverseOrder(true);
+            addErrorLabel(labelSpan, elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
         default:
             break;
         }
 
-        auto timeLabel        = new gui::Label(nullptr, 0, 0, 0, smsBubble->getHeight());
+        if (!smsBubble->visible) {
+            delete labelSpan; // total fail
+            labelSpan = nullptr;
+        }
+        return labelSpan;
+    }
+
+    void ThreadViewWindow::addErrorLabel(HBox *layout, uint16_t widthAvailable) const
+    {
+        auto errorIcon = new gui::Image("messages_error_W_M");
+        // set icon vertical aligmnet to center
+        errorIcon->setY((layout->getHeight() - errorIcon->getHeight()) / 2);
+        errorIcon->activeItem = false; // make it non-focusable
+
+        uint16_t errorIconSpacerWidth = widthAvailable - errorIcon->getWidth();
+
+        auto errorIconSpacer        = new gui::Label(nullptr, 0, 0, errorIconSpacerWidth, layout->getHeight());
+        errorIconSpacer->activeItem = false;
+        errorIconSpacer->setPenWidth(0);
+
+        layout->addWidget(errorIconSpacer);
+        layout->addWidget(errorIcon);
+    }
+
+    void ThreadViewWindow::addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const
+    {
+        // add time label activated on focus
+        timeLabel->setSize(timeLabel->getWidth(), layout->getHeight());
+
+        uint16_t timeLabelSpacerWidth = widthAvailable - timeLabel->getWidth();
+        auto timeLabelSpacer          = new gui::Label(nullptr, 0, 0, timeLabelSpacerWidth, layout->getHeight());
+        timeLabelSpacer->activeItem   = false;
+        timeLabelSpacer->setPenWidth(0);
+
+        layout->addWidget(timeLabelSpacer);
+        layout->addWidget(timeLabel);
+
+        timeLabel->setVisible(false);
+        layout->focusChangedCallback = [=](gui::Item &item) {
+            timeLabel->setVisible(item.focus);
+            return true;
+        };
+    }
+
+    Label *ThreadViewWindow::timeLabelBuild(time_t timestamp) const
+    {
+        auto timeLabel        = new gui::Label(nullptr, 0, 0, 0, 0);
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
-        timeLabel->setText(utils::time::Time(el.date));
+        timeLabel->setText(utils::time::Time(timestamp));
         timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
         timeLabel->setPenWidth(style::window::default_border_no_focus_w);
         timeLabel->setVisible(false);
         timeLabel->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-        uint16_t dateLabelSpacerWidth =
-            (elements_width - smsBubble->getWidth() - timeLabel->getWidth() - smsBubble->yapSize);
-        auto timeLabelSpacer          = new gui::Label(nullptr, 0, 0, dateLabelSpacerWidth, smsBubble->getHeight());
-        timeLabelSpacer->activeItem   = false;
-        timeLabelSpacer->setPenWidth(0);
-
-        labelSpan->addWidget(timeLabelSpacer);
-        labelSpan->addWidget(timeLabel);
-
-        timeLabel->setVisible(false);
-        labelSpan->focusChangedCallback = [=](gui::Item &item) {
-            timeLabel->setVisible(item.focus);
-            return true;
-        };
-        if (!smsBubble->visible) {
-            delete labelSpan; // total fail
-            labelSpan = nullptr;
-        }
-        return labelSpan;
+        return timeLabel;
     }
 
     bool ThreadViewWindow::smsBuild(const SMSRecord &smsRecord)
