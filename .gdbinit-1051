@@ -5,3 +5,7 @@ load
 monitor halt
 eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
 b main
+b HardFault_Handler
+b MemManage_Handler
+b BusFault_Handler
+b UsageFault_Handler
