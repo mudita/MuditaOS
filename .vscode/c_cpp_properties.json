@@ -1,22 +1,11 @@
 {
     "configurations": [
         {
-            "name": "Win32",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE",
-                "CPU_MIMXRT1051DVL6B"
-            ],
-            "compilerPath": "c:/Program Files (x86)/GNU Tools ARM Embedded/8 2018-q4-major/bin/arm-none-eabi-g++",
+            "name": "CMake configuration",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64",
-            "configurationProvider": "vector-of-bool.cmake-tools",
-            "compileCommands": "${workspaceFolder}/build/compile_commands.json" 
+            "intelliSenseMode": "${default}",
+            "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
     "version": 4

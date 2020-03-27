@@ -1,14 +1,14 @@
 [
   {
-    "name": "RT1051",
+    "name": "rt1051",
     "toolchainFile": "Target_RT1051.cmake"
   },
   {
-    "name": "Linux",
+    "name": "linux",
     "toolchainFile": "Target_Linux.cmake"
   },
   {
     "name": "Unittests",
     "toolchainFile": "Target_Unittests.cmake"
   }
-  ]
+]
