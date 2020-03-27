@@ -3,7 +3,6 @@ doc/docs-gui/
 
 build-*/
 .vscode/ipch
-.vscode/settings.json
 
 lib/
 
