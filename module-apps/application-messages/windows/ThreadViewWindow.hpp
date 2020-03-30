@@ -38,8 +38,9 @@ namespace gui
         /// return if request was handled
         bool showMessages(Action what);
         void addSMS(Action what);
-        bool smsBuild(const SMSRecord &el, bool top);
-        HBox *smsSpanBuild(Text *smsBubble, const Alignment position, const uint32_t timestamp) const;
+        bool smsBuild(const SMSRecord &smsRecord);
+        Label *timeLabelBuild(time_t timestamp) const;
+        HBox *smsSpanBuild(Text *smsBubble, const SMSRecord &el) const;
         const ssize_t maxsmsinwindow = 7;
 
         struct
@@ -50,23 +51,24 @@ namespace gui
             int dbsize                                  = 0;       // size of elements in db
             std::unique_ptr<std::vector<SMSRecord>> sms = nullptr; // loaded sms from db
         } SMS;
-
       public:
         ThreadViewWindow(app::Application *app);
-        virtual ~ThreadViewWindow();
 
+        virtual ~ThreadViewWindow();
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
+
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         bool onDatabaseMessage(sys::Message *msgl) override;
-
         void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
 
+        void destroyInterface() override;
         gui::Text *text = nullptr;
         void rebuildText();
+        void addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const;
+        void addErrorLabel(HBox *layout, uint16_t widthAvailable) const;
     };
 
 } /* namespace gui */
