@@ -13,6 +13,7 @@
 #include "fsl_clock.h"
 #include "fsl_dcdc.h"
 #include "pin_mux.h"
+#include "chip.h"
 
 #include "irq/irq_gpio.hpp"
 
@@ -194,6 +195,7 @@ namespace bsp
         DCDC_BootIntoDCM(DCDC);
 
         PrintSystemClocks();
+        printBootReason();
     }
 
 } // namespace bsp
