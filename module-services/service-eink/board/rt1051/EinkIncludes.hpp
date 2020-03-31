@@ -11,9 +11,9 @@
 
 // module-bsp
 #include "board/rt1051/bsp/eink/ED028TC1.h"
+#include "chip.h"
 extern "C"
 {
-#include "chip.h"
 #include "fsl_dmamux.h"
 #include "fsl_edma.h"
 #include "dma_config.h"

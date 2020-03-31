@@ -33,6 +33,7 @@
 #include <string.h>
 #include "MIMXRT1051.h"
 #include <log/log.hpp>
+#include <macros.h>
 // ----------------------------------------------------------------------------
 
 // Forward declaration
@@ -60,7 +61,7 @@ void __attribute__((weak)) _exit(int code __attribute__((unused)))
 {
     LOG_FATAL("_exit %d", code);
     vTaskEndScheduler();
-    while (1) {};
+    haltIfDebugging();
 }
 
 // ----------------------------------------------------------------------------

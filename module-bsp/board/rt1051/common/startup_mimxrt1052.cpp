@@ -456,6 +456,7 @@ extern "C"
 #include <log/log.hpp>
 #include <segger/rtt/SEGGER_RTT.h>
 #include <stdlib.h>
+#include <macros.h>
 
 //*****************************************************************************
 // The vector table.
@@ -1065,6 +1066,7 @@ extern "C"
         syslog.registers.bfar      = SCB->BFAR;
         syslog.registers.abfsr.all = SCB->ABFSR;
 
+        haltIfDebugging();
         printHardFaultInfo(syslog);
 
         abort();
