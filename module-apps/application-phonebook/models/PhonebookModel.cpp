@@ -68,8 +68,15 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
 gui::ListItem *PhonebookModel::getItem(
     int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-    // LOG_INFO("index: %d, first:%d prev: %d, count: %d, rem: %d, topDown: %d", index, firstElement, prevIndex, count,
-    // remaining, topDown);
+    auto compareFirstChar = [&](std::shared_ptr<ContactRecord> contact, std::shared_ptr<ContactRecord> prevContact) {
+        if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    };
+
     bool download = false;
     if (index > firstIndex + pageSize / 2)
         download = true;
@@ -104,8 +111,7 @@ gui::ListItem *PhonebookModel::getItem(
             }
             else {
                 std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
-                if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))
-                {
+                if (compareFirstChar(contact, prevContact)) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
@@ -147,8 +153,7 @@ gui::ListItem *PhonebookModel::getItem(
                 std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
                 if (remaining == 0) {
                     // previous element has the same first character of alternative name so display first character
-                    if (index == prevIndex)
-                    {
+                    if (index == prevIndex) {
                         item->markFavourite(false);
                         item->setContact(contact);
                         item->setID(index);
@@ -157,8 +162,8 @@ gui::ListItem *PhonebookModel::getItem(
                         item->setValue(prevContact->primaryName.substr(0, 1));
                     }
                 }
-                else if (((index == firstElement) || (index == prevIndex) || (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1))))
-                {
+                else if (((index == firstElement) || (index == prevIndex) ||
+                          (compareFirstChar(contact, prevContact)))) {
                     item->markFavourite(false);
                     item->setContact(contact);
                     item->setID(index);
@@ -170,5 +175,4 @@ gui::ListItem *PhonebookModel::getItem(
             return item;
         }
     }
-    return nullptr;
 }
