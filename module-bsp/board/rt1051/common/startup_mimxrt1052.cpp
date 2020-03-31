@@ -1066,7 +1066,6 @@ extern "C"
         syslog.registers.bfar      = SCB->BFAR;
         syslog.registers.abfsr.all = SCB->ABFSR;
 
-        haltIfDebugging();
         printHardFaultInfo(syslog);
 
         abort();

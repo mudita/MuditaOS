@@ -60,8 +60,9 @@ void __reset_hardware(void)
 void __attribute__((weak)) _exit(int code __attribute__((unused)))
 {
     LOG_FATAL("_exit %d", code);
-    vTaskEndScheduler();
     haltIfDebugging();
+    vTaskEndScheduler();
+    while(1){};
 }
 
 // ----------------------------------------------------------------------------
