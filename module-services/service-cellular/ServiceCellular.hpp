@@ -11,45 +11,14 @@
 #define PUREPHONE_SERVICECELLULAR_HPP
 
 #include "CellularCall.hpp"
-#include "Modem/TS0710/DLC_channel.h"
-#include "Modem/TS0710/TS0710.h"
-#include "Service/Service.hpp"
+#include <Modem/TS0710/DLC_channel.h>
+#include <Modem/TS0710/TS0710.h>
+#include <Service/Service.hpp>
 #include "messages/CellularMessage.hpp"
-#include "utf8/UTF8.hpp"
-//
+#include <utf8/UTF8.hpp>
+#include "State.hpp"
+
 class MuxDaemon;
-
-namespace cellular
-{
-    class State
-    {
-      public:
-        enum class ST
-        {
-            Idle,              /// start mode of cellular - does nothing
-            PowerUpInProgress, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state
-                               /// bases on URC without much thinking
-            ModemConfigurationInProgress, /// modem basic, non sim related configuration
-            AudioConfigurationInProgress, /// audio configuration for modem (could be in ModemConfiguration)
-            SanityCheck,                  /// prior to ModemOn last sanity checks for one time configurations etc
-            ModemOn, /// modem ready - indicates that modem is fully configured, ( **SIM is not yet configured** )
-            ModemFatalFailure, /// modem full shutdown need
-            SimInitInProgress, /// initialize SIM - triggers sim ON in, ( **changed on URC** )
-            FullyFunctional,   /// modem is on, sim is initialized
-            Failed
-        };
-
-      private:
-        enum ST state = ST::Idle;
-
-      public:
-        const char *c_str(ST state) const;
-        /// 1. sets state of ServiceCellular
-        /// 2. TODO sends Multicast notification of ServiceCellular state
-        void set(ST state);
-        ST get() const;
-    };
-} // namespace cellular
 
 class ServiceCellular : public sys::Service
 {
@@ -109,13 +78,36 @@ class ServiceCellular : public sys::Service
 
     CellularCall::CellularCall ongoingCall;
 
+    /// one point of state change handling
+    void change_state(cellular::StateChange *msg);
+
+    /// @defgroup state_handlers     all functions on State::ST:: change requests
+    /// @{
+
+    /// idle handler
+    bool handle_idle();
+    /// cellular power up procedure
+    bool handle_power_up_procedure();
+    /// configure basic modem parameters
+    bool handle_start_conf_procedure();
+    /// configure modem audio parameters
+    bool handle_audio_conf_procedure();
+    /// modem on event is used in desktop to follow up sim selection
+    bool handle_modem_on();
     /// check one time modem configuration for sim (hot swap)
-    /// if hot swap is not eanbled full modem restart is needed (right now at best reboot)
-    bool sim_sanity_check();
+    /// if hot swap is not enabled full modem restart is needed (right now at best reboot)
+    bool handle_sim_sanity_check();
     /// select sim from settings
-    bool select_sim();
+    bool handle_select_sim();
     /// initialize sim (GSM commands for initialization)
-    bool init_sim();
+    bool handle_sim_init();
+    /// modem failure handler
+    bool handle_failure();
+    /// fatal failure handler, if we have power switch - we could handle it here
+    /// \note some run state should be added to ignore non system messages now...
+    bool handle_fatal_failure();
+
+    /// @}
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP

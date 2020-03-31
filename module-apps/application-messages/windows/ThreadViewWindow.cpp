@@ -175,7 +175,7 @@ namespace gui
         SMS.end = SMS.start;
         for (auto &el : *SMS.sms) {
             LOG_DEBUG("...");
-            if (!smsBuild(el, false)) {
+            if (!smsBuild(el)) {
                 break;
             }
             ++SMS.end;
@@ -188,16 +188,87 @@ namespace gui
         LOG_DEBUG("sms built");
     }
 
-    HBox *ThreadViewWindow::smsSpanBuild(Text *smsBubble, const Alignment position, const uint32_t timestamp) const
+    HBox *ThreadViewWindow::smsSpanBuild(Text *smsBubble, const SMSRecord &el) const
     {
-        auto labelSpan = new gui::HBox();
+        HBox *labelSpan = new gui::HBox();
+
         labelSpan->setPenWidth(style::window::default_border_no_focus_w);
         labelSpan->setPenFocusWidth(style::window::default_border_no_focus_w);
-        labelSpan->setReverseOrder(position.alignment != Alignment::ALIGN_HORIZONTAL_LEFT);
         labelSpan->setSize(elements_width, smsBubble->getHeight());
+        labelSpan->setFillColor(gui::Color(11, 0));
         labelSpan->addWidget(smsBubble);
 
-        auto timeLabel        = new gui::Label(nullptr, 0, 0, 0, smsBubble->getHeight());
+        LOG_DEBUG("ADD SMS TYPE: %d", el.type);
+        switch (el.type) {
+        case SMSType::OUTBOX:
+            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            smsBubble->setX(body->getWidth() - smsBubble->getWidth());
+            labelSpan->setReverseOrder(true);
+            addTimeLabel(
+                labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
+            break;
+        case SMSType::INBOX:
+            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
+            labelSpan->setReverseOrder(false);
+            addTimeLabel(
+                labelSpan, timeLabelBuild(el.date), elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
+            break;
+        case SMSType::FAILED:
+            smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
+            smsBubble->setX(body->getWidth() - smsBubble->getWidth());
+            labelSpan->setReverseOrder(true);
+            addErrorLabel(labelSpan, elements_width - (smsBubble->getWidth() + smsBubble->yapSize));
+        default:
+            break;
+        }
+
+        if (!smsBubble->visible) {
+            delete labelSpan; // total fail
+            labelSpan = nullptr;
+        }
+        return labelSpan;
+    }
+
+    void ThreadViewWindow::addErrorLabel(HBox *layout, uint16_t widthAvailable) const
+    {
+        auto errorIcon = new gui::Image("messages_error_W_M");
+        // set icon vertical aligmnet to center
+        errorIcon->setY((layout->getHeight() - errorIcon->getHeight()) / 2);
+        errorIcon->activeItem = false; // make it non-focusable
+
+        uint16_t errorIconSpacerWidth = widthAvailable - errorIcon->getWidth();
+
+        auto errorIconSpacer        = new gui::Label(nullptr, 0, 0, errorIconSpacerWidth, layout->getHeight());
+        errorIconSpacer->activeItem = false;
+        errorIconSpacer->setPenWidth(0);
+
+        layout->addWidget(errorIconSpacer);
+        layout->addWidget(errorIcon);
+    }
+
+    void ThreadViewWindow::addTimeLabel(HBox *layout, Label *timeLabel, uint16_t widthAvailable) const
+    {
+        // add time label activated on focus
+        timeLabel->setSize(timeLabel->getWidth(), layout->getHeight());
+
+        uint16_t timeLabelSpacerWidth = widthAvailable - timeLabel->getWidth();
+        auto timeLabelSpacer          = new gui::Label(nullptr, 0, 0, timeLabelSpacerWidth, layout->getHeight());
+        timeLabelSpacer->activeItem   = false;
+        timeLabelSpacer->setPenWidth(0);
+
+        layout->addWidget(timeLabelSpacer);
+        layout->addWidget(timeLabel);
+
+        timeLabel->setVisible(false);
+        layout->focusChangedCallback = [=](gui::Item &item) {
+            timeLabel->setVisible(item.focus);
+            return true;
+        };
+    }
+
+    Label *ThreadViewWindow::timeLabelBuild(time_t timestamp) const
+    {
+        auto timeLabel        = new gui::Label(nullptr, 0, 0, 0, 0);
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
         timeLabel->setText(utils::time::Time(timestamp));
@@ -207,49 +278,29 @@ namespace gui
         timeLabel->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-        uint16_t dateLabelSpacerWidth =
-            (elements_width - smsBubble->getWidth() - timeLabel->getWidth() - smsBubble->yapSize);
-        auto timeLabelSpacer        = new gui::Label(nullptr, 0, 0, dateLabelSpacerWidth, smsBubble->getHeight());
-        timeLabelSpacer->activeItem = false;
-        timeLabelSpacer->setPenWidth(0);
-
-        labelSpan->addWidget(timeLabelSpacer);
-
-        labelSpan->addWidget(timeLabel);
-
-        timeLabel->setVisible(false);
-        labelSpan->focusChangedCallback = [=](gui::Item &item) {
-            timeLabel->setVisible(item.focus);
-            return true;
-        };
-
-        if (!smsBubble->visible) {
-            delete labelSpan; // total fail
-            labelSpan = nullptr;
-        }
-        return labelSpan;
+        return timeLabel;
     }
 
-    bool ThreadViewWindow::smsBuild(const SMSRecord &el, bool bottom)
+    bool ThreadViewWindow::smsBuild(const SMSRecord &smsRecord)
     {
         /// dummy sms thread - TODO load from db - on switchData
-        auto label = new Text(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
-        label->setTextType(Text::TextType::MULTI_LINE);
-        label->setEditMode(Text::EditMode::SCROLL);
-        label->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        label->setRadius(style::window::messages::sms_radius);
-        label->setFont(style::window::font::medium);
-        label->setPenFocusWidth(style::window::default_border_focucs_w);
-        label->setPenWidth(style::window::messages::sms_border_no_focus);
-        label->expandMode = Text::ExpandMode::EXPAND_DOWN;
-        label->buildDrawList();
-        label->setText(el.body.length() ? el.body : " "); // text doesn't really like being empty//
-        label->setMargins(gui::Margins(style::window::messages::sms_h_padding,
-                                       style::window::messages::sms_v_padding,
-                                       style::window::messages::sms_h_padding,
-                                       style::window::messages::sms_v_padding));
+        auto smsLabel = new Text(nullptr, 0, 0, style::window::messages::sms_max_width, 0);
+        smsLabel->setTextType(Text::TextType::MULTI_LINE);
+        smsLabel->setEditMode(Text::EditMode::SCROLL);
+        smsLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
+        smsLabel->setRadius(style::window::messages::sms_radius);
+        smsLabel->setFont(style::window::font::medium);
+        smsLabel->setPenFocusWidth(style::window::default_border_focucs_w);
+        smsLabel->setPenWidth(style::window::messages::sms_border_no_focus);
+        smsLabel->expandMode = Text::ExpandMode::EXPAND_DOWN;
+        smsLabel->buildDrawList();
+        smsLabel->setText(smsRecord.body.length() ? smsRecord.body : " "); // text doesn't really like being empty//
+        smsLabel->setMargins(gui::Margins(style::window::messages::sms_h_padding,
+                                          style::window::messages::sms_v_padding,
+                                          style::window::messages::sms_h_padding,
+                                          style::window::messages::sms_v_padding));
 
-        label->activatedCallback = [=](Item &) {
+        smsLabel->activatedCallback = [=](Item &) {
             LOG_INFO("Message activated!");
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             if (app == nullptr) {
@@ -258,30 +309,14 @@ namespace gui
             }
             if (app->windowOptions != nullptr) {
                 app->windowOptions->clearOptions();
-                app->windowOptions->addOptions(smsWindowOptions(app, el));
+                app->windowOptions->addOptions(smsWindowOptions(app, smsRecord));
                 app->switchWindow(app->windowOptions->getName(), nullptr);
             }
             return true;
         };
 
         // wrap label in H box, to make fit datetime in it
-        HBox *labelSpan = nullptr;
-
-        // TODO dashed (dotted) outline
-        LOG_DEBUG("ADD SMS TYPE: %d", el.type);
-        switch (el.type) {
-        case SMSType::OUTBOX:
-            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
-            label->setX(body->getWidth() - label->getWidth());
-            labelSpan = smsSpanBuild(label, Alignment::ALIGN_HORIZONTAL_RIGHT, el.date);
-            break;
-        case SMSType::INBOX:
-            label->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT);
-            labelSpan = smsSpanBuild(label, Alignment::ALIGN_HORIZONTAL_LEFT, el.date);
-            break;
-        default:
-            break;
-        }
+        HBox *labelSpan = smsSpanBuild(smsLabel, smsRecord);
 
         if (labelSpan == nullptr) {
             return false;
@@ -293,7 +328,7 @@ namespace gui
         verticalSpacer->setPenWidth(style::window::default_border_no_focus_w);
         body->addWidget(verticalSpacer);
 
-        LOG_INFO("Add sms: %s %s", el.body.c_str(), el.number.c_str());
+        LOG_INFO("Add sms: %s %s", smsRecord.body.c_str(), smsRecord.number.c_str());
         body->addWidget(labelSpan);
         return labelSpan->visible;
     }

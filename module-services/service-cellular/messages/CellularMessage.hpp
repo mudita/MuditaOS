@@ -11,11 +11,12 @@
 #define PUREPHONE_CELLULARMESSAGE_HPP
 
 #include "../SignalStrength.hpp"
-#include "MessageType.hpp"
-#include "Service/Message.hpp"
-#include "utf8/UTF8.hpp"
+#include <MessageType.hpp>
+#include <Service/Message.hpp>
+#include <utf8/UTF8.hpp>
 #include <memory>
 #include <variant>
+#include "../State.hpp"
 
 class CellularMessage : public sys::DataMessage
 {
@@ -35,15 +36,9 @@ class CellularNotificationMessage : public CellularMessage
         Ringing,      // user provided number to call to and service initialized calling procedure.
         NewIncomingSMS,       // device received new sms from network. (what about sms delivery reports?).
         SignalStrengthUpdate, // update of the strength of the network's signal.
-        ServiceReady, // Idle state of the service. This is a start state before any call is initialized by user or by
-                      // network. service returns to this state when call is finished.
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
         SIM,                      // change on SIM from URC
-        SanityCheck,
-        ModemOn,           // Modem initialized
-        ModemFatalFailure, // Modem messed up beyond recognition, needs reboot (ie. QSIMSEL not set, or just returns
-                           // `OK` without message body (which happens sometimes...), or stopped totally responding
         RawCommand,        // send raw command to modem -> returns raw, tokenised result
         None
     };
@@ -90,6 +85,14 @@ class CellularResponseMessage : public sys::ResponseMessage
 
 namespace cellular
 {
+
+    class StateChange : public CellularMessage
+    {
+      public:
+        const State::ST request;
+        StateChange(const State::ST request) : CellularMessage(MessageType::CellularStateRequest), request(request)
+        {}
+    };
 
     class RawCommand : public CellularNotificationMessage
     {

@@ -15,3 +15,6 @@
 [submodule "module-utils/segger"]
 	path = module-utils/segger
 	url = ../segger-utils.git
+[submodule "module-utils/crc32"]
+	path = module-utils/crc32
+	url = ../crc32

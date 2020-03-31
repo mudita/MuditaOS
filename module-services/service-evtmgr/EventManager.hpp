@@ -23,7 +23,6 @@ class EventManager : public sys::Service
   private:
     void HandleAlarmTrigger(sys::DataMessage *msgl);
     void GetNextAlarmTimestamp(time_t timestamp);
-    uint32_t pollTimerID = 0;
 
   protected:
     std::unique_ptr<WorkerEvent> EventWorker;
@@ -40,16 +39,12 @@ class EventManager : public sys::Service
     bool alarmIsValid = false;
     // flag informs about suspend/resume status
     bool suspended = false;
-    /// to periodically check and update battery state, to be removed when battery charger will work fine
-    void handleBatPolling();
 
   public:
     EventManager(const std::string &name);
     ~EventManager();
 
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
-
-    void TickHandler(uint32_t id) override;
 
     // Invoked during initialization
     sys::ReturnCodes InitHandler() override;

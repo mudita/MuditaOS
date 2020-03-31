@@ -94,9 +94,7 @@ namespace bsp
                 xHigherPriorityTaskWoken |= BSP_BatteryChargerINOKB_IRQHandler();
             }
 
-            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {
-                // TODO:M.P xHigherPriorityTaskWoken |= BSP_BatteryChargerWCINOKB_IRQHandler();
-            }
+            if (irq_mask & (1 << BOARD_BATTERY_CHARGER_WCINOKB_PIN)) {}
 
             if (irq_mask & (1 << BOARD_BATTERY_CHARGER_INTB_PIN)) {
                 xHigherPriorityTaskWoken |= BSP_BatteryChargerINTB_IRQHandler();
