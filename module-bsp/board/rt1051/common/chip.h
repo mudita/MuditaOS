@@ -31,7 +31,7 @@ static const std::map<uint32_t, std::string> bootReasonDef = {
     {SRC_SRSR_WDOG3_RST_B_SHIFT, "IC Watchdog3 Time-out reset"},
     {SRC_SRSR_TEMPSENSE_RST_B_SHIFT, "Tamper Sensor software reset"}};
 
-static inline void printBootReason()
+static inline void clearAndPrintBootReason()
 {
     // get boot reason
     uint32_t SRSR_val = SRC_GetResetStatusFlags(SRC);

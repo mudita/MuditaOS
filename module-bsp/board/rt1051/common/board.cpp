@@ -195,7 +195,7 @@ namespace bsp
         DCDC_BootIntoDCM(DCDC);
 
         PrintSystemClocks();
-        printBootReason();
+        clearAndPrintBootReason();
     }
 
 } // namespace bsp
