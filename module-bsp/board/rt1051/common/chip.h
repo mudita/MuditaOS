@@ -23,10 +23,7 @@ static const std::map<uint32_t, std::string> bootReasonDef = {
     {SRC_SRSR_CSU_RESET_B_SHIFT, "csu_reset_b input"},
     {SRC_SRSR_IPP_USER_RESET_B_SHIFT, "ipp_user_reset_b qualified reset"},
     {SRC_SRSR_WDOG_RST_B_SHIFT, "IC Watchdog Time-out reset"},
-    {
-        SRC_SRSR_JTAG_RST_B_SHIFT,
-        "HIGH - Z JTAG reset",
-    },
+    {SRC_SRSR_JTAG_RST_B_SHIFT, "HIGH - Z JTAG reset"},
     {SRC_SRSR_JTAG_SW_RST_SHIFT, "JTAG software reset"},
     {SRC_SRSR_WDOG3_RST_B_SHIFT, "IC Watchdog3 Time-out reset"},
     {SRC_SRSR_TEMPSENSE_RST_B_SHIFT, "Tamper Sensor software reset"}};
