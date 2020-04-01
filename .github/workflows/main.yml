@@ -8,25 +8,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       with:
         token: ${{ secrets.GitHub_PAT }}
         submodules: true
-    - name: Style Linter Setup
-      run: |
-        sudo apt-get update && sudo apt-get install -y clang-format-9
-    - name: Style Check
-      run: |
-        ./config/pre-commit-check-only.hook --last
-    - name: Run bootstrap & Build
-      run: |
-        echo "Install neccessary packages"
-        ./config/bootstrap.sh 3-
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@2.0.0
-    - name: Build
-      run: |
-        sudo apt-get -q -y remove cmake
-        export gcc_arm_none_eabi_9_2019_q4_major_PATH="/home/runner/gcc-arm-none-eabi-9-2019-q4-major/bin"
-        ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
-
+    - uses: ./.github/actions/style-chek
+      with:
+        action: "style"
+        #    - name: Style Check
+        #      uses: docker://hub.docker.com/rwicik/pure_phone_build:latest
+        #      run: |
+        #        ./config/pre-commit-check-only.hook --last
+        #        #- name: Checkout submodules
+        #        #  uses: textbook/git-checkout-submodule-action@2.0.0
+        #    - name: Configure - rt1051
+        #      uses: docker://hub.docker.com/rwicik/pure_phone_build:latest
+        #      run: |
+        #        ./configure.sh rt1051 Release
+        #    - name: Build - rt1051
+        #      uses: docker://hub.docker.com/rwicik/pure_phone_build:latest
+        #      run: |
+        #        cd build-rt1051-Release && make -j
+        #
