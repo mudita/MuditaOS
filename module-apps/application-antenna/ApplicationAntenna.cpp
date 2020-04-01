@@ -8,16 +8,21 @@
 #include "ApplicationAntenna.hpp"
 #include "service-cellular/api/CellularServiceAPI.hpp"
 #include "windows/AntennaMainWindow.hpp"
+#include "windows/ScanModesWindow.hpp"
 #include <ticks.hpp>
 namespace app
 {
 
     void ApplicationAntenna::timerHandler(void)
     {
+        auto win = getCurrentWindow();
 
-        if (!scanInProgress) {
-            LOG_INFO("Get Network info");
-            CellularServiceAPI::GetNetworkInfo(this);
+        if (win->getName() == gui::name::window::main_window) {
+            if (!cellularRequestInProgress) {
+                LOG_INFO("Get Network info");
+                cellularRequestInProgress = true;
+                CellularServiceAPI::GetNetworkInfo(this);
+            }
         }
     }
 
@@ -48,14 +53,14 @@ namespace app
             if (msg != nullptr) {
                 auto win = getCurrentWindow();
 
-                if (win->getName() == "MainWindow") {
+                if (win->getName() == gui::name::window::main_window) {
                     auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
                     if (window != nullptr) {
 
                         window->updateOperatorsScan(msg->data);
                     }
                 }
-                scanInProgress = false;
+                cellularRequestInProgress = false;
             }
             handled = true;
         }
@@ -64,17 +69,33 @@ namespace app
             if (msg != nullptr) {
                 auto win = getCurrentWindow();
 
-                if (win->getName() == "MainWindow") {
+                if (win->getName() == gui::name::window::main_window) {
                     auto window = dynamic_cast<gui::AntennaMainWindow *>(win);
                     if (window != nullptr) {
 
                         window->updateDebugInfo(msg->data);
                     }
                 }
+                cellularRequestInProgress = false;
             }
             handled = true;
         }
+        if (msgl->messageType == MessageType::CellularGetScanModeResult) {
+            auto msg = dynamic_cast<cellular::RawCommandRespAsync *>(msgl);
+            if (msg != nullptr) {
+                auto win = getWindow(gui::name::window::scan_window);
 
+                if (win->getName() == gui::name::window::scan_window) {
+                    auto window = dynamic_cast<gui::ScanModesWindow *>(win);
+                    if (window != nullptr) {
+
+                        window->updateCurrentMode(msg->data[0]);
+                    }
+                }
+                cellularRequestInProgress = false;
+            }
+            handled = true;
+        }
         if (handled)
             return std::make_shared<sys::ResponseMessage>();
         else
@@ -105,9 +126,10 @@ namespace app
     {
 
         gui::AppWindow *win = new gui::AntennaMainWindow(this);
-        win->setSize(480, 600);
-
         windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::main_window, win));
+
+        win = new gui::ScanModesWindow(this);
+        windows.insert(std::pair<std::string, gui::AppWindow *>(gui::name::window::scan_window, win));
     }
 
     void ApplicationAntenna::destroyUserInterface()

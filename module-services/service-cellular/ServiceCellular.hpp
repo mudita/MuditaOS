@@ -108,6 +108,9 @@ class ServiceCellular : public sys::Service
     bool handle_fatal_failure();
 
     /// @}
+
+    bool SetScanMode(std::string mode);
+    std::string GetScanMode(void);
 };
 
 #endif // PUREPHONE_SERVICECELLULAR_HPP

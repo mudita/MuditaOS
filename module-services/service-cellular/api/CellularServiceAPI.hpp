@@ -50,6 +50,9 @@ namespace CellularServiceAPI
      * @param antenna selected antenna. 0 to select antenna A, 1 to select antenna B
      */
     bool SelectAntenna(sys::Service *serv, uint8_t antenna);
+
+    bool SetScanMode(sys::Service *serv, std::string mode);
+    bool GetScanMode(sys::Service *serv);
 }; // namespace CellularServiceAPI
 
 #endif // PUREPHONE_CELLULARSERVICEAPI_HPP

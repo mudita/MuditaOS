@@ -205,6 +205,23 @@ namespace gui
         }
     }
 
+    void BoxLayout::setFocusOnElement(uint32_t elementNumber)
+    {
+        uint32_t i = 0;
+        for (auto child : children) {
+            if (child->activeItem == true && child->visible == true) {
+
+                if (elementNumber == i) {
+                    child->setFocus(true);
+                    focusItem = child;
+                }
+                else {
+                    child->setFocus(false);
+                }
+                ++i;
+            }
+        }
+    }
     HBox::HBox() : BoxLayout()
     {
         type = ItemType::HBOX;
