@@ -46,13 +46,8 @@ namespace gui
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         title->setMargins(Margins(0, 0, 0, 18));
         title->setFont(style::window::font::small);
-        if (contact) {
-            title->setText(utils::localize.get("app_phonebook_contact_edit"));
-        }
-        else {
-            title->setText(utils::localize.get("app_phonebook_contact_title"));
-        }
-        title->setAlignment(
+        title->setText(utils::localize.get("app_phonebook_contact_title"));
+        title->setAlignement(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         // page 1 labels and text
@@ -450,6 +445,12 @@ namespace gui
         PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
         if (item) {
             contact = item->getContact();
+            if(contact->ID){
+                title->setText(utils::localize.get("app_phonebook_contact_edit"));
+            }
+            else {
+                title->setText(utils::localize.get("app_phonebook_contact_title"));
+            }
             setContactData();
         }
 
