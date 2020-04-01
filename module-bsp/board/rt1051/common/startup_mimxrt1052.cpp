@@ -451,11 +451,11 @@ extern "C"
 #endif
 
 #include "MIMXRT1051.h"
-#include <string.h>
-#include <stdint.h>
+#include "macros.h"
 #include <log/log.hpp>
-#include <segger/rtt/SEGGER_RTT.h>
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstdint>
+#include <string>
 
 //*****************************************************************************
 // The vector table.

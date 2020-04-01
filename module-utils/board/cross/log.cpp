@@ -72,6 +72,12 @@ static const char *level_colors[] = {"", "", "", "", "", ""};
 #include <map>
 #include <string>
 
+namespace
+{
+    const char *critStr = "CRIT";
+    const char *irqStr  = "IRQ";
+} // namespace
+
 struct Logger
 {
     Logger(logger_level level = LOGTRACE) : level{level}
@@ -118,7 +124,9 @@ struct Logger
     std::map<std::string, logger_level> filtered = {
         // {"ServiceDB", logger_level::LOGFATAL},
         {"ApplicationManager", logger_level::LOGINFO},
-    };
+        // make sure that we got defined map entries for at least crit and irq
+        {critStr, logger_level::LOGTRACE},
+        {irqStr, logger_level::LOGTRACE}};
 
     /// Filter out not interesting logs via thread Name
     /// its' using fact that:
@@ -163,8 +171,8 @@ void log_Printf(const char *fmt, ...)
 static inline const char *getTaskDesc()
 {
     return xTaskGetCurrentTaskHandle() == NULL
-               ? "CRIT"
-               : xPortIsInsideInterrupt() ? "IRQ" : pcTaskGetName(xTaskGetCurrentTaskHandle());
+               ? critStr
+               : xPortIsInsideInterrupt() ? irqStr : pcTaskGetName(xTaskGetCurrentTaskHandle());
 }
 
 static void _log_Log(

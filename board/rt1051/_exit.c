@@ -27,12 +27,11 @@
 
 // ----------------------------------------------------------------------------
 
-#include "FreeRTOS.h"
-#include "task.h"
-#include <stdlib.h>
-#include <string.h>
-#include "MIMXRT1051.h"
+#include <FreeRTOS.h>
+#include <MIMXRT1051.h>
 #include <log/log.hpp>
+#include <task.h>
+#include <macros.h>
 // ----------------------------------------------------------------------------
 
 // Forward declaration
@@ -56,11 +55,14 @@ void __reset_hardware(void)
 // It can be redefined in the application, if more functionality
 // is required.
 
-void __attribute__((weak)) _exit(int code __attribute__((unused)))
+void __attribute__((weak)) _exit(int code)
 {
     LOG_FATAL("_exit %d", code);
+    haltIfDebugging();
     vTaskEndScheduler();
-    while (1) {};
+#ifdef DEBUG
+    while(1){};
+#endif
 }
 
 // ----------------------------------------------------------------------------

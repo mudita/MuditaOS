@@ -1,14 +1,4 @@
-/*
- *  @file macros.h
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 31 lip 2018
- *  @brief Handy macros
- *  @copyright Copyright (C) 2018 mudita.com
- *  @details
- */
-
-#ifndef MACROS_H_
-#define MACROS_H_
+#pragma once
 
 #include "MIMXRT1051.h"
 #include <stdbool.h>
@@ -74,4 +64,9 @@ static inline bool isIRQ()
     return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
 }
 
-#endif /* MACROS_H_ */
+static inline void haltIfDebugging()
+{
+    if (CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) {
+        __asm("bkpt 1");
+    }
+}
