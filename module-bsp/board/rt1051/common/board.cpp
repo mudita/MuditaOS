@@ -8,18 +8,19 @@
  * @details
  */
 
-#include "fsl_common.h"
 #include "board.h"
+extern "C"
+{
+#include "fsl_common.h"
 #include "fsl_clock.h"
 #include "fsl_dcdc.h"
 #include "pin_mux.h"
-#include "chip.h"
-
-#include "irq/irq_gpio.hpp"
-
 #if LOG_REDIRECT == RTT_LUART
 #include "fsl_lpuart.h"
 #endif
+}
+#include "chip.hpp"
+#include "irq/irq_gpio.hpp"
 
 namespace bsp
 {

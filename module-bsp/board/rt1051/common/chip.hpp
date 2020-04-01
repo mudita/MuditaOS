@@ -1,15 +1,14 @@
 #pragma once
 
+extern "C"
+{
 #include "cmsis/cmsis_gcc.h"
 #include "cmsis/core_cm7.h"
-#include <stdio.h>
-#include <stdbool.h>
+#include "fsl_drivers/fsl_src.h"
+}
 #include <log/log.hpp>
-#include "fsl_src.h"
-#include <string>
 #include <map>
-
-//#define userprintf(...) SEGGER_RTT_printf(0, __VA_ARGS__)
+#include <string>
 
 //! Test if in interrupt mode
 static inline bool isIRQ()
