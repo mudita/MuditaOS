@@ -274,13 +274,11 @@ namespace gui
             }
 
             if (availableSpace - (glyph->xadvance + kern_value) < 0) {
-                if (spaceConsumed) {
-                    spaceConsumed = space - availableSpace; // unreachable
-                }
+                spaceConsumed = space - availableSpace;
                 return stringChars;
             }
 
-            availableSpace -= glyph->xadvance + kern_value;
+            availableSpace -= (glyph->xadvance + kern_value);
 
             idLast = idCurrent;
             ++stringChars;
