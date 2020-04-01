@@ -102,7 +102,7 @@ extern uint32_t SystemCoreClock;
 #define configTIMER_TASK_STACK_DEPTH            (1024)
 
 /* Define to trap errors during development. */
-#define configASSERT(x) if((x) == 0) {LOG_FATAL("Assertion: %s",x); while(1);}
+#define configASSERT(x) if( (x) == 0 ) { taskDISABLE_INTERRUPTS(); LOG_FATAL("Assert!"); while(1){};}
 
 
 /* Optional functions - most linkers will remove unused functions anyway. */
