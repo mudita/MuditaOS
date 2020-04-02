@@ -446,7 +446,7 @@ namespace gui
         if (item) {
             contact = item->getContact();
             if(contact->ID){
-                title->setText(utils::localize.get("app_phonebook_contact_edit"));
+                title->setText(utils::localize.get("app_phonebook_options_edit"));
             }
             else {
                 title->setText(utils::localize.get("app_phonebook_contact_title"));
