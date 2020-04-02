@@ -62,12 +62,19 @@ class AudioRequestMessage : public AudioMessage
 class AudioResponseMessage : public sys::ResponseMessage
 {
   public:
-    AudioResponseMessage(audio::RetCode retCode, audio::Tags tags = {})
-        : sys::ResponseMessage(), retCode(retCode), tags(tags){};
-    virtual ~AudioResponseMessage(){};
+    AudioResponseMessage(audio::RetCode retCode  = audio::RetCode::Success,
+                         const audio::Tags &tags = {},
+                         const float val         = 0)
+        : sys::ResponseMessage(), tags(tags), val(val)
+    {}
+    AudioResponseMessage(audio::RetCode retCode, const float val) : AudioResponseMessage(retCode, {}, val)
+    {}
+    virtual ~AudioResponseMessage()
+    {}
 
-    audio::RetCode retCode;
-    audio::Tags tags;
+    audio::RetCode retCode = audio::RetCode::Success;
+    audio::Tags tags       = {};
+    float val              = 0;
 };
 
 #endif // PUREPHONE_AUDIOMESSAGE_HPP

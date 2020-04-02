@@ -1,17 +1,7 @@
-/*
- *  @file Audio.cpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 22.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
 #include "Audio.hpp"
-
 #include "Operation/Operation.hpp"
-
-#include "log/log.hpp"
+#include <log/log.hpp>
+#include <Utils.hpp>
 
 namespace audio
 {
@@ -49,19 +39,20 @@ namespace audio
 
     int32_t Audio::SetOutputVolume(Volume vol)
     {
-        float volSet = vol;
+        auto volToSet = vol;
         if (vol > 1) {
-            volSet = 1;
+            volToSet = 1;
         }
         if (vol < 0) {
-            volSet = 0;
+            volToSet = 0;
         }
-        return currentOperation->SetOutputVolume(volSet);
+
+        return currentOperation->SetOutputVolume(volToSet);
     }
 
     int32_t Audio::SetInputGain(Gain gain)
     {
-        float gainToSet = gain;
+        auto gainToSet = gain;
         if (gain > 10) {
             gainToSet = 10.0;
         }

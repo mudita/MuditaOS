@@ -1,20 +1,8 @@
-/*
- * @file Profile.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 24 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_GUI_GUI_INPUT_PROFILE_HPP_
-#define MODULE_GUI_GUI_INPUT_PROFILE_HPP_
-
+#include "InputEvent.hpp"
 #include <string>
 #include <cstdint>
 #include <vector>
 #include <map>
-#include "input/InputEvent.hpp"
-
 namespace gui
 {
 
@@ -74,5 +62,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_GUI_GUI_INPUT_PROFILE_HPP_ */

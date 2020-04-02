@@ -156,6 +156,20 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetInputGain(msg->val)));
     } break;
 
+    case MessageType::AudioGetOutputVolume: {
+        AudioRequestMessage *msg = dynamic_cast<AudioRequestMessage *>(msgl);
+        if (msg != nullptr) {
+            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, audio.GetOutputVolume());
+        }
+    } break;
+
+    case MessageType::AudioGetInputGain: {
+        AudioRequestMessage *msg = dynamic_cast<AudioRequestMessage *>(msgl);
+        if (msg != nullptr) {
+            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, audio.GetInputGain());
+        }
+    } break;
+
     default:
         break;
     }
