@@ -79,11 +79,35 @@ shouldnt_ignore() {
     return 0
 }
 
+# check if branch match naming convention
+check_branch_name(){
+local_branch="$(git rev-parse --abbrev-ref HEAD)"
+
+valid_branch_regex="^\|EGD-[0-9]{3,5}\|(.*)"
+
+message="Wrong branch name ${local_branch}. Proper naming convention |EGD-XXXX|. Rename your branch to a valid name and try again."
+
+if [[ ! $local_branch =~ $valid_branch_regex ]]
+then
+    echo "$message"
+    return 0
+fi
+
+return 1
+
+}
+
 case "${1}" in
   --about )
-    echo "Runs clang-format on source files"
+    echo "Runs git pre-commit hook"
     ;;
   * )
+    echo "Checking branch name"
+    if check_branch_name; then
+      exit 1
+    fi
+
+    echo "Runs clang-format on source files"
     for file in `git diff-index --cached --name-only HEAD` ; do
         if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
             format_file "${file}"

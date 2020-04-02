@@ -38,6 +38,7 @@ function installHooks(){
 
     L_GIT_DIR=$(git rev-parse --show-toplevel)
     ln -sf ${L_GIT_DIR}/config/${HOOK} ${L_GIT_DIR}/.git/hooks/pre-commit
+    ln -sf ${L_GIT_DIR}/config/prepare-commit-msg.hook ${L_GIT_DIR}/.git/hooks/prepare-commit-msg
     PS3=$CUR_PS3
 }
 

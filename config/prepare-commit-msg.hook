@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# An example hook script to prepare the commit log message.
+# Called by "git commit" with the name of the file that has the
+# commit message, followed by the description of the commit
+# message's source.  The hook's purpose is to edit the commit
+# message file.  If the hook fails with a non-zero status,
+# the commit is aborted.
+#
+# To enable this hook, rename this file to "prepare-commit-msg".
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+SHA1=$3
+
+# Only add custom message when there is no commit source
+# ($COMMIT_SOURCE is empty). Otherwise, keep the default message
+# proposed by Git. Possible commit source: message, template,
+# merge, squash or commit. See https://git-scm.com/docs/githooks
+if [[ -z "$COMMIT_SOURCE" ]]
+then
+  ref=$(git rev-parse --abbrev-ref HEAD)
+  if [[ $ref =~ ^.*(\|EGD-[0-9]{3,5}\|).* ]]
+  then
+    hint=$(cat "$COMMIT_MSG_FILE")
+    ticket="${BASH_REMATCH[1]}"
+    echo "${ticket} " > "$COMMIT_MSG_FILE"
+    echo "$hint" >> "$COMMIT_MSG_FILE"
+  fi
+fi

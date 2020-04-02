@@ -10,7 +10,8 @@ Prior to any build setup environment, need to be run once. (See: `## Run provisi
 During the bootstrap you can install git hooks for style checking.
 We have two similar scripts:
 pre-commit-check-only.hook  - this hook only notifies you that style is wrong, doesn't change anything
-pre-commit.hook             - this hook automatically update style during commit
+pre-commit.hook             - this hook automatically checks branch name and update style during commit
+prepare-commit-msg.hook     - this hook automatically adds Jira ID from branch name to commit msg
 if you haven't run `bootstrap.sh` you have to copy (link) *one* of this to your 
 `.git/config/hooks` directory, just:
 `ln -s `pwd`/config/<pre-commit-scipt> .git/hooks/pre-commit`
