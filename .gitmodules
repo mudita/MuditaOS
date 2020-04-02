@@ -21,3 +21,8 @@
 [submodule "module-utils/sbini"]
 	path = module-utils/sbini
 	url = ../sbini
+[submodule "module-utils/re2"]
+	path = module-utils/re2
+	url = ../re2.git
+	branch = rt1051
+	shallow = true
