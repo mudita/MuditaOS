@@ -143,16 +143,13 @@ namespace gui
     {
         AppWindow::destroyInterface();
 
-        if (numberLabel) {
-            removeWidget(numberLabel);
-            delete numberLabel;
-            numberLabel = nullptr;
-        }
-        if (durationLabel) {
-            removeWidget(durationLabel);
-            delete durationLabel;
-            durationLabel = nullptr;
-        }
+        removeWidget(numberLabel);
+        delete numberLabel;
+        numberLabel = nullptr;
+
+        removeWidget(durationLabel);
+        delete durationLabel;
+        durationLabel = nullptr;
 
         removeWidget(microphoneIcon);
         delete microphoneIcon;
@@ -166,16 +163,13 @@ namespace gui
         delete sendSmsIcon;
         sendSmsIcon = nullptr;
 
-        if (imageCircleTop) {
-            removeWidget(imageCircleTop);
-            delete imageCircleTop;
-            imageCircleTop = nullptr;
-        }
-        if (imageCircleBottom) {
-            removeWidget(imageCircleBottom);
-            delete imageCircleBottom;
-            imageCircleBottom = nullptr;
-        }
+        removeWidget(imageCircleTop);
+        delete imageCircleTop;
+        imageCircleTop = nullptr;
+
+        removeWidget(imageCircleBottom);
+        delete imageCircleBottom;
+        imageCircleBottom = nullptr;
 
         children.clear();
     }
