@@ -62,11 +62,7 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
-    switch (static_cast<MessageType>(msgl->messageType)) {
-
-    case MessageType::AudioNotification: {
-        AudioNotificationMessage *msg = reinterpret_cast<AudioNotificationMessage *>(msgl);
-
+    if (auto *msg = dynamic_cast<AudioNotificationMessage *>(msgl)) {
         switch (msg->type) {
 
         case AudioNotificationMessage::Type::EndOfFile: {
@@ -78,100 +74,95 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 
         } break;
         default:
+            LOG_DEBUG("Unhandled AudioNotificationMessage");
             break;
         }
-    } break;
+    }
+    else if (auto *msg = dynamic_cast<AudioRequestMessage *>(msgl)) {
+        switch (msg->type) {
+        case MessageType::AudioPlaybackStart: {
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                static_cast<RetCode>(audio.Start(Operation::Type::Playback, msg->fileName.c_str())));
+        } break;
 
-    case MessageType::AudioPlaybackStart: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg              = std::make_shared<AudioResponseMessage>(
-            static_cast<RetCode>(audio.Start(Operation::Type::Playback, msg->fileName.c_str())));
-    } break;
+        case MessageType::AudioRecorderStart: {
+            responseMsg = std::make_shared<AudioResponseMessage>(
+                static_cast<RetCode>(audio.Start(Operation::Type::Recorder, msg->fileName.c_str())));
+        } break;
 
-    case MessageType::AudioRecorderStart: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg              = std::make_shared<AudioResponseMessage>(
-            static_cast<RetCode>(audio.Start(Operation::Type::Recorder, msg->fileName.c_str())));
-    } break;
+        case MessageType::AudioRoutingStart: {
+            LOG_DEBUG("AudioRoutingStart");
+            responseMsg =
+                std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Start(Operation::Type::Router)));
+        } break;
 
-    case MessageType::AudioRoutingStart: {
-        responseMsg =
-            std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Start(Operation::Type::Router)));
-    } break;
+        case MessageType::AudioStop: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Stop()));
 
-    case MessageType::AudioStop: {
-        responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Stop()));
+            // Send notification that audio file was stopped
+            auto msg = std::make_shared<AudioNotificationMessage>(
+                static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::Stop));
+            sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceAudioNotifications, this);
+        } break;
 
-        // Send notification that audio file was stopped
-        auto msg = std::make_shared<AudioNotificationMessage>(
-            static_cast<AudioNotificationMessage::Type>(AudioNotificationMessage::Type::Stop));
-        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceAudioNotifications, this);
-    } break;
+        case MessageType::AudioPause: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Pause()));
+        } break;
 
-    case MessageType::AudioPause: {
-        responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Pause()));
-    } break;
+        case MessageType::AudioResume: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Resume()));
+        } break;
 
-    case MessageType::AudioResume: {
-        responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.Resume()));
-    } break;
+        case MessageType::AudioGetFileTags: {
+            auto tag = audio.GetFileTags(msg->fileName.c_str());
+            if (tag) {
+                responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, tag.value());
+            }
+            else {
+                responseMsg = std::make_shared<AudioResponseMessage>(RetCode::FileDoesntExist);
+            }
+        } break;
 
-    case MessageType::AudioGetFileTags: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        auto tag                 = audio.GetFileTags(msg->fileName.c_str());
-        if (tag) {
-            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, tag.value());
-        }
-        else {
-            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::FileDoesntExist);
-        }
+        case MessageType::AudioRoutingRecordCtrl: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SendEvent(
+                msg->enable ? Operation::Event::StartCallRecording : Operation::Event::StopCallRecording)));
+        } break;
 
-    } break;
+        case MessageType::AudioRoutingMute: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(
+                audio.SendEvent(msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute)));
+        } break;
 
-    case MessageType::AudioRoutingRecordCtrl: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg              = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(
-            audio.SendEvent(msg->enable ? Operation::Event::StartCallRecording : Operation::Event::StopCallRecording)));
-    } break;
+        case MessageType::AudioRoutingSpeakerhone: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SendEvent(
+                msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff)));
+        } break;
 
-    case MessageType::AudioRoutingMute: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg              = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(
-            audio.SendEvent(msg->enable ? Operation::Event::CallMute : Operation::Event::CallUnmute)));
-    } break;
+        case MessageType::AudioSetOutputVolume: {
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetOutputVolume(msg->val)));
+        } break;
 
-    case MessageType::AudioRoutingSpeakerhone: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg              = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SendEvent(
-            msg->enable ? Operation::Event::CallSpeakerphoneOn : Operation::Event::CallSpeakerphoneOff)));
-    } break;
+        case MessageType::AudioSetInputGain: {
+            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
+            responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetInputGain(msg->val)));
+        } break;
 
-    case MessageType::AudioSetOutputVolume: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetOutputVolume(msg->val)));
-    } break;
-
-    case MessageType::AudioSetInputGain: {
-        AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
-        responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetInputGain(msg->val)));
-    } break;
-
-    case MessageType::AudioGetOutputVolume: {
-        AudioRequestMessage *msg = dynamic_cast<AudioRequestMessage *>(msgl);
-        if (msg != nullptr) {
+        case MessageType::AudioGetOutputVolume: {
             responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, audio.GetOutputVolume());
-        }
-    } break;
+        } break;
 
-    case MessageType::AudioGetInputGain: {
-        AudioRequestMessage *msg = dynamic_cast<AudioRequestMessage *>(msgl);
-        if (msg != nullptr) {
+        case MessageType::AudioGetInputGain: {
             responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Success, audio.GetInputGain());
-        }
-    } break;
+        } break;
 
-    default:
-        break;
+        default:
+            LOG_ERROR("Unhandled AudioRequestMessage");
+            responseMsg = std::make_shared<AudioResponseMessage>(RetCode::Failed);
+            break;
+        }
+    }
+    else {
+        LOG_DEBUG("Unhandled message");
     }
 
     return responseMsg;

@@ -85,6 +85,7 @@ namespace audio
         }
         else {
             // If creating operation failed fallback to IdleOperation which is guaranteed to work
+            LOG_ERROR("Failed to create operation type %d", static_cast<int>(op));
             currentOperation = Operation::Create(Operation::Type::Idle, "").value_or(nullptr);
             currentState     = State ::Idle;
             return static_cast<int32_t>(RetCode::OperationCreateFailed);
