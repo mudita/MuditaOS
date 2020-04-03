@@ -8,25 +8,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v1
       with:
         token: ${{ secrets.GitHub_PAT }}
-        submodules: true
-    - uses: ./.github/actions/style-chek
+        submodules: recursive
+        fetch-depth: 0
+    - name: "Style checking"
+      uses: ./.github/actions/build
       with:
         action: "style"
-        #    - name: Style Check
-        #      uses: docker://hub.docker.com/rwicik/pure_phone_build:latest
-        #      run: |
-        #        ./config/pre-commit-check-only.hook --last
-        #        #- name: Checkout submodules
-        #        #  uses: textbook/git-checkout-submodule-action@2.0.0
-        #    - name: Configure - rt1051
-        #      uses: docker://hub.docker.com/rwicik/pure_phone_build:latest
-        #      run: |
-        #        ./configure.sh rt1051 Release
-        #    - name: Build - rt1051
-        #      uses: docker://hub.docker.com/rwicik/pure_phone_build:latest
-        #      run: |
-        #        cd build-rt1051-Release && make -j
-        #
+        target: ${{ github.event.pull_request.head.sha }}
+        #- name: "Unit Tests"
+        #  uses: ./.github/actions/build
+        #  with:
+        #    action: check
+        #    target: linux
+        #    build_type: Debug
+    - name: "Build for RT1051"
+      uses: ./.github/actions/build
+      with:
+        action: "c&b"
+        target: rt1051
+        build_type: RelWithDebInfo
