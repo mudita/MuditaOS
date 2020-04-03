@@ -78,8 +78,15 @@ namespace gui
         bool textSelectSpecialCB();
         bool returnToPreviousView();
         // TODO: possibly move to differetn class
-        bool incCurrentVolume(const audio::Volume step = audio::defaultVolumeStep);
-        bool decCurrentVolume(const audio::Volume step = audio::defaultVolumeStep);
+        bool adjustCurrentVolume(const audio::Volume step);
+        bool incCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        {
+            return adjustCurrentVolume(step);
+        }
+        bool decCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        {
+            return adjustCurrentVolume(-step);
+        }
     };
 
 } /* namespace gui */

@@ -186,20 +186,14 @@ namespace gui
             std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
     }
 
-    bool AppWindow::incCurrentVolume(const audio::Volume step)
+    bool AppWindow::adjustCurrentVolume(const audio::Volume step)
     {
         audio::Volume vol;
-        AudioServiceAPI::GetOutputVolume(this->application, vol);
-        AudioServiceAPI::SetOutputVolume(this->application, vol + step);
-        return true;
-    }
-
-    bool AppWindow::decCurrentVolume(const audio::Volume step)
-    {
-        audio::Volume vol;
-        AudioServiceAPI::GetOutputVolume(this->application, vol);
-        AudioServiceAPI::SetOutputVolume(this->application, vol - step);
-        return true;
+        auto ret = AudioServiceAPI::GetOutputVolume(this->application, vol);
+        if (ret == audio::RetCode::Success) {
+            ret = AudioServiceAPI::SetOutputVolume(this->application, vol + step);
+        }
+        return ret == audio::RetCode::Success;
     }
 
 } /* namespace gui */
