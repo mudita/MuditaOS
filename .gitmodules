@@ -26,3 +26,8 @@
 	url = ../re2.git
 	branch = rt1051
 	shallow = true
+[submodule "module-utils/protobuf"]
+	path = module-utils/protobuf
+	url = ../protobuf.git
+	branch = rt1051
+	shallow = true
