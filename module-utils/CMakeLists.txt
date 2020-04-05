@@ -52,7 +52,7 @@ include(segger/rtt/CMakeLists.txt)
 
 # add third party libs
 include(third-party/re2.cmake)
-
+include(third-party/protobuf-lite.cmake)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 
@@ -67,9 +67,9 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(${PROJECT_NAME}
-		PUBLIC
+        PUBLIC
 
-		${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 
