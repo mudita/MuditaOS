@@ -22,6 +22,10 @@ extern "C"
 #include "chip.hpp"
 #include "irq/irq_gpio.hpp"
 
+#include <cstdint>
+
+extern std::uint8_t __sdram_cached_start[];
+
 namespace bsp
 {
 
@@ -170,7 +174,7 @@ namespace bsp
         /* Region 9 setting: Memory with Normal type, not shareable, outer/inner write back
          * BOARD_SDRAM_HEAP
          */
-        MPU->RBAR = ARM_MPU_RBAR(9, 0x80400000U);
+        MPU->RBAR = ARM_MPU_RBAR(9, reinterpret_cast<std::uintptr_t>(__sdram_cached_start));
         MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_16MB);
 #endif
 
