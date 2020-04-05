@@ -45,6 +45,9 @@
 // module-sys
 #include "SystemManager/SystemManager.hpp"
 
+// libphonenumber
+#include <phonenumbers/phonenumberutil.h>
+
 class vfs vfs;
 
 class BlinkyService : public sys::Service
@@ -154,6 +157,11 @@ int main()
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]() -> int {
+        /// force initialization of PhonenumberUtil because of its stack usage
+        /// otherwise we would end up with an init race and PhonenumberUtil could
+        /// be initiated in a task with stack not big enough to handle it
+        i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+
         vfs.Init();
 
         bool ret = false;

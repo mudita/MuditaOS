@@ -7,30 +7,32 @@
  * @details
  */
 #include "ApplicationCall.hpp"
-#include "Application.hpp"
 
-#include "MessageType.hpp"
 #include "data/CallSwitchData.hpp"
-#include "log/log.hpp"
-#include "time/time_conversion.hpp"
 #include "windows/CallMainWindow.hpp"
 #include "windows/CallWindow.hpp"
 #include "windows/EmergencyCallWindow.hpp"
 #include "windows/EnterNumberWindow.hpp"
+
+#include <Application.hpp>
+#include <MessageType.hpp>
+#include <UiCommonActions.hpp>
+
+#include <log/log.hpp>
+#include <service-cellular/ServiceCellular.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <service-audio/api/AudioServiceAPI.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
+#include <time/time_conversion.hpp>
 #include <ticks.hpp>
 
-#include "service-cellular/ServiceCellular.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include "service-audio/api/AudioServiceAPI.hpp"
-
-#include "service-appmgr/ApplicationManager.hpp"
 #include <cassert>
 
 namespace app
 {
 
     ApplicationCall::ApplicationCall(std::string name, std::string parent, bool startBackgound)
-        : Application(name, parent, startBackgound, 4096 + 2048),
+        : Application(name, parent, startBackgound, app::call_stack_size),
           timerCall(CreateAppTimer(1000, true, [=]() { timerCallCallback(); }))
     {}
 
@@ -199,7 +201,6 @@ namespace app
 
     void ApplicationCall::createUserInterface()
     {
-
         gui::AppWindow *window = nullptr;
 
         window = new gui::CallMainWindow(this);
@@ -213,16 +214,6 @@ namespace app
 
         window = new gui::EmergencyCallWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
-    }
-
-    void ApplicationCall::setDisplayedNumber(std::string num)
-    {
-        phoneNumber = num;
-    }
-
-    const std::string &ApplicationCall::getDisplayedNumber()
-    {
-        return phoneNumber;
     }
 
     void ApplicationCall::runCallTimer()
@@ -243,5 +234,18 @@ namespace app
 
     void ApplicationCall::destroyUserInterface()
     {}
+
+    void ApplicationCall::handleCallEvent(const std::string &number)
+    {
+        LOG_INFO("number: [%s]", number.c_str());
+        auto ret = CellularServiceAPI::DialNumber(this, number.c_str());
+        LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+    }
+
+    void ApplicationCall::handleAddContactEvent(const std::string &number)
+    {
+        LOG_INFO("add contact information: %s", number.c_str());
+        app::contact(this, app::ContactOperation::Add, number);
+    }
 
 } // namespace app
