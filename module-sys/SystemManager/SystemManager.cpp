@@ -23,7 +23,7 @@ namespace sys
     const char *systemManagerServiceName = "SysMgrService";
 
     SystemManager::SystemManager(TickType_t pingInterval)
-        : Service(systemManagerServiceName), pingInterval(pingInterval)
+        : Service(systemManagerServiceName, "", 8192), pingInterval(pingInterval)
     {
         // Specify list of channels which System Manager is registered to
         busChannels = {BusChannels::SystemManagerRequests};
