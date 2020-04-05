@@ -31,3 +31,8 @@
 	url = ../protobuf.git
 	branch = rt1051
 	shallow = true
+[submodule "module-utils/libphonenumber"]
+	path = module-utils/libphonenumber
+	url = ../libphonenumber.git
+	branch = rt1051
+	shallow = true
