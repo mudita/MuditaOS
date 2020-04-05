@@ -53,6 +53,7 @@ include(segger/rtt/CMakeLists.txt)
 # add third party libs
 include(third-party/re2.cmake)
 include(third-party/protobuf-lite.cmake)
+include(third-party/libphonenumber.cmake)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 
