@@ -23,11 +23,12 @@ RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime && \
         apt-utils \
         locales \
         tzdata && \
+    ln -fs /usr/bin/python3 /usr/bin/python && \
     locale-gen pl_PL.UTF-8 \
                en_US.UTF-8 \
                de_DE.UTF-8 \
                es_ES.UTF-8 && \
-    dpkg-reconfigure --frontend noninteractive tzdata 
+    dpkg-reconfigure --frontend noninteractive tzdata
 
 ADD gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 /usr/local/
 
