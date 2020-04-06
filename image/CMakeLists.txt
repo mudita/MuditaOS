@@ -26,4 +26,5 @@ foreach(ASSET ${ASSETS_LIST})
             ${outfile}
         )
     add_custom_target(${filename} ALL DEPENDS ${ASSET} ${outfile})
+    add_dependencies(check ${filename})
 endforeach()
