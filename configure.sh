@@ -70,7 +70,7 @@ function check_systemview() {
             SYSTEMVIEW="ON"
             return 0;;
         *)
-            echo "wrong systemview option \"${SYSTEMVIEW}\" using default OFF"
+            echo "\"systemview\" option ${SYSTEMVIEW:+has wrong value:}${SYSTEMVIEW:-is not set} - using default (OFF)"
             SYSTEMVIEW="OFF"
             return 1;;
     esac
@@ -107,8 +107,9 @@ if check_target && check_build_type ; then
         CMAKE_CMD="cmake \
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
-                    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${SRC_DIR} \
-                    -DSYSTEMVIEW=${SYSTEMVIEW} $@"
+                    -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+                    -DSYSTEMVIEW=${SYSTEMVIEW} $@ \
+                    ${SRC_DIR} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
         if $CMAKE_CMD; then
             echo -e "\e[32mcd ${BUILD_DIR} && make -j\e[0m"
