@@ -50,7 +50,9 @@ bool test_time_day_month_format(std::ostream &outstream)
     string data    = c_data;
 
     auto el = search(data.begin(), data.end(), pattern.begin(), pattern.end());
-    data.erase(el, std::next(el, 4));
+    if (el != data.end()) {
+        data.erase(el, std::next(el, 4));
+    }
 
     Time t(date);
     outstream << "\t"

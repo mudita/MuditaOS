@@ -38,15 +38,15 @@ TARGET=$1
 shift 
 case ${TARGET} in
     "login") 
-        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME} -it ${CONTAINER} /bin/bash --rcfile ${RCFILE}"
+        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME} -it --entrypoint /bin/bash ${CONTAINER} --rcfile ${RCFILE}"
         ;;
     "config")
-        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME} ${CONTAINER} ./configure.sh $@"
+        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME} --entrypoint ./configure.sh ${CONTAINER}  $@"
         ;;
     "make")
         BUILD_DIR=$1
         shift
-        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} ${CONTAINER} make -j $@"
+        CMD="docker run ${STANDARD_OPTIONS} -w ${PURE_HOME}/${BUILD_DIR} --entrypoint make ${CONTAINER} -j $@"
         ;;
     *)
         help

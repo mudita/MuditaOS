@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # taken from: https://raw.githubusercontent.com/andrewseidl/githook-clang-format/master/clang-format.hook
 # - with just added check for cpp file & check for proper version of clang-format
 # - with use of clang-format diff.py - for changed chunk changes only
@@ -25,7 +25,7 @@ Either install:
     clang-format-9
 
     Your clang format version in path used:
-        $(clang-format --version)
+        $(clang-format --version):
         $(clang-format-9 --version)
     git commit aborted"
 EOF
@@ -61,7 +61,7 @@ format_file() {
   file="${1}"
   if [ -f $file ]; then
     [[ $VERBOSE ]] && echo "Format: ${1} diff"
-    git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 -i
+    git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
     git add ${1}
   fi
 }
@@ -70,11 +70,11 @@ check_file() {
   file="${1}"
   last_commit="${2}"
   if [ -f $file ]; then
-    [[ $VERBOSE ]] && echo -en "Checking: \e[33m${1}\e[0m :\t"
+    [[ $VERBOSE ]] && echo -en "Checking: \e[33m${file}\e[0m :\t"
     if [[ -z ${last_commit} ]]; then
-        OUT=$(git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+        OUT=$(git diff -U0 --no-color --cached ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
     else
-        OUT=$(git diff -U0 --no-color HEAD^..HEAD ${1} | ${L_CLANG_DIFF_TOOL} -p1 )
+        OUT=$(git diff -U0 --no-color remotes/origin/master...HEAD ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
     fi
     if [ -z "$OUT" ]; then
         [[ ${VERBOSE} ]] && echo "OK"
@@ -106,7 +106,7 @@ case "${1}" in
     LAST=""
     ;;
   --last)
-    FILES=$(git diff --name-only HEAD^..HEAD)
+    FILES=$(git diff --name-only remotes/origin/master...HEAD)
     LAST="True"
     ;;
   * )
