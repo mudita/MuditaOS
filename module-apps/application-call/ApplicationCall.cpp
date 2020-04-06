@@ -96,7 +96,7 @@ namespace app
         }
         else {
 
-            AudioServiceAPI::PlaybackStart(this, "sys/assets/audio/ringtone.wav");
+            AudioServiceAPI::PlaybackStart(this, ringtone_path);
             runCallTimer();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
             // send to itself message to switch (run) call application

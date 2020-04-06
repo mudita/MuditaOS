@@ -2,7 +2,6 @@
 
 namespace audio
 {
-
     using Position = float;
     using Volume   = float;
     using Gain     = float;
@@ -28,5 +27,4 @@ namespace audio
         EndOfFile,
         FileSystemNoSpace
     };
-
 } // namespace audio
