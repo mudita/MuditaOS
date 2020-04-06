@@ -17,13 +17,12 @@ jobs:
       uses: ./.github/actions/build
       with:
         action: "style"
-        target: ${{ github.event.pull_request.head.sha }}
-        #- name: "Unit Tests"
-        #  uses: ./.github/actions/build
-        #  with:
-        #    action: check
-        #    target: linux
-        #    build_type: Debug
+    - name: "Unit Tests"
+      uses: ./.github/actions/build
+      with:
+        action: check
+        target: linux
+        build_type: Debug
     - name: "Build for RT1051"
       uses: ./.github/actions/build
       with:
