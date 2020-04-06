@@ -2,7 +2,9 @@ FROM ubuntu:eoan
 MAINTAINER radoslaw.wicik@mudiata.com
 # basic build system for PurePhoneOs
 
-RUN apt-get update && \
+RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && \
     apt-get full-upgrade -y && \
     apt-get install -y \
         binutils \
@@ -17,7 +19,15 @@ RUN apt-get update && \
         build-essential \
         vim \
         bash-completion \
-        clang-format-9
+        clang-format-9 \
+        apt-utils \
+        locales \
+        tzdata && \
+    locale-gen pl_PL.UTF-8 \
+               en_US.UTF-8 \
+               de_DE.UTF-8 \
+               es_ES.UTF-8 && \
+    dpkg-reconfigure --frontend noninteractive tzdata 
 
 ADD gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 /usr/local/
 
