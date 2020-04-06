@@ -195,6 +195,16 @@ namespace app
             shutdownInProgress = true;
         };
 
+        bool adjustCurrentVolume(const audio::Volume step);
+        bool incCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        {
+            return adjustCurrentVolume(step);
+        }
+        bool decCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        {
+            return adjustCurrentVolume(-step);
+        }
+
         /// @defgroup Application Application static functions
         /// All this functions are meant to be used in ApplicationManager only
         /// @note consider moving these as private elements of ApplicationManager i.e. under names

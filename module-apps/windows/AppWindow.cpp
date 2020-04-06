@@ -139,10 +139,10 @@ namespace gui
 
         switch (inputEvent.keyCode) {
         case KeyCode::KEY_VOLUP: {
-            return incCurrentVolume();
+            return application->incCurrentVolume();
         }
         case KeyCode::KEY_VOLDN: {
-            return decCurrentVolume();
+            return application->decCurrentVolume();
         }
         case KeyCode::KEY_RF: {
             return returnToPreviousView();
@@ -184,16 +184,6 @@ namespace gui
         return sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
             std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
-    }
-
-    bool AppWindow::adjustCurrentVolume(const audio::Volume step)
-    {
-        audio::Volume vol;
-        auto ret = AudioServiceAPI::GetOutputVolume(this->application, vol);
-        if (ret == audio::RetCode::Success) {
-            ret = AudioServiceAPI::SetOutputVolume(this->application, vol + step);
-        }
-        return ret == audio::RetCode::Success;
     }
 
 } /* namespace gui */

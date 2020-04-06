@@ -18,7 +18,7 @@ namespace audio
 
     Position Audio::GetPosition()
     {
-        return currentOperation->GetPosition();
+        return currentOperation != nullptr ? currentOperation->GetPosition() : -1; // RetCode::OperationNotSet;
     }
 
     std::optional<Tags> Audio::GetFileTags(const char *filename)
@@ -34,7 +34,7 @@ namespace audio
 
     int32_t Audio::SendEvent(const Operation::Event evt, const EventData *data)
     {
-        return currentOperation->SendEvent(evt, data);
+        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data) : -1; // RetCode::OperationNotSet;
     }
 
     int32_t Audio::SetOutputVolume(Volume vol)
@@ -47,7 +47,8 @@ namespace audio
             volToSet = 0;
         }
 
-        return currentOperation->SetOutputVolume(volToSet);
+        return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet)
+                                           : -1; // TODO: alek: // RetCode::OperationNotSet;
     }
 
     int32_t Audio::SetInputGain(Gain gain)
@@ -59,7 +60,8 @@ namespace audio
         if (gain < 0) {
             gainToSet = 0;
         }
-        return currentOperation->SetInputGain(gainToSet);
+        return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet)
+                                           : -1; // TODO: alek: // RetCode::OperationNotSet;
     }
 
     int32_t Audio::Start(Operation::Type op, const char *fileName)
@@ -122,7 +124,7 @@ namespace audio
             return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
         }
 
-        return currentOperation->Pause();
+        return currentOperation != nullptr ? currentOperation->Pause() : -1; // TODO: alek: // RetCode::OperationNotSet;
     }
 
     int32_t Audio::Resume()
@@ -130,7 +132,8 @@ namespace audio
         if (currentState == State::Idle) {
             return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
         }
-        return currentOperation->Resume();
+        return currentOperation != nullptr ? currentOperation->Resume()
+                                           : -1; // TODO: alek: // RetCode::OperationNotSet;
     }
 
 } // namespace audio

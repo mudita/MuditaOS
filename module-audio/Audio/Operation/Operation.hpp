@@ -76,12 +76,12 @@ namespace audio
 
         Volume GetOutputVolume()
         {
-            return currentProfile != nullptr ? currentProfile->GetOutputVolume() : 0; // TODO: create const for invalid
+            return currentProfile != nullptr ? currentProfile->GetOutputVolume() : invalidVolume;
         }
 
         Gain GetInputGain()
         {
-            return currentProfile != nullptr ? currentProfile->GetInputGain() : 0; // TODO: create const for invalid
+            return currentProfile != nullptr ? currentProfile->GetInputGain() : invalidGain;
         }
 
         State GetState()
