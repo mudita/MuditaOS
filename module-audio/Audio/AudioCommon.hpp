@@ -7,11 +7,11 @@ namespace audio
     using Gain     = float;
 
     constexpr Volume defaultVolumeStep = 0.1;
-    constexpr Volume defaultGainStep   = 1.0;
+    constexpr Gain defaultGainStep     = 1.0;
     constexpr Volume invalidVolume     = -1.0;
-    constexpr Volume invalidGain       = -1.0;
+    constexpr Gain invalidGain         = -1.0;
     constexpr Volume defaultVolume     = 0.5;
-    constexpr Volume defaultGain       = 0.5;
+    constexpr Gain defaultGain         = 0.5;
 
     enum class RetCode
     {
