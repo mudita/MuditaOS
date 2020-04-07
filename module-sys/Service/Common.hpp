@@ -1,12 +1,4 @@
-/*
- * Common.hpp
- *
- *  Created on: Mar 7, 2019
- *      Author: mati
- */
-
-#ifndef SYSTEMMANAGER_COMMON_HPP_
-#define SYSTEMMANAGER_COMMON_HPP_
+#pragma once
 
 #include "FreeRTOSConfig.h"
 
@@ -56,4 +48,32 @@ namespace sys
 
 } // namespace sys
 
-#endif /* SYSTEMMANAGER_COMMON_HPP_ */
+inline const char *c_str(sys::ReturnCodes code)
+{
+    switch (code) {
+    case sys::ReturnCodes::Success:
+        return "Success";
+    case sys::ReturnCodes::Failure:
+        return "Failure";
+    case sys::ReturnCodes::Timeout:
+        return "Timeout";
+    case sys::ReturnCodes::ServiceDoesntExist:
+        return "ServiceDoesntExist";
+    case sys::ReturnCodes::Unresolved:
+        return "Unresolved";
+    }
+    return "Undefined";
+}
+
+inline const char *c_str(sys::ServicePowerMode code)
+{
+    switch (code) {
+    case sys::ServicePowerMode::Active:
+        return "Active";
+    case sys::ServicePowerMode::SuspendToRAM:
+        return "SuspendToRAM";
+    case sys::ServicePowerMode::SuspendToNVM:
+        return "SuspendToNVM";
+    }
+    return "";
+}

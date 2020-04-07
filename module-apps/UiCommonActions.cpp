@@ -44,7 +44,7 @@ namespace app
             data = std::make_unique<EnterNumberData>(e164number.c_str());
         } break;
         default: {
-            LOG_ERROR("callOperation not supported %d", static_cast<uint32_t>(callOperation));
+            LOG_ERROR("callOperation not supported %" PRIu32, static_cast<uint32_t>(callOperation));
             return false;
         }
         }
@@ -69,7 +69,7 @@ namespace app
                 app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
         }
         default: {
-            LOG_ERROR("SmsOperation not supported %d", static_cast<uint32_t>(smsOperation));
+            LOG_ERROR("SmsOperation not supported %" PRIu32, static_cast<uint32_t>(smsOperation));
             return false;
         }
         }
@@ -109,7 +109,7 @@ namespace app
                 std::make_unique<PhonebookItemData>(std::shared_ptr<ContactRecord>(new ContactRecord(contact))));
         } break;
         default: {
-            LOG_ERROR("ContactOperation not supported %d", static_cast<uint32_t>(contactOperation));
+            LOG_ERROR("ContactOperation not supported %" PRIu32, static_cast<uint32_t>(contactOperation));
             return false;
         }
         }
@@ -123,7 +123,7 @@ namespace app
         ContactRecord contactRec;
         if (searchResults.get()->size() == 1) {
             contactRec = searchResults->front();
-            LOG_INFO("Found contact matching search num %s : contact ID %u - %s %s",
+            LOG_INFO("Found contact matching search num %s : contact ID %" PRIu32 " - %s %s",
                      number.c_str(),
                      contactRec.ID,
                      contactRec.primaryName.c_str(),
@@ -142,7 +142,7 @@ namespace app
         else if (searchResults.get()->size() > 1) {
             LOG_FATAL("Found more than one contact for numer %s", number.c_str());
             for (auto i : *searchResults) {
-                LOG_FATAL("ContactID = %u", i.ID);
+                LOG_FATAL("ContactID = %" PRIu32, i.ID);
             }
             return false;
         }

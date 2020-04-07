@@ -31,7 +31,7 @@ namespace ModemCall
 
         auto numberOfTokens = tokens.size();
         if (numberOfTokens != 7 && numberOfTokens != 8) {
-            LOG_ERROR("wrong number of tokens %u", numberOfTokens);
+            LOG_ERROR("wrong number of tokens %u", static_cast<unsigned int>(numberOfTokens));
             throw std::runtime_error("No valid prefix");
         }
         // TODO: alek: add paramters validation
@@ -128,13 +128,13 @@ namespace CellularCall
             } break;
 
             default:
-                LOG_ERROR("Not a valid call type %u", callType);
+                LOG_ERROR("Not a valid call type %u", static_cast<int>(callType));
                 return false;
             }
         }
 
         if (!(endCallAction && endCallAction(call))) {
-            LOG_ERROR("CalllogUpdate failed, id %u", call.ID);
+            LOG_ERROR("CalllogUpdate failed, id %" PRIu32, call.ID);
             return false;
         }
 

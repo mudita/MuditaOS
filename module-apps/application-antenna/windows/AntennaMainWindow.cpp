@@ -172,7 +172,7 @@ namespace gui
 
     void AntennaMainWindow::updateDebugInfo(std::vector<std::string> &data)
     {
-        LOG_INFO("AntennaMainWindow::updateDebugInfo vector size %d", data.size());
+        LOG_INFO("AntennaMainWindow::updateDebugInfo vector size %u", static_cast<unsigned int>(data.size()));
         if (data.size() == 3) {
             titles[static_cast<uint32_t>(labelDescripion::csq)]->setText(
                 titlesText[static_cast<uint32_t>(labelDescripion::csq)] + data[0]);

@@ -22,7 +22,7 @@ void NotesModel::requestRecordsCount()
     uint32_t start = xTaskGetTickCount();
     recordsCount   = DBServiceAPI::NotesGetCount(application);
     uint32_t stop  = xTaskGetTickCount();
-    LOG_INFO("DBServiceAPI::NotesGetCount %d records %d ms", recordsCount, stop - start);
+    LOG_INFO("DBServiceAPI::NotesGetCount %d records %" PRIu32 " ms", recordsCount, stop - start);
 
     // request first and second page if possible
     if (recordsCount > 0) {

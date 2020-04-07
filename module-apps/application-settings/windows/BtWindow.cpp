@@ -43,7 +43,7 @@ namespace gui
         std::shared_ptr<BluetoothMessage> msg = std::make_shared<BluetoothMessage>(req);
         auto ret                              = sys::Bus::SendUnicast(msg, "ServiceBluetooth", app, 5000);
         if (ret.first != sys::ReturnCodes::Success) {
-            LOG_ERROR("err: %d", ret.first);
+            LOG_ERROR("err: %d", static_cast<int>(ret.first));
         }
         return ret.first;
     }

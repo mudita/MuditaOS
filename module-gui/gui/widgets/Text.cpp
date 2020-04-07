@@ -578,7 +578,7 @@ namespace gui
 
         // it there is no key char it means that translator didn't handled the key and this key
         if (code == 0) {
-            LOG_ERROR("Key not handled! %d", inputEvent.keyCode);
+            LOG_ERROR("Key not handled! %d", static_cast<int>(inputEvent.keyCode));
             return false;
         }
 
@@ -1009,7 +1009,7 @@ namespace gui
                 h = widgetArea.h;
             }
             setSize(getWidth(), h);
-            LOG_DEBUG("Resized Text to: %d %d", getWidth(), getHeight());
+            LOG_DEBUG("Resized Text to: %" PRIu32 " %" PRIu32, getWidth(), getHeight());
         }
         return h;
     }

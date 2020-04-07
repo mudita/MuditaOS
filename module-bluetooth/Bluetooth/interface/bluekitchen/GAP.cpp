@@ -169,7 +169,6 @@ static void packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packe
             else {
                 dev.state = REMOTE_NAME_REQUEST;
             }
-            LOG_INFO("");
             devices.push_back(dev);
         } break;
 

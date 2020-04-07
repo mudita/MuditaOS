@@ -136,7 +136,7 @@ ssize_t BluetoothCommon::write_blocking(char *buf, ssize_t len)
 
 BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
 {
-    LOG_INFO("Set baudrate: %d", bd);
+    LOG_INFO("Set baudrate: %" PRIu32, bd);
     Error ret = Success;
     int err   = 0;
     if ((err = LPUART_SetBaudRate(BSP_BLUETOOTH_UART_BASE, bd, UartGetPeripheralClock())) != 0) {

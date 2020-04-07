@@ -37,7 +37,8 @@ namespace gui
         text->activatedCallback = [=](Item &) -> bool {
             std::shared_ptr<std::vector<ContactRecord>> searchResults =
                 DBServiceAPI::ContactSearch(application, text->getText(), text->getText(), text->getText());
-            LOG_INFO("Get contact from another app, contacts matching num: %d", searchResults.get()->size());
+            LOG_INFO("Get contact from another app, contacts matching num: %d",
+                     static_cast<int>(searchResults.get()->size()));
             if (searchResults.get()->size() > 0) {
                 std::unique_ptr<PhonebookSearchReuqest> data =
                     std::make_unique<PhonebookSearchReuqest>(text->getText(), searchResults);

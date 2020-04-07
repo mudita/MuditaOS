@@ -22,3 +22,4 @@ namespace Bt
     };
 
 } // namespace Bt
+const char *c_str(Bt::Error::Code code);

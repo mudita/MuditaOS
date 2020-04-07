@@ -120,13 +120,13 @@ namespace app
 
     bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
     {
-        LOG_DEBUG("Removing CalllogRecord: %d", record.ID);
+        LOG_DEBUG("Removing CalllogRecord: %" PRIu32, record.ID);
         auto dialog = dynamic_cast<gui::Dialog *>(windows[calllog::settings::CallDeleteWindowStr]);
         if (dialog != nullptr) {
             auto meta   = dialog->meta;
             meta.action = [=]() -> bool {
                 if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
-                    LOG_ERROR("CalllogRemove id=%u failed", record.ID);
+                    LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
                     return false;
                 }
                 this->switchWindow(calllog::settings::MainWindowStr);

@@ -118,7 +118,7 @@ namespace bsp
 
     void RT1051Cellular::SetSpeed(uint32_t portSpeed)
     {
-        LOG_DEBUG("[RT1051] Setting %i baudrate", portSpeed);
+        LOG_DEBUG("[RT1051] Setting %" PRIu32 " baudrate", portSpeed);
 
         LPUART_SetBaudRate(CELLULAR_UART_BASE, portSpeed, GetPerphSourceClock(PerphClock_LPUART));
     }

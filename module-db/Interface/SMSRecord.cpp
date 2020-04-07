@@ -121,11 +121,11 @@ std::unique_ptr<std::vector<SMSRecord>> SMSRecordInterface::GetLimitOffsetByFiel
         break;
 
     default:
-        LOG_ERROR("SMS thread get - wrong selection: %d", field);
+        LOG_ERROR("SMS thread get - wrong selection: %d", static_cast<int>(field));
         return records;
     }
 
-    LOG_INFO("Get: %d SMS by selection: %d", smses.size(), field);
+    LOG_INFO("Get: %u SMS by selection: %d", static_cast<unsigned int>(smses.size()), static_cast<int>(field));
 
     ContactRecordInterface contactInterface(contactsDB);
     for (const auto &w : smses) {

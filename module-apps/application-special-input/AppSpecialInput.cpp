@@ -22,13 +22,13 @@ sys::Message_t AppSpecialInput::DataReceivedHandler(sys::DataMessage *msgl, sys:
     return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
-// THIS IS IMPORTANT THIS SETS APPLICATION STATE... (not for example Application(...) constructor - this wouild be too
-// easy
+// THIS IS IMPORTANT THIS SETS APPLICATION STATE...
+// (not for example Application(...) constructor - this would be too easy)
 sys::ReturnCodes AppSpecialInput::InitHandler()
 {
     auto ret = Application::InitHandler();
     if (ret != sys::ReturnCodes::Success) {
-        LOG_ERROR("");
+        LOG_ERROR("!");
     }
     setActiveWindow(gui::name::window::main_window);
     return ret;

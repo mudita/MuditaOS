@@ -175,7 +175,7 @@ namespace gui
                 mapFiles.push_back(mapFolder + "/" + ent.fileName);
         }
 
-        LOG_INFO("Total number of images: %d", mapFiles.size());
+        LOG_INFO("Total number of images: %u", static_cast<unsigned int>(mapFiles.size()));
 
         return mapFiles;
     }

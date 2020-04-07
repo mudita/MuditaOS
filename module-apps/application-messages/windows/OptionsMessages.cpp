@@ -30,18 +30,18 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     };
 
     p("phonebook_phone_ringing", [=](gui::Item &) -> bool {
-        LOG_INFO("Call: %s", contact.primaryName);
+        LOG_INFO("Call: %s", contact.primaryName.c_str());
         return app::call(app, app::CallOperation::ExecuteCall, contact);
     });
 
     p("mail", [=](gui::Item &) -> bool {
-        LOG_INFO("SMS to: %s", contact.primaryName);
+        LOG_INFO("SMS to: %s", contact.primaryName.c_str());
         app::sms(app, app::SmsOperation::Add, contact);
         return true;
     });
 
     p("cross", [=](gui::Item &) -> bool {
-        LOG_INFO("Add contact: %s", contact.primaryName);
+        LOG_INFO("Add contact: %s", contact.primaryName.c_str());
         app::contact(app, app::ContactOperation::Add, contact);
         return true;
     });

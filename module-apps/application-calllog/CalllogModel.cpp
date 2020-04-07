@@ -50,10 +50,7 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  uint32_t count)
 {
 
-    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-    //	for( uint32_t i=0; i<records.get()->size(); ++i ) {
-    //		LOG_INFO("id: %d, ", records.get()->operator [](i).ID, records.get()->operator [](i).path.c_str());
-    //	}
+    LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 

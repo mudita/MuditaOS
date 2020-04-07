@@ -245,7 +245,7 @@ namespace sapm
         case MessageType::APMSwitchPrevApp: {
             sapm::APMSwitchPrevApp *msg = reinterpret_cast<sapm::APMSwitchPrevApp *>(msgl);
             if (!handleSwitchPrevApplication(msg)) {
-                LOG_ERROR("Switch from app: failed", msg->getSenderName().c_str());
+                LOG_ERROR("Switch from app: %s failed", msg->getSenderName().c_str());
             }
         } break;
         case MessageType::APMConfirmSwitch: {
@@ -413,7 +413,7 @@ namespace sapm
 
     sys::ReturnCodes ApplicationManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_FATAL("[ServiceAppMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+        LOG_FATAL("[ServiceAppMgr] PowerModeHandler: %s", c_str(mode));
 
         switch (mode) {
         case sys::ServicePowerMode ::Active:
@@ -557,7 +557,7 @@ namespace sapm
         auto app = appGet(previousApplicationName);
         if (!app) {
             // specified application was not found, exiting
-            LOG_ERROR("Unable to find previous application: %s", previousApplicationName);
+            LOG_ERROR("Unable to find previous application: %s", previousApplicationName.c_str());
             return false;
         }
 
@@ -634,7 +634,7 @@ namespace sapm
             app->setState(app::Application::State::ACTIVE_BACKGROUND);
         }
 
-        LOG_DEBUG("NOTIFICATION NOTIFICATION NOTIFICATION NOTIFICATION NOTIFICATION NOTIFICATION");
+        LOG_DEBUG("Send notification!");
         auto notification = std::make_shared<APMCheckApp>(this->GetName(), msg->getSenderName());
         sys::Bus::SendMulticast(notification, sys::BusChannels::AppManagerNotifications, this);
 
@@ -750,7 +750,7 @@ namespace sapm
     {
         auto app = appGet(msg->getSenderName());
         if (app == nullptr) {
-            LOG_ERROR("can't handle: %s app: %s doesn't exist", __FUNCTION__, msg->getSenderName());
+            LOG_ERROR("can't handle: %s app: %s doesn't exist", __FUNCTION__, msg->getSenderName().c_str());
             return false;
         }
 
