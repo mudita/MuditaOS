@@ -33,44 +33,44 @@ target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
 message("Setting PROJECT_LIB_DIRECTORY to ${PROJECT_LIB_DIRECTORY}")
 message("Setting CMAKE_BINARY_DIR to ${CMAKE_BINARY_DIR}")
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${SERIAL_PORT_PATH})
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DFSL_RTOS_FREE_RTOS)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DUSB_STACK_FREERTOS)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DDEBUG_CONSOLE_TRANSFER_NON_BLOCKING)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DFSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D__STARTUP_INITIALIZE_NONCACHEDATA)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DSDK_OS_FREE_RTOS)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DXIP_EXTERNAL_FLASH=0)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DXIP_BOOT_HEADER_ENABLE=1)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DXIP_BOOT_HEADER_DCD_ENABLE=0)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DCPU_MIMXRT1051DVL6B_cm7)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DCPU_MIMXRT1051DVL6B)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DSDK_DEBUGCONSOLE=0)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D__MCUXPRESSO)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D__USE_CMSIS)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D__NEWLIB__)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DSKIP_SYSCLK_INIT)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -D_GNU_SOURCE)
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS}
+                ${TARGET_COMPILE_DEFINITIONS}
+                ${PROJECT_TARGET}
+                ${SERIAL_PORT_PATH})
 
+add_compile_definitions(FSL_RTOS_FREE_RTOS
+                USB_STACK_FREERTOS
+                DEBUG_CONSOLE_TRANSFER_NON_BLOCKING
+                FSL_SDK_ENABLE_DRIVER_CACHE_CONTROL=1
+                __STARTUP_INITIALIZE_NONCACHEDATA
+                SDK_OS_FREE_RTOS
+                XIP_EXTERNAL_FLASH=0
+                XIP_BOOT_HEADER_ENABLE=1
+                XIP_BOOT_HEADER_DCD_ENABLE=0
+                CPU_MIMXRT1051DVL6B_cm7
+                CPU_MIMXRT1051DVL6B
+                SDK_DEBUGCONSOLE=0
+                __MCUXPRESSO
+                __USE_CMSIS
+                __NEWLIB__
+                SKIP_SYSCLK_INIT
+                _GNU_SOURCE)
 
-target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
-target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-std=gnu11>)
-target_compile_options(${PROJECT_NAME} PUBLIC -fsingle-precision-constant)
-target_compile_options(${PROJECT_NAME} PUBLIC -ffunction-sections)
-target_compile_options(${PROJECT_NAME} PUBLIC -fdata-sections)
-target_compile_options(${PROJECT_NAME} PUBLIC -MMD)
-target_compile_options(${PROJECT_NAME} PUBLIC -MP)
-target_compile_options(${PROJECT_NAME} PUBLIC -fno-builtin)
+add_compile_options( ${TARGET_COMPILE_OPTIONS}
+                     $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
+                     -fsingle-precision-constant
+                     -ffunction-sections
+                     -fdata-sections
+                     -MMD
+                     -MP
+                     -fno-builtin
+                     # warning flags
+                     -Wall -Wextra -Werror -Wno-unused-parameter)
 
 target_compile_features(${PROJECT_NAME} PUBLIC
         ${TARGET_COMPILE_FEATURES})
 
 
-# Warnings related flags
-add_compile_options(-Wall -Wextra -Werror -Wno-unused-parameter)
 target_compile_options(${PROJECT_NAME} PUBLIC $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>)
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC ${TARGET_SOURCES})
