@@ -22,4 +22,7 @@ namespace gui
         return nullptr;
     }
 
+    void ListItemProvider::requestDBUpdate(const uint32_t offset, const uint32_t limit)
+    {}
+
 } /* namespace gui */
