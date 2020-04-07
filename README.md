@@ -107,13 +107,25 @@ There is provisioning script `./config/bootstrap.sh` run it to install all depen
 
 `cd config && ./bootstrap.sh`
 
+## build docker image
+If for some reason you don't want to use existing (on hub.docker.com) docker image you can build your own.
+### download toolchain
+```bash
+./config/download_assets
+```
+### build image
+```bash
+docker build docker/ -t rwicik/pure_phone_build:latest
+```
+please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if docker couldn't find it locally it will download it from hub.docker.com
+
+
 ## Install JLink driver:
 
 We use JLink driver in version JLink v634f, for ubuntu download from here:
 [tested JLink we use](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb)
 
-To install this driver on linux:
-`sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
+To install this driver on linux: `sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
 
 ## First time repo checkout with submodules
 `git submodule update --init --recursive`
