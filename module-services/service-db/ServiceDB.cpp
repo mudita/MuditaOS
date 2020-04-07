@@ -80,7 +80,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
             auto record    = std::make_unique<std::vector<SMSRecord>>();
             msg->record.ID = smsRecordInterface->GetLastID();
             record->push_back(msg->record);
-            LOG_INFO("SMS added, record ID: %d", msg->record.ID);
+            LOG_INFO("SMS added, record ID: %" PRIu32, msg->record.ID);
             responseMsg = std::make_shared<DBSMSResponseMessage>(std::move(record), ret);
 
             // send notification
@@ -393,7 +393,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
             msg->record = calllogRecordInterface->GetByID(calllogRecordInterface->GetLastID());
         }
         record->push_back(msg->record);
-        LOG_INFO("Last ID %d", msg->record.ID);
+        LOG_INFO("Last ID %" PRIu32, msg->record.ID);
         responseMsg = std::make_shared<DBCalllogResponseMessage>(std::move(record), ret);
 
         auto notificationMessage = std::make_shared<DBNotificationMessage>(
@@ -485,6 +485,6 @@ sys::ReturnCodes ServiceDB::DeinitHandler()
 
 sys::ReturnCodes ServiceDB::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[%s] PowerModeHandler: %d", this->GetName().c_str(), static_cast<uint32_t>(mode));
+    LOG_FATAL("[%s] PowerModeHandler: %s", this->GetName().c_str(), c_str(mode));
     return sys::ReturnCodes::Success;
 }

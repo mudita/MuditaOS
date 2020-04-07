@@ -67,9 +67,9 @@ int ATParser::ProcessNewData(sys::Service *service)
     {
         cpp_freertos::LockGuard lock(mutex);
         responseBuffer.append(reinterpret_cast<char *>(rawBuffer), length);
-        LOG_DEBUG("Appending %i bytes to responseBuffer[%d]: %s",
-                  length,
-                  responseBuffer.size(),
+        LOG_DEBUG("Appending %d bytes to responseBuffer[%u]: %s",
+                  static_cast<int>(length),
+                  static_cast<unsigned int>(responseBuffer.size()),
                   utils::removeNewLines(responseBuffer).c_str());
     }
 

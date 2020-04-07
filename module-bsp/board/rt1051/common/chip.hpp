@@ -32,12 +32,12 @@ static inline void clearAndPrintBootReason()
     // get boot reason
     uint32_t SRSR_val = SRC_GetResetStatusFlags(SRC);
 
-    LOG_INFO("Boot reason: 0x%02x", SRSR_val);
+    LOG_INFO("Boot reason: %" PRIu32, SRSR_val);
     if (SRSR_val & (1UL << SRC_SRSR_IPP_RESET_B_SHIFT))
         LOG_INFO("\t*%s", bootReasonDef.at(SRC_SRSR_IPP_RESET_B_SHIFT).c_str());
     if (SRSR_val & (1UL << SRC_SRSR_LOCKUP_SYSRESETREQ_SHIFT)) {
         LOG_WARN("\t*%s", bootReasonDef.at(SRC_SRSR_LOCKUP_SYSRESETREQ_SHIFT).c_str());
-        LOG_INFO("\tGPR_5 %u", SRC_GetGeneralPurposeRegister(SRC, 5));
+        LOG_INFO("\tGPR_5 %" PRIu32, SRC_GetGeneralPurposeRegister(SRC, 5));
     }
     if (SRSR_val & (1UL << SRC_SRSR_CSU_RESET_B_SHIFT))
         LOG_INFO("\t*%s", bootReasonDef.at(SRC_SRSR_CSU_RESET_B_SHIFT).c_str());

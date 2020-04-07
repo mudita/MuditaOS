@@ -827,7 +827,7 @@ namespace gui
                 glyph = glyph_found->second;
             }
             else {
-                LOG_WARN("no glyph for character id:%d in font \"%s\"", idCurrent, font->info.face.c_str());
+                LOG_WARN("no glyph for character id:%" PRIu32 " in font \"%s\"", idCurrent, font->info.face.c_str());
                 unique_glyph = font->getGlyphUnsupported();
                 glyph        = unique_glyph.get();
             }

@@ -33,7 +33,7 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
     }
 
     uint32_t contactID = contactDB->GetLastInsertRowID();
-    LOG_DEBUG("New contact with ID %u created", contactID);
+    LOG_DEBUG("New contact with ID %" PRIu32 " created", contactID);
 
     ret = contactDB->name.Add(ContactsNameTableRow{.contactID       = contactID,
                                                    .namePrimary     = rec.primaryName,

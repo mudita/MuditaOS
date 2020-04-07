@@ -375,8 +375,10 @@ class TS0710
 
             LOG_CUSTOM(level, "Invalid response: %s", resp.c_str());
             // numberOfExpectedTokens == 0, means do not validate number of tokens
-            LOG_CUSTOM(
-                level, " - Number of tokens %u, number of expected tokens %u", numberOfTokens, numberOfExpectedTokens);
+            LOG_CUSTOM(level,
+                       " - Number of tokens %u, number of expected tokens %u",
+                       static_cast<unsigned int>(numberOfTokens),
+                       static_cast<unsigned int>(numberOfExpectedTokens));
             return false;
         }
     }

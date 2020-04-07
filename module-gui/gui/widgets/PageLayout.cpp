@@ -91,7 +91,7 @@ namespace gui
     bool PageLayout::switchPage(unsigned int n, bool previous)
     {
         if (children.size() == 0 || n >= children.size()) {
-            LOG_ERROR("Cant switch to page %d, num of pages: %d", n, children.size());
+            LOG_ERROR("Cant switch to page %d, num of pages: %u", n, static_cast<unsigned int>(children.size()));
             return false;
         }
         unsigned int i = 0;

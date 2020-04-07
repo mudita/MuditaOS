@@ -396,7 +396,7 @@ static bsp::batteryRetval battery_storeConfiguration(void)
     }
 
     uint16_t regVal = 0;
-    for (uint32_t i = 0; i < 0xff; ++i) {
+    for (unsigned int i = 0; i < 0xff; ++i) {
         if (battery_fuelGaugeRead(static_cast<bsp::batteryChargerRegisters>(i), &regVal) != kStatus_Success) {
             LOG_ERROR("Reading register 0x%x failed.", i);
             vfs.fclose(fd);

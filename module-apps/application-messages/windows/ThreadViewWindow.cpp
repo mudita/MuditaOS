@@ -128,7 +128,7 @@ namespace gui
 
     void ThreadViewWindow::addSMS(ThreadViewWindow::Action what)
     {
-        LOG_DEBUG("--- %d ---", what);
+        LOG_DEBUG("--- %d ---", static_cast<int>(what));
         // if there was text - then remove it temp
         gui::Alignment align;
         // 1. load elements to tmp vector
@@ -164,7 +164,10 @@ namespace gui
             LOG_DEBUG("in progress %d", SMS.start);
         }
         SMS.sms = DBServiceAPI::SMSGetLimitOffsetByThreadID(this->application, SMS.start, maxsmsinwindow, SMS.thread);
-        LOG_DEBUG("=> SMS %d < %d < %d", SMS.start, SMS.sms->size(), maxsmsinwindow);
+        LOG_DEBUG("=> SMS %d < %d < %d",
+                  static_cast<int>(SMS.start),
+                  static_cast<int>(SMS.sms->size()),
+                  static_cast<int>(maxsmsinwindow));
         // 3. add them to box
         this->cleanView();
         // if we are going from 0 then we want to show text prompt
@@ -198,7 +201,7 @@ namespace gui
         labelSpan->setFillColor(gui::Color(11, 0));
         labelSpan->addWidget(smsBubble);
 
-        LOG_DEBUG("ADD SMS TYPE: %d", el.type);
+        LOG_DEBUG("ADD SMS TYPE: %d", static_cast<int>(el.type));
         switch (el.type) {
         case SMSType::OUTBOX:
             smsBubble->setYaps(RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT);
@@ -357,7 +360,7 @@ namespace gui
         {
             auto pdata = dynamic_cast<SMSThreadData *>(data);
             if (pdata) {
-                LOG_INFO("We have it! %d", pdata->thread->dbID);
+                LOG_INFO("We have it! %" PRIu32, pdata->thread->dbID);
                 cleanView();
                 SMS.thread = pdata->thread->dbID;
                 showMessages(Action::Start);

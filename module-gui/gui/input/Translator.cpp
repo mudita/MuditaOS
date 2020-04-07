@@ -186,7 +186,7 @@ namespace gui
                 }
             }
 
-            LOG_INFO("Total number of profiles: %d", profileFiles.size());
+            LOG_INFO("Total number of profiles: %u", static_cast<unsigned int>(profileFiles.size()));
             return profileFiles;
         }
 

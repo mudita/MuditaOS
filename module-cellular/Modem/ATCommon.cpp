@@ -38,7 +38,8 @@ void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
     switch (result.code) {
     case Result::Code::TIMEOUT: {
-        LOG_ERROR("[AT]: >%s<, timeout %d - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
+        LOG_ERROR("[AT]: >%s<, timeout %" PRIu32
+                  " - please check the value with Quectel_EC25&EC21_AT_Commands_Manual_V1.3.pdf",
                   cmd.c_str(),
                   timeout);
     } break;

@@ -575,7 +575,7 @@ namespace gui
             LOG_ERROR("Can't get country code from database, fall back to Poland country code");
             return (app::defaultCountryCode);
         }
-        LOG_DEBUG("getCountryPrefix country_code:%d", country_code);
+        LOG_DEBUG("getCountryPrefix country_code: %" PRIu32, country_code);
         std::string buf = "+";
         buf += std::to_string(country_code);
 
