@@ -78,7 +78,7 @@ SECTIONS
 
     .text : ALIGN(4)    
     {
-       /**(.text*)*/
+       *(.text*)
        *(.rodata .rodata.* .constdata .constdata.*)
        . = ALIGN(4);
             /* C++ constructors etc */
