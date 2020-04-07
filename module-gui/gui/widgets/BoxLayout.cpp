@@ -222,6 +222,23 @@ namespace gui
             }
         }
     }
+
+    void BoxLayout::setFocusOnLastActiveElement()
+    {
+        auto last = true;
+        for (auto child = children.rbegin(); child != children.rend(); child++) {
+
+            if ((*child)->activeItem && (*child)->visible && last) {
+                (*child)->setFocus(true);
+                focusItem = (*child);
+                last      = false;
+            }
+            else {
+                (*child)->setFocus(false);
+            }
+        }
+    }
+
     HBox::HBox() : BoxLayout()
     {
         type = ItemType::HBOX;

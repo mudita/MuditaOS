@@ -53,17 +53,17 @@ namespace gui
                                      phonebookStyle::mainWindow::searchImage::h,
                                      "search");
 
-        contactsList = new gui::PhonebookListView(this,
-                                                  phonebookStyle::mainWindow::contactsList::x,
-                                                  phonebookStyle::mainWindow::contactsList::y,
-                                                  phonebookStyle::mainWindow::contactsList::w,
-                                                  phonebookStyle::mainWindow::contactsList::h);
-        contactsList->setMaxElements(phonebookStyle::mainWindow::contactsList::maxElements);
+        contactsList = new gui::ListView(this,
+                                         phonebookStyle::mainWindow::contactsList::x,
+                                         phonebookStyle::mainWindow::contactsList::y,
+                                         phonebookStyle::mainWindow::contactsList::w,
+                                         phonebookStyle::mainWindow::contactsList::h);
+        //        contactsList->setMaxElements(phonebookStyle::mainWindow::contactsList::maxElements);
         contactsList->setPageSize(phonebookStyle::mainWindow::contactsList::pageSize);
         contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
         contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
         contactsList->setProvider(phonebookModel);
-        contactsList->setApplication(application);
+        //        contactsList->setApplication(application);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -117,16 +117,17 @@ namespace gui
         contactsList->clear();
         contactsList->setElementsCount(phonebookModel->getItemCount());
 
-        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
-        if (contactRequest) {
-            contactsList->cb_ENTER = [=](gui::PhonebookItem *item) {
-                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
-                data->result                                 = item->getContact();
-                data->setDescription("PhonebookSearchRequest");
-                return sapm::ApplicationManager::messageSwitchPreviousApplication(
-                    application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
-            };
-        }
+        //        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
+        //        if (contactRequest) {
+        //            contactsList->cb_ENTER = [=](gui::PhonebookItem *item) {
+        //                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+        //                data->result                                 = item->getContact();
+        //                data->setDescription("PhonebookSearchRequest");
+        //                return sapm::ApplicationManager::messageSwitchPreviousApplication(
+        //                    application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(),
+        //                    std::move(data)));
+        //            };
+        //        }
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)

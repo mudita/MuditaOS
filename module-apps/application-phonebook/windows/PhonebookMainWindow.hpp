@@ -10,7 +10,7 @@ namespace gui
     {
       protected:
         PhonebookModel *phonebookModel  = nullptr;
-        PhonebookListView *contactsList = nullptr;
+        ListView *contactsList          = nullptr;
 
         Image *leftArrowImage  = nullptr;
         Image *rightArrowImage = nullptr;
