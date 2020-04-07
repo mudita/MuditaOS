@@ -21,10 +21,14 @@ namespace gui
         setPenFocusWidth(0);
         setPenWidth(0);
 
-        scroll = new Rect(this, 0, 0, 0, 0);
-        scroll->setRadius(3);
-        scroll->setFilled(true);
-        scroll->setFillColor(Color{0, 0});
+        scroll = new Rect(this,
+                          style::listview::scroll_x,
+                          style::listview::scroll_y,
+                          style::listview::scroll_w,
+                          style::listview::scroll_h);
+        scroll->setRadius(style::listview::scroll_radius);
+        scroll->setFilled(style::listview::scroll_fill);
+        scroll->setFillColor(style::listview::scroll_color);
     }
 
     ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
@@ -32,14 +36,17 @@ namespace gui
           drawVerticalScroll{true}, orientation{ListView::ORIENTATION_TOP_DOWN}, maxElements{4},
           selectedIndex{0}, listMode{ListView::MODE_PAGE}, pageSize{4}
     {
-
         setPenFocusWidth(0);
         setPenWidth(0);
 
-        scroll = new Rect(this, 0, 0, 0, 0);
-        scroll->setRadius(3);
-        scroll->setFilled(true);
-        scroll->setFillColor(Color{0, 0});
+        scroll = new Rect(this,
+                          style::listview::scroll_x,
+                          style::listview::scroll_y,
+                          style::listview::scroll_w,
+                          style::listview::scroll_h);
+        scroll->setRadius(style::listview::scroll_radius);
+        scroll->setFilled(style::listview::scroll_fill);
+        scroll->setFillColor(style::listview::scroll_color);
     }
 
     ListView::~ListView()
@@ -138,11 +145,12 @@ namespace gui
             }
         }
 
-        // calculate height of the item using list's height and pageSize
+        // calculate item Width if scroll present
         uint32_t itemWidth = widgetArea.w;
         if (drawVerticalScroll)
-            itemWidth -= 10;
+            itemWidth -= style::listview::item_scroll_margin;
 
+        // calculate height of the item using list's height and pageSize
         int availableHeight = widgetArea.h - pageSize;
         if (availableHeight < 0)
             availableHeight = 0;
@@ -351,12 +359,11 @@ namespace gui
                     return;
                 }
             }
-
             uint32_t currentPage = selectedIndex / pageSize;
             uint32_t pageHeight  = widgetArea.h / pagesCount;
 
-            scroll->setPosition(widgetArea.w - 7, pageHeight * currentPage);
-            scroll->setSize(7, pageHeight);
+            scroll->setPosition(widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
+            scroll->setSize(style::listview::scroll_w, pageHeight);
         }
         // not enough space - disable scroll
         else {
