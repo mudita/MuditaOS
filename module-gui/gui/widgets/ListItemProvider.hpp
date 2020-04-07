@@ -22,11 +22,13 @@ namespace gui
     class ListItemProvider
     {
       protected:
-        ListView *list = nullptr;
 
       public:
         ListItemProvider();
         virtual ~ListItemProvider();
+
+        ListView *list         = nullptr;
+        bool listDataAvailable = false;
 
         virtual int getItemCount() const = 0;
         /**
@@ -39,6 +41,8 @@ namespace gui
          */
         virtual ListItem *getItem(
             int index, int firstElement, int prevElement, uint32_t count, int remaining = 0, bool topDown = true);
+
+        virtual void requestDBUpdate(const uint32_t offset, const uint32_t limit);
     };
 
 } /* namespace gui */

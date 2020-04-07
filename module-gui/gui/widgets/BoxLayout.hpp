@@ -82,6 +82,7 @@ namespace gui
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
         // set focus on specified box element
         void setFocusOnElement(uint32_t elementNumber);
+        void setFocusOnLastActiveElement();
     };
 
     class HBox : public BoxLayout

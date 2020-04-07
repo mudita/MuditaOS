@@ -13,13 +13,9 @@ namespace gui
 {
 
     ListView::ListView()
-        : firstIndex{0}, lastIndex{0}, elementsCount{4}, drawSeparators{true}, drawVerticalScroll{true},
-          orientation{ListView::ORIENTATION_TOP_DOWN}, maxElements{4},
-          selectedIndex{0}, listMode{ListView::MODE_PAGE}, pageSize{4}
     {
 
-        setPenFocusWidth(0);
-        setPenWidth(0);
+        listItems = new VBox{this, 0, 0, 0, 0};
 
         scroll = new Rect(this,
                           style::listview::scroll_x,
@@ -31,13 +27,32 @@ namespace gui
         scroll->setFillColor(style::listview::scroll_color);
     }
 
-    ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : Rect{parent, x, y, w, h}, firstIndex{0}, lastIndex{0}, elementsCount{4}, drawSeparators{true},
-          drawVerticalScroll{true}, orientation{ListView::ORIENTATION_TOP_DOWN}, maxElements{4},
-          selectedIndex{0}, listMode{ListView::MODE_PAGE}, pageSize{4}
+    ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
     {
-        setPenFocusWidth(0);
-        setPenWidth(0);
+
+        this->setBorderColor(ColorNoColor);
+        direction      = DIRECTION_BOTTOM;
+        listContinuous = true;
+
+        listItems = new VBox{this, 0, 0, w, h};
+        listItems->setBorderColor(ColorNoColor);
+
+        listItems->borderCallback = [this](const InputEvent &inputEvent) -> bool {
+            if (inputEvent.state != InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (inputEvent.keyCode == KeyCode::KEY_UP) {
+                direction = DIRECTION_TOP;
+                return this->listPageEndReached();
+            }
+            else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
+                direction = DIRECTION_BOTTOM;
+                return this->listPageEndReached();
+            }
+            else {
+                return false;
+            }
+        };
 
         scroll = new Rect(this,
                           style::listview::scroll_x,
@@ -47,11 +62,11 @@ namespace gui
         scroll->setRadius(style::listview::scroll_radius);
         scroll->setFilled(style::listview::scroll_fill);
         scroll->setFillColor(style::listview::scroll_color);
+        scroll->activeItem = false;
     }
 
     ListView::~ListView()
     {
-
         clearItems();
     }
 
@@ -68,29 +83,7 @@ namespace gui
     void ListView::setElementsCount(int count)
     {
         elementsCount = count;
-        if (listMode == ListView::MODE_PAGE) {
-            if (firstIndex > elementsCount)
-                firstIndex = (elementsCount / pageSize) * pageSize;
-            lastIndex = firstIndex + pageSize - 1;
-            if (lastIndex > elementsCount - 1)
-                lastIndex = elementsCount - 1;
-            if (selectedIndex > lastIndex)
-                selectedIndex = lastIndex;
-        }
-        updateScrollDimenstions();
-    }
-
-    void ListView::setDrawSeparators(bool value)
-    {
-        drawSeparators = value;
-    }
-
-    void ListView::setOrientation(int orientation)
-    {
-        if (orientation == ListView::ORIENTATION_BOTTOM_UP)
-            this->orientation = ListView::ORIENTATION_BOTTOM_UP;
-        else if (orientation == ListView::ORIENTATION_TOP_DOWN)
-            this->orientation = ListView::ORIENTATION_TOP_DOWN;
+        refreshList();
     }
 
     void ListView::drawScroll(bool value)
@@ -104,194 +97,105 @@ namespace gui
         maxElements = value;
     }
 
-    void ListView::setProvider(ListItemProvider *provider)
+    void ListView::setProvider(ListItemProvider *prov)
     {
-        this->provider = provider;
+        this->provider = prov;
     }
 
     void ListView::clearItems()
     {
 
-        for (auto item : items) {
-            removeWidget(item);
-            delete (item);
-        }
+        auto temp = listItems->children.size();
+        for (unsigned int i = 0; i < temp; i++) {
 
-        items.clear();
+            auto rm = listItems->children.back();
+            listItems->removeWidget(rm);
+            delete (rm);
+        }
     }
 
     void ListView::clear()
     {
         clearItems();
-
-        firstIndex    = 0;
-        lastIndex     = 0;
-        selectedIndex = 0;
-
-        updateScrollDimenstions();
+        startIndex                  = 0;
+        listEndPageReached          = true;
+        provider->listDataAvailable = false;
     }
 
-    void ListView::updatePageItems()
+    void ListView::refreshPage()
     {
 
-        int prevIndex = firstIndex - 1;
-        for (int i = 0; i < pageSize; i++) {
+        if (provider->listDataAvailable && listEndPageReached) {
 
-            ListItem *item = provider->getItem(firstIndex + i, firstIndex, prevIndex, pageSize);
-            if (item != nullptr) {
-                addWidget(item);
-                items.push_back(item);
-                prevIndex++;
-            }
-        }
+            auto prevIndex          = startIndex - 1;
+            auto pageCalculatedSize = 0;
+            auto itemsOnPage        = 0;
 
-        // calculate item Width if scroll present
-        uint32_t itemWidth = widgetArea.w;
-        if (drawVerticalScroll)
-            itemWidth -= style::listview::item_scroll_margin;
+            while (pageCalculatedSize <= widgetArea.h) {
 
-        // calculate height of the item using list's height and pageSize
-        int availableHeight = widgetArea.h - pageSize;
-        if (availableHeight < 0)
-            availableHeight = 0;
-        int itemHeight = availableHeight / pageSize;
+                ListItem *item = provider->getItem(0 + itemsOnPage, startIndex, prevIndex, listPageSize, direction);
 
-        int verticalPosition;
-        if (orientation == ORIENTATION_TOP_DOWN)
-            verticalPosition = 0;
-        else
-            verticalPosition = widgetArea.h;
+                if (item != nullptr) {
 
-        auto it = items.begin();
-        for (unsigned int i = 0; i < items.size(); i++) {
-            if (availableHeight > 0) {
+                    pageCalculatedSize += item->minHeight;
+                    item->setSize(item->minWidth, item->minHeight);
 
-                itemHeight            = (*it)->minHeight;
-                gui::BoundingBox bbox = (*it)->widgetArea;
-                bbox.h                = itemHeight;
-                bbox.w                = itemWidth;
+                    if (pageCalculatedSize <= widgetArea.h) {
 
-                if (orientation == ORIENTATION_TOP_DOWN) {
-                    bbox.y = verticalPosition;
-                    verticalPosition += itemHeight + 1; // 1 for separator
-                }
-                else {
-                    verticalPosition -= itemHeight - 1; // 1 for separator
-                    bbox.y = verticalPosition;
-                }
-
-                (*it)->setBoundingBox(bbox);
-
-                // if list has focus and it is visible mark selected element
-                if (visible) {
-                    if ((int)(i + firstIndex) == selectedIndex)
-                        (*it)->setFocus(true);
-                }
-
-                availableHeight -= itemHeight;
-            }
-            std::advance(it, 1);
-        }
-    }
-
-    bool ListView::onInput(const InputEvent &inputEvent)
-    {
-
-        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_ENTER)) {
-            return onActivated(nullptr);
-        }
-
-        if ((inputEvent.state == InputEvent::State::keyReleasedShort) && (inputEvent.keyCode == KeyCode::KEY_UP)) {
-            if (orientation == ORIENTATION_TOP_DOWN) {
-                if (listMode == MODE_PAGE) {
-                    if (selectedIndex > firstIndex) {
-                        selectedIndex--;
-                        return true;
+                        listItems->addWidget(item);
+                        itemsOnPage++;
+                        prevIndex++;
                     }
-                    if (selectedIndex == firstIndex) {
-                        if (firstIndex > 0) {
-                            firstIndex -= pageSize;
-                            if (firstIndex < 0)
-                                firstIndex = 0;
-                            lastIndex = firstIndex + pageSize - 1;
-                            if (lastIndex > elementsCount - 1)
-                                lastIndex = elementsCount - 1;
-                            selectedIndex = lastIndex;
-                            updateScrollDimenstions();
-                            return true;
-                        }
+                    else {
+                        listPageSize = itemsOnPage;
+                        break;
                     }
                 }
                 else {
-                    // TODO implement continuous mode
+                    break;
+                }
+
+                pageCalculatedSize += style::listview::list_span;
+                if (pageCalculatedSize <= widgetArea.h) {
+
+                    listSpanItem = new Span(Axis::Y, style::listview::list_span);
+                    listItems->addWidget(listSpanItem);
                 }
             }
-            else if (orientation == ORIENTATION_BOTTOM_UP) {
-                // TODO implement BOTTOM_UP orientation
+
+            if (direction == DIRECTION_TOP) {
+                setFocusItem(listItems);
+                listItems->setFocusOnLastActiveElement();
             }
+            if (direction == DIRECTION_BOTTOM) {
+                setFocusItem(listItems);
+            }
+
+            updateScrollDimenstions();
+            listEndPageReached = false;
         }
-        else if ((inputEvent.state == InputEvent::State::keyReleasedShort) &&
-                 (inputEvent.keyCode == KeyCode::KEY_DOWN)) {
-            if (orientation == ORIENTATION_TOP_DOWN) {
-                if (listMode == MODE_PAGE) {
-                    if (selectedIndex < lastIndex) {
-                        selectedIndex++;
-                        return true;
-                    }
-                    if (selectedIndex == lastIndex) {
-                        if (lastIndex < elementsCount - 1) {
-                            firstIndex += pageSize;
-                            if (firstIndex > elementsCount - 1)
-                                firstIndex = elementsCount - 1;
-                            lastIndex = firstIndex + pageSize - 1;
-                            if (lastIndex > elementsCount - 1)
-                                lastIndex = elementsCount - 1;
-                            selectedIndex = firstIndex;
-                            updateScrollDimenstions();
-                            return true;
-                        }
-                    }
-                }
-                else { // continuous mode
-                }
-            }
-            else { // BOTTOM_UP
-            }
-        }
-        return false;
     }
 
-    void ListView::updateContinousItems()
-    {}
-
-    // TODO reuse items if possible
-    void ListView::updateItems()
+    void ListView::refreshList()
     {
 
-        // remove old items
-        clearItems();
+        if (provider->listDataAvailable) {
 
-        if (provider == nullptr)
-            return;
+            // remove old items
+            if (listEndPageReached)
+                clearItems();
 
-        elementsCount = provider->getItemCount();
+            if (provider == nullptr)
+                return;
 
-        if (listMode == ListView::MODE_PAGE) {
-            updatePageItems();
-        }
-        else if (listMode == ListView::MODE_CONTINUOUS) {
-            updateContinousItems();
+            elementsCount = provider->getItemCount();
+
+            refreshPage();
         }
     }
 
     ListItem *ListView::getSelectedItem()
     {
-        // return object only if there are any items in the list
-        if (elementsCount) {
-            auto it = items.begin();
-            std::advance(it, selectedIndex - firstIndex);
-            return *it;
-        }
         return nullptr;
     }
 
@@ -303,39 +207,14 @@ namespace gui
             return std::list<DrawCommand *>();
         }
 
-        updateItems();
+        refreshList();
 
-        // uint8_t* bBuf = gui::Rect::buildDrawList(bSize, bCount);
         return gui::Rect::buildDrawList();
-    }
-
-    void ListView::setMode(int mode)
-    {
-        if ((mode == ListView::MODE_PAGE) || (mode == ListView::MODE_CONTINUOUS))
-            listMode = mode;
     }
 
     void ListView::setPageSize(int size)
     {
-        pageSize = size;
-    }
-
-    bool ListView::onActivated(void *data)
-    {
-
-        // return if list doesn't have focus
-        if (focus == false)
-            return false;
-
-        // if there are any elements in the list
-        if (elementsCount > 0) {
-            // select item that has focus
-            auto it = items.begin();
-            std::advance(it, selectedIndex - firstIndex);
-            return (*it)->onActivated(data);
-        }
-
-        return false;
+        listPageSize = size;
     }
 
     bool ListView::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
@@ -352,14 +231,15 @@ namespace gui
                 scroll->visible = true;
 
             uint32_t pagesCount = 1;
-            if (pageSize) {
-                pagesCount = (elementsCount % pageSize == 0) ? elementsCount / pageSize : elementsCount / pageSize + 1;
+            if (listPageSize) {
+                pagesCount = (elementsCount % listPageSize == 0) ? elementsCount / listPageSize
+                                                                 : elementsCount / listPageSize + 1;
                 if (pagesCount == 0) {
                     disableScroll();
                     return;
                 }
             }
-            uint32_t currentPage = selectedIndex / pageSize;
+            uint32_t currentPage = startIndex / listPageSize;
             uint32_t pageHeight  = widgetArea.h / pagesCount;
 
             scroll->setPosition(widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
@@ -375,6 +255,67 @@ namespace gui
     {
         scroll->setSize(0, 0);
         scroll->visible = false;
+    }
+
+    bool ListView::onInput(const InputEvent &inputEvent)
+
+    {
+        return listItems->onInput(inputEvent);
+    }
+
+    bool ListView::listPageEndReached()
+    {
+
+        auto calculateLimit = [&]() {
+            return (2 * listPageSize + startIndex <= elementsCount ? 2 * listPageSize : elementsCount - startIndex);
+        };
+
+        if (direction == DIRECTION_BOTTOM) {
+            if (startIndex + listPageSize > elementsCount) {
+
+                if (listContinuous) {
+                    startIndex = 0;
+                }
+                else {
+                    return true;
+                }
+            }
+            else {
+                startIndex += listPageSize;
+            }
+
+            if (startIndex <= elementsCount - listPageSize)
+                provider->requestDBUpdate(startIndex, calculateLimit());
+            else
+                provider->requestDBUpdate(elementsCount - (elementsCount - startIndex), elementsCount - startIndex);
+
+            provider->listDataAvailable = false;
+        }
+
+        if (direction == DIRECTION_TOP) {
+            if (startIndex - listPageSize < 0) {
+
+                if (listContinuous) {
+                    startIndex = elementsCount - (elementsCount % listPageSize);
+                }
+                else {
+                    return true;
+                }
+            }
+            else {
+                startIndex -= listPageSize;
+            }
+
+            if (startIndex - listPageSize >= 0)
+                provider->requestDBUpdate(startIndex, calculateLimit());
+            else
+                provider->requestDBUpdate(0, calculateLimit());
+
+            provider->listDataAvailable = false;
+        }
+
+        listEndPageReached = true;
+        return true;
     }
 
 } /* namespace gui */
