@@ -22,14 +22,6 @@ function help() {
     echo -e "\n\e[1m\e[31mThis script will delete previous build dir!\e[0m"
 }
 
-function test_env.cmake() {
-    ENV_FILE="env.cmake"
-    if [ ! -f ${ENV_FILE} ]; then
-        echo "there's no ${ENV_FILE} please check README.md on how to create one"
-        exit 2
-    fi
-}
-
 function check_target() {
     case ${TARGET,,} in
         linux ) 
@@ -80,7 +72,6 @@ if [[ $# > 3 || $# < 2 ]]; then
     help
     exit 1
 fi
-#test_env.cmake
 
 TARGET=$1
 BUILD_TYPE=$2
