@@ -1,6 +1,22 @@
 PurePhone repository
 ====================
 
+# Quickstart in docker
+You can build project in docker container, to that
+
+### Get docker
+`./config/bootstrap.sh 8`
+
+### configure for linux Debug
+`./in_docker.sh config linux Debug`
+
+### build linux Debug
+`./in_docker.sh make build-linux-Debug`
+
+### build rt1051 Release
+`./in_docker.sh config rt1051 Release`
+`./in_docker.sh make build-rt1051-Release`
+
 # Quickstart
 
 Prior to any build setup environment, need to be run once. (See: `## Run provisioning`)
@@ -17,7 +33,7 @@ If this is new checkout you need to update your git config (step 0 and 1).
 * `./config/bootstrap.sh 5`  - list of commands for required for switching default gcc/g++ to version 9
 * `./config/bootstrap.sh 6`  - adds Paths for arm toolchain to your PATH environment variable - this is also used by ./env.cmake
 * `./config/bootstrap.sh 7`  - adds Paths for cmake to your PATH environment variable
-* `./config/bootstrap.sh 8`  - setup cmake.env 
+* `./config/bootstrap.sh 8`  - install docker
 
 *6 add_to_path gcc_arm... is required because new ./env.cmake uses environment variables set by this target.*
 

@@ -3,9 +3,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
-include(env.cmake)
 project(PurePhone)
 
+include(config/CCacheConfig.cmake)
 include(config/ProjectConfig.cmake)
 include(config/Version.cmake)
 include(config/ModuleConfig.cmake)
@@ -25,6 +25,9 @@ add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DDEBUG" CACHE STRING "")
+
+set(SERIAL_PORT_PATH  "SERIAL_PORT=\"/dev/ttyUSB0\"" CACHE STRING "defines where serial port is")
+set(TOOLCHAIN_PATH "" CACHE STRING "Path to coolchain directory")
 
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
 
