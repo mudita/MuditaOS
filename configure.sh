@@ -72,7 +72,7 @@ function check_systemview() {
         *)
             echo "wrong systemview option \"${SYSTEMVIEW}\" using default OFF"
             SYSTEMVIEW="OFF"
-            return 0;;
+            return 1;;
     esac
 }
 
@@ -80,14 +80,18 @@ if [[ $# > 3 || $# < 2 ]]; then
     help
     exit 1
 fi
-test_env.cmake
+#test_env.cmake
 
 TARGET=$1
 BUILD_TYPE=$2
-SYSTEMVIEW=$3
 
 if check_target && check_build_type ; then
-    check_systemview
+    shift 2
+    SYSTEMVIEW=$1
+    if check_systemview ; then
+        shift
+    fi
+
     BUILD_DIR="build-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
     SRC_DIR=`pwd`
@@ -104,7 +108,7 @@ if check_target && check_build_type ; then
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
                     -DCMAKE_EXPORT_COMPILE_COMMANDS=1 ${SRC_DIR} \
-                    -DSYSTEMVIEW=${SYSTEMVIEW} "
+                    -DSYSTEMVIEW=${SYSTEMVIEW} $@"
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
         if $CMAKE_CMD; then
             echo -e "\e[32mcd ${BUILD_DIR} && make -j\e[0m"

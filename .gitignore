@@ -30,4 +30,7 @@ source/version.hpp
 **/*.pyc
 ./doc/docs-gui/
 
+docker/cmake-3.17.0-Linux-x86_64.tar.gz
+docker/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+
 LAST_STEP
