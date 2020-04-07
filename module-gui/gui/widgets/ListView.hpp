@@ -11,6 +11,7 @@
 #include <list>
 #include "Rect.hpp"
 #include "ListItemProvider.hpp"
+#include "Style.hpp"
 
 namespace gui
 {

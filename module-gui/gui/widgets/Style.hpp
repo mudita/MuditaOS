@@ -26,8 +26,8 @@ namespace style
     };     // namespace header
     namespace window
     {
-        const inline uint32_t default_left_margin       = 30;
-        const inline uint32_t default_right_margin      = 30;
+        const inline uint32_t default_left_margin       = 20;
+        const inline uint32_t default_right_margin      = 20;
         const inline uint32_t default_border_focucs_w   = 2;
         const inline uint32_t default_border_no_focus_w = 0;
         namespace font
@@ -146,4 +146,19 @@ namespace style
             const inline std::string Yesterday = "common_yesterday";
         } // namespace common
     }     // namespace strings
-}; // namespace style
+
+    namespace listview
+    {
+
+        const inline uint32_t scroll_x           = 0;
+        const inline uint32_t scroll_y           = 0;
+        const inline uint32_t scroll_w           = 5;
+        const inline uint32_t scroll_h           = 0;
+        const inline uint32_t scroll_radius      = 2;
+        const inline bool scroll_fill            = false;
+        const inline gui::Color scroll_color     = gui::Color{0, 0};
+        const inline uint32_t scroll_margin      = 5;
+        const inline uint32_t item_scroll_margin = 10;
+
+    } // namespace listview
+};    // namespace style
