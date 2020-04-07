@@ -15,7 +15,7 @@ sys::ReturnCodes EndpointHandler::update(
         LOG_INFO("update request");
         uint32_t dataSize = static_cast<uint32_t>(body["fileSize"].number_value());
         LOG_INFO("file name: %s", body["fileName"].string_value().c_str());
-        LOG_INFO("file size: %d", dataSize);
+        LOG_INFO("file size: %" PRIu32 "", dataSize);
 
         json11::Json responseBodyJson =
             json11::Json::object({{"updateReady", true}, {"dataSize", std::to_string(dataSize)}});

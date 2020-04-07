@@ -169,5 +169,5 @@ void SearchResultsModel::setResults(std::shared_ptr<std::vector<ContactRecord>> 
 {
     results = _results;
 
-    LOG_INFO("setResults count:%d", results.get()->size());
+    LOG_INFO("setResults count: %d", static_cast<int>(results.get()->size()));
 }

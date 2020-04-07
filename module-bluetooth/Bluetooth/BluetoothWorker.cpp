@@ -4,6 +4,21 @@
 
 using namespace bsp;
 
+const char *c_str(Bt::Error::Code code)
+{
+    switch (code) {
+    case Bt::Error::Code::Succes:
+        return "Succes";
+    case Bt::Error::Code::NotReady:
+        return "NotReady";
+    case Bt::Error::Code::SystemError:
+        return "SystemError";
+    case Bt::Error::Code::LibraryError:
+        return "LibraryError";
+    }
+    return "";
+}
+
 BluetoothWorker::BluetoothWorker(sys::Service *service) : Worker(service)
 {
     init({
@@ -55,7 +70,7 @@ bool BluetoothWorker::scan()
     // state active - change what? (BT [ON] on display? )
     auto ret = Bt::GAP::scan();
     if (ret.err != Bt::Error::Succes) {
-        LOG_ERROR("Cant start scan!: %d %d", ret.err, ret.lib_code);
+        LOG_ERROR("Cant start scan!: %s %" PRIu32 "", c_str(ret.err), ret.lib_code);
         return false;
     }
     else {
@@ -75,7 +90,7 @@ bool BluetoothWorker::start_pan()
     Bt::PAN::bnep_setup();
     auto err = Bt::PAN::bnep_start();
     if (err.err != Bt::Error::Succes) {
-        LOG_ERROR("PAN setup error: %d %d", err.err, err.lib_code);
+        LOG_ERROR("PAN setup error: %s %" PRIu32, c_str(err.err), err.lib_code);
     }
     return false;
 }
@@ -101,7 +116,7 @@ bool BluetoothWorker::handleMessage(uint32_t queueID)
         return true;
     }
     if (queueID != queueIO_handle) {
-        LOG_ERROR("Wrong queue! %d", queueID);
+        LOG_ERROR("Wrong queue! %" PRIu32, queueID);
         return false;
     }
 

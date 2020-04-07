@@ -51,7 +51,7 @@ sys::ReturnCodes ServiceAudio::DeinitHandler()
 
 sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[ServiceAudio] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+    LOG_FATAL("[ServiceAudio] PowerModeHandler: %s", c_str(mode));
     return sys::ReturnCodes::Success;
 }
 

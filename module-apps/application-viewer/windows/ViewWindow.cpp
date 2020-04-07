@@ -37,7 +37,7 @@ namespace gui
         uint32_t statesCount;
         std::stringstream(str) >> statesCount;
 
-        LOG_INFO("States count: %d", statesCount);
+        LOG_INFO("States count: %" PRIu32, statesCount);
         bool err = false;
         for (uint32_t i = 0; i < statesCount; ++i) {
             std::string stateName = vfs.getline(file);

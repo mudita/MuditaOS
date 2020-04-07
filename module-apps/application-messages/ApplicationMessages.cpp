@@ -129,7 +129,7 @@ namespace app
             return false;
         }
         else {
-            LOG_DEBUG("Removing thread: %d", record->dbID);
+            LOG_DEBUG("Removing thread: %" PRIu32, record->dbID);
             auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_rm_confirm]);
             if (dialog != nullptr) {
                 auto meta   = dialog->meta;

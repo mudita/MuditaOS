@@ -149,7 +149,7 @@ namespace at
         if (fact.count(at)) {
             return fact.at(at);
         }
-        LOG_ERROR("NO SUCH AT COMMAND DEFINED: %d", at);
+        LOG_ERROR("NO SUCH AT COMMAND DEFINED: %d", static_cast<int>(at));
         return fact.at(AT::AT);
     }
 }; // namespace at

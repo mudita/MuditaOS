@@ -114,7 +114,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
     ongoingCall.setEndCallAction([=](const CalllogRecord &rec) { return DBServiceAPI::CalllogUpdate(this, rec); });
 
     notificationCallback = [this](std::vector<uint8_t> &data) {
-        LOG_DEBUG("Notifications callback called with %i data bytes", data.size());
+        LOG_DEBUG("Notifications callback called with %u data bytes", static_cast<unsigned int>(data.size()));
         TS0710_Frame frame(data);
         std::string message;
         auto msg = identifyNotification(frame.getFrame().data);
@@ -151,7 +151,7 @@ void ServiceCellular::TickHandler(uint32_t id)
         CallStateTimerHandler();
     }
     else {
-        LOG_ERROR("Unrecognized timer ID = %u", id);
+        LOG_ERROR("Unrecognized timer ID = %" PRIu32, id);
     }
 }
 
@@ -169,7 +169,7 @@ sys::ReturnCodes ServiceCellular::DeinitHandler()
 
 sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[ServiceCellular] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+    LOG_FATAL("[ServiceCellular] PowerModeHandler: %s", c_str(mode));
 
     switch (mode) {
     case sys::ServicePowerMode ::Active:
@@ -371,7 +371,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 }
                 break;
             default: {
-                LOG_INFO("Skipped CellularNotificationMessage::Type %d", msg->type);
+                LOG_INFO("Skipped CellularNotificationMessage::Type %d", static_cast<int>(msg->type));
             }
             }
         }
@@ -551,7 +551,7 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
 
     if (responseMsg == nullptr) {
-        LOG_DEBUG("message not handled: %d, %d", msgl->type, msgl->messageType);
+        LOG_DEBUG("message not handled: %d, %d", static_cast<int>(msgl->type), static_cast<int>(msgl->messageType));
         responseMsg = std::make_shared<CellularResponseMessage>(false);
     }
 

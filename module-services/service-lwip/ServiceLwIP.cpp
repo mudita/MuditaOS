@@ -38,7 +38,7 @@ sys::ReturnCodes message_lwip(sys::Service *app, LwIP_message::Request req)
     std::shared_ptr<LwIP_message> msg = std::make_shared<LwIP_message>(req);
     auto ret                          = sys::Bus::SendUnicast(msg, "ServiceLwIP", app, 5000);
     if (ret.first != sys::ReturnCodes::Success) {
-        LOG_ERROR("err: %d", ret.first);
+        LOG_ERROR("err: %s", c_str(ret.first));
     }
     return ret.first;
 }
@@ -94,7 +94,7 @@ sys::Message_t ServiceLwIP::DataReceivedHandler(sys::DataMessage *msg, sys::Resp
             }
         } break;
         default:
-            LOG_ERROR("Not handled messageType: %s", msg->messageType);
+            LOG_ERROR("Not handled messageType: %d", static_cast<int>(msg->messageType));
         }
     }
     catch (std::exception &ex) {

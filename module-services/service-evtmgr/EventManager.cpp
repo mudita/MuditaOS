@@ -195,7 +195,7 @@ sys::ReturnCodes EventManager::DeinitHandler()
 
 sys::ReturnCodes EventManager::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+    LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));
 
     suspended = true;
 

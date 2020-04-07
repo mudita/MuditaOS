@@ -114,7 +114,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             std::string text = bsp::harness::read();
             auto ret         = harness::parse(text, this->service);
             if (ret != harness::Error::Success) {
-                LOG_ERROR("Harness parser error: %d", ret);
+                LOG_ERROR("Harness parser error: %s", c_str(ret));
             }
         }
         else {
@@ -136,7 +136,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         if (notification == bsp::cellular::trayPin) {
             Store::GSM::Tray pinstate = bsp::cellular::sim::getTray();
-            LOG_DEBUG("SIM state change: %d", pinstate);
+            LOG_DEBUG("SIM state change: %d", static_cast<int>(pinstate));
             bsp::cellular::sim::hotswap_trigger();
         }
     }

@@ -1094,7 +1094,7 @@ void PrintSystemClocks()
     int i;
 
     for (i = 0; i < 22; i++) {
-        LOG_PRINTF("%s: %i Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
+        LOG_PRINTF("%s: %lu Hz\r\n", _PLLNames[i], CLOCK_GetFreq(static_cast<clock_name_t>(i)));
         // volatile uint32_t val = CLOCK_GetFreq(static_cast<clock_name_t>(i));
     }
 
