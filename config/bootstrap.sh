@@ -9,17 +9,10 @@
 # it's support is added to default ccache
 
 # packages settings
-ARM_GCC="gcc-arm-none-eabi-9-2019-q4-major"
-ARM_GCC_PACKAGE_FILE="${ARM_GCC}-x86_64-linux.tar.bz2"
-ARM_GCC_SOURCE_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2?revision=108bd959-44bd-4619-9c19-26187abf5225&la=en&hash=E788CE92E5DFD64B2A8C246BBA91A249CB8E2D2D"
-ARM_GCC_PATH_VAR="${ARM_GCC//-/_}"
+SCRIPT=$(readlink -f $0)
+SCRIPT_DIR="$(dirname ${SCRIPT})"
 
-CMAKE_DIR="cmake-3.17.0-Linux-x86_64"
-CMAKE_SOURCE_LINK="https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.tar.gz"
-CMAKE_PKG="${CMAKE_DIR}.tar.gz"
-CMAKE_PATH_VAR=${CMAKE_DIR//[-.]/_}
-
-
+. ${SCRIPT_DIR}/bootstrap_config
 
 function printVar(){
     echo "$1: '${!1}'"
@@ -131,9 +124,20 @@ function setup_cmake() {
     echo "CMAKEV installed to ${HOME}/${CMAKE_DIR} and set in PATH"
 }
 
-function setup_env_cmake() {
-    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    cat env.cmake.sample | sed "s:<ARM_GCC_HOME>:${HOME}/${ARM_GCC}/bin:" > env.cmake
+function install_docker() {
+    if [[ -n $(command -v docker) ]]; then
+        TESTED_VERSION="19.03.8"
+        DOCKER_VERSION=$(docker version -f '{{.Server.Version}}')
+        if [[ ${TESTED_VERSION} != ${DOCKER_VERSION} ]]; then
+            echo -e "Tested with docker ${DOCKER_VERSION} your is ${DOCKER_VERSION} consider updating"
+        else
+            echo "Docker already installed"
+        fi
+
+    else
+        curl -fsSL https://get.docker.com -o /tmp/get-docker.sh
+        sudo sh /tmp/get-docker.sh
+    fi
 }
 
 
@@ -146,7 +150,7 @@ BUILD_STEPS=(
         setup_gcc_alternatives
         "add_to_path ${ARM_GCC_PATH_VAR} ${HOME}/${ARM_GCC}/bin"
         "add_to_path ${CMAKE_PATH_VAR} ${HOME}/${CMAKE_DIR}/bin"
-        "setup_env_cmake"
+        install_docker
         )
 
 

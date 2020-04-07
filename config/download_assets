@@ -1,0 +1,38 @@
+#!/bin/bash
+# packages settings
+
+function printVar(){
+    echo "$1: '${!1}'"
+}
+
+SCRIPT=$(readlink -f $0)
+SCRIPT_DIR="$(dirname ${SCRIPT})"
+. ${SCRIPT_DIR}/bootstrap_config
+SRC_ROOT=$(readlink -f ${SCRIPT_DIR}/..)
+
+DEST_DIR="${SRC_ROOT}/docker"
+
+printVar SCRIPT
+printVar SCRIPT_DIR
+printVar SRC_ROOT
+printVar DEST_DIR
+
+function get_arm_toolchain() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    echo "Download armgcc"
+    [[ ! -f $ARM_GCC ]] &&
+        wget --no-verbose --show-progress -O ${ARM_GCC_PACKAGE_FILE} ${ARM_GCC_SOURCE_LINK}
+}
+
+function get_cmake() {
+    echo -e "\e[32m${FUNCNAME[0]}\e[0m"
+    [[ ! -f ${CMAKE_DIR}.tgz ]] &&
+        wget --no-verbose -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
+}
+
+pushd ${DEST_DIR}
+get_arm_toolchain
+get_cmake
+popd
+
+
