@@ -1,10 +1,42 @@
 PurePhone repository
 ====================
 
+# Quickstart in docker
+You can build project in docker container, to that
+
+### Get docker
+`./config/bootstrap.sh 8`
+
+### configure for linux Debug
+`./in_docker.sh config linux Debug`
+
+### build linux Debug
+`./in_docker.sh make build-linux-Debug`
+
+### build rt1051 Release
+`./in_docker.sh config rt1051 Release`
+`./in_docker.sh make build-rt1051-Release`
+
 # Quickstart
 
 Prior to any build setup environment, need to be run once. (See: `## Run provisioning`)
 `cd config && ./bootstrap.sh`
+boostrap.sh will show you list of changes that may be required for you.
+If this is new checkout you need to update your git config (step 0 and 1).
+
+### Bootstrap steps:
+* `./config/bootstrap.sh 0`  - install style checking scripts to be automatically run on commit
+* `./config/bootstrap.sh 1`  - `git blame` will ignore style changing commit
+* `./config/bootstrap.sh 2`  - list packages required for builds *but it is not installed*
+* `./config/bootstrap.sh 3`  - setup arm toolchain, download and install in home dir
+* `./config/bootstrap.sh 4`  - setup cmake, download and install in home dir
+* `./config/bootstrap.sh 5`  - list of commands for required for switching default gcc/g++ to version 9
+* `./config/bootstrap.sh 6`  - adds Paths for arm toolchain to your PATH environment variable - this is also used by ./env.cmake
+* `./config/bootstrap.sh 7`  - adds Paths for cmake to your PATH environment variable
+* `./config/bootstrap.sh 8`  - install docker
+
+*6 add_to_path gcc_arm... is required because new ./env.cmake uses environment variables set by this target.*
+
 
 ## style git hooks
 During the bootstrap you can install git hooks for style checking.
@@ -18,7 +50,6 @@ in the hooks directory script has to be named *pre-commit*.
 
 ## Super quick and dirty to run app on linux:
 ```
-cat env.cmake.sample | sed "s:<HOME>:$HOME:" > env.cmake                    # set env.cmake
 git submodule update --init --recursive                                     # initialize submodules
 cd ./config/ && ./bootstrap.sh && cd ../                                    # bootstrap requirements
 ./cofnigure.sh rt1051|linux Debug|Release|RelWithDebInfo                    # configure build
@@ -76,13 +107,25 @@ There is provisioning script `./config/bootstrap.sh` run it to install all depen
 
 `cd config && ./bootstrap.sh`
 
+## build docker image
+If for some reason you don't want to use existing (on hub.docker.com) docker image you can build your own.
+### download toolchain
+```bash
+./config/download_assets
+```
+### build image
+```bash
+docker build docker/ -t rwicik/pure_phone_build:latest
+```
+please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if docker couldn't find it locally it will download it from hub.docker.com
+
+
 ## Install JLink driver:
 
 We use JLink driver in version JLink v634f, for ubuntu download from here:
 [tested JLink we use](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb)
 
-To install this driver on linux:
-`sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
+To install this driver on linux: `sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
 
 ## First time repo checkout with submodules
 `git submodule update --init --recursive`

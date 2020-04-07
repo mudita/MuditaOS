@@ -1,0 +1,25 @@
+name: 'Style Check'
+description: 'Checking style for last commit'
+branding:
+  icon: 'align-left'
+  color: 'white'
+inputs:
+  action:
+    description: 'Describes action to be taken: style|configure|build|c&b|check'
+    required: true
+    default: 'style'
+  target:
+    description: 'Defines on destination target, should be one of: rt1051|linux'
+    required: false
+    default: 'rt1051'
+  build_type:
+    destination: 'Defines build type, should be one of: Debug|Release|RelWithDebInfo'
+    required: false
+    default: 'RelWithDebInfo'
+runs:
+  using: 'docker'
+  image: 'docker://rwicik/pure_phone_build:v1.0'
+  args:
+    - ${{ inputs.action }}
+    - ${{ inputs.target }}
+    - ${{ inputs.build_type }}

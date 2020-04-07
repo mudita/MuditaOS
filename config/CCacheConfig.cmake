@@ -1,5 +1,3 @@
-set(TOOLCHAIN_PATH "<HOME>/gcc-arm-none-eabi-8-2019-q3-update/" CACHE INTERNAL "")
-set(SERIAL_PORT_PATH "SERIAL_PORT=\"/dev/ttyUSB0\"" CACHE INTERNAL "")
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)

@@ -11,38 +11,21 @@ jobs:
     - uses: actions/checkout@v1
       with:
         token: ${{ secrets.GitHub_PAT }}
-        submodules: true
-    - name: Style Linter Setup
-      run: |
-        sudo apt-get update && sudo apt-get install -y clang-format-9
-    - name: Style Check
-      run: |
-        ./config/pre-commit-check-only.hook --last
-    - name: Run bootstrap & Build
-      run: |
-        echo "Install neccessary packages"
-        ARM_GCC='gcc-arm-none-eabi-8-2019-q3-update'
-        CMAKEV='cmake-3.15.5-Linux-x86_64'
-        echo "Setup gcc, cmake etc..."
-        echo "Download armgcc"
-        [[ ! -f $ARM_GCC ]] && wget --no-verbose -O ${ARM_GCC}.tgz https://developer.arm.com/-/media/Files/downloads/gnu-rm/8-2019q3/RC1.1/gcc-arm-none-eabi-8-2019-q3-update-linux.tar.bz2?revision=c34d758a-be0c-476e-a2de-af8c6e16a8a2?product=GNU%20Arm%20Embedded%20Toolchain,64-bit,,Linux,8-2019-q3-update
-        [[ ! -d ${HOME}/${ARM_GCC} ]] &&
-        tar -xf ${ARM_GCC}.tgz -C ${HOME}/
-        echo "ARM GCC installed to ${HOME}/${ARM_GCC}"
-        [[ ! -f ${CMAKEV}.tgz ]] && wget --no-verbose -O ${CMAKEV}.tgz https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
-        [[ ! -d ${HOME}/${CMAKEV} ]] && tar -xf ${CMAKEV}.tgz -C ${HOME}/
-        echo "Set path for cmake"
-        echo 'export PATH="${HOME}/cmake-3.15.5-Linux-x86_64/bin:$PATH"' >> ~/.bashrc
-        export PATH="${HOME}/${CMAKEV}/bin:$PATH"
-        echo "CMAKEV installed to ${HOME}/${CMAKEV} and set in PATH"
-        echo "Removing downloaded: ${CMAKEV}.tgz and ${ARM_GCC}.tgz is on you :)"
-        echo "Please mind that running this script multiple times will add ${CMAKEV} to your ~/.bashrc (end of file) multiple times"
-        
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@2.0.0
-    - name: Build
-      run: |
-        echo 'set(TOOLCHAIN_PATH "/home/runner/gcc-arm-none-eabi-8-2019-q3-update" CACHE INTERNAL "")' > ./env.cmake
-        sudo apt-get -q -y remove cmake
-        ./configure.sh rt1051 Release && make -C  build-rt1051-Release -j4
-
+        submodules: recursive
+        fetch-depth: 0
+    - name: "Style checking"
+      uses: ./.github/actions/build
+      with:
+        action: "style"
+    - name: "Unit Tests"
+      uses: ./.github/actions/build
+      with:
+        action: check
+        target: linux
+        build_type: Debug
+    - name: "Build for RT1051"
+      uses: ./.github/actions/build
+      with:
+        action: "c&b"
+        target: rt1051
+        build_type: RelWithDebInfo
