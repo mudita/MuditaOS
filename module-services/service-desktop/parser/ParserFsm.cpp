@@ -36,7 +36,7 @@ class StateMessageType : public ParserFsm
             transit<StateMessageSize>();
             break;
         default:
-            LOG_ERROR("Invalid msg type: %d", msgType);
+            LOG_ERROR("Invalid msg type: %d", static_cast<int>(msgType));
             return;
         }
     };

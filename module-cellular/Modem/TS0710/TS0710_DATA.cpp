@@ -64,7 +64,7 @@ void TS0710_DATA::request(DLCI_t DLCI, DLC_ESTABL_SystemParameters_t sysParams, 
         int dataLeft                     = User_data.size();
         std::vector<uint8_t>::iterator i = User_data.begin();
         uint32_t parts                   = User_data.size() / sysParams.MaxFrameSize + 1; // add reminder
-        LOG_DEBUG("SENDING %i parts", parts);
+        LOG_DEBUG("SENDING %" PRIu32 " parts", parts);
         while (parts--) {
             std::vector<uint8_t>::iterator last =
                 i + (dataLeft < sysParams.MaxFrameSize ? dataLeft : sysParams.MaxFrameSize); // distinguish reminder

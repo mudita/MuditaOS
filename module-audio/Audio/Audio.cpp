@@ -110,7 +110,7 @@ namespace audio
 
         auto retStop = currentOperation->Stop();
         if (retStop != 0) {
-            LOG_ERROR("Operation STOP failure: %d see RetCode enum for audio for more information", retStop);
+            LOG_ERROR("Operation STOP failure: %" PRIu32 " see RetCode enum for audio for more information", retStop);
         }
 
         auto ret = Operation::Create(Operation::Type::Idle, "");

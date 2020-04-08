@@ -91,7 +91,7 @@ namespace utils
 
             // Error
             if (err.length() != 0) {
-                LOG_FATAL(err.c_str());
+                LOG_FATAL("%s", err.c_str());
                 return json11::Json();
             }
             else {

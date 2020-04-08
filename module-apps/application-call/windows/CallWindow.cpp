@@ -299,7 +299,7 @@ namespace gui
         auto records = DBServiceAPI::ContactGetByPhoneNumber(this->application, phoneNumber);
         if (records->size() == 1) {
             auto rec = records->operator[](0);
-            LOG_INFO("number = %s recognized as contact id = %u, name = %s",
+            LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
                      phoneNumber.c_str(),
                      rec.ID,
                      rec.getFormattedName().c_str());
@@ -308,7 +308,7 @@ namespace gui
         else if (records->size() > 1) {
             LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.c_str());
             for (auto i : *records) {
-                LOG_ERROR("contact id = %u, name = %s", i.ID, i.getFormattedName().c_str());
+                LOG_ERROR("contact id = %" PRIu32 ", name = %s", i.ID, i.getFormattedName().c_str());
             }
         }
         else {
@@ -357,7 +357,7 @@ namespace gui
     bool CallWindow::onInput(const InputEvent &inputEvent)
     {
 
-        LOG_INFO("key code: %d, state: %d",
+        LOG_INFO("key code: %" PRIu32 ", state: %" PRIu32,
                  static_cast<uint32_t>(inputEvent.keyCode),
                  static_cast<uint32_t>(inputEvent.state));
 

@@ -17,7 +17,7 @@ namespace bsp
                 ssize_t length = read(fd, &inputData[0], SERIAL_BUFFER_LEN);
                 if (length > 0) {
                     receiveMsg = std::string(inputData, inputData + length);
-                    LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", length);
+                    LOG_DEBUG("[ServiceDesktop:BSP_Driver] Received: %d signs", static_cast<int>(length));
                     xQueueSend(USBReceiveQueue, &receiveMsg, portMAX_DELAY);
                 }
                 else {
@@ -38,7 +38,7 @@ namespace bsp
         delete sendMsg;
 
         if (t >= 0) {
-            LOG_DEBUG("[ServiceDesktop:BSP_Driver] Send: %d signs", t);
+            LOG_DEBUG("[ServiceDesktop:BSP_Driver] Send: %d signs", static_cast<int>(t));
             return 0;
         }
         else {

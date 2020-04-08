@@ -132,7 +132,7 @@ namespace audio
         if (audioDevice->IsFormatSupported(currentProfile->GetAudioFormat())) {
             auto ret = audioDevice->Start(currentProfile->GetAudioFormat());
             if (ret != 0) {
-                LOG_ERROR("Start error: %d", ret);
+                LOG_ERROR("Start error: %u", static_cast<unsigned int>(ret));
             }
         }
         else {

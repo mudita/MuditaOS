@@ -124,7 +124,8 @@ namespace gui
                             addKeyProfile(pk);
                         }
                         else {
-                            LOG_FATAL("Incorrect number of chars or key code duplicate key code: [%d]", pk->keyCode);
+                            LOG_FATAL("Incorrect number of chars or key code duplicate key code: [%" PRIu32 "]",
+                                      pk->keyCode);
                             delete pk;
                             pk = nullptr;
                         }
@@ -195,9 +196,9 @@ namespace gui
 
     uint32_t Profile::get(bsp::KeyCodes code, uint32_t times)
     {
-        const KeyProfile *p = getKeyProfile(uint32_t(code));
+        const KeyProfile *p = getKeyProfile(static_cast<uint32_t>(code));
         if (p == nullptr) {
-            LOG_ERROR("KeyProfile for key: %d not found", code);
+            LOG_ERROR("KeyProfile for key: %" PRIu32 " not found", static_cast<uint32_t>(code));
             return 0;
         }
         return p->chars[times % p->chars.size()];

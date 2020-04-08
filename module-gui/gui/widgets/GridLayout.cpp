@@ -30,7 +30,9 @@ void GridLayout::resizeItems()
     }
 
     if (children.size() > max_elements) {
-        LOG_ERROR("More children than possible to show: %d > %d", children.size() > max_elements);
+        LOG_ERROR("More children than possible to show: %u > %" PRIu32 "",
+                  static_cast<unsigned int>(children.size()),
+                  max_elements);
         return;
     }
     if (el_in_x > 2)

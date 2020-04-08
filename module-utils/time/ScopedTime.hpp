@@ -29,7 +29,7 @@ namespace utils
             ~Scoped()
             {
 #if DEBUG_SCOPED_TIMINGS == 1
-                LOG_DEBUG("%s time: %lu", text.c_str(), cpp_freertos::Ticks::GetTicks() - timestamp);
+                LOG_DEBUG("%s time: %" PRIu32, text.c_str(), cpp_freertos::Ticks::GetTicks() - timestamp);
 #endif
             }
         };

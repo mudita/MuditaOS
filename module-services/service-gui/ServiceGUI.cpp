@@ -279,7 +279,7 @@ extern "C"
 
     sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_FATAL("[ServiceGUI] PowerModeHandler: %d", static_cast<uint32_t>(mode));
+        LOG_FATAL("[ServiceGUI] PowerModeHandler: %s", c_str(mode));
 
         switch (mode) {
         case sys::ServicePowerMode ::Active:

@@ -493,7 +493,7 @@ namespace gui
             }
         }
 
-        LOG_INFO("Total number of images: %d", fontFiles.size());
+        LOG_INFO("Total number of images: %u", static_cast<unsigned int>(fontFiles.size()));
 
         return fontFiles;
     }
@@ -517,7 +517,7 @@ namespace gui
     Font *FontManager::getFont(uint32_t id)
     {
         if (id >= fonts.size()) {
-            LOG_ERROR("Font not found! id: %d", id);
+            LOG_ERROR("Font not found! id: %" PRIu32, id);
             return nullptr;
         }
         return fonts[id];

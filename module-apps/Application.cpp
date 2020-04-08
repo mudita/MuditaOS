@@ -508,7 +508,8 @@ namespace app
     {
         auto ret = std::find(windowStack.begin(), windowStack.end(), window);
         if (ret != windowStack.end()) {
-            LOG_INFO("Pop last window(s) : %d! %s", std::distance(ret, windowStack.end()), ret->c_str());
+            LOG_INFO(
+                "Pop last window(s) [%d] :  %s", static_cast<int>(std::distance(ret, windowStack.end())), ret->c_str());
             windowStack.erase(std::next(ret), windowStack.end());
             return true;
         }

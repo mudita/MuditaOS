@@ -179,7 +179,8 @@ namespace gui
                     return true;
                 }
                 default:
-                    LOG_DEBUG("SMS main window not handled key: %d", inputEvent.keyCode);
+                    LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
+                    break;
                 }
             }
         }

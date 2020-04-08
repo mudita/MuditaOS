@@ -159,7 +159,7 @@ int Database::queryCallback(void *usrPtr, int count, char **data, char **columns
             row.push_back(Field{data[i]});
         }
         catch (...) {
-            LOG_FATAL("Error on: %d %s", i, data[i]);
+            LOG_FATAL("Error on: %" PRIu32 " %s", i, data[i]);
         }
     }
 
