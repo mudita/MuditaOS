@@ -43,6 +43,7 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_date_validation.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/microtar/src/microtar.c
 	${CMAKE_CURRENT_SOURCE_DIR}/crc32/crc32.c
+	${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.c
 
         )
 
