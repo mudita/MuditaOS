@@ -48,7 +48,7 @@ struct ContactRecord
     bool isOnWhitelist  = false;
     bool isOnBlacklist  = false;
     bool isOnFavourites = false;
-    UTF8 speeddial   = "";
+    UTF8 speeddial      = "";
 
     inline UTF8 getFormattedName()
     {
