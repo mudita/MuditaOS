@@ -16,17 +16,20 @@ namespace AudioServiceAPI
 {
     namespace
     {
-        auto SendAudioRequest(sys::Service *serv, std::shared_ptr<sys::Message> msg)
+        auto SendAudioRequest(sys::Service *serv, std::shared_ptr<AudioRequestMessage> msg)
         {
+            auto msgType = static_cast<int>(msg->type);
+            LOG_DEBUG("Msg type %d", msgType);
             auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, sys::defaultCmdTimeout);
             if (ret.first == sys::ReturnCodes::Success) {
                 if (auto resp = std::dynamic_pointer_cast<AudioResponseMessage>(ret.second)) {
+                    LOG_DEBUG("Msg type %d done", msgType);
                     return resp;
                 }
-                LOG_ERROR("not AudioResponseMessage");
+                LOG_ERROR("msgType %d - not AudioResponseMessage", msgType);
                 return std::make_shared<AudioResponseMessage>(audio::RetCode::Failed);
             }
-            LOG_ERROR("Command Failed with %d error", static_cast<int>(ret.first));
+            LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));
             return std::make_shared<AudioResponseMessage>(audio::RetCode::Failed);
         }
     } // namespace

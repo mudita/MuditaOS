@@ -62,6 +62,9 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
+    auto msgType = static_cast<int>(msgl->messageType);
+    LOG_DEBUG("msgType %d", msgType);
+
     if (auto *msg = dynamic_cast<AudioNotificationMessage *>(msgl)) {
         switch (msg->type) {
 
