@@ -251,7 +251,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
                                          .isOnFavourites  = contact.isOnFavourites,
-                                         .speeddial       = static_cast<uint8_t>(contact.speedDial)});
+                                         .speeddial       = contact.speedDial});
     }
 
     return records;
@@ -306,7 +306,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
                                              .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)});
+                                             .speeddial       = contact.speedDial});
         }
     }
 
@@ -358,7 +358,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
                                              .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)
+                                             .speeddial       = contact.speedDial
 
             });
         }
@@ -409,7 +409,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
                                              .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)});
+                                             .speeddial       = contact.speedDial});
         }
     } break;
 
@@ -459,7 +459,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
                                              .isOnFavourites  = contact.isOnFavourites,
-                                             .speeddial       = static_cast<uint8_t>(contact.speedDial)});
+                                             .speeddial       = contact.speedDial});
         }
     } break;
     }
@@ -512,7 +512,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
                                          .isOnFavourites  = contact.isOnFavourites,
-                                         .speeddial       = static_cast<uint8_t>(contact.speedDial)});
+                                         .speeddial       = contact.speedDial});
     }
 
     return records;
@@ -563,7 +563,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
                                          .isOnFavourites  = contact.isOnFavourites,
-                                         .speeddial       = static_cast<uint8_t>(contact.speedDial)});
+                                         .speeddial       = contact.speedDial});
     }
 
     return records;
@@ -599,9 +599,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByNumber(
     return ret;
 }
 
-std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial(uint8_t speedDial)
+std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetBySpeedDial(UTF8 speedDial)
 {
-    return GetLimitOffsetByField(0, 1, ContactRecordField::SpeedDial, std::to_string(speedDial).c_str());
+    return GetLimitOffsetByField(0, 1, ContactRecordField::SpeedDial, speedDial.c_str());
 }
 
 std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std::string &numbers_id)
