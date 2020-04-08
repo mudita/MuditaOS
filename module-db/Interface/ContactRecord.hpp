@@ -48,7 +48,7 @@ struct ContactRecord
     bool isOnWhitelist  = false;
     bool isOnBlacklist  = false;
     bool isOnFavourites = false;
-    uint8_t speeddial   = 0;
+    UTF8 speeddial   = "";
 
     inline UTF8 getFormattedName()
     {
@@ -107,7 +107,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     std::unique_ptr<std::vector<ContactRecord>> GetByNumber(
         const UTF8 &number, CreateTempContact createTempContact = CreateTempContact::False);
 
-    std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(uint8_t speedDial);
+    std::unique_ptr<std::vector<ContactRecord>> GetBySpeedDial(UTF8 speedDial);
 
     std::unique_ptr<std::vector<ContactRecord>> Search(const char *primaryName,
                                                        const char *alternativeName,

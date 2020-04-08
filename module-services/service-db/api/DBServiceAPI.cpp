@@ -269,7 +269,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Se
     }
 }
 
-std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, uint8_t speeddial)
+std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
 {
     ContactRecord rec;
     rec.speeddial = speeddial;
@@ -312,29 +312,28 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
                                                                    ContactRecord &speedDial)
 {
     auto retName = ContactGetByName(serv, rec.primaryName, rec.alternativeName);
-    if (retName->size() != 0) {
+    if (!retName->empty()) {
         errName = retName->operator[](0);
         return (nameError);
     }
 
     auto retSpeedDial = ContactGetBySpeeddial(serv, rec.speeddial);
-    if (retSpeedDial->size() != 0) {
+    if (!retSpeedDial->empty()) {
         speedDial = retSpeedDial->operator[](0);
         return (speedDialError);
     }
 
-    // request contact by speed dial
-    if (rec.numbers.size() > 0) {
-        auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
-        if (retPhone1->size() != 0) {
+    if (rec.numbers.size() > 0 && rec.numbers[0].numberUser.length()) {
+        auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberUser);
+        if (!retPhone1->empty()) {
             errPhone1 = retPhone1->operator[](0);
             return (primaryNumberError);
         }
     }
 
-    if (rec.numbers.size() > 1) {
-        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberE164);
-        if (retPhone2->size() != 0) {
+    if (rec.numbers.size() > 1 && rec.numbers[1].numberUser.length()) {
+        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberUser);
+        if (!retPhone2->empty()) {
             errPhone2 = retPhone2->operator[](0);
             return (secondaryNumberError);
         }

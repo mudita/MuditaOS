@@ -369,7 +369,7 @@ namespace gui
             contact->mail           = page1.text[4]->getText();
             contact->note           = page2.text[1]->getText();
             contact->isOnFavourites = page2.favSelected;
-            contact->speeddial      = atoi(page2.speedValue->getText().c_str());
+            contact->speeddial      = page2.speedValue->getText();
         }
     }
 
@@ -405,10 +405,10 @@ namespace gui
                 page2.imageTick->setVisible(false);
                 page2.favSelected = false;
             }
-            if (contact->speeddial < 10)
-                page2.speedValue->setText(std::to_string(contact->speeddial));
+            if (contact->speeddial.length())
+                page2.speedValue->setText(contact->speeddial);
             else
-                page2.speedValue->setText("-");
+                page2.speedValue->setText("");
 
             saveStateChanged();
         }
@@ -499,7 +499,7 @@ namespace gui
         record.mail           = page1.text[4]->getText();
         record.note           = page2.text[1]->getText();
         record.isOnFavourites = page2.favSelected;
-        record.speeddial      = atoi(page2.speedValue->getText().c_str());
+        record.speeddial      = page2.speedValue->getText();
 
         /** basic sanity checks */
         if (!isValidName(record.primaryName)) {

@@ -274,8 +274,7 @@ void PhonebookDuplicateSpeedDial::setContactData()
     fillContactData(t, contact);
     confirmationLabel->setText(t);
 
-    /* speeddial value convert to string */
-    dialValue->setText(std::to_string(contact->speeddial));
+    dialValue->setText(contact->speeddial);
 
-    setTitle(contact.get()->numbers[0].numberE164);
+    setTitle(contact.get()->numbers[0].numberUser);
 }

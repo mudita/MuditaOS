@@ -40,10 +40,10 @@ static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRec
     utils::findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
     utils::findAndReplaceAll(data, "$CONTACT_NAME$", formatContactName(contact));
     utils::findAndReplaceAll(
-        data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberE164 : "");
+        data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberUser : "");
     utils::findAndReplaceAll(
-        data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberE164 : "");
-    utils::findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", std::to_string(contact->speeddial));
+        data, "$CONTACT_NUMBER2$", (contact->numbers.size() == 2) ? contact->numbers[1].numberUser : "");
+    utils::findAndReplaceAll(data, "$CONTACT_SPEED_DIAL$", contact->speeddial);
     return true;
 }
 
