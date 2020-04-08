@@ -26,7 +26,7 @@ bool ContactsTable::Add(ContactsTableRow entry)
 {
     return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, "
                        "blacklist, favourites, speeddial ) VALUES "
-                       "(%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, %lu);",
+                       "(%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, '%s');",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
@@ -35,7 +35,7 @@ bool ContactsTable::Add(ContactsTableRow entry)
                        entry.isOnWhitelist,
                        entry.isOnBlacklist,
                        entry.isOnFavourites,
-                       entry.speedDial);
+                       entry.speedDial.c_str());
 }
 
 bool ContactsTable::RemoveByID(uint32_t id)
@@ -52,7 +52,7 @@ bool ContactsTable::Update(ContactsTableRow entry)
 {
     return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%s' ,ring_id = %lu, address_ids = '%s', type "
                        "= %lu, whitelist = %lu, blacklist = %lu, "
-                       "favourites = %lu, speeddial = %lu WHERE _id=%lu;",
+                       "favourites = %lu, speeddial = '%s' WHERE _id=%lu;",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
@@ -61,7 +61,7 @@ bool ContactsTable::Update(ContactsTableRow entry)
                        entry.isOnWhitelist,
                        entry.isOnBlacklist,
                        entry.isOnFavourites,
-                       entry.speedDial,
+                       entry.speedDial.c_str(),
                        entry.ID);
 }
 
@@ -83,7 +83,7 @@ ContactsTableRow ContactsTable::GetByID(uint32_t id)
         (*retQuery)[6].GetBool(),                             // is on whitelist
         (*retQuery)[7].GetBool(),                             // is on blacklist
         (*retQuery)[8].GetBool(),                             // is on favourites
-        (*retQuery)[9].GetUInt32(),                           // speed dial key
+        (*retQuery)[9].GetString(),                           // speed dial key
     };
 }
 
@@ -134,7 +134,7 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
             (*retQuery)[6].GetBool(),                             // is on whitelist
             (*retQuery)[7].GetBool(),                             // is on blacklist
             (*retQuery)[8].GetBool(),                             // is on favourites
-            (*retQuery)[9].GetUInt32(),                           // speed dial key
+            (*retQuery)[9].GetString(),                           // speed dial key
             (*retQuery)[10].GetString(),                          // primaryName
             (*retQuery)[11].GetString(),                          // alternativeName (WTF!)
         });
@@ -164,7 +164,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
             (*retQuery)[6].GetBool(),                             // is on whitelist
             (*retQuery)[7].GetBool(),                             // is on blacklist
             (*retQuery)[8].GetBool(),                             // is on favourites
-            (*retQuery)[9].GetUInt32(),                           // speed dial key
+            (*retQuery)[9].GetString(),                           // speed dial key
         });
     } while (retQuery->NextRow());
 
@@ -212,7 +212,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offs
             (*retQuery)[6].GetBool(),                             // is on whitelist
             (*retQuery)[7].GetBool(),                             // is on blacklist
             (*retQuery)[8].GetBool(),                             // is on favourites
-            (*retQuery)[9].GetUInt32(),                           // speed dial key
+            (*retQuery)[9].GetString(),                           // speed dial key
         });
     } while (retQuery->NextRow());
 

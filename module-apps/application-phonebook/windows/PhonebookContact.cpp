@@ -1,5 +1,6 @@
 #include "PhonebookContact.hpp"
 #include "../ApplicationPhonebook.hpp"
+#include "../data/PhonebookInternals.hpp"
 #include "InputEvent.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
@@ -357,14 +358,14 @@ namespace gui
         if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
             setTitle(contact->primaryName + " " + contact->alternativeName);
 
-        if (contact->speeddial < 10) {
-            speedDial->setText(std::to_string(contact->speeddial));
-        }
-        else {
-            speedDial->setText(UTF8("-"));
-        }
+        auto isSpeedDialInRange = [&](const UTF8& speedDialStr) {
+          unsigned int speedDialInt = atoi(speedDialStr.c_str());
+            return speedDialStr.length() && speedDialInt <= phonebookInternals::speedDialMaxValue;
+        };
 
-        if (contact->isOnFavourites == false) {
+        speedDial->setText(isSpeedDialInRange(contact->speeddial) ? contact->speeddial : UTF8(""));
+
+        if (!contact->isOnFavourites) {
             LOG_INFO("setContactData contact %s is not on fav list", contact->primaryName.c_str());
             favouritesIcon->setVisible(false);
             favouritesLabel->setVisible(false);
@@ -373,7 +374,7 @@ namespace gui
             LOG_INFO("setContactData contact %s is on fav list", contact->primaryName.c_str());
         }
 
-        if (contact->isOnBlacklist == false) {
+        if (!contact->isOnBlacklist) {
             blockedLabel->setVisible(false);
             blockedIcon->setVisible(false);
         }
@@ -398,7 +399,7 @@ namespace gui
         }
 
         if (contact->numbers.size() == 1) {
-            numberPrimary->setText(contact->numbers[0].numberE164);
+            numberPrimary->setText(contact->numbers[0].numberUser);
 
             numberSecondary->setVisible(false);
             numberSecondaryLabel->setVisible(false);
@@ -419,8 +420,8 @@ namespace gui
 
         if (contact->numbers.size() == 2) {
 
-            numberPrimary->setText(contact->numbers[0].numberE164);
-            numberSecondary->setText(contact->numbers[1].numberE164);
+            numberPrimary->setText(contact->numbers[0].numberUser);
+            numberSecondary->setText(contact->numbers[1].numberUser);
             email->setY(363);
             addressLabel->setY(429);
             addressLine1->setY(475);
