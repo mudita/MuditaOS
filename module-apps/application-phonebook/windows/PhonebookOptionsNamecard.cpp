@@ -149,6 +149,6 @@ const std::string PhonebookOptionsNamecard::formatVCARD()
           << "END:VCARD";
 
     LOG_INFO("formatted vcard:");
-    LOG_INFO(vcard.str().c_str());
+    LOG_INFO("%s", vcard.str().c_str());
     return (vcard.str());
 }
