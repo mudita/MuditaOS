@@ -96,7 +96,8 @@ namespace app
         }
         else {
 
-            AudioServiceAPI::PlaybackStart(this, ringtone_path);
+            // AudioServiceAPI::PlaybackStart(this, ringtone_path); // TODO: disabled untill
+            // https://appnroll.atlassian.net/browse/EGD-3095 is finished
             runCallTimer();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
             // send to itself message to switch (run) call application
