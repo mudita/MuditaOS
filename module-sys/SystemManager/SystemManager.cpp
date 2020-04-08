@@ -43,16 +43,32 @@ namespace sys
             userInit();
         }
 
-        while (enableRunLoop) {
-
+        while (state == State::Running) {
             auto msg = mailbox.pop();
-
             msg->Execute(this);
         }
+
+        while (state == State::Reboot && PreShutdownLoop()) {
+            vTaskDelay(100);
+        }
+
         Bus::Remove(shared_from_this());
         EndScheduler();
+
         // Power off system
-        powerManager->PowerOff();
+        switch (state) {
+        case Reboot:
+            powerManager->Reboot();
+            break;
+        case PowerOff:
+
+            powerManager->PowerOff();
+            break;
+        default:
+            LOG_FATAL("State changed after reset/shutdown was requested! this is terrible failure!");
+            exit(1);
+            powerManager->PowerOff();
+        };
     }
 
     void SystemManager::StartSystem(std::function<int()> init)
@@ -214,6 +230,13 @@ namespace sys
         }
     }
 
+    void SystemManager::kill(std::shared_ptr<Service> const &toKill)
+    {
+        auto ret = toKill->DeinitHandler();
+        // needs merging -> LOG_DEBUG("deinit handler: %s", c_str(ret));
+        toKill->CloseHandler();
+    }
+
     ReturnCodes SystemManager::InitHandler()
     {
         isReady = true;
@@ -250,6 +273,9 @@ namespace sys
                 CloseSystemHandler();
                 break;
             }
+        case SystemManagerMsgType::Reboot:
+            RebootHandler();
+            break;
         }
 
         return std::make_shared<ResponseMessage>();
@@ -267,25 +293,38 @@ namespace sys
         CriticalSection::Exit();
 
     retry:
-        for (auto &w : servicesList) {
+        for (auto &service : servicesList) {
 
-            // Sysmgr stores list of all active services but some of them are under control of parent services.
-            // Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
-            // parents.
-            if (w->parent == "") {
-                auto ret = DestroyService(w->GetName(), this);
+            if (service->parent == "") {
+                auto ret = DestroyService(service->GetName(), this);
                 if (!ret) {
                     // no response to exit message,
-                    LogOutput::Output(w->GetName() + " failed to response to exit message");
-                    exit(1);
+                    LogOutput::Output(service->GetName() + " failed to response to exit message");
+                    kill(service);
                 }
                 goto retry;
             }
         }
 
-        if (servicesList.size() == 0) {
-            enableRunLoop = false;
+        set(State::Shutdown);
+    }
+
+    void SystemManager::RebootHandler()
+    {
+        CloseSystemHandler();
+        set(State::Reboot);
+    }
+
+    bool PreShutdownLoop()
+    {
+        // if red button was pressed na we were in shutdown state we can shutdown
+        if (red_button_was_pressed() && state == State::Shutdown) {
+            return false;
         }
+        if (usb_was_unpluged() && satte == State::Reboot) {
+            return false;
+        }
+        return true;
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;
