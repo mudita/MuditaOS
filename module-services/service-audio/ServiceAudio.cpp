@@ -146,7 +146,6 @@ sys::Message_t ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         } break;
 
         case MessageType::AudioSetInputGain: {
-            AudioRequestMessage *msg = reinterpret_cast<AudioRequestMessage *>(msgl);
             responseMsg = std::make_shared<AudioResponseMessage>(static_cast<RetCode>(audio.SetInputGain(msg->val)));
         } break;
 
