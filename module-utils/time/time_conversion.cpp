@@ -282,7 +282,8 @@ namespace utils
             seconds   = (this->duration % secondsInHour) % secondsInMinute;
 
             if (verboseConversion) {
-                LOG_DEBUG("durtaion %u - %u hours %u minutes %u seconds", duration, hours, minutes, seconds);
+                LOG_DEBUG(
+                    "duration %" PRIu64 " - %lu hours %lu minutes %lu seconds", duration, hours, minutes, seconds);
             }
         }
 
