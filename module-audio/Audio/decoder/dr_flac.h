@@ -2101,6 +2101,8 @@ static DRFLAC_INLINE drflac_int32 drflac__calculate_prediction_32(drflac_uint32 
     case 1:
         prediction += coefficients[0] * pDecodedSamples[-1];
         [[fallthrough]];
+    default:
+        break;
     }
 
     return (drflac_int32)(prediction >> shift);
