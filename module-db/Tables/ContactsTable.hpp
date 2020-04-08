@@ -27,9 +27,9 @@ struct ContactsTableRow
     bool isOnWhitelist     = false;
     bool isOnBlacklist     = false;
     bool isOnFavourites    = false;
-    std::string speedDial     = "";
-    UTF8 namePrimary     = "";
-    UTF8 nameAlternative = "";
+    std::string speedDial  = "";
+    UTF8 namePrimary       = "";
+    UTF8 nameAlternative   = "";
 };
 
 enum class ContactTableFields

@@ -358,8 +358,8 @@ namespace gui
         if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
             setTitle(contact->primaryName + " " + contact->alternativeName);
 
-        auto isSpeedDialInRange = [&](const UTF8& speedDialStr) {
-          unsigned int speedDialInt = atoi(speedDialStr.c_str());
+        auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
+            unsigned int speedDialInt = atoi(speedDialStr.c_str());
             return speedDialStr.length() && speedDialInt <= phonebookInternals::speedDialMaxValue;
         };
 
