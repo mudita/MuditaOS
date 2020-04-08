@@ -1057,6 +1057,8 @@ bool ServiceCellular::handle_select_sim()
 bool ServiceCellular::handle_modem_on()
 {
     state.set(this, State::ST::Idle);
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    channel->cmd("AT+CCLK?\r");
     return true;
 }
 
