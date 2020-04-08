@@ -8,7 +8,7 @@ set(TARGET_COMPILE_FEATURES CACHE INTERNAL "")
 
 set(TARGET_COMPILE_DEFINITIONS CACHE INTERNAL "")
 
-set(TARGET_COMPILE_OPTIONS -Werror -fsanitize=address  CACHE INTERNAL "")
+add_compile_options(-fsanitize=address)
 
 set(TARGET_LIBRARIES
     rt
@@ -16,7 +16,7 @@ set(TARGET_LIBRARIES
     portaudio
     CACHE INTERNAL "" )
 
-set(TARGET_LINK_OPTIONS  -fsanitize=address  CACHE INTERNAL "" )
+add_link_options(-fsanitize=address)
 
 set(CMAKE_STRIP strip CACHE INTERNAL "")
 set(CMAKE_OBJCOPY objcopy CACHE INTERNAL "")
