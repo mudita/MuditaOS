@@ -196,11 +196,11 @@ namespace app
         };
 
         bool adjustCurrentVolume(const audio::Volume step);
-        bool incCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        bool increaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {
             return adjustCurrentVolume(step);
         }
-        bool decCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
+        bool decreaseCurrentVolume(const audio::Volume step = audio::defaultVolumeStep)
         {
             return adjustCurrentVolume(-step);
         }
