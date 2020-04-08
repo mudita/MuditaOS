@@ -18,7 +18,7 @@ namespace audio
 
     Position Audio::GetPosition()
     {
-        return currentOperation != nullptr ? currentOperation->GetPosition() : -1; // RetCode::OperationNotSet;
+        return currentOperation != nullptr ? currentOperation->GetPosition() : -1; // TODO: need to be fixed
     }
 
     std::optional<Tags> Audio::GetFileTags(const char *filename)
@@ -34,7 +34,8 @@ namespace audio
 
     int32_t Audio::SendEvent(const Operation::Event evt, const EventData *data)
     {
-        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data) : -1; // RetCode::OperationNotSet;
+        return currentOperation != nullptr ? currentOperation->SendEvent(evt, data)
+                                           : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
     int32_t Audio::SetOutputVolume(Volume vol)
@@ -48,7 +49,7 @@ namespace audio
         }
 
         return currentOperation != nullptr ? currentOperation->SetOutputVolume(volToSet)
-                                           : -1; // TODO: alek: // RetCode::OperationNotSet;
+                                           : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
     int32_t Audio::SetInputGain(Gain gain)
@@ -61,7 +62,7 @@ namespace audio
             gainToSet = 0;
         }
         return currentOperation != nullptr ? currentOperation->SetInputGain(gainToSet)
-                                           : -1; // TODO: alek: // RetCode::OperationNotSet;
+                                           : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
     int32_t Audio::Start(Operation::Type op, const char *fileName)
@@ -102,7 +103,8 @@ namespace audio
             return static_cast<int32_t>(RetCode::Success);
         }
 
-        auto retStop = currentOperation->Stop();
+        auto retStop =
+            currentOperation != nullptr ? currentOperation->Stop() : static_cast<int32_t>(RetCode::OperationNotSet);
         if (retStop != 0) {
             LOG_ERROR("Operation STOP failure: %" PRIu32 " see RetCode enum for audio for more information", retStop);
         }
@@ -124,7 +126,7 @@ namespace audio
             return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
         }
 
-        return currentOperation != nullptr ? currentOperation->Pause() : -1; // TODO: alek: // RetCode::OperationNotSet;
+        return currentOperation != nullptr ? currentOperation->Pause() : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
     int32_t Audio::Resume()
@@ -133,7 +135,7 @@ namespace audio
             return static_cast<int32_t>(RetCode::InvokedInIncorrectState);
         }
         return currentOperation != nullptr ? currentOperation->Resume()
-                                           : -1; // TODO: alek: // RetCode::OperationNotSet;
+                                           : static_cast<int32_t>(RetCode::OperationNotSet);
     }
 
 } // namespace audio
