@@ -83,7 +83,7 @@ namespace sys
         }
         timersList.push_back(
             std::make_unique<ServiceTimer>(nameNew, Ticks::MsToTicks(interval), isPeriodic, unique, this));
-        LOG_DEBUG(std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
+        LOG_DEBUG("%s", std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
         return unique;
     }
 

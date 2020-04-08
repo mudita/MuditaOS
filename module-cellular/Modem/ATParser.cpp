@@ -41,7 +41,7 @@ std::vector<ATParser::Urc> ATParser::ParseURC()
         if (pos != std::string::npos) {
             resp.push_back(el.second);
             maxPos = std::max(pos + el.first.length(), maxPos);
-            LOG_DEBUG(("[URC]: " + el.first).c_str());
+            LOG_DEBUG("%s", ("[URC]: " + el.first).c_str());
         }
     }
 
