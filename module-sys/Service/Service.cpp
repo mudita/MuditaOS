@@ -54,6 +54,7 @@ namespace sys
                                                 }),
                                  staleUniqueMsg.end());
 
+            /// this is the only place that uses Reponse messages (service manager doesnt...)
             auto ret = msg->Execute(this);
             if (ret == nullptr) {
                 LOG_FATAL("NO MESSAGE from: %s msg type: %d", msg->sender.c_str(), static_cast<int>(msg->type));
@@ -72,6 +73,33 @@ namespace sys
         Bus::Remove(shared_from_this());
     };
 
+    auto Service::MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t
+    {
+        Message_t ret = std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        auto what     = type_index(typeid(*message));
+        auto handler  = message_handlers.find(what);
+        if (handler != message_handlers.end()) {
+            LOG_INFO("++++++> %s", typeid(*message).name());
+            ret = message_handlers[what](message, response);
+        }
+        else {
+            LOG_INFO("------> %s", typeid(*message).name());
+            ret = DataReceivedHandler(message, response);
+        }
+        return ret;
+    }
+
+    bool Service::subscribe(Message *msg, MessageHandler handler)
+    {
+        if (message_handlers.find(type_index(typeid(*msg))) == message_handlers.end()) {
+            LOG_DEBUG("Registering new message handler on %s", typeid(*msg).name());
+            message_handlers[type_index(typeid(*msg))] = handler;
+            return true;
+        }
+        LOG_ERROR("Handler for: %s already registered!", typeid(*msg).name());
+        return false;
+    }
+
     // Create service timer
     uint32_t Service::CreateTimer(uint32_t interval, bool isPeriodic, const std::string &name)
     {
@@ -80,6 +108,7 @@ namespace sys
         if (name.empty()) {
             nameNew = GetName() + "Timer" + std::to_string(unique);
         }
+        // this is bad... timer should message service, not run code on it
         timersList.push_back(
             std::make_unique<ServiceTimer>(nameNew, Ticks::MsToTicks(interval), isPeriodic, unique, this));
         LOG_DEBUG("%s", std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());

@@ -34,6 +34,7 @@ namespace bsp {
         Mode GetCurrentMode(){return currentMode;}
 
         virtual int32_t PowerOff() = 0;
+        virtual int32_t Reboot() = 0;
 
 
     protected:
