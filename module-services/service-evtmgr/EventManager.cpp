@@ -28,8 +28,7 @@
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
-    LOG_INFO("[EventManager] Initializing");
-
+    LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
     alarmID        = 0;
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
@@ -38,7 +37,7 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
 EventManager::~EventManager()
 {
 
-    LOG_INFO("[EventManager] Cleaning resources");
+    LOG_INFO("[%s] Cleaning resources", GetName().c_str());
     if (EventWorker != nullptr) {
         EventWorker->deinit();
     }
@@ -215,5 +214,5 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 {
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
-    return sys::Bus::SendUnicast(msg, "EventManager", sender);
+    return sys::Bus::SendUnicast(msg, service::name_evt_manager, sender);
 }

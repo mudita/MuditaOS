@@ -6,6 +6,7 @@
 #include <Service/Bus.hpp>
 #include <json/json11.hpp>
 #include <log/log.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 namespace harness
 {
@@ -35,7 +36,7 @@ namespace harness
             case (int)Events::KeyPress: {
                 auto evt = events::KeyPress(el);
                 if (evt && evt.msg) {
-                    sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
+                    sys::Bus::SendUnicast(evt.msg, service::name_evt_manager, serv);
                 }
             } break;
             case static_cast<int>(Events::GSMCmd): {
@@ -50,7 +51,7 @@ namespace harness
                     LOG_DEBUG("GPIO processing request failed");
                 }
                 else if (evt.msg) {
-                    sys::Bus::SendUnicast(evt.msg, "EventManager", serv);
+                    sys::Bus::SendUnicast(evt.msg, service::name_evt_manager, serv);
                 }
                 else {
                     LOG_DEBUG("> evt: %s", evt.encode().c_str());

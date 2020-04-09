@@ -45,6 +45,7 @@
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
 #include <common_data/EventStore.hpp>
+#include <service-evtmgr/EventManager.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -632,7 +633,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
         auto message = std::make_shared<sevm::SIMMessage>();
-        sys::Bus::SendUnicast(message, "EventManager", this);
+        sys::Bus::SendUnicast(message, service::name::evt_manager, this);
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
@@ -1087,7 +1088,7 @@ bool ServiceCellular::handle_select_sim()
             // NO SIM IN
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), "EventManager", this);
+        ys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
     }
 #endif
     return true;
