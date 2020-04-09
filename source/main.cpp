@@ -166,7 +166,8 @@ int main()
 
         bool ret = false;
 
-        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        ret |=
+            sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
 #if defined(TARGET_Linux) && not defined(SERIAL_PORT_PATH)
