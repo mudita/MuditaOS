@@ -30,6 +30,7 @@ extern "C"
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
+#include "Constants.hpp"
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -69,7 +70,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             auto message           = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
             message->levelPercents = battLevel;
             message->fullyCharged  = false;
-            sys::Bus::SendUnicast(message, "EventManager", this->service);
+            sys::Bus::SendUnicast(message, service::name_evt_manager, this->service);
         }
         if (notification & static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
             bool status;
@@ -77,7 +78,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             bsp::battery_ClearAllIRQs();
             auto message     = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
             message->plugged = status;
-            sys::Bus::SendUnicast(message, "EventManager", this->service);
+            sys::Bus::SendUnicast(message, service::name_evt_manager, this->service);
         }
     }
 
@@ -97,7 +98,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
-        sys::Bus::SendUnicast(message, "EventManager", this->service);
+        sys::Bus::SendUnicast(message, service::name_evt_manager, this->service);
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHarness)) {
@@ -208,5 +209,5 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
             message->key.time_release = xTaskGetTickCount();
         }
     }
-    sys::Bus::SendUnicast(message, "EventManager", this->service);
+    sys::Bus::SendUnicast(message, service::name_evt_manager, this->service);
 }
