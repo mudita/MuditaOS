@@ -271,6 +271,9 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Se
 
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
 {
+    if (!speeddial.length())
+        return std::make_unique<std::vector<ContactRecord>>();
+
     ContactRecord rec;
     rec.speeddial = speeddial;
 
