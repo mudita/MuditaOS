@@ -65,7 +65,6 @@ namespace gui
         list->setProvider(threadModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
-
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
@@ -81,7 +80,31 @@ namespace gui
         newMessageImage = new gui::Image(this, 48, 55, 0, 0, "cross");
         searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
-        //	setFocusItem( list );
+        emptyListWidget = new gui::EmptyListWidget(this,
+                                                   0,
+                                                   style::header::height,
+                                                   style::window_width,
+                                                   style::window_height - style::header::height - style::footer::height,
+                                                   "phonebook_contact_delete_trashcan",
+                                                   utils::localize.get("app_messages_no_messages"));
+
+        list->setVisible(true);
+        list->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setActive(BottomBar::Side::LEFT, true);
+            bottomBar->setActive(BottomBar::Side::CENTER, true);
+            rightArrowImage->setVisible(true);
+            searchImage->setVisible(true);
+            return true;
+        };
+
+        emptyListWidget->setVisible(false);
+        emptyListWidget->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            rightArrowImage->setVisible(false);
+            searchImage->setVisible(false);
+            return true;
+        };
     }
     void MessagesMainWindow::destroyInterface()
     {
@@ -145,6 +168,11 @@ namespace gui
 
             setFocusItem(list);
         }
+
+        if (threadModel->getItemCount() == 0) {
+            emptyListWidget->setVisible(true);
+            setFocusItem(emptyListWidget);
+        }
     }
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
@@ -165,7 +193,7 @@ namespace gui
                         LOG_ERROR("Something went horribly wrong");
                         return false;
                     }
-                    if (app->windowOptions != nullptr) {
+                    if (app->windowOptions != nullptr && getFocusItem() == list) {
                         app->windowOptions->clearOptions();
                         auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
                         if (it) {

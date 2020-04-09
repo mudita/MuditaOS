@@ -76,6 +76,7 @@ namespace style
     }; // namespace window
     namespace footer
     {
+        const inline uint32_t height = 54;
         namespace font
         {
             const inline std::string bold   = "gt_pressura_bold_24";
