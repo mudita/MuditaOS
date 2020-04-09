@@ -271,7 +271,8 @@ void PhonebookDuplicateSpeedDial::setContactData()
 {
     /* for name formatting */
     std::string t = utils::localize.get("app_phonebook_duplicate_speed_dial");
-    fillContactData(t, contact);
+    if (!fillContactData(t, contact))
+        return;
     confirmationLabel->setText(t);
     if (contact->speeddial.length())
         dialValue->setText(contact->speeddial);
