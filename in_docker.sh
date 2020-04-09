@@ -1,9 +1,9 @@
 #!/bin/bash
 
 CONTAINER_NAME=rwicik/pure_phone_build
-CONTAINER_TAG=latest
+CONTAINER_TAG=v1.0
 CONTAINER=${CONTAINER_NAME}:${CONTAINER_TAG}
-PURE_HOME="/home/PurePhone"
+PURE_HOME=`pwd`
 STANDARD_OPTIONS="-v `pwd`:${PURE_HOME} --user \"$(id -u):$(id -g)\" -t"
 
 RCFILE="/home/docker/.bashrc"
