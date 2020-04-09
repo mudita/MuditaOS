@@ -86,6 +86,9 @@ enum class MessageType
     CellularOperatorsScanResult,
     CellularNetworkInfoResult,
     CellularSelectAntenna,
+    CellularSetScanMode,
+    CellularGetScanMode,
+    CellularGetScanModeResult,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record

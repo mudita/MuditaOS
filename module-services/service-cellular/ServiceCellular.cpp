@@ -546,6 +546,30 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
     } break;
+    case MessageType::CellularSetScanMode: {
+        auto msg = dynamic_cast<CellularRequestMessage *>(msgl);
+        bool ret = false;
+        if (msg != nullptr) {
+            ret = SetScanMode(msg->data);
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(ret);
+        break;
+    }
+    case MessageType::CellularGetScanMode: {
+
+        std::string response;
+        response = GetScanMode();
+
+        if (response != "") {
+            responseMsg = std::make_shared<CellularResponseMessage>(true);
+            auto msg    = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularGetScanModeResult);
+            msg->data.push_back(response);
+            sys::Bus::SendUnicast(msg, msgl->sender, this);
+            break;
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        break;
+    }
     default:
         break;
     }
@@ -1096,4 +1120,35 @@ bool ServiceCellular::handle_fatal_failure()
     while (true) {
         vTaskDelay(500);
     }
+}
+
+bool ServiceCellular::SetScanMode(std::string mode)
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        auto command = at::factory(at::AT::SET_SCANMODE);
+
+        auto resp = channel->cmd(command.cmd + mode + ",1\r", 300, 1);
+        if (resp.code == at::Result::Code::OK) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string ServiceCellular::GetScanMode(void)
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+
+        auto resp = channel->cmd(at::AT::GET_SCANMODE);
+        if (resp.code == at::Result::Code::OK) {
+            auto beg = resp.response[0].find(",");
+            if (beg != std::string::npos) {
+                auto response = resp.response[0].substr(beg + 1, 1);
+                return response;
+            }
+        }
+    }
+    return ("");
 }

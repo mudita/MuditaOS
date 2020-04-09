@@ -109,7 +109,7 @@ void CellularServiceAPI::StartOperatorsScan(sys::Service *serv)
 {
     std::shared_ptr<CellularRequestMessage> msg =
         std::make_shared<CellularRequestMessage>(MessageType::CellularStartOperatorsScan);
-    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv);
+    sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 185000);
 }
 
 bool CellularServiceAPI::SelectAntenna(sys::Service *serv, uint8_t antenna)
@@ -127,5 +127,37 @@ bool CellularServiceAPI::SelectAntenna(sys::Service *serv, uint8_t antenna)
         }
     }
 
+    return false;
+}
+
+bool CellularServiceAPI::SetScanMode(sys::Service *serv, std::string mode)
+{
+    std::shared_ptr<CellularRequestMessage> msg =
+        std::make_shared<CellularRequestMessage>(MessageType::CellularSetScanMode);
+    msg->data = mode;
+    auto ret  = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
+
+    CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
+
+    if (response != nullptr) {
+        if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
+            return true;
+        }
+    }
+    return false;
+}
+bool CellularServiceAPI::GetScanMode(sys::Service *serv)
+{
+    std::shared_ptr<CellularRequestMessage> msg =
+        std::make_shared<CellularRequestMessage>(MessageType::CellularGetScanMode);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 1000);
+
+    CellularResponseMessage *response = dynamic_cast<CellularResponseMessage *>(ret.second.get());
+
+    if (response != nullptr) {
+        if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
+            return true;
+        }
+    }
     return false;
 }
