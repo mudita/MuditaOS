@@ -1,39 +1,26 @@
-/*
- * @file MessagesMainWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#include <functional>
-#include <memory>
-
-#include "../ApplicationMessages.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-
-#include "service-db/messages/DBMessage.hpp"
-#include "i18/i18.hpp"
-
-#include "Label.hpp"
-#include "ListView.hpp"
-#include "Margins.hpp"
 #include "MessagesMainWindow.hpp"
+
+#include "NewMessage.hpp"
+#include "OptionsWindow.hpp"
+#include "../ApplicationMessages.hpp"
 #include "../MessagesStyle.hpp"
-
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-
 #include "../data/SMSdata.hpp"
 #include "../widgets/ThreadItem.hpp"
 #include "../windows/ThreadViewWindow.hpp"
-#include "NewMessage.hpp"
-#include "OptionsWindow.hpp"
-#include "application-phonebook/data/PhonebookItemData.hpp"
+
+#include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBMessage.hpp>
+#include <i18/i18.hpp>
+#include <Margins.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
+#include <time/time_conversion.hpp>
 
-#include "time/time_conversion.hpp"
+#include <functional>
+#include <memory>
 
 namespace gui
 {
@@ -80,13 +67,13 @@ namespace gui
         newMessageImage = new gui::Image(this, 48, 55, 0, 0, "cross");
         searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
-        emptyListWidget = new gui::EmptyListWidget(this,
-                                                   0,
-                                                   style::header::height,
-                                                   style::window_width,
-                                                   style::window_height - style::header::height - style::footer::height,
-                                                   "phonebook_contact_delete_trashcan",
-                                                   utils::localize.get("app_messages_no_messages"));
+        emptyListIcon = new Icon(this,
+                                 0,
+                                 style::header::height,
+                                 style::window_width,
+                                 style::window_height - style::header::height - style::footer::height,
+                                 "phonebook_empty_grey_circle", // TODO: need to provide proper image
+                                 utils::localize.get("app_messages_no_messages"));
 
         list->setVisible(true);
         list->focusChangedCallback = [=](gui::Item &item) {
@@ -97,8 +84,8 @@ namespace gui
             return true;
         };
 
-        emptyListWidget->setVisible(false);
-        emptyListWidget->focusChangedCallback = [=](gui::Item &item) {
+        emptyListIcon->setVisible(false);
+        emptyListIcon->focusChangedCallback = [=](gui::Item &item) {
             bottomBar->setActive(BottomBar::Side::LEFT, false);
             bottomBar->setActive(BottomBar::Side::CENTER, false);
             rightArrowImage->setVisible(false);
@@ -109,31 +96,29 @@ namespace gui
     void MessagesMainWindow::destroyInterface()
     {
         AppWindow::destroyInterface();
-        if (list) {
-            removeWidget(list);
-            delete list;
-            list = nullptr;
-        }
-        if (leftArrowImage) {
-            removeWidget(leftArrowImage);
-            delete leftArrowImage;
-            leftArrowImage = nullptr;
-        }
-        if (rightArrowImage) {
-            removeWidget(rightArrowImage);
-            delete rightArrowImage;
-            rightArrowImage = nullptr;
-        }
-        if (newMessageImage) {
-            removeWidget(newMessageImage);
-            delete newMessageImage;
-            newMessageImage = nullptr;
-        }
-        if (searchImage) {
-            removeWidget(searchImage);
-            delete searchImage;
-            searchImage = nullptr;
-        }
+        removeWidget(list);
+        delete list;
+        list = nullptr;
+
+        removeWidget(leftArrowImage);
+        delete leftArrowImage;
+        leftArrowImage = nullptr;
+
+        removeWidget(rightArrowImage);
+        delete rightArrowImage;
+        rightArrowImage = nullptr;
+
+        removeWidget(newMessageImage);
+        delete newMessageImage;
+        newMessageImage = nullptr;
+
+        removeWidget(searchImage);
+        delete searchImage;
+        searchImage = nullptr;
+
+        removeWidget(emptyListIcon);
+        delete emptyListIcon;
+        emptyListIcon = nullptr;
 
         children.clear();
         delete threadModel;
@@ -170,8 +155,8 @@ namespace gui
         }
 
         if (threadModel->getItemCount() == 0) {
-            emptyListWidget->setVisible(true);
-            setFocusItem(emptyListWidget);
+            emptyListIcon->setVisible(true);
+            setFocusItem(emptyListIcon);
         }
     }
 
