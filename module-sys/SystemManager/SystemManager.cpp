@@ -5,12 +5,10 @@
  *      Author: mati
  */
 #include "SystemManager.hpp"
-#include "Service/LogOutput.hpp"
 
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "critical.hpp"
-
 #include <algorithm>
 
 namespace sys
@@ -31,7 +29,7 @@ namespace sys
 
     SystemManager::~SystemManager()
     {
-        LogOutput::Output(GetName() + ":destructor");
+        LOG_DEBUG("%s", (GetName() + ":destructor").c_str());
     }
 
     void SystemManager::Run()
@@ -43,11 +41,13 @@ namespace sys
             userInit();
         }
 
-        while (state == State::Running) {
+        // in shutdown we need to wait till event manager tells us that it's ok to stfu
+        while (state == State::Running || state == State::Shutdown) {
             auto msg = mailbox.pop();
             msg->Execute(this);
         }
 
+        DestroyService(service::name::evt_manager, this);
         while (state == State::Reboot && PreShutdownLoop()) {
             vTaskDelay(100);
         }
@@ -57,23 +57,21 @@ namespace sys
 
         // Power off system
         switch (state) {
-        case Reboot:
+        case State::Reboot:
             powerManager->Reboot();
             break;
-        case PowerOff:
-
+        case State::Shutdown:
             powerManager->PowerOff();
             break;
         default:
             LOG_FATAL("State changed after reset/shutdown was requested! this is terrible failure!");
             exit(1);
-            powerManager->PowerOff();
         };
     }
 
     void SystemManager::StartSystem(std::function<int()> init)
     {
-        LogOutput::Output("Initializing system...");
+        LOG_FATAL("Initializing system...");
 
         powerManager = std::make_unique<PowerManager>();
         // Switch system to full functionality(clocks and power domains configured to max values)
@@ -90,9 +88,14 @@ namespace sys
 
     bool SystemManager::CloseSystem(Service *s)
     {
-
         Bus::SendUnicast(
             std::make_shared<SystemManagerMsg>(SystemManagerMsgType::CloseSystem), systemManagerServiceName, s);
+        return true;
+    }
+
+    bool SystemManager::Reboot(Service *s)
+    {
+        Bus::SendUnicast(std::make_shared<SystemManagerMsg>(SystemManagerMsgType::Reboot), systemManagerServiceName, s);
         return true;
     }
 
@@ -218,6 +221,7 @@ namespace sys
                 return s->GetName() == name;
             });
             if (serv == servicesList.end()) {
+                LOG_ERROR("No such service to destroy in services list: %s", name.c_str());
                 return false;
             }
 
@@ -226,6 +230,7 @@ namespace sys
             return true;
         }
         else {
+            LOG_ERROR("Service to close: %s doesn't exist", name.c_str());
             return false;
         }
     }
@@ -250,7 +255,7 @@ namespace sys
             for (auto &w : servicesList) {
                 if (w->pingTimestamp == 0) {
                     // no reponse for ping messages, restart system
-                    LogOutput::Output(w->GetName() + " failed to response to ping message");
+                    LOG_FATAL("%s", (w->GetName() + " failed to response to ping message").c_str());
                     exit(1);
                 }
                 else {
@@ -265,25 +270,23 @@ namespace sys
     Message_t SystemManager::DataReceivedHandler(DataMessage *msg, ResponseMessage *resp)
     {
         if (msg->channel == BusChannels::SystemManagerRequests) {
-            SystemManagerMsg *data = static_cast<SystemManagerMsg *>(msg);
+            auto *data = static_cast<SystemManagerMsg *>(msg);
 
             switch (data->type) {
-
             case SystemManagerMsgType::CloseSystem:
                 CloseSystemHandler();
                 break;
+            case SystemManagerMsgType::Reboot:
+                RebootHandler();
+                break;
             }
-        case SystemManagerMsgType::Reboot:
-            RebootHandler();
-            break;
         }
-
         return std::make_shared<ResponseMessage>();
     }
 
     void SystemManager::CloseSystemHandler()
     {
-        LogOutput::Output("Invoking closing procedure...");
+        LOG_DEBUG("Invoking closing procedure...");
 
         DeleteTimer(pingPongTimerID);
 
@@ -294,12 +297,15 @@ namespace sys
 
     retry:
         for (auto &service : servicesList) {
-
+            if (service->GetName() == service::name::evt_manager) {
+                LOG_DEBUG("Delay closing %s", service::name::evt_manager.c_str());
+                continue;
+            }
             if (service->parent == "") {
                 auto ret = DestroyService(service->GetName(), this);
                 if (!ret) {
                     // no response to exit message,
-                    LogOutput::Output(service->GetName() + " failed to response to exit message");
+                    LOG_FATAL("%s", service->GetName() + " failed to response to exit message");
                     kill(service);
                 }
                 goto retry;
@@ -313,18 +319,6 @@ namespace sys
     {
         CloseSystemHandler();
         set(State::Reboot);
-    }
-
-    bool PreShutdownLoop()
-    {
-        // if red button was pressed na we were in shutdown state we can shutdown
-        if (red_button_was_pressed() && state == State::Shutdown) {
-            return false;
-        }
-        if (usb_was_unpluged() && satte == State::Reboot) {
-            return false;
-        }
-        return true;
     }
 
     std::vector<std::shared_ptr<Service>> SystemManager::servicesList;

@@ -8,8 +8,6 @@
 #include "Channel.hpp"
 #include "ticks.hpp"
 
-#include "LogOutput.hpp"
-
 #include <string.h>
 
 namespace sys

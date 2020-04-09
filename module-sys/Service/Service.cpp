@@ -4,7 +4,6 @@
 #include "ticks.hpp"
 #include "timer.hpp"
 #include "Bus.hpp"
-#include "LogOutput.hpp"
 
 namespace sys
 {
@@ -24,7 +23,7 @@ namespace sys
     Service::~Service()
     {
         enableRunLoop = false;
-        LogOutput::Output(GetName() + ":Service base destructor");
+        LOG_DEBUG("%s", (GetName() + ":Service base destructor").c_str());
     }
 
     void Service::StartService()
@@ -32,7 +31,7 @@ namespace sys
         Bus::Add(shared_from_this());
         enableRunLoop = true;
         if (!Start()) {
-            LogOutput::Output("FATAL ERROR: Start service failed!");
+            LOG_FATAL("FATAL ERROR: Start service failed!");
             configASSERT(0);
         }
     }
