@@ -18,6 +18,8 @@
 #include "gui/widgets/Window.hpp"
 #include "ListView.hpp"
 #include "../widgets/ThreadModel.hpp"
+#include <gui/widgets/EmptyListWidget.hpp>
+#include <gui/widgets/Text.hpp>
 
 namespace gui
 {
@@ -25,9 +27,6 @@ namespace gui
     class MessagesMainWindow : public AppWindow
     {
       protected:
-        //    PhonebookListView* list;
-        //    PhonebookModel* phonebookModel = nullptr;
-
         Image *leftArrowImage  = nullptr;
         Image *rightArrowImage = nullptr;
         Image *newMessageImage = nullptr;
@@ -35,6 +34,8 @@ namespace gui
 
         ThreadModel *threadModel = nullptr;
         gui::ListView *list      = nullptr;
+
+        EmptyListWidget *emptyListWidget = nullptr;
 
       public:
         MessagesMainWindow(app::Application *app);
