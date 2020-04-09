@@ -273,8 +273,10 @@ void PhonebookDuplicateSpeedDial::setContactData()
     std::string t = utils::localize.get("app_phonebook_duplicate_speed_dial");
     fillContactData(t, contact);
     confirmationLabel->setText(t);
-
-    dialValue->setText(contact->speeddial);
+    if (contact->speeddial.length())
+        dialValue->setText(contact->speeddial);
+    else
+        dialValue->setText("");
 
     setTitle(contact.get()->numbers[0].numberUser);
 }
