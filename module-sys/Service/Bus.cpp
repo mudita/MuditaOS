@@ -86,8 +86,7 @@ namespace sys
             servicesRegistered[service]->mailbox.push(msg);
         }
         else {
-            // TODO: service specified doesn't exist
-            LogOutput::Output("Service " + service + " doesn't exist");
+            LOG_ERROR("Service %s doesn't exist", service.c_str());
             return false;
         }
 
@@ -116,8 +115,7 @@ namespace sys
             servicesRegistered[service]->mailbox.push(msg);
         }
         else {
-            // TODO: service specified doesn't exist
-            LogOutput::Output("Service " + service + " doesn't exist");
+            LOG_ERROR("Service %s doesn't exist", service.c_str());
             return std::make_pair(ReturnCodes::ServiceDoesntExist, nullptr);
         }
 

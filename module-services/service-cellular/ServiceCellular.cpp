@@ -45,7 +45,7 @@
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
 #include <common_data/EventStore.hpp>
-#include <service-evtmgr/EventManager.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 

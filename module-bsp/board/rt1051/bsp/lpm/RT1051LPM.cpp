@@ -54,6 +54,11 @@ namespace bsp
         return 0;
     }
 
+    int32_t RT1051LPM::Reboot()
+    {
+        return -1;
+    }
+
     int32_t RT1051LPM::EnterFullSpeed()
     {
         LPM_EnterFullSpeed();

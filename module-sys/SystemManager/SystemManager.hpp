@@ -21,20 +21,20 @@
 
 namespace sys
 {
-
-    enum class SystemManagerMsgType
+    enum class Code
     {
         CloseSystem,
         Reboot,
+        None,
     };
 
-    class SystemManagerMsg : public DataMessage
+    class SystemManagerCmd : public DataMessage
     {
       public:
-        SystemManagerMsg(SystemManagerMsgType type) : DataMessage(BusChannels::SystemManagerRequests), type(type)
+        SystemManagerCmd(Code type = Code::None) : DataMessage(BusChannels::SystemManagerRequests), type(type)
         {}
 
-        SystemManagerMsgType type;
+        Code type;
     };
 
     class SystemManager : public Service
@@ -48,6 +48,7 @@ namespace sys
             ShutdownReady,
             Reboot,
         } state = State::Running;
+        void set(enum State state);
         SystemManager(TickType_t pingInterval);
 
         ~SystemManager();
@@ -56,6 +57,8 @@ namespace sys
 
         // Invoke system close procedure
         static bool CloseSystem(Service *s);
+
+        static bool Reboot(Service *s);
 
         static bool SuspendSystem(Service *caller);
 
@@ -77,7 +80,7 @@ namespace sys
         /// please mind that services & apps not registered in SystemManager cant be killed - these should ba handled by
         /// parenst (as above in Destroy) ApplicationManager somehow propagates this, but I would call how it's done
         /// `imperfect`
-        bool kill(std::shared_ptr<Service> const &toKill);
+        void kill(std::shared_ptr<Service> const &toKill);
 
       private:
         void TickHandler(uint32_t id) override;
@@ -138,6 +141,8 @@ inline const char *c_str(sys::SystemManager::State state)
         return "Shutdown";
     case sys::SystemManager::State::Reboot:
         return "Reboot";
+    case sys::SystemManager::State::ShutdownReady:
+        return "ShutdownReady";
     }
     return "";
 }

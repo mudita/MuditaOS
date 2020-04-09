@@ -25,6 +25,7 @@
 #include "harness/events/AtResponse.hpp"
 #include "harness/events/FocusApp.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -214,5 +215,5 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 {
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
-    return sys::Bus::SendUnicast(msg, service::name_evt_manager, sender);
+    return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
 }

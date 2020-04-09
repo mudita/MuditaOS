@@ -31,6 +31,7 @@
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
+#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
 
