@@ -45,6 +45,7 @@ namespace sys
             Running,
             Suspend,
             Shutdown,
+            ShutdownReady,
             Reboot,
         } state = State::Running;
         SystemManager(TickType_t pingInterval);
@@ -97,9 +98,11 @@ namespace sys
 
         void Run() override;
 
-        // Sysmgr stores list of all active services but some of them are under control of parent services.
-        // Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
-        // parents.
+        /// Sysmgr stores list of all active services but some of them are under control of parent services.
+        /// Parent services ought to manage lifetime of child services hence we are sending DestroyRequests only to
+        /// parents.
+        /// It closes all workers except EventManager -as it needs information from Eventmanager that it's safe to
+        /// shutdown
         void CloseSystemHandler();
 
         void RebootHandler();
