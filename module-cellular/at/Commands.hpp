@@ -98,6 +98,8 @@ namespace at
         QSIMSTAT,   /// sim insertion / removal notification in URC
         SIM_DET_ON, /// enable sim detection
         SIMSTAT_ON, /// enable sim stat urc
+        SET_SCANMODE,
+        GET_SCANMODE
 
     };
 
@@ -138,13 +140,14 @@ namespace at
             {AT::CMUX, {"AT+CMUX="}},
             {AT::CMGS, {"AT+CMGS=\""}},
             {AT::QCMGS, {"AT+QCMGS=\""}},
-            {AT::CREG, {"AT+CREG?\r"}},
+            {AT::CREG, {"AT+CREG?\r", default_doc_timeout}},
             {AT::QNWINFO, {"AT+QNWINFO\r"}},
             {AT::COPS, {"AT+COPS=?\r", 180000}},
             {AT::QSIMSTAT, {"AT+QSIMSTAT?\r"}},
             {AT::SIM_DET, {"AT+QSIMDET?\r"}},
             {AT::SIM_DET_ON, {"AT+QSIMDET=1,0\r"}},
-            {AT::SIMSTAT_ON, {"AT+QSIMSTAT=1\r"}},
+            {AT::SET_SCANMODE, {"AT+QCFG=\"nwscanmode\","}},
+            {AT::GET_SCANMODE, {"AT+QCFG=\"nwscanmode\"\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);

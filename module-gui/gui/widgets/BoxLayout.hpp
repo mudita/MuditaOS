@@ -80,6 +80,8 @@ namespace gui
         /// callback for situaton when we reached top/bottom/left/right of box
         /// if we want to do sth special (i.e. request new items)
         std::function<bool(const InputEvent &inputEvent)> borderCallback = nullptr;
+        // set focus on specified box element
+        void setFocusOnElement(uint32_t elementNumber);
     };
 
     class HBox : public BoxLayout
