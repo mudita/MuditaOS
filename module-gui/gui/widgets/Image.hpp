@@ -1,12 +1,4 @@
-/*
- * Image.hpp
- *
- *  Created on: 17 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_IMAGE_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_IMAGE_HPP_
+#pragma once
 
 #include <list>
 
@@ -31,6 +23,9 @@ namespace gui
         Image(const UTF8 &);
         /// Create new Image element on position x,y w&h will be *ignored*
         Image(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const UTF8 = UTF8{""});
+        Image(Item *parent, uint32_t x, uint32_t y, const UTF8 imgName = UTF8{""})
+            : Image(parent, x, y, 0u, 0u, imgName)
+        {}
         virtual ~Image() = default;
         /// set image with id
         bool set(int id);
@@ -42,5 +37,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_IMAGE_HPP_ */
