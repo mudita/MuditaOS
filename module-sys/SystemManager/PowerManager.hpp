@@ -35,6 +35,7 @@ namespace sys
 
         int32_t Switch(const Mode mode);
         int32_t PowerOff();
+        int32_t Reboot();
 
         Mode GetCurrentMode()
         {

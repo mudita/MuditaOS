@@ -10,6 +10,7 @@
 #include "ticks.hpp"
 #include "critical.hpp"
 #include <algorithm>
+#include <../module-services/service-evtmgr/Constants.hpp>
 
 namespace sys
 {
@@ -19,6 +20,12 @@ namespace sys
     using namespace sys;
 
     const char *systemManagerServiceName = "SysMgrService";
+
+    void SystemManager::set(enum State state)
+    {
+        LOG_DEBUG("System manager state: [%s] -> [%s]", c_str(this->state), c_str(state));
+        this->state = state;
+    }
 
     SystemManager::SystemManager(TickType_t pingInterval)
         : Service(systemManagerServiceName, "", 8192), pingInterval(pingInterval)
@@ -48,9 +55,6 @@ namespace sys
         }
 
         DestroyService(service::name::evt_manager, this);
-        while (state == State::Reboot && PreShutdownLoop()) {
-            vTaskDelay(100);
-        }
 
         Bus::Remove(shared_from_this());
         EndScheduler();
@@ -88,14 +92,13 @@ namespace sys
 
     bool SystemManager::CloseSystem(Service *s)
     {
-        Bus::SendUnicast(
-            std::make_shared<SystemManagerMsg>(SystemManagerMsgType::CloseSystem), systemManagerServiceName, s);
+        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), systemManagerServiceName, s);
         return true;
     }
 
     bool SystemManager::Reboot(Service *s)
     {
-        Bus::SendUnicast(std::make_shared<SystemManagerMsg>(SystemManagerMsgType::Reboot), systemManagerServiceName, s);
+        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), systemManagerServiceName, s);
         return true;
     }
 
@@ -237,14 +240,36 @@ namespace sys
 
     void SystemManager::kill(std::shared_ptr<Service> const &toKill)
     {
+        // TODO timeout on deinit hanlder? anything? message it?
         auto ret = toKill->DeinitHandler();
-        // needs merging -> LOG_DEBUG("deinit handler: %s", c_str(ret));
+        if (ret != sys::ReturnCodes::Success) {
+            LOG_DEBUG("deinit handler: %s", c_str(ret));
+        }
         toKill->CloseHandler();
     }
 
     ReturnCodes SystemManager::InitHandler()
     {
         isReady = true;
+        SystemManagerCmd cmd;
+        subscribe(&cmd, [&](DataMessage *msg, ResponseMessage *resp) {
+            if (msg->channel == BusChannels::SystemManagerRequests) {
+                auto *data = static_cast<SystemManagerCmd *>(msg);
+
+                switch (data->type) {
+                case Code::CloseSystem:
+                    CloseSystemHandler();
+                    break;
+                case Code::Reboot:
+                    RebootHandler();
+                    break;
+                case Code::None:
+                    break;
+                }
+            }
+            return Message_t();
+        });
+
         return ReturnCodes::Success;
     }
 
@@ -269,18 +294,6 @@ namespace sys
 
     Message_t SystemManager::DataReceivedHandler(DataMessage *msg, ResponseMessage *resp)
     {
-        if (msg->channel == BusChannels::SystemManagerRequests) {
-            auto *data = static_cast<SystemManagerMsg *>(msg);
-
-            switch (data->type) {
-            case SystemManagerMsgType::CloseSystem:
-                CloseSystemHandler();
-                break;
-            case SystemManagerMsgType::Reboot:
-                RebootHandler();
-                break;
-            }
-        }
         return std::make_shared<ResponseMessage>();
     }
 
@@ -305,7 +318,7 @@ namespace sys
                 auto ret = DestroyService(service->GetName(), this);
                 if (!ret) {
                     // no response to exit message,
-                    LOG_FATAL("%s", service->GetName() + " failed to response to exit message");
+                    LOG_FATAL("%s", (service->GetName() + " failed to response to exit message").c_str());
                     kill(service);
                 }
                 goto retry;

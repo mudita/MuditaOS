@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Common.hpp"
-#include "LogOutput.hpp"
 #include "MessageType.hpp"
 #include <memory>
 #include <stdint.h>
