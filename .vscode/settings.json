@@ -1,4 +1,17 @@
 {
     "cmake.sourceDirectory": "${workspaceFolder}",
-    "cmake.buildDirectory": "${workspaceFolder}/build-${buildKit}-${buildType}"
+    "cmake.buildDirectory": "${workspaceFolder}/build-${buildKit}-${buildType}",
+    "files.associations": {
+        "memory": "cpp",
+        "*.inc": "cpp",
+        "*.tcc": "cpp",
+        "bitset": "cpp",
+        "set": "cpp",
+        "functional": "cpp",
+        "new": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
+    }
 }
