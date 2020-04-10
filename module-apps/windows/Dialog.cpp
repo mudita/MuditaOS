@@ -48,7 +48,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     yes->setFilled(false);
     yes->setBorderColor(ColorFullBlack);
     yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yes->setFont(style::window::font::small);
+    yes->setFont(style::window::font::big);
     yes->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     no->setNavigationItem(NavigationDirection::RIGHT, yes);
