@@ -16,6 +16,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <log/log.hpp>
+#include <limits.h>
 
 namespace gui
 {
@@ -359,8 +360,28 @@ namespace gui
             setTitle(contact->primaryName + " " + contact->alternativeName);
 
         auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
-            unsigned int speedDialInt = atoi(speedDialStr.c_str());
-            return speedDialStr.length() && speedDialInt <= phonebookInternals::speedDialMaxValue;
+            if (speedDialStr.length() == 0)
+                return false;
+
+            char *endPtr;
+            long speedDialInt = std::strtol(speedDialStr.c_str(), &endPtr, 10);
+            if (endPtr == speedDialStr.c_str()) {
+                LOG_ERROR("%s: not a decimal number", speedDialStr.c_str());
+                return false;
+            }
+            else if ('\0' != *endPtr) {
+                LOG_ERROR("%s: extra characters at end of input: %s\n", speedDialStr.c_str(), endPtr);
+                return false;
+            }
+            else if ((LONG_MIN == speedDialInt || LONG_MAX == speedDialInt) && ERANGE == errno) {
+                LOG_ERROR("%s out of range of type long\n", speedDialStr.c_str());
+                return false;
+            }
+            else if (speedDialInt > phonebookInternals::speedDialMaxValue) {
+                LOG_ERROR("%ld greater than speedDialMaxValue\n", speedDialInt);
+                return false;
+            }
+            return true;
         };
 
         speedDial->setText(isSpeedDialInRange(contact->speeddial) ? contact->speeddial : UTF8(""));
