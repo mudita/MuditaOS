@@ -131,7 +131,7 @@ namespace app
                     }
                     return this->switchWindow(gui::name::window::main_window);
                 };
-                meta.text = utils::localize.get("app_messages_thread_delete_confirmation");
+                meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
                 auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
                 auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
                 meta.title      = cont.getFormattedName();
