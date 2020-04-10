@@ -72,7 +72,7 @@ namespace gui
                                  style::header::height,
                                  style::window_width,
                                  style::window_height - style::header::height - style::footer::height,
-                                 "phonebook_empty_grey_circle", // TODO: need to provide proper image
+                                 "phonebook_empty_grey_circle_W_G",
                                  utils::localize.get("app_messages_no_messages"));
 
         list->setVisible(true);
