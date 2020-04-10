@@ -6,11 +6,13 @@
  */
 #include "SystemManager.hpp"
 
+#include <common_data/EventStore.hpp>
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "critical.hpp"
 #include <algorithm>
-#include <../module-services/service-evtmgr/Constants.hpp>
+#include <service-evtmgr/messages/KbdMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 namespace sys
 {
@@ -19,8 +21,6 @@ namespace sys
     using namespace std;
     using namespace sys;
 
-    const char *systemManagerServiceName = "SysMgrService";
-
     void SystemManager::set(enum State state)
     {
         LOG_DEBUG("System manager state: [%s] -> [%s]", c_str(this->state), c_str(state));
@@ -28,7 +28,7 @@ namespace sys
     }
 
     SystemManager::SystemManager(TickType_t pingInterval)
-        : Service(systemManagerServiceName, "", 8192), pingInterval(pingInterval)
+        : Service(service::name::system_manager), pingInterval(pingInterval)
     {
         // Specify list of channels which System Manager is registered to
         busChannels = {BusChannels::SystemManagerRequests};
@@ -49,9 +49,25 @@ namespace sys
         }
 
         // in shutdown we need to wait till event manager tells us that it's ok to stfu
-        while (state == State::Running || state == State::Shutdown) {
+        while (state == State::Running) {
             auto msg = mailbox.pop();
             msg->Execute(this);
+        }
+
+        while (state == State::Shutdown) {
+            // check if we are discharging - if so -> shutdown (if not -> wait for TODO Discharging message not addded)
+            if (Store::Battery::get().state == Store::Battery::State::Discharging) {
+                set(State::ShutdownReady);
+            }
+            else {
+                // await from EvtManager for info that red key was pressed / timeout
+                auto msg = mailbox.pop();
+                if (msg->sender != service::name::evt_manager) {
+                    LOG_ERROR("Ignored msg from: %s on shutdown", msg->sender.c_str());
+                    continue;
+                }
+                msg->Execute(this);
+            }
         }
 
         DestroyService(service::name::evt_manager, this);
@@ -62,13 +78,15 @@ namespace sys
         // Power off system
         switch (state) {
         case State::Reboot:
+            LOG_INFO("  --->  REBOOT <--- ");
             powerManager->Reboot();
             break;
-        case State::Shutdown:
+        case State::ShutdownReady:
+            LOG_INFO("  ---> SHUTDOWN <--- ");
             powerManager->PowerOff();
             break;
         default:
-            LOG_FATAL("State changed after reset/shutdown was requested! this is terrible failure!");
+            LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!", c_str(state));
             exit(1);
         };
     }
@@ -92,13 +110,13 @@ namespace sys
 
     bool SystemManager::CloseSystem(Service *s)
     {
-        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), systemManagerServiceName, s);
+        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem), service::name::system_manager, s);
         return true;
     }
 
     bool SystemManager::Reboot(Service *s)
     {
-        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), systemManagerServiceName, s);
+        Bus::SendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot), service::name::system_manager, s);
         return true;
     }
 
@@ -157,6 +175,7 @@ namespace sys
         }
         return true;
     }
+
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller)
     {
@@ -266,6 +285,15 @@ namespace sys
                 case Code::None:
                     break;
                 }
+            }
+            return Message_t();
+        });
+
+        sevm::KbdMessage kbdmsg;
+        subscribe(&kbdmsg, [&](DataMessage *msg, ResponseMessage *resp) {
+            // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
+            if (state == State::Shutdown) {
+                set(State::Reboot);
             }
             return Message_t();
         });
