@@ -148,6 +148,17 @@ namespace app
         {
             return event;
         };
+
+        operator std::string() const override
+        {
+            std::stringstream ss;
+            ss << "{ ";
+            ss << "state:   " << c_str(event.state) << ", ";
+            ss << "RawKey:  " << c_str(event.key.key_code) << "}";
+            ss << "t0: " << event.key.time_press << ", t1: " << event.key.time_release;
+            ss << " }";
+            return ss.str().c_str();
+        }
     };
 
     class AppRebuildMessage : public AppMessage

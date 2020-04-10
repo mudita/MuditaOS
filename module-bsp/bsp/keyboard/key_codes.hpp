@@ -1,17 +1,4 @@
-
-/*
- * @file key_codes_linux.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 22.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
-
-#ifndef PUREPHONE_KEY_CODES_LINUX_HPP
-#define PUREPHONE_KEY_CODES_LINUX_HPP
-
+#pragma once
 
 namespace bsp {
 
@@ -47,7 +34,63 @@ namespace bsp {
         SSwitchDown = 54,
         SSwitchMid = 44
     };
-
 }
 
-#endif //PUREPHONE_KEY_CODES_LINUX_HPP
+inline const char *c_str(bsp::KeyCodes code)
+{
+    switch (code) {
+    case bsp::KeyCodes::Undefined:
+        return "Undefined";
+    case bsp::KeyCodes::NumericKey1:
+        return "NumericKey1";
+    case bsp::KeyCodes::NumericKey2:
+        return "NumericKey2";
+    case bsp::KeyCodes::NumericKey3:
+        return "NumericKey3";
+    case bsp::KeyCodes::NumericKey4:
+        return "NumericKey4";
+    case bsp::KeyCodes::NumericKey5:
+        return "NumericKey5";
+    case bsp::KeyCodes::NumericKey6:
+        return "NumericKey6";
+    case bsp::KeyCodes::NumericKey7:
+        return "NumericKey7";
+    case bsp::KeyCodes::NumericKey8:
+        return "NumericKey8";
+    case bsp::KeyCodes::NumericKey9:
+        return "NumericKey9";
+    case bsp::KeyCodes::NumericKey0:
+        return "NumericKey0";
+    case bsp::KeyCodes::NumericKeyAst:
+        return "NumericKeyAst";
+    case bsp::KeyCodes::NumericKeyPnd:
+        return "NumericKeyPnd";
+    case bsp::KeyCodes::JoystickLeft:
+        return "JoystickLeft";
+    case bsp::KeyCodes::JoystickRight:
+        return "JoystickRight";
+    case bsp::KeyCodes::JoystickUp:
+        return "JoystickUp";
+    case bsp::KeyCodes::JoystickDown:
+        return "JoystickDown";
+    case bsp::KeyCodes::JoystickEnter:
+        return "JoystickEnter";
+    case bsp::KeyCodes::FnLeft:
+        return "FnLeft";
+    case bsp::KeyCodes::FnRight:
+        return "FnRight";
+    case bsp::KeyCodes::VolUp:
+        return "VolUp";
+    case bsp::KeyCodes::VolDown:
+        return "VolDown";
+    case bsp::KeyCodes::Torch:
+        return "Torch";
+    case bsp::KeyCodes::SSwitchUp:
+        return "SSwitchUp";
+    case bsp::KeyCodes::SSwitchDown:
+        return "SSwitchDown";
+    case bsp::KeyCodes::SSwitchMid:
+        return "SSwitchMid";
+    }
+    return "";
+}

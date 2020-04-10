@@ -99,4 +99,19 @@ namespace gui
 
 } // namespace gui
 
+inline const char *c_str(gui::InputEvent::State state)
+{
+    switch (state) {
+    case gui::InputEvent::State::Undefined:
+        return "Undefined";
+    case gui::InputEvent::State::keyPressed:
+        return "keyPressed";
+    case gui::InputEvent::State::keyReleasedShort:
+        return "keyReleasedShort";
+    case gui::InputEvent::State::keyReleasedLong:
+        return "keyReleasedLong ";
+    }
+    return "";
+}
+
 #endif /* MODULE_GUI_GUI_INPUT_INPUTEVENT_HPP_ */
