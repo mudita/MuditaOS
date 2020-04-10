@@ -7,10 +7,14 @@
 #include "Bus.hpp"
 
 // this could use Scoped() class from utils to print execution time too
-void debug_msg(sys::DataMessage *ptr)
+void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
 {
 #if (DEBUG_SERVICE_MESSAGES > 0)
-    LOG_DEBUG("Handle message [%s]", typeid(*ptr).name());
+    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
+              ptr->sender.c_str(),
+              srvc->GetName().c_str(),
+              typeid(*ptr).name(),
+              std::string(*ptr).c_str());
 #else
 #endif
 }
@@ -86,14 +90,13 @@ namespace sys
     auto Service::MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t
     {
         Message_t ret = std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        auto what     = type_index(typeid(*message));
-        auto handler  = message_handlers.find(what);
+        auto idx      = type_index(typeid(*message));
+        auto handler  = message_handlers.find(idx);
+        debug_msg(this, message);
         if (handler != message_handlers.end()) {
-            debug_msg(message);
-            ret = message_handlers[what](message, response);
+            ret = message_handlers[idx](message, response);
         }
         else {
-            debug_msg(message);
             ret = DataReceivedHandler(message, response);
         }
         return ret;
@@ -101,9 +104,10 @@ namespace sys
 
     bool Service::subscribe(Message *msg, MessageHandler handler)
     {
-        if (message_handlers.find(type_index(typeid(*msg))) == message_handlers.end()) {
+        auto idx = type_index(typeid(*msg));
+        if (message_handlers.find(idx) == message_handlers.end()) {
             LOG_DEBUG("Registering new message handler on %s", typeid(*msg).name());
-            message_handlers[type_index(typeid(*msg))] = handler;
+            message_handlers[idx] = handler;
             return true;
         }
         LOG_ERROR("Handler for: %s already registered!", typeid(*msg).name());

@@ -69,7 +69,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else if (msgl->messageType == MessageType::KBDKeyEvent && msgl->sender == this->GetName()) {
 
-        auto *msg = reinterpret_cast<sevm::KbdMessage *>(msgl);
+        auto *msg = static_cast<sevm::KbdMessage *>(msgl);
 
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
@@ -77,6 +77,10 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         if (suspended && (message->key.state == RawKey::State::Pressed)) {
             suspended = false;
             sys::SystemManager::ResumeSystem(this);
+        }
+        if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
+            // and state == ShutDown
+            sys::Bus::SendUnicast(message, service::name::system_manager, this);
         }
 
         // send key to focused application
