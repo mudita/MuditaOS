@@ -4,6 +4,9 @@
 
 using namespace gui;
 
+namespace style
+{}
+
 Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Meta &meta)
     : gui::AppWindow(app, name), meta(meta)
 {
@@ -21,12 +24,13 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
 
     icon = new Image(this, 176, 135, 128, 128, meta.icon);
 
-    text = new Text(this, 45, 293, 390, 128);
+    text = new Text(this, 45, 293, 400, 66);
     text->setText(meta.text);
     text->setTextType(Text::TextType::MULTI_LINE);
     text->setEditMode(Text::EditMode::BROWSE);
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-    text->setFont(style::window::font::small);
+    text->setFont(style::window::font::medium);
+    text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
     no = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
     no->setPenWidth(0);
@@ -34,7 +38,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     no->setFilled(false);
     no->setBorderColor(ColorFullBlack);
     no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    no->setFont(style::window::font::small);
+    no->setFont(style::window::font::big);
     no->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
 
