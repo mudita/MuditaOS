@@ -18,6 +18,7 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 #include "PowerManager.hpp"
+#include "Constants.hpp"
 
 namespace sys
 {
