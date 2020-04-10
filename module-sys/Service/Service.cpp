@@ -1,9 +1,19 @@
 #include <algorithm>
 #include "Service.hpp"
+#include "Service/Message.hpp"
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "timer.hpp"
 #include "Bus.hpp"
+
+// this could use Scoped() class from utils to print execution time too
+void debug_msg(sys::DataMessage *ptr)
+{
+#if (DEBUG_SERVICE_MESSAGES > 0)
+    LOG_DEBUG("Handle message [%s]", typeid(*ptr).name());
+#else
+#endif
+}
 
 namespace sys
 {
@@ -79,11 +89,11 @@ namespace sys
         auto what     = type_index(typeid(*message));
         auto handler  = message_handlers.find(what);
         if (handler != message_handlers.end()) {
-            LOG_INFO("++++++> %s", typeid(*message).name());
+            debug_msg(message);
             ret = message_handlers[what](message, response);
         }
         else {
-            LOG_INFO("------> %s", typeid(*message).name());
+            debug_msg(message);
             ret = DataReceivedHandler(message, response);
         }
         return ret;
