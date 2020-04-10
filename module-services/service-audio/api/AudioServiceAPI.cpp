@@ -12,111 +12,154 @@
 #include "../ServiceAudio.hpp"
 
 using namespace audio;
-
-RetCode AudioServiceAPI::PlaybackStart(sys::Service *serv, const std::string &fileName)
+namespace AudioServiceAPI
 {
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
-    msg->fileName                            = fileName;
+    namespace
+    {
+        auto SendAudioRequest(sys::Service *serv, std::shared_ptr<AudioRequestMessage> msg)
+        {
+            auto msgType = static_cast<int>(msg->type);
+            LOG_DEBUG("Msg type %d", msgType);
+            auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, sys::defaultCmdTimeout);
+            if (ret.first == sys::ReturnCodes::Success) {
+                if (auto resp = std::dynamic_pointer_cast<AudioResponseMessage>(ret.second)) {
+                    LOG_DEBUG("Msg type %d done", msgType);
+                    return resp;
+                }
+                LOG_ERROR("msgType %d - not AudioResponseMessage", msgType);
+                return std::make_shared<AudioResponseMessage>(audio::RetCode::Failed);
+            }
+            LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));
+            return std::make_shared<AudioResponseMessage>(audio::RetCode::Failed);
+        }
+    } // namespace
 
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
+    RetCode PlaybackStart(sys::Service *serv, const std::string &fileName)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioPlaybackStart);
+        msg->fileName = fileName;
 
-RetCode AudioServiceAPI::RecordingStart(sys::Service *serv, const std::string &fileName)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
-    msg->fileName                            = fileName;
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-audio::RetCode AudioServiceAPI::RoutingStart(sys::Service *serv)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingStart);
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-audio::RetCode AudioServiceAPI::RoutingRecordCtrl(sys::Service *serv, bool enable)
-{
-    std::shared_ptr<AudioRequestMessage> msg =
-        std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingRecordCtrl);
-    msg->enable = enable;
-    auto ret    = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-audio::RetCode AudioServiceAPI::RoutingMute(sys::Service *serv, bool enable)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
-    msg->enable                              = enable;
-    auto ret                                 = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-audio::RetCode AudioServiceAPI::RoutingSpeakerPhone(sys::Service *serv, bool enable)
-{
-    std::shared_ptr<AudioRequestMessage> msg =
-        std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
-    msg->enable = enable;
-    auto ret    = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-RetCode AudioServiceAPI::Stop(sys::Service *serv)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioStop);
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-RetCode AudioServiceAPI::Pause(sys::Service *serv)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioPause);
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-RetCode AudioServiceAPI::Resume(sys::Service *serv)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioResume);
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-RetCode AudioServiceAPI::SetInputGain(sys::Service *serv, const Gain gain)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioSetInputGain);
-    msg->val                                 = gain;
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-RetCode AudioServiceAPI::SetOutputVolume(sys::Service *serv, const Volume vol)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioSetOutputVolume);
-    msg->val                                 = vol;
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode;
-}
-
-std::optional<Tags> AudioServiceAPI::GetFileTags(sys::Service *serv, const std::string &fileName)
-{
-    std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
-    msg->fileName                            = fileName;
-
-    auto ret = sys::Bus::SendUnicast(msg, ServiceAudio::serviceName, serv, 5000);
-    if (reinterpret_cast<AudioResponseMessage *>(ret.second.get())->retCode != RetCode::Success) {
-        return {};
+        return SendAudioRequest(serv, msg)->retCode;
     }
-    else {
-        return reinterpret_cast<AudioResponseMessage *>(ret.second.get())->tags;
+
+    RetCode RecordingStart(sys::Service *serv, const std::string &fileName)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioRecorderStart);
+        msg->fileName = fileName;
+
+        return SendAudioRequest(serv, msg)->retCode;
     }
-}
+
+    audio::RetCode RoutingStart(sys::Service *serv)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingStart);
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    audio::RetCode RoutingRecordCtrl(sys::Service *serv, bool enable)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingRecordCtrl);
+        msg->enable = enable;
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    audio::RetCode RoutingMute(sys::Service *serv, bool enable)
+    {
+        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingMute);
+        msg->enable                              = enable;
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    audio::RetCode RoutingSpeakerPhone(sys::Service *serv, bool enable)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioRoutingSpeakerhone);
+        msg->enable = enable;
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode Stop(sys::Service *serv)
+    {
+        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioStop);
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode Pause(sys::Service *serv)
+    {
+        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioPause);
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode Resume(sys::Service *serv)
+    {
+        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioResume);
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode SetInputGain(sys::Service *serv, const Gain gain)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioSetInputGain);
+        msg->val = gain;
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode GetInputGain(sys::Service *serv, Gain &gain)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioGetInputGain);
+
+        auto resp = SendAudioRequest(serv, msg);
+        if (resp->retCode == audio::RetCode::Success) {
+            gain = resp->val;
+        }
+        gain = 0;
+        return resp->retCode;
+    }
+
+    RetCode SetOutputVolume(sys::Service *serv, const Volume vol)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioSetOutputVolume);
+        msg->val = vol;
+
+        return SendAudioRequest(serv, msg)->retCode;
+    }
+
+    RetCode GetOutputVolume(sys::Service *serv, Volume &vol)
+    {
+        std::shared_ptr<AudioRequestMessage> msg =
+            std::make_shared<AudioRequestMessage>(MessageType::AudioGetOutputVolume);
+
+        auto resp = SendAudioRequest(serv, msg);
+        vol       = resp->retCode == audio::RetCode::Success ? resp->val : invalidVolume;
+
+        return resp->retCode;
+    }
+
+    std::optional<Tags> GetFileTags(sys::Service *serv, const std::string &fileName)
+    {
+        std::shared_ptr<AudioRequestMessage> msg = std::make_shared<AudioRequestMessage>(MessageType::AudioGetFileTags);
+        msg->fileName                            = fileName;
+
+        auto resp = SendAudioRequest(serv, msg);
+        if (resp->retCode == audio::RetCode::Success) {
+            return resp->tags;
+        }
+        else {
+            return {};
+        }
+    }
+} // namespace AudioServiceAPI

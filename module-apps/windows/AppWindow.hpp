@@ -1,19 +1,11 @@
-/*
- * @file AppWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 24 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_WINDOWS_APPWINDOW_HPP_
-#define MODULE_APPS_WINDOWS_APPWINDOW_HPP_
+#pragma once
 
-#include "gui/widgets/TopBar.hpp"
-#include "gui/widgets/BottomBar.hpp"
-#include "gui/widgets/Window.hpp"
-#include "Service/Service.hpp"
-#include "Service/Message.hpp"
+#include <gui/widgets/TopBar.hpp>
+#include <gui/widgets/BottomBar.hpp>
+#include <gui/widgets/Window.hpp>
+#include <Service/Service.hpp>
+#include <Service/Message.hpp>
+#include <service-audio/api/AudioServiceAPI.hpp>
 
 namespace app
 {
@@ -88,5 +80,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_WINDOWS_APPWINDOW_HPP_ */

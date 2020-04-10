@@ -1,21 +1,17 @@
-/*
- *  @file Common.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 24.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_AUDIOCOMMON_HPP
-#define PUREPHONE_AUDIOCOMMON_HPP
+#pragma once
 
 namespace audio
 {
-
     using Position = float;
     using Volume   = float;
     using Gain     = float;
+
+    constexpr Volume defaultVolumeStep = 0.1;
+    constexpr Gain defaultGainStep     = 1.0;
+    constexpr Volume invalidVolume     = -1.0;
+    constexpr Gain invalidGain         = -1.0;
+    constexpr Volume defaultVolume     = 0.5;
+    constexpr Gain defaultGain         = 0.5;
 
     enum class RetCode
     {
@@ -26,8 +22,10 @@ namespace audio
         InvalidFormat,
         OperationCreateFailed,
         FileDoesntExist,
-        FailedToAllocateMemory
-
+        FailedToAllocateMemory,
+        OperationNotSet,
+        ProfileNotSet,
+        Failed
     };
 
     enum class AudioEvents
@@ -35,7 +33,4 @@ namespace audio
         EndOfFile,
         FileSystemNoSpace
     };
-
 } // namespace audio
-
-#endif // PUREPHONE_AUDIOCOMMON_HPP

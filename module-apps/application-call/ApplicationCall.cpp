@@ -77,6 +77,7 @@ namespace app
         gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
         assert(callWindow != nullptr);
 
+        AudioServiceAPI::RoutingStart(this);
         runCallTimer();
 
         LOG_INFO("---------------------------------CallActive");
@@ -94,7 +95,9 @@ namespace app
             LOG_INFO("ignoring call incoming");
         }
         else {
-            AudioServiceAPI::RoutingStart(this);
+
+            // AudioServiceAPI::PlaybackStart(this, ringtone_path); // TODO: disabled untill
+            // https://appnroll.atlassian.net/browse/EGD-3095 is finished
             runCallTimer();
             std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
             // send to itself message to switch (run) call application

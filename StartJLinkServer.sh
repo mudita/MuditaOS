@@ -7,14 +7,12 @@ help()
 cat << EOF
 For basic run with default values:
 ./StartJLinkServer.sh
-
 Params:
     continous   - run in continous mode
     verify      - verify data loaded
     speed       - change speed (please mind 30000 is max by docs)
 EOF
 }
-
 while [[ $# -gt 0 ]]; do
     case $1 in
         "continous")
@@ -34,7 +32,6 @@ while [[ $# -gt 0 ]]; do
     esac;
     shift
 done
-
 CMD="JLinkGDBServerCLExe -if SWD -device MCIMXRT1051                     \
     -jlinkscriptfile evkbimxrt1050_sdram_init.jlinkscript -strict -ir    \
     -rtos GDBServer/RTOSPlugin_FreeRTOS                                  \

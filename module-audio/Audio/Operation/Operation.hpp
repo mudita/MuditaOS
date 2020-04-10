@@ -1,14 +1,4 @@
-/*
- *  @file Operation.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 24.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_OPERATION_HPP
-#define PUREPHONE_OPERATION_HPP
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -86,12 +76,12 @@ namespace audio
 
         Volume GetOutputVolume()
         {
-            return currentProfile->GetOutputVolume();
+            return currentProfile != nullptr ? currentProfile->GetOutputVolume() : invalidVolume;
         }
 
         Gain GetInputGain()
         {
-            return currentProfile->GetInputGain();
+            return currentProfile != nullptr ? currentProfile->GetInputGain() : invalidGain;
         }
 
         State GetState()
@@ -105,7 +95,7 @@ namespace audio
         }
 
       protected:
-        Profile *currentProfile;
+        Profile *currentProfile = nullptr;
         std::vector<std::unique_ptr<Profile>> availableProfiles;
         State state                                             = State::Idle;
         std::function<int32_t(AudioEvents event)> eventCallback = nullptr;
@@ -121,5 +111,3 @@ namespace audio
     };
 
 } // namespace audio
-
-#endif // PUREPHONE_OPERATION_HPP

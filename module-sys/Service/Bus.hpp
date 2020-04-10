@@ -12,6 +12,7 @@ namespace sys
     class Service;
     class Message;
 
+    constexpr uint32_t defaultCmdTimeout = 5000;
     class Bus
     {
 
