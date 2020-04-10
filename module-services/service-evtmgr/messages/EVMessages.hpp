@@ -10,43 +10,15 @@
 #define MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_
 
 #include <string>
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
-#include "SwitchData.hpp"
+#include <Service/Message.hpp>
+#include <MessageType.hpp>
+#include <SwitchData.hpp>
 #include "Service/Service.hpp"
-#include "MessageType.hpp"
 #include "bsp/keyboard/key_codes.hpp"
-#include "common_data/RawKey.hpp"
+#include "KbdMessage.hpp"
 
 namespace sevm
 {
-
-    struct Message : public sys::DataMessage
-    {
-        Message(MessageType messageType) : DataMessage(messageType)
-        {}
-        auto Execute(sys::Service *service) -> sys::Message_t override
-        {
-            // Ignore incoming data message if this service is not yet initialized
-            if (service->isReady) {
-                return service->DataReceivedHandler(this, nullptr);
-            }
-            else {
-                return std::make_shared<sys::ResponseMessage>();
-            }
-        }
-    };
-
-    class KbdMessage : public Message
-    {
-      public:
-        KbdMessage() : Message(MessageType::KBDKeyEvent)
-        {
-            type = Type::Data;
-        }
-        RawKey key = {};
-    };
-
     namespace message
     {
         class GPIO : public Message
