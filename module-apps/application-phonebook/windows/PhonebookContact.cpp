@@ -363,7 +363,7 @@ namespace gui
             if (speedDialStr.length() == 0)
                 return false;
 
-            char *endPtr;
+            char *endPtr = nullptr;
             long speedDialInt = std::strtol(speedDialStr.c_str(), &endPtr, 10);
             if (endPtr == speedDialStr.c_str()) {
                 LOG_ERROR("%s: not a decimal number", speedDialStr.c_str());
