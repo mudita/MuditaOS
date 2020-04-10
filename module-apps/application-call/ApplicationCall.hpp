@@ -19,6 +19,8 @@ namespace app
         inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
     } // namespace window
 
+    inline const std::string ringtone_path = "sys/assets/audio/ringtone.wav"; // Should bo moved to database
+
     class ApplicationCall : public Application
     {
       private:
