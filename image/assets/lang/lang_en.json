@@ -126,6 +126,7 @@
     
     "app_messages_title_main": "Messages",
     "app_messages_new_message": "New Message",
+    "app_messages_no_messages": "There are no messages yet.\nPress Left arrow to add new.",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
