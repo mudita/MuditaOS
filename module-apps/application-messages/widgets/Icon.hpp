@@ -5,7 +5,6 @@
 
 namespace gui
 {
-    // TODO: possibly a general Icon widget should be created (img + text below)
     class Icon : public Rect
     {
         Text *text = nullptr;
