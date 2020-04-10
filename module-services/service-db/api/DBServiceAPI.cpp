@@ -271,7 +271,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByID(sys::Se
 
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(sys::Service *serv, UTF8 speeddial)
 {
-    if (!speeddial.length())
+    if (speeddial.length() == 0)
         return std::make_unique<std::vector<ContactRecord>>();
 
     ContactRecord rec;
@@ -326,7 +326,7 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
         return (speedDialError);
     }
 
-    if (rec.numbers.size() > 0 && rec.numbers[0].numberUser.length()) {
+    if (rec.numbers.size() > 0 && rec.numbers[0].numberUser.length() > 0) {
         auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberUser);
         if (!retPhone1->empty()) {
             errPhone1 = retPhone1->operator[](0);
@@ -334,7 +334,7 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
         }
     }
 
-    if (rec.numbers.size() > 1 && rec.numbers[1].numberUser.length()) {
+    if (rec.numbers.size() > 1 && rec.numbers[1].numberUser.length() > 0) {
         auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberUser);
         if (!retPhone2->empty()) {
             errPhone2 = retPhone2->operator[](0);

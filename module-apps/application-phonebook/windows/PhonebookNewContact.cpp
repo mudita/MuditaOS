@@ -405,7 +405,7 @@ namespace gui
                 page2.imageTick->setVisible(false);
                 page2.favSelected = false;
             }
-            if (contact->speeddial.length())
+            if (contact->speeddial.length() > 0)
                 page2.speedValue->setText(contact->speeddial);
             else
                 page2.speedValue->setText("");
