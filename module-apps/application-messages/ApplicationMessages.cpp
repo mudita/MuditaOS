@@ -1,23 +1,14 @@
-/*
- * @file ApplicationMessages.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#include "Application.hpp"
-
-#include "MessageType.hpp"
-#include "windows/MessagesMainWindow.hpp"
-
 #include "ApplicationMessages.hpp"
+
+#include "windows/MessagesMainWindow.hpp"
 #include "windows/NewMessage.hpp"
 #include "windows/OptionsMessages.hpp"
 #include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
-#include <Dialog.hpp>
 
+#include <MessageType.hpp>
+#include <Dialog.hpp>
+#include <i18/i18.hpp>
 #include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
@@ -133,8 +124,17 @@ namespace app
             auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_rm_confirm]);
             if (dialog != nullptr) {
                 auto meta   = dialog->meta;
-                meta.action = [=]() -> bool { return DBServiceAPI::ThreadRemove(this, record->dbID); };
-                meta.text   = "Remove thread: " + std::to_string(record->dbID) + " ?";
+                meta.action = [=]() -> bool {
+                    if (!DBServiceAPI::ThreadRemove(this, record->dbID)) {
+                        LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", record->dbID);
+                        return false;
+                    }
+                    return this->switchWindow(gui::name::window::main_window);
+                };
+                meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
+                auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
+                auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
+                meta.title      = cont.getFormattedName();
                 dialog->update(meta);
                 return switchWindow(gui::name::window::thread_rm_confirm, nullptr);
             }

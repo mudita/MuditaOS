@@ -127,6 +127,7 @@
     "app_messages_title_main": "Messages",
     "app_messages_new_message": "New Message",
     "app_messages_no_messages": "There are no messages yet.\nPress Left arrow to add new.",
+    "app_messages_thread_delete_confirmation": "Do you really want to delete\nthis conversation?",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
