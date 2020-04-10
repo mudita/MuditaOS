@@ -274,7 +274,7 @@ void PhonebookDuplicateSpeedDial::setContactData()
     if (!fillContactData(t, contact))
         return;
     confirmationLabel->setText(t);
-    if (contact->speeddial.length())
+    if (contact->speeddial.length() > 0)
         dialValue->setText(contact->speeddial);
     else
         dialValue->setText("");
