@@ -17,7 +17,7 @@ namespace style
         constexpr uint32_t y  = 247;
         constexpr uint32_t w  = 400;
         constexpr uint32_t h  = 66;
-        constexpr Color color = {11, 0};
+        constexpr Color color = {7, 0};
     } // namespace text
 } // namespace style
 
@@ -34,7 +34,7 @@ Icon::Icon(Item *parent,
     setPenFocusWidth(style::window::default_border_no_focus_w);
     setPenWidth(style::window::default_border_no_focus_w);
 
-    img = new Image(this, style::img::x, style::img::y, 0, 0, imageName);
+    img = new Image(this, style::img::x, style::img::y, imageName);
 
     text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h, str);
     text->setTextType(Text::TextType::MULTI_LINE);
