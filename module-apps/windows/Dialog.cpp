@@ -5,7 +5,35 @@
 using namespace gui;
 
 namespace style
-{}
+{
+    namespace image
+    {
+        constexpr uint32_t x = 176;
+        constexpr uint32_t y = 135;
+    } // namespace image
+    namespace text
+    {
+        constexpr uint32_t x = 45;
+        constexpr uint32_t y = 293;
+        constexpr uint32_t w = 400;
+        constexpr uint32_t h = 66;
+    } // namespace text
+    namespace no
+    {
+        constexpr uint32_t x = 75;
+        constexpr uint32_t y = 415;
+        constexpr uint32_t w = 150;
+        constexpr uint32_t h = 75;
+    } // namespace no
+    namespace yes
+    {
+        constexpr uint32_t x = 255;
+        constexpr uint32_t y = 415;
+        constexpr uint32_t w = 150;
+        constexpr uint32_t h = 75;
+    } // namespace yes
+
+} // namespace style
 
 Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Meta &meta)
     : gui::AppWindow(app, name), meta(meta)
@@ -22,9 +50,9 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
 
     setTitle(meta.title);
 
-    icon = new Image(this, 176, 135, 128, 128, meta.icon);
+    icon = new Image(this, style::image::x, style::image::y, meta.icon);
 
-    text = new Text(this, 45, 293, 400, 66);
+    text = new Text(this, style::text::x, style::text::y, style::text::w, style::text::h);
     text->setText(meta.text);
     text->setTextType(Text::TextType::MULTI_LINE);
     text->setEditMode(Text::EditMode::BROWSE);
@@ -32,7 +60,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
-    no = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
+    no = new Label(this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get("common_no"));
     no->setPenWidth(0);
     no->setPenFocusWidth(3);
     no->setFilled(false);
@@ -42,7 +70,8 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     no->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
 
-    yes = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
+    yes =
+        new Label(this, style::yes::x, style::yes::y, style::yes::w, style::yes::h, utils::localize.get("common_yes"));
     yes->setPenWidth(0);
     yes->setPenFocusWidth(3);
     yes->setFilled(false);
