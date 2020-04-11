@@ -89,8 +89,8 @@ namespace gui
         charging->setText("Z");
         charging->setVisible(false);
 
-        const auto design_sim_offset = 378; // this offset is not final
-        sim                          = new SIM(this, design_sim_offset, 17);
+        const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
+        sim                          = new SIM(this, design_sim_offset, 12);
 
         // icon of the lock
         lock = new gui::Image(this, 240 - 11, 17, 0, 0, "lock");
