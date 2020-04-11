@@ -429,7 +429,7 @@ namespace app
         }
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             getCurrentWindow()->setSIM();
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         if (handled)
