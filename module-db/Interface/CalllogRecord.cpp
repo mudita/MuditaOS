@@ -7,16 +7,23 @@
  * @details
  */
 #include "CalllogRecord.hpp"
-#include "../Tables/CalllogTable.hpp"
-#include "ContactRecord.hpp"
-#include <Utils.hpp>
-#include <cassert>
-#include <log/log.hpp>
-#include <sstream>
 
-CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name)
-    : Record{tableRow.ID}, number(num), presentation(tableRow.presentation), date(tableRow.date),
-      duration(tableRow.duration), type(tableRow.type), name(name), contactId(tableRow.contactId)
+#include <ContactRecord.hpp>
+#include <log/log.hpp>
+#include <Tables/CalllogTable.hpp>
+#include <PhoneNumber.hpp>
+#include <Utils.hpp>
+
+#include <cassert>
+#include <exception>
+#include <sstream>
+#include <vector>
+#include <utility>
+
+CalllogRecord::CalllogRecord(const CalllogTableRow &tableRow)
+    : Record{tableRow.ID}, presentation(tableRow.presentation), date(tableRow.date), duration(tableRow.duration),
+      type(tableRow.type), name(tableRow.name), contactId(tableRow.contactId),
+      phoneNumber(utils::PhoneNumber::validateNumber(tableRow.e164number, tableRow.number))
 {}
 
 uint32_t CalllogRecord::getContactId() const
@@ -32,7 +39,8 @@ uint32_t CalllogRecord::getContactId() const
 
 std::ostream &operator<<(std::ostream &out, const CalllogRecord &rec)
 {
-    out << " <id> " << rec.ID << " <number> " << rec.number << " <presentation> "
+    out << " <id> " << rec.ID << " <number> " << rec.phoneNumber.getEntered() << " <e164number> "
+        << rec.phoneNumber.getE164() << " <formatted> " << rec.phoneNumber.getFormatted() << " <presentation> "
         << static_cast<uint32_t>(rec.presentation) << " <date> " << rec.date << " <duration> " << rec.duration
         << " <type> " << static_cast<uint32_t>(rec.type) << " <name> " << rec.name << " <contactID> " << rec.contactId;
 
@@ -49,9 +57,10 @@ CalllogRecordInterface::~CalllogRecordInterface()
 bool CalllogRecordInterface::Add(const CalllogRecord &rec)
 {
     ContactRecordInterface contactInterface(contactsDB);
-    auto contactRec = contactInterface.GetByNumber(rec.number, ContactRecordInterface::CreateTempContact::True);
+    auto contactRec =
+        contactInterface.GetByNumber(rec.phoneNumber.getE164(), ContactRecordInterface::CreateTempContact::True);
     if (contactRec->size() == 0) {
-        LOG_ERROR("Cannot get contact, for number %s", rec.number.c_str());
+        LOG_ERROR("Cannot get contact, for number %s", rec.phoneNumber.getE164().c_str());
         return false;
     }
     auto localRec      = rec;
@@ -61,7 +70,8 @@ bool CalllogRecordInterface::Add(const CalllogRecord &rec)
     LOG_DEBUG("Adding calllog record %s", utils::to_string(localRec).c_str());
 
     return calllogDB->calls.Add(CalllogTableRow{.ID           = localRec.ID, // this is only to remove warning
-                                                .number       = localRec.number,
+                                                .number       = localRec.phoneNumber.getEntered(),
+                                                .e164number   = localRec.phoneNumber.getE164(),
                                                 .presentation = localRec.presentation,
                                                 .date         = localRec.date,
                                                 .duration     = localRec.duration,
@@ -104,14 +114,15 @@ std::unique_ptr<std::vector<CalllogRecord>> CalllogRecordInterface::GetLimitOffs
 
     auto records = std::make_unique<std::vector<CalllogRecord>>();
 
-    for (const auto &c : calls) {
+    for (auto &c : calls) {
         auto contactRec = GetContactRecordByID(c.contactId);
         if (contactRec.ID == DB_ID_NONE) {
             LOG_ERROR("Cannot find contact for ID %s", c.contactId.c_str());
             continue;
         }
 
-        records->push_back({c, contactRec.numbers[0].numberE164, contactRec.getFormattedName()});
+        c.name = contactRec.getFormattedName();
+        records->push_back(c);
     }
 
     return records;
@@ -126,7 +137,8 @@ bool CalllogRecordInterface::Update(const CalllogRecord &rec)
     }
 
     return calllogDB->calls.Update(CalllogTableRow{.ID           = rec.ID,
-                                                   .number       = rec.number,
+                                                   .number       = rec.phoneNumber.getEntered(),
+                                                   .e164number   = rec.phoneNumber.getE164(),
                                                    .presentation = rec.presentation,
                                                    .date         = rec.date,
                                                    .duration     = rec.duration,
@@ -170,7 +182,8 @@ CalllogRecord CalllogRecordInterface::GetByID(uint32_t id)
         return CalllogRecord();
     }
 
-    return CalllogRecord{call, contactRec.numbers[0].numberE164, contactRec.getFormattedName()};
+    call.name = contactRec.getFormattedName();
+    return CalllogRecord(call);
 }
 
 uint32_t CalllogRecordInterface::GetCount(EntryState state)

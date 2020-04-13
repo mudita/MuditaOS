@@ -16,6 +16,7 @@
 
 #include <Application.hpp>
 #include <MessageType.hpp>
+#include <PhoneNumber.hpp>
 #include <UiCommonActions.hpp>
 
 #include <log/log.hpp>
@@ -85,7 +86,7 @@ namespace app
         refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 
-    void ApplicationCall::IncomingCallHandler(const CellularNotificationMessage *const msg)
+    void ApplicationCall::IncomingCallHandler(const CellularCallMessage *const msg)
     {
         gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
         assert(callWindow != nullptr);
@@ -99,7 +100,7 @@ namespace app
             // AudioServiceAPI::PlaybackStart(this, ringtone_path); // TODO: disabled untill
             // https://appnroll.atlassian.net/browse/EGD-3095 is finished
             runCallTimer();
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->data);
+            std::unique_ptr<gui::SwitchData> data = std::make_unique<app::IncommingCallData>(msg->number);
             // send to itself message to switch (run) call application
             callWindow->setState(gui::CallWindow::State::INCOMING_CALL);
             if (getState() == State::ACTIVE_FORGROUND) {
@@ -114,7 +115,7 @@ namespace app
         }
     }
 
-    void ApplicationCall::RingingHandler(const CellularNotificationMessage *const msg)
+    void ApplicationCall::RingingHandler(const CellularCallMessage *const msg)
     {
         gui::CallWindow *callWindow = dynamic_cast<gui::CallWindow *>(windows.find(window::name_call)->second);
         assert(callWindow != nullptr);
@@ -123,7 +124,7 @@ namespace app
         AudioServiceAPI::RoutingStart(this);
         runCallTimer();
 
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->data);
+        std::unique_ptr<gui::SwitchData> data = std::make_unique<app::ExecuteCallData>(msg->number);
         callWindow->setState(gui::CallWindow::State::OUTGOING_CALL);
         if (getState() == State::ACTIVE_FORGROUND) {
             switchWindow(window::name_call, std::move(data));
@@ -151,17 +152,24 @@ namespace app
             case CellularNotificationMessage::Type::CallActive: {
                 CallActiveHandler();
             } break;
-            case CellularNotificationMessage::Type::IncomingCall: {
-                IncomingCallHandler(msg);
-            } break;
-            case CellularNotificationMessage::Type::Ringing: {
-                RingingHandler(msg);
-            } break;
             default:
                 break;
             }
 
             return std::make_shared<sys::ResponseMessage>();
+        }
+        else if (msgl->messageType == MessageType::CellularCall) {
+            auto *msg = dynamic_cast<CellularCallMessage *>(msgl);
+            assert(msg != nullptr);
+
+            switch (msg->type) {
+            case CellularCallMessage::Type::Ringing: {
+                RingingHandler(msg);
+            } break;
+            case CellularCallMessage::Type::IncomingCall: {
+                IncomingCallHandler(msg);
+            } break;
+            }
         }
 
         if (resp != nullptr) {
@@ -241,7 +249,7 @@ namespace app
     void ApplicationCall::handleCallEvent(const std::string &number)
     {
         LOG_INFO("number: [%s]", number.c_str());
-        auto ret = CellularServiceAPI::DialNumber(this, number.c_str());
+        auto ret = CellularServiceAPI::DialNumber(this, utils::PhoneNumber(number));
         LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
     }
 

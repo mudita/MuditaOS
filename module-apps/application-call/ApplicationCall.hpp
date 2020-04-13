@@ -26,8 +26,8 @@ namespace app
       private:
         void CallAbortHandler();
         void CallActiveHandler();
-        void IncomingCallHandler(const CellularNotificationMessage *const msg);
-        void RingingHandler(const CellularNotificationMessage *const msg);
+        void IncomingCallHandler(const CellularCallMessage *const msg);
+        void RingingHandler(const CellularCallMessage *const msg);
 
       protected:
         AppTimer timerCall;
