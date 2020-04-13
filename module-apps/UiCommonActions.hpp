@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Application.hpp"
+
 #include <OptionWindow.hpp>
+#include <PhoneNumber.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 
 namespace app
@@ -20,7 +22,7 @@ namespace app
     /// @parem contact - contact record on which the operation is requested
     ///
     /// @return true if succeed
-    bool call(Application *app, CallOperation callOperation, const ContactRecord &contact);
+    bool call(Application *app, const ContactRecord &contact);
 
     /// @brief requests selected call operation
     ///
@@ -30,17 +32,25 @@ namespace app
     /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
-    bool call(Application *app, CallOperation callOperation, const std::string &number);
+    bool call(Application *app, const std::string &number);
 
     /// @brief requests selected call operation
     ///
     /// @param app - requesting application
     /// @param CallOperation - selected call operation.
     ///
-    /// @param key - phone key on which the operation is requested
+    /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
-    bool call(Application *app, CallOperation callOperation, uint32_t key);
+    bool call(Application *app, const utils::PhoneNumber::View &number);
+
+    /// @brief prepares for a call (displays number to the user)
+    ///
+    /// @param app - requesting application
+    /// @param number - phone number on which the operation is requested
+    ///
+    /// @return true if succeed
+    bool prepare_call(Application *app, const std::string &number);
 
     enum class SmsOperation
     {

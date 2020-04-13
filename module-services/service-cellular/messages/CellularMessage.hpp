@@ -15,8 +15,11 @@
 #include <Service/Message.hpp>
 #include <utf8/UTF8.hpp>
 #include <memory>
-#include <variant>
 #include "../State.hpp"
+
+#include <PhoneNumber.hpp>
+
+#include <string>
 
 class CellularMessage : public sys::DataMessage
 {
@@ -25,22 +28,43 @@ class CellularMessage : public sys::DataMessage
     virtual ~CellularMessage(){};
 };
 
+class CellularCallMessage : public CellularMessage
+{
+  public:
+    enum class Type
+    {
+        Ringing,      // user provided number to call to and service initialized calling procedure.
+        IncomingCall, // device receives connection from other device.
+    };
+
+    CellularCallMessage() = delete;
+    CellularCallMessage(Type type, const utils::PhoneNumber::View &number)
+        : CellularMessage(MessageType::CellularCall), type(type), number(number)
+    {}
+    CellularCallMessage(Type type, const utils::PhoneNumber &number)
+        : CellularMessage(MessageType::CellularCall), type(type), number(number.makeView())
+    {}
+    CellularCallMessage(Type type, const std::string &e164number)
+        : CellularMessage(MessageType::CellularCall), type(type), number(utils::PhoneNumber::viewFromE164(e164number))
+    {}
+
+    Type type;
+    utils::PhoneNumber::View number;
+};
+
 class CellularNotificationMessage : public CellularMessage
 {
   public:
     enum class Type
     {
-        IncomingCall, // device receives connection from other device.
-        CallAborted,  // user tried to call other device but receiving side dropped call or call unsuccessful
-        CallActive,   // call is in progress both if call was initialized by user and when user received incoming call.
-        Ringing,      // user provided number to call to and service initialized calling procedure.
-        NewIncomingSMS,       // device received new sms from network. (what about sms delivery reports?).
-        SignalStrengthUpdate, // update of the strength of the network's signal.
+        CallAborted, // user tried to call other device but receiving side dropped call or call unsuccessful
+        CallActive,  // call is in progress both if call was initialized by user and when user received incoming call.
+        NewIncomingSMS,           // device received new sms from network. (what about sms delivery reports?).
+        SignalStrengthUpdate,     // update of the strength of the network's signal.
         PowerUpProcedureComplete, // modem without cmux on initialization complete (cold start || reset modem -> and
                                   // cold start)
         SIM,                      // change on SIM from URC
-        RawCommand,        // send raw command to modem -> returns raw, tokenised result
-        None
+        RawCommand,               // send raw command to modem -> returns raw, tokenised result
     };
 
     // TODO check and fix all CellularNotificationMessage constructors
@@ -52,8 +76,7 @@ class CellularNotificationMessage : public CellularMessage
 
     virtual ~CellularNotificationMessage() = default;
 
-    Type type = Type::None;
-
+    Type type;
     std::string data;
 };
 
@@ -66,6 +89,15 @@ class CellularRequestMessage : public CellularMessage
     {}
 
     std::string data;
+};
+
+class CellularCallRequestMessage : public CellularMessage
+{
+  public:
+    CellularCallRequestMessage(const utils::PhoneNumber::View &number)
+        : CellularMessage(MessageType::CellularCallRequest), number(number)
+    {}
+    utils::PhoneNumber::View number;
 };
 
 class CellularResponseMessage : public sys::ResponseMessage

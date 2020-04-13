@@ -33,7 +33,7 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
 
     p("phonebook_phone_ringing", [=](gui::Item &) -> bool {
         LOG_INFO("Call: %s", contact.getFormattedName().c_str());
-        return app::call(app, app::CallOperation::ExecuteCall, contact);
+        return app::call(app, contact);
     });
 
     p("mail", [=](gui::Item &) -> bool {

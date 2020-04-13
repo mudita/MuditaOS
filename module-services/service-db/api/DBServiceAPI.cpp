@@ -16,6 +16,8 @@
 
 #include <Utils.hpp>
 
+#include <cassert>
+
 SettingsRecord DBServiceAPI::SettingsGet(sys::Service *serv)
 {
 
@@ -359,8 +361,9 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumbe
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber, rec);
 
-    auto ret                                  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
-    DBContactResponseMessage *contactResponse = reinterpret_cast<DBContactResponseMessage *>(ret.second.get());
+    auto ret              = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto *contactResponse = dynamic_cast<DBContactResponseMessage *>(ret.second.get());
+    assert(contactResponse);
     if ((ret.first == sys::ReturnCodes::Success) && (contactResponse->retCode == true)) {
         return std::move(contactResponse->records);
     }

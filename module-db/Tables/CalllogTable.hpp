@@ -38,6 +38,7 @@ struct CalllogTableRow
 {
     uint32_t ID = DB_ID_NONE;
     UTF8 number;
+    UTF8 e164number;
     PresentationType presentation;
     time_t date;
     time_t duration;

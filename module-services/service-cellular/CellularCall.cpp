@@ -64,7 +64,7 @@ namespace ModemCall
 
 namespace CellularCall
 {
-    bool CellularCall::startCall(const UTF8 &number, const CallType type)
+    bool CellularCall::startCall(const utils::PhoneNumber::View &number, const CallType type)
     {
         if (isValid()) {
             LOG_ERROR("call already set");
@@ -73,13 +73,12 @@ namespace CellularCall
 
         clear();
         CalllogRecord callRec;
-        callRec.number = number;
-        callRec.type = type;
-        callRec.date   = utils::time::Timestamp().getTime();
-        callRec.name = number; // temporary set name as number
-        call = startCallAction ? startCallAction(callRec) : CalllogRecord();
-        if (call.ID == DB_ID_NONE)
-        {
+        callRec.type        = type;
+        callRec.date        = utils::time::Timestamp().getTime();
+        callRec.name        = number.getFormatted(); // temporary set name to entered number
+        callRec.phoneNumber = number;
+        call                = startCallAction ? startCallAction(callRec) : CalllogRecord();
+        if (call.ID == DB_ID_NONE) {
             LOG_ERROR("startCallAction failed");
             clear();
             return false;
@@ -90,10 +89,9 @@ namespace CellularCall
 
     bool CellularCall::setActive()
     {
-        if (isValid())
-        {
+        if (isValid()) {
             startActiveTime = utils::time::Timestamp();
-            isActiveCall = true;
+            isActiveCall    = true;
             return true;
         }
         return false;
@@ -106,8 +104,7 @@ namespace CellularCall
             return false;
         }
 
-        if (isActiveCall)
-        {
+        if (isActiveCall) {
             auto endTime  = utils::time::Timestamp();
             call.duration = (endTime - startActiveTime).get();
         }

@@ -47,6 +47,11 @@
 #include <common_data/EventStore.hpp>
 #include <service-evtmgr/Constants.hpp>
 
+#include <vector>
+#include <utility>
+#include <optional>
+#include <string>
+
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
 inline const auto cellularStack = 24000UL;
@@ -120,12 +125,12 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
         std::string message;
         auto msg = identifyNotification(frame.getFrame().data);
 
-        if (msg->type == CellularNotificationMessage::Type::None) {
+        if (msg == std::nullopt) {
             LOG_INFO("Skipped uknown notification");
             return;
         }
 
-        sys::Bus::SendMulticast(msg, sys::BusChannels::ServiceCellularNotifications, this);
+        sys::Bus::SendMulticast(msg.value(), sys::BusChannels::ServiceCellularNotifications, this);
     };
 }
 
@@ -185,38 +190,38 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 void ServiceCellular::change_state(cellular::StateChange *msg)
 {
     assert(msg);
-    switch(msg->request) {
-        case State::ST::Idle:
-            handle_idle();
-            break;
-        case State::ST::PowerUpProcedure:
-            handle_power_up_procedure();
-            break;
-        case State::ST::AudioConfigurationProcedure:
-            handle_audio_conf_procedure();
-            break;
-        case State::ST::CellularConfProcedure:
-            handle_start_conf_procedure();
-            break;
-        case State::ST::SanityCheck:
-            handle_sim_sanity_check();
-            break;
-        case State::ST::SimInit:
-            handle_sim_init();
-            break;
-        case State::ST::SimSelect:
-            handle_select_sim();
-            break;
-        case State::ST::ModemOn:
-            handle_modem_on();
-            break;
-        case State::ST::ModemFatalFailure:
-            handle_fatal_failure();
-            break;
-        case State::ST::Failed:
-            handle_failure();
-            break;
-        };
+    switch (msg->request) {
+    case State::ST::Idle:
+        handle_idle();
+        break;
+    case State::ST::PowerUpProcedure:
+        handle_power_up_procedure();
+        break;
+    case State::ST::AudioConfigurationProcedure:
+        handle_audio_conf_procedure();
+        break;
+    case State::ST::CellularConfProcedure:
+        handle_start_conf_procedure();
+        break;
+    case State::ST::SanityCheck:
+        handle_sim_sanity_check();
+        break;
+    case State::ST::SimInit:
+        handle_sim_init();
+        break;
+    case State::ST::SimSelect:
+        handle_select_sim();
+        break;
+    case State::ST::ModemOn:
+        handle_modem_on();
+        break;
+    case State::ST::ModemFatalFailure:
+        handle_fatal_failure();
+        break;
+    case State::ST::Failed:
+        handle_failure();
+        break;
+    };
 }
 
 bool ServiceCellular::handle_idle()
@@ -304,6 +309,26 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         change_state(dynamic_cast<cellular::StateChange *>(msgl));
         responseMsg = std::make_shared<CellularResponseMessage>(true);
     } break;
+    case MessageType::CellularCall: {
+        auto *msg = dynamic_cast<CellularCallMessage *>(msgl);
+        assert(msg != nullptr);
+
+        switch (msg->type) {
+        case CellularCallMessage::Type::Ringing: {
+            auto ret    = ongoingCall.startCall(msg->number, CallType::CT_OUTGOING);
+            responseMsg = std::make_shared<CellularResponseMessage>(ret);
+            break;
+        } break;
+        case CellularCallMessage::Type::IncomingCall: {
+            auto ret = true;
+            if (!ongoingCall.isValid()) {
+                ret = ongoingCall.startCall(msg->number, CallType::CT_INCOMING);
+            }
+            responseMsg = std::make_shared<CellularResponseMessage>(ret);
+            break;
+        }
+        }
+    } break;
     // Incoming notifications from Notification Virtual Channel
     case MessageType::CellularNotification: {
         CellularNotificationMessage *msg = dynamic_cast<CellularNotificationMessage *>(msgl);
@@ -314,24 +339,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
-            case CellularNotificationMessage::Type::IncomingCall: {
-                auto ret = true;
-                if (!ongoingCall.isValid()) {
-                    // CellularNotificationMessage::Type::IncomingCall is called periodically during not answered
-                    // incomming call create ongoing call only once
-                    ret = ongoingCall.startCall(msg->data, CallType::CT_INCOMING);
-                }
-                responseMsg = std::make_shared<CellularResponseMessage>(ret);
-                break;
-            }
             case CellularNotificationMessage::Type::CallAborted: {
                 stopTimer(callStateTimerId);
                 auto ret    = ongoingCall.endCall();
-                responseMsg = std::make_shared<CellularResponseMessage>(ret);
-                break;
-            }
-            case CellularNotificationMessage::Type::Ringing: {
-                auto ret    = ongoingCall.startCall(msg->data, CallType::CT_OUTGOING);
                 responseMsg = std::make_shared<CellularResponseMessage>(ret);
                 break;
             }
@@ -453,20 +463,21 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         responseMsg = std::make_shared<CellularResponseMessage>(ret);
     } break;
 
-    case MessageType::CellularDialNumber: {
-        CellularRequestMessage *msg = reinterpret_cast<CellularRequestMessage *>(msgl);
-        auto channel                = cmux->get(TS0710::Channel::Commands);
+    case MessageType::CellularCallRequest: {
+        auto *msg = dynamic_cast<CellularCallRequestMessage *>(msgl);
+        assert(msg != nullptr);
+        auto channel = cmux->get(TS0710::Channel::Commands);
         if (channel) {
-            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->data + ";\r");
+            auto ret = channel->cmd(at::factory(at::AT::ATD) + msg->number.getEntered() + ";\r");
             if (ret) {
                 responseMsg = std::make_shared<CellularResponseMessage>(true);
                 // activate call state timer
                 ReloadTimer(callStateTimerId);
                 // Propagate "Ringing" notification into system
-                sys::Bus::SendMulticast(std::make_shared<CellularNotificationMessage>(
-                                            CellularNotificationMessage::Type::Ringing, msg->data),
-                                        sys::BusChannels::ServiceCellularNotifications,
-                                        this);
+                sys::Bus::SendMulticast(
+                    std::make_shared<CellularCallMessage>(CellularCallMessage::Type::Ringing, msg->number),
+                    sys::BusChannels::ServiceCellularNotifications,
+                    this);
                 break;
             }
         }
@@ -604,7 +615,7 @@ namespace
     }
 } // namespace
 
-std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
+std::optional<std::shared_ptr<CellularMessage>> ServiceCellular::identifyNotification(const std::vector<uint8_t> &data)
 {
     std::string str(data.begin(), data.end());
 
@@ -641,7 +652,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
         auto end     = str.find("\"", ret + beg + 1);
         auto message = str.substr(beg + 1, end - beg - 1);
 
-        return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::IncomingCall, message);
+        return std::make_shared<CellularCallMessage>(CellularCallMessage::Type::IncomingCall, message);
     }
 
     // Call aborted/failed
@@ -678,7 +689,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
     }
 
     LOG_WARN("Unhandled notification");
-    return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::None);
+    return std::nullopt;
 }
 
 bool ServiceCellular::sendSMS(void)

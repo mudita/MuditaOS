@@ -23,17 +23,18 @@ bool CalllogTable::Create()
 
 bool CalllogTable::Add(CalllogTableRow entry)
 {
-
-    return db->Execute("INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId, "
-                       "isRead) VALUES ('%q', %lu, %q, %q, %lu, '%q', '%q', %d);",
-                       entry.number.c_str(),
-                       static_cast<uint32_t>(entry.presentation),
-                       utils::to_string(entry.date).c_str(),
-                       utils::to_string(entry.duration).c_str(),
-                       static_cast<uint32_t>(entry.type),
-                       entry.name.c_str(),
-                       entry.contactId.c_str(),
-                       entry.isRead);
+    return db->Execute(
+        "INSERT or ignore INTO calls (number, e164number, presentation, date, duration, type, name, contactId, "
+        "isRead) VALUES ('%q', '%q', %lu, %q, %q, %lu, '%q', '%q', %d);",
+        entry.number.c_str(),
+        entry.e164number.c_str(),
+        static_cast<uint32_t>(entry.presentation),
+        utils::to_string(entry.date).c_str(),
+        utils::to_string(entry.duration).c_str(),
+        static_cast<uint32_t>(entry.type),
+        entry.name.c_str(),
+        entry.contactId.c_str(),
+        entry.isRead);
 }
 
 bool CalllogTable::RemoveByID(uint32_t id)
@@ -48,10 +49,12 @@ bool CalllogTable::RemoveByField(CalllogTableFields field, const char *str)
 
 bool CalllogTable::Update(CalllogTableRow entry)
 {
-    return db->Execute("UPDATE calls SET number = '%q', presentation = %lu, date = %lu, duration = %lu, type = %lu, "
+    return db->Execute("UPDATE calls SET number = '%q', e164number = '%q', presentation = %lu, date = %lu, duration = "
+                       "%lu, type = %lu, "
                        "name = '%q', contactId = '%q', isRead = "
                        "%d WHERE _id = %lu;",
                        entry.number.c_str(),
+                       entry.e164number.c_str(),
                        static_cast<uint32_t>(entry.presentation),
                        static_cast<uint32_t>(entry.date),
                        static_cast<uint32_t>(entry.duration),
@@ -73,13 +76,14 @@ CalllogTableRow CalllogTable::GetByID(uint32_t id)
     return CalllogTableRow{
         (*retQuery)[0].GetUInt32(),                                // ID
         (*retQuery)[1].GetString(),                                // number
-        static_cast<PresentationType>((*retQuery)[2].GetUInt32()), // presentation
-        static_cast<time_t>((*retQuery)[3].GetUInt64()),           // date
-        static_cast<time_t>((*retQuery)[4].GetUInt64()),           // duration
-        static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
-        (*retQuery)[6].GetString(),                                // name
-        (*retQuery)[7].GetString(),                                // contactID
-        static_cast<bool>((*retQuery)[8].GetUInt64()),             // isRead
+        (*retQuery)[2].GetString(),                                // e164number
+        static_cast<PresentationType>((*retQuery)[3].GetUInt32()), // presentation
+        static_cast<time_t>((*retQuery)[4].GetUInt64()),           // date
+        static_cast<time_t>((*retQuery)[5].GetUInt64()),           // duration
+        static_cast<CallType>((*retQuery)[6].GetUInt32()),         // type
+        (*retQuery)[7].GetString(),                                // name
+        (*retQuery)[8].GetString(),                                // contactID
+        static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
     };
 }
 
@@ -97,13 +101,14 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffset(uint32_t offset, uint3
         ret.push_back(CalllogTableRow{
             (*retQuery)[0].GetUInt32(),                                // ID
             (*retQuery)[1].GetString(),                                // number
-            static_cast<PresentationType>((*retQuery)[2].GetUInt32()), // presentation
-            static_cast<time_t>((*retQuery)[3].GetUInt64()),           // date
-            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // duration
-            static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
-            (*retQuery)[6].GetString(),                                // name
-            (*retQuery)[7].GetString(),                                // contactID
-            static_cast<bool>((*retQuery)[8].GetUInt64()),             // isRead
+            (*retQuery)[2].GetString(),                                // e164number
+            static_cast<PresentationType>((*retQuery)[3].GetUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // date
+            static_cast<time_t>((*retQuery)[5].GetUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[6].GetUInt32()),         // type
+            (*retQuery)[7].GetString(),                                // name
+            (*retQuery)[8].GetString(),                                // contactID
+            static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
         });
     } while (retQuery->NextRow());
 
@@ -141,13 +146,14 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffsetByField(uint32_t offset
         ret.push_back(CalllogTableRow{
             (*retQuery)[0].GetUInt32(),                                // ID
             (*retQuery)[1].GetString(),                                // number
-            static_cast<PresentationType>((*retQuery)[2].GetUInt32()), // presentation
-            static_cast<time_t>((*retQuery)[3].GetUInt64()),           // date
-            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // duration
-            static_cast<CallType>((*retQuery)[5].GetUInt32()),         // type
-            (*retQuery)[6].GetString(),                                // name
-            (*retQuery)[7].GetString(),                                // contactID
-            static_cast<bool>((*retQuery)[8].GetUInt64()),             // isRead
+            (*retQuery)[2].GetString(),                                // e164number
+            static_cast<PresentationType>((*retQuery)[3].GetUInt32()), // presentation
+            static_cast<time_t>((*retQuery)[4].GetUInt64()),           // date
+            static_cast<time_t>((*retQuery)[5].GetUInt64()),           // duration
+            static_cast<CallType>((*retQuery)[6].GetUInt32()),         // type
+            (*retQuery)[7].GetString(),                                // name
+            (*retQuery)[8].GetString(),                                // contactID
+            static_cast<bool>((*retQuery)[9].GetUInt64()),             // isRead
         });
     } while (retQuery->NextRow());
 

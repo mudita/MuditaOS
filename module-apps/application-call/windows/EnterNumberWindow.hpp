@@ -14,6 +14,7 @@
 #include <Application.hpp>
 #include <AppWindow.hpp>
 #include <ContactRecord.hpp>
+#include <country.hpp>
 #include <gui/input/Translator.hpp>
 #include <gui/widgets/BottomBar.hpp>
 #include <gui/widgets/Image.hpp>
@@ -31,6 +32,10 @@ namespace gui
 {
     class EnterNumberWindow : public AppWindow
     {
+      public:
+        using CountryCode = utils::country::Id;
+
+      private:
         using PhoneNumberUtil = i18n::phonenumbers::PhoneNumberUtil;
         using Formatter       = i18n::phonenumbers::AsYouTypeFormatter;
 
@@ -54,13 +59,13 @@ namespace gui
         void destroyInterface() override;
 
       private:
-        const std::string defaultRegionCode = "PL";
+        CountryCode defaultCountry = utils::country::defaultCountry;
+        CountryCode currentCountry;
         gui::KeyInputMappedTranslation translator;
         PhoneNumberUtil &numberUtil;
         std::unique_ptr<Formatter> formatter;
         std::string formattedNumber;
         std::string enteredNumber;
-        std::string currentRegionCode;
 
         bool addNewContact();
         void switchFormatter(const std::string &countryCode);

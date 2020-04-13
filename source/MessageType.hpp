@@ -79,9 +79,10 @@ enum class MessageType
     // Cellular messages
     CellularStateRequest,       /// cellular change state request, only for use by cellular
     CellularNotification,       // Async notification message
-    CellularDialNumber,         // Dial number
     CellularAnswerIncomingCall, // Answer incoming call
     CellularHangupCall,         // Hang up call
+    CellularCall,               // Call related events
+    CellularCallRequest,        // Call request
 
     CellularListCurrentCalls,
     CellularSimProcedure,

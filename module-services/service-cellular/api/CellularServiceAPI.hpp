@@ -13,11 +13,13 @@
 #include "../messages/CellularMessage.hpp"
 #include "utf8/UTF8.hpp"
 
+#include <PhoneNumber.hpp>
+
 class Service;
 
 namespace CellularServiceAPI
 {
-    bool DialNumber(sys::Service *serv, const std::string &number);
+    bool DialNumber(sys::Service *serv, const utils::PhoneNumber &number);
     bool AnswerIncomingCall(sys::Service *serv);
     void HangupCall(sys::Service *serv);
     /*
