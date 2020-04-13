@@ -10,18 +10,24 @@
 #include "application-phonebook/windows/PhonebookDialogs.hpp"
 #include "application-phonebook/windows/PhonebookNewContact.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
-#include <cassert>
+
 #include <i18/i18.hpp>
 #include <log/log.hpp>
+#include <PhoneNumber.hpp>
+
+#include <cassert>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace app
 {
-    bool call(Application *app, CallOperation callOperation, const ContactRecord &contact)
+    bool call(Application *app, const ContactRecord &contact)
     {
         assert(app != nullptr);
 
         if (contact.numbers.size() != 0) {
-            return call(app, callOperation, contact.numbers[0].numberE164);
+            return call(app, std::string(contact.numbers[0].numberE164));
         }
         else {
             LOG_ERROR("No contact numbers!");
@@ -29,33 +35,27 @@ namespace app
         }
     }
 
-    bool call(Application *app, CallOperation callOperation, const std::string &e164number)
+    bool call(Application *app, const utils::PhoneNumber::View &phoneNumber)
     {
         assert(app != nullptr);
-        const std::string window = window::name_enterNumber;
+        auto data = std::make_unique<ExecuteCallData>(phoneNumber);
 
-        std::unique_ptr<CallSwitchData> data;
-
-        switch (callOperation) {
-        case CallOperation::ExecuteCall: {
-            data = std::make_unique<ExecuteCallData>(e164number.c_str());
-        } break;
-        case CallOperation::PrepareCall: {
-            data = std::make_unique<EnterNumberData>(e164number.c_str());
-        } break;
-        default: {
-            LOG_ERROR("callOperation not supported %" PRIu32, static_cast<uint32_t>(callOperation));
-            return false;
-        }
-        }
-        return sapm::ApplicationManager::messageSwitchApplication(app, name_call, window, std::move(data));
+        return sapm::ApplicationManager::messageSwitchApplication(
+            app, name_call, window::name_enterNumber, std::move(data));
     }
 
-    bool call(Application *app, CallOperation callOperation, uint32_t key)
+    bool call(Application *app, const std::string &e164number)
     {
-        std::string keyStr;
-        keyStr = key;
-        return call(app, callOperation, keyStr);
+        return call(app, utils::PhoneNumber::viewFromE164(e164number));
+    }
+
+    bool prepare_call(Application *app, const std::string &number)
+    {
+        assert(app != nullptr);
+        auto data = std::make_unique<EnterNumberData>(number);
+
+        return sapm::ApplicationManager::messageSwitchApplication(
+            app, name_call, window::name_enterNumber, std::move(data));
     }
 
     bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)

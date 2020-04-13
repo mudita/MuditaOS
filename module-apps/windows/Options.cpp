@@ -11,7 +11,7 @@ namespace gui::options
     {
         assert(app != nullptr);
         return {UTF8(utils::localize.get("sms_call_text")) + contact.primaryName,
-                [app, contact, callOperation](gui::Item &item) { return app::call(app, callOperation, contact); },
+                [app, contact, callOperation](gui::Item &item) { return app::call(app, contact); },
                 gui::Arrow::Enabled};
     }
 

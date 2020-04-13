@@ -145,13 +145,13 @@ namespace gui
 
         // activated callbacks
         rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("call %s", record.number.c_str());
-            return app::call(application, app::CallOperation::ExecuteCall, record.number);
+            LOG_INFO("call %s", record.phoneNumber.getE164().c_str());
+            return app::call(application, record.phoneNumber);
         };
 
         rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("sms %s", record.number.c_str());
-            return app::sms(application, app::SmsOperation::Add, record.number);
+            LOG_INFO("sms %s", record.phoneNumber.getE164().c_str());
+            return app::sms(application, app::SmsOperation::Add, record.phoneNumber.getE164());
         };
 
         // Type
@@ -203,7 +203,7 @@ namespace gui
 
             setTitle(record.name);
 
-            number->setText(record.number.c_str());
+            number->setText(record.phoneNumber.getFormatted());
 
             auto callType = toCallLogCallType(record.type);
             for (auto &img : callTypeImg) {

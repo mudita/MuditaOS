@@ -86,7 +86,7 @@ gui::ListItem *CalllogModel::getItem(int index)
             }
             if (event.keyCode == gui::KeyCode::KEY_LF) {
                 LOG_DEBUG("calling");
-                return app::call(application, app::CallOperation::ExecuteCall, item->getCall().number);
+                return app::call(application, item->getCall().phoneNumber);
             }
             return false;
         };
