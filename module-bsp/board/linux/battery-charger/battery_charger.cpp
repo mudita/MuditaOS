@@ -40,6 +40,7 @@ namespace bsp
         if (xTaskCreate(battery_worker, "battery", 512, qHandle, 0, &battery_worker_handle) != pdPASS) {
             return 1;
         }
+        Store::Battery::modify().level = battLevel;
         return 0;
     }
 
@@ -51,7 +52,7 @@ namespace bsp
     void battery_getBatteryLevel(uint8_t &levelPercent)
     {
         levelPercent = battLevel;
-        Store::Battery::modify().level = levelPercent;
+        Store::Battery::modify().level = battLevel;
     }
 
     void battery_getChargeStatus(bool &status)
