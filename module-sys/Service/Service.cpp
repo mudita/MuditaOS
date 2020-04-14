@@ -114,6 +114,11 @@ namespace sys
         return false;
     }
 
+    bool Service::subscribe(Message &&msg, MessageHandler handler)
+    {
+        return Service::subscribe(&msg, handler);
+    }
+
     // Create service timer
     uint32_t Service::CreateTimer(uint32_t interval, bool isPeriodic, const std::string &name)
     {

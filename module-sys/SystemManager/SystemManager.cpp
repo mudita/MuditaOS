@@ -1,9 +1,3 @@
-/*
- * Service.cpp
- *
- *  Created on: Mar 7, 2019
- *      Author: mati
- */
 #include "SystemManager.hpp"
 
 #include <common_data/EventStore.hpp>
@@ -12,6 +6,7 @@
 #include "critical.hpp"
 #include <algorithm>
 #include <service-evtmgr/messages/KbdMessage.hpp>
+#include <service-evtmgr/messages/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
 namespace sys
@@ -270,8 +265,8 @@ namespace sys
     ReturnCodes SystemManager::InitHandler()
     {
         isReady = true;
-        SystemManagerCmd cmd;
-        subscribe(&cmd, [&](DataMessage *msg, ResponseMessage *resp) {
+
+        subscribe(SystemManagerCmd(), [&](DataMessage *msg, ResponseMessage *resp) {
             if (msg->channel == BusChannels::SystemManagerRequests) {
                 auto *data = static_cast<SystemManagerCmd *>(msg);
 
@@ -289,11 +284,17 @@ namespace sys
             return Message_t();
         });
 
-        sevm::KbdMessage kbdmsg;
-        subscribe(&kbdmsg, [&](DataMessage *msg, ResponseMessage *resp) {
+        subscribe(sevm::KbdMessage(), [&](DataMessage *msg, ResponseMessage *resp) {
             // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
             if (state == State::Shutdown) {
                 set(State::Reboot);
+            }
+            return Message_t();
+        });
+
+        subscribe(sevm::BatteryPlugMessage(), [&](DataMessage *msg, ResponseMessage *resp) {
+            if (state == State::Shutdown) {
+                set(State::ShutdownReady);
             }
             return Message_t();
         });
