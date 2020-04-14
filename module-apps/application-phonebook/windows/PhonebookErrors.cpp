@@ -29,7 +29,7 @@ static Label *addLabel(gui::Item *parentPage,
     l->setEdges(edges);
     l->setFont(fontName);
     l->setText(text);
-    l->setAlignement(alignment);
+    l->setAlignment(alignment);
     l->setLineMode(lineMode);
     return (l);
 }

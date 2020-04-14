@@ -67,7 +67,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     no->setBorderColor(ColorFullBlack);
     no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     no->setFont(style::window::font::big);
-    no->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    no->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
     no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
 
     yes =
@@ -78,7 +78,7 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     yes->setBorderColor(ColorFullBlack);
     yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     yes->setFont(style::window::font::big);
-    yes->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    yes->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     no->setNavigationItem(NavigationDirection::RIGHT, yes);
     yes->setNavigationItem(NavigationDirection::LEFT, no);

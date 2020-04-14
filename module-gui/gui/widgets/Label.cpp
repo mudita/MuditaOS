@@ -37,7 +37,7 @@ namespace gui
         setPenWidth(label.no_focus);
         setFont(label.font);
         setDotsMode(label.dots);
-        setAlignement(label.align);
+        setAlignment(label.align);
         setRadius(label.radius);
         setEdges(label.edges);
         setMargins(label.margins);
@@ -176,7 +176,7 @@ namespace gui
         return text;
     }
 
-    void Label::setAlignement(const Alignment &alignment)
+    void Label::setAlignment(const Alignment &alignment)
     {
         this->alignment = alignment;
         calculateDisplayText();

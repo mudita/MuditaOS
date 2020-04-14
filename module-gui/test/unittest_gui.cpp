@@ -287,19 +287,18 @@ bool drawWindowWithLabelsTest(uint8_t *frameBuffer)
 
     // add label with time
     gui::Label *label = new gui::Label(win, 20, 80, 440, 120, "TOP LEFT");
-    label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_TOP));
+    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_TOP));
     label->setRadius(5);
     label->setFont("gt_pressura_bold_65");
 
     label = new gui::Label(win, 20, 280, 440, 120, "2xCENTER#####");
-    label->setAlignement(
-        gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->setRadius(10);
     label->setPenWidth(5);
     label->setFont("gt_pressura_bold_65");
 
     label = new gui::Label(win, 20, 480, 440, 120, "BOTTOM RIGHT");
-    label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
+    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
     label->setRadius(15);
     label->setDotsMode(true);
     label->setFont("gt_pressura_bold_65");
@@ -380,8 +379,7 @@ bool drawWindowWithHBoxTest(uint8_t *frameBuffer)
     gui::Label *maxH4 = new gui::Label();
     maxH4->setText("Hello Mudita");
     maxH4->setRadius(20);
-    maxH4->setAlignement(
-        gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    maxH4->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     maxH4->setMaxSize(75, 60);
 
     // TODO:M.P unit test for GUI should be fixed/updated gui::Image* img1 = new gui::Image();

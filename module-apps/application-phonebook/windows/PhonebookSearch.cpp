@@ -32,7 +32,7 @@ namespace gui
         l->setEdges(edges);
         l->setFont(fontName);
         l->setText(text);
-        l->setAlignement(alignment);
+        l->setAlignment(alignment);
         l->setLineMode(lineMode);
 
         if (parentPage)

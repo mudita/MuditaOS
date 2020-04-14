@@ -37,7 +37,7 @@ gui::Item *PhonebookOptions::addOptionLabel(const std::string &text,
     label->setPenFocusWidth(3);
     label->setPenWidth(0);
     label->setFont(style::window::font::small);
-    label->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+    label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
     label->activatedCallback = activatedCallback;
     label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     if (hasSubOptions) {

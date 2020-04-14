@@ -1052,7 +1052,7 @@ namespace gui
             label->setFilled(false);
             label->setPenWidth(1);
             label->setPenFocusWidth(3);
-            label->setAlignement(alignment);
+            label->setAlignment(alignment);
             label->setFont(font->getName());
             label->setTextColor(textColor);
 
