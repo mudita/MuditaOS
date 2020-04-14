@@ -79,12 +79,21 @@ namespace gui
                 favValue->setVisible(visible);
                 favDescription->setVisible(visible);
                 imageFav->setVisible(visible);
-                imageTick->setVisible(visible);
-
                 addressLabel->setVisible(visible);
                 noteLabel->setVisible(visible);
                 text[0]->setVisible(visible);
                 text[1]->setVisible(visible);
+                if (visible) {
+                    if (favSelected) {
+                        imageTick->setVisible(true);
+                    }
+                    else {
+                        imageTick->setVisible(false);
+                    }
+                }
+                else {
+                    imageTick->setVisible(false);
+                }
             }
         };
 
