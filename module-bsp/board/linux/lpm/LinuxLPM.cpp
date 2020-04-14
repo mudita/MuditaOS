@@ -18,4 +18,8 @@ namespace bsp
         return 0;
     }
 
+    int32_t LinuxLPM::Reboot()
+    {
+        return 0;
+    }
 } // namespace bsp
