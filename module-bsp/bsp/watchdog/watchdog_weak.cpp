@@ -1,4 +1,3 @@
-#pragma once
 #include "watchdog.hpp"
 
 namespace bsp::watchdog
