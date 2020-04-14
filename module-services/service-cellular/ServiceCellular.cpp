@@ -570,6 +570,21 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         responseMsg = std::make_shared<CellularResponseMessage>(false);
         break;
     }
+    case MessageType::CellularGetFirmwareVersion: {
+        std::string response;
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        if (channel) {
+            auto resp = channel->cmd(at::AT::QGMR);
+            if (resp.code == at::Result::Code::OK) {
+                response    = resp.response[0];
+                responseMsg = std::make_shared<CellularResponseMessage>(true, response);
+            }
+            else {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+        break;
+    }
     default:
         break;
     }
