@@ -1088,7 +1088,7 @@ bool ServiceCellular::handle_select_sim()
             // NO SIM IN
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        ys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
+        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
     }
 #endif
     return true;
