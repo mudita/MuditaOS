@@ -99,7 +99,8 @@ namespace at
         SIM_DET_ON, /// enable sim detection
         SIMSTAT_ON, /// enable sim stat urc
         SET_SCANMODE,
-        GET_SCANMODE
+        GET_SCANMODE,
+        QGMR, /// ditailed firmware revision (as required by Quectel)
 
     };
 
@@ -148,6 +149,7 @@ namespace at
             {AT::SIM_DET_ON, {"AT+QSIMDET=1,0\r"}},
             {AT::SET_SCANMODE, {"AT+QCFG=\"nwscanmode\","}},
             {AT::GET_SCANMODE, {"AT+QCFG=\"nwscanmode\"\r"}},
+            {AT::QGMR, {"AT+QGMR\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);
