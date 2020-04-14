@@ -109,6 +109,7 @@ namespace sys
 
         /// subscribe: register message handler
         bool subscribe(Message *msg, MessageHandler handler);
+        bool subscribe(Message &&msg, MessageHandler handler);
 
       protected:
         bool enableRunLoop;

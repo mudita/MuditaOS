@@ -108,7 +108,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::SystemManager::ResumeSystem(this);
         }
 
-        auto message           = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+        auto message           = std::make_shared<sevm::BatteryLevelMessage>();
         message->levelPercents = msg->levelPercents;
         message->fullyCharged  = msg->fullyCharged;
 
@@ -126,8 +126,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::SystemManager::ResumeSystem(this);
         }
 
-        auto message     = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+        auto message     = std::make_shared<sevm::BatteryPlugMessage>();
         message->plugged = msg->plugged;
+
+        if (!message->plugged) {
+            sys::Bus::SendUnicast(message, service::name::system_manager, this);
+        }
 
         if (targetApplication.empty() == false) {
             sys::Bus::SendUnicast(message, targetApplication, this);

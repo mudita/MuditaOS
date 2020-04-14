@@ -1,11 +1,3 @@
-/*
- * @file EVMessages.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 17 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #ifndef MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_
 #define MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_
 
@@ -16,6 +8,7 @@
 #include "Service/Service.hpp"
 #include "bsp/keyboard/key_codes.hpp"
 #include "KbdMessage.hpp"
+#include "BatteryMessages.hpp"
 
 namespace sevm
 {
@@ -29,27 +22,6 @@ namespace sevm
             uint32_t num = 0, port = 0, state = 0;
         };
     } // namespace message
-
-    class BatteryLevelMessage : public Message
-    {
-      public:
-        BatteryLevelMessage(MessageType messageType) : Message(messageType)
-        {
-            type = Type::Data;
-        }
-        uint8_t levelPercents = 0;
-        bool fullyCharged     = false;
-    };
-
-    class BatteryPlugMessage : public Message
-    {
-      public:
-        BatteryPlugMessage(MessageType messageType) : Message(messageType)
-        {
-            type = Type::Data;
-        }
-        bool plugged = false;
-    };
 
     class RtcMinuteAlarmMessage : public Message
     {

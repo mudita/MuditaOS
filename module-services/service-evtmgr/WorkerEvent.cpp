@@ -67,7 +67,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             uint8_t battLevel = 0;
             bsp::battery_getBatteryLevel(battLevel);
             bsp::battery_ClearAllIRQs();
-            auto message           = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+            auto message           = std::make_shared<sevm::BatteryLevelMessage>();
             message->levelPercents = battLevel;
             message->fullyCharged  = false;
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
@@ -76,7 +76,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             bool status;
             bsp::battery_getChargeStatus(status);
             bsp::battery_ClearAllIRQs();
-            auto message     = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+            auto message     = std::make_shared<sevm::BatteryPlugMessage>();
             message->plugged = status;
             sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
