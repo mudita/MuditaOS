@@ -17,7 +17,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
-        bottomBar->setText(BottomBar::Side::CENTER, "SELECT");
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
         setTitle(utils::localize.get("sms_title_message"));
 
@@ -32,11 +32,13 @@ namespace gui
         label->setFont(style::window::font::small);
         label->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        auto text = new gui::Text(nullptr, 0, 0, body->getWidth(), 43, "", gui::Text::ExpandMode::EXPAND_NONE);
+        text = new gui::Text(nullptr, 0, 0, body->getWidth(), 43, "", gui::Text::ExpandMode::EXPAND_NONE);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         text->setInputMode(new InputMode({InputMode::phone}));
         text->setPenFocusWidth(style::window::default_border_focucs_w);
+        text->setPenWidth(style::window::messages::sms_border_no_focus);
         text->setFont(style::window::font::medium);
+        text->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         text->activatedCallback = [=](Item &) -> bool {
             std::shared_ptr<std::vector<ContactRecord>> searchResults =
                 DBServiceAPI::ContactSearch(application, text->getText(), text->getText(), text->getText());
@@ -45,9 +47,14 @@ namespace gui
             if (searchResults.get()->size() > 0) {
                 std::unique_ptr<PhonebookSearchReuqest> data =
                     std::make_unique<PhonebookSearchReuqest>(text->getText(), searchResults);
+                data->disableAppClose = true;
                 return sapm::ApplicationManager::messageSwitchApplication(
                     application, app::name_phonebook, name::window::search_results, std::move(data));
             }
+            return true;
+        };
+        text->focusChangedCallback = [=](Item &) -> bool {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
             return true;
         };
         body->addWidget(text);
@@ -66,8 +73,14 @@ namespace gui
             [=](const UTF8 &text) {},
             [=]() { textSelectSpecialCB(); }));
         message->setPenFocusWidth(style::window::default_border_focucs_w);
+        message->setPenWidth(style::window::messages::sms_border_no_focus);
         message->setFont(style::window::font::medium);
+        message->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         message->activatedCallback = [=](Item &) -> bool { return true; };
+        message->focusChangedCallback = [=](Item &) -> bool {
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
+            return true;
+        };
         body->addWidget(message);
 
         body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -84,9 +97,9 @@ namespace gui
 
     void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (dynamic_cast<PhonebookSearchReuqest *>(data)) {
-            LOG_INFO("SUCCESS!");
-            application->switchWindow(gui::name::window::thread_view, std::make_unique<SwitchData>(*data));
+        if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data)) {
+            LOG_INFO("received search results");
+            text->setText(pdata->result->getFormattedName());
         }
     }
 
