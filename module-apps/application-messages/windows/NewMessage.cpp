@@ -25,15 +25,18 @@ namespace gui
         uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
         auto body  = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
-        auto label = new Label(body, 0, 0, body->getWidth(), 40);
+        auto label = new Label(body, 0, 0, body->getWidth(), 42);
         label->setText(utils::localize.get("sms_add_rec_num"));
         label->activeItem = false;
         label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        label->setFont(style::window::font::small);
+        label->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        auto text = new gui::Text(nullptr, 0, 0, body->getWidth(), 40, "", gui::Text::ExpandMode::EXPAND_UP);
+        auto text = new gui::Text(nullptr, 0, 0, body->getWidth(), 43, "", gui::Text::ExpandMode::EXPAND_NONE);
         text->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        text->setInputMode(new InputMode({InputMode::digit, InputMode::ABC, InputMode::abc}));
+        text->setInputMode(new InputMode({InputMode::phone}));
         text->setPenFocusWidth(style::window::default_border_focucs_w);
+        text->setFont(style::window::font::medium);
         text->activatedCallback = [=](Item &) -> bool {
             std::shared_ptr<std::vector<ContactRecord>> searchResults =
                 DBServiceAPI::ContactSearch(application, text->getText(), text->getText(), text->getText());
@@ -47,9 +50,28 @@ namespace gui
             }
             return true;
         };
+        body->addWidget(text);
+
+        auto labelMessage = new Label(body, 0, 0, body->getWidth(), 44);
+        labelMessage->setText(utils::localize.get("app_messages_message"));
+        labelMessage->activeItem = false;
+        labelMessage->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        labelMessage->setFont(style::window::font::small);
+        labelMessage->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+
+        auto message = new gui::Text(nullptr, 0, 0, body->getWidth(), 43, "", gui::Text::ExpandMode::EXPAND_UP);
+        message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        message->setInputMode(new InputMode(
+            {InputMode::ABC, InputMode::abc, InputMode::digit},
+            [=](const UTF8 &text) {},
+            [=]() { textSelectSpecialCB(); }));
+        message->setPenFocusWidth(style::window::default_border_focucs_w);
+        message->setFont(style::window::font::medium);
+        message->activatedCallback = [=](Item &) -> bool { return true; };
+        body->addWidget(message);
 
         body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        body->addWidget(text);
+
         body->setVisible(true);
         body->setNavigation();
         setFocusItem(body);
