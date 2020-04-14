@@ -38,14 +38,14 @@ namespace gui
 
         struct Page
         {
-            virtual void setVisibile(bool visible) = 0;
+            virtual void setVisible(bool visible) = 0;
         };
 
         struct Page1 : public Page
         {
             gui::Label *labels[5] = {nullptr};
             gui::Text *text[5]    = {nullptr};
-            void setVisibile(bool visible)
+            void setVisible(bool visible)
             {
                 for (uint32_t i = 0; i < 5; i++) {
                     labels[i]->setVisible(visible);
@@ -71,7 +71,7 @@ namespace gui
 
             bool favSelected = false;
 
-            void setVisibile(bool visible)
+            void setVisible(bool visible) override
             {
                 speedValue->setVisible(visible);
                 speedDescription->setVisible(visible);
@@ -118,7 +118,7 @@ namespace gui
         bool verifyAndSave();
         void setContactData();
         void saveStateChanged();
-        void coppyDataToContact();
+        void copyDataToContact();
         const std::string getCountryPrefix();
     };
 
