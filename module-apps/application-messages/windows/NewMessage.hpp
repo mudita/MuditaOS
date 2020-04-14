@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AppWindow.hpp"
+#include <widgets/Text.hpp>
 #include <string>
 
 namespace gui
@@ -17,6 +18,8 @@ namespace gui
     class NewSMS_Window : public AppWindow
     {
       private:
+        gui::Text *text = nullptr;
+
       public:
         NewSMS_Window(app::Application *app);
         virtual ~NewSMS_Window() = default;
