@@ -15,6 +15,7 @@ namespace bsp
       public:
         int32_t Switch(const Mode mode) override final;
         int32_t PowerOff() override final;
+        int32_t Reboot() override final;
     };
 
 } // namespace bsp
