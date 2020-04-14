@@ -50,7 +50,7 @@ namespace sys
         }
 
         while (state == State::Shutdown) {
-            // check if we are discharging - if so -> shutdown (if not -> wait for TODO Discharging message not addded)
+            // check if we are discharging - if so -> shutdown
             if (Store::Battery::get().state == Store::Battery::State::Discharging) {
                 set(State::ShutdownReady);
             }
@@ -254,7 +254,6 @@ namespace sys
 
     void SystemManager::kill(std::shared_ptr<Service> const &toKill)
     {
-        // TODO timeout on deinit hanlder? anything? message it?
         auto ret = toKill->DeinitHandler();
         if (ret != sys::ReturnCodes::Success) {
             LOG_DEBUG("deinit handler: %s", c_str(ret));
