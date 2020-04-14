@@ -486,6 +486,8 @@ namespace gui
             }
         }
 
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
         return (false);
     }
 
