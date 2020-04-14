@@ -7,8 +7,8 @@
 #include <Style.hpp>
 #include <memory>
 
-#include <../source/version.hpp>
-
+#include <source/version.hpp>
+#include <module-services/service-cellular/api/CellularServiceAPI.hpp>
 namespace gui
 {
 
@@ -42,12 +42,18 @@ namespace gui
 
         setTitle("Info");
 
-        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 5 * style::window::label::default_h);
+        box = new gui::VBox(this, 0, title->offset_h(), style::window_width, 7 * style::window::label::default_h);
         box->setPenWidth(style::window::default_border_no_focus_w);
 
         add_box_label(box, "GIT revision: " + std::string(GIT_REV));
         add_box_label(box, "GIT tag:      " + std::string(GIT_TAG));
         add_box_label(box, "GIT branch:   " + std::string(GIT_BRANCH));
+        add_box_label(box, "Modem Firmware:");
+        std::string firmwareVersion;
+        CellularServiceAPI::GetFirmwareVersion(getApplication(), firmwareVersion);
+        add_box_label(box, firmwareVersion);
+        LOG_DEBUG("Modem Firmware: %s", firmwareVersion.c_str());
+        /// TODO: make sure entire string is displayed.
         box->resizeItems();
         // this->focusItem->setFocus(true);
     }

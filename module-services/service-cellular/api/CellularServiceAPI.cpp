@@ -11,6 +11,7 @@
 #include "Service/Bus.hpp"
 #include "../ServiceCellular.hpp"
 #include "utf8/UTF8.hpp"
+#include <memory>
 
 bool CellularServiceAPI::DialNumber(sys::Service *serv, const std::string &number)
 {
@@ -156,6 +157,22 @@ bool CellularServiceAPI::GetScanMode(sys::Service *serv)
 
     if (response != nullptr) {
         if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &response)
+{
+    std::shared_ptr<CellularRequestMessage> msg =
+        std::make_shared<CellularRequestMessage>(MessageType::CellularGetFirmwareVersion);
+    auto ret = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 1000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto celResponse = std::dynamic_pointer_cast<CellularResponseMessage>(ret.second);
+        if ((celResponse != nullptr) && (celResponse->retCode == true)) {
+            LOG_DEBUG("Modem Firmware: %s", celResponse->data.c_str());
+            response = celResponse->data;
             return true;
         }
     }

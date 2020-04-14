@@ -91,6 +91,8 @@ set(PROJECT_INCLUDES
 
         CACHE INTERNAL "")
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})

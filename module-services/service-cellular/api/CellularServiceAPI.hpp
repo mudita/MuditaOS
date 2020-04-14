@@ -53,6 +53,7 @@ namespace CellularServiceAPI
 
     bool SetScanMode(sys::Service *serv, std::string mode);
     bool GetScanMode(sys::Service *serv);
+    bool GetFirmwareVersion(sys::Service *serv, std::string &response);
 }; // namespace CellularServiceAPI
 
 #endif // PUREPHONE_CELLULARSERVICEAPI_HPP
