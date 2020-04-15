@@ -26,6 +26,7 @@
 #include "harness/events/FocusApp.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
 #include <service-evtmgr/Constants.hpp>
+#include <cassert>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
@@ -69,8 +70,8 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else if (msgl->messageType == MessageType::KBDKeyEvent && msgl->sender == this->GetName()) {
 
-        auto *msg = static_cast<sevm::KbdMessage *>(msgl);
-
+        auto *msg = dynamic_cast<sevm::KbdMessage *>(msgl);
+        assert(msg);
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 

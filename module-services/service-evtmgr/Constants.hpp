@@ -4,5 +4,5 @@
 
 namespace service::name
 {
-    inline std::string evt_manager = "EventManager";
+    inline const std::string evt_manager = "EventManager";
 };

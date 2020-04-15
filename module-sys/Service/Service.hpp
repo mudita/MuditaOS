@@ -41,7 +41,7 @@ namespace sys
         static uint32_t m_timers_unique_idx;
     };
 
-    /// proxy has one objective - be friend for Service, so that Message which is not a frient could access
+    /// proxy has one objective - be friend for Service, so that Message which is not a friend could access
     /// one and only one entrypoint to messages entrypoint (MessageEntry)
     /// MessageEntry calls overridable DataReceivedHandler for Service instance and all Calls that are 100% neccessary
     /// for service

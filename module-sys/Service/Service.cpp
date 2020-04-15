@@ -104,13 +104,14 @@ namespace sys
 
     bool Service::subscribe(Message *msg, MessageHandler handler)
     {
-        auto idx = type_index(typeid(*msg));
+        auto &type = typeid(*msg);
+        auto idx   = type_index(type);
         if (message_handlers.find(idx) == message_handlers.end()) {
-            LOG_DEBUG("Registering new message handler on %s", typeid(*msg).name());
+            LOG_DEBUG("Registering new message handler on %s", type.name());
             message_handlers[idx] = handler;
             return true;
         }
-        LOG_ERROR("Handler for: %s already registered!", typeid(*msg).name());
+        LOG_ERROR("Handler for: %s already registered!", type.name());
         return false;
     }
 
