@@ -277,7 +277,7 @@ void PhonebookDuplicateSpeedDial::setContactData()
     if (contact->speeddial.length() > 0)
         dialValue->setText(contact->speeddial);
     else
-        dialValue->setText("");
+        dialValue->clear();
 
     setTitle(contact.get()->numbers[0].numberUser);
 }

@@ -48,7 +48,7 @@ namespace gui
         title = new gui::Label(this, 0, 52, 480, 52);
         title->setFilled(false);
         title->setFont(font::title);
-        title->setText("");
+        title->clear();
         title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
