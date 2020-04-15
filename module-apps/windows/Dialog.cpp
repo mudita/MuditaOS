@@ -45,7 +45,6 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     bottomBar->setActive(BottomBar::Side::LEFT, false);
     bottomBar->setActive(BottomBar::Side::CENTER, true);
     bottomBar->setActive(BottomBar::Side::RIGHT, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
     bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
     setTitle(meta.title);
@@ -59,32 +58,6 @@ Dialog::Dialog(app::Application *app, const std::string &name, const Dialog::Met
     text->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     text->setFont(style::window::font::medium);
     text->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-
-    no = new Label(this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get("common_no"));
-    no->setPenWidth(0);
-    no->setPenFocusWidth(3);
-    no->setFilled(false);
-    no->setBorderColor(ColorFullBlack);
-    no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    no->setFont(style::window::font::big);
-    no->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
-    no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
-
-    yes =
-        new Label(this, style::yes::x, style::yes::y, style::yes::w, style::yes::h, utils::localize.get("common_yes"));
-    yes->setPenWidth(0);
-    yes->setPenFocusWidth(3);
-    yes->setFilled(false);
-    yes->setBorderColor(ColorFullBlack);
-    yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-    yes->setFont(style::window::font::big);
-    yes->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
-
-    no->setNavigationItem(NavigationDirection::RIGHT, yes);
-    yes->setNavigationItem(NavigationDirection::LEFT, no);
-    no->setNavigationItem(NavigationDirection::LEFT, yes);
-    yes->setNavigationItem(NavigationDirection::RIGHT, no);
-    setFocusItem(no);
 }
 
 bool Dialog::onInput(const InputEvent &inputEvent)
@@ -100,10 +73,47 @@ void Dialog::update(const Meta &meta)
     this->meta = meta;
     setTitle(meta.title);
     text->setText(meta.text);
-    yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+    if (meta.have_choice) {
+        setupChoice();
+    }
 }
 
 void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 {
+    setFocusItem(no);
+}
+
+void Dialog::setupChoice()
+{
+    erase(no);
+    no = new Label(this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get("common_no"));
+    no->setPenWidth(0);
+    no->setPenFocusWidth(3);
+    no->setFilled(false);
+    no->setBorderColor(ColorFullBlack);
+    no->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    no->setFont(style::window::font::big);
+    no->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
+
+    erase(yes);
+    yes =
+        new Label(this, style::yes::x, style::yes::y, style::yes::w, style::yes::h, utils::localize.get("common_yes"));
+    yes->setPenWidth(0);
+    yes->setPenFocusWidth(3);
+    yes->setFilled(false);
+    yes->setBorderColor(ColorFullBlack);
+    yes->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
+    yes->setFont(style::window::font::big);
+    yes->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    yes->activatedCallback = [=](Item &) -> bool { return meta.action(); };
+
+    no->setNavigationItem(NavigationDirection::RIGHT, yes);
+    yes->setNavigationItem(NavigationDirection::LEFT, no);
+    no->setNavigationItem(NavigationDirection::LEFT, yes);
+    yes->setNavigationItem(NavigationDirection::RIGHT, no);
+
+    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_confirm"));
+
     setFocusItem(no);
 }
