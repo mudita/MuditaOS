@@ -1,35 +1,29 @@
-#include <functional>
-#include <memory>
-
-#include "service-appmgr/ApplicationManager.hpp"
-
-#include "i18/i18.hpp"
-#include "time/time_conversion.hpp"
-
-#include "Label.hpp"
-#include "ListView.hpp"
-#include "Margins.hpp"
-
-#include "service-db/messages/DBMessage.hpp"
-
-#include <log/log.hpp>
-
 #include "ThreadViewWindow.hpp"
-#include <Style.hpp>
-
-#include "../widgets/ThreadModel.hpp"
 
 #include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
+#include "../widgets/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include <application-phonebook/data/PhonebookItemData.hpp>
-#include <gui/widgets/Text.hpp>
-#include <widgets/ListItem.hpp>
-#include <widgets/ListItemProvider.hpp>
-#include <widgets/ListView.hpp>
 
-#include "service-db/api/DBServiceAPI.hpp"
+#include <Text.hpp>
+#include <ListItem.hpp>
+#include <ListItemProvider.hpp>
+#include <ListView.hpp>
+#include <Label.hpp>
+#include <Margins.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBMessage.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <application-phonebook/data/PhonebookItemData.hpp>
+#include <i18/i18.hpp>
+#include <time/time_conversion.hpp>
+#include <log/log.hpp>
+#include <Style.hpp>
+
+#include <functional>
+#include <memory>
+#include <cassert>
 
 namespace style
 {}; // namespace style
@@ -96,15 +90,9 @@ namespace gui
                 LOG_DEBUG("No text to send in SMS");
                 return true;
             }
-            SMSRecord record;
-            record.number = title->getText();
-            record.body   = text->getText();
-            record.type   = SMSType::QUEUED;
-            auto time     = utils::time::Timestamp();
-            record.date   = time.getTime();
-            DBServiceAPI::SMSAdd(this->application, record);
-
-            return true;
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app != nullptr);
+            return app->sendSms(title->getText(), text->getText());
         };
     }
 
@@ -366,7 +354,7 @@ namespace gui
                 showMessages(Action::Start);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 // should be name number for now - easier to handle
-                setTitle(ret->front().number);
+                setTitle(ret->front().getFormattedName());
                 return;
             }
         }

@@ -13,6 +13,7 @@
 #include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <cassert>
+#include <time/time_conversion.hpp>
 
 namespace app
 {
@@ -161,6 +162,15 @@ namespace app
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
         return switchWindow(gui::name::window::thread_search_none, nullptr);
+    bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
+    {
+        SMSRecord record;
+        record.number = number;
+        record.body   = body;
+        record.type   = SMSType::QUEUED;
+        auto time     = utils::time::Timestamp();
+        record.date   = time.getTime();
+        return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
     }
 
 } /* namespace app */
