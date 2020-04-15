@@ -21,6 +21,7 @@
 
 #include <functional>
 #include <memory>
+#include <cassert>
 
 namespace gui
 {
@@ -162,6 +163,8 @@ namespace gui
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
     {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app);
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             return true;
@@ -172,12 +175,12 @@ namespace gui
                 case gui::KeyCode::KEY_LEFT:
                     application->switchWindow(gui::name::window::new_sms, nullptr);
                     return true;
-                case gui::KeyCode::KEY_LF: {
+                case gui::KeyCode::KEY_RIGHT: {
                     auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                    if (app == nullptr) {
-                        LOG_ERROR("Something went horribly wrong");
-                        return false;
-                    }
+                    app->searchEmpty();
+                    return true;
+                } break;
+                case gui::KeyCode::KEY_LF: {
                     if (app->windowOptions != nullptr && getFocusItem() == list) {
                         app->windowOptions->clearOptions();
                         auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());

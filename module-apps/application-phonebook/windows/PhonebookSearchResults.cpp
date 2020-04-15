@@ -44,7 +44,7 @@ namespace gui
 
         topBar->setActive(TopBar::Elements::TIME, true);
 
-        setTitle(utils::localize.get("app_phonebook_search_results_prefix"));
+        setTitle(utils::localize.get("common_results_prefix"));
     }
 
     void PhonebookSearchResults::destroyInterface()
@@ -119,7 +119,7 @@ namespace gui
             searchResultsModel->setResults(res);
             searchResultList->clear();
             searchResultList->setElementsCount(res.get()->size());
-            setTitle(utils::localize.get("app_phonebook_search_results_prefix") + "\"" + title + "\"");
+            setTitle(utils::localize.get("common_results_prefix") + "\"" + title + "\"");
         };
 
         auto searchResults = dynamic_cast<PhonebookSearchResultsData *>(data);

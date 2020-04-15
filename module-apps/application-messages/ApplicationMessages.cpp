@@ -11,6 +11,7 @@
 #include <i18/i18.hpp>
 #include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
+#include <cassert>
 
 namespace app
 {
@@ -108,6 +109,10 @@ namespace app
                                                 return true;
                                             },
                                         })});
+        windows.insert({gui::name::window::thread_search_none,
+                        new gui::Dialog(this,
+                                        gui::name::window::thread_search_none,
+                                        {.icon = "search_big", .have_choice = false})});
     }
 
     void ApplicationMessages::destroyUserInterface()
@@ -143,6 +148,17 @@ namespace app
                 return false;
             }
         }
+    }
+
+    bool ApplicationMessages::searchEmpty(const std::string &query)
+    {
+        auto dialog = dynamic_cast<gui::Dialog *>(windows[gui::name::window::thread_search_none]);
+        assert(dialog);
+        auto meta  = dialog->meta;
+        meta.text  = utils::localize.get("app_messages_thread_no_result");
+        meta.title = utils::localize.get("common_results_prefix") + query;
+        dialog->update(meta);
+        return switchWindow(gui::name::window::thread_search_none, nullptr);
     }
 
 } /* namespace app */
