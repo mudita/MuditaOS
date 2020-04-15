@@ -134,8 +134,9 @@ namespace gui
 
             auto thread = DBServiceAPI::ThreadGetByContact(application, contactId);
             if (thread) {
-                application->switchWindow(gui::name::window::thread_view,
-                                          std::make_unique<SMSThreadData>(std::move(thread)));
+                auto switchData                        = std::make_unique<SMSThreadData>(std::move(thread));
+                switchData->ignoreCurrentWindowOnStack = true;
+                application->switchWindow(gui::name::window::thread_view, std::move(switchData));
             }
             else {
                 LOG_FATAL("No thread and thread not created!");
