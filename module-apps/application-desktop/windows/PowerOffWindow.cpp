@@ -63,7 +63,7 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setText(utils::localize.get("app_desktop_poweroff_title"));
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignement(
+        titleLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         // label with question for powering down
@@ -71,7 +71,7 @@ namespace gui
         infoLabel->setFilled(false);
         infoLabel->setBorderColor(gui::ColorNoColor);
         infoLabel->setFont(style::window::font::medium);
-        infoLabel->setAlignement(
+        infoLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         infoLabel->setText(utils::localize.get("app_desktop_poweroff_question"));
 
@@ -87,7 +87,7 @@ namespace gui
             label->setRadius(5);
             label->setFont(style::window::font::medium);
             label->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
             selectionLabels.push_back(label);
             pinLabelX += 193;
@@ -107,7 +107,7 @@ namespace gui
         eventMgrLabel->setFont(style::window::font::bigbold);
         eventMgrLabel->setText("TURN PWR MGR OFF");
         eventMgrLabel->setEdges(RectangleEdgeFlags::GUI_RECT_ALL_EDGES);
-        eventMgrLabel->setAlignement(
+        eventMgrLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
         // define navigation between labels

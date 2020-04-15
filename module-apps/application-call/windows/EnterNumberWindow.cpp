@@ -66,7 +66,7 @@ namespace gui
         numberLabel->setPenWidth(numberLabel::borderW);
         numberLabel->setFont(style::window::font::largelight);
         numberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        numberLabel->setAlignement(
+        numberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         numberLabel->setDotsMode(true, false);
 

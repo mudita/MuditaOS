@@ -49,7 +49,7 @@ namespace gui
         title->setFilled(false);
         title->setFont(font::title);
         title->setText("");
-        title->setAlignement(
+        title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         title->setDotsMode(true);

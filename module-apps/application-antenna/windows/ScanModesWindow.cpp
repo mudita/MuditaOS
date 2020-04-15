@@ -134,7 +134,7 @@ namespace gui
         label->setPenWidth(antenna::scan_mode_window::commonNoFocusPen);
 
         label->setFont(style::window::font::verysmall);
-        label->setAlignement(
+        label->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
         return label;

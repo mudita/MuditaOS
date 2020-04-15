@@ -66,17 +66,17 @@ namespace gui
         label->setBorderColor(Color{15, 15});
         switch (side) {
         case Side::LEFT:
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
             label->setFont(style::footer::font::medium);
             break;
         case Side::CENTER:
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
             label->setFont(style::footer::font::bold);
             break;
         case Side::RIGHT:
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER));
             label->setFont(style::footer::font::medium);
             break;
