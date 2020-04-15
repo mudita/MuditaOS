@@ -41,9 +41,6 @@ namespace gui
     void NewSMS_Window::buildInterface()
     {
         AppWindow::buildInterface();
-        bottomBar->setActive(BottomBar::Side::LEFT, true);
-        bottomBar->setActive(BottomBar::Side::CENTER, true);
-        bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
@@ -68,6 +65,13 @@ namespace gui
         recipient->setFont(style::window::font::medium);
         recipient->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         recipient->activatedCallback = [=](Item &) -> bool {
+            if (recipient->getText().length() == 0) {
+                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                data->disableAppClose                        = true;
+                return sapm::ApplicationManager::messageSwitchApplication(
+                    application, app::name_phonebook, name::window::main_window, std::move(data));
+            }
+
             std::shared_ptr<std::vector<ContactRecord>> searchResults =
                 DBServiceAPI::ContactSearch(application, {}, {}, recipient->getText());
             LOG_INFO("Get contact from another app, contacts matching num: %d",
@@ -115,6 +119,7 @@ namespace gui
                 LOG_ERROR("sendSms failed");
                 return false;
             }
+
             uint32_t contactId;
             if (!contact || contact->numbers.size() == 0) {
                 // once the sms is send, there is assumption that contact exists
@@ -125,7 +130,6 @@ namespace gui
                 }
                 contact = std::make_shared<ContactRecord>(records->operator[](0));
             }
-
             contactId = contact->ID;
 
             auto thread = DBServiceAPI::ThreadGetByContact(application, contactId);
