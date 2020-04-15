@@ -52,7 +52,7 @@ namespace gui
         else {
             title->setText(utils::localize.get("app_phonebook_contact_title"));
         }
-        title->setAlignement(
+        title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         // page 1 labels and text
@@ -66,7 +66,7 @@ namespace gui
             if (i == 0)
                 page1.labels[i]->setFont(style::footer::font::bold);
 
-            page1.labels[i]->setAlignement(
+            page1.labels[i]->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
             page1.text[i] = new gui::Text(this, 30, 157 + 87 * i, 420, 42);
@@ -133,7 +133,7 @@ namespace gui
         page2.speedValue->setPenWidth(1);
         page2.speedValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         page2.speedValue->setFont(style::window::font::small);
-        page2.speedValue->setAlignement(
+        page2.speedValue->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.speedValue->focusChangedCallback = [=](gui::Item &item) { return true; };
@@ -154,7 +154,7 @@ namespace gui
         page2.speedDescription->setPenWidth(0);
         page2.speedDescription->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.speedDescription->setFont(style::window::font::small);
-        page2.speedDescription->setAlignement(
+        page2.speedDescription->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.imageSpeed = new gui::Image(this, 416, 122, 0, 0, "small_circle");
@@ -166,7 +166,7 @@ namespace gui
         page2.favValue->setPenWidth(1);
         page2.favValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         page2.favValue->setFont(style::window::font::small);
-        page2.favValue->setAlignement(
+        page2.favValue->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.favValue->focusChangedCallback = [=](gui::Item &item) {
@@ -206,7 +206,7 @@ namespace gui
         page2.favDescription->setPenWidth(0);
         page2.favDescription->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.favDescription->setFont(style::window::font::small);
-        page2.favDescription->setAlignement(
+        page2.favDescription->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.imageTick = new gui::Image(this, 43, 174, 0, 0, "small_tick");
@@ -222,7 +222,7 @@ namespace gui
         page2.addressLabel->setBorderColor(gui::ColorFullBlack);
         page2.addressLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.addressLabel->setFont(style::window::font::small);
-        page2.addressLabel->setAlignement(
+        page2.addressLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         page2.addressLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
 
@@ -231,7 +231,7 @@ namespace gui
         page2.noteLabel->setBorderColor(gui::ColorFullBlack);
         page2.noteLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.noteLabel->setFont(style::window::font::small);
-        page2.noteLabel->setAlignement(
+        page2.noteLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         page2.noteLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
 

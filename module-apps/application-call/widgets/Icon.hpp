@@ -53,7 +53,7 @@ namespace gui
             img   = new gui::Image(boundingRect, icon::img::x, icon::img::y, 0, 0);
             label = new gui::Label(this, icon::label::x, icon::label::y, icon::label::w + 2 * w_margin, icon::label::h);
             label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
             label->setFont(style::window::font::verysmall);
 

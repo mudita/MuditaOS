@@ -40,7 +40,7 @@ namespace gui
             new gui::Label(it, 0, it->area().h - style::design::tile_text_y, it->area().w, style::design::tile_text_y);
         desc->setPenWidth(style::window::default_border_no_focus_w);
         desc->setFont(style::window::font::verysmall);
-        desc->setAlignement(
+        desc->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         desc->setText(utils::localize.get(title));
 

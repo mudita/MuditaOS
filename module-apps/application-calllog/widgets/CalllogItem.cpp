@@ -54,7 +54,7 @@ namespace gui
         timestamp = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorate(timestamp);
         timestamp->setFont(style::window::font::big);
-        timestamp->setAlignement(
+        timestamp->setAlignment(
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER});
 
         auto newImg = [=](const UTF8 imageName) -> gui::Image * {
