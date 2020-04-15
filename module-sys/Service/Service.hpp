@@ -107,9 +107,9 @@ namespace sys
 
         std::vector<std::pair<uint64_t, uint32_t>> staleUniqueMsg;
 
-        /// subscribe: register message handler
-        bool subscribe(Message *msg, MessageHandler handler);
-        bool subscribe(Message &&msg, MessageHandler handler);
+        /// connect: register message handler
+        bool connect(Message *msg, MessageHandler handler);
+        bool connect(Message &&msg, MessageHandler handler);
 
       protected:
         bool enableRunLoop;
