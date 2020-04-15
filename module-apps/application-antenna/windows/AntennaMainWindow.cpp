@@ -96,7 +96,7 @@ namespace gui
         for (uint32_t i = 0; i < buttons.size(); i++) {
             buttons[i]->setFont(style::window::font::medium);
             buttons[i]->setPosition(posX, 500);
-            buttons[i]->setAlignement(
+            buttons[i]->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
             posX += 240;
         }
@@ -204,7 +204,7 @@ namespace gui
             label->setPenWidth(0);
         }
         label->setFont(style::window::font::verysmall);
-        label->setAlignement(
+        label->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
         label->setRadius(11);
         label->activatedCallback = activatedCallback;

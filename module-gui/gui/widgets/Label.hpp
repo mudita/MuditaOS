@@ -112,7 +112,7 @@ namespace gui
         virtual void setText(const UTF8 &text);
         virtual void clear();
         virtual UTF8 getText();
-        virtual void setAlignement(const Alignment &alignment);
+        virtual void setAlignment(const Alignment &alignment);
         virtual void setMargins(const Margins &margins);
         void setDotsMode(const bool val, const bool truncateEnd = true);
         /**

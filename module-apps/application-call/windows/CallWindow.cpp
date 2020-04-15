@@ -67,14 +67,14 @@ namespace gui
         durationLabel->setFilled(false);
         durationLabel->setBorderColor(gui::ColorNoColor);
         durationLabel->setFont(style::window::font::mediumlight);
-        durationLabel->setAlignement(
+        durationLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setFilled(false);
         numberLabel->setBorderColor(gui::ColorNoColor);
         numberLabel->setFont(style::window::font::largelight);
-        numberLabel->setAlignement(
+        numberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
 
         speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);

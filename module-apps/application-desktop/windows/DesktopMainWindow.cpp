@@ -61,14 +61,14 @@ namespace gui
         time->setBorderColor(gui::ColorNoColor);
         time->setFont(style::window::font::supersizemelight);
         time->setText(ttime);
-        time->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
+        time->setAlignment(Alignment::ALIGN_HORIZONTAL_CENTER);
 
         dayText = new gui::Label(this, 0, style::design_day_offset, style::window_width, style::design_day_h);
         dayText->setFilled(false);
         dayText->setBorderColor(gui::ColorNoColor);
         dayText->setFont(style::window::font::biglight);
         dayText->setText(ttime.day() + ", " + ttime.str("%d %b"));
-        dayText->setAlignement(Alignment::ALIGN_HORIZONTAL_CENTER);
+        dayText->setAlignment(Alignment::ALIGN_HORIZONTAL_CENTER);
 
         setVisibleState();
     }
@@ -287,7 +287,7 @@ namespace gui
         text->area(Item::Area::Max).size(Axis::X) = el->area().w; // set max area for text in axis to max
         text->setText(name);
         text->setFont(style::window::font::medium);
-        text->setAlignement(Alignment::ALIGN_VERTICAL_CENTER);
+        text->setAlignment(Alignment::ALIGN_VERTICAL_CENTER);
         text->setPenWidth(style::window::default_border_no_focus_w);
         text->activeItem = false;
 
@@ -296,7 +296,7 @@ namespace gui
         number->setFont(style::window::font::mediumbold);
         number->setPenWidth(style::window::default_border_no_focus_w);
         number->setSize(size_needed_for_2digits, el->area().h);
-        number->setAlignement(Alignment::ALIGN_VERTICAL_CENTER | Alignment::ALIGN_HORIZONTAL_RIGHT);
+        number->setAlignment(Alignment::ALIGN_VERTICAL_CENTER | Alignment::ALIGN_HORIZONTAL_RIGHT);
         number->activeItem = false;
         // 2. Add all elements to hbox layout
         new gui::Span(el, Axis::X, style::design_border_offset);

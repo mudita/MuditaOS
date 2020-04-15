@@ -101,7 +101,7 @@ namespace gui
         timeLabel->setBorderColor(gui::ColorNoColor);
         timeLabel->setFont(style::header::font::time);
         timeLabel->setText("00:00");
-        timeLabel->setAlignement(
+        timeLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     }
 
