@@ -57,11 +57,15 @@ namespace gui
         label->setFont(style::window::font::small);
         label->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        recipient = new gui::Text(nullptr, 0, 0, body->getWidth(), 43, "", gui::Text::ExpandMode::EXPAND_NONE);
-        recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), 43);
+        reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
+        reciepientHbox->setPenFocusWidth(style::window::default_border_focucs_w);
+        reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
+
+        recipient =
+            new gui::Text(reciepientHbox, 0, 0, body->getWidth() - 32, 43, "", gui::Text::ExpandMode::EXPAND_NONE);
+        recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipient->setInputMode(new InputMode({InputMode::phone}));
-        recipient->setPenFocusWidth(style::window::default_border_focucs_w);
-        recipient->setPenWidth(style::window::messages::sms_border_no_focus);
         recipient->setFont(style::window::font::medium);
         recipient->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         recipient->activatedCallback = [=](Item &) -> bool {
@@ -89,7 +93,8 @@ namespace gui
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
             return true;
         };
-        body->addWidget(recipient);
+        auto img = new gui::Image(nullptr, 0, 0, 0, 0, "phonebook_small");
+        reciepientHbox->addWidget(img);
 
         auto labelMessage = new Label(body, 0, 0, body->getWidth(), 44);
         labelMessage->setText(utils::localize.get("app_messages_message"));
