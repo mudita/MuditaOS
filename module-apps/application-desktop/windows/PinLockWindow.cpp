@@ -130,13 +130,13 @@ namespace gui
             charCount = 0;
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(true);
-                pinLabels[i]->setText("");
+                pinLabels[i]->clear();
             }
             // hide second info label
             infoLabels[0]->setVisible(true);
             infoLabels[1]->setVisible(false);
             infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
-            infoLabels[1]->setText("");
+            infoLabels[1]->clear();
 
             // show pin icon
             lockImage->setVisible(true);
@@ -145,7 +145,7 @@ namespace gui
         else if (state == State::WrongPinInfo) {
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(false);
-                pinLabels[i]->setText("");
+                pinLabels[i]->clear();
             }
             // hide second info label
             titleLabel->setVisible(true);
@@ -162,14 +162,14 @@ namespace gui
         else if (state == State::PhoneBlocked) {
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(false);
-                pinLabels[i]->setText("");
+                pinLabels[i]->clear();
             }
             // hide second info label
             titleLabel->setVisible(false);
             infoLabels[0]->setVisible(true);
             infoLabels[1]->setVisible(false);
             infoLabels[0]->setText(utils::localize.get("app_desktop_pin_blocked1"));
-            infoLabels[1]->setText("");
+            infoLabels[1]->clear();
 
             // show pin icon
             lockImage->setVisible(false);
@@ -203,7 +203,7 @@ namespace gui
                 }
                 else if (inputEvent.keyCode == KeyCode::KEY_PND) {
                     if (charCount > 0) {
-                        pinLabels[charCount - 1]->setText("");
+                        pinLabels[charCount - 1]->clear();
                         charCount--;
                         bottomBar->setActive(BottomBar::Side::CENTER, false);
                         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);

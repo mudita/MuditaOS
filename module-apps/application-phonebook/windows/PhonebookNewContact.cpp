@@ -140,7 +140,7 @@ namespace gui
 
         page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
             if (inputEvent.keyCode == KeyCode::KEY_PND) {
-                page2.speedValue->setText("");
+                page2.speedValue->clear();
                 return true;
             }
             int val = gui::toNumeric(inputEvent.keyCode);
@@ -412,7 +412,7 @@ namespace gui
             if (contact->speeddial.length() > 0)
                 page2.speedValue->setText(contact->speeddial);
             else
-                page2.speedValue->setText("");
+                page2.speedValue->clear();
 
             saveStateChanged();
         }
