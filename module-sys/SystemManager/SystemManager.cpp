@@ -265,7 +265,7 @@ namespace sys
     {
         isReady = true;
 
-        subscribe(SystemManagerCmd(), [&](DataMessage *msg, ResponseMessage *resp) {
+        connect(SystemManagerCmd(), [&](DataMessage *msg, ResponseMessage *resp) {
             if (msg->channel == BusChannels::SystemManagerRequests) {
                 auto *data = static_cast<SystemManagerCmd *>(msg);
 
@@ -283,7 +283,7 @@ namespace sys
             return Message_t();
         });
 
-        subscribe(sevm::KbdMessage(), [&](DataMessage *msg, ResponseMessage *resp) {
+        connect(sevm::KbdMessage(), [&](DataMessage *msg, ResponseMessage *resp) {
             // we are in shutdown mode - we received that there was red key pressed -> we need to reboot
             if (state == State::Shutdown) {
                 set(State::Reboot);
@@ -291,7 +291,7 @@ namespace sys
             return Message_t();
         });
 
-        subscribe(sevm::BatteryPlugMessage(), [&](DataMessage *msg, ResponseMessage *resp) {
+        connect(sevm::BatteryPlugMessage(), [&](DataMessage *msg, ResponseMessage *resp) {
             if (state == State::Shutdown) {
                 set(State::ShutdownReady);
             }

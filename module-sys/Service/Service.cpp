@@ -102,7 +102,7 @@ namespace sys
         return ret;
     }
 
-    bool Service::subscribe(Message *msg, MessageHandler handler)
+    bool Service::connect(Message *msg, MessageHandler handler)
     {
         auto &type = typeid(*msg);
         auto idx   = type_index(type);
@@ -115,9 +115,9 @@ namespace sys
         return false;
     }
 
-    bool Service::subscribe(Message &&msg, MessageHandler handler)
+    bool Service::connect(Message &&msg, MessageHandler handler)
     {
-        return Service::subscribe(&msg, handler);
+        return Service::connect(&msg, handler);
     }
 
     // Create service timer
