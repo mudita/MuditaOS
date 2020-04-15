@@ -47,7 +47,7 @@ namespace gui
         title->setMargins(Margins(0, 0, 0, 18));
         title->setFont(style::window::font::small);
         title->setText(utils::localize.get("app_phonebook_contact_title"));
-        title->setAlignement(
+        title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         // page 1 labels and text
