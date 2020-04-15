@@ -229,7 +229,7 @@ namespace gui
         }
 
         // if rounding of corners is 0
-        if (cmd->radius == 0) {
+        if (wgtR == 0) {
             // fill field inside the rectangle if fill flag is set
             if (cmd->filled) {
                 uint32_t offset = wgtY * drawCtx->getW() + wgtX;
@@ -274,21 +274,21 @@ namespace gui
         else {
 
             // calculate centers of circle for all corners
-            int16_t xcTopRight    = wgtX + wgtW - cmd->radius;
-            int16_t xcTopLeft     = wgtX + cmd->radius;
+            int16_t xcTopRight    = wgtX + wgtW - wgtR;
+            int16_t xcTopLeft     = wgtX + wgtR;
             int16_t xcBottomRight = xcTopRight;
             int16_t xcBottomLeft  = xcTopLeft;
 
-            int16_t ycTopRight    = wgtY + cmd->radius;
+            int16_t ycTopRight    = wgtY + wgtR;
             int16_t ycTopLeft     = ycTopRight;
-            int16_t ycBottomRight = wgtY + cmd->h - cmd->radius;
+            int16_t ycBottomRight = wgtY + cmd->h - wgtR;
             int16_t ycBottomLeft  = ycBottomRight;
 
-            int x = cmd->radius, y = 0;
+            int x = wgtR, y = 0;
 
             // Calculate coordinates of the points on the circle's quarter.
-            int16_t *Px = (int16_t *)malloc(2 * cmd->radius * sizeof(int16_t));
-            int16_t *Py = (int16_t *)malloc(2 * cmd->radius * sizeof(int16_t));
+            int16_t *Px = (int16_t *)malloc(2 * wgtR * sizeof(int16_t));
+            int16_t *Py = (int16_t *)malloc(2 * wgtR * sizeof(int16_t));
 
             // if any of the vector failed to be created exit the function
             if ((Px == NULL) || (Py == NULL)) {
@@ -298,8 +298,8 @@ namespace gui
                     free(Px);
                 return;
             }
-            memset(Px, 0, 2 * cmd->radius * sizeof(int16_t));
-            memset(Py, 0, 2 * cmd->radius * sizeof(int16_t));
+            memset(Px, 0, 2 * wgtR * sizeof(int16_t));
+            memset(Py, 0, 2 * wgtR * sizeof(int16_t));
             int32_t index = 0;
             // index where middle point of quarter of arc is located. This means that Y starts to grow faster than X
             int32_t middleIndex = 0;
@@ -310,9 +310,9 @@ namespace gui
             ++index;
             pointCount++;
 
-            int P = 1 - cmd->radius;
+            int P = 1 - wgtR;
 
-            while (y < cmd->radius) // just a failsafe
+            while (y < wgtR) // just a failsafe
             {
                 y++;
 
@@ -368,115 +368,179 @@ namespace gui
             // Third part takes into consideration if bottom corners exists, are they rounded or are they sharp.
 
             if (cmd->filled) {
-
-                // create array with offset how X position changes across Y axis
-                int16_t offsetX[2 * wgtR] = {0};
-                uint32_t offsetXIndex     = 0;
-
-                int32_t lastY = 0x0FFFFFFF;
-                for (int32_t i = 0; i < int32_t(pointCount); ++i) {
-                    if (lastY != Py[i]) {
-                        lastY                 = Py[i];
-                        offsetX[offsetXIndex] = Px[i];
-                        ++offsetXIndex;
-                    }
-                }
-
-                // Part 1
-                int16_t startX[2 * wgtR] = {0};
-                int16_t endX[2 * wgtR]   = {0};
-                if (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT) {
-                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT) {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            startX[i] = 0;
-                    }
-                    // @TODO: filled yaps, here and other corners
-                    else {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            startX[i] = wgtR - offsetX[i];
-                    }
-                }
-                // if there is no corner set whole vector of points to the value of the radius
-                else {
-                    for (int32_t i = 0; i < pointCount; ++i)
-                        startX[i] = wgtR;
-                }
+                // corners
                 if (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_RIGHT) {
-                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT) {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            endX[i] = wgtW;
+                    // if corner then evaluate: sharp corner (aka flat), sms (aka yap), else: round.
+                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT) {}
+                    else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_RIGHT) {
                     }
                     else {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            endX[i] = wgtW - wgtR + offsetX[i];
+                        // draw arc from 0 index up to mid point using horizontal line
+                        index = 0;
+                        // X is growing faster
+                        for (index = 1; index < middleIndex; ++index) {
+                            // then draw the outline
+                            // fill the quarter first
+                            drawHorizontalLine(drawCtx,
+                                               xcTopRight,
+                                               ycTopRight - Py[index],
+                                               Px[index],
+                                               1,
+                                               cmd->fillColor,
+                                               gui::LineExpansionDirection::LINE_EXPAND_DOWN);
+                            ;
+                        }
+                        // Y is growing faster
+                        for (index = middleIndex; index < pointCount - 1; ++index) {
+                            drawVerticalLine(drawCtx,
+                                             xcTopRight + Px[index],
+                                             ycTopRight - Py[index] + cmd->penWidth,
+                                             Py[index] - cmd->penWidth,
+                                             1,
+                                             cmd->fillColor,
+                                             gui::LineExpansionDirection::LINE_EXPAND_LEFT);
+                        }
                     }
-                }
-                // if there is no corner set whole vector of points to the value of the radius
-                else {
-                    for (int32_t i = 0; i < pointCount; ++i)
-                        endX[i] = wgtW - wgtR;
-                }
-                for (int32_t i = 0; i < wgtR; ++i)
-                    drawHorizontalLine(drawCtx,
-                                       wgtX + startX[i],
-                                       wgtY + wgtR - i,
-                                       endX[i] - startX[i],
-                                       1,
-                                       cmd->fillColor,
-                                       LineExpansionDirection::LINE_EXPAND_DOWN);
-                // Part 2
-                int16_t xs, ys;
-                xs = 0;
-                ys = cmd->radius;
-                drawHorizontalLine(drawCtx,
-                                   wgtX + xs,
-                                   wgtY + ys,
-                                   wgtW,
-                                   wgtH - 2 * cmd->radius,
-                                   cmd->fillColor,
-                                   LineExpansionDirection::LINE_EXPAND_DOWN);
-
-                // Part 3
-                memset(startX, 0, 2 * wgtR * sizeof(int16_t));
-                memset(endX, 0, 2 * wgtR * sizeof(int16_t));
-                if (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT) {
-                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT) {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            startX[i] = 0;
-                    }
-                    else {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            startX[i] = wgtR - offsetX[i];
-                    }
-                }
-                // if there is no corner set whole vector of points to the value of the radius
-                else {
-                    for (int32_t i = 0; i < pointCount; ++i)
-                        startX[i] = wgtR;
                 }
                 if (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_RIGHT) {
-                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT) {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            endX[i] = wgtW;
+                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT) {}
+                    else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_RIGHT) {
                     }
                     else {
-                        for (int32_t i = 0; i < pointCount; ++i)
-                            endX[i] = wgtW - wgtR + offsetX[i];
+                        // draw arc from 0 index up to mid point using horizontal line
+                        index = 0;
+                        // X is growing faster
+                        for (index = 1; index < middleIndex; ++index) {
+                            // fill the quarter first
+                            drawHorizontalLine(drawCtx,
+                                               xcBottomRight,
+                                               ycBottomRight + Py[index],
+                                               Px[index] - cmd->penWidth,
+                                               1,
+                                               cmd->fillColor,
+                                               gui::LineExpansionDirection::LINE_EXPAND_UP);
+                        }
+                        // Y is growing faster
+                        for (index = middleIndex; index < pointCount - 1; ++index) {
+                            drawVerticalLine(drawCtx,
+                                             xcBottomRight + Px[index],
+                                             ycBottomRight /*+ 1*/,
+                                             Py[index],
+                                             1,
+                                             cmd->fillColor,
+                                             gui::LineExpansionDirection::LINE_EXPAND_LEFT);
+                        }
                     }
                 }
-                // if there is no corner set whole vector of points to the value of the radius
-                else {
-                    for (int32_t i = 0; i < pointCount; ++i)
-                        endX[i] = wgtW - wgtR;
+                if (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_TOP_LEFT) {
+                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT) {}
+                    else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_TOP_LEFT) {
+                    }
+                    else {
+                        // draw arc from 0 index up to mid point using horizontal line
+                        index = 0;
+                        // X is growing faster
+                        for (index = 1; index < middleIndex; ++index) {
+                            // fill the quarter first
+                            drawHorizontalLine(drawCtx,
+                                               xcTopLeft - Px[index] + cmd->penWidth,
+                                               ycTopLeft - Py[index],
+                                               Px[index] - cmd->penWidth,
+                                               1,
+                                               cmd->fillColor,
+                                               gui::LineExpansionDirection::LINE_EXPAND_DOWN);
+                        }
+                        // Y is growing faster
+                        for (index = middleIndex; index < pointCount - 1; ++index) {
+                            drawVerticalLine(drawCtx,
+                                             xcTopLeft - Px[index] /*+ 1*/,
+                                             ycTopLeft - Py[index] + cmd->penWidth,
+                                             Py[index] - cmd->penWidth,
+                                             1,
+                                             cmd->fillColor,
+                                             gui::LineExpansionDirection::LINE_EXPAND_RIGHT);
+                        }
+                    }
                 }
-                for (int32_t i = 0; i < wgtR; ++i)
+                if (cmd->corners & RectangleCornerFlags::GUI_RECT_CORNER_BOTTOM_LEFT) {
+                    if (cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT) {}
+                    else if (cmd->yaps & RectangleYapFlags::GUI_RECT_YAP_BOTTOM_LEFT) {
+                    }
+                    else {
+                        // draw arc from 0 index up to mid point using horizontal line
+                        index = 0;
+                        // X is growing faster
+                        for (index = 1; index < middleIndex; ++index) {
+                            // fill the quarter first
+                            drawHorizontalLine(drawCtx,
+                                               xcBottomLeft - Px[index] + cmd->penWidth,
+                                               ycBottomLeft + Py[index],
+                                               Px[index] - cmd->penWidth,
+                                               1,
+                                               cmd->fillColor,
+                                               gui::LineExpansionDirection::LINE_EXPAND_UP);
+                        }
+
+                        ;
+                        // Y is growing faster
+                        for (index = middleIndex; index < pointCount - 1; ++index) {
+                            drawVerticalLine(drawCtx,
+                                             xcBottomLeft - Px[index],
+                                             ycBottomLeft,
+                                             Py[index] - cmd->penWidth,
+                                             1,
+                                             cmd->fillColor,
+                                             gui::LineExpansionDirection::LINE_EXPAND_RIGHT);
+                        }
+                    }
+                }
+
+                // edges
+                if (cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_TOP) {
                     drawHorizontalLine(drawCtx,
-                                       wgtX + startX[i],
-                                       wgtY + wgtH - wgtR + i,
-                                       endX[i] - startX[i],
-                                       1,
+                                       wgtX + wgtR,
+                                       wgtY,
+                                       wgtW - 2 * wgtR,
+                                       wgtR,
                                        cmd->fillColor,
                                        LineExpansionDirection::LINE_EXPAND_DOWN);
+                }
+                if (cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM) {
+                    drawHorizontalLine(drawCtx,
+                                       wgtX + wgtR,
+                                       wgtY + wgtH - wgtR,
+                                       wgtW - 2 * wgtR,
+                                       wgtR,
+                                       cmd->fillColor,
+                                       LineExpansionDirection::LINE_EXPAND_DOWN);
+                }
+                if (cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_LEFT) {
+                    drawHorizontalLine(drawCtx,
+                                       wgtX,
+                                       wgtY + wgtR,
+                                       wgtR,
+                                       wgtH - 2 * wgtR,
+                                       cmd->fillColor,
+                                       LineExpansionDirection::LINE_EXPAND_DOWN);
+                }
+                if (cmd->edges & RectangleEdgeFlags::GUI_RECT_EDGE_RIGHT) {
+                    drawHorizontalLine(drawCtx,
+                                       wgtX + wgtW - wgtR,
+                                       wgtY + wgtR,
+                                       wgtR,
+                                       wgtH - 2 * wgtR,
+                                       cmd->fillColor,
+                                       LineExpansionDirection::LINE_EXPAND_DOWN);
+                }
+
+                // center
+                drawHorizontalLine(drawCtx,
+                                   wgtX + wgtR,
+                                   wgtY + wgtR,
+                                   wgtW - 2 * wgtR,
+                                   wgtH - 2 * wgtR,
+                                   cmd->fillColor,
+                                   LineExpansionDirection::LINE_EXPAND_DOWN);
             }
 
             // Here rounded border is painted
@@ -492,6 +556,7 @@ namespace gui
                     index = 0;
                     // X is growing faster
                     for (index = 0; index < middleIndex; ++index) {
+                        // then draw the outline
                         drawHorizontalLine(drawCtx,
                                            xcTopRight + Px[index] - cmd->penWidth,
                                            ycTopRight - Py[index],
@@ -509,6 +574,8 @@ namespace gui
                                          1,
                                          cmd->borderColor,
                                          gui::LineExpansionDirection::LINE_EXPAND_LEFT);
+
+                        ;
                     }
                 }
             }
@@ -585,6 +652,7 @@ namespace gui
                     index = 0;
                     // X is growing faster
                     for (index = 0; index < middleIndex; ++index) {
+
                         drawHorizontalLine(drawCtx,
                                            xcBottomLeft - Px[index],
                                            ycBottomLeft + Py[index],
@@ -595,6 +663,7 @@ namespace gui
                     }
                     // Y is growing faster
                     for (index = middleIndex; index < pointCount; ++index) {
+
                         drawVerticalLine(drawCtx,
                                          xcBottomLeft - Px[index],
                                          ycBottomLeft + Py[index] - cmd->penWidth,
@@ -619,7 +688,7 @@ namespace gui
                     xs += cmd->penWidth;
                 }
                 else {
-                    xs = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
+                    xs = wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
                 }
                 // right "corner" now
                 le -= xs;
@@ -627,7 +696,7 @@ namespace gui
                     le += (cmd->yapSize - cmd->penWidth);
                 }
                 else {
-                    le -= cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
+                    le -= wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
                 }
                 ys = 0;
                 drawHorizontalLine(drawCtx,
@@ -646,7 +715,7 @@ namespace gui
                     xs += cmd->penWidth;
                 }
                 else {
-                    xs = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+                    xs = wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
                 }
                 // right "corner" now
                 le -= xs;
@@ -654,7 +723,7 @@ namespace gui
                     le += (cmd->yapSize - cmd->penWidth);
                 }
                 else {
-                    le -= cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+                    le -= wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
                 }
                 ys = wgtH; // beware. doesn't -1 break rounded corners ?
                 drawHorizontalLine(drawCtx,
@@ -682,7 +751,7 @@ namespace gui
                                   Line45degEnd::BOTTOM_TIP);
                 }
                 else {
-                    ys = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
+                    ys = wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_LEFT));
                 }
                 // bottom "corner" now
                 le = wgtH - ys;
@@ -700,7 +769,7 @@ namespace gui
                                   Line45degEnd::TOP_TIP);
                 }
                 else {
-                    le -= cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
+                    le -= wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_LEFT));
                 }
                 drawVerticalLine(drawCtx,
                                  wgtX + xs,
@@ -726,7 +795,7 @@ namespace gui
                                   Line45degEnd::BOTTOM_TIP);
                 }
                 else {
-                    ys = cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
+                    ys = wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_TOP_RIGHT));
                 }
                 // bottom "corner" now
                 le = wgtH - ys;
@@ -744,7 +813,7 @@ namespace gui
                                   Line45degEnd::TOP_TIP);
                 }
                 else {
-                    le -= cmd->radius * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
+                    le -= wgtR * (!(cmd->flatEdges & RectangleFlatFlags::GUI_RECT_FLAT_BOTTOM_RIGHT));
                 }
                 drawVerticalLine(drawCtx,
                                  wgtX + xs,
