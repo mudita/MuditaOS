@@ -278,7 +278,6 @@ class TS0710
 
     DLC_channel::Callback_t controlCallback = nullptr;
     std::queue<uint8_t> RXFifo;
-
   public:
     enum class ConfState
     {
@@ -329,7 +328,7 @@ class TS0710
     {
         return static_cast<DLCI_t>(channels.size() == 0 ? 0 : channels.size() - 1);
     }
-
+    ConfState BaudDetectProcedure();
     ConfState PowerUpProcedure();
     ConfState ConfProcedure();
     ConfState AudioConfProcedure();
@@ -430,6 +429,10 @@ class TS0710
     // Add error handling - only for Advanced mode. Leave for now
     // Add callback for received frame (after error handling)
     // Add frame routing to different channels
+
+    bool IsModemActive(void);
+    void TurnOnModem(void);
+    void ResetModem(void);
 };
 
 #endif //_TS0710_H
