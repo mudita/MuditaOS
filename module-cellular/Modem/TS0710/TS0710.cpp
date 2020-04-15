@@ -83,36 +83,34 @@ TS0710::~TS0710()
     }
     delete parser;
 }
-
-TS0710::ConfState TS0710::PowerUpProcedure()
+TS0710::ConfState TS0710::BaudDetectProcedure()
 {
-    bool result = false;
-    int step    = 1;
+    enum class BaudTestStep
+    {
+        baud460800_NoCmux,
+        baud460800_Cmux,
+        baud115200_NoCmux,
+        baud115200_Cmux
+    };
+
+    BaudTestStep step = BaudTestStep::baud460800_NoCmux;
     at::Result ret;
+    bool result = false;
+
     while (!result) {
         switch (step) {
-        case 1:
-            // 1. Send AT - check for answer
-            // 2. OK ? -> ret success
-            LOG_DEBUG("1. Sending AT...");
-            if (parser->cmd(at::AT::AT))
-                result = true;
-            step++;
-            break;
-        case 2:
-            // 3. set baudrate 460800 baud
-            // 4. Send AT - check for answer
-            // 5. OK ? -> ret success
-            LOG_DEBUG("2. Setting baudrate to %i...", ATPortSpeeds_text[startParams.PortSpeed]);
+        case BaudTestStep::baud460800_NoCmux:
+            LOG_DEBUG("Setting baudrate to 460800.");
             pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
-            LOG_DEBUG("Sending AT...");
-            if (parser->cmd(at::AT::AT))
+            if (parser->cmd(at::AT::AT)) {
                 result = true;
-            step++;
+                LOG_DEBUG("Baud found: 460800 no CMUX.");
+                return ConfState::Success;
+            }
+            step = BaudTestStep::baud460800_Cmux;
             break;
-        case 3: {
-            // 6. Close CMUX -> Send AT
-            LOG_INFO("3. Closing mux mode");
+        case BaudTestStep::baud460800_Cmux: {
+            LOG_INFO("Closing mux mode, baud 460800.");
             TS0710_Frame::frame_t frame;
             frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
             frame.Control = TypeOfFrame_e::UIH;
@@ -125,28 +123,28 @@ TS0710::ConfState TS0710::PowerUpProcedure()
             pv_cellular->InformModemHostWakeup();
             // GSM module needs some time to close multiplexer
             vTaskDelay(1000);
-            LOG_DEBUG("Sending AT...");
             if (parser->cmd(at::AT::AT)) {
                 result = true;
+                LOG_DEBUG("Baud found: 460800 CMUX.");
+                return ConfState::Success;
             }
-            step++;
-        } break;
-        case 4:
-            // 7. set baudrate 115200 baud
-            // 8. Send AT
-            LOG_DEBUG("4. Setting baudrate to 115200...");
+            step = BaudTestStep::baud115200_NoCmux;
+            break;
+        }
+        case BaudTestStep::baud115200_NoCmux:
+            LOG_DEBUG("Setting baudrate to 115200.");
 #if USE_DAEFAULT_BAUDRATE
             pv_cellular->SetSpeed(115200);
 #endif
-            LOG_DEBUG("Sending AT...");
             if (parser->cmd(at::AT::AT)) {
                 result = true;
+                LOG_DEBUG("Baud found: 115200 no CMUX.");
+                return ConfState::Success;
             }
-            step++;
+            step = BaudTestStep::baud115200_Cmux;
             break;
-        case 5: {
-            // 9. Close CMUX -> Send AT
-            LOG_INFO("5. Closing mux mode");
+        case BaudTestStep::baud115200_Cmux: {
+            LOG_INFO("Closing mux mode, baud 115200.");
             TS0710_Frame::frame_t frame;
             frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
             frame.Control = TypeOfFrame_e::UIH;
@@ -159,29 +157,48 @@ TS0710::ConfState TS0710::PowerUpProcedure()
             pv_cellular->InformModemHostWakeup();
             // GSM module needs some time to close multiplexer
             vTaskDelay(1000);
-            LOG_DEBUG("Sending AT...");
-            if (parser->cmd(at::AT::AT))
+            if (parser->cmd(at::AT::AT)) {
                 result = true;
-        }
-            step++;
-            break;
-        case 6:
-            // 10. power UP
-            LOG_INFO("6. Starting power up procedure...");
-            pv_cellular->PowerUp();
-            return ConfState::PowerUp;
-            break;
+                LOG_DEBUG("Baud found: 115200 CMUX.");
+                return ConfState::Success;
+            }
+            else {
+                LOG_DEBUG("No Baud found.");
+                return ConfState::Failure;
+            }
+        } break;
         }
     }
-    return ConfState ::Success;
+    return ConfState::Failure;
+}
+TS0710::ConfState TS0710::PowerUpProcedure()
+{
+    // disable urc
+    pv_cellular->InformModemHostAsleep();
+    auto ret = BaudDetectProcedure();
+    // enable urc
+    pv_cellular->InformModemHostWakeup();
+
+    if (ret != ConfState::Success) {
+        LOG_INFO("6. Starting power up procedure...");
+        pv_cellular->PowerUp();
+        return ConfState::PowerUp;
+    }
+    return ConfState::Success;
 }
 
 // TODO:M.P Fetch configuration from JSON/XML file
 TS0710::ConfState TS0710::ConfProcedure()
 {
+    pv_cellular->InformModemHostAsleep();
     LOG_DEBUG("Configuring modem...");
-    parser->cmd(at::AT::FACTORY_RESET);
-    parser->cmd(at::AT::ECHO_OFF);
+    if (!parser->cmd(at::AT::FACTORY_RESET)) {
+        return ConfState::Failure;
+    }
+    if (!parser->cmd(at::AT::ECHO_OFF)) {
+        return ConfState::Failure;
+    }
+
     LOG_INFO("GSM modem info:");
     auto ret = parser->cmd(at::AT::SW_INFO);
     if (ret) {
@@ -190,24 +207,37 @@ TS0710::ConfState TS0710::ConfProcedure()
             LOG_INFO("%s", ret.response[i].c_str());
         }
     }
+
+    at::AT flowCmd;
     if (hardwareControlFlowEnable) {
-        parser->cmd(at::AT::FLOW_CTRL_ON);
+        flowCmd = (at::AT::FLOW_CTRL_ON);
     }
     else {
-        parser->cmd(at::AT::FLOW_CTRL_OFF);
+        flowCmd = (at::AT::FLOW_CTRL_OFF);
+    }
+    if (!parser->cmd(flowCmd)) {
+        return ConfState::Failure;
     }
 
-    parser->cmd(at::AT::URC_NOTIF_CHANNEL);
-    parser->cmd(at::AT::RI_PIN_OFF_CALL);
-    parser->cmd(at::AT::RI_PIN_OFF_SMS);
-    parser->cmd(at::AT::URC_UART1);
-    parser->cmd(at::AT::AT_PIN_READY_LOGIC);
-    parser->cmd(at::AT::URC_NOTIF_SIGNAL);
+    auto commands = at::getCommadsSet(at::commadsSet::modemInit);
+
+    for (auto command : commands) {
+        if (!parser->cmd(command)) {
+            return ConfState::Failure;
+        }
+    }
+
     LOG_WARN("TODO: determine while this retry loop is necessary");
+    auto tries          = 0;
+    auto const maxTries = 40;
     while (!parser->cmd(at::AT::QSCLK_ON)) {
         auto const sec = 1000;
         vTaskDelay(pdMS_TO_TICKS(
             sec)); // if error then limit polling - 1 poll per sec modem normaly takes ~ 20 sec to start anyway
+        if (tries > maxTries) {
+            return ConfState ::Failure;
+        }
+        tries++;
     }
 
     return ConfState ::Success;
@@ -334,7 +364,7 @@ TS0710::ConfState TS0710::StartMultiplexer()
     OpenChannel(Channel::Data);
 
     mode = Mode::CMUX;
-
+    pv_cellular->InformModemHostWakeup();
     DLC_channel *c = get(Channel::Commands);
     if (c != nullptr) {
         // Route URCs to second (Notifications) MUX channel
@@ -465,4 +495,26 @@ void TS0710::SelectAntenna(uint8_t antenna)
 uint8_t TS0710::GetAntenna()
 {
     return pv_cellular->GetAntenna();
+}
+
+bool TS0710::IsModemActive(void)
+{
+    auto status = bsp::cellular::status::getStatus();
+
+    if (status == bsp::cellular::status::value::ACTIVE) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+void TS0710::TurnOnModem(void)
+{
+    return pv_cellular->PowerUp();
+}
+
+void TS0710::ResetModem(void)
+{
+    return pv_cellular->Restart();
 }

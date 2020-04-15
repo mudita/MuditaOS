@@ -9,9 +9,12 @@ namespace cellular
       public:
         enum class ST
         {
-            Idle,             /// does nothing
-            PowerUpProcedure, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state
-                              /// bases on URC without much thinking
+            Idle,              /// does nothing
+            StatusCheck,       /// set on service start - cheek for modem status - skipped on T3 board
+            PowerUpInProgress, /// waiting for modem powered up - skipped on T3 board
+
+            PowerUpProcedure, /// set on service start - hot/cold start to CMUX (cold start && cmux reset - next state -
+                              /// skipped on T4 board bases on URC without much thinking
             CellularConfProcedure,       /// configuration procedure
             AudioConfigurationProcedure, /// audio configuration for modem (could be in ModemConfiguration)
             SanityCheck,                 /// prior to ModemOn last sanity checks for one time configurations etc

@@ -18,17 +18,17 @@ const std::string Chanel::NO_ANSWER  = "NO ANSWER";
 
 Result::Code Chanel::at_check(const std::vector<std::string> &arr)
 {
-    Result::Code code = Result::Code::NONE;
     if (arr.size()) {
-        auto &el = arr.back();
-        if (el.compare(0, OK.length(), OK) == 0) {
-            code = Result::Code::OK;
-        }
-        else if (el.compare(0, ERROR.length(), ERROR) == 0) {
-            code = Result::Code::ERROR;
+        for (auto el : arr) {
+            if (el.compare(0, OK.length(), OK) == 0) {
+                return Result::Code::OK;
+            }
+            else if (el.compare(0, ERROR.length(), ERROR) == 0) {
+                return Result::Code::ERROR;
+            }
         }
     }
-    return code;
+    return Result::Code::NONE;
 }
 
 void Chanel::cmd_log(std::string cmd, const Result &result, uint32_t timeout)
