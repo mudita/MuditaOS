@@ -16,10 +16,12 @@ namespace gui
       public:
         struct Meta
         {
-            std::string title;
+            std::string title = "";
             UTF8 icon;
-            UTF8 text;
-            std::function<bool()> action;
+            UTF8 text                    = "";
+            std::function<bool()> action = []() -> bool { return false; };
+
+            bool have_choice = true;
         } meta;
 
         Dialog(app::Application *app, const std::string &name, const Meta &meta);
@@ -31,6 +33,10 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         void update(const Meta &meta);
+
+      private:
+        /// build yes / no elements and set focus on no
+        void setupChoice();
     };
 
 }; // namespace gui

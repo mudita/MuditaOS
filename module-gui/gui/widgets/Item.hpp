@@ -165,8 +165,12 @@ namespace gui
         virtual void addWidget(Item *item);
         /// function to remove child item from element
         /// it's recursive for all elements underneath
-        /// @attention It doe not call `delete` please remove item after calling this function
+        /// @attention It doesn't call `delete` please remove item after calling this function
         virtual bool removeWidget(Item *item);
+        /// call removeWidget on item and delete on item
+        virtual bool erase(Item *item);
+        /// remove all children and destroy them
+        virtual void erase() final;
         /// sets `visible` flag
         virtual void setVisible(bool value);
         /// sets position of element - this is sets area().x and area().y of item
