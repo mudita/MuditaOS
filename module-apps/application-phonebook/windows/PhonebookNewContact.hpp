@@ -45,7 +45,7 @@ namespace gui
         {
             gui::Label *labels[5] = {nullptr};
             gui::Text *text[5]    = {nullptr};
-            void setVisible(bool visible)
+            void setVisible(bool visible) override
             {
                 for (uint32_t i = 0; i < 5; i++) {
                     labels[i]->setVisible(visible);
@@ -83,13 +83,8 @@ namespace gui
                 noteLabel->setVisible(visible);
                 text[0]->setVisible(visible);
                 text[1]->setVisible(visible);
-                if (visible) {
-                    if (favSelected) {
-                        imageTick->setVisible(true);
-                    }
-                    else {
-                        imageTick->setVisible(false);
-                    }
+                if (visible && favSelected) {
+                    imageTick->setVisible(true);
                 }
                 else {
                     imageTick->setVisible(false);
