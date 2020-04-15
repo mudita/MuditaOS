@@ -139,8 +139,12 @@ namespace gui
         page2.speedValue->focusChangedCallback = [=](gui::Item &item) { return true; };
 
         page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
+            if (inputEvent.keyCode == KeyCode::KEY_PND) {
+                page2.speedValue->setText("");
+                return true;
+            }
             int val = gui::toNumeric(inputEvent.keyCode);
-            if ((val >= 0) && (val < 9)) {
+            if ((val >= 0) && (val <= 9)) {
                 page2.speedValue->setText(std::to_string(val));
                 return true;
             }
