@@ -117,7 +117,7 @@ namespace sys
         }
 
         Message_t Execute(Service *service) override final;
-    }; 
+    };
 
     class ResponseMessage : public Message
     {

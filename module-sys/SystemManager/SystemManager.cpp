@@ -81,7 +81,8 @@ namespace sys
             powerManager->PowerOff();
             break;
         default:
-            LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!", c_str(state));
+            LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
+                      c_str(state));
             exit(1);
         };
     }
@@ -170,7 +171,6 @@ namespace sys
         }
         return true;
     }
-
 
     bool SystemManager::SuspendService(const std::string &name, sys::Service *caller)
     {
