@@ -35,6 +35,7 @@
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
+#include "service-internet/ServiceInternet.hpp"
 
 // module-bsp
 #include "bsp/bsp.hpp"

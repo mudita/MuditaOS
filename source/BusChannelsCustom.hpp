@@ -9,6 +9,6 @@
 
 // Custom Bus channels
 ServiceCellularNotifications, Test2CustomBusChannel, ServiceDBNotifications, ServiceAudioNotifications,
-    AppManagerNotifications,
+    AppManagerNotifications, ServiceInternetNotifications
 
 #endif // MODULE_CORE_BUSCHANNELSCUSTOM_HPP

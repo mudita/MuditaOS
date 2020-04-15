@@ -26,6 +26,7 @@ add_subdirectory( service-audio )
 add_subdirectory( service-bluetooth )
 add_subdirectory( service-lwip )
 add_subdirectory( service-desktop )
+add_subdirectory( service-internet )
 
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-bsp module-os module-sys module-utils module-gui module-apps module-db module-cellular module-audio  ${TARGET_LIBRARIES} )

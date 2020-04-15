@@ -28,6 +28,7 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/microtar/src/microtar.c
         ${CMAKE_CURRENT_SOURCE_DIR}/crc32/crc32.c
         ${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.c
+        base64/base64.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp

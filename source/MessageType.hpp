@@ -180,6 +180,17 @@ enum class MessageType
     LwIP_request,
     EVM_GPIO,
     SIMTrayEvent,
+
+    // Cellular Data messsages
+    InternetNotification,
+    InternetConfigure,
+    InternetConnect,
+    InternetDisconnect,
+    InternetOpenHTTPConnection,
+    InternetHTTPUrl,
+    InternetHTTPGET,
+    InternetHTTPPOST,
+    InternetHTTPReadData,
 };
 
 #endif /* SOURCE_MESSAGETYPE_HPP_ */
