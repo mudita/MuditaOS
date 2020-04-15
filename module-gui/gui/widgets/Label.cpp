@@ -169,6 +169,7 @@ namespace gui
     void Label::clear()
     {
         this->text = UTF8("");
+        calculateDisplayText();
     }
 
     UTF8 Label::getText()
