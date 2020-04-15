@@ -1,7 +1,9 @@
 #pragma once
 
-#include "AppWindow.hpp"
+#include <AppWindow.hpp>
 #include <widgets/Text.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+
 #include <string>
 
 namespace gui
@@ -18,7 +20,9 @@ namespace gui
     class NewSMS_Window : public AppWindow
     {
       private:
-        gui::Text *text = nullptr;
+        gui::Text *recipient = nullptr;
+        gui::Text *message   = nullptr;
+        std::shared_ptr<ContactRecord> contact;
 
       public:
         NewSMS_Window(app::Application *app);
