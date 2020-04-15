@@ -78,11 +78,11 @@ namespace sys
 
         /// Kill service
         /// @note - this is final, it straight takes service, calls it's close callback and it's gone
-        /// please mind that services & apps not registered in SystemManager cant be killed - these should ba handled by
-        /// parenst (as above in Destroy) ApplicationManager somehow propagates this, but I would call how it's done
+        /// please mind that services & apps not registered in SystemManager cant be killed - these should be handled by
+        /// parents (as above in Destroy) ApplicationManager somehow propagates this, but I would call how it's done
         /// `imperfect`
         ///
-        /// @note there is no timeout on deinit hanlder, might be worth to consider blocking `message` DeinitHandler
+        /// @note there is no timeout on deinit handler, might be worth to consider blocking `message` DeinitHandler
         /// instead
         void kill(std::shared_ptr<Service> const &toKill);
 
