@@ -9,6 +9,8 @@
 #include <service-evtmgr/messages/BatteryMessages.hpp>
 #include <service-evtmgr/Constants.hpp>
 
+const inline size_t systemManagerStack = 4096 * 2;
+
 namespace sys
 {
 
@@ -23,7 +25,7 @@ namespace sys
     }
 
     SystemManager::SystemManager(TickType_t pingInterval)
-        : Service(service::name::system_manager), pingInterval(pingInterval)
+        : Service(service::name::system_manager, "", systemManagerStack), pingInterval(pingInterval)
     {
         // Specify list of channels which System Manager is registered to
         busChannels = {BusChannels::SystemManagerRequests};
