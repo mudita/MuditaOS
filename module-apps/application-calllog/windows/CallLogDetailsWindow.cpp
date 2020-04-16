@@ -81,9 +81,9 @@ namespace gui
     {
         AppWindow::buildInterface();
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_call"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         topBar->setActive(TopBar::Elements::TIME, true);
 
@@ -95,7 +95,7 @@ namespace gui
                                                         information::label::y,
                                                         information::label::w,
                                                         0,
-                                                        utils::localize.get("common_information")));
+                                                        utils::localize.get(style::strings::common::information)));
         number           = decorateData(
             new gui::Label(this, information::number::x, information::number::y, information::number::w, 0));
         number->setFont(style::window::font::mediumbold);
@@ -134,12 +134,12 @@ namespace gui
 
         // focus callbacks
         rects[static_cast<uint32_t>(FocusRects::Call)]->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_call"));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::call));
             return true;
         };
 
         rects[static_cast<uint32_t>(FocusRects::Sms)]->focusChangedCallback = [=](gui::Item &item) {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
             return true;
         };
 
