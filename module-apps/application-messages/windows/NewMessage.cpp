@@ -1,8 +1,9 @@
 #include "NewMessage.hpp"
 
 #include "ThreadViewWindow.hpp"
-#include "../ApplicationMessages.hpp"
-#include "../data/SMSdata.hpp"
+#include "application-messages/ApplicationMessages.hpp"
+#include "application-messages/data/SMSdata.hpp"
+#include "application-messages/MessagesStyle.hpp"
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
 #include <application-phonebook/windows/PhonebookSearchResults.hpp>
@@ -40,30 +41,35 @@ namespace gui
 
     void NewSMS_Window::buildInterface()
     {
+        using namespace messages::newMessage;
         AppWindow::buildInterface();
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
         bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        topBar->setActive(TopBar::Elements::BATTERY, false);
+        topBar->setActive(TopBar::Elements::SIM, false);
+        topBar->setActive(TopBar::Elements::SIGNAL, false);
+
         setTitle(utils::localize.get("sms_title_message"));
 
-        uint32_t w = this->getWidth() - style::window::default_left_margin * 2;
-        uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
-        auto body  = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
+        const uint32_t w = this->getWidth() - style::window::default_left_margin - style::window::default_right_margin;
+        const uint32_t h = this->getHeight() - title->offset_h() - bottomBar->getHeight();
+        auto body        = new gui::VBox(this, style::window::default_left_margin, (uint32_t)title->offset_h(), w, h);
 
-        auto label = new Label(body, 0, 0, body->getWidth(), 42);
-        label->setText(utils::localize.get("sms_add_rec_num"));
-        label->activeItem = false;
-        label->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        label->setFont(style::window::font::small);
-        label->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        auto recipientLabel = new Label(body, 0, 0, body->getWidth(), recipientLabel::h);
+        recipientLabel->setText(utils::localize.get("sms_add_rec_num"));
+        recipientLabel->activeItem = false;
+        recipientLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
+        recipientLabel->setFont(style::window::font::small);
+        recipientLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), 43);
+        auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), text::h);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         reciepientHbox->setPenFocusWidth(style::window::default_border_focucs_w);
         reciepientHbox->setPenWidth(style::window::messages::sms_border_no_focus);
 
-        recipient =
-            new gui::Text(reciepientHbox, 0, 0, body->getWidth() - 32, 43, "", gui::Text::ExpandMode::EXPAND_NONE);
+        recipient = new gui::Text(
+            reciepientHbox, 0, 0, body->getWidth() - recipientImg::w, text::h, "", gui::Text::ExpandMode::EXPAND_NONE);
         recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipient->setInputMode(new InputMode({InputMode::phone}));
         recipient->setFont(style::window::font::medium);
@@ -93,17 +99,18 @@ namespace gui
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
             return true;
         };
-        auto img = new gui::Image(nullptr, 0, 0, 0, 0, "phonebook_small");
-        reciepientHbox->addWidget(img);
 
-        auto labelMessage = new Label(body, 0, 0, body->getWidth(), 44);
+        auto img        = new gui::Image(reciepientHbox, 0, 0, 0, 0, "phonebook_small");
+        img->activeItem = false;
+
+        auto labelMessage = new Label(body, 0, 0, body->getWidth(), messageLabel::h);
         labelMessage->setText(utils::localize.get("app_messages_message"));
         labelMessage->activeItem = false;
         labelMessage->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         labelMessage->setFont(style::window::font::small);
         labelMessage->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
-        message = new gui::Text(nullptr, 0, 0, body->getWidth(), 43, "", gui::Text::ExpandMode::EXPAND_UP);
+        message = new gui::Text(nullptr, 0, 0, body->getWidth(), text::h, "", gui::Text::ExpandMode::EXPAND_UP);
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         message->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc, InputMode::digit},
@@ -157,7 +164,6 @@ namespace gui
         body->addWidget(message);
 
         body->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-
         body->setVisible(true);
         body->setNavigation();
         setFocusItem(body);
