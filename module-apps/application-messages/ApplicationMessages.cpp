@@ -5,6 +5,7 @@
 #include "windows/OptionsMessages.hpp"
 #include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
+#include "windows/SearchStart.hpp"
 
 #include <MessageType.hpp>
 #include <Dialog.hpp>
@@ -113,6 +114,7 @@ namespace app
                         new gui::Dialog(this,
                                         gui::name::window::thread_search_none,
                                         {.icon = "search_big", .have_choice = false})});
+        windows.insert({gui::name::window::thread_sms_search, new gui::SMSSearch(this)});
     }
 
     void ApplicationMessages::destroyUserInterface()
