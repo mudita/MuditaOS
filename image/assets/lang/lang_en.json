@@ -40,6 +40,7 @@
     "common_december": "December",
     "common_yesterday" : "Yesterday",
     "common_results_prefix": "Results: ",
+    "common_search": "SEARCH",
 
     "locale_12hour_min" : "%I:%M %p",
     "locale_24hour_min" : "%H:%M",
@@ -157,7 +158,6 @@
     "app_phonebook_options": "OPTIONS",
     "app_phonebook_confirm": "CONFIRM",
     "app_phonebook_select": "SELECT",
-    "app_phonebook_search": "SEARCH",
     "app_phonebook_search_win_contacts": "Contacts",
     "app_phonebook_search_win_search": "Search",
     "app_phonebook_search_win_info": "Type what do you need\nand click SEARCH",
