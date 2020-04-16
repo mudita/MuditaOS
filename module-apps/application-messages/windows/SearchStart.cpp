@@ -2,6 +2,7 @@
 #include "../ApplicationMessages.hpp"
 #include <i18/i18.hpp>
 #include <widgets/SearchBox.hpp>
+#include <cassert>
 
 namespace gui
 {
@@ -19,6 +20,7 @@ namespace gui
         addWidget(body);
         inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app);
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
