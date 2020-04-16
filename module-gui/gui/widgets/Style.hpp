@@ -121,6 +121,7 @@ namespace style
             const inline std::string Switch      = "common_switch";
             const inline std::string options     = "common_options";
             const inline std::string information = "common_information";
+            const inline std::string search      = "common_search";
             // days
             const inline std::string Monday    = "common_monday";
             const inline std::string Tuesday   = "common_tuesday";

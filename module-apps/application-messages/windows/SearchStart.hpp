@@ -16,7 +16,6 @@ namespace gui
 
       public:
         SMSSearch(app::Application *app);
-        /// TODO why is it needed? why inputCallback doesnt work when it was connected...
         bool onInput(const InputEvent &inputEvent) override;
     };
 
