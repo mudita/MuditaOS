@@ -73,8 +73,6 @@ namespace gui
         auto l = new Label(parent, searchHeader::x, searchHeader::y, searchHeader::w, searchHeader::h);
 
         l->setFont(style::window::font::small);
-        // l->setFilled(false);
-        // l->setBorderColor(ColorFullBlack);
         l->setEdges(edges);
         l->setText(header);
         l->setAlignment(alignment);
