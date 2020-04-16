@@ -106,9 +106,9 @@ namespace gui
     {
         using namespace messages::newMessage;
         AppWindow::buildInterface();
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         topBar->setActive(TopBar::Elements::BATTERY, false);
         topBar->setActive(TopBar::Elements::SIM, false);
         topBar->setActive(TopBar::Elements::SIGNAL, false);
@@ -134,12 +134,12 @@ namespace gui
         recipient = new gui::Text(
             reciepientHbox, 0, 0, body->getWidth() - recipientImg::w, text::h, "", gui::Text::ExpandMode::EXPAND_NONE);
         recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        recipient->setInputMode(new InputMode({InputMode::phone}));
+        recipient->setInputMode(new InputMode({InputMode::digit})); // TODO: possibly it should be changed to phone;
         recipient->setFont(style::window::font::medium);
         recipient->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         recipient->activatedCallback    = [=](Item &) -> bool { return selectContact(); };
         recipient->focusChangedCallback = [=](Item &) -> bool {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_select"));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
             return true;
         };
 
@@ -165,7 +165,7 @@ namespace gui
         message->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         message->activatedCallback    = [=](Item &) -> bool { return sendSms(); };
         message->focusChangedCallback = [=](Item &) -> bool {
-            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
+            bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
             return true;
         };
         body->addWidget(message);
