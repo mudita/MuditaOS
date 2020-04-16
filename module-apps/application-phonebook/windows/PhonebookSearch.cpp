@@ -2,6 +2,7 @@
 #include "../data/PhonebookStyle.hpp"
 #include "Utils.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include "widgets/SearchBox.hpp"
 
 namespace gui
 {
@@ -11,36 +12,6 @@ namespace gui
         buildInterface();
     }
 
-    PhonebookSearch::~PhonebookSearch()
-    {}
-
-    Label *PhonebookSearch::addLabel(std::list<Item *> *parentPage,
-                                     int x,
-                                     int y,
-                                     int w,
-                                     int h,
-                                     const std::string text         = "",
-                                     const std::string fontName     = style::window::font::small,
-                                     const RectangleEdgeFlags edges = RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                     const Alignment alignment      = Alignment(Alignment::ALIGN_HORIZONTAL_LEFT,
-                                                                           Alignment::ALIGN_VERTICAL_BOTTOM),
-                                     const bool lineMode            = false)
-    {
-        Label *l = new Label(this, x, y, w, h);
-        l->setFilled(false);
-        l->setBorderColor(ColorFullBlack);
-        l->setEdges(edges);
-        l->setFont(fontName);
-        l->setText(text);
-        l->setAlignment(alignment);
-        l->setLineMode(lineMode);
-
-        if (parentPage)
-            parentPage->push_back(l);
-
-        return (l);
-    }
-
     void PhonebookSearch::buildInterface()
     {
         AppWindow::buildInterface();
@@ -48,42 +19,7 @@ namespace gui
 
         setTitle(utils::localize.get("app_phonebook_title_main"));
 
-        searchHeader = addLabel(nullptr,
-                                phonebookStyle::search::searchHeader::x,
-                                phonebookStyle::search::searchHeader::y,
-                                phonebookStyle::search::searchHeader::w,
-                                phonebookStyle::search::searchHeader::h,
-                                utils::localize.get("app_phonebook_search_win_search"));
-        searchHeader->setFont(style::window::font::small);
-
-        inputField = new Text(nullptr,
-                              phonebookStyle::search::horizontalBox::inputField::x,
-                              phonebookStyle::search::horizontalBox::inputField::y,
-                              phonebookStyle::search::horizontalBox::inputField::w,
-                              phonebookStyle::search::horizontalBox::inputField::h);
-        inputField->setTextType(Text::TextType::SINGLE_LINE);
-        inputField->setEditMode(Text::EditMode::EDIT);
-        inputField->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        inputField->setInputMode(new InputMode({InputMode::ABC, InputMode::abc}));
-        inputField->setFont(style::window::font::mediumbold);
-
-        searchTop = new Image(nullptr,
-                              phonebookStyle::search::horizontalBox::searchTop::x,
-                              phonebookStyle::search::horizontalBox::searchTop::y,
-                              phonebookStyle::search::horizontalBox::searchTop::w,
-                              phonebookStyle::search::horizontalBox::searchTop::h,
-                              "search");
-
-        horizontalBox = new HBox(this,
-                                 phonebookStyle::search::horizontalBox::x,
-                                 phonebookStyle::search::horizontalBox::y,
-                                 phonebookStyle::search::horizontalBox::w,
-                                 phonebookStyle::search::horizontalBox::h);
-        horizontalBox->addWidget(inputField);
-        horizontalBox->addWidget(searchTop);
-        horizontalBox->setPenWidth(phonebookStyle::search::horizontalBox::penWidth);
-        horizontalBox->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-
+        inputField = searchBox(this, utils::localize.get("app_phonebook_search_win_search"), "search");
         bottomBar->setActive(BottomBar::Side::LEFT, false);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);

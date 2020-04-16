@@ -1,6 +1,7 @@
 #include "SearchStart.hpp"
 #include "../ApplicationMessages.hpp"
 #include <i18/i18.hpp>
+#include <widgets/SearchBox.hpp>
 
 namespace gui
 {
@@ -26,6 +27,9 @@ namespace gui
             }
             return false;
         };
+
+        auto text = searchBox(this, utils::localize.get("app_phonebook_search_win_search"), "search");
+        setFocusItem(text);
     }
 
     bool SMSSearch::onInput(const InputEvent &inputEvent)
