@@ -7,6 +7,7 @@
 #include "../data/SMSdata.hpp"
 #include "../widgets/ThreadItem.hpp"
 #include "../windows/ThreadViewWindow.hpp"
+#include "application-messages/windows/SearchStart.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBMessage.hpp>
@@ -177,7 +178,8 @@ namespace gui
                     return true;
                 case gui::KeyCode::KEY_RIGHT: {
                     auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                    app->searchEmpty();
+                    app->switchWindow(gui::name::window::thread_sms_search, nullptr);
+                    // app->searchEmpty();
                     return true;
                 } break;
                 case gui::KeyCode::KEY_LF: {

@@ -88,7 +88,7 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
 
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("app_phonebook_search"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_search"));
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_phonebook_back"));
 
         setFocusItem(inputField);

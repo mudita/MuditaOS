@@ -186,4 +186,12 @@ namespace gui
             std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
     }
 
+    BoundingBox AppWindow::bodySize()
+    {
+        return {0,
+                title->offset_h(),
+                this->getWidth(),
+                this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
+    }
+
 } /* namespace gui */
