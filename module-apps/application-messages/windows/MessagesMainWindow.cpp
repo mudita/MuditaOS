@@ -179,7 +179,6 @@ namespace gui
                 case gui::KeyCode::KEY_RIGHT: {
                     auto app = dynamic_cast<app::ApplicationMessages *>(application);
                     app->switchWindow(gui::name::window::thread_sms_search, nullptr);
-                    // app->searchEmpty();
                     return true;
                 } break;
                 case gui::KeyCode::KEY_LF: {
