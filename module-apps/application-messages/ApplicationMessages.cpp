@@ -42,7 +42,8 @@ namespace app
             if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB) &&
                 ((msg->notificationType == DB::NotificationType::Updated) ||
                  (msg->notificationType == DB::NotificationType::Added))) {
-                if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view]) {
+                if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view] ||
+                    this->getCurrentWindow() == this->windows[gui::name::window::main_window]) {
                     LOG_DEBUG("TODO");
                     this->getCurrentWindow()->rebuild();
                 }
@@ -166,6 +167,10 @@ namespace app
 
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
     {
+        if (number.length() == 0 || body.length() == 0) {
+            LOG_WARN("Number or sms body is empty");
+            return false;
+        }
         SMSRecord record;
         record.number = number;
         record.body   = body;
