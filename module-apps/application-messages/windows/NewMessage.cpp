@@ -61,7 +61,7 @@ namespace gui
         recipientLabel->activeItem = false;
         recipientLabel->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         recipientLabel->setFont(style::window::font::small);
-        recipientLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        recipientLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
         auto reciepientHbox = new gui::HBox(body, 0, 0, body->getWidth(), text::h);
         reciepientHbox->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
@@ -108,7 +108,7 @@ namespace gui
         labelMessage->activeItem = false;
         labelMessage->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         labelMessage->setFont(style::window::font::small);
-        labelMessage->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
+        labelMessage->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
 
         message = new gui::Text(nullptr, 0, 0, body->getWidth(), text::h, "", gui::Text::ExpandMode::EXPAND_UP);
         message->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);

@@ -162,6 +162,8 @@ namespace app
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
         return switchWindow(gui::name::window::thread_search_none, nullptr);
+    }
+
     bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
     {
         SMSRecord record;
