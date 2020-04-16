@@ -39,4 +39,17 @@ CMD="JLinkGDBServerCLExe -if SWD -device MCIMXRT1051                     \
 
 echo "RUN: ${CMD}"
 
+if [ "${OPTS['continous']}" == " " ]; then 
+
+notify-send 'DEBUG WARNING!' "
+When using continous mode, after full reset please remember to set PS_EN pin high. GDB command:
+
+    monitor memU32 0x401BC000 = 128;
+
+This will set PS_EN high so that after core reset power circuit would work while  loading software
+ps. you can copy it from .gdbinit-rt1051
+" \
+--icon=dialog-information
+fi
+
 eval ${CMD}
