@@ -22,7 +22,11 @@ namespace gui
       private:
         gui::Text *recipient = nullptr;
         gui::Text *message   = nullptr;
+        gui::VBox *body      = nullptr;
         std::shared_ptr<ContactRecord> contact;
+
+        bool selectContact();
+        bool sendSms();
 
       public:
         NewSMS_Window(app::Application *app);
@@ -32,9 +36,7 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
-        void rebuild() override;
         void buildInterface() override;
-        void destroyInterface() override;
     };
 
 } /* namespace gui */
