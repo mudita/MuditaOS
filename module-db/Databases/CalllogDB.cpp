@@ -8,7 +8,7 @@
  */
 #include "CalllogDB.hpp"
 
-const char *CalllogDB::dbName = "sys/calllog.db";
+const char *CalllogDB::dbName = "/user/calllog.db";
 
 CalllogDB::CalllogDB() : Database(dbName), calls(this)
 {

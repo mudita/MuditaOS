@@ -10,7 +10,7 @@
 
 #include "ContactsDB.hpp"
 
-const char *ContactsDB::dbName = "sys/contacts.db";
+const char *ContactsDB::dbName = "/user/contacts.db";
 
 ContactsDB::ContactsDB() : Database(dbName), contacts(this), name(this), number(this), ringtones(this), address(this)
 {

@@ -7,7 +7,7 @@
 
 #include "AlarmsDB.hpp"
 
-const char *AlarmsDB::dbName = "sys/alarms.db";
+const char *AlarmsDB::dbName = "/user/alarms.db";
 
 AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
 {

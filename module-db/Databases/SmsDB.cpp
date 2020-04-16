@@ -10,7 +10,7 @@
 
 #include "SmsDB.hpp"
 
-const char *SmsDB::dbName = "sys/sms.db";
+const char *SmsDB::dbName = "/user/sms.db";
 
 SmsDB::SmsDB() : Database(dbName), sms(this), threads(this)
 {

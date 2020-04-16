@@ -8,13 +8,12 @@
  */
 
 #include "../../vfs.hpp"
-#include "board/cross/eMMC/eMMC.hpp"
 #include "ff_eMMC_user_disk.hpp"
 
 #define eMMCHIDDEN_SECTOR_COUNT 8
-#define eMMCPRIMARY_PARTITIONS  1
+#define eMMCPRIMARY_PARTITIONS  2
 #define eMMCHUNDRED_64_BIT      100ULL
-#define eMMCPARTITION_NUMBER    0 /* Only a single partition is used. */
+#define eMMCPARTITION_NUMBER    0
 #define eMMCBYTES_PER_MB        (1024ull * 1024ull)
 #define eMMCSECTORS_PER_MB      (eMMCBYTES_PER_MB / 512ull)
 
@@ -22,6 +21,59 @@
 disk. */
 #define eMMCSIGNATURE             0x61606362
 #define mainIO_MANAGER_CACHE_SIZE (15UL * FSL_SDMMC_DEFAULT_BLOCK_SIZE)
+
+unsigned long computeCRC32(FF_FILE *file, unsigned long *outCrc32)
+{
+    unsigned char buf[purefs::buffer::crcBuf];
+    size_t bufLen;
+
+    *outCrc32 = 0;
+
+    while (!ff_feof(file)) {
+        bufLen = ff_fread(buf, 1, purefs::buffer::crcBuf, file);
+        if (bufLen <= 0)
+            break;
+
+        *outCrc32 = Crc32_ComputeBuf(*outCrc32, buf, bufLen);
+    }
+
+    return 0;
+}
+
+bool verifyCRC(const std::string filePath, const unsigned long crc32)
+{
+    unsigned long crc32Read;
+    FF_FILE *fp = vfs.fopen(filePath.c_str(), "r");
+    if (fp != NULL) {
+        if (computeCRC32(fp, &crc32Read) == 0) {
+            ff_fclose(fp);
+            return (crc32Read == crc32);
+        }
+    }
+    LOG_ERROR("verifyCRC can't open %s", filePath.c_str());
+    return (false);
+}
+
+bool verifyCRC(const fs::path filePath)
+{
+    char crcBuf[purefs::buffer::crcCharSize] = {0};
+    fs::path crcFilePath(filePath);
+    crcFilePath += purefs::extension::crc32;
+
+    FF_FILE *fp = vfs.fopen(crcFilePath.c_str(), "r");
+    if (fp != NULL) {
+        if (ff_fgets(crcBuf, purefs::buffer::crcCharSize, fp) == NULL) {
+            LOG_ERROR("verifyCRC ff_fgets on %s returned NULL", crcFilePath.c_str());
+            return (false);
+        }
+
+        ff_fclose(fp);
+        const unsigned long crc32Read = strtoull(crcBuf, nullptr, 16);
+        return (verifyCRC(filePath, crc32Read));
+    }
+    LOG_ERROR("verifyCRC can't open %s", crcFilePath.c_str());
+    return (false);
+}
 
 vfs::vfs() : emmc()
 {}
@@ -34,17 +86,58 @@ vfs::~vfs()
 
 void vfs::Init()
 {
+    LOG_INFO("vfs::Init");
     emmc.Init();
 
-    emmcFFDisk = FF_eMMC_user_DiskInit(eMMC_USER_DISK_NAME, &emmc);
+    emmcFFDisk = FF_eMMC_user_DiskInit(purefs::dir::eMMCDisk.c_str(), &emmc);
 
     /* Print out information on the disk. */
     FF_eMMC_user_DiskShowPartition(emmcFFDisk);
+
+    osRootPath = purefs::dir::eMMCDisk;
+
+    if (getOSRootFromIni()) {
+        LOG_INFO("vfs::Init osType %s root:%s", osType.c_str(), osRootPath.c_str());
+        if (ff_chdir(osRootPath.c_str()) != 0) {
+            LOG_ERROR("vfs::Init can't chdir to %s", osRootPath.c_str());
+        }
+    }
+    else {
+        LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", osRootPath.c_str());
+    }
+}
+
+bool vfs::getOSRootFromIni()
+{
+    const fs::path currentBootIni   = getCurrentBootIni();
+    sbini_t *ini                    = sbini_load(currentBootIni.c_str());
+    if (!ini) {
+        LOG_ERROR("getOSRootFromIni can't load ini file %s", currentBootIni.c_str());
+        return (false);
+    }
+    else {
+        osType      = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::ostype.c_str());
+        osRootPath  = purefs::dir::eMMCDisk / osType;
+        sbini_free(ini);
+        return (true);
+    }
+}
+
+const fs::path vfs::getCurrentBootIni()
+{
+    if (verifyCRC(purefs::file::bootIni)) {
+        return (relativeToRoot(purefs::file::bootIni));
+    }
+    else if (verifyCRC(purefs::file::bootIniBak)) {
+        return (relativeToRoot(purefs::file::bootIniBak));
+    }
+
+    return ("");
 }
 
 vfs::FILE *vfs::fopen(const char *filename, const char *mode)
 {
-    return ff_fopen(filename, mode);
+    return ff_fopen(relativeToRoot(filename).c_str(), mode);
 }
 
 int vfs::fclose(FILE *stream)
@@ -120,7 +213,7 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
 
     /* The first parameter to ff_findfist() is the directory being searched.  Do
     not add wildcards to the end of the directory name. */
-    if (ff_findfirst(path, pxFindStruct) == 0 && pxFindStruct != nullptr) {
+    if (ff_findfirst(relativeToRoot(path).c_str(), pxFindStruct) == 0 && pxFindStruct != nullptr) {
         do {
             if ((pxFindStruct->ucAttributes & FF_FAT_ATTR_HIDDEN) ||
                 (pxFindStruct->ucAttributes & FF_FAT_ATTR_SYSTEM) || (pxFindStruct->ucAttributes & FF_FAT_ATTR_VOLID) ||
@@ -236,4 +329,20 @@ vfs::FilesystemStats vfs::getFilesystemStats()
     }
 
     return (filesystemStats);
+}
+
+std::string vfs::relativeToRoot(const std::string path)
+{
+    fs::path fsPath(path);
+    if (fsPath.is_absolute()) {
+        if (osRootPath.parent_path() == fsPath.parent_path())
+            return (fsPath);
+        else
+            return (purefs::dir::eMMCDisk / fsPath.relative_path()).c_str();
+    }
+
+    if (path.empty())
+        return (osRootPath);
+    else
+        return (osRootPath / fsPath);
 }

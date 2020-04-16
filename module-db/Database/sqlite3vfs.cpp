@@ -588,18 +588,22 @@ static int ecophoneFullPathname(sqlite3_vfs *pVfs, /* VFS */
 {
     UNUSED(pVfs);
 
+    /*
+     * there is no need to modify any paths here
+     * vfs module does that
+     *
     std::string path;
     // absolute path
     if (zPath[0] == '/') {}
     // relative path
     else {
-        path = vfs.getcurrdir();
+        path = vfs.relativeToRoot(path);
         if (path.empty())
             return SQLITE_IOERR;
     }
 
     // Current path is "/"
-    if (path.size() == 1) {
+    if (path.size() <= 1) {
         sqlite3_snprintf(nPathOut, zPathOut, "%s%s", path.c_str(), zPath);
     }
     else {
@@ -607,7 +611,9 @@ static int ecophoneFullPathname(sqlite3_vfs *pVfs, /* VFS */
     }
 
     zPathOut[nPathOut - 1] = '\0';
-
+     */
+    sqlite3_snprintf(nPathOut, zPathOut, "%s", zPath);
+    zPathOut[nPathOut - 1] = '\0';
     return SQLITE_OK;
 }
 

@@ -8,7 +8,7 @@
  */
 #include "NotesDB.hpp"
 
-const char *NotesDB::dbName = "sys/notes.db";
+const char *NotesDB::dbName = "/user/notes.db";
 
 NotesDB::NotesDB() : Database(dbName), notes(this)
 {

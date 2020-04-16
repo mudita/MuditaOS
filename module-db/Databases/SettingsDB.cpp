@@ -10,7 +10,7 @@
 
 #include "SettingsDB.hpp"
 
-const char *SettingsDB::dbName = "sys/settings.db";
+const char *SettingsDB::dbName = "/user/settings.db";
 
 SettingsDB::SettingsDB() : Database(dbName), settings(this)
 {

@@ -13,14 +13,54 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+extern "C"
+{
+    #include "../module-utils/sbini/sbini.h"
+    #include "../module-utils/crc32/crc32.h"
+}
 
 #ifdef TARGET_Linux
 #include <cstdio>
 #else
-
 #include "ff_stdio.h"
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
+
+namespace purefs
+{
+    namespace file
+    {
+        const inline fs::path bootIni    = ".boot.ini";
+        const inline fs::path bootIniBak = ".boot.ini.bak";
+    };
+
+    namespace dir
+    {
+        const inline fs::path eMMCDisk = "/sys";
+    }
+
+    namespace extension
+    {
+        const inline std::string crc32 = ".crc32";
+    }
+
+    namespace buffer
+    {
+        const inline int crcBuf      = 1024;
+        const inline int crcCharSize =  9;
+    }
+
+    namespace ini
+    {
+        const inline std::string main = "main";
+        const inline std::string ostype = "ostype";
+    }
+};
 
 class vfs
 {
@@ -30,7 +70,6 @@ class vfs
     using FILE = FF_FILE;
 #else
     using FILE = std::FILE;
-
 #endif
 
     enum class FileAttributes
@@ -101,13 +140,17 @@ class vfs
 
     FilesystemStats getFilesystemStats();
 
-  private:
-    const char *eMMC_USER_DISK_NAME = "/sys";
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
     FF_Disk_t *emmcFFDisk;
 #endif
+    std::string relativeToRoot(const std::string path);
+  private:
+    bool getOSRootFromIni();
+    const fs::path getCurrentBootIni();
+    fs::path osRootPath;
+    std::string osType;
 };
 
 extern vfs vfs;

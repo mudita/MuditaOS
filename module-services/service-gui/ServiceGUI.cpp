@@ -57,11 +57,11 @@ extern "C"
 
         // load fonts
         gui::FontManager &fontManager = gui::FontManager::getInstance();
-        fontManager.init("sys/assets");
+        fontManager.init("assets");
 
         // load images
         gui::ImageManager &imageManager = gui::ImageManager::getInstance();
-        imageManager.init("sys/assets");
+        imageManager.init("assets");
     }
 
     ServiceGUI::~ServiceGUI()
