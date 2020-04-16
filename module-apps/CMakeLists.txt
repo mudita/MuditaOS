@@ -18,6 +18,7 @@ set( SOURCES
     "windows/OptionWindow.cpp"
     "windows/Options.cpp" 
     "windows/Dialog.cpp" 
+    "widgets/SearchBox.cpp"
     )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
