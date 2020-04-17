@@ -43,7 +43,7 @@ namespace gui
         numberLabel->setText(num);
 
         if (numberLabel->getText().length() == 0) {
-            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+            bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
             return;
         }
         bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("app_call_clear"));

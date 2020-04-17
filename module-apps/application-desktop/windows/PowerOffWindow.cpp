@@ -49,8 +49,8 @@ namespace gui
         AppWindow::buildInterface();
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_confirm"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::confirm));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         powerImage     = new gui::Image(this, 177, 132, 0, 0, "pin_lock_info");
         powerDownImage = new gui::Image(this, 0, 0, 0, 0, "logo");
@@ -93,8 +93,8 @@ namespace gui
             pinLabelX += 193;
         }
 
-        selectionLabels[0]->setText(utils::localize.get("common_no"));
-        selectionLabels[1]->setText(utils::localize.get("common_yes"));
+        selectionLabels[0]->setText(utils::localize.get(style::strings::common::no));
+        selectionLabels[1]->setText(utils::localize.get(style::strings::common::yes));
 
         pinLabelX = 46;
         pinLabelY += 75;
