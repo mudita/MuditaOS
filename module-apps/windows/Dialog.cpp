@@ -86,7 +86,8 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 void Dialog::setupChoice()
 {
     erase(no);
-    no = new Label(this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get("common_no"));
+    no = new Label(
+        this, style::no::x, style::no::y, style::no::w, style::no::h, utils::localize.get(style::strings::common::no));
     no->setPenWidth(0);
     no->setPenFocusWidth(3);
     no->setFilled(false);
@@ -97,8 +98,12 @@ void Dialog::setupChoice()
     no->activatedCallback = [=](Item &) -> bool { return returnToPreviousView(); };
 
     erase(yes);
-    yes =
-        new Label(this, style::yes::x, style::yes::y, style::yes::w, style::yes::h, utils::localize.get("common_yes"));
+    yes = new Label(this,
+                    style::yes::x,
+                    style::yes::y,
+                    style::yes::w,
+                    style::yes::h,
+                    utils::localize.get(style::strings::common::yes));
     yes->setPenWidth(0);
     yes->setPenFocusWidth(3);
     yes->setFilled(false);
