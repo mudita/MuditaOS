@@ -113,7 +113,7 @@ namespace app
         windows.insert({gui::name::window::thread_search_none,
                         new gui::Dialog(this,
                                         gui::name::window::thread_search_none,
-                                        {.icon = "search_big", .have_choice = false})});
+                                        gui::Dialog::Meta{.icon = "search_big", .have_choice = false})});
         windows.insert({gui::name::window::thread_sms_search, new gui::SMSSearch(this)});
     }
 

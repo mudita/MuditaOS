@@ -12,6 +12,7 @@
 #include "thread.hpp"
 #include "timer.hpp"
 #include <typeindex>
+#include <functional>
 
 namespace sys
 {
