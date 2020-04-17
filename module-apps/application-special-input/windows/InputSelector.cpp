@@ -26,7 +26,7 @@ UiCharSelector::UiCharSelector(app::Application *app) : AppWindow(app, app::char
     for (auto schar : gui::special_chars) {
         auto el = new gui::Label(box, 0, 0, style::design::char_label_w, style::design::char_label_h);
         style::window::decorate(el);
-        el->setAlignement(
+        el->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
         el->setText(std::string(1, schar));
         el->setFont(style::window::font::medium);

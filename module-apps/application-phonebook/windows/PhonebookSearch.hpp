@@ -12,10 +12,7 @@ namespace gui
     {
       protected:
         /** labels */
-        Label *searchHeader = nullptr;
         Text *inputField    = nullptr;
-        HBox *horizontalBox = nullptr;
-        Image *searchTop    = nullptr;
 
         PhonebookModel *phonebookModel = nullptr;
 
@@ -24,7 +21,7 @@ namespace gui
 
       public:
         PhonebookSearch(app::Application *app);
-        virtual ~PhonebookSearch();
+        ~PhonebookSearch() override = default;
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
@@ -34,17 +31,6 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
 
-      private:
-        Label *addLabel(std::list<Item *> *parentPage,
-                        int x,
-                        int y,
-                        int w,
-                        int h,
-                        const std::string text,
-                        const std::string fontName,
-                        const RectangleEdgeFlags edges,
-                        const Alignment alignment,
-                        const bool lineMode);
     };
 
 } /* namespace gui */

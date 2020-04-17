@@ -12,6 +12,7 @@
 #include "board.h"
 #include "log/log.hpp"
 #include "bsp/BoardDefinitions.hpp"
+#include "bsp/watchdog/watchdog.hpp"
 
 namespace bsp
 {
@@ -51,6 +52,13 @@ namespace bsp
     int32_t RT1051LPM::PowerOff()
     {
         gpio->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
+        return 0;
+    }
+
+    int32_t RT1051LPM::Reboot()
+    {
+        bsp::watchdog::init();
+        bsp::watchdog::system_reset();
         return 0;
     }
 

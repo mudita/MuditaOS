@@ -198,7 +198,7 @@ namespace gui
     {
         const KeyProfile *p = getKeyProfile(static_cast<uint32_t>(code));
         if (p == nullptr) {
-            LOG_ERROR("KeyProfile for key: %" PRIu32 " not found", static_cast<uint32_t>(code));
+            LOG_DEBUG("KeyProfile for key: %" PRIu32 " not found", static_cast<uint32_t>(code));
             return 0;
         }
         return p->chars[times % p->chars.size()];

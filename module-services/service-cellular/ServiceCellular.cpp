@@ -45,6 +45,7 @@
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
 #include <common_data/EventStore.hpp>
+#include <service-evtmgr/Constants.hpp>
 
 const char *ServiceCellular::serviceName = "ServiceCellular";
 
@@ -546,6 +547,45 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
             responseMsg = std::make_shared<CellularResponseMessage>(false);
         }
     } break;
+    case MessageType::CellularSetScanMode: {
+        auto msg = dynamic_cast<CellularRequestMessage *>(msgl);
+        bool ret = false;
+        if (msg != nullptr) {
+            ret = SetScanMode(msg->data);
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(ret);
+        break;
+    }
+    case MessageType::CellularGetScanMode: {
+
+        std::string response;
+        response = GetScanMode();
+
+        if (response != "") {
+            responseMsg = std::make_shared<CellularResponseMessage>(true);
+            auto msg    = std::make_shared<cellular::RawCommandRespAsync>(MessageType::CellularGetScanModeResult);
+            msg->data.push_back(response);
+            sys::Bus::SendUnicast(msg, msgl->sender, this);
+            break;
+        }
+        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        break;
+    }
+    case MessageType::CellularGetFirmwareVersion: {
+        std::string response;
+        auto channel = cmux->get(TS0710::Channel::Commands);
+        if (channel) {
+            auto resp = channel->cmd(at::AT::QGMR);
+            if (resp.code == at::Result::Code::OK) {
+                response    = resp.response[0];
+                responseMsg = std::make_shared<CellularResponseMessage>(true, response);
+            }
+            else {
+                responseMsg = std::make_shared<CellularResponseMessage>(false);
+            }
+        }
+        break;
+    }
     default:
         break;
     }
@@ -593,7 +633,7 @@ std::shared_ptr<CellularNotificationMessage> ServiceCellular::identifyNotificati
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
         auto message = std::make_shared<sevm::SIMMessage>();
-        sys::Bus::SendUnicast(message, "EventManager", this);
+        sys::Bus::SendUnicast(message, service::name::evt_manager, this);
         return std::make_shared<CellularNotificationMessage>(CellularNotificationMessage::Type::SIM);
     }
 
@@ -1048,7 +1088,7 @@ bool ServiceCellular::handle_select_sim()
             // NO SIM IN
             Store::GSM::get()->sim = Store::GSM::SIM::SIM_FAIL;
         }
-        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), "EventManager", this);
+        sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), service::name::evt_manager, this);
     }
 #endif
     return true;
@@ -1096,4 +1136,35 @@ bool ServiceCellular::handle_fatal_failure()
     while (true) {
         vTaskDelay(500);
     }
+}
+
+bool ServiceCellular::SetScanMode(std::string mode)
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+        auto command = at::factory(at::AT::SET_SCANMODE);
+
+        auto resp = channel->cmd(command.cmd + mode + ",1\r", 300, 1);
+        if (resp.code == at::Result::Code::OK) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string ServiceCellular::GetScanMode(void)
+{
+    auto channel = cmux->get(TS0710::Channel::Commands);
+    if (channel) {
+
+        auto resp = channel->cmd(at::AT::GET_SCANMODE);
+        if (resp.code == at::Result::Code::OK) {
+            auto beg = resp.response[0].find(",");
+            if (beg != std::string::npos) {
+                auto response = resp.response[0].substr(beg + 1, 1);
+                return response;
+            }
+        }
+    }
+    return ("");
 }

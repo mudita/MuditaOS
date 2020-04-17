@@ -10,7 +10,8 @@ In order to crate new custom service you have to inherit from base Service class
 several virtual methods which are listed below:
 #### `ReturnCodes InitHandler()`
 This handler is invoked upon creation of the service. It is very important to return proper return code specified in:
-````
+
+```
 enum class ReturnCodes{
     Success,
     Failure,
@@ -18,19 +19,20 @@ enum class ReturnCodes{
     ServiceDoesntExist,
     Unresolved
 };
-````
+```
+
 #### `ReturnCodes DeinitHandler()`  
 This handler is invoked upon destruction of the service. The same rules about return codes apply here.
 #### `ReturnCodes SwitchPowerModeHandler(const ServicePowerMode mode)`  
 This handler is invoked when there is request for switching specified service's power mode. Available power modes which
 service should support are specified below:
-````
+```
 enum class ServicePowerMode{
     Active,
     SuspendToRAM,
     SuspendToNVM
 }; 
-````
+```
 
 Important: Currently there is no distinction between `SuspendToRAM` and `SuspendsToNVM`. These two cases should be handled the same.  Additionally only `SuspendToNVM` can be received by service.
 
@@ -105,7 +107,7 @@ Additionally current implementation of PowerManager(it should be considered as f
 For the time being PowerManager class exposes two methods which are internally used by SystemManager:
 #### `int32_t Switch(const Mode mode)`
 This method allows for switching CPU to different modes which are listed below:
-````
+```
 enum class Mode{
     FullSpeed,
     LowPowerRun,
@@ -113,7 +115,7 @@ enum class Mode{
     Suspend
 
 };
-````
+```
 In current implementation only `FullSpeed` and `LowPowerIdle` modes are used. It is worth to note that `LowPowerIdle` is heavy customized
 and it absolutely doesn't correspond to low power idle mode from RT1051's data sheet. Main differences are:
 * All internal RAM controller banks are preserved

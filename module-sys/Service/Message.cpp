@@ -8,8 +8,6 @@
 #include "Channel.hpp"
 #include "ticks.hpp"
 
-#include "LogOutput.hpp"
-
 #include <string.h>
 
 namespace sys
@@ -25,7 +23,7 @@ namespace sys
 
         // Ignore incoming data message if this service is not yet initialized
         if (service->isReady) {
-            return service->DataReceivedHandler(this, nullptr);
+            return Proxy::handle(service, this, nullptr);
         }
         else {
             return std::make_shared<ResponseMessage>();
@@ -68,7 +66,7 @@ namespace sys
         // Ignore incoming data message if this service is not yet initialized
         if (service->isReady) {
             DataMessage dummy(MessageType::MessageTypeUninitialized);
-            return service->DataReceivedHandler(&dummy, this);
+            return Proxy::handle(service, &dummy, this);
         }
         else {
             return std::make_shared<ResponseMessage>();

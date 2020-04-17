@@ -1,17 +1,10 @@
-/*
- * @file AppWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 24 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "AppWindow.hpp"
 #include "Application.hpp"
-#include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
+#include <i18/i18.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
 #include <Style.hpp>
 #include <application-desktop/ApplicationDesktop.hpp>
+#include <service-audio/api/AudioServiceAPI.hpp>
 
 using namespace style::header;
 
@@ -55,8 +48,8 @@ namespace gui
         title = new gui::Label(this, 0, 52, 480, 52);
         title->setFilled(false);
         title->setFont(font::title);
-        title->setText("");
-        title->setAlignement(
+        title->clear();
+        title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         title->setDotsMode(true);
@@ -128,7 +121,6 @@ namespace gui
 
     bool AppWindow::onInput(const InputEvent &inputEvent)
     {
-
         // check if any of the lower inheritance onInput methods catch the event
         if (Window::onInput(inputEvent)) {
             if (inputEvent.keyCode != KeyCode::KEY_ENTER)
@@ -145,8 +137,18 @@ namespace gui
         if ((inputEvent.state != InputEvent::State::keyReleasedShort))
             return false;
 
-        if (inputEvent.keyCode == KeyCode::KEY_RF) {
+        switch (inputEvent.keyCode) {
+        case KeyCode::KEY_VOLUP: {
+            return application->increaseCurrentVolume();
+        }
+        case KeyCode::KEY_VOLDN: {
+            return application->decreaseCurrentVolume();
+        }
+        case KeyCode::KEY_RF: {
             return returnToPreviousView();
+        }
+        default:
+            break;
         }
 
         return false;
@@ -182,6 +184,14 @@ namespace gui
         return sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
             std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+    }
+
+    BoundingBox AppWindow::bodySize()
+    {
+        return {0,
+                title->offset_h(),
+                this->getWidth(),
+                this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
     }
 
 } /* namespace gui */

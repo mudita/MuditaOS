@@ -278,7 +278,7 @@ namespace gui
         timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
         timeLabel->setPenWidth(style::window::default_border_no_focus_w);
         timeLabel->setVisible(false);
-        timeLabel->setAlignement(
+        timeLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
 
         return timeLabel;

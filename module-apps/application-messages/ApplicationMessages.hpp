@@ -20,6 +20,7 @@ namespace gui
         namespace window
         {
             inline const std::string thread_rm_confirm = "ConfirmRM";
+            inline const std::string thread_search_none = "SearchNone";
         };
     }; // namespace name
 };     // namespace gui
@@ -50,6 +51,8 @@ namespace app
         void destroyUserInterface() override;
 
         bool removeSMS_thread(const ThreadRecord *record);
+        /// show dialog with big search icon and text which was used for query
+        bool searchEmpty(const std::string &query = "");
     };
 } /* namespace app */
 

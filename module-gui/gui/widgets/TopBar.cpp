@@ -21,7 +21,7 @@ namespace gui
 {
 
     const uint32_t TopBar::signalOffset    = 35;
-    const uint32_t TopBar::batteryOffset   = 415;
+    const uint32_t TopBar::batteryOffset   = 413;
     gui::TopBar::TimeMode TopBar::timeMode = TimeMode::TIME_24H;
     uint32_t TopBar::time                  = 0;
 
@@ -56,7 +56,7 @@ namespace gui
             val = battery.size();
         }
         for (unsigned int i = 0; i < battery.size(); ++i) {
-            battery[i]->setVisible(val > i);
+            battery[i]->setVisible(val >= i);
         }
     }
 
@@ -73,24 +73,24 @@ namespace gui
 
         // icons for battery
         battery = {
-            new gui::Image(this, batteryOffset, 17, 0, 0, "battery0"),
-            new gui::Image(this, batteryOffset, 17, 0, 0, "battery1"),
-            new gui::Image(this, batteryOffset, 17, 0, 0, "battery2"),
-            new gui::Image(this, batteryOffset, 17, 0, 0, "battery3"),
-            new gui::Image(this, batteryOffset, 17, 0, 0, "battery4"),
-            new gui::Image(this, batteryOffset, 17, 0, 0, "battery5"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery0"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery1"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery2"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery3"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery4"),
+            new gui::Image(this, batteryOffset, 15, 0, 0, "battery5"),
         };
         batteryShowBars(0);
 
-        charging = new Label(this, batteryOffset, 17, 30, this->drawArea.h);
+        charging = new Label(this, batteryOffset, 15, 30, this->drawArea.h);
         charging->setFilled(false);
         charging->setBorderColor(gui::ColorNoColor);
         charging->setFont(style::header::font::title);
         charging->setText("Z");
         charging->setVisible(false);
 
-        const auto design_sim_offset = 378; // this offset is not final
-        sim                          = new SIM(this, design_sim_offset, 17);
+        const auto design_sim_offset = 376; // this offset is not final, but it is pixel Purefect
+        sim                          = new SIM(this, design_sim_offset, 12);
 
         // icon of the lock
         lock = new gui::Image(this, 240 - 11, 17, 0, 0, "lock");
@@ -101,7 +101,7 @@ namespace gui
         timeLabel->setBorderColor(gui::ColorNoColor);
         timeLabel->setFont(style::header::font::time);
         timeLabel->setText("00:00");
-        timeLabel->setAlignement(
+        timeLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
     }
 

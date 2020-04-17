@@ -1,33 +1,22 @@
-/*
- * @file MessagesMainWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_MESSAGESMAINWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_MESSAGESMAINWINDOW_HPP_
+#pragma once
+
+#include "../widgets/Icon.hpp"
+#include "../widgets/ThreadModel.hpp"
+
+#include <AppWindow.hpp>
+#include <Image.hpp>
+#include <Label.hpp>
+#include <ListView.hpp>
+#include <Text.hpp>
 
 #include <functional>
 #include <string>
 
-#include "AppWindow.hpp"
-#include "gui/widgets/Image.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Window.hpp"
-#include "ListView.hpp"
-#include "../widgets/ThreadModel.hpp"
-
 namespace gui
 {
-
     class MessagesMainWindow : public AppWindow
     {
       protected:
-        //    PhonebookListView* list;
-        //    PhonebookModel* phonebookModel = nullptr;
-
         Image *leftArrowImage  = nullptr;
         Image *rightArrowImage = nullptr;
         Image *newMessageImage = nullptr;
@@ -35,6 +24,8 @@ namespace gui
 
         ThreadModel *threadModel = nullptr;
         gui::ListView *list      = nullptr;
+
+        Icon *emptyListIcon = nullptr;
 
       public:
         MessagesMainWindow(app::Application *app);
@@ -53,4 +44,3 @@ namespace gui
 
 } /* namespace gui */
 
-#endif /* MODULE_APPS_APPLICATION_MESSAGES_WINDOWS_MESSAGESMAINWINDOW_HPP_ */

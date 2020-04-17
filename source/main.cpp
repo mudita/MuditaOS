@@ -31,6 +31,7 @@
 #include "service-db/ServiceDB.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-desktop/ServiceDesktop.hpp"
+#include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
 
@@ -44,6 +45,9 @@
 
 // module-sys
 #include "SystemManager/SystemManager.hpp"
+
+// libphonenumber
+#include <phonenumbers/phonenumberutil.h>
 
 class vfs vfs;
 
@@ -154,11 +158,17 @@ int main()
     auto sysmgr = std::make_shared<sys::SystemManager>(5000);
 
     sysmgr->StartSystem([sysmgr]() -> int {
+        /// force initialization of PhonenumberUtil because of its stack usage
+        /// otherwise we would end up with an init race and PhonenumberUtil could
+        /// be initiated in a task with stack not big enough to handle it
+        i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+
         vfs.Init();
 
         bool ret = false;
 
-        ret |= sys::SystemManager::CreateService(std::make_shared<EventManager>("EventManager"), sysmgr.get());
+        ret |=
+            sys::SystemManager::CreateService(std::make_shared<EventManager>(service::name::evt_manager), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceDB>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<BlinkyService>("Blinky"), sysmgr.get());
 #if defined(TARGET_Linux) && not defined(SERIAL_PORT_PATH)

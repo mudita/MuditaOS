@@ -11,21 +11,27 @@
 #include "../ApplicationCall.hpp"
 #include "../data/CallAppStyle.hpp"
 #include "../data/CallSwitchData.hpp"
-#include "InputMode.hpp"
-#include "UiCommonActions.hpp"
-#include "i18/i18.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include <ContactRecord.hpp>
+
 #include <application-phonebook/windows/PhonebookContact.hpp>
+#include <ContactRecord.hpp>
+#include <i18/i18.hpp>
+#include <InputMode.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <UiCommonActions.hpp>
+
+#include <phonenumbers/phonenumberutil.h>
+#include <phonenumbers/asyoutypeformatter.h>
 
 namespace gui
 {
     using namespace callAppStyle;
     using namespace callAppStyle::enterNumberWindow;
 
-    EnterNumberWindow::EnterNumberWindow(app::Application *app, std::string windowName) : AppWindow(app, windowName)
+    EnterNumberWindow::EnterNumberWindow(app::Application *app, std::string windowName)
+        : AppWindow(app, windowName), numberUtil(*PhoneNumberUtil::GetInstance()), currentRegionCode(defaultRegionCode)
     {
+        switchFormatter(currentRegionCode);
         buildInterface();
     }
 
@@ -34,13 +40,6 @@ namespace gui
 
     void EnterNumberWindow::setNumberLabel(const std::string num)
     {
-        auto app = dynamic_cast<app::ApplicationCall *>(application);
-        if (app == nullptr) {
-            LOG_ERROR("app != ApplicationCall");
-            return;
-        }
-        app->setDisplayedNumber(num);
-
         numberLabel->setText(num);
 
         if (numberLabel->getText().length() == 0) {
@@ -67,7 +66,7 @@ namespace gui
         numberLabel->setPenWidth(numberLabel::borderW);
         numberLabel->setFont(style::window::font::largelight);
         numberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        numberLabel->setAlignement(
+        numberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         numberLabel->setDotsMode(true, false);
 
@@ -80,8 +79,7 @@ namespace gui
     {
         auto app = dynamic_cast<app::ApplicationCall *>(application);
         if (app != nullptr) {
-            auto phoneNumber = app->getDisplayedNumber();
-            return app::contact(getApplication(), app::ContactOperation::Add, phoneNumber);
+            app->handleAddContactEvent(enteredNumber);
         }
         return false;
     }
@@ -116,62 +114,53 @@ namespace gui
         }
         auto code = translator.handle(inputEvent.key, InputMode({InputMode::phone}).get());
         if (inputEvent.state == InputEvent::State::keyReleasedShort) {
+            // Call function
             if (inputEvent.keyCode == KeyCode::KEY_LF) {
-                std::string num = app->getDisplayedNumber();
-                LOG_INFO("number: [%s]", num.c_str());
-                auto ret = CellularServiceAPI::DialNumber(application, num.c_str());
-                LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+                app->handleCallEvent(enteredNumber);
                 return true;
             }
+            // Clear/back function
             else if (inputEvent.keyCode == KeyCode::KEY_RF) {
-                std::string num = app->getDisplayedNumber();
                 // if there isn't any char in phone number field return to previous application
-                if (num.empty()) {
+                if (enteredNumber.empty()) {
+                    formatter->Clear();
                     sapm::ApplicationManager::messageSwitchPreviousApplication(application);
-                    return true;
                 }
+                // if there is the last char just clear input
+                else if (enteredNumber.size() == 1) {
+                    clearInput();
+                }
+                else {
+                    // remove last digit and reformat entered number otherwise
+                    enteredNumber = enteredNumber.substr(0, enteredNumber.size() - 1);
+                    initFormatterInput(enteredNumber);
+                    setNumberLabel(formattedNumber);
 
-                num = num.substr(0, num.size() - 1);
-                setNumberLabel(num);
-
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
+                    application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+                }
                 return true;
             }
             else if (code != 0) {
-                std::string num = app->getDisplayedNumber();
-                num += code;
-                setNumberLabel(num);
-
-                app->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
+                addDigit(code);
                 return true;
             }
         }
         else if (inputEvent.state == InputEvent::State::keyReleasedLong) {
             // erase all characters from phone number
             if (inputEvent.keyCode == KeyCode::KEY_RF) {
-                std::string num = app->getDisplayedNumber();
                 // if there isn't any char in phone number field return to previous application
-                if (num.empty()) {
+                if (enteredNumber.empty()) {
                     sapm::ApplicationManager::messageSwitchPreviousApplication(application);
                     return true;
                 }
 
-                setNumberLabel("");
-
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+                clearInput();
 
                 return true;
             }
             // long press of '0' key is translated to '+'
             else if (inputEvent.keyCode == KeyCode::KEY_0) {
-                std::string num = app->getDisplayedNumber();
-                num += '+';
-                setNumberLabel(num);
-
-                application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
-
+                addDigit('+');
                 return true;
             }
         }
@@ -182,6 +171,7 @@ namespace gui
 
     bool EnterNumberWindow::handleSwitchData(SwitchData *data)
     {
+        auto app = dynamic_cast<app::ApplicationCall *>(application);
 
         if (data == nullptr) {
             LOG_ERROR("Received null pointer");
@@ -190,14 +180,17 @@ namespace gui
 
         app::CallSwitchData *callData = dynamic_cast<app::CallSwitchData *>(data);
         if (callData != nullptr) {
-            std::string num = callData->getPhoneNumber();
-            setNumberLabel(num);
+            enteredNumber = callData->getPhoneNumber();
+
+            /// init formatter with provided number, set formatted number to be
+            /// displayed on the label
+            initFormatterInput(enteredNumber);
+            setNumberLabel(formattedNumber);
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
             switch (callData->getType()) {
             case app::CallSwitchData::Type::EXECUTE_CALL: {
-                LOG_INFO("number: [%s]", num.c_str());
-                auto ret = CellularServiceAPI::DialNumber(application, num.c_str());
-                LOG_INFO("CALL RESULT: %s", (ret ? "OK" : "FAIL"));
+                app->handleCallEvent(enteredNumber);
                 return true;
             }
 
@@ -219,4 +212,40 @@ namespace gui
         return false;
     }
 
+    void EnterNumberWindow::switchFormatter(const std::string &regionCode)
+    {
+        auto newFormatter = std::unique_ptr<Formatter>(numberUtil.GetAsYouTypeFormatter(regionCode));
+        formatter.swap(newFormatter);
+        LOG_INFO("Switched formatter to region: %s", regionCode.c_str());
+    }
+
+    void EnterNumberWindow::initFormatterInput(const std::string &number)
+    {
+        formatter->Clear();
+        for (auto c : number) {
+            formatter->InputDigit(c, &formattedNumber);
+        }
+    }
+
+    void EnterNumberWindow::addDigit(const std::string::value_type &digit)
+    {
+        enteredNumber += digit;
+        formatter->InputDigit(digit, &formattedNumber);
+        setNumberLabel(formattedNumber);
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+    }
+
+    const std::string &EnterNumberWindow::getEnteredNumber() const noexcept
+    {
+        return enteredNumber;
+    }
+
+    void EnterNumberWindow::clearInput()
+    {
+        enteredNumber.clear();
+        formattedNumber.clear();
+        formatter->Clear();
+        setNumberLabel("");
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+    }
 } /* namespace gui */

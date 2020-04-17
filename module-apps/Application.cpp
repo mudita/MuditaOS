@@ -429,7 +429,7 @@ namespace app
         }
         else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
             getCurrentWindow()->setSIM();
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
 
         if (handled)
@@ -458,6 +458,16 @@ namespace app
     {
         pushWindow(windowName);
         acceptInput = true;
+    }
+
+    bool Application::adjustCurrentVolume(const audio::Volume step)
+    {
+        audio::Volume vol;
+        auto ret = AudioServiceAPI::GetOutputVolume(this, vol);
+        if (ret == audio::RetCode::Success && vol != audio::invalidVolume) {
+            ret = AudioServiceAPI::SetOutputVolume(this, vol + step);
+        }
+        return ret == audio::RetCode::Success;
     }
 
     bool Application::messageSwitchApplication(sys::Service *sender,

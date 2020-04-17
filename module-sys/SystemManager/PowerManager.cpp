@@ -50,4 +50,9 @@ namespace sys
         return lowPowerControl->PowerOff();
     }
 
+    int32_t PowerManager::Reboot()
+    {
+        return lowPowerControl->Reboot();
+    }
+
 } // namespace sys

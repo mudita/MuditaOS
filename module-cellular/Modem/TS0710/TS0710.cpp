@@ -188,7 +188,7 @@ TS0710::ConfState TS0710::ConfProcedure()
     if (ret) {
         for (uint32_t i = 0; i < ret.response.size() - 1; ++i) // skip final "OK"
         {
-            LOG_INFO(ret.response[i].c_str());
+            LOG_INFO("%s", ret.response[i].c_str());
         }
     }
     if (hardwareControlFlowEnable) {
@@ -204,7 +204,6 @@ TS0710::ConfState TS0710::ConfProcedure()
     parser->cmd(at::AT::URC_UART1);
     parser->cmd(at::AT::AT_PIN_READY_LOGIC);
     parser->cmd(at::AT::URC_NOTIF_SIGNAL);
-
     LOG_WARN("TODO: determine while this retry loop is necessary");
     while (!parser->cmd(at::AT::QSCLK_ON)) {
         auto const sec = 1000;

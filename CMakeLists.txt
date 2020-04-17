@@ -91,6 +91,8 @@ set(PROJECT_INCLUDES
 
         CACHE INTERNAL "")
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${TARGET_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
@@ -185,9 +187,9 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} --only-keep-debug
                 $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
-                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.dbg
+                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.debug
         COMMAND ${CMAKE_STRIP} --strip-debug --strip-unneeded $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
-        COMMAND ${CMAKE_OBJCOPY} --add-gnu-debuglink=$<TARGET_FILE:${CMAKE_PROJECT_NAME}>.dbg
-                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>.dbg
+        COMMAND ${CMAKE_OBJCOPY} --add-gnu-debuglink=$<TARGET_FILE:${CMAKE_PROJECT_NAME}>.debug
+                $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
         )
 endif()

@@ -30,6 +30,7 @@ extern "C"
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
+#include "Constants.hpp"
 
 bool WorkerEvent::handleMessage(uint32_t queueID)
 {
@@ -66,18 +67,18 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
             uint8_t battLevel = 0;
             bsp::battery_getBatteryLevel(battLevel);
             bsp::battery_ClearAllIRQs();
-            auto message           = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+            auto message           = std::make_shared<sevm::BatteryLevelMessage>();
             message->levelPercents = battLevel;
             message->fullyCharged  = false;
-            sys::Bus::SendUnicast(message, "EventManager", this->service);
+            sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
         if (notification & static_cast<uint8_t>(bsp::batteryIRQSource::INOKB)) {
             bool status;
             bsp::battery_getChargeStatus(status);
             bsp::battery_ClearAllIRQs();
-            auto message     = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+            auto message     = std::make_shared<sevm::BatteryPlugMessage>();
             message->plugged = status;
-            sys::Bus::SendUnicast(message, "EventManager", this->service);
+            sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
         }
     }
 
@@ -97,7 +98,7 @@ bool WorkerEvent::handleMessage(uint32_t queueID)
 
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
-        sys::Bus::SendUnicast(message, "EventManager", this->service);
+        sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
     }
 
     if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueHarness)) {
@@ -208,5 +209,5 @@ void WorkerEvent::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
             message->key.time_release = xTaskGetTickCount();
         }
     }
-    sys::Bus::SendUnicast(message, "EventManager", this->service);
+    sys::Bus::SendUnicast(message, service::name::evt_manager, this->service);
 }

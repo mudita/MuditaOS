@@ -60,9 +60,8 @@ fi
 format_file() {
   file="${1}"
   if [ -f $file ]; then
-    [[ $VERBOSE ]] && echo "Format: ${1} diff"
-    git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
-    git add ${1}
+    [[ $VERBOSE ]] && echo "Formating"
+    git diff -U0 --no-color remotes/origin/master...HEAD ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
   fi
 }
 
@@ -74,7 +73,11 @@ check_file() {
     if [[ -z ${last_commit} ]]; then
         OUT=$(git diff -U0 --no-color --cached ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
     else
-        OUT=$(git diff -U0 --no-color remotes/origin/master...HEAD ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
+        if [[ -z ${FIX} ]]; then
+            OUT=$(git diff -U0 --no-color remotes/origin/master...HEAD ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
+        else
+            format_file ${file}
+        fi
     fi
     if [ -z "$OUT" ]; then
         [[ ${VERBOSE} ]] && echo "OK"
@@ -99,19 +102,37 @@ shouldnt_ignore() {
     return 0
 }
 
+function help() {
+        echo "Runs clang-format on source files"
+        cat <<- EOM
+		ussge:
+		   $0 [option]
+		        --about             does nothing
+		        --last              checks current branch against origin/master - doesn't fix
+		        --branch-fix        checks current branch against origin/master and fixes errors - you have to 'git add' and 'git commit' them
+		EOM
+}
+
+
 case "${1}" in
-  --about )
-    echo "Runs clang-format on source files"
-    FILES=''
-    LAST=""
-    ;;
-  --last)
-    FILES=$(git diff --name-only remotes/origin/master...HEAD)
-    LAST="True"
-    ;;
-  * )
-    FILES=$(git diff-index --cached --name-only HEAD)
-    ;;
+    --about|--help )
+        help
+        FILES=''
+        LAST=""
+        exit 0
+        ;;
+    --last)
+        FILES=$(git diff --name-only remotes/origin/master...HEAD)
+        LAST="True"
+        ;;
+    --branch-fix)
+        FILES=$(git diff --name-only remotes/origin/master...HEAD)
+        LAST="True"
+        FIX="True"
+        ;;
+    * )
+        FILES=$(git diff-index --cached --name-only HEAD)
+        ;;
 esac
 
 EXIT_CODE=0

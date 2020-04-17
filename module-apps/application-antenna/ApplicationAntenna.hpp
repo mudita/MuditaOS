@@ -21,7 +21,7 @@ namespace app
       protected:
         AppTimer appTimer;
         void timerHandler(void);
-        bool scanInProgress = false;
+        bool cellularRequestInProgress = false;
 
       public:
         ApplicationAntenna(std::string name = name_antenna, std::string parent = "", bool startBackgound = false);
@@ -40,7 +40,7 @@ namespace app
         void destroyUserInterface() override;
         void setScanInProgress(bool value)
         {
-            scanInProgress = value;
+            cellularRequestInProgress = value;
         };
     };
 

@@ -1,5 +1,6 @@
 #include "PhonebookContact.hpp"
 #include "../ApplicationPhonebook.hpp"
+#include "../data/PhonebookInternals.hpp"
 #include "InputEvent.hpp"
 #include "Label.hpp"
 #include "Margins.hpp"
@@ -15,6 +16,7 @@
 #include "service-appmgr/ApplicationManager.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 #include <log/log.hpp>
+#include <limits.h>
 
 namespace gui
 {
@@ -48,7 +50,7 @@ namespace gui
         l->setEdges(edges);
         l->setFont(fontName);
         l->setText(text);
-        l->setAlignement(alignment);
+        l->setAlignment(alignment);
         l->setLineMode(lineMode);
 
         if (parentPage)
@@ -357,14 +359,34 @@ namespace gui
         if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
             setTitle(contact->primaryName + " " + contact->alternativeName);
 
-        if (contact->speeddial < 10) {
-            speedDial->setText(std::to_string(contact->speeddial));
-        }
-        else {
-            speedDial->setText(UTF8("-"));
-        }
+        auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
+            if (speedDialStr.length() == 0)
+                return false;
 
-        if (contact->isOnFavourites == false) {
+            char *endPtr      = nullptr;
+            long speedDialInt = std::strtol(speedDialStr.c_str(), &endPtr, 10);
+            if (endPtr == speedDialStr.c_str()) {
+                LOG_ERROR("%s: not a decimal number", speedDialStr.c_str());
+                return false;
+            }
+            else if ('\0' != *endPtr) {
+                LOG_ERROR("%s: extra characters at end of input: %s\n", speedDialStr.c_str(), endPtr);
+                return false;
+            }
+            else if ((LONG_MIN == speedDialInt || LONG_MAX == speedDialInt) && ERANGE == errno) {
+                LOG_ERROR("%s out of range of type long\n", speedDialStr.c_str());
+                return false;
+            }
+            else if (speedDialInt > phonebookInternals::speedDialMaxValue) {
+                LOG_ERROR("%ld greater than speedDialMaxValue\n", speedDialInt);
+                return false;
+            }
+            return true;
+        };
+
+        speedDial->setText(isSpeedDialInRange(contact->speeddial) ? contact->speeddial : UTF8(""));
+
+        if (!contact->isOnFavourites) {
             LOG_INFO("setContactData contact %s is not on fav list", contact->primaryName.c_str());
             favouritesIcon->setVisible(false);
             favouritesLabel->setVisible(false);
@@ -373,7 +395,7 @@ namespace gui
             LOG_INFO("setContactData contact %s is on fav list", contact->primaryName.c_str());
         }
 
-        if (contact->isOnBlacklist == false) {
+        if (!contact->isOnBlacklist) {
             blockedLabel->setVisible(false);
             blockedIcon->setVisible(false);
         }
@@ -398,7 +420,7 @@ namespace gui
         }
 
         if (contact->numbers.size() == 1) {
-            numberPrimary->setText(contact->numbers[0].numberE164);
+            numberPrimary->setText(contact->numbers[0].numberUser);
 
             numberSecondary->setVisible(false);
             numberSecondaryLabel->setVisible(false);
@@ -419,8 +441,8 @@ namespace gui
 
         if (contact->numbers.size() == 2) {
 
-            numberPrimary->setText(contact->numbers[0].numberE164);
-            numberSecondary->setText(contact->numbers[1].numberE164);
+            numberPrimary->setText(contact->numbers[0].numberUser);
+            numberSecondary->setText(contact->numbers[1].numberUser);
             email->setY(363);
             addressLabel->setY(429);
             addressLine1->setY(475);

@@ -65,7 +65,7 @@ namespace gui
         titleLabel->setFont(style::header::font::title);
         titleLabel->setText(utils::localize.get("app_desktop_pin_info1"));
         titleLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        titleLabel->setAlignement(
+        titleLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         // labels with stars for displaying entered digits
@@ -78,7 +78,7 @@ namespace gui
             label->setFont(style::window::font::largelight);
             label->setText("*");
             label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
             pinLabels.push_back(label);
             pinLabelX += 84;
@@ -91,7 +91,7 @@ namespace gui
             label->setFilled(false);
             label->setBorderColor(gui::ColorNoColor);
             label->setFont(style::window::font::medium);
-            label->setAlignement(
+            label->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
             infoLabels.push_back(label);
             infoLabelY += 40;
@@ -130,13 +130,13 @@ namespace gui
             charCount = 0;
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(true);
-                pinLabels[i]->setText("");
+                pinLabels[i]->clear();
             }
             // hide second info label
             infoLabels[0]->setVisible(true);
             infoLabels[1]->setVisible(false);
             infoLabels[0]->setText(utils::localize.get("app_desktop_pin_lock"));
-            infoLabels[1]->setText("");
+            infoLabels[1]->clear();
 
             // show pin icon
             lockImage->setVisible(true);
@@ -145,7 +145,7 @@ namespace gui
         else if (state == State::WrongPinInfo) {
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(false);
-                pinLabels[i]->setText("");
+                pinLabels[i]->clear();
             }
             // hide second info label
             titleLabel->setVisible(true);
@@ -162,14 +162,14 @@ namespace gui
         else if (state == State::PhoneBlocked) {
             for (uint32_t i = 0; i < 4; i++) {
                 pinLabels[i]->setVisible(false);
-                pinLabels[i]->setText("");
+                pinLabels[i]->clear();
             }
             // hide second info label
             titleLabel->setVisible(false);
             infoLabels[0]->setVisible(true);
             infoLabels[1]->setVisible(false);
             infoLabels[0]->setText(utils::localize.get("app_desktop_pin_blocked1"));
-            infoLabels[1]->setText("");
+            infoLabels[1]->clear();
 
             // show pin icon
             lockImage->setVisible(false);
@@ -203,7 +203,7 @@ namespace gui
                 }
                 else if (inputEvent.keyCode == KeyCode::KEY_PND) {
                     if (charCount > 0) {
-                        pinLabels[charCount - 1]->setText("");
+                        pinLabels[charCount - 1]->clear();
                         charCount--;
                         bottomBar->setActive(BottomBar::Side::CENTER, false);
                         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);

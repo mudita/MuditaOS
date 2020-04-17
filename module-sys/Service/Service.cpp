@@ -1,10 +1,23 @@
 #include <algorithm>
 #include "Service.hpp"
+#include "Service/Message.hpp"
 #include "thread.hpp"
 #include "ticks.hpp"
 #include "timer.hpp"
 #include "Bus.hpp"
-#include "LogOutput.hpp"
+
+// this could use Scoped() class from utils to print execution time too
+void debug_msg(sys::Service *srvc, sys::DataMessage *&ptr)
+{
+#if (DEBUG_SERVICE_MESSAGES > 0)
+    LOG_DEBUG("Handle message ([%s] -> [%s] (%s) data: %s",
+              ptr->sender.c_str(),
+              srvc->GetName().c_str(),
+              typeid(*ptr).name(),
+              std::string(*ptr).c_str());
+#else
+#endif
+}
 
 namespace sys
 {
@@ -24,7 +37,7 @@ namespace sys
     Service::~Service()
     {
         enableRunLoop = false;
-        LogOutput::Output(GetName() + ":Service base destructor");
+        LOG_DEBUG("%s", (GetName() + ":Service base destructor").c_str());
     }
 
     void Service::StartService()
@@ -32,7 +45,7 @@ namespace sys
         Bus::Add(shared_from_this());
         enableRunLoop = true;
         if (!Start()) {
-            LogOutput::Output("FATAL ERROR: Start service failed!");
+            LOG_FATAL("FATAL ERROR: Start service failed!");
             configASSERT(0);
         }
     }
@@ -55,6 +68,7 @@ namespace sys
                                                 }),
                                  staleUniqueMsg.end());
 
+            /// this is the only place that uses Reponse messages (service manager doesnt...)
             auto ret = msg->Execute(this);
             if (ret == nullptr) {
                 LOG_FATAL("NO MESSAGE from: %s msg type: %d", msg->sender.c_str(), static_cast<int>(msg->type));
@@ -73,6 +87,39 @@ namespace sys
         Bus::Remove(shared_from_this());
     };
 
+    auto Service::MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t
+    {
+        Message_t ret = std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+        auto idx      = type_index(typeid(*message));
+        auto handler  = message_handlers.find(idx);
+        debug_msg(this, message);
+        if (handler != message_handlers.end()) {
+            ret = message_handlers[idx](message, response);
+        }
+        else {
+            ret = DataReceivedHandler(message, response);
+        }
+        return ret;
+    }
+
+    bool Service::connect(Message *msg, MessageHandler handler)
+    {
+        auto &type = typeid(*msg);
+        auto idx   = type_index(type);
+        if (message_handlers.find(idx) == message_handlers.end()) {
+            LOG_DEBUG("Registering new message handler on %s", type.name());
+            message_handlers[idx] = handler;
+            return true;
+        }
+        LOG_ERROR("Handler for: %s already registered!", type.name());
+        return false;
+    }
+
+    bool Service::connect(Message &&msg, MessageHandler handler)
+    {
+        return Service::connect(&msg, handler);
+    }
+
     // Create service timer
     uint32_t Service::CreateTimer(uint32_t interval, bool isPeriodic, const std::string &name)
     {
@@ -81,9 +128,10 @@ namespace sys
         if (name.empty()) {
             nameNew = GetName() + "Timer" + std::to_string(unique);
         }
+        // this is bad... timer should message service, not run code on it
         timersList.push_back(
             std::make_unique<ServiceTimer>(nameNew, Ticks::MsToTicks(interval), isPeriodic, unique, this));
-        LOG_DEBUG(std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
+        LOG_DEBUG("%s", std::string(nameNew + "'s ID: " + std::to_string(unique)).c_str());
         return unique;
     }
 

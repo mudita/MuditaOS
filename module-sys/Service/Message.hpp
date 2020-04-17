@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Common.hpp"
-#include "LogOutput.hpp"
 #include "MessageType.hpp"
 #include <memory>
 #include <stdint.h>
@@ -76,6 +75,11 @@ namespace sys
         uint64_t id;
         uint64_t uniID;
 
+        virtual operator std::string() const
+        {
+            return "{}";
+        }
+
 #ifdef UNIT_TESTS
         static uint32_t unitestsMsgInstancesCount;
 #endif
@@ -112,7 +116,7 @@ namespace sys
             type = Type::Data;
         }
 
-        Message_t Execute(Service *service) override;
+        Message_t Execute(Service *service) override final;
     };
 
     class ResponseMessage : public Message

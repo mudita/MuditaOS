@@ -20,12 +20,14 @@ target_sources( ${PROJECT_NAME}
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/Icon.cpp"
         
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesMainWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/ThreadViewWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/NewMessage.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/OptionsWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/OptionsMessages.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/SearchStart.cpp"
 
 	PUBLIC
 		#"${CMAKE_CURRENT_LIST_DIR}/MessagesModel.hpp"

@@ -41,16 +41,19 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/common_data/EventStore.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ucs2/UCS2.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/time/time_date_validation.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/microtar/src/microtar.c
-	${CMAKE_CURRENT_SOURCE_DIR}/crc32/crc32.c
-	${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.c
-
-        )
+        ${CMAKE_CURRENT_SOURCE_DIR}/microtar/src/microtar.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/crc32/crc32.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.c
+)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 
 include(segger/rtt/CMakeLists.txt)
 
+# add third party libs
+include(third-party/re2.cmake)
+include(third-party/protobuf-lite.cmake)
+include(third-party/libphonenumber.cmake)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC module-os module-vfs)
 
@@ -65,9 +68,9 @@ target_compile_options(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_OPTIONS})
 target_link_options(${PROJECT_NAME} PUBLIC ${TARGET_LINK_OPTIONS})
 
 target_include_directories(${PROJECT_NAME}
-		PUBLIC
+        PUBLIC
 
-		${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 

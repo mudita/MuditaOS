@@ -40,7 +40,7 @@ namespace gui
             new gui::Label(it, 0, it->area().h - style::design::tile_text_y, it->area().w, style::design::tile_text_y);
         desc->setPenWidth(style::window::default_border_no_focus_w);
         desc->setFont(style::window::font::verysmall);
-        desc->setAlignement(
+        desc->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         desc->setText(utils::localize.get(title));
 
@@ -121,7 +121,7 @@ namespace gui
                     },
                 },
                 new gui::Tile("menu_alarm", "app_desktop_menu_alarm", [=](gui::Item &item) { return true; }),
-                new gui::Tile("menu_calendar", "app_desktop_menu_calendar", [=](gui::Item &item) { return true; }),
+                new gui::Tile("menu_calendar_W_G", "app_desktop_menu_calendar", [=](gui::Item &item) { return true; }),
                 new gui::Tile{"menu_phone",
                               "app_desktop_menu_phone",
                               [=](gui::Item &item) {
@@ -150,7 +150,8 @@ namespace gui
                               },
                               app->notifications.notSeenSMS},
                 new gui::Tile{"menu_music_player", "app_desktop_menu_music", [=](gui::Item &item) { return true; }},
-                new gui::Tile{"menu_meditation", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
+                new gui::Tile{
+                    "menu_meditation_W_G", "app_desktop_menu_meditation", [=](gui::Item &item) { return true; }},
                 new gui::Tile{"menu_settings",
                               "app_desktop_menu_settings",
                               [=](gui::Item &item) {

@@ -76,6 +76,7 @@ namespace style
     }; // namespace window
     namespace footer
     {
+        const inline uint32_t height = 54;
         namespace font
         {
             const inline std::string bold   = "gt_pressura_bold_24";
@@ -120,6 +121,7 @@ namespace style
             const inline std::string Switch      = "common_switch";
             const inline std::string options     = "common_options";
             const inline std::string information = "common_information";
+            const inline std::string search      = "common_search";
             // days
             const inline std::string Monday    = "common_monday";
             const inline std::string Tuesday   = "common_tuesday";

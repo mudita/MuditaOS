@@ -15,6 +15,7 @@ extern "C"
 
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <module-utils/common_data/EventStore.hpp>
 
 #include "board.h"
 #include "bsp/battery-charger/battery_charger.hpp"
@@ -39,6 +40,7 @@ namespace bsp
         if (xTaskCreate(battery_worker, "battery", 512, qHandle, 0, &battery_worker_handle) != pdPASS) {
             return 1;
         }
+        Store::Battery::modify().level = battLevel;
         return 0;
     }
 
@@ -50,6 +52,7 @@ namespace bsp
     void battery_getBatteryLevel(uint8_t &levelPercent)
     {
         levelPercent = battLevel;
+        Store::Battery::modify().level = battLevel;
     }
 
     void battery_getChargeStatus(bool &status)
@@ -96,7 +99,7 @@ namespace bsp
                     break;
                 case '[':
                     notification = 0x01;
-                    if (battLevel > 1)
+                    if (battLevel >= 1)
                         battLevel--;
                     break;
                 }

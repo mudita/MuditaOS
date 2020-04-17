@@ -8,7 +8,9 @@
 
 namespace app
 {
-    inline const std::string name_call = "ApplicationCall";
+    inline const std::string name_call      = "ApplicationCall";
+    constexpr std::uint16_t call_stack_size = 8192;
+
     namespace window
     {
         inline const std::string name_call              = "CallWindow";
@@ -16,6 +18,8 @@ namespace app
         inline const std::string name_emergencyCall     = "EmergencyCallWindow";
         inline const std::string name_duplicatedContact = "DuplicatedContactWindow";
     } // namespace window
+
+    inline const std::string ringtone_path = "sys/assets/audio/ringtone.wav"; // Should bo moved to database
 
     class ApplicationCall : public Application
     {
@@ -26,9 +30,8 @@ namespace app
         void RingingHandler(const CellularNotificationMessage *const msg);
 
       protected:
-        std::string phoneNumber;
         AppTimer timerCall;
-        utils::time::Timestamp callStartTime      = 0;
+        utils::time::Timestamp callStartTime = 0;
         utils::time::Duration callDuration;
         utils::time::Timestamp callDelayedStopTime = 0;
         void timerCallCallback();
@@ -53,5 +56,8 @@ namespace app
         // move to previous application
         void runCallTimer();
         void stopCallTimer();
+
+        void handleCallEvent(const std::string &number);
+        void handleAddContactEvent(const std::string &number);
     };
 } /* namespace app */

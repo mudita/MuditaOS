@@ -29,7 +29,7 @@ namespace gui
         value->setPenFocusWidth(0);
         value->setPenWidth(0);
         value->setFont(style::window::font::small);
-        value->setAlignement(
+        value->setAlignment(
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
     }
 

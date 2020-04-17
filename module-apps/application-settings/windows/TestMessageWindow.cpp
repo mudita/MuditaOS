@@ -62,7 +62,7 @@ namespace gui
         topBar->setActive(TopBar::Elements::BATTERY, true);
 
         receivedLabel = new gui::Label(this, 10, 50, 480 - 20, 50, "Received SMS");
-        receivedLabel->setAlignement(
+        receivedLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         receivedLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
@@ -70,7 +70,7 @@ namespace gui
         receiveNumber->setFont(style::window::font::small);
 
         RecNumberLabel = new gui::Label(this, 10, 190, 90, 50, "Number");
-        RecNumberLabel->setAlignement(
+        RecNumberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         RecNumberLabel->setFont(style::window::font::small);
         RecNumberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
@@ -80,13 +80,13 @@ namespace gui
         receiveMessage->setFont(style::window::font::small);
 
         RecMessageLabel = new gui::Label(this, 10, 120, 90, 50, "Message");
-        RecMessageLabel->setAlignement(
+        RecMessageLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         RecMessageLabel->setFont(style::window::font::small);
         RecMessageLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         sendLabel = new gui::Label(this, 10, 290, 480 - 20, 50, "New SMS");
-        sendLabel->setAlignement(
+        sendLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         sendLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
@@ -100,19 +100,19 @@ namespace gui
         sendNumber->setFont(style::window::font::small);
 
         SendNumberLabel = new gui::Label(this, 10, 430, 90, 50, "Number");
-        SendNumberLabel->setAlignement(
+        SendNumberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         SendNumberLabel->setFont(style::window::font::small);
         SendNumberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         SendMessageLabel = new gui::Label(this, 10, 360, 90, 50, "Message");
-        SendMessageLabel->setAlignement(
+        SendMessageLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         SendMessageLabel->setFont(style::window::font::small);
         SendMessageLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
 
         sendButton = new gui::Label(this, 10, 500, 480 - 20, 50, "Send SMS");
-        sendButton->setAlignement(
+        sendButton->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_VERTICAL_CENTER, gui::Alignment::ALIGN_HORIZONTAL_CENTER));
         sendButton->setPenWidth(1);
         sendButton->setPenFocusWidth(3);

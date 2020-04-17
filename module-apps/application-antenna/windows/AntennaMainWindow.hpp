@@ -1,12 +1,5 @@
-/*
- * AntennaMAinWindow.hpp
- *
- *  Created on: 18 lut 2020
- *      Author: kuba
- */
 
-#ifndef MODULE_APPS_APPLICATION_ANTENNA_WINDOWS_ANTENNAMAINWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_ANTENNA_WINDOWS_ANTENNAMAINWINDOW_HPP_
+#pragma once
 
 #include "Application.hpp"
 #include "gui/widgets/Text.hpp"
@@ -21,7 +14,7 @@ namespace gui
         std::vector<gui::Label *> titles;
 
         std::vector<gui::Label *> buttons;
-        gui::Text *operators;
+        gui::Text *operators = nullptr;
 
         gui::Label *addLabel(const UTF8 &title,
                              std::function<bool(Item &)> activatedCallback,
@@ -33,6 +26,14 @@ namespace gui
             status    = 1,
             band      = 2,
             operators = 3
+        };
+
+        enum buttonDescriotion
+        {
+            AntennaA = 0,
+            AntennaB,
+            StartScan,
+            ScanMode
         };
 
       public:
@@ -51,4 +52,3 @@ namespace gui
 
 } /* namespace gui */
 
-#endif /* MODULE_APPS_APPLICATION_ANTENNA_WINDOWS_ANTENNAMAINWINDOW_HPP_ */

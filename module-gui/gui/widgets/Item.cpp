@@ -41,6 +41,22 @@ namespace gui
             delete navigationDirections;
     }
 
+    bool Item::erase(Item *item)
+    {
+        if (removeWidget(item)) {
+            delete item;
+            return true;
+        }
+        return false;
+    }
+
+    void Item::erase()
+    {
+        for (auto el : children) {
+            erase(el);
+        }
+    }
+
     void Item::addWidget(Item *item)
     {
         if (item == nullptr)

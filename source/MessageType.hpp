@@ -86,6 +86,11 @@ enum class MessageType
     CellularOperatorsScanResult,
     CellularNetworkInfoResult,
     CellularSelectAntenna,
+    CellularSetScanMode,
+    CellularGetScanMode,
+    CellularGetScanModeResult,
+    CellularGetFirmwareVersion,
+    CellularGetFirmwareVersionResult,
 
     DBNotesAdd,            // Add new note's record
     DBNotesRemove,         // Remove selected note's record
@@ -114,6 +119,8 @@ enum class MessageType
 
     AudioSetOutputVolume,
     AudioSetInputGain,
+    AudioGetOutputVolume,
+    AudioGetInputGain,
     AudioGetFileTags,
 
     // application manager

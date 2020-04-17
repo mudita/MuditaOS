@@ -1,39 +1,28 @@
-/*
- * @file MessagesMainWindow.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#include <functional>
-#include <memory>
-
-#include "../ApplicationMessages.hpp"
-#include "service-appmgr/ApplicationManager.hpp"
-
-#include "service-db/messages/DBMessage.hpp"
-#include "i18/i18.hpp"
-
-#include "Label.hpp"
-#include "ListView.hpp"
-#include "Margins.hpp"
 #include "MessagesMainWindow.hpp"
+
+#include "NewMessage.hpp"
+#include "OptionsWindow.hpp"
+#include "../ApplicationMessages.hpp"
 #include "../MessagesStyle.hpp"
-
-#include "service-db/api/DBServiceAPI.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-
 #include "../data/SMSdata.hpp"
 #include "../widgets/ThreadItem.hpp"
 #include "../windows/ThreadViewWindow.hpp"
-#include "NewMessage.hpp"
-#include "OptionsWindow.hpp"
-#include "application-phonebook/data/PhonebookItemData.hpp"
+#include "application-messages/windows/SearchStart.hpp"
+
+#include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBMessage.hpp>
+#include <i18/i18.hpp>
+#include <Margins.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <application-phonebook/data/PhonebookItemData.hpp>
 #include <Style.hpp>
 #include <log/log.hpp>
+#include <time/time_conversion.hpp>
 
-#include "time/time_conversion.hpp"
+#include <functional>
+#include <memory>
+#include <cassert>
 
 namespace gui
 {
@@ -65,7 +54,6 @@ namespace gui
         list->setProvider(threadModel);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
-
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
         bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
@@ -81,36 +69,58 @@ namespace gui
         newMessageImage = new gui::Image(this, 48, 55, 0, 0, "cross");
         searchImage     = new gui::Image(this, 480 - 48 - 26, 55, 0, 0, "search");
 
-        //	setFocusItem( list );
+        emptyListIcon = new Icon(this,
+                                 0,
+                                 style::header::height,
+                                 style::window_width,
+                                 style::window_height - style::header::height - style::footer::height,
+                                 "phonebook_empty_grey_circle_W_G",
+                                 utils::localize.get("app_messages_no_messages"));
+
+        list->setVisible(true);
+        list->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setActive(BottomBar::Side::LEFT, true);
+            bottomBar->setActive(BottomBar::Side::CENTER, true);
+            rightArrowImage->setVisible(true);
+            searchImage->setVisible(true);
+            return true;
+        };
+
+        emptyListIcon->setVisible(false);
+        emptyListIcon->focusChangedCallback = [=](gui::Item &item) {
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
+            bottomBar->setActive(BottomBar::Side::CENTER, false);
+            rightArrowImage->setVisible(false);
+            searchImage->setVisible(false);
+            return true;
+        };
     }
     void MessagesMainWindow::destroyInterface()
     {
         AppWindow::destroyInterface();
-        if (list) {
-            removeWidget(list);
-            delete list;
-            list = nullptr;
-        }
-        if (leftArrowImage) {
-            removeWidget(leftArrowImage);
-            delete leftArrowImage;
-            leftArrowImage = nullptr;
-        }
-        if (rightArrowImage) {
-            removeWidget(rightArrowImage);
-            delete rightArrowImage;
-            rightArrowImage = nullptr;
-        }
-        if (newMessageImage) {
-            removeWidget(newMessageImage);
-            delete newMessageImage;
-            newMessageImage = nullptr;
-        }
-        if (searchImage) {
-            removeWidget(searchImage);
-            delete searchImage;
-            searchImage = nullptr;
-        }
+        removeWidget(list);
+        delete list;
+        list = nullptr;
+
+        removeWidget(leftArrowImage);
+        delete leftArrowImage;
+        leftArrowImage = nullptr;
+
+        removeWidget(rightArrowImage);
+        delete rightArrowImage;
+        rightArrowImage = nullptr;
+
+        removeWidget(newMessageImage);
+        delete newMessageImage;
+        newMessageImage = nullptr;
+
+        removeWidget(searchImage);
+        delete searchImage;
+        searchImage = nullptr;
+
+        removeWidget(emptyListIcon);
+        delete emptyListIcon;
+        emptyListIcon = nullptr;
 
         children.clear();
         delete threadModel;
@@ -145,10 +155,17 @@ namespace gui
 
             setFocusItem(list);
         }
+
+        if (threadModel->getItemCount() == 0) {
+            emptyListIcon->setVisible(true);
+            setFocusItem(emptyListIcon);
+        }
     }
 
     bool MessagesMainWindow::onInput(const InputEvent &inputEvent)
     {
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app);
         // check if any of the lower inheritance onInput methods catch the event
         if (AppWindow::onInput(inputEvent)) {
             return true;
@@ -159,13 +176,13 @@ namespace gui
                 case gui::KeyCode::KEY_LEFT:
                     application->switchWindow(gui::name::window::new_sms, nullptr);
                     return true;
-                case gui::KeyCode::KEY_LF: {
+                case gui::KeyCode::KEY_RIGHT: {
                     auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                    if (app == nullptr) {
-                        LOG_ERROR("Something went horribly wrong");
-                        return false;
-                    }
-                    if (app->windowOptions != nullptr) {
+                    app->switchWindow(gui::name::window::thread_sms_search, nullptr);
+                    return true;
+                } break;
+                case gui::KeyCode::KEY_LF: {
+                    if (app->windowOptions != nullptr && getFocusItem() == list) {
                         app->windowOptions->clearOptions();
                         auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
                         if (it) {

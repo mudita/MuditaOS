@@ -27,9 +27,9 @@ struct ContactsTableRow
     bool isOnWhitelist     = false;
     bool isOnBlacklist     = false;
     bool isOnFavourites    = false;
-    uint32_t speedDial     = 0;
-    UTF8 namePrimary     = "";
-    UTF8 nameAlternative = "";
+    std::string speedDial  = "";
+    UTF8 namePrimary       = "";
+    UTF8 nameAlternative   = "";
 };
 
 enum class ContactTableFields
@@ -84,7 +84,7 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
         "whitelist        INTEGER,"
         "blacklist        INTEGER,"
         "favourites       INTEGER,"
-        "speeddial        INTEGER,"
+        "speeddial        TEXT NOT NULL,"
         "FOREIGN KEY(name_id) REFERENCES contact_name(_id) FOREIGN KEY(ring_id) REFERENCES contact_ringtones(_id)"
         ");";
 };

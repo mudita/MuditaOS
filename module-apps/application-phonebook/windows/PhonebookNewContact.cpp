@@ -52,7 +52,7 @@ namespace gui
         else {
             title->setText(utils::localize.get("app_phonebook_contact_title"));
         }
-        title->setAlignement(
+        title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         // page 1 labels and text
@@ -66,7 +66,7 @@ namespace gui
             if (i == 0)
                 page1.labels[i]->setFont(style::footer::font::bold);
 
-            page1.labels[i]->setAlignement(
+            page1.labels[i]->setAlignment(
                 gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
             page1.text[i] = new gui::Text(this, 30, 157 + 87 * i, 420, 42);
@@ -133,14 +133,18 @@ namespace gui
         page2.speedValue->setPenWidth(1);
         page2.speedValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         page2.speedValue->setFont(style::window::font::small);
-        page2.speedValue->setAlignement(
+        page2.speedValue->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.speedValue->focusChangedCallback = [=](gui::Item &item) { return true; };
 
         page2.speedValue->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
+            if (inputEvent.keyCode == KeyCode::KEY_PND) {
+                page2.speedValue->clear();
+                return true;
+            }
             int val = gui::toNumeric(inputEvent.keyCode);
-            if ((val >= 0) && (val < 9)) {
+            if ((val >= 0) && (val <= 9)) {
                 page2.speedValue->setText(std::to_string(val));
                 return true;
             }
@@ -154,7 +158,7 @@ namespace gui
         page2.speedDescription->setPenWidth(0);
         page2.speedDescription->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.speedDescription->setFont(style::window::font::small);
-        page2.speedDescription->setAlignement(
+        page2.speedDescription->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.imageSpeed = new gui::Image(this, 416, 122, 0, 0, "small_circle");
@@ -166,7 +170,7 @@ namespace gui
         page2.favValue->setPenWidth(1);
         page2.favValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         page2.favValue->setFont(style::window::font::small);
-        page2.favValue->setAlignement(
+        page2.favValue->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.favValue->focusChangedCallback = [=](gui::Item &item) {
@@ -206,7 +210,7 @@ namespace gui
         page2.favDescription->setPenWidth(0);
         page2.favDescription->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.favDescription->setFont(style::window::font::small);
-        page2.favDescription->setAlignement(
+        page2.favDescription->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         page2.imageTick = new gui::Image(this, 43, 174, 0, 0, "small_tick");
@@ -222,7 +226,7 @@ namespace gui
         page2.addressLabel->setBorderColor(gui::ColorFullBlack);
         page2.addressLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.addressLabel->setFont(style::window::font::small);
-        page2.addressLabel->setAlignement(
+        page2.addressLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         page2.addressLabel->setText(utils::localize.get("app_phonebook_new_contact_address"));
 
@@ -231,7 +235,7 @@ namespace gui
         page2.noteLabel->setBorderColor(gui::ColorFullBlack);
         page2.noteLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
         page2.noteLabel->setFont(style::window::font::small);
-        page2.noteLabel->setAlignement(
+        page2.noteLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
         page2.noteLabel->setText(utils::localize.get("app_phonebook_new_contact_note"));
 
@@ -355,7 +359,7 @@ namespace gui
         }
     }
 
-    void PhonebookNewContact::coppyDataToContact()
+    void PhonebookNewContact::copyDataToContact()
     {
         if (contact) {
             contact->primaryName     = page1.text[0]->getText();
@@ -369,7 +373,7 @@ namespace gui
             contact->mail           = page1.text[4]->getText();
             contact->note           = page2.text[1]->getText();
             contact->isOnFavourites = page2.favSelected;
-            contact->speeddial      = atoi(page2.speedValue->getText().c_str());
+            contact->speeddial      = page2.speedValue->getText();
         }
     }
 
@@ -405,10 +409,10 @@ namespace gui
                 page2.imageTick->setVisible(false);
                 page2.favSelected = false;
             }
-            if (contact->speeddial < 10)
-                page2.speedValue->setText(std::to_string(contact->speeddial));
+            if (contact->speeddial.length() > 0)
+                page2.speedValue->setText(contact->speeddial);
             else
-                page2.speedValue->setText("-");
+                page2.speedValue->clear();
 
             saveStateChanged();
         }
@@ -421,12 +425,12 @@ namespace gui
     void PhonebookNewContact::switchPage(uint32_t page)
     {
         if (page == 0) {
-            page1.setVisibile(true);
-            page2.setVisibile(false);
+            page1.setVisible(true);
+            page2.setVisible(false);
         }
         else if (page == 1) {
-            page1.setVisibile(false);
-            page2.setVisibile(true);
+            page1.setVisible(false);
+            page2.setVisible(true);
         }
     }
 
@@ -486,6 +490,8 @@ namespace gui
             }
         }
 
+        application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+
         return (false);
     }
 
@@ -499,7 +505,7 @@ namespace gui
         record.mail           = page1.text[4]->getText();
         record.note           = page2.text[1]->getText();
         record.isOnFavourites = page2.favSelected;
-        record.speeddial      = atoi(page2.speedValue->getText().c_str());
+        record.speeddial      = page2.speedValue->getText();
 
         /** basic sanity checks */
         if (!isValidName(record.primaryName)) {
@@ -538,7 +544,7 @@ namespace gui
                 return (false);
             }
             else {
-                coppyDataToContact();
+                copyDataToContact();
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 LOG_INFO("verifyAndSave contact ADDED");
@@ -551,7 +557,7 @@ namespace gui
                 return (false);
             }
             else {
-                coppyDataToContact();
+                copyDataToContact();
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 

@@ -67,14 +67,14 @@ namespace gui
         durationLabel->setFilled(false);
         durationLabel->setBorderColor(gui::ColorNoColor);
         durationLabel->setFont(style::window::font::mediumlight);
-        durationLabel->setAlignement(
+        durationLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setFilled(false);
         numberLabel->setBorderColor(gui::ColorNoColor);
         numberLabel->setFont(style::window::font::largelight);
-        numberLabel->setAlignement(
+        numberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
 
         speakerIcon                       = new SpeakerIcon(this, speakerIcon::x, speakerIcon::y);
@@ -143,16 +143,13 @@ namespace gui
     {
         AppWindow::destroyInterface();
 
-        if (numberLabel) {
-            removeWidget(numberLabel);
-            delete numberLabel;
-            numberLabel = nullptr;
-        }
-        if (durationLabel) {
-            removeWidget(durationLabel);
-            delete durationLabel;
-            durationLabel = nullptr;
-        }
+        removeWidget(numberLabel);
+        delete numberLabel;
+        numberLabel = nullptr;
+
+        removeWidget(durationLabel);
+        delete durationLabel;
+        durationLabel = nullptr;
 
         removeWidget(microphoneIcon);
         delete microphoneIcon;
@@ -166,16 +163,13 @@ namespace gui
         delete sendSmsIcon;
         sendSmsIcon = nullptr;
 
-        if (imageCircleTop) {
-            removeWidget(imageCircleTop);
-            delete imageCircleTop;
-            imageCircleTop = nullptr;
-        }
-        if (imageCircleBottom) {
-            removeWidget(imageCircleBottom);
-            delete imageCircleBottom;
-            imageCircleBottom = nullptr;
-        }
+        removeWidget(imageCircleTop);
+        delete imageCircleTop;
+        imageCircleTop = nullptr;
+
+        removeWidget(imageCircleBottom);
+        delete imageCircleBottom;
+        imageCircleBottom = nullptr;
 
         children.clear();
     }

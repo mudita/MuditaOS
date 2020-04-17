@@ -56,7 +56,7 @@ void PhonebookDialog::buildInterface()
     noLabel->setBorderColor(ColorFullBlack);
     noLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     noLabel->setFont(style::window::font::small);
-    noLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    noLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
     yesLabel->setPenWidth(0);
@@ -65,7 +65,7 @@ void PhonebookDialog::buildInterface()
     yesLabel->setBorderColor(ColorFullBlack);
     yesLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     yesLabel->setFont(style::window::font::small);
-    yesLabel->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    yesLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     noLabel->setNavigationItem(NavigationDirection::DOWN, yesLabel);
     yesLabel->setNavigationItem(NavigationDirection::UP, noLabel);
@@ -240,7 +240,7 @@ void PhonebookDuplicateSpeedDial::onBeforeShow(ShowMode mode, SwitchData *data)
     dialValue->setBorderColor(ColorFullBlack);
     dialValue->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
     dialValue->setFont(style::window::font::largelight);
-    dialValue->setAlignement(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
+    dialValue->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
     noLabel->inputCallback = [=](gui::Item &item, const InputEvent &inputEvent) {
         if ((inputEvent.keyCode == KeyCode::KEY_ENTER) && ((inputEvent.state == InputEvent::State::keyReleasedShort) ||
@@ -271,11 +271,13 @@ void PhonebookDuplicateSpeedDial::setContactData()
 {
     /* for name formatting */
     std::string t = utils::localize.get("app_phonebook_duplicate_speed_dial");
-    fillContactData(t, contact);
+    if (!fillContactData(t, contact))
+        return;
     confirmationLabel->setText(t);
+    if (contact->speeddial.length() > 0)
+        dialValue->setText(contact->speeddial);
+    else
+        dialValue->clear();
 
-    /* speeddial value convert to string */
-    dialValue->setText(std::to_string(contact->speeddial));
-
-    setTitle(contact.get()->numbers[0].numberE164);
+    setTitle(contact.get()->numbers[0].numberUser);
 }

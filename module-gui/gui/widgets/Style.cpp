@@ -12,7 +12,7 @@ namespace style::window
         el->setPenWidth(default_border_no_focus_w);
         el->setPenFocusWidth(default_border_focucs_w);
         el->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        el->setAlignement(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
+        el->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER));
     }
 
     void decorateOption(gui::Label *el)

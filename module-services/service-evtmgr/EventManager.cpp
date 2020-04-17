@@ -25,11 +25,12 @@
 #include "harness/events/AtResponse.hpp"
 #include "harness/events/FocusApp.hpp"
 #include <service-cellular/messages/CellularMessage.hpp>
+#include <service-evtmgr/Constants.hpp>
+#include <cassert>
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
-    LOG_INFO("[EventManager] Initializing");
-
+    LOG_INFO("[%s] Initializing", name.c_str());
     alarmTimestamp = 0;
     alarmID        = 0;
     busChannels.push_back(sys::BusChannels::ServiceDBNotifications);
@@ -38,7 +39,7 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
 EventManager::~EventManager()
 {
 
-    LOG_INFO("[EventManager] Cleaning resources");
+    LOG_INFO("[%s] Cleaning resources", GetName().c_str());
     if (EventWorker != nullptr) {
         EventWorker->deinit();
     }
@@ -69,14 +70,18 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     }
     else if (msgl->messageType == MessageType::KBDKeyEvent && msgl->sender == this->GetName()) {
 
-        auto *msg = reinterpret_cast<sevm::KbdMessage *>(msgl);
-
+        auto *msg = dynamic_cast<sevm::KbdMessage *>(msgl);
+        assert(msg);
         auto message = std::make_shared<sevm::KbdMessage>();
         message->key = msg->key;
 
         if (suspended && (message->key.state == RawKey::State::Pressed)) {
             suspended = false;
             sys::SystemManager::ResumeSystem(this);
+        }
+        if (message->key.state == RawKey::State::Pressed && message->key.key_code == bsp::KeyCodes::FnRight) {
+            // and state == ShutDown
+            sys::Bus::SendUnicast(message, service::name::system_manager, this);
         }
 
         // send key to focused application
@@ -104,7 +109,7 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::SystemManager::ResumeSystem(this);
         }
 
-        auto message           = std::make_shared<sevm::BatteryLevelMessage>(MessageType::EVMBatteryLevel);
+        auto message           = std::make_shared<sevm::BatteryLevelMessage>();
         message->levelPercents = msg->levelPercents;
         message->fullyCharged  = msg->fullyCharged;
 
@@ -122,8 +127,12 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
             sys::SystemManager::ResumeSystem(this);
         }
 
-        auto message     = std::make_shared<sevm::BatteryPlugMessage>(MessageType::EVMChargerPlugged);
+        auto message     = std::make_shared<sevm::BatteryPlugMessage>();
         message->plugged = msg->plugged;
+
+        if (!message->plugged) {
+            sys::Bus::SendUnicast(message, service::name::system_manager, this);
+        }
 
         if (targetApplication.empty() == false) {
             sys::Bus::SendUnicast(message, targetApplication, this);
@@ -215,5 +224,5 @@ bool EventManager::messageSetApplication(sys::Service *sender, const std::string
 {
 
     auto msg = std::make_shared<sevm::EVMFocusApplication>(applicationName);
-    return sys::Bus::SendUnicast(msg, "EventManager", sender);
+    return sys::Bus::SendUnicast(msg, service::name::evt_manager, sender);
 }

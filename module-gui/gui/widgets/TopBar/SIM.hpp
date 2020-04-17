@@ -11,8 +11,8 @@ namespace gui
 
       public:
         /// create first image (sim unknown) and set it
-        const unsigned int w   = 32;
-        const unsigned int h   = 24;
+        const unsigned int w   = 24;
+        const unsigned int h   = 30;
         const char *sim1       = "sim1";       // sim 1 indicator
         const char *sim2       = "sim2";       // sim 2 indicator
         const char *simunknown = "simunknown"; // sim - unknown sim state indicator (i.e. no initialization was done)

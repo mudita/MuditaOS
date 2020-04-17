@@ -9,19 +9,20 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <stdbool.h>
 #include "thread.hpp"
 #include "timer.hpp"
+#include <typeindex>
 
 namespace sys
 {
+    using MessageHandler = std::function<Message_t(DataMessage *, ResponseMessage *)>;
 
     class ServiceTimer : public Timer
     {
       public:
         ServiceTimer(const std::string &name, TickType_t tick, bool isPeriodic, uint32_t idx, Service *service);
 
-        uint32_t GetId() const
+        [[nodiscard]] uint32_t GetId() const
         {
             return m_id;
         }
@@ -40,9 +41,19 @@ namespace sys
         static uint32_t m_timers_unique_idx;
     };
 
+    /// proxy has one objective - be friend for Service, so that Message which is not a friend could access
+    /// one and only one entrypoint to messages entrypoint (MessageEntry)
+    /// MessageEntry calls overridable DataReceivedHandler for Service instance and all Calls that are 100% neccessary
+    /// for service
+    struct Proxy;
+
     class Service : public cpp_freertos::Thread, public std::enable_shared_from_this<Service>
     {
       public:
+        /// TODO this should be split in two...
+        /// only ServiceManager should be able to not tell who is it's parent :/
+        /// parent ... should be (sharet) pointer at least.. (to be able to tell if parent exists (shared) and to
+        /// identify parent nicelly)
         Service(std::string name,
                 std::string parent       = "",
                 uint32_t stackDepth      = 4096,
@@ -65,10 +76,13 @@ namespace sys
          */
         void stopTimer(uint32_t id);
 
-        // Invoked when service received data message
+        // Invoked for not processed already messages
+        // override should in in either callback, function or whatever...
         virtual Message_t DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) = 0;
 
-        // Invoked when timer ticked
+        // TODO register message -> function handler ;) add map/-> :( no can do: array/variant ) <-/ whatever for it
+        // (with check if already registered sth Invoked when timer ticked
+        // TODO this is crap - it should be done via message, in DataReceivedHandler :/
         virtual void TickHandler(uint32_t id){};
 
         // Invoked during initialization
@@ -93,17 +107,36 @@ namespace sys
 
         std::vector<std::pair<uint64_t, uint32_t>> staleUniqueMsg;
 
+        /// connect: register message handler
+        bool connect(Message *msg, MessageHandler handler);
+        bool connect(Message &&msg, MessageHandler handler);
+
       protected:
         bool enableRunLoop;
 
-        // TODO R.B. I've removed this private tag to be able to create application class
-        // private:
-
-        virtual void Run();
+        void Run() override;
 
         std::vector<std::unique_ptr<ServiceTimer>> timersList;
 
         friend class ServiceTimer;
+
+        std::map<std::type_index, MessageHandler> message_handlers;
+
+      private:
+        /// first point of enttry on messages - actually used method in run
+        /// First calls message_hanlders
+        /// If not - fallback to DataReceivedHandler
+        virtual auto MessageEntry(DataMessage *message, ResponseMessage *response) -> Message_t final;
+
+        friend Proxy;
+    };
+
+    struct Proxy
+    {
+        static auto handle(Service *service, DataMessage *message, ResponseMessage *response) -> Message_t
+        {
+            return service->MessageEntry(message, response);
+        }
     };
 
 } // namespace sys
