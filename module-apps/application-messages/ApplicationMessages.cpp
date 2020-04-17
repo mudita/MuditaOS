@@ -13,6 +13,7 @@
 #include <../module-services/service-db/messages/DBNotificationMessage.hpp>
 #include <service-db/api/DBServiceAPI.hpp>
 #include <cassert>
+#include <time/time_conversion.hpp>
 
 namespace app
 {
@@ -41,7 +42,8 @@ namespace app
             if ((msg != nullptr) && (msg->baseType == DB::BaseType::SmsDB) &&
                 ((msg->notificationType == DB::NotificationType::Updated) ||
                  (msg->notificationType == DB::NotificationType::Added))) {
-                if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view]) {
+                if (this->getCurrentWindow() == this->windows[gui::name::window::thread_view] ||
+                    this->getCurrentWindow() == this->windows[gui::name::window::main_window]) {
                     LOG_DEBUG("TODO");
                     this->getCurrentWindow()->rebuild();
                 }
@@ -113,7 +115,7 @@ namespace app
         windows.insert({gui::name::window::thread_search_none,
                         new gui::Dialog(this,
                                         gui::name::window::thread_search_none,
-                                        {.icon = "search_big", .have_choice = false})});
+                                        gui::Dialog::Meta{.icon = "search_big", .have_choice = false})});
         windows.insert({gui::name::window::thread_sms_search, new gui::SMSSearch(this)});
     }
 
@@ -161,6 +163,21 @@ namespace app
         meta.title = utils::localize.get("common_results_prefix") + query;
         dialog->update(meta);
         return switchWindow(gui::name::window::thread_search_none, nullptr);
+    }
+
+    bool ApplicationMessages::sendSms(const UTF8 &number, const UTF8 &body)
+    {
+        if (number.length() == 0 || body.length() == 0) {
+            LOG_WARN("Number or sms body is empty");
+            return false;
+        }
+        SMSRecord record;
+        record.number = number;
+        record.body   = body;
+        record.type   = SMSType::QUEUED;
+        auto time     = utils::time::Timestamp();
+        record.date   = time.getTime();
+        return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
     }
 
 } /* namespace app */

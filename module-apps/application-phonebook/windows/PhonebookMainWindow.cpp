@@ -1,8 +1,12 @@
 #include "PhonebookMainWindow.hpp"
+
 #include "PhonebookNewContact.hpp"
-#include "i18/i18.hpp"
-#include "service-db/messages/DBMessage.hpp"
-#include <application-phonebook/data/PhonebookStyle.hpp>
+#include "application-phonebook/data/PhonebookStyle.hpp"
+#include "application-phonebook/widgets/PhonebookItem.hpp"
+
+#include <i18/i18.hpp>
+#include <service-db/messages/DBMessage.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
 
 namespace gui
 {
@@ -112,6 +116,17 @@ namespace gui
 
         contactsList->clear();
         contactsList->setElementsCount(phonebookModel->getItemCount());
+
+        auto contactRequest = dynamic_cast<PhonebookSearchReuqest *>(data);
+        if (contactRequest) {
+            contactsList->cb_ENTER = [=](gui::PhonebookItem *item) {
+                std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
+                data->result                                 = item->getContact();
+                data->setDescription("PhonebookSearchRequest");
+                return sapm::ApplicationManager::messageSwitchPreviousApplication(
+                    application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
+            };
+        }
     }
 
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)

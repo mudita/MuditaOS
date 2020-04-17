@@ -362,21 +362,24 @@ namespace app
             }
         }
         else if (msgl->messageType == MessageType::AppSwitchWindow) {
-            AppSwitchWindowMessage *msg = reinterpret_cast<AppSwitchWindowMessage *>(msgl);
+            AppSwitchWindowMessage *msg = static_cast<AppSwitchWindowMessage *>(msgl);
             // check if specified window is in the application
             auto it = windows.find(msg->getWindowName());
             if (it != windows.end()) {
-
+                auto switchData = std::move(msg->getData());
+                if (switchData && switchData->ignoreCurrentWindowOnStack) {
+                    popToWindow(getPrevWindow());
+                }
                 setActiveWindow(msg->getWindowName());
 
-                getCurrentWindow()->handleSwitchData(msg->getData().get());
+                getCurrentWindow()->handleSwitchData(switchData.get());
 
                 // check if this is case where application is returning to the last visible window.
-                if ((msg->getData() != nullptr) && (msg->LastSeenWindow)) {}
+                if ((switchData != nullptr) && (msg->LastSeenWindow)) {}
                 else {
-                    getCurrentWindow()->onBeforeShow(msg->getCommand(), msg->getData().get());
-                    auto ret = dynamic_cast<gui::SwitchSpecialChar *>(msg->getData().get());
-                    if (ret != nullptr && msg->getData() != nullptr) {
+                    getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
+                    auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
+                    if (ret != nullptr && switchData != nullptr) {
                         auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
                         if (text) {
                             if (text->handleChar(ret->getDescription()[0])) {
@@ -516,6 +519,10 @@ namespace app
 
     bool Application::popToWindow(const std::string &window)
     {
+        if (window == gui::name::window::no_window) {
+            return false;
+        }
+
         auto ret = std::find(windowStack.begin(), windowStack.end(), window);
         if (ret != windowStack.end()) {
             LOG_INFO(

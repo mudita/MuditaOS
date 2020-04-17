@@ -31,4 +31,24 @@ namespace messages
         constexpr auto prewievPositionX   = 14;
         constexpr auto previewWidthOffset = 20;
     } // namespace threadItem
+
+    namespace newMessage
+    {
+        namespace recipientLabel
+        {
+            constexpr uint32_t h = 42;
+        }
+        namespace recipientImg
+        {
+            constexpr uint32_t w = 32, h = 32;
+        }
+        namespace text
+        {
+            constexpr uint32_t h = 43;
+        }
+        namespace messageLabel
+        {
+            constexpr uint32_t h = 44;
+        }
+    } // namespace newMessage
 } // namespace messages

@@ -33,6 +33,7 @@ namespace gui
             description = desc;
         };
         bool disableAppClose = false;
+        bool ignoreCurrentWindowOnStack = false;
     };
 
     class SwitchSpecialChar : public SwitchData
