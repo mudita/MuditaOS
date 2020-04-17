@@ -18,9 +18,34 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
-                {   "description": "disable SIGUSR1 crappy logs",
+                {
+                    "description": "disable SIGUSR1 logs",
                     "text": "handle SIGUSR1 nostop noprint"
                 },
+            ]
+        },
+        {
+            "name": "Debug (rt1051)",
+            "type": "gdb",
+            "gdbpath": "arm-none-eabi-gdb",
+            "request": "attach",
+            "target": ":2331",
+            "remote": true,
+            "cwd": "${workspaceRoot}",
+            "valuesFormatting": "parseText",
+            "executable": "${workspaceFolder}/build-rt1051-Debug/PurePhone.elf",
+            "autorun": [
+                "eval \"monitor exec SetRTTAddr %p\", &_SEGGER_RTT",
+                "monitor reset 0",
+                "monitor halt",
+                "monitor memU32 0x401BC000 = 128;",
+                "load",
+                "b ResetISR",
+                "b main",
+                "b HardFault_Handler",
+                "b MemManage_Handler",
+                "b BusFault_Handler",
+                "b UsageFault_Handler",
             ]
         }
     ]
