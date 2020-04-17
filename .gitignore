@@ -3,6 +3,7 @@ doc/docs-gui/
 
 build-*/
 .vscode/ipch
+.vscode/tasks.json
 
 lib/
 
