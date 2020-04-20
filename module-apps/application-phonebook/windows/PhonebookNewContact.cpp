@@ -445,7 +445,8 @@ namespace gui
         PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
         if (item) {
             contact = item->getContact();
-            if(contact->ID){
+
+            if(contact != nullptr && contact->ID){
                 title->setText(utils::localize.get("app_phonebook_options_edit"));
             }
             else {
