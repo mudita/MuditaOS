@@ -53,24 +53,15 @@ namespace gui
         return commands;
     }
 
-    // bool Window::onDatabaseMessage( const dbus_msg_t* msg ) {
-    //	return false;
-    //}
-
     bool Window::onInput(const InputEvent &inputEvent)
     {
-        auto res = false;
-        if (focusItem != nullptr)
-            res = focusItem->onInput(inputEvent);
-
-        if (res)
+        if (inputCallback && inputCallback(*this, inputEvent)) {
             return true;
-
-        // if focused item didn't handle the key event and it was navigation key
-        // check if moving focus is possible
+        }
+        if (focusItem != nullptr && focusItem->onInput(inputEvent)) {
+            return true;
+        }
         return handleNavigation(inputEvent);
-
-        return false;
     }
 
 } /* namespace gui */
