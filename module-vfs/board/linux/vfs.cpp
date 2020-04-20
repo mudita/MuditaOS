@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
+#include "../module-utils/log/log.hpp"
 
 namespace fs = std::filesystem;
 
@@ -30,11 +31,18 @@ vfs::~vfs()
 {}
 
 void vfs::Init()
-{}
+{
+    osRootPath = purefs::dir::eMMC_disk;
+}
+
+std::string vfs::relativeToRoot(const std::string path)
+{
+    return ((osRootPath / fs::path(path).relative_path()).relative_path());
+}
 
 FILE *vfs::fopen(const char *filename, const char *mode)
 {
-    return std::fopen(filename, mode);
+    return std::fopen(relativeToRoot(filename).c_str(), mode);
 }
 
 int vfs::fclose(FILE *stream)
@@ -88,6 +96,10 @@ size_t vfs::filelength(FILE *stream)
 
     return size;
 }
+char*vfs::fgets(char *buffer, size_t count, FILE *stream)
+{
+    return (fgets(buffer, count, stream));
+}
 
 std::string vfs::getcurrdir()
 {
@@ -116,7 +128,7 @@ std::vector<vfs::DirectoryEntry> vfs::listdir(const char *path, const std::strin
     FileAttributes attribute = FileAttributes::ReadOnly;
     size_t fileSize = 0;
 
-    for (auto &p : fs::directory_iterator(path)) {
+    for (auto &p : fs::directory_iterator(relativeToRoot(path))) {
         if (fs::is_directory(p)) {
             attribute = FileAttributes ::Directory;
         }

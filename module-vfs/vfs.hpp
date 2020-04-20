@@ -15,14 +15,11 @@
 #include <vector>
 #include <sstream>
 #include <filesystem>
+#include <sbini/sbini.h>
+#include <crc32/crc32.h>
+#include <log/log.hpp>
 
 namespace fs = std::filesystem;
-
-extern "C"
-{
-    #include "../module-utils/sbini/sbini.h"
-    #include "../module-utils/crc32/crc32.h"
-}
 
 #ifdef TARGET_Linux
 #include <cstdio>
@@ -35,13 +32,13 @@ namespace purefs
 {
     namespace file
     {
-        const inline fs::path bootIni    = ".boot.ini";
-        const inline fs::path bootIniBak = ".boot.ini.bak";
+        const inline fs::path boot_ini    = ".boot.ini";
+        const inline fs::path boot_ini_bak = ".boot.ini.bak";
     };
 
     namespace dir
     {
-        const inline fs::path eMMCDisk = "/sys";
+        const inline fs::path eMMC_disk = "/sys";
     }
 
     namespace extension
@@ -51,25 +48,25 @@ namespace purefs
 
     namespace buffer
     {
-        const inline int crcBuf      = 1024;
-        const inline int crcCharSize =  9;
+        const inline int crc_buf       = 1024;
+        const inline int crc_char_size =  9;
+        const inline int crc_radix     = 16;
     }
 
     namespace ini
     {
         const inline std::string main = "main";
-        const inline std::string ostype = "ostype";
+        const inline std::string os_type = "ostype";
     }
 };
 
 class vfs
 {
-
   public:
-#ifndef TARGET_Linux
-    using FILE = FF_FILE;
-#else
+#ifdef TARGET_Linux
     using FILE = std::FILE;
+#else
+    using FILE = FF_FILE;
 #endif
 
     enum class FileAttributes
@@ -119,6 +116,7 @@ class vfs
 
     std::string getcurrdir();
 
+    char *fgets(char *buffer, size_t count, FILE *stream);
     /**
      * @brief Informs whether end of file was reached
      * @param stream to be checked.
@@ -146,6 +144,11 @@ class vfs
     FF_Disk_t *emmcFFDisk;
 #endif
     std::string relativeToRoot(const std::string path);
+
+    static unsigned long computeCRC32(FILE *file, unsigned long *outCrc32);
+    static bool verifyCRC(const std::string filePath, const unsigned long crc32);
+    static bool verifyCRC(const fs::path filePath);
+
   private:
     bool getOSRootFromIni();
     const fs::path getCurrentBootIni();
