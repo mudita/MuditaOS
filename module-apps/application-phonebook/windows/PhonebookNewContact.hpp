@@ -115,6 +115,9 @@ namespace gui
         void saveStateChanged();
         void copyDataToContact();
         const std::string getCountryPrefix();
+
+      private:
+        void clearNewContactWindow();
     };
 
 } /* namespace gui */
