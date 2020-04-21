@@ -267,4 +267,7 @@ bool Thread::Wait(  ConditionVariable &Cv,
 
 #endif
 
-
+TaskHandle_t Thread::GetCurrentThreadHandle()
+{
+    return xTaskGetCurrentTaskHandle();
+}
