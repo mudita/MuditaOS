@@ -98,7 +98,7 @@ namespace gui
             return y;
     }
 
-    std::string BoundingBox::str()
+    std::string BoundingBox::str() const
     {
         std::stringstream ss;
         ss << "{";
