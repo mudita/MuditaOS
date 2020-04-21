@@ -312,7 +312,7 @@ uint32_t UTF8::operator[](const uint32_t &idx) const
     return retValue;
 }
 
-UTF8 UTF8::operator+(const UTF8 &utf)
+UTF8 UTF8::operator+(const UTF8 &utf) const
 {
     // this will call copy constructor and operator += on created copy.
     return UTF8(*this) += utf;
