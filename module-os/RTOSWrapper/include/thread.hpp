@@ -146,6 +146,11 @@ class Thread {
         }
 
         /**
+         * Get current task handle
+         */
+        static TaskHandle_t GetCurrentThreadHandle();
+
+        /**
          *  Yield the scheduler.
          */
         static inline void Yield()
