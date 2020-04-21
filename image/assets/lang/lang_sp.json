@@ -129,8 +129,9 @@
 	"app_settings_language_english": "Inglesa",
 	"app_settings_language_polish": "Polaco",
 	"app_settings_language_german": "Alemana",
-	"app_settings_language_spanish": "Española",
+	"app_settings_language_spanish": "Español",
     "app_settings_date_time": "Date and Time",
+    "app_settings_cellular_passthrough": "Cellular <-> USB",
 
     "app_phonebook_title_main": "Contactos",
 	"app_phonebook_call": "CALL",

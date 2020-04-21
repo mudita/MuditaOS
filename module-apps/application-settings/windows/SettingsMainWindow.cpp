@@ -3,6 +3,7 @@
 #include "Info.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
+#include "CellularPassthroughWindow.hpp"
 #include "FotaWindow.hpp"
 
 std::list<gui::Option> mainWindowOptions(app::Application *app)
@@ -29,6 +30,7 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
     addMenu(i18("app_settings_language"), "Languages");
     addMenu("SIM SELECT", app::sim_select);
     addMenu(i18("app_settings_date_and_time"), "DateTime");
+    addMenu(i18("app_settings_cellular_passthrough"), gui::window::cellular_passthrough::window_name);
     addMenu(i18("Fota update"), gui::window::name::fota_window);
     addMenu(i18("app_settings_display"));
     addMenu(i18("app_settings_phone_modes"));
