@@ -1,0 +1,6 @@
+label: dos
+label-id: 0x2564605e
+unit: sectors
+
+1 : start=        2048, size=    30408704, type=b, bootable
+2 : start=    30410752, size=      210944, type=b
