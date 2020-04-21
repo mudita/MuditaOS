@@ -505,6 +505,10 @@ namespace gui
     {
         bool res = false;
 
+        if (inputCallback && inputCallback(*this, inputEvent)) {
+            return true;
+        }
+
         if (inputEvent.state == InputEvent::State::keyReleasedLong && inputEvent.keyCode == gui::KeyCode::KEY_AST) {
             if (mode) {
                 mode->select_special_char();
@@ -578,7 +582,7 @@ namespace gui
 
         // it there is no key char it means that translator didn't handled the key and this key
         if (code == 0) {
-            LOG_ERROR("Key not handled! %d", static_cast<int>(inputEvent.keyCode));
+            LOG_DEBUG("Key not handled! %d", static_cast<int>(inputEvent.keyCode));
             return false;
         }
 
