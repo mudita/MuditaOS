@@ -43,12 +43,9 @@ namespace gui
         setMargins(label.margins);
     }
 
-    Label::~Label()
-    {}
-
     void Label::calculateDisplayText()
     {
-        uint32_t availableSpace = drawArea.w;
+        uint32_t availableSpace = widgetArea.w;
         // calculate number of chars that can fit available space
         uint32_t spaceConsumed;
         // @TODO spaceConsumed returns value irrelevant of current char
@@ -67,7 +64,7 @@ namespace gui
 
                 // calculate how many dots can fit in the available space
                 uint32_t dotsSpaceConsumed;
-                uint32_t dotsFitting = font->getCharCountInSpace(dotsStr, drawArea.w, dotsSpaceConsumed);
+                uint32_t dotsFitting = font->getCharCountInSpace(dotsStr, widgetArea.w, dotsSpaceConsumed);
 
                 // if there is not enough space even for three dots
                 if (dotsFitting < 3) {
@@ -163,7 +160,32 @@ namespace gui
     void Label::setText(const UTF8 &text)
     {
         this->text = text;
+        auto fits  = textFitsIn(text, area(Area::Normal).w);
+        if (!fits) {
+            fitTextIn(text);
+        }
         calculateDisplayText();
+    }
+
+    Label::Fits Label::textFitsIn(const UTF8 &text, uint32_t width)
+    {
+        Fits fits;
+        auto availableSpace = width - margins.left - margins.right;
+        auto cnt            = font->getCharCountInSpace(text, availableSpace, fits.space_consumed);
+        fits.fits           = cnt == text.length();
+        return fits;
+    }
+
+    void Label::fitTextIn(const UTF8 &text)
+    {
+        // if (area(Item::Area::Max).w > area(Item::Area::Normal).w) {}
+        Fits fits = textFitsIn(text, area(Item::Area::Max).w);
+        if (fits) {
+            setSize(fits.space_consumed, h());
+        }
+        else {
+            setSize(area(Item::Area::Max).w, h());
+        }
     }
 
     void Label::clear()
