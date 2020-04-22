@@ -26,8 +26,11 @@ set(RE2_SOURCES
 )
 target_sources(${PROJECT_NAME} PRIVATE ${RE2_SOURCES})
 
-# turn off thread safety
-target_compile_definitions(${PROJECT_NAME} PUBLIC RE2_NO_THREAD_SAFETY)
+# use FreeRTOS cpp wrapper to provide thread safety
+target_compile_definitions(${PROJECT_NAME}
+	PUBLIC
+	RE2_USE_RTOS_WRAPPER
+)
 
 # suppress warning for RE2 to avoid big changes in the original library
 set_source_files_properties(${RE2_SRCDIR}/re2/perl_groups.cc
