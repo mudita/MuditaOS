@@ -95,5 +95,5 @@ target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
 # Host target configuration(mainly used for unit testing)
 
 message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2986")
-#add_subdirectory(tests)
+add_subdirectory(tests)
 

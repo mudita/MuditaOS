@@ -42,7 +42,7 @@ TEST_CASE("Contact Record tests")
     const char *noteTest                          = "TestNote";
     const char *mailTest                          = "TestMail";
     const char *assetPath                         = "/Test/Path/To/Asset";
-    const uint8_t speeddialTest                   = 100;
+    const char *speeddialTest                     = "100";
     const ContactAddressType addressTypeTest      = ContactAddressType ::WORK;
     const ContactType contactTypeTest             = ContactType ::USER;
     const ContactNumberType contactNumberTypeTest = ContactNumberType ::PAGER;
@@ -76,7 +76,7 @@ TEST_CASE("Contact Record tests")
     {
         auto recordOUT = contRecInterface.GetByID(1);
 
-        REQUIRE(recordOUT.dbID == 1);
+        REQUIRE(recordOUT.ID == 1);
 
         REQUIRE(recordOUT.primaryName == primaryNameTest);
         REQUIRE(recordOUT.alternativeName == alternativeNameTest);
@@ -105,7 +105,7 @@ TEST_CASE("Contact Record tests")
         uint32_t cnt = 1;
         for (const auto w : *recordList) {
 
-            REQUIRE(w.dbID == cnt++);
+            REQUIRE(w.ID == cnt++);
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
@@ -133,7 +133,7 @@ TEST_CASE("Contact Record tests")
         uint32_t cnt = 1;
         for (const auto w : *recordList) {
 
-            REQUIRE(w.dbID == cnt++);
+            REQUIRE(w.ID == cnt++);
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
@@ -160,7 +160,7 @@ TEST_CASE("Contact Record tests")
         uint32_t cnt = 1;
         for (const auto w : *recordList) {
 
-            REQUIRE(w.dbID == cnt++);
+            REQUIRE(w.ID == cnt++);
 
             REQUIRE(w.primaryName == primaryNameTest);
             REQUIRE(w.alternativeName == alternativeNameTest);
