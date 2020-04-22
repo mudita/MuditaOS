@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.12)
 project(module-cellular VERSION 1.0
         DESCRIPTION "Cellular module library")
 
+include(SerialPort)
+
 set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATParser.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modem/ATCommon.cpp
@@ -38,7 +40,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
 # Board specific compilation definitions,options,include directories and features
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${SERIAL_PORT_PATH})
+define_serial(${PROJECT_NAME})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${TARGET_COMPILE_DEFINITIONS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${BOARD_DIR_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})

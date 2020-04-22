@@ -131,11 +131,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
 ServiceCellular::~ServiceCellular()
 {
-
     LOG_INFO("[ServiceCellular] Cleaning resources");
-    if (cmux != nullptr) {
-        delete cmux;
-    }
 }
 
 void ServiceCellular::CallStateTimerHandler()
@@ -1016,42 +1012,98 @@ std::vector<std::string> ServiceCellular::scanOperators(void)
     return result;
 }
 
-bool sim_check_hot_swap(DLC_channel *chanel)
+std::vector<std::string> get_last_AT_error(DLC_channel *channel)
 {
-    assert(chanel);
-    bool reboot_needed = false;
-    auto ret           = chanel->cmd(at::AT::SIM_DET);
-    if (!ret) {
-        LOG_FATAL("Cant check sim detection status!");
+    auto ret = channel->cmd(at::AT::CEER);
+    return std::move(ret.response);
+}
+
+void log_last_AT_error(DLC_channel *channel)
+{
+    std::vector<std::string> atErrors(get_last_AT_error(channel));
+    int i = 1;
+    for (auto &msg_line : atErrors) {
+        LOG_ERROR("%d/%d: %s", i, static_cast<int>(atErrors.size()), msg_line.c_str());
+        i++;
     }
-    else {
+}
+
+bool is_SIM_detection_enabled(DLC_channel *channel)
+{
+    auto ret = channel->cmd(at::AT::SIM_DET);
+    if (ret) {
         if (ret.response[0].find("+QSIMDET: 1") != std::string::npos) {
             LOG_DEBUG("SIM detecition enabled!");
+            return true;
         }
-        else {
-            LOG_FATAL("SIM detection failure - trying to enable! %s", ret.response[0].c_str());
-            reboot_needed = true;
-        }
-    }
-    ret = chanel->cmd(at::AT::QSIMSTAT);
-    if (!ret) {
-        LOG_FATAL("Cant check sim stat status");
     }
     else {
+        LOG_FATAL("Cant check sim detection status!");
+        log_last_AT_error(channel);
+    }
+    return false;
+}
+
+bool enable_SIM_detection(DLC_channel *channel)
+{
+    auto ret = channel->cmd(at::AT::SIM_DET_ON);
+    if (!ret) {
+        log_last_AT_error(channel);
+        return false;
+    }
+    return true;
+}
+
+bool is_SIM_status_enabled(DLC_channel *channel)
+{
+    auto ret = channel->cmd(at::AT::QSIMSTAT);
+    if (ret) {
         if (ret.response[0].find("+QSIMSTAT: 1") != std::string::npos) {
             LOG_DEBUG("SIM swap enabled!");
-        }
-        else {
-            LOG_FATAL("SIM swap status failure! %s", ret.response[0].c_str());
-            reboot_needed = true;
+            return true;
         }
     }
+    else {
+        LOG_FATAL("SIM swap status failure! %s", ret.response[0].c_str());
+        log_last_AT_error(channel);
+    }
+    return false;
+}
 
-    // try to force set sim detection and sim stat
-    if (reboot_needed == true) {
-        ret = chanel->cmd(at::AT::SIM_DET_ON);
-        ret = chanel->cmd(at::AT::SIMSTAT_ON);
-        LOG_FATAL("Please full reboot phone!");
+bool enable_SIM_status(DLC_channel *channel)
+{
+    auto ret = channel->cmd(at::AT::SIMSTAT_ON);
+    if (!ret) {
+        log_last_AT_error(channel);
+        return false;
+    }
+    return true;
+}
+
+void save_SIM_detection_status(DLC_channel *channel)
+{
+    auto ret = channel->cmd(at::AT::STORE_SETTINGS_ATW);
+    if (!ret) {
+        log_last_AT_error(channel);
+    }
+}
+
+bool sim_check_hot_swap(DLC_channel *channel)
+{
+    assert(channel);
+    bool reboot_needed = false;
+
+    if (!is_SIM_detection_enabled(channel)) {
+        reboot_needed = true;
+    }
+    if (!is_SIM_status_enabled(channel)) {
+        reboot_needed = true;
+    }
+    if (reboot_needed) {
+        enable_SIM_detection(channel);
+        enable_SIM_status(channel);
+        save_SIM_detection_status(channel);
+        LOG_FATAL("Modem reboot required, Please remove battery!");
     }
     return !reboot_needed;
 }
