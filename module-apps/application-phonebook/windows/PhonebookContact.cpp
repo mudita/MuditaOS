@@ -174,7 +174,7 @@ namespace gui
         numberPrimaryMessageLabel->setPenWidth(0);
         numberPrimaryMessageLabel->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER) {
-                LOG_DEBUG("numberPrimayLabel->inputCallback switch to sms window");
+                LOG_DEBUG("numberPrimaryLabel->inputCallback switch to sms window");
                 return sapm::ApplicationManager::messageSwitchApplication(application,
                                                                           app::name_messages,
                                                                           gui::name::window::thread_view,
@@ -492,6 +492,9 @@ namespace gui
             application->switchWindow("Options", gui::ShowMode::GUI_SHOW_INIT, std::move(data));
             return (true);
         }
+
+        if (inputEvent.keyCode == KeyCode::KEY_RF)
+            rebuild();
 
         return (AppWindow::onInput(inputEvent));
     }
