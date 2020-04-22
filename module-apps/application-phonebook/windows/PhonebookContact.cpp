@@ -467,6 +467,8 @@ namespace gui
         if (contact->note.length() > 0) {
             noteText->setText(contact->note);
         }
+
+        contact = nullptr;
     }
 
     bool PhonebookContact::handleSwitchData(SwitchData *data)
@@ -493,8 +495,10 @@ namespace gui
             return (true);
         }
 
-        if (inputEvent.keyCode == KeyCode::KEY_RF)
+        if (inputEvent.keyCode == KeyCode::KEY_RF) {
+            contact = nullptr;
             rebuild();
+        }
 
         return (AppWindow::onInput(inputEvent));
     }
