@@ -50,9 +50,9 @@ namespace gui
 
         setTitle(utils::localize.get("app_calllog_title_main"));
 
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_call"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::call));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         topBar->setActive(TopBar::Elements::TIME, true);
 

@@ -138,6 +138,7 @@ namespace gui
                     application, std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(), std::move(data)));
             };
             fill_results(contactRequest->results, contactRequest->request);
+            setTitle(utils::localize.get("common_results_prefix") + "\"" + contactRequest->request + "\"");
         }
 
         return (false);

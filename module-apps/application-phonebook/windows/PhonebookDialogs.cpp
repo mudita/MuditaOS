@@ -49,7 +49,7 @@ void PhonebookDialog::buildInterface()
     confirmationLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
     confirmationLabel->setFont(style::window::font::small);
 
-    noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get("common_no"));
+    noLabel = new Label(this, 75, 415, 150, 75, utils::localize.get(style::strings::common::no));
     noLabel->setPenWidth(0);
     noLabel->setPenFocusWidth(3);
     noLabel->setFilled(false);
@@ -58,7 +58,7 @@ void PhonebookDialog::buildInterface()
     noLabel->setFont(style::window::font::small);
     noLabel->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
 
-    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get("common_yes"));
+    yesLabel = new Label(this, 255, 415, 150, 75, utils::localize.get(style::strings::common::yes));
     yesLabel->setPenWidth(0);
     yesLabel->setPenFocusWidth(3);
     yesLabel->setFilled(false);

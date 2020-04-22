@@ -131,6 +131,7 @@
     "app_messages_no_messages": "There are no messages yet.\nPress Left arrow to add new.",
     "app_messages_thread_delete_confirmation": "Do you really want to delete\nthis conversation?",
     "app_messages_thread_no_result" : "There are no results",
+    "app_messages_message": "Message",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
