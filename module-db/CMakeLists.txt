@@ -42,6 +42,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/AlarmsRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/NotesRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/CalllogRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSTemplateRecord.cpp
 
         )
 

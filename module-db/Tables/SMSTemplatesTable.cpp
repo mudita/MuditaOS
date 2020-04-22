@@ -16,9 +16,9 @@ bool SMSTemplatesTable::Create()
 bool SMSTemplatesTable::Add(SMSTemplatesTableRow entry)
 {
     return db->Execute(
-        "INSERT or ignore INTO templates (text, usageTimestamp) VALUES (%s,%lu);", // TODO: change to 64 bit value
+        "INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES (%s,%lu);", // TODO: change to 64 bit value
         entry.text.c_str(),
-        entry.usageTimestamp);
+        entry.lastUsageTimestamp);
 }
 
 bool SMSTemplatesTable::RemoveByID(uint32_t id)
@@ -34,9 +34,9 @@ bool SMSTemplatesTable::RemoveByField(SMSTemplatesTableFields field, const char 
 
 bool SMSTemplatesTable::Update(SMSTemplatesTableRow entry)
 {
-    return db->Execute("UPDATE templates SET text = %s, usageTimestamp = %lu WHERE _id=%lu;",
+    return db->Execute("UPDATE templates SET text = %s, lastUsageTimestamp = %lu WHERE _id=%lu;",
                        entry.text.c_str(),
-                       entry.usageTimestamp,
+                       entry.lastUsageTimestamp,
                        entry.ID);
 }
 
@@ -51,14 +51,14 @@ SMSTemplatesTableRow SMSTemplatesTable::GetByID(uint32_t id)
     return SMSTemplatesTableRow{
         (*retQuery)[0].GetUInt32(), // ID
         (*retQuery)[1].GetString(), // text
-        (*retQuery)[2].GetUInt32(), // usageTimestamp
+        (*retQuery)[2].GetUInt32(), // lastUsageTimestamp
     };
 }
 
 std::vector<SMSTemplatesTableRow> SMSTemplatesTable::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery =
-        db->Query("SELECT * from templates ORDER BY usageTimestamp DESC LIMIT %lu OFFSET %lu;", limit, offset);
+        db->Query("SELECT * from templates ORDER BY lastUsageTimestamp DESC LIMIT %lu OFFSET %lu;", limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTemplatesTableRow>();
@@ -70,7 +70,7 @@ std::vector<SMSTemplatesTableRow> SMSTemplatesTable::GetLimitOffset(uint32_t off
         ret.push_back(SMSTemplatesTableRow{
             (*retQuery)[0].GetUInt32(), // ID
             (*retQuery)[1].GetString(), // text
-            (*retQuery)[2].GetUInt32(), // usageTimestamp
+            (*retQuery)[2].GetUInt32(), // lastUsageTimestamp
         });
     } while (retQuery->NextRow());
 

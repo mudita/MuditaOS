@@ -10,7 +10,7 @@
 struct SMSTemplatesTableRow : public Record
 {
     UTF8 text;
-    uint32_t usageTimestamp;
+    uint32_t lastUsageTimestamp;
 };
 
 enum class SMSTemplatesTableFields
@@ -43,5 +43,5 @@ class SMSTemplatesTable : public Table<SMSTemplatesTableRow, SMSTemplatesTableFi
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS templates("
                                    "_id INTEGER PRIMARY KEY,"
                                    "text TEXT,"
-                                   "usageTimestamp INTEGER)";
+                                   "lastUsageTimestamp INTEGER)";
 };
