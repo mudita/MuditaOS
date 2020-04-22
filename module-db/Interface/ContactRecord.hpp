@@ -50,7 +50,7 @@ struct ContactRecord
     bool isOnFavourites = false;
     UTF8 speeddial      = "";
 
-    inline UTF8 getFormattedName()
+    inline UTF8 getFormattedName() const
     {
         if (contactType == ContactType::TEMPORARY) {
             return numbers[0].numberE164;
