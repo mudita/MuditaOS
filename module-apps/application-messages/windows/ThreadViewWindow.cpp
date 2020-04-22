@@ -365,13 +365,12 @@ namespace gui
                 // TODO agree what should be used and how. Now Request have only contact,
                 // maybe it should have additional info - which nr to use and how to show it
                 if (pdata->contact->numbers.size() != 0) {
-                    LOG_DEBUG("SEND SMS TO: %s %s %s %s %s",
+                    LOG_DEBUG("SEND SMS TO: %s %s %s %s",
                               pdata->contact->number.c_str(),
                               pdata->contact->numbers[0].numberE164.c_str(),
                               pdata->contact->numbers[0].numberUser.c_str(),
-                              pdata->contact->primaryName.c_str(),
-                              pdata->contact->alternativeName.c_str());
-                    setTitle(pdata->contact->numbers[0].numberUser);
+                              pdata->contact->getFormattedName().c_str());
+                    setTitle(pdata->contact->getFormattedName());
                 }
                 else {
                     // TODO handle error better
