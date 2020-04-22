@@ -242,7 +242,8 @@ namespace gui
         if (state != focus) {
             focus = state;
             onFocus(state);
-            focusChangedCallback(*this);
+            if (focusChangedCallback)
+                focusChangedCallback(*this);
         };
         return state;
     }
@@ -279,7 +280,10 @@ namespace gui
 
     bool Item::onInput(const InputEvent &inputEvent)
     {
-        return inputCallback(*this, inputEvent);
+        if (inputCallback) {
+            return inputCallback(*this, inputEvent);
+        }
+        return false;
     }
 
     bool Item::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

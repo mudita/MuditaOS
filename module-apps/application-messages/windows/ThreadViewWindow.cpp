@@ -94,6 +94,14 @@ namespace gui
             assert(app != nullptr);
             return app->sendSms(title->getText(), text->getText());
         };
+        text->inputCallback = [=](Item &, const InputEvent &event) {
+            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                assert(app != nullptr);
+                return app->newMessageOptions();
+            }
+            return false;
+        };
     }
 
     void ThreadViewWindow::cleanView()
@@ -291,19 +299,19 @@ namespace gui
                                           style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding));
 
-        smsLabel->activatedCallback = [=](Item &) {
-            LOG_INFO("Message activated!");
-            auto app = dynamic_cast<app::ApplicationMessages *>(application);
-            if (app == nullptr) {
-                LOG_ERROR("Something went horribly wrong");
-                return false;
+        smsLabel->inputCallback = [=](Item &, const InputEvent &event) {
+            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+                LOG_INFO("Message activated!");
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                assert(app != nullptr);
+                if (app->windowOptions != nullptr) {
+                    app->windowOptions->clearOptions();
+                    app->windowOptions->addOptions(smsWindowOptions(app, smsRecord));
+                    app->switchWindow(app->windowOptions->getName(), nullptr);
+                }
+                return true;
             }
-            if (app->windowOptions != nullptr) {
-                app->windowOptions->clearOptions();
-                app->windowOptions->addOptions(smsWindowOptions(app, smsRecord));
-                app->switchWindow(app->windowOptions->getName(), nullptr);
-            }
-            return true;
+            return false;
         };
 
         // wrap label in H box, to make fit datetime in it
