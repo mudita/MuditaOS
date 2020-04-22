@@ -90,3 +90,16 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
         newCombo(app, contact) // contact.numbers[0].numberE164)
     };
 }
+
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app)
+{
+    return {
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_use_template")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_paste")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+
+    };
+}
