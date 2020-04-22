@@ -326,16 +326,16 @@ DBServiceAPI::ContactVerificationError DBServiceAPI::verifyContact(sys::Service 
         return (speedDialError);
     }
 
-    if (rec.numbers.size() > 0 && rec.numbers[0].numberUser.length() > 0) {
-        auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberUser);
+    if (rec.numbers.size() > 0 && rec.numbers[0].numberE164.length() > 0) {
+        auto retPhone1 = ContactGetByPhoneNumber(serv, rec.numbers[0].numberE164);
         if (!retPhone1->empty()) {
             errPhone1 = retPhone1->operator[](0);
             return (primaryNumberError);
         }
     }
 
-    if (rec.numbers.size() > 1 && rec.numbers[1].numberUser.length() > 0) {
-        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberUser);
+    if (rec.numbers.size() > 1 && rec.numbers[1].numberE164.length() > 0) {
+        auto retPhone2 = ContactGetByPhoneNumber(serv, rec.numbers[1].numberE164);
         if (!retPhone2->empty()) {
             errPhone2 = retPhone2->operator[](0);
             return (secondaryNumberError);
