@@ -62,117 +62,136 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
     else
         DatabaseModel::updateRecords(std::move(records), offset + favouriteCount, limit, count);
 
+    listDataAvailable = true;
+
     return true;
 }
 
-gui::ListItem *PhonebookModel::getItem(
-    int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
+gui::ListItem *PhonebookModel::getItem(int index)
 {
-    auto compareFirstChar = [&](std::shared_ptr<ContactRecord> contact, std::shared_ptr<ContactRecord> prevContact) {
-        if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
+    std::shared_ptr<ContactRecord> contact = getRecord(index);
 
-    bool download = false;
-    if (index > firstIndex + pageSize / 2)
-        download = true;
-    if (index < firstIndex - pageSize / 2)
-        download = true;
-    std::shared_ptr<ContactRecord> contact = getRecord(index, download);
+    //    SettingsRecord &settings = application->getSettings();
 
     if (contact == nullptr)
         return nullptr;
 
-    if (topDown) {
-        // return item from favorite part of contacts
-        if (static_cast<uint32_t>(index) < favouriteCount) {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-
-            if ((index == firstElement) && (index != prevIndex)) {
-                item->setValue(utils::localize.get("app_phonebook_list_favourites"));
-            }
-            else {
-                item->markFavourite(true);
-                item->setContact(contact);
-                item->setID(index);
-            }
-            return item;
-        }
-        else {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-            // on top the page or if element next after last favourite contact is requested
-            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex)) {
-
-                item->setValue(contact->primaryName.substr(0, 1));
-            }
-            else {
-                std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
-                if (compareFirstChar(contact, prevContact)) {
-                    item->markFavourite(false);
-                    item->setContact(contact);
-                    item->setID(index);
-                }
-                else {
-                    item->setValue(contact->primaryName.substr(0, 1));
-                }
-            }
-            return item;
-        }
+    gui::PhonebookItem *item = new gui::PhonebookItem();
+    if (item != nullptr) {
+        item->setContact(contact);
+        item->setID(index);
+        return item;
     }
-    else {
-        if (static_cast<uint32_t>(index) < favouriteCount - 1) {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
-            if (remaining == 0) {
-                item->setValue(utils::localize.get("app_phonebook_list_favourites"));
-            }
-            else {
-                item->markFavourite(true);
-                item->setContact(contact);
-                item->setID(index);
-            }
-            return item;
-        }
-        else {
-            gui::PhonebookItem *item = new gui::PhonebookItem();
 
-            // leaving normal contacts list and entering favourite area but character is already placed
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex)) {
-                item->markFavourite(true);
-                item->setContact(contact);
-                item->setID(index);
-            }
-            // leaving normal contacts list and entering favourite area - return character
-            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex)) {
-                item->setValue(contact->primaryName.substr(0, 1));
-            }
-            else {
-                std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
-                if (remaining == 0) {
-                    // previous element has the same first character of alternative name so display first character
-                    if (index == prevIndex) {
-                        item->markFavourite(false);
-                        item->setContact(contact);
-                        item->setID(index);
-                    }
-                    else {
-                        item->setValue(prevContact->primaryName.substr(0, 1));
-                    }
-                }
-                else if (((index == firstElement) || (index == prevIndex) ||
-                          (compareFirstChar(contact, prevContact)))) {
-                    item->markFavourite(false);
-                    item->setContact(contact);
-                    item->setID(index);
-                }
-                else {
-                    item->setValue(prevContact->primaryName.substr(0, 1));
-                }
-            }
-            return item;
-        }
-    }
+    return nullptr;
 }
+
+//    auto compareFirstChar = [&](std::shared_ptr<ContactRecord> contact, std::shared_ptr<ContactRecord> prevContact) {
+//        if (contact->primaryName.substr(0, 1) == prevContact->primaryName.substr(0, 1)) {
+//            return true;
+//        }
+//        else {
+//            return false;
+//        }
+//    };
+//
+//    bool download = false;
+//    if (index > firstIndex + pageSize / 2)
+//        download = true;
+//    if (index < firstIndex - pageSize / 2)
+//        download = true;
+//    std::shared_ptr<ContactRecord> contact = getRecord(index, download);
+//
+//    if (contact == nullptr)
+//        return nullptr;
+//
+//    if (topDown) {
+//        // return item from favorite part of contacts
+//        if (static_cast<uint32_t>(index) < favouriteCount) {
+//            gui::PhonebookItem *item = new gui::PhonebookItem();
+//
+//            if ((index == firstElement) && (index != prevIndex)) {
+//                item->setValue(utils::localize.get("app_phonebook_list_favourites"));
+//            }
+//            else {
+//                item->markFavourite(true);
+//                item->setContact(contact);
+//                item->setID(index);
+//            }
+//            return item;
+//        }
+//        else {
+//            gui::PhonebookItem *item = new gui::PhonebookItem();
+//            // on top the page or if element next after last favourite contact is requested
+//            if (((index == firstElement) || (static_cast<uint32_t>(index) == favouriteCount)) && (index != prevIndex))
+//            {
+//
+//                item->setValue(contact->primaryName.substr(0, 1));
+//            }
+//            else {
+//                std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
+//                if (compareFirstChar(contact, prevContact)) {
+//                    item->markFavourite(false);
+//                    item->setContact(contact);
+//                    item->setID(index);
+//                }
+//                else {
+//                    item->setValue(contact->primaryName.substr(0, 1));
+//                }
+//            }
+//            return item;
+//        }
+//    }
+//    else {
+//        if (static_cast<uint32_t>(index) < favouriteCount - 1) {
+//            gui::PhonebookItem *item = new gui::PhonebookItem();
+//            if (remaining == 0) {
+//                item->setValue(utils::localize.get("app_phonebook_list_favourites"));
+//            }
+//            else {
+//                item->markFavourite(true);
+//                item->setContact(contact);
+//                item->setID(index);
+//            }
+//            return item;
+//        }
+//        else {
+//            gui::PhonebookItem *item = new gui::PhonebookItem();
+//
+//            // leaving normal contacts list and entering favourite area but character is already placed
+//            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index == prevIndex)) {
+//                item->markFavourite(true);
+//                item->setContact(contact);
+//                item->setID(index);
+//            }
+//            // leaving normal contacts list and entering favourite area - return character
+//            if ((static_cast<uint32_t>(index) == favouriteCount - 1) && (index != prevIndex)) {
+//                item->setValue(contact->primaryName.substr(0, 1));
+//            }
+//            else {
+//                std::shared_ptr<ContactRecord> prevContact = getRecord(prevIndex, false);
+//                if (remaining == 0) {
+//                    // previous element has the same first character of alternative name so display first character
+//                    if (index == prevIndex) {
+//                        item->markFavourite(false);
+//                        item->setContact(contact);
+//                        item->setID(index);
+//                    }
+//                    else {
+//                        item->setValue(prevContact->primaryName.substr(0, 1));
+//                    }
+//                }
+//                else if (((index == firstElement) || (index == prevIndex) ||
+//                          (compareFirstChar(contact, prevContact)))) {
+//                    item->markFavourite(false);
+//                    item->setContact(contact);
+//                    item->setID(index);
+//                }
+//                else {
+//                    item->setValue(prevContact->primaryName.substr(0, 1));
+//                }
+//            }
+//            return item;
+//        }
+//    }
+//}

@@ -223,7 +223,7 @@ namespace gui
         }
     }
 
-    void BoxLayout::setFocusOnLastActiveElement()
+    void BoxLayout::setFocusOnLastElement()
     {
         auto last = true;
         for (auto child = children.rbegin(); child != children.rend(); child++) {

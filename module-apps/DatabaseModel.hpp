@@ -23,6 +23,7 @@ namespace app
     /*
      *
      */
+    //    TODO: Remove template - nice to have
     template <class T> class DatabaseModel
     {
       protected:
@@ -67,11 +68,11 @@ namespace app
 
             // store new records
 
-            for (int i = 0; i < recordsCount; i++)
+            auto maxElem = ((int)limit <= recordsCount ? limit : recordsCount);
+
+            for (uint32_t i = 0; i <= maxElem; i++)
                 records[i] = nullptr;
             records.clear();
-
-            auto maxElem = ((int)limit <= recordsCount ? limit : recordsCount);
 
             for (unsigned int i = 0; i < maxElem; i++) {
                 auto ii     = i;
@@ -175,7 +176,7 @@ namespace app
                 firstIndex = recordsCount / pageCount;
         }
 
-        virtual void requestRecords(const uint32_t offset, const uint32_t limit) = 0;
+        //        virtual void requestRecords(const uint32_t offset, const uint32_t limit) = 0;
 
         bool setRecordsCount(int count)
         {

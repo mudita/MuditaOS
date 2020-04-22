@@ -19,7 +19,7 @@
 /*
  *
  */
-class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListItemProvider
+class CalllogModel : public app::DatabaseModel<CalllogRecord>, virtual public gui::ListItemProvider
 {
   public:
     CalllogModel() = delete;
@@ -35,10 +35,10 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListI
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    gui::ListItem *getItem(
-        int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown) override;
+    gui::ListItem *getItem(int index) override;
     int getItemCount() const override
     {
         return recordsCount;
     };
+
 };
