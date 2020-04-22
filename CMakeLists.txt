@@ -5,11 +5,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project(PurePhone)
 
-include(config/CCacheConfig.cmake)
-include(config/ProjectConfig.cmake)
-include(config/Version.cmake)
-include(config/ModuleConfig.cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/config")
+
+include(Colours)
+include(CCacheConfig)
+include(ProjectConfig)
+include(Version)
+include(ModuleConfig)
 include(module-lwip/lwip-includes.cmake)
+include(SerialPort)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")
@@ -26,7 +30,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -O2 -DDEBUG" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -ggdb3 -DDEBUG" CACHE STRING "")
 
-set(SERIAL_PORT_PATH  "SERIAL_PORT=\"/dev/ttyUSB0\"" CACHE STRING "defines where serial port is")
 set(TOOLCHAIN_PATH "" CACHE STRING "Path to coolchain directory")
 
 target_link_directories(${PROJECT_NAME} PUBLIC ${PROJECT_LIB_DIRECTORY})
@@ -36,7 +39,9 @@ message("Setting CMAKE_BINARY_DIR to ${CMAKE_BINARY_DIR}")
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_CONFIG_DEFINITIONS}
                 ${TARGET_COMPILE_DEFINITIONS}
                 ${PROJECT_TARGET}
-                ${SERIAL_PORT_PATH})
+                )
+
+define_serial(${PROJECT_NAME})
 
 add_compile_definitions(FSL_RTOS_FREE_RTOS
                 USB_STACK_FREERTOS
@@ -193,3 +198,5 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RelWithDebInfo")
                 $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
         )
 endif()
+
+message_serial_status()

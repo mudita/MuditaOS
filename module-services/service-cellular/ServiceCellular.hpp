@@ -61,8 +61,7 @@ class ServiceCellular : public sys::Service
     std::vector<std::string> scanOperators(void);
 
   private:
-    // std::unique_ptr<MuxDaemon> muxdaemon;
-    TS0710 *cmux = new TS0710(PortSpeed_e::PS460800, this);
+    std::unique_ptr<TS0710> cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
     // used for polling for call state
     uint32_t callStateTimerId = 0;
     void CallStateTimerHandler();

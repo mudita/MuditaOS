@@ -16,6 +16,7 @@
 #include "log/log.hpp"
 #include "mutex.hpp"
 #include <common_data/EventStore.hpp>
+#include <errno.h>
 #include <fcntl.h>
 #include <map>
 #include <sys/stat.h>
@@ -47,7 +48,7 @@ namespace bsp
             // open serial port
             fd = open(term, O_RDWR | O_NOCTTY | O_NONBLOCK);
             if (fd == -1) {
-                LOG_FATAL("Failed to open serial port");
+                LOG_FATAL("Failed to open serial port: %s (%d)", term, portSpeed);
                 return;
             }
 
@@ -79,7 +80,7 @@ namespace bsp
         event.events = EPOLLIN;
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event)) {
-            LOG_FATAL("Failed to add file descriptor to epoll");
+            LOG_FATAL("Failed to add file descriptor to epoll: errno:%d", errno);
         }
 
         isInitialized = true;
