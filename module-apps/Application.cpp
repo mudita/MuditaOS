@@ -243,8 +243,8 @@ namespace app
 
         bool handled = false;
 
-        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-        if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+        auto src_msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+        if (src_msg != nullptr && src_msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
             handled = signalStrengthUpdateHandler();
         }
         else if (msgl->messageType == MessageType::AppInputEvent) {
@@ -256,6 +256,7 @@ namespace app
             handled = true;
         }
         else if (msgl->messageType == MessageType::KBDKeyEvent) {
+            LOG_DEBUG("MessageType::KBDKeyEvent");
             if (this->getState() != app::Application::State::ACTIVE_FORGROUND) {
                 LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
             }

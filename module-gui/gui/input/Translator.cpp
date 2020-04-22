@@ -8,8 +8,7 @@ namespace gui
 
     void recon_long_press(InputEvent &evt, const RawKey &key, const RawKey &prev_key_press, uint32_t time)
     {
-        if (key.state == RawKey::State::Released && prev_key_press.key_code == key.key_code) {
-            // determine long press
+        if (prev_key_press.key_code == key.key_code) {
             if (key.time_release - prev_key_press.time_press >= key_time_longpress_ms) {
                 evt.state = InputEvent::State::keyReleasedLong;
             }
@@ -21,20 +20,11 @@ namespace gui
         gui::InputEvent evt(key);
         if (key.state == RawKey::State::Pressed) {
             evt.state = InputEvent::State::keyPressed;
+            prev_key_press = key;
         }
         else if (key.state == RawKey::State::Released) {
             evt.state = InputEvent::State::keyReleasedShort;
-        }
-        recon_long_press(evt, key, prev_key_press, key_time_longpress_ms);
-        // store last key press/release
-        if (key.state == RawKey::State::Pressed) {
-            prev_key_press = key;
-        }
-        if (key.state != RawKey::State::Released) {
-            prev_key_released = false;
-        }
-        else {
-            prev_key_released = true;
+            recon_long_press(evt, key, prev_key_press, key_time_longpress_ms);
         }
         return evt;
     }
