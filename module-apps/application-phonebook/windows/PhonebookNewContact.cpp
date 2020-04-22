@@ -395,7 +395,7 @@ namespace gui
         }
         else {
             LOG_DEBUG("new contact create");
-            clearNewContactWindow();
+            rebuild();
         }
     }
 
@@ -574,20 +574,6 @@ namespace gui
 
         LOG_DEBUG("getCountryPrefix return: \"%s\"", buf.c_str());
         return (buf);
-    }
-
-    void PhonebookNewContact::clearNewContactWindow()
-    {
-        page1.text[0]->clear();                     // primaryName
-        page1.text[1]->clear();                     // secondaryName
-        page1.text[2]->setText(getCountryPrefix()); // number
-        page1.text[3]->clear();                     // secondNumber
-        page1.text[4]->clear();                     // mail
-
-        page2.speedValue->clear();
-        page2.imageTick->setVisible(false);
-        page2.favSelected = false;
-        page2.text[1]->clear(); // note
     }
 
 } // namespace gui
