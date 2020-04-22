@@ -463,8 +463,6 @@ namespace gui
         if (contact->note.length() > 0) {
             noteText->setText(contact->note);
         }
-
-        contact = nullptr;
     }
 
     bool PhonebookContact::handleSwitchData(SwitchData *data)
