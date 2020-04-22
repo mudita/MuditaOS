@@ -1,9 +1,3 @@
-/*
- * ListView.cpp
- *
- *  Created on: 11 mar 2019
- *      Author: robert
- */
 #include <algorithm>
 
 #include "ListView.hpp"
@@ -15,7 +9,7 @@ namespace gui
     ListView::ListView()
     {
 
-        listItems = new VBox{this, 0, 0, 0, 0};
+        body = new VBox{this, 0, 0, 0, 0};
 
         scroll = new Rect(this,
                           style::listview::scroll_x,
@@ -31,22 +25,20 @@ namespace gui
     {
 
         this->setBorderColor(ColorNoColor);
-        direction      = DIRECTION_BOTTOM;
-        listContinuous = true;
 
-        listItems = new VBox{this, 0, 0, w, h};
-        listItems->setBorderColor(ColorNoColor);
+        body = new VBox{this, 0, 0, w, h};
+        body->setBorderColor(ColorNoColor);
 
-        listItems->borderCallback = [this](const InputEvent &inputEvent) -> bool {
+        body->borderCallback = [this](const InputEvent &inputEvent) -> bool {
             if (inputEvent.state != InputEvent::State::keyReleasedShort) {
                 return false;
             }
             if (inputEvent.keyCode == KeyCode::KEY_UP) {
-                direction = DIRECTION_TOP;
+                direction = Direction::Top;
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
-                direction = DIRECTION_BOTTOM;
+                direction = Direction::Bot;
                 return this->listPageEndReached();
             }
             else {
@@ -54,6 +46,7 @@ namespace gui
             }
         };
 
+        //        TODO: Make seperate scroll class
         scroll = new Rect(this,
                           style::listview::scroll_x,
                           style::listview::scroll_y,
@@ -70,20 +63,9 @@ namespace gui
         clearItems();
     }
 
-    /**
-     * For MODE_PAGE:
-     * When new number of elements is provided list checks if currently visible items are still valid.
-     * If value of the first index is invalid then new value is calculated using number of all elements
-     * and defined size of page(number of visible elements).
-     * Last index is calculated using value of first index and page size. If value is too big it is reduced
-     * to index of the last element.
-     * if index of selected element is invalid after change new value is set to the index of the last element
-     * in the list.
-     */
     void ListView::setElementsCount(int count)
     {
         elementsCount = count;
-        refreshList();
     }
 
     void ListView::drawScroll(bool value)
@@ -99,98 +81,108 @@ namespace gui
 
     void ListView::setProvider(ListItemProvider *prov)
     {
-        this->provider = prov;
-    }
-
-    void ListView::clearItems()
-    {
-
-        auto temp = listItems->children.size();
-        for (unsigned int i = 0; i < temp; i++) {
-
-            auto rm = listItems->children.back();
-            listItems->removeWidget(rm);
-            delete (rm);
-        }
+        provider = prov;
     }
 
     void ListView::clear()
     {
         clearItems();
         startIndex                  = 0;
-        listEndPageReached          = true;
         provider->listDataAvailable = false;
     }
 
-    void ListView::refreshPage()
+    void ListView::clearItems()
     {
+        auto temp = body->children.size();
+        for (unsigned int i = 0; i < temp; i++) {
 
-        if (provider->listDataAvailable && listEndPageReached) {
-
-            auto prevIndex          = startIndex - 1;
-            auto pageCalculatedSize = 0;
-            auto itemsOnPage        = 0;
-
-            while (pageCalculatedSize <= widgetArea.h) {
-
-                ListItem *item = provider->getItem(0 + itemsOnPage, startIndex, prevIndex, listPageSize, direction);
-
-                if (item != nullptr) {
-
-                    pageCalculatedSize += item->minHeight;
-                    item->setSize(item->minWidth, item->minHeight);
-
-                    if (pageCalculatedSize <= widgetArea.h) {
-
-                        listItems->addWidget(item);
-                        itemsOnPage++;
-                        prevIndex++;
-                    }
-                    else {
-                        listPageSize = itemsOnPage;
-                        break;
-                    }
-                }
-                else {
-                    break;
-                }
-
-                pageCalculatedSize += style::listview::list_span;
-                if (pageCalculatedSize <= widgetArea.h) {
-
-                    listSpanItem = new Span(Axis::Y, style::listview::list_span);
-                    listItems->addWidget(listSpanItem);
-                }
-            }
-
-            if (direction == DIRECTION_TOP) {
-                setFocusItem(listItems);
-                listItems->setFocusOnLastActiveElement();
-            }
-            if (direction == DIRECTION_BOTTOM) {
-                setFocusItem(listItems);
-            }
-
-            updateScrollDimenstions();
-            listEndPageReached = false;
+            auto rm = body->children.back();
+            body->removeWidget(rm);
+            delete (rm);
         }
     }
 
-    void ListView::refreshList()
+    void ListView::refresh()
     {
 
         if (provider->listDataAvailable) {
 
-            // remove old items
-            if (listEndPageReached)
-                clearItems();
-
             if (provider == nullptr)
                 return;
 
+            // remove old items
+            clearItems();
+
             elementsCount = provider->getItemCount();
 
-            refreshPage();
+            //            auto pageCalculatedSize = 0;
+            auto itemsOnPage = 0;
+
+            // Fill all VBox body with list items
+            while (true) {
+
+                ListItem *item = provider->getItem(itemsOnPage);
+                if (item == nullptr)
+                    break;
+
+                item->setSize(item->minWidth, item->minHeight);
+                body->addWidget(item);
+
+                if (item->visible != true) {
+                    listPageSize = itemsOnPage;
+                    break;
+                }
+
+                itemsOnPage++;
+
+                listSpanItem = new Span(Axis::Y, style::listview::list_span);
+                body->addWidget(listSpanItem);
+            }
+
+            //            // TODO Calculation size from VBox
+            //            while (pageCalculatedSize <= widgetArea.h) {
+            //
+            //                ListItem *item = provider->getItem(itemsOnPage);
+            //
+            //                if (item != nullptr) {
+            //
+            //                    pageCalculatedSize += item->minHeight;
+            //                    item->setSize(item->minWidth, item->minHeight);
+            //
+            //                    if (pageCalculatedSize <= widgetArea.h) {
+            //
+            //                        body->addWidget(item);
+            //                        itemsOnPage++;
+            //
+            //                    }
+            //                    else {
+            //                        listPageSize = itemsOnPage;
+            //                        break;
+            //                    }
+            //                }
+            //                else {
+            //                    break;
+            //                }
+            //
+            //                pageCalculatedSize += style::listview::list_span;
+            //                if (pageCalculatedSize <= widgetArea.h) {
+            //
+            //                    listSpanItem = new Span(Axis::Y, style::listview::list_span);
+            //                    body->addWidget(listSpanItem);
+            //                }
+            //            }
+
+            // TODO: Set focus method
+            if (direction == Direction::Top) {
+                setFocusItem(body);
+                body->setFocusOnLastElement();
+            }
+            if (direction == Direction::Bot) {
+                setFocusItem(body);
+            }
+
+            updateScrollDimenstions();
+            provider->listDataAvailable = false;
         }
     }
 
@@ -207,7 +199,7 @@ namespace gui
             return std::list<DrawCommand *>();
         }
 
-        refreshList();
+        refresh();
 
         return gui::Rect::buildDrawList();
     }
@@ -260,7 +252,7 @@ namespace gui
     bool ListView::onInput(const InputEvent &inputEvent)
 
     {
-        return listItems->onInput(inputEvent);
+        return body->onInput(inputEvent);
     }
 
     bool ListView::listPageEndReached()
@@ -270,51 +262,42 @@ namespace gui
             return (2 * listPageSize + startIndex <= elementsCount ? 2 * listPageSize : elementsCount - startIndex);
         };
 
-        if (direction == DIRECTION_BOTTOM) {
-            if (startIndex + listPageSize > elementsCount) {
+        if (direction == Direction::Bot) {
 
-                if (listContinuous) {
-                    startIndex = 0;
-                }
-                else {
-                    return true;
-                }
+            if (startIndex + listPageSize > elementsCount && listType == Type::Continuous) {
+
+                startIndex = 0;
+            }
+            else if (startIndex + listPageSize > elementsCount && listType == Type::TopDown) {
+
+                return true;
             }
             else {
-                startIndex += listPageSize;
+
+                startIndex = startIndex <= elementsCount - listPageSize ? startIndex + listPageSize
+                                                                        : elementsCount - (elementsCount - startIndex);
             }
 
-            if (startIndex <= elementsCount - listPageSize)
-                provider->requestDBUpdate(startIndex, calculateLimit());
-            else
-                provider->requestDBUpdate(elementsCount - (elementsCount - startIndex), elementsCount - startIndex);
-
-            provider->listDataAvailable = false;
+            provider->requestRecords(startIndex, calculateLimit());
         }
 
-        if (direction == DIRECTION_TOP) {
-            if (startIndex - listPageSize < 0) {
+        if (direction == Direction::Top) {
 
-                if (listContinuous) {
-                    startIndex = elementsCount - (elementsCount % listPageSize);
-                }
-                else {
-                    return true;
-                }
+            if (startIndex == 0 && listType == Type::Continuous) {
+
+                startIndex = elementsCount - (elementsCount % listPageSize);
+            }
+            else if (startIndex == 0 && listType == Type::TopDown) {
+
+                return true;
             }
             else {
-                startIndex -= listPageSize;
+                startIndex = startIndex - listPageSize > 0 ? startIndex - listPageSize : 0;
             }
 
-            if (startIndex - listPageSize >= 0)
-                provider->requestDBUpdate(startIndex, calculateLimit());
-            else
-                provider->requestDBUpdate(0, calculateLimit());
-
-            provider->listDataAvailable = false;
+            provider->requestRecords(startIndex, calculateLimit());
         }
 
-        listEndPageReached = true;
         return true;
     }
 

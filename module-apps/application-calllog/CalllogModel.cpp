@@ -33,9 +33,6 @@ void CalllogModel::requestRecordsCount()
     if (recordsCount > 0) {
         LOG_INFO("DBServiceAPI::CalllogGetCount CalllogGetLimitOffset");
         DBServiceAPI::CalllogGetLimitOffset(application, 0, pageSize);
-        if (recordsCount >= pageSize) {
-            DBServiceAPI::CalllogGetLimitOffset(application, pageSize, pageSize);
-        }
     }
 }
 
@@ -50,15 +47,17 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  uint32_t count)
 {
 
-    LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
-
+    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    for (uint32_t i = 0; i < records.get()->size(); ++i) {
+        LOG_INFO("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
+    }
+    listDataAvailable = true;
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 
     return true;
 }
 
-gui::ListItem *CalllogModel::getItem(
-    int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown)
+gui::ListItem *CalllogModel::getItem(int index)
 {
     std::shared_ptr<CalllogRecord> call = getRecord(index);
     SettingsRecord &settings            = application->getSettings();
@@ -66,6 +65,7 @@ gui::ListItem *CalllogModel::getItem(
         // LOG_ERROR("getItem nullptr");
         return nullptr;
     }
+
     auto item = new gui::CalllogItem(this, !settings.timeFormat12);
     if (item != nullptr) {
         item->setCall(call);

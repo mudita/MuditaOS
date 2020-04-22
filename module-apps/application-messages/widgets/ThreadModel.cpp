@@ -45,8 +45,7 @@ void ThreadModel::requestRecords(uint32_t offset, uint32_t limit)
     DBServiceAPI::ThreadGetLimitOffset(application, offset, limit);
 }
 
-gui::ListItem *ThreadModel::getItem(
-    int index, int fistElement, int prevElement, uint32_t limit, int remaining, bool topDown)
+gui::ListItem *ThreadModel::getItem(int index)
 {
     std::shared_ptr<ThreadRecord> thread = getRecord(index);
 
