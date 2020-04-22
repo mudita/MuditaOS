@@ -7,7 +7,6 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/Item.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Label.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ListItem.cpp"
-		"${CMAKE_CURRENT_LIST_DIR}/ListItemProvider.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/ListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Margins.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/Navigation.cpp"
