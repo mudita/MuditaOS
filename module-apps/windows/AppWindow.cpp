@@ -123,8 +123,6 @@ namespace gui
     {
         // check if any of the lower inheritance onInput methods catch the event
         if (Window::onInput(inputEvent)) {
-            if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-                application->render(RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
 

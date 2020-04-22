@@ -250,7 +250,9 @@ namespace app
         else if (msgl->messageType == MessageType::AppInputEvent) {
             AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
             if (getCurrentWindow() != nullptr)
-                getCurrentWindow()->onInput(msg->getEvent());
+                if (getCurrentWindow()->onInput(msg->getEvent())) {
+                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                }
 
             //		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
             handled = true;
