@@ -353,11 +353,7 @@ namespace gui
         if (contact == nullptr)
             return;
 
-        if (contact && contact->primaryName.length() > 0)
-            setTitle(contact->primaryName);
-
-        if (contact && contact->primaryName.length() > 0 && contact->alternativeName.length() > 0)
-            setTitle(contact->primaryName + " " + contact->alternativeName);
+        setTitle(formatContactName(contact));
 
         auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
             if (speedDialStr.length() == 0)
