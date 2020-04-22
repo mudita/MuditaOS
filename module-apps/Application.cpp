@@ -229,98 +229,151 @@ namespace app
         return 0;
     }
 
-    bool Application::signalStrengthUpdateHandler()
+    sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
+    {
+        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
+        if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
+            return handleSignalStrengthUpdate(msgl);
+        }
+        else if (msgl->messageType == MessageType::AppInputEvent) {
+            return handleInputEvent(msgl);
+        }
+        else if (msgl->messageType == MessageType::KBDKeyEvent) {
+            return handleKBDKeyEvent(msgl);
+        }
+        else if (msgl->messageType == MessageType::EVMBatteryLevel) {
+            return handleBatteryLevel(msgl);
+        }
+        else if (msgl->messageType == MessageType::EVMChargerPlugged) {
+            return handleChargerPlugged(msgl);
+        }
+        else if (msgl->messageType == MessageType::EVMMinuteUpdated) {
+            return handleMinuteUpdated(msgl);
+        }
+        else if (msgl->messageType == MessageType::AppSwitch) {
+            return handleApplicationSwitch(msgl);
+        }
+        else if (msgl->messageType == MessageType::AppSwitchWindow) {
+            return handleSwitchWindow(msgl);
+        }
+        else if (msgl->messageType == MessageType::AppClose) {
+            return handleAppClose(msgl);
+        }
+        else if (msgl->messageType == MessageType::AppRebuild) {
+            return handleAppRebuild(msg);
+        }
+        else if (msgl->messageType == MessageType::AppRefresh) {
+            return handleAppRefresh(msgl);
+        }
+        else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
+            return handleSIMMessage(msgl);
+        }
+        return msgNotHandled();
+    }
+
+    sys::Message_t Application::handleSignalStrengthUpdate(sys::DataMessage *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-
-        return true;
+        return msgHandled();
     }
 
-    sys::Message_t Application::DataReceivedHandler(sys::DataMessage *msgl)
+    sys::Message_t Application::handleInputEvent(sys::DataMessage *msgl)
     {
-
-        bool handled = false;
-
-        auto msg = dynamic_cast<CellularNotificationMessage *>(msgl);
-        if (msg != nullptr && msg->type == CellularNotificationMessage::Type::SignalStrengthUpdate) {
-            handled = signalStrengthUpdateHandler();
+        AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
+        if (getCurrentWindow() != nullptr && getCurrentWindow()->onInput(msg->getEvent())) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
-        else if (msgl->messageType == MessageType::AppInputEvent) {
-            AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
-            if (getCurrentWindow() != nullptr)
-                if (getCurrentWindow()->onInput(msg->getEvent())) {
-                    refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleKBDKeyEvent(sys::DataMessage *msgl)
+    {
+        if (this->getState() != app::Application::State::ACTIVE_FORGROUND) {
+            LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
+        }
+        sevm::KbdMessage *msg = static_cast<sevm::KbdMessage *>(msgl);
+        gui::InputEvent iev   = keyTranslator->translate(msg->key);
+        if (iev.keyCode != gui::KeyCode::KEY_UNDEFINED) {
+            messageInputEventApplication(this, this->GetName(), iev);
+        }
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleBatteryLevel(sys::DataMessage *msgl)
+    {
+        auto msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
+        LOG_INFO("Application battery level: %d", msg->levelPercents);
+
+        if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents)) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleChargerPlugged(sys::DataMessage *msgl)
+    {
+        auto *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
+        if (msg->plugged == true) {
+            LOG_INFO("Application charger connected");
+            getCurrentWindow()->batteryCharging(true);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        else {
+            LOG_INFO("Application charger disconnected");
+            getCurrentWindow()->batteryCharging(false);
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleMinuteUpdated(sys::DataMessage *msgl)
+    {
+        auto *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
+        getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
+        if (state == State::ACTIVE_FORGROUND) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        }
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleApplicationSwitch(sys::DataMessage *msgl)
+    {
+        AppSwitchMessage *msg = reinterpret_cast<AppSwitchMessage *>(msgl);
+        bool handled          = false;
+        LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
+        // Application is starting or it is in the background. Upon switch command if name if correct it goes
+        // foreground
+        if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
+
+            if (msg->getTargetApplicationName() == this->GetName()) {
+                setState(State::ACTIVE_FORGROUND);
+                if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
+                    LOG_INFO("target Window: %s : target description: %s",
+                             msg->getTargetWindowName().c_str(),
+                             msg->getData() ? msg->getData()->getDescription().c_str() : "");
+                    switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
+                    handled = true;
                 }
-
-            //		LOG_INFO( "Key event :%s", msg->getEvent().to_string().c_str());
-            handled = true;
-        }
-        else if (msgl->messageType == MessageType::KBDKeyEvent) {
-            if (this->getState() != app::Application::State::ACTIVE_FORGROUND) {
-                LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
-            }
-            sevm::KbdMessage *msg = static_cast<sevm::KbdMessage *>(msgl);
-            gui::InputEvent iev   = keyTranslator->translate(msg->key);
-            if (iev.keyCode != gui::KeyCode::KEY_UNDEFINED) {
-                messageInputEventApplication(this, this->GetName(), iev);
-            }
-            handled = true;
-        }
-        else if (msgl->messageType == MessageType::EVMBatteryLevel) {
-            sevm::BatteryLevelMessage *msg = static_cast<sevm::BatteryLevelMessage *>(msgl);
-            LOG_INFO("Application battery level: %d", msg->levelPercents);
-
-            if (getCurrentWindow()->updateBatteryLevel(msg->levelPercents)) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            }
-
-            handled = true;
-        }
-        else if (msgl->messageType == MessageType::EVMChargerPlugged) {
-            sevm::BatteryPlugMessage *msg = static_cast<sevm::BatteryPlugMessage *>(msgl);
-            if (msg->plugged == true) {
-                LOG_INFO("Application charger connected");
-                getCurrentWindow()->batteryCharging(true);
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                else {
+                    // TODO send to itself message to close
+                    LOG_ERROR("Failed to communicate ");
+                }
             }
             else {
-                // hide plug icon
-                LOG_INFO("Application charger disconnected");
-                getCurrentWindow()->batteryCharging(false);
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+                LOG_ERROR("Received switch message outside of activation flow");
             }
-
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-            handled = true;
         }
-        else if (msgl->messageType == MessageType::EVMMinuteUpdated) {
-            sevm::RtcMinuteAlarmMessage *msg = static_cast<sevm::RtcMinuteAlarmMessage *>(msgl);
-            LOG_INFO("Application time updated");
-
-            getCurrentWindow()->updateTime(msg->timestamp, !settings.timeFormat12);
-
-            if (state == State::ACTIVE_FORGROUND)
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-
-            handled = true;
-        }
-
-        else if (msgl->messageType == MessageType::AppSwitch) {
-            AppSwitchMessage *msg = reinterpret_cast<AppSwitchMessage *>(msgl);
-            LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
-            // Application is starting or it is in the background. Upon switch command if name if correct it goes
-            // foreground
-            if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
-
-                if (msg->getTargetApplicationName() == this->GetName()) {
-                    setState(State::ACTIVE_FORGROUND);
+        else if (state == State::ACTIVE_FORGROUND) {
+            if (msg->getTargetApplicationName() == this->GetName()) {
+                // if window name and data are null pointers this is a message informing
+                // that application should go to background mode
+                if ((msg->getTargetWindowName() == "") && (msg->getData() == nullptr)) {
+                    setState(State::ACTIVE_BACKGROUND);
                     if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
-                        LOG_INFO("target Window: %s : target description: %s",
-                                 msg->getTargetWindowName().c_str(),
-                                 msg->getData() ? msg->getData()->getDescription().c_str() : "");
-                        switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
                         handled = true;
                     }
                     else {
@@ -328,119 +381,103 @@ namespace app
                         LOG_ERROR("Failed to communicate ");
                     }
                 }
+                // if application is in front and receives message with defined window it should
+                // change to that window.
                 else {
-                    LOG_ERROR("Received switch message outside of activation flow");
-                }
-            }
-            else if (state == State::ACTIVE_FORGROUND) {
-                if (msg->getTargetApplicationName() == this->GetName()) {
-                    // if window name and data are null pointers this is a message informing
-                    // that application should go to background mode
-                    if ((msg->getTargetWindowName() == "") && (msg->getData() == nullptr)) {
-                        setState(State::ACTIVE_BACKGROUND);
-                        if (sapm::ApplicationManager::messageConfirmSwitch(this)) {
-                            handled = true;
-                        }
-                        else {
-                            // TODO send to itself message to close
-                            LOG_ERROR("Failed to communicate ");
-                        }
-                    }
-                    // if application is in front and receives message with defined window it should
-                    // change to that window.
-                    else {
-                        switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
-                        handled = true;
-                    }
-                }
-                else {
-                    LOG_ERROR("Received switch message outside of activation flow");
+                    switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
+                    handled = true;
                 }
             }
             else {
-                LOG_ERROR("Wrong internal application %s switch to ACTIVE state form %s",
-                          msg->getTargetApplicationName().c_str(),
-                          stateStr(state));
+                LOG_ERROR("Received switch message outside of activation flow");
             }
         }
-        else if (msgl->messageType == MessageType::AppSwitchWindow) {
-            AppSwitchWindowMessage *msg = static_cast<AppSwitchWindowMessage *>(msgl);
-            // check if specified window is in the application
-            auto it = windows.find(msg->getWindowName());
-            if (it != windows.end()) {
-                auto switchData = std::move(msg->getData());
-                if (switchData && switchData->ignoreCurrentWindowOnStack) {
-                    popToWindow(getPrevWindow());
-                }
-                setActiveWindow(msg->getWindowName());
+        else {
+            LOG_ERROR("Wrong internal application %s switch to ACTIVE state form %s",
+                      msg->getTargetApplicationName().c_str(),
+                      stateStr(state));
+        }
+        if (handled) {
+            return msgHandled();
+        }
+        return msgNotHandled();
+    }
 
-                getCurrentWindow()->handleSwitchData(switchData.get());
+    sys::Message_t Application::handleSwitchWindow(sys::DataMessage *msgl)
+    {
+        auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
+        // check if specified window is in the application
+        auto it = windows.find(msg->getWindowName());
+        if (it != windows.end()) {
+            auto switchData = std::move(msg->getData());
+            if (switchData && switchData->ignoreCurrentWindowOnStack) {
+                popToWindow(getPrevWindow());
+            }
+            setActiveWindow(msg->getWindowName());
 
-                // check if this is case where application is returning to the last visible window.
-                if ((switchData != nullptr) && (msg->LastSeenWindow)) {}
-                else {
-                    getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
-                    auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
-                    if (ret != nullptr && switchData != nullptr) {
-                        auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
-                        if (text) {
-                            if (text->handleChar(ret->getDescription()[0])) {
-                                text->updateCursor();
-                            }
+            getCurrentWindow()->handleSwitchData(switchData.get());
+
+            // check if this is case where application is returning to the last visible window.
+            if ((switchData != nullptr) && (msg->LastSeenWindow)) {}
+            else {
+                getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
+                auto ret = dynamic_cast<gui::SwitchSpecialChar *>(switchData.get());
+                if (ret != nullptr && switchData != nullptr) {
+                    auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
+                    if (text != nullptr) {
+                        if (text->handleChar(ret->getDescription()[0])) {
+                            text->updateCursor();
                         }
                     }
                 }
+            }
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        }
+        else {
+            LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
+        }
+        return msgHandled();
+    }
 
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+    sys::Message_t Application::handleAppClose(sys::DataMessage *msgl)
+    {
+        setState(State::DEACTIVATING);
+        sapm::ApplicationManager::messageConfirmClose(this);
+        return msgHandled();
+    }
+
+    sys::Message_t Application::handleAppRebuild(sys::DataMessage *msgl)
+    {
+        LOG_INFO("Application %s rebuilding gui", GetName().c_str());
+        for (auto it = windows.begin(); it != windows.end(); it++) {
+            LOG_DEBUG("Rebuild: %s", it->first.c_str());
+            if (!it->second) {
+                LOG_ERROR("NO SUCH WINDOW");
             }
             else {
-                LOG_ERROR("No such window: %s", msg->getWindowName().c_str());
+                it->second->rebuild();
             }
-            handled = true;
         }
+        LOG_INFO("Refresh app with focus!");
+        if (state == State::ACTIVE_FORGROUND) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
+        }
+        LOG_INFO("App rebuild done");
+        return msgHandled();
+    }
 
-        else if (msgl->messageType == MessageType::AppClose) {
-            setState(State::DEACTIVATING);
-            sapm::ApplicationManager::messageConfirmClose(this);
-            // here should go all the cleaning
-            handled = true;
-        }
-        else if (msgl->messageType == MessageType::AppRebuild) {
+    sys::Message_t Application::handleAppRefresh(sys::DataMessage *msgl)
+    {
+        AppRefreshMessage *msg = reinterpret_cast<AppRefreshMessage *>(msgl);
+        render(msg->getMode());
+        return msgHandled();
+    }
 
-            LOG_INFO("Application %s rebuilding gui", GetName().c_str());
-            // for all windows call rebuild method
-            for (auto it = windows.begin(); it != windows.end(); it++) {
-                LOG_DEBUG("Rebuild: %s", it->first.c_str());
-                if (!it->second) {
-                    LOG_ERROR("NO SUCH WINDOW");
-                }
-                else {
-                    it->second->rebuild();
-                }
-            }
-            // if application has focus call deep refresh
-            LOG_INFO("Refresh app with focus!");
-            if (state == State::ACTIVE_FORGROUND) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
-            }
-            handled = true;
-            LOG_INFO("App rebuild done");
-        }
-        else if (msgl->messageType == MessageType::AppRefresh) {
-            AppRefreshMessage *msg = reinterpret_cast<AppRefreshMessage *>(msgl);
-            // getCurrentWindow()->onBeforeShow( gui::ShowMode::GUI_SHOW_RETURN, 0, nullptr );
-            render(msg->getMode());
-            handled = true;
-        }
-        else if (dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
-            getCurrentWindow()->setSIM();
-            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-        }
-
-        if (handled)
-            return std::make_shared<sys::ResponseMessage>();
-        else
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    sys::Message_t Application::handleSIMMessage(sys::DataMessage *msgl)
+    {
+        getCurrentWindow()->setSIM();
+        refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+        return msgHandled();
     }
 
     sys::ReturnCodes Application::InitHandler()
