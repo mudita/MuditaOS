@@ -300,7 +300,7 @@ bool drawWindowWithLabelsTest(uint8_t *frameBuffer)
     label = new gui::Label(win, 20, 480, 440, 120, "BOTTOM RIGHT");
     label->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
     label->setRadius(15);
-    label->setDotsMode(true);
+    label->setEllipsis();
     label->setFont("gt_pressura_bold_65");
 
     // vector with draw commands
@@ -346,7 +346,7 @@ bool drawWindowWithHBoxTest(uint8_t *frameBuffer)
 
     gui::Label *maxW4 = new gui::Label();
     maxW4->setText("Top Left corner");
-    maxW4->setDotsMode(true);
+    maxW4->setEllipsis();
     // maxW4->setRadius( 20 );
     // maxW4->setMargins( gui::Margins(20,20,20,20));
     maxW4->setMaxSize(275, 60);

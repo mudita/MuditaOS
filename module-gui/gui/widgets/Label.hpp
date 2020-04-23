@@ -44,10 +44,7 @@ namespace gui
                 return *this;
             }
             uint32_t x = 0, y = 0, w = 0, h = 0;
-            int32_t no_focus = style::window::default_border_no_focus_w;
-            int32_t focus    = style::window::default_border_no_focus_w;
             std::string font = style::window::font::medium;
-            bool dots        = true;
             uint32_t align   = gui::Alignment::ALIGN_HORIZONTAL_LEFT | gui::Alignment::ALIGN_VERTICAL_CENTER;
             RectangleEdgeFlags edges =
                 gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM;
@@ -64,8 +61,25 @@ namespace gui
         };
     }; // namespace meta
 
+    /// elision setting for Label to use
+    /// by default do not ellipsis
+    /// by default set elision at the end
+    struct Ellipsis
+    {
+        bool on = false;
+        enum class Pos
+        {
+            Begin,
+            End
+        } pos = Pos::End;
+    };
+
     class Label : public Rect
     {
+      public:
+        Ellipsis ellipsis;
+        /// now we always want to ellipsis
+        /// if that changes there is no problem to change it to class and add enum class "How" inside
       protected:
         UTF8 text;
         UTF8 textDisplayed;
@@ -81,10 +95,6 @@ namespace gui
         Margins margins;
         // type of alignment
         Alignment alignment;
-        // flag that defines if 3 dots (ellipsis) are to be displayed at the end of label's text.
-        bool dotsMode;
-        // truncate a beginning or an end.
-        bool dotsTruncateEnd;
         // flag that defines if a remaining area of the label has a horizontal line.
         bool lineMode;
 
@@ -134,7 +144,10 @@ namespace gui
         virtual UTF8 getText();
         virtual void setAlignment(const Alignment &alignment);
         virtual void setMargins(const Margins &margins);
-        void setDotsMode(const bool val, const bool truncateEnd = true);
+        void setDotsMode(const bool val);
+        /// by default most of times we want to set elision ( text...) at the end of text
+        void setEllipsis(gui::Ellipsis::Pos pos = gui::Ellipsis::Pos::End);
+        void setEllipsis(gui::Ellipsis ellipsis);
         /**
          * @brief Defines if remaining area of the label has a horizontal line.
          */
