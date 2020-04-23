@@ -28,10 +28,15 @@ static inline bool isValidEmail(const UTF8 email)
 
 static inline const std::string formatContactName(std::shared_ptr<ContactRecord> contact)
 {
-    if (contact->primaryName.length() > 0 && contact != nullptr) {
+    if (contact == nullptr)
+        return "";
+    if (contact->primaryName.length() > 0) {
         if (contact->alternativeName.length() > 0)
             return (contact->primaryName + " " + contact->alternativeName);
         return (contact->primaryName);
+    }
+    if (contact->alternativeName.length() > 0) {
+        return (contact->alternativeName);
     }
     return "";
 }
