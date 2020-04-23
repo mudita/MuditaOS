@@ -57,8 +57,6 @@ namespace gui
         topBar->setActive(TopBar::Elements::TIME, true);
 
         list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h);
-        list->setMaxElements(calllog::settings::pageSize);
-        list->setPageSize(calllog::settings::pageSize);
         list->setProvider(calllogModel);
 
         setFocusItem(list);

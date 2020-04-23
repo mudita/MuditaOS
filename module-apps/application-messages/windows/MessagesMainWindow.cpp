@@ -47,8 +47,6 @@ namespace gui
 
         list = new gui::ListView(
             this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listWidth);
-        list->setMaxElements(threads::pageSize);
-        list->setPageSize(threads::pageSize);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);

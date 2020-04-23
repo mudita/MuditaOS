@@ -6,19 +6,50 @@
 namespace gui
 {
 
+    ListViewScroll::ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+        : Rect{parent, x, y, w, h}
+    {
+
+        setRadius(style::listview::scroll_radius);
+        setFilled(style::listview::scroll_fill);
+        setFillColor(style::listview::scroll_color);
+        activeItem = false;
+    }
+
+    void ListViewScroll::update(int startIndex, int listPageSize, int elementsCount)
+    {
+        if ((parent->widgetArea.w > 10) && (parent->widgetArea.h > 10)) {
+
+            uint32_t pagesCount = 1;
+            if (listPageSize) {
+                pagesCount = (elementsCount % listPageSize == 0) ? elementsCount / listPageSize
+                                                                 : elementsCount / listPageSize + 1;
+                if (pagesCount == 0) {
+                    return;
+                }
+            }
+            uint32_t currentPage = startIndex / listPageSize;
+            uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
+
+            setPosition(parent->widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
+            setSize(style::listview::scroll_w, pageHeight);
+        }
+        //             not enough space - disable scroll
+        else {
+            setVisible(false);
+        }
+    }
+
     ListView::ListView()
     {
 
         body = new VBox{this, 0, 0, 0, 0};
 
-        scroll = new Rect(this,
-                          style::listview::scroll_x,
-                          style::listview::scroll_y,
-                          style::listview::scroll_w,
-                          style::listview::scroll_h);
-        scroll->setRadius(style::listview::scroll_radius);
-        scroll->setFilled(style::listview::scroll_fill);
-        scroll->setFillColor(style::listview::scroll_color);
+        scroll = new ListViewScroll(this,
+                                    style::listview::scroll_x,
+                                    style::listview::scroll_y,
+                                    style::listview::scroll_w,
+                                    style::listview::scroll_h);
     }
 
     ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
@@ -46,16 +77,11 @@ namespace gui
             }
         };
 
-        //        TODO: Make seperate scroll class
-        scroll = new Rect(this,
-                          style::listview::scroll_x,
-                          style::listview::scroll_y,
-                          style::listview::scroll_w,
-                          style::listview::scroll_h);
-        scroll->setRadius(style::listview::scroll_radius);
-        scroll->setFilled(style::listview::scroll_fill);
-        scroll->setFillColor(style::listview::scroll_color);
-        scroll->activeItem = false;
+        scroll = new ListViewScroll(this,
+                                    style::listview::scroll_x,
+                                    style::listview::scroll_y,
+                                    style::listview::scroll_w,
+                                    style::listview::scroll_h);
     }
 
     ListView::~ListView()
@@ -68,15 +94,10 @@ namespace gui
         elementsCount = count;
     }
 
-    void ListView::drawScroll(bool value)
+    void ListView::setListViewType(ListViewType type)
     {
-        drawVerticalScroll = value;
-        scroll->visible    = value;
-    }
 
-    void ListView::setMaxElements(int value)
-    {
-        maxElements = value;
+        listType = type;
     }
 
     void ListView::setProvider(ListItemProvider *prov)
@@ -115,7 +136,6 @@ namespace gui
 
             elementsCount = provider->getItemCount();
 
-            //            auto pageCalculatedSize = 0;
             auto itemsOnPage = 0;
 
             // Fill all VBox body with list items
@@ -140,6 +160,9 @@ namespace gui
             }
 
             //            // TODO Calculation size from VBox
+            //            auto pageCalculatedSize = 0;
+            //            auto itemsOnPage = 0;
+
             //            while (pageCalculatedSize <= widgetArea.h) {
             //
             //                ListItem *item = provider->getItem(itemsOnPage);
@@ -181,7 +204,7 @@ namespace gui
                 setFocusItem(body);
             }
 
-            updateScrollDimenstions();
+            scroll->update(startIndex, listPageSize, elementsCount);
             provider->listDataAvailable = false;
         }
     }
@@ -204,49 +227,11 @@ namespace gui
         return gui::Rect::buildDrawList();
     }
 
-    void ListView::setPageSize(int size)
-    {
-        listPageSize = size;
-    }
-
     bool ListView::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
-        updateScrollDimenstions();
+        scroll->update(startIndex, listPageSize, elementsCount);
         return true;
-    }
-
-    void ListView::updateScrollDimenstions()
-    {
-        if ((widgetArea.w > 10) && (widgetArea.h > 10)) {
-            if (drawVerticalScroll)
-                scroll->visible = true;
-
-            uint32_t pagesCount = 1;
-            if (listPageSize) {
-                pagesCount = (elementsCount % listPageSize == 0) ? elementsCount / listPageSize
-                                                                 : elementsCount / listPageSize + 1;
-                if (pagesCount == 0) {
-                    disableScroll();
-                    return;
-                }
-            }
-            uint32_t currentPage = startIndex / listPageSize;
-            uint32_t pageHeight  = widgetArea.h / pagesCount;
-
-            scroll->setPosition(widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
-            scroll->setSize(style::listview::scroll_w, pageHeight);
-        }
-        // not enough space - disable scroll
-        else {
-            disableScroll();
-        }
-    }
-
-    void ListView::disableScroll()
-    {
-        scroll->setSize(0, 0);
-        scroll->visible = false;
     }
 
     bool ListView::onInput(const InputEvent &inputEvent)
@@ -264,11 +249,11 @@ namespace gui
 
         if (direction == Direction::Bot) {
 
-            if (startIndex + listPageSize > elementsCount && listType == Type::Continuous) {
+            if (startIndex + listPageSize > elementsCount && listType == ListViewType::Continuous) {
 
                 startIndex = 0;
             }
-            else if (startIndex + listPageSize > elementsCount && listType == Type::TopDown) {
+            else if (startIndex + listPageSize > elementsCount && listType == ListViewType::TopDown) {
 
                 return true;
             }
@@ -283,11 +268,11 @@ namespace gui
 
         if (direction == Direction::Top) {
 
-            if (startIndex == 0 && listType == Type::Continuous) {
+            if (startIndex == 0 && listType == ListViewType::Continuous) {
 
                 startIndex = elementsCount - (elementsCount % listPageSize);
             }
-            else if (startIndex == 0 && listType == Type::TopDown) {
+            else if (startIndex == 0 && listType == ListViewType::TopDown) {
 
                 return true;
             }
