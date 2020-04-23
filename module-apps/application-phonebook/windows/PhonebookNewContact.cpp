@@ -428,7 +428,7 @@ namespace gui
         if (item) {
             contact = item->getContact();
 
-            if (contact != nullptr && contact->ID) {
+            if (contact != nullptr && contact->ID != DB_ID_NONE) {
                 title->setText(utils::localize.get("app_phonebook_options_edit"));
             }
             else {
