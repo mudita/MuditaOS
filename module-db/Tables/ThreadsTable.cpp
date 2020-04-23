@@ -19,15 +19,15 @@ ThreadsTable::~ThreadsTable()
 bool ThreadsTable::Create()
 {
     // Create necessary tables
-    if (db->Execute(createTableQuery) == false)
+    if (!db->Execute(createTableQuery))
         return false;
-    if (db->Execute(createTableThreadsCounterQuery))
+    if (!db->Execute(createTableThreadsCounterQuery))
         return false;
-    if (db->Execute(threadsCounterInsertionQuery))
+    if (!db->Execute(threadsCounterInsertionQuery))
         return false;
-    if (db->Execute(threadInsertTriggerQuery))
+    if (!db->Execute(threadInsertTriggerQuery))
         return false;
-    if (db->Execute(threadRemoveTriggerQuery))
+    if (!db->Execute(threadRemoveTriggerQuery))
         return false;
 
     return true;

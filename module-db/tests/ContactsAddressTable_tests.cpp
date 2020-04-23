@@ -29,6 +29,7 @@ TEST_CASE("Contacts Address Table tests")
     vfs.remove(ContactsDB::GetDBName());
 
     ContactsDB contactsdb;
+    REQUIRE(contactsdb.IsInitialized());
 
     ContactsAddressTableRow testRow1 = {.ID        = 0,
                                         .contactID = 0,
