@@ -33,6 +33,7 @@ TEST_CASE("Settings Table tests")
     {
 
         SettingsDB settingsDb;
+        REQUIRE(settingsDb.IsInitialized());
 
         auto settingsRow = settingsDb.settings.GetByID(1);
         REQUIRE(settingsRow.ID == 1);

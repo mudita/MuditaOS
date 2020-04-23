@@ -30,6 +30,7 @@ TEST_CASE("Contact Record tests")
     vfs.remove(ContactsDB::GetDBName());
 
     auto contactDB = std::make_unique<ContactsDB>();
+    REQUIRE(contactDB->IsInitialized());
 
     const char *primaryNameTest                   = "PrimaryNameTest";
     const char *alternativeNameTest               = "AlternativeNameTest";
