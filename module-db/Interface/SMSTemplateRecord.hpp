@@ -11,7 +11,7 @@
 struct SMSTemplatesRecord : public Record
 {
     UTF8 text;
-    uint32_t lastUsageTimestamp;
+    uint32_t lastUsageTimestamp = 0;
 
     SMSTemplatesRecord() = default;
     SMSTemplatesRecord(const SMSTemplatesTableRow &);
