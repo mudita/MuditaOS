@@ -4,7 +4,7 @@
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
-SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel(app, 14)
+SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel_old(app, 14)
 {}
 
 SearchResultsModel::~SearchResultsModel()
@@ -22,16 +22,9 @@ void SearchResultsModel::requestRecordsCount()
 void SearchResultsModel::requestRecords(const uint32_t offset, const uint32_t limit)
 {}
 
-gui::ListItem *SearchResultsModel::getItem(int index)
+gui::ListItem *SearchResultsModel::getItem(
+    int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown)
 {
-
-    //    WIP %& TEMP
-    int firstElement = 0;
-    int prevIndex    = 0;
-    //    uint32_t count = 0;
-    int remaining = 0;
-    bool topDown  = 0;
-
     auto isInResultsRange = [&](int idx) {
         try {
             results->at(idx);

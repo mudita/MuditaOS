@@ -18,7 +18,7 @@ class PhonebookSearchResults : public AppWindow
 {
   protected:
     SearchResultsModel *searchResultsModel = nullptr;
-    ListView *searchResultList             = nullptr;
+    PhonebookListView *searchResultList    = nullptr;
 
     Image *newContactImage = nullptr;
 
