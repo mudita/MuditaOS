@@ -115,6 +115,8 @@ bool Database::Execute(const char *format, ...)
     }
 
     int result = sqlite3_exec(dbConnection, szQuery.get(), NULL, NULL, NULL);
+    if (result != SQLITE_OK)
+        LOG_ERROR("Execute failed with %d", result);
 
     return result != SQLITE_OK ? false : true;
 }
