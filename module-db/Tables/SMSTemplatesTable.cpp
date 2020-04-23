@@ -1,6 +1,10 @@
 
 #include "SMSTemplatesTable.hpp"
+
+#include <Utils.hpp>
 #include <log/log.hpp>
+
+#include <cassert>
 
 SMSTemplatesTable::SMSTemplatesTable(Database *db) : Table(db)
 {}
@@ -15,51 +19,52 @@ bool SMSTemplatesTable::Create()
 
 bool SMSTemplatesTable::Add(SMSTemplatesTableRow entry)
 {
-    return db->Execute(
-        "INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%s', %lu);", // TODO: change to 64 bit
-                                                                                          // value
-        entry.text.c_str(),
-        entry.lastUsageTimestamp);
+    return db->Execute("INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%s', '%s');",
+
+                       entry.text.c_str(),
+                       utils::to_string(entry.lastUsageTimestamp).c_str());
 }
 
 bool SMSTemplatesTable::RemoveByID(uint32_t id)
 {
-    return db->Execute("DELETE FROM templates where _id = %u;", id);
+    return db->Execute("DELETE FROM templates where _id = %" PRIu32 ";", id);
 }
 
 bool SMSTemplatesTable::RemoveByField(SMSTemplatesTableFields field, const char *str)
 {
-    LOG_ERROR("RemoveByField not implemented");
+    assert(0 && "Not implemented");
     return false;
 }
 
 bool SMSTemplatesTable::Update(SMSTemplatesTableRow entry)
 {
-    return db->Execute("UPDATE templates SET text = '%s', lastUsageTimestamp = %lu WHERE _id=%lu;",
+    return db->Execute("UPDATE templates SET text = '%s', lastUsageTimestamp = %s WHERE _id=%" PRIu32 ";",
                        entry.text.c_str(),
-                       entry.lastUsageTimestamp,
+                       utils::to_string(entry.lastUsageTimestamp).c_str(),
                        entry.ID);
 }
 
 SMSTemplatesTableRow SMSTemplatesTable::GetByID(uint32_t id)
 {
-    auto retQuery = db->Query("SELECT * FROM templates WHERE _id = %lu;", id);
+    auto retQuery = db->Query("SELECT * FROM templates WHERE _id = %" PRIu32 ";", id);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return SMSTemplatesTableRow();
     }
 
     return SMSTemplatesTableRow{
-        (*retQuery)[0].GetUInt32(), // ID
-        (*retQuery)[1].GetString(), // text
-        (*retQuery)[2].GetUInt32(), // lastUsageTimestamp
+        (*retQuery)[0].GetUInt32(),                      // ID
+        (*retQuery)[1].GetString(),                      // text
+        static_cast<time_t>((*retQuery)[2].GetUInt64()), // lastUsageTimestamp
     };
 }
 
 std::vector<SMSTemplatesTableRow> SMSTemplatesTable::GetLimitOffset(uint32_t offset, uint32_t limit)
 {
     auto retQuery =
-        db->Query("SELECT * from templates ORDER BY lastUsageTimestamp DESC LIMIT %lu OFFSET %lu;", limit, offset);
+        db->Query("SELECT * from templates ORDER BY lastUsageTimestamp DESC LIMIT %" PRIu32 " OFFSET %" PRIu32 ";",
+                  limit,
+                  offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<SMSTemplatesTableRow>();
@@ -69,9 +74,9 @@ std::vector<SMSTemplatesTableRow> SMSTemplatesTable::GetLimitOffset(uint32_t off
 
     do {
         ret.push_back(SMSTemplatesTableRow{
-            (*retQuery)[0].GetUInt32(), // ID
-            (*retQuery)[1].GetString(), // text
-            (*retQuery)[2].GetUInt32(), // lastUsageTimestamp
+            (*retQuery)[0].GetUInt32(),                      // ID
+            (*retQuery)[1].GetString(),                      // text
+            static_cast<time_t>((*retQuery)[2].GetUInt64()), // lastUsageTimestamp
         });
     } while (retQuery->NextRow());
 
@@ -83,7 +88,7 @@ std::vector<SMSTemplatesTableRow> SMSTemplatesTable::GetLimitOffsetByField(uint3
                                                                            SMSTemplatesTableFields field,
                                                                            const char *str)
 {
-    LOG_ERROR("Not implemented");
+    assert(0 && "Not implemented");
     return std::vector<SMSTemplatesTableRow>();
 }
 
@@ -100,11 +105,11 @@ uint32_t SMSTemplatesTable::GetCount()
 
 uint32_t SMSTemplatesTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM templates WHERE '%s'=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM templates WHERE '%s'=%" PRIu32 ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].GetUInt32()};
+    return (*queryRet)[0].GetUInt32();
 }

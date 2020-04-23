@@ -10,7 +10,7 @@
 struct SMSTemplatesTableRow : public Record
 {
     UTF8 text;
-    uint32_t lastUsageTimestamp;
+    time_t lastUsageTimestamp;
 };
 
 enum class SMSTemplatesTableFields

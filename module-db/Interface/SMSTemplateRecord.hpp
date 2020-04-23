@@ -11,7 +11,7 @@
 struct SMSTemplatesRecord : public Record
 {
     UTF8 text;
-    uint32_t lastUsageTimestamp = 0;
+    time_t lastUsageTimestamp = 0;
 
     SMSTemplatesRecord() = default;
     SMSTemplatesRecord(const SMSTemplatesTableRow &);
@@ -43,5 +43,5 @@ class SMSTemplatesRecordInterface : public RecordInterface<SMSTemplatesRecord, S
                                                                            const char *str) override final;
 
   private:
-    SmsDB *smsDB;
+    SmsDB *smsDB = nullptr;
 };
