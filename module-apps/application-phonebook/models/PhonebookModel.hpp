@@ -12,14 +12,14 @@
 #include <vector>
 
 #include "Application.hpp"
-#include "DatabaseModel.hpp"
+#include "DatabaseModel_old.hpp"
 #include "Interface/ContactRecord.hpp"
-#include "ListItemProvider.hpp"
+#include "ListItemProvider_old.hpp"
 #include "NotesRecord.hpp"
 /*
  *
  */
-class PhonebookModel : public gui::ListItemProvider, public app::DatabaseModel<ContactRecord>
+class PhonebookModel : public gui::ListItemProvider_old, public app::DatabaseModel_old<ContactRecord>
 {
     /**
      * Number of favourite records in the database.
@@ -40,7 +40,8 @@ class PhonebookModel : public gui::ListItemProvider, public app::DatabaseModel<C
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
     // virtual methods for ListViewProvider
-    gui::ListItem *getItem(int index) override;
+    gui::ListItem *getItem(
+        int index, int firstElement, int prevIndex, uint32_t count, int remaining, bool topDown) override;
     int getItemCount() const override
     {
         return recordsCount;
