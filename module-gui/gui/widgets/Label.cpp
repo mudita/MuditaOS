@@ -17,26 +17,25 @@ namespace gui
 {
 
     Label::Label()
-        : Rect(), text{""}, textDisplayed{""}, charDrawableCount{0},
-          stringPixelWidth{0}, textColor{0, 0}, font{nullptr}, dotsMode{false}
+        : Rect(), text{""}, textDisplayed{""}, charDrawableCount{0}, stringPixelWidth{0}, textColor{0, 0}, font{nullptr}
     {
         setFont(style::window::font::medium);
     }
 
     Label::Label(
         Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h, const UTF8 &newText)
-        : Rect{parent, x, y, w, h}, text(newText), textDisplayed{""}, charDrawableCount{0},
-          stringPixelWidth{0}, textColor{0, 0}, dotsMode{false}, dotsTruncateEnd{true}
+        : Rect{parent, x, y, w, h},
+          text(newText), textDisplayed{""}, charDrawableCount{0}, stringPixelWidth{0}, textColor{0, 0}
     {
         setFont(style::window::font::medium);
     }
 
     Label::Label(Item *parent, meta::Label label) : Label(parent, label.x, label.y, label.w, label.h, label.text)
     {
-        setPenFocusWidth(label.focus);
-        setPenWidth(label.no_focus);
+        setPenFocusWidth(style::window::default_border_no_focus_w);
+        setPenWidth(style::window::default_border_no_focus_w);
         setFont(label.font);
-        setDotsMode(label.dots);
+        setEllipsis();
         setAlignment(label.align);
         setRadius(label.radius);
         setEdges(label.edges);
@@ -58,7 +57,7 @@ namespace gui
             textDisplayed = text.substr(0, charDrawableCount);
 
             // if 3 dots should be placed a the end
-            if (dotsMode) {
+            if (elide.on) {
                 // create 3 dots string
                 UTF8 dotsStr = UTF8("...");
 
@@ -78,10 +77,10 @@ namespace gui
                     availableSpace -= dotsSpaceConsumed;
 
                     uint32_t remainingCharDraw =
-                        font->getCharCountInSpace(text, availableSpace, spaceConsumed, this->dotsTruncateEnd);
+                        font->getCharCountInSpace(text, availableSpace, spaceConsumed, elide.pos == Ellipsis::Pos::End);
                     if (remainingCharDraw) {
                         // get as much chars as possible
-                        if (this->dotsTruncateEnd) {
+                        if (elide.pos == Ellipsis::Pos::End) {
                             textDisplayed = text.substr(0, remainingCharDraw) + dotsStr;
                         }
                         else {
@@ -128,7 +127,7 @@ namespace gui
         }
 
         // if dots mode is disabled and line mode is enabled calculate positiona and width of the line
-        if ((!dotsMode) && (lineMode) && (lineFront != nullptr)) {
+        if ((!elide.on) && (lineMode) && (lineFront != nullptr)) {
             uint32_t spaceWidth = font->getCharPixelWidth(' ');
             int32_t lineW       = availableSpace - stringPixelWidth;
             uint32_t lineY      = textArea.y - font->getCharPixelHeight('a') / 2;
@@ -211,10 +210,15 @@ namespace gui
         calculateDisplayText();
     }
 
-    void Label::setDotsMode(const bool val, const bool truncateEnd)
+    void Label::setEllipsis(gui::Ellipsis::Pos pos)
     {
-        dotsMode        = val;
-        dotsTruncateEnd = truncateEnd;
+        elide.pos = pos;
+        calculateDisplayText();
+    }
+
+    void Label::setEllipsis(gui::Ellipsis elide)
+    {
+        this->elide = elide;
         calculateDisplayText();
     }
 
