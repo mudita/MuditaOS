@@ -61,7 +61,7 @@ class UTF8
     UTF8 &operator=(const UTF8 &utf);
     UTF8 &operator=(UTF8 &&utf) noexcept;
     uint32_t operator[](const uint32_t &idx) const;
-    UTF8 operator+(const UTF8 &utf);
+    UTF8 operator+(const UTF8 &utf) const;
     UTF8 &operator+=(const UTF8 &utf);
     bool operator==(const UTF8 &utf) const;
     operator std::string() const

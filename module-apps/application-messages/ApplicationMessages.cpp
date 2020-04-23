@@ -180,4 +180,15 @@ namespace app
         return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
     }
 
+    bool ApplicationMessages::newMessageOptions()
+    {
+        LOG_INFO("New message options");
+        if (windowOptions != nullptr) {
+            windowOptions->clearOptions();
+            windowOptions->addOptions(newMessageWindowOptions(this));
+            switchWindow(windowOptions->getName(), nullptr);
+        }
+        return true;
+    }
+
 } /* namespace app */

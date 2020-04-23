@@ -1,13 +1,17 @@
 #!/bin/bash
 # set -e
 
+source config/common.sh
+
 if [ -z $1 ]; then
-  BUILD_PATH=./build
+  BUILD_PATH=./build-rt1051-Debug
   echo "copying from default: $BUILD_PATH"
   echo -e "usage: $0 <build-folder>\n"
 else
   BUILD_PATH=$1
 fi
+
+check_target_rt1051 "$BUILD_PATH"
 
 PURE_DEV=/dev/disk/by-id/usb-NXP_SEMI_NXP_MASS_STORAGE_0123456789ABCDEF-0:0
 PURE_DISK=`readlink -f $PURE_DEV`
@@ -34,7 +38,7 @@ cp -v $BUILD_PATH/sys/* "$PURE_PATH"/ -r  # | sed 's/'-\>'/'→'/g'
 # sudo sync $PURE_DEV # https://unix.stackexchange.com/a/345950
 echo -e "PurePhone copied\n"
 
-PURE_PARTITION=$(lsblk -nlp /dev/sda | tail +2 | awk '{print $1}')
+PURE_PARTITION=$(lsblk -nlp $PURE_DISK | tail +2 | awk '{print $1}')
 if [ -z $PURE_PARTITION ]; then
        PURE_PARTITION=$PURE_DISK # it is formatted like so apparently
 fi

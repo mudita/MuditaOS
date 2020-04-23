@@ -71,8 +71,10 @@
 /*-----------------------------------------------------------
  * Implementation of functions defined in portable.h for the Posix port.
  *----------------------------------------------------------*/
-
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
