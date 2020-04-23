@@ -14,8 +14,10 @@ namespace app
     template <class T> class DatabaseModel
     {
       protected:
-        /// Number of elements requested from database in single message
-        int pageSize = 1;
+        static constexpr auto defBuffSize = 12;
+
+        /// Receive messages buffer size
+        int buffSize = defBuffSize;
         /// Pointer to application that owns the model
         Application *application;
         /// Total number of records in database
@@ -33,17 +35,14 @@ namespace app
                                    uint32_t count)
         {
 
-            auto maxElem = ((int)limit <= recordsCount ? limit : recordsCount);
-
-            for (uint32_t i = 0; i <= maxElem; i++)
+            for (auto i = 0; i < buffSize; i++)
                 records[i] = nullptr;
 
-            records.clear();
+            auto maxElem = ((int)limit <= buffSize ? limit : buffSize);
 
-            for (unsigned int i = 0; i < maxElem; i++) {
-                auto ii     = i;
-                records[ii] = nullptr;
-                records[ii] = std::make_shared<T>(dbRecords.get()->operator[](i));
+            for (uint32_t i = 0; i < maxElem; i++) {
+                records[i] = nullptr;
+                records[i] = std::make_shared<T>(dbRecords.get()->operator[](i));
             }
 
             return true;
@@ -54,17 +53,21 @@ namespace app
             clear();
         }
 
-        DatabaseModel(Application *app, int pageSize) : pageSize{pageSize}, application{app}, recordsCount{-1}
+        DatabaseModel(Application *app, int buffSize = defBuffSize)
+            : buffSize{buffSize}, application{app}, recordsCount{-1}
         {
-            records.resize(pageSize * 3);
+            resizeBuffer(buffSize);
+        }
+
+        virtual void resizeBuffer(int buffSize)
+        {
+            records.resize(buffSize);
             std::fill(records.begin(), records.end(), nullptr);
         }
 
         virtual void clear()
         {
-
-            for (int i = 0; i < pageSize * 3; i++)
-                records[i] = nullptr;
+            std::fill(records.begin(), records.end(), nullptr);
             records.clear();
             recordsCount = -1;
         }

@@ -11,7 +11,7 @@ namespace messages
 {
     namespace threads
     {
-        constexpr auto pageSize = 4;
+        constexpr auto pageSize = 5;
 
         constexpr auto listHeight    = 445;
         constexpr auto listWidth     = 458;

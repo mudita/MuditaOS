@@ -40,7 +40,6 @@ class NotesModel : public app::DatabaseModel<NotesRecord>, public gui::ListItemP
     {
         return recordsCount;
     };
-
 };
 
 #endif /* MODULE_APPS_APPLICATION_NOTES_NOTESMODEL_HPP_ */

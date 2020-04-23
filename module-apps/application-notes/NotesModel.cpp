@@ -11,7 +11,7 @@
 
 #include "NotesModel.hpp"
 
-NotesModel::NotesModel(app::Application *app) : DatabaseModel(app, 4)
+NotesModel::NotesModel(app::Application *app) : DatabaseModel(app)
 {}
 
 NotesModel::~NotesModel()
@@ -26,10 +26,7 @@ void NotesModel::requestRecordsCount()
 
     // request first and second page if possible
     if (recordsCount > 0) {
-        DBServiceAPI::NotesGetLimitOffset(application, 0, pageSize);
-        //        if (recordsCount > pageSize) {
-        //            DBServiceAPI::NotesGetLimitOffset(application, pageSize, pageSize);
-        //        }
+        DBServiceAPI::NotesGetLimitOffset(application, 0, 3);
     }
 }
 
@@ -44,14 +41,13 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
                                uint32_t count)
 {
 
-    	LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-    	for( uint32_t i=0; i<records.get()->size(); ++i ) {
-    		LOG_INFO("id: %d, filename: %s", records.get()->operator [](i).ID, records.get()->operator
-    [](i).path.c_str());
-    	}
+    //    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    //    for (uint32_t i = 0; i < records.get()->size(); ++i) {
+    //        LOG_INFO("id: %d, filename: %s", records.get()->operator[](i).ID,
+    //        records.get()->operator[](i).path.c_str());
+    //    }
 
     listDataAvailable = true;
-
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 
     return true;
