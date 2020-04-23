@@ -61,49 +61,25 @@ namespace gui
         };
     }; // namespace meta
 
-    /// elision setting for Label to use
-    /// by default do not ellipsis
-    /// by default set elision at the end
-    struct Ellipsis
-    {
-        bool on = false;
-        enum class Pos
-        {
-            Begin,
-            End
-        } pos = Pos::End;
-    };
-
     class Label : public Rect
     {
-      public:
-        Ellipsis ellipsis;
-        /// now we always want to ellipsis
-        /// if that changes there is no problem to change it to class and add enum class "How" inside
       protected:
         UTF8 text;
         UTF8 textDisplayed;
-        uint32_t charDrawableCount;
-        // number of pixels occupied by displayed text;
-        uint32_t stringPixelWidth;
-
-        // color of the text
-        Color textColor;
-        // font pointer
-        Font *font;
-        // margins for text
-        Margins margins;
-        // type of alignment
+        Ellipsis ellipsis;
+        uint32_t charDrawableCount = 0;
+        uint32_t stringPixelWidth  = 0;
+        Color textColor            = {0, 0};
+        Font *font                 = nullptr;
+        Margins margins            = {0, 0, 0, 0};
+        bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
         Alignment alignment;
-        // flag that defines if a remaining area of the label has a horizontal line.
-        bool lineMode;
 
         // area specified in pixels occupied by text inside label space.
         // This defines also position of the text considering alignment and margins.
         BoundingBox textArea;
         // widgets to add line
         Rect *lineFront = nullptr;
-
         Rect *lineBack = nullptr;
         void calculateDisplayText();
 

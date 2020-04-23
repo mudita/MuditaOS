@@ -45,65 +45,11 @@ namespace gui
     void Label::calculateDisplayText()
     {
         uint32_t availableSpace = widgetArea.w;
-        // calculate number of chars that can fit available space
-        uint32_t spaceConsumed;
-        // @TODO spaceConsumed returns value irrelevant of current char
-        charDrawableCount = font->getCharCountInSpace(text, availableSpace, spaceConsumed);
-        textArea.w        = (uint16_t)spaceConsumed;
-
-        // if not all characters fit create substring
-        if (charDrawableCount < text.length()) {
-            // get as much chars as possible
-            textDisplayed = text.substr(0, charDrawableCount);
-
-            // if 3 dots should be placed a the end
-            if (elide.on) {
-                // create 3 dots string
-                UTF8 dotsStr = UTF8("...");
-
-                // calculate how many dots can fit in the available space
-                uint32_t dotsSpaceConsumed;
-                uint32_t dotsFitting = font->getCharCountInSpace(dotsStr, widgetArea.w, dotsSpaceConsumed);
-
-                // if there is not enough space even for three dots
-                if (dotsFitting < 3) {
-                    textDisplayed     = dotsStr.substr(0, dotsFitting);
-                    textArea.w        = (uint16_t)dotsSpaceConsumed;
-                    charDrawableCount = (uint16_t)dotsFitting;
-                }
-                else // 3 dots fit, calculate how many chars can be placed using smaller space (space for dots
-                     // subtracted )
-                {
-                    availableSpace -= dotsSpaceConsumed;
-
-                    uint32_t remainingCharDraw =
-                        font->getCharCountInSpace(text, availableSpace, spaceConsumed, elide.pos == Ellipsis::Pos::End);
-                    if (remainingCharDraw) {
-                        // get as much chars as possible
-                        if (elide.pos == Ellipsis::Pos::End) {
-                            textDisplayed = text.substr(0, remainingCharDraw) + dotsStr;
-                        }
-                        else {
-                            textDisplayed = dotsStr + text.substr(text.length() - remainingCharDraw, remainingCharDraw);
-                        }
-                        textArea.w        = (uint16_t)(dotsSpaceConsumed + spaceConsumed);
-                        charDrawableCount = (uint16_t)textDisplayed.length();
-                    }
-                    else // only 3 dots can fit
-                    {
-                        textArea.w        = (uint16_t)dotsSpaceConsumed;
-                        charDrawableCount = (uint16_t)dotsFitting;
-                        textDisplayed     = dotsStr;
-                    }
-                }
-            }
-        }
-        else {
-            textDisplayed = text;
-        }
-
-        stringPixelWidth = font->getPixelWidth(textDisplayed, 0, textDisplayed.length());
-        textArea.h       = font->info.line_height;
+        charDrawableCount       = font->getCharCountInSpace(text, availableSpace);
+        textArea.w              = font->getPixelWidth(text.substr(0, charDrawableCount));
+        textDisplayed           = font->getTextWithElipsis(text, availableSpace, ellipsis);
+        stringPixelWidth        = font->getPixelWidth(textDisplayed, 0, textDisplayed.length());
+        textArea.h              = font->info.line_height;
 
         // calculate vertical position of text
         if (alignment.vertical_center) {
@@ -116,6 +62,7 @@ namespace gui
             textArea.y = widgetArea.h - font->info.line_height + font->info.base - margins.bottom;
         }
         // calculate horizontal position o text
+        textArea.x = 0;
         if (alignment.horizontal_center) {
             textArea.x = (widgetArea.w - textArea.w) / 2;
         }
@@ -127,7 +74,7 @@ namespace gui
         }
 
         // if dots mode is disabled and line mode is enabled calculate positiona and width of the line
-        if ((!elide.on) && (lineMode) && (lineFront != nullptr)) {
+        if ((!ellipsis.on) && (lineMode) && (lineFront != nullptr)) {
             uint32_t spaceWidth = font->getCharPixelWidth(' ');
             int32_t lineW       = availableSpace - stringPixelWidth;
             uint32_t lineY      = textArea.y - font->getCharPixelHeight('a') / 2;
@@ -169,9 +116,9 @@ namespace gui
     Label::Fits Label::textFitsIn(const UTF8 &text, uint32_t width)
     {
         Fits fits;
-        auto availableSpace = width - margins.left - margins.right;
-        auto cnt            = font->getCharCountInSpace(text, availableSpace, fits.space_consumed);
+        auto cnt            = font->getCharCountInSpace(text, area(Area::Max).w);
         fits.fits           = cnt == text.length();
+        fits.space_consumed = font->getPixelWidth(text);
         return fits;
     }
 
@@ -212,13 +159,14 @@ namespace gui
 
     void Label::setEllipsis(gui::Ellipsis::Pos pos)
     {
-        elide.pos = pos;
+        ellipsis.pos = pos;
+        ellipsis.on  = true;
         calculateDisplayText();
     }
 
-    void Label::setEllipsis(gui::Ellipsis elide)
+    void Label::setEllipsis(gui::Ellipsis ellipsis)
     {
-        this->elide = elide;
+        this->ellipsis = ellipsis;
         calculateDisplayText();
     }
 

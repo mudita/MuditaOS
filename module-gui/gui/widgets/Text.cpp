@@ -278,11 +278,9 @@ namespace gui
         while (index < totalLength) {
 
             UTF8 textCopy = text.substr(index, totalLength - index);
-            // find how many character fit in the widget's width
-            // this doesnt include any line breaking conditinos like enter or space because line is too long
-            uint32_t spaceConsumed = 0;
-            uint32_t charCount     = font->getCharCountInSpace(textCopy, availableSpace, spaceConsumed);
+            uint32_t charCount     = font->getCharCountInSpace(textCopy, availableSpace);
             UTF8 tmpText           = textCopy.substr(0, charCount);
+            uint32_t spaceConsumed = font->getPixelWidth(tmpText);
 
             // some default values
             uint32_t startIndex     = 0;
@@ -383,9 +381,7 @@ namespace gui
     bool Text::splitText(UTF8 &source, UTF8 &remaining, LineEndType &endType, uint32_t availableSpace)
     {
 
-        uint32_t spaceConsumed;
-        uint32_t charCount = font->getCharCountInSpace(source, availableSpace, spaceConsumed);
-        // this is sub-string that fits available space.
+        uint32_t charCount = font->getCharCountInSpace(source, availableSpace);
         UTF8 searchStr = source.substr(0, charCount);
 
         // try to find first enter.
