@@ -231,6 +231,68 @@ uint32_t DBServiceAPI::ThreadGetCount(sys::Service *serv)
     }
 }
 
+bool DBServiceAPI::SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &rec)
+{
+    auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateAdd, rec);
+
+    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
+    if (ret.first == sys::ReturnCodes::Success && resp) {
+        return resp->retCode;
+    }
+
+    return false;
+}
+
+bool DBServiceAPI::SMSTemplateRemove(sys::Service *serv, uint32_t id)
+{
+    auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateRemove);
+    msg->id  = id;
+
+    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto resp = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
+    if (ret.first == sys::ReturnCodes::Success && resp) {
+        return resp->retCode;
+    }
+
+    return false;
+}
+
+bool DBServiceAPI::SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord &rec)
+{
+    auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateUpdate, rec);
+
+    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto resp = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
+    if (ret.first == sys::ReturnCodes::Success && resp) {
+        return resp->retCode;
+    }
+
+    return false;
+}
+
+uint32_t DBServiceAPI::SMSTemplateGetCount(sys::Service *serv)
+{
+    auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateGetCount);
+
+    auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
+    auto resp = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
+    if (ret.first == sys::ReturnCodes::Success && resp) {
+        return resp->retCode;
+    }
+
+    return false;
+}
+
+bool DBServiceAPI::SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit)
+{
+    auto msg    = std::make_shared<DBThreadMessage>(MessageType::DBSMSTemplateGetLimitOffset);
+    msg->offset = offset;
+    msg->limit  = limit;
+
+    return sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv);
+}
+
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByName(sys::Service *serv,
                                                                            UTF8 primaryName,
                                                                            UTF8 alternativeName)

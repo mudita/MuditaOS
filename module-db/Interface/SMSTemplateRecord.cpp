@@ -4,47 +4,47 @@
 
 #include <cassert>
 
-SMSTemplatesRecord::SMSTemplatesRecord(const SMSTemplatesTableRow &w)
+SMSTemplateRecord::SMSTemplateRecord(const SMSTemplateTableRow &w)
 {
     ID                 = w.ID;
     text               = w.text;
     lastUsageTimestamp = w.lastUsageTimestamp;
 }
 
-SMSTemplatesRecordInterface::SMSTemplatesRecordInterface(SmsDB *smsDb) : smsDB(smsDb)
+SMSTemplateRecordInterface::SMSTemplateRecordInterface(SmsDB *smsDb) : smsDB(smsDb)
 {}
 
-SMSTemplatesRecordInterface::~SMSTemplatesRecordInterface()
+SMSTemplateRecordInterface::~SMSTemplateRecordInterface()
 {}
 
-bool SMSTemplatesRecordInterface::Add(const SMSTemplatesRecord &rec)
+bool SMSTemplateRecordInterface::Add(const SMSTemplateRecord &rec)
 {
     return smsDB->templates.Add(
-        SMSTemplatesTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+        SMSTemplateTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
 }
-uint32_t SMSTemplatesRecordInterface::GetCount()
+uint32_t SMSTemplateRecordInterface::GetCount()
 {
     return smsDB->templates.GetCount();
 }
 
-std::unique_ptr<std::vector<SMSTemplatesRecord>> SMSTemplatesRecordInterface::GetLimitOffsetByField(
-    uint32_t offset, uint32_t limit, SMSTemplatesRecordField field, const char *str)
+std::unique_ptr<std::vector<SMSTemplateRecord>> SMSTemplateRecordInterface::GetLimitOffsetByField(
+    uint32_t offset, uint32_t limit, SMSTemplateRecordField field, const char *str)
 {
     assert(0 && "need proper implementation");
     return GetLimitOffset(offset, limit);
 }
 
-std::unique_ptr<std::vector<SMSTemplatesRecord>> SMSTemplatesRecordInterface::GetLimitOffset(uint32_t offset,
-                                                                                             uint32_t limit)
+std::unique_ptr<std::vector<SMSTemplateRecord>> SMSTemplateRecordInterface::GetLimitOffset(uint32_t offset,
+                                                                                           uint32_t limit)
 {
     auto templates = smsDB->templates.GetLimitOffset(offset, limit);
 
-    auto records = std::make_unique<std::vector<SMSTemplatesRecord>>(templates.begin(), templates.end());
+    auto records = std::make_unique<std::vector<SMSTemplateRecord>>(templates.begin(), templates.end());
 
     return records;
 }
 
-bool SMSTemplatesRecordInterface::Update(const SMSTemplatesRecord &rec)
+bool SMSTemplateRecordInterface::Update(const SMSTemplateRecord &rec)
 {
     auto templ = smsDB->templates.GetByID(rec.ID);
     if (templ.ID == DB_ID_NONE) {
@@ -52,10 +52,10 @@ bool SMSTemplatesRecordInterface::Update(const SMSTemplatesRecord &rec)
     }
 
     return smsDB->templates.Update(
-        SMSTemplatesTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
+        SMSTemplateTableRow{{.ID = rec.ID}, .text = rec.text, .lastUsageTimestamp = rec.lastUsageTimestamp});
 }
 
-bool SMSTemplatesRecordInterface::RemoveByID(uint32_t id)
+bool SMSTemplateRecordInterface::RemoveByID(uint32_t id)
 {
 
     auto templ = smsDB->templates.GetByID(id);
@@ -66,15 +66,15 @@ bool SMSTemplatesRecordInterface::RemoveByID(uint32_t id)
     return smsDB->templates.RemoveByID(id);
 }
 
-bool SMSTemplatesRecordInterface::RemoveByField(SMSTemplatesRecordField field, const char *str)
+bool SMSTemplateRecordInterface::RemoveByField(SMSTemplateRecordField field, const char *str)
 {
     assert(0 && "need implementation");
     return false;
 }
 
-SMSTemplatesRecord SMSTemplatesRecordInterface::GetByID(uint32_t id)
+SMSTemplateRecord SMSTemplateRecordInterface::GetByID(uint32_t id)
 {
     auto templ = smsDB->templates.GetByID(id);
 
-    return SMSTemplatesRecord{templ};
+    return SMSTemplateRecord{templ};
 }

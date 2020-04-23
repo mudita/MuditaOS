@@ -20,6 +20,8 @@ target_sources( ${PROJECT_NAME}
 		#"${CMAKE_CURRENT_LIST_DIR}/widgets/MessagesListView.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadModel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/widgets/ThreadItem.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/SMSTemplateModel.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/widgets/SMSTemplateItem.cpp"
 		"${CMAKE_CURRENT_LIST_DIR}/widgets/Icon.cpp"
         
 		"${CMAKE_CURRENT_LIST_DIR}/windows/MessagesMainWindow.cpp"
