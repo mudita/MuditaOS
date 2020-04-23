@@ -40,5 +40,4 @@ class CalllogModel : public app::DatabaseModel<CalllogRecord>, virtual public gu
     {
         return recordsCount;
     };
-
 };

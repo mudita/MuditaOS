@@ -15,7 +15,7 @@
 #include "../windows/ThreadViewWindow.hpp" // for name of window
 
 #include "service-db/api/DBServiceAPI.hpp"
-ThreadModel::ThreadModel(app::Application *app) : DatabaseModel(app, messages::threads::pageSize)
+ThreadModel::ThreadModel(app::Application *app) : DatabaseModel(app)
 {}
 
 void ThreadModel::requestRecordsCount(void)
@@ -25,9 +25,6 @@ void ThreadModel::requestRecordsCount(void)
     if (recordsCount > 0) {
 
         DBServiceAPI::ThreadGetLimitOffset(application, 0, messages::threads::pageSize);
-        if (recordsCount >= messages::threads::pageSize) {
-            DBServiceAPI::ThreadGetLimitOffset(application, messages::threads::pageSize, messages::threads::pageSize);
-        }
     }
 }
 bool ThreadModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> records,
@@ -35,6 +32,7 @@ bool ThreadModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> recor
                                 const uint32_t limit,
                                 uint32_t count)
 {
+    listDataAvailable = true;
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 
     return true;
