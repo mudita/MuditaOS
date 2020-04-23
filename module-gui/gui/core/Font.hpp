@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "Ellipsis.hpp"
 
 namespace gui
 {
@@ -23,25 +24,27 @@ namespace gui
     class FontGlyph
     {
       public:
+        FontGlyph() = default;
+        FontGlyph(FontGlyph *);
         virtual ~FontGlyph();
         gui::Status load(uint8_t *data, uint32_t &offset);
         gui::Status loadImage(uint8_t *data, uint32_t offset);
         // character id
-        uint16_t id;
+        uint16_t id = 0;
         // offset in glyph data field
-        uint32_t glyph_offset;
+        uint32_t glyph_offset = 0;
         // width of the character image in the texture
-        uint16_t width;
+        uint16_t width = 0;
         // height of the character image in the texture
-        uint16_t height;
+        uint16_t height = 0;
         // how much the current position should be offset when copying the image from the texture to the screen
-        int16_t xoffset;
+        int16_t xoffset = 0;
         // how much the current position should be offset when copying the image from the texture to the screen
-        int16_t yoffset;
+        int16_t yoffset = 0;
         // how much the current position should be advanced after drawing the character
-        uint16_t xadvance;
+        uint16_t xadvance = 0;
         // image data of the glyph
-        uint8_t *data;
+        uint8_t *data = 0;
     };
 
     class FontKerning
@@ -91,6 +94,7 @@ namespace gui
 
         gui::Status load(uint8_t *data);
 
+        static const uint32_t none_char_id = std::numeric_limits<const uint32_t>().max();
         // structure holding detailed information about font
         FontInfo info;
         // number of glyphs in the fontno
@@ -108,26 +112,24 @@ namespace gui
         std::map<uint32_t, FontGlyph *> glyphs;
         std::map<uint32_t, std::map<uint32_t, FontKerning *> *> kerning;
 
+        /// return glyph for selected code
+        /// if code is not found - unsupportedGlyph returned
+        std::unique_ptr<FontGlyph> getGlyph(uint32_t id) const;
+
         /**
          * @brief Returns kerning value for pair of the two characters.
          * @param id1 Code of the first character.
-         * @param id2 Code of the second character.
+         * @param id2 Code of the second character - if none_char_id then return 0
          * @return Value of the kerning or 0 if pair was not found.
          */
-        int32_t getKerning(uint32_t id1, uint32_t id2);
+        int32_t getKerning(uint32_t id1, uint32_t id2) const;
         /**
          * @brief Method calculates how many chars will fit specified width using current font.
          * @param str UTF8 string that will be used to calculate how many chars can fit provided space.
          * @param space Number of pixels in width availabale to calculate how many chars will fit.
-         * @param spaceConsumed Space actually consumed by characters.
-         * @param delimiter Optional character that stops operation. This character will be the last included character
          * @return number of chars that can fit provided space;
          */
-        uint32_t getCharCountInSpace(const UTF8 &str,
-                                     const uint32_t space,
-                                     uint32_t &spaceConsumed,
-                                     const bool fromBeginning  = true,
-                                     const uint32_t &delimiter = 0);
+        uint32_t getCharCountInSpace(const UTF8 &str, const uint32_t space) const;
         /**
          * @brief Calculates how many pixels will occupy selected part of the string.
          * @param str String used as a source of text.
@@ -135,17 +137,19 @@ namespace gui
          * @param count Number of characters that should be used during calculating pixels width.
          * @return Number of pixels in width occupied by selected part of the text.
          */
-        uint32_t getPixelWidth(const UTF8 &str, const uint32_t start, const uint32_t count);
+        uint32_t getPixelWidth(const UTF8 &str, const uint32_t start, const uint32_t count) const;
         /**
          * @brief Calculates how many pixels will occupy string.
          * @param str String used as a source of text.
          * @return Number of pixels in width occupied by string.
          */
-        uint32_t getPixelWidth(const UTF8 &str);
+        uint32_t getPixelWidth(const UTF8 &str) const;
         /**
          * @brief returns number of pixels occupied by character horizontally.
+         *
+         * if previous char is set - then tries to append kerning
          */
-        uint32_t getCharPixelWidth(uint32_t charCode);
+        uint32_t getCharPixelWidth(uint32_t charCode, uint32_t previousChar = none_char_id) const;
         /**
          * @brief Returns number of pixels occupied by the character vertically.
          */
@@ -154,7 +158,20 @@ namespace gui
         {
             return info.face;
         }
+
+        /// get elipsis text in selected width from input text
+        /// this essentially means:
+        /// return test with "..." if needed in text begin / end if needed
+        UTF8 getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const;
+
         std::unique_ptr<FontGlyph> getGlyphUnsupported() const;
+
+      private:
+        /// set ellipsis on text in first parameter
+        /// @note our UTF8 doesn't provide way to replace single character
+        ///
+        /// this is lazy done implementation - we just try to replace first/last 3 characters that would fit
+        void setTextEllipsis(std::string &text, Ellipsis ellipsis) const;
     };
 
     class FontManager
