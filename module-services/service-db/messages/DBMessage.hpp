@@ -161,7 +161,7 @@ class DBSMSTemplateMessage : public DBMessage
 class DBSMSTemplateGetCount : public DBSMSTemplateMessage
 {
   public:
-    DBSMSTemplateGetCount() : DBSMSTemplateMessage(MessageType::DBSMSGetCount)
+    DBSMSTemplateGetCount() : DBSMSTemplateMessage(MessageType::DBSMSTemplateGetCount)
     {}
 };
 
@@ -169,13 +169,17 @@ class DBSMSTemplateResponseMessage : public DBResponseMessage
 {
   public:
     DBSMSTemplateResponseMessage(std::unique_ptr<std::vector<SMSTemplateRecord>> rec,
-                                 uint32_t retCode   = 0,
+                                 uint32_t retCode,
+                                 uint32_t limit     = 0,
+                                 uint32_t offset    = 0,
                                  uint32_t count     = 0,
                                  MessageType respTo = MessageType::MessageTypeUninitialized)
-        : DBResponseMessage(retCode, count, respTo), records(std::move(rec)){};
+        : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset){};
     virtual ~DBSMSTemplateResponseMessage() = default;
 
     std::unique_ptr<std::vector<SMSTemplateRecord>> records;
+    uint32_t limit  = 0;
+    uint32_t offset = 0;
 };
 
 class DBContactMessage : public DBMessage

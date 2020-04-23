@@ -4,12 +4,6 @@
 
 namespace gui
 {
-
-    namespace name::window
-    {
-        inline std::string thread_sms_search = "SMSSearch";
-    }
-
     class SMSSearch : public AppWindow
     {
         gui::Item *body = nullptr;

@@ -250,7 +250,7 @@ bool DBServiceAPI::SMSTemplateRemove(sys::Service *serv, uint32_t id)
     msg->id  = id;
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
-    auto resp = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
+    auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp) {
         return resp->retCode;
     }
@@ -263,7 +263,7 @@ bool DBServiceAPI::SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord
     auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateUpdate, rec);
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
-    auto resp = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
+    auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp) {
         return resp->retCode;
     }
@@ -273,20 +273,20 @@ bool DBServiceAPI::SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord
 
 uint32_t DBServiceAPI::SMSTemplateGetCount(sys::Service *serv)
 {
-    auto msg = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateGetCount);
+    auto msg = std::make_shared<DBSMSTemplateGetCount>();
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
-    auto resp = dynamic_cast<DBThreadResponseMessage *>(ret.second.get());
+    auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
     if (ret.first == sys::ReturnCodes::Success && resp) {
-        return resp->retCode;
+        return resp->count;
     }
 
-    return false;
+    return 0;
 }
 
 bool DBServiceAPI::SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit)
 {
-    auto msg    = std::make_shared<DBThreadMessage>(MessageType::DBSMSTemplateGetLimitOffset);
+    auto msg    = std::make_shared<DBSMSTemplateMessage>(MessageType::DBSMSTemplateGetLimitOffset);
     msg->offset = offset;
     msg->limit  = limit;
 

@@ -19,6 +19,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Message.hpp"
 #include "Service/Service.hpp"
 
@@ -36,6 +37,7 @@ class ServiceDB : public sys::Service
     std::unique_ptr<SettingsRecordInterface> settingsRecordInterface;
     std::unique_ptr<SMSRecordInterface> smsRecordInterface;
     std::unique_ptr<ThreadRecordInterface> threadRecordInterface;
+    std::unique_ptr<SMSTemplateRecordInterface> smsTemplateRecordInterface;
     std::unique_ptr<ContactRecordInterface> contactRecordInterface;
     std::unique_ptr<AlarmsRecordInterface> alarmsRecordInterface;
     std::unique_ptr<NotesRecordInterface> notesRecordInterface;

@@ -94,9 +94,10 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
 std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app)
 {
     return {
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_use_template")),
-                             [=](gui::Item &item) { return false; },
-                             gui::Arrow::Disabled}),
+        gui::newOptionLabel(
+            {UTF8(utils::localize.get("sms_use_template")),
+             [=](gui::Item &item) { return app->switchWindow(gui::name::window::sms_templates, nullptr); },
+             gui::Arrow::Disabled}),
         gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_paste")),
                              [=](gui::Item &item) { return false; },
                              gui::Arrow::Disabled}),

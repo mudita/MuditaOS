@@ -51,4 +51,17 @@ namespace messages
             constexpr uint32_t h = 44;
         }
     } // namespace newMessage
+
+    namespace templates
+    {
+        namespace list
+        {
+            constexpr auto pageSize = 7;
+
+            constexpr auto h = 445;
+            constexpr auto w = 458;
+            constexpr auto x = 11;
+            constexpr auto y = 105;
+        } // namespace list
+    }     // namespace templates
 } // namespace messages

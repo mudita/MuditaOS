@@ -1,13 +1,4 @@
-/*
- * @file ApplicationMessages.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 25 wrz 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_
-#define MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_
+#pragma once
 
 #include "Application.hpp"
 #include "Interface/ThreadRecord.hpp"
@@ -19,11 +10,16 @@ namespace gui
     {
         namespace window
         {
-            inline const std::string thread_rm_confirm = "ConfirmRM";
+            inline const std::string thread_rm_confirm  = "ConfirmRM";
             inline const std::string thread_search_none = "SearchNone";
-        };
-    }; // namespace name
-};     // namespace gui
+            inline const std::string new_sms            = "NewSMS";
+            inline const std::string thread_sms_search  = "SMSSearch";
+            inline const std::string sms_templates      = "SMSTemplates";
+            inline const std::string thread_view        = "ThreadViewWindow";
+
+        }; // namespace window
+    };     // namespace name
+};         // namespace gui
 
 namespace app
 {
@@ -57,5 +53,3 @@ namespace app
         bool newMessageOptions();
     };
 } /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_MESSAGES_APPLICATIONMESSAGES_HPP_ */

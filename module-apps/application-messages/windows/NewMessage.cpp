@@ -34,6 +34,11 @@ namespace gui
             recipient->setText(pdata->result->getFormattedName());
             contact = pdata->result;
         }
+        if (auto pdata = dynamic_cast<SMSTemplateData *>(data)) {
+            auto templText = pdata->templ->text;
+            LOG_INFO("received sms templates data \"%s\"", templText.c_str());
+            message->setText(message->getText() + templText);
+        }
     }
 
     bool NewSMS_Window::selectContact()

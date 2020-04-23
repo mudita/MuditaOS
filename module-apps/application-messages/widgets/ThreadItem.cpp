@@ -78,6 +78,7 @@ namespace gui
 
         if (model != nullptr) {
             auto contactRec = DBServiceAPI::ContactGetByID(model->getApplication(), thread->contactID);
+            LOG_FATAL("contact ID = %d", thread->contactID); // TODO: check for empty?
             auto cont       = contactRec->front();
             contact->setText(cont.getFormattedName());
         }

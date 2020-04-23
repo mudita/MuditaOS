@@ -30,6 +30,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/windows/OptionsWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/OptionsMessages.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/SearchStart.cpp"
+		"${CMAKE_CURRENT_LIST_DIR}/windows/SMSTemplatesWindow.cpp"
 
 	PUBLIC
 		#"${CMAKE_CURRENT_LIST_DIR}/MessagesModel.hpp"
