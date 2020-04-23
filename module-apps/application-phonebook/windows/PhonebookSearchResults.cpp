@@ -28,8 +28,6 @@ namespace gui
                                              phonebookStyle::searchResults::searchResultList::y,
                                              phonebookStyle::searchResults::searchResultList::w,
                                              phonebookStyle::searchResults::searchResultList::h);
-        searchResultList->setMaxElements(phonebookStyle::searchResults::searchResultList::maxElements);
-        searchResultList->setPageSize(phonebookStyle::searchResults::searchResultList::pageSize);
         searchResultList->setPenFocusWidth(phonebookStyle::searchResults::searchResultList::penFocusWidth);
         searchResultList->setPenWidth(phonebookStyle::searchResults::searchResultList::penWidth);
         searchResultList->setProvider(searchResultsModel);

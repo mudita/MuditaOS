@@ -40,8 +40,6 @@ namespace gui
         AppWindow::buildInterface();
 
         list = new gui::ListView(this, 16, 105, 480 - 32, 440);
-        list->setMaxElements(3);
-        list->setPageSize(3);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(notesModel);

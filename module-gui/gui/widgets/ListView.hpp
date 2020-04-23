@@ -10,7 +10,23 @@
 namespace gui
 {
 
+    enum class ListViewType
+    {
+        TopDown,
+        Continuous
+    };
+
     class ListItemProvider;
+
+    class ListViewScroll : public Rect
+    {
+
+      public:
+        ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+        ~ListViewScroll(){};
+
+        void update(int startIndex, int listPageSize, int elementsCount);
+    };
 
     class ListView : public Rect
     {
@@ -19,27 +35,16 @@ namespace gui
         int startIndex;
         /// defines total number of elements in the list
         int elementsCount;
-        /// defines whether scroll bar should be drawn on the right side of list widget
-        bool drawVerticalScroll;
-        /// maximum number of elements that can be displayed on the screen
-        //        TODO: Remove
-        int maxElements;
         /// pointer to the item provider object
         ListItemProvider *provider = nullptr;
         /// Vbox that holds currently visible list of items
         VBox *body;
         /// rounded rectangle used to draw scroll bar
-        Rect *scroll = nullptr;
+        ListViewScroll *scroll = nullptr;
         /// list span item
         Span *listSpanItem = nullptr;
 
         int listPageSize;
-
-        enum class Type
-        {
-            TopDown,
-            Continuous
-        };
 
         enum class Direction
         {
@@ -47,28 +52,23 @@ namespace gui
             Bot
         };
 
-        Type listType       = Type::Continuous;
-        Direction direction = Direction::Bot;
+        ListViewType listType = ListViewType::TopDown;
+        Direction direction   = Direction::Bot;
 
         void refresh();
         void clearItems();
-        void updateScrollDimenstions();
-        void disableScroll();
 
         //        TODO: add direction as parameter
         bool listPageEndReached();
 
       public:
-
         ListView();
         ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
         ~ListView();
 
         void setElementsCount(int count);
-        void drawScroll(bool value);
-        void setMaxElements(int value);
         void setProvider(ListItemProvider *provider);
-        void setPageSize(int size);
+        void setListViewType(ListViewType type);
         virtual ListItem *getSelectedItem();
 
         void clear();
@@ -80,4 +80,3 @@ namespace gui
     };
 
 } /* namespace gui */
-

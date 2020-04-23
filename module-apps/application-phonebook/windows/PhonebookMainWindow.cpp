@@ -58,8 +58,7 @@ namespace gui
                                          phonebookStyle::mainWindow::contactsList::y,
                                          phonebookStyle::mainWindow::contactsList::w,
                                          phonebookStyle::mainWindow::contactsList::h);
-        //        contactsList->setMaxElements(phonebookStyle::mainWindow::contactsList::maxElements);
-        contactsList->setPageSize(phonebookStyle::mainWindow::contactsList::pageSize);
+
         contactsList->setPenFocusWidth(phonebookStyle::mainWindow::contactsList::penFocusWidth);
         contactsList->setPenWidth(phonebookStyle::mainWindow::contactsList::penWidth);
         contactsList->setProvider(phonebookModel);
