@@ -79,7 +79,6 @@ class CalllogTable : public Table<CalllogTableRow, CalllogTableFields>
     uint32_t GetCountByFieldID(const char *field, uint32_t id) override final;
 
   private:
-    // TODO: this need to be fixed
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS calls("
                                    "_id INTEGER PRIMARY KEY,"
                                    "date INTEGER,"

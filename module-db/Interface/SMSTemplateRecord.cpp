@@ -41,13 +41,6 @@ std::unique_ptr<std::vector<SMSTemplatesRecord>> SMSTemplatesRecordInterface::Ge
 
     auto records = std::make_unique<std::vector<SMSTemplatesRecord>>(templates.begin(), templates.end());
 
-    // for (const auto &w : smses) {
-
-    //     auto contactRec = contactInterface.GetByID(w.contactID);
-    //     // TODO: or numberUser? or other number
-    //     records->push_back({w});
-    // }
-
     return records;
 }
 
