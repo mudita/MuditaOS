@@ -69,7 +69,7 @@ namespace gui
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorate(text);
         text->setFont(style::window::font::big);
-        text->setDotsMode(true);
+        text->setEllipsis();
     }
 
     CalllogItem::~CalllogItem()

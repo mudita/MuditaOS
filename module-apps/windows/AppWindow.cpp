@@ -52,7 +52,7 @@ namespace gui
         title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        title->setDotsMode(true);
+        title->setEllipsis();
         title->visible = false;
 
         topBar = new gui::TopBar(this, 0, 0, 480, 50);

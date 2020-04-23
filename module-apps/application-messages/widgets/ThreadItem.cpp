@@ -35,7 +35,7 @@ namespace gui
         contact->setPenFocusWidth(window::default_border_no_focus_w);
         contact->setPenWidth(window::default_border_no_focus_w);
         contact->setFont(style::window::font::big);
-        contact->setDotsMode(true);
+        contact->setEllipsis();
         contact->setAlignment(
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
 
@@ -43,7 +43,7 @@ namespace gui
         timestamp->setPenFocusWidth(window::default_border_no_focus_w);
         timestamp->setPenWidth(window::default_border_no_focus_w);
         timestamp->setFont(style::window::font::small);
-        timestamp->setDotsMode(true);
+        timestamp->setEllipsis();
         timestamp->setAlignment(
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_RIGHT, gui::Alignment::ALIGN_VERTICAL_CENTER});
 
@@ -51,7 +51,7 @@ namespace gui
         preview->setPenFocusWidth(window::default_border_no_focus_w);
         preview->setPenWidth(window::default_border_no_focus_w);
         preview->setFont(style::window::font::small);
-        preview->setDotsMode(true);
+        preview->setEllipsis();
         preview->setAlignment(
             gui::Alignment{gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_CENTER});
     }
