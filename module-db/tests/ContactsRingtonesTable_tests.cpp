@@ -29,6 +29,7 @@ TEST_CASE("Contacts Ringtones Table tests")
     vfs.remove(ContactsDB::GetDBName());
 
     ContactsDB contactsdb;
+    REQUIRE(contactsdb.IsInitialized());
 
     ContactsRingtonesTableRow testRow1 = {.ID = 0, .contactID = 0, .assetPath = "/test/assets/path/ringtone.wr"};
 

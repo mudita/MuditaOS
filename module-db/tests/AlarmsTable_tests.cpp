@@ -27,6 +27,7 @@ TEST_CASE("Alarms Table tests")
     vfs.remove(AlarmsDB::GetDBName());
 
     AlarmsDB alarmsDb;
+    REQUIRE(alarmsDb.IsInitialized());
 
     auto alarmsRow = alarmsDb.alarms.GetByID(1);
     REQUIRE(alarmsRow.ID == 1);

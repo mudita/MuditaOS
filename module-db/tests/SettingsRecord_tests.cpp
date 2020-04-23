@@ -31,6 +31,7 @@ TEST_CASE("Settings Record tests")
     vfs.remove(SettingsDB::GetDBName());
 
     auto settingsDB = std::make_unique<SettingsDB>();
+    REQUIRE(settingsDB->IsInitialized());
 
     SettingsRecordInterface settingsRecordInterface(settingsDB.get());
 
@@ -46,7 +47,7 @@ TEST_CASE("Settings Record tests")
     REQUIRE(settingsRecord.pinDaysLeft == 0);
     REQUIRE(settingsRecord.pin1 == "");
     REQUIRE(settingsRecord.pin2 == "");
-    REQUIRE(settingsRecord.activeSIM == 1);
+    REQUIRE(settingsRecord.activeSIM == SettingsRecord::ActiveSim::SIM1);
     REQUIRE(settingsRecord.networkOperator == "");
     REQUIRE(settingsRecord.lockPassHash == 0);
     REQUIRE(settingsRecord.language == SettingsLanguage ::ENGLISH);

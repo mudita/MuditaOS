@@ -38,8 +38,8 @@ bool ContactsNameTable::RemoveByID(uint32_t id)
 
 bool ContactsNameTable::Update(ContactsNameTableRow entry)
 {
-    return db->Execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%s' ,name_alternative = '%s' "
-                       "favourite = '%d' WHERE _id=%lu;",
+    return db->Execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%s', name_alternative = '%s', "
+                       "favourite = '%lu' WHERE _id = %lu;",
                        entry.contactID,
                        entry.namePrimary.c_str(),
                        entry.nameAlternative.c_str(),

@@ -31,6 +31,7 @@ TEST_CASE("Contacts Table tests")
     vfs.remove(ContactsDB::GetDBName());
 
     ContactsDB contactsdb;
+    REQUIRE(contactsdb.IsInitialized());
 
     ContactsTableRow testRow1 = {.ID             = 0,
                                  .nameID         = 0,
@@ -40,7 +41,7 @@ TEST_CASE("Contacts Table tests")
                                  .isOnWhitelist  = true,
                                  .isOnBlacklist  = true,
                                  .isOnFavourites = false,
-                                 .speedDial      = 666
+                                 .speedDial      = "666"
 
     };
 
@@ -55,7 +56,7 @@ TEST_CASE("Contacts Table tests")
 
     // Update existing element in table
     testRow1.ID        = 4;
-    testRow1.speedDial = 777;
+    testRow1.speedDial = "777";
     REQUIRE(contactsdb.contacts.Update(testRow1));
 
     // Get table row using valid ID & check if it was updated
@@ -64,7 +65,7 @@ TEST_CASE("Contacts Table tests")
 
     // Get table row using invalid ID(should return empty contactsdb.contactsRow)
     auto smsFailed = contactsdb.contacts.GetByID(100);
-    REQUIRE(smsFailed.speedDial == 0);
+    REQUIRE(smsFailed.speedDial == "");
 
     // Get table rows using valid offset/limit parameters
     auto retOffsetLimit = contactsdb.contacts.GetLimitOffset(0, 4);
