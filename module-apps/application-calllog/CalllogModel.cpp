@@ -16,7 +16,7 @@ using namespace calllog;
 
 #define DEBUG_CALLLOG_DB_ACCESS 0
 
-CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app, calllog::settings::pageSize)
+CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app)
 {}
 
 void CalllogModel::requestRecordsCount()
@@ -32,7 +32,7 @@ void CalllogModel::requestRecordsCount()
     // request first and second page if possible
     if (recordsCount > 0) {
         LOG_INFO("DBServiceAPI::CalllogGetCount CalllogGetLimitOffset");
-        DBServiceAPI::CalllogGetLimitOffset(application, 0, pageSize);
+        DBServiceAPI::CalllogGetLimitOffset(application, 0, calllog::settings::pageSize);
     }
 }
 
@@ -47,10 +47,11 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  uint32_t count)
 {
 
-    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-    for (uint32_t i = 0; i < records.get()->size(); ++i) {
-        LOG_INFO("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
-    }
+    //    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    //    for (uint32_t i = 0; i < records.get()->size(); ++i) {
+    //        LOG_INFO("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
+    //    }
+
     listDataAvailable = true;
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 

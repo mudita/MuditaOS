@@ -12,7 +12,6 @@ namespace gui
     {
 
       public:
-
         bool listDataAvailable = false;
 
         virtual int getItemCount() const = 0;

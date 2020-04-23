@@ -31,20 +31,16 @@ namespace gui
     class ListView : public Rect
     {
       protected:
-        /// list first item index
         int startIndex;
-        /// defines total number of elements in the list
         int elementsCount;
-        /// pointer to the item provider object
         ListItemProvider *provider = nullptr;
         /// Vbox that holds currently visible list of items
         VBox *body;
-        /// rounded rectangle used to draw scroll bar
         ListViewScroll *scroll = nullptr;
         /// list span item
         Span *listSpanItem = nullptr;
 
-        int listPageSize;
+        int currentPageSize = 1;
 
         enum class Direction
         {
@@ -57,8 +53,8 @@ namespace gui
 
         void refresh();
         void clearItems();
-
-        //        TODO: add direction as parameter
+        void addItemsOnPage();
+        void setFocus();
         bool listPageEndReached();
 
       public:
