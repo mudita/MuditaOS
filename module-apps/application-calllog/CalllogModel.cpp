@@ -11,6 +11,7 @@
 #include "data/CallLogSwitchData.hpp"
 #include "data/CallLogInternals.hpp"
 #include "CalllogModel.hpp"
+#include "UiCommonActions.hpp"
 
 using namespace calllog;
 
@@ -77,8 +78,18 @@ gui::ListItem *CalllogModel::getItem(int index)
             application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
             return true;
         };
+
+        item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (event.keyCode == gui::KeyCode::KEY_LF) {
+                LOG_DEBUG("calling");
+                return app::call(application, app::CallOperation::ExecuteCall, item->getCall().number);
+            }
+            return false;
+        };
         return item;
     }
-
     return nullptr;
 }
