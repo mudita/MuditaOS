@@ -39,9 +39,7 @@ std::unique_ptr<std::vector<SMSTemplateRecord>> SMSTemplateRecordInterface::GetL
 {
     auto templates = smsDB->templates.GetLimitOffset(offset, limit);
 
-    auto records = std::make_unique<std::vector<SMSTemplateRecord>>(templates.begin(), templates.end());
-
-    return records;
+    return std::make_unique<std::vector<SMSTemplateRecord>>(templates.begin(), templates.end());
 }
 
 bool SMSTemplateRecordInterface::Update(const SMSTemplateRecord &rec)
