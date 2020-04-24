@@ -39,7 +39,7 @@ namespace gui
         return true;
     }
 
-    void SMSTemplateItem::setTemplate(std::shared_ptr<SMSTemplateRecord> &templ)
+    void SMSTemplateItem::setTemplate(std::shared_ptr<SMSTemplateRecord> templ)
     {
         this->templ = templ;
         text->setText(templ->text);

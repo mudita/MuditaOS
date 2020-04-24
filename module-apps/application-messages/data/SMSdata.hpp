@@ -34,3 +34,13 @@ class SMSTemplateData : public gui::SwitchData
     virtual ~SMSTemplateData()               = default;
     std::shared_ptr<SMSTemplateRecord> templ = nullptr;
 };
+
+class SMSTemplateRequest : public gui::SwitchData
+{
+  public:
+    SMSTemplateRequest(const std::string &requestingWindow) : requestingWindow(requestingWindow)
+    {}
+    virtual ~SMSTemplateRequest() = default;
+
+    std::string requestingWindow;
+};

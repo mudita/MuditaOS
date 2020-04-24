@@ -183,12 +183,12 @@ namespace app
         return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
     }
 
-    bool ApplicationMessages::newMessageOptions()
+    bool ApplicationMessages::newMessageOptions(const std::string &requestingWindow)
     {
         LOG_INFO("New message options");
         if (windowOptions != nullptr) {
             windowOptions->clearOptions();
-            windowOptions->addOptions(newMessageWindowOptions(this));
+            windowOptions->addOptions(newMessageWindowOptions(this, requestingWindow));
             switchWindow(windowOptions->getName(), nullptr);
         }
         return true;

@@ -49,15 +49,17 @@ namespace gui
         list->setPageSize(list::pageSize);
         list->setProvider(smsTemplateModel);
 
+        setFocusItem(list);
+
         if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
             app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
-                application->switchWindow(gui::name::window::new_sms, std::move(data));
+                application->switchWindow(requestingWindow, std::move(data));
                 return true;
             };
         }
-        setFocusItem(list);
     }
+
     void SMSTemplatesWindow::destroyInterface()
     {
         AppWindow::destroyInterface();
@@ -82,6 +84,10 @@ namespace gui
             smsTemplateModel->requestRecordsCount();
             list->clear();
             list->setElementsCount(smsTemplateModel->getItemCount());
+        }
+
+        if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
+            requestingWindow = switchData->requestingWindow;
         }
     }
 

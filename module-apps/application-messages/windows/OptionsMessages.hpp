@@ -5,4 +5,4 @@
 #include "OptionWindow.hpp"
 
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
-std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app);
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app, const std::string &requestingWindow);

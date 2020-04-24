@@ -17,7 +17,7 @@ namespace gui
       public:
         SMSTemplateItem(SMSTemplateModel *model);
         virtual ~SMSTemplateItem() = default;
-        void setTemplate(std::shared_ptr<SMSTemplateRecord> &);
+        void setTemplate(std::shared_ptr<SMSTemplateRecord>);
         SMSTemplateRecord getTemplate() const
         {
             return *templ;

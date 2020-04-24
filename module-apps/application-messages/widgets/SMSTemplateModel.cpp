@@ -53,10 +53,10 @@ gui::ListItem *SMSTemplateModel::getItem(
     if (item != nullptr) {
         item->setTemplate(templ);
         item->setID(index);
-        item->activatedCallback = [=](gui::Item &item) {
+        item->activatedCallback = [=](gui::Item &it) {
             LOG_INFO("activatedCallback");
             if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
-                if (app->templatesCallback) // TODO: use null pattern
+                if (app->templatesCallback) // TODO: alek: use null pattern
                 {
                     return app->templatesCallback(templ);
                 }
