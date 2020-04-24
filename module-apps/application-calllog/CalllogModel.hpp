@@ -19,7 +19,7 @@
 /*
  *
  */
-class CalllogModel : public app::DatabaseModel<CalllogRecord>, virtual public gui::ListItemProvider
+class CalllogModel : public app::DatabaseModel<CalllogRecord>, public gui::ListItemProvider
 {
   public:
     CalllogModel() = delete;

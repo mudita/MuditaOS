@@ -11,14 +11,15 @@ namespace gui
     {
 
         setRadius(style::listview::scroll_radius);
-        setFilled(style::listview::scroll_fill);
+        setFilled(true);
         setFillColor(style::listview::scroll_color);
         activeItem = false;
     }
 
     void ListViewScroll::update(int startIndex, int listPageSize, int elementsCount)
     {
-        if ((parent->widgetArea.w > 10) && (parent->widgetArea.h > 10)) {
+        if ((parent->widgetArea.w > style::listview::scroll_min_space) &&
+            (parent->widgetArea.h > style::listview::scroll_min_space)) {
 
             uint32_t pagesCount = 1;
             if (listPageSize) {
@@ -71,7 +72,7 @@ namespace gui
                 return this->listPageEndReached();
             }
             else if (inputEvent.keyCode == KeyCode::KEY_DOWN) {
-                direction = Direction::Bot;
+                direction = Direction::Bottom;
                 return this->listPageEndReached();
             }
             else {
@@ -98,7 +99,6 @@ namespace gui
 
     void ListView::setListViewType(ListViewType type)
     {
-
         listType = type;
     }
 
@@ -125,7 +125,7 @@ namespace gui
         if (provider->listDataAvailable) {
 
             if (provider == nullptr) {
-                LOG_ERROR("ListViev Data provider not exist");
+                LOG_ERROR("ListView Data provider not exist");
                 return;
             }
 
@@ -174,7 +174,7 @@ namespace gui
             setFocusItem(body);
             body->setFocusOnLastElement();
         }
-        if (direction == Direction::Bot) {
+        if (direction == Direction::Bottom) {
             setFocusItem(body);
         }
     };
@@ -214,7 +214,7 @@ namespace gui
             return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);
         };
 
-        if (direction == Direction::Bot) {
+        if (direction == Direction::Bottom) {
 
             if (startIndex + currentPageSize >= elementsCount && listType == ListViewType::Continuous) {
 

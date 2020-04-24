@@ -43,6 +43,6 @@ namespace calllog
         const inline std::string DetailsWindowStr    = "DetailsWindow";
         const inline std::string CallDeleteWindowStr = "CallDeleteOptionsWindow";
 
-        constexpr auto pageSize = 7;
+        constexpr auto pageSize = 8;
     } // namespace settings
 } // namespace calllog
