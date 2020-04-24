@@ -33,15 +33,15 @@ namespace purefs
 {
     namespace file
     {
-        const inline fs::path boot_ini    = ".boot.ini";
+        const inline fs::path boot_ini     = ".boot.ini";
         const inline fs::path boot_ini_bak = ".boot.ini.bak";
-    };
+    }; // namespace file
 
     namespace dir
     {
         const inline fs::path eMMC_disk = "/sys";
         const inline fs::path user_disk = "/user/";
-    }
+    } // namespace dir
 
     namespace extension
     {
@@ -51,16 +51,16 @@ namespace purefs
     namespace buffer
     {
         const inline int crc_buf       = 1024;
-        const inline int crc_char_size =  9;
+        const inline int crc_char_size = 9;
         const inline int crc_radix     = 16;
-    }
+    } // namespace buffer
 
     namespace ini
     {
-        const inline std::string main = "main";
+        const inline std::string main    = "main";
         const inline std::string os_type = "ostype";
-    }
-};
+    } // namespace ini
+};    // namespace purefs
 
 class vfs
 {

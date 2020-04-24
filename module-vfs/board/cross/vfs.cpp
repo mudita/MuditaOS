@@ -56,15 +56,15 @@ void vfs::Init()
 
 bool vfs::getOSRootFromIni()
 {
-    const fs::path currentBootIni   = getCurrentBootIni();
-    sbini_t *ini                    = sbini_load(currentBootIni.c_str());
+    const fs::path currentBootIni = getCurrentBootIni();
+    sbini_t *ini                  = sbini_load(currentBootIni.c_str());
     if (!ini) {
         LOG_ERROR("getOSRootFromIni can't load ini file %s", currentBootIni.c_str());
         return (false);
     }
     else {
-        osType      = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
-        osRootPath  = purefs::dir::eMMC_disk / osType;
+        osType     = sbini_get_string(ini, purefs::ini::main.c_str(), purefs::ini::os_type.c_str());
+        osRootPath = purefs::dir::eMMC_disk / osType;
         sbini_free(ini);
         return (true);
     }
