@@ -52,7 +52,7 @@ namespace gui
 
     void Item::erase()
     {
-        for (auto el : children) {
+        while (auto el = children.back()) {
             erase(el);
         }
     }
