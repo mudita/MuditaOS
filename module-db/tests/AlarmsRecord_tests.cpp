@@ -28,6 +28,7 @@ TEST_CASE("Alarms Record tests")
     vfs.remove(AlarmsDB::GetDBName());
 
     auto alarmsDB = std::make_unique<AlarmsDB>();
+    REQUIRE(alarmsDB->IsInitialized());
 
     AlarmsRecordInterface alarmsRecordInterface(alarmsDB.get());
 

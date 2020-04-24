@@ -32,6 +32,7 @@ set(SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/Tables/NotesTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/CalllogTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/CountryCodesTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTemplatesTable.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
@@ -41,6 +42,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/AlarmsRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/NotesRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/CalllogRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSTemplateRecord.cpp
 
         )
 
@@ -93,7 +95,5 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} module-utils module-vfs )
 
 # Host target configuration(mainly used for unit testing)
-
-message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: https://appnroll.atlassian.net/browse/EGD-2986")
-#add_subdirectory(tests)
+add_subdirectory(tests)
 

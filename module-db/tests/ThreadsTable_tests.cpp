@@ -31,6 +31,7 @@ TEST_CASE("Threads Table tests")
     vfs.remove(SmsDB::GetDBName());
 
     SmsDB smsdb;
+    REQUIRE(smsdb.IsInitialized());
 
     ThreadsTableRow testRow1 = {.ID        = 0,
                                 .date      = 0,
