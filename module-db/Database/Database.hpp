@@ -31,7 +31,7 @@ class Database
     // Must be invoked before closing system in order to properly close OS layer
     static void Deinitialize();
 
-    bool IsInitialized()
+    bool IsInitialized() const
     {
         return isInitialized;
     }

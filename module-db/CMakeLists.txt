@@ -32,6 +32,7 @@ set(SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/Tables/NotesTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/CalllogTable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Tables/CountryCodesTable.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Tables/SMSTemplatesTable.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/Record.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSRecord.cpp
@@ -41,6 +42,7 @@ set(SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/AlarmsRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/NotesRecord.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Interface/CalllogRecord.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Interface/SMSTemplateRecord.cpp
 
         )
 
