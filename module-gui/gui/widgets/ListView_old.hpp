@@ -76,6 +76,7 @@ namespace gui
         virtual void setProvider(ListItemProvider_old *provider);
         virtual void setMode(int mode);
         virtual void setPageSize(int size);
+        virtual ListItem *getSelectedItem();
         /*
          * Acquire and/or update items using item provider
          */

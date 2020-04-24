@@ -276,6 +276,17 @@ namespace gui
         }
     }
 
+    ListItem *ListView_old::getSelectedItem()
+    {
+        // return object only if there are any items in the list
+        if (elementsCount) {
+            auto it = items.begin();
+            std::advance(it, selectedIndex - firstIndex);
+            return *it;
+        }
+        return nullptr;
+    }
+
     std::list<DrawCommand *> ListView_old::buildDrawList()
     {
 
