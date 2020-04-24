@@ -6,9 +6,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <module-vfs/vfs.hpp>
 #include "CalllogDB.hpp"
 
-const char *CalllogDB::dbName = "/user/calllog.db";
+const char *CalllogDB::dbName = USER_FILE("callog.db");
 
 CalllogDB::CalllogDB() : Database(dbName), calls(this)
 {

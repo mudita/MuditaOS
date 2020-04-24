@@ -7,10 +7,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
+#include <module-vfs/vfs.hpp>
 #include "SmsDB.hpp"
 
-const char *SmsDB::dbName = "/user/sms.db";
+const char *SmsDB::dbName = USER_FILE("sms.db");
 
 SmsDB::SmsDB() : Database(dbName), sms(this), threads(this)
 {

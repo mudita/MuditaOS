@@ -5,9 +5,10 @@
  *      Author: kuba
  */
 
+#include <module-vfs/vfs.hpp>
 #include "AlarmsDB.hpp"
 
-const char *AlarmsDB::dbName = "/user/alarms.db";
+const char *AlarmsDB::dbName = USER_FILE("alarms.db");
 
 AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
 {
