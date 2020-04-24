@@ -28,11 +28,13 @@ namespace gui
                     return;
                 }
             }
-            uint32_t currentPage = startIndex / listPageSize;
-            uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
+            if (listPageSize != 0 && pagesCount != 0) {
+                uint32_t currentPage = startIndex / listPageSize;
+                uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
 
-            setPosition(parent->widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
-            setSize(style::listview::scroll_w, pageHeight);
+                setPosition(parent->widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
+                setSize(style::listview::scroll_w, pageHeight);
+            }
         }
         //             not enough space - disable scroll
         else {
@@ -114,13 +116,7 @@ namespace gui
 
     void ListView::clearItems()
     {
-        auto temp = body->children.size();
-        for (unsigned int i = 0; i < temp; i++) {
-
-            auto rm = body->children.back();
-            body->removeWidget(rm);
-            delete (rm);
-        }
+        body->erase();
     }
 
     void ListView::refresh()
