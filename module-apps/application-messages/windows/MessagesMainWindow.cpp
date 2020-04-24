@@ -179,20 +179,6 @@ namespace gui
                     app->switchWindow(gui::name::window::thread_sms_search, nullptr);
                     return true;
                 } break;
-                case gui::KeyCode::KEY_LF: {
-                    if (app->windowOptions != nullptr && getFocusItem() == list) {
-                        app->windowOptions->clearOptions();
-                        auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
-                        if (it) {
-                            app->windowOptions->addOptions(threadWindowOptions(app, it->getThreadItem().get()));
-                            app->switchWindow(app->windowOptions->getName(), nullptr);
-                        }
-                        else {
-                            LOG_ERROR("Can't switch to options -wrong input type");
-                        }
-                    }
-                    return true;
-                }
                 default:
                     LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
                     break;

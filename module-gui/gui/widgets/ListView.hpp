@@ -65,8 +65,6 @@ namespace gui
         void setElementsCount(int count);
         void setProvider(ListItemProvider *provider);
         void setListViewType(ListViewType type);
-        virtual ListItem *getSelectedItem();
-
         void clear();
 
         // virtual methods from Item
