@@ -150,15 +150,15 @@ namespace style
     namespace listview
     {
 
-        const inline uint32_t scroll_x       = 0;
-        const inline uint32_t scroll_y       = 0;
-        const inline uint32_t scroll_w       = 5;
-        const inline uint32_t scroll_h       = 0;
-        const inline uint32_t scroll_radius  = 2;
-        const inline bool scroll_fill        = true;
-        const inline gui::Color scroll_color = gui::Color{0, 0};
-        const inline uint32_t scroll_margin  = 5;
-        const inline uint32_t list_span      = 12;
+        const inline uint32_t scroll_x         = 0;
+        const inline uint32_t scroll_y         = 0;
+        const inline uint32_t scroll_w         = 5;
+        const inline uint32_t scroll_h         = 0;
+        const inline uint32_t scroll_radius    = 2;
+        const inline gui::Color scroll_color   = gui::Color{0, 0};
+        const inline uint32_t scroll_margin    = 5;
+        const inline uint32_t scroll_min_space = 10;
+        const inline uint32_t list_span        = 12;
 
     } // namespace listview
 };    // namespace style

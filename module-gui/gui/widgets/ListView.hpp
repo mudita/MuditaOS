@@ -23,7 +23,6 @@ namespace gui
 
       public:
         ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
-        ~ListViewScroll(){};
 
         void update(int startIndex, int listPageSize, int elementsCount);
     };
@@ -31,25 +30,24 @@ namespace gui
     class ListView : public Rect
     {
       protected:
-        int startIndex;
-        int elementsCount;
+        int startIndex             = 0;
+        int elementsCount          = 1;
         ListItemProvider *provider = nullptr;
         /// Vbox that holds currently visible list of items
-        VBox *body;
+        VBox *body             = nullptr;
         ListViewScroll *scroll = nullptr;
-        /// list span item
-        Span *listSpanItem = nullptr;
+        Span *listSpanItem     = nullptr;
 
         int currentPageSize = 1;
 
         enum class Direction
         {
             Top,
-            Bot
+            Bottom
         };
 
         ListViewType listType = ListViewType::TopDown;
-        Direction direction   = Direction::Bot;
+        Direction direction   = Direction::Bottom;
 
         void refresh();
         void clearItems();
