@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Application.hpp"
-#include "Interface/ThreadRecord.hpp"
+#include <Application.hpp>
+#include <Interface/ThreadRecord.hpp>
+#include <Interface/SMSTemplateRecord.hpp>
 
 namespace gui
 {
@@ -51,5 +52,8 @@ namespace app
         bool searchEmpty(const std::string &query = "");
         bool sendSms(const UTF8 &number, const UTF8 &body);
         bool newMessageOptions();
+
+        // used by sms template items
+        std::function<bool(std::shared_ptr<SMSTemplateRecord> templ)> templatesCallback;
     };
 } /* namespace app */

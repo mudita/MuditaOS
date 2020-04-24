@@ -3,6 +3,7 @@
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/widgets/SMSTemplateItem.hpp"
 #include "application-messages/MessagesStyle.hpp"
+#include "application-messages/data/SMSdata.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBMessage.hpp>
@@ -48,6 +49,13 @@ namespace gui
         list->setPageSize(list::pageSize);
         list->setProvider(smsTemplateModel);
 
+        if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
+            app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
+                application->switchWindow(gui::name::window::new_sms, std::move(data));
+                return true;
+            };
+        }
         setFocusItem(list);
     }
     void SMSTemplatesWindow::destroyInterface()

@@ -55,9 +55,13 @@ gui::ListItem *SMSTemplateModel::getItem(
         item->setID(index);
         item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("activatedCallback");
-            std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
-            application->switchWindow(gui::name::window::new_sms, std::move(data));
-            return true;
+            if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
+                if (app->templatesCallback) // TODO: use null pattern
+                {
+                    return app->templatesCallback(templ);
+                }
+            }
+            return false;
         };
         return item;
     }
