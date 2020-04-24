@@ -6,6 +6,7 @@
  */
 
 #include "ThreadModel.hpp"
+#include "OptionWindow.hpp"
 #include "ThreadItem.hpp"
 
 #include "Application.hpp"
@@ -14,7 +15,10 @@
 #include "../data/SMSdata.hpp"
 #include "../windows/ThreadViewWindow.hpp" // for name of window
 
+#include "application-messages/ApplicationMessages.hpp"
+#include "application-messages/windows/OptionsWindow.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
+#include <cassert>
 ThreadModel::ThreadModel(app::Application *app) : DatabaseModel(app)
 {}
 
@@ -64,6 +68,20 @@ gui::ListItem *ThreadModel::getItem(int index)
                 LOG_ERROR("No application!");
             }
             return true;
+        };
+
+        item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app);
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (event.keyCode == gui::KeyCode::KEY_LF) {
+                app->windowOptions->clearOptions();
+                app->windowOptions->addOptions(threadWindowOptions(app, item->getThreadItem().get()));
+                app->switchWindow(app->windowOptions->getName(), nullptr);
+            }
+            return false;
         };
         return item;
     }
