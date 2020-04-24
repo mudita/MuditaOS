@@ -179,11 +179,6 @@ namespace gui
         }
     };
 
-    ListItem *ListView::getSelectedItem()
-    {
-        return nullptr;
-    }
-
     std::list<DrawCommand *> ListView::buildDrawList()
     {
 
