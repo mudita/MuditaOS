@@ -386,6 +386,11 @@ namespace gui
                 }
             }
         }
+        if (auto pdata = dynamic_cast<SMSTemplateData *>(data)) {
+            auto templText = pdata->templ->text;
+            LOG_INFO("received sms templates data \"%s\"", templText.c_str());
+            text->setText(text->getText() + templText);
+        }
     }
 
     bool ThreadViewWindow::onInput(const InputEvent &inputEvent)
