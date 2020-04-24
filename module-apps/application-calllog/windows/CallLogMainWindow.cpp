@@ -92,21 +92,6 @@ namespace gui
 
     bool CallLogMainWindow::onInput(const InputEvent &inputEvent)
     {
-        // process only if key is released
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) ||
-            (inputEvent.state != InputEvent::State::keyReleasedLong)) {
-            if (inputEvent.keyCode == KeyCode::KEY_LF) {
-                LOG_DEBUG("calling");
-                auto it = dynamic_cast<CalllogItem *>(list->getSelectedItem());
-                if (it == nullptr) {
-                    LOG_ERROR("wrong item type");
-                    assert(0);
-                    return false;
-                }
-                return app::call(application, app::CallOperation::ExecuteCall, it->getCall().number);
-            }
-        }
-
         return AppWindow::onInput(inputEvent);
     }
 
