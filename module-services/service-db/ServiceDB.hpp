@@ -1,15 +1,4 @@
-
-/*
- * @file ServiceDB.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 06.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
-#ifndef PUREPHONE_SERVICEDB_HPP
-#define PUREPHONE_SERVICEDB_HPP
+#pragma once
 
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
@@ -62,4 +51,3 @@ class ServiceDB : public sys::Service
     static const char *serviceName;
 };
 
-#endif // PUREPHONE_SERVICEDB_HPP

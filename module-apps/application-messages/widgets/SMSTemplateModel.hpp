@@ -17,7 +17,6 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gu
     SMSTemplateModel(app::Application *app);
     virtual ~SMSTemplateModel() = default;
 
-    // virtual methods
     void requestRecordsCount() override;
     bool updateRecords(std::unique_ptr<std::vector<SMSTemplateRecord>> records,
                        const uint32_t offset,
@@ -25,7 +24,6 @@ class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gu
                        uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
-    // virtual methods for ListViewProvider
     gui::ListItem *getItem(
         int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown) override;
     int getItemCount() const override

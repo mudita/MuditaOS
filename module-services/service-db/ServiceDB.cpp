@@ -192,7 +192,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         /**
          * SMS templates records
          */
-
+    // TODO: alek rewrite to signal/slot?
     case MessageType::DBSMSTemplateAdd: {
         auto time   = utils::time::Scoped("DBSMSTemplateAdd");
         auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
