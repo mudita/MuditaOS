@@ -171,7 +171,7 @@ namespace gui
         /// @note our UTF8 doesn't provide way to replace single character
         ///
         /// this is lazy done implementation - we just try to replace first/last 3 characters that would fit
-        void setTextEllipsis(std::string &text, Ellipsis ellipsis) const;
+        void setEllipsis(std::string &text, Ellipsis ellipsis) const;
     };
 
     class FontManager
