@@ -207,8 +207,8 @@ namespace gui
         page2.favDescription->setFont(style::window::font::small);
         page2.favDescription->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
-        page2.imageTick = new gui::Image(this, 43, 174, 0, 0, "small_tick");
+        page2.favSelected = false;
+        page2.imageTick   = new gui::Image(this, 43, 174, 0, 0, "small_tick");
         page2.imageTick->setVisible(false);
 
         page2.imageFav = new gui::Image(this, 416, 177, 0, 0, "small_heart");
@@ -430,8 +430,6 @@ namespace gui
     {
         switchPage(0);
         setFocusItem(page1.text[0]);
-        page2.favSelected = false;
-        page2.imageFav->setVisible(false);
     }
 
     bool PhonebookNewContact::handleSwitchData(SwitchData *data)
@@ -553,8 +551,7 @@ namespace gui
                 contact                               = std::make_shared<ContactRecord>(record);
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-
-                LOG_INFO("verifyAndSave new contact UPDATED");
+                LOG_INFO("verifyAndSave contact UPDATED");
                 return (true);
             }
         }

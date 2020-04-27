@@ -389,11 +389,17 @@ namespace gui
         }
         else {
             LOG_INFO("setContactData contact %s is on fav list", contact->primaryName.c_str());
+            favouritesIcon->setVisible(true);
+            favouritesLabel->setVisible(true);
         }
 
         if (!contact->isOnBlacklist) {
             blockedLabel->setVisible(false);
             blockedIcon->setVisible(false);
+        }
+        else {
+            blockedLabel->setVisible(true);
+            blockedIcon->setVisible(true);
         }
 
         if (contact->numbers.size() == 0) {
