@@ -354,6 +354,21 @@ namespace gui
         }
     }
 
+    void PhonebookNewContact::copyInputData(ContactRecord &contactRecord)
+    {
+        contactRecord.primaryName     = page1.text[0]->getText();
+        contactRecord.alternativeName = page1.text[1]->getText();
+        // Temporary use numberUser also as numberE164, to be changed with libphonenumber
+        contactRecord.numbers.push_back(ContactRecord::Number(page1.text[2]->getText(), page1.text[2]->getText()));
+        // Temporary disable saving secondary number since multiple numbers are not supported yet, and this could lead
+        // to confusing errors
+        // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
+        contactRecord.mail           = page1.text[4]->getText();
+        contactRecord.note           = page2.text[1]->getText();
+        contactRecord.isOnFavourites = page2.favSelected;
+        contactRecord.speeddial      = page2.speedValue->getText();
+    }
+
     void PhonebookNewContact::setContactData()
     {
         if (contact) {
@@ -482,17 +497,7 @@ namespace gui
     bool PhonebookNewContact::verifyAndSave()
     {
         ContactRecord record, errName, errPhone, errSpeed, errFav;
-        record.primaryName     = page1.text[0]->getText();
-        record.alternativeName = page1.text[1]->getText();
-        // Temporary use numberUser also as numberE164, to be changed with libphonenumber
-        record.numbers.push_back(ContactRecord::Number(page1.text[2]->getText(), page1.text[2]->getText()));
-        // Temporary disable saving secondary number since multiple numbers are not supported yet, and this could lead
-        // to confusing errors
-        // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
-        record.mail           = page1.text[4]->getText();
-        record.note           = page2.text[1]->getText();
-        record.isOnFavourites = page2.favSelected;
-        record.speeddial      = page2.speedValue->getText();
+        copyInputData(record);
 
         /** basic sanity checks */
         if (!isValidName(record.primaryName)) {
@@ -538,8 +543,9 @@ namespace gui
                 return (true);
             }
         }
-        else if (contact->ID > 0) {
-            if (DBServiceAPI::ContactUpdate(application, record) == false) {
+        else if (contact->ID != DB_ID_NONE) {
+            copyInputData(*contact);
+            if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return (false);
             }
