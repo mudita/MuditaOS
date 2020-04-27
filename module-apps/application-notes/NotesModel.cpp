@@ -41,14 +41,14 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
                                uint32_t count)
 {
 
-    //    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    //    LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
     //    for (uint32_t i = 0; i < records.get()->size(); ++i) {
-    //        LOG_INFO("id: %d, filename: %s", records.get()->operator[](i).ID,
+    //        LOG_DEBUG("id: %d, filename: %s", records.get()->operator[](i).ID,
     //        records.get()->operator[](i).path.c_str());
     //    }
 
-    listDataAvailable = true;
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    list->onProviderDataUpdate();
 
     return true;
 }

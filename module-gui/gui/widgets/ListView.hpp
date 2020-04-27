@@ -36,9 +36,10 @@ namespace gui
         /// Vbox that holds currently visible list of items
         VBox *body             = nullptr;
         ListViewScroll *scroll = nullptr;
+        int itemSpanSize       = style::listview::item_span_small;
         Span *listSpanItem     = nullptr;
 
-        int currentPageSize = 1;
+        int currentPageSize = 0;
 
         enum class Direction
         {
@@ -49,10 +50,10 @@ namespace gui
         ListViewType listType = ListViewType::TopDown;
         Direction direction   = Direction::Bottom;
 
-        void refresh();
         void clearItems();
         void addItemsOnPage();
         void setFocus();
+        void refresh();
         bool listPageEndReached();
 
       public:
@@ -63,6 +64,8 @@ namespace gui
         void setElementsCount(int count);
         void setProvider(ListItemProvider *provider);
         void setListViewType(ListViewType type);
+        void setItemSpanSize(int size);
+        void onProviderDataUpdate();
         void clear();
 
         // virtual methods from Item
