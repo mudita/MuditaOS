@@ -351,7 +351,7 @@ namespace gui
                 char_offset = text.length() - text_fit_len;
             }
             result = text.substr(char_offset, text_fit_len);
-            setTextEllipsis(result, ellipsis);
+            setEllipsis(result, ellipsis);
         }
         else {
             result = text.substr(0, text_fit_len);
@@ -359,7 +359,7 @@ namespace gui
         return result;
     }
 
-    void Font::setTextEllipsis(std::string &text, Ellipsis ellipsis) const
+    void Font::setEllipsis(std::string &text, Ellipsis ellipsis) const
     {
         auto set_dot = [&](auto begin, auto end) {
             auto dots_in_elipsis = 3;
