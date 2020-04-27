@@ -158,7 +158,8 @@ namespace style
         const inline gui::Color scroll_color   = gui::Color{0, 0};
         const inline uint32_t scroll_margin    = 5;
         const inline uint32_t scroll_min_space = 10;
-        const inline uint32_t list_span        = 12;
+        const inline uint32_t item_span_small  = 8;
+        const inline uint32_t item_span_big    = 12;
 
     } // namespace listview
 };    // namespace style

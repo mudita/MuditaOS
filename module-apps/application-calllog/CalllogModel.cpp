@@ -47,14 +47,14 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  const uint32_t limit,
                                  uint32_t count)
 {
+    //        LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    //        for (uint32_t i = 0; i < records.get()->size(); ++i) {
+    //            LOG_DEBUG("id: %d, name: %s", records.get()->operator[](i).ID,
+    //            records.get()->operator[](i).name.c_str());
+    //        }
 
-    //    LOG_INFO("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-    //    for (uint32_t i = 0; i < records.get()->size(); ++i) {
-    //        LOG_INFO("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
-    //    }
-
-    listDataAvailable = true;
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    list->onProviderDataUpdate();
 
     return true;
 }
@@ -72,7 +72,7 @@ gui::ListItem *CalllogModel::getItem(int index)
     if (item != nullptr) {
         item->setCall(call);
         item->setID(index);
-        item->activatedCallback = [=](gui::Item &item) { // TODO: alek: this is not the best place for this
+        item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("activatedCallback");
             std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
             application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
