@@ -35,7 +35,7 @@ namespace gui
         setPenFocusWidth(style::window::default_border_no_focus_w);
         setPenWidth(style::window::default_border_no_focus_w);
         setFont(label.font);
-        setEllipsis();
+        setEllipsis(Ellipsis::Right);
         setAlignment(label.align);
         setRadius(label.radius);
         setEdges(label.edges);
@@ -74,7 +74,7 @@ namespace gui
         }
 
         // if dots mode is disabled and line mode is enabled calculate positiona and width of the line
-        if ((!ellipsis.on) && (lineMode) && (lineFront != nullptr)) {
+        if ((ellipsis != Ellipsis::None) && (lineMode) && (lineFront != nullptr)) {
             uint32_t spaceWidth = font->getCharPixelWidth(' ');
             int32_t lineW       = availableSpace - stringPixelWidth;
             uint32_t lineY      = textArea.y - font->getCharPixelHeight('a') / 2;
@@ -157,14 +157,7 @@ namespace gui
         calculateDisplayText();
     }
 
-    void Label::setEllipsis(gui::Ellipsis::Pos pos)
-    {
-        ellipsis.pos = pos;
-        ellipsis.on  = true;
-        calculateDisplayText();
-    }
-
-    void Label::setEllipsis(gui::Ellipsis ellipsis)
+    void Label::setEllipsis(Ellipsis ellipsis)
     {
         this->ellipsis = ellipsis;
         calculateDisplayText();
