@@ -26,7 +26,7 @@ bool ContactsTable::Add(ContactsTableRow entry)
 {
     return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, "
                        "blacklist, favourites, speeddial ) VALUES "
-                       "(%lu, '%s', %lu, '%s', %lu, %lu, %lu, %lu, '%s');",
+                       "(%lu, '%q', %lu, '%q', %lu, %lu, %lu, %lu, '%q');",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
@@ -50,9 +50,9 @@ bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 
 bool ContactsTable::Update(ContactsTableRow entry)
 {
-    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%s' ,ring_id = %lu, address_ids = '%s', type "
+    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q' ,ring_id = %lu, address_ids = '%q', type "
                        "= %lu, whitelist = %lu, blacklist = %lu, "
-                       "favourites = %lu, speeddial = '%s' WHERE _id=%lu;",
+                       "favourites = %lu, speeddial = '%q' WHERE _id=%lu;",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
@@ -189,7 +189,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offs
         return std::vector<ContactsTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contacts WHERE %s='%s' ORDER BY name_id LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from contacts WHERE %q='%q' ORDER BY name_id LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -232,7 +232,7 @@ uint32_t ContactsTable::GetCount()
 
 uint32_t ContactsTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM contacts WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
