@@ -83,12 +83,7 @@ namespace gui
                 noteLabel->setVisible(visible);
                 text[0]->setVisible(visible);
                 text[1]->setVisible(visible);
-                if (visible && favSelected) {
-                    imageTick->setVisible(true);
-                }
-                else {
-                    imageTick->setVisible(false);
-                }
+                imageTick->setVisible(visible && favSelected);
             }
         };
 
