@@ -23,7 +23,7 @@ bool ContactsRingtonesTable::Create()
 
 bool ContactsRingtonesTable::Add(ContactsRingtonesTableRow entry)
 {
-    return db->Execute("insert or ignore into contact_ringtones (contact_id, asset_path ) VALUES (%lu, '%s');",
+    return db->Execute("insert or ignore into contact_ringtones (contact_id, asset_path ) VALUES (%lu, '%q');",
                        entry.contactID,
                        entry.assetPath.c_str());
 }
@@ -35,7 +35,7 @@ bool ContactsRingtonesTable::RemoveByID(uint32_t id)
 
 bool ContactsRingtonesTable::Update(ContactsRingtonesTableRow entry)
 {
-    return db->Execute("UPDATE contact_ringtones SET contact_id = %lu, asset_path = '%s' WHERE _id=%lu;",
+    return db->Execute("UPDATE contact_ringtones SET contact_id = %lu, asset_path = '%q' WHERE _id=%lu;",
                        entry.contactID,
                        entry.assetPath.c_str(),
                        entry.ID);
@@ -92,7 +92,7 @@ std::vector<ContactsRingtonesTableRow> ContactsRingtonesTable::GetLimitOffsetByF
         return std::vector<ContactsRingtonesTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contact_ringtones WHERE %s='%s' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from contact_ringtones WHERE %q='%q' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -128,7 +128,7 @@ uint32_t ContactsRingtonesTable::GetCount()
 
 uint32_t ContactsRingtonesTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_ringtones WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_ringtones WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

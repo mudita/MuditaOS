@@ -98,25 +98,21 @@ void Database::Deinitialize()
 
 bool Database::Execute(const char *format, ...)
 {
-
     if (!format) {
         return false;
     }
 
     va_list ap;
-    auto szQuery = std::make_unique<char[]>(maxQueryLen);
+    char *szQuery = static_cast<char *>(sqlite3_malloc(maxQueryLen));
     va_start(ap, format);
-    int res = vsnprintf(szQuery.get(), maxQueryLen, format, ap);
+    sqlite3_vsnprintf(maxQueryLen, (char *)szQuery, format, ap);
     va_end(ap);
 
-    if (res == -1) {
-        LOG_ERROR("SQL Query truncated (and not execute) for format: %s", format);
-        return false;
-    }
-
-    int result = sqlite3_exec(dbConnection, szQuery.get(), NULL, NULL, NULL);
+    int result = sqlite3_exec(dbConnection, szQuery, NULL, NULL, NULL);
     if (result != SQLITE_OK)
-        LOG_ERROR("Execute failed with %d", result);
+        LOG_ERROR("Execution of \'%s\' failed with %d", szQuery, result);
+
+    sqlite3_free(szQuery);
 
     return result != SQLITE_OK ? false : true;
 }
@@ -129,24 +125,21 @@ std::unique_ptr<QueryResult> Database::Query(const char *format, ...)
     }
 
     va_list ap;
-    auto szQuery = std::make_unique<char[]>(maxQueryLen);
+    char *szQuery = static_cast<char *>(sqlite3_malloc(maxQueryLen));
     va_start(ap, format);
-    szQuery.get()[0] = 0;
-    int res          = vsnprintf(szQuery.get(), maxQueryLen, format, ap);
+    szQuery[0] = 0;
+    sqlite3_vsnprintf(maxQueryLen, szQuery, format, ap);
     va_end(ap);
-
-    if (res == -1) {
-        LOG_ERROR("SQL Query truncated (and not execute) for format: %s", format);
-        return nullptr;
-    }
 
     auto queryResult = std::make_unique<QueryResult>();
 
-    int result = sqlite3_exec(dbConnection, szQuery.get(), queryCallback, queryResult.get(), NULL);
+    int result = sqlite3_exec(dbConnection, szQuery, queryCallback, queryResult.get(), NULL);
     if (result != SQLITE_OK) {
-        LOG_ERROR("SQL query failed selecting : %d", result);
+        LOG_ERROR("SQL query \'%s\' failed selecting : %d", szQuery, result);
         return nullptr;
     }
+
+    sqlite3_free(szQuery);
 
     return queryResult;
 }

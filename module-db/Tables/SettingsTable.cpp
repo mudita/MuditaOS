@@ -63,9 +63,9 @@ bool SettingsTable::Update(SettingsTableRow entry)
 {
     return db->Execute("UPDATE settings SET time_format_12 = %lu, time_auto = %lu, time_date_format = %lu "
                        ",brightness_auto = %lu, brightness_level = %lu, "
-                       "bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%s', "
-                       "pin2_string = '%s', active_sim = %lu, "
-                       "network_operator = '%s', lock_pass_hash = %lu, lock_time = %lu, language = %lu WHERE _id=1;",
+                       "bigger_font = %lu, pin_mode =%lu, pin_days = %lu ,pin_days_left = %lu, pin1_string = '%q', "
+                       "pin2_string = '%q', active_sim = %lu, "
+                       "network_operator = '%q', lock_pass_hash = %lu, lock_time = %lu, language = %lu WHERE _id=1;",
                        entry.timeFormat12,
                        entry.timeAuto,
                        entry.timeDateFormat,
