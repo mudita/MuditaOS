@@ -16,28 +16,32 @@ namespace gui
         activeItem = false;
     }
 
-    void ListViewScroll::update(int startIndex, int listPageSize, int elementsCount)
+    void ListViewScroll::update(int startIndex, int currentPageSize, int elementsCount)
     {
-        if ((parent->widgetArea.w > style::listview::scroll_min_space) &&
-            (parent->widgetArea.h > style::listview::scroll_min_space)) {
+        // Dont draw scroll if all items fit on one page
+        if (currentPageSize == elementsCount) {
+            setVisible(false);
+        }
+        else if ((parent->widgetArea.w > style::listview::scroll_min_space) &&
+                 (parent->widgetArea.h > style::listview::scroll_min_space)) {
 
             uint32_t pagesCount = 1;
-            if (listPageSize) {
-                pagesCount = (elementsCount % listPageSize == 0) ? elementsCount / listPageSize
-                                                                 : elementsCount / listPageSize + 1;
+            if (currentPageSize) {
+                pagesCount = (elementsCount % currentPageSize == 0) ? elementsCount / currentPageSize
+                                                                    : elementsCount / currentPageSize + 1;
                 if (pagesCount == 0) {
                     return;
                 }
             }
-            if (listPageSize != 0 && pagesCount != 0) {
-                uint32_t currentPage = startIndex / listPageSize;
+            if (currentPageSize != 0 && pagesCount != 0) {
+                uint32_t currentPage = startIndex / currentPageSize;
                 uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
 
                 setPosition(parent->widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
                 setSize(style::listview::scroll_w, pageHeight);
             }
         }
-        //             not enough space - disable scroll
+        // not enough space - disable scroll
         else {
             setVisible(false);
         }
@@ -102,16 +106,21 @@ namespace gui
         listType = type;
     }
 
+    void ListView::setItemSpanSize(int size)
+    {
+        itemSpanSize = size;
+    }
+
     void ListView::setProvider(ListItemProvider *prov)
     {
-        provider = prov;
+        provider       = prov;
+        provider->list = this;
     }
 
     void ListView::clear()
     {
         clearItems();
-        startIndex                  = 0;
-        provider->listDataAvailable = false;
+        startIndex = 0;
     }
 
     void ListView::clearItems()
@@ -121,37 +130,33 @@ namespace gui
 
     void ListView::refresh()
     {
-
-        if (provider->listDataAvailable) {
-
-            if (provider == nullptr) {
-                LOG_ERROR("ListView Data provider not exist");
-                return;
-            }
-
-            // remove old items
-            clearItems();
-
-            elementsCount = provider->getItemCount();
-            addItemsOnPage();
-
-            setFocus();
-            scroll->update(startIndex, currentPageSize, elementsCount);
-
-            // set flag that data has been used
-            provider->listDataAvailable = false;
+        if (provider == nullptr) {
+            LOG_ERROR("ListView Data provider not exist");
+            return;
         }
+
+        // remove old items
+        clearItems();
+
+        elementsCount = provider->getItemCount();
+        addItemsOnPage();
+
+        setFocus();
+        scroll->update(startIndex, currentPageSize, elementsCount);
+    }
+
+    void ListView::onProviderDataUpdate()
+    {
+        refresh();
     }
 
     void ListView::addItemsOnPage()
     {
         auto itemsOnPage = 0;
 
-        while (true) {
+        ListItem *item = nullptr;
 
-            ListItem *item = provider->getItem(itemsOnPage);
-            if (item == nullptr)
-                break;
+        while ((item = provider->getItem(itemsOnPage)) != nullptr) {
 
             item->setSize(item->minWidth, item->minHeight);
             body->addWidget(item);
@@ -163,9 +168,13 @@ namespace gui
 
             itemsOnPage++;
 
-            listSpanItem = new Span(Axis::Y, style::listview::list_span);
+            listSpanItem = new Span(Axis::Y, itemSpanSize);
             body->addWidget(listSpanItem);
         }
+
+        // Temporary solution, will be removed when top direction properly calculated.
+        if (currentPageSize == 0)
+            currentPageSize = itemsOnPage;
     }
 
     void ListView::setFocus()
@@ -181,13 +190,10 @@ namespace gui
 
     std::list<DrawCommand *> ListView::buildDrawList()
     {
-
         // check if widget is visible
         if (visible == false) {
             return std::list<DrawCommand *>();
         }
-
-        refresh();
 
         return gui::Rect::buildDrawList();
     }
@@ -209,6 +215,8 @@ namespace gui
     {
 
         auto calculateLimit = [&]() {
+            // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
+            // before it gets them, requests twice size of current page with down limit of at least 4.
             auto minLimit = (2 * currentPageSize > 4 ? 2 * currentPageSize : 4);
 
             return (minLimit + startIndex <= elementsCount ? minLimit : elementsCount - startIndex);

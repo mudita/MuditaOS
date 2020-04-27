@@ -36,9 +36,8 @@ bool ThreadModel::updateRecords(std::unique_ptr<std::vector<ThreadRecord>> recor
                                 const uint32_t limit,
                                 uint32_t count)
 {
-    listDataAvailable = true;
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-
+    list->onProviderDataUpdate();
     return true;
 }
 

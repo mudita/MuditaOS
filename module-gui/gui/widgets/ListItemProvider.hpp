@@ -12,7 +12,7 @@ namespace gui
     {
 
       public:
-        bool listDataAvailable = false;
+        ListView *list = nullptr;
 
         virtual int getItemCount() const = 0;
 

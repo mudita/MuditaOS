@@ -50,6 +50,7 @@ namespace gui
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);
+        list->setItemSpanSize(style::listview::item_span_big);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -175,7 +176,6 @@ namespace gui
                     application->switchWindow(gui::name::window::new_sms, nullptr);
                     return true;
                 case gui::KeyCode::KEY_RIGHT: {
-                    auto app = dynamic_cast<app::ApplicationMessages *>(application);
                     app->switchWindow(gui::name::window::thread_sms_search, nullptr);
                     return true;
                 } break;
