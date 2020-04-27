@@ -124,7 +124,6 @@ namespace gui
 
     void Label::fitTextIn(const UTF8 &text)
     {
-        // if (area(Item::Area::Max).w > area(Item::Area::Normal).w) {}
         Fits fits = textFitsIn(text, area(Item::Area::Max).w);
         if (fits) {
             setSize(fits.space_consumed, h());

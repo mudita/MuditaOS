@@ -29,10 +29,10 @@ namespace gui
             delete[] data;
     }
 
-    FontGlyph::FontGlyph(FontGlyph *from)
+    FontGlyph::FontGlyph(const FontGlyph *from)
     {
         this->id           = from->id;
-        this->glyph_offset = from->id;
+        this->glyph_offset = from->glyph_offset;
         this->width        = from->width;
         this->height       = from->height;
         this->xoffset      = from->xoffset;
@@ -272,7 +272,6 @@ namespace gui
     std::unique_ptr<FontGlyph> Font::getGlyph(uint32_t id) const
     {
         auto glyph_found = glyphs.find(id);
-        std::unique_ptr<FontGlyph> unique_glyph;
         if (glyph_found != glyphs.end()) {
             return std::make_unique<FontGlyph>(glyph_found->second);
         }
@@ -296,7 +295,8 @@ namespace gui
 
         // width of text in pixels
         uint32_t width  = 0;
-        uint32_t idLast = none_char_id, idCurrent = 0;
+        uint32_t idCurrent = 0;
+        uint32_t idLast    = none_char_id;
 
         for (uint32_t i = 0; i < count; ++i) {
             idCurrent        = str[start + i];
@@ -315,7 +315,7 @@ namespace gui
     uint32_t Font::getCharPixelWidth(uint32_t charCode, uint32_t previousChar) const
     {
         auto glyph = getGlyph(charCode);
-        if (glyph != NULL) {
+        if (glyph != nullptr) {
             return glyph->xadvance + getKerning(charCode, previousChar);
         }
 
@@ -326,7 +326,7 @@ namespace gui
     {
         FontGlyph *glyph = glyphs.find(charCode)->second;
 
-        if (glyph != NULL)
+        if (glyph != nullptr)
             return glyph->height;
 
         return 0;
@@ -370,11 +370,15 @@ namespace gui
                 }
             }
         };
-        if (ellipsis == Ellipsis::Right) {
+        switch (ellipsis) {
+        case Ellipsis::Right:
             set_dot(text.rbegin(), text.rend());
-        }
-        else {
+            break;
+        case Ellipsis::Left:
             set_dot(text.begin(), text.end());
+            break;
+        case Ellipsis::None:
+            break;
         }
     }
 

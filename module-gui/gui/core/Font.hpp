@@ -25,7 +25,7 @@ namespace gui
     {
       public:
         FontGlyph() = default;
-        FontGlyph(FontGlyph *);
+        FontGlyph(const FontGlyph *);
         virtual ~FontGlyph();
         gui::Status load(uint8_t *data, uint32_t &offset);
         gui::Status loadImage(uint8_t *data, uint32_t offset);

@@ -6,7 +6,7 @@ namespace gui
     enum class Ellipsis
     {
         Left,
-        Center,
+        // Center, - not implemented
         Right,
         None
     };

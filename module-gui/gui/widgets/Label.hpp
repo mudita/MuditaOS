@@ -120,7 +120,6 @@ namespace gui
         virtual UTF8 getText();
         virtual void setAlignment(const Alignment &alignment);
         virtual void setMargins(const Margins &margins);
-        void setDotsMode(const bool val);
         void setEllipsis(gui::Ellipsis ellipsis);
         /**
          * @brief Defines if remaining area of the label has a horizontal line.
