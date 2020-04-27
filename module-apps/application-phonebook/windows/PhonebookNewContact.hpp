@@ -110,7 +110,10 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
         bool verifyAndSave();
+        void copyInputData(ContactRecord &contactRecord);
         void setContactData();
         void saveStateChanged();
         const std::string getCountryPrefix();
