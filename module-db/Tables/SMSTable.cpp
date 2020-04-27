@@ -25,7 +25,7 @@ bool SMSTable::Create()
 bool SMSTable::Add(SMSTableRow entry)
 {
     return db->Execute("INSERT or ignore INTO sms ( thread_id,contact_id, date, date_send, error_code, body, read, "
-                       "type ) VALUES (%lu,%lu,%lu,%lu,0,'%s',%d,%d);",
+                       "type ) VALUES (%lu,%lu,%lu,%lu,0,'%q',%d,%d);",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
@@ -60,13 +60,13 @@ bool SMSTable::RemoveByField(SMSTableFields field, const char *str)
         return false;
     }
 
-    return db->Execute("DELETE FROM sms where %s = '%s';", fieldName.c_str(), str);
+    return db->Execute("DELETE FROM sms where %q = '%q';", fieldName.c_str(), str);
 }
 
 bool SMSTable::Update(SMSTableRow entry)
 {
     return db->Execute("UPDATE sms SET thread_id = %lu, contact_id = %lu ,date = %lu, date_send = %lu, error_code = 0, "
-                       "body = '%s', read = %d, type =%d WHERE _id=%lu;",
+                       "body = '%q', read = %d, type =%d WHERE _id=%lu;",
                        entry.threadID,
                        entry.contactID,
                        entry.date,
@@ -146,7 +146,7 @@ std::vector<SMSTableRow> SMSTable::GetLimitOffsetByField(uint32_t offset,
         return std::vector<SMSTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from sms WHERE %s='%s' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from sms WHERE %q='%q' ORDER BY date DESC LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -204,7 +204,7 @@ uint32_t SMSTable::GetCount()
 
 uint32_t SMSTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM sms WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM sms WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
