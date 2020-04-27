@@ -56,8 +56,7 @@ gui::ListItem *SMSTemplateModel::getItem(
         item->activatedCallback = [=](gui::Item &it) {
             LOG_INFO("activatedCallback");
             if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
-                if (app->templatesCallback) // TODO: alek: use null pattern
-                {
+                if (app->templatesCallback) {
                     return app->templatesCallback(templ);
                 }
             }

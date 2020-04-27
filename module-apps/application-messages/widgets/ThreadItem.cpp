@@ -78,7 +78,7 @@ namespace gui
 
         if (model != nullptr) {
             auto contactRec = DBServiceAPI::ContactGetByID(model->getApplication(), thread->contactID);
-            LOG_FATAL("contact ID = %" PRIu32, thread->contactID); // TODO: alek: check for empty?
+            LOG_FATAL("contact ID = %" PRIu32, thread->contactID);
             auto cont       = contactRec->front();
             contact->setText(cont.getFormattedName());
         }
