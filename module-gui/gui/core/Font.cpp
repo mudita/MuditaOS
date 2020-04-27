@@ -254,18 +254,17 @@ namespace gui
     {
         int32_t availableSpace = space;
         uint32_t count         = 0;
-        uint16_t previous = 0, current = 0;
+        uint32_t current       = 0;
+        uint32_t previous      = none_char_id;
 
-        for (uint32_t i = 0; i < str.length(); ++i) {
+        for (uint32_t i = 0; i < str.length(); ++i, ++count) {
             current = str[i];
 
             availableSpace -= getCharPixelWidth(current, previous);
             if (availableSpace < 0) {
                 return count;
             }
-
             previous = current;
-            ++count;
         }
         return count;
     }
