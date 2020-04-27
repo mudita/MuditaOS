@@ -70,12 +70,12 @@ TEST_CASE("Create and destroy simple database")
     {
         Database testDB("test.db");
 
-        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');", "Mati Patus") == true);
-        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');", "Mati Patus2") == true);
-        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');", "Mati Patus3") == true);
-        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');", "Mati Patus4") == true);
-        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');", "Mati Patus5") == true);
-        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%s');", "Mati Patus6") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%q');", "Mati Patus") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%q');", "Mati Patus2") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%q');", "Mati Patus3") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%q');", "Mati Patus4") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%q');", "Mati Patus5") == true);
+        REQUIRE(testDB.Execute("insert or ignore into artists ( name ) VALUES ( '%q');", "Mati Patus6") == true);
     }
 
     SECTION("Query database")

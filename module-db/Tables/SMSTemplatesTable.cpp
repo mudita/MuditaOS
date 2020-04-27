@@ -19,7 +19,7 @@ bool SMSTemplatesTable::Create()
 
 bool SMSTemplatesTable::Add(SMSTemplatesTableRow entry)
 {
-    return db->Execute("INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%s', '%s');",
+    return db->Execute("INSERT or ignore INTO templates (text, lastUsageTimestamp) VALUES ('%q', '%q');",
 
                        entry.text.c_str(),
                        utils::to_string(entry.lastUsageTimestamp).c_str());
@@ -38,7 +38,7 @@ bool SMSTemplatesTable::RemoveByField(SMSTemplatesTableFields field, const char 
 
 bool SMSTemplatesTable::Update(SMSTemplatesTableRow entry)
 {
-    return db->Execute("UPDATE templates SET text = '%s', lastUsageTimestamp = %s WHERE _id=%" PRIu32 ";",
+    return db->Execute("UPDATE templates SET text = '%q', lastUsageTimestamp = %q WHERE _id=%" PRIu32 ";",
                        entry.text.c_str(),
                        utils::to_string(entry.lastUsageTimestamp).c_str(),
                        entry.ID);
@@ -105,7 +105,7 @@ uint32_t SMSTemplatesTable::GetCount()
 
 uint32_t SMSTemplatesTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM templates WHERE '%s'=%" PRIu32 ";", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM templates WHERE '%q'=%" PRIu32 ";", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

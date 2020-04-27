@@ -24,7 +24,7 @@ bool ContactsNameTable::Create()
 bool ContactsNameTable::Add(ContactsNameTableRow entry)
 {
     return db->Execute("insert or ignore into contact_name (contact_id, name_primary, name_alternative, favourite) "
-                       "VALUES (%lu, '%s', '%s', '%lu');",
+                       "VALUES (%lu, '%q', '%q', '%lu');",
                        entry.contactID,
                        entry.namePrimary.c_str(),
                        entry.nameAlternative.c_str(),
@@ -38,7 +38,7 @@ bool ContactsNameTable::RemoveByID(uint32_t id)
 
 bool ContactsNameTable::Update(ContactsNameTableRow entry)
 {
-    return db->Execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%s', name_alternative = '%s', "
+    return db->Execute("UPDATE contact_name SET contact_id = %lu, name_primary = '%q', name_alternative = '%q', "
                        "favourite = '%lu' WHERE _id = %lu;",
                        entry.contactID,
                        entry.namePrimary.c_str(),
@@ -111,7 +111,7 @@ std::vector<ContactsNameTableRow> ContactsNameTable::GetLimitOffsetByField(uint3
     }
 
     auto retQuery =
-        db->Query("SELECT * from contact_name WHERE %s='%s' ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
+        db->Query("SELECT * from contact_name WHERE %q='%q' ORDER BY name_alternative LIMIT %lu OFFSET %lu;",
                   fieldName.c_str(),
                   str,
                   limit,
@@ -149,7 +149,7 @@ uint32_t ContactsNameTable::GetCount()
 
 uint32_t ContactsNameTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_name WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_name WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
@@ -161,7 +161,7 @@ uint32_t ContactsNameTable::GetCountByFieldID(const char *field, uint32_t id)
 std::vector<ContactsNameTableRow> ContactsNameTable::GetByName(const char *primaryName, const char *alternativeName)
 {
 
-    auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary='%s' AND name_alternative='%s' ORDER BY "
+    auto retQuery = db->Query("SELECT * from contact_name WHERE name_primary='%q' AND name_alternative='%q' ORDER BY "
                               "name_alternative LIMIT 1;",
                               primaryName,
                               alternativeName);

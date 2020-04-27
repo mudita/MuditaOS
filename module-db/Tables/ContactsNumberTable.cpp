@@ -24,7 +24,7 @@ bool ContactsNumberTable::Create()
 bool ContactsNumberTable::Add(ContactsNumberTableRow entry)
 {
     return db->Execute("insert or ignore into contact_number (contact_id, number_user, number_e164, type) VALUES (%lu, "
-                       "'%s', '%s', %lu);",
+                       "'%q', '%q', %lu);",
                        entry.contactID,
                        entry.numberUser.c_str(),
                        entry.numbere164.c_str(),
@@ -39,7 +39,7 @@ bool ContactsNumberTable::RemoveByID(uint32_t id)
 bool ContactsNumberTable::Update(ContactsNumberTableRow entry)
 {
     return db->Execute(
-        "UPDATE contact_number SET contact_id = %lu, number_user = '%s' ,number_e164 = '%s', type = %lu WHERE _id=%lu;",
+        "UPDATE contact_number SET contact_id = %lu, number_user = '%q' ,number_e164 = '%q', type = %lu WHERE _id=%lu;",
         entry.contactID,
         entry.numberUser.c_str(),
         entry.numbere164.c_str(),
@@ -104,7 +104,7 @@ std::vector<ContactsNumberTableRow> ContactsNumberTable::GetLimitOffsetByField(u
         return std::vector<ContactsNumberTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contact_number WHERE %s='%s' ORDER BY number_user LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from contact_number WHERE %q='%q' ORDER BY number_user LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -142,7 +142,7 @@ uint32_t ContactsNumberTable::GetCount()
 
 uint32_t ContactsNumberTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_number WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_number WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;
