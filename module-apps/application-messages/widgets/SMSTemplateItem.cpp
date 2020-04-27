@@ -20,9 +20,7 @@ namespace gui
 
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorateOption(text);
-        // text->setFont(style::window::font::big);
         text->setDotsMode(true);
-        // text->setMargins();
     }
 
     bool SMSTemplateItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
