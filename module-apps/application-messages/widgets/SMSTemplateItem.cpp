@@ -5,7 +5,6 @@
 
 namespace gui
 {
-
     namespace smsTemplItemStyle
     {
         constexpr uint32_t w = 440;
@@ -19,16 +18,11 @@ namespace gui
         maxWidth  = smsTemplItemStyle::w;
         maxHeight = smsTemplItemStyle::h;
 
-        setRadius(0);
-        setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM | RectangleEdgeFlags::GUI_RECT_EDGE_TOP);
-
-        setPenFocusWidth(style::window::default_border_focucs_w);
-        setPenWidth(style::window::default_border_no_focus_w);
-
         text = new gui::Label(this, 0, 0, 0, 0);
-        style::window::decorate(text);
-        text->setFont(style::window::font::big);
+        style::window::decorateOption(text);
+        // text->setFont(style::window::font::big);
         text->setDotsMode(true);
+        // text->setMargins();
     }
 
     bool SMSTemplateItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
