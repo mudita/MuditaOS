@@ -346,9 +346,9 @@ namespace gui
         {
             return text;
         }
-        if (ellipsis.on) {
+        if (ellipsis != Ellipsis::None) {
             auto char_offset = 0;
-            if (ellipsis.pos == Ellipsis::Pos::Begin) {
+            if (ellipsis == Ellipsis::Left) {
                 char_offset = text.length() - text_fit_len;
             }
             result = text.substr(char_offset, text_fit_len);
@@ -371,7 +371,7 @@ namespace gui
                 }
             }
         };
-        if (ellipsis.pos == Ellipsis::Pos::End) {
+        if (ellipsis == Ellipsis::Right) {
             set_dot(text.rbegin(), text.rend());
         }
         else {

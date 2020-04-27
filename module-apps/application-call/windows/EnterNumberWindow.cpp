@@ -68,7 +68,7 @@ namespace gui
         numberLabel->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         numberLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
-        numberLabel->setEllipsis(gui::Ellipsis::Pos::Begin);
+        numberLabel->setEllipsis(Ellipsis::Left);
 
         newContactIcon                    = new gui::AddContactIcon(this, newContactIcon::x, newContactIcon::y);
         newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };

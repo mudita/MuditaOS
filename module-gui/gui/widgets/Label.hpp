@@ -66,7 +66,7 @@ namespace gui
       protected:
         UTF8 text;
         UTF8 textDisplayed;
-        Ellipsis ellipsis;
+        Ellipsis ellipsis          = gui::Ellipsis::Right;
         uint32_t charDrawableCount = 0;
         uint32_t stringPixelWidth  = 0;
         Color textColor            = {0, 0};
@@ -121,8 +121,6 @@ namespace gui
         virtual void setAlignment(const Alignment &alignment);
         virtual void setMargins(const Margins &margins);
         void setDotsMode(const bool val);
-        /// by default most of times we want to set elision ( text...) at the end of text
-        void setEllipsis(gui::Ellipsis::Pos pos = gui::Ellipsis::Pos::End);
         void setEllipsis(gui::Ellipsis ellipsis);
         /**
          * @brief Defines if remaining area of the label has a horizontal line.
