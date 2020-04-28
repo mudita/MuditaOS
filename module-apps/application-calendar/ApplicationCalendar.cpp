@@ -21,24 +21,16 @@ namespace app
         : Application(name, parent, false, stackDepth, priority)
     {}
 
-    ApplicationCalendar::~ApplicationCalendar()
-    {}
-
-    // Invoked upon receiving data message
     sys::Message_t ApplicationCalendar::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        return std::make_shared<sys::ResponseMessage>();
+        return Application::DataReceivedHandler(msgl);
     }
 
-    // Invoked during initialization
     sys::ReturnCodes ApplicationCalendar::InitHandler()
     {
-
+        auto ret = Application::InitHandler();
         createUserInterface();
-
-        setActiveWindow("Main");
-
-        return sys::ReturnCodes::Success;
+        return ret;
     }
 
     sys::ReturnCodes ApplicationCalendar::DeinitHandler()
@@ -48,9 +40,8 @@ namespace app
 
     void ApplicationCalendar::createUserInterface()
     {
-
-        gui::AppWindow *win = new CalendarMainWindow(this, "Main");
-        windows.insert(std::pair<std::string, gui::AppWindow *>(win->getName(), win));
+        windows.insert(std::pair<std::string, gui::AppWindow *>(
+            gui::name::window::main_window, new CalendarMainWindow(this, gui::name::window::main_window)));
     }
 
     void ApplicationCalendar::destroyUserInterface()
