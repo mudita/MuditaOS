@@ -161,14 +161,7 @@ namespace gui
     }
     void AntennaMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        children.clear();
-    }
-
-    AntennaMainWindow::~AntennaMainWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void AntennaMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
