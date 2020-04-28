@@ -102,28 +102,11 @@ namespace gui
     }
     void PinLockWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        delete titleLabel;
-        for (uint32_t i = 0; i < infoLabels.size(); i++)
-            delete infoLabels[i];
-        infoLabels.clear();
-        for (uint32_t i = 0; i < pinLabels.size(); i++)
-            delete pinLabels[i];
-        pinLabels.clear();
-        delete lockImage;
-        delete infoImage;
-        focusItem = nullptr;
-        children.clear();
-    }
-
-    PinLockWindow::~PinLockWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void PinLockWindow::setVisibleState(const State &state)
     {
-
         this->state = state;
         // show pin labels for entering pin and erase their's content
         if (state == State::EnteringPin) {

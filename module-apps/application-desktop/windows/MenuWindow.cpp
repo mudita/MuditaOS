@@ -201,13 +201,7 @@ namespace gui
 
     void MenuWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        children.clear();
-    }
-
-    MenuWindow::~MenuWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void MenuWindow::onBeforeShow(ShowMode mode, SwitchData *data)
