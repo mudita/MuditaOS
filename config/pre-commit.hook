@@ -1,16 +1,26 @@
-#!/bin/bash -e
+#!/bin/bash 
 # taken from: https://raw.githubusercontent.com/andrewseidl/githook-clang-format/master/clang-format.hook
 # - with just added check for cpp file & check for proper version of clang-format
 # - with use of clang-format diff.py - for changed chunk changes only
 # might be worth to consider: https://github.com/Sarcasm/run-clang-format
 
-set -o pipefail
 
 L_GIT_DIR=$(git rev-parse --show-toplevel)
 source $L_GIT_DIR/config/format-config.sh
 
+RED='\e[38;2;255;13;0m'
+YELLOW="\e[38;2;255;232;0m"
+GREEN="\e[38;2;0;222;27m"
+ORANGE="\e[38;2;255;100;0m"
+
+OK="${GREEN}OK!\e[0m"
+ERROR="${RED}Error!\e[0m"
+FIXED="${YELLOW}Fixed!\e[0m"
+
+
 # if autoformatting was disabled by user - then ignore this commit hook
 if [[ $DISABLE_AUTO_FORMATTING ]]; then
+    [[ $VERBOSE ]] && echo "auto formatting is disabled"
     exit 0
 fi
 
@@ -25,7 +35,7 @@ Either install:
     clang-format-9
 
     Your clang format version in path used:
-        $(clang-format --version)
+        $(clang-format --version):
         $(clang-format-9 --version)
     git commit aborted"
 EOF
@@ -57,13 +67,55 @@ if ! [[ $L_CLANG_DIFF_TOOL ]] || [[ $L_CLANG_DIFF_TOOL == "" ]]; then
     exit 1
 fi
 
-format_file() {
-  file="${1}"
-  if [ -f $file ]; then
-    [[ $VERBOSE ]] && echo "Format: ${1} diff"
-    git diff -U0 --no-color --cached ${1} | ${L_CLANG_DIFF_TOOL} -p1 -i
-    git add ${1}
-  fi
+check_file() {
+    file="${1}"
+    last_commit="${2}"
+    if [ -f $file ]; then
+        #[[ $VERBOSE ]] && echo -en "Checking: \e[33m${file}\e[0m :\t"
+        results["${file}"]="${OK}"
+        case ${last_commit} in
+        "True")
+            if [[ ${FIX,,} == "true" ]]; then
+                git diff -U0 --no-color remotes/origin/master...HEAD ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
+                STATUS=$(git status --short -- ${file})
+                if [ -n "${STATUS}" ]; then
+                    git add "${file}"
+                    results["${file}"]="${FIXED}";
+                fi
+            else
+                OUT=$(git diff -U0 --no-color remotes/origin/master...HEAD ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
+                if [ -n "${OUT}" ]; then
+                    results["${file}"]="${ERROR}"
+                    return 1
+                fi
+            fi
+            ;;
+        "Stage")
+            if [[ ${FIX,,} == "true" ]]; then
+                git diff -U0 --no-color --cached ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 -i
+                STATUS=$(git status --short -- ${file})
+                if [ -n "${STATUS}" ]; then
+                    git add "${file}"
+                    results["${file}"]="${FIXED}";
+                fi
+            else
+                OUT=$(git diff -U0 --no-color --cached ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1)
+                if [ -n "${OUT}" ]; then
+                    results["${file}"]="${ERROR}"
+                    return 1
+                fi
+            fi
+            ;;
+        *)
+            OUT=$(git diff -U0 --no-color --cached ${file} | ${L_CLANG_DIFF_TOOL} -style file -p1 )
+            if [ -n ${OUT} ]; then
+                results["${file}"]="${ERROR}"
+                return 1
+            fi
+            ;;
+        esac
+    fi
+    return 0
 }
 
 # bash function using above config function
@@ -79,15 +131,71 @@ shouldnt_ignore() {
     return 0
 }
 
+function help() {
+        echo "Runs clang-format on source files"
+        cat <<- EOM
+		ussge:
+		   $0 [option]
+		        --about             does nothing
+		        --last              checks current branch against origin/master - doesn't fix
+		        --branch-fix        checks current branch against origin/master and fixes errors - you have to 'git add' and 'git commit' them
+		        --fix               fix style in currently staged files (ignores user.fixinstage variale), this is usefull for manual style applying
+		
+		If you would like to automatially fix style before commit
+		add to your git config "user.fixinstage" variable with value "True"
+		by calling:
+		    git config user.fixinstage True
+		EOM
+}
+
+
 case "${1}" in
-  --about )
-    echo "Runs clang-format on source files"
-    ;;
-  * )
-    for file in `git diff-index --cached --name-only HEAD` ; do
-        if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
-            format_file "${file}"
-        fi
-    done
-    ;;
+    --about|--help )
+        help
+        FILES=''
+        LAST=""
+        exit 0
+        ;;
+    --last)
+        FILES=$(git diff --name-only remotes/origin/master...HEAD)
+        LAST="True"
+        FIX="false"
+        ;;
+    --branch-fix)
+        FILES=$(git diff --name-only remotes/origin/master...HEAD)
+        LAST="True"
+        FIX="true"
+        ;;
+    --fix)
+        FILES=$(git diff-index --cached --name-only HEAD)
+        LAST="Stage" 
+        FIX=true
+        ;;
+    *)
+        FILES=$(git diff-index --cached --name-only HEAD)
+        LAST="Stage" 
+        FIX=$(git config user.fixinstage)
+        FIX=${FIX:-false}
+        ;;
 esac
+
+declare -A results
+
+EXIT_CODE=0
+for file in ${FILES}; do
+    if [[ ${file} =~ ^.*\.(cpp|hpp|c|h|cxx|gcc|cc)$ ]] && shouldnt_ignore ${file}; then
+        check_file "${file}" ${LAST}
+        RESULT=$?
+        if [[ ${RESULT} -eq 1 ]]; then
+            EXIT_CODE=1
+        fi
+    fi
+done
+
+for FILE in "${!results[@]}"
+do
+    echo -e "  ${FILE} : ${results[${FILE}]}"
+done
+
+exit ${EXIT_CODE}
+
