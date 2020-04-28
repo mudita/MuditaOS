@@ -27,6 +27,7 @@ extern "C"
 #include "bsp/keyboard/keyboard.hpp"
 #include "bsp/rtc/rtc.hpp"
 #include "bsp/vibrator/vibrator.hpp"
+#include "bsp/magnetometer/magnetometer.hpp"
 
 #include "bsp/harness/bsp_harness.hpp"
 #include "harness/Parser.hpp"
@@ -157,6 +158,7 @@ bool WorkerEvent::init(std::list<sys::WorkerQueueInfo> queues)
     bsp::rtc_Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueRTC)]);
     bsp::harness::Init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueHarness)]);
     bsp::cellular::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueCellular)]);
+    bsp::magnetometer::init(qhandles[static_cast<int32_t>(WorkerEventQueues::queueMagnetometer)]);
 
     time_t timestamp;
     bsp::rtc_GetCurrentTimestamp(&timestamp);

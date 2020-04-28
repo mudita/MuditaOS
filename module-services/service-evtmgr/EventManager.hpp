@@ -44,6 +44,8 @@ class EventManager : public sys::Service
     EventManager(const std::string &name);
     ~EventManager();
 
+    static const char *serviceName;
+
     sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
