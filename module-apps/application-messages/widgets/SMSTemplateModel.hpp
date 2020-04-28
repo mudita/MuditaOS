@@ -1,14 +1,10 @@
 #pragma once
 
-#include <vector>
-
 #include "Interface/SMSTemplateRecord.hpp"
 
 #include <DatabaseModel.hpp>
 #include <Application.hpp>
 #include <ListItemProvider.hpp>
-
-#include <vector>
 
 class SMSTemplateModel : public app::DatabaseModel<SMSTemplateRecord>, public gui::ListItemProvider
 {
