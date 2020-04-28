@@ -40,13 +40,29 @@ If this is new checkout you need to update your git config (step 0 and 1).
 
 ### Style git hooks
 During the bootstrap you can install git hooks for style checking.
-We have two similar scripts:
-pre-commit-check-only.hook  - this hook only notifies you that style is wrong, doesn't change anything
 pre-commit.hook             - this hook automatically update style during commit
-if you haven't run `bootstrap.sh` you have to copy (link) *one* of this to your 
+if you haven't run `bootstrap.sh` you have to copy (or link) `pre-commit.hook` to your git conig directory
 `.git/config/hooks` directory, just:
-`ln -s `pwd`/config/<pre-commit-scipt> .git/hooks/pre-commit`
-in the hooks directory script has to be named *pre-commit*.
+`ln -s `pwd`/config/pre-commit.hook .git/hooks/pre-commit`
+
+By default commit hook only checks if your changes have correct style, if you would like to fix
+the style automatically during `git commit` you have to configure your git, by adding new
+variable `user.fixinstage` and setting it to `true`, just call:
+`git config user.fixinstage true`
+
+If you prefer "notification than fix" work flow (so you can examine the changes), use default hook behaviour (to notify)
+and then call `./config/pre-commit.hoot --fix`, this checks and fixes files in "stage" are,
+files that have status "changed" are not tested.
+
+```
+git commit 
+<stele error - commit aborted>
+./config/pre-commit.hook --fix
+git diff
+git add -u
+git commit
+<commit accepted>
+```
 
 ## Super quick and dirty to run app on linux:
 ```
