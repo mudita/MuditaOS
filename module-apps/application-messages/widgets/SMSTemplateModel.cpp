@@ -36,9 +36,7 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
 
     LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
 
-    DatabaseModel::updateRecords(std::move(records), offset, limit, count);
-
-    return true;
+    return DatabaseModel::updateRecords(std::move(records), offset, limit, count);
 }
 
 gui::ListItem *SMSTemplateModel::getItem(
@@ -50,20 +48,17 @@ gui::ListItem *SMSTemplateModel::getItem(
     }
 
     auto item = new gui::SMSTemplateItem(this);
-    if (item != nullptr) {
-        item->setTemplate(templ);
-        item->setID(index);
-        item->activatedCallback = [=](gui::Item &it) {
-            LOG_INFO("activatedCallback");
-            if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
-                if (app->templatesCallback) {
-                    return app->templatesCallback(templ);
-                }
+    item->setTemplate(templ);
+    item->setID(index);
+    item->activatedCallback = [=](gui::Item &it) {
+        LOG_INFO("activatedCallback");
+        if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
+            if (app->templatesCallback) {
+                return app->templatesCallback(templ);
             }
-            return false;
-        };
-        return item;
-    }
+        }
+        return false;
+    };
 
-    return nullptr;
+    return item;
 }

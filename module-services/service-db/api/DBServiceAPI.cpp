@@ -237,7 +237,7 @@ bool DBServiceAPI::SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &r
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
-    if (ret.first == sys::ReturnCodes::Success && resp) {
+    if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->retCode;
     }
 
@@ -251,7 +251,7 @@ bool DBServiceAPI::SMSTemplateRemove(sys::Service *serv, uint32_t id)
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
-    if (ret.first == sys::ReturnCodes::Success && resp) {
+    if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->retCode;
     }
 
@@ -264,7 +264,7 @@ bool DBServiceAPI::SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
-    if (ret.first == sys::ReturnCodes::Success && resp) {
+    if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->retCode;
     }
 
@@ -277,7 +277,7 @@ uint32_t DBServiceAPI::SMSTemplateGetCount(sys::Service *serv)
 
     auto ret  = sys::Bus::SendUnicast(msg, ServiceDB::serviceName, serv, 5000);
     auto resp = dynamic_cast<DBSMSTemplateResponseMessage *>(ret.second.get());
-    if (ret.first == sys::ReturnCodes::Success && resp) {
+    if (ret.first == sys::ReturnCodes::Success && resp != nullptr) {
         return resp->count;
     }
 

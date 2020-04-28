@@ -64,11 +64,7 @@ namespace gui
     {
         AppWindow::destroyInterface();
 
-        removeWidget(list);
-        delete list;
-        list = nullptr;
-
-        children.clear();
+        erase();
         delete smsTemplateModel;
     }
 

@@ -25,7 +25,7 @@ class SMSTemplateRecordInterface : public RecordInterface<SMSTemplateRecord, SMS
 {
   public:
     SMSTemplateRecordInterface(SmsDB *smsDb);
-    ~SMSTemplateRecordInterface();
+    ~SMSTemplateRecordInterface() = default;
 
     bool Add(const SMSTemplateRecord &rec) override final;
     bool RemoveByID(uint32_t id) override final;
