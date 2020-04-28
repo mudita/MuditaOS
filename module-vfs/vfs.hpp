@@ -28,7 +28,12 @@ namespace fs = std::filesystem;
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
 
-#define USER_FILE(filename) (purefs::dir::user_disk / filename).c_str();
+#define PATH_USER "/user/"
+#define PATH_SYS  "/sys"
+
+// this just concatenates two strings and creates a /user/ subdirectory filename
+#define USER_PATH(file) PATH_USER file
+
 namespace purefs
 {
     namespace file
@@ -39,8 +44,8 @@ namespace purefs
 
     namespace dir
     {
-        const inline fs::path eMMC_disk = "/sys";
-        const inline fs::path user_disk = "/user/";
+        const inline fs::path eMMC_disk = PATH_SYS;
+        const inline fs::path user_disk = PATH_USER;
     } // namespace dir
 
     namespace extension

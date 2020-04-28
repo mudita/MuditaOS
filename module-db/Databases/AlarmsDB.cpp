@@ -8,7 +8,7 @@
 #include <module-vfs/vfs.hpp>
 #include "AlarmsDB.hpp"
 
-const char *AlarmsDB::dbName = USER_FILE("alarms.db");
+const char *AlarmsDB::dbName = USER_PATH("alarms.db");
 
 AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
 {

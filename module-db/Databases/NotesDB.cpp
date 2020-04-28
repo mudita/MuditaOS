@@ -9,7 +9,7 @@
 #include <module-vfs/vfs.hpp>
 #include "NotesDB.hpp"
 
-const char *NotesDB::dbName = USER_FILE("notes.db");
+const char *NotesDB::dbName = USER_PATH("notes.db");
 
 NotesDB::NotesDB() : Database(dbName), notes(this)
 {

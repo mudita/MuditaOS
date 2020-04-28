@@ -10,7 +10,7 @@
 #include <module-vfs/vfs.hpp>
 #include "SettingsDB.hpp"
 
-const char *SettingsDB::dbName = USER_FILE("settings.db");
+const char *SettingsDB::dbName = USER_PATH("settings.db");
 
 SettingsDB::SettingsDB() : Database(dbName), settings(this)
 {

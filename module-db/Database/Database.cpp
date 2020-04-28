@@ -70,10 +70,10 @@ extern "C"
 
 Database::Database(const char *name) : dbConnection(nullptr), dbName(name), isInitialized(false)
 {
-
+    LOG_INFO("creating database: %s", dbName);
     auto rc = sqlite3_open(name, &dbConnection);
     if (rc != SQLITE_OK) {
-        LOG_ERROR("SQLITE INITIALIZATION ERROR! %d", rc);
+        LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
     }
     assert(rc == SQLITE_OK);
 }

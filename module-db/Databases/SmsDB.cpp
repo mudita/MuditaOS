@@ -10,7 +10,7 @@
 #include <module-vfs/vfs.hpp>
 #include "SmsDB.hpp"
 
-const char *SmsDB::dbName = USER_FILE("sms.db");
+const char *SmsDB::dbName = USER_PATH("sms.db");
 
 SmsDB::SmsDB() : Database(dbName), sms(this), threads(this)
 {
