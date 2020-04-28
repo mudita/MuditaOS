@@ -96,16 +96,10 @@ namespace gui
 
         CellularServiceAPI::GetScanMode(this->application);
     }
+
     void ScanModesWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        children.clear();
-    }
-
-    ScanModesWindow::~ScanModesWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void ScanModesWindow::onBeforeShow(ShowMode mode, SwitchData *data)

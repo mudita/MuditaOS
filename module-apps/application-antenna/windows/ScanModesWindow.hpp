@@ -39,7 +39,6 @@ namespace gui
 
       public:
         ScanModesWindow(app::Application *app);
-        virtual ~ScanModesWindow();
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
