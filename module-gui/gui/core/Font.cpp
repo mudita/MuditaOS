@@ -294,12 +294,12 @@ namespace gui
         }
 
         // width of text in pixels
-        uint32_t width  = 0;
+        uint32_t width     = 0;
         uint32_t idCurrent = 0;
         uint32_t idLast    = none_char_id;
 
         for (uint32_t i = 0; i < count; ++i) {
-            idCurrent        = str[start + i];
+            idCurrent = str[start + i];
             width += getCharPixelWidth(idCurrent, idLast);
             idLast = idCurrent;
         }
