@@ -90,11 +90,6 @@ namespace gui
         }
     }
 
-    bool CallLogMainWindow::onInput(const InputEvent &inputEvent)
-    {
-        return AppWindow::onInput(inputEvent);
-    }
-
     bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
         DBCalllogResponseMessage *msg = reinterpret_cast<DBCalllogResponseMessage *>(msgl);

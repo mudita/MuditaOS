@@ -47,11 +47,12 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  const uint32_t limit,
                                  uint32_t count)
 {
-    //        LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-    //        for (uint32_t i = 0; i < records.get()->size(); ++i) {
-    //            LOG_DEBUG("id: %d, name: %s", records.get()->operator[](i).ID,
-    //            records.get()->operator[](i).name.c_str());
-    //        }
+#if DEBUG_DB_MODEL_DATA == 1
+    LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    for (uint32_t i = 0; i < records.get()->size(); ++i) {
+        LOG_DEBUG("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
+    }
+#endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
     list->onProviderDataUpdate();

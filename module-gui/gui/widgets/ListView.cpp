@@ -16,14 +16,15 @@ namespace gui
         activeItem = false;
     }
 
+    bool ListViewScroll::shouldShowScroll(int currentPageSize, int elementsCount)
+    {
+        return ((parent->widgetArea.w > style::listview::scroll_min_space) &&
+                (parent->widgetArea.h > style::listview::scroll_min_space) && currentPageSize < elementsCount);
+    }
+
     void ListViewScroll::update(int startIndex, int currentPageSize, int elementsCount)
     {
-        // Dont draw scroll if all items fit on one page
-        if (currentPageSize == elementsCount) {
-            setVisible(false);
-        }
-        else if ((parent->widgetArea.w > style::listview::scroll_min_space) &&
-                 (parent->widgetArea.h > style::listview::scroll_min_space)) {
+        if (shouldShowScroll(currentPageSize, elementsCount)) {
 
             uint32_t pagesCount = 1;
             if (currentPageSize) {
@@ -33,6 +34,7 @@ namespace gui
                     return;
                 }
             }
+
             if (currentPageSize != 0 && pagesCount != 0) {
                 uint32_t currentPage = startIndex / currentPageSize;
                 uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
@@ -40,10 +42,6 @@ namespace gui
                 setPosition(parent->widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
                 setSize(style::listview::scroll_w, pageHeight);
             }
-        }
-        // not enough space - disable scroll
-        else {
-            setVisible(false);
         }
     }
 
@@ -135,7 +133,6 @@ namespace gui
             return;
         }
 
-        // remove old items
         clearItems();
 
         elementsCount = provider->getItemCount();
@@ -172,7 +169,6 @@ namespace gui
             body->addWidget(listSpanItem);
         }
 
-        // Temporary solution, will be removed when top direction properly calculated.
         if (currentPageSize == 0)
             currentPageSize = itemsOnPage;
     }
@@ -206,7 +202,6 @@ namespace gui
     }
 
     bool ListView::onInput(const InputEvent &inputEvent)
-
     {
         return body->onInput(inputEvent);
     }
