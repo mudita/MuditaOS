@@ -20,6 +20,7 @@
 #include "application-settings/ApplicationSettings.hpp"
 #include "application-special-input/AppSpecialInput.hpp"
 #include "application-viewer/ApplicationViewer.hpp"
+#include "application-calendar/ApplicationCalendar.hpp"
 
 // module-services
 #include "service-appmgr/ApplicationManager.hpp"
@@ -197,6 +198,7 @@ int main()
         applications.push_back(app::CreateLauncher<app::ApplicationMessages>(app::name_messages));
         applications.push_back(app::CreateLauncher<app::AppSpecialInput>(app::special_input, false));
         applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));
+        applications.push_back(app::CreateLauncher<app::ApplicationCalendar>(app::name_calendar));
 
         // start application manager
         ret |= sysmgr->CreateService(
