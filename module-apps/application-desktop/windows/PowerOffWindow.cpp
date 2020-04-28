@@ -1,11 +1,3 @@
-/*
- * @file PowerOff.cpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 4 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #include "log/log.hpp"
 #include "gui/widgets/BottomBar.hpp"
 #include "gui/widgets/TopBar.hpp"
@@ -153,7 +145,6 @@ namespace gui
             return true;
         };
 
-        // TODO Mati pisze tutaj.
         eventMgrLabel->activatedCallback = [=](gui::Item &item) {
             static bool state = false;
             if (state == false) {
@@ -172,46 +163,7 @@ namespace gui
     }
     void PowerOffWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        if (titleLabel) {
-            removeWidget(titleLabel);
-            delete titleLabel;
-            titleLabel = nullptr;
-        };
-        if (infoLabel) {
-            removeWidget(infoLabel);
-            delete infoLabel;
-            infoLabel = nullptr;
-        };
-
-        for (uint32_t i = 0; i < selectionLabels.size(); i++) {
-            if (selectionLabels[i]) {
-                removeWidget(selectionLabels[i]);
-                delete selectionLabels[i];
-                selectionLabels[i] = nullptr;
-            };
-        }
-        selectionLabels.clear();
-
-        if (powerImage) {
-            removeWidget(powerImage);
-            delete powerImage;
-            powerImage = nullptr;
-        };
-        if (powerDownImage) {
-            removeWidget(powerDownImage);
-            delete powerDownImage;
-            powerDownImage = nullptr;
-        };
-
-        focusItem = nullptr;
-        delete eventMgrLabel;
-        children.clear();
-    }
-
-    PowerOffWindow::~PowerOffWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void PowerOffWindow::onBeforeShow(ShowMode mode, SwitchData *data)

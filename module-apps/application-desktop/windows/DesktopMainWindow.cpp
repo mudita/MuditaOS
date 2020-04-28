@@ -75,21 +75,12 @@ namespace gui
 
     void DesktopMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        delete time;
-        delete dayText;
-        focusItem = nullptr;
-        children.clear();
+        erase();
     }
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
         buildInterface();
-    }
-
-    DesktopMainWindow::~DesktopMainWindow()
-    {
-        destroyInterface();
     }
 
     void DesktopMainWindow::setVisibleState()

@@ -1,13 +1,4 @@
-/*
- * @file DesktopMainWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 19 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_
+#pragma once
 
 #include "../ApplicationDesktop.hpp"
 #include "AppWindow.hpp"
@@ -21,9 +12,6 @@
 namespace gui
 {
 
-    /*
-     *
-     */
     class DesktopMainWindow : public AppWindow
     {
       protected:
@@ -55,7 +43,6 @@ namespace gui
 
       public:
         DesktopMainWindow(app::Application *app);
-        virtual ~DesktopMainWindow();
 
         // virtual methods gui::Window
         bool onInput(const InputEvent &inputEvent) override;
@@ -73,5 +60,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_DESKTOPMAINWINDOW_HPP_ */
