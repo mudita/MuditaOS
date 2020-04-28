@@ -52,7 +52,7 @@ int vfs::fclose(FILE *stream)
 
 int vfs::remove(const char *name)
 {
-    return std::remove(name);
+    return std::remove(relativeToRoot(name).c_str());
 }
 
 size_t vfs::fread(void *ptr, size_t size, size_t count, FILE *stream)
