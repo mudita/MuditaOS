@@ -28,6 +28,10 @@
 #include <service-evtmgr/Constants.hpp>
 #include <cassert>
 
+#include "bsp/magnetometer/magnetometer.hpp"
+
+const char *EventManager::serviceName = "EventManager";
+
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
     LOG_INFO("[%s] Initializing", name.c_str());
@@ -154,6 +158,11 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
     else if (!targetApplication.empty() && dynamic_cast<sevm::SIMMessage *>(msgl) != nullptr) {
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
+    else if (msgl->messageType == MessageType::EVMGetHw) {
+        auto ret = std::make_shared<sevm::EVMResponseMessage>(bsp::magnetometer::isPresent());
+
+        return ret;
+    }
 
     if (handled)
         return std::make_shared<sys::ResponseMessage>();
@@ -179,6 +188,8 @@ sys::ReturnCodes EventManager::InitHandler()
     sys::WorkerQueueInfo qHarness = {"qHarness", sizeof(uint8_t), 3};
     // sim tray queue
     sys::WorkerQueueInfo qSIM = {"qSIM", sizeof(uint8_t), 5};
+    // magnetometer queue
+    sys::WorkerQueueInfo qMagnetometer = {"qMagnetometer", sizeof(uint8_t), 5};
 
     std::list<sys::WorkerQueueInfo> list;
 
@@ -187,6 +198,7 @@ sys::ReturnCodes EventManager::InitHandler()
     list.push_back(qRTC);
     list.push_back(qHarness);
     list.push_back(qSIM);
+    list.push_back(qMagnetometer);
 
     EventWorker->init(list);
     EventWorker->run();

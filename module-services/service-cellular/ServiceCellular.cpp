@@ -41,6 +41,8 @@
 #include "service-db/api/DBServiceAPI.hpp"
 #include "service-db/messages/DBNotificationMessage.hpp"
 
+#include "service-evtmgr/api/EventServiceAPI.hpp"
+
 #include "time/time_conversion.hpp"
 #include <Utils.hpp>
 #include <at/URC_QIND.hpp>
@@ -172,10 +174,16 @@ void ServiceCellular::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
-    // T4
-    //    state.set(this, State::ST::StatusCheck);
-    // T3
-    state.set(this, State::ST::PowerUpProcedure);
+    bool dev = EventServiceAPI::GetHwPlatform(this);
+
+    LOG_INFO("Hardware platform: %s", dev ? "T4" : "T3");
+    if (dev) {
+
+        state.set(this, State::ST::StatusCheck);
+    }
+    else {
+        state.set(this, State::ST::PowerUpProcedure);
+    }
     return sys::ReturnCodes::Success;
 }
 
