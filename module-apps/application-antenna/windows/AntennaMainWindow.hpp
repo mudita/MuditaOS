@@ -38,7 +38,6 @@ namespace gui
 
       public:
         AntennaMainWindow(app::Application *app);
-        virtual ~AntennaMainWindow();
 
         // virtual methods
         bool onInput(const InputEvent &inputEvent) override;
