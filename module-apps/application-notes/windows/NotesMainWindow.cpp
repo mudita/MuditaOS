@@ -52,8 +52,8 @@ namespace gui
 
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         topBar->setActive(TopBar::Elements::TIME, true);
     }

@@ -40,6 +40,7 @@
     "common_december": "December",
     "common_yesterday" : "Yesterday",
     "common_results_prefix": "Results: ",
+    "common_search": "SEARCH",
 
     "locale_12hour_min" : "%I:%M %p",
     "locale_24hour_min" : "%H:%M",
@@ -130,6 +131,7 @@
     "app_messages_no_messages": "There are no messages yet.\nPress Left arrow to add new.",
     "app_messages_thread_delete_confirmation": "Do you really want to delete\nthis conversation?",
     "app_messages_thread_no_result" : "There are no results",
+    "app_messages_message": "Message",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
@@ -157,7 +159,6 @@
     "app_phonebook_options": "OPTIONS",
     "app_phonebook_confirm": "CONFIRM",
     "app_phonebook_select": "SELECT",
-    "app_phonebook_search": "SEARCH",
     "app_phonebook_search_win_contacts": "Contacts",
     "app_phonebook_search_win_search": "Search",
     "app_phonebook_search_win_info": "Type what do you need\nand click SEARCH",

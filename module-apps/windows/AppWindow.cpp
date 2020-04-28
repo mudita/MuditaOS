@@ -52,7 +52,7 @@ namespace gui
         title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_TOP));
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
-        title->setDotsMode(true);
+        title->setEllipsis(Ellipsis::Right);
         title->visible = false;
 
         topBar = new gui::TopBar(this, 0, 0, 480, 50);
@@ -123,8 +123,6 @@ namespace gui
     {
         // check if any of the lower inheritance onInput methods catch the event
         if (Window::onInput(inputEvent)) {
-            if (inputEvent.keyCode != KeyCode::KEY_ENTER)
-                application->render(RefreshModes::GUI_REFRESH_FAST);
             return true;
         }
 
@@ -184,6 +182,14 @@ namespace gui
         return sapm::ApplicationManager::messageSwitchSpecialInput(
             application,
             std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Request, application->GetName()));
+    }
+
+    BoundingBox AppWindow::bodySize()
+    {
+        return {0,
+                title->offset_h(),
+                this->getWidth(),
+                this->getHeight() - this->title->offset_h() - bottomBar->getHeight()};
     }
 
 } /* namespace gui */

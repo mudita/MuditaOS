@@ -21,7 +21,7 @@ bool NotesTable::Create()
 
 bool NotesTable::Add(NotesTableRow entry)
 {
-    return db->Execute("INSERT or ignore INTO notes ( date, snippet, path ) VALUES (%lu,'%s','%s');",
+    return db->Execute("INSERT or ignore INTO notes ( date, snippet, path ) VALUES (%lu,'%q','%q');",
                        entry.date,
                        entry.snippet.c_str(),
                        entry.path.c_str());
@@ -52,12 +52,12 @@ bool NotesTable::RemoveByField(NotesTableFields field, const char *str)
         return false;
     }
 
-    return db->Execute("DELETE FROM note where %s = '%s';", fieldName.c_str(), str);
+    return db->Execute("DELETE FROM note where %q = '%q';", fieldName.c_str(), str);
 }
 
 bool NotesTable::Update(NotesTableRow entry)
 {
-    return db->Execute("UPDATE notes SET date = %lu, snippet = '%s', , snippet = '%s' WHERE _id=%lu;",
+    return db->Execute("UPDATE notes SET date = %lu, snippet = '%q', , snippet = '%q' WHERE _id=%lu;",
                        entry.date,
                        entry.snippet.c_str(),
                        entry.path.c_str(),
@@ -124,7 +124,7 @@ std::vector<NotesTableRow> NotesTable::GetLimitOffsetByField(uint32_t offset,
     }
 
     auto retQuery = db->Query(
-        "SELECT * from notes WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
+        "SELECT * from notes WHERE %q='%q' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<NotesTableRow>();
@@ -157,7 +157,7 @@ uint32_t NotesTable::GetCount()
 
 uint32_t NotesTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM notes WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM notes WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

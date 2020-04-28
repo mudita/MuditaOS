@@ -193,8 +193,8 @@ Name: sms_template
 | Field | Scope | Type | Desciption |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
-| snippet | (m) | TEXT | Text field for storing snippet of the sms template. Up to 40 characters. |
-| body | (m) | TEXT | Text field for storing body of the sms template |
+| text | (m) | TEXT | Text field for storing body of the sms template |
+| lastUsageTimestamp | (m) | INTEGER | Timestamp of when the templates was lastly used|
 
 
 #### 10. Phone settings

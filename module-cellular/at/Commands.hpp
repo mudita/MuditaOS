@@ -100,7 +100,9 @@ namespace at
         SIMSTAT_ON, /// enable sim stat urc
         SET_SCANMODE,
         GET_SCANMODE,
-        QGMR, /// ditailed firmware revision (as required by Quectel)
+        QGMR,               /// ditailed firmware revision (as required by Quectel)
+        STORE_SETTINGS_ATW, /// required to save in firmware ex SIMSTAT_ON
+        CEER,               /// get error description from modem
 
     };
 
@@ -147,9 +149,13 @@ namespace at
             {AT::QSIMSTAT, {"AT+QSIMSTAT?\r"}},
             {AT::SIM_DET, {"AT+QSIMDET?\r"}},
             {AT::SIM_DET_ON, {"AT+QSIMDET=1,0\r"}},
+            {AT::SIMSTAT_ON, {"AT+QSIMSTAT=1\r"}},
             {AT::SET_SCANMODE, {"AT+QCFG=\"nwscanmode\","}},
             {AT::GET_SCANMODE, {"AT+QCFG=\"nwscanmode\"\r"}},
             {AT::QGMR, {"AT+QGMR\r"}},
+            {AT::STORE_SETTINGS_ATW, {"AT&W\r"}},
+            {AT::CEER, {"AT+CEER\r"}},
+
         };
         if (fact.count(at)) {
             return fact.at(at);

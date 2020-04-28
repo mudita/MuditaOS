@@ -44,10 +44,7 @@ namespace gui
                 return *this;
             }
             uint32_t x = 0, y = 0, w = 0, h = 0;
-            int32_t no_focus = style::window::default_border_no_focus_w;
-            int32_t focus    = style::window::default_border_no_focus_w;
             std::string font = style::window::font::medium;
-            bool dots        = true;
             uint32_t align   = gui::Alignment::ALIGN_HORIZONTAL_LEFT | gui::Alignment::ALIGN_VERTICAL_CENTER;
             RectangleEdgeFlags edges =
                 gui::RectangleEdgeFlags::GUI_RECT_EDGE_TOP | gui::RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM;
@@ -69,52 +66,61 @@ namespace gui
       protected:
         UTF8 text;
         UTF8 textDisplayed;
-        uint32_t charDrawableCount;
-        // number of pixels occupied by displayed text;
-        uint32_t stringPixelWidth;
-
-        // color of the text
-        Color textColor;
-        // font pointer
-        Font *font;
-        // margins for text
-        Margins margins;
-        // type of alignment
+        Ellipsis ellipsis          = gui::Ellipsis::Right;
+        uint32_t charDrawableCount = 0;
+        uint32_t stringPixelWidth  = 0;
+        Color textColor            = {0, 0};
+        Font *font                 = nullptr;
+        Margins margins            = {0, 0, 0, 0};
+        bool lineMode              = true; // TODO PLZ REMOVE - this was working by accident (in Phonebook)
         Alignment alignment;
-        // flag that defines if 3 dots (ellipsis) are to be displayed at the end of label's text.
-        bool dotsMode;
-        // truncate a beginning or an end.
-        bool dotsTruncateEnd;
-        // flag that defines if a remaining area of the label has a horizontal line.
-        bool lineMode;
 
         // area specified in pixels occupied by text inside label space.
         // This defines also position of the text considering alignment and margins.
         BoundingBox textArea;
         // widgets to add line
         Rect *lineFront = nullptr;
-
         Rect *lineBack = nullptr;
         void calculateDisplayText();
+
+      private:
+        /// helper class storing 2 information from c function with bad interface:
+        /// 1. whether text will fit in size
+        /// 2. how much provided size will be in use
+        struct Fits
+        {
+            bool fits               = false; /// whether element fits in or not
+            uint32_t space_consumed = 0;     /// size needed to render text
+            Fits(bool fits = false, uint32_t space_consumed = 0) : fits(fits), space_consumed(space_consumed)
+            {}
+            operator bool()
+            {
+                return fits;
+            }
+        };
+        /// check if text will fit in Label
+        Fits textFitsIn(const UTF8 &text, uint32_t width);
+        /// resize widget width ( 0 <= size needed to render text <= max width )
+        /// @note it doesn't call calculateDisplay text which should probably be in resize callback (onDimensionChanged)
+        void fitTextIn(const UTF8 &text);
 
       public:
         Label();
         Label(Item *parent,
-              const uint32_t &x,
-              const uint32_t &y,
-              const uint32_t &w,
-              const uint32_t &h,
-              const UTF8 &text = UTF8{});
+              const uint32_t &x = 0,
+              const uint32_t &y = 0,
+              const uint32_t &w = 0,
+              const uint32_t &h = 0,
+              const UTF8 &text  = UTF8{});
         Label(Item *parent, meta::Label label);
 
-        virtual ~Label();
         // Label's specific methods
         virtual void setText(const UTF8 &text);
         virtual void clear();
         virtual UTF8 getText();
         virtual void setAlignment(const Alignment &alignment);
         virtual void setMargins(const Margins &margins);
-        void setDotsMode(const bool val, const bool truncateEnd = true);
+        void setEllipsis(gui::Ellipsis ellipsis);
         /**
          * @brief Defines if remaining area of the label has a horizontal line.
          */

@@ -59,6 +59,16 @@ namespace app
         bool operator==(const uint32_t &rhs) const;
     };
 
+    inline auto msgHandled() -> sys::Message_t
+    {
+        return std::make_shared<sys::ResponseMessage>();
+    }
+
+    inline auto msgNotHandled() -> sys::Message_t
+    {
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
+
     /// This is template for creating new applications. Main difference between Application and service is that:
     /// 1. Application has access to GUI and Input
     /// 2. Application lifetime is managed with sapm::ApplicationManager
@@ -102,7 +112,18 @@ namespace app
       private:
         State state = State::DEACTIVATED;
 
-        bool signalStrengthUpdateHandler();
+        sys::Message_t handleSignalStrengthUpdate(sys::DataMessage *msgl);
+        sys::Message_t handleInputEvent(sys::DataMessage *msgl);
+        sys::Message_t handleKBDKeyEvent(sys::DataMessage *msgl);
+        sys::Message_t handleBatteryLevel(sys::DataMessage *msgl);
+        sys::Message_t handleChargerPlugged(sys::DataMessage *msgl);
+        sys::Message_t handleMinuteUpdated(sys::DataMessage *msgl);
+        sys::Message_t handleApplicationSwitch(sys::DataMessage *msgl);
+        sys::Message_t handleSwitchWindow(sys::DataMessage *msgl);
+        sys::Message_t handleAppClose(sys::DataMessage *msgl);
+        sys::Message_t handleAppRebuild(sys::DataMessage *msgl);
+        sys::Message_t handleAppRefresh(sys::DataMessage *msgl);
+        sys::Message_t handleSIMMessage(sys::DataMessage *msgl);
 
       public:
         std::list<uint32_t> timerIDs;

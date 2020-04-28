@@ -29,6 +29,17 @@ namespace gui
             delete[] data;
     }
 
+    FontGlyph::FontGlyph(const FontGlyph *from)
+    {
+        this->id           = from->id;
+        this->glyph_offset = from->glyph_offset;
+        this->width        = from->width;
+        this->height       = from->height;
+        this->xoffset      = from->xoffset;
+        this->yoffset      = from->yoffset;
+        this->xadvance     = from->xadvance;
+    }
+
     gui::Status FontGlyph::load(uint8_t *data, uint32_t &offset)
     {
         // character id
@@ -170,7 +181,7 @@ namespace gui
         // offset to the beginning of the image data
         memcpy(&image_data_offset, data + offset, sizeof(uint32_t));
         offset += sizeof(uint32_t);
-        // id of the font asigned by the font manager
+        // id of the font assigned by the font manager
         id = 1;
 
         //	LOG_INFO("font: %s glyphs: %d, kern: %d", info.face.c_str(), glyph_count, kern_count );
@@ -216,8 +227,11 @@ namespace gui
         return gui::Status::GUI_SUCCESS;
     }
 
-    int32_t Font::getKerning(uint32_t id1, uint32_t id2)
+    int32_t Font::getKerning(uint32_t id1, uint32_t id2) const
     {
+        if (id2 == none_char_id) {
+            return 0;
+        }
         // search for a map with kerning for given character (id1)
         auto it1 = kerning.find(id1);
 
@@ -236,70 +250,43 @@ namespace gui
         return kern->amount;
     }
 
-    uint32_t Font::getCharCountInSpace(const UTF8 &str,
-                                       const uint32_t space,
-                                       uint32_t &spaceConsumed,
-                                       const bool fromBeginning,
-                                       const uint32_t &delimiter)
+    uint32_t Font::getCharCountInSpace(const UTF8 &str, const uint32_t space) const
     {
-        spaceConsumed = 0;
-
-        // width of text in pixels
         int32_t availableSpace = space;
-        uint32_t stringChars   = 0;
-        uint16_t idLast = 0, idCurrent = 0;
+        uint32_t count         = 0;
+        uint32_t current       = 0;
+        uint32_t previous      = none_char_id;
 
-        for (uint32_t i = 0; i < str.length(); ++i) {
-            // go in reverse rather than UTF8::reverse. be careful, no NULL at the end.
-            uint32_t iAnyDir = fromBeginning ? i : (str.length() - 1 - i); // i compensated for direction
-            idCurrent        = str[iAnyDir];
+        for (uint32_t i = 0; i < str.length(); ++i, ++count) {
+            current = str[i];
 
-            auto glyph_found = glyphs.find(idCurrent);
-
-            std::unique_ptr<FontGlyph> unique_glyph;
-
-            FontGlyph *glyph = nullptr;
-            if (glyph_found != glyphs.end()) {
-                glyph = glyph_found->second;
+            availableSpace -= getCharPixelWidth(current, previous);
+            if (availableSpace < 0) {
+                return count;
             }
-            else {
-                unique_glyph = getGlyphUnsupported();
-                glyph        = unique_glyph.get();
-            }
-
-            int32_t kern_value = 0;
-
-            if (i > 0) {
-                kern_value = getKerning(idLast, idCurrent);
-            }
-
-            if (availableSpace - (glyph->xadvance + kern_value) < 0) {
-                spaceConsumed = space - availableSpace;
-                return stringChars;
-            }
-
-            availableSpace -= (glyph->xadvance + kern_value);
-
-            idLast = idCurrent;
-            ++stringChars;
-
-            // check for delimiter
-            if (idCurrent == delimiter) {
-                break;
-            }
+            previous = current;
         }
-        spaceConsumed = space - availableSpace;
-        return stringChars;
+        return count;
     }
 
-    uint32_t Font::getPixelWidth(const UTF8 &str, const uint32_t start, const uint32_t count)
+    std::unique_ptr<FontGlyph> Font::getGlyph(uint32_t id) const
     {
+        auto glyph_found = glyphs.find(id);
+        if (glyph_found != glyphs.end()) {
+            return std::make_unique<FontGlyph>(glyph_found->second);
+        }
+        return getGlyphUnsupported();
+    }
 
-        if (count == 0)
+    uint32_t Font::getPixelWidth(const UTF8 &str, const uint32_t start, const uint32_t count) const
+    {
+        if (count == 0) {
             return 0;
+        }
 
-        if (str.length() == 0)
+        if (str.length() == 0) {
             return 0;
+        }
 
         if ((start >= str.length()) || (start + count - 1 >= str.length())) {
             LOG_ERROR("incorrect string index provided");
@@ -307,35 +294,30 @@ namespace gui
         }
 
         // width of text in pixels
-        uint32_t stringPixelWidth = 0;
-        uint16_t idLast = 0, idCurrent = 0;
+        uint32_t width     = 0;
+        uint32_t idCurrent = 0;
+        uint32_t idLast    = none_char_id;
 
         for (uint32_t i = 0; i < count; ++i) {
-            idCurrent        = str[start + i];
-            auto glyph_found = glyphs.find(idCurrent);
-            if (glyph_found != glyphs.end()) {
-                stringPixelWidth += getCharPixelWidth(idCurrent) + (i == 0 ? 0 : getKerning(idLast, idCurrent));
-            }
-            else {
-                stringPixelWidth += getGlyphUnsupported()->xadvance;
-            }
+            idCurrent = str[start + i];
+            width += getCharPixelWidth(idCurrent, idLast);
             idLast = idCurrent;
         }
 
-        return stringPixelWidth;
+        return width;
     }
 
-    uint32_t Font::getPixelWidth(const UTF8 &str)
+    uint32_t Font::getPixelWidth(const UTF8 &str) const
     {
         return getPixelWidth(str, 0, str.length());
     }
 
-    uint32_t Font::getCharPixelWidth(uint32_t charCode)
+    uint32_t Font::getCharPixelWidth(uint32_t charCode, uint32_t previousChar) const
     {
-        FontGlyph *glyph = glyphs.find(charCode)->second;
-
-        if (glyph != NULL)
-            return glyph->xadvance;
+        auto glyph = getGlyph(charCode);
+        if (glyph != nullptr) {
+            return glyph->xadvance + getKerning(charCode, previousChar);
+        }
 
         return 0;
     }
@@ -344,11 +326,62 @@ namespace gui
     {
         FontGlyph *glyph = glyphs.find(charCode)->second;
 
-        if (glyph != NULL)
+        if (glyph != nullptr)
             return glyph->height;
 
         return 0;
     }
+
+    UTF8 Font::getTextWithElipsis(const UTF8 &text, uint32_t width, Ellipsis ellipsis) const
+    {
+        std::string result;
+        auto w_dot        = getCharPixelWidth('.');
+        auto text_fit_len = getCharCountInSpace(text, width);
+        if (width < w_dot) // none will fit
+        {
+            return result;
+        }
+        if (text_fit_len == text.length()) // all will fit
+        {
+            return text;
+        }
+        if (ellipsis != Ellipsis::None) {
+            auto char_offset = 0;
+            if (ellipsis == Ellipsis::Left) {
+                char_offset = text.length() - text_fit_len;
+            }
+            result = text.substr(char_offset, text_fit_len);
+            setEllipsis(result, ellipsis);
+        }
+        else {
+            result = text.substr(0, text_fit_len);
+        }
+        return result;
+    }
+
+    void Font::setEllipsis(std::string &text, Ellipsis ellipsis) const
+    {
+        auto set_dot = [&](auto begin, auto end) {
+            auto dots_in_elipsis = 3;
+            for (auto el = begin; el != end; ++el) {
+                *el = '.';
+                if (--dots_in_elipsis == 0) {
+                    break;
+                }
+            }
+        };
+        switch (ellipsis) {
+        case Ellipsis::Right:
+            set_dot(text.rbegin(), text.rend());
+            break;
+        case Ellipsis::Left:
+            set_dot(text.begin(), text.end());
+            break;
+        case Ellipsis::None:
+            break;
+        }
+    }
+
     std::unique_ptr<FontGlyph> Font::getGlyphUnsupported() const
     {
         std::unique_ptr<FontGlyph> unsupported = std::make_unique<FontGlyph>();

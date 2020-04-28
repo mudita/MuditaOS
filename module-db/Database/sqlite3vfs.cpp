@@ -550,7 +550,7 @@ static int ecophoneDelete(sqlite3_vfs *pVfs, const char *zPath, int dirSync)
         char zDir[MAXPATHNAME + 1]; /* Name of directory containing file zPath */
 
         /* Figure out the directory name from the path of the file deleted. */
-        sqlite3_snprintf(MAXPATHNAME, zDir, "%s", zPath);
+        sqlite3_snprintf(MAXPATHNAME, zDir, "%q", zPath);
         zDir[MAXPATHNAME] = '\0';
         for (i = strlen(zDir); i > 1 && zDir[i] != '/'; i++)
             ;

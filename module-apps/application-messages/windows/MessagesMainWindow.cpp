@@ -7,6 +7,7 @@
 #include "../data/SMSdata.hpp"
 #include "../widgets/ThreadItem.hpp"
 #include "../windows/ThreadViewWindow.hpp"
+#include "application-messages/windows/SearchStart.hpp"
 
 #include <service-appmgr/ApplicationManager.hpp>
 #include <service-db/messages/DBMessage.hpp>
@@ -55,9 +56,9 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_open"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::open));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
 
         topBar->setActive(TopBar::Elements::TIME, true);
 
@@ -177,7 +178,7 @@ namespace gui
                     return true;
                 case gui::KeyCode::KEY_RIGHT: {
                     auto app = dynamic_cast<app::ApplicationMessages *>(application);
-                    app->searchEmpty();
+                    app->switchWindow(gui::name::window::thread_sms_search, nullptr);
                     return true;
                 } break;
                 case gui::KeyCode::KEY_LF: {

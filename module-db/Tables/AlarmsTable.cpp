@@ -28,7 +28,7 @@ bool AlarmsTable::Create()
 
 bool AlarmsTable::Add(AlarmsTableRow entry)
 {
-    return db->Execute("INSERT or ignore INTO alarms ( time, snooze, status, path ) VALUES (%lu,%lu,%lu,'%s');",
+    return db->Execute("INSERT or ignore INTO alarms ( time, snooze, status, path ) VALUES (%lu,%lu,%lu,'%q');",
                        entry.time,
                        entry.snooze,
                        entry.status,
@@ -60,12 +60,12 @@ bool AlarmsTable::RemoveByField(AlarmsTableFields field, const char *str)
         return false;
     }
 
-    return db->Execute("DELETE FROM alarms where %s = '%s';", fieldName.c_str(), str);
+    return db->Execute("DELETE FROM alarms where %q = '%q';", fieldName.c_str(), str);
 }
 
 bool AlarmsTable::Update(AlarmsTableRow entry)
 {
-    return db->Execute("UPDATE alarms SET time = %lu, snooze = %lu ,status = %lu, path = '%s' WHERE _id=%lu;",
+    return db->Execute("UPDATE alarms SET time = %lu, snooze = %lu ,status = %lu, path = '%q' WHERE _id=%lu;",
                        entry.time,
                        entry.snooze,
                        entry.status,
@@ -134,7 +134,7 @@ std::vector<AlarmsTableRow> AlarmsTable::GetLimitOffsetByField(uint32_t offset,
         return std::vector<AlarmsTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from alarms WHERE %s='%s' ORDER BY time LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from alarms WHERE %q='%q' ORDER BY time LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -172,7 +172,7 @@ uint32_t AlarmsTable::GetCount()
 
 uint32_t AlarmsTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM alarms WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM alarms WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

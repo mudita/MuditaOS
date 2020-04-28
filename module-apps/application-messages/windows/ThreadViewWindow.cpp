@@ -1,35 +1,29 @@
-#include <functional>
-#include <memory>
-
-#include "service-appmgr/ApplicationManager.hpp"
-
-#include "i18/i18.hpp"
-#include "time/time_conversion.hpp"
-
-#include "Label.hpp"
-#include "ListView.hpp"
-#include "Margins.hpp"
-
-#include "service-db/messages/DBMessage.hpp"
-
-#include <log/log.hpp>
-
 #include "ThreadViewWindow.hpp"
-#include <Style.hpp>
-
-#include "../widgets/ThreadModel.hpp"
 
 #include "../ApplicationMessages.hpp"
 #include "../data/SMSdata.hpp"
+#include "../widgets/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
-#include "service-cellular/api/CellularServiceAPI.hpp"
-#include <application-phonebook/data/PhonebookItemData.hpp>
-#include <gui/widgets/Text.hpp>
-#include <widgets/ListItem.hpp>
-#include <widgets/ListItemProvider.hpp>
-#include <widgets/ListView.hpp>
 
-#include "service-db/api/DBServiceAPI.hpp"
+#include <Text.hpp>
+#include <ListItem.hpp>
+#include <ListItemProvider.hpp>
+#include <ListView.hpp>
+#include <Label.hpp>
+#include <Margins.hpp>
+#include <service-db/api/DBServiceAPI.hpp>
+#include <service-appmgr/ApplicationManager.hpp>
+#include <service-db/messages/DBMessage.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
+#include <application-phonebook/data/PhonebookItemData.hpp>
+#include <i18/i18.hpp>
+#include <time/time_conversion.hpp>
+#include <log/log.hpp>
+#include <Style.hpp>
+
+#include <functional>
+#include <memory>
+#include <cassert>
 
 namespace style
 {}; // namespace style
@@ -45,9 +39,9 @@ namespace gui
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
         bottomBar->setActive(BottomBar::Side::RIGHT, true);
-        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get("common_options"));
-        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("common_send"));
-        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        bottomBar->setText(BottomBar::Side::LEFT, utils::localize.get(style::strings::common::options));
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get(style::strings::common::back));
         body = new gui::VBox(this,
                              style::window::default_left_margin,
                              title->offset_h(),
@@ -96,15 +90,17 @@ namespace gui
                 LOG_DEBUG("No text to send in SMS");
                 return true;
             }
-            SMSRecord record;
-            record.number = title->getText();
-            record.body   = text->getText();
-            record.type   = SMSType::QUEUED;
-            auto time     = utils::time::Timestamp();
-            record.date   = time.getTime();
-            DBServiceAPI::SMSAdd(this->application, record);
-
-            return true;
+            auto app = dynamic_cast<app::ApplicationMessages *>(application);
+            assert(app != nullptr);
+            return app->sendSms(title->getText(), text->getText());
+        };
+        text->inputCallback = [=](Item &, const InputEvent &event) {
+            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                assert(app != nullptr);
+                return app->newMessageOptions();
+            }
+            return false;
         };
     }
 
@@ -303,19 +299,19 @@ namespace gui
                                           style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding));
 
-        smsLabel->activatedCallback = [=](Item &) {
-            LOG_INFO("Message activated!");
-            auto app = dynamic_cast<app::ApplicationMessages *>(application);
-            if (app == nullptr) {
-                LOG_ERROR("Something went horribly wrong");
-                return false;
+        smsLabel->inputCallback = [=](Item &, const InputEvent &event) {
+            if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
+                LOG_INFO("Message activated!");
+                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                assert(app != nullptr);
+                if (app->windowOptions != nullptr) {
+                    app->windowOptions->clearOptions();
+                    app->windowOptions->addOptions(smsWindowOptions(app, smsRecord));
+                    app->switchWindow(app->windowOptions->getName(), nullptr);
+                }
+                return true;
             }
-            if (app->windowOptions != nullptr) {
-                app->windowOptions->clearOptions();
-                app->windowOptions->addOptions(smsWindowOptions(app, smsRecord));
-                app->switchWindow(app->windowOptions->getName(), nullptr);
-            }
-            return true;
+            return false;
         };
 
         // wrap label in H box, to make fit datetime in it
@@ -366,7 +362,7 @@ namespace gui
                 showMessages(Action::Start);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 // should be name number for now - easier to handle
-                setTitle(ret->front().number);
+                setTitle(ret->front().getFormattedName());
                 return;
             }
         }
@@ -377,13 +373,12 @@ namespace gui
                 // TODO agree what should be used and how. Now Request have only contact,
                 // maybe it should have additional info - which nr to use and how to show it
                 if (pdata->contact->numbers.size() != 0) {
-                    LOG_DEBUG("SEND SMS TO: %s %s %s %s %s",
+                    LOG_DEBUG("SEND SMS TO: %s %s %s %s",
                               pdata->contact->number.c_str(),
                               pdata->contact->numbers[0].numberE164.c_str(),
                               pdata->contact->numbers[0].numberUser.c_str(),
-                              pdata->contact->primaryName.c_str(),
-                              pdata->contact->alternativeName.c_str());
-                    setTitle(pdata->contact->numbers[0].numberUser);
+                              pdata->contact->getFormattedName().c_str());
+                    setTitle(pdata->contact->getFormattedName());
                 }
                 else {
                     // TODO handle error better

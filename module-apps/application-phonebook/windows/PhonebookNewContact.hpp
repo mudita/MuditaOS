@@ -113,7 +113,6 @@ namespace gui
         bool verifyAndSave();
         void setContactData();
         void saveStateChanged();
-        void copyDataToContact();
         const std::string getCountryPrefix();
     };
 

@@ -19,15 +19,15 @@ ThreadsTable::~ThreadsTable()
 bool ThreadsTable::Create()
 {
     // Create necessary tables
-    if (db->Execute(createTableQuery) == false)
+    if (!db->Execute(createTableQuery))
         return false;
-    if (db->Execute(createTableThreadsCounterQuery))
+    if (!db->Execute(createTableThreadsCounterQuery))
         return false;
-    if (db->Execute(threadsCounterInsertionQuery))
+    if (!db->Execute(threadsCounterInsertionQuery))
         return false;
-    if (db->Execute(threadInsertTriggerQuery))
+    if (!db->Execute(threadInsertTriggerQuery))
         return false;
-    if (db->Execute(threadRemoveTriggerQuery))
+    if (!db->Execute(threadRemoveTriggerQuery))
         return false;
 
     return true;
@@ -37,7 +37,7 @@ bool ThreadsTable::Add(ThreadsTableRow entry)
 {
 
     return db->Execute("INSERT or ignore INTO threads ( date, msg_count, read, contact_id, snippet, last_dir ) VALUES "
-                       "( %lu, 0, 0, %lu, '%s', %lu );",
+                       "( %lu, 0, 0, %lu, '%q', %lu );",
                        entry.date,
                        entry.contactID,
                        entry.snippet.c_str(),
@@ -51,7 +51,7 @@ bool ThreadsTable::RemoveByID(uint32_t id)
 
 bool ThreadsTable::Update(ThreadsTableRow entry)
 {
-    return db->Execute("UPDATE threads SET date = %lu, msg_count = %lu ,read = %lu, contact_id = %lu, snippet = '%s', "
+    return db->Execute("UPDATE threads SET date = %lu, msg_count = %lu ,read = %lu, contact_id = %lu, snippet = '%q', "
                        "last_dir = %lu WHERE _id=%lu;",
                        entry.date,
                        entry.msgCount,
@@ -173,7 +173,7 @@ uint32_t ThreadsTable::GetCount()
 
 uint32_t ThreadsTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM threads WHERE %s=%u;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM threads WHERE %q=%u;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

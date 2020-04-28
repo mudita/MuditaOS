@@ -25,7 +25,7 @@ bool CalllogTable::Add(CalllogTableRow entry)
 {
 
     return db->Execute("INSERT or ignore INTO calls (number, presentation, date, duration, type, name, contactId, "
-                       "isRead) VALUES ('%s', %lu, %s, %s, %lu, '%s', '%s', %d);",
+                       "isRead) VALUES ('%q', %lu, %q, %q, %lu, '%q', '%q', %d);",
                        entry.number.c_str(),
                        static_cast<uint32_t>(entry.presentation),
                        utils::to_string(entry.date).c_str(),
@@ -48,8 +48,8 @@ bool CalllogTable::RemoveByField(CalllogTableFields field, const char *str)
 
 bool CalllogTable::Update(CalllogTableRow entry)
 {
-    return db->Execute("UPDATE calls SET number = '%s', presentation = %lu, date = %lu, duration = %lu, type = %lu, "
-                       "name = '%s', contactId = '%s', isRead = "
+    return db->Execute("UPDATE calls SET number = '%q', presentation = %lu, date = %lu, duration = %lu, type = %lu, "
+                       "name = '%q', contactId = '%q', isRead = "
                        "%d WHERE _id = %lu;",
                        entry.number.c_str(),
                        static_cast<uint32_t>(entry.presentation),
@@ -129,7 +129,7 @@ std::vector<CalllogTableRow> CalllogTable::GetLimitOffsetByField(uint32_t offset
     }
 
     auto retQuery = db->Query(
-        "SELECT * from calls WHERE %s='%s' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
+        "SELECT * from calls WHERE %q='%q' ORDER BY date LIMIT %lu OFFSET %lu;", fieldName.c_str(), str, limit, offset);
 
     if ((retQuery == nullptr) || (retQuery->GetRowCount() == 0)) {
         return std::vector<CalllogTableRow>();
@@ -185,7 +185,7 @@ uint32_t CalllogTable::GetCount()
 
 uint32_t CalllogTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM calls WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM calls WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

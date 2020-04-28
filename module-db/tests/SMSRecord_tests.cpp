@@ -105,12 +105,12 @@ TEST_CASE("SMS Record tests")
 
     // Test updating record
     REQUIRE(smsRecInterface.Add(recordIN));
-    recordIN.dbID = 1;
+    recordIN.ID   = 1;
     recordIN.body = bodyTest2;
     REQUIRE(smsRecInterface.Update(recordIN));
 
     auto record = smsRecInterface.GetByID(1);
-    REQUIRE(record.dbID != 0);
+    REQUIRE(record.ID != 0);
     REQUIRE(record.body == bodyTest2);
 
     // SMS database should contain 1 record

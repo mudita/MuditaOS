@@ -19,7 +19,7 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     auto l        = new gui::Label(box, 0, 0, text_len, label::big_h);
     l->area(gui::Item::Area::Max).w = box->area().w; // let box layout resize
     decorate(l);
-    l->setText(contact.primaryName);
+    l->setText(contact.getFormattedName());
     l->activeItem = false;
 
     auto p = [=](const UTF8 &icon, auto foo) {
@@ -30,18 +30,18 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     };
 
     p("phonebook_phone_ringing", [=](gui::Item &) -> bool {
-        LOG_INFO("Call: %s", contact.primaryName.c_str());
+        LOG_INFO("Call: %s", contact.getFormattedName().c_str());
         return app::call(app, app::CallOperation::ExecuteCall, contact);
     });
 
     p("mail", [=](gui::Item &) -> bool {
-        LOG_INFO("SMS to: %s", contact.primaryName.c_str());
+        LOG_INFO("SMS to: %s", contact.getFormattedName().c_str());
         app::sms(app, app::SmsOperation::Add, contact);
         return true;
     });
 
     p("cross", [=](gui::Item &) -> bool {
-        LOG_INFO("Add contact: %s", contact.primaryName.c_str());
+        LOG_INFO("Add contact: %s", contact.getFormattedName().c_str());
         app::contact(app, app::ContactOperation::Add, contact);
         return true;
     });
@@ -88,5 +88,18 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
                              gui::Arrow::Disabled}),
         placeholder(utils::localize.get("sms_from_this_sms")),
         newCombo(app, contact) // contact.numbers[0].numberE164)
+    };
+}
+
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app)
+{
+    return {
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_use_template")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_paste")),
+                             [=](gui::Item &item) { return false; },
+                             gui::Arrow::Disabled}),
+
     };
 }

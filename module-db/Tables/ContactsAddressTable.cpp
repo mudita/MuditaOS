@@ -24,8 +24,8 @@ bool ContactsAddressTable::Create()
 bool ContactsAddressTable::Add(ContactsAddressTableRow entry)
 {
     return db->Execute("insert or ignore into contact_address (contact_id, country, city, street, number, type, note, "
-                       "mail) VALUES (%lu, '%s', '%s', '%s', "
-                       "'%s', %lu, '%s', '%s');",
+                       "mail) VALUES (%lu, '%q', '%q', '%q', "
+                       "'%q', %lu, '%q', '%q');",
                        entry.contactID,
                        entry.country.c_str(),
                        entry.city.c_str(),
@@ -43,9 +43,9 @@ bool ContactsAddressTable::RemoveByID(uint32_t id)
 
 bool ContactsAddressTable::Update(ContactsAddressTableRow entry)
 {
-    return db->Execute("UPDATE contact_address SET contact_id = %lu, country = '%s' ,city = '%s',street = '%s',number "
-                       "= '%s', type =%lu, note = '%s',mail = "
-                       "'%s' WHERE _id=%lu;",
+    return db->Execute("UPDATE contact_address SET contact_id = %lu, country = '%q' ,city = '%q',street = '%q',number "
+                       "= '%q', type =%lu, note = '%q',mail = "
+                       "'%q' WHERE _id=%lu;",
                        entry.contactID,
                        entry.country.c_str(),
                        entry.city.c_str(),
@@ -132,7 +132,7 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField
         return std::vector<ContactsAddressTableRow>();
     }
 
-    auto retQuery = db->Query("SELECT * from contact_address WHERE %s='%s' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
+    auto retQuery = db->Query("SELECT * from contact_address WHERE %q='%q' ORDER BY contact_id LIMIT %lu OFFSET %lu;",
                               fieldName.c_str(),
                               str,
                               limit,
@@ -174,7 +174,7 @@ uint32_t ContactsAddressTable::GetCount()
 
 uint32_t ContactsAddressTable::GetCountByFieldID(const char *field, uint32_t id)
 {
-    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_address WHERE %s=%lu;", field, id);
+    auto queryRet = db->Query("SELECT COUNT(*) FROM contact_address WHERE %q=%lu;", field, id);
 
     if ((queryRet == nullptr) || (queryRet->GetRowCount() == 0)) {
         return 0;

@@ -46,12 +46,7 @@ namespace gui
         title->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
         title->setMargins(Margins(0, 0, 0, 18));
         title->setFont(style::window::font::small);
-        if (contact) {
-            title->setText(utils::localize.get("app_phonebook_contact_edit"));
-        }
-        else {
-            title->setText(utils::localize.get("app_phonebook_contact_title"));
-        }
+        title->setText(utils::localize.get("app_phonebook_contact_title"));
         title->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
 
@@ -359,43 +354,25 @@ namespace gui
         }
     }
 
-    void PhonebookNewContact::copyDataToContact()
-    {
-        if (contact) {
-            contact->primaryName     = page1.text[0]->getText();
-            contact->alternativeName = page1.text[1]->getText();
-
-            contact->numbers.clear();
-
-            contact->numbers.push_back(ContactRecord::Number(page1.text[2]->getText()));
-            contact->numbers.push_back(ContactRecord::Number(page1.text[3]->getText()));
-
-            contact->mail           = page1.text[4]->getText();
-            contact->note           = page2.text[1]->getText();
-            contact->isOnFavourites = page2.favSelected;
-            contact->speeddial      = page2.speedValue->getText();
-        }
-    }
-
     void PhonebookNewContact::setContactData()
     {
         if (contact) {
             page1.text[0]->setText(contact->primaryName);
             page1.text[1]->setText(contact->alternativeName);
             if (contact->numbers.size() > 0) {
-                if (contact->numbers[0].numberE164.length() == 0) {
+                if (contact->numbers[0].numberUser.length() == 0) {
                     page1.text[2]->setText(getCountryPrefix());
                 }
                 else {
-                    page1.text[2]->setText(contact->numbers[0].numberE164);
+                    page1.text[2]->setText(contact->numbers[0].numberUser);
                 }
             }
             if (contact->numbers.size() > 1) {
-                if (contact->numbers[1].numberE164.length() == 0) {
+                if (contact->numbers[1].numberUser.length() == 0) {
                     page1.text[3]->setText(getCountryPrefix());
                 }
                 else {
-                    page1.text[3]->setText(contact->numbers[1].numberE164);
+                    page1.text[3]->setText(contact->numbers[1].numberUser);
                 }
             }
             page1.text[4]->setText(contact->mail);
@@ -418,7 +395,7 @@ namespace gui
         }
         else {
             LOG_DEBUG("new contact create");
-            page1.text[2]->setText(getCountryPrefix());
+            rebuild();
         }
     }
 
@@ -450,6 +427,13 @@ namespace gui
         PhonebookItemData *item = dynamic_cast<PhonebookItemData *>(data);
         if (item) {
             contact = item->getContact();
+
+            if (contact != nullptr && contact->ID != DB_ID_NONE) {
+                title->setText(utils::localize.get("app_phonebook_options_edit"));
+            }
+            else {
+                title->setText(utils::localize.get("app_phonebook_contact_title"));
+            }
             setContactData();
         }
 
@@ -500,8 +484,11 @@ namespace gui
         ContactRecord record, errName, errPhone, errSpeed, errFav;
         record.primaryName     = page1.text[0]->getText();
         record.alternativeName = page1.text[1]->getText();
-        record.numbers.push_back(page1.text[2]->getText());
-        record.numbers.push_back(page1.text[3]->getText());
+        // Temporary use numberUser also as numberE164, to be changed with libphonenumber
+        record.numbers.push_back(ContactRecord::Number(page1.text[2]->getText(), page1.text[2]->getText()));
+        // Temporary disable saving secondary number since multiple numbers are not supported yet, and this could lead
+        // to confusing errors
+        // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
         record.mail           = page1.text[4]->getText();
         record.note           = page2.text[1]->getText();
         record.isOnFavourites = page2.favSelected;
@@ -544,7 +531,7 @@ namespace gui
                 return (false);
             }
             else {
-                copyDataToContact();
+                contact                               = std::make_shared<ContactRecord>(record);
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                 LOG_INFO("verifyAndSave contact ADDED");
@@ -557,7 +544,7 @@ namespace gui
                 return (false);
             }
             else {
-                copyDataToContact();
+                contact                               = std::make_shared<ContactRecord>(record);
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
 
