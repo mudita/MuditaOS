@@ -38,7 +38,11 @@ cp -v $BUILD_PATH/sys/* "$PURE_PATH"/ -r  # | sed 's/'-\>'/'→'/g'
 # sudo sync $PURE_DEV # https://unix.stackexchange.com/a/345950
 echo -e "PurePhone copied\n"
 
+<<<<<<< HEAD
+PURE_PARTITION=$(lsblk -nlp /dev/sda1 | tail +2 | awk '{print $1}')
+=======
 PURE_PARTITION=$(lsblk -nlp $PURE_DISK | tail +2 | awk '{print $1}')
+>>>>>>> master
 if [ -z $PURE_PARTITION ]; then
        PURE_PARTITION=$PURE_DISK # it is formatted like so apparently
 fi

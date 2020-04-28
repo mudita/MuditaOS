@@ -13,24 +13,67 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <filesystem>
+#include <sbini/sbini.h>
+#include <crc32/crc32.h>
+#include <log/log.hpp>
+
+namespace fs = std::filesystem;
 
 #ifdef TARGET_Linux
 #include <cstdio>
 #else
-
 #include "ff_stdio.h"
 #include "board/cross/eMMC/eMMC.hpp"
 #endif
 
+#define PATH_USER "/user/"
+#define PATH_SYS  "/sys"
+
+// this just concatenates two strings and creates a /user/ subdirectory filename
+#define USER_PATH(file) PATH_USER file
+
+namespace purefs
+{
+    namespace file
+    {
+        const inline fs::path boot_ini     = ".boot.ini";
+        const inline fs::path boot_ini_bak = ".boot.ini.bak";
+    }; // namespace file
+
+    namespace dir
+    {
+        const inline fs::path eMMC_disk = PATH_SYS;
+        const inline fs::path user_disk = PATH_USER;
+    } // namespace dir
+
+    namespace extension
+    {
+        const inline std::string crc32 = ".crc32";
+    }
+
+    namespace buffer
+    {
+        const inline int crc_buf       = 1024;
+        const inline int crc_char_size = 9;
+        const inline int crc_radix     = 16;
+    } // namespace buffer
+
+    namespace ini
+    {
+        const inline std::string main    = "main";
+        const inline std::string os_type = "ostype";
+    } // namespace ini
+};    // namespace purefs
+
 class vfs
 {
-
   public:
-#ifndef TARGET_Linux
-    using FILE = FF_FILE;
-#else
+#ifdef TARGET_Linux
     using FILE = std::FILE;
-
+#else
+    using FILE = FF_FILE;
 #endif
 
     enum class FileAttributes
@@ -80,6 +123,7 @@ class vfs
 
     std::string getcurrdir();
 
+    char *fgets(char *buffer, size_t count, FILE *stream);
     /**
      * @brief Informs whether end of file was reached
      * @param stream to be checked.
@@ -101,13 +145,22 @@ class vfs
 
     FilesystemStats getFilesystemStats();
 
-  private:
-    const char *eMMC_USER_DISK_NAME = "/sys";
 
 #ifndef TARGET_Linux
     bsp::eMMC emmc;
     FF_Disk_t *emmcFFDisk;
 #endif
+    std::string relativeToRoot(const std::string path);
+
+    static unsigned long computeCRC32(FILE *file, unsigned long *outCrc32);
+    static bool verifyCRC(const std::string filePath, const unsigned long crc32);
+    static bool verifyCRC(const fs::path filePath);
+
+  private:
+    bool getOSRootFromIni();
+    const fs::path getCurrentBootIni();
+    fs::path osRootPath;
+    std::string osType;
 };
 
 extern vfs vfs;

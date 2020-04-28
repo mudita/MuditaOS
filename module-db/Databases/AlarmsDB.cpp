@@ -5,9 +5,10 @@
  *      Author: kuba
  */
 
+#include <module-vfs/vfs.hpp>
 #include "AlarmsDB.hpp"
 
-const char *AlarmsDB::dbName = "sys/alarms.db";
+const char *AlarmsDB::dbName = USER_PATH("alarms.db");
 
 AlarmsDB::AlarmsDB() : Database(dbName), alarms(this)
 {
