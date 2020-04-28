@@ -20,7 +20,7 @@ namespace gui
 
         text = new gui::Label(this, 0, 0, 0, 0);
         style::window::decorateOption(text);
-        text->setDotsMode(true);
+        text->setEllipsis(gui::Ellipsis::Right);
     }
 
     bool SMSTemplateItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)

@@ -45,8 +45,6 @@ namespace gui
         topBar->setActive(TopBar::Elements::TIME, true);
 
         list = new gui::ListView(this, list::x, list::y, list::w, list::h);
-        list->setMaxElements(list::pageSize);
-        list->setPageSize(list::pageSize);
         list->setProvider(smsTemplateModel);
 
         setFocusItem(list);

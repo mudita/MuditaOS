@@ -6,20 +6,18 @@
 #include "application-messages/ApplicationMessages.hpp"
 #include <service-db/api/DBServiceAPI.hpp>
 
-SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app, messages::templates::list::pageSize)
+SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app)
 {}
 
 void SMSTemplateModel::requestRecordsCount()
 {
     recordsCount = DBServiceAPI::SMSTemplateGetCount(application);
     LOG_DEBUG("SMSTemplateGetCount %d", recordsCount);
-    // request first and second page if possible
+    // request first
     if (recordsCount > 0) {
         LOG_DEBUG("SMSTemplateGetLimitOffset");
+        auto pageSize = messages::templates::list::pageSize;
         DBServiceAPI::SMSTemplateGetLimitOffset(application, 0, pageSize);
-        if (recordsCount >= pageSize) {
-            DBServiceAPI::SMSTemplateGetLimitOffset(application, pageSize, pageSize);
-        }
     }
 }
 
@@ -36,11 +34,14 @@ bool SMSTemplateModel::updateRecords(std::unique_ptr<std::vector<SMSTemplateReco
 
     LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
 
-    return DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    if (DatabaseModel::updateRecords(std::move(records), offset, limit, count)) {
+        list->onProviderDataUpdate();
+        return true;
+    }
+    return false;
 }
 
-gui::ListItem *SMSTemplateModel::getItem(
-    int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown)
+gui::ListItem *SMSTemplateModel::getItem(int index)
 {
     auto templ = getRecord(index);
     if (!templ) {
