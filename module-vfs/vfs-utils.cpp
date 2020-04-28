@@ -34,7 +34,7 @@ bool vfs::verifyCRC(const std::string filePath, const unsigned long crc32)
 
 bool vfs::verifyCRC(const fs::path filePath)
 {
-    std::unique_ptr<char> crcBuf(new char[purefs::buffer::crc_char_size]);
+    std::unique_ptr<char[]> crcBuf(new char[purefs::buffer::crc_char_size]);
 
     fs::path crcFilePath(filePath);
     crcFilePath += purefs::extension::crc32;
