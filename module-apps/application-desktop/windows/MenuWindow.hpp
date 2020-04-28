@@ -43,7 +43,6 @@ namespace gui
 
       public:
         MenuWindow(app::Application *app);
-        virtual ~MenuWindow();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
