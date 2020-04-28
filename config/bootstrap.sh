@@ -38,36 +38,16 @@ function add_to_path() {
 }
 function install_hooks(){
     echo -e "\e[32m${FUNCNAME[0]}\e[0m"
-    echo -e "Install style checking hooks"
-    options=('Automatic style update.'
-             'Just notify me about style errors but do not apply it.'
-             'Let me do it manually.'
-             )
-    CUR_PS3="$PS3"
-    PS3="Please select a script:"
-    select OPT in "${options[@]}"; do
-        case ${REPLY} in 
-            1 )
-                HOOK="pre-commit.hook"
-                break
-                ;;
-            2 )
-                HOOK="pre-commit-check-only.hook"
-                break
-                ;;
-            3 )
-                PS3=$CUR_PS3
-                return
-                ;;
-            * )
-                echo "invalid option \"${REPLY}\""
-                ;;
-        esac
-    done
+    cat <<-MSGEND
+		Install style checking hooks
+		by default hook is reportin error only
+		if you would like to make it automatically fix style errors add config "user.fixinstage" to your git configuration:
+		    git config user.fixinstage true
+		MSGEND
+    HOOK="pre-commit.hook"
 
     L_GIT_DIR=$(git rev-parse --show-toplevel)
     ln -sf ${L_GIT_DIR}/config/${HOOK} ${L_GIT_DIR}/.git/hooks/pre-commit
-    PS3=$CUR_PS3
 }
 
 function add_ignore_revs_for_blame() {
