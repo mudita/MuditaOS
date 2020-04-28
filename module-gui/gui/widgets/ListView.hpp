@@ -21,6 +21,8 @@ namespace gui
     class ListViewScroll : public Rect
     {
 
+        bool shouldShowScroll(int listPageSize, int elementsCount);
+
       public:
         ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
@@ -33,11 +35,10 @@ namespace gui
         int startIndex             = 0;
         int elementsCount          = 1;
         ListItemProvider *provider = nullptr;
-        /// Vbox that holds currently visible list of items
-        VBox *body             = nullptr;
-        ListViewScroll *scroll = nullptr;
-        int itemSpanSize       = style::listview::item_span_small;
-        Span *listSpanItem     = nullptr;
+        VBox *body                 = nullptr;
+        ListViewScroll *scroll     = nullptr;
+        int itemSpanSize           = style::listview::item_span_small;
+        Span *listSpanItem         = nullptr;
 
         int currentPageSize = 0;
 

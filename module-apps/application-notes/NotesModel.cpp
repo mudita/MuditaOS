@@ -40,12 +40,12 @@ bool NotesModel::updateRecords(std::unique_ptr<std::vector<NotesRecord>> records
                                const uint32_t limit,
                                uint32_t count)
 {
-
-    //    LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
-    //    for (uint32_t i = 0; i < records.get()->size(); ++i) {
-    //        LOG_DEBUG("id: %d, filename: %s", records.get()->operator[](i).ID,
-    //        records.get()->operator[](i).path.c_str());
-    //    }
+#if DEBUG_DB_MODEL_DATA == 1
+    LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    for (uint32_t i = 0; i < records.get()->size(); ++i) {
+        LOG_DEBUG("id: %d, filename: %s", records.get()->operator[](i).ID, records.get()->operator[](i).path.c_str());
+    }
+#endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
     list->onProviderDataUpdate();
