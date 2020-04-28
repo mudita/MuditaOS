@@ -2,7 +2,7 @@
 
 unsigned long vfs::computeCRC32(vfs::FILE *file, unsigned long *outCrc32)
 {
-    std::unique_ptr<unsigned char> buf(new unsigned char[purefs::buffer::crc_buf]);
+    std::unique_ptr<unsigned char[]> buf(new unsigned char[purefs::buffer::crc_buf]);
     size_t bufLen;
 
     *outCrc32 = 0;
