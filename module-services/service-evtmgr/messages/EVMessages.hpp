@@ -74,6 +74,20 @@ namespace sevm
         ~EVMAlarmSwitchData() override = default;
         uint32_t dbID                  = 0;
     };
+
+    class EVMResponseMessage : public sys::ResponseMessage
+    {
+      public:
+        EVMResponseMessage(bool retCode,
+                           std::string retdata    = std::string(),
+                           MessageType responseTo = MessageType::MessageTypeUninitialized)
+            : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+        EVMResponseMessage(bool retCode, MessageType responseTo)
+            : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
+        virtual ~EVMResponseMessage(){};
+
+        bool retCode;
+    };
 } /* namespace sevm*/
 
 #endif /* MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_ */
