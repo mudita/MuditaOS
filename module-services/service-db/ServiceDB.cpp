@@ -280,7 +280,7 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
     case MessageType::DBContactGetByNumber: {
         auto time             = utils::time::Scoped("DBContactGetByNumber");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->GetByNumber(msg->record.number);
+        auto ret              = contactRecordInterface->GetByNumber(msg->record.numbers[0].numberE164);
         responseMsg           = std::make_shared<DBContactResponseMessage>(std::move(ret),
                                                                  true,
                                                                  msg->limit,

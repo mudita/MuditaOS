@@ -144,7 +144,7 @@ const std::string PhonebookOptionsNamecard::formatVCARD()
         vcard << "TEL;TYPE=HOME,VOICE:" << secNumber << "\n";
     }
 
-    vcard << "ADR;TYPE=HOME:;;" << contact->street.c_str() << ";" << contact->city.c_str() << "\n"
+    vcard << "ADR;TYPE=HOME:;;" << contact->addressLine1.c_str() << ";" << contact->addressLine2.c_str() << "\n"
           << "EMAIL:" << contact->mail.c_str() << "\n"
           << "END:VCARD";
 

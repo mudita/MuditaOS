@@ -1,13 +1,3 @@
-
-/*
- * @file ContactRecord.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
 #include <log/log.hpp>
@@ -68,15 +58,11 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactRingID = contactDB->GetLastInsertRowID();
 
-    // TODO: add missing feature: multiple addresses per contact
-    ret = contactDB->address.Add(ContactsAddressTableRow{.contactID = contactID,
-                                                         .country   = rec.country,
-                                                         .city      = rec.city,
-                                                         .street    = rec.street,
-                                                         .number    = rec.number,
-                                                         .type      = rec.addressType,
-                                                         .note      = rec.note,
-                                                         .mail      = rec.mail});
+    ret = contactDB->address.Add(ContactsAddressTableRow{.contactID    = contactID,
+                                                         .addressLine1 = rec.addressLine1,
+                                                         .addressLine2 = rec.addressLine2,
+                                                         .note         = rec.note,
+                                                         .mail         = rec.mail});
 
     if (!ret) {
         return ret;
@@ -177,14 +163,11 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->address.Update(ContactsAddressTableRow{.contactID = contact.ID,
-                                                            .country   = rec.country,
-                                                            .city      = rec.city,
-                                                            .street    = rec.street,
-                                                            .number    = rec.number,
-                                                            .type      = rec.addressType,
-                                                            .note      = rec.note,
-                                                            .mail      = rec.mail});
+    ret = contactDB->address.Update(ContactsAddressTableRow{.contactID    = contact.ID,
+                                                            .addressLine1 = rec.addressLine1,
+                                                            .addressLine2 = rec.addressLine2,
+                                                            .note         = rec.note,
+                                                            .mail         = rec.mail});
 
     if (!ret)
         return ret;
@@ -228,13 +211,10 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     rec.alternativeName = name.nameAlternative;
     rec.numbers         = nrs;
     rec.contactType     = contact.type;
-    rec.country         = address.country;
-    rec.city            = address.city;
-    rec.street          = address.street;
-    rec.number          = address.number;
+    rec.addressLine1    = address.addressLine1;
+    rec.addressLine2    = address.addressLine2;
     rec.note            = address.note;
     rec.mail            = address.mail;
-    rec.addressType     = address.type;
     rec.assetPath       = ring.assetPath;
     rec.isOnWhitelist   = contact.isOnWhitelist;
     rec.isOnBlacklist   = contact.isOnBlacklist;
@@ -293,13 +273,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                          .alternativeName = name.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .country         = address.country,
-                                         .city            = address.city,
-                                         .street          = address.street,
-                                         .number          = address.number,
+                                         .addressLine1    = address.addressLine1,
+                                         .addressLine2    = address.addressLine2,
                                          .note            = address.note,
                                          .mail            = address.mail,
-                                         .addressType     = address.type,
                                          .assetPath       = ring.assetPath,
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
@@ -348,13 +325,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = w.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .addressLine1    = address.addressLine1,
+                                             .addressLine2    = address.addressLine2,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -400,13 +374,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .addressLine1    = address.addressLine1,
+                                             .addressLine2    = address.addressLine2,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -451,13 +422,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .addressLine1    = address.addressLine1,
+                                             .addressLine2    = address.addressLine2,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -501,13 +469,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .addressLine1    = address.addressLine1,
+                                             .addressLine2    = address.addressLine2,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -554,13 +519,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .country         = address.country,
-                                         .city            = address.city,
-                                         .street          = address.street,
-                                         .number          = address.number,
+                                         .addressLine1    = address.addressLine1,
+                                         .addressLine2    = address.addressLine2,
                                          .note            = address.note,
                                          .mail            = address.mail,
-                                         .addressType     = address.type,
                                          .assetPath       = ring.assetPath,
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
@@ -605,13 +567,10 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .country         = address.country,
-                                         .city            = address.city,
-                                         .street          = address.street,
-                                         .number          = address.number,
+                                         .addressLine1    = address.addressLine1,
+                                         .addressLine2    = address.addressLine2,
                                          .note            = address.note,
                                          .mail            = address.mail,
-                                         .addressType     = address.type,
                                          .assetPath       = ring.assetPath,
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
