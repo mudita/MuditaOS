@@ -20,12 +20,10 @@ namespace gui
 
     class ListViewScroll : public Rect
     {
-
-        bool shouldShowScroll(int listPageSize, int elementsCount);
-
       public:
         ListViewScroll(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 
+        bool shouldShowScroll(int listPageSize, int elementsCount);
         void update(int startIndex, int listPageSize, int elementsCount);
     };
 
@@ -55,6 +53,7 @@ namespace gui
         void addItemsOnPage();
         void setFocus();
         void refresh();
+        void resizeWithScroll();
         bool listPageEndReached();
 
       public:
