@@ -1,13 +1,4 @@
-/*
- * @file ViewWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 2 lip 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_VIEWER_WINDOWS_VIEWWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_VIEWER_WINDOWS_VIEWWINDOW_HPP_
+#pragma once
 
 #include <map>
 #include "AppWindow.hpp"
@@ -72,16 +63,12 @@ namespace gui
 
       public:
         ViewWindow(app::Application *app);
-        virtual ~ViewWindow();
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
-
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_VIEWER_WINDOWS_VIEWWINDOW_HPP_ */
