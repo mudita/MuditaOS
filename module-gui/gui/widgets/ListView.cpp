@@ -10,16 +10,16 @@ namespace gui
         : Rect{parent, x, y, w, h}
     {
 
-        setRadius(style::listview::scroll_radius);
+        setRadius(style::listview::scroll::radius);
         setFilled(true);
-        setFillColor(style::listview::scroll_color);
+        setFillColor(style::listview::scroll::color);
         activeItem = false;
     }
 
     bool ListViewScroll::shouldShowScroll(int currentPageSize, int elementsCount)
     {
-        return ((parent->widgetArea.w > style::listview::scroll_min_space) &&
-                (parent->widgetArea.h > style::listview::scroll_min_space) && currentPageSize < elementsCount);
+        return ((parent->widgetArea.w > style::listview::scroll::min_space) &&
+                (parent->widgetArea.h > style::listview::scroll::min_space) && currentPageSize < elementsCount);
     }
 
     void ListViewScroll::update(int startIndex, int currentPageSize, int elementsCount)
@@ -39,10 +39,13 @@ namespace gui
                 uint32_t currentPage = startIndex / currentPageSize;
                 uint32_t pageHeight  = parent->widgetArea.h / pagesCount;
 
-                setPosition(parent->widgetArea.w - style::listview::scroll_margin, pageHeight * currentPage);
-                setSize(style::listview::scroll_w, pageHeight);
+                setPosition(parent->widgetArea.w - style::listview::scroll::margin, pageHeight * currentPage);
+                setSize(style::listview::scroll::w, pageHeight);
+                setVisible(true);
             }
         }
+        else
+            setVisible(false);
     }
 
     ListView::ListView()
@@ -51,10 +54,10 @@ namespace gui
         body = new VBox{this, 0, 0, 0, 0};
 
         scroll = new ListViewScroll(this,
-                                    style::listview::scroll_x,
-                                    style::listview::scroll_y,
-                                    style::listview::scroll_w,
-                                    style::listview::scroll_h);
+                                    style::listview::scroll::x,
+                                    style::listview::scroll::y,
+                                    style::listview::scroll::w,
+                                    style::listview::scroll::h);
     }
 
     ListView::ListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
@@ -83,10 +86,10 @@ namespace gui
         };
 
         scroll = new ListViewScroll(this,
-                                    style::listview::scroll_x,
-                                    style::listview::scroll_y,
-                                    style::listview::scroll_w,
-                                    style::listview::scroll_h);
+                                    style::listview::scroll::x,
+                                    style::listview::scroll::y,
+                                    style::listview::scroll::w,
+                                    style::listview::scroll::h);
     }
 
     ListView::~ListView()
@@ -140,11 +143,21 @@ namespace gui
 
         setFocus();
         scroll->update(startIndex, currentPageSize, elementsCount);
+        resizeWithScroll();
     }
 
     void ListView::onProviderDataUpdate()
     {
         refresh();
+    }
+
+    void ListView::resizeWithScroll()
+    {
+        if (scroll->shouldShowScroll(currentPageSize, elementsCount)) {
+            for (auto item : body->children) {
+                item->setSize(item->w() - style::listview::scroll::item_margin, item->h());
+            }
+        }
     }
 
     void ListView::addItemsOnPage()
