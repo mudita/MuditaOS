@@ -151,15 +151,22 @@ namespace style
 
     namespace listview
     {
+        namespace scroll
+        {
+            const inline uint32_t x           = 0;
+            const inline uint32_t y           = 0;
+            const inline uint32_t w           = 5;
+            const inline uint32_t h           = 0;
+            const inline uint32_t radius      = 2;
+            const inline gui::Color color     = gui::Color{0, 0};
+            const inline uint32_t margin      = 5;
+            const inline uint32_t min_space   = 10;
+            const inline uint32_t item_margin = 10;
+        } // namespace scroll
 
-        const inline uint32_t scroll_x         = 0;
-        const inline uint32_t scroll_y         = 0;
-        const inline uint32_t scroll_w         = 5;
-        const inline uint32_t scroll_h         = 0;
-        const inline uint32_t scroll_radius    = 2;
-        const inline gui::Color scroll_color   = gui::Color{0, 0};
-        const inline uint32_t scroll_margin    = 5;
-        const inline uint32_t scroll_min_space = 10;
+        const inline uint32_t right_margin     = 15;
+        const inline uint32_t top_margin_small = 5;
+        const inline uint32_t top_margin_big   = 8;
         const inline uint32_t item_span_small  = 8;
         const inline uint32_t item_span_big    = 12;
 

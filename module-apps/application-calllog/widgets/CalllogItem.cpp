@@ -20,7 +20,7 @@ namespace gui
 
     namespace clItemStyle
     {
-        constexpr uint32_t w = 431;
+        constexpr uint32_t w = 440;
         constexpr uint32_t h = style::window::label::big_h;
         namespace img
         {
