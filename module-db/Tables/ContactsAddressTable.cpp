@@ -1,13 +1,3 @@
-
-/*
- * @file ContactsAddressTable.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ContactsAddressTable.hpp"
 
 ContactsAddressTable::ContactsAddressTable(Database *db) : Table(db)
@@ -23,15 +13,11 @@ bool ContactsAddressTable::Create()
 
 bool ContactsAddressTable::Add(ContactsAddressTableRow entry)
 {
-    return db->Execute("insert or ignore into contact_address (contact_id, country, city, street, number, type, note, "
-                       "mail) VALUES (%lu, '%q', '%q', '%q', "
-                       "'%q', %lu, '%q', '%q');",
+    return db->Execute("insert or ignore into contact_address (contact_id, address_line1, address_line2, note, mail) "
+                       "VALUES (%lu, '%q', '%q', '%q', '%q');",
                        entry.contactID,
-                       entry.country.c_str(),
-                       entry.city.c_str(),
-                       entry.street.c_str(),
-                       entry.number.c_str(),
-                       entry.type,
+                       entry.addressLine1.c_str(),
+                       entry.addressLine2.c_str(),
                        entry.note.c_str(),
                        entry.mail.c_str());
 }
@@ -43,15 +29,12 @@ bool ContactsAddressTable::RemoveByID(uint32_t id)
 
 bool ContactsAddressTable::Update(ContactsAddressTableRow entry)
 {
-    return db->Execute("UPDATE contact_address SET contact_id = %lu, country = '%q' ,city = '%q',street = '%q',number "
-                       "= '%q', type =%lu, note = '%q',mail = "
-                       "'%q' WHERE _id=%lu;",
+    return db->Execute("UPDATE contact_address SET contact_id = %lu, address_line1 = '%q', address_line2 = '%q', "
+                       "note = '%q', mail = '%q' "
+                       "WHERE _id=%lu;",
                        entry.contactID,
-                       entry.country.c_str(),
-                       entry.city.c_str(),
-                       entry.street.c_str(),
-                       entry.number.c_str(),
-                       entry.type,
+                       entry.addressLine1.c_str(),
+                       entry.addressLine2.c_str(),
                        entry.note.c_str(),
                        entry.mail.c_str(),
                        entry.ID);
@@ -66,15 +49,12 @@ ContactsAddressTableRow ContactsAddressTable::GetByID(uint32_t id)
     }
 
     return ContactsAddressTableRow{
-        (*retQuery)[0].GetUInt32(),                                  // ID
-        (*retQuery)[1].GetUInt32(),                                  // contactID
-        (*retQuery)[2].GetString(),                                  // country
-        (*retQuery)[3].GetString(),                                  // city
-        (*retQuery)[4].GetString(),                                  // street
-        (*retQuery)[5].GetString(),                                  // number
-        static_cast<ContactAddressType>((*retQuery)[6].GetUInt32()), // type
-        (*retQuery)[7].GetString(),                                  // note
-        (*retQuery)[8].GetString(),                                  // mail
+        (*retQuery)[0].GetUInt32(), // ID
+        (*retQuery)[1].GetUInt32(), // contactID
+        (*retQuery)[2].GetString(), // addressLine1
+        (*retQuery)[3].GetString(), // addressLine2
+        (*retQuery)[4].GetString(), // note
+        (*retQuery)[5].GetString(), // mail
     };
 }
 
@@ -90,15 +70,12 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffset(uint32
 
     do {
         ret.push_back(ContactsAddressTableRow{
-            (*retQuery)[0].GetUInt32(),                                  // ID
-            (*retQuery)[1].GetUInt32(),                                  // contactID
-            (*retQuery)[2].GetString(),                                  // country
-            (*retQuery)[3].GetString(),                                  // city
-            (*retQuery)[4].GetString(),                                  // street
-            (*retQuery)[5].GetString(),                                  // number
-            static_cast<ContactAddressType>((*retQuery)[6].GetUInt32()), // type
-            (*retQuery)[7].GetString(),                                  // note
-            (*retQuery)[8].GetString(),                                  // mail
+            (*retQuery)[0].GetUInt32(), // ID
+            (*retQuery)[1].GetUInt32(), // contactID
+            (*retQuery)[2].GetString(), // addressLine1
+            (*retQuery)[3].GetString(), // addressLine2
+            (*retQuery)[4].GetString(), // note
+            (*retQuery)[5].GetString(), // mail
         });
     } while (retQuery->NextRow());
 
@@ -113,18 +90,6 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField
 
     std::string fieldName;
     switch (field) {
-    case ContactAddressTableFields ::City:
-        fieldName = "city";
-        break;
-    case ContactAddressTableFields ::Country:
-        fieldName = "country";
-        break;
-    case ContactAddressTableFields ::Street:
-        fieldName = "street";
-        break;
-    case ContactAddressTableFields ::Number:
-        fieldName = "number";
-        break;
     case ContactAddressTableFields ::Mail:
         fieldName = "mail";
         break;
@@ -146,15 +111,12 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField
 
     do {
         ret.push_back(ContactsAddressTableRow{
-            (*retQuery)[0].GetUInt32(),                                  // ID
-            (*retQuery)[1].GetUInt32(),                                  // contactID
-            (*retQuery)[2].GetString(),                                  // country
-            (*retQuery)[3].GetString(),                                  // city
-            (*retQuery)[4].GetString(),                                  // street
-            (*retQuery)[5].GetString(),                                  // number
-            static_cast<ContactAddressType>((*retQuery)[6].GetUInt32()), // type
-            (*retQuery)[7].GetString(),                                  // note
-            (*retQuery)[8].GetString(),                                  // mail
+            (*retQuery)[0].GetUInt32(), // ID
+            (*retQuery)[1].GetUInt32(), // contactID
+            (*retQuery)[2].GetString(), // addressLine1
+            (*retQuery)[3].GetString(), // addressLine2
+            (*retQuery)[4].GetString(), // note
+            (*retQuery)[5].GetString(), // mail
         });
     } while (retQuery->NextRow());
 

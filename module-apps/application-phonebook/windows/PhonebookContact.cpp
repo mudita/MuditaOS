@@ -457,12 +457,12 @@ namespace gui
             email->setVisible(false);
         }
 
-        if (contact->street.length() > 0) {
-            addressLine1->setText(contact->street);
+        if (contact->addressLine1.length() > 0) {
+            addressLine1->setText(contact->addressLine1);
         }
 
-        if (contact->city.length() > 0) {
-            addressLine2->setText(contact->city);
+        if (contact->addressLine2.length() > 0) {
+            addressLine2->setText(contact->addressLine2);
         }
 
         if (contact->note.length() > 0) {

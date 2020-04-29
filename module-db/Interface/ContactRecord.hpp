@@ -1,13 +1,3 @@
-
-/*
- * @file ContactRecord.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #pragma once
 
 #include "../Common/Common.hpp"
@@ -35,10 +25,8 @@ struct ContactRecord
     };
     std::vector<Number> numbers;
 
-    UTF8 country                   = "";
-    UTF8 city                      = "";
-    UTF8 street                    = "";
-    UTF8 number                    = "";
+    UTF8 addressLine1              = "";
+    UTF8 addressLine2              = "";
     UTF8 note                      = "";
     UTF8 mail                      = "";
     ContactAddressType addressType = ContactAddressType::OTHER;

@@ -357,7 +357,7 @@ std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetBySpeeddial(
 std::unique_ptr<std::vector<ContactRecord>> DBServiceAPI::ContactGetByPhoneNumber(sys::Service *serv, UTF8 phoneNumber)
 {
     ContactRecord rec;
-    rec.number = phoneNumber;
+    rec.numbers.push_back(ContactRecord::Number(phoneNumber, phoneNumber));
 
     std::shared_ptr<DBContactMessage> msg = std::make_shared<DBContactMessage>(MessageType::DBContactGetByNumber, rec);
 
