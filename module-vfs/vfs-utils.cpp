@@ -1,6 +1,6 @@
 #include <vfs.hpp>
 
-unsigned long vfs::computeCRC32(vfs::FILE *file, unsigned long *outCrc32)
+void vfs::computeCRC32(vfs::FILE *file, unsigned long *outCrc32)
 {
     std::unique_ptr<unsigned char[]> buf(new unsigned char[purefs::buffer::crc_buf]);
     size_t bufLen;
@@ -14,8 +14,6 @@ unsigned long vfs::computeCRC32(vfs::FILE *file, unsigned long *outCrc32)
 
         *outCrc32 = Crc32_ComputeBuf(*outCrc32, buf.get(), bufLen);
     }
-
-    return 0;
 }
 
 bool vfs::verifyCRC(const std::string filePath, const unsigned long crc32)
@@ -23,10 +21,9 @@ bool vfs::verifyCRC(const std::string filePath, const unsigned long crc32)
     unsigned long crc32Read;
     vfs::FILE *fp = ::vfs.fopen(filePath.c_str(), "r");
     if (fp != NULL) {
-        if (computeCRC32(fp, &crc32Read) == 0) {
-            ::vfs.fclose(fp);
-            return (crc32Read == crc32);
-        }
+        computeCRC32(fp, &crc32Read);
+        ::vfs.fclose(fp);
+        return (crc32Read == crc32);
     }
     LOG_ERROR("verifyCRC can't open %s", filePath.c_str());
     return (false);
