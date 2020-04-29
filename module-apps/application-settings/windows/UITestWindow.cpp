@@ -51,13 +51,7 @@ namespace gui
 
     void UiTestWindow::destroyInterface()
     {
-        this->focusItem = nullptr;
-        AppWindow::destroyInterface();
-    }
-
-    UiTestWindow::~UiTestWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void UiTestWindow::onBeforeShow(ShowMode mode, SwitchData *data)

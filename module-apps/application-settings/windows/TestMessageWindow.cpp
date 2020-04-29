@@ -130,15 +130,8 @@ namespace gui
     }
     void TestMessageWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        this->focusItem = nullptr;
-
-        children.clear();
+        erase();
     }
-
-    TestMessageWindow::~TestMessageWindow()
-    {}
 
     void TestMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
