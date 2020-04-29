@@ -21,9 +21,8 @@ namespace gui
 {
 
     SMSTemplatesWindow::SMSTemplatesWindow(app::Application *app)
-        : AppWindow(app, name::window::sms_templates), smsTemplateModel{new SMSTemplateModel(app)}
+        : AppWindow(app, name::window::sms_templates), smsTemplateModel{std::make_unique<SMSTemplateModel>(app)}
     {
-
         buildInterface();
     }
 
@@ -45,7 +44,7 @@ namespace gui
         topBar->setActive(TopBar::Elements::TIME, true);
 
         list = new gui::ListView(this, list::x, list::y, list::w, list::h);
-        list->setProvider(smsTemplateModel);
+        list->setProvider(smsTemplateModel.get());
 
         setFocusItem(list);
 
@@ -63,7 +62,6 @@ namespace gui
         AppWindow::destroyInterface();
 
         erase();
-        delete smsTemplateModel;
     }
 
     SMSTemplatesWindow::~SMSTemplatesWindow()

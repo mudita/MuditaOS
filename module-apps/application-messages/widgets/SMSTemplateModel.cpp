@@ -48,7 +48,7 @@ gui::ListItem *SMSTemplateModel::getItem(int index)
         return nullptr;
     }
 
-    auto item = new gui::SMSTemplateItem(this);
+    auto item = new gui::SMSTemplateItem();
     item->setTemplate(templ);
     item->setID(index);
     item->activatedCallback = [=](gui::Item &it) {

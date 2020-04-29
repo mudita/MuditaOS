@@ -11,7 +11,7 @@ namespace gui
         constexpr uint32_t h = style::window::label::big_h;
     } // namespace smsTemplItemStyle
 
-    SMSTemplateItem::SMSTemplateItem(SMSTemplateModel *model) : model{model}
+    SMSTemplateItem::SMSTemplateItem()
     {
         minWidth  = smsTemplItemStyle::w;
         minHeight = smsTemplItemStyle::h;

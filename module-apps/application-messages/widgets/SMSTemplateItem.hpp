@@ -10,12 +10,11 @@ namespace gui
 {
     class SMSTemplateItem : public ListItem
     {
-        SMSTemplateModel *model                  = nullptr;
         std::shared_ptr<SMSTemplateRecord> templ = nullptr;
         gui::Label *text                         = nullptr;
 
       public:
-        SMSTemplateItem(SMSTemplateModel *model);
+        SMSTemplateItem();
         virtual ~SMSTemplateItem() = default;
         void setTemplate(std::shared_ptr<SMSTemplateRecord>);
 

@@ -13,11 +13,12 @@ namespace gui
 {
     class SMSTemplatesWindow : public AppWindow
     {
-        SMSTemplateModel *smsTemplateModel = nullptr;
+        std::unique_ptr<SMSTemplateModel> smsTemplateModel;
         gui::ListView *list                = nullptr;
         std::string requestingWindow;
 
       public:
+        SMSTemplatesWindow() = delete;
         SMSTemplatesWindow(app::Application *app);
         virtual ~SMSTemplatesWindow();
 
