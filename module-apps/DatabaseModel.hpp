@@ -13,21 +13,14 @@ namespace app
     template <class T> class DatabaseModel
     {
       protected:
-        static constexpr auto defBuffSize = 12;
-
-        /// Receive messages buffer size
-        int buffSize = defBuffSize;
         /// Pointer to application that owns the model
         Application *application = nullptr;
-        int recordsCount;
+        uint32_t recordsCount;
         std::vector<std::shared_ptr<T>> records;
 
       public:
-        DatabaseModel(Application *app, int buffSize = defBuffSize)
-            : buffSize{buffSize}, application{app}, recordsCount{-1}
-        {
-            resizeBuffer(buffSize);
-        }
+        DatabaseModel(Application *app) : application{app}, recordsCount{0}
+        {}
 
         virtual ~DatabaseModel()
         {
@@ -42,35 +35,31 @@ namespace app
                                    const uint32_t limit,
                                    uint32_t count)
         {
-            for (auto i = 0; i < buffSize; i++)
-                records[i] = nullptr;
 
-            auto maxElem = (static_cast<int>(limit) <= buffSize ? limit : buffSize);
+            records.clear();
 
-            for (uint32_t i = 0; i < maxElem; i++) {
-                records[i] = std::make_shared<T>(dbRecords.get()->operator[](i));
+            if (dbRecords != nullptr) {
+                for (uint32_t i = 0; i < dbRecords->size(); i++) {
+                    records.push_back(std::make_shared<T>(dbRecords.get()->operator[](i)));
+                }
+                return true;
             }
-
-            return true;
-        }
-
-        virtual void resizeBuffer(int buffSize)
-        {
-            records.resize(buffSize);
-            std::fill(records.begin(), records.end(), nullptr);
+            else {
+                LOG_ERROR("Null pointer received from DB");
+                return false;
+            }
         }
 
         virtual void clear()
         {
-            std::fill(records.begin(), records.end(), nullptr);
             records.clear();
-            recordsCount = -1;
+            recordsCount = 0;
         }
 
-        std::shared_ptr<T> getRecord(int index)
+        std::shared_ptr<T> getRecord(uint32_t index)
         {
 
-            if ((index < 0) || (index > buffSize)) {
+            if ((index < 0) || (index >= records.size())) {
                 return nullptr;
             }
 
