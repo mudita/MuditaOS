@@ -14,7 +14,6 @@ SMSTemplateRecord::SMSTemplateRecord(const SMSTemplateTableRow &w)
 SMSTemplateRecordInterface::SMSTemplateRecordInterface(SmsDB *smsDb) : smsDB(smsDb)
 {}
 
-
 bool SMSTemplateRecordInterface::Add(const SMSTemplateRecord &rec)
 {
     return smsDB->templates.Add(
