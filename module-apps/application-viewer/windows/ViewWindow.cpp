@@ -112,14 +112,7 @@ namespace gui
     }
     void ViewWindow::destroyInterface()
     {
-        destroyInterface();
-        for (uint32_t i = 0; i < images.size(); i++)
-            delete images[i];
-    }
-
-    ViewWindow::~ViewWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void ViewWindow::onBeforeShow(ShowMode mode, SwitchData *data)
