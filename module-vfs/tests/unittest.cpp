@@ -44,9 +44,10 @@ TEST_CASE("Test case 1")
 
     REQUIRE(vfs.fclose(fd) == 0);
 
-    auto cwd = vfs.getcurrdir();
-
-    auto dirList = vfs.listdir((cwd + "/module-vfs/test_dir").c_str());
+    // current directory is the build dir
+    // vfs adds sys/ to the path we need to got outside sys (bad!)
+    // and look for some files there
+    auto dirList = vfs.listdir("../module-vfs/test_dir");
     REQUIRE(dirList.size() == 3);
     for (auto &dir : dirList) {
         if (dir.fileName == "test_dir2") {
