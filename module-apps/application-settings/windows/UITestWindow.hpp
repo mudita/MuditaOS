@@ -20,9 +20,7 @@ namespace gui
 
       public:
         UiTestWindow(app::Application *app);
-        virtual ~UiTestWindow();
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;

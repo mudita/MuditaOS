@@ -45,11 +45,8 @@ namespace gui
 
       public:
         TestMessageWindow(app::Application *app);
-        virtual ~TestMessageWindow();
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
