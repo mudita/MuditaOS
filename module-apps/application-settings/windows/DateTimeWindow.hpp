@@ -52,11 +52,8 @@ namespace gui
 
       public:
         DateTimeWindow(app::Application *app);
-        virtual ~DateTimeWindow();
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;

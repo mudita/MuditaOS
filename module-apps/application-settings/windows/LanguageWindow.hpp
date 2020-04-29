@@ -34,11 +34,8 @@ namespace gui
 
       public:
         LanguageWindow(app::Application *app);
-        virtual ~LanguageWindow();
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
-
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
