@@ -9,6 +9,7 @@
     "common_send": "SEND",
     "common_confirm": "CONFIRM",
     "common_select": "SELECT",
+    "common_use": "USE",
     "common_ok": "OK",
     "common_back": "BACK",
     "common_set": "SET",
@@ -132,6 +133,7 @@
     "app_messages_thread_delete_confirmation": "Do you really want to delete\nthis conversation?",
     "app_messages_thread_no_result" : "There are no results",
     "app_messages_message": "Message",
+    "app_messages_templates": "Templates",
 
     "app_settings_title_main": "Settings",
     "app_settings_bt" : "Bluetooth",
@@ -201,6 +203,8 @@
     "sms_copy" : "Copy",
     "sms_delete_message" : "Delete",
     "sms_from_this_sms" : "From this message",
+    "sms_use_template" : "Use Template",
+    "sms_paste" : "Paste",
     
     "settings_lang_PL": "PL",
     "settings_lang_ENG": "ENG",

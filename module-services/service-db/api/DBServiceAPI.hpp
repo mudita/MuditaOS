@@ -1,15 +1,4 @@
-
-/*
- * @file DBServiceAPI.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 06.06.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
-#ifndef PUREPHONE_DBSERVICEAPI_HPP
-#define PUREPHONE_DBSERVICEAPI_HPP
+#pragma once
 
 #include "Interface/AlarmsRecord.hpp"
 #include "Interface/CalllogRecord.hpp"
@@ -18,6 +7,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "Interface/SMSTemplateRecord.hpp"
 #include "Service/Bus.hpp"
 
 class DBServiceAPI
@@ -63,6 +53,12 @@ class DBServiceAPI
     static bool ThreadRemove(sys::Service *serv, uint32_t id);
     static bool ThreadGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
     static uint32_t ThreadGetCount(sys::Service *serv);
+
+    static bool SMSTemplateAdd(sys::Service *serv, const SMSTemplateRecord &rec);
+    static bool SMSTemplateRemove(sys::Service *serv, uint32_t id);
+    static bool SMSTemplateUpdate(sys::Service *serv, const SMSTemplateRecord &rec);
+    static uint32_t SMSTemplateGetCount(sys::Service *serv);
+    static bool SMSTemplateGetLimitOffset(sys::Service *serv, uint32_t offset, uint32_t limit);
 
     /**
      * @brief Function is checking if new contact can be added to database. Function is blocking.
@@ -123,5 +119,3 @@ class DBServiceAPI
     /* country codes */
     static uint32_t GetCountryCodeByMCC(sys::Service *serv, uint32_t mcc);
 };
-
-#endif // PUREPHONE_DBSERVICEAPI_HPP

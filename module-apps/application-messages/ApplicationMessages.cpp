@@ -6,6 +6,7 @@
 #include "windows/OptionsWindow.hpp"
 #include "windows/ThreadViewWindow.hpp"
 #include "windows/SearchStart.hpp"
+#include "windows/SMSTemplatesWindow.hpp"
 
 #include <MessageType.hpp>
 #include <Dialog.hpp>
@@ -57,7 +58,8 @@ namespace app
         if (resp != nullptr) {
             handled = true;
             switch (resp->responseTo) {
-            case MessageType::DBThreadGetLimitOffset: {
+            case MessageType::DBThreadGetLimitOffset:
+            case MessageType::DBSMSTemplateGetLimitOffset: {
                 if (getCurrentWindow()->onDatabaseMessage(resp))
                     refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
             } break;
@@ -117,6 +119,7 @@ namespace app
                                         gui::name::window::thread_search_none,
                                         gui::Dialog::Meta{.icon = "search_big", .have_choice = false})});
         windows.insert({gui::name::window::thread_sms_search, new gui::SMSSearch(this)});
+        windows.insert({gui::name::window::sms_templates, new gui::SMSTemplatesWindow(this)});
     }
 
     void ApplicationMessages::destroyUserInterface()
@@ -180,12 +183,12 @@ namespace app
         return DBServiceAPI::SMSAdd(this, record) != DB_ID_NONE;
     }
 
-    bool ApplicationMessages::newMessageOptions()
+    bool ApplicationMessages::newMessageOptions(const std::string &requestingWindow)
     {
         LOG_INFO("New message options");
         if (windowOptions != nullptr) {
             windowOptions->clearOptions();
-            windowOptions->addOptions(newMessageWindowOptions(this));
+            windowOptions->addOptions(newMessageWindowOptions(this, requestingWindow));
             switchWindow(windowOptions->getName(), nullptr);
         }
         return true;

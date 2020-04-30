@@ -15,7 +15,7 @@ add_executable( ${PROJECT_NAME} EXCLUDE_FROM_ALL
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsAddressTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SettingsTable_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/AlarmsTable_tests.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplatesTable_tests.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/SMSTemplateTable_tests.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/ContactsRecord_tests.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/SMSRecord_tests.cpp"

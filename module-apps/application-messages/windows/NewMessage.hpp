@@ -8,15 +8,6 @@
 
 namespace gui
 {
-
-    namespace name
-    {
-        namespace window
-        {
-            inline std::string new_sms = "NewSMS";
-        };
-    }; // namespace name
-
     class NewSMS_Window : public AppWindow
     {
       private:
