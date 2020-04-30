@@ -26,21 +26,6 @@ static inline bool isValidEmail(const UTF8 email)
     return (email.length() > 4);
 }
 
-static inline const std::string formatContactName(std::shared_ptr<ContactRecord> contact)
-{
-    if (contact == nullptr)
-        return "";
-    if (contact->primaryName.length() > 0) {
-        if (contact->alternativeName.length() > 0)
-            return (contact->primaryName + " " + contact->alternativeName);
-        return (contact->primaryName);
-    }
-    if (contact->alternativeName.length() > 0) {
-        return (contact->alternativeName);
-    }
-    return "";
-}
-
 static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRecord> contact)
 {
     if (contact.get() == nullptr) {
@@ -48,7 +33,7 @@ static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRec
     }
     utils::findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName);
     utils::findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
-    utils::findAndReplaceAll(data, "$CONTACT_NAME$", formatContactName(contact));
+    utils::findAndReplaceAll(data, "$CONTACT_NAME$", contact->getFormattedName());
     utils::findAndReplaceAll(
         data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberUser : "");
     utils::findAndReplaceAll(
