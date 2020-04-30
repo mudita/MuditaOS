@@ -39,7 +39,7 @@ bool ContactsNumberTable::RemoveByID(uint32_t id)
 bool ContactsNumberTable::Update(ContactsNumberTableRow entry)
 {
     return db->Execute(
-        "UPDATE contact_number SET contact_id = %lu, number_user = '%q' ,number_e164 = '%q', type = %lu WHERE _id=%lu;",
+        "UPDATE contact_number SET contact_id = %lu, number_user = '%q', number_e164 = '%q', type = %lu WHERE _id=%lu;",
         entry.contactID,
         entry.numberUser.c_str(),
         entry.numbere164.c_str(),
