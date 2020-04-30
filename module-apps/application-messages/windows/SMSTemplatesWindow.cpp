@@ -59,8 +59,6 @@ namespace gui
 
     void SMSTemplatesWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
         erase();
     }
 
