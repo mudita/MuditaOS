@@ -352,7 +352,7 @@ namespace gui
         if (contact == nullptr)
             return;
 
-        setTitle(formatContactName(contact));
+        setTitle(contact->getFormattedName());
 
         auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
             if (speedDialStr.length() == 0)

@@ -43,8 +43,15 @@ struct ContactRecord
         if (contactType == ContactType::TEMPORARY) {
             return numbers[0].numberUser;
         }
-
-        return primaryName + " " + alternativeName;
+        if (primaryName.length() > 0) {
+            if (alternativeName.length() > 0)
+                return (primaryName + " " + alternativeName);
+            return (primaryName);
+        }
+        if (alternativeName.length() > 0) {
+            return (alternativeName);
+        }
+        return "";
     }
 };
 
