@@ -88,6 +88,15 @@ namespace sevm
 
         bool retCode;
     };
+    class StateMessage : public Message
+    {
+      public:
+        StateMessage(MessageType messageType) : Message(messageType)
+        {
+            type = Type::Data;
+        }
+        bool state = false;
+    };
 } /* namespace sevm*/
 
 #endif /* MODULE_SERVICES_SERVICE_EVTMGR_MESSAGES_EVMESSAGES_HPP_ */

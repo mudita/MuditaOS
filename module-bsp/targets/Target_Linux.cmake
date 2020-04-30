@@ -21,6 +21,8 @@ set(BOARD_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/usb_cdc/usb_cdc.cpp"
 
         "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/vibrator/vibrator.cpp"
+        
+        "${CMAKE_CURRENT_SOURCE_DIR}/board/linux/magnetometer/magnetometer.cpp"
 
         CACHE INTERNAL "")
 
