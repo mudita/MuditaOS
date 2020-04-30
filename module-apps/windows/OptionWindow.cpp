@@ -60,11 +60,7 @@ namespace gui
 
     void OptionWindow::clearOptions()
     {
-
-        for (auto el : body->children) {
-            delete el;
-        }
-        body->children.clear();
+        body->erase();
     }
 
     void OptionWindow::buildInterface()
@@ -92,9 +88,7 @@ namespace gui
     }
     void OptionWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        this->focusItem = nullptr;
-        children.clear();
+        erase();
     }
 
     OptionWindow::~OptionWindow()
