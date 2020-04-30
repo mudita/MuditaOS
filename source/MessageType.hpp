@@ -48,6 +48,12 @@ enum class MessageType
     DBThreadGetLimitOffset, // Get Thread record by limit,offset
     DBThreadGetCount,       // get Thread count
 
+    DBSMSTemplateAdd,            // Add new sms template record
+    DBSMSTemplateRemove,         // Remove selected sms template record
+    DBSMSTemplateUpdate,         // Update selected sms template record
+    DBSMSTemplateGetLimitOffset, // Get sms templates records by limit,offset
+    DBSMSTemplateGetCount,       // Get sms templates reocrds count
+
     DBContactVerify, // checks database for a contact that has the same name (primary+" "+alternative) or phone number 1
                      // or phone number 2 or speed dial key
     DBContactGetByName, // used to ask for a contact with specified primary and alternative name.

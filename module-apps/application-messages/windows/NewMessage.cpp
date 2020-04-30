@@ -29,10 +29,15 @@ namespace gui
 
     void NewSMS_Window::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data)) {
+        if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
             LOG_INFO("received search results");
             recipient->setText(pdata->result->getFormattedName());
             contact = pdata->result;
+        }
+        if (auto pdata = dynamic_cast<SMSTemplateData *>(data); pdata != nullptr) {
+            auto templText = pdata->templ->text;
+            LOG_INFO("received sms templates data \"%s\"", templText.c_str());
+            message->setText(message->getText() + templText);
         }
     }
 
@@ -172,7 +177,7 @@ namespace gui
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                return app->newMessageOptions();
+                return app->newMessageOptions(getName());
             }
             return false;
         };

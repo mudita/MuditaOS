@@ -20,6 +20,7 @@
 #include "Interface/SMSRecord.hpp"
 #include "Interface/SettingsRecord.hpp"
 #include "Interface/ThreadRecord.hpp"
+#include "Interface/SMSTemplateRecord.hpp"
 #include "MessageType.hpp"
 #include "Service/Message.hpp"
 #include <memory>
@@ -142,6 +143,41 @@ class DBThreadResponseMessage : public DBResponseMessage
     virtual ~DBThreadResponseMessage(){};
 
     std::unique_ptr<std::vector<ThreadRecord>> records;
+    uint32_t limit  = 0;
+    uint32_t offset = 0;
+};
+
+class DBSMSTemplateMessage : public DBMessage
+{
+  public:
+    DBSMSTemplateMessage(MessageType messageType, const SMSTemplateRecord &rec = SMSTemplateRecord{})
+        : DBMessage(messageType), record(rec)
+    {}
+    virtual ~DBSMSTemplateMessage() = default;
+
+    SMSTemplateRecord record;
+};
+
+class DBSMSTemplateGetCount : public DBSMSTemplateMessage
+{
+  public:
+    DBSMSTemplateGetCount() : DBSMSTemplateMessage(MessageType::DBSMSTemplateGetCount)
+    {}
+};
+
+class DBSMSTemplateResponseMessage : public DBResponseMessage
+{
+  public:
+    DBSMSTemplateResponseMessage(std::unique_ptr<std::vector<SMSTemplateRecord>> rec,
+                                 uint32_t retCode,
+                                 uint32_t limit     = 0,
+                                 uint32_t offset    = 0,
+                                 uint32_t count     = 0,
+                                 MessageType respTo = MessageType::MessageTypeUninitialized)
+        : DBResponseMessage(retCode, count, respTo), records(std::move(rec)), limit(limit), offset(offset){};
+    virtual ~DBSMSTemplateResponseMessage() = default;
+
+    std::unique_ptr<std::vector<SMSTemplateRecord>> records;
     uint32_t limit  = 0;
     uint32_t offset = 0;
 };

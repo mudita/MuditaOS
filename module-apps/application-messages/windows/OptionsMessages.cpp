@@ -1,7 +1,9 @@
 #include "OptionsMessages.hpp"
-#include "Options.hpp"
-#include "i18/i18.hpp"
-#include "log/log.hpp"
+#include "application-messages/data/SMSdata.hpp"
+
+#include <Options.hpp>
+#include <i18/i18.hpp>
+#include <log/log.hpp>
 
 #include <BoxLayout.hpp>
 
@@ -91,11 +93,15 @@ std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMS
     };
 }
 
-std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app)
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app, const std::string &requestingWindow)
 {
     return {
-        gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_use_template")),
-                             [=](gui::Item &item) { return false; },
+        gui::newOptionLabel({UTF8(utils::localize.get("sms_use_template")),
+                             [=](gui::Item &item) {
+                                 std::unique_ptr<gui::SwitchData> data =
+                                     std::make_unique<SMSTemplateRequest>(requestingWindow);
+                                 return app->switchWindow(gui::name::window::sms_templates, std::move(data));
+                             },
                              gui::Arrow::Disabled}),
         gui::newOptionLabel({UTF8(" <STUB> ") + UTF8(utils::localize.get("sms_paste")),
                              [=](gui::Item &item) { return false; },

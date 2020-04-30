@@ -83,7 +83,7 @@ false
 #JoystickEnter = 12,
 12
 false
-0x0D
+''
 0
 #FnLeft = 21,//1,
 #FnRight = 23,//3,

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "ContactRecord.hpp"
-#include "SwitchData.hpp"
-#include "ThreadRecord.hpp"
+#include <SwitchData.hpp>
+#include <SMSTemplateRecord.hpp>
+#include <ContactRecord.hpp>
+#include <ThreadRecord.hpp>
 #include <Database/Database.hpp>
 #include <memory>
 #include <string>
@@ -23,4 +24,23 @@ class SMSSendRequest : public gui::SwitchData
     SMSSendRequest(std::shared_ptr<ContactRecord> contact) : contact(contact)
     {}
     virtual ~SMSSendRequest() = default;
+};
+
+class SMSTemplateData : public gui::SwitchData
+{
+  public:
+    SMSTemplateData(std::shared_ptr<SMSTemplateRecord> templ) : templ(templ)
+    {}
+    virtual ~SMSTemplateData()               = default;
+    std::shared_ptr<SMSTemplateRecord> templ = nullptr;
+};
+
+class SMSTemplateRequest : public gui::SwitchData
+{
+  public:
+    SMSTemplateRequest(const std::string &requestingWindow) : requestingWindow(requestingWindow)
+    {}
+    virtual ~SMSTemplateRequest() = default;
+
+    std::string requestingWindow;
 };

@@ -23,12 +23,7 @@ std::list<gui::Option> calllogWindowOptions(app::ApplicationCallLog *app, const 
     // add option delete call option
     options.push_back(gui::Option(
         utils::localize.get("app_calllog_options_delete_call"),
-        [=](gui::Item &item) {
-            auto application = dynamic_cast<app::ApplicationCallLog *>(app);
-            if (application != nullptr)
-                return application->removeCalllogEntry(record);
-            return false;
-        },
+        [=](gui::Item &item) { return app->removeCalllogEntry(record); },
         gui::Arrow::Disabled));
 
     return options;

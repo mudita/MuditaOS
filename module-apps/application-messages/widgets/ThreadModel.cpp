@@ -1,19 +1,11 @@
-/*
- * ThreadModel.cpp
- *
- *  Created on: 15 lis 2019
- *      Author: kuba
- */
-
 #include "ThreadModel.hpp"
 #include "OptionWindow.hpp"
 #include "ThreadItem.hpp"
 
-#include "Application.hpp"
+#include "application-messages/ApplicationMessages.hpp"
 
-#include "../MessagesStyle.hpp"
-#include "../data/SMSdata.hpp"
-#include "../windows/ThreadViewWindow.hpp" // for name of window
+#include "application-messages/MessagesStyle.hpp"
+#include "application-messages/data/SMSdata.hpp"
 
 #include "application-messages/ApplicationMessages.hpp"
 #include "application-messages/windows/OptionsWindow.hpp"

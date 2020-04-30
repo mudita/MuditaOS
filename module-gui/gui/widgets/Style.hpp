@@ -113,6 +113,7 @@ namespace style
             const inline std::string send        = "common_send";
             const inline std::string confirm     = "common_confirm";
             const inline std::string select      = "common_select";
+            const inline std::string use         = "common_use";
             const inline std::string ok          = "common_ok";
             const inline std::string back        = "common_back";
             const inline std::string set         = "common_set";

@@ -3,7 +3,7 @@
 #include "Database/Database.hpp"
 #include "Databases/SmsDB.hpp"
 
-#include "Tables/SMSTemplatesTable.hpp"
+#include "Tables/SMSTemplateTable.hpp"
 
 #include <vfs.hpp>
 #include <stdint.h>
@@ -22,7 +22,7 @@ TEST_CASE("SMS Templates Table tests")
 
     auto &templatesTbl = smsDb.templates;
 
-    SMSTemplatesTableRow testRow = {{.ID = 0}, .text = "Test text", .lastUsageTimestamp = 100};
+    SMSTemplateTableRow testRow = {{.ID = 0}, .text = "Test text", .lastUsageTimestamp = 100};
 
     // Add 4 elements into table
     REQUIRE(templatesTbl.Add(testRow));

@@ -512,6 +512,12 @@ namespace gui
             }
         }
 
+        if (inputEvent.state == InputEvent::State::keyReleasedShort && inputEvent.keyCode == KeyCode::KEY_ENTER) {
+            if (activatedCallback && activatedCallback(*this)) {
+                return true;
+            }
+        }
+
         // handle navigation
         if (inputEvent.state == InputEvent::State::keyReleasedShort &&
             ((inputEvent.keyCode == KeyCode::KEY_LEFT) || (inputEvent.keyCode == KeyCode::KEY_RIGHT) ||
