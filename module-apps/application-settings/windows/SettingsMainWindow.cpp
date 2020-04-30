@@ -3,6 +3,7 @@
 #include "Info.hpp"
 #include "i18/i18.hpp"
 #include "log/log.hpp"
+#include "FotaWindow.hpp"
 
 std::list<gui::Option> mainWindowOptions(app::Application *app)
 {
@@ -48,6 +49,13 @@ std::list<gui::Option> mainWindowOptions(app::Application *app)
          [=](gui::Item &) {
              LOG_INFO("switching to date and time page");
              app->switchWindow("DateTime");
+             return true;
+         },
+         gui::Arrow::Enabled},
+        {utils::localize.get("Fota update"),
+         [=](gui::Item &) {
+             LOG_INFO("switching to FOTA page");
+             app->switchWindow(gui::window::fota_window);
              return true;
          },
          gui::Arrow::Enabled},

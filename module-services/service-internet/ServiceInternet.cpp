@@ -11,7 +11,9 @@
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
 
-#include "Modem/MuxDaemon.hpp"
+//#include "Modem/MuxDaemon.hpp"
+#include <module-cellular/Modem/TS0710/TS0710.h>
+#include <module-cellular/at/Result.hpp>
 
 #include "MessageType.hpp"
 
@@ -20,14 +22,14 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "service-Internet/api/InternetServiceAPI.hpp"
+#include "api/InternetServiceAPI.hpp"
 
 const char *ServiceInternet::serviceName = "ServiceInternet";
 
 ServiceInternet::ServiceInternet() : sys::Service(serviceName)
 {
     LOG_INFO("[ServiceInternet] Initializing");
-    cmux = std::make_unique(PortSpeed_e::PS460800, this);
+    cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
 
     busChannels.push_back(sys::BusChannels::ServiceInternetNotifications);
 
@@ -72,16 +74,16 @@ void ServiceInternet::TickHandler(uint32_t id)
 sys::ReturnCodes ServiceInternet::InitHandler()
 {
 
-    //    muxdaemon = MuxDaemon::Create(notificationCallback);
-    //    if (muxdaemon) {
+//    muxdaemon = MuxDaemon::Create(notificationCallback);
+//    if (muxdaemon) {
 
-    //        state = State::Idle;
+//        state = State::Idle;
 
-    return sys::ReturnCodes::Success;
-    //    }
-    //    else {
-    //        return sys::ReturnCodes::Failure;
-    //    }
+        return sys::ReturnCodes::Success;
+//    }
+//    else {
+//        return sys::ReturnCodes::Failure;
+//    }
 }
 
 sys::ReturnCodes ServiceInternet::DeinitHandler()
@@ -97,20 +99,20 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
     LOG_DEBUG("ServiceInternet: DataRecieve.");
 
     auto channel = cmux->get(TS0710::Channel::Data);
-    bool retVal(false);
+    at::Result retVal;
 
     switch (static_cast<MessageType>(msgl->messageType)) {
     // Incoming notifications from Notification Virtual Channel
     case MessageType::InternetNotification: {
-        LOG_DEBUG("MessageType::InternetNotification")
-        InternetNotificationMessage *msg = reinterpret_cast<InternetNotificationMessage *>(msgl);
+        LOG_DEBUG("MessageType::InternetNotification");
+        //        InternetNotificationMessage *msg = reinterpret_cast<InternetNotificationMessage *>(msgl);
 
-        // if (msg->type == InternetNotificationMessage::Type::Disconnect) {
-        //     stopTimer(connectionTimer);
-        // } else if (msg->type == InternetNotificationMessage::Type::Connect) {
+        //         if (msg->type == InternetNotificationMessage::Type::Disconnect) {
+        //             stopTimer(connectionTimer);
+        //         } else if (msg->type == InternetNotificationMessage::Type::Connect) {
         //     // activate call state timer
-        //     ReloadTimer(connectionTimer);
-        // }
+        //             ReloadTimer(connectionTimer);
+        //         }
         // else {
 
         // }
@@ -119,21 +121,20 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
     case MessageType::InternetConfigure: {
         LOG_DEBUG("MessageType::InternetConfigure");
         InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
-        retVal                      = channel->cmd(("AT+QICSGP=1,1,"
-                               "\"" +
-                               msg->apn +
-                               "\","
-                               "\"" +
-                               msg->user +
-                               "\","
-                               "\"" +
-                               msg->password +
-                               "\","
-                               "1" +
-                               ";\r")
-                                  .c_str(),
-                              1);
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        retVal = channel->cmd( ("AT+QICSGP=1,1,"
+                                 "\"" +
+                                 msg->apn +
+                                 "\","
+                                 "\"" +
+                                 msg->user +
+                                 "\","
+                                 "\"" +
+                                 msg->password +
+                                 "\","
+                                 "1" +
+                                 ";\r").c_str(),
+                                 1);
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data connection configured" notification into system
@@ -152,9 +153,9 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     case MessageType::InternetConnect: {
         LOG_DEBUG("MessageType::InternetConnect.");
-        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
-        retVal                      = channel->cmd("AT+QIACT=1;\r", 1);
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        //        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
+        retVal = channel->cmd("AT+QIACT=1;\r", 1);
+        if (retVal) {
             // Propagate "Data Connecting" notification into system
             sys::Bus::SendMulticast(
                 std::make_shared<InternetNotificationMessage>(
@@ -172,8 +173,8 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
     case MessageType::InternetDisconnect: {
         LOG_DEBUG("MessageType::InternetDisconnect.");
         InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
-        retVal                      = channel->cmd(("AT+QIDEACT=1" + msg->data + ";\r").c_str(), 1);
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        retVal = channel->cmd(("AT+QIDEACT=1" + msg->data + ";\r").c_str(), 1);
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data Connecting" notification into system
@@ -192,9 +193,9 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
 
     case MessageType::InternetOpenHTTPConnection: {
         LOG_DEBUG("MessageType::InternetOpenHTTPConnection.");
-        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
-        auto retVal                 = channel->cmd("AT+QHTTPCFG=1;\r", 1);
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        //        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
+        retVal = channel->cmd("AT+QHTTPCFG=1;\r", 1);
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data Connecting" notification into system
@@ -212,7 +213,7 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
 
         retVal = channel->cmd("AT+QHTTPCFG=\"requestheader\",1;\r", 1);
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data Connecting" notification into system
@@ -236,11 +237,11 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
         tmp << "AT+QHTTPURL=" << msg->url.length() << ";\r";
 
         auto retVal = channel->cmd(tmp.str().c_str(), 10000);
-        if ((retVal.size() == 1) && (retVal[0] == "CONNECT")) { // wait for 'COMMAND' from gsm module & send url
+        if (retVal && (retVal.response[0] == "CONNECT")) { // wait for 'COMMAND' from gsm module & send url
             retVal = channel->cmd(msg->url.c_str(), 1);
             LOG_DEBUG("InternetHTTP Url-CONNECT OK");
         }
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data Connecting" notification into system
@@ -264,11 +265,11 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
         tmp << "AT+QHTTPGET=30," << msg->request.length() << ";\r";
 
         auto retVal = channel->cmd(tmp.str().c_str(), 10000);
-        if ((retVal.size() == 1) && (retVal[0] == "CONNECT")) { // wait for 'COMMAND' from gsm module & send request
+        if (retVal) { // wait for 'COMMAND' from gsm module & send request
             retVal = channel->cmd(msg->request.c_str(), 30000);
             LOG_DEBUG("InternetHTTP GET-CONNECT OK");
         }
-        if ((retVal.size() == 1) && (retVal[0] == "OK")) {
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data Connecting" notification into system
@@ -286,18 +287,18 @@ sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys:
     } break;
 
     case MessageType::InternetHTTPPOST: {
-        InternetNotificationMessage *msg = reinterpret_cast<InternetNotificationMessage *>(msgl);
+        //        InternetNotificationMessage *msg = reinterpret_cast<InternetNotificationMessage *>(msgl);
     } break;
 
     case MessageType::InternetHTTPReadData: {
         LOG_DEBUG("HTTP Read data.");
-        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
+        //        InternetRequestMessage *msg = reinterpret_cast<InternetRequestMessage *>(msgl);
 
         auto retVal = channel->cmd("AT+QHTTPREAD=30;\r", 10000);
-        if (retVal[0] == "CONNECT") { // wait for 'COMMAND' from gsm module
-            LOG_DEBUG("HTTP: %s", retVal[1].c_str());
+        if (retVal) { // wait for 'COMMAND' from gsm module
+            LOG_DEBUG("HTTP: %s", retVal.response[0].c_str());
         }
-        if (retVal.back() == "OK") {
+        if (retVal) {
             responseMsg = std::make_shared<InternetResponseMessage>(true);
 
             // Propagate "Data Connecting" notification into system

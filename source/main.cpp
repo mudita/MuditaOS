@@ -179,6 +179,7 @@ int main()
 #else
         LOG_INFO("ServiceCellular (GSM) - Enabling");
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceInternet>(), sysmgr.get());
 #endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());

@@ -12,10 +12,11 @@ message( "${PROJECT_NAME}  ${CMAKE_CURRENT_SOURCE_DIR}" )
 
 target_sources( ${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/g711.c
+        g711.c
+        ServiceInternet.cpp
     PUBLIC
-        ${CMAKE_CURRENT_LIST_DIR}/api/InternetServiceAPI.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/g711.h
-        ${CMAKE_CURRENT_LIST_DIR}/messages/InternetMessage.hpp
+        api/InternetServiceAPI.cpp
+        g711.h
+        messages/InternetMessage.hpp
 )
 

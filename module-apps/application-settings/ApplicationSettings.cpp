@@ -13,6 +13,7 @@
 #include "windows/LanguageWindow.hpp"
 #include "windows/BtWindow.hpp"
 #include "windows/DateTimeWindow.hpp"
+#include "windows/FotaWindow.hpp"
 #include "windows/Info.hpp"
 #include "windows/LanguageWindow.hpp"
 #include "windows/SettingsMainWindow.hpp"
@@ -100,6 +101,11 @@ namespace app
 
         window = new gui::DateTimeWindow(this);
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
+        window = new gui::FotaWindow(this);
+        LOG_INFO("fota name: %s", window->getName().c_str());
+        windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
+
         window = newOptionWindow(this, app::sim_select, simSelectWindow(this));
         windows.insert(std::pair<std::string, gui::AppWindow *>(window->getName(), window));
     }

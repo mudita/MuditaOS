@@ -1,10 +1,15 @@
 #pragma once
 
-#include "AppWindow.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/Text.hpp"
+#include "Fota.hpp"
 
+#include <Application.hpp>
+#include <AppWindow.hpp>
+#include <gui/widgets/BoxLayout.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/Text.hpp>
+#include <gui/widgets/BoxLayout.hpp>
+
+#include <memory>
 #include <string>
 
 namespace gui
@@ -27,14 +32,17 @@ namespace gui
         void buildInterface() override;
         void destroyInterface() override;
 
-        Text apnName;
-        Text apnUser;
-        Text apnPassword;
+        //        Text apnName;
+        //        Text apnUser;
+        //        Text apnPassword;
 
-        Label currentFirmware;
-        Label availablUpdate;
+      private:
+        void add_box_label(BoxLayout *layout, const std::string &text);
+        std::unique_ptr<Fota> fotaWorker;
+        Label *currentFirmwareLabel;
+        Label *availablUpdateLabel;
+        Label *statusLabel;
 
-
-
+        VBox *mainBox;
     };
 } //namespace gui

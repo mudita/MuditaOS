@@ -22,7 +22,9 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/UITestWindow.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/Info.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/windows/SimSelectWindow.cpp"
-"${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/windows/DateTimeWindow.cpp"
+        "windows/FotaWindow.cpp"
+        "windows/Fota.cpp"
 
 	PUBLIC
 		"${CMAKE_CURRENT_LIST_DIR}/ApplicationSettings.hpp"
