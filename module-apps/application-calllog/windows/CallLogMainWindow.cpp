@@ -63,15 +63,7 @@ namespace gui
     }
     void CallLogMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        if (list) {
-            removeWidget(list);
-            delete list;
-            list = nullptr;
-        };
-
-        children.clear();
+        erase();
         delete calllogModel;
     }
 

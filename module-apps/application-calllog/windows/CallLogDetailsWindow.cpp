@@ -187,53 +187,7 @@ namespace gui
 
     void CallLogDetailsWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        removeWidget(informationLabel);
-        delete informationLabel;
-        informationLabel = nullptr;
-        removeWidget(number);
-        delete number;
-        number = nullptr;
-        rects[FocusRects::Call]->removeWidget(callImg);
-        delete callImg;
-        callImg = nullptr;
-        rects[FocusRects::Sms]->removeWidget(smsImg);
-        delete smsImg;
-        smsImg = nullptr;
-        for (auto &rect : rects) {
-            removeWidget(rect);
-            delete rect;
-            rect = nullptr;
-        }
-        removeWidget(typeLabel);
-        delete typeLabel;
-        typeLabel = nullptr;
-        removeWidget(durationLabel);
-        delete durationLabel;
-        durationLabel = nullptr;
-        for (auto &img : callTypeImg) {
-            removeWidget(img);
-            delete img;
-            img = nullptr;
-        }
-        removeWidget(typeData);
-        delete typeData;
-        typeData = nullptr;
-        removeWidget(durationData);
-        delete durationData;
-        durationData = nullptr;
-        removeWidget(dateLabel);
-        delete dateLabel;
-        dateLabel = nullptr;
-        removeWidget(dateDay);
-        delete dateDay;
-        dateDay = nullptr;
-        removeWidget(dateDate);
-        delete dateDate;
-        dateDate = nullptr;
-
-        children.clear();
+        erase();
     }
 
     CallLogDetailsWindow::~CallLogDetailsWindow()
