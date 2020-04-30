@@ -1,13 +1,3 @@
-
-/*
- * @file ContactsTable.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ContactsTable.hpp"
 #include <log/log.hpp>
 
@@ -24,13 +14,13 @@ bool ContactsTable::Create()
 
 bool ContactsTable::Add(ContactsTableRow entry)
 {
-    return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_ids, type, whitelist, "
+    return db->Execute("insert or ignore into contacts (name_id, numbers_id, ring_id, address_id, type, whitelist, "
                        "blacklist, favourites, speeddial ) VALUES "
-                       "(%lu, '%q', %lu, '%q', %lu, %lu, %lu, %lu, '%q');",
+                       "(%lu, '%q', %lu, %lu, %lu, %lu, %lu, %lu, '%q');",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
-                       entry.addressIDs.c_str(),
+                       entry.addressID,
                        entry.type,
                        entry.isOnWhitelist,
                        entry.isOnBlacklist,
@@ -50,13 +40,13 @@ bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
 
 bool ContactsTable::Update(ContactsTableRow entry)
 {
-    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q' ,ring_id = %lu, address_ids = '%q', type "
+    return db->Execute("UPDATE contacts SET name_id = %lu, numbers_id = '%q', ring_id = %lu, address_id = %lu, type "
                        "= %lu, whitelist = %lu, blacklist = %lu, "
                        "favourites = %lu, speeddial = '%q' WHERE _id=%lu;",
                        entry.nameID,
                        entry.numbersID.c_str(),
                        entry.ringID,
-                       entry.addressIDs.c_str(),
+                       entry.addressID,
                        entry.type,
                        entry.isOnWhitelist,
                        entry.isOnBlacklist,
@@ -78,7 +68,7 @@ ContactsTableRow ContactsTable::GetByID(uint32_t id)
         (*retQuery)[1].GetUInt32(),                           // nameID
         (*retQuery)[2].GetString(),                           // numbersID
         (*retQuery)[3].GetUInt32(),                           // ringID
-        (*retQuery)[4].GetString(),                           // addressID
+        (*retQuery)[4].GetUInt32(),                           // addressID
         static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
         (*retQuery)[6].GetBool(),                             // is on whitelist
         (*retQuery)[7].GetBool(),                             // is on blacklist
@@ -129,7 +119,7 @@ std::vector<ContactsTableRow> ContactsTable::Search(const std::string primaryNam
             (*retQuery)[1].GetUInt32(),                           // nameID
             (*retQuery)[2].GetString(),                           // numbersID
             (*retQuery)[3].GetUInt32(),                           // ringID
-            (*retQuery)[4].GetString(),                           // addressID
+            (*retQuery)[4].GetUInt32(),                           // addressID
             static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
             (*retQuery)[6].GetBool(),                             // is on whitelist
             (*retQuery)[7].GetBool(),                             // is on blacklist
@@ -159,7 +149,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffset(uint32_t offset, uin
             (*retQuery)[1].GetUInt32(),                           // nameID
             (*retQuery)[2].GetString(),                           // numbersID
             (*retQuery)[3].GetUInt32(),                           // ringID
-            (*retQuery)[4].GetString(),                           // addressID
+            (*retQuery)[4].GetUInt32(),                           // addressID
             static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
             (*retQuery)[6].GetBool(),                             // is on whitelist
             (*retQuery)[7].GetBool(),                             // is on blacklist
@@ -207,7 +197,7 @@ std::vector<ContactsTableRow> ContactsTable::GetLimitOffsetByField(uint32_t offs
             (*retQuery)[1].GetUInt32(),                           // nameID
             (*retQuery)[2].GetString(),                           // numbersID
             (*retQuery)[3].GetUInt32(),                           // ringID
-            (*retQuery)[4].GetString(),                           // addressID
+            (*retQuery)[4].GetUInt32(),                           // addressID
             static_cast<ContactType>((*retQuery)[5].GetUInt32()), // type
             (*retQuery)[6].GetBool(),                             // is on whitelist
             (*retQuery)[7].GetBool(),                             // is on blacklist

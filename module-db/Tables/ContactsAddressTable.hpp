@@ -10,7 +10,7 @@
 struct ContactsAddressTableRow
 {
     uint32_t ID        = DB_ID_NONE;
-    uint32_t contactID = 0;
+    uint32_t contactID = DB_ID_NONE;
     UTF8 addressLine1  = "";
     UTF8 addressLine2  = "";
     UTF8 note          = "";
