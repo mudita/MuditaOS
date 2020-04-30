@@ -173,14 +173,11 @@ TS0710::ConfState TS0710::BaudDetectProcedure()
 }
 TS0710::ConfState TS0710::PowerUpProcedure()
 {
-    // disable urc
-    pv_cellular->InformModemHostAsleep();
+
     auto ret = BaudDetectProcedure();
-    // enable urc
-    pv_cellular->InformModemHostWakeup();
 
     if (ret != ConfState::Success) {
-        LOG_INFO("6. Starting power up procedure...");
+        LOG_INFO("Starting power up procedure...");
         pv_cellular->PowerUp();
         return ConfState::PowerUp;
     }
@@ -192,6 +189,15 @@ TS0710::ConfState TS0710::ConfProcedure()
 {
     pv_cellular->InformModemHostAsleep();
     LOG_DEBUG("Configuring modem...");
+    uint32_t tries = 0;
+
+    while (tries < 20) {
+        if (parser->cmd(at::AT::FACTORY_RESET)) {
+
+            break;
+        }
+        tries++;
+    }
     if (!parser->cmd(at::AT::FACTORY_RESET)) {
         return ConfState::Failure;
     }
@@ -228,7 +234,7 @@ TS0710::ConfState TS0710::ConfProcedure()
     }
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
-    auto tries          = 0;
+    tries               = 0;
     auto const maxTries = 40;
     while (!parser->cmd(at::AT::QSCLK_ON)) {
         auto const sec = 1000;

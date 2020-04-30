@@ -159,11 +159,17 @@ sys::Message_t EventManager::DataReceivedHandler(sys::DataMessage *msgl, sys::Re
         sys::Bus::SendUnicast(std::make_shared<sevm::SIMMessage>(), targetApplication, this);
     }
     else if (msgl->messageType == MessageType::EVMGetHw) {
-        auto ret = std::make_shared<sevm::EVMResponseMessage>(bsp::magnetometer::isPresent());
-
-        return ret;
+        return std::make_shared<sevm::EVMResponseMessage>(bsp::magnetometer::isPresent());
     }
-
+    else if (msgl->messageType == MessageType::EVMModemStatus) {
+        sevm::StateMessage *msg = dynamic_cast<sevm::StateMessage *>(msgl);
+        if (msg != nullptr) {
+            auto message   = std::make_shared<sevm::StateMessage>(MessageType::EVMModemStatus);
+            message->state = msg->state;
+            sys::Bus::SendUnicast(message, "ServiceCellular", this);
+        }
+        handled = true;
+    }
     if (handled)
         return std::make_shared<sys::ResponseMessage>();
     else
