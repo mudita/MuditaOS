@@ -57,15 +57,7 @@ namespace gui
     }
     void NotesMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        if (list) {
-            removeWidget(list);
-            delete list;
-            list = nullptr;
-        };
-
-        children.clear();
+        erase();
         delete notesModel;
     }
 
