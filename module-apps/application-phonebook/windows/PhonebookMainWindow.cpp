@@ -75,29 +75,7 @@ namespace gui
 
     void PhonebookMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        removeWidget(contactsList);
-        delete contactsList;
-        contactsList = nullptr;
-
-        removeWidget(leftArrowImage);
-        delete leftArrowImage;
-        leftArrowImage = nullptr;
-
-        removeWidget(rightArrowImage);
-        delete rightArrowImage;
-        rightArrowImage = nullptr;
-
-        removeWidget(newContactImage);
-        delete newContactImage;
-        newContactImage = nullptr;
-
-        removeWidget(searchImage);
-        delete searchImage;
-        searchImage = nullptr;
-
-        children.clear();
+        erase();
         delete phonebookModel;
     }
 

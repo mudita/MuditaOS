@@ -330,8 +330,7 @@ namespace gui
 
     void PhonebookContact::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        children.clear();
+        erase();
     }
 
     PhonebookContact::~PhonebookContact()

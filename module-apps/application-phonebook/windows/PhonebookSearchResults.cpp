@@ -49,19 +49,7 @@ namespace gui
 
     void PhonebookSearchResults::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        if (searchResultList) {
-            removeWidget(searchResultList);
-            delete searchResultList;
-            searchResultList = nullptr;
-        }
-        if (newContactImage) {
-            removeWidget(newContactImage);
-            delete newContactImage;
-            newContactImage = nullptr;
-        }
-
-        children.clear();
+        erase();
         delete searchResultsModel;
     }
 
