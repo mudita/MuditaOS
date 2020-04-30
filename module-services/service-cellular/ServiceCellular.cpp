@@ -145,9 +145,9 @@ ServiceCellular::~ServiceCellular()
 {
 
     LOG_INFO("[ServiceCellular] Cleaning resources");
-    if (cmux != nullptr) {
-        delete cmux;
-    }
+    //    if (cmux != nullptr) {
+    //        delete cmux;
+    //    }
 }
 
 void ServiceCellular::CallStateTimerHandler()
@@ -174,15 +174,27 @@ void ServiceCellular::TickHandler(uint32_t id)
 
 sys::ReturnCodes ServiceCellular::InitHandler()
 {
+#if defined(TARGET_Linux)
+    board = cellular::Board::Linux;
+#else
     bool dev = EventServiceAPI::GetHwPlatform(this);
 
     LOG_INFO("Hardware platform: %s", dev ? "T4" : "T3");
-    if (dev) {
-
+    board = dev ? cellular::Board::T4 : cellular::Board::T3;
+#endif
+    switch (board) {
+    case cellular::Board::T4:
         state.set(this, State::ST::StatusCheck);
-    }
-    else {
+        break;
+    case cellular::Board::T3:
         state.set(this, State::ST::PowerUpProcedure);
+        break;
+    case cellular::Board::Linux:
+        state.set(this, State::ST::PowerUpProcedure);
+        break;
+    default:
+        return sys::ReturnCodes::Failure;
+        break;
     }
     return sys::ReturnCodes::Success;
 }
@@ -376,7 +388,9 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
                 break;
             }
             case CellularNotificationMessage::Type::PowerUpProcedureComplete: {
-                state.set(this, State::ST::CellularConfProcedure);
+                if (board == Board::T3 || board == Board::Linux) {
+                    state.set(this, State::ST::CellularConfProcedure);
+                }
                 break;
             }
             case CellularNotificationMessage::Type::NewIncomingSMS: {
@@ -623,18 +637,22 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         }
         break;
     }
+    case MessageType::EVMModemStatus: {
+        if (state.get() == State::ST::PowerUpInProgress && board == Board::T4) {
+            state.set(this, State::ST::CellularConfProcedure);
+        }
+        break;
     default:
         break;
     }
 
-    if (responseMsg == nullptr) {
-        LOG_DEBUG("message not handled: %d, %d", static_cast<int>(msgl->type), static_cast<int>(msgl->messageType));
-        responseMsg = std::make_shared<CellularResponseMessage>(false);
+        if (responseMsg == nullptr) {
+            LOG_DEBUG("message not handled: %d, %d", static_cast<int>(msgl->type), static_cast<int>(msgl->messageType));
+            responseMsg = std::make_shared<CellularResponseMessage>(false);
+        }
     }
-
     return responseMsg;
 }
-
 namespace
 {
     bool isAbortCallNotification(const std::string &str)
@@ -1232,6 +1250,7 @@ bool ServiceCellular::handle_fatal_failure()
     while (true) {
         vTaskDelay(500);
     }
+    return true;
 }
 
 bool ServiceCellular::SetScanMode(std::string mode)
