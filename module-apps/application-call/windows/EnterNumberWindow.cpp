@@ -86,23 +86,11 @@ namespace gui
 
     void EnterNumberWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        if (numberLabel) {
-            removeWidget(numberLabel);
-            delete numberLabel;
-            numberLabel = nullptr;
-        }
-        if (newContactIcon) {
-            removeWidget(newContactIcon);
-            delete newContactIcon;
-            newContactIcon = nullptr;
-        }
-        children.clear();
+        erase();
     }
 
     EnterNumberWindow::~EnterNumberWindow()
     {
-        destroyInterface();
     }
 
     bool EnterNumberWindow::onInput(const InputEvent &inputEvent)
