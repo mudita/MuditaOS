@@ -12,7 +12,7 @@ SMSTemplateModel::SMSTemplateModel(app::Application *app) : DatabaseModel(app)
 void SMSTemplateModel::requestRecordsCount()
 {
     recordsCount = DBServiceAPI::SMSTemplateGetCount(application);
-    LOG_DEBUG("SMSTemplateGetCount %d", recordsCount);
+    LOG_DEBUG("SMSTemplateGetCount %" PRIu32, recordsCount);
     // request first
     if (recordsCount > 0) {
         LOG_DEBUG("SMSTemplateGetLimitOffset");
