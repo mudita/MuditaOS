@@ -40,9 +40,6 @@ struct ContactRecord
 
     inline UTF8 getFormattedName() const
     {
-        if (contactType == ContactType::TEMPORARY) {
-            return numbers[0].numberUser;
-        }
         if (primaryName.length() > 0) {
             if (alternativeName.length() > 0)
                 return (primaryName + " " + alternativeName);
@@ -51,7 +48,10 @@ struct ContactRecord
         if (alternativeName.length() > 0) {
             return (alternativeName);
         }
-        return "";
+        if (numbers.size() > 0) {
+            return numbers[0].numberUser;
+        }
+        return "no name";
     }
 };
 
