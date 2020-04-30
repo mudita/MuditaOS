@@ -141,37 +141,7 @@ namespace gui
 
     void CallWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        removeWidget(numberLabel);
-        delete numberLabel;
-        numberLabel = nullptr;
-
-        removeWidget(durationLabel);
-        delete durationLabel;
-        durationLabel = nullptr;
-
-        removeWidget(microphoneIcon);
-        delete microphoneIcon;
-        microphoneIcon = nullptr;
-
-        removeWidget(speakerIcon);
-        delete speakerIcon;
-        speakerIcon = nullptr;
-
-        removeWidget(sendSmsIcon);
-        delete sendSmsIcon;
-        sendSmsIcon = nullptr;
-
-        removeWidget(imageCircleTop);
-        delete imageCircleTop;
-        imageCircleTop = nullptr;
-
-        removeWidget(imageCircleBottom);
-        delete imageCircleBottom;
-        imageCircleBottom = nullptr;
-
-        children.clear();
+        erase();
     }
 
     CallWindow::~CallWindow()
