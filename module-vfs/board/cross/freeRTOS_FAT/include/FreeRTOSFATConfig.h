@@ -258,7 +258,7 @@ Set to 0 to calculate these values as a 32-bit number. */
 
 /* Defines the maximum number of partitions (and also logical partitions)
 that can be recognised. */
-#define	ffconfigMAX_PARTITIONS 1
+#define	ffconfigMAX_PARTITIONS 2
 
 /* Defines how many drives can be combined in total.  Should be set to at
 least 2. */
