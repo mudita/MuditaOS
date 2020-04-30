@@ -77,15 +77,7 @@ namespace gui
 
     void NotesEditWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        if (text) {
-            removeWidget(text);
-            delete text;
-            text = nullptr;
-        }
-
-        children.clear();
+        erase();
     }
 
     NotesEditWindow::~NotesEditWindow()
