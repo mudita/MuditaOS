@@ -96,38 +96,13 @@ namespace gui
     }
     void MessagesMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        removeWidget(list);
-        delete list;
-        list = nullptr;
-
-        removeWidget(leftArrowImage);
-        delete leftArrowImage;
-        leftArrowImage = nullptr;
-
-        removeWidget(rightArrowImage);
-        delete rightArrowImage;
-        rightArrowImage = nullptr;
-
-        removeWidget(newMessageImage);
-        delete newMessageImage;
-        newMessageImage = nullptr;
-
-        removeWidget(searchImage);
-        delete searchImage;
-        searchImage = nullptr;
-
-        removeWidget(emptyListIcon);
-        delete emptyListIcon;
-        emptyListIcon = nullptr;
-
-        children.clear();
+        erase();
         delete threadModel;
     }
 
     MessagesMainWindow::~MessagesMainWindow()
     {
-        destroyInterface();
+        delete threadModel;
     }
 
     void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
