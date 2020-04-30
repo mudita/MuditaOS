@@ -27,7 +27,6 @@ namespace gui
 
       public:
         Info(app::Application *app);
-        virtual ~Info();
 
         // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
