@@ -2,6 +2,9 @@
 
 void vfs::computeCRC32(vfs::FILE *file, unsigned long *outCrc32)
 {
+    if (outCrc32 == nullptr)
+        return;
+
     std::unique_ptr<unsigned char[]> buf(new unsigned char[purefs::buffer::crc_buf]);
     size_t bufLen;
 

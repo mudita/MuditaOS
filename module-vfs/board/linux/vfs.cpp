@@ -20,7 +20,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-#include "../module-utils/log/log.hpp"
+#include <log/log.hpp>
 
 namespace fs = std::filesystem;
 
