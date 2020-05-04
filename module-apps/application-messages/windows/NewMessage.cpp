@@ -43,6 +43,7 @@ namespace gui
 
     bool NewSMS_Window::selectContact()
     {
+        // select contact only if there is no entered number
         if (recipient->getText().length() == 0) {
             std::unique_ptr<PhonebookSearchReuqest> data = std::make_unique<PhonebookSearchReuqest>();
             data->disableAppClose                        = true;
@@ -50,17 +51,6 @@ namespace gui
                 application, app::name_phonebook, name::window::main_window, std::move(data));
         }
 
-        std::shared_ptr<std::vector<ContactRecord>> searchResults =
-            DBServiceAPI::ContactSearch(application, {}, {}, recipient->getText());
-        LOG_INFO("Get contact from another app, contacts matching num: %d",
-                 static_cast<int>(searchResults.get()->size()));
-        if (searchResults.get()->size() > 0) {
-            std::unique_ptr<PhonebookSearchReuqest> data =
-                std::make_unique<PhonebookSearchReuqest>(recipient->getText(), searchResults);
-            data->disableAppClose = true;
-            return sapm::ApplicationManager::messageSwitchApplication(
-                application, app::name_phonebook, name::window::search_results, std::move(data));
-        }
         return true;
     }
 
@@ -139,12 +129,13 @@ namespace gui
         recipient = new gui::Text(
             reciepientHbox, 0, 0, body->getWidth() - recipientImg::w, text::h, "", gui::Text::ExpandMode::EXPAND_NONE);
         recipient->setEdges(gui::RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES);
-        recipient->setInputMode(new InputMode({InputMode::digit})); // TODO: possibly it should be changed to phone;
-        recipient->setFont(style::window::font::medium);
+        recipient->setInputMode(new InputMode({InputMode::phone}));
+        recipient->setFont(style::window::font::mediumbold);
         recipient->setAlignment(Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM));
         recipient->activatedCallback    = [=](Item &) -> bool { return selectContact(); };
         recipient->focusChangedCallback = [=](Item &) -> bool {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::select));
+            bottomBar->setActive(BottomBar::Side::LEFT, false);
             return true;
         };
 
@@ -171,6 +162,7 @@ namespace gui
         message->activatedCallback    = [=](Item &) -> bool { return sendSms(); };
         message->focusChangedCallback = [=](Item &) -> bool {
             bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get(style::strings::common::send));
+            bottomBar->setActive(BottomBar::Side::LEFT, true);
             return true;
         };
         message->inputCallback = [=](Item &, const InputEvent &event) {
