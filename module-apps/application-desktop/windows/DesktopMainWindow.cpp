@@ -318,10 +318,7 @@ namespace gui
 
     auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
     {
-        if (notifications) {
-            this->removeWidget(notifications);
-            delete notifications;
-        }
+        erase(notifications);
         // 1. create notifications box
         notifications = new gui::VBox(nullptr,
                                       style::window::default_left_margin,
