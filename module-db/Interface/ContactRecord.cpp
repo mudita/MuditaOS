@@ -1,6 +1,5 @@
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
-#include <log/log.hpp>
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
 {}
