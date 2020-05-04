@@ -16,6 +16,7 @@
 #include <utf8/UTF8.hpp>
 #include <memory>
 #include "../State.hpp"
+#include <Modem/TS0710/TS0710.h>
 
 #include <PhoneNumber.hpp>
 
@@ -98,6 +99,30 @@ class CellularCallRequestMessage : public CellularMessage
         : CellularMessage(MessageType::CellularCallRequest), number(number)
     {}
     utils::PhoneNumber::View number;
+};
+class CellularGetChannelMessage : public sys::DataMessage
+{
+  public:
+    CellularGetChannelMessage(TS0710::Channel channel = TS0710::Channel::None)
+        : sys::DataMessage(MessageType::CellularGetChannel), channel(channel)
+    {}
+    TS0710::Channel channel;
+};
+class CellularGetChannelResponseMessage : public sys::DataMessage
+{
+  public:
+    CellularGetChannelResponseMessage(DLC_channel *channelPtr = nullptr)
+        : sys::DataMessage(MessageType::CellularGetChannelResponse), channelPtr(channelPtr)
+    {}
+    DLC_channel *channelPtr;
+};
+class CellularGetChannelResponseMessage : public sys::DataMessage
+{
+  public:
+    CellularGetChannelResponseMessage(DLC_channel *channelPtr = nullptr)
+        : sys::DataMessage(MessageType::CellularGetChannelResponse), channelPtr(channelPtr)
+    {}
+    DLC_channel *channelPtr;
 };
 
 class CellularResponseMessage : public sys::ResponseMessage

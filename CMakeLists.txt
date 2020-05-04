@@ -14,6 +14,7 @@ include(Version)
 include(ModuleConfig)
 include(module-lwip/lwip-includes.cmake)
 include(SerialPort)
+include(CopyGdbInit)
 
 message("PROJECT_TARGET: ${PROJECT_TARGET}")
 message("TARGET_SOURCES: ${TARGET_SOURCES}")

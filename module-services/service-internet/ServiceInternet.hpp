@@ -51,14 +51,17 @@ class ServiceInternet : public sys::Service
         return sys::ReturnCodes::Success;
     }
 
+    void registerMessageHandlers();
+
     static const char *serviceName;
 
   private:
+    void handle_CellularGetChannelResponseMessage();
     uint32_t connectionTimer = 0;
     //    NotificationMuxChannel::NotificationCallback_t notificationCallback = nullptr;
 
     State state = State ::Idle;
-    std::unique_ptr<TS0710> cmux;
+    DLC_channel *channel = nullptr;
 };
 
 #endif // PUREPHONE_SERVICEINTERNET_HPP

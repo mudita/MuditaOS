@@ -1,17 +1,7 @@
-/*
- *  @file CellularServiceAPI.hpp
- *  @author Mateusz Piesta (mateusz.piesta@mudita.com)
- *  @date 09.07.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
-
-#ifndef PUREPHONE_CELLULARSERVICEAPI_HPP
-#define PUREPHONE_CELLULARSERVICEAPI_HPP
-
+#pragma once
 #include "../messages/CellularMessage.hpp"
 #include "utf8/UTF8.hpp"
+#include <Modem/TS0710/TS0710.h>
 
 #include <PhoneNumber.hpp>
 
@@ -56,6 +46,8 @@ namespace CellularServiceAPI
     bool SetScanMode(sys::Service *serv, std::string mode);
     bool GetScanMode(sys::Service *serv);
     bool GetFirmwareVersion(sys::Service *serv, std::string &response);
-}; // namespace CellularServiceAPI
+    bool GetChannel(sys::Service *serv,
+                    TS0710::Channel channel); /// asychronius, returns message CellureMessageChannelReady;
+    bool GetDataChannel(sys::Service *serv);
 
-#endif // PUREPHONE_CELLULARSERVICEAPI_HPP
+}; // namespace CellularServiceAPI

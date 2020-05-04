@@ -1,10 +1,13 @@
 #include "Fota.hpp"
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <service-internet/api/InternetServiceAPI.hpp>
+#include <service-internet/messages/InternetMessage.hpp>
 
 Fota::Fota(app::Application *app) : app_m(app), currentState_m(Disconnected)
 {
     getCurrentVersion();
+
+    //    app->connect(InternetRequestMessag(),[]{});
 }
 
 void Fota::next()

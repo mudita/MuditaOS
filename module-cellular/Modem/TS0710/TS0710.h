@@ -203,6 +203,7 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include "Modem/ATParser.hpp"
 #include "Service/Service.hpp"
 #include <queue>
+#include <string>
 
 #if defined(__cplusplus)
 extern "C"
@@ -224,15 +225,18 @@ void workerTaskFunction(void *ptr);
 class TS0710
 {
   public:
-    enum class Channel
+    enum class Channel : unsigned char
     {
+        None          = 0,
         Commands      = 1,
         Notifications = 2,
         Data          = 3,
     };
-    std::string name(enum Channel name)
+    static std::string name(enum Channel name)
     {
         switch (name) {
+        case Channel::None:
+            return "";
         case Channel::Commands:
             return "Commands";
         case Channel::Notifications:
@@ -303,6 +307,7 @@ class TS0710
 
     DLC_channel *OpenChannel(Channel chanel_val)
     {
+        /// TODO Convert ot unique_ptr, or shared_ptr and pass  back as weak_ptr
         DLC_channel *channel = new DLC_channel(static_cast<DLCI_t>(chanel_val), name(chanel_val), pv_cellular.get());
         channels.push_back(channel);
         return channels.back();

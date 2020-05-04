@@ -45,7 +45,7 @@ namespace sys
         Bus::Add(shared_from_this());
         enableRunLoop = true;
         if (!Start()) {
-            LOG_FATAL("FATAL ERROR: Start service failed!");
+            LOG_FATAL("[%s]: FATAL ERROR: Start service failed!", GetName().c_str());
             configASSERT(0);
         }
     }

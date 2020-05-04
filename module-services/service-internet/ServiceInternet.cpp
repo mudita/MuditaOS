@@ -7,6 +7,8 @@
  *  @details
  */
 
+#include "api/InternetServiceAPI.hpp"
+
 #include "ServiceInternet.hpp"
 #include "Service/Service.hpp"
 #include "Service/Message.hpp"
@@ -14,6 +16,7 @@
 //#include "Modem/MuxDaemon.hpp"
 #include <module-cellular/Modem/TS0710/TS0710.h>
 #include <module-cellular/at/Result.hpp>
+#include <service-cellular/api/CellularServiceAPI.hpp>
 
 #include "MessageType.hpp"
 
@@ -22,18 +25,22 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "api/InternetServiceAPI.hpp"
 
 const char *ServiceInternet::serviceName = "ServiceInternet";
 
 ServiceInternet::ServiceInternet() : sys::Service(serviceName)
 {
     LOG_INFO("[ServiceInternet] Initializing");
-    cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    //    cmux = std::make_unique<TS0710>(PortSpeed_e::PS460800, this);
+    //    popbrać kanał service-celular
 
     busChannels.push_back(sys::BusChannels::ServiceInternetNotifications);
 
     connectionTimer = CreateTimer(1000, true);
+    registerMessageHandlers();
+
+    CellularServiceAPI::GetDataChannel(this);
+
     /*
         notificationCallback = [this](NotificationType type, std::string resp) {
 
@@ -92,7 +99,25 @@ sys::ReturnCodes ServiceInternet::DeinitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+void ServiceInternet::registerMessageHandlers()
+{
+    LOG_DEBUG("Registring Handlers for ServiceInternet:");
+    handle_CellularGetChannelResponseMessage();
+}
+
+void ServiceInternet::handle_CellularGetChannelResponseMessage()
+{
+    LOG_DEBUG("  -CellularGetChannelResponseMessage");
+    connect(CellularGetChannelResponseMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+        LOG_DEBUG("Handling channel");
+        auto responseMessage = static_cast<CellularGetChannelResponseMessage *>(req);
+        LOG_DEBUG("chanel ptr: %p", responseMessage->channelPtr);
+        channel = responseMessage->channelPtr;
+        return sys::Message_t();
+    });
+}
+
+sys::Message_t ServiceInternet::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage * /*resp*/)
 {
     std::shared_ptr<sys::ResponseMessage> responseMsg;
 
