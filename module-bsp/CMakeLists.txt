@@ -8,8 +8,6 @@ set(SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/harness/bsp_harness.cpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/bsp/audio/bsp_audio.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/bsp/lpm/bsp_lpm.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/bsp/watchdog/watchdog_weak.cpp"
-
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/pll/DriverPLL.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dmamux/DriverDMAMux.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/drivers/dma/DriverDMA.cpp"
