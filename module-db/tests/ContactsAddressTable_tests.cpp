@@ -1,26 +1,7 @@
-
-/*
- * @file ContactsAddressTable_tests.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
+#include "../Databases/ContactsDB.hpp"
 #include "vfs.hpp"
 
 #include "catch.hpp"
-
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <algorithm>
-
-#include <iostream>
-
-#include "../Database/Database.hpp"
-#include "../Databases/ContactsDB.hpp"
 
 TEST_CASE("Contacts Address Table tests")
 {
@@ -31,15 +12,12 @@ TEST_CASE("Contacts Address Table tests")
     ContactsDB contactsdb;
     REQUIRE(contactsdb.IsInitialized());
 
-    ContactsAddressTableRow testRow1 = {.ID        = 0,
-                                        .contactID = 0,
-                                        .country   = "Poland",
-                                        .city      = "Warsaw",
-                                        .street    = "Czeczota",
-                                        .number    = "9",
-                                        .type      = ContactAddressType ::WORK,
-                                        .note      = "Test note",
-                                        .mail      = "test@mudita.com"};
+    ContactsAddressTableRow testRow1 = {.ID           = 0,
+                                        .contactID    = 0,
+                                        .addressLine1 = "6 Czeczota St.",
+                                        .addressLine2 = "02600 Warsaw",
+                                        .note         = "Test note",
+                                        .mail         = "test@mudita.com"};
 
     // Add 4 elements into table
     REQUIRE(contactsdb.address.Add(testRow1));
@@ -68,7 +46,8 @@ TEST_CASE("Contacts Address Table tests")
     REQUIRE(retOffsetLimit.size() == 4);
 
     // Get table rows using valid offset/limit parameters and specific field's ID
-    REQUIRE(contactsdb.address.GetLimitOffsetByField(0, 4, ContactAddressTableFields::Number, "9").size() == 4);
+    REQUIRE(contactsdb.address.GetLimitOffsetByField(0, 4, ContactAddressTableFields::Mail, "test@mudita.com").size() ==
+            4);
 
     // Get table rows using invalid limit parameters(should return 4 elements instead of 100)
     auto retOffsetLimitBigger = contactsdb.address.GetLimitOffset(0, 100);
@@ -84,6 +63,7 @@ TEST_CASE("Contacts Address Table tests")
     // Get count of elements by invalid field's ID
     REQUIRE(contactsdb.address.GetCountByFieldID("invalid_field", 0) == 0);
 
+    // Remove existing element
     REQUIRE(contactsdb.address.RemoveByID(2));
 
     // Table should have now 3 elements

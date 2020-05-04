@@ -1,28 +1,8 @@
-
-/*
- * @file ContactsTable_tests.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
+#include "../Databases/ContactsDB.hpp"
+#include "Tables/ContactsTable.hpp"
 #include "vfs.hpp"
 
 #include "catch.hpp"
-
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <algorithm>
-
-#include <iostream>
-
-#include "../Database/Database.hpp"
-#include "../Databases/ContactsDB.hpp"
-
-#include "Tables/ContactsTable.hpp"
 
 TEST_CASE("Contacts Table tests")
 {
@@ -37,7 +17,7 @@ TEST_CASE("Contacts Table tests")
                                  .nameID         = 0,
                                  .numbersID      = "0 1 2 3 4",
                                  .ringID         = 0,
-                                 .addressIDs     = "5 6 7 8",
+                                 .addressID      = 0,
                                  .isOnWhitelist  = true,
                                  .isOnBlacklist  = true,
                                  .isOnFavourites = false,

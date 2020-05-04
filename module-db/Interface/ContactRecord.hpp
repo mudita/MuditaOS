@@ -1,11 +1,8 @@
 #pragma once
 
-#include "../Common/Common.hpp"
 #include "../Databases/ContactsDB.hpp"
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
-
-#include <vector>
 
 struct ContactRecord
 {
