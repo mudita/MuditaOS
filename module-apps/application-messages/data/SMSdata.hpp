@@ -19,11 +19,19 @@ class SMSThreadData : public gui::SwitchData
 
 class SMSSendRequest : public gui::SwitchData
 {
+  protected:
+    std::string
+        phoneNumber; // once there is support for it in phonebook, it should be switched to utils::PhoneNumber::View
+
   public:
-    std::shared_ptr<ContactRecord> contact = nullptr;
-    SMSSendRequest(std::shared_ptr<ContactRecord> contact) : contact(contact)
+    SMSSendRequest(const UTF8 &phoneNumber) : phoneNumber(phoneNumber)
     {}
     virtual ~SMSSendRequest() = default;
+
+    const std::string &getPhoneNumber() const
+    {
+        return phoneNumber;
+    };
 };
 
 class SMSTemplateData : public gui::SwitchData

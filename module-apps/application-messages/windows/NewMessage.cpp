@@ -39,6 +39,18 @@ namespace gui
             LOG_INFO("received sms templates data \"%s\"", templText.c_str());
             message->setText(message->getText() + templText);
         }
+        if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
+            LOG_INFO("recieved sms send request");
+            auto number  = pdata->getPhoneNumber();
+            auto records = DBServiceAPI::ContactGetByPhoneNumber(application, number);
+            if (records->empty()) {
+                LOG_WARN("not valid contact for number %s", number.c_str());
+                recipient->setText(number);
+                return;
+            }
+            contact = std::make_shared<ContactRecord>(records->operator[](0));
+            recipient->setText(contact->getFormattedName());
+        }
     }
 
     bool NewSMS_Window::selectContact()

@@ -58,15 +58,14 @@ namespace app
             app, name_call, window::name_enterNumber, std::move(data));
     }
 
-    bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)
+    bool sms(Application *app, SmsOperation smsOperation, const std::string &number)
     {
         assert(app != nullptr);
-        // TODO return to current application doesn't change application window >_>
-        auto param = std::shared_ptr<ContactRecord>(new ContactRecord(contact));
+
         switch (smsOperation) {
         case SmsOperation::Add: {
             return sapm::ApplicationManager::messageSwitchApplication(
-                app, name_messages, gui::name::window::thread_view, std::make_unique<SMSSendRequest>(param));
+                app, name_messages, gui::name::window::new_sms, std::make_unique<SMSSendRequest>(number));
         }
         default: {
             LOG_ERROR("SmsOperation not supported %" PRIu32, static_cast<uint32_t>(smsOperation));
@@ -75,12 +74,18 @@ namespace app
         }
     }
 
-    bool sms(Application *app, SmsOperation smsOperation, const std::string &number)
+    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number)
     {
         assert(app != nullptr);
-        ContactRecord contactRec;
-        contactRec.numbers = std::vector<ContactRecord::Number>({ContactRecord::Number(number, number)});
-        return sms(app, smsOperation, contactRec);
+
+        return sms(app, smsOperation, number.getE164());
+    }
+
+    bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)
+    {
+        assert(app != nullptr);
+
+        return sms(app, smsOperation, contact.numbers[0].numberE164);
     }
 
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)

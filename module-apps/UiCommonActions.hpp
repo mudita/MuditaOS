@@ -54,7 +54,7 @@ namespace app
 
     enum class SmsOperation
     {
-        Add
+        Add /// add/send new sms
     };
 
     /// @brief requests selected sms operation
@@ -62,7 +62,7 @@ namespace app
     /// @param app - requesting application
     /// @param smsOperation - selected sms operation.
     ///
-    /// @parem contact - contact record on which the operation is requested
+    /// @param contact - contact record on which the operation is requested
     ///
     /// @return true if succeed
     bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact);
@@ -72,9 +72,22 @@ namespace app
     /// @param app - requesting application
     /// @param smsOperation - selected sms operation.
     ///
-    /// @parem number - phone number (assigned to contact) on which the operation is requested
+    /// @param number - phone number (assigned to contact) on which the operation is requested
     ///
     /// @return true if succeed
+    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number);
+
+    /// @brief requests selected sms operation
+    ///
+    /// @param app - requesting application
+    /// @param smsOperation - selected sms operation.
+    ///
+    /// @param number - phone number (assigned to contact) on which the operation is requested
+    ///
+    /// @return true if succeed
+    ///
+    /// @note this is depreceted, and wherever possible version above (with phone number as utils::PhoneNumber::View)
+    /// should be used
     bool sms(Application *app, SmsOperation smsOperation, const std::string &number);
 
     enum class ContactOperation

@@ -151,7 +151,7 @@ namespace gui
 
         rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("sms %s", record.phoneNumber.getE164().c_str());
-            return app::sms(application, app::SmsOperation::Add, record.phoneNumber.getE164());
+            return app::sms(application, app::SmsOperation::Add, record.phoneNumber);
         };
 
         // Type
