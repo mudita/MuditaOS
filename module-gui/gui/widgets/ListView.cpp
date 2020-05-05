@@ -197,7 +197,8 @@ namespace gui
     bool ListView::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         Rect::onDimensionChanged(oldDim, newDim);
-        scroll->update(startIndex, currentPageSize, elementsCount);
+        body->setSize(newDim.w, newDim.h);
+        refresh();
         return true;
     }
 
@@ -208,7 +209,6 @@ namespace gui
 
     bool ListView::listPageEndReached()
     {
-
         auto calculateLimit = [&]() {
             // Minimal arbitrary number of items requested from database. As ListView does not know how big elements are
             // before it gets them, requests twice size of current page with down limit of at least 4.

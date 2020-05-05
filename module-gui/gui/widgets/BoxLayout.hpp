@@ -42,6 +42,7 @@ namespace gui
 
         template <Axis axis> void resizeItems();
 
+        std::list<Item *> outOfDrawAreaItems;
         virtual void resizeItems();
         bool reverse_order = false;
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items
