@@ -122,40 +122,42 @@ namespace gui
     template <Axis axis> void BoxLayout::resizeItems()
     {
         // we want to split to interested parties what's left, as much as they can fit
-        int32_t to_split = sizeLeft<axis>(this);
+        int32_t to_split = getSize(axis);
         auto pos        = reverse_order ? this->area().size(axis) : 0;
-        auto pos_update = [this, &pos](Item *it) {
+        auto pos_update  = [this](Item *it, int32_t &pos) {
             if (this->reverse_order) {
-                pos -= it->area(Item::Area::Min).size(axis);
-                it->area(Item::Area::Min).pos(axis)    = pos;
-                it->area(Item::Area::Normal).pos(axis) = pos;
+                pos -= it->area(Item::Area::Normal).size(axis);
+                it->setPosition(pos, axis);
             }
             else {
-                it->area(Item::Area::Min).pos(axis)    = pos;
-                it->area(Item::Area::Normal).pos(axis) = pos;
-                pos += it->area(Item::Area::Min).size(axis);
+                it->setPosition(pos, axis);
+                pos += it->area(Item::Area::Normal).size(axis);
             }
         };
 
-        auto set_size = [&to_split](Item *el, auto &pos) {
+        auto set_size = [](Item *el, auto &pos, int32_t &to_split) {
             if (el == nullptr) {
                 return;
             }
-            int32_t left_in_el = el->area(Area::Normal).size(axis) - el->area(Area::Min).size(axis);
+            // Here should be Max - Min ?
+            int32_t left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis) - 10;
             if (to_split > 0 && left_in_el > 0) {
                 int32_t resize = left_in_el < to_split ? left_in_el : to_split;
                 el->setSize(el->area(Area::Min).size(axis) + resize, axis);
-                to_split -= resize;
+                to_split = -(resize - el->getWidth());
+            }
+            if (to_split <= 0) {
+                el->visible = false;
             }
         };
 
         for (auto &el : children) {
-            LOG_DEBUG("# el %s", el->area(Area::Normal).str().c_str());
+            // LOG_DEBUG("# el %s", el->area(Area::Normal).str().c_str());
             el->area(Item::Area::Normal) = el->area(Item::Area::Min);
-            set_size(el, pos);
-            pos_update(el);
-            LOG_DEBUG("> el %s", el->area(Area::Normal).str().c_str());
-            // single element at a time
+            set_size(el, pos, to_split);
+            pos_update(el, pos);
+            LOG_DEBUG("> el     %s", el->area(Area::Normal).str().c_str());
+            LOG_DEBUG("> el max %s", el->area(Area::Max).str().c_str());
         }
         Rect::updateDrawArea();
     }
@@ -164,7 +166,7 @@ namespace gui
     {
         Rect::addWidget(item);
         item->visible = false;
-        if (size<axis>(this) - sizeUsed<axis>(this) >= size<axis>(item)) {
+        if (getSize(axis) - sizeUsed<axis>(this) >= 0) {
             item->visible = true;
             resizeItems<axis>();
         }
