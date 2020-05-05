@@ -26,8 +26,8 @@ namespace style
     };     // namespace header
     namespace window
     {
-        const inline uint32_t default_left_margin       = 30;
-        const inline uint32_t default_right_margin      = 30;
+        const inline uint32_t default_left_margin       = 20;
+        const inline uint32_t default_right_margin      = 20;
         const inline uint32_t default_border_focucs_w   = 2;
         const inline uint32_t default_border_no_focus_w = 0;
         namespace font
@@ -113,6 +113,7 @@ namespace style
             const inline std::string send        = "common_send";
             const inline std::string confirm     = "common_confirm";
             const inline std::string select      = "common_select";
+            const inline std::string use         = "common_use";
             const inline std::string ok          = "common_ok";
             const inline std::string back        = "common_back";
             const inline std::string set         = "common_set";
@@ -146,4 +147,20 @@ namespace style
             const inline std::string Yesterday = "common_yesterday";
         } // namespace common
     }     // namespace strings
-}; // namespace style
+
+    namespace listview
+    {
+
+        const inline uint32_t scroll_x         = 0;
+        const inline uint32_t scroll_y         = 0;
+        const inline uint32_t scroll_w         = 5;
+        const inline uint32_t scroll_h         = 0;
+        const inline uint32_t scroll_radius    = 2;
+        const inline gui::Color scroll_color   = gui::Color{0, 0};
+        const inline uint32_t scroll_margin    = 5;
+        const inline uint32_t scroll_min_space = 10;
+        const inline uint32_t item_span_small  = 8;
+        const inline uint32_t item_span_big    = 12;
+
+    } // namespace listview
+};    // namespace style

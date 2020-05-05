@@ -107,13 +107,7 @@ namespace gui
 
     void BtWindow::destroyInterface()
     {
-        this->focusItem = nullptr;
-        AppWindow::destroyInterface();
-    }
-
-    BtWindow::~BtWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void BtWindow::onBeforeShow(ShowMode mode, SwitchData *data)

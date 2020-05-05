@@ -4,16 +4,16 @@ PurePhone repository
 # Quickstart in docker
 You can build project in docker container, to that
 
-### Get docker
+1. Get docker
 `./config/bootstrap.sh 8`
 
-### configure for linux Debug
+2. configure for linux Debug
 `./in_docker.sh config linux Debug`
 
-### build linux Debug
+3. build linux Debug
 `./in_docker.sh make build-linux-Debug`
 
-### build rt1051 Release
+4. build rt1051 Release
 `./in_docker.sh config rt1051 Release`
 `./in_docker.sh make build-rt1051-Release`
 
@@ -24,7 +24,7 @@ Prior to any build setup environment, need to be run once. (See: `## Run provisi
 boostrap.sh will show you list of changes that may be required for you.
 If this is new checkout you need to update your git config (step 0 and 1).
 
-### Bootstrap steps:
+## Bootstrap steps:
 * `./config/bootstrap.sh 0`  - install style checking scripts to be automatically run on commit
 * `./config/bootstrap.sh 1`  - `git blame` will ignore style changing commit
 * `./config/bootstrap.sh 2`  - list packages required for builds *but it is not installed*
@@ -38,15 +38,31 @@ If this is new checkout you need to update your git config (step 0 and 1).
 *6 add_to_path gcc_arm... is required because new ./env.cmake uses environment variables set by this target.*
 
 
-## style git hooks
+### Style git hooks
 During the bootstrap you can install git hooks for style checking.
-We have two similar scripts:
-pre-commit-check-only.hook  - this hook only notifies you that style is wrong, doesn't change anything
 pre-commit.hook             - this hook automatically update style during commit
-if you haven't run `bootstrap.sh` you have to copy (link) *one* of this to your 
+if you haven't run `bootstrap.sh` you have to copy (or link) `pre-commit.hook` to your git conig directory
 `.git/config/hooks` directory, just:
-`ln -s `pwd`/config/<pre-commit-scipt> .git/hooks/pre-commit`
-in the hooks directory script has to be named *pre-commit*.
+`ln -s `pwd`/config/pre-commit.hook .git/hooks/pre-commit`
+
+By default commit hook only checks if your changes have correct style, if you would like to fix
+the style automatically during `git commit` you have to configure your git, by adding new
+variable `user.fixinstage` and setting it to `true`, just call:
+`git config user.fixinstage true`
+
+If you prefer "notification than fix" work flow (so you can examine the changes), use default hook behaviour (to notify)
+and then call `./config/pre-commit.hoot --fix`, this checks and fixes files in "stage" are,
+files that have status "changed" are not tested.
+
+```
+git commit 
+<stele error - commit aborted>
+./config/pre-commit.hook --fix
+git diff
+git add -u
+git commit
+<commit accepted>
+```
 
 ## Super quick and dirty to run app on linux:
 ```
@@ -97,8 +113,6 @@ JLinkRTTClient | tee /tmp/log.txt
 
 # Longstart
 
-## Run provisioning
-
 There is provisioning script `./config/bootstrap.sh` run it to install all dependencies - written for Ubuntu tested on 18.10
 * This script will require sudo (for apt)
 * needed cmake and GCC will be installed by default to `${HOME}` - in case of other needs, change it
@@ -107,37 +121,43 @@ There is provisioning script `./config/bootstrap.sh` run it to install all depen
 
 `cd config && ./bootstrap.sh`
 
-## build docker image
-If for some reason you don't want to use existing (on hub.docker.com) docker image you can build your own.
-### download toolchain
+After running provisioning you are ready to checkout and build project for both linux and rt1051 target:
+* checking out project with submodules for the first time
+```sh
+git submodule update --init --recursive
+```
+* repo update with submodules
+```sh
+git pull --recurse-submodules
+```
+* building project
+```sh
+./configure.sh [rt1051|linux] [release|debug|relwithdebinfo]
+cd build-[rt1051|linux]-[release|debug|relwithdebinfo]
+make
+```
+
+## Building own docker image
+
+If for some reason you don't want to use existing (on hub.docker.com) docker image you can build your own:
+1. download toolchain
 ```bash
 ./config/download_assets
 ```
-### build image
+2. build image
 ```bash
 docker build docker/ -t rwicik/pure_phone_build:latest
 ```
 please make sure that you add proper tag for image (`-t rwicik/pure_phone_build:latest`) as other scripts are using it for building, and if docker couldn't find it locally it will download it from hub.docker.com
 
-
-## Install JLink driver:
+## Installing JLink driver
 
 We use JLink driver in version JLink v634f, for ubuntu download from here:
 [tested JLink we use](https://www.segger.com/downloads/jlink/JLink_Linux_V634f_x86_64.deb)
 
 To install this driver on linux: `sudo dpkg -i JLink_Linux_V634f_x86_64.deb`
 
-## First time repo checkout with submodules
-`git submodule update --init --recursive`
-
-## Building project
-
-after running provisioning you are ready to build project for both linux and rt1051 target
-
-## Repo update with submodules
-`git pull --recurse-submodules`
-
-# Documentation:
+# Documentation
 
 * [doc/development_workflow](./doc/development_workflow.md)
 * [doc/config](./doc/config.linux.md)
@@ -151,11 +171,23 @@ after running provisioning you are ready to build project for both linux and rt1
 * [Linux emulator keyboard bindings](./doc/host_keyboard_bindings.md)
 * [test/harness](./test/README.md)
 
-**Doxygen genertion for GUI:**
-`cd doc && doxygen doxyfile-gui`
-to show docs:
-`firefox docs-gui/html/index.html`
-Right now docs are filled for Item.hpp + grouping
+## Code documentation (doxygen)
+
+You can build code documentation with:
+```sh
+make doc
+```
+If you prefer to build documentation always with `all` target instead, configure cmake
+with `BUILD_DOC_WITH_ALL` option set, e.g.:
+```sh
+cmake -DBUILD_DOC_WITH_ALL=ON . build/
+```
+
+Documentation is generated in the `doc/html` subdirectory of a build dir. To view
+open index with browser, e.g.:
+```sh
+firefox build/doc/html/index.html
+```
 
 # Linux Bluetooth device
 

@@ -11,12 +11,13 @@
 #include "data/CallLogSwitchData.hpp"
 #include "data/CallLogInternals.hpp"
 #include "CalllogModel.hpp"
+#include "UiCommonActions.hpp"
 
 using namespace calllog;
 
 #define DEBUG_CALLLOG_DB_ACCESS 0
 
-CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app, calllog::settings::pageSize)
+CalllogModel::CalllogModel(app::Application *app) : DatabaseModel(app)
 {}
 
 void CalllogModel::requestRecordsCount()
@@ -32,10 +33,7 @@ void CalllogModel::requestRecordsCount()
     // request first and second page if possible
     if (recordsCount > 0) {
         LOG_INFO("DBServiceAPI::CalllogGetCount CalllogGetLimitOffset");
-        DBServiceAPI::CalllogGetLimitOffset(application, 0, pageSize);
-        if (recordsCount >= pageSize) {
-            DBServiceAPI::CalllogGetLimitOffset(application, pageSize, pageSize);
-        }
+        DBServiceAPI::CalllogGetLimitOffset(application, 0, calllog::settings::pageSize);
     }
 }
 
@@ -49,16 +47,20 @@ bool CalllogModel::updateRecords(std::unique_ptr<std::vector<CalllogRecord>> rec
                                  const uint32_t limit,
                                  uint32_t count)
 {
-
-    LOG_INFO("Offset: %" PRIu32 ", Limit: %" PRIu32 " Count:%" PRIu32 "", offset, limit, count);
+#if DEBUG_DB_MODEL_DATA == 1
+    LOG_DEBUG("Offset: %d, Limit: %d Count:%d", offset, limit, count);
+    for (uint32_t i = 0; i < records.get()->size(); ++i) {
+        LOG_DEBUG("id: %d, name: %s", records.get()->operator[](i).ID, records.get()->operator[](i).name.c_str());
+    }
+#endif
 
     DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+    list->onProviderDataUpdate();
 
     return true;
 }
 
-gui::ListItem *CalllogModel::getItem(
-    int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown)
+gui::ListItem *CalllogModel::getItem(int index)
 {
     std::shared_ptr<CalllogRecord> call = getRecord(index);
     SettingsRecord &settings            = application->getSettings();
@@ -66,18 +68,29 @@ gui::ListItem *CalllogModel::getItem(
         // LOG_ERROR("getItem nullptr");
         return nullptr;
     }
+
     auto item = new gui::CalllogItem(this, !settings.timeFormat12);
     if (item != nullptr) {
         item->setCall(call);
         item->setID(index);
-        item->activatedCallback = [=](gui::Item &item) { // TODO: alek: this is not the best place for this
+        item->activatedCallback = [=](gui::Item &item) {
             LOG_INFO("activatedCallback");
             std::unique_ptr<gui::SwitchData> data = std::make_unique<calllog::CallLogSwitchData>(*call);
             application->switchWindow(calllog::settings::DetailsWindowStr, std::move(data));
             return true;
         };
+
+        item->inputCallback = [this, item](gui::Item &, const gui::InputEvent &event) {
+            if (event.state != gui::InputEvent::State::keyReleasedShort) {
+                return false;
+            }
+            if (event.keyCode == gui::KeyCode::KEY_LF) {
+                LOG_DEBUG("calling");
+                return app::call(application, item->getCall().phoneNumber);
+            }
+            return false;
+        };
         return item;
     }
-
     return nullptr;
 }

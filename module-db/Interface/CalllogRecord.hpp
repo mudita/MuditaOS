@@ -8,28 +8,32 @@
  */
 #pragma once
 
-#include "../Common/Common.hpp"
-#include "../Databases/CalllogDB.hpp"
-#include "ContactRecord.hpp"
-#include "Record.hpp"
-#include "utf8/UTF8.hpp"
-#include <stdint.h>
+#include <Common/Common.hpp>
+#include <ContactRecord.hpp>
+#include <Databases/CalllogDB.hpp>
+#include <Record.hpp>
+#include <PhoneNumber.hpp>
+#include <utf8/UTF8.hpp>
+
+#include <cstdint>
+#include <vector>
+#include <utility>
 
 struct CalllogRecord : public Record
 {
-    UTF8 number                   = "";
-    PresentationType presentation = PresentationType::PR_UNKNOWN;
-    time_t date                   = 0;
-    time_t duration               = 0;
-    CallType type                 = CallType::CT_NONE;
-    UTF8 name                     = "";
-    UTF8 contactId                = "";
+    PresentationType presentation        = PresentationType::PR_UNKNOWN;
+    time_t date                          = 0;
+    time_t duration                      = 0;
+    CallType type                        = CallType::CT_NONE;
+    UTF8 name                            = "";
+    UTF8 contactId                       = "";
+    utils::PhoneNumber::View phoneNumber = utils::PhoneNumber::View();
 
     friend std::ostream &operator<<(std::ostream &out, const CalllogRecord &point);
 
     CalllogRecord()  = default;
     ~CalllogRecord() = default;
-    CalllogRecord(const CalllogTableRow &tableRow, const UTF8 &num, const UTF8 &name);
+    CalllogRecord(const CalllogTableRow &tableRow);
 
     uint32_t getContactId() const;
 };
@@ -40,9 +44,6 @@ enum class CalllogRecordField
     TYPE,
 };
 
-/*
- *
- */
 class CalllogRecordInterface : public RecordInterface<CalllogRecord, CalllogRecordField>
 {
   public:

@@ -10,13 +10,13 @@
 #define MODULE_APPS_APPLICATION_PHONEBOOK_WIDGETS_PHONEBOOKLISTVIEW_HPP_
 
 #include "Application.hpp"
-#include "ListView.hpp"
+#include "ListView_old.hpp"
 #include <functional>
 
 namespace gui
 {
     class PhonebookItem;
-    class PhonebookListView : public ListView
+    class PhonebookListView : public ListView_old
     {
         /**
          * Pointer to application that owns the model

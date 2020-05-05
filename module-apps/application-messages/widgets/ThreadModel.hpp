@@ -29,8 +29,7 @@ class ThreadModel : public app::DatabaseModel<ThreadRecord>, public gui::ListIte
                        uint32_t count) override;
     void requestRecords(const uint32_t offset, const uint32_t limit) override;
 
-    gui::ListItem *getItem(
-        int index, int firstElement, int prevElement, uint32_t limit, int remaining, bool topDown) override;
+    gui::ListItem *getItem(int index) override;
     int getItemCount() const override
     {
         return recordsCount;

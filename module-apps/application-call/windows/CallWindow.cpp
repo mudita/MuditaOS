@@ -7,10 +7,6 @@
  * @details
  */
 #include "CallWindow.hpp"
-#include <memory>
-#include <functional>
-#include <sstream>
-#include <iomanip>
 
 #include "application-call/widgets/Icons.hpp"
 #include "service-appmgr/ApplicationManager.hpp"
@@ -27,6 +23,13 @@
 #include "Label.hpp"
 #include "Margins.hpp"
 #include "application-call/data/CallAppStyle.hpp"
+
+#include <memory>
+#include <functional>
+#include <sstream>
+#include <iomanip>
+
+#include <cassert>
 
 namespace gui
 {
@@ -141,37 +144,7 @@ namespace gui
 
     void CallWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        removeWidget(numberLabel);
-        delete numberLabel;
-        numberLabel = nullptr;
-
-        removeWidget(durationLabel);
-        delete durationLabel;
-        durationLabel = nullptr;
-
-        removeWidget(microphoneIcon);
-        delete microphoneIcon;
-        microphoneIcon = nullptr;
-
-        removeWidget(speakerIcon);
-        delete speakerIcon;
-        speakerIcon = nullptr;
-
-        removeWidget(sendSmsIcon);
-        delete sendSmsIcon;
-        sendSmsIcon = nullptr;
-
-        removeWidget(imageCircleTop);
-        delete imageCircleTop;
-        imageCircleTop = nullptr;
-
-        removeWidget(imageCircleBottom);
-        delete imageCircleBottom;
-        imageCircleBottom = nullptr;
-
-        children.clear();
+        erase();
     }
 
     CallWindow::~CallWindow()
@@ -267,10 +240,12 @@ namespace gui
             return false;
         }
 
-        std::string phoneNumber;
+        utils::PhoneNumber::View phoneNumber;
+
         if (data->getDescription() == app::CallSwitchData::descriptionStr) {
-            app::CallSwitchData *callData = reinterpret_cast<app::CallSwitchData *>(data);
-            phoneNumber                   = callData->getPhoneNumber();
+            auto *callData = dynamic_cast<app::CallSwitchData *>(data);
+            assert(callData != nullptr);
+            phoneNumber = callData->getPhoneNumber();
             switch (callData->getType()) {
             case app::CallSwitchData::Type::INCOMMING_CALL: {
                 state = State::INCOMING_CALL;
@@ -282,7 +257,6 @@ namespace gui
 
             default:
                 LOG_ERROR("Unhandled type");
-                phoneNumber = "";
             }
         }
         else {
@@ -290,26 +264,27 @@ namespace gui
             return false;
         }
 
-        auto records = DBServiceAPI::ContactGetByPhoneNumber(this->application, phoneNumber);
+        auto records            = DBServiceAPI::ContactGetByPhoneNumber(this->application, phoneNumber.getEntered());
+        std::string displayName = phoneNumber.getFormatted();
         if (records->size() == 1) {
             auto rec = records->operator[](0);
             LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
-                     phoneNumber.c_str(),
+                     phoneNumber.getEntered().c_str(),
                      rec.ID,
                      rec.getFormattedName().c_str());
-            phoneNumber = rec.getFormattedName();
+            displayName = rec.getFormattedName();
         }
         else if (records->size() > 1) {
-            LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.c_str());
+            LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.getEntered().c_str());
             for (auto i : *records) {
                 LOG_ERROR("contact id = %" PRIu32 ", name = %s", i.ID, i.getFormattedName().c_str());
             }
         }
         else {
-            LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.c_str());
+            LOG_INFO("number = %s was not recognized as any valid contact", phoneNumber.getEntered().c_str());
         }
 
-        numberLabel->setText(phoneNumber);
+        numberLabel->setText(displayName);
 
         setVisibleState();
         application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);

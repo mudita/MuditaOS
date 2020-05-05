@@ -75,21 +75,12 @@ namespace gui
 
     void DesktopMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        delete time;
-        delete dayText;
-        focusItem = nullptr;
-        children.clear();
+        erase();
     }
 
     DesktopMainWindow::DesktopMainWindow(app::Application *app) : AppWindow(app, app::window::name::desktop_main_window)
     {
         buildInterface();
-    }
-
-    DesktopMainWindow::~DesktopMainWindow()
-    {
-        destroyInterface();
     }
 
     void DesktopMainWindow::setVisibleState()
@@ -212,7 +203,7 @@ namespace gui
                 }
                 // if numeric key was pressed record that key and send it to call application
                 else if (code != 0) {
-                    return app::call(application, app::CallOperation::PrepareCall, code);
+                    return app::prepare_call(application, std::string(1, static_cast<char>(code)));
                 }
             }
         }
@@ -232,7 +223,7 @@ namespace gui
             }
             // long press of '0' key is translated to '+'
             else if (inputEvent.keyCode == KeyCode::KEY_0) {
-                return app::call(application, app::CallOperation::PrepareCall, '+');
+                return app::prepare_call(application, std::to_string('+'));
             }
         }
 
@@ -327,10 +318,7 @@ namespace gui
 
     auto DesktopMainWindow::fillNotifications(app::ApplicationDesktop *app) -> bool
     {
-        if (notifications) {
-            this->removeWidget(notifications);
-            delete notifications;
-        }
+        erase(notifications);
         // 1. create notifications box
         notifications = new gui::VBox(nullptr,
                                       style::window::default_left_margin,

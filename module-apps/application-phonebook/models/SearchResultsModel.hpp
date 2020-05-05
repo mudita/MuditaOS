@@ -3,12 +3,12 @@
 #include <vector>
 
 #include "Application.hpp"
-#include "DatabaseModel.hpp"
+#include "DatabaseModel_old.hpp"
 #include "Interface/ContactRecord.hpp"
-#include "ListItemProvider.hpp"
+#include "ListItemProvider_old.hpp"
 #include "NotesRecord.hpp"
 
-class SearchResultsModel : public gui::ListItemProvider, public app::DatabaseModel<ContactRecord>
+class SearchResultsModel : public gui::ListItemProvider_old, public app::DatabaseModel_old<ContactRecord>
 {
   public:
     SearchResultsModel(app::Application *app);

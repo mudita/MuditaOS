@@ -57,23 +57,13 @@ namespace gui
         topBar->setActive(TopBar::Elements::TIME, true);
 
         list = new gui::ListView(this, mainWindow::x, mainWindow::y, mainWindow::w, mainWindow::h);
-        list->setMaxElements(calllog::settings::pageSize);
-        list->setPageSize(calllog::settings::pageSize);
         list->setProvider(calllogModel);
 
         setFocusItem(list);
     }
     void CallLogMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        if (list) {
-            removeWidget(list);
-            delete list;
-            list = nullptr;
-        };
-
-        children.clear();
+        erase();
         delete calllogModel;
     }
 
@@ -90,26 +80,6 @@ namespace gui
             list->clear();
             list->setElementsCount(calllogModel->getItemCount());
         }
-    }
-
-    bool CallLogMainWindow::onInput(const InputEvent &inputEvent)
-    {
-        // process only if key is released
-        if ((inputEvent.state != InputEvent::State::keyReleasedShort) ||
-            (inputEvent.state != InputEvent::State::keyReleasedLong)) {
-            if (inputEvent.keyCode == KeyCode::KEY_LF) {
-                LOG_DEBUG("calling");
-                auto it = dynamic_cast<CalllogItem *>(list->getSelectedItem());
-                if (it == nullptr) {
-                    LOG_ERROR("wrong item type");
-                    assert(0);
-                    return false;
-                }
-                return app::call(application, app::CallOperation::ExecuteCall, it->getCall().number);
-            }
-        }
-
-        return AppWindow::onInput(inputEvent);
     }
 
     bool CallLogMainWindow::onDatabaseMessage(sys::Message *msgl)

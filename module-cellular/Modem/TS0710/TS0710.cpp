@@ -44,6 +44,8 @@ std::map<PortSpeed_e, int> ATPortSpeeds_text          = {{PortSpeed_e::PS9600, 9
 
 #define USE_DAEFAULT_BAUDRATE 1
 
+static const std::uint16_t threadSizeWords = 2048;
+
 TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
 {
     LOG_INFO("Serial port: '%s'", SERIAL_PORT);
@@ -61,12 +63,8 @@ TS0710::TS0710(PortSpeed_e portSpeed, sys::Service *parent)
     startParams.WakeUpRespTime          = 10;  // 10s default
     startParams.ErrRecovWindowSize      = 2;   // 2 default
 
-    BaseType_t task_error = xTaskCreate(workerTaskFunction,
-                                        "TS0710Worker",
-                                        1024, // in words
-                                        this,
-                                        taskPriority,
-                                        &taskHandle);
+    BaseType_t task_error =
+        xTaskCreate(workerTaskFunction, "TS0710Worker", threadSizeWords, this, taskPriority, &taskHandle);
     if (task_error != pdPASS) {
         LOG_ERROR("Failed to start inputSerialWorker task");
         return;

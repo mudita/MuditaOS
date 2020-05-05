@@ -94,16 +94,8 @@ namespace gui
     }
     void LanguageWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        for (uint32_t i = 0; i < options.size(); i++)
-            delete options[i];
-        this->focusItem = nullptr;
-        options.clear();
-        children.clear();
+        erase();
     }
-
-    LanguageWindow::~LanguageWindow()
-    {}
 
     gui::Item *LanguageWindow::addOptionLabel(const std::string &text, std::function<bool(Item &)> activatedCallback)
     {

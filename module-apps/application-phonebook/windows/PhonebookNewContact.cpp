@@ -207,8 +207,8 @@ namespace gui
         page2.favDescription->setFont(style::window::font::small);
         page2.favDescription->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_LEFT, gui::Alignment::ALIGN_VERTICAL_BOTTOM));
-
-        page2.imageTick = new gui::Image(this, 43, 174, 0, 0, "small_tick");
+        page2.favSelected = false;
+        page2.imageTick   = new gui::Image(this, 43, 174, 0, 0, "small_tick");
         page2.imageTick->setVisible(false);
 
         page2.imageFav = new gui::Image(this, 416, 177, 0, 0, "small_heart");
@@ -261,82 +261,7 @@ namespace gui
 
     void PhonebookNewContact::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        if (title) {
-            removeWidget(title);
-            delete title;
-            title = nullptr;
-        }
-
-        // page 1
-        for (uint32_t i = 0; i < 5; i++) {
-            if (page1.labels[i]) {
-                removeWidget(page1.labels[i]);
-                delete page1.labels[i];
-                page1.labels[i] = nullptr;
-            }
-            if (page1.text[i]) {
-                removeWidget(page1.text[i]);
-                delete page1.text[i];
-                page1.text[i] = nullptr;
-            }
-        }
-
-        if (page2.speedValue) {
-            removeWidget(page2.speedValue);
-            delete page2.speedValue;
-            page2.speedValue = nullptr;
-        }
-        if (page2.speedDescription) {
-            removeWidget(page2.speedDescription);
-            delete page2.speedDescription;
-            page2.speedDescription = nullptr;
-        }
-        if (page2.imageSpeed) {
-            removeWidget(page2.imageSpeed);
-            delete page2.imageSpeed;
-            page2.imageSpeed = nullptr;
-        }
-        if (page2.favValue) {
-            removeWidget(page2.favValue);
-            delete page2.favValue;
-            page2.favValue = nullptr;
-        }
-        if (page2.favDescription) {
-            removeWidget(page2.favDescription);
-            delete page2.favDescription;
-            page2.favDescription = nullptr;
-        }
-        if (page2.imageFav) {
-            removeWidget(page2.imageFav);
-            delete page2.imageFav;
-            page2.imageFav = nullptr;
-        }
-        if (page2.imageTick) {
-            removeWidget(page2.imageTick);
-            delete page2.imageTick;
-            page2.imageTick = nullptr;
-        }
-        if (page2.addressLabel) {
-            removeWidget(page2.addressLabel);
-            delete page2.addressLabel;
-            page2.addressLabel = nullptr;
-        }
-        if (page2.noteLabel) {
-            removeWidget(page2.noteLabel);
-            delete page2.noteLabel;
-            page2.noteLabel = nullptr;
-        }
-        for (uint32_t i = 0; i < 2; i++) {
-            if (page2.text[i]) {
-                removeWidget(page2.text[i]);
-                delete page2.text[i];
-                page2.text[i] = nullptr;
-            }
-        }
-
-        children.clear();
+        erase();
     }
 
     PhonebookNewContact::~PhonebookNewContact()
@@ -352,6 +277,21 @@ namespace gui
         else {
             bottomBar->setActive(BottomBar::Side::CENTER, false);
         }
+    }
+
+    void PhonebookNewContact::copyInputData(ContactRecord &contactRecord)
+    {
+        contactRecord.primaryName     = page1.text[0]->getText();
+        contactRecord.alternativeName = page1.text[1]->getText();
+        // Temporary use numberUser also as numberE164, to be changed with libphonenumber
+        contactRecord.numbers.push_back(ContactRecord::Number(page1.text[2]->getText(), page1.text[2]->getText()));
+        // Temporary disable saving secondary number since multiple numbers are not supported yet, and this could lead
+        // to confusing errors
+        // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
+        contactRecord.mail           = page1.text[4]->getText();
+        contactRecord.note           = page2.text[1]->getText();
+        contactRecord.isOnFavourites = page2.favSelected;
+        contactRecord.speeddial      = page2.speedValue->getText();
     }
 
     void PhonebookNewContact::setContactData()
@@ -415,8 +355,6 @@ namespace gui
     {
         switchPage(0);
         setFocusItem(page1.text[0]);
-        page2.favSelected = false;
-        page2.imageFav->setVisible(false);
     }
 
     bool PhonebookNewContact::handleSwitchData(SwitchData *data)
@@ -482,17 +420,7 @@ namespace gui
     bool PhonebookNewContact::verifyAndSave()
     {
         ContactRecord record, errName, errPhone, errSpeed, errFav;
-        record.primaryName     = page1.text[0]->getText();
-        record.alternativeName = page1.text[1]->getText();
-        // Temporary use numberUser also as numberE164, to be changed with libphonenumber
-        record.numbers.push_back(ContactRecord::Number(page1.text[2]->getText(), page1.text[2]->getText()));
-        // Temporary disable saving secondary number since multiple numbers are not supported yet, and this could lead
-        // to confusing errors
-        // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
-        record.mail           = page1.text[4]->getText();
-        record.note           = page2.text[1]->getText();
-        record.isOnFavourites = page2.favSelected;
-        record.speeddial      = page2.speedValue->getText();
+        copyInputData(record);
 
         /** basic sanity checks */
         if (!isValidName(record.primaryName)) {
@@ -538,8 +466,9 @@ namespace gui
                 return (true);
             }
         }
-        else if (contact->ID > 0) {
-            if (DBServiceAPI::ContactUpdate(application, record) == false) {
+        else if (contact->ID != DB_ID_NONE) {
+            copyInputData(*contact);
+            if (DBServiceAPI::ContactUpdate(application, *contact) == false) {
                 LOG_ERROR("verifyAndSave failed to UPDATE contact");
                 return (false);
             }
@@ -547,8 +476,7 @@ namespace gui
                 contact                               = std::make_shared<ContactRecord>(record);
                 std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>(contact);
                 application->switchWindow(gui::window::name::contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
-
-                LOG_INFO("verifyAndSave new contact UPDATED");
+                LOG_INFO("verifyAndSave contact UPDATED");
                 return (true);
             }
         }

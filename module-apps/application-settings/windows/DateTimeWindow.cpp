@@ -153,15 +153,8 @@ namespace gui
     }
     void DateTimeWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        this->focusItem = nullptr;
-        dateItems.clear();
-        timeItems.clear();
-        children.clear();
+        erase();
     }
-
-    DateTimeWindow::~DateTimeWindow()
-    {}
 
     void DateTimeWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {

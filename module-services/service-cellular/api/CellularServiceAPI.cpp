@@ -7,18 +7,21 @@
  *  @details
  */
 
-#include "CellularServiceAPI.hpp"
-#include "Service/Bus.hpp"
 #include "../ServiceCellular.hpp"
-#include "utf8/UTF8.hpp"
+
+#include "CellularServiceAPI.hpp"
+
+#include <PhoneNumber.hpp>
+#include <Service/Bus.hpp>
+#include <utf8/UTF8.hpp>
+
 #include <memory>
+#include <string>
+#include <utility>
 
-bool CellularServiceAPI::DialNumber(sys::Service *serv, const std::string &number)
+bool CellularServiceAPI::DialNumber(sys::Service *serv, const utils::PhoneNumber &number)
 {
-    std::shared_ptr<CellularRequestMessage> msg =
-        std::make_shared<CellularRequestMessage>(MessageType::CellularDialNumber);
-    msg->data = number;
-
+    auto msg                          = std::make_shared<CellularCallRequestMessage>(number.makeView());
     auto ret                          = sys::Bus::SendUnicast(msg, ServiceCellular::serviceName, serv, 5000);
     CellularResponseMessage *response = reinterpret_cast<CellularResponseMessage *>(ret.second.get());
     if ((ret.first == sys::ReturnCodes::Success) && (response->retCode == true)) {

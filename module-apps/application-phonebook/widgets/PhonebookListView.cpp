@@ -18,13 +18,13 @@
 namespace gui
 {
 
-    PhonebookListView::PhonebookListView() : ListView()
+    PhonebookListView::PhonebookListView() : ListView_old()
     {
         orientation = ORIENTATION_TOP_DOWN;
     }
 
     PhonebookListView::PhonebookListView(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-        : ListView(parent, x, y, w, h)
+        : ListView_old(parent, x, y, w, h)
     {
         orientation = ORIENTATION_TOP_DOWN;
     }
@@ -83,8 +83,7 @@ namespace gui
             gui::PhonebookItem *item = getSelectedPhonebookItem();
             if (item) {
                 // LOG_INFO("calling index: %d %s", item->getID(), item->getValue().c_str());
-                return app::call(
-                    application, app::CallOperation::ExecuteCall, item->getContact()->numbers[0].numberE164);
+                return app::call(application, item->getContact()->numbers[0].numberE164);
             }
             else {
                 LOG_ERROR("failed to get selected item!");

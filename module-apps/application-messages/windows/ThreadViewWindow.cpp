@@ -77,7 +77,7 @@ namespace gui
             body->removeWidget(text);
         }
         text = new gui::Text(
-            nullptr, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
+            this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
             {InputMode::ABC, InputMode::abc},
             [=](const UTF8 &text) { textModeShowCB(text); },
@@ -98,7 +98,7 @@ namespace gui
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                return app->newMessageOptions();
+                return app->newMessageOptions(getName());
             }
             return false;
         };
@@ -342,8 +342,7 @@ namespace gui
 
     void ThreadViewWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        children.clear();
+        erase();
     }
 
     ThreadViewWindow::~ThreadViewWindow()
@@ -385,6 +384,11 @@ namespace gui
                     setTitle("NO CONTACT");
                 }
             }
+        }
+        if (auto pdata = dynamic_cast<SMSTemplateData *>(data)) {
+            auto templText = pdata->templ->text;
+            LOG_INFO("received sms templates data \"%s\"", templText.c_str());
+            text->setText(text->getText() + templText);
         }
     }
 

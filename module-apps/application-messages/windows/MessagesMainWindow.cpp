@@ -47,11 +47,10 @@ namespace gui
 
         list = new gui::ListView(
             this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listWidth);
-        list->setMaxElements(threads::pageSize);
-        list->setPageSize(threads::pageSize);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);
+        list->setItemSpanSize(style::listview::item_span_big);
 
         bottomBar->setActive(BottomBar::Side::LEFT, true);
         bottomBar->setActive(BottomBar::Side::CENTER, true);
@@ -97,38 +96,13 @@ namespace gui
     }
     void MessagesMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        removeWidget(list);
-        delete list;
-        list = nullptr;
-
-        removeWidget(leftArrowImage);
-        delete leftArrowImage;
-        leftArrowImage = nullptr;
-
-        removeWidget(rightArrowImage);
-        delete rightArrowImage;
-        rightArrowImage = nullptr;
-
-        removeWidget(newMessageImage);
-        delete newMessageImage;
-        newMessageImage = nullptr;
-
-        removeWidget(searchImage);
-        delete searchImage;
-        searchImage = nullptr;
-
-        removeWidget(emptyListIcon);
-        delete emptyListIcon;
-        emptyListIcon = nullptr;
-
-        children.clear();
+        erase();
         delete threadModel;
     }
 
     MessagesMainWindow::~MessagesMainWindow()
     {
-        destroyInterface();
+        delete threadModel;
     }
 
     void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -177,24 +151,9 @@ namespace gui
                     application->switchWindow(gui::name::window::new_sms, nullptr);
                     return true;
                 case gui::KeyCode::KEY_RIGHT: {
-                    auto app = dynamic_cast<app::ApplicationMessages *>(application);
                     app->switchWindow(gui::name::window::thread_sms_search, nullptr);
                     return true;
                 } break;
-                case gui::KeyCode::KEY_LF: {
-                    if (app->windowOptions != nullptr && getFocusItem() == list) {
-                        app->windowOptions->clearOptions();
-                        auto it = dynamic_cast<gui::ThreadItem *>(list->getSelectedItem());
-                        if (it) {
-                            app->windowOptions->addOptions(threadWindowOptions(app, it->getThreadItem().get()));
-                            app->switchWindow(app->windowOptions->getName(), nullptr);
-                        }
-                        else {
-                            LOG_ERROR("Can't switch to options -wrong input type");
-                        }
-                    }
-                    return true;
-                }
                 default:
                     LOG_DEBUG("SMS main window not handled key: %d", static_cast<int>(inputEvent.keyCode));
                     break;

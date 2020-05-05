@@ -60,13 +60,7 @@ namespace gui
 
     void Info::destroyInterface()
     {
-        this->focusItem = nullptr;
-        AppWindow::destroyInterface();
-    }
-
-    Info::~Info()
-    {
-        destroyInterface();
+        erase();
     }
 
     void Info::onBeforeShow(ShowMode mode, SwitchData *data)

@@ -19,17 +19,13 @@ namespace gui
     AppWindow::~AppWindow()
     {
         LOG_INFO("deleting window: %s", name.c_str());
-        destroyInterface();
     }
 
     void AppWindow::destroyInterface()
     {
-        children.remove(bottomBar);
-        children.remove(topBar);
-        children.remove(title);
-        delete title;
-        delete bottomBar;
-        delete topBar;
+        erase(bottomBar);
+        erase(topBar);
+        erase(title);
         title     = nullptr;
         bottomBar = nullptr;
         topBar    = nullptr;

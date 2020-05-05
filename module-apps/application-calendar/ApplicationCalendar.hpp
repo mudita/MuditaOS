@@ -1,13 +1,4 @@
-/*
- * @file ApplicationCalendar.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 3 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_CALENDAR_APPLICATIONCALENDAR_HPP_
-#define MODULE_APPS_APPLICATION_CALENDAR_APPLICATIONCALENDAR_HPP_
+#pragma once
 
 #include "Application.hpp"
 #include "Service/Message.hpp"
@@ -17,9 +8,8 @@
 namespace app
 {
 
-    /*
-     * @brief Class representing calendar application
-     */
+    inline const std::string name_calendar = "ApplicationCalendar";
+
     class ApplicationCalendar : public Application
     {
       public:
@@ -27,7 +17,6 @@ namespace app
                             std::string parent,
                             uint32_t stackDepth           = 4096,
                             sys::ServicePriority priority = sys::ServicePriority::Idle);
-        virtual ~ApplicationCalendar();
 
         sys::Message_t DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
         sys::ReturnCodes InitHandler() override;
@@ -43,5 +32,3 @@ namespace app
     };
 
 } /* namespace app */
-
-#endif /* MODULE_APPS_APPLICATION_CALENDAR_APPLICATIONCALENDAR_HPP_ */

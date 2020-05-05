@@ -121,7 +121,15 @@ namespace gui
                     },
                 },
                 new gui::Tile("menu_alarm", "app_desktop_menu_alarm", [=](gui::Item &item) { return true; }),
-                new gui::Tile("menu_calendar_W_G", "app_desktop_menu_calendar", [=](gui::Item &item) { return true; }),
+
+                new gui::Tile("menu_calendar_W_G",
+                              "app_desktop_menu_calendar",
+                              [=](gui::Item &item) {
+                                  sapm::ApplicationManager::messageSwitchApplication(
+                                      application, "ApplicationCalendar", gui::name::window::main_window, nullptr);
+                                  return true;
+                              }),
+
                 new gui::Tile{"menu_phone",
                               "app_desktop_menu_phone",
                               [=](gui::Item &item) {
@@ -201,13 +209,7 @@ namespace gui
 
     void MenuWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        children.clear();
-    }
-
-    MenuWindow::~MenuWindow()
-    {
-        destroyInterface();
+        erase();
     }
 
     void MenuWindow::onBeforeShow(ShowMode mode, SwitchData *data)

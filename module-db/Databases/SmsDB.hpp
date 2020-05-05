@@ -12,7 +12,7 @@
 #include "Database/Database.hpp"
 #include "../Tables/SMSTable.hpp"
 #include "../Tables/ThreadsTable.hpp"
-#include "../Tables/SMSTemplatesTable.hpp"
+#include "../Tables/SMSTemplateTable.hpp"
 
 class SmsDB : public Database
 {
@@ -22,7 +22,7 @@ class SmsDB : public Database
 
     SMSTable sms;
     ThreadsTable threads;
-    SMSTemplatesTable templates;
+    SMSTemplateTable templates;
 
     static const char *GetDBName()
     {

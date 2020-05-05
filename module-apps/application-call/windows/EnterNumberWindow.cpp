@@ -14,6 +14,7 @@
 
 #include <application-phonebook/windows/PhonebookContact.hpp>
 #include <ContactRecord.hpp>
+#include <country.hpp>
 #include <i18/i18.hpp>
 #include <InputMode.hpp>
 #include <service-appmgr/ApplicationManager.hpp>
@@ -23,15 +24,17 @@
 #include <phonenumbers/phonenumberutil.h>
 #include <phonenumbers/asyoutypeformatter.h>
 
+using namespace utils;
+
 namespace gui
 {
     using namespace callAppStyle;
     using namespace callAppStyle::enterNumberWindow;
 
     EnterNumberWindow::EnterNumberWindow(app::Application *app, std::string windowName)
-        : AppWindow(app, windowName), numberUtil(*PhoneNumberUtil::GetInstance()), currentRegionCode(defaultRegionCode)
+        : AppWindow(app, windowName), currentCountry(defaultCountry), numberUtil(*PhoneNumberUtil::GetInstance())
     {
-        switchFormatter(currentRegionCode);
+        switchFormatter(country::getAlpha2Code(currentCountry));
         buildInterface();
     }
 
@@ -86,23 +89,11 @@ namespace gui
 
     void EnterNumberWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        if (numberLabel) {
-            removeWidget(numberLabel);
-            delete numberLabel;
-            numberLabel = nullptr;
-        }
-        if (newContactIcon) {
-            removeWidget(newContactIcon);
-            delete newContactIcon;
-            newContactIcon = nullptr;
-        }
-        children.clear();
+        erase();
     }
 
     EnterNumberWindow::~EnterNumberWindow()
     {
-        destroyInterface();
     }
 
     bool EnterNumberWindow::onInput(const InputEvent &inputEvent)
@@ -178,38 +169,34 @@ namespace gui
             return false;
         }
 
-        app::CallSwitchData *callData = dynamic_cast<app::CallSwitchData *>(data);
-        if (callData != nullptr) {
-            enteredNumber = callData->getPhoneNumber();
+        if (data->getDescription() == app::EnterNumberData::descriptionStr) {
+            auto *callData = dynamic_cast<app::EnterNumberData *>(data);
+            assert(callData != nullptr);
 
-            /// init formatter with provided number, set formatted number to be
-            /// displayed on the label
-            initFormatterInput(enteredNumber);
+            initFormatterInput(callData->getPhoneNumber());
             setNumberLabel(formattedNumber);
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
+        }
+        else if (data->getDescription() == app::CallSwitchData::descriptionStr) {
+            auto *callData = dynamic_cast<app::CallSwitchData *>(data);
+            assert(callData != nullptr);
 
-            switch (callData->getType()) {
-            case app::CallSwitchData::Type::EXECUTE_CALL: {
-                app->handleCallEvent(enteredNumber);
-                return true;
-            }
+            auto &phoneNumber = callData->getPhoneNumber();
 
-            case app::CallSwitchData::Type::ENTER_NUMBER: {
-                return true;
-            } break;
+            initFormatterInput(phoneNumber.getEntered());
+            setNumberLabel(phoneNumber.getFormatted());
+            application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
 
-            default: {
-                LOG_ERROR("Unhandled callData type");
-                return false;
-            }
+            if (callData->getType() == app::CallSwitchData::Type::EXECUTE_CALL) {
+                app->handleCallEvent(phoneNumber.getEntered());
             }
         }
         else {
-            LOG_ERROR("Unrecognized SwitchData");
-            return false;
+            LOG_ERROR("Unhandled switch data");
+            abort();
         }
 
-        return false;
+        return true;
     }
 
     void EnterNumberWindow::switchFormatter(const std::string &regionCode)
@@ -221,6 +208,7 @@ namespace gui
 
     void EnterNumberWindow::initFormatterInput(const std::string &number)
     {
+        enteredNumber = number;
         formatter->Clear();
         for (auto c : number) {
             formatter->InputDigit(c, &formattedNumber);

@@ -23,9 +23,7 @@ namespace gui
 
       public:
         BtWindow(app::Application *app);
-        virtual ~BtWindow();
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
         void buildInterface() override;

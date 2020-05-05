@@ -5,18 +5,18 @@
  *      Author: robert
  */
 
-#include "ListItemProvider.hpp"
+#include "ListItemProvider_old.hpp"
 
 namespace gui
 {
 
-    ListItemProvider::ListItemProvider()
+    ListItemProvider_old::ListItemProvider_old()
     {}
 
-    ListItemProvider::~ListItemProvider()
+    ListItemProvider_old::~ListItemProvider_old()
     {}
 
-    ListItem *ListItemProvider::getItem(
+    ListItem *ListItemProvider_old::getItem(
         int index, int firstElement, int prevElement, uint32_t count, int remaining, bool topDown)
     {
         return nullptr;

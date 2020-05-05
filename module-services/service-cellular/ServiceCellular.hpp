@@ -18,6 +18,8 @@
 #include <utf8/UTF8.hpp>
 #include "State.hpp"
 
+#include <optional>
+
 class MuxDaemon;
 
 class ServiceCellular : public sys::Service
@@ -71,7 +73,7 @@ class ServiceCellular : public sys::Service
     cellular::State state;
 
     /// URC GSM notification handler
-    std::shared_ptr<CellularNotificationMessage> identifyNotification(const std::vector<uint8_t> &data);
+    std::optional<std::shared_ptr<CellularMessage>> identifyNotification(const std::vector<uint8_t> &data);
 
     std::vector<std::string> messageParts;
 

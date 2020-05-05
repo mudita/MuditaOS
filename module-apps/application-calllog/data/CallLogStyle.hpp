@@ -113,9 +113,9 @@ namespace callLogStyle
         constexpr uint32_t leftMargin  = 19;
         constexpr uint32_t rightMargin = 17;
         constexpr uint32_t x           = leftMargin;
-        constexpr uint32_t y           = 111;
+        constexpr uint32_t y           = 110;
         constexpr uint32_t w           = style::window_width - leftMargin - rightMargin;
-        constexpr uint32_t h           = style::window_height - y;
+        constexpr uint32_t h           = style::window_height - y - style::footer::height;
     } // namespace mainWindow
 
 } // namespace callLogStyle

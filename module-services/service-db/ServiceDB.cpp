@@ -49,8 +49,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
 {
 
     std::shared_ptr<sys::ResponseMessage> responseMsg;
-
-    switch (static_cast<MessageType>(msgl->messageType)) {
+    auto type = static_cast<MessageType>(msgl->messageType);
+    switch (type) {
 
     /*
      * Settings record
@@ -189,6 +189,49 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         responseMsg = std::make_shared<DBThreadResponseMessage>(nullptr, true, 0, 0, ret);
     } break;
 
+        /**
+         * SMS templates records
+         */
+
+    case MessageType::DBSMSTemplateAdd: {
+        auto time   = utils::time::Scoped("DBSMSTemplateAdd");
+        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
+        auto ret    = smsTemplateRecordInterface->Add(msg->record);
+        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, ret);
+    } break;
+
+    case MessageType::DBSMSTemplateUpdate: {
+        auto time   = utils::time::Scoped("DBSMSTemplateUpdate");
+        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
+        auto ret    = smsTemplateRecordInterface->Update(msg->record);
+        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, ret);
+    }; break;
+
+    case MessageType::DBSMSTemplateRemove: {
+        auto time   = utils::time::Scoped("DBSMSTemplateRemove");
+        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
+        auto ret    = smsTemplateRecordInterface->RemoveByID(msg->id);
+        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, ret);
+    } break;
+
+    case MessageType::DBSMSTemplateGetLimitOffset: {
+        auto time   = utils::time::Scoped("DBSMSTemplateGetLimitOffset");
+        auto msg    = static_cast<DBSMSTemplateMessage *>(msgl);
+        auto ret    = smsTemplateRecordInterface->GetLimitOffset(msg->offset, msg->limit);
+        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(
+            std::move(ret), true, msg->limit, msg->offset, ret->size(), type);
+    } break;
+
+    case MessageType::DBSMSTemplateGetCount: {
+        auto time   = utils::time::Scoped("DBSMSTemplateGetCount");
+        auto ret    = smsTemplateRecordInterface->GetCount();
+        responseMsg = std::make_shared<DBSMSTemplateResponseMessage>(nullptr, true, 0, 0, ret);
+    } break;
+
+        /**
+         * Contact records
+         */
+
     case MessageType::DBContactAdd: {
         auto time             = utils::time::Scoped("DBContactAdd");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
@@ -200,13 +243,8 @@ sys::Message_t ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::Respo
         auto time             = utils::time::Scoped("DBContactGetByName");
         DBContactMessage *msg = reinterpret_cast<DBContactMessage *>(msgl);
         auto ret              = contactRecordInterface->GetByName(msg->record.primaryName, msg->record.alternativeName);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(std::move(ret),
-                                                                 true,
-                                                                 msg->limit,
-                                                                 msg->offset,
-                                                                 msg->favourite,
-                                                                 ret->size(),
-                                                                 MessageType::DBContactGetByName);
+        responseMsg           = std::make_shared<DBContactResponseMessage>(
+            std::move(ret), true, msg->limit, msg->offset, msg->favourite, ret->size(), type);
     } break;
 
     case MessageType::DBContactSearch: {
@@ -475,6 +513,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
     contactRecordInterface     = std::make_unique<ContactRecordInterface>(contactsDB.get());
     smsRecordInterface         = std::make_unique<SMSRecordInterface>(smsDB.get(), contactsDB.get());
     threadRecordInterface      = std::make_unique<ThreadRecordInterface>(smsDB.get(), contactsDB.get());
+    smsTemplateRecordInterface = std::make_unique<SMSTemplateRecordInterface>(smsDB.get());
     alarmsRecordInterface      = std::make_unique<AlarmsRecordInterface>(alarmsDB.get());
     notesRecordInterface       = std::make_unique<NotesRecordInterface>(notesDB.get());
     calllogRecordInterface     = std::make_unique<CalllogRecordInterface>(calllogDB.get(), contactsDB.get());

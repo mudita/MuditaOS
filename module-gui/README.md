@@ -1,4 +1,3 @@
-[](NOTE: This file is prepared for doxygen markdown, it should look just ok with normal markdown, but some links might not work)
 UI README
 =========
 

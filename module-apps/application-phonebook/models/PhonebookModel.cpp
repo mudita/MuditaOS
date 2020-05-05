@@ -12,7 +12,7 @@
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
-PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel(app, 14)
+PhonebookModel::PhonebookModel(app::Application *app) : DatabaseModel_old(app, 14)
 {}
 
 void PhonebookModel::requestRecordsCount()
@@ -58,9 +58,9 @@ bool PhonebookModel::updateRecords(std::unique_ptr<std::vector<ContactRecord>> r
 {
 
     if (favourite)
-        DatabaseModel::updateRecords(std::move(records), offset, limit, count);
+        DatabaseModel_old::updateRecords(std::move(records), offset, limit, count);
     else
-        DatabaseModel::updateRecords(std::move(records), offset + favouriteCount, limit, count);
+        DatabaseModel_old::updateRecords(std::move(records), offset + favouriteCount, limit, count);
 
     return true;
 }

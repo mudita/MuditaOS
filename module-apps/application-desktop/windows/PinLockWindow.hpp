@@ -1,14 +1,3 @@
-/*
- * @file PinLockWindow.hpp
- * @author Robert Borzecki (robert.borzecki@mudita.com)
- * @date 19 cze 2019
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-#ifndef MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_PINLOCKWINDOW_HPP_
-#define MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_PINLOCKWINDOW_HPP_
-
 #include "AppWindow.hpp"
 #include "gui/widgets/Label.hpp"
 #include "gui/widgets/Image.hpp"
@@ -48,7 +37,6 @@ namespace gui
 
       public:
         PinLockWindow(app::Application *app);
-        virtual ~PinLockWindow();
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
 
@@ -58,5 +46,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MODULE_APPS_APPLICATION_DESKTOP_WINDOWS_PINLOCKWINDOW_HPP_ */

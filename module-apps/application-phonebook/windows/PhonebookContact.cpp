@@ -147,7 +147,7 @@ namespace gui
                                       Alignment(Alignment::ALIGN_HORIZONTAL_CENTER, Alignment::ALIGN_VERTICAL_CENTER));
         numberPrimaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER && input.state == InputEvent::State::keyReleasedShort) {
-                return app::call(application, app::CallOperation::ExecuteCall, contact->numbers[0].numberE164);
+                return app::call(application, contact->numbers[0].numberE164);
             }
             LOG_DEBUG("numberPrimayLabel->inputCallback just return false");
             return (false);
@@ -212,7 +212,7 @@ namespace gui
         numberSecondaryLabel->setPenWidth(0);
         numberSecondaryLabel->inputCallback = [=](Item &item, const InputEvent &input) {
             if (input.keyCode == KeyCode::KEY_ENTER) {
-                return app::call(application, app::CallOperation::ExecuteCall, contact->numbers[1].numberE164);
+                return app::call(application, contact->numbers[1].numberE164);
             }
             return (false);
         };
@@ -330,8 +330,7 @@ namespace gui
 
     void PhonebookContact::destroyInterface()
     {
-        AppWindow::destroyInterface();
-        children.clear();
+        erase();
     }
 
     PhonebookContact::~PhonebookContact()
@@ -389,11 +388,17 @@ namespace gui
         }
         else {
             LOG_INFO("setContactData contact %s is on fav list", contact->primaryName.c_str());
+            favouritesIcon->setVisible(true);
+            favouritesLabel->setVisible(true);
         }
 
         if (!contact->isOnBlacklist) {
             blockedLabel->setVisible(false);
             blockedIcon->setVisible(false);
+        }
+        else {
+            blockedLabel->setVisible(true);
+            blockedIcon->setVisible(true);
         }
 
         if (contact->numbers.size() == 0) {

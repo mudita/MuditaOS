@@ -145,13 +145,13 @@ namespace gui
 
         // activated callbacks
         rects[FocusRects::Call]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("call %s", record.number.c_str());
-            return app::call(application, app::CallOperation::ExecuteCall, record.number);
+            LOG_INFO("call %s", record.phoneNumber.getE164().c_str());
+            return app::call(application, record.phoneNumber);
         };
 
         rects[FocusRects::Sms]->activatedCallback = [=](gui::Item &item) {
-            LOG_INFO("sms %s", record.number.c_str());
-            return app::sms(application, app::SmsOperation::Add, record.number);
+            LOG_INFO("sms %s", record.phoneNumber.getE164().c_str());
+            return app::sms(application, app::SmsOperation::Add, record.phoneNumber.getE164());
         };
 
         // Type
@@ -187,53 +187,7 @@ namespace gui
 
     void CallLogDetailsWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        removeWidget(informationLabel);
-        delete informationLabel;
-        informationLabel = nullptr;
-        removeWidget(number);
-        delete number;
-        number = nullptr;
-        rects[FocusRects::Call]->removeWidget(callImg);
-        delete callImg;
-        callImg = nullptr;
-        rects[FocusRects::Sms]->removeWidget(smsImg);
-        delete smsImg;
-        smsImg = nullptr;
-        for (auto &rect : rects) {
-            removeWidget(rect);
-            delete rect;
-            rect = nullptr;
-        }
-        removeWidget(typeLabel);
-        delete typeLabel;
-        typeLabel = nullptr;
-        removeWidget(durationLabel);
-        delete durationLabel;
-        durationLabel = nullptr;
-        for (auto &img : callTypeImg) {
-            removeWidget(img);
-            delete img;
-            img = nullptr;
-        }
-        removeWidget(typeData);
-        delete typeData;
-        typeData = nullptr;
-        removeWidget(durationData);
-        delete durationData;
-        durationData = nullptr;
-        removeWidget(dateLabel);
-        delete dateLabel;
-        dateLabel = nullptr;
-        removeWidget(dateDay);
-        delete dateDay;
-        dateDay = nullptr;
-        removeWidget(dateDate);
-        delete dateDate;
-        dateDate = nullptr;
-
-        children.clear();
+        erase();
     }
 
     CallLogDetailsWindow::~CallLogDetailsWindow()
@@ -249,7 +203,7 @@ namespace gui
 
             setTitle(record.name);
 
-            number->setText(record.number.c_str());
+            number->setText(record.phoneNumber.getFormatted());
 
             auto callType = toCallLogCallType(record.type);
             for (auto &img : callTypeImg) {

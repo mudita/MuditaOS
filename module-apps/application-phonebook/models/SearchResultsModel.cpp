@@ -4,7 +4,7 @@
 #include "../widgets/PhonebookItem.hpp"
 #include "service-db/api/DBServiceAPI.hpp"
 
-SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel(app, 14)
+SearchResultsModel::SearchResultsModel(app::Application *app) : DatabaseModel_old(app, 14)
 {}
 
 SearchResultsModel::~SearchResultsModel()

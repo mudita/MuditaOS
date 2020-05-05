@@ -1,7 +1,9 @@
 #pragma once
 
-#include "Interface/CalllogRecord.hpp"
-#include "time/time_conversion.hpp"
+#include <PhoneNumber.hpp>
+#include <Interface/CalllogRecord.hpp>
+#include <time/time_conversion.hpp>
+
 #include <functional>
 #include <string>
 
@@ -83,7 +85,6 @@ namespace CellularCall
         void clear()
         {
             call.ID           = 0; // 0 - Invalid
-            call.number       = "";
             call.presentation = PresentationType::PR_ALLOWED;
             call.date         = 0;
             call.duration     = 0;
@@ -92,21 +93,22 @@ namespace CellularCall
             call.contactId    = "";
             isActiveCall      = false;
             startActiveTime   = 0;
+            call.phoneNumber.clear();
         }
 
       public:
-        CellularCall(const UTF8 &number    = "",
-                     const CallType type   = CallType::CT_NONE,
-                     const time_t date     = 0,
-                     const time_t duration = 0)
+        CellularCall(utils::PhoneNumber::View number = utils::PhoneNumber::View(),
+                     const CallType type             = CallType::CT_NONE,
+                     const time_t date               = 0,
+                     const time_t duration           = 0)
         {
             clear();
-            this->call.number    = number;
-            this->call.date      = date;
-            this->call.duration  = duration;
-            this->call.type      = type;
-            this->call.name      = number; // temporary set number as name
-            this->call.contactId = "1";
+            this->call.phoneNumber = number;
+            this->call.date        = date;
+            this->call.duration    = duration;
+            this->call.type        = type;
+            this->call.name        = number.getEntered(); // temporary set number as name
+            this->call.contactId   = "1";
         }
 
         ~CellularCall() = default;
@@ -121,7 +123,7 @@ namespace CellularCall
             endCallAction = callAction;
         }
 
-        bool startCall(const UTF8 &number, const CallType type);
+        bool startCall(const utils::PhoneNumber::View &number, const CallType type);
 
         bool setActive();
 

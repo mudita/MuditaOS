@@ -83,12 +83,7 @@ namespace gui
                 noteLabel->setVisible(visible);
                 text[0]->setVisible(visible);
                 text[1]->setVisible(visible);
-                if (visible && favSelected) {
-                    imageTick->setVisible(true);
-                }
-                else {
-                    imageTick->setVisible(false);
-                }
+                imageTick->setVisible(visible && favSelected);
             }
         };
 
@@ -110,7 +105,10 @@ namespace gui
         void rebuild() override;
         void buildInterface() override;
         void destroyInterface() override;
+
+      private:
         bool verifyAndSave();
+        void copyInputData(ContactRecord &contactRecord);
         void setContactData();
         void saveStateChanged();
         const std::string getCountryPrefix();

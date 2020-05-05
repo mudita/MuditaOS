@@ -5,4 +5,9 @@
 #include "OptionWindow.hpp"
 
 std::list<gui::Item *> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
-std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app);
+
+/// @brief options for New Message Window
+///
+/// @param app - application pointer
+/// @param requestingWindow -requesting window - intentionally return point from an "action"
+std::list<gui::Item *> newMessageWindowOptions(app::ApplicationMessages *app, const std::string &requestingWindow);

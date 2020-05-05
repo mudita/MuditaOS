@@ -40,8 +40,6 @@ namespace gui
         AppWindow::buildInterface();
 
         list = new gui::ListView(this, 16, 105, 480 - 32, 440);
-        list->setMaxElements(3);
-        list->setPageSize(3);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(notesModel);
@@ -59,15 +57,7 @@ namespace gui
     }
     void NotesMainWindow::destroyInterface()
     {
-        AppWindow::destroyInterface();
-
-        if (list) {
-            removeWidget(list);
-            delete list;
-            list = nullptr;
-        };
-
-        children.clear();
+        erase();
         delete notesModel;
     }
 

@@ -137,8 +137,61 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
 
 bool ContactRecordInterface::Update(const ContactRecord &rec)
 {
-    // dummy not needed
-    return true;
+    ContactsTableRow contact = contactDB->contacts.GetByID(rec.ID);
+    if (contact.ID == DB_ID_NONE)
+        return false;
+
+    bool ret = contactDB->contacts.Update(ContactsTableRow{.ID              = contact.ID,
+                                                           .nameID          = contact.nameID,
+                                                           .numbersID       = contact.numbersID,
+                                                           .ringID          = contact.ringID,
+                                                           .addressIDs      = contact.addressIDs,
+                                                           .type            = rec.contactType,
+                                                           .isOnWhitelist   = rec.isOnWhitelist,
+                                                           .isOnBlacklist   = rec.isOnBlacklist,
+                                                           .isOnFavourites  = rec.isOnFavourites,
+                                                           .speedDial       = rec.speeddial,
+                                                           .namePrimary     = rec.primaryName,
+                                                           .nameAlternative = rec.alternativeName});
+
+    if (!ret)
+        return ret;
+
+    ret = contactDB->name.Update(ContactsNameTableRow{.ID              = contact.nameID,
+                                                      .contactID       = contact.ID,
+                                                      .namePrimary     = rec.primaryName,
+                                                      .nameAlternative = rec.alternativeName,
+                                                      .favourite       = rec.isOnFavourites});
+
+    if (!ret)
+        return ret;
+
+    for (auto number : rec.numbers) {
+        ret = contactDB->number.Update(ContactsNumberTableRow{.ID = static_cast<uint32_t>(std::stoi(contact.numbersID)),
+                                                              .contactID  = contact.ID,
+                                                              .numberUser = number.numberUser.c_str(),
+                                                              .numbere164 = number.numberE164.c_str(),
+                                                              .type       = number.numberType});
+    }
+
+    if (!ret)
+        return ret;
+
+    ret = contactDB->address.Update(ContactsAddressTableRow{.contactID = contact.ID,
+                                                            .country   = rec.country,
+                                                            .city      = rec.city,
+                                                            .street    = rec.street,
+                                                            .number    = rec.number,
+                                                            .type      = rec.addressType,
+                                                            .note      = rec.note,
+                                                            .mail      = rec.mail});
+
+    if (!ret)
+        return ret;
+
+    ret = contactDB->ringtones.Update(ContactsRingtonesTableRow{.contactID = contact.ID, .assetPath = rec.assetPath});
+
+    return ret;
 }
 
 ContactRecord ContactRecordInterface::GetByID(uint32_t id)

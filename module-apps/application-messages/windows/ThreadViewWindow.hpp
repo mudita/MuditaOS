@@ -14,15 +14,6 @@
 
 namespace gui
 {
-
-    namespace name
-    {
-        namespace window
-        {
-            inline std::string thread_view = "ThreadViewWindow";
-        };
-    }; // namespace name
-
     class ThreadViewWindow : public AppWindow
     {
       private:
