@@ -33,9 +33,9 @@ namespace gui
         /// set x,y,w,h to zero
         void clear();
         /// get size in axis - in x get width in y get height
-        uint16_t &size(gui::Axis axis);
+        uint16_t size(gui::Axis axis) const;
         /// get position in axis - in x get x, in y get y
-        int16_t &pos(gui::Axis axis);
+        int16_t pos(gui::Axis axis) const;
         std::string str() const;
         /// logical sum of bounding box by another bounding box values
         void sum(const BoundingBox &box);

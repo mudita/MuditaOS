@@ -47,9 +47,8 @@ void GridLayout::resizeItems()
         if (it->area().w > grid.x || it->area().h > grid.y) {
             continue;
         }
-        // set position
-        it->area().pos(Axis::X) = col * (grid.x + strech_x) + (grid.x - it->area().w) / 2;
-        it->area().pos(Axis::Y) = row * (grid.y + strech_y) + (grid.y - it->area().h) / 2;
+        it->setPosition(col * (grid.x + strech_x) + (grid.x - it->area().w) / 2,
+                        row * (grid.y + strech_y) + (grid.y - it->area().h) / 2);
         // shift row/col
         ++col;
         if (col == el_in_x) {
