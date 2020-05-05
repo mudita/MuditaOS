@@ -126,34 +126,35 @@ namespace gui
         auto pos        = reverse_order ? this->area().size(axis) : 0;
         auto pos_update = [this, &pos](Item *it) {
             if (this->reverse_order) {
-                pos -= it->area(Item::Area::Actual).size(axis);
-                it->area(Item::Area::Actual).pos(axis) = pos;
+                pos -= it->area(Item::Area::Min).size(axis);
+                it->area(Item::Area::Min).pos(axis)    = pos;
                 it->area(Item::Area::Normal).pos(axis) = pos;
             }
             else {
-                it->area(Item::Area::Actual).pos(axis) = pos;
+                it->area(Item::Area::Min).pos(axis)    = pos;
                 it->area(Item::Area::Normal).pos(axis) = pos;
-                pos += it->area(Item::Area::Actual).size(axis);
+                pos += it->area(Item::Area::Min).size(axis);
             }
         };
 
-        auto set_size = [this, &to_split, &pos_update](Item *el, auto &pos) {
+        auto set_size = [&to_split](Item *el, auto &pos) {
             if (el == nullptr) {
                 return;
             }
-            int32_t left_in_el = el->area(Item::Area::Max).size(axis) - el->area(Item::Area::Normal).size(axis);
+            int32_t left_in_el = el->area(Area::Normal).size(axis) - el->area(Area::Min).size(axis);
             if (to_split > 0 && left_in_el > 0) {
                 int32_t resize = left_in_el < to_split ? left_in_el : to_split;
-                el->area(Item::Area::Actual).size(axis) += resize;
+                el->setSize(el->area(Area::Min).size(axis) + resize, axis);
                 to_split -= resize;
             }
         };
 
         for (auto &el : children) {
-            el->area(Item::Area::Actual) = el->area(Item::Area::Normal);
+            LOG_DEBUG("# el %s", el->area(Area::Normal).str().c_str());
+            el->area(Item::Area::Normal) = el->area(Item::Area::Min);
             set_size(el, pos);
             pos_update(el);
-            // LOG_DEBUG("> el %s", el->area(Area::Normal).str().c_str()); // log to show how inefficient is adding
+            LOG_DEBUG("> el %s", el->area(Area::Normal).str().c_str());
             // single element at a time
         }
         Rect::updateDrawArea();

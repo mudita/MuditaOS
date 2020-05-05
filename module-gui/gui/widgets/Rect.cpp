@@ -17,34 +17,23 @@ namespace gui
 {
 
     Rect::Rect()
-        : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1},
-          penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
+        : penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
           flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
           yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{style::window::messages::yaps_size_default}
     {}
 
     Rect::Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h)
-        : borderColor(Color(0, 0)), fillColor(Color(15, 15)), penWidth{1},
-          penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
+        : penFocusWidth{1}, filled{false}, edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES},
           flatEdges{RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT}, corners{RectangleCornerFlags::GUI_RECT_ALL_CORNERS},
           yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{style::window::messages::yaps_size_default}
     {
-
-        widgetArea.x = 0;
-        widgetArea.y = 0;
-        widgetArea.w = 0;
-        widgetArea.h = 0;
-        setPosition(x, y);
-        setSize(w, h);
+        setArea({int16_t(x), int16_t(y), uint16_t(w), uint16_t(h)});
 
         this->parent = parent;
-        if (parent) {
+        if (parent != nullptr) {
             parent->addWidget(this);
         }
     }
-
-    Rect::~Rect()
-    {}
 
     void Rect::setFillColor(const Color &color)
     {
