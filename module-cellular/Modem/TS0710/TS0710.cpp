@@ -11,6 +11,7 @@
 #include <at/URC_QIND.hpp>
 #include <cassert>
 #include <sstream>
+#include <module-os/RTOSWrapper/include/ticks.hpp>
 
 std::map<TypeOfFrame_e, std::string> TypeOfFrame_text = {{TypeOfFrame_e::SABM, "SABM"},
                                                          {TypeOfFrame_e::UA, "UA"},
@@ -83,94 +84,102 @@ TS0710::~TS0710()
     }
     delete parser;
 }
+
+TS0710_Frame::frame_t createCMUXExitFrame()
+{
+    TS0710_Frame::frame_t frame;
+    frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
+    frame.Control = TypeOfFrame_e::UIH;
+    frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) |
+                         static_cast<uint8_t>(MuxDefines::GSM0710_EA) | static_cast<uint8_t>(MuxDefines::GSM0710_CR));
+    frame.data.push_back(0x01);
+    return frame;
+}
+
+enum class BaudTestStep
+{
+    baud460800_NoCmux,
+    baud460800_Cmux,
+    baud115200_NoCmux,
+    baud115200_Cmux
+};
+
+const char *c_str(BaudTestStep step)
+{
+    switch (step) {
+    case BaudTestStep::baud460800_NoCmux:
+        return "baud460800_NoCmux";
+    case BaudTestStep::baud460800_Cmux:
+        return "baud460800_Cmux";
+    case BaudTestStep::baud115200_NoCmux:
+        return "baud115200_NoCmux";
+    case BaudTestStep::baud115200_Cmux:
+        return "baud115200_Cmux";
+    }
+    return "";
+}
+
+bool BaudDetectTestAT(ATParser *parser, BaudTestStep &step, BaudTestStep nextStep)
+{
+    LOG_DEBUG("=> Baud detection step: %s -> %s", c_str(step), c_str(nextStep));
+    step = nextStep;
+    if (parser->cmd(at::AT::AT)) {
+        return true;
+    }
+    return false;
+}
+
+void CloseCmux(std::unique_ptr<bsp::Cellular> &pv_cellular)
+{
+    LOG_INFO("Closing mux mode");
+    TS0710_Frame::frame_t frame = createCMUXExitFrame();
+    pv_cellular->Write((void *)frame.serialize().data(), frame.serialize().size());
+    vTaskDelay(1000); // GSM module needs some time to close multiplexer
+}
+
 TS0710::ConfState TS0710::BaudDetectProcedure()
 {
-    enum class BaudTestStep
-    {
-        baud460800_NoCmux,
-        baud460800_Cmux,
-        baud115200_NoCmux,
-        baud115200_Cmux
-    };
-
     BaudTestStep step = BaudTestStep::baud460800_NoCmux;
     at::Result ret;
-    bool result = false;
+    bool result  = false;
+    auto timeout_s = 60 * 1000 + cpp_freertos::Ticks::GetTicks();
 
     while (!result) {
         switch (step) {
         case BaudTestStep::baud460800_NoCmux:
-            LOG_DEBUG("Setting baudrate to 460800.");
-            pv_cellular->SetSpeed(ATPortSpeeds_text[startParams.PortSpeed]);
-            if (parser->cmd(at::AT::AT)) {
-                result = true;
-                LOG_DEBUG("Baud found: 460800 no CMUX.");
-                return ConfState::Success;
-            }
-            step = BaudTestStep::baud460800_Cmux;
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS460800]);
+            result = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_Cmux);
             break;
-        case BaudTestStep::baud460800_Cmux: {
-            LOG_INFO("Closing mux mode, baud 460800.");
-            TS0710_Frame::frame_t frame;
-            frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
-            frame.Control = TypeOfFrame_e::UIH;
-            frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) |
-                                 static_cast<uint8_t>(MuxDefines::GSM0710_EA) |
-                                 static_cast<uint8_t>(MuxDefines::GSM0710_CR));
-            frame.data.push_back(0x01);
-            pv_cellular->Write((void *)frame.serialize().data(), frame.serialize().size());
+        case BaudTestStep::baud460800_Cmux:
+            CloseCmux(pv_cellular);
+            result = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_NoCmux);
+            break;
 
-            pv_cellular->InformModemHostWakeup();
-            // GSM module needs some time to close multiplexer
-            vTaskDelay(1000);
-            if (parser->cmd(at::AT::AT)) {
-                result = true;
-                LOG_DEBUG("Baud found: 460800 CMUX.");
-                return ConfState::Success;
-            }
-            step = BaudTestStep::baud115200_NoCmux;
-            break;
-        }
         case BaudTestStep::baud115200_NoCmux:
-            LOG_DEBUG("Setting baudrate to 115200.");
-#if USE_DAEFAULT_BAUDRATE
-            pv_cellular->SetSpeed(115200);
-#endif
-            if (parser->cmd(at::AT::AT)) {
-                result = true;
-                LOG_DEBUG("Baud found: 115200 no CMUX.");
-                return ConfState::Success;
-            }
-            step = BaudTestStep::baud115200_Cmux;
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]);
+            result = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_Cmux);
             break;
-        case BaudTestStep::baud115200_Cmux: {
-            LOG_INFO("Closing mux mode, baud 115200.");
-            TS0710_Frame::frame_t frame;
-            frame.Address = 0 | static_cast<unsigned char>(MuxDefines ::GSM0710_CR);
-            frame.Control = TypeOfFrame_e::UIH;
-            frame.data.push_back(static_cast<uint8_t>(MuxDefines::GSM0710_CONTROL_CLD) |
-                                 static_cast<uint8_t>(MuxDefines::GSM0710_EA) |
-                                 static_cast<uint8_t>(MuxDefines::GSM0710_CR));
-            frame.data.push_back(0x01);
-            pv_cellular->Write((void *)frame.serialize().data(), frame.serialize().size());
+        case BaudTestStep::baud115200_Cmux:
+            CloseCmux(pv_cellular);
+            result = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_NoCmux);
+            break;
 
-            pv_cellular->InformModemHostWakeup();
-            // GSM module needs some time to close multiplexer
-            vTaskDelay(1000);
-            if (parser->cmd(at::AT::AT)) {
-                result = true;
-                LOG_DEBUG("Baud found: 115200 CMUX.");
-                return ConfState::Success;
-            }
-            else {
-                LOG_DEBUG("No Baud found.");
-                return ConfState::Failure;
-            }
-        } break;
+        if (cpp_freertos::Ticks::GetTicks() > timeout_s) {
+            LOG_ERROR("Baudrate detection timeout!");
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
+            break;
         }
     }
+
+    if (result) {
+        LOG_DEBUG("Baud found: %s", c_str(step));
+        return ConfState::Success;
+    }
+    }
+    LOG_DEBUG("No Baud found.");
     return ConfState::Failure;
 }
+
 TS0710::ConfState TS0710::PowerUpProcedure()
 {
 
@@ -188,6 +197,9 @@ TS0710::ConfState TS0710::PowerUpProcedure()
 TS0710::ConfState TS0710::ConfProcedure()
 {
     pv_cellular->InformModemHostAsleep();
+
+    BaudDetectProcedure();
+
     LOG_DEBUG("Configuring modem...");
     uint32_t tries = 0;
 
