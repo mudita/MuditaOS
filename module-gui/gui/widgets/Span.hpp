@@ -12,8 +12,8 @@ namespace gui
       public:
         Span(Axis axis, unsigned int size) : axis(axis)
         {
-            area().size(axis) = size;
-            activeItem        = false;
+            setSize(size, axis);
+            activeItem = false;
         }
 
         Span(Item *parent, Axis axis, unsigned int size) : Span(axis, size)

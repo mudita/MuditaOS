@@ -48,9 +48,9 @@ namespace gui
         std::list<Item *> children;
         enum class Area
         {
+            Min,
             Normal,
             Draw,
-            Actual, // actual area in use between: Normal <-> Max
             Max,
         };
         /// bounding box of the item. This is in coordinates of the parent widget.
@@ -65,14 +65,14 @@ namespace gui
         auto area(Area which = Area::Normal) -> BoundingBox &
         {
             switch (which) {
+            case Area::Min:
+                return widgetActualArea;
             case Area::Normal:
                 return widgetArea;
             case Area::Draw:
                 return drawArea;
             case Area::Max:
                 return widgetMaxArea;
-            case Area::Actual:
-                return widgetActualArea;
             }
             return widgetArea;
         }
@@ -173,14 +173,17 @@ namespace gui
         virtual void erase() final;
         /// sets `visible` flag
         virtual void setVisible(bool value);
+        void setArea(BoundingBox area);
         /// sets position of element - this is sets area().x and area().y of item
         /// calls onDimensionChanged callback & updateDrawArea for item
         /// @attention should be bind to area
         virtual void setPosition(const short &x, const short &y);
+        virtual void setPosition(const short &val, Axis axis);
         /// sets size of element - this is sets area().w and area().h of item
         /// calls onDimensionChanged & updateDrawArea for item
         /// @attention should be bind to area
         virtual void setSize(const unsigned short w, const unsigned short h);
+        void setSize(uint32_t val, Axis axis);
         /// used in ListView to position element sets area() = WidgetArea(params)
         /// calls onDimensionChanged & updateDrwArea
         /// @attention should be bind to area
@@ -207,8 +210,8 @@ namespace gui
         /// possibly all of that should be handled via area() (and area should have callback pinned from Item on resize
         /// @{
 
-        void setX(const uint32_t x);
-        void setY(const uint32_t y);
+        void setX(const int32_t x);
+        void setY(const int32_t y);
         [[nodiscard]] uint32_t getX() const
         {
             return (widgetArea.x);

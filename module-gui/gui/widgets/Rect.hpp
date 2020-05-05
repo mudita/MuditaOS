@@ -20,11 +20,11 @@ namespace gui
     {
       public:
         // defines color used for drawing border
-        Color borderColor;
+        Color borderColor = Color(0, 0);
         // defines color for filling rectangle
-        Color fillColor;
+        Color fillColor = Color(15, 15);
         // defines number of pixels used to draw border of rectangle without focus
-        uint8_t penWidth;
+        uint8_t penWidth = 1;
         // defines number of pixels used to draw border of rectangle when it has focus
         uint8_t penFocusWidth;
         // defines whether rectangle should be filled with fill color.
@@ -43,7 +43,6 @@ namespace gui
       public:
         Rect();
         Rect(Item *parent, const uint32_t &x, const uint32_t &y, const uint32_t &w, const uint32_t &h);
-        virtual ~Rect();
 
         void setFillColor(const Color &color);
         void setBorderColor(const Color &color);
