@@ -105,44 +105,60 @@ namespace gui
         return commands;
     }
 
+    void Item::setArea(BoundingBox area)
+    {
+        BoundingBox oldArea = widgetArea;
+        widgetArea          = area;
+        widgetMaxArea.sum(widgetArea);
+        widgetActualArea.sum(widgetArea);
+        updateDrawArea();
+        onDimensionChanged(oldArea, widgetArea);
+    }
+
     void Item::setPosition(const short &x, const short &y)
     {
-
-        BoundingBox oldArea = widgetArea;
-        widgetArea.x        = x;
-        widgetArea.y        = y;
-        updateDrawArea();
-
-        onDimensionChanged(oldArea, widgetArea);
+        setArea({x, y, widgetArea.w, widgetArea.h});
     }
 
-    void Item::setX(const uint32_t x)
+    void Item::setX(const int32_t x)
     {
-        BoundingBox oldArea = widgetArea;
-        widgetArea.x        = x;
-        updateDrawArea();
-
-        onDimensionChanged(oldArea, widgetArea);
+        setArea({x, widgetArea.y, widgetArea.w, widgetArea.h});
     }
 
-    void Item::setY(const uint32_t y)
+    void Item::setY(const int32_t y)
     {
-        BoundingBox oldArea = widgetArea;
-        widgetArea.y        = y;
-        updateDrawArea();
-
-        onDimensionChanged(oldArea, widgetArea);
+        setArea({widgetArea.x, y, widgetArea.w, widgetArea.h});
     }
 
     void Item::setSize(const unsigned short w, const unsigned short h)
     {
-        BoundingBox oldArea = widgetArea;
-        widgetArea.w        = w;
-        widgetArea.h        = h;
-        widgetMaxArea.sum(widgetArea);
-        updateDrawArea();
+        setArea({widgetArea.x, widgetArea.y, w, h});
+    }
 
-        onDimensionChanged(oldArea, widgetArea);
+    void Item::setSize(uint32_t val, Axis axis)
+    {
+        uint16_t w = getWidth();
+        uint16_t h = getHeight();
+        if (axis == Axis::X) {
+            w = val;
+        }
+        else {
+            h = val;
+        }
+        setArea({getX(), getY(), w, h});
+    }
+
+    void Item::setPosition(const short &val, Axis axis)
+    {
+        int16_t x = getX();
+        int16_t y = getY();
+        if (axis == Axis::X) {
+            x = val;
+        }
+        else {
+            y = val;
+        }
+        setArea({x, y, getWidth(), getHeight()});
     }
 
     void Item::setBoundingBox(const BoundingBox &new_box)

@@ -19,6 +19,14 @@ namespace gui
         this->h = h;
     }
 
+    BoundingBox::BoundingBox(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+    {
+        this->x = x;
+        this->y = y;
+        this->w = w;
+        this->h = h;
+    }
+
     bool BoundingBox::intersect(const BoundingBox &box1, const BoundingBox &box2, BoundingBox &result)
     {
         const BoundingBox *l;

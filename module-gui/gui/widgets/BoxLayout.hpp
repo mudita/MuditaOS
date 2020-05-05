@@ -31,17 +31,18 @@ namespace gui
         {
             return it->widgetArea.size(axis);
         };
-        template <Axis axis> uint32_t sizeUsed(Item *it, Item::Area area = Item::Area::Normal)
+
+        template <Axis axis> uint32_t sizeUsed(Item *it)
         {
             uint32_t sum = 0;
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area(area).size(axis) : 0;
+                sum += el->visible ? el->area().size(axis) : 0;
             });
             return sum;
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
         {
-            return size<axis>(it) - sizeUsed<axis>(it, area);
+            return size<axis>(it) - sizeUsed<axis>(it);
         };
 
         template <Axis axis> void resizeItems();

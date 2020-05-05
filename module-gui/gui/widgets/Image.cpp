@@ -1,12 +1,6 @@
-/*
- * Image.cpp
- *
- *  Created on: 17 mar 2019
- *      Author: robert
- */
-
 #include "../core/DrawCommand.hpp"
 #include "../core/PixMap.hpp"
+#include "BoundingBox.hpp"
 #include "Image.hpp"
 
 #include "../core/ImageManager.hpp"
@@ -26,32 +20,18 @@ namespace gui
         type = ItemType::IMAGE;
         set(imageName);
         setPosition(x, y);
-        updateDrawArea();
     }
 
     Image::Image(const UTF8 &imageName) : imageMap{nullptr}
     {
         type = ItemType::IMAGE;
         set(imageName);
-        updateDrawArea();
     }
 
     bool Image::set(int id)
     {
-
-        // get pixmap for selected ID
         imageMap = ImageManager::getInstance().getImageMap(id);
-
-        // set height and width and max and min dimensions
-        uint16_t imageMapWidth  = imageMap->getWidth();
-        uint16_t imageMapHeight = imageMap->getHeight();
-
-        drawArea.w = imageMapWidth;
-        drawArea.h = imageMapHeight;
-
-        widgetMaxArea.w = widgetArea.w = imageMapWidth;
-        widgetMaxArea.h = widgetArea.h = imageMapHeight;
-
+        setArea(BoundingBox(getX(), getY(), imageMap->getWidth(), imageMap->getHeight()));
         return true;
     }
 

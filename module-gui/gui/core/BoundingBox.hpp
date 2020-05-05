@@ -24,6 +24,8 @@ namespace gui
             uint16_t w = 0, h = 0;
         };
         BoundingBox(int32_t x = 0, int32_t y = 0, uint32_t w = 0, uint32_t h = 0);
+        // this is workaround - we mostly use uint32_t - to not cast left and right ctor to use uint32...
+        BoundingBox(uint32_t x, uint32_t y, uint32_t w = 0, uint32_t h = 0);
         virtual ~BoundingBox() = default;
 
         static bool intersect(const BoundingBox &box1, const BoundingBox &box2, BoundingBox &result);
