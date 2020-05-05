@@ -27,11 +27,6 @@ namespace gui
             bool noUpdate;
         };
 
-        template <Axis axis> uint16_t &size(Item *it)
-        {
-            return it->widgetArea.size(axis);
-        };
-
         template <Axis axis> uint32_t sizeUsed(Item *it)
         {
             uint32_t sum = 0;
@@ -42,7 +37,7 @@ namespace gui
         };
         template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
         {
-            return size<axis>(it) - sizeUsed<axis>(it);
+            return it->getSize(axis) - sizeUsed<axis>(it);
         };
 
         template <Axis axis> void resizeItems();

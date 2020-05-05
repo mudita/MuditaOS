@@ -90,7 +90,7 @@ namespace gui
         h = 0;
     }
 
-    uint16_t &BoundingBox::size(gui::Axis axis)
+    uint16_t BoundingBox::size(gui::Axis axis) const
     {
         if (axis == Axis::X)
             return w;
@@ -98,7 +98,7 @@ namespace gui
             return h;
     }
 
-    int16_t &BoundingBox::pos(gui::Axis axis)
+    int16_t BoundingBox::pos(gui::Axis axis) const
     {
         if (axis == Axis::X)
             return x;

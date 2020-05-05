@@ -148,6 +148,21 @@ namespace gui
         setArea({getX(), getY(), w, h});
     }
 
+    void Item::setMaxSize(uint32_t val, Axis axis)
+    {
+        if (axis == Axis::X) {
+            area(Area::Max).w = val;
+        }
+        else {
+            area(Area::Max).h = val;
+        }
+    }
+
+    uint16_t Item::getSize(Axis axis)
+    {
+        return widgetArea.size(axis);
+    }
+
     void Item::setPosition(const short &val, Axis axis)
     {
         int16_t x = getX();
