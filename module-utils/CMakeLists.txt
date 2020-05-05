@@ -29,8 +29,8 @@ set (SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/crc32/crc32.c
         ${CMAKE_CURRENT_SOURCE_DIR}/sbini/sbini.c
         ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/PhoneNumber.hpp
+#        ${CMAKE_CURRENT_SOURCE_DIR}/country.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${BOARD_SOURCES})
