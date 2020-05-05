@@ -32,6 +32,7 @@ namespace gui
             return true;
         }
         if (borderCallback && borderCallback(inputEvent)) {
+            outOfDrawAreaItems.clear();
             return true;
         }
         // let item logic rule it
@@ -62,7 +63,13 @@ namespace gui
     {
         Rect::setSize(w, h);
 
+        for (auto it : outOfDrawAreaItems) {
+            it->setVisible(true);
+        }
+        outOfDrawAreaItems.clear();
+
         resizeItems();
+        setNavigation();
     }
     void BoxLayout::addWidget(Item *item)
     {
@@ -123,15 +130,24 @@ namespace gui
     {
         // we want to split to interested parties what's left, as much as they can fit
         int32_t to_split = getSize(axis);
-        auto pos        = reverse_order ? this->area().size(axis) : 0;
+        auto pos         = reverse_order ? this->area().size(axis) : 0;
         auto pos_update  = [this](Item *it, int32_t &pos) {
-            if (this->reverse_order) {
-                pos -= it->area(Item::Area::Normal).size(axis);
-                it->setPosition(pos, axis);
+            if (pos <= this->area().size(axis) && pos >= 0) {
+
+                if (this->reverse_order) {
+                    pos -= it->area(Item::Area::Normal).size(axis);
+                    it->setPosition(pos, axis);
+                }
+                else {
+                    it->setPosition(pos, axis);
+                    pos += it->area(Item::Area::Normal).size(axis);
+                }
             }
             else {
-                it->setPosition(pos, axis);
-                pos += it->area(Item::Area::Normal).size(axis);
+                if (it->visible) {
+                    outOfDrawAreaItems.push_back(it);
+                    it->visible = false;
+                }
             }
         };
 
@@ -139,25 +155,31 @@ namespace gui
             if (el == nullptr) {
                 return;
             }
+
             // Here should be Max - Min ?
-            int32_t left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis) - 10;
+            int32_t left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
             if (to_split > 0 && left_in_el > 0) {
                 int32_t resize = left_in_el < to_split ? left_in_el : to_split;
                 el->setSize(el->area(Area::Min).size(axis) + resize, axis);
                 to_split = -(resize - el->getWidth());
             }
-            if (to_split <= 0) {
-                el->visible = false;
+            else {
+                el->setSize(el->area(Area::Normal).size(axis), axis);
             }
         };
 
         for (auto &el : children) {
             // LOG_DEBUG("# el %s", el->area(Area::Normal).str().c_str());
+
+            if (!el->visible)
+                continue;
+
             el->area(Item::Area::Normal) = el->area(Item::Area::Min);
             set_size(el, pos, to_split);
             pos_update(el, pos);
-            LOG_DEBUG("> el     %s", el->area(Area::Normal).str().c_str());
-            LOG_DEBUG("> el max %s", el->area(Area::Max).str().c_str());
+            //            LOG_DEBUG("> el     %s", el->area(Area::Normal).str().c_str());
+            //            LOG_DEBUG("> el max %s", el->area(Area::Max).str().c_str());
+            //            LOG_DEBUG("> el visible %d", el->visible);
         }
         Rect::updateDrawArea();
     }
@@ -165,9 +187,7 @@ namespace gui
     template <Axis axis> void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
-        item->visible = false;
         if (getSize(axis) - sizeUsed<axis>(this) >= 0) {
-            item->visible = true;
             resizeItems<axis>();
         }
     }
