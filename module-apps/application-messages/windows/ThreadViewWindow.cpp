@@ -287,7 +287,6 @@ namespace gui
         smsLabel->setPenFocusWidth(style::window::default_border_focucs_w);
         smsLabel->setPenWidth(style::window::messages::sms_border_no_focus);
         smsLabel->expandMode = Text::ExpandMode::EXPAND_DOWN;
-        // smsLabel->buildDrawList();
         smsLabel->setText(smsRecord.body.length() ? smsRecord.body : " "); // text doesn't really like being empty//
         smsLabel->setMargins(gui::Margins(style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding,
