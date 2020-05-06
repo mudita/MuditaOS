@@ -22,7 +22,8 @@ RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime && \
         clang-format-9 \
         apt-utils \
         locales \
-        tzdata && \
+        tzdata \
+        ninja-build && \
     ln -fs /usr/bin/python3 /usr/bin/python && \
     locale-gen pl_PL.UTF-8 \
                en_US.UTF-8 \
