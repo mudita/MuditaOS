@@ -328,8 +328,8 @@ class TS0710
     {
         return static_cast<DLCI_t>(channels.size() == 0 ? 0 : channels.size() - 1);
     }
-    ConfState BaudDetectProcedure();
-    ConfState PowerUpProcedure();
+    ConfState BaudDetectOnce();
+    ConfState BaudDetectProcedure(uint16_t timeout_s = 30);
     ConfState ConfProcedure();
     ConfState AudioConfProcedure();
     ConfState StartMultiplexer();
