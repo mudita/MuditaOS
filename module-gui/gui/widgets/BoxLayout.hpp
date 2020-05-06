@@ -41,6 +41,7 @@ namespace gui
         };
 
         template <Axis axis> void resizeItems();
+        template <Axis axis> void updatePosition();
 
         std::list<Item *> outOfDrawAreaItems;
         virtual void resizeItems();
