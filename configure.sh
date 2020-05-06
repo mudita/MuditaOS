@@ -9,16 +9,13 @@ fi
 function help() {
     echo -e "Use this script for faster configuring build types"
     echo -e "ussage:"
-    echo -e "\t$0 <target> <build_type> [systemview]"
+    echo -e "\t$0 <target> <build_type> [other cmake options]"
     echo -e "available targets are:"
     echo -e "\t\t\tlinux\n\t\t\trt1051"
     echo -e "available build types:"
     echo -e "\t\t\tDebug\t\t- standard debug build"
     echo -e "\t\t\tRelease\t\t- release build (not for debugging)"
     echo -e "\t\t\tRelWithDebInfo\t - release with debug info in separate file"
-    echo -e "available systemview options:"
-    echo -e "\t\t\tSYSTEMVIEW_OFF\t\t- default - disabled"
-    echo -e "\t\t\tSYSTEMVIEW_ON\t\t- enabled"
     echo -e "\n\e[1m\e[31mThis script will delete previous build dir!\e[0m"
 }
 
@@ -53,31 +50,11 @@ function check_build_type() {
     esac
 }
 
-function check_systemview() {
-    case ${SYSTEMVIEW,,} in
-        systemview_off)
-            SYSTEMVIEW="OFF"
-            return 0;;
-        systemview_on)
-            SYSTEMVIEW="ON"
-            return 0;;
-        *)
-            echo "\"systemview\" option ${SYSTEMVIEW:+has wrong value:}${SYSTEMVIEW:-is not set} - using default (OFF)"
-            SYSTEMVIEW="OFF"
-            return 1;;
-    esac
-}
-
-
 TARGET=$1
 BUILD_TYPE=$2
 
 if check_target && check_build_type ; then
     shift 2
-    SYSTEMVIEW=$1
-    if check_systemview ; then
-        shift
-    fi
 
     BUILD_DIR="build-${TARGET,,}-${CMAKE_BUILD_TYPE}"
     echo -e "build dir:\e[34m\n\t${BUILD_DIR}\e[0m"
@@ -95,7 +72,7 @@ if check_target && check_build_type ; then
                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
                     -DCMAKE_TOOLCHAIN_FILE=${SRC_DIR}/${CMAKE_TOOLCHAIN_FILE} \
                     -DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
-                    -DSYSTEMVIEW=${SYSTEMVIEW} $@ \
+                    $@ \
                     ${SRC_DIR} "
         echo -e "\e[32m${CMAKE_CMD}\e[0m" | tr -s " "
         if $CMAKE_CMD; then
