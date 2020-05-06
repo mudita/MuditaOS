@@ -101,7 +101,8 @@ enum class BaudTestStep
     baud460800_NoCmux,
     baud460800_Cmux,
     baud115200_NoCmux,
-    baud115200_Cmux
+    baud115200_Cmux,
+    over,
 };
 
 const char *c_str(BaudTestStep step)
@@ -115,6 +116,8 @@ const char *c_str(BaudTestStep step)
         return "baud115200_NoCmux";
     case BaudTestStep::baud115200_Cmux:
         return "baud115200_Cmux";
+    default:
+        return "baudBad";
     }
     return "";
 }
@@ -137,67 +140,66 @@ void CloseCmux(std::unique_ptr<bsp::Cellular> &pv_cellular)
     vTaskDelay(1000); // GSM module needs some time to close multiplexer
 }
 
-TS0710::ConfState TS0710::BaudDetectProcedure()
+TS0710::ConfState TS0710::BaudDetectOnce()
 {
-    BaudTestStep step = BaudTestStep::baud460800_NoCmux;
-    at::Result ret;
-    bool result    = false;
-    bool timed_out = false;
-    auto timeout_s = 60 * 1000 + cpp_freertos::Ticks::GetTicks();
+    bool result           = false;
+    BaudTestStep lastStep = BaudTestStep::over;
+    BaudTestStep step     = BaudTestStep::baud460800_NoCmux;
 
-    while (!result && !timed_out) {
+    while (!result) {
         switch (step) {
         case BaudTestStep::baud460800_NoCmux:
             pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS460800]);
-            result = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_Cmux);
+            lastStep = step;
+            result   = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_Cmux);
             break;
         case BaudTestStep::baud460800_Cmux:
             CloseCmux(pv_cellular);
-            result = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_NoCmux);
+            lastStep = step;
+            result   = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_NoCmux);
             break;
-
         case BaudTestStep::baud115200_NoCmux:
             pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]);
-            result = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_Cmux);
+            lastStep = step;
+            result   = BaudDetectTestAT(parser, step, BaudTestStep::baud115200_Cmux);
             break;
         case BaudTestStep::baud115200_Cmux:
             CloseCmux(pv_cellular);
-            result = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_NoCmux);
+            lastStep = step;
+            result   = BaudDetectTestAT(parser, step, BaudTestStep::over);
+            break;
+        case BaudTestStep::over:
+            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
+            LOG_ERROR("No Baud found for modem.");
+            return ConfState::Failure;
             break;
         }
+    }
+    LOG_DEBUG("Baud found: %s", c_str(lastStep));
+    return ConfState::Success;
+}
 
-        timed_out = cpp_freertos::Ticks::GetTicks() > timeout_s;
-        if (result) {
-            LOG_DEBUG("Baud found: %s", c_str(step));
+TS0710::ConfState TS0710::BaudDetectProcedure(uint16_t timeout_s)
+{
+    at::Result ret;
+    bool timed_out     = false;
+    auto timeout_ticks = cpp_freertos::Ticks::GetTicks() + pdMS_TO_TICKS(timeout_s * 1000);
+
+    while (!timed_out) {
+        auto baud_result = BaudDetectOnce();
+        timed_out        = cpp_freertos::Ticks::GetTicks() > timeout_ticks;
+        if (baud_result == ConfState::Success) {
             return ConfState::Success;
         }
     }
-
     pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
     LOG_DEBUG("No Baud found.");
     return ConfState::Failure;
 }
 
-TS0710::ConfState TS0710::PowerUpProcedure()
-{
-
-    auto ret = BaudDetectProcedure();
-
-    if (ret != ConfState::Success) {
-        LOG_INFO("Starting power up procedure...");
-        pv_cellular->PowerUp();
-        return ConfState::PowerUp;
-    }
-    return ConfState::Success;
-}
-
 // TODO:M.P Fetch configuration from JSON/XML file
 TS0710::ConfState TS0710::ConfProcedure()
 {
-    pv_cellular->InformModemHostAsleep();
-
-    BaudDetectProcedure();
-
     LOG_DEBUG("Configuring modem...");
     uint32_t tries = 0;
 
@@ -379,8 +381,7 @@ TS0710::ConfState TS0710::StartMultiplexer()
     OpenChannel(Channel::Notifications);
     OpenChannel(Channel::Data);
 
-    mode = Mode::CMUX;
-    pv_cellular->InformModemHostWakeup();
+    mode           = Mode::CMUX;
     DLC_channel *c = get(Channel::Commands);
     if (c != nullptr) {
         // Route URCs to second (Notifications) MUX channel
@@ -407,6 +408,8 @@ TS0710::ConfState TS0710::StartMultiplexer()
         LOG_FATAL("No channel");
         return ConfState::Failure;
     }
+    pv_cellular->InformModemHostWakeup();
+    LOG_DEBUG("AP ready");
 
     return ConfState::Success;
 }
