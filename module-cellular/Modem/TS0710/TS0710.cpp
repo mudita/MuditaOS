@@ -141,10 +141,11 @@ TS0710::ConfState TS0710::BaudDetectProcedure()
 {
     BaudTestStep step = BaudTestStep::baud460800_NoCmux;
     at::Result ret;
-    bool result  = false;
+    bool result    = false;
+    bool timed_out = false;
     auto timeout_s = 60 * 1000 + cpp_freertos::Ticks::GetTicks();
 
-    while (!result) {
+    while (!result && !timed_out) {
         switch (step) {
         case BaudTestStep::baud460800_NoCmux:
             pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS460800]);
@@ -163,19 +164,16 @@ TS0710::ConfState TS0710::BaudDetectProcedure()
             CloseCmux(pv_cellular);
             result = BaudDetectTestAT(parser, step, BaudTestStep::baud460800_NoCmux);
             break;
+        }
 
-        if (cpp_freertos::Ticks::GetTicks() > timeout_s) {
-            LOG_ERROR("Baudrate detection timeout!");
-            pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
-            break;
+        timed_out = cpp_freertos::Ticks::GetTicks() > timeout_s;
+        if (result) {
+            LOG_DEBUG("Baud found: %s", c_str(step));
+            return ConfState::Success;
         }
     }
 
-    if (result) {
-        LOG_DEBUG("Baud found: %s", c_str(step));
-        return ConfState::Success;
-    }
-    }
+    pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
     LOG_DEBUG("No Baud found.");
     return ConfState::Failure;
 }
