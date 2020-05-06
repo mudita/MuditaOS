@@ -73,9 +73,7 @@ namespace gui
 
     void ThreadViewWindow::rebuildText()
     {
-        if (text) {
-            body->erase(text);
-        }
+        body->erase(text);
         text = new gui::Text(
             this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
@@ -106,10 +104,7 @@ namespace gui
 
     void ThreadViewWindow::cleanView()
     {
-        body->erase(text);
-        body->setFocusItem(nullptr);
-        std::for_each(body->children.begin(), body->children.end(), [&](auto &el) { delete el; });
-        body->children.erase(body->children.begin(), body->children.end());
+        body->erase();
     }
 
     bool ThreadViewWindow::showMessages(ThreadViewWindow::Action what)
@@ -318,7 +313,6 @@ namespace gui
         HBox *labelSpan = smsSpanBuild(smsLabel, smsRecord);
 
         if (labelSpan == nullptr) {
-            delete smsLabel;
             return false;
         }
 
