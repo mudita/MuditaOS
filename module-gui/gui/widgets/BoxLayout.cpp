@@ -123,51 +123,68 @@ namespace gui
         setVisible(value, false);
     }
 
+    template <Axis axis> void BoxLayout::updatePosition()
+    {
+        auto pos        = reverse_order ? this->area().size(axis) : 0;
+        auto pos_update = [this](Item *it, int32_t &pos) {
+            if (this->reverse_order) {
+
+                if (pos - it->area(Item::Area::Normal).size(axis) >= 0) {
+                    pos -= it->area(Item::Area::Normal).size(axis);
+                    it->setPosition(pos, axis);
+                }
+                else {
+                    if (it->visible) {
+                        outOfDrawAreaItems.push_back(it);
+                        it->visible = false;
+                    }
+                }
+            }
+            else {
+
+                if (pos <= (this->area().size(axis) - it->area(Item::Area::Normal).size(axis))) {
+                    it->setPosition(pos, axis);
+                    pos += it->area(Item::Area::Normal).size(axis);
+                }
+                else {
+                    if (it->visible) {
+                        outOfDrawAreaItems.push_back(it);
+                        it->visible = false;
+                    }
+                }
+            }
+        };
+
+        for (auto &el : children) {
+
+            if (!el->visible)
+                continue;
+
+            pos_update(el, pos);
+        }
+
+        Rect::updateDrawArea();
+    }
+
     // space left distposition `first is better` tactics
     // there could be other i.e. socialism: each element take in equal part up to it's max size
     // not needed now == not implemented
     template <Axis axis> void BoxLayout::resizeItems()
     {
         // we want to split to interested parties what's left, as much as they can fit
-        int32_t to_split = getSize(axis);
-        auto pos         = reverse_order ? this->area().size(axis) : 0;
-        auto pos_update  = [this](Item *it, int32_t &pos, int32_t &to_split) {
-            if (pos <= this->area().size(axis) && pos >= 0 && to_split > 0) {
+        int32_t to_split = sizeLeft<axis>(this);
 
-                if (this->reverse_order) {
-                    pos -= it->area(Item::Area::Normal).size(axis);
-                    it->setPosition(pos, axis);
-                }
-                else {
-                    it->setPosition(pos, axis);
-                    pos += it->area(Item::Area::Normal).size(axis);
-                }
-            }
-            else {
-                if (it->visible) {
-                    outOfDrawAreaItems.push_back(it);
-                    it->visible = false;
-                }
-            }
-        };
-
-        auto set_size = [this](Item *it, auto &pos, int32_t &to_split) {
+        auto set_size = [this](Item *it, int32_t &to_split) {
             if (it == nullptr) {
                 return;
             }
 
-            if (to_split > 0) {
-                // Check if item can be resized
-                int32_t left_in_el = it->area(Area::Max).size(axis) - it->area(Area::Min).size(axis);
-                if (left_in_el > 0) {
-                    int32_t resize = left_in_el < to_split ? left_in_el : to_split;
-                    it->setSize(it->area(Area::Min).size(axis) + resize, axis);
-                    to_split -= resize + it->area(Area::Min).size(axis) + resize;
-                }
-                else {
-                    it->setSize(it->area(Area::Normal).size(axis), axis);
-                    to_split -= it->area(Area::Normal).size(axis);
-                }
+            // Check if item can be resized
+            int32_t left_in_el = it->area(Area::Max).size(axis) - it->area(Area::Min).size(axis);
+            if (to_split > 0 && left_in_el > 0) {
+                int32_t resize = left_in_el < to_split ? left_in_el : to_split;
+                it->setSize(it->area(Area::Min).size(axis) + resize, axis);
+                to_split -= resize;
             }
 
             // Set size of orthogonal axis to Normal BoxLayout size
@@ -180,18 +197,17 @@ namespace gui
                 continue;
 
             el->area(Item::Area::Normal) = el->area(Item::Area::Min);
-            set_size(el, pos, to_split);
-            pos_update(el, pos, to_split);
+            set_size(el, to_split);
         }
+
+        updatePosition<axis>();
         Rect::updateDrawArea();
     }
 
     template <Axis axis> void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
-        if (getSize(axis) - sizeUsed<axis>(this) >= 0) {
-            resizeItems<axis>();
-        }
+        updatePosition<axis>();
     }
 
     std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
