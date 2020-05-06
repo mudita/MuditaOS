@@ -49,7 +49,7 @@ fi
 
 function styleCheck() {
     echo "style"
-    ./config/pre-commit-check-only.hook --last
+    ./config/pre-commit.hook --last
 }
 
 function configure() {
