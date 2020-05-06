@@ -18,7 +18,7 @@ inputs:
     default: 'RelWithDebInfo'
 runs:
   using: 'docker'
-  image: 'docker://rwicik/pure_phone_build:v1.0'
+  image: 'docker://rwicik/pure_phone_build:v1.1'
   args:
     - ${{ inputs.action }}
     - ${{ inputs.target }}
