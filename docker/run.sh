@@ -10,6 +10,8 @@ echo "       variables      "
 printVar INPUT_ACTION
 printVar INPUT_TARGET
 printVar INPUT_BUILD_TYPE
+printVar INPUT_BUILD_GENERATOR
+printVar INPUT_JOBS
 printVar PATH
 printVar HOME
 echo "======================"
@@ -25,6 +27,26 @@ printVar GITHUB_REF
 printVar GITHUB_HEAD_REF
 printVar GITHUB_BASE_REF
 echo "======================"
+
+GENERATOR=${INPUT_BUILD_GENERATOR,,}
+
+case ${GENERATOR} in
+    "ninja")
+        GENERATOR_NAME=${GENERATOR^}
+        BUILD_CMD=${GENERATOR}
+        ;;
+    "make")
+        GENERATOR_NAME=""
+        BUILD_CMD=${GENERATOR}
+        ;;
+esac
+
+if [[ "${INPUT_JOBS}" == "nproc" ]]; then
+    JOBS=`nproc`
+else 
+    JOBS=${INPUT_JOBS}
+fi
+
 function styleCheck() {
     echo "style"
     ./config/pre-commit-check-only.hook --last
@@ -32,17 +54,17 @@ function styleCheck() {
 
 function configure() {
     echo "configure"
-    ./configure.sh ${INPUT_TARGET} ${INPUT_BUILD_TYPE}
+    ./configure.sh ${INPUT_TARGET} ${INPUT_BUILD_TYPE} ${GENERATOR_NAME:+-G ${GENERATOR_NAME}}
 }
 
 function build() {
     echo "build"
-    cd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} && make -j
+    cd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} && ${BUILD_CMD} -j ${JOBS}
 }
 
 function check() {
     echo "check"
-    cd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} && make check -j
+    cd build-${INPUT_TARGET}-${INPUT_BUILD_TYPE} && ${BUILD_CMD} check -j ${JOBS}
 }
 
 pushd ${GITHUB_WORKSPACE}
@@ -70,3 +92,5 @@ case ${INPUT_ACTION} in
         ;;
 esac
 
+uptime 
+echo "procesor count: `nproc`"
