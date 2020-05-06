@@ -153,7 +153,7 @@ namespace bsp
         DisableRx();
 
         ExitSleep();
-        InformModemHostWakeup();
+        InformModemHostAsleep();
 
         TickType_t tick = xTaskGetTickCount();
         gpio_2->WritePin(static_cast<uint32_t>(BoardDefinitions::CELLULAR_GPIO_2_POWER_PIN), 1);

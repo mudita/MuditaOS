@@ -226,44 +226,44 @@ sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePower
 void ServiceCellular::change_state(cellular::StateChange *msg)
 {
     assert(msg);
-    switch(msg->request) {
-        case State::ST::Idle:
-            handle_idle();
-            break;
-        case State::ST::StatusCheck:
-            handle_status_check();
-            break;
-        case State::ST::PowerUpInProgress:
-
-            break;
-        case State::ST::PowerUpProcedure:
-            handle_power_up_procedure();
-            break;
-        case State::ST::AudioConfigurationProcedure:
-            handle_audio_conf_procedure();
-            break;
-        case State::ST::CellularConfProcedure:
-            handle_start_conf_procedure();
-            break;
-        case State::ST::SanityCheck:
-            handle_sim_sanity_check();
-            break;
-        case State::ST::SimInit:
-            handle_sim_init();
-            break;
-        case State::ST::SimSelect:
-            handle_select_sim();
-            break;
-        case State::ST::ModemOn:
-            handle_modem_on();
-            break;
-        case State::ST::ModemFatalFailure:
-            handle_fatal_failure();
-            break;
-        case State::ST::Failed:
-            handle_failure();
-            break;
-        };
+    switch (msg->request) {
+    case State::ST::Idle:
+        handle_idle();
+        break;
+    case State::ST::StatusCheck:
+        handle_status_check();
+        break;
+    case State::ST::PowerUpInProgress:
+        handle_power_up_in_progress_procedure();
+        break;
+    case State::ST::PowerUpProcedure:
+        handle_power_up_procedure();
+        break;
+    case State::ST::AudioConfigurationProcedure:
+        handle_audio_conf_procedure();
+        break;
+    case State::ST::CellularConfProcedure:
+        handle_start_conf_procedure();
+        break;
+    case State::ST::SanityCheck:
+        handle_sim_sanity_check();
+        break;
+    case State::ST::SimInit:
+        handle_sim_init();
+        break;
+    case State::ST::SimSelect:
+        handle_select_sim();
+        break;
+    case State::ST::ModemOn:
+        handle_modem_on();
+        break;
+    case State::ST::ModemFatalFailure:
+        handle_fatal_failure();
+        break;
+    case State::ST::Failed:
+        handle_failure();
+        break;
+    };
 }
 
 bool ServiceCellular::handle_idle()
@@ -274,17 +274,72 @@ bool ServiceCellular::handle_idle()
 
 bool ServiceCellular::handle_power_up_procedure()
 {
-    auto ret = cmux->PowerUpProcedure();
+    switch (board) {
+    case Board::T4: {
+        LOG_DEBUG("T4 - cold start");
+        cmux->TurnOnModem();
+        state.set(this, State::ST::PowerUpInProgress);
+        break;
+    }
+    case Board::T3: {
+        // check baud once to determine if it's already turned on
+        auto ret = cmux->BaudDetectOnce();
+        if (ret == TS0710::ConfState::Success) {
+            // it's on aka hot start.
+            LOG_DEBUG("T3 - hot start");
+            state.set(this, State::ST::CellularConfProcedure);
+            break;
+        }
+        else {
+            // it's off aka cold start
+            LOG_DEBUG("T3 - cold start");
+            cmux->TurnOnModem();
+            // if it's T3, then wait for status pin to become active, to align its starting position with T4
+            vTaskDelay(pdMS_TO_TICKS(8000));
+            state.set(this, State::ST::PowerUpInProgress);
+            break;
+        }
+    }
+    case Board::Linux: {
+        // it is basically the same as T3
+        // check baud once to determine if it's already turned on
+        auto ret = cmux->BaudDetectOnce();
+        if (ret == TS0710::ConfState::Success) {
+            // it's on aka hot start.
+            LOG_DEBUG("Linux - hot start");
+            state.set(this, State::ST::CellularConfProcedure);
+            break;
+        }
+        else {
+            // it's off aka cold start
+            LOG_DEBUG("Linux - cold start");
+            LOG_WARN("Press PWR_KEY for 2 sec on modem eval board!");
+            vTaskDelay(pdMS_TO_TICKS(2000)); // give some 2 secs more for user input
+            // if it's Linux (T3), then wait for status pin to become active, to align its starting position with T4
+            vTaskDelay(pdMS_TO_TICKS(8000));
+            state.set(this, State::ST::PowerUpInProgress);
+            break;
+        }
+    }
+    case Board::none:
+        break;
+    default:
+        break;
+    }
+    return true;
+}
+
+bool ServiceCellular::handle_power_up_in_progress_procedure(void)
+{
+    auto ret = cmux->BaudDetectProcedure();
     if (ret == TS0710::ConfState::Success) {
-        state.set(this, State::ST::CellularConfProcedure);
+        state.set(this, cellular::State::ST::CellularConfProcedure);
         return true;
     }
-    else if (ret == TS0710::ConfState::PowerUp) {
-        state.set(this, State::ST::Idle);
-        return true;
+    else {
+        state.set(this, cellular::State::ST::ModemFatalFailure);
+        return false;
     }
-    state.set(this, State::ST::Failed);
-    return false;
 }
 
 bool ServiceCellular::handle_start_conf_procedure()
@@ -638,13 +693,15 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
         break;
     }
     case MessageType::EVMModemStatus: {
-        if (state.get() == State::ST::PowerUpInProgress && board == Board::T4) {
-            state.set(this, State::ST::CellularConfProcedure);
+        using namespace bsp::cellular::status;
+        auto status_pin = dynamic_cast<sevm::StateMessage *>(msgl)->state == true ? value::ACTIVE : value::INACTIVE;
+        if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == Board::T4) {
+            state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
         }
         break;
+    }
     default:
         break;
-    }
 
         if (responseMsg == nullptr) {
             LOG_DEBUG("message not handled: %d, %d", static_cast<int>(msgl->type), static_cast<int>(msgl->messageType));
@@ -1224,7 +1281,7 @@ bool ServiceCellular::handle_sim_init()
         state.set(this, State::ST::Failed);
         return false;
     }
-    bool success = true;
+    bool success  = true;
     auto commands = at::getCommadsSet(at::commadsSet::simInit);
 
     for (auto command : commands) {
@@ -1291,31 +1348,15 @@ bool ServiceCellular::handle_status_check(void)
     if (modemActive) {
         // modem is already turned on, call configutarion procedure
         LOG_INFO("Modem is already turned on.");
-
-        auto ret = cmux->BaudDetectProcedure();
-        if (ret == TS0710::ConfState::Success) {
-            LOG_INFO("Modem baudrate detected.");
-            state.set(this, cellular::State::ST::CellularConfProcedure);
-        }
-        else {
-            LOG_ERROR("Baud rate detection failed.");
-            state.set(this, cellular::State::ST::ModemFatalFailure);
-        }
-    }
-    else {
-        // turn on modem
-        LOG_INFO("Turning on modem.");
-        cmux->TurnOnModem();
+        LOG_DEBUG("T4 - hot start");
         state.set(this, cellular::State::ST::PowerUpInProgress);
     }
+    else {
+        state.set(this, cellular::State::ST::PowerUpProcedure);
+    }
     return true;
 }
 
-bool ServiceCellular::handle_power_up_in_progress_procedure(void)
-{
-
-    return true;
-}
 void ServiceCellular::startStateTimer(uint32_t timeout)
 {
     stateTimeout = timeout;
