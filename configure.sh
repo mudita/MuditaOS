@@ -68,10 +68,6 @@ function check_systemview() {
     esac
 }
 
-if [[ $# > 3 || $# < 2 ]]; then
-    help
-    exit 1
-fi
 
 TARGET=$1
 BUILD_TYPE=$2

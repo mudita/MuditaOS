@@ -23,7 +23,9 @@ RUN ln -fs /usr/share/zoneinfo/Europe/Warsaw /etc/localtime && \
         apt-utils \
         locales \
         tzdata \
-        ninja-build && \
+        ninja-build \
+        graphviz \
+        doxygen && \
     ln -fs /usr/bin/python3 /usr/bin/python && \
     locale-gen pl_PL.UTF-8 \
                en_US.UTF-8 \
