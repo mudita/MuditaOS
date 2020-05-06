@@ -1,3 +1,4 @@
+
 /*
  * @file SmsDB.cpp
  * @author Mateusz Piesta (mateusz.piesta@mudita.com)
