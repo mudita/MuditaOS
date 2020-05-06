@@ -131,8 +131,8 @@ namespace gui
         // we want to split to interested parties what's left, as much as they can fit
         int32_t to_split = getSize(axis);
         auto pos         = reverse_order ? this->area().size(axis) : 0;
-        auto pos_update  = [this](Item *it, int32_t &pos) {
-            if (pos <= this->area().size(axis) && pos >= 0) {
+        auto pos_update  = [this](Item *it, int32_t &pos, int32_t &to_split) {
+            if (pos <= this->area().size(axis) && pos >= 0 && to_split > 0) {
 
                 if (this->reverse_order) {
                     pos -= it->area(Item::Area::Normal).size(axis);
@@ -151,35 +151,37 @@ namespace gui
             }
         };
 
-        auto set_size = [](Item *el, auto &pos, int32_t &to_split) {
-            if (el == nullptr) {
+        auto set_size = [this](Item *it, auto &pos, int32_t &to_split) {
+            if (it == nullptr) {
                 return;
             }
 
-            // Here should be Max - Min ?
-            int32_t left_in_el = el->area(Area::Max).size(axis) - el->area(Area::Min).size(axis);
-            if (to_split > 0 && left_in_el > 0) {
-                int32_t resize = left_in_el < to_split ? left_in_el : to_split;
-                el->setSize(el->area(Area::Min).size(axis) + resize, axis);
-                to_split = -(resize - el->getWidth());
+            if (to_split > 0) {
+                // Check if item can be resized
+                int32_t left_in_el = it->area(Area::Max).size(axis) - it->area(Area::Min).size(axis);
+                if (left_in_el > 0) {
+                    int32_t resize = left_in_el < to_split ? left_in_el : to_split;
+                    it->setSize(it->area(Area::Min).size(axis) + resize, axis);
+                    to_split -= resize + it->area(Area::Min).size(axis) + resize;
+                }
+                else {
+                    it->setSize(it->area(Area::Normal).size(axis), axis);
+                    to_split -= it->area(Area::Normal).size(axis);
+                }
             }
-            else {
-                el->setSize(el->area(Area::Normal).size(axis), axis);
-            }
+
+            // Set size of orthogonal axis to Normal BoxLayout size
+            it->setSize(this->area(Area::Normal).size(orthogonal(axis)), orthogonal(axis));
         };
 
         for (auto &el : children) {
-            // LOG_DEBUG("# el %s", el->area(Area::Normal).str().c_str());
 
             if (!el->visible)
                 continue;
 
             el->area(Item::Area::Normal) = el->area(Item::Area::Min);
             set_size(el, pos, to_split);
-            pos_update(el, pos);
-            //            LOG_DEBUG("> el     %s", el->area(Area::Normal).str().c_str());
-            //            LOG_DEBUG("> el max %s", el->area(Area::Max).str().c_str());
-            //            LOG_DEBUG("> el visible %d", el->visible);
+            pos_update(el, pos, to_split);
         }
         Rect::updateDrawArea();
     }

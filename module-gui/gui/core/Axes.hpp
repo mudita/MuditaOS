@@ -1,9 +1,7 @@
 //
 // Created by mateusz on 06.02.2020.
 //
-
-#ifndef GUI_CORE_AXES_HPP_
-#define GUI_CORE_AXES_HPP_
+#pragma once
 
 namespace gui
 {
@@ -12,6 +10,14 @@ namespace gui
         X,
         Y
     };
-}
 
-#endif // GUI_CORE_AXES_HPP_
+    inline Axis orthogonal(Axis axis)
+    {
+        if (axis == Axis::X) {
+            return Axis::Y;
+        }
+        else {
+            return Axis::X;
+        }
+    }
+} // namespace gui
