@@ -23,6 +23,7 @@ OzoneJlink\.jdebug\.user
 \.idea/vcs\.xml
 \.idea/workspace\.xml
 \.idea/codeStyles/
+\.idea/inspectionProfiles/
 
 src/git-fame
 
