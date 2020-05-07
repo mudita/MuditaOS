@@ -16,8 +16,7 @@ TEST_CASE("Contact Record tests")
     const char *alternativeNameTest               = "AlternativeNameTest";
     const char *numberUserTest                    = "111222333";
     const char *numberE164Test                    = "333222111";
-    const char *addressLine1Test                  = "6 Czeczota St.";
-    const char *addressLine2Test                  = "02600 Warsaw";
+    const char *addressTest                       = "6 Czeczota St.\n02600 Warsaw";
     const char *noteTest                          = "TestNote";
     const char *mailTest                          = "TestMail";
     const char *assetPath                         = "/Test/Path/To/Asset";
@@ -35,8 +34,7 @@ TEST_CASE("Contact Record tests")
         ContactRecord::Number(numberUserTest, numberE164Test, contactNumberTypeTest),
     });
     recordIN.contactType     = contactTypeTest;
-    recordIN.addressLine1    = addressLine1Test;
-    recordIN.addressLine2    = addressLine2Test;
+    recordIN.address         = addressTest;
     recordIN.note            = noteTest;
     recordIN.mail            = mailTest;
     recordIN.assetPath       = assetPath;
@@ -60,8 +58,7 @@ TEST_CASE("Contact Record tests")
         REQUIRE(recordOUT.numbers[0].numberE164 == numberE164Test);
         REQUIRE(recordOUT.numbers[0].numberType == contactNumberTypeTest);
         REQUIRE(recordOUT.contactType == contactTypeTest);
-        REQUIRE(recordOUT.addressLine1 == addressLine1Test);
-        REQUIRE(recordOUT.addressLine2 == addressLine2Test);
+        REQUIRE(recordOUT.address == addressTest);
         REQUIRE(recordOUT.note == noteTest);
         REQUIRE(recordOUT.mail == mailTest);
         REQUIRE(recordOUT.assetPath == assetPath);
@@ -85,8 +82,7 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.numbers[0].numberE164 == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
-            REQUIRE(w.addressLine1 == addressLine1Test);
-            REQUIRE(w.addressLine2 == addressLine2Test);
+            REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
             REQUIRE(w.mail == mailTest);
             REQUIRE(w.assetPath == assetPath);
@@ -110,8 +106,7 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.numbers[0].numberE164 == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
-            REQUIRE(w.addressLine1 == addressLine1Test);
-            REQUIRE(w.addressLine2 == addressLine2Test);
+            REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
             REQUIRE(w.mail == mailTest);
             REQUIRE(w.assetPath == assetPath);
@@ -134,8 +129,7 @@ TEST_CASE("Contact Record tests")
             REQUIRE(w.numbers[0].numberE164 == numberE164Test);
             REQUIRE(w.numbers[0].numberType == contactNumberTypeTest);
             REQUIRE(w.contactType == contactTypeTest);
-            REQUIRE(w.addressLine1 == addressLine1Test);
-            REQUIRE(w.addressLine2 == addressLine2Test);
+            REQUIRE(w.address == addressTest);
             REQUIRE(w.note == noteTest);
             REQUIRE(w.mail == mailTest);
             REQUIRE(w.assetPath == assetPath);

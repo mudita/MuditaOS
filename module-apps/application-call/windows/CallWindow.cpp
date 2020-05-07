@@ -271,13 +271,15 @@ namespace gui
             LOG_INFO("number = %s recognized as contact id = %" PRIu32 ", name = %s",
                      phoneNumber.getEntered().c_str(),
                      rec.ID,
-                     rec.getFormattedName().c_str());
-            displayName = rec.getFormattedName();
+                     rec.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
+            displayName = rec.getFormattedName(ContactRecord::NameFormatType::Default);
         }
         else if (records->size() > 1) {
             LOG_ERROR("number = %s recognized as more than one contact", phoneNumber.getEntered().c_str());
             for (auto i : *records) {
-                LOG_ERROR("contact id = %" PRIu32 ", name = %s", i.ID, i.getFormattedName().c_str());
+                LOG_ERROR("contact id = %" PRIu32 ", name = %s",
+                          i.ID,
+                          i.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
             }
         }
         else {

@@ -13,11 +13,10 @@ bool ContactsAddressTable::Create()
 
 bool ContactsAddressTable::Add(ContactsAddressTableRow entry)
 {
-    return db->Execute("insert or ignore into contact_address (contact_id, address_line1, address_line2, note, mail) "
-                       "VALUES (%lu, '%q', '%q', '%q', '%q');",
+    return db->Execute("insert or ignore into contact_address (contact_id, address, note, mail) "
+                       "VALUES (%lu, '%q', '%q', '%q');",
                        entry.contactID,
-                       entry.addressLine1.c_str(),
-                       entry.addressLine2.c_str(),
+                       entry.address.c_str(),
                        entry.note.c_str(),
                        entry.mail.c_str());
 }
@@ -29,12 +28,10 @@ bool ContactsAddressTable::RemoveByID(uint32_t id)
 
 bool ContactsAddressTable::Update(ContactsAddressTableRow entry)
 {
-    return db->Execute("UPDATE contact_address SET contact_id = %lu, address_line1 = '%q', address_line2 = '%q', "
-                       "note = '%q', mail = '%q' "
+    return db->Execute("UPDATE contact_address SET contact_id = %lu, address = '%q', note = '%q', mail = '%q' "
                        "WHERE _id=%lu;",
                        entry.contactID,
-                       entry.addressLine1.c_str(),
-                       entry.addressLine2.c_str(),
+                       entry.address.c_str(),
                        entry.note.c_str(),
                        entry.mail.c_str(),
                        entry.ID);
@@ -51,10 +48,9 @@ ContactsAddressTableRow ContactsAddressTable::GetByID(uint32_t id)
     return ContactsAddressTableRow{
         (*retQuery)[0].GetUInt32(), // ID
         (*retQuery)[1].GetUInt32(), // contactID
-        (*retQuery)[2].GetString(), // addressLine1
-        (*retQuery)[3].GetString(), // addressLine2
-        (*retQuery)[4].GetString(), // note
-        (*retQuery)[5].GetString(), // mail
+        (*retQuery)[2].GetString(), // address
+        (*retQuery)[3].GetString(), // note
+        (*retQuery)[4].GetString(), // mail
     };
 }
 
@@ -72,10 +68,9 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffset(uint32
         ret.push_back(ContactsAddressTableRow{
             (*retQuery)[0].GetUInt32(), // ID
             (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // addressLine1
-            (*retQuery)[3].GetString(), // addressLine2
-            (*retQuery)[4].GetString(), // note
-            (*retQuery)[5].GetString(), // mail
+            (*retQuery)[2].GetString(), // address
+            (*retQuery)[3].GetString(), // note
+            (*retQuery)[4].GetString(), // mail
         });
     } while (retQuery->NextRow());
 
@@ -113,10 +108,9 @@ std::vector<ContactsAddressTableRow> ContactsAddressTable::GetLimitOffsetByField
         ret.push_back(ContactsAddressTableRow{
             (*retQuery)[0].GetUInt32(), // ID
             (*retQuery)[1].GetUInt32(), // contactID
-            (*retQuery)[2].GetString(), // addressLine1
-            (*retQuery)[3].GetString(), // addressLine2
-            (*retQuery)[4].GetString(), // note
-            (*retQuery)[5].GetString(), // mail
+            (*retQuery)[2].GetString(), // address
+            (*retQuery)[3].GetString(), // note
+            (*retQuery)[4].GetString(), // mail
         });
     } while (retQuery->NextRow());
 

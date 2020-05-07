@@ -57,11 +57,8 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactRingID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->address.Add(ContactsAddressTableRow{.contactID    = contactID,
-                                                         .addressLine1 = rec.addressLine1,
-                                                         .addressLine2 = rec.addressLine2,
-                                                         .note         = rec.note,
-                                                         .mail         = rec.mail});
+    ret = contactDB->address.Add(
+        ContactsAddressTableRow{.contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret) {
         return ret;
@@ -162,12 +159,8 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->address.Update(ContactsAddressTableRow{.ID           = contact.addressID,
-                                                            .contactID    = contact.ID,
-                                                            .addressLine1 = rec.addressLine1,
-                                                            .addressLine2 = rec.addressLine2,
-                                                            .note         = rec.note,
-                                                            .mail         = rec.mail});
+    ret = contactDB->address.Update(ContactsAddressTableRow{
+        .ID = contact.addressID, .contactID = contact.ID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret)
         return ret;
@@ -211,8 +204,7 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     rec.alternativeName = name.nameAlternative;
     rec.numbers         = nrs;
     rec.contactType     = contact.type;
-    rec.addressLine1    = address.addressLine1;
-    rec.addressLine2    = address.addressLine2;
+    rec.address         = address.address;
     rec.note            = address.note;
     rec.mail            = address.mail;
     rec.assetPath       = ring.assetPath;
@@ -273,8 +265,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                          .alternativeName = name.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .addressLine1    = address.addressLine1,
-                                         .addressLine2    = address.addressLine2,
+                                         .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
                                          .assetPath       = ring.assetPath,
@@ -325,8 +316,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = w.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .addressLine1    = address.addressLine1,
-                                             .addressLine2    = address.addressLine2,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
@@ -374,8 +364,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .addressLine1    = address.addressLine1,
-                                             .addressLine2    = address.addressLine2,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
@@ -422,8 +411,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .addressLine1    = address.addressLine1,
-                                             .addressLine2    = address.addressLine2,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
@@ -469,8 +457,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .addressLine1    = address.addressLine1,
-                                             .addressLine2    = address.addressLine2,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
                                              .assetPath       = ring.assetPath,
@@ -519,8 +506,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .addressLine1    = address.addressLine1,
-                                         .addressLine2    = address.addressLine2,
+                                         .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
                                          .assetPath       = ring.assetPath,
@@ -567,8 +553,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .addressLine1    = address.addressLine1,
-                                         .addressLine2    = address.addressLine2,
+                                         .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
                                          .assetPath       = ring.assetPath,

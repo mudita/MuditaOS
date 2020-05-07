@@ -289,7 +289,7 @@ namespace gui
         // to confusing errors
         // record.numbers.push_back(ContactRecord::Number(page1.text[3]->getText(), page1.text[3]->getText()));
         contactRecord.mail           = page1.text[4]->getText();
-        contactRecord.addressLine1   = page2.text[0]->getText();
+        contactRecord.address        = page2.text[0]->getText();
         contactRecord.note           = page2.text[1]->getText();
         contactRecord.isOnFavourites = page2.favSelected;
         contactRecord.speeddial      = page2.speedValue->getText();
@@ -318,7 +318,7 @@ namespace gui
             }
             page1.text[4]->setText(contact->mail);
 
-            page2.text[0]->setText(contact->addressLine1);
+            page2.text[0]->setText(contact->address);
             page2.text[1]->setText(contact->note);
             if (contact->isOnFavourites) {
                 page2.imageTick->setVisible(true);
