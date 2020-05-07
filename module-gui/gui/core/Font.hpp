@@ -44,7 +44,7 @@ namespace gui
         // how much the current position should be advanced after drawing the character
         uint16_t xadvance = 0;
         // image data of the glyph
-        uint8_t *data = 0;
+        uint8_t *data = nullptr;
     };
 
     class FontKerning

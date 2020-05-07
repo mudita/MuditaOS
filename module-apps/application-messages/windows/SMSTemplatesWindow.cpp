@@ -19,7 +19,6 @@ using namespace messages::templates;
 
 namespace gui
 {
-
     SMSTemplatesWindow::SMSTemplatesWindow(app::Application *app)
         : AppWindow(app, name::window::sms_templates), smsTemplateModel{std::make_unique<SMSTemplateModel>(app)}
     {
