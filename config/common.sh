@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+IMAGE_FILES="assets country-codes.db Luts.bin user"
 check_any_arch() {
     local path="${1}"
     local arch="${2}"
