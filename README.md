@@ -189,6 +189,12 @@ open index with browser, e.g.:
 firefox build/doc/html/index.html
 ```
 
+## Miscellaneous CMake configuration options
+
+Following CMake options can be used:
+ * `COLOR_OUTPUT` - enable/disable colored output (enabled by default). Useful when you need to process CMake output or your IDE does not support escape codes.
+ * `BUILD_DOC_WITH_ALL` - enable disable building code documentation with the `all` target (disabled by default).
+
 # Linux Bluetooth device
 
 Bluetooth service by default initializes bluetooth device. 
