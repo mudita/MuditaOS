@@ -146,7 +146,7 @@ namespace app
                 meta.text       = utils::localize.get("app_messages_thread_delete_confirmation");
                 auto contactRec = DBServiceAPI::ContactGetByID(this, record->contactID);
                 auto cont       = !contactRec->empty() ? contactRec->front() : ContactRecord{};
-                meta.title      = cont.getFormattedName();
+                meta.title      = cont.getFormattedName(ContactRecord::NameFormatType::Default);
                 dialog->update(meta);
                 return switchWindow(gui::name::window::thread_rm_confirm, nullptr);
             }

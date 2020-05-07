@@ -33,7 +33,7 @@ static inline bool fillContactData(std::string &data, std::shared_ptr<ContactRec
     }
     utils::findAndReplaceAll(data, "$CONTACT_PRIMARY_NAME$", contact->primaryName);
     utils::findAndReplaceAll(data, "$CONTACT_ALTERNATIVE_NAME$", contact->alternativeName);
-    utils::findAndReplaceAll(data, "$CONTACT_NAME$", contact->getFormattedName());
+    utils::findAndReplaceAll(data, "$CONTACT_NAME$", contact->getFormattedName(ContactRecord::NameFormatType::Title));
     utils::findAndReplaceAll(
         data, "$CONTACT_NUMBER1$", (contact->numbers.size() == 1) ? contact->numbers[0].numberUser : "");
     utils::findAndReplaceAll(
@@ -59,7 +59,7 @@ namespace gui
         Label *informationLabel = nullptr;
         Label *ifnormation      = nullptr;
         Label *addressLabel     = nullptr;
-        Label *addressLine1     = nullptr;
+        Label *address          = nullptr;
         Label *addressLine2     = nullptr;
         Label *email            = nullptr;
         Label *numberPrimary    = nullptr;

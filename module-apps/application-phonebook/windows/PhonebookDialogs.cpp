@@ -132,7 +132,7 @@ void PhonebookDeleteContact::onBeforeShow(ShowMode mode, SwitchData *data)
 void PhonebookDeleteContact::setContactData()
 {
     if (contact != nullptr)
-        setTitle(contact->getFormattedName());
+        setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
 }
 
 void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -180,7 +180,7 @@ void PhonebookBlockContact::onBeforeShow(ShowMode mode, SwitchData *data)
 void PhonebookBlockContact::setContactData()
 {
     if (contact != nullptr)
-        setTitle(contact->getFormattedName());
+        setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
 }
 
 DuplicatedContactDialogWindow::DuplicatedContactDialogWindow(app::Application *app)

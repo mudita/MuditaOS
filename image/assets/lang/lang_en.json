@@ -168,6 +168,7 @@
     "app_phonebook_search_no_results": "There are no results",
     "app_phonebook_list_favourites": "Favourites",
     "app_phonebook_contact_title": "Add Contact",
+    "app_phonebook_contact_no_name": "no name",
     "app_phonebook_contact_note": "Note",
     "app_phonebook_contact_address": "Address",
     "app_phonebook_contact_information": "Information",

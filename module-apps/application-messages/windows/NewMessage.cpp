@@ -31,7 +31,7 @@ namespace gui
     {
         if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
             LOG_INFO("received search results");
-            recipient->setText(pdata->result->getFormattedName());
+            recipient->setText(pdata->result->getFormattedName(ContactRecord::NameFormatType::Default));
             contact = pdata->result;
         }
         if (auto pdata = dynamic_cast<SMSTemplateData *>(data); pdata != nullptr) {

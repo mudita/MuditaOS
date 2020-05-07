@@ -55,7 +55,7 @@ namespace gui
     {
         this->contact = contact;
         /* alternativeName is used as Surname or Second name */
-        value->setText(contact->getFormattedName());
+        value->setText(contact->getFormattedName(ContactRecord::NameFormatType::List));
     }
 
     void PhonebookItem::setValue(UTF8 text)
