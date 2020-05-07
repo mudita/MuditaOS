@@ -60,7 +60,6 @@ namespace gui
         Label *ifnormation      = nullptr;
         Label *addressLabel     = nullptr;
         Label *address          = nullptr;
-        Label *addressLine2     = nullptr;
         Label *email            = nullptr;
         Label *numberPrimary    = nullptr;
         Label *numberSecondary  = nullptr;
