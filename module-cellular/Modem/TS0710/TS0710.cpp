@@ -408,8 +408,6 @@ TS0710::ConfState TS0710::StartMultiplexer()
         LOG_FATAL("No channel");
         return ConfState::Failure;
     }
-    pv_cellular->InformModemHostWakeup();
-    LOG_DEBUG("AP ready");
 
     return ConfState::Success;
 }
@@ -514,6 +512,11 @@ void TS0710::SelectAntenna(uint8_t antenna)
 uint8_t TS0710::GetAntenna()
 {
     return pv_cellular->GetAntenna();
+}
+
+void TS0710::InformModemHostWakeup(void)
+{
+    return pv_cellular->InformModemHostWakeup();
 }
 
 bool TS0710::IsModemActive(void)

@@ -1270,6 +1270,9 @@ bool ServiceCellular::handle_modem_on()
     state.set(this, State::ST::Idle);
     auto channel = cmux->get(TS0710::Channel::Commands);
     channel->cmd("AT+CCLK?\r");
+    // inform host ap ready
+    cmux->InformModemHostWakeup();
+    LOG_DEBUG("AP ready");
     return true;
 }
 
