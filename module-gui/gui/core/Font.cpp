@@ -18,6 +18,7 @@
 #include "DrawCommand.hpp"
 #include "Renderer.hpp"
 #include "vfs.hpp"
+#include <cstring>
 #include <cassert>
 
 namespace gui
@@ -411,7 +412,7 @@ namespace gui
         unsupported->xadvance =
             unsupported->width + (2 * unsupported->xoffset); // use xoffset as margins on the left/right of the glyph
         // populate with a bitmap (glyph)
-        CommandRectangle *commandRect = new CommandRectangle();
+        auto commandRect              = std::make_unique<CommandRectangle>();
         commandRect->x                = 0;
         commandRect->y                = 0;
         commandRect->w                = unsupported->width;
@@ -422,11 +423,13 @@ namespace gui
         commandRect->areaH            = unsupported->height;
         commandRect->penWidth         = unsupported->xoffset;
 
-        Context *renderCtx                       = new Context(unsupported->width, unsupported->height);
-        std::vector<gui::DrawCommand *> commands = {commandRect};
-        Renderer().render(renderCtx, commands);
+        auto renderCtx                           = std::make_unique<Context>(unsupported->width, unsupported->height);
+        std::vector<gui::DrawCommand *> commands = {commandRect.get()};
+        Renderer().render(renderCtx.get(), commands);
 
-        unsupported->data = renderCtx->getData();
+        auto size         = unsupported->width * unsupported->height;
+        unsupported->data = new uint8_t[size];
+        std::memcpy(unsupported->data, renderCtx->getData(), size);
 
         return unsupported;
     }

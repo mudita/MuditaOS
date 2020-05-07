@@ -73,9 +73,7 @@ namespace gui
 
     void ThreadViewWindow::rebuildText()
     {
-        if (text) {
-            body->removeWidget(text);
-        }
+        body->erase(text);
         text = new gui::Text(
             this, 0, 0, body->getWidth(), style::window::messages::sms_height, "", gui::Text::ExpandMode::EXPAND_UP);
         text->setInputMode(new InputMode(
@@ -106,10 +104,7 @@ namespace gui
 
     void ThreadViewWindow::cleanView()
     {
-        body->removeWidget(text);
-        body->setFocusItem(nullptr);
-        std::for_each(body->children.begin(), body->children.end(), [&](auto &el) { delete el; });
-        body->children.erase(body->children.begin(), body->children.end());
+        body->erase();
     }
 
     bool ThreadViewWindow::showMessages(ThreadViewWindow::Action what)
@@ -292,7 +287,6 @@ namespace gui
         smsLabel->setPenFocusWidth(style::window::default_border_focucs_w);
         smsLabel->setPenWidth(style::window::messages::sms_border_no_focus);
         smsLabel->expandMode = Text::ExpandMode::EXPAND_DOWN;
-        smsLabel->buildDrawList();
         smsLabel->setText(smsRecord.body.length() ? smsRecord.body : " "); // text doesn't really like being empty//
         smsLabel->setMargins(gui::Margins(style::window::messages::sms_h_padding,
                                           style::window::messages::sms_v_padding,
