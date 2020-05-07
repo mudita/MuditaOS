@@ -8,7 +8,7 @@ struct ContactsAddressTableRow
 {
     uint32_t ID        = DB_ID_NONE;
     uint32_t contactID = DB_ID_NONE;
-    UTF8 address  = "";
+    UTF8 address       = "";
     UTF8 note          = "";
     UTF8 mail          = "";
 };
