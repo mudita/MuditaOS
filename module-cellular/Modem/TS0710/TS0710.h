@@ -430,6 +430,7 @@ class TS0710
     // Add callback for received frame (after error handling)
     // Add frame routing to different channels
 
+    void InformModemHostWakeup(void); // damn, it should be in ServiceCellular
     bool IsModemActive(void);
     void TurnOnModem(void);
     void ResetModem(void);
