@@ -265,15 +265,15 @@ namespace gui
                                 Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_BOTTOM),
                                 true);
 
-        addressLine1 = addLabel(&page1,
-                                30,
-                                475,
-                                422,
-                                33,
-                                "",
-                                style::window::font::big,
-                                RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
+        address = addLabel(&page1,
+                           30,
+                           475,
+                           422,
+                           33,
+                           "",
+                           style::window::font::big,
+                           RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
+                           Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
 
         addressLine2 = addLabel(&page1,
                                 30,
@@ -353,7 +353,7 @@ namespace gui
         if (contact == nullptr)
             return;
 
-        setTitle(contact->getFormattedName());
+        setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Title));
 
         auto isSpeedDialInRange = [&](const UTF8 &speedDialStr) {
             if (speedDialStr.length() == 0)
@@ -417,7 +417,7 @@ namespace gui
 
             email->setY(363 - 66);
             addressLabel->setY(429 - 33);
-            addressLine1->setY(475 - 33);
+            address->setY(475 - 33);
             addressLine2->setY(508 - 33);
         }
 
@@ -437,7 +437,7 @@ namespace gui
 
             email->setY(363 - 33);
             addressLabel->setY(429 - 33);
-            addressLine1->setY(475 - 33);
+            address->setY(475 - 33);
             addressLine2->setY(508 - 33);
         }
 
@@ -447,7 +447,7 @@ namespace gui
             numberSecondary->setText(contact->numbers[1].numberUser);
             email->setY(363);
             addressLabel->setY(429);
-            addressLine1->setY(475);
+            address->setY(475);
             addressLine2->setY(508);
         }
 
@@ -458,12 +458,8 @@ namespace gui
             email->setVisible(false);
         }
 
-        if (contact->addressLine1.length() > 0) {
-            addressLine1->setText(contact->addressLine1);
-        }
-
-        if (contact->addressLine2.length() > 0) {
-            addressLine2->setText(contact->addressLine2);
+        if (contact->address.length() > 0) {
+            address->setText(contact->address);
         }
 
         if (contact->note.length() > 0) {

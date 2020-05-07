@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Databases/ContactsDB.hpp"
+#include "i18/i18.hpp"
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
 
@@ -22,8 +23,7 @@ struct ContactRecord
     };
     std::vector<Number> numbers;
 
-    UTF8 addressLine1              = "";
-    UTF8 addressLine2              = "";
+    UTF8 address                   = "";
     UTF8 note                      = "";
     UTF8 mail                      = "";
     ContactAddressType addressType = ContactAddressType::OTHER;
@@ -35,20 +35,25 @@ struct ContactRecord
     bool isOnFavourites = false;
     UTF8 speeddial      = "";
 
-    inline UTF8 getFormattedName() const
+    enum class NameFormatType
+    {
+        Default,
+        List,
+        Title,
+    };
+
+    inline auto getFormattedName(const NameFormatType type) const -> UTF8
     {
         if (primaryName.length() > 0) {
-            if (alternativeName.length() > 0)
-                return (primaryName + " " + alternativeName);
-            return (primaryName);
+            return alternativeName.length() > 0 ? primaryName + " " + alternativeName : primaryName;
         }
         if (alternativeName.length() > 0) {
-            return (alternativeName);
+            return alternativeName;
         }
-        if (numbers.size() > 0) {
+        if (type == NameFormatType::List && numbers.size() > 0) {
             return numbers[0].numberUser;
         }
-        return "no name";
+        return type == NameFormatType::Default ? "" : utils::localize.get("no_name");
     }
 };
 

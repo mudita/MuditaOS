@@ -12,12 +12,11 @@ TEST_CASE("Contacts Address Table tests")
     ContactsDB contactsdb;
     REQUIRE(contactsdb.IsInitialized());
 
-    ContactsAddressTableRow testRow1 = {.ID           = 0,
-                                        .contactID    = 0,
-                                        .addressLine1 = "6 Czeczota St.",
-                                        .addressLine2 = "02600 Warsaw",
-                                        .note         = "Test note",
-                                        .mail         = "test@mudita.com"};
+    ContactsAddressTableRow testRow1 = {.ID        = 0,
+                                        .contactID = 0,
+                                        .address   = "6 Czeczota St.\n02600 Warsaw",
+                                        .note      = "Test note",
+                                        .mail      = "test@mudita.com"};
 
     // Add 4 elements into table
     REQUIRE(contactsdb.address.Add(testRow1));

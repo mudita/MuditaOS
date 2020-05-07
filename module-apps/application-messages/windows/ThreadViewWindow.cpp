@@ -355,7 +355,7 @@ namespace gui
                 showMessages(Action::Start);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 // should be name number for now - easier to handle
-                setTitle(ret->front().getFormattedName());
+                setTitle(ret->front().getFormattedName(ContactRecord::NameFormatType::Default));
                 return;
             }
         }
@@ -369,8 +369,8 @@ namespace gui
                     LOG_DEBUG("SEND SMS TO: %s %s %s",
                               pdata->contact->numbers[0].numberE164.c_str(),
                               pdata->contact->numbers[0].numberUser.c_str(),
-                              pdata->contact->getFormattedName().c_str());
-                    setTitle(pdata->contact->getFormattedName());
+                              pdata->contact->getFormattedName(ContactRecord::NameFormatType::Default).c_str());
+                    setTitle(pdata->contact->getFormattedName(ContactRecord::NameFormatType::Default));
                 }
                 else {
                     // TODO handle error better
@@ -394,7 +394,7 @@ namespace gui
     {
         //	DBContactResponseMessage* msg = reinterpret_cast<DBContactResponseMessage*>( msgl );
         //	if( phonebookModel->updateRecords( std::move(msg->records), msg->offset, msg->limit, msg->count,
-        //msg->favourite ) ) 		return true;
+        // msg->favourite ) ) 		return true;
 
         return false;
     }

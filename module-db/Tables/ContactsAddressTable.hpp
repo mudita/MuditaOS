@@ -8,8 +8,7 @@ struct ContactsAddressTableRow
 {
     uint32_t ID        = DB_ID_NONE;
     uint32_t contactID = DB_ID_NONE;
-    UTF8 addressLine1  = "";
-    UTF8 addressLine2  = "";
+    UTF8 address  = "";
     UTF8 note          = "";
     UTF8 mail          = "";
 };
@@ -51,8 +50,7 @@ class ContactsAddressTable : public Table<ContactsAddressTableRow, ContactAddres
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_address("
                                    "_id              INTEGER PRIMARY KEY,"
                                    "contact_id       INTEGER,"
-                                   "address_line1    TEXT NOT NULL,"
-                                   "address_line2    TEXT NOT NULL,"
+                                   "address          TEXT NOT NULL,"
                                    "note             TEXT NOT NULL,"
                                    "mail             TEXT NOT NULL,"
                                    "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"
