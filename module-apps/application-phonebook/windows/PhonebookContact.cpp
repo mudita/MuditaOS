@@ -275,16 +275,6 @@ namespace gui
                            RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
                            Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
 
-        addressLine2 = addLabel(&page1,
-                                30,
-                                508,
-                                422,
-                                33,
-                                "",
-                                style::window::font::big,
-                                RectangleEdgeFlags::GUI_RECT_EDGE_NO_EDGES,
-                                Alignment(Alignment::ALIGN_HORIZONTAL_LEFT, Alignment::ALIGN_VERTICAL_CENTER));
-
         noteLabel = addLabel(&page2,
                              30,
                              203,
@@ -418,7 +408,6 @@ namespace gui
             email->setY(363 - 66);
             addressLabel->setY(429 - 33);
             address->setY(475 - 33);
-            addressLine2->setY(508 - 33);
         }
 
         if (contact->numbers.size() == 1) {
@@ -438,7 +427,6 @@ namespace gui
             email->setY(363 - 33);
             addressLabel->setY(429 - 33);
             address->setY(475 - 33);
-            addressLine2->setY(508 - 33);
         }
 
         if (contact->numbers.size() == 2) {
@@ -448,7 +436,6 @@ namespace gui
             email->setY(363);
             addressLabel->setY(429);
             address->setY(475);
-            addressLine2->setY(508);
         }
 
         if (contact->mail.length() > 0) {

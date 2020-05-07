@@ -53,7 +53,7 @@ struct ContactRecord
         if (type == NameFormatType::List && numbers.size() > 0) {
             return numbers[0].numberUser;
         }
-        return type == NameFormatType::Default ? "" : utils::localize.get("no_name");
+        return type == NameFormatType::Default ? "" : utils::localize.get("app_phonebook_contact_no_name");
     }
 };
 
