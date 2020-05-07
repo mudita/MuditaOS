@@ -1116,9 +1116,8 @@ WEAK_AV void MemManage_Handler(void)
 #endif
 }
 
-WEAK_AV void HardFault_Handler(void)
+[[gnu::naked]] WEAK_AV void HardFault_Handler(void)
 {
-#if 1
     asm volatile(" tst lr,#4       \n"
                  " ite eq          \n"
                  " mrseq r0,msp    \n"
@@ -1131,7 +1130,6 @@ WEAK_AV void HardFault_Handler(void)
                  : /* Inputs */
                  : /* Clobbers */
     );
-#endif
 }
 
 WEAK_AV void BusFault_Handler(void)
