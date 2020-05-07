@@ -52,6 +52,12 @@ void vfs::Init()
     else {
         LOG_ERROR("vfs::Init unable to determine OS type, fallback to %s", osRootPath.c_str());
     }
+
+    // this should already exist and have user data in it
+    // if it does not create an exmpty directory so that sqlite3 does not fault
+    if (ff_mkdir(relativeToRoot(PATH_USER).c_str()) != 0) {
+        LOG_ERROR("vfs::Init can't find a valid USER=%s path", relativeToRoot(PATH_USER).c_str());
+    }
 }
 
 bool vfs::getOSRootFromIni()
