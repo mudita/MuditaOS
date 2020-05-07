@@ -24,6 +24,7 @@
 | Robert Borzęcki | alarms         | Draft  | 05.03.2019        |
 | Kuba Kleczkowski | Added date_format in settings.db         | Draft  | 04.02.2020  
 | Alek Rudnik | calllog | Draft | 28.02.2020 |
+| Paweł Olejniczak | Contact address | Draft | 07.05.2020 |
 
 ## Scope <a name="scope"></a>
 This document is defines how SMS and contacts databases are constructed.
@@ -58,18 +59,18 @@ This document describes details of different user information database tables:
 #### 1. Contacts joining table
 Name: contacts
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's joining record. |
-| name_id | (mr) | INTEGER FOREIGN KEY(**contact_names**) | Uniuqe ID in the contact_names table where display name for given contact is stored. | 
-| numbers_id | (mr) | TEXT | List of unique IDs assigned to records where phone numbers assigned to given contact are stored. Values are separeted with spaces. |
-| ring_id | (m) | INTEGER FOREIGN KEY(**contact_rings**)| Unique ID of the record in the contact_rings table where path to audio asset selected for playing during given contact's call |
-| address_ids | (m) | TEXT | List of unique IDs assigned to records where addresses assigned to given contact are stored. Values are separeted with spaces. |
+| name_id | (mr) | INTEGER FOREIGN KEY(**contact_name**) | Unique ID in the contact_names table where display name for given contact is stored. |
+| numbers_id | (mr) | TEXT | List of unique IDs assigned to records where phone numbers assigned to given contact are stored. Values are separated with spaces. |
+| ring_id | (m) | INTEGER FOREIGN KEY(**contact_ring**)| Unique ID of the record in the contact_rings table where path to audio asset selected for playing during given contact's call |
+| address_id | (m) | INTEGER FOREIGN KEY(**contact_address**) | Unique ID in the contact_address table where address assigned to given contact is stored. |
 | type | (m) | INTEGER | Type of the contact as defined in the table below.  |
 
 Possible values of the type field in the contacts' table
 
-| Name | Value |  Desciption |
+| Name | Value |  Description |
 | -------- | ------- | -------------------|
 | USER| 0| ID defines that contact was created by the user and should be displayed in the applications that manipulate contacts. | 
 | TEMPORARY | 1| ID defines that contact was created for unknown messager/caller purposes. Possible reasons are: user created draft of the message, user received a message/call from unknown number |
@@ -77,7 +78,7 @@ Possible values of the type field in the contacts' table
 #### 2. Contacts name table
 Name: contact_names
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's name information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**)| Unique ID of the joining record in the contacts table.  |
@@ -87,7 +88,7 @@ Name: contact_names
 #### 3. Contacts number table
 Name: contact_numbers
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's number information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**)| Unique ID of the joining record in the contacts table.  |
@@ -97,7 +98,7 @@ Name: contact_numbers
 
 Possible values of the type field
 
-| Name | Value |  Desciption |
+| Name | Value |  Description |
 | -------- | ------- | -------------------|
 | CELL| 0| ID defines that number is a cellphone number. | 
 | HOME| 1| ID defines that number is a home number. |
@@ -109,7 +110,7 @@ Possible values of the type field
 #### 4. Contacts ring assets table
 Name: contact_rings
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's name information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**) | Unique ID of the joining record in the contacts table.  |
@@ -118,21 +119,17 @@ Name: contact_rings
 #### 5. Contacts address table
 Name: contact_address
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique number assigned to the contact's address information. |
 | contact_id | (um) | INTEGER FOREIGN KEY(**contacts**) | Unique ID of the joining record in the contacts table.  |
-| country | (m) | TEXT | Name of the country where address is located. | 
-| city | (m) | TEXT | Name of the city provided by the user. | 
-| street | (m) | TEXT | Name of the street provided by the user. | 
-| number | (m) | TEXT | House number provided by the user. | 
-| type | (m) | INTEGER | Type of address. Values are defined in table bellow. | 
+| address | (m) | TEXT | Address information provided by the user. |
 | note | (m) | TEXT | Optional note about given address provided by the user. |
 
 
 Possible values of the address type field
 
-| Name | Value |  Desciption |
+| Name | Value |  Description |
 | -------- | ------- | -------------------|
 | HOME| 0| ID defines that address is home address. |
 | WORK| 1| ID defines that address is work address. |
@@ -141,7 +138,7 @@ Possible values of the address type field
 #### 6. SMS messages table
 Name: sms
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID of the message. |
 | thread_id | (um) | INTEGER FOREIGN KEY(**threads**)| Unique ID of the thread that this message bellongs to.  |
@@ -155,12 +152,12 @@ Name: sms
 
 Possible values of the type field
 
-| Name | Value |  Desciption |
+| Name | Value |  Description |
 | -------- | ------- | -------------------|
-| DRAFT| 0x01| Defines unfinished message that should be loaded in editor for a given thread and may be later sheduled for sending. | 
+| DRAFT| 0x01| Defines unfinished message that should be loaded in editor for a given thread and may be later scheduled for sending. | 
 | FAILED| 0x02| Defines message that was queued for sending but this process for some reasons failed |
-| INBOX| 0x04| Defines incomming message.|
-| OUBTOX | 0x08| Defines outgoing message. |
+| INBOX| 0x04| Defines incoming message.|
+| OUTBOX | 0x08| Defines outgoing message. |
 | QUEUED| 0x10 | Defines message that is scheduled for sending|
 | ALL| 0xFF| Defines all types of messages. |
 
@@ -169,11 +166,11 @@ NOTE: Date is designed to be stored in UNIX (EPOCH) format - number of seconds s
 #### 7. SMS threads table
 Name: threads
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID of the thread. |
 | date | (m) | INTEGER | Date of the last modification of the thread. |
-| msg_count | (m) | INTEGER | Number of messags in the thread. |
+| msg_count | (m) | INTEGER | Number of messages in the thread. |
 | read | (m) | INTEGER |Value that defines number of unread messages in the thread. Value of zero defines that all messages were seen by the user. |
 | contact_id | (m) | TEXT | ID of the contact involved in the thread. Values refer to **contacts**. |
 | snippet | (m) | TEXT | First row of the last message in given thread. Text is encoded in UTF8 and has up to 45 characters. |
@@ -182,7 +179,7 @@ Name: threads
 #### 8. SMS threads counter table
 Name: threads_count
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | count | (m) | INTEGER | Fields used to count sms threads. Every new thread increments value stored in count by 1. Removing any of the threads will cause decrementation of the count value by 1. Those operations are performed by database via triggers: **on_thread_insert ** and **on_thread_remove** |
@@ -190,7 +187,7 @@ Name: threads_count
 #### 9. SMS template table
 Name: sms_template
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | text | (m) | TEXT | Text field for storing body of the sms template |
@@ -200,7 +197,7 @@ Name: sms_template
 #### 10. Phone settings
 Name: settings
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | time_format_12 | (m) | BOOL | if true time will be displayed as number with AM or PM suffix. Otherwise it wil be displayed in 24h format.  |
@@ -209,19 +206,19 @@ Name: settings
 | brightness_level | (m) | BOOL | If auto mode is disabled this value will be used to set brightness of the display. |
 | bigger_font | (m) | BOOL | If true bigger font is used in applications. |
 | pin_mode | (m) | INTEGER | Mode how user will be requested for PIN entering |
-| pin_days | (m) | INTEGER | Numer of days after which user will be requested to reeneter PIN. |
-| pin_days_left | (m) | INTEGER | Numer of days until PIN will have to be reentered. |
+| pin_days | (m) | INTEGER | Number of days after which user will be requested to reenter PIN. |
+| pin_days_left | (m) | INTEGER | Number of days until PIN will have to be reentered. |
 | pin1_string | (m) | TEXT | Raw string with PIN for sim card 1. |
 | pin2_string | (m) | TEXT | Raw string with PIN for sim card 2. |
-| active_sim | (m) | INTEGER | Indx of the SIM card selected by the user. By default it is first SIM card is selected: value 0 |
+| active_sim | (m) | INTEGER | Index of the SIM card selected by the user. By default it is first SIM card is selected: value 0 |
 | network_operator | (m) | TEXT	 | Raw string with selected network operator. |
-| lock_pass_hash | (m) | INTEGER | Hash of the pasword required for unlocking phone. |
+| lock_pass_hash | (m) | INTEGER | Hash of the password required for unlocking phone. |
 | lock_time| (m) | INTEGER | time of inactivity of the user after which phone will be automatically blocked. Expressed in milliseconds. Default value is 30 000ms |
 | language | (m) | INTEGER | Language selected by user. English by default. |
 
 Table describes possible values of **pin_mode** field.
 
-| Name | Value |  Desciption |
+| Name | Value |  Description |
 | -------- | ------- | -------------------|
 | ALWAYS | 0x01| User wil have to enter PIN after each restart. | 
 | DAYS | 0x02| Phone will ask for PIN after given number of days will elapse. |
@@ -238,7 +235,7 @@ Table describes possible values of **language** field.
 #### 11. Table with BT paired devices.
 Name: bt_devices.
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | mac | (m) | TEXT | MAC address of the paired BT device.  |
@@ -249,7 +246,7 @@ Name: bt_devices.
 #### 12. Table with information about notes.
 Name: notes.
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | date | (m) | INTEGER | date of note's last modification. |
@@ -259,25 +256,25 @@ Name: notes.
 #### 13. Table with information about alarms
 Name: alarms
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
-| time | (m) | INTEGER | Number of seconds from midnight that needs to elapse to genereate alarm event.  |
-| snooze | (m) | INTEGER | Number of seconds from alarm that needs to elapse to genereate alarm event after snooze.  |
+| time | (m) | INTEGER | Number of seconds from midnight that needs to elapse to generate alarm event.  |
+| snooze | (m) | INTEGER | Number of seconds from alarm that needs to elapse to generate alarm event after snooze.  |
 | status | (m) | INTEGER | State of the timer as defined in the table below. |
 | path | (m) | TEXT | Path to sound file that should be played when alarm event is generated. |
 
 Table describes possible states of **status** field for alarms.
 
-| Name | Value |  Desciption |
+| Name | Value |  Description |
 | -------- | ------- | -------------------|
-|ARMED| 0x01| Timer is activated. At specified time in the day timer will play selelcted music. | 
-|DORMENT| 0x02| Timer is deactivated. No event will happen at the time specified in timer. |
+|ARMED| 0x01| Timer is activated. At specified time in the day timer will play selected music. | 
+|DORMANT| 0x02| Timer is deactivated. No event will happen at the time specified in timer. |
 
 #### 14. Table with information about calls
 Name: calllog.
 
-| Field | Scope | Type | Desciption |
+| Field | Scope | Type | Description |
 | -------- | ----------- | ------- | -------------------|
 | _id | (um) | INTEGER PRIMARY KEY | Unique ID. |
 | number | (m) | TEXT | date of note's last modification. |
@@ -313,12 +310,12 @@ Name: calllog.
 
 ## Database Triggers <a name="triggers"></a>
 
-This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is incremented by 1.
+This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count column with _id equal to 1 in the threads_count table is incremented by 1.
 ```
 CREATE TRIGGER on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END;
 ```
 
-This trigger is responsible for taking action when thread is removedf rom threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is decremented by 1.
+This trigger is responsible for taking action when thread is removed from threads table. As a result value of the count column with _id equal to 1 in the threads_count table is decremented by 1.
 ```
 CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
 ```
@@ -373,12 +370,12 @@ If client wants to access SMS or Contacts database ```DB_OPEN_SMS_DB``` or ```  
 
 ## Database Triggers <a name="triggers"></a>
 
-This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is incremented by 1.
+This trigger is responsible for taking action when new thread is created and inserted to threads table. As a result value of the count column with _id equal to 1 in the threads_count table is incremented by 1.
 ```
 CREATE TRIGGER on_thread_insert AFTER INSERT ON threads BEGIN UPDATE threads_count SET count=count+1 WHERE _id=1; END;
 ```
 
-This trigger is responsible for taking action when thread is removedf rom threads table. As a result value of the count coulumn with _id equal to 1 in the threads_count table is decremented by 1.
+This trigger is responsible for taking action when thread is removedf rom threads table. As a result value of the count column with _id equal to 1 in the threads_count table is decremented by 1.
 ```
 CREATE TRIGGER on_thread_remove AFTER DELETE ON threads BEGIN UPDATE threads_count SET count=count-1 WHERE _id=1; END;
 ```
