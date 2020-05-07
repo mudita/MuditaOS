@@ -1,4 +1,7 @@
 {
     "cmake.sourceDirectory": "${workspaceFolder}",
-    "cmake.buildDirectory": "${workspaceFolder}/build-${buildKit}-${buildType}"
+    "cmake.buildDirectory": "${workspaceFolder}/build-${buildKit}-${buildType}",
+    "cmake.configureSettings": {
+        "COLOR_OUTPUT": "OFF"
+    }
 }
