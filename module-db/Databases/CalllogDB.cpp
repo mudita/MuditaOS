@@ -9,7 +9,7 @@
 #include <module-vfs/vfs.hpp>
 #include "CalllogDB.hpp"
 
-const char *CalllogDB::dbName = USER_PATH("callog.db");
+const char *CalllogDB::dbName = USER_PATH("calllog.db");
 
 CalllogDB::CalllogDB() : Database(dbName), calls(this)
 {
