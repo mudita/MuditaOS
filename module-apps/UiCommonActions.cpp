@@ -58,34 +58,24 @@ namespace app
             app, name_call, window::name_enterNumber, std::move(data));
     }
 
-    bool sms(Application *app, SmsOperation smsOperation, const std::string &number)
+    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number)
     {
         assert(app != nullptr);
 
         switch (smsOperation) {
-        case SmsOperation::Add: {
+        case SmsOperation::New: {
             return sapm::ApplicationManager::messageSwitchApplication(
                 app, name_messages, gui::name::window::new_sms, std::make_unique<SMSSendRequest>(number));
+        }
+        case SmsOperation::Template: {
+            return sapm::ApplicationManager::messageSwitchApplication(
+                app, name_messages, gui::name::window::sms_templates, std::make_unique<SMSSendTemplateRequest>(number));
         }
         default: {
             LOG_ERROR("SmsOperation not supported %" PRIu32, static_cast<uint32_t>(smsOperation));
             return false;
         }
         }
-    }
-
-    bool sms(Application *app, SmsOperation smsOperation, const utils::PhoneNumber::View &number)
-    {
-        assert(app != nullptr);
-
-        return sms(app, smsOperation, number.getE164());
-    }
-
-    bool sms(Application *app, SmsOperation smsOperation, const ContactRecord &contact)
-    {
-        assert(app != nullptr);
-
-        return sms(app, smsOperation, contact.numbers[0].numberE164);
     }
 
     bool contact(Application *app, ContactOperation contactOperation, const ContactRecord &contact)

@@ -33,6 +33,7 @@ namespace gui
         gui::Image *imageCircleBottom  = nullptr;
 
         State state = State::IDLE;
+        utils::PhoneNumber::View phoneNumber;
         /**
          * Manipulates widgets to handle currently set state of the window.
          */

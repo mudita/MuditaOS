@@ -172,8 +172,9 @@ namespace gui
         numberPrimaryMessageLabel->setPenFocusWidth(3);
         numberPrimaryMessageLabel->setPenWidth(0);
         numberPrimaryMessageLabel->activatedCallback = [=](Item &item) {
-            LOG_DEBUG("numberPrimaryLabel->inputCallback switch to sms window");
-            return app::sms(application, app::SmsOperation::Add, numberPrimary->getText());
+            LOG_ERROR("TODO missing support for libphonenumber in phonebook, simply open new messagew window");
+            return app::sms(
+                application, app::SmsOperation::New, utils::PhoneNumber::View()); // get number from primary number
         };
 
         numberPrimaryMessage = new Image(this, 401, 248, 32, 32, "mail");
@@ -225,7 +226,9 @@ namespace gui
         numberSecondaryMessageLabel->setPenFocusWidth(3);
         numberSecondaryMessageLabel->setPenWidth(0);
         numberSecondaryMessageLabel->activatedCallback = [=](Item &item) {
-            return app::sms(application, app::SmsOperation::Add, numberSecondary->getText());
+            LOG_ERROR("TODO missing support for libphonenumber in phonebook, simply open new messagew window");
+            return app::sms(
+                application, app::SmsOperation::New, utils::PhoneNumber::View()); // get number from secondary number
         };
 
         numberSecondaryMessage = new Image(this, 401, 306, 32, 32, "mail");

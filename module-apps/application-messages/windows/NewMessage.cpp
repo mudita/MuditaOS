@@ -31,7 +31,7 @@ namespace gui
     {
         if (auto pdata = dynamic_cast<PhonebookSearchReuqest *>(data); pdata != nullptr) {
             LOG_INFO("received search results");
-            recipient->setText(pdata->result->getFormattedName(ContactRecord::NameFormatType::Default));
+            recipient->setText(pdata->result->getFormattedName());
             contact = pdata->result;
         }
         if (auto pdata = dynamic_cast<SMSTemplateData *>(data); pdata != nullptr) {
@@ -41,7 +41,7 @@ namespace gui
         }
         if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
             LOG_INFO("recieved sms send request");
-            auto number  = pdata->getPhoneNumber();
+            auto number  = pdata->getPhoneNumber().getE164();
             auto records = DBServiceAPI::ContactGetByPhoneNumber(application, number);
             if (records->empty()) {
                 LOG_WARN("not valid contact for number %s", number.c_str());

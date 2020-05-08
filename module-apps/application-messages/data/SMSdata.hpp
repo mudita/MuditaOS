@@ -17,22 +17,40 @@ class SMSThreadData : public gui::SwitchData
     virtual ~SMSThreadData() = default;
 };
 
-class SMSSendRequest : public gui::SwitchData
+class SMSRequest : public gui::SwitchData
 {
   protected:
-    std::string
-        phoneNumber; // once there is support for it in phonebook, it should be switched to utils::PhoneNumber::View
+    utils::PhoneNumber::View phoneNumber;
 
   public:
-    SMSSendRequest(const UTF8 &phoneNumber) : phoneNumber(phoneNumber)
+    SMSRequest(const utils::PhoneNumber::View &phoneNumber) : phoneNumber(phoneNumber)
     {}
-    virtual ~SMSSendRequest() = default;
+    virtual ~SMSRequest() = default;
 
-    const std::string &getPhoneNumber() const
+    const utils::PhoneNumber::View &getPhoneNumber() const
     {
         return phoneNumber;
     };
 };
+
+class SMSSendRequest : public SMSRequest
+{
+  public:
+    SMSSendRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
+    {}
+    virtual ~SMSSendRequest() = default;
+};
+
+class SMSSendTemplateRequest : public SMSRequest
+{
+  public:
+    SMSSendTemplateRequest(const utils::PhoneNumber::View &phoneNumber) : SMSRequest(phoneNumber)
+    {}
+    virtual ~SMSSendTemplateRequest() = default;
+};
+
+class SMSTemplateSent : public gui::SwitchData
+{};
 
 class SMSTemplateData : public gui::SwitchData
 {

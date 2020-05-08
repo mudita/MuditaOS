@@ -15,7 +15,6 @@ namespace gui
     {
         std::unique_ptr<SMSTemplateModel> smsTemplateModel;
         gui::ListView *list = nullptr;
-        std::string requestingWindow;
 
       public:
         SMSTemplatesWindow() = delete;

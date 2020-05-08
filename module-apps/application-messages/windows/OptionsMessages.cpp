@@ -21,7 +21,7 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     auto l        = new gui::Label(box, 0, 0, text_len, label::big_h);
     l->area(gui::Item::Area::Max).w = box->area().w; // let box layout resize
     decorate(l);
-    l->setText(contact.getFormattedName(ContactRecord::NameFormatType::Default));
+    l->setText(contact.getFormattedName());
     l->activeItem = false;
 
     auto p = [=](const UTF8 &icon, auto foo) {
@@ -32,18 +32,19 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
     };
 
     p("phonebook_phone_ringing", [=](gui::Item &) -> bool {
-        LOG_INFO("Call: %s", contact.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
+        LOG_INFO("Call: %s", contact.getFormattedName().c_str());
         return app::call(app, contact);
     });
 
     p("mail", [=](gui::Item &) -> bool {
-        LOG_INFO("SMS to: %s", contact.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
-        app::sms(app, app::SmsOperation::Add, contact);
+        LOG_ERROR("TODO Missing support for libphonenumer");
+        // LOG_INFO("SMS to: %s", contact.getFormattedName().c_str());
+        // app::sms(app, app::SmsOperation::New, contact);
         return true;
     });
 
     p("cross", [=](gui::Item &) -> bool {
-        LOG_INFO("Add contact: %s", contact.getFormattedName(ContactRecord::NameFormatType::Default).c_str());
+        LOG_INFO("Add contact: %s", contact.getFormattedName().c_str());
         app::contact(app, app::ContactOperation::Add, contact);
         return true;
     });

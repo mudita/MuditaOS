@@ -9,6 +9,7 @@
 #include <service-db/messages/DBMessage.hpp>
 #include <i18/i18.hpp>
 #include <Style.hpp>
+#include <log/log.hpp>
 
 #include <cassert>
 #include <functional>
@@ -46,14 +47,6 @@ namespace gui
         list->setProvider(smsTemplateModel.get());
 
         setFocusItem(list);
-
-        if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
-            app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
-                std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
-                application->switchWindow(requestingWindow, std::move(data));
-                return true;
-            };
-        }
     }
 
     void SMSTemplatesWindow::destroyInterface()
@@ -75,8 +68,30 @@ namespace gui
             list->setElementsCount(smsTemplateModel->getItemCount());
         }
 
+        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        assert(app != nullptr);
+
         if (auto switchData = dynamic_cast<SMSTemplateRequest *>(data)) {
-            requestingWindow = switchData->requestingWindow;
+            auto requestingWindow  = switchData->requestingWindow;
+            app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
+                LOG_DEBUG("SMS template id = %" PRIu32 "chosen", templ->ID);
+                std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateData>(templ);
+                application->switchWindow(requestingWindow, std::move(data));
+                return true;
+            };
+        }
+
+        if (auto switchData = dynamic_cast<SMSSendTemplateRequest *>(data); switchData != nullptr) {
+            auto phoneNumber       = switchData->getPhoneNumber().getE164();
+            app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
+                LOG_DEBUG("SMS template id = %" PRIu32 "sent to %s", templ->ID, phoneNumber.c_str());
+                app->sendSms(phoneNumber, templ->text);
+                sapm::ApplicationManager::messageSwitchPreviousApplication(
+                    app,
+                    std::make_unique<sapm::APMSwitchPrevApp>(application->GetName(),
+                                                             std::make_unique<SMSTemplateSent>()));
+                return true;
+            };
         }
     }
 

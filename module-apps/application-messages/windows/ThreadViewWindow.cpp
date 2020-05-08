@@ -358,7 +358,7 @@ namespace gui
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
                 contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
-                setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Default));
+                setTitle(ret->front().getFormattedName());
                 return;
             }
         }
