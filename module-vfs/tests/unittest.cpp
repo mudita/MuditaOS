@@ -47,7 +47,7 @@ TEST_CASE("Test case 1")
     // current directory is the build dir
     // vfs adds sys/ to the path we need to got outside sys (bad!)
     // and look for some files there
-    auto dirList = vfs.listdir("../module-vfs/test_dir");
+    auto dirList = vfs.listdir("module-vfs/test_dir");
     REQUIRE(dirList.size() == 3);
     for (auto &dir : dirList) {
         if (dir.fileName == "test_dir2") {
