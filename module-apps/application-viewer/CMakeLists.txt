@@ -21,4 +21,4 @@ target_sources( ${PROJECT_NAME}
 		"${CMAKE_CURRENT_LIST_DIR}/windows/ViewWindow.hpp"
 )
 
-configure_file(viewerStates.txt ${CMAKE_BINARY_DIR}/sys/viewerStates.txt COPYONLY)
+configure_file(viewerStates.txt ${CMAKE_BINARY_DIR}/viewerStates.txt COPYONLY)

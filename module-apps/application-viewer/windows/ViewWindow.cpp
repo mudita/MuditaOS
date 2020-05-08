@@ -31,7 +31,7 @@ namespace gui
     {
         AppWindow::buildInterface();
         // load all states from file
-        auto file = vfs.fopen("sys/viewerStates.txt", "r");
+        auto file = vfs.fopen("viewerStates.txt", "r");
         // read line with number of states
         std::string str = vfs.getline(file);
         uint32_t statesCount;
