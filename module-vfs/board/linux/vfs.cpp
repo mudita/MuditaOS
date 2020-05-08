@@ -32,7 +32,8 @@ vfs::~vfs()
 
 void vfs::Init()
 {
-    osRootPath = purefs::dir::eMMC_disk;
+    // whatever current path on Linux we treat that as the root for our app
+    osRootPath = "./";
 }
 
 std::string vfs::relativeToRoot(const std::string path)
