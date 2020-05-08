@@ -70,6 +70,16 @@ namespace app
         AudioServiceAPI::Stop(this);
         callDelayedStopTime = utils::time::Timestamp() + delayToSwitchToPreviousApp;
         callWindow->setState(gui::CallWindow::State::CALL_ENDED);
+        if (getState() == State::ACTIVE_FORGROUND) {
+            getCurrentWindow() == callWindow ? refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP)
+                                             : switchWindow(window::name_call);
+        }
+        else {
+            // it means we have switched to different application during call and the call was aborted
+            // hence we need to switch back to call application
+            sapm::ApplicationManager::messageSwitchPreviousApplication(this);
+        }
+
         refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
     }
 

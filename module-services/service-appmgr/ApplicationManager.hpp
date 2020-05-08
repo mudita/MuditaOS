@@ -196,7 +196,7 @@ namespace sapm
         static bool messageSwitchApplication(sys::Service *sender,
                                              const std::string &applicationName,
                                              const std::string &windowName,
-                                             std::unique_ptr<gui::SwitchData> data);
+                                             std::unique_ptr<gui::SwitchData> data = nullptr);
 
         static bool messageSwitchSpecialInput(sys::Service *sender, std::unique_ptr<gui::SwitchSpecialChar> data);
         /**
