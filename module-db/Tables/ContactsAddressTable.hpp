@@ -1,41 +1,20 @@
-
-/*
- * @file ContactsAddressTable.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #pragma once
 
-#include "Common/Common.hpp"
-#include "Database/Database.hpp"
 #include "Table.hpp"
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
-#include <string>
 
 struct ContactsAddressTableRow
 {
-    uint32_t ID             = DB_ID_NONE;
-    uint32_t contactID      = 0;
-    UTF8 country            = "";
-    UTF8 city               = "";
-    UTF8 street             = "";
-    UTF8 number             = "";
-    ContactAddressType type = ContactAddressType::OTHER;
-    UTF8 note               = "";
-    UTF8 mail               = "";
+    uint32_t ID        = DB_ID_NONE;
+    uint32_t contactID = DB_ID_NONE;
+    UTF8 address       = "";
+    UTF8 note          = "";
+    UTF8 mail          = "";
 };
 
 enum class ContactAddressTableFields
 {
-    Country,
-    City,
-    Street,
-    Number,
     Mail
 };
 
@@ -71,11 +50,7 @@ class ContactsAddressTable : public Table<ContactsAddressTableRow, ContactAddres
     const char *createTableQuery = "CREATE TABLE IF NOT EXISTS contact_address("
                                    "_id              INTEGER PRIMARY KEY,"
                                    "contact_id       INTEGER,"
-                                   "country          TEXT NOT NULL,"
-                                   "city             TEXT NOT NULL,"
-                                   "street           TEXT NOT NULL,"
-                                   "number           TEXT NOT NULL,"
-                                   "type             INTEGER,"
+                                   "address          TEXT NOT NULL,"
                                    "note             TEXT NOT NULL,"
                                    "mail             TEXT NOT NULL,"
                                    "FOREIGN KEY(contact_id) REFERENCES contacts(_id)"

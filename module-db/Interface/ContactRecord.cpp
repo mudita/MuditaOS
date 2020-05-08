@@ -1,16 +1,5 @@
-
-/*
- * @file ContactRecord.cpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #include "ContactRecord.hpp"
 #include <Utils.hpp>
-#include <log/log.hpp>
 
 ContactRecordInterface::ContactRecordInterface(ContactsDB *db) : contactDB(db)
 {}
@@ -68,15 +57,8 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactRingID = contactDB->GetLastInsertRowID();
 
-    // TODO: add missing feature: multiple addresses per contact
-    ret = contactDB->address.Add(ContactsAddressTableRow{.contactID = contactID,
-                                                         .country   = rec.country,
-                                                         .city      = rec.city,
-                                                         .street    = rec.street,
-                                                         .number    = rec.number,
-                                                         .type      = rec.addressType,
-                                                         .note      = rec.note,
-                                                         .mail      = rec.mail});
+    ret = contactDB->address.Add(
+        ContactsAddressTableRow{.contactID = contactID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret) {
         return ret;
@@ -84,11 +66,11 @@ bool ContactRecordInterface::Add(const ContactRecord &rec)
 
     auto contactAddressID = contactDB->GetLastInsertRowID();
 
-    ret = contactDB->contacts.Update(ContactsTableRow{.ID         = contactID,
-                                                      .nameID     = contactNameID,
-                                                      .numbersID  = std::to_string(contactNumberID),
-                                                      .ringID     = contactRingID,
-                                                      .addressIDs = std::to_string(contactAddressID),
+    ret = contactDB->contacts.Update(ContactsTableRow{.ID        = contactID,
+                                                      .nameID    = contactNameID,
+                                                      .numbersID = std::to_string(contactNumberID),
+                                                      .ringID    = contactRingID,
+                                                      .addressID = contactAddressID,
 
                                                       .type           = rec.contactType,
                                                       .isOnWhitelist  = rec.isOnBlacklist,
@@ -116,7 +98,7 @@ bool ContactRecordInterface::RemoveByID(uint32_t id)
         return false;
     }
 
-    if (contactDB->address.RemoveByID(std::stoul(contact.addressIDs)) == false) {
+    if (contactDB->address.RemoveByID(contact.addressID) == false) {
         return false;
     }
 
@@ -145,7 +127,7 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
                                                            .nameID          = contact.nameID,
                                                            .numbersID       = contact.numbersID,
                                                            .ringID          = contact.ringID,
-                                                           .addressIDs      = contact.addressIDs,
+                                                           .addressID       = contact.addressID,
                                                            .type            = rec.contactType,
                                                            .isOnWhitelist   = rec.isOnWhitelist,
                                                            .isOnBlacklist   = rec.isOnBlacklist,
@@ -177,14 +159,8 @@ bool ContactRecordInterface::Update(const ContactRecord &rec)
     if (!ret)
         return ret;
 
-    ret = contactDB->address.Update(ContactsAddressTableRow{.contactID = contact.ID,
-                                                            .country   = rec.country,
-                                                            .city      = rec.city,
-                                                            .street    = rec.street,
-                                                            .number    = rec.number,
-                                                            .type      = rec.addressType,
-                                                            .note      = rec.note,
-                                                            .mail      = rec.mail});
+    ret = contactDB->address.Update(ContactsAddressTableRow{
+        .ID = contact.addressID, .contactID = contact.ID, .address = rec.address, .note = rec.note, .mail = rec.mail});
 
     if (!ret)
         return ret;
@@ -200,7 +176,7 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     ContactRecord rec = ContactRecord();
 
     auto contact = contactDB->contacts.GetByID(id);
-    if (contact.ID == 0) {
+    if (contact.ID == DB_ID_NONE) {
         return rec;
     }
 
@@ -209,12 +185,12 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
         return rec;
     }
     auto ring = contactDB->ringtones.GetByID(contact.ringID);
-    if (ring.ID == 0) {
+    if (ring.ID == DB_ID_NONE) {
         return rec;
     }
 
-    auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-    if (address.ID == 0) {
+    auto address = contactDB->address.GetByID(contact.addressID);
+    if (address.ID == DB_ID_NONE) {
         return rec;
     }
 
@@ -228,13 +204,9 @@ ContactRecord ContactRecordInterface::GetByID(uint32_t id)
     rec.alternativeName = name.nameAlternative;
     rec.numbers         = nrs;
     rec.contactType     = contact.type;
-    rec.country         = address.country;
-    rec.city            = address.city;
-    rec.street          = address.street;
-    rec.number          = address.number;
+    rec.address         = address.address;
     rec.note            = address.note;
     rec.mail            = address.mail;
-    rec.addressType     = address.type;
     rec.assetPath       = ring.assetPath;
     rec.isOnWhitelist   = contact.isOnWhitelist;
     rec.isOnBlacklist   = contact.isOnBlacklist;
@@ -264,12 +236,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
     for (const auto &w : ret) {
 
         auto contact = contactDB->contacts.GetByID(w.ID);
-        if (contact.ID == 0) {
+        if (contact.ID == DB_ID_NONE) {
             return records;
         }
 
         auto name = contactDB->name.GetByID(contact.nameID);
-        if (name.ID == 0) {
+        if (name.ID == DB_ID_NONE) {
             return records;
         }
 
@@ -279,12 +251,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         }
 
         auto ring = contactDB->ringtones.GetByID(contact.ringID);
-        if (ring.ID == 0) {
+        if (ring.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-        if (address.ID == 0) {
+        auto address = contactDB->address.GetByID(contact.addressID);
+        if (address.ID == DB_ID_NONE) {
             return records;
         }
 
@@ -293,13 +265,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                          .alternativeName = name.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .country         = address.country,
-                                         .city            = address.city,
-                                         .street          = address.street,
-                                         .number          = address.number,
+                                         .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
-                                         .addressType     = address.type,
                                          .assetPath       = ring.assetPath,
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
@@ -324,7 +292,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.contactID);
-            if (contact.ID == 0) {
+            if (contact.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -334,12 +302,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0) {
+            if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0) {
+            auto address = contactDB->address.GetByID(contact.addressID);
+            if (address.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -348,13 +316,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = w.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -371,7 +335,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.contactID);
-            if (contact.ID == 0) {
+            if (contact.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -381,17 +345,17 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto name = contactDB->name.GetByID(contact.nameID);
-            if (name.ID == 0) {
+            if (name.ID == DB_ID_NONE) {
                 return records;
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0) {
+            if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0) {
+            auto address = contactDB->address.GetByID(contact.addressID);
+            if (address.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -400,13 +364,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -422,12 +382,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.ID);
-            if (contact.ID == 0) {
+            if (contact.ID == DB_ID_NONE) {
                 return records;
             }
 
             auto name = contactDB->name.GetByID(contact.nameID);
-            if (name.ID == 0) {
+            if (name.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -437,12 +397,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0) {
+            if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0) {
+            auto address = contactDB->address.GetByID(contact.addressID);
+            if (address.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -451,13 +411,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -472,12 +428,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
         for (const auto &w : ret) {
 
             auto contact = contactDB->contacts.GetByID(w.ID);
-            if (contact.ID == 0) {
+            if (contact.ID == DB_ID_NONE) {
                 return records;
             }
 
             auto name = contactDB->name.GetByID(contact.nameID);
-            if (name.ID == 0) {
+            if (name.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -487,12 +443,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
             }
 
             auto ring = contactDB->ringtones.GetByID(contact.ringID);
-            if (ring.ID == 0) {
+            if (ring.ID == DB_ID_NONE) {
                 return records;
             }
 
-            auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-            if (address.ID == 0) {
+            auto address = contactDB->address.GetByID(contact.addressID);
+            if (address.ID == DB_ID_NONE) {
                 return records;
             }
 
@@ -501,13 +457,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetLimitOffs
                                              .alternativeName = name.nameAlternative,
                                              .contactType     = contact.type,
                                              .numbers         = nrs,
-                                             .country         = address.country,
-                                             .city            = address.city,
-                                             .street          = address.street,
-                                             .number          = address.number,
+                                             .address         = address.address,
                                              .note            = address.note,
                                              .mail            = address.mail,
-                                             .addressType     = address.type,
                                              .assetPath       = ring.assetPath,
                                              .isOnWhitelist   = contact.isOnWhitelist,
                                              .isOnBlacklist   = contact.isOnBlacklist,
@@ -530,7 +482,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
     for (const auto &w : ret) {
 
         auto contact = contactDB->contacts.GetByID(w.contactID);
-        if (contact.ID == 0) {
+        if (contact.ID == DB_ID_NONE) {
             return records;
         }
 
@@ -540,12 +492,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
         }
 
         auto ring = contactDB->ringtones.GetByID(contact.ringID);
-        if (ring.ID == 0) {
+        if (ring.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-        if (address.ID == 0) {
+        auto address = contactDB->address.GetByID(contact.addressID);
+        if (address.ID == DB_ID_NONE) {
             return records;
         }
 
@@ -554,13 +506,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::GetByName(UT
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .country         = address.country,
-                                         .city            = address.city,
-                                         .street          = address.street,
-                                         .number          = address.number,
+                                         .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
-                                         .addressType     = address.type,
                                          .assetPath       = ring.assetPath,
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
@@ -581,7 +529,7 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
 
     for (const auto &w : ret) {
         auto contact = contactDB->contacts.GetByID(w.ID);
-        if (contact.ID == 0) {
+        if (contact.ID == DB_ID_NONE) {
             return records;
         }
 
@@ -591,12 +539,12 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
         }
 
         auto ring = contactDB->ringtones.GetByID(contact.ringID);
-        if (ring.ID == 0) {
+        if (ring.ID == DB_ID_NONE) {
             return records;
         }
 
-        auto address = contactDB->address.GetByID(std::stoul(contact.addressIDs));
-        if (address.ID == 0) {
+        auto address = contactDB->address.GetByID(contact.addressID);
+        if (address.ID == DB_ID_NONE) {
             return records;
         }
 
@@ -605,13 +553,9 @@ std::unique_ptr<std::vector<ContactRecord>> ContactRecordInterface::Search(const
                                          .alternativeName = w.nameAlternative,
                                          .contactType     = contact.type,
                                          .numbers         = nrs,
-                                         .country         = address.country,
-                                         .city            = address.city,
-                                         .street          = address.street,
-                                         .number          = address.number,
+                                         .address         = address.address,
                                          .note            = address.note,
                                          .mail            = address.mail,
-                                         .addressType     = address.type,
                                          .assetPath       = ring.assetPath,
                                          .isOnWhitelist   = contact.isOnWhitelist,
                                          .isOnBlacklist   = contact.isOnBlacklist,
@@ -662,7 +606,7 @@ std::vector<ContactRecord::Number> ContactRecordInterface::getNumbers(const std:
     std::vector<ContactRecord::Number> nrs;
     for (auto nr_str : utils::split(numbers_id, ' ')) {
         auto nr = contactDB->number.GetByID(std::stol(nr_str));
-        if (nr.ID == 0) {
+        if (nr.ID == DB_ID_NONE) {
             return nrs;
         }
         nrs.push_back(ContactRecord::Number(nr.numberUser, nr.numbere164, nr.type));

@@ -1,21 +1,9 @@
-
-/*
- * @file ContactRecord.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 29.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
-
 #pragma once
 
-#include "../Common/Common.hpp"
 #include "../Databases/ContactsDB.hpp"
+#include "i18/i18.hpp"
 #include "Record.hpp"
 #include "utf8/UTF8.hpp"
-
-#include <vector>
 
 struct ContactRecord
 {
@@ -35,10 +23,7 @@ struct ContactRecord
     };
     std::vector<Number> numbers;
 
-    UTF8 country                   = "";
-    UTF8 city                      = "";
-    UTF8 street                    = "";
-    UTF8 number                    = "";
+    UTF8 address                   = "";
     UTF8 note                      = "";
     UTF8 mail                      = "";
     ContactAddressType addressType = ContactAddressType::OTHER;
@@ -50,13 +35,25 @@ struct ContactRecord
     bool isOnFavourites = false;
     UTF8 speeddial      = "";
 
-    inline UTF8 getFormattedName() const
+    enum class NameFormatType
     {
-        if (contactType == ContactType::TEMPORARY) {
+        Default,
+        List,
+        Title,
+    };
+
+    inline auto getFormattedName(const NameFormatType type) const -> UTF8
+    {
+        if (primaryName.length() > 0) {
+            return alternativeName.length() > 0 ? primaryName + " " + alternativeName : primaryName;
+        }
+        if (alternativeName.length() > 0) {
+            return alternativeName;
+        }
+        if (type == NameFormatType::List && numbers.size() > 0) {
             return numbers[0].numberUser;
         }
-
-        return primaryName + " " + alternativeName;
+        return type == NameFormatType::Default ? "" : utils::localize.get("app_phonebook_contact_no_name");
     }
 };
 

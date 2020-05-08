@@ -1,35 +1,24 @@
-
-/*
- * @file ContactsTable.hpp
- * @author Mateusz Piesta (mateusz.piesta@mudita.com)
- * @date 28.05.19
- * @brief
- * @copyright Copyright (C) 2019 mudita.com
- * @details
- */
 #pragma once
 
 #include "Common/Common.hpp"
-#include "Database/Database.hpp"
 #include "Record.hpp"
 #include "Table.hpp"
 #include "utf8/UTF8.hpp"
-#include <string>
 
 struct ContactsTableRow
 {
-    uint32_t ID            = DB_ID_NONE;
-    uint32_t nameID        = 0;
-    std::string numbersID  = "";
-    uint32_t ringID        = 0;
-    std::string addressIDs = "";
-    ContactType type       = ContactType::TEMPORARY;
-    bool isOnWhitelist     = false;
-    bool isOnBlacklist     = false;
-    bool isOnFavourites    = false;
-    std::string speedDial  = "";
-    UTF8 namePrimary       = "";
-    UTF8 nameAlternative   = "";
+    uint32_t ID           = DB_ID_NONE;
+    uint32_t nameID       = DB_ID_NONE;
+    std::string numbersID = "";
+    uint32_t ringID       = DB_ID_NONE;
+    uint32_t addressID    = DB_ID_NONE;
+    ContactType type      = ContactType::TEMPORARY;
+    bool isOnWhitelist    = false;
+    bool isOnBlacklist    = false;
+    bool isOnFavourites   = false;
+    std::string speedDial = "";
+    UTF8 namePrimary      = "";
+    UTF8 nameAlternative  = "";
 };
 
 enum class ContactTableFields
@@ -75,12 +64,12 @@ class ContactsTable : public Table<ContactsTableRow, ContactTableFields>
   private:
     const char *createTableQuery =
         "CREATE TABLE IF NOT EXISTS contacts("
-        "_id INTEGER PRIMARY KEY,"
-        "name_id INTEGER,"
-        "numbers_id TEXT NOT NULL,"
-        "ring_id INTEGER,"
-        "address_ids TEXT NOT NULL,"
-        "type INTEGER,"
+        "_id              INTEGER PRIMARY KEY,"
+        "name_id          INTEGER,"
+        "numbers_id       TEXT NOT NULL,"
+        "ring_id          INTEGER,"
+        "address_id       INTEGER,"
+        "type             INTEGER,"
         "whitelist        INTEGER,"
         "blacklist        INTEGER,"
         "favourites       INTEGER,"
