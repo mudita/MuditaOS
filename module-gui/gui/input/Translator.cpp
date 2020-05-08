@@ -162,7 +162,7 @@ namespace gui
     class Profiles
     {
       private:
-        const char *profilesFolder                   = "sys/assets/profiles";
+        const char *profilesFolder                   = "assets/profiles";
         std::map<std::string, gui::Profile> profiles = {};
 
         void loadProfile(const std::string &filepath)
