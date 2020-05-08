@@ -323,7 +323,7 @@ bool ServiceEink::changeWaveform(EinkWaveforms_e mode, const int32_t temperature
     }
 
     // Open file
-    auto file = vfs.fopen("sys/Luts.bin", "rb");
+    auto file = vfs.fopen("Luts.bin", "rb");
     if (file == nullptr) {
         LOG_FATAL("Could not find the LUTS.bin file. Returning");
         return false;

@@ -7,10 +7,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
-
+#include <module-vfs/vfs.hpp>
 #include "SettingsDB.hpp"
 
-const char *SettingsDB::dbName = "sys/settings.db";
+const char *SettingsDB::dbName = USER_PATH("settings.db");
 
 SettingsDB::SettingsDB() : Database(dbName), settings(this)
 {

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(module-vfs VERSION 1.0
         DESCRIPTION "VFS module library")
 
-set(SOURCES "")
+set(SOURCES "" vfs-utils.cpp)
 
 if(NOT ${PROJECT_TARGET}  STREQUAL "TARGET_Linux")
     include(targets/Target_Cross.cmake)

@@ -6,9 +6,10 @@
  * @copyright Copyright (C) 2019 mudita.com
  * @details
  */
+#include <module-vfs/vfs.hpp>
 #include "NotesDB.hpp"
 
-const char *NotesDB::dbName = "sys/notes.db";
+const char *NotesDB::dbName = USER_PATH("notes.db");
 
 NotesDB::NotesDB() : Database(dbName), notes(this)
 {
