@@ -84,7 +84,6 @@ namespace sevm
             : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
         EVMResponseMessage(bool retCode, MessageType responseTo)
             : sys::ResponseMessage(sys::ReturnCodes::Success, responseTo), retCode(retCode){};
-        virtual ~EVMResponseMessage(){};
 
         bool retCode;
     };

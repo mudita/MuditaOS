@@ -102,7 +102,7 @@ enum class BaudTestStep
     baud460800_Cmux,
     baud115200_NoCmux,
     baud115200_Cmux,
-    over,
+    baud_NotFound,
 };
 
 const char *c_str(BaudTestStep step)
@@ -117,17 +117,18 @@ const char *c_str(BaudTestStep step)
     case BaudTestStep::baud115200_Cmux:
         return "baud115200_Cmux";
     default:
-        return "baudBad";
+        return "baud_NotFound";
     }
-    return "";
 }
 
 bool BaudDetectTestAT(ATParser *parser, BaudTestStep &step, BaudTestStep nextStep)
 {
-    LOG_DEBUG("=> Baud detection step: %s -> %s", c_str(step), c_str(nextStep));
-    step = nextStep;
-    if (parser->cmd(at::AT::AT)) {
-        return true;
+    if (parser != nullptr) {
+        LOG_DEBUG("=> Baud detection step: %s -> %s", c_str(step), c_str(nextStep));
+        step = nextStep;
+        if (parser->cmd(at::AT::AT)) {
+            return true;
+        }
     }
     return false;
 }
@@ -143,7 +144,7 @@ void CloseCmux(std::unique_ptr<bsp::Cellular> &pv_cellular)
 TS0710::ConfState TS0710::BaudDetectOnce()
 {
     bool result           = false;
-    BaudTestStep lastStep = BaudTestStep::over;
+    BaudTestStep lastStep = BaudTestStep::baud_NotFound;
     BaudTestStep step     = BaudTestStep::baud460800_NoCmux;
 
     while (!result) {
@@ -166,9 +167,9 @@ TS0710::ConfState TS0710::BaudDetectOnce()
         case BaudTestStep::baud115200_Cmux:
             CloseCmux(pv_cellular);
             lastStep = step;
-            result   = BaudDetectTestAT(parser, step, BaudTestStep::over);
+            result   = BaudDetectTestAT(parser, step, BaudTestStep::baud_NotFound);
             break;
-        case BaudTestStep::over:
+        case BaudTestStep::baud_NotFound:
             pv_cellular->SetSpeed(ATPortSpeeds_text[PortSpeed_e::PS115200]); // set port speed to default 115200
             LOG_ERROR("No Baud found for modem.");
             return ConfState::Failure;
@@ -201,15 +202,7 @@ TS0710::ConfState TS0710::BaudDetectProcedure(uint16_t timeout_s)
 TS0710::ConfState TS0710::ConfProcedure()
 {
     LOG_DEBUG("Configuring modem...");
-    uint32_t tries = 0;
 
-    while (tries < 20) {
-        if (parser->cmd(at::AT::FACTORY_RESET)) {
-
-            break;
-        }
-        tries++;
-    }
     if (!parser->cmd(at::AT::FACTORY_RESET)) {
         return ConfState::Failure;
     }
@@ -246,7 +239,7 @@ TS0710::ConfState TS0710::ConfProcedure()
     }
 
     LOG_WARN("TODO: determine while this retry loop is necessary");
-    tries               = 0;
+    uint32_t tries      = 0;
     auto const maxTries = 40;
     while (!parser->cmd(at::AT::QSCLK_ON)) {
         auto const sec = 1000;
@@ -521,14 +514,7 @@ void TS0710::InformModemHostWakeup(void)
 
 bool TS0710::IsModemActive(void)
 {
-    auto status = bsp::cellular::status::getStatus();
-
-    if (status == bsp::cellular::status::value::ACTIVE) {
-        return true;
-    }
-    else {
-        return false;
-    }
+    return bsp::cellular::status::getStatus() == bsp::cellular::status::value::ACTIVE;
 }
 
 void TS0710::TurnOnModem(void)

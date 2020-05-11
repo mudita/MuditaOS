@@ -143,11 +143,7 @@ ServiceCellular::ServiceCellular() : sys::Service(serviceName, "", cellularStack
 
 ServiceCellular::~ServiceCellular()
 {
-
     LOG_INFO("[ServiceCellular] Cleaning resources");
-    //    if (cmux != nullptr) {
-    //        delete cmux;
-    //    }
 }
 
 void ServiceCellular::CallStateTimerHandler()
@@ -322,6 +318,8 @@ bool ServiceCellular::handle_power_up_procedure()
         }
     }
     case Board::none:
+        LOG_FATAL("Board not known!");
+        assert(0);
         break;
     default:
         break;
@@ -694,9 +692,12 @@ sys::Message_t ServiceCellular::DataReceivedHandler(sys::DataMessage *msgl, sys:
     }
     case MessageType::EVMModemStatus: {
         using namespace bsp::cellular::status;
-        auto status_pin = dynamic_cast<sevm::StateMessage *>(msgl)->state == true ? value::ACTIVE : value::INACTIVE;
-        if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == Board::T4) {
-            state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+        auto msg = dynamic_cast<sevm::StateMessage *>(msgl);
+        if (msg != nullptr) {
+            auto status_pin = msg->state == true ? value::ACTIVE : value::INACTIVE;
+            if (status_pin == value::ACTIVE && state.get() == State::ST::PowerUpProcedure && board == Board::T4) {
+                state.set(this, State::ST::PowerUpInProgress); // and go to baud detect as usual
+            }
         }
         break;
     }
