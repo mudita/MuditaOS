@@ -321,6 +321,9 @@ namespace gui
     void PhonebookContact::destroyInterface()
     {
         erase();
+        // data was erased, now we need to clear page so that we won't use old pointers
+        page1.clear();
+        page2.clear();
     }
 
     PhonebookContact::~PhonebookContact()
