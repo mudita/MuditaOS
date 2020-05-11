@@ -31,7 +31,11 @@ namespace gui
     bool Image::set(int id)
     {
         imageMap = ImageManager::getInstance().getImageMap(id);
-        setArea(BoundingBox(getX(), getY(), imageMap->getWidth(), imageMap->getHeight()));
+        auto w   = imageMap->getWidth();
+        auto h   = imageMap->getHeight();
+        setMinimumWidth(w);
+        setMinimumHeight(h);
+        setArea(BoundingBox(getX(), getY(), w, h));
         return true;
     }
 

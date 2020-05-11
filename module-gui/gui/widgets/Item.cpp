@@ -158,6 +158,16 @@ namespace gui
         }
     }
 
+    void Item::setMinimumWidth(uint32_t w)
+    {
+        area(Area::Min).w = w;
+    }
+
+    void Item::setMinimumHeight(uint32_t h)
+    {
+        area(Area::Min).h = h;
+    }
+
     uint16_t Item::getSize(Axis axis)
     {
         return widgetArea.size(axis);
