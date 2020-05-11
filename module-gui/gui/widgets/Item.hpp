@@ -214,11 +214,11 @@ namespace gui
 
         void setX(const int32_t x);
         void setY(const int32_t y);
-        [[nodiscard]] uint32_t getX() const
+        [[nodiscard]] int32_t getX() const
         {
             return (widgetArea.x);
         }
-        [[nodiscard]] uint32_t getY() const
+        [[nodiscard]] int32_t getY() const
         {
             return (widgetArea.y);
         }
