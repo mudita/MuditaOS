@@ -286,6 +286,7 @@ namespace gui
         number->setFont(style::window::font::mediumbold);
         number->setPenWidth(style::window::default_border_no_focus_w);
         number->setSize(size_needed_for_2digits, el->area().h);
+        number->setMinimumWidth(size_needed_for_2digits);
         number->setAlignment(Alignment::ALIGN_VERTICAL_CENTER | Alignment::ALIGN_HORIZONTAL_RIGHT);
         number->activeItem = false;
         // 2. Add all elements to hbox layout
