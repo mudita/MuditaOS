@@ -110,7 +110,6 @@ namespace gui
         BoundingBox oldArea = widgetArea;
         widgetArea          = area;
         widgetMaxArea.sum(widgetArea);
-        widgetActualArea.sum(widgetArea);
         updateDrawArea();
         onDimensionChanged(oldArea, widgetArea);
     }

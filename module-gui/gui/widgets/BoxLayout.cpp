@@ -134,7 +134,7 @@ namespace gui
 
     template <Axis axis> void BoxLayout::updatePosition()
     {
-        auto pos        = reverse_order ? this->area().size(axis) : 0;
+        int32_t pos     = reverse_order ? this->area().size(axis) : 0;
         auto pos_update = [this](Item *it, int32_t &pos) {
             if (this->reverse_order) {
 
@@ -202,7 +202,8 @@ namespace gui
             if (!el->visible)
                 continue;
 
-            el->area(Item::Area::Normal) = el->area(Item::Area::Min);
+            el->area(Item::Area::Normal).w = el->area(Item::Area::Min).w;
+            el->area(Item::Area::Normal).h = el->area(Item::Area::Min).h;
             set_size(el, to_split);
         }
 
