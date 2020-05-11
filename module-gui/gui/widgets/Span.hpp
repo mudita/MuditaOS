@@ -7,12 +7,13 @@ namespace gui
     /// span class - provides offset in selected axis
     class Span : public Item
     {
-        Axis axis = Axis::X;
 
       public:
-        Span(Axis axis, unsigned int size) : axis(axis)
+        Span(Axis axis, unsigned int size)
         {
             setSize(size, axis);
+            setMinimumWidth(getWidth());
+            setMinimumHeight(getHeight());
             activeItem = false;
         }
 
