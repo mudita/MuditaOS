@@ -308,7 +308,6 @@ namespace gui
             return false;
         };
 
-        el->resizeItems();
         layout->addWidget(el);
         if (el->visible) {
             // space between next notifications to show

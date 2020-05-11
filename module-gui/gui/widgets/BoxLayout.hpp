@@ -31,11 +31,11 @@ namespace gui
         {
             uint32_t sum = 0;
             std::for_each(it->children.begin(), it->children.end(), [&](auto &el) {
-                sum += el->visible ? el->area().size(axis) : 0;
+                sum += el->visible ? el->area(Area::Min).size(axis) : 0;
             });
             return sum;
         };
-        template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Normal)
+        template <Axis axis> uint32_t sizeLeft(Item *it, Item::Area area = Item::Area::Min)
         {
             return it->getSize(axis) - sizeUsed<axis>(it);
         };
@@ -44,6 +44,7 @@ namespace gui
         template <Axis axis> void updatePosition();
 
         std::list<Item *> outOfDrawAreaItems;
+        void addToOutOfDrawAreaList(Item *item);
         virtual void resizeItems();
         bool reverse_order = false;
         /// get next navigation item including `from` item, ecludes not visible items and not acvite items

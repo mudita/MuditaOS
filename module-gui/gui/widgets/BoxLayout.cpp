@@ -123,6 +123,15 @@ namespace gui
         setVisible(value, false);
     }
 
+    void BoxLayout::addToOutOfDrawAreaList(Item *it)
+    {
+
+        if (it->visible) {
+            outOfDrawAreaItems.push_back(it);
+            it->visible = false;
+        }
+    }
+
     template <Axis axis> void BoxLayout::updatePosition()
     {
         auto pos        = reverse_order ? this->area().size(axis) : 0;
@@ -134,10 +143,7 @@ namespace gui
                     it->setPosition(pos, axis);
                 }
                 else {
-                    if (it->visible) {
-                        outOfDrawAreaItems.push_back(it);
-                        it->visible = false;
-                    }
+                    addToOutOfDrawAreaList(it);
                 }
             }
             else {
@@ -147,10 +153,7 @@ namespace gui
                     pos += it->area(Item::Area::Normal).size(axis);
                 }
                 else {
-                    if (it->visible) {
-                        outOfDrawAreaItems.push_back(it);
-                        it->visible = false;
-                    }
+                    addToOutOfDrawAreaList(it);
                 }
             }
         };
@@ -182,9 +185,12 @@ namespace gui
             // Check if item can be resized
             int32_t left_in_el = it->area(Area::Max).size(axis) - it->area(Area::Min).size(axis);
             if (to_split > 0 && left_in_el > 0) {
-                int32_t resize = left_in_el < to_split ? left_in_el : to_split;
+                int32_t resize = std::min(left_in_el, to_split);
                 it->setSize(it->area(Area::Min).size(axis) + resize, axis);
                 to_split -= resize;
+            }
+            else {
+                it->setSize(it->area(Area::Min).size(axis), axis);
             }
 
             // Set size of orthogonal axis to Normal BoxLayout size
@@ -207,7 +213,7 @@ namespace gui
     template <Axis axis> void BoxLayout::addWidget(Item *item)
     {
         Rect::addWidget(item);
-        updatePosition<axis>();
+        resizeItems<axis>();
     }
 
     std::list<Item *>::iterator BoxLayout::nextNavigationItem(std::list<Item *>::iterator from)
