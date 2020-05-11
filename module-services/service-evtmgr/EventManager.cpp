@@ -30,7 +30,6 @@
 
 #include "bsp/magnetometer/magnetometer.hpp"
 
-const char *EventManager::serviceName = "EventManager";
 
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
