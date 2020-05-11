@@ -186,6 +186,8 @@ namespace gui
         void setSize(uint32_t val, Axis axis);
         uint16_t getSize(Axis axis);
         void setMaxSize(uint32_t val, Axis axis);
+        void setMinimumWidth(uint32_t w);
+        void setMinimumHeight(uint32_t h);
         /// used in ListView to position element sets area() = WidgetArea(params)
         /// calls onDimensionChanged & updateDrwArea
         /// @attention should be bind to area
