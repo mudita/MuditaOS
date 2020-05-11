@@ -50,10 +50,13 @@ struct ContactRecord
         if (alternativeName.length() > 0) {
             return alternativeName;
         }
-        if (type == NameFormatType::List && numbers.size() > 0) {
+        if ((type == NameFormatType::Default || type == NameFormatType::List) && numbers.size() > 0) {
             return numbers[0].numberUser;
         }
-        return type == NameFormatType::Default ? "" : utils::localize.get("app_phonebook_contact_no_name");
+        if (type == NameFormatType::List || type == NameFormatType::Title) {
+            return utils::localize.get("app_phonebook_contact_no_name");
+        }
+        return "";
     }
 };
 
