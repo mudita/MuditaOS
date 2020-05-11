@@ -34,6 +34,8 @@ namespace gui
         HBox *smsSpanBuild(Text *smsBubble, const SMSRecord &el) const;
         const ssize_t maxsmsinwindow = 7;
 
+        std::shared_ptr<ContactRecord> contact;
+
         struct
         {
             int start                                   = 0;       // actual shown position start

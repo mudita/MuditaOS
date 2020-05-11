@@ -90,7 +90,7 @@ namespace gui
             }
             auto app = dynamic_cast<app::ApplicationMessages *>(application);
             assert(app != nullptr);
-            return app->sendSms(title->getText(), text->getText());
+            return app->sendSms(contact->numbers[0].numberE164.c_str(), text->getText());
         };
         text->inputCallback = [=](Item &, const InputEvent &event) {
             if (event.state == InputEvent::State::keyReleasedShort && event.keyCode == KeyCode::KEY_LF) {
@@ -354,8 +354,9 @@ namespace gui
                 SMS.thread = pdata->thread->dbID;
                 showMessages(Action::Start);
                 auto ret = DBServiceAPI::ContactGetByID(application, pdata->thread->contactID);
+                contact  = std::make_shared<ContactRecord>(ret->front());
                 // should be name number for now - easier to handle
-                setTitle(ret->front().getFormattedName(ContactRecord::NameFormatType::Default));
+                setTitle(contact->getFormattedName(ContactRecord::NameFormatType::Default));
                 return;
             }
         }
@@ -371,6 +372,7 @@ namespace gui
                               pdata->contact->numbers[0].numberUser.c_str(),
                               pdata->contact->getFormattedName(ContactRecord::NameFormatType::Default).c_str());
                     setTitle(pdata->contact->getFormattedName(ContactRecord::NameFormatType::Default));
+                    contact = pdata->contact;
                 }
                 else {
                     // TODO handle error better
