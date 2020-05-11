@@ -41,7 +41,6 @@ EventManager::EventManager(const std::string &name) : sys::Service(name)
 
 EventManager::~EventManager()
 {
-
     LOG_INFO("[%s] Cleaning resources", GetName().c_str());
     if (EventWorker != nullptr) {
         EventWorker->deinit();
