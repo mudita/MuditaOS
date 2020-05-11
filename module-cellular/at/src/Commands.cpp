@@ -26,7 +26,6 @@ namespace at
             ret.push_back(AT::CALLER_NUMBER_PRESENTATION);
             ret.push_back(AT::SMS_TEXT_FORMAT);
             ret.push_back(AT::SMS_UCSC2);
-            //        	ret.push_back(AT::SMS_STORAGE);
             ret.push_back(AT::CRC_ON);
             break;
         }
