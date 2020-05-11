@@ -29,19 +29,26 @@ PURE_PATH=$(echo -e $PURE_PATH)
 
 echo "PurePhone remove all files"
 rm "$PURE_PATH"/* -r &>/dev/null || echo "PurePhone disk alread empty"
+rm -f $PURE_PATH/.boot.ini*
 # sudo sync $PURE_DEV
 
 echo "PurePhone copy build files"
 cp -v $BUILD_PATH/boot.bin "$PURE_PATH"/  # | sed 's/'-\>'/'→'/g'
-cp -v $BUILD_PATH/sys/* "$PURE_PATH"/ -r  # | sed 's/'-\>'/'→'/g'
+
+for file in $IMAGE_FILES; do
+	echo Copying $file
+	cp -vr $BUILD_PATH/$file "$PURE_PATH"/
+done
 
 # sudo sync $PURE_DEV # https://unix.stackexchange.com/a/345950
 echo -e "PurePhone copied\n"
 
 PURE_PARTITION=$(lsblk -nlp $PURE_DISK | tail +2 | awk '{print $1}')
+
 if [ -z $PURE_PARTITION ]; then
        PURE_PARTITION=$PURE_DISK # it is formatted like so apparently
 fi
+
 # unmount the partition (sdX1), but eject the whole disk (sdX). then the PurePhone will detect it's been removed (=ejected)
 if $(udisksctl unmount -b "$PURE_PARTITION" > /dev/null ) || $(umount "$PURE_PARTITION" > /dev/null ); then
 	echo "PurePhone unmouted"
