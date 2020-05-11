@@ -30,7 +30,6 @@
 
 #include "bsp/magnetometer/magnetometer.hpp"
 
-
 EventManager::EventManager(const std::string &name) : sys::Service(name)
 {
     LOG_INFO("[%s] Initializing", name.c_str());
