@@ -1,17 +1,10 @@
-/*
- * Rect.h
- *
- *  Created on: 6 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_RECT_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_RECT_HPP_
+#pragma once
 
 #include <list>
 #include <cstdint>
 #include "Item.hpp"
 #include "../core/Color.hpp"
+#include "Style.hpp"
 
 namespace gui
 {
@@ -19,26 +12,26 @@ namespace gui
     class Rect : public Item
     {
       public:
-        // defines color used for drawing border
+        /// color used for drawing border
         Color borderColor = Color(0, 0);
-        // defines color for filling rectangle
+        /// color for filling rectangle
         Color fillColor = Color(15, 15);
-        // defines number of pixels used to draw border of rectangle without focus
-        uint8_t penWidth = 1;
-        // defines number of pixels used to draw border of rectangle when it has focus
-        uint8_t penFocusWidth;
-        // defines whether rectangle should be filled with fill color.
-        bool filled;
-        // flags that defines whether paint given border
-        RectangleEdgeFlags edges;
-        // flags that defines which edge should be flat. This will disable roundness on both sides of the edge.
-        RectangleFlatFlags flatEdges;
-        // flags that defines whether paint given corner (only for rounded corners)
-        RectangleCornerFlags corners;
-        // flags that define whether to paint japs. small protrusions indicating a speech bubble
-        RectangleYapFlags yaps;
-        // a yap size (if present). size is horizontal width.
-        unsigned short yapSize = 0;
+        /// number of pixels used to draw border of rectangle without focus
+        uint8_t penWidth = style::window::default_border_rect_no_focus;
+        /// number of pixels used to draw border of rectangle when it has focus
+        uint8_t penFocusWidth = style::window::default_border_focucs_w;
+        /// mark if rectangle should be filled with fill color.
+        bool filled = false;
+        /// mark how to draw borders
+        RectangleEdgeFlags edges{RectangleEdgeFlags::GUI_RECT_ALL_EDGES};
+        /// mark which edge should be flat. This will disable roundness on both sides of the edge.
+        RectangleFlatFlags flatEdges = {RectangleFlatFlags::GUI_RECT_FLAT_NO_FLAT};
+        /// mark if given corners should be painted (only for rounded corners)
+        RectangleCornerFlags corners = {RectangleCornerFlags::GUI_RECT_ALL_CORNERS};
+        /// mark if we japs should be painted. small protrusions indicating a speech bubble
+        RectangleYapFlags yaps = {RectangleYapFlags::GUI_RECT_YAP_NO_YAPS};
+        /// yap size in horizontal width.
+        unsigned short yapSize = {style::window::messages::yaps_size_default};
 
       public:
         Rect();
@@ -54,11 +47,7 @@ namespace gui
         virtual void setYaps(RectangleYapFlags yaps);
         virtual void setYapSize(unsigned short value);
         void setFilled(bool val);
-
-        // virtaul methods
-        std::list<DrawCommand *> buildDrawList();
+        std::list<DrawCommand *> buildDrawList() override;
     };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_RECT_HPP_ */
