@@ -7,7 +7,7 @@ namespace gui
 {
     namespace smsTemplItemStyle
     {
-        constexpr uint32_t w = 440;
+        constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = style::window::label::big_h;
     } // namespace smsTemplItemStyle
 
@@ -26,7 +26,7 @@ namespace gui
     bool SMSTemplateItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         text->setPosition(0, 0);
-        text->setSize(smsTemplItemStyle::w, newDim.h);
+        text->setSize(newDim.w, newDim.h);
 
         return true;
     }

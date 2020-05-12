@@ -20,7 +20,7 @@ namespace gui
 
     namespace clItemStyle
     {
-        constexpr uint32_t w = 440;
+        constexpr uint32_t w = style::window::default_body_width;
         constexpr uint32_t h = style::window::label::big_h;
         namespace img
         {
@@ -97,7 +97,7 @@ namespace gui
     bool CalllogItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         text->setPosition(clItemStyle::text::x, 0);
-        text->setSize(clItemStyle::text::w, newDim.h);
+        text->setSize(newDim.w, newDim.h);
 
         timestamp->setPosition(newDim.w - clItemStyle::timestamp::w, 0);
         timestamp->setSize(clItemStyle::timestamp::w, newDim.h);

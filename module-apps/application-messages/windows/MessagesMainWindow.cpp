@@ -46,7 +46,7 @@ namespace gui
         AppWindow::buildInterface();
 
         list = new gui::ListView(
-            this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listWidth);
+            this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listHeight);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);

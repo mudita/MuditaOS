@@ -20,9 +20,9 @@ namespace gui
         using namespace style;
 
         model     = threadmodel;
-        minWidth  = 431;
+        minWidth  = window::default_body_width;
         minHeight = 100;
-        maxWidth  = 431;
+        maxWidth  = window::default_body_width;
         maxHeight = 100;
 
         setRadius(0);

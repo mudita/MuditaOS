@@ -14,9 +14,9 @@ namespace gui
 
     NotesItem::NotesItem(NotesModel *model, bool mode24H) : model{model}, mode24H{mode24H}
     {
-        minWidth  = 436;
+        minWidth  = style::window::default_body_width;
         minHeight = 146;
-        maxWidth  = 436;
+        maxWidth  = style::window::default_body_width;
         maxHeight = 146;
 
         setRadius(8);

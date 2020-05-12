@@ -26,8 +26,10 @@ namespace style
     };     // namespace header
     namespace window
     {
-        const inline uint32_t default_left_margin          = 20;
-        const inline uint32_t default_right_margin         = 20;
+        const inline uint32_t default_left_margin  = 20;
+        const inline uint32_t default_right_margin = 20;
+        const inline uint32_t default_body_width =
+            style::window_width - style::window::default_right_margin - style::window::default_left_margin;
         const inline uint32_t default_border_focucs_w      = 2;
         const inline uint32_t default_border_rect_no_focus = 1;
         const inline uint32_t default_border_no_focus_w    = 0;
@@ -164,6 +166,10 @@ namespace style
             const inline uint32_t item_margin = 10;
         } // namespace scroll
 
+        const inline uint32_t item_width_with_scroll =
+            style::window::default_body_width - style::listview::scroll::item_margin;
+        const inline uint32_t body_width_with_scroll =
+            style::window::default_body_width + style::listview::scroll::margin;
         const inline uint32_t right_margin     = 15;
         const inline uint32_t top_margin_small = 5;
         const inline uint32_t top_margin_big   = 8;
