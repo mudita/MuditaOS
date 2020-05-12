@@ -13,11 +13,11 @@ namespace messages
     {
         constexpr auto pageSize = 5;
 
-        constexpr auto listHeight    = 445;
-        constexpr auto listWidth     = 458;
-        constexpr auto listPositionX = 11;
-        constexpr auto ListPositionY = 105; // @TODO M.G. tweak it to design. Spacers between entries, top margin
-    }                                       // namespace threads
+        constexpr auto listPositionX = style::window::default_left_margin;
+        constexpr auto ListPositionY = style::header::height + style::listview::top_margin_small;
+        constexpr auto listHeight    = style::window_height - ListPositionY - style::footer::height;
+        constexpr auto listWidth     = style::listview::body_width_with_scroll;
+    } // namespace threads
 
     namespace threadItem
     {
@@ -58,10 +58,11 @@ namespace messages
         {
             constexpr auto pageSize = 7;
 
-            constexpr auto h = 445;
-            constexpr auto w = 458;
-            constexpr auto x = 11;
-            constexpr auto y = 105;
+            constexpr auto x = style::window::default_left_margin;
+            constexpr auto y = style::header::height + style::listview::top_margin_small;
+            constexpr auto h = style::window_height - y - style::footer::height;
+            constexpr auto w = style::listview::body_width_with_scroll;
+
         } // namespace list
     }     // namespace templates
 } // namespace messages
