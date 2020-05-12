@@ -274,7 +274,7 @@ namespace gui
         // 1. create hbox for all elements
         auto el   = new gui::HBox(nullptr, 0, 0, layout->getWidth(), style::window::label::default_h);
         auto text = new gui::Label(nullptr, 0, 0, text_normal_size, style::window::label::default_h, "");
-        text->setMaxSize(el->area().w, Axis::X);
+        text->setMaximumSize(el->area().w, Axis::X);
         text->setText(name);
         text->setFont(style::window::font::medium);
         text->setAlignment(Alignment::ALIGN_VERTICAL_CENTER);

@@ -126,10 +126,10 @@ namespace gui
     {
         Fits fits = textFitsIn(text, area(Item::Area::Max).w);
         if (fits) {
-            setSize(fits.space_consumed, h());
+            setSize(fits.space_consumed, getHeight());
         }
         else {
-            setSize(area(Item::Area::Max).w, h());
+            setSize(area(Item::Area::Max).w, getHeight());
         }
     }
 

@@ -179,15 +179,28 @@ namespace gui
         /// @attention should be bind to area
         virtual void setPosition(const short &x, const short &y);
         virtual void setPosition(const short &val, Axis axis);
-        /// sets size of element - this is sets area().w and area().h of item
-        /// calls onDimensionChanged & updateDrawArea for item
-        /// @attention should be bind to area
-        virtual void setSize(const unsigned short w, const unsigned short h);
-        void setSize(uint32_t val, Axis axis);
-        uint16_t getSize(Axis axis);
-        void setMaxSize(uint32_t val, Axis axis);
+        [[nodiscard]] uint16_t getSize(Axis axis) const;
+
+        /// @defgroup size_range_setters Named the same way that are in QT minimum/maximum sizes setters
+        ///
+        /// All setters:
+        /// 1. only sets range in which normal area can be calculated in layouts
+        /// 2. doesn't trigger any callbacks
+        /// @note we can consider calling callback when setMinimum/Maximum exceeds normal size
+        /// @{
+        void setMaximumSize(uint32_t val, Axis axis);
+        void setMaximumWidth(uint32_t w);
+        void setMaximumHeight(uint32_t h);
+        void setMaximumSize(uint32_t w, uint32_t h);
+
+        void setMinimumSize(uint32_t val, Axis axis);
+        void setMinimumSize(uint32_t w, uint32_t h);
         void setMinimumWidth(uint32_t w);
         void setMinimumHeight(uint32_t h);
+        /// @}
+
+        virtual void setSize(const unsigned short w, const unsigned short h);
+        void setSize(uint32_t val, Axis axis);
         /// used in ListView to position element sets area() = WidgetArea(params)
         /// calls onDimensionChanged & updateDrwArea
         /// @attention should be bind to area
@@ -232,25 +245,17 @@ namespace gui
         {
             return (widgetArea.h);
         }
-        int16_t w()
-        {
-            return widgetArea.w;
-        }
-        int16_t h()
-        {
-            return widgetArea.h;
-        }
         /// helper function to show where widget ends in x axis
-        int32_t offset_w()
+        [[nodiscard]] int32_t offset_w() const
         {
-            return w() + widgetArea.x;
+            return getWidth() + widgetArea.x;
         }
         /// helper function to show where widget ends in y axis
-        int32_t offset_h()
+        [[nodiscard]] int32_t offset_h() const
         {
-            return h() + widgetArea.y;
+            return getHeight() + widgetArea.y;
         }
-        int32_t offset(Axis axis)
+        [[nodiscard]] int32_t getOffset(Axis axis) const
         {
             return this->widgetArea.size(axis) + this->widgetArea.pos(axis);
         };
