@@ -4,6 +4,7 @@
 #include "../data/SMSdata.hpp"
 #include "../widgets/ThreadModel.hpp"
 #include "OptionsMessages.hpp"
+#include "Span.hpp"
 
 #include <Text.hpp>
 #include <ListItem.hpp>
@@ -247,18 +248,21 @@ namespace gui
     {
         // add time label activated on focus
         timeLabel->setSize(timeLabel->getWidth(), layout->getHeight());
+        timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
+        timeLabel->setMinimumWidth(timeLabel->getWidth());
+        timeLabel->setMinimumHeight(timeLabel->getHeight());
 
         uint16_t timeLabelSpacerWidth = widthAvailable - timeLabel->getWidth();
-        auto timeLabelSpacer          = new gui::Label(nullptr, 0, 0, timeLabelSpacerWidth, layout->getHeight());
-        timeLabelSpacer->activeItem   = false;
-        timeLabelSpacer->setPenWidth(0);
 
-        layout->addWidget(timeLabelSpacer);
+        layout->addWidget(new gui::Span(Axis::X, timeLabelSpacerWidth));
         layout->addWidget(timeLabel);
 
-        timeLabel->setVisible(false);
         layout->focusChangedCallback = [=](gui::Item &item) {
             timeLabel->setVisible(item.focus);
+            // we need to inform parent that it needs to resize itself - easiest way to do so
+            if (timeLabel->parent) {
+                timeLabel->parent->setSize(timeLabel->parent->getWidth(), timeLabel->parent->getHeight());
+            }
             return true;
         };
     }
@@ -269,12 +273,10 @@ namespace gui
         timeLabel->activeItem = false;
         timeLabel->setFont(style::window::font::verysmall);
         timeLabel->setText(utils::time::Time(timestamp));
-        timeLabel->setSize(timeLabel->getTextNeedSpace(), timeLabel->getHeight());
         timeLabel->setPenWidth(style::window::default_border_no_focus_w);
         timeLabel->setVisible(false);
         timeLabel->setAlignment(
             gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-
         return timeLabel;
     }
 
@@ -318,11 +320,7 @@ namespace gui
             return false;
         }
 
-        auto verticalSpacer =
-            new gui::Rect(nullptr, 0, 0, elements_width, style::window::messages::sms_vertical_spacer);
-        verticalSpacer->activeItem = false;
-        verticalSpacer->setPenWidth(style::window::default_border_no_focus_w);
-        body->addWidget(verticalSpacer);
+        body->addWidget(new gui::Span(Axis::Y, style::window::messages::sms_vertical_spacer));
 
         LOG_INFO("Add sms: %s %s", smsRecord.body.c_str(), smsRecord.number.c_str());
         body->addWidget(labelSpan);
