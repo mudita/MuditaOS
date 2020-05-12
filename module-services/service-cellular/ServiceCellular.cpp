@@ -829,7 +829,7 @@ bool ServiceCellular::sendSMS(void)
                     ->SendCommandPrompt(
                         (std::string(at::factory(at::AT::CMGS)) + UCS2(record.number).modemStr() + "\"\r").c_str(),
                         1,
-                        120000))) {
+                        2000))) {
 
             if (cmux->get(TS0710::Channel::Commands)->cmd((UCS2(record.body).modemStr() + "\032").c_str())) {
                 result = true;
@@ -867,7 +867,7 @@ bool ServiceCellular::sendSMS(void)
                     cmux->get(TS0710::Channel::Commands)->SendCommandPrompt(command.c_str(), 1, 5000))) {
                 // prompt sign received, send data ended by "Ctrl+Z"
                 if (cmux->get(TS0710::Channel::Commands)
-                        ->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2, 2000)) {
+                        ->cmd((UCS2(messagePart).modemStr() + "\032").c_str(), 2000, 2)) {
                     result = true;
                 }
                 else {

@@ -168,6 +168,10 @@ std::vector<std::string> DLC_channel::SendCommandPrompt(const char *cmd, size_t 
             auto pos = str.find(">");
             if (pos != std::string::npos) {
                 tokens.push_back(str.substr(pos, strlen(">")));
+                return tokens;
+            }
+            if (tokens.size() >= rxCount) {
+                break;
             }
             if (tokens.size() < rxCount) {
                 continue;
