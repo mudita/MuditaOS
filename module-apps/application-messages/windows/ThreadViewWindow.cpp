@@ -104,6 +104,7 @@ namespace gui
 
     void ThreadViewWindow::cleanView()
     {
+        body->removeWidget(text);
         body->erase();
     }
 
@@ -189,6 +190,8 @@ namespace gui
         labelSpan->setPenWidth(style::window::default_border_no_focus_w);
         labelSpan->setPenFocusWidth(style::window::default_border_no_focus_w);
         labelSpan->setSize(elements_width, smsBubble->getHeight());
+        labelSpan->setMinimumWidth(elements_width);
+        labelSpan->setMinimumHeight(smsBubble->getHeight());
         labelSpan->setFillColor(gui::Color(11, 0));
         labelSpan->addWidget(smsBubble);
 

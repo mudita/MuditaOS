@@ -156,6 +156,7 @@ namespace gui
         while ((item = provider->getItem(itemsOnPage)) != nullptr) {
 
             item->setSize(item->minWidth, item->minHeight);
+            item->setMinimumWidth(item->minWidth);
             item->setMinimumHeight(item->minHeight);
 
             body->addWidget(item);
