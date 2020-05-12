@@ -28,6 +28,8 @@ namespace gui
           yaps{RectangleYapFlags::GUI_RECT_YAP_NO_YAPS}, yapSize{style::window::messages::yaps_size_default}
     {
         setArea({int16_t(x), int16_t(y), uint16_t(w), uint16_t(h)});
+        setMinimumHeight(h);
+        setMinimumWidth(w);
 
         this->parent = parent;
         if (parent != nullptr) {
