@@ -9,6 +9,7 @@
 #include <iterator>
 
 #include "../core/Font.hpp"
+#include "Ellipsis.hpp"
 #include "Text.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
@@ -1061,6 +1062,7 @@ namespace gui
             label->setAlignment(alignment);
             label->setFont(font->getName());
             label->setTextColor(textColor);
+            label->setEllipsis(gui::Ellipsis::None);
 
             if (underline)
                 label->setEdges(RectangleEdgeFlags::GUI_RECT_EDGE_BOTTOM);
