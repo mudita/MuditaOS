@@ -17,6 +17,18 @@ You can build project in docker container, to that
 `./in_docker.sh config rt1051 Release`
 `./in_docker.sh make build-rt1051-Release`
 
+5. build & run tests (linux only)
+`./in_docker.sh make build-linux-Debug`
+`./in_docker.sh make check`
+__do not call `make test` it will make fool of you__
+
+To build manually selected test in work-dir in attached docker image:
+`cd ./build-linux-Debug ; make <test_name>; ./<test_name>`
+i.e.:
+`cd ./build-linux-Debug ; make unittest_gui && ./unittest_gui`
+
+Running tests checks memory leaks too. This might be helpful in creation of new widgets
+
 # Quickstart
 
 Prior to any build setup environment, need to be run once. (See: `## Run provisioning`)
