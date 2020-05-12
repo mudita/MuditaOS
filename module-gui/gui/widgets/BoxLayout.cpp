@@ -134,36 +134,33 @@ namespace gui
 
     template <Axis axis> void BoxLayout::updatePosition()
     {
-        int32_t pos     = reverse_order ? this->area().size(axis) : 0;
-        auto pos_update = [this](Item *it, int32_t &pos) {
-            if (this->reverse_order) {
+        int32_t pos        = reverse_order ? this->area().size(axis) : 0;
+        uint32_t size_left = this->getSize(axis);
 
-                if (pos - it->area(Item::Area::Normal).size(axis) >= 0) {
-                    pos -= it->area(Item::Area::Normal).size(axis);
-                    it->setPosition(pos, axis);
+        auto pos_update = [this](Item *it, int32_t &pos, uint32_t &size_left) {
+            if (it->area().size(axis) <= size_left) {
+                if (reverse_order) {
+                    pos -= it->area().size(axis);
                 }
-                else {
-                    addToOutOfDrawAreaList(it);
+
+                it->setPosition(pos, axis);
+
+                if (!reverse_order) {
+                    pos += it->area().size(axis);
                 }
+
+                size_left -= it->area().size(axis);
             }
             else {
-
-                if (pos <= (this->area().size(axis) - it->area(Item::Area::Normal).size(axis))) {
-                    it->setPosition(pos, axis);
-                    pos += it->area(Item::Area::Normal).size(axis);
-                }
-                else {
-                    addToOutOfDrawAreaList(it);
-                }
+                addToOutOfDrawAreaList(it);
             }
         };
 
         for (auto &el : children) {
-
-            if (!el->visible)
+            if (!el->visible) {
                 continue;
-
-            pos_update(el, pos);
+            }
+            pos_update(el, pos, size_left);
         }
 
         Rect::updateDrawArea();
