@@ -110,12 +110,10 @@ namespace callLogStyle
     // MAIN WINDOW
     namespace mainWindow
     {
-        constexpr uint32_t leftMargin  = style::window::default_left_margin;
-        constexpr uint32_t rightMargin = style::listview::right_margin;
-        constexpr uint32_t x           = leftMargin;
-        constexpr uint32_t y           = style::header::height + style::listview::top_margin_big;
-        constexpr uint32_t w           = style::window_width - leftMargin - rightMargin;
-        constexpr uint32_t h           = style::window_height - y - style::footer::height;
+        constexpr uint32_t x = style::window::default_left_margin;
+        constexpr uint32_t y = style::header::height + style::listview::top_margin_big;
+        constexpr uint32_t w = style::listview::body_width_with_scroll;
+        constexpr uint32_t h = style::window_height - y - style::footer::height;
     } // namespace mainWindow
 
 } // namespace callLogStyle

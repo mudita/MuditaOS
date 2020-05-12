@@ -210,6 +210,7 @@ namespace gui
 
     template <Axis axis> void BoxLayout::addWidget(Item *item)
     {
+        outOfDrawAreaItems.clear();
         Rect::addWidget(item);
         resizeItems<axis>();
     }
