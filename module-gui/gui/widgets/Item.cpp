@@ -147,27 +147,63 @@ namespace gui
         setArea({getX(), getY(), w, h});
     }
 
-    void Item::setMaxSize(uint32_t val, Axis axis)
+    void setAreaSizeInAxis(BoundingBox &area, Axis axis, uint32_t size)
     {
         if (axis == Axis::X) {
-            area(Area::Max).w = val;
+            area.w = size;
         }
         else {
-            area(Area::Max).h = val;
+            area.h = size;
         }
+    }
+
+    /// set maximum
+
+    void Item::setMaximumSize(uint32_t val, Axis axis)
+    {
+        setAreaSizeInAxis(area(Area::Max), axis, val);
+    }
+
+    void Item::setMaximumWidth(uint32_t w)
+    {
+        setMaximumSize(w, Axis::Y);
+    }
+
+    void Item::setMaximumHeight(uint32_t h)
+    {
+        setMaximumSize(h, Axis::Y);
+    }
+
+    void Item::setMaximumSize(uint32_t w, uint32_t h)
+    {
+        setMaximumHeight(h);
+        setMaximumWidth(w);
+    }
+
+    /// set minimum
+
+    void Item::setMinimumSize(uint32_t val, Axis axis)
+    {
+        setAreaSizeInAxis(area(Area::Min), axis, val);
     }
 
     void Item::setMinimumWidth(uint32_t w)
     {
-        area(Area::Min).w = w;
+        setMinimumSize(w, Axis::X);
     }
 
     void Item::setMinimumHeight(uint32_t h)
     {
-        area(Area::Min).h = h;
+        setMinimumSize(h, Axis::Y);
     }
 
-    uint16_t Item::getSize(Axis axis)
+    void Item::setMinimumSize(uint32_t w, uint32_t h)
+    {
+        setMinimumWidth(w);
+        setMinimumHeight(h);
+    }
+
+    uint16_t Item::getSize(Axis axis) const
     {
         return widgetArea.size(axis);
     }
