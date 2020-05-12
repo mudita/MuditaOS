@@ -42,6 +42,4 @@ target_include_directories(${PROJECT_NAME}
 
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC )
-
-message(WARNING "Tests for ${PROJECT_NAME} need update - disabled: tps://appnroll.atlassian.net/browse/EGD-2987")
-#add_subdirectory(test)
+add_subdirectory(test)

@@ -1,12 +1,4 @@
-/*
- * Window.h
- *
- *  Created on: 6 mar 2019
- *      Author: robert
- */
-
-#ifndef MIDDLEWARES_GUI_WIDGETS_WINDOW_HPP_
-#define MIDDLEWARES_GUI_WIDGETS_WINDOW_HPP_
+#pragma once
 
 #include <list>
 #include "Item.hpp"
@@ -45,7 +37,6 @@ namespace gui
 
       public:
         Window(std::string name, uint32_t id = GUIWindowID++);
-        virtual ~Window();
 
         /// run every time in Application prior to showing window, except for when we came back to first window with no
         /// switch data to show
@@ -77,5 +68,3 @@ namespace gui
     };
 
 } /* namespace gui */
-
-#endif /* MIDDLEWARES_GUI_WIDGETS_WINDOW_HPP_ */
