@@ -162,4 +162,10 @@ standard names. */
 /* Low power Tickless idle. Low power timer (GPT) is initialized in application code. */
 #define configGPT_CLOCK_HZ                    (32768U)
 
+/* system heap integrity check */
+#ifdef DEBUG_FREERTOS
+#define configSYSTEM_HEAP_STATS           (1)
+#define configSYSTEM_HEAP_INTEGRITY_CHECK (1)
+#endif
+
 #endif /* FREERTOS_CONFIG_H */
