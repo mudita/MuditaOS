@@ -23,6 +23,7 @@ class SMSRequest : public gui::SwitchData
     utils::PhoneNumber::View phoneNumber;
 
   public:
+    SMSRequest() = delete;
     SMSRequest(const utils::PhoneNumber::View &phoneNumber) : phoneNumber(phoneNumber)
     {}
     virtual ~SMSRequest() = default;

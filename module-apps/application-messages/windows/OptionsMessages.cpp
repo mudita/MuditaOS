@@ -38,8 +38,6 @@ gui::HBox *newCombo(app::ApplicationMessages *app, const ContactRecord &contact)
 
     p("mail", [=](gui::Item &) -> bool {
         LOG_ERROR("TODO Missing support for libphonenumer");
-        // LOG_INFO("SMS to: %s", contact.getFormattedName().c_str());
-        // app::sms(app, app::SmsOperation::New, contact);
         return true;
     });
 

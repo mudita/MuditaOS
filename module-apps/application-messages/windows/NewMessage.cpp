@@ -41,14 +41,14 @@ namespace gui
         }
         if (auto pdata = dynamic_cast<SMSSendRequest *>(data); pdata != nullptr) {
             LOG_INFO("recieved sms send request");
-            auto number  = pdata->getPhoneNumber().getE164();
+            auto number  = pdata->getPhoneNumber().getEntered();
             auto records = DBServiceAPI::ContactGetByPhoneNumber(application, number);
             if (records->empty()) {
                 LOG_WARN("not valid contact for number %s", number.c_str());
                 recipient->setText(number);
                 return;
             }
-            contact = std::make_shared<ContactRecord>(records->operator[](0));
+            contact = std::make_shared<ContactRecord>((*records)[0]);
             recipient->setText(contact->getFormattedName());
         }
     }
