@@ -58,16 +58,16 @@ namespace gui
 
     bool ThreadItem::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
     {
-        using namespace messages::threadItem;
+        namespace msti = ::messages::threadItem;
 
-        contact->setPosition(contactPositionX, contactPositionY);
-        contact->setSize(newDim.w - cotactWidthOffset, newDim.h / 2);
+        contact->setPosition(msti::contactPositionX, msti::contactPositionY);
+        contact->setSize(newDim.w - msti::cotactWidthOffset, newDim.h / 2);
 
-        timestamp->setPosition(newDim.w - timestampWidth, 0);
-        timestamp->setSize(timestampWidth, newDim.h / 2);
+        timestamp->setPosition(newDim.w - msti::timestampWidth, 0);
+        timestamp->setSize(msti::timestampWidth, newDim.h / 2);
 
         preview->setPosition(14, newDim.h / 2);
-        preview->setSize(newDim.w - previewWidthOffset, newDim.h / 2);
+        preview->setSize(newDim.w - msti::previewWidthOffset, newDim.h / 2);
 
         return true;
     }

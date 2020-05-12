@@ -9,7 +9,6 @@ else()
         set(GDB_INIT_SCRIPT "${CMAKE_SOURCE_DIR}/.gdbinit-1051-clion")
     else()
         set(GDB_INIT_SCRIPT "${CMAKE_SOURCE_DIR}/.gdbinit-1051")
-    else()
     endif()
 endif()
 

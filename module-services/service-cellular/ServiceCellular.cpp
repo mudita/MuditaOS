@@ -1354,10 +1354,10 @@ void ServiceCellular::handle_CellularGetChannelMessage()
 {
     connect(CellularGetChannelMessage(), [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
         auto getChannelMsg = static_cast<CellularGetChannelMessage *>(req);
-        LOG_DEBUG("Handle request for channel: %s", TS0710::name(getChannelMsg->channel).c_str());
+        LOG_DEBUG("Handle request for channel: %s", TS0710::name(getChannelMsg->dataChannel).c_str());
         std::shared_ptr<CellularGetChannelResponseMessage> channelResponsMessage =
-            std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->channel));
-        LOG_DEBUG("chanel ptr: %p", channelResponsMessage->channelPtr);
+            std::make_shared<CellularGetChannelResponseMessage>(cmux->get(getChannelMsg->dataChannel));
+        LOG_DEBUG("chanel ptr: %p", channelResponsMessage->dataChannelPtr);
         sys::Bus::SendUnicast(std::move(channelResponsMessage), req->sender, this);
         return sys::Message_t();
     });

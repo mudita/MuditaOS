@@ -1,84 +1,119 @@
-/*
- *  @file InternetMessage.hpp
- *  @author Łukasz Skrzypczak (lukasz.skrzypczak@mudita.com)
- *  @date 16.09.19
- *  @brief
- *  @copyright Copyright (C) 2019 mudita.com
- *  @details
- */
+#pragma once
 
-#ifndef PUREPHONE_INTERNETMESSAGE_HPP
-#define PUREPHONE_INTERNETMESSAGE_HPP
+#include <service-internet/api/InternetServiceAPI.hpp>
+#include <Service/Message.hpp>
+#include <MessageType.hpp>
 
 #include <memory>
 #include <variant>
-#include "Service/Message.hpp"
-#include "MessageType.hpp"
 
-class InternetMessage : public sys::DataMessage
+namespace InternetService
 {
-  public:
-    InternetMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
 
-    virtual ~InternetMessage(){};
-
-    MessageType type;
-};
-
-class InternetNotificationMessage : public InternetMessage
-{
-  public:
-    enum class Type
+    class InternetMessage : public sys::DataMessage
     {
-        Configured,
-        Connected,
-        Disconnected,
-        RequestProcessed,
-        ServiceReady, // Idle state of the service. This is a start state before any call is initialized by user or by
-                      // network. service returns to this state when call is finished.
+      public:
+        InternetMessage(MessageType messageType) : sys::DataMessage(messageType), type(messageType){};
+
+        virtual ~InternetMessage(){};
+
+        MessageType type;
     };
 
-    InternetNotificationMessage(Type type) : InternetMessage(MessageType::InternetNotification), type(type)
-    {}
-
-    ~InternetNotificationMessage()
-    {}
-
-    Type type;
-    std::string data;
-};
-
-class InternetRequestMessage : public InternetMessage
-{
-  public:
-    enum class Type
+    class NotificationMessage : public InternetMessage
     {
-        Connect,    // data service connected
-        Disconnect, // data service disconnected
-        Configure,
+      public:
+        enum class Type
+        {
+            NotReady,
+            Configured,
+            Connected,
+            Disconnected,
+            RequestProcessed,
+            ServiceReady, // Idle state of the service. This is a start state before any call is initialized by user or
+                          // by network. service returns to this state when call is finished.
+        };
+        const char *c_str()
+        {
+            return c_str(type);
+        }
+        static const char *c_str(Type type)
+        {
+            switch (type) {
+            case NotificationMessage::Type::NotReady:
+                return "NotReady";
+            case NotificationMessage::Type::Configured:
+                return "Configured";
+            case NotificationMessage::Type::Connected:
+                return "Connected";
+            case NotificationMessage::Type::Disconnected:
+                return "Disconnected";
+            case NotificationMessage::Type::RequestProcessed:
+                return "RequestProcessed";
+            case NotificationMessage::Type::ServiceReady:
+                return "ServiceReady";
+            }
+            return "";
+        }
+
+        NotificationMessage(Type type = Type::NotReady) : InternetMessage(MessageType::InternetNotification), type(type)
+        {}
+
+        ~NotificationMessage()
+        {}
+
+        Type type;
+        std::string data;
     };
 
-    InternetRequestMessage(MessageType messageType) : InternetMessage(messageType)
-    {}
-    ~InternetRequestMessage()
-    {}
+    class InternetRequestMessage : public InternetMessage
+    {
+      public:
+        enum class Type
+        {
+            Connect,    // data service connected
+            Disconnect, // data service disconnected
+            Configure,
+        };
 
-    std::string data;
-    std::string apn;
-    std::string user;
-    std::string password;
-    std::string url;
-    std::string request;
-};
+        InternetRequestMessage(MessageType messageType) : InternetMessage(messageType)
+        {}
+        ~InternetRequestMessage()
+        {}
 
-class InternetResponseMessage : public sys::ResponseMessage
-{
-  public:
-    InternetResponseMessage(uint32_t retCode) : sys::ResponseMessage(), retCode(retCode){};
-    virtual ~InternetResponseMessage(){};
+        std::string data;
+        std::string url;
+        std::string request;
+    };
 
-    uint32_t retCode;
-    std::vector<std::string> retData;
-};
+    class ConfigureAPNMessage : public InternetMessage
+    {
+      public:
+        ConfigureAPNMessage(const APN::Config &apnConfig = APN::Config())
+            : InternetMessage(MessageType::InternetConfigureAPN), apnConfig(apnConfig)
+        {}
+        ~ConfigureAPNMessage() = default;
+        APN::Config apnConfig;
+    };
 
-#endif // PUREPHONE_INTERNETMESSAGE_HPP
+    class ConnectMessage : public InternetMessage
+    {
+      public:
+        ConnectMessage(unsigned char contextId = 1)
+            : InternetMessage(MessageType::InternetConnect), contextId(contextId)
+        {}
+        ~ConnectMessage() = default;
+        unsigned char contextId;
+    };
+
+    class InternetResponseMessage : public sys::ResponseMessage
+    {
+      public:
+        InternetResponseMessage(uint32_t retCode) : sys::ResponseMessage(), retCode(retCode){};
+        virtual ~InternetResponseMessage(){};
+
+        uint32_t retCode;
+        std::vector<std::string> retData;
+    };
+
+} // namespace InternetService

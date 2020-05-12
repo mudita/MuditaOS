@@ -15,7 +15,6 @@
 #include <memory>
 
 using namespace style;
-using namespace messages::templates;
 
 namespace gui
 {
@@ -42,7 +41,11 @@ namespace gui
 
         topBar->setActive(TopBar::Elements::TIME, true);
 
-        list = new gui::ListView(this, list::x, list::y, list::w, list::h);
+        list = new gui::ListView(this,
+                                 ::messages::templates::list::x,
+                                 ::messages::templates::list::y,
+                                 ::messages::templates::list::w,
+                                 ::messages::templates::list::h);
         list->setProvider(smsTemplateModel.get());
 
         setFocusItem(list);

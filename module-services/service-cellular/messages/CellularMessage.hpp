@@ -103,18 +103,18 @@ class CellularCallRequestMessage : public CellularMessage
 class CellularGetChannelMessage : public sys::DataMessage
 {
   public:
-    CellularGetChannelMessage(TS0710::Channel channel = TS0710::Channel::None)
-        : sys::DataMessage(MessageType::CellularGetChannel), channel(channel)
+    CellularGetChannelMessage(TS0710::Channel dataChannel = TS0710::Channel::None)
+        : sys::DataMessage(MessageType::CellularGetChannel), dataChannel(dataChannel)
     {}
-    TS0710::Channel channel;
+    TS0710::Channel dataChannel;
 };
 class CellularGetChannelResponseMessage : public sys::DataMessage
 {
   public:
-    CellularGetChannelResponseMessage(DLC_channel *channelPtr = nullptr)
-        : sys::DataMessage(MessageType::CellularGetChannelResponse), channelPtr(channelPtr)
+    CellularGetChannelResponseMessage(DLC_channel *dataChannelPtr = nullptr)
+        : sys::DataMessage(MessageType::CellularGetChannelResponse), dataChannelPtr(dataChannelPtr)
     {}
-    DLC_channel *channelPtr;
+    DLC_channel *dataChannelPtr;
 };
 class CellularGetChannelResponseMessage : public sys::DataMessage
 {
@@ -147,7 +147,8 @@ namespace cellular
     {
       public:
         const State::ST request;
-        StateChange(const State::ST request) : CellularMessage(MessageType::CellularStateRequest), request(request)
+        StateChange(const State::ST request = State::ST::Failed)
+            : CellularMessage(MessageType::CellularStateRequest), request(request)
         {}
     };
 

@@ -23,7 +23,7 @@ namespace gui
      */
     class FotaWindow : public AppWindow
     {
-    public:
+      public:
         FotaWindow(app::Application *app);
         virtual ~FotaWindow();
 
@@ -45,4 +45,4 @@ namespace gui
 
         VBox *mainBox;
     };
-} //namespace gui
+} // namespace gui

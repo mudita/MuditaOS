@@ -2,80 +2,77 @@
 #include <service-cellular/api/CellularServiceAPI.hpp>
 #include <i18/i18.hpp>
 
-namespace gui {
+namespace gui
+{
 
-    FotaWindow::FotaWindow(app::Application *app)
-        : AppWindow(app, window::fota_window), fotaWorker(std::make_unique<Fota>(app))
+    FotaWindow::FotaWindow(app::Application *app) : AppWindow(app, window::fota_window)
     {
+        buildInterface();
+        fotaWorker = std::make_unique<Fota>(app, statusLabel);
+        currentFirmwareLabel->setText(fotaWorker->currentFirmwareVersion());
+    }
+
+    FotaWindow::~FotaWindow()
+    {
+        destroyInterface();
+    }
+
+    void FotaWindow::onBeforeShow(ShowMode /*mode*/, SwitchData * /*data*/)
+    {}
+
+    void FotaWindow::rebuild()
+    {
+        destroyInterface();
         buildInterface();
     }
 
-FotaWindow::~FotaWindow()
-{
-    destroyInterface();
-}
+    void FotaWindow::buildInterface()
+    {
+        LOG_INFO("Build Fota Window");
+        AppWindow::buildInterface();
+        setTitle("Modem Firmware update (FOTA)");
 
-void FotaWindow::onBeforeShow(ShowMode /*mode*/, SwitchData */*data*/)
-{
+        topBar->setActive(TopBar::Elements::SIGNAL, true);
+        topBar->setActive(TopBar::Elements::BATTERY, true);
 
-}
+        bottomBar->setActive(BottomBar::Side::CENTER, true);
+        bottomBar->setActive(BottomBar::Side::RIGHT, true);
+        bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("Check for updates"));
+        bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
 
-void FotaWindow::rebuild()
-{
-    destroyInterface();
-    buildInterface();
-}
+        mainBox = new gui::VBox(this,
+                                0,
+                                title->offset_h(),
+                                style::window_width,
+                                6 * style::window::label::default_h); // style::window_height);
+        mainBox->setPenWidth(style::window::default_border_no_focus_w);
 
-void FotaWindow::buildInterface()
-{
-    LOG_INFO("Build Fota Window");
-    AppWindow::buildInterface();
-    setTitle("Modem Firmware update (FOTA)");
+        add_box_label(mainBox, "FOTA Status:");
+        statusLabel = new Label(mainBox, 0, 0, style::window_width, style::window::label::default_h);
+        statusLabel->setFocus(true);
 
-    topBar->setActive(TopBar::Elements::SIGNAL, true);
-    topBar->setActive(TopBar::Elements::BATTERY, true);
+        add_box_label(mainBox, "Current Firmware:");
+        currentFirmwareLabel = new Label(mainBox, 0, 0, style::window_width, style::window::label::default_h);
 
-    bottomBar->setActive(BottomBar::Side::CENTER, true);
-    bottomBar->setActive(BottomBar::Side::RIGHT, true);
-    bottomBar->setText(BottomBar::Side::CENTER, utils::localize.get("Check for updates"));
-    bottomBar->setText(BottomBar::Side::RIGHT, utils::localize.get("common_back"));
+        setFocusItem(statusLabel);
 
-    mainBox = new gui::VBox(
-        this, 0, title->offset_h(), style::window_width, 6 * style::window::label::default_h); // style::window_height);
-    mainBox->setPenWidth(style::window::default_border_no_focus_w);
+        statusLabel->activatedCallback = [&](Item &) -> bool {
+            fotaWorker->next();
+            return true;
+        };
+    }
 
-    add_box_label(mainBox, "FOTA Status:");
-    statusLabel = new Label(mainBox, 0, 0, style::window_width, style::window::label::default_h);
-    statusLabel->setText(fotaWorker->getStateString());
-    statusLabel->setFocus(true);
+    void FotaWindow::destroyInterface()
+    {
+        this->focusItem = nullptr;
+        AppWindow::destroyInterface();
+    }
 
-    add_box_label(mainBox, "Current Firmware:");
-    currentFirmwareLabel = new Label(mainBox, 0, 0, style::window_width, style::window::label::default_h);
-    currentFirmwareLabel->setText(fotaWorker->currentFirmwareVersion());
-
-    setFocusItem(statusLabel);
-
-    statusLabel->activatedCallback = [&](Item &) -> bool {
-        fotaWorker->next();
-        statusLabel->setText(fotaWorker->getStateString());
-        return true;
-    };
-
-    //    mainBox->resizeItems();
-}
-
-void FotaWindow::destroyInterface()
-{
-    this->focusItem = nullptr;
-    AppWindow::destroyInterface();
-
-}
-
-void FotaWindow::add_box_label(BoxLayout *layout, const std::string &text)
-{
-    auto el = new gui::Label(layout, 0, 0, style::window_width, style::window::label::default_h);
-    style::window::decorateOption(el);
-    el->setText(text);
-}
+    void FotaWindow::add_box_label(BoxLayout *layout, const std::string &text)
+    {
+        auto el = new gui::Label(layout, 0, 0, style::window_width, style::window::label::default_h);
+        style::window::decorateOption(el);
+        el->setText(text);
+    }
 
 } // namespace gui

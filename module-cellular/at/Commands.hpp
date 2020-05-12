@@ -103,7 +103,7 @@ namespace at
         QGMR,               /// ditailed firmware revision (as required by Quectel)
         STORE_SETTINGS_ATW, /// required to save in firmware ex SIMSTAT_ON
         CEER,               /// get error description from modem
-
+        QIGETERROR,         /// get tcp/ip error code
     };
 
     inline auto factory(AT at) -> const Cmd &
@@ -155,7 +155,7 @@ namespace at
             {AT::QGMR, {"AT+QGMR\r"}},
             {AT::STORE_SETTINGS_ATW, {"AT&W\r"}},
             {AT::CEER, {"AT+CEER\r"}},
-
+            {AT::QIGETERROR, {"AT+QIGETERROR\r"}},
         };
         if (fact.count(at)) {
             return fact.at(at);

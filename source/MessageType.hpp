@@ -185,7 +185,7 @@ enum class MessageType
 
     // Cellular Data messsages
     InternetNotification,
-    InternetConfigure,
+    InternetConfigureAPN,
     InternetConnect,
     InternetDisconnect,
     InternetOpenHTTPConnection,

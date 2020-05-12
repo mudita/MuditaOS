@@ -3,17 +3,35 @@
 #include <service-internet/api/InternetServiceAPI.hpp>
 #include <service-internet/messages/InternetMessage.hpp>
 
-Fota::Fota(app::Application *app) : app_m(app), currentState_m(Disconnected)
+#include <gui/widgets/Label.hpp>
+
+Fota::Fota(app::Application *app, gui::Label *statusLabel)
+    : app_m(app), currentState_m(Disconnected), statusLable_m(statusLabel)
 {
+    app_m->busChannels.push_back(sys::BusChannels::ServiceInternetNotifications);
+    registerHandlers();
+    sys::Bus::Add(std::static_pointer_cast<sys::Service>(app_m));
+
     getCurrentVersion();
+    statusLabel->setText(getStateString());
 
     //    app->connect(InternetRequestMessag(),[]{});
+}
+
+Fota::~Fota()
+{
+    sys::Bus::Remove(std::static_pointer_cast<sys::Service>(app_m));
 }
 
 void Fota::next()
 {
     switch (currentState_m) {
     case Disconnected:
+        configureAPN();
+        break;
+    case Configuring:
+        break;
+    case Confiured:
         connect();
         break;
 
@@ -40,6 +58,7 @@ void Fota::next()
     case Finished:
         break;
     }
+    statusLable_m->setText(getStateString());
 }
 
 std::string Fota::getStateString()
@@ -47,6 +66,10 @@ std::string Fota::getStateString()
     switch (currentState_m) {
     case Disconnected:
         return std::string("Disconnected");
+    case Configuring:
+        return std::string("Configuring APN");
+    case Confiured:
+        return std::string("Connect to APN");
     case Connectiong:
         return std::string("Connecting...");
     case Connected:
@@ -68,17 +91,27 @@ std::string Fota::getStateString()
     }
 }
 
+void Fota::configureAPN()
+{
+    InternetService::APN::Config apnConfig;
+    apnConfig.contextId  = 1;
+    apnConfig.apn        = "plus";
+    apnConfig.authMethod = InternetService::APN::AuthMethod::NONE;
+    InternetService::API::Configure(app_m.get(), apnConfig);
+    currentState_m = Configuring;
+}
+
 void Fota::connect()
 {
     currentState_m = Connectiong;
     // do the connection
-    InternetServiceAPI::Connect(app_m);
-    currentState_m = Connected;
+    InternetService::API::Connect(app_m.get());
 }
 
 void Fota::downloadInfo()
 {
     currentState_m = DownloadingInfo;
+    LOG_DEBUG("!");
     // do the dwonload
     currentState_m = DownloadedInfo;
 }
@@ -86,6 +119,7 @@ void Fota::downloadInfo()
 void Fota::parseInfo()
 {
     currentState_m = ParsingInfo;
+    LOG_DEBUG("!");
     // do the parsing
     currentState_m = ParsedInfo;
 }
@@ -93,11 +127,50 @@ void Fota::parseInfo()
 void Fota::update()
 {
     currentState_m = Updating;
+    LOG_DEBUG("!");
     // do the updating
     currentState_m = Finished;
 }
 
+void Fota::registerHandlers()
+{
+    LOG_DEBUG("Registrng handles");
+    handleInternetNotification();
+}
+
+void Fota::handleInternetNotification()
+{
+    LOG_DEBUG("handle IntrntNotificationMassage");
+    app_m->connect(InternetService::NotificationMessage(),
+                   [&](sys::DataMessage *req, sys::ResponseMessage * /*response*/) {
+                       LOG_DEBUG("IntrntNotificationMassage");
+                       if (auto msg = dynamic_cast<InternetService::NotificationMessage *>(req)) {
+                           LOG_DEBUG("IntrntNotificationMassage: %s", msg->c_str());
+                           switch (msg->type) {
+                           case InternetService::NotificationMessage::Type::NotReady:
+                               break;
+                           case InternetService::NotificationMessage::Type::Configured:
+                               currentState_m = Confiured;
+                               statusLable_m->setText(getStateString());
+                               break;
+                           case InternetService::NotificationMessage::Type::Connected:
+                               currentState_m = Connected;
+                               statusLable_m->setText(getStateString());
+                               break;
+                           case InternetService::NotificationMessage::Type::Disconnected:
+                               currentState_m = Disconnected;
+                               break;
+                           case InternetService::NotificationMessage::Type::RequestProcessed:
+                               break;
+                           case InternetService::NotificationMessage::Type::ServiceReady:
+                               break;
+                           }
+                       }
+                       return std::make_shared<sys::ResponseMessage>();
+                   });
+}
+
 void Fota::getCurrentVersion()
 {
-    CellularServiceAPI::GetFirmwareVersion(app_m, currentFirmwareVersion_m);
+    CellularServiceAPI::GetFirmwareVersion(app_m.get(), currentFirmwareVersion_m);
 }

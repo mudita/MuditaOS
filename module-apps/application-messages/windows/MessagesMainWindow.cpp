@@ -41,12 +41,13 @@ namespace gui
     void MessagesMainWindow::buildInterface()
     {
 
-        using namespace messages;
-
         AppWindow::buildInterface();
 
-        list = new gui::ListView(
-            this, threads::listPositionX, threads::ListPositionY, threads::listWidth, threads::listWidth);
+        list = new gui::ListView(this,
+                                 ::messages::threads::listPositionX,
+                                 ::messages::threads::ListPositionY,
+                                 ::messages::threads::listWidth,
+                                 ::messages::threads::listWidth);
         list->setPenFocusWidth(0);
         list->setPenWidth(0);
         list->setProvider(threadModel);

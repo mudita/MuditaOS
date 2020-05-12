@@ -35,7 +35,7 @@
 #include "service-evtmgr/Constants.hpp"
 #include "service-evtmgr/EventManager.hpp"
 #include "service-lwip/ServiceLwIP.hpp"
-#include "service-internet/ServiceInternet.hpp"
+#include <service-internet/ServiceInternet.hpp>
 
 // module-bsp
 #include "bsp/bsp.hpp"
@@ -179,7 +179,7 @@ int main()
 #else
         LOG_INFO("ServiceCellular (GSM) - Enabling");
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceCellular>(), sysmgr.get());
-        ret |= sys::SystemManager::CreateService(std::make_shared<ServiceInternet>(), sysmgr.get());
+        ret |= sys::SystemManager::CreateService(std::make_shared<InternetService::Service>(), sysmgr.get());
 #endif
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceAudio>(), sysmgr.get());
         ret |= sys::SystemManager::CreateService(std::make_shared<ServiceBluetooth>(), sysmgr.get());
