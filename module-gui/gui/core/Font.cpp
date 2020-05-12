@@ -536,8 +536,10 @@ namespace gui
 
     bool FontManager::init(std::string baseDirectory)
     {
-        // load fonts from specified folder
-        loadFonts(baseDirectory);
+        static bool initialized = false;
+        if (!initialized) {
+            loadFonts(baseDirectory);
+        }
 
         return true;
     }
