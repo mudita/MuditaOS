@@ -1,9 +1,3 @@
-/*
- * unittest_gui.cpp
- *
- *  Created on: 29 kwi 2019
- *      Author: robert
- */
 #include <memory>
 #include <functional>
 #include <iostream>
@@ -13,64 +7,23 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include "catch.hpp"
 
 #include "../gui/core/ImageManager.hpp"
 #include "log/log.hpp"
 #include "utf8/UTF8.hpp"
-#include "vfs.hpp"
 
-#include "gui/core/Font.hpp"
-#include "gui/core/BoundingBox.hpp"
-#include "gui/core/Context.hpp"
-#include "gui/core/Renderer.hpp"
-#include "gui/core/DrawCommand.hpp"
-#include "gui/core/Font.hpp"
-#include "gui/widgets/Window.hpp"
-#include "gui/widgets/Item.hpp"
-#include "gui/widgets/Label.hpp"
-#include "gui/widgets/BoxLayout.hpp"
-#include "gui/widgets/Image.hpp"
-
-class vfs vfs;
-
-static const int FrameBufferWidth  = 480;
-static const int FrameBufferHeight = 600;
-static const int FrameBufferSize   = FrameBufferWidth * FrameBufferHeight;
-
-typedef struct
-{
-    uint32_t frameCount;
-    uint32_t width;
-    uint32_t height;
-} shared_memory;
-
-uint8_t *createSHMBuffer(std::string name)
-{
-    shared_memory *shared_mem_ptr;
-    int fd_shm;
-
-    // check if shared memory blok is already created
-    if ((fd_shm = shm_open(name.c_str(), O_RDWR | O_CREAT, 0660)) == -1) {
-        std::cerr << "shm is already created" << std::endl;
-    }
-    else {
-        std::cout << "shm created" << std::endl;
-        if (ftruncate(fd_shm, sizeof(shared_memory) + FrameBufferSize) == -1) {
-            std::cerr << "shm is already created" << std::endl;
-        }
-    }
-    if ((shared_mem_ptr = static_cast<shared_memory *>(
-             mmap(NULL, sizeof(shared_memory) + FrameBufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, fd_shm, 0))) ==
-        MAP_FAILED) {
-        std::cerr << "mmap failed" << std::endl;
-    }
-
-    return reinterpret_cast<uint8_t *>(shared_mem_ptr);
-}
+#include <gui/core/BoundingBox.hpp>
+#include <gui/widgets/Window.hpp>
+#include <gui/widgets/Label.hpp>
+#include <gui/widgets/BoxLayout.hpp>
+#include <gui/widgets/Image.hpp>
 
 using namespace std;
 
-bool bouindingBoxTest()
+// TODO assert
+// TODO split it
+TEST_CASE("Test BoundingBox intersect")
 {
 
     gui::BoundingBox result;
@@ -84,11 +37,11 @@ bool bouindingBoxTest()
         return false;
     if (gui::BoundingBox::intersect(gui::BoundingBox(0, 0, 15, 15), gui::BoundingBox(14, 0, 15, 15), result) == false)
         return false;
-
-    return true;
 }
 
-bool getContextBoxTest()
+// TODO assert
+// TODO split this...
+TEST_CASE("test context size and position")
 {
 
     gui::Context *ctx = new gui::Context(static_cast<unsigned short>(30), static_cast<unsigned short>(30));
@@ -101,11 +54,9 @@ bool getContextBoxTest()
     delete test;
 
     delete ctx;
-
-    return true;
 }
 
-bool insertContextTest()
+TEST_CASE("insertContextTest")
 {
 
     gui::Context *dstCtx;
@@ -155,13 +106,10 @@ bool insertContextTest()
     dstCtx->insert(-30, -1, insCtx);
     delete dstCtx;
     delete insCtx;
-
-    return true;
 }
 
-bool drawRectangleTest(uint8_t *frameBuffer)
+TEST_CASE("Draw Rectangle")
 {
-
     // context for drawing commands
     gui::Context *context = new gui::Context(static_cast<unsigned short>(480), static_cast<unsigned short>(600));
     context->fill(15);
@@ -273,7 +221,7 @@ bool drawRectangleTest(uint8_t *frameBuffer)
     return true;
 }
 
-bool drawWindowWithLabelsTest(uint8_t *frameBuffer)
+TEST_CASE("Draw window with labels")
 {
 
     gui::Context *context = new gui::Context(static_cast<unsigned short>(480), static_cast<unsigned short>(600));
@@ -325,15 +273,8 @@ bool drawWindowWithLabelsTest(uint8_t *frameBuffer)
     return true;
 }
 
-bool drawWindowWithHBoxTest(uint8_t *frameBuffer)
+TEST_CASE("Draw window with box layouts")
 {
-
-    gui::Context *context = new gui::Context(static_cast<unsigned short>(480), static_cast<unsigned short>(600));
-    context->fill(15);
-
-    // renderer class that will perform drawing
-    gui::Renderer renderer;
-
     gui::Window *win = new gui::Window("MAIN");
     win->setSize(480, 600);
 
@@ -342,22 +283,22 @@ bool drawWindowWithHBoxTest(uint8_t *frameBuffer)
     gui::Rect *maxW1 = new gui::Rect();
     maxW1->setFillColor(gui::Color(5, 0));
     maxW1->setFilled(true);
-    maxW1->setMaxSize(50, 300);
+    maxW1->setMaximumSize(50, 300);
 
     gui::Label *maxW4 = new gui::Label();
     maxW4->setText("Top Left corner");
     maxW4->setEllipsis(Ellipsis::Right);
-    maxW4->setMaxSize(275, 60);
+    maxW4->setMaximumSize(275, 60);
 
     gui::Rect *maxW2 = new gui::Rect();
     maxW2->setFillColor(gui::Color(8, 0));
     maxW2->setFilled(true);
-    maxW2->setMaxSize(35, 300);
+    maxW2->setMaximumSize(35, 300);
 
     gui::Rect *maxW3 = new gui::Rect();
     maxW3->setFillColor(gui::Color(11, 0));
     maxW3->setFilled(true);
-    maxW3->setMaxSize(30, 300);
+    maxW3->setMaximumSize(30, 300);
 
     hBox->addWidget(maxW1);
     hBox->addWidget(maxW4);
@@ -366,19 +307,19 @@ bool drawWindowWithHBoxTest(uint8_t *frameBuffer)
     gui::VBox *vBox = new gui::VBox(hBox, 10, 155, 460, 600 - 160);
 
     gui::Rect *maxH1 = new gui::Rect();
-    maxH1->setMaxSize(10, 80);
+    maxH1->setMaximumSize(10, 80);
 
     gui::Rect *maxH2 = new gui::Rect();
-    maxH2->setMaxSize(15, 300);
+    maxH2->setMaximumSize(15, 300);
 
     gui::Rect *maxH3 = new gui::Rect();
-    maxH3->setMaxSize(30, 300);
+    maxH3->setMaximumSize(30, 300);
 
     gui::Label *maxH4 = new gui::Label();
     maxH4->setText("Hello Mudita");
     maxH4->setRadius(20);
     maxH4->setAlignment(gui::Alignment(gui::Alignment::ALIGN_HORIZONTAL_CENTER, gui::Alignment::ALIGN_VERTICAL_CENTER));
-    maxH4->setMaxSize(75, 60);
+    maxH4->setMaximumSize(75, 60);
 
     // TODO:M.P unit test for GUI should be fixed/updated gui::Image* img1 = new gui::Image();
     // TODO:M.P unit test for GUI should be fixed/updated uint16_t id =
@@ -394,22 +335,6 @@ bool drawWindowWithHBoxTest(uint8_t *frameBuffer)
     hBox->addWidget(maxW3);
 
     // context for drawing commands
-    std::list<gui::DrawCommand *> commandsList = win->buildDrawList();
-    std::vector<gui::DrawCommand *> commands{commandsList.begin(), commandsList.end()};
-
-    delete win;
-
-    // render commands
-    renderer.render(context, commands);
-
-    // copy context to shared memory
-    memcpy(frameBuffer, context->getData(), FrameBufferSize);
-
-    // cleanup
-    for (auto cmd : commands)
-        delete cmd;
-
-    delete context;
     return true;
 }
 
@@ -470,6 +395,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // TODO this have to be in both tests and rendering program
     gui::FontManager::getInstance().init(basePath);
     // TODO:M.P unit test for GUI should be fixed/updated gui::PixMapManager::getInstance().init( assetsPath );
 
