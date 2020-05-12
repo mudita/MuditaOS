@@ -26,10 +26,11 @@ namespace style
     };     // namespace header
     namespace window
     {
-        const inline uint32_t default_left_margin       = 20;
-        const inline uint32_t default_right_margin      = 20;
-        const inline uint32_t default_border_focucs_w   = 2;
-        const inline uint32_t default_border_no_focus_w = 0;
+        const inline uint32_t default_left_margin          = 20;
+        const inline uint32_t default_right_margin         = 20;
+        const inline uint32_t default_border_focucs_w      = 2;
+        const inline uint32_t default_border_rect_no_focus = 1;
+        const inline uint32_t default_border_no_focus_w    = 0;
         namespace font
         {
             const inline std::string supersizemelight = "gt_pressura_light_90";
